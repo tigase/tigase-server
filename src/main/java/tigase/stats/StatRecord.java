@@ -21,6 +21,7 @@
  */
 package tigase.stats;
 
+import java.util.Collection;
 import java.util.logging.Level;
 
 /**
@@ -39,17 +40,19 @@ public class StatRecord {
 	private long longValue = -1;
  	private int intValue = -1;
 	private float floatValue = -1f;
+	private Collection collection = null;
 
 	private String description = null;
 	private String value = null;
 	private String component = null;
 
-	public StatRecord(String comp, String description,	String value,
-		Level level) {
-		this.description = description;
-		this.value = value;
+	public StatRecord(String comp, String description, String value, Level level) {
+		this.description = description.intern();
+		if (value != null) {
+			this.value = value.intern();
+		}
 		this.level = level;
-		this.component = comp;
+		this.component = comp.intern();
 	}
 
 	public StatRecord(String comp, String description, int value,
@@ -81,6 +84,11 @@ public class StatRecord {
 		this.floatValue = value;
 	}
 
+	StatRecord(String comp, String description, Collection value, Level level) {
+		this(comp, description, (value != null ? value.toString() : ""), level);
+		this.collection = value;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -109,10 +117,21 @@ public class StatRecord {
 		return this.intValue;
 	}
 
+	public <E> Collection<E> getCollection() { return this.collection; };
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(component).append('/').append(description);
+
+		sb.append('[');
+		if (longValue > -1) { sb.append('L');
+		} else if (intValue > -1) { sb.append('I');
+		} else if (floatValue > -1f) { sb.append('F');
+		} else if (collection != null) { sb.append('C');
+		} else { sb.append('S'); }
+		sb.append(']');
+
 		sb.append(" = ").append(value);
 		return sb.toString();
 	}

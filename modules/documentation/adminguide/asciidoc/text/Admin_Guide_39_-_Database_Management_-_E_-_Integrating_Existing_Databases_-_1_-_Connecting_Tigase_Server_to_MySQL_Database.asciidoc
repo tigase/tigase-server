@@ -1,0 +1,69 @@
+[[connectingTigaseToMysql]]
+= Connecting the Tigase Server to MySQL Database
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Please before continuing reading of this manual have a look at the xref:prepareMysql[initial MySQL database setup]. It will help you with database preparation for connecting with Tigase server.
+
+The easiest way to setup Tigase server for connecting with MySQL database is to use the xref:tigase3xconfiguration[configuration wizards] (configuration generators) which release you from manually editing the XML configuration file and allow you quickly regenerate the XML configuration file in case of problems.
+
+The article describes an older way for using configuration generators which is a bit more difficult and doesn't work on Windows systems. The guide below describes a new way to use them which is simpler and can be applied to Windows systems as well. It is using the +init.properties+ file where you can put all your initial configuration parameters.
+
+This guide describes MySQL database connection parameters.
+
+This guide is actually very short as there are example configuration files which can be used and customized for your environment.
+
+Unfortunately these files are not included yet in the server version 3.x binary release and you have to download them from the SVN repository using following links:
+
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/etc/tigase-mysql.conf[tigase-mysql.conf] - the Tigase server startup file. The only difference from the default one is that it points to the file described below to load initial parameters.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/etc/init-mysql.properties[init-mysql.properties] - the file contains a few initial parameters which can/should be adjusted to your environment. Here is a content of the file with each line described:
++
+[source,bash]
+-----
+# Load standard set of the server components.
+# Look at the http://www.tigase.org/configuration-wizards
+# document for other possible values. Normally you don't
+# need to change this line.
+config-type=--gen-config-def
+# List of administrator accounts, please replace them with
+# administrator accounts in your installation
+--admins=admin@tigase.org,admin@test-d
+# The line says that the database used by the Tigase server is 'mysql'
+# Look at the configuration wizards article for different options
+# You can also put here a Java class name if you have a custom
+# implementation for a database connector.
+--user-db=mysql
+# The line contains the database connection string. This is database
+# specific string and for each kind of database it may look differently.
+# Below string is for MySQL database. Please modify it for your system.
+# MySQL connector requires connection string in the following format:
+# jdbc:mysql://[hostname]/[database name]?user=[user name]&password=[user password]
+--user-db-uri=jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass
+# Virtual domains for your server installation, comma separated list of vhosts
+--virt-hosts=tigase.org,test-d,localhost
+# Select what packages you want to have logging switched for
+# The below setting is recommended for the initail setup and it is required
+# when asking for help with setting the server up
+--debug=server
+-----
+
+Download both files and put them to your +etc/+ directory.
+
+Edit the +init-mysql.properties+ for your environment.
+
+Remove the XML configuration file.
+
+Start the server using following command:
+
+[source,sh]
+-----
+./bin/tigase.sh start etc/tigase-mysql.conf
+-----
+
+_Ask more questions if you got stuck or need any help with this._

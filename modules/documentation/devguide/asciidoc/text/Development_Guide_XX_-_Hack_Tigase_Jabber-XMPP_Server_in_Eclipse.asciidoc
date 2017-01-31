@@ -1,0 +1,54 @@
+[[codingTigase]]
+= Hack Tigase Jabber/XMPP Server in Eclipse
+:author: Bartosz Malkowski <bmalkowski@tigase.pl>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+link:files/tigase-server.psf[tigase-server.psf  424 bytes]
+
+link:files/eclipse-config.tar_.gz[eclipse-config.tar_.gz  1.01 KB]
+
+
+If you want to write code for *Tigase* server we recommend the use of link:http://www.eclipse.org/[Eclipse]. Here is a guide how to start working on source code using this IDE.
+
+All you need to start is:
+
+. Installed and working copy of link:http://www.eclipse.org/[Eclipse]
+. Installed and working copy of link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[Java Development Kit (JDK)].
+. Installed and working link:http://subclipse.tigris.org/[Subclipse] plugin for Eclipse.
+
+
+== JDK-1.6.0 Setup
+After installation JDK-1.6.0 in your operating system, run Eclipse and select Window/Preferences.
+
+image:images/preferences-jre.png[]
+
+In section Java/Installed JREs press *Add* button. In the new opened window enter path to installed JDK-6. In this case it is */opt/jdk1.6.0*. It also good to set name to *sun-jdk-1.6.0*.
+
+image:images/preferences-jre-add.png[]
+
+== Subclipse Installation
+As Eclipse doesn't contain built-in support for Subversion repositories you have to add the Subclipse plugin.  Detailed instruction for Subclipse installation is on page:
+
+link:http://subclipse.tigris.org/install.html[subclipse.tigris.org/install.html].
+
+Alternatively you may use the link:http://marketplace.eclipse.org/marketplace-client-intro[Eclipse Marketplace Client].
+
+== Project Import
+From menu File in Eclipse execute *Import*. Next, highlight section *Team/Team
+Project Set* and press *Next*.
+
+image:images/import-project.png[]
+
+Enter file name *tigase-server.psf* in field *File* and press *Finish*.
+
+The file is attached to this article.
+
+You will have to add and manipulate Eclipse configuration files on your own as we do not maintain those on the file repository.
+
+That's it. Start hacking now!

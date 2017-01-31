@@ -46,7 +46,9 @@ import java.util.concurrent.TimeUnit;
  * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ * @deprecated was replaced by {@link S2SConnectionManager}, will be removed in 7.2.0
  */
+@Deprecated
 public interface ConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	boolean writePacketToSocket(IO serv, Packet packet);
 

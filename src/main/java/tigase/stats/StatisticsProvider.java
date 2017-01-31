@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -73,16 +74,6 @@ public class StatisticsProvider
 
 	// ~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param theRef
-	 * @param historySize
-	 * @param updateInterval
-	 *
-	 * @throws NotCompliantMBeanException
-	 */
 	public StatisticsProvider(StatisticsCollector theRef, int historySize,
 			long updateInterval)
 					throws NotCompliantMBeanException {
@@ -96,10 +87,6 @@ public class StatisticsProvider
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void stop() {
 		if (cache != null) {
 			cache.stop();
@@ -260,7 +247,7 @@ public class StatisticsProvider
 				? cache.direct_used_history.getCurrentHistory()
 				: null;
 	}
-
+	
 	@Override
 	public float getHeapMemUsage() {
 		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage();
@@ -453,28 +440,11 @@ public class StatisticsProvider
 		return TigaseRuntime.getTigaseRuntime().getUptime();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanInfo.getDescription()
-	 *
-	 */
 	@Override
 	protected String getDescription(MBeanInfo info) {
 		return "Provides the Tigase server statistics";
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanAttributeInfo.getDescription()
-	 */
 	@Override
 	protected String getDescription(MBeanAttributeInfo info) {
 		String description = null;
@@ -503,14 +473,6 @@ public class StatisticsProvider
 		return description;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanParameterInfo.getDescription()
-	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
 			int sequence) {
@@ -540,14 +502,6 @@ public class StatisticsProvider
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanOperationInfo.getDescription()
-	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo info) {
 		String               description = null;
@@ -576,15 +530,6 @@ public class StatisticsProvider
 		return description;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanParameterInfo.getName()
-	 *
-	 */
 	@Override
 	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,
 			int sequence) {
@@ -614,6 +559,10 @@ public class StatisticsProvider
 		return null;
 	}
 
+	protected Set<String> getCompNames() {
+		return cache.allStats.getCompNames();
+	}
+	
 	private Map<String, String> getMapFromList(StatisticsList list) {
 		if (list != null) {
 			Map<String, String> result = new LinkedHashMap<String, String>(300);
@@ -745,10 +694,6 @@ public class StatisticsProvider
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		public void stop() {
 			updateTimer.cancel();
 		}
@@ -901,38 +846,38 @@ public class StatisticsProvider
 				sb.append(",      Temp: ").append(cpu_temp).append(" C");
 			}
 
-			String cpu_freq = allStats.getValue("cpu-mon", "CPU freq", null);
+			String cpu_freq = allStats.getValue("cpu-mon", "CPU freq", "");
 
-			if (cpu_freq != null) {
+			if (cpu_freq != null && !cpu_freq.isEmpty()) {
 				sb.append("\nFreq: ").append(cpu_freq);
 			}
 
-			String cpu_throt = allStats.getValue("cpu-mon", "CPU throt", null);
+			String cpu_throt = allStats.getValue("cpu-mon", "CPU throt", "");
 
-			if (cpu_throt != null) {
+			if (cpu_throt != null && !cpu_throt.isEmpty()) {
 				sb.append("\nThrott: ").append(cpu_throt);
 			}
 			sb.append("\nTop threads:");
 
-			String cpu_thread = allStats.getValue("cpu-mon", "1st max CPU thread", null);
+			String cpu_thread = allStats.getValue("cpu-mon", "1st max CPU thread", "");
 
-			if (cpu_thread != null) {
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "2nd max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "2nd max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "3rd max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "3rd max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "4th max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "4th max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "5th max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "5th max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
 

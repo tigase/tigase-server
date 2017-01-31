@@ -1,0 +1,798 @@
+[[restAPI]]
+= REST API & HTTP Guide
+:author: many people
+:date: 2015-11-09 10:22
+:version: v1.0 September 2015
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+This component covers both REST API as well as basic HTTP component configuration.
+REST stands for REpresentational State Transfer which is a stateless communication method that in our case passes commands using HTTP GET, PUT, POST, and DELETE commands to resources within the Tigase server.
+Although REST uses HTTP to receive commands, REST itself is not intended for use in a browser.
+
+== Setup & Configuration
+Tigase's REST component requires the following in classpath
+
+- +servlet-api-3.1.jar+
+
+If you have installed Tigase v7.1.0 or later, the jar is already installed.  If you are using an older version of Tigase, you may download the file from link:https://projects.tigase.org/attachments/download/1504/servlet-api-3.1.jar[this link].
+Once this is installed, you will also need to add the following lines in your init.properties file to enable the HTTP component.
+
+[source,bash]
+------
+--comp-name-4=http
+--comp-class-4=tigase.http.HttpMessageReceiver
+------
+In this default configuration, Tigase will try to start a standalone Jetty HTTP server at port 8080 and start up the default modules, including +RestModule+ which will add context for REST API in the /rest path. +RestModule+ will also load all groovy scripts located in +scripts/rest/*+ directories and will bind them to proper actions for the +/rest/*+ paths.
+
+*NOTE:* Scripts that handle HTTP requests are available in the component repository in +src/scriopts/groovy/tigase/rest/+ directory.
+
+=== Component Properties
+Here are some additional properties for the +HttpMessageReceiver+ component that can be set in the init.properties file.
+
+- +{compname}/http/ports[i]=+ - Sets a comma separated list of ports on which the HTTP server will listen for connections. Default is 8080.
+- +{compname}/*********/socket=ssl+ - Sets the port for SSL connections, replace ### with the port number of your choice.
+- +{compname}/*********/domain=example.com+ - This sets the domain name of the SSL certificate from Tigase XMPP certificate store, also sets the port to ### to listen for HTTPS connections.
+- +{compname}/server-class=+ - Sets the name of the class used to manage the HTTP server. Currently there are the following options:
+. +tigase.http.JettyStandaloneHttpServer+ - Starts standalone Jetty HTTP Server instance *(requires Tigase HTTP API - Jetty HTTP Server)*
+. +tigase.http.jetty.JettyOSGIHttpServer+ - Uses Jetty HTTP Server instance available as OSGi service (may be used only in OSGi envoirment) *(require Tigase HTTP API - Jetty HTTP Server)*
+. +tigase.http.java.JavaStandaloneHttpServer+ - Uses +HttpServer+ provided by Java JDK to start standalone HTTP server (may not work on JDK from every JDK provider).
+. +{compname}/http/threads=+ - Sets the number of threads available for HTTP component. Default is 4.
+. +{compname}/http/request-timeout=+ - Sets the timeout time in ms for threads to close on inactive connections. Default is 60 seconds.
+
+=== Modules
+Tigase's REST Component comes with two modules that can be enabled, disabled, and configured separately.
+Common settings for modules for component properties are used in the following format: +component_name/module_id/module_setting/+
+the following settings are available for both listed modules:
+
+- +active[B]+ - Boolean values true/false to enable or disable the module.
+- +context-path+ - Path of HTTP context under which the module should be available.
+- +vhosts[s]+ - Comma separated list of virtual hosts for which the module should be available. If not configured, the module will be available for all vhosts.
+
+==== Rest Module
+This is the Module that provides support for the REST API.
+Available properties:
+
+- +rest-scripts-dir+ - Provides ability to specify path to scripts processing REST requests if you do not wish to use default (scripts/rest).
+- +api-keys[s]+ - Comma separated list of strings which would be possible to use as keys to pass +api-key+ parameter to request authorization for request execution. If nothing is passed, then no request will be allowed. To allow any request, this property needs to be set using the following:
+-----
+http/rest/api-keys[s]=open_access
+-----
+You may set api-keys to any string you wish, however, when you make requests of the HTTP API service, the included API key must match *EXACTLY*. Keep the API key to ASCII characters to maintain compatibility. For example, if you were to set the following API key:
+-----
+http/rest/api-key[s]=a7D2dm3lps138w
+-----
+Requests made to the HTTP service must conclude with the same key: +http://localhost:8080/rest/adhoc/sess-man@domain.com?api-key=a7D2dm3lps138w+
+
+==== +dns-webservice+
+This module provides resolution of DNS names using HTTP protocol. This particular module might be useful for web applications that need to resolve the DNS address to a particular IP. For example to help discover the IP and port of WebSocket services used to connect to the XMPP server.
+
+== Usage Examples
+Here are some examples using the HTTP API using available scripts.
+
+=== Retrieving list of available ad-hoc commands
+To retrieve a list of available commands, REST needs to use the GET method from the following resource: +/rest/adhoc/sess-man@domain.com+. This provides a list of available adhoc commands from the sess-man@domain.com resource. This can be change to any bare JID that you wish to get commands from so it can be a MUC room, monitor component, or in this case, the Session manager.
+With the server running, lets connect to the address +http://localhost:8080/rest/+ and the following resource +/adhoc/sess-man@domain.com+ which will retrieve a list of all ad-hoc commands available at sess-man@domain.com. This particular action is protected by authentication using HTTP basic authentication so valid credentials are necessary. User credentials are available in the Tigase's user database installation, so use the bare JID and password of an admin-authorized account to conduct this activity.
+The result will be an XML format output of available commands, similar to an IQ stanza, below an example of that result.
+
+[source,xml]
+-----
+<items>
+  <item>
+    <jid>sess-man@domain.com</jid>
+    <node>http://jabber.org/protocol/admin#get-active-users</node>
+    <name>Get list of active users</name>
+  </item>
+  <item>
+    <jid>sess-man@domain.com</jid>
+    <node>del-script</node>
+    <name>Remove command script</name>
+  </item>
+  <item>
+    <jid>sess-man@domain.com</jid>
+    <node>add-script</node>
+    <name>New command script</name>
+  </item>
+</items>
+-----
+
+There is also the ability to return a JSON formatted result. To achieve this, you need to pass +Content-Type: application/json+ to the HTTP header of the request, or add the +type+ parameter and set it to +application/json+ setting.  An example of a JSON result is below.
+[source,java]
+-----
+{
+    "items": [
+        {
+            "jid": "sess-man@domain.com",
+            "node": "http://jabber.org/protocol/admin#get-active-users",
+            "name": "Get list of active users"
+        },
+        {
+            "jid": "sess-man@domain.com",
+            "node": "del-script",
+            "name": "Remove command script"
+        },
+        {
+            "jid": "sess-man@domain.com",
+            "node": "add-script",
+            "name": "New command script"
+        }
+    ]
+}
+-----
+Again, either of these methods can be used on any component with available ad-hoc commands. Feel free to experiment and see what options are available for each component.
+
+=== Executing ad-hoc commands
+Once you have found a command you wish to use, you can send that command using the HTTP POST method. In this example, lets request a list of active users as seen in the previous section. *NOTE:* like the previous example, these commands require basic HTTP authentication.
+
+The following command is sent to +http://localhost:8080/rest/adhoc/sess-man@domain.com+
+[source,xml]
+-----
+<command>
+  <node>http://jabber.org/protocol/admin#get-active-users</node>
+  <fields>
+    <item>
+      <var>domainjid</var>
+      <value>domain.com</value>
+    </item>
+    <item>
+      <var>max_items</var>
+      <value>25</value>
+    </item>
+  </fields>
+</command>
+-----
+This particular command reqiures the three fields +<node>+, +domainjid+, and +max_items+. These three values are the node for the command, as returned in available commands, the domain results are to be returned from, and the maximum number of results. Keep in mind that +Content-type: text/xml+ must be passed to the HTTP header to get an XML result. Not doing so may yield errors or incomprehensible results.
+The result for this command will look like this:
+
+[source,xml]
+-----
+<command>
+  <jid>sess-man@domain.com</jid>
+  <node>http://jabber.org/protocol/admin#get-active-users</node>
+  <fields>
+    <item>
+      <var>Users: 3</var>
+      <label>text-multi</label>
+      <value>admin@domain.com</value>
+      <value>user1@domain.com</value>
+      <value>morbo@domain.com</value>
+    </item>
+  </fields>
+</command>
+-----
+
+Similar results can be sent and received using JSON in a similar fashion. Again, be sure to set +ContentType: application/json+ in the header or default settings.
+
+[source,java]
+-----
+{
+  "command" : {
+    "node" : "http://jabber.org/protocol/admin#get-active-users",
+    "fields" : [
+      {
+        "var" : "domainjid",
+        "value" : "subdomain.domain.com"
+      },
+      {
+        "var" : "max_items",
+        "value" : "25"
+      }
+    ]
+  }
+}
+-----
+
+The results will look quite similar to the XML results:
+
+[source,java]
+-----
+{
+    "command": {
+        "jid": "sess-man@domain.com",
+        "node": "http://jabber.org/protocol/admin#get-active-users",
+        "fields": [
+            {
+                "var": "Users: 2",
+                "label": "text-multi",
+                "value": [
+                  "minion1@subdomain.domain.com",
+                  "overadmin@subdomain.domain.com"
+                ]
+            }
+        ]
+    }
+}
+-----
+
+[we should take another approach, and use something more permanent, like add or delete a user]
+
+=== Sending any XMPP Stanza
+XMPP messages or any other XMPP stanza can be sent using this API by sending HTTP POST request on http://localhost:8080/rest/stream/api-key=API_KEY with a serialized XMPP stanza as content, where API_KEY is the API key specified in the init.properties file.
+Each request needs to be authorized by sending a valid administrator JID and password as a user/password of BASIC HTTP authorization method.  The content of the HTTP request should be encoded in UTF-8 and +Content-Type+ should be set to application/xml.
+
+==== Handling of request
+If no +from+ attribute is set in the stanza, the HTTP API component will supplant it's JID instead, however if one is set it will be preserved.  However, in iq stanzas, if no +from+ attribute is set the HTTP response content will be sent back as a response.  Successful requests will return a HTTP response code of 200.
+
+*Examples:*
+Any of these examples must be sent as an HTTP POST request to /rest/stream/?api-key=API_KEY of the HTTP API component.
+
+===== Sending XMPP message with +from+ set to HTTP API component a full JID
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
+===== Sending XMPP message with +from+ set to HTTP API component with a bare JID
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com">
+    <body>Example message 1</body>
+</message>
+-----
+
+===== Sending XMPP message with from set to a specified JID to a full JID
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from="sender@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
+== Sending messages through REST
+You can also send messages, or really any XMPP stanza to users and components through REST API. Sending XMPP messages or stanzas using HTTP is realized as a groovy script bundled in the installation package from v7.0.2. If you want to be sure your current install supports this feature, check for the presence of +Stream.groovy+ file in the +scripts/rest/stream/+ directory.
+
+As in other examples, be sure that you have the following line in your init.properties:
+[source,bash]
+-----
+http/rest/api-keys[s]=test_key
+-----
+You may also opt to have +open_access+ set to disable API key parameter.
+
+=== Usage
+Using the HTTP POST method, XMPP stanzas can be sent using the built in HTTP API. In a local installation, the request can be sent to +http://localhost:8080/rest/stream/?api-key=API_KEY+ with a seralized XMPP stanza as content, where API_KEY is the API key for HTTP API which is set in +etc/init.properties+ as +rest/api-keys[s]+.  In the case we laid out, it would be +test_key+. Because XMPP uses XML for formatting, all content in these requests *MUST* be encoded in UTF-8 and +Content-type+ must be set to +application/xml+.
+Lets take a look at some examples.
+
+_In all examples the data is sent as an HTTP POST request to /rest/stream/?api-key=test-key._
+
+==== Send XMPP stanza with from set to HTTP API component to bare JID
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+Once this message is sent, the Groovy script adds the remaining information automatically, and the following is what is receieved by test@example.com/resource-1.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from:"http@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+As you can see, the HTTP component is automatically populated as the sender.
+
+==== Send XMPP stanza with from set to HTTP API component to full JID
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com">
+    <body>Example message 1</body>
+</message>
+-----
+The syntax and formatting is the same, with the recepiant messaging being exactly the same.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from:"http@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
+==== Send XMPP stanza with from set to specified JID
+You may specify any JID that is registered in the server to send the stanza, ones that use a name that is not registered will return an error.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from="sender@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+Ends with the result being somewhat customized.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from:"sender@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
+[[avatarRetrievalRequests]]
+=== Avatar retrieval requests
+There are different formats for avatar retrieval depending on how they are stored, see below for the resources for each type of avatar.
+
+- +/rest/avatar/user@domain+ - which returns first avatar found (PEP, VCard4 or VCardTemp in this order)
+- +/rest/avatar/user@domain/avatar+ - which returns PEP avatar
+- +/rest/avatar/user@domain/vcard4+ - which returns avatar from VCard4
+- +/rest/avatar/user@domain/vcard-temp+ - which returns avatar from VCardTemp
+
+== Setting HTTP API Privacy Rules
+The HTTP API component has settings that allow you to specify who is allowed to use the HTTP API interface, keeping unauthorized users from accessing the feature. This feature is implemented using a Groovy admin ad-hoc stript for the Session Manager component. As a result of this method, it will be avaiulable to execution using the default GTTP API componene capability to execute the script. The actual work of filtering, however, will be conducted by the +DomainFilter+ plugin.
+
+[[getUserInfoREST]]
+== New Rest API added to obtain a JID login time
++GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. To obtain the information, send a POST request to http://xmpp.domain.net:8080/rest/adhoc/sess-man@xmpp.domain.net?api-key=test-api-key with the following:
+[source,xml]
+-----
+<command>
+  <node>get-user-info</node>
+  <fields>
+    <item>
+      <var>accountjid</var>
+      <value>user@xmpp.domain.net</value>
+    </item>
+    <item>
+      <var>Show connected resources in table</var>
+      <value>true</value>
+    </item>
+  </fields>
+</command>
+-----
+
+=== Configuration
+The HTTP API privacy scipt is loaded automatically. +DomainFilter+ is a default plugin loaded by Tigase on startup. This means there is very little you need to do to have this running.
+Again, you may define a custom API key to limit access using the following line in init.properties
+[source,properties]
+------
+http/rest/api-keys[s]=test_key
+------
+
+=== Usage
+Setting privacy rules can be done by sending a POST request to the session manager using this address: +http://localhost:8080/rest/sess-man@domain.com?api-key=test_key+
+[source,xml]
+-----
+<command>
+  <node>user-domain-perm</node>
+  <fields>
+    <item>
+      <var>jid</var>
+      <value>user@domain.com</value>
+    </item>
+    <item>
+      <var>fiteringPolicy</var>
+      <value>CUSTOM</value>
+    </item>
+    <item>
+      <var>filteringList</var>
+      <value>
+         1|allow|self;
+         2|allow|jid|admin@test2.com;
+         3|allow|jid|pubsub@test.com;
+         4|deny|all;
+      </value>
+    </item>
+  </fields>
+</command>
+-----
+Here all parameters are passed to be excuted by ad-hot command.  Using the +user-domain-perm+ node we were able to add jids to a +CUSTOM+ filter. Here is a brief breakdown:
+
+- +jid+ denotes which JID the settings will be applied too.
+- +filteringPolicy+ - This uses a +CUSTOM+ type list that allows for multi-item list of custom processing rules.
+- +filteringLise - This is a multi-item list, semi-colon delimited, where each line denotes one item with a rule in this format: +order_number|policy|UID_type[|UID]:+
+  - +order_number+ can be any integer, as long as no numbers repeat.
+  - +policy+ can either +allow+ or +deny+.
+  - +UID_type+ is the User ID Type, can be +jid+, +domain+, or +all+.
+  - +UID+ is the user JID affected. If +UID_type+ is set to +all+ then this will be ignored.
+
+These ad-hoc commands replicate settings found in xref:domainBasedPacketFiltering[Domain Based Packet Filtering] in the admin guide. They may also be influenced by the link:http://docs.tigase.org/tigase-server-Properties_Guide/html?#domainFilterPolicy[--domain-filter-policy] property of init.properties.
+
+
+== Scripting
+As you can see from the above commands, Tigase uses pre-defined scripts for processing of all requests in HTTP API.
+Although the list may be small for now, this does mean with a little bit of Groovy scripting, you can create your own scripts to interpret REST commands and send them to the server!
+
+All scripts for this purpose will be an implementation of class extending +tigase.http.rest.Handler+ class. The URI of the scripts will be inside the scripts folder. For example, if the script uses +TestHandler+ with a regular expression set to +/test+ and is placed inside the +scripts/rest/+ the handler will be called with this URI: +scripts/rest/test/+.
+
+=== Properties
+When extending classes, you will need to set the following listed properties.
+regex::
+  Regular expression which is used to match request URI and parse parameters embedded in URI, for example:
+
+  -----
+  /\/([^@\/]+)@([^@\/]+)/
+  -----
+
+requiredRole::
+  Role of user required to be able to access this URI. Available values are +null+, +user+, and +admin+. Authentication for the script will be required if +requiredRole+ is not null.
+
+isAsync::
+  If set to true, it will be possible to wait for results pending the arrival of IQ stanzas for instance.
+
+==== Properties containing closures
+Extended class should also set for closures for one or more of the following properties: +execGet+, +execPut+, +execPost+, +execDelete+, depending on which HTTP action is needed to support the following URI. Each closure has a *dynamic arguments list* generated at runtime. Below is a list of arguments passed to closure which describe how and when the list of arguments change.
+
+service::
+  Implementation of service interface which is used to access database or send/receove XMPP stanzas.
+
+callback::
+  Callback closures needs to be called to return data. However they only accept one argument of type +string,byte[],Map+. If data is Map tupe, it will be encoded to JSON or XML depending on Content-Type header.
+
+user::
+  Is passed only if requiredRole is not null. Otherwise this argument will not be in the argument list.
+
+content::
+  Parsed content of the request. *This will not be in the list of arguments if Content-Lengeth of request is empty.* If Content-Type is set to XML or JSON the return result will be as Map, otherwise it will be an instance of +HttpServletRequest+.
+
+x::
+  Additional arguments passed to callback are groups from regular expression matching the URI. Groups are not passed as a list, but are added to the list of arguments and next arguments.
+
+If a property for corresponding HTTP action is not set, the component will return an HTTP 404 error.
+
+=== Example Script
+
+Lets have a look at a script that is included with the install package to get a better idea of how these scripts work.
+This script will GET a list of all registered account and output them according to an HTML file we will look at later.
+[source,java]
+-----
+import tigase.http.rest.Service
+import tigase.xmpp.BareJID
+
+/**
+ * Class implements ability to retrieve by service administrator list of registered accounts
+ * Handles requests for /rest/users/
+ *
+ * Example format of content of response:
+ * <users><items><item>user1@domain</item><item>user2@domain</item></items><count>2</count></users>
+ */
+class UsersHandler extends tigase.http.rest.Handler {
+
+    public UsersHandler() {
+		description = [
+			regex : "/",
+			GET : [ info:'Retrieve list of registered user jids',
+				description: """Request do not require any parameters and returns list of all registered user accounts on this server (for all vhosts).
+
+Example response will look like this:
+\${util.formatData([users:[items:['user1@example.com','user2@example.com','user1@example2.com'],count:3]])}
+"""]
+		];
+        regex = /\//
+        requiredRole = "admin"
+        isAsync = false
+        execGet = { Service service, callback, jid ->
+            def users = service.getUserRepository().getUsers()
+            callback([users:[items:users, count:users.size()]]);
+        }
+    }
+
+}
+-----
+As we can see, it's a fairly short code.  First it calls the rest service (required for all of the REST activity), and the BareJID handler.
+Next we extend out custom class to extend +tigase.http.rest.Handler+. Our author has provided a helpful description of the code to better describe it's operation and expected result.
+The last section is the actual code that defines what will match our query, in this case anything, a requirement that an admin make the command, that the connection will terminate with results, and what commands will be passed.
+
+The matching HTML, which will shape the output of the code is included here.
+[source,html]
+-----
+${ util.include('header', [title:'All users']) }
+<table style="margin: auto;">
+<tr>
+<th>Avatar</th>
+<th>User JID</th>
+</tr>
+<% result.users.items.each { user -> %>
+<tr>
+<td>
+<img style="max-height: 50px; max-width: 50px;" src="${util.link("/avatar/" + user)}" />
+</td>
+<td>
+<a href="${util.link("/user/"+user)}">${user}</a>
+</td>
+</tr>
+<% } %>
+</table>
+${ util.include('footer') }
+-----
+This file builds a table using the user fields from the GET request. *NOTE:* Not all scripts need a matching HTML file, basic requests may not need special handling.
+
+== REST API & PubSub
+All PubSub Scripts are found within the +scripts/rest/pubsub+ directory of Tigase's installation directory.  All examples in this section are prepared for a PubSub component available at pubsub@example.com. To use these examples for your installation, that JID needs to be replaced with with your pubsub JID.
+
+All parameters passed in the content of HTTP request needs to be wrapped with +<data/>+ tag at the root of the XML document. Returned results will be wrapped within the +<result/>+ tag in the root of the XMl document.
+
+=== Create a Node
+HTTP URL: example.com/rest/pubsub/pubsub@example.com/create-node
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed to the newly created node.
+
+*POST*
+
+Command requires fields +node+ and +pubsub#node_type+ to be filled with proper values for execution.
+
+- +node+ Field contains id of node to create
+- +owner+ Field may contain JID or JIDS which will be considered owner of the node. If this field is empty, server will use JID of HTTP API Component (rest@example.com)
+- +pubsub#node_type+ Field should contain one of two types:
+  * +leaf+ Node to items that will be published
+  * +collection+ Node to nodes what will contain other nodes
+
+Below is an example of creating a +leaf+ type node with the owner set to admin@example.com.
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <owner>admin@example.com</owner>
+  <pubsub prefix="true">
+    <node_type>leaf</node_type>
+  </pubsub>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+=== Delete a node
+HTTP URL: example.com/rest/pubsub/pubsub@example.com/delete-node
+
+Available HTTP methods:
+
+*GET*
+
+Command returns example content which contains all required and operational parameters that may be passed.
+
+*POST*
+
+Command requires field +node+ to be filled where +node+ is the id of the node to delete.
+
+Below is an example of removing a node with an id of +example+
+[source,xml]
+-----
+<data>
+  <node>example</node>
+</data>
+-----
+Server response
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+=== Subscribe to a node
+HTTP URI: example.com/rest/pubsub/pubsub@example.com/subscribe-node
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Command requires +node+ and +jid+ fields to be filled.
+
+- +node+ is the id of the node to subscribe too.
+- +jid+ is the JID or JIDS to be subscribed to the node.
+
+Below is an example of the XML information passed between client and server with +test1@example.com+ and +test2@example.com+ subscribing to +example+ node.
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <jids>
+    <value>test1@example.com</value>
+    <value>test2@example.com</value>
+  </jids>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+=== Unsubscribe from a node
+HTTP URI: example.com/rest/pubsub/pubsub@example.com/unsubscribe-node
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Like the Subscribe to a node section, the command requires both the +node+ and +jid+ fields to be filled.
+
+- +node+ is the id of the node to unsubscribe from.
+- +jid+ is the JID or JIDS to be unsubscribed from the node.
+
+Below is an example of the XML information passed between client and server with +test1@example.com+ and +test2@example.com+ unsubscribing to +example+ node.
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <jids>
+    <value>test@example.com</value>
+    <value>test2@example.com</value>
+  </jids>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+=== Publish an item to a node
+HTTP URI: example.com/rest/pubsub/pubsub@example.com/publish-item
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Command requires the +node+ and +entry+ fields to be filled.
+Available fields:
+
+- +node+ Field contains the id of the node to be published to.
+- +item-id+ Field to contain the id of the entry to publish.
+- +expire-at+ Field may contain a timestamp after which item should not be delivered to subscribed users.  Timestamp should follow this pattern: YYYY-MM-DDhh:mm:ss with a trailing Z to indicate UTC time in a 24h format.
+- +entry+ Field should contain multi-line entry content which should be valid XML value for an item.
+
+Below is an example exchange between client and server for publishing an item with id +item-1+ to node +example+ .
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <item-id>item-1</item-id>
+  <expire-at>2015-05-13T16:05:00+02:00</expire-at>
+  <entry>
+    <item-entry>
+      <title>Example 1</title>
+      <content>Example content</content>
+    </item-entry>
+  </entry>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+=== List Available Nodes
+HTTP URI: example.com/rest/pubsub/pubsub.example.com/list-nodes
+
+Available HTTP methods
+
+*GET*
+
+This method returns list of available PubSub nodes for the domain passed as part of the URI (+pubsub.example.com+).
+
+Below is an example exchange between client and server for listing all nodes, the result having +test+, +node_54idf40037+ and +node_3ws5lz0037+
+[source,xml]
+-----
+<result>
+<title>List of available nodes</title>
+<nodes label="Nodes" type="text-multi">
+<value>test</value>
+<value>node_54idf40037</value>
+<value>node_3ws5lz0037</value>
+</nodes>
+</result>
+-----
+
+=== List Published Items on Node
+HTTP URI: example.com/rest/pubsub/pubsub.example.com/list-items
+
+Available HTTP methods
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+This command requires the +node+ field to be filled.  The +node+ field contains the ID of the node from which we want the list of published items.
+
+Below is an example exchange between client and server asking for all items published in the example node.
+[source,xml]
+-----
+<data>
+<node>example</node>
+</data>
+-----
+
+Server Response
+[source,xml]
+-----
+<result>
+<title>List of PubSub node items</title>
+<node label="Node" type="text-single">
+<value>example</value>
+</node>
+<items label="Items" type="text-multi">
+<value>item-1</value>
+<value>item-2</value>
+</items>
+</result>
+-----
+
+Items item-1 and item-2 are the listed items.
+
+=== Retrieve Published Item on Node
+HTTP URI: example.com/rest/pubsub/pubsub.example.com/retrieve-item
+
+Available HTTP methods
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Command requires that fields +node+ and +item-id+ are filled.
+Available Fields:
+- +node+ The node the item is published to.
+- +item-id+ The id of the item you wish to retrieve.
+
+Example communication between client and server:
+[source,xml]
+-----
+<data>
+<node>example</node>
+<item-id>item-1</item>
+</data>
+-----
+
+Server response:
+[source,xml]
+-----
+<result>
+<title>Retrive PubSub node item</title>
+<node label="Node" type="text-single">
+<value>example</value>
+</node>
+<item-id label="Item ID" type="text-single">
+<value>item-1</value>
+</item-id>
+<item label="Item" type="text-multi">
+<value>&lt;item expire-at=&quot;2015-05-13T14:05:00Z&quot; id=&quot;item-1&quot;&gt;&lt;item-entry&gt;
+&lt;title&gt;Example 1&lt;/title&gt;
+&lt;content&gt;Example content&lt;/content&gt;
+&lt;/item-entry&gt;&lt;/item&gt;
+</value>
+</item>
+</result>
+-----
+
+Node that inside the item element, there is an XML encoded element, this will be retrieved without any decoding.
+
+== Other Example REST Commands and Documentation
+Other example REST commands, and accompanied documentation can be found at localhost:8080/rest/ on any server running Tigase and the HTTP component.

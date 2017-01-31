@@ -18,18 +18,7 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.db.DBInitException;
@@ -41,6 +30,10 @@ import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -128,7 +121,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();
 		
@@ -136,7 +129,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();	
 		
@@ -144,10 +137,42 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());		
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();
 	}		
+
+
+	@Test
+	public void testRestorePacketForOffLineUser() throws Exception {
+		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
+		JID res1 = JID.jidInstance(userJid, "res1");
+		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), res1);
+
+		assertEquals(Arrays.asList(session1), session1.getActiveSessions());
+
+		Element packetEl = new Element("iq", new String[] { "type", "from", "to", "time" },
+				new String[] { "set", "dip1@test.com/res1", userJid.toString(), "1440810935000" });
+		packetEl.addChild(new Element("jingle", new String[] { "action", "sid", "offline", "xmlns" },
+				new String[] { "session-terminate", UUID.randomUUID().toString(), "true", "urn:xmpp:jingle:1" }));
+		Packet packet = Packet.packetInstance(packetEl);
+		msgRepo.storeMessage( packet.getFrom(), packet.getTo(), null, packet.getElement(), null);
+
+		packetEl = new Element("iq", new String[] { "type", "from", "to", "time" },
+				new String[] { "set", "dip1@test.com/res1", userJid.toString(), "1440810972000" });
+		packetEl.addChild(new Element("jingle", new String[] { "action", "sid", "offline", "xmlns" },
+				new String[] { "session-terminate", UUID.randomUUID().toString(), "true", "urn:xmpp:jingle:1" }));
+		packet = Packet.packetInstance(packetEl);
+		msgRepo.storeMessage( packet.getFrom(), packet.getTo(), null, packet.getElement(), null);
+
+		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+
+		Queue<Packet> restorePacketForOffLineUser = offlineProcessor.restorePacketForOffLineUser( session1, msgRepo );
+
+		assertEquals("number of restored messages differ!", restorePacketForOffLineUser.size(), 2);
+
+		msgRepo.getStored().clear();
+	}
 
 	@Test
 	public void testLoadOfflineMessages() throws Exception {
@@ -168,6 +193,59 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		assertTrue(offlineProcessor.loadOfflineMessages(packet, session1));	
 	}	
 	
+	@Test
+	public void testIsAllowedForOfflineStorage() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("body", "Test message")
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("storeMe1", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));		
+		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		Map<String,Object> settings = new HashMap<>();
+		settings.put("msg-store-offline-paths", new String[] {
+			"/message/storeMe1[custom_xmlns]",
+			"/message/storeMe2",
+			"-/message/noStore1"
+		});
+		offlineProcessor.init(settings);	
+
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("storeMe2", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));		
+
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("storeMe3", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
+		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));	
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("body", "Test message 123"),
+			new Element("no-store", new String[] { "xmlns" }, new String[] { "urn:xmpp:hints" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));
+		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("noStore1"), new Element("body", "body of message")
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("body", "body of message")
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+	}
+	
 	private static class MsgRepositoryIfcImpl implements MsgRepositoryIfc {
 
 		private final Queue<Packet> stored = new ArrayDeque();
@@ -181,13 +259,17 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		}
 
 		@Override
-		public Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException {
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException {
+			Queue<Element> res = new LinkedList<Element>();
+			for ( Packet pac : stored ) {
+				res.add( pac.getElement());
+			}
+			return res;
 		}
 		
 		@Override
-		public void storeMessage(JID from, JID to, Date expired, Element msg) throws UserNotFoundException {
-			stored.offer(Packet.packetInstance(msg, from, to));
+		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo) throws UserNotFoundException {
+			return stored.offer(Packet.packetInstance(msg, from, to));
 		}
 		
 		@Override

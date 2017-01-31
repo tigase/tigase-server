@@ -39,6 +39,10 @@ public class ListenerScriptRegistrar {
 	public void load() {
 		File par = new File(scriptPath);
 
+		if (!par.exists() || !par.isDirectory()) {
+			return;
+		}
+
 		for (File f : par.listFiles()) {
 			if (f.isFile() && f.getName().endsWith(".script")) {
 				load(f);

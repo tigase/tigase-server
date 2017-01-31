@@ -1,0 +1,169 @@
+[[ad-hocCommands]]
+= Specification for ad-hoc Commands Used to Manage Virtual Domains
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+There are 3 ad-hoc commands for virtual domains management in the Tigase server:
+
+. *VHOSTS_RELOAD* used to reload virtual domains list from the repository (database).
+. *VHOSTS_UPDATE* used to add a new virtual domain or update information for existing one.
+. *VHOSTS_REMOVE* used to remove an existing virtual host from the running server.
+
+Syntax of the commands follows the specification described in link:http://xmpp.org/extensions/xep-0050.html[XEP-0050]. Extra information required to complete the command is carried as data forms described in link:http://xmpp.org/extensions/xep-0004.html[XEP-0004].
+
+All commands are accepted by the server only when send by the installation administrator. If the command is sent from any other account +&lt;not-authorized /&gt;+ error is returned. To grant administrator rights to an account you have to set *--admins* property in the +init.Properties+ configuration file.
+
+Commands are sent to the 'vhost-man' server component and the 'to' attribute of the stanza must contain a full JID of the VHostManager on the server. The full *JID* consists of the component name: 'vhost-man' and the local domain, that is domain which is already on the list of virtual domains and is active. Assuming 'existing.domain.com' one of domains already activated for the server installation the *JID* is: 'vhost-man@existing.domain.com'.
+
+== Reloading the Domains List from the Database
+In order to reload virtual domains from the permanent repository other than configuration file, you have to send *VHOSTS_RELOAD* ad-hoc command to the VHostManager on the server.
+
+The reload command request is of the form:
+
+[source,xml]
+-----
+<iq type="set"
+    to="vhost-man@existing.domain.com"
+    id="aac8a">
+  <command xmlns="http://jabber.org/protocol/commands"
+           node="VHOSTS_RELOAD" />
+</iq>
+-----
+
+The server sends a response upon successful completion of the command with current number of virtual domains server by the installation:
+
+[source,xml]
+-----
+<iq from="vhost-man@existing.domain.com"
+    type="result"
+    to="cmd-sender-admin@existing.domain.com"
+    id="aac8a">
+  <command xmlns="http://jabber.org/protocol/commands"
+           status="completed"
+           node="VHOSTS_RELOAD">
+    <x xmlns="jabber:x:data" type="result">
+      <field type="fixed" var="Note">
+        <value>Current number of VHosts: 123</value>
+      </field>
+    </x>
+  </command>
+</iq>
+-----
+
+If the command is sent from an account other than admin, the server returns an error:
+
+[source,xml]
+-----
+<iq from="vhost-man@existing.domain.com"
+    type="error"
+    to="cmd-sender-admin@existing.domain.com"
+    id="aac8a">
+  <command xmlns="http://jabber.org/protocol/commands"
+           node="VHOSTS_RELOAD" />
+  <error type="auth" code="401">
+    <not-authorized xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
+    <text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas"
+          xml:lang="en">
+      You are not authorized for this action.
+    </text>
+  </error>
+</iq>
+-----
+
+The response doesn't have any special meaning other then end-user information. The client may ignore the response as it is sent after the command has been executed.
+
+== Adding a New Domain or Updating Existing One
+In order to add a new domain or update existing one you have to send an ad-hoc command *VHOSTS_UPDATE* with at least one domain name in the command data form. You can also specify whether the domain is enabled or disabled but this is optional. Future releases may allow for setting additional parameters for the domain: maximum number of user accounts for this domain, anonymous login enabled/disabled for the domain, registration via XMPP enabled/disabled for this domain and some more parameters not specified yet.
+
+The domain add/update command request is of the form:
+
+[source,xml]
+-----
+<iq type="set"
+    to="vhost-man@existing.domain.com"
+    id="aacba">
+  <command xmlns="http://jabber.org/protocol/commands"
+           node="VHOSTS_UPDATE">
+    <x xmlns="jabber:x:data" type="submit">
+      <field type="text-single"
+             var="VHost">
+        <value>new-virt.domain.com</value>
+      </field>
+      <field type="list-single"
+             var="Enabled">
+        <value>true</value>
+      </field>
+    </x>
+  </command>
+</iq>
+-----
+
+Please note: Character case in the command field variable names does matter.
+
+Upon successful completion of the command the server sends a response back to the client with information of the existing number of virtual hosts on the server:
+
+[source,xml]
+-----
+<iq from="vhost-man@existing.domain.com"
+    type="result"
+    to="cmd-sender-admin@existing.domain.com"
+    id="aacba">
+  <command xmlns="http://jabber.org/protocol/commands"
+           status="completed"
+           node="VHOSTS_UPDATE">
+    <x xmlns="jabber:x:data" type="result">
+      <field type="fixed" var="Note">
+        <value>Current number of VHosts: 124</value>
+      </field>
+    </x>
+  </command>
+</iq>
+-----
+
+== Removing a Virtual Domain From the Server
+In order to remove a virtual domain you have to send *VHOSTS_REMOVE* command to the server with the domain name.
+
+The domain remove command is sent by the client:
+
+[source,xml]
+-----
+<iq type="set"
+    to="vhost-man@existing.domain.com"
+    id="aacba">
+  <command xmlns="http://jabber.org/protocol/commands"
+           node="VHOSTS_REMOVE">
+    <x xmlns="jabber:x:data" type="submit">
+      <field type="text-single"
+             var="VHost">
+        <value>virt-nn.domain.com</value>
+      </field>
+    </x>
+  </command>
+</iq>
+-----
+
+Upon successful completion of the command the server sends a response back to the client with information of the existing number of virtual hosts on the server:
+
+[source,bash]
+-----
+<iq from="vhost-man@existing.domain.com"
+    type="result"
+    to="cmd-sender-admin@existing.domain.com"
+    id="aacba">
+  <command xmlns="http://jabber.org/protocol/commands"
+           status="completed"
+           node="VHOSTS_REMOVE">
+    <x xmlns="jabber:x:data" type="result">
+      <field type="fixed" var="Note">
+        <value>Current number of VHosts: 124</value>
+      </field>
+    </x>
+  </command>
+</iq>
+-----

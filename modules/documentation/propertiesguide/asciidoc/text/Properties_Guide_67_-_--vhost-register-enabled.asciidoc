@@ -1,0 +1,26 @@
+[[vhostRegisterEnabled]]
+= --vhost-register-enabled
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-22 03:00
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +true+
+
+*Example:* +--vhost-register-enabled = false+
+
+*Possible values:* +true|false+
+
+*Description:* +--vhost-register-enabled+ is a global property which allows you to switch on/off user registration on the installation. Setting this property to +false+ does not disable the registration plugin on the server. You can enable registration for selected domains in the domain configuration settings.
+
+This is a global property which is overridden by settings for particular vhost.
+
+The +true+ value is used as a default when no configuration is set. This settings is useful for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It allows admins to configure default values for all of them, instead of having to provide individual configuration for each vhost.
+
+It is also applied as a default value for all new vhosts added at run-time.
+
+*Available since:* 5.2.0

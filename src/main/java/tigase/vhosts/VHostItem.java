@@ -26,27 +26,34 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.lang.reflect.Array;
+import tigase.vhosts.filter.DomainFilterPolicy;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.db.comp.RepositoryItemAbstract;
-
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
-
+import tigase.server.xmppclient.ClientTrustManagerFactory;
 import tigase.util.DataTypes;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
-
 import tigase.util.StringUtilities;
+import tigase.xmpp.BareJID;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration
@@ -103,14 +110,16 @@ public class VHostItem
 		private final String name;
 		private final String key;
 		private final Class cls;
+		private final Class collectionCls;
 		private final Object defValue;
 		private final Object[] options;
 		private final String[] optionsNames;
 		
-		public DataType(String key, String name, Class cls, Object defValue, Object[] options, String[] optionsNames) {
+		public DataType(String key, String name, Class cls, Class<? extends Collection> collectionCls, Object defValue, Object[] options, String[] optionsNames) {
 			this.key = key;
 			this.name = name;
 			this.cls = cls;
+			this.collectionCls = collectionCls;
 			this.defValue = defValue;
 			this.options = options;
 			this.optionsNames = optionsNames;
@@ -131,14 +140,22 @@ public class VHostItem
 			}
 		}
 		
+		public DataType(String key, String name, Class cls, Class<? extends Collection> collectionCls, Object defValue, Object[] options) {
+			this(key, name, cls, collectionCls, defValue, options, null);
+		}
+		
+		public DataType(String key, String name, Class cls, Class<? extends Collection> collectionCls, Object defValue) {
+			this(key, name, cls, collectionCls, defValue, null, null);
+		}
+		
 		public DataType(String key, String name, Class cls, Object defValue, Object[] options) {
-			this(key, name, cls, defValue, options, null);
+			this(key, name, cls, null, defValue, options, null);
 		}
 		
 		public DataType(String key, String name, Class cls, Object defValue) {
-			this(key, name, cls, defValue, null, null);
+			this(key, name, cls, null, defValue, null, null);
 		}
-
+		
 		public String getName() {
 			return name;
 		}
@@ -149,6 +166,10 @@ public class VHostItem
 
 		public Class getCls() {
 			return cls;
+		}
+		
+		public Class<? extends Collection> getCollectionCls() {
+			return collectionCls;
 		}
 		
 		public <T> T getDefValue() {
@@ -280,6 +301,9 @@ public class VHostItem
 	/** Field description */
 	public static final String TLS_REQUIRED_LABEL = "TLS required";
 
+	/** Field description */
+	public static final String TRUSTED_JIDS_ATT = "trusted-jids";
+	
 	/**
 	 * Element name to for the VHostItem XML storage.
 	 */
@@ -348,11 +372,43 @@ public class VHostItem
 
 	protected static final Map<String,DataType> dataTypes = new ConcurrentHashMap<String,DataType>();
 	
+	private static ConcurrentSkipListSet<String> GLOBAL_TRUSTED_JIDS = null;
+	
 	public static void registerData(List<DataType> types) {
 		for (DataType type : types) {
 			dataTypes.put(type.getKey(), type);
 		}
 	}
+	
+	protected static void initGlobalTrustedJids() {
+		String trustedJidsStr = System.getProperty("trusted");
+		if (trustedJidsStr == null || trustedJidsStr.isEmpty())
+			GLOBAL_TRUSTED_JIDS = null;
+		else {
+			ConcurrentSkipListSet<String> trusted = new ConcurrentSkipListSet<>();
+			for (String trustedStr : trustedJidsStr.split(",")) {
+				if (!trustedStr.contains("{"))
+					trusted.add(trustedStr);
+			}
+			if (trusted.isEmpty())
+				GLOBAL_TRUSTED_JIDS = null;
+			else
+				GLOBAL_TRUSTED_JIDS = trusted;
+		}
+	}
+	
+	static {
+		List<DataType> types = new ArrayList<VHostItem.DataType>();
+		types.add(new DataType(ClientTrustManagerFactory.CA_CERT_PATH, "Client Certificate CA", String.class, null));
+		types.add(new DataType(ClientTrustManagerFactory.CERT_REQUIRED_KEY, "Client Certificate Required", Boolean.class,
+				Boolean.FALSE));
+		types.add(new DataType(TRUSTED_JIDS_ATT, "Trusted JIDs", String[].class, 
+				ConcurrentSkipListSet.class, null, null));
+		VHostItem.registerData(types);
+		
+		initGlobalTrustedJids();
+	}
+
 	
 	//~--- fields ---------------------------------------------------------------
 
@@ -393,6 +449,9 @@ public class VHostItem
 		// will always fail (needed mostly for newly added vhosts).
 		if (s2sSecret == null) {
 			s2sSecret = UUID.randomUUID().toString();
+		}
+		if (GLOBAL_TRUSTED_JIDS != null) {
+			data.put(TRUSTED_JIDS_ATT, GLOBAL_TRUSTED_JIDS);
 		}
 	}
 
@@ -476,6 +535,15 @@ public class VHostItem
 			if (type.cls != Boolean.class) {
 				Object[] options = type.getOptions();
 				Object val = getData(type.getKey());
+				if (val instanceof Collection) {
+					Collection collection = (Collection) val;
+					val = Array.newInstance(type.getCls().getComponentType(), collection.size());
+					int i=0;
+					for (Object v : collection) {
+						Array.set(val, i, v);
+						i++;
+					}
+				}
 				String valueStr = val != null ? DataTypes.valueToString(val) : "";
 				if (options == null || options.length == 0) {
 					Command.addFieldValue(packet, type.getName(), valueStr);
@@ -544,7 +612,8 @@ public class VHostItem
 			if (domainFilter == null) {
 				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
-			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST) {
+			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST
+					|| domainFilter == DomainFilterPolicy.CUSTOM) {
 				tmp = Command.getFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL);
 				if ( tmp != null && !tmp.trim().isEmpty() ){
 					domainFilterDomains = StringUtilities.stringToArrayOfString( tmp, ";" );
@@ -596,6 +665,18 @@ public class VHostItem
 			String valueStr = Command.getFieldValue(packet, type.getName());
 			char typeId = DataTypes.typesMap.get(type.cls.getName());
 			Object value = (valueStr == null || valueStr.isEmpty()) ? null :DataTypes.decodeValueType(typeId, valueStr);
+			if (value != null && type.getCollectionCls() != null) {
+				try {
+					Collection collection = type.getCollectionCls().newInstance();
+					for (int i = 0; i < Array.getLength(value); i++) {
+						collection.add(Array.get(value, i));
+					}
+					value = collection;
+				} catch (InstantiationException | IllegalAccessException ex) {
+					throw new IllegalArgumentException("Could not instantiate collection of class: " 
+							+ type.getCollectionCls().getCanonicalName(), ex);
+				}
+			}
 			setData(type.getKey(), value);
 		}
 
@@ -624,7 +705,8 @@ public class VHostItem
 			if (domainFilter == null) {
 				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
-			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST) {
+			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST
+					|| domainFilter == DomainFilterPolicy.CUSTOM) {
 				String tmp = elem.getAttributeStaticStr(DOMAIN_FILTER_POLICY_DOMAINS_ATT);
 				if ( tmp != null && !tmp.trim().isEmpty() ){
 					domainFilterDomains = StringUtilities.stringToArrayOfString( tmp, ";" );
@@ -669,9 +751,22 @@ public class VHostItem
 		if (data != null) {
 			List<Element> items = data.getChildren();
 			if (items != null) {
-				for (Element item : data.getChildren()) {
-					char type = item.getAttributeStaticStr("type").charAt(0);
-					Object value = DataTypes.decodeValueType(type, item.getCData());
+				for (Element item : items) {
+					DataType type = dataTypes.get(item.getName());
+					char typeChar = type != null ? DataTypes.typesMap.get(type.getCls().getName()) : item.getAttributeStaticStr("type").charAt(0);
+					Object value = DataTypes.decodeValueType(typeChar, item.getCData());
+					if (type != null && type.getCollectionCls() != null && value != null) {
+						try {
+							Collection collection = type.getCollectionCls().newInstance();
+							for (int i = 0; i < Array.getLength(value); i++) {
+								collection.add(Array.get(value, i));
+							}
+							value = collection;
+						} catch (InstantiationException | IllegalAccessException ex) {
+							throw new IllegalArgumentException("Could not instantiate collection of class: "
+									+ type.getCollectionCls().getCanonicalName(), ex);
+						}					
+					}
 					setData(item.getName(), value);
 				}
 			}
@@ -781,6 +876,12 @@ public class VHostItem
 				String[] mu = tmp.split("=");
 				setSaslAllowedMechanisms(mu[1].split(";"));
 			}
+
+			String[] mu = tmp.split("=");
+			if (mu != null && mu.length == 2 && dataTypes.containsKey(mu[0])) {
+				parseDataValue(mu[0], mu[1]);
+			}
+
 		}
 		log.log( Level.FINE, "Initialized from property string: {0}", this);
 	}
@@ -847,7 +948,18 @@ public class VHostItem
 			for (Map.Entry<String,Object> e : this.data.entrySet()) {
 				Element item = new Element(e.getKey());
 				item.addAttribute("type", String.valueOf(DataTypes.getTypeId(e.getValue())));
-				item.setCData(DataTypes.valueToString(e.getValue()));
+				Object val = e.getValue();
+				DataType type = dataTypes.get(e.getKey());
+				if (type != null && val instanceof Collection && type.getCollectionCls() != null) {
+					Collection collection = (Collection) val;
+					val = Array.newInstance(type.getCls().getComponentType(), collection.size());
+					int i=0;
+					for (Object v : collection) {
+						Array.set(val, i, v);
+						i++;
+					}
+				}
+				item.setCData(DataTypes.valueToString(val));
 				data.addChild(item);
 			}
 			elem.addChild(data);
@@ -911,7 +1023,18 @@ public class VHostItem
 								 + ", saslAllowedMechanisms: " + Arrays.toString( saslAllowedMechanisms );
 		
 		for (Map.Entry<String,Object> e : data.entrySet()) {
-			str += ", " + e.getKey() + ": " + DataTypes.valueToString(e.getValue());
+			Object val = e.getValue();
+			DataType type = dataTypes.get(e.getKey());
+			if (type != null && val instanceof Collection && type.getCollectionCls() != null) {
+				Collection collection = (Collection) val;
+				val = Array.newInstance(type.getCls().getComponentType(), collection.size());
+				int i = 0;
+				for (Object v : collection) {
+					Array.set(val, i, v);
+					i++;
+				}
+			}			
+			str += ", " + e.getKey() + ": " + DataTypes.valueToString(val);
 		}
 		
 		return str;
@@ -1063,6 +1186,10 @@ public class VHostItem
 		return s2sSecret;
 	}
 
+	public Set<String> getTrustedJIDs() {
+		return getData(TRUSTED_JIDS_ATT);
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1150,6 +1277,15 @@ public class VHostItem
 	public boolean isTlsRequired() {
 		return tlsRequired || XMPPServer.isHardenedModeEnabled();
 	}
+	
+	public boolean isTrustedJID(JID jid) {
+		Set<String> trustedJids = VHostItem.this.getTrustedJIDs();
+		if (trustedJids == null)
+			return false;
+		
+		return trustedJids.contains(jid.toString()) || trustedJids.contains(jid.getBareJID().toString()) 
+				|| trustedJids.contains(jid.getDomain());
+	}
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -1200,6 +1336,35 @@ public class VHostItem
 			this.data.remove(key);
 		} else {
 			this.data.put(key, value);
+		}
+	}
+	
+	public void parseDataValue(String key, String valueStr) {
+		DataType type = dataTypes.get(key);
+		if (type == null)
+			throw new RuntimeException("Key " + key + " is not registered");
+
+		if (valueStr == null) {
+			this.data.remove(key);
+		} else {
+			char typeId = DataTypes.typesMap.get(type.cls.getName());
+			if (valueStr.contains(";")) 
+				valueStr = valueStr.replace(';', ',');
+			Object value = (valueStr == null || valueStr.isEmpty()) ? null : DataTypes.decodeValueType(typeId, valueStr);
+			if (type.getCollectionCls() != null && value != null) {
+				try {
+					Collection collection = type.getCollectionCls().newInstance();
+					for (int i = 0; i < Array.getLength(value); i++) {
+						collection.add(Array.get(value, i));
+					}
+					value = collection;
+				} catch (InstantiationException | IllegalAccessException ex) {
+					throw new IllegalArgumentException("Could not instantiate collection of class: "
+							+ type.getCollectionCls().getCanonicalName(), ex);
+				}
+			}
+			
+			setData(type.getKey(), value);
 		}
 	}
 	
@@ -1307,6 +1472,10 @@ public class VHostItem
 		this.tlsRequired = value;
 	}
 
+	public void setTrustedJIDs(JID[] trustedJids) {
+		setData(TRUSTED_JIDS_ATT, trustedJids);
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1465,6 +1634,11 @@ public class VHostItem
 		public String[] getSaslAllowedMechanisms() {
 			return VHostItem.this.getSaslAllowedMechanisms();
 		}
+		
+		@Override
+		public Set<String> getTrustedJIDs() {
+			return Collections.unmodifiableSet(VHostItem.this.getTrustedJIDs());
+		}
 
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
@@ -1501,6 +1675,11 @@ public class VHostItem
 			return VHostItem.this.isTlsRequired();
 		}
 
+		@Override
+		public boolean isTrustedJID(JID jid) {
+			return VHostItem.this.isTrustedJID(jid);
+		}
+		
 		//~--- set methods --------------------------------------------------------
 
 		@Override

@@ -60,6 +60,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.NonAuthUserRepositoryImpl;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -292,8 +297,17 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		" from " + JID_TABLE + " where " + JID_SHA_COLUMN + " = ?";
         private static final String MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF =
                 "select count(*) from " + MSG_TABLE + " where " + MSG_TO_UID_COLUMN + " = ? and " + MSG_FROM_UID_COLUMN + " = ?";
-	private static final String ADD_USER_JID_ID_QUERY = 
-		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") values (?, ?)";
+	private static final String ADD_USER_JID_ID_QUERY =
+		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
+		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
+	private static final String ADD_USER_JID_ID_QUERY_MYSQL =
+		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
+		+ "from dual "
+		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
+	private static final String ADD_USER_JID_ID_QUERY_DERBY =
+		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
+		+ "FROM SYSIBM.SYSDUMMY1 "
+		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
 	/* @formatter:on */
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
 	private static final String MSGS_COUNT_LIMIT_PROP_KEY = "count-limit-query";
@@ -309,7 +323,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
 	private String msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
 	private String msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
-	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
+	private String add_user_jid_id = ADD_USER_JID_ID_QUERY;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
@@ -337,14 +351,10 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			if (query != null) {
 				msg_count_for_limit_query = query;
 			}
-
-			String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
-			
-			if (msgs_store_limit_str != null) {
-				msgs_store_limit = Long.parseLong(msgs_store_limit_str);
-			}
 		}
 
+		super.initRepository(conn_str, map);
+		
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
 			switch (data_repo.getDatabaseType()) {
@@ -355,6 +365,17 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				default:
 					msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
 					msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
+					break;
+			}
+			switch (data_repo.getDatabaseType()) {
+				case mysql:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY_MYSQL;
+					break;
+				case derby:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY_DERBY;
+					break;
+				default:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY;
 					break;
 			}
 
@@ -372,7 +393,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					MSG_SELECT_EXPIRED_BEFORE_QUERY);
 			data_repo.initPreparedStatement(msg_count_for_limit_query,
 					msg_count_for_limit_query);
-			data_repo.initPreparedStatement(ADD_USER_JID_ID_QUERY, ADD_USER_JID_ID_QUERY);
+			data_repo.initPreparedStatement(add_user_jid_id, add_user_jid_id);
 			data_repo.initPreparedStatement(MSG_SELECT_BROADCAST_RECIPIENTS, MSG_SELECT_BROADCAST_RECIPIENTS);
 			data_repo.initPreparedStatement(MSG_SELECT_MESSAGES_TO_BROADCAST, MSG_SELECT_MESSAGES_TO_BROADCAST);
 			if (data_repo.getDatabaseType() == dbTypes.derby) {
@@ -416,9 +437,9 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public Map<MSG_TYPES,Long> getMessagesCount(JID to) throws UserNotFoundException {
+	public Map<Enum,Long> getMessagesCount(JID to) throws UserNotFoundException {
 
-		Map<MSG_TYPES,Long> result = new HashMap<>(MSG_TYPES.values().length);
+		Map<Enum,Long> result = new HashMap<>(MSG_TYPES.values().length);
 
 		try {
 
@@ -467,44 +488,47 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				PreparedStatement select_messages_list
 													= data_repo.getPreparedStatement( to.getBareJID(), MSG_SELECT_LIST_TO_JID_QUERY );
 
-				synchronized ( select_messages_list ) {
-					select_messages_list.setLong( 1, to_uid );
+				synchronized (select_messages_list) {
+					try {
+						select_messages_list.setLong(1, to_uid);
 
-					rs = select_messages_list.executeQuery();
+						rs = select_messages_list.executeQuery();
 
-					while ( rs.next() ) {
-						long msgId = rs.getLong(MSG_ID_COLUMN );
-						int mType = rs.getInt(MSG_TYPE_COLUMN );
-						MSG_TYPES messageType = MSG_TYPES.getFromInt( mType );
-						String sender = rs.getString( JID_COLUMN );
+						while (rs.next()) {
+							long msgId = rs.getLong(MSG_ID_COLUMN);
+							int mType = rs.getInt(MSG_TYPE_COLUMN);
+							MSG_TYPES messageType = MSG_TYPES.getFromInt(mType);
+							String sender = rs.getString(JID_COLUMN);
 
-						if (msgId != 0 && messageType != MSG_TYPES.none && sender != null ) {
-							Element item = new Element( "item",
-									new String[] { "jid", "node", "type", "name" },
-									new String[] { to.getBareJID().toString(), String.valueOf( msgId),
-																																			messageType.name(), sender } );
-							result.add( item );
+							if (msgId != 0 && messageType != MSG_TYPES.none && sender != null) {
+								Element item = new Element("item",
+										new String[]{"jid", "node", "type", "name"},
+										new String[]{to.getBareJID().toString(), String.valueOf(msgId),
+											messageType.name(), sender});
+								result.add(item);
+							}
 						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 
 			} catch ( SQLException e ) {
 				log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
-			} finally {
-				data_repo.release( null, rs );
 			}
 			return result;
 
 	}
 
 	@Override
-	public Queue<Element> loadMessagesToJID( List<String> db_ids, JID to, boolean delete, OfflineMessagesProcessor proc) throws UserNotFoundException {
+	public Queue<Element> loadMessagesToJID( List<String> db_ids, XMPPResourceConnection session, boolean delete, OfflineMessagesProcessor proc) throws UserNotFoundException {
 
 			Queue<Element> result = null;
-			ResultSet rs = null;
-
+			BareJID to = null;
+		
 			try {
-				long to_uid = getUserUID( to.getBareJID() );
+				to = session.getBareJID();		
+				long to_uid = getUserUID( to );
 
 				if ( to_uid < 0 ){
 					throw new UserNotFoundException( "User: " + to + " was not found in database." );
@@ -512,8 +536,9 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 				if ( db_ids == null || db_ids.size() == 0 ){
 					// fetch
-					return loadMessagesToJID( to, delete, proc );
+					return loadMessagesToJID( session, delete, proc );
 				} else {
+					ResultSet rs = null;
 					result = new LinkedList<Element>();
 
 					Iterator<String> ids = db_ids.iterator();
@@ -522,41 +547,47 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					for ( int i = 0 ; i < iters ; i++ ) {
 						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
 						if (params == 0 ) continue;
-						PreparedStatement select_ids_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
+						PreparedStatement select_ids_to_jid_st = data_repo.getPreparedStatement( to,
 																																							 MSG_SELECT_IDS_TO_JID_QUERY + "_" + params );
 
 						synchronized ( select_ids_to_jid_st ) {
-							select_ids_to_jid_st.setLong( 1, to_uid );
-							for ( int j = 0 ; j < params ; j++ ) {
-								String id = ids.next();
-								select_ids_to_jid_st.setString( j + 2, id );
+							try {
+								select_ids_to_jid_st.setLong(1, to_uid);
+								for (int j = 0; j < params; j++) {
+									String id = ids.next();
+									select_ids_to_jid_st.setString(j + 2, id);
+								}
+								rs = select_ids_to_jid_st.executeQuery();
+								result.addAll(parseLoadedMessages(proc, rs));
+							} finally {
+								data_repo.release(null, rs);
 							}
-							rs = select_ids_to_jid_st.executeQuery();
-							result.addAll( parseLoadedMessages( proc, rs ) );
-							data_repo.release( null, rs );
-							rs = null;
 						}
 					}
 				}
 
 				if ( delete ){
-					deleteMessagesToJID( null, to );
+					deleteMessagesToJID( null, session );
 				}
 			} catch ( SQLException e ) {
 				log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
-			} finally {
-				data_repo.release( null, rs );
+			} catch (NotAuthorizedException ex) {
+				log.log(Level.WARNING, "Session not authorized yet!", ex);				
 			}
 			return result;
 
 	}
 
 	@Override
-	public int deleteMessagesToJID( List<String> db_ids, JID to ) throws UserNotFoundException {
+	public int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session ) throws UserNotFoundException {
 
 		int affectedRows = 0;
+		BareJID to = null;
+		
 		try {
-			long to_uid = getUserUID( to.getBareJID() );
+			to = session.getBareJID();
+			
+			long to_uid = getUserUID( to );
 
 			if ( to_uid < 0 ){
 				throw new UserNotFoundException( "User: " + to + " was not found in database." );
@@ -565,7 +596,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			if ( db_ids == null || db_ids.size() == 0 ){
 				// purge
 				PreparedStatement delete_to_jid_st
-													= data_repo.getPreparedStatement( to.getBareJID(), MSG_DELETE_TO_JID_QUERY );
+													= data_repo.getPreparedStatement( to, MSG_DELETE_TO_JID_QUERY );
 
 				synchronized ( delete_to_jid_st ) {
 					delete_to_jid_st.setLong( 1, to_uid );
@@ -578,7 +609,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					for ( int i = 0 ; i < iters ; i++ ) {
 						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
 						if (params == 0 ) continue;
-					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
+					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement( to,
 																																							 MSG_DELETE_IDS_TO_JID_QUERY + "_" + params );
 
 					synchronized ( delete_to_jid_st ) {
@@ -593,44 +624,52 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 		} catch ( SQLException e ) {
 			log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+		} catch (NotAuthorizedException ex) {
+			log.log(Level.WARNING, "Session not authorized yet!", ex);			
 		}
 		return affectedRows;
 	}
 
 
 	@Override
-	public Queue<Element> loadMessagesToJID( JID to, boolean delete )
+	public Queue<Element> loadMessagesToJID( XMPPResourceConnection session, boolean delete )
 			throws UserNotFoundException {
-		return loadMessagesToJID( to, delete, null );
+		return loadMessagesToJID( session, delete, null );
 	}
 
-	public Queue<Element> loadMessagesToJID(JID to, boolean delete, OfflineMessagesProcessor proc)
+	public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete, OfflineMessagesProcessor proc)
 			throws UserNotFoundException {
 		Queue<Element> result = null;
-		ResultSet rs = null;
-
+		BareJID to = null;
+		
 		try {
-			long to_uid = getUserUID(to.getBareJID());
+			to = session.getBareJID();
+			long to_uid = getUserUID(to);
 
 			if (to_uid < 0) {
 				throw new UserNotFoundException("User: " + to + " was not found in database.");
 			}
 
+			ResultSet rs = null;
 			PreparedStatement select_to_jid_st =
-					data_repo.getPreparedStatement(to.getBareJID(), MSG_SELECT_TO_JID_QUERY);
+					data_repo.getPreparedStatement(to, MSG_SELECT_TO_JID_QUERY);
 
 			synchronized (select_to_jid_st) {
-				select_to_jid_st.setLong(1, to_uid);
-				rs = select_to_jid_st.executeQuery();
+				try {
+					select_to_jid_st.setLong(1, to_uid);
+					rs = select_to_jid_st.executeQuery();
 
-				StringBuilder sb = new StringBuilder(1000);
+					StringBuilder sb = new StringBuilder(1000);
 
-				result = parseLoadedMessages( proc, rs);
+					result = parseLoadedMessages(proc, rs);
+				} finally {
+					data_repo.release(null, rs);
+				}
 			}
 
 			if (delete) {
 				PreparedStatement delete_to_jid_st =
-						data_repo.getPreparedStatement(to.getBareJID(), MSG_DELETE_TO_JID_QUERY);
+						data_repo.getPreparedStatement(to, MSG_DELETE_TO_JID_QUERY);
 
 				synchronized (delete_to_jid_st) {
 					delete_to_jid_st.setLong(1, to_uid);
@@ -639,14 +678,14 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages for user: " + to, e);
-		} finally {
-			data_repo.release(null, rs);
+		} catch (NotAuthorizedException ex) {
+			log.log(Level.WARNING, "Session not authorized yet!", ex);
 		}
 
 		return result;
 	}
 
-	private Queue<Element> parseLoadedMessages( OfflineMessagesProcessor proc, ResultSet rs) throws SQLException {
+	protected Queue<Element> parseLoadedMessages( OfflineMessagesProcessor proc, ResultSet rs) throws SQLException {
 		StringBuilder sb = new StringBuilder( 1000 );
 		Queue<Element> result = new LinkedList<Element>();
 		if ( proc == null ){
@@ -685,14 +724,13 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public void storeMessage(JID from, JID to, Date expired, Element msg)
+	public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
 			throws UserNotFoundException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Storring expired: {0} message: {1}", new Object[] { expired,
 					Packet.elemToString(msg) });
 		}
 
-		ResultSet rs = null;
 		try {
 			long from_uid = getUserUID(from.getBareJID());
 
@@ -708,30 +746,36 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 			long count = 0;
 			
+			long msgs_store_limit = getMsgsStoreLimit(to.getBareJID(), userRepo);
 			// If the msgs_store_limit is set to 0, skip the select because the message will be saved anyway
-			if (msgs_store_limit > 0) {
-				PreparedStatement count_msgs_st =
-						data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
-	
+			if (msgs_store_limit != 0) {
+				ResultSet rs = null;
+				PreparedStatement count_msgs_st
+						= data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
+
 				synchronized (count_msgs_st) {
-					count_msgs_st.setLong(1, to_uid);
-					count_msgs_st.setLong(2, from_uid);
-	
-					rs = count_msgs_st.executeQuery();
-	
-					if (rs.next()) {
-						count = rs.getLong(1);
+					try {
+						count_msgs_st.setLong(1, to_uid);
+						count_msgs_st.setLong(2, from_uid);
+
+						rs = count_msgs_st.executeQuery();
+
+						if (rs.next()) {
+							count = rs.getLong(1);
+						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			}
 
 			// The insertion will be skipped if the msgs_store_limit is higher than 0 and it was passed
-			if (msgs_store_limit > 0 && msgs_store_limit <= count) {
+			if (msgs_store_limit != 0 && msgs_store_limit <= count) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Message store limit ({0}) exceeded for message: {1}",
 							new Object[] { msgs_store_limit, Packet.elemToString(msg) });
 				}
-				return;
+				return false;
 			}
 
 			PreparedStatement insert_msg_st =
@@ -781,43 +825,46 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		} catch (DataTruncation dte) {
 			log.log(Level.FINE, "Data truncated for message from {0} to {1}", new Object[] {
 					from, to });
-
-			data_repo.release(null, rs);
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
+		return true;
 	}
 	
 	@Override
 	public void loadMessagesToBroadcast() {
-		ResultSet rs = null;
 		try {
 			Set<String> oldMessages = new HashSet<String>(broadcastMessages.keySet());
 
+			ResultSet rs = null;
 			PreparedStatement stmt = data_repo.getPreparedStatement(null, MSG_SELECT_MESSAGES_TO_BROADCAST);
 
 			synchronized (stmt) {
-				stmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-				rs = stmt.executeQuery();
-				
-				DomBuilderHandler domHandler = new DomBuilderHandler();
-				while (rs.next()) {
-					String msgId = rs.getString(1);
-					oldMessages.remove(msgId);
-					if (broadcastMessages.containsKey(msgId))
-						continue;
-					
-					Date expire = rs.getTimestamp(2);
-					char[] msgChars = rs.getString(3).toCharArray();
-					
-					parser.parse(domHandler, msgChars, 0, msgChars.length);
-					
-					Queue<Element> elems = domHandler.getParsedElements();
-					Element msg = elems.poll();
-					if (msg == null)
-						continue;
-					
-					broadcastMessages.put(msgId, new BroadcastMsg(null, msg, expire));
+				try {
+					stmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+					rs = stmt.executeQuery();
+
+					DomBuilderHandler domHandler = new DomBuilderHandler();
+					while (rs.next()) {
+						String msgId = rs.getString(1);
+						oldMessages.remove(msgId);
+						if (broadcastMessages.containsKey(msgId))
+							continue;
+
+						Date expire = rs.getTimestamp(2);
+						char[] msgChars = rs.getString(3).toCharArray();
+
+						parser.parse(domHandler, msgChars, 0, msgChars.length);
+
+						Queue<Element> elems = domHandler.getParsedElements();
+						Element msg = elems.poll();
+						if (msg == null)
+							continue;
+
+						broadcastMessages.put(msgId, new BroadcastMsg(null, msg, expire));
+					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 			
@@ -825,26 +872,26 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				broadcastMessages.remove(id);
 			}
 			
-			data_repo.release(null, rs);
 			rs = null;
 			
 			for (String id : broadcastMessages.keySet()) {
 				BroadcastMsg bmsg = broadcastMessages.get(id);
 				stmt = data_repo.getPreparedStatement(null, MSG_SELECT_BROADCAST_RECIPIENTS);
 				synchronized (stmt) {
-					stmt.setString(1, id);
-					rs = stmt.executeQuery();
-					while (rs.next()) {
-						BareJID jid = BareJID.bareJIDInstanceNS(rs.getString(1));
-						bmsg.addRecipient(jid);
+					try {
+						stmt.setString(1, id);
+						rs = stmt.executeQuery();
+						while (rs.next()) {
+							BareJID jid = BareJID.bareJIDInstanceNS(rs.getString(1));
+							bmsg.addRecipient(jid);
+						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
-				data_repo.release(null, rs);
 			}
 		} catch (SQLException ex) {
 			log.log(Level.WARNING, "Problem with retrieving broadcast messages", ex);
-		} finally {
-			data_repo.release(null, rs);
 		}
 	}
 	
@@ -929,11 +976,13 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		try {
 			String jid_sha = Algorithms.hexDigest(bareJID.toString(), "", "SHA");
 			PreparedStatement add_jid_id_st =
-					data_repo.getPreparedStatement(bareJID, ADD_USER_JID_ID_QUERY);
+					data_repo.getPreparedStatement(bareJID, add_user_jid_id);
 
 			synchronized (add_jid_id_st) {
 				add_jid_id_st.setString(1, jid_sha);
 				add_jid_id_st.setString(2, bareJID.toString());
+				add_jid_id_st.setString( 3, jid_sha );
+				add_jid_id_st.setString( 4, bareJID.toString() );
 				add_jid_id_st.executeUpdate();
 			}
 
@@ -1037,7 +1086,6 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			return cache_res.longValue();
 		} // end of if (result != null)
 
-		ResultSet rs = null;
 		long result = -1;
 		String jid_sha;
 
@@ -1049,10 +1097,11 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			return -1;
 		}
 
-		try {
-			PreparedStatement uid_st = data_repo.getPreparedStatement(user_id, uid_query);
+		ResultSet rs = null;
+		PreparedStatement uid_st = data_repo.getPreparedStatement(user_id, uid_query);
 
-			synchronized (uid_st) {
+		synchronized (uid_st) {
+			try {
 				uid_st.setString(1, jid_sha);
 				rs = uid_st.executeQuery();
 
@@ -1061,7 +1110,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Found entry for JID: {0}, DB JID: {1}", new Object[] {
-								user_id, res_jid });
+							user_id, res_jid });
 					}
 
 					// There is a slight chance that there is the same SHA for 2 different
@@ -1076,7 +1125,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
 									"JIDs don't match, SHA conflict? JID: {0}, DB JID: {1}", new Object[] {
-											user_id, res_jid });
+										user_id, res_jid });
 						}
 					}
 				} else {
@@ -1084,14 +1133,14 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 						log.log(Level.FINEST, "No entry for JID: {0}", user_id);
 					}
 				}
+			} finally {
+				data_repo.release(null, rs);
 			}
+		}
 
 			// if (result <= 0) {
 			// throw new UserNotFoundException("User does not exist: " + user_id);
 			// } // end of if (isnext) else
-		} finally {
-			data_repo.release(null, rs);
-		}
 
 		if (result > 0) {
 			uids_cache.put(user_id, result);
@@ -1104,43 +1153,44 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 	@Override
 	protected void loadExpiredQueue(int min_elements) {
-		ResultSet rs = null;
-
 		try {
+			ResultSet rs = null;
 			PreparedStatement select_expired_st =
 					data_repo.getPreparedStatement(null, MSG_SELECT_EXPIRED_QUERY);
 
 			synchronized (select_expired_st) {
-				rs = select_expired_st.executeQuery();
+				try {
+					rs = select_expired_st.executeQuery();
 
-				DomBuilderHandler domHandler = new DomBuilderHandler();
-				int counter = 0;
+					DomBuilderHandler domHandler = new DomBuilderHandler();
+					int counter = 0;
 
-				while (rs.next()
-						&& ((expiredQueue.size() < MAX_QUEUE_SIZE) || (counter++ < min_elements))) {
-					String msg_str = rs.getString(MSG_BODY_COLUMN);
+					while (rs.next()
+							&& ((expiredQueue.size() < MAX_QUEUE_SIZE) || (counter++ < min_elements))) {
+						String msg_str = rs.getString(MSG_BODY_COLUMN);
 
-					parser.parse(domHandler, msg_str.toCharArray(), 0, msg_str.length());
+						parser.parse(domHandler, msg_str.toCharArray(), 0, msg_str.length());
 
-					Queue<Element> elems = domHandler.getParsedElements();
-					Element msg = elems.poll();
+						Queue<Element> elems = domHandler.getParsedElements();
+						Element msg = elems.poll();
 
-					if (msg == null) {
-						log.log(Level.INFO,
-								"Something wrong, loaded offline message from DB but parsed no "
-										+ "XML elements: {0}", msg_str);
-					} else {
-						Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
-						MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
+						if (msg == null) {
+							log.log(Level.INFO,
+									"Something wrong, loaded offline message from DB but parsed no "
+									+ "XML elements: {0}", msg_str);
+						} else {
+							Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
+							MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
 
-						expiredQueue.offer(item);
+							expiredQueue.offer(item);
+						}
 					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 
 		earliestOffline = Long.MAX_VALUE;
@@ -1148,47 +1198,48 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 	@Override
 	protected void loadExpiredQueue(Date expired) {
-		ResultSet rs = null;
-
 		try {
 			if (expiredQueue.size() > 100 * MAX_QUEUE_SIZE) {
 				expiredQueue.clear();
 			}
 
+			ResultSet rs = null;
 			PreparedStatement select_expired_before_st =
 					data_repo.getPreparedStatement(null, MSG_SELECT_EXPIRED_BEFORE_QUERY);
 
 			synchronized (select_expired_before_st) {
-				select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()));
-				rs = select_expired_before_st.executeQuery();
+				try {
+					select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()));
+					rs = select_expired_before_st.executeQuery();
 
-				DomBuilderHandler domHandler = new DomBuilderHandler();
-				int counter = 0;
+					DomBuilderHandler domHandler = new DomBuilderHandler();
+					int counter = 0;
 
-				while (rs.next() && (counter++ < MAX_QUEUE_SIZE)) {
-					String msg_str = rs.getString(MSG_BODY_COLUMN);
+					while (rs.next() && (counter++ < MAX_QUEUE_SIZE)) {
+						String msg_str = rs.getString(MSG_BODY_COLUMN);
 
-					parser.parse(domHandler, msg_str.toCharArray(), 0, msg_str.length());
+						parser.parse(domHandler, msg_str.toCharArray(), 0, msg_str.length());
 
-					Queue<Element> elems = domHandler.getParsedElements();
-					Element msg = elems.poll();
+						Queue<Element> elems = domHandler.getParsedElements();
+						Element msg = elems.poll();
 
-					if (msg == null) {
-						log.log(Level.INFO,
-								"Something wrong, loaded offline message from DB but parsed no "
-										+ "XML elements: {0}", msg_str);
-					} else {
-						Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
-						MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
+						if (msg == null) {
+							log.log(Level.INFO,
+									"Something wrong, loaded offline message from DB but parsed no "
+									+ "XML elements: {0}", msg_str);
+						} else {
+							Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
+							MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
 
-						expiredQueue.offer(item);
+							expiredQueue.offer(item);
+						}
 					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 
 		earliestOffline = Long.MAX_VALUE;

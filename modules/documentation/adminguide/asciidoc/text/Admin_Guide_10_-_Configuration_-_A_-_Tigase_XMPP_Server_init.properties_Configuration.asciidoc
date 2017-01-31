@@ -1,0 +1,184 @@
+[[initPropertiesGuide]]
+= Tigase XMPP Server init.properties Configuration
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 03:54
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+init.properties is a slightly extended version of the Java properties file with (key, value) pairs.
+
+Comment lines will have as it's first non-white space ASCII character either '#' or '!'.
+
+The key starts with first non-white space ASCII character and ends on either first white space ASCII character or either of '=' or ':'. Therefore if your key contains any of '=', ':' or white space characters you have to escape them with backslash \'\': \: or \=.
+
+All examples below specify 'vhosts' as a key and 'test-a, test-b, test-c' as a value:
+
+[source,bash]
+-----
+vhosts=test-a, test-b, test-c
+vhosts : test-a, test-b, test-c
+    vhosts     =     test-a, test-b, test-c
+-----
+
+Possible types are:
+
+- *[S]* (or nothing) - Characters string: 'abcdef'
+- *[s]* - String array: 'abcdef, ghaijk, lmnopq'
+- *[B]* - Boolean: 'true' or 'false'
+- *[b]* - Boolean array: 'true, true, false'
+- *[L]* - Long number: 1234567890
+- *[l]* - Long array: '12334, 45435, 45645'
+- *[I]* - Integer number: 123456
+- *[i]* - Integer array: '123, 456, 678'
+
+There are lots of parameters which have broader meaning than just one property. Some of them affect many configuration settings or can generate whole sections in the XML file. Most of them starts with \'--' double hyphen. Please note, each property put in the init.properties file starting with \'--' becomes a JVM system property (without \'--' at the beginning).
+
+//example init.properties goes here
+
+Reference the property guide for a description of properties.
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#admins[--admins]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDb[--auth-db]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDbUri[--auth-db-uri]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDomainRepoPool[--auth-domain-repo-pool]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authRepoPool[--auth-repo-pool]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authRepoPoolSize[--auth-repo-pool-size]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#bindExtHostnames[--bind-ext-hostnames]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#boshCloseConnection[--bosh-close-connection]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#boshExtraHeadersFile[--bosh-extra-headers-file]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clConnRepoClass[--cl-conn-repo-class]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clientAccessPolicyFile[--client-access-policy-file]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clusterConnectAll[--cluster-connect-all]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clusterMode[--cluster-mode]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clusterNodes[--cluster-nodes]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmHtTrafficThrottling[--cm-ht-traffic-throttling]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmSeeOtherHost[--cm-see-other-host]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmTrafficThrottling[--cm-traffic-throttling]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmpnamePorts[--cmpname-ports]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#compClass[--comp-class]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#compName[--comp-name]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#crossDomainPolicyFile[--cross-domain-policy-file]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#dataRepoPoolSize[--data-repo-pool-size]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#debug[--debug]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#debugPackages[--debug-packages]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#domainFilterPolicy[--domain-filter-policy]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#elementsNumberLimit[--elements-number-limit]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#extComp[--ext-comp]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#extcompRepoClass[--extcomp-repo-class]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#external[--external]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#hardenedMode[--hardened-mode]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#maxQueueSize[--max-queue-size]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#monitoring[--monitoring]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#netBuffHighThroughput[--net-buff-high-throughput]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#netBuffStandard[--net-buff-standard]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#newConnectionsThrottling[--new-connections-throttling]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#nonpriorityQueue[--nonpriority-queue]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#queueImplementation[--queue-implementation]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#rosterImplementation[--roster-implementation]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#s2sEjabberdBugWorkaroundActive[--s2s-ejabberd-bug-workaround-active]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#s2sSecret[--s2s-secret]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#s2sSkipTlsHostnames[--s2s-skip-tls-hostnames]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#scriptDir[--script-dir]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#smClusterStrategyClass[--sm-cluster-strategy-class]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#smPlugins[--sm-plugins]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#smThreadsPool[--sm-threads-pool]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#sslCertsLocation[--ssl-certs-location]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#sslContainerClass[--ssl-container-class]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#sslDefCertDomain[--ssl-def-cert-domain]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#statsHistory[--stats-history]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#stringprepProcessor[--stringprep-processor]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#test[--test]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#tigaseConfigRepoClass[--tigase-config-repo-class]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#tigaseConfigRepoUri[--tigase-config-repo-uri]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#tlsJdkNssBugWorkaroundActive[--tls-jdk-nss-bug-workaround-active]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#trusted[--trusted]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userDb[--user-db]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userDbUri[--user-db-uri]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userDomainRepoPool[--user-domain-repo-pool]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userRepoPool[--user-repo-pool]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userRepoPoolSize[--user-repo-pool-size]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostAnonymousEnabled[--vhost-anonymous-enabled]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostMaxUsers[--vhost-max-users]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostMessageForwardJid[--vhost-message-forward-jid]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostPresenceForwardJid[--vhost-presence-forward-jid]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostRegisterEnabled[--vhost-register-enabled]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostTlsRequired[--vhost-tls-required]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#virtHosts[--virt-hosts]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#watchdogDelay[--watchdog_delay]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#watchdogPingType[--watchdog_ping_type]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#watchdogTimeout[--watchdog_timeout]
+
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#configType[config-type]

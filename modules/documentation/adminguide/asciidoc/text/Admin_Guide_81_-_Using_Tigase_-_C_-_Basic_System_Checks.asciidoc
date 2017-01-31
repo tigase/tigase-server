@@ -1,0 +1,26 @@
+[[systemchecks]]
+= Basic System Checks
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-03-06 20:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Previously, a configuration article is available about xref:linuxhighload[Linux settings for high load systems]. This has a description of basic settings which are essential to successfully run XMPP service for hundreds or thousands of online users.
+
+Of course, high load and high traffic systems require much more tuning and adjustments. If you use selinux you have to be careful as it can interfere with the service while it is under a high load. Also some firewall settings may cause problems as the system may decide it is under a DDOS attack and can start blocking incoming connections or throttle the traffic.
+
+In any case, there are some basic checks to do every time you deploy XMPP service to make sure it will function properly. I am trying to keep the article mentioned above up to date and add all the settings and parameters I discover while working with different installations. _If you have some suggestions for different values or different parameters to add, please let me know._
+
+// The article, while helpful, seems to be not enough though.
+
+If you want to run a service on a few cluster nodes (5 or even 10), then manually checking every machine and adjusting these settings is time consuming and it is very easy to forget about.
+
+To overcome this problem I started to work on a shell script which would run all the basic checks and report problems found. Ideally it should be also able to adjust some parameters for you.
+
+Inside the Tigase server link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/scripts[/scripts/] repository find a script called +machine-check.sh+. It performs all the basic checks from the article and also tries to adjust them when necessary. Have a link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/scripts/machine-check.sh[look at the code] or link:https://projects.tigase.org/projects/tigase-server/repository/changes/scripts/machine-check.sh?rev=master[check it out] and run for yourself.
+
+Any comments or suggestions, as usual, are very much appreciated.

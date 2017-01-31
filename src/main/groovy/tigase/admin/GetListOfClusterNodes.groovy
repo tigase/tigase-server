@@ -15,10 +15,6 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev: $
- * Last modified by $Author: $
- * $Date: $
- */
 /*
  Get list of all connected cluster nodes
 
@@ -32,7 +28,6 @@ package tigase.admin
 import tigase.server.*
 import tigase.util.*
 import tigase.xmpp.*
-import tigase.cluster.repo.ClusterRepoItem
 import tigase.db.*
 import tigase.db.comp.ComponentRepository
 import tigase.xml.*
@@ -40,8 +35,7 @@ import tigase.xml.*
 def p = (Packet)packet
 def result = p.commandResult(Command.DataType.result)
 try {
-	def repo = (ComponentRepository<ClusterRepoItem>)comp_repo;
-	def nodes = repo.allItems().collect { return it.getHostname() };
+	def nodes = component.getNodesConnectedWithLocal().collect { return it.getDomain() }
 	Command.addFieldMultiValue(result, "Cluster nodes:", nodes);
 } catch (Exception ex) {
 	Command.addTextField(result, "Note", "Problem with retrieving list of all connected cluster nodes: " + ex.getMessage());

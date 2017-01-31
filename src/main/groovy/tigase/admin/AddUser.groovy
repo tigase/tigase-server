@@ -90,8 +90,10 @@ try {
 		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");
 	}
 } catch (UserExistsException ex) {
+	ex.printStackTrace();
 	Command.addTextField(result, "Note", "User already exists, can't be added.");
 } catch (TigaseDBException ex) {
+	ex.printStackTrace();
 	Command.addTextField(result, "Note", "Problem accessing database, user not added.");
 }
 

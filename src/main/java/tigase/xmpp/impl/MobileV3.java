@@ -26,26 +26,19 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xml.Element;
-
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.xmpp.impl.MobileV3.*;
 
@@ -188,7 +181,7 @@ public class MobileV3
 			Logger.getLogger(MobileV3.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
+
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (session == null) {
@@ -228,9 +221,19 @@ public class MobileV3
 				continue;
 			}
 
+			// get parent session to look up for connection for destination
+			XMPPSession parentSession = sessionFromSM.getParentSession();
+			if (parentSession == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session for destination {0} for packet {1} - missing parent session",
+							new Object[] { res.getPacketTo().toString(),
+										   res.toString() });
+				}
+				continue;
+			}
+
 			// get resource connection for destination
-			XMPPResourceConnection session = sessionFromSM.getParentSession()
-					.getResourceForConnectionId(res.getPacketTo());
+			XMPPResourceConnection session = parentSession.getResourceForConnectionId(res.getPacketTo());
 
 			if (session == null) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -333,7 +336,8 @@ public class MobileV3
 			switch (e.getValue()) {
 				case need_flush:
 					try {
-						session = sessionFromSM.getParentSession().getResourceForConnectionId(e.getKey());
+						XMPPSession parentSession = sessionFromSM.getParentSession();
+						session = (parentSession == null) ? null : parentSession.getResourceForConnectionId(e.getKey());
 						if (session != null) {
 							Map<JID, Packet> presenceQueue = (Map<JID, Packet>) session.getSessionData(PRESENCE_QUEUE_KEY);
 							synchronized (presenceQueue) {
@@ -353,8 +357,10 @@ public class MobileV3
 					}
 				case need_packet_flush:
 					try {
-						if (session == null)
-							session = sessionFromSM.getParentSession().getResourceForConnectionId(e.getKey());
+						if (session == null) {
+							XMPPSession parentSession = sessionFromSM.getParentSession();
+							session = (parentSession == null) ? null : parentSession.getResourceForConnectionId(e.getKey());
+						}
 						if (session != null) {
 							Queue<Packet> packetQueue = (Queue<Packet>) session.getSessionData(PACKET_QUEUE_KEY);
 							synchronized (packetQueue) {

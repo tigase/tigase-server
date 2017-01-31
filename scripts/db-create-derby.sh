@@ -4,31 +4,17 @@
   echo "Give me a path to the location where you want to have the database created" && \
   exit 1
 
-# for tigase 5.0 and below
-#java -Dij.protocol=jdbc:derby: -Dij.database="$1;create=true" \
-#		-Dderby.system.home=`pwd` \
-#		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
-#		org.apache.derby.tools.ij database/derby-schema-4.sql
-#java -Dij.protocol=jdbc:derby: -Dij.database="$1" \
-#		-Dderby.system.home=`pwd` \
-#		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
-#		org.apache.derby.tools.ij database/derby-schema-4-sp.schema
-#java -Dij.protocol=jdbc:derby: -Dij.database="$1" \
-#		-Dderby.system.home=`pwd` \
-#		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
-#		org.apache.derby.tools.ij database/derby-schema-4-props.sql
+export USER_NAME=tigase
+export USER_PASS=${USER_NAME}
+export ROOT_NAME=root
+export ROOT_PASS=${ROOT_USER}
+export DB_HOST=localhost
+export DB_NAME=$1
+export DB_TYPE=derby
+export DB_VERSION=7-1
 
-# for Tigase 5.1
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL
 
-java -Dij.protocol=jdbc:derby: -Dij.database="$1;create=true" \
-		-Dderby.system.home=`pwd` \
-		-cp jars/derby.jar:jars/derbytools.jar:jars/tigase-server.jar \
-		org.apache.derby.tools.ij database/derby-schema-5-1.sql &> derby-db-create.txt
-
-java -Dij.protocol=jdbc:derby: -Dij.database="$1;create=true" \
-		-Dderby.system.home=`pwd` \
-		-cp jars/derby.jar:jars/derbytools.jar:jars/tigase-server.jar \
-		org.apache.derby.tools.ij database/derby-pubsub-schema-3.0.0.sql &> derby-db-create-pubsub.txt
-
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL -file database/${DB_TYPE}-pubsub-schema-3.0.0.sql
 
 echo -e "\n\n\nconfiguration:\n\n--user-db=derby\n--user-db-uri=jdbc:derby:$1\n\n"

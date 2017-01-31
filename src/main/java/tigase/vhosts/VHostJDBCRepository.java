@@ -26,24 +26,22 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
 import tigase.db.comp.UserRepoRepository;
-
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
 
 import tigase.xmpp.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolverFactory;
+import tigase.util.DNSResolverIfc;
+import tigase.util.TigaseStringprepException;
 
 import java.net.UnknownHostException;
-
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import tigase.db.DBInitException;
 
 /**
  * This implementation stores virtual domains in the UserRepository database. It
@@ -120,16 +118,18 @@ public class VHostJDBCRepository
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 
 		// Something to initialize database with, in case it is empty
 		// Otherwise the server would not work at all with empty Items database
 		super.getDefaults(defs, params);
-		DNS_SRV_DEF_ADDR_PROP_VAL = DNSResolver.getDefaultHostname();
+		DNSResolverIfc resolver = DNSResolverFactory.getInstance();
+		DNS_SRV_DEF_ADDR_PROP_VAL = resolver.getDefaultHost();
 		try {
-			DNS_DEF_IP_PROP_VAL = DNSResolver.getHostIP(DNSResolver.getDefaultHostname());
+			DNS_DEF_IP_PROP_VAL = resolver.getHostIP(resolver.getDefaultHost());
 		} catch (Exception e) {
-			DNS_DEF_IP_PROP_VAL = DNSResolver.getDefaultHostname();
+			DNS_DEF_IP_PROP_VAL = resolver.getDefaultHost();
 		}
 		defs.put(DNS_SRV_DEF_ADDR_PROP_KEY, DNS_SRV_DEF_ADDR_PROP_VAL);
 		defs.put(DNS_DEF_IP_PROP_KEY, DNS_DEF_IP_PROP_VAL);
@@ -209,7 +209,7 @@ public class VHostJDBCRepository
 
 		// verify all SRV DNS records
 		try {
-			DNSEntry[] entries = DNSResolver.getHostSRV_Entries(item.getKey());
+			DNSEntry[] entries = DNSResolverFactory.getInstance().getHostSRV_Entries(item.getKey());
 
 			if (entries != null) {
 				for (DNSEntry dNSEntry : entries) {
@@ -233,7 +233,7 @@ public class VHostJDBCRepository
 
 		// verify DNS records
 		try {
-			String[] ipAddress = DNSResolver.getHostIPs(item.getKey());
+			String[] ipAddress = DNSResolverFactory.getInstance().getHostIPs(item.getKey());
 
 			if (ipAddress != null) {
 				if (Arrays.asList(ipAddress).contains(def_ip_address)) {

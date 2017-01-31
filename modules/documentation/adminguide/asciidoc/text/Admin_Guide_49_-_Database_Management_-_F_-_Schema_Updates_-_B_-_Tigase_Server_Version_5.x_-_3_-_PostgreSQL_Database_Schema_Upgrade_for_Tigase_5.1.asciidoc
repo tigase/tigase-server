@@ -1,0 +1,41 @@
+[[postgresql51upgrade]]
+= PostgreSQL Database Schema Upgrade for Tigase 5.1
+:author: Andrzej Wojcik <andrzejw@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-06-16 11:03
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+The schema upgrade is very simple and safe but make sure the current database schema is in version 4.0.
+
+Assumptions:
+
+- *tigasedb* is a database name
+- *tigase_user* is a database user name
+- *admin_db_user* is database admin user name
+
+First things first - make a database backup:
+
+[source,sql]
+-----
+pg_dump -U tigase_user -W tigasedb > tigasedb_dump.sql
+-----
+
+If you need to restore database for any reason execute following commands:
+
+[source,sql]
+-----
+dropdb -U admin_db_user -W tigasedb
+createdb -U admin_db_user -W -O tigase_user tigasedb
+psql -U tigase_user -W tigasedb < tigasedb_dump.sql
+-----
+
+Now we can run schema upgrade script
+
+[source,sql]
+-----
+psql -q -U tigase_user -W tigasedb -f database/postgresql-schema-upgrade-to-5-1.sql
+-----

@@ -3,17 +3,25 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.5</slf4j.version>
-		<packet.version>5.3.0</packet.version>
+		<packet.version>7.1.0</packet.version>
 		<packaging.type>bundle</packaging.type>
 		<dir>target</dir>
 		<maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
+
+		<sign-keystore>/path/to/jks.keystore</sign-keystore>
+		<sign-alias>alias</sign-alias>
+		<sign-storepass>storepass</sign-storepass>
+		<sign-keypass>keypass</sign-keypass>
+		<sign-skip>true</sign-skip>
+		<verbose-log>false</verbose-log>
+		<tsa-uri></tsa-uri>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server-master</artifactId>
-	<version>7.0.5-SNAPSHOT</version>
+	<version>7.1.1-SNAPSHOT</version>
 	
 	<name>Tigase XMPP Server Master project</name>
 
@@ -49,8 +57,7 @@
 		<connection>scm:git:https://repository.tigase.org/git/tigase-server.git</connection>
 		<developerConnection>scm:git:https://repository.tigase.org/git/tigase-server.git</developerConnection>
 		<url>https://projects.tigase.org/projects/tigase-server/repository</url>
-	  <tag>tigase-server-7.0.4</tag>
-  </scm>
+	</scm>
 
 	<organization>
 		<name>"Tigase, Inc."</name>
@@ -63,6 +70,21 @@
 
 	<profiles>
 		<profile>
+			<id>doc</id>
+			<activation>
+				<property>
+					<name>doc</name>
+				</property>
+			</activation>
+			<modules>
+				<module>../documentation</module>
+			</modules>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+				<packaging.type>bundle</packaging.type>
+			</properties>
+		</profile>
+		<profile>
 			<id>dist</id>
 			<activation>
 				<property>
@@ -70,11 +92,9 @@
 				</property>
 			</activation>
 			<modules>
-				<module>../documentation</module>
 				<module>../distribution</module>
 			</modules>
 			<properties>
-				<maven.javadoc.skip>false</maven.javadoc.skip>
 				<packaging.type>bundle</packaging.type>
 			</properties>
 		</profile>
@@ -102,7 +122,6 @@
 					<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
 					<shortRevisionLength>8</shortRevisionLength>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<tagNameFormat>tigase-server-@{project.version}</tagNameFormat>
 				</configuration>
 				<executions>
 					<execution>
@@ -118,8 +137,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 					<showDeprecation>true</showDeprecation>
 				</configuration>
@@ -193,31 +212,18 @@
 				</executions>
 			</plugin>
 		</plugins>
-
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>2.10</version>
-			</extension>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.10</version>
-			</extension>
-		</extensions>
 	</build>
 
 	<repositories>
 		<repository>
 			<id>tigase</id>
 			<name>Tigase repository</name>
-			<url>http://maven.tigase.org</url>
+			<url>http://maven-repo.tigase.org/repository/release</url>
 		</repository>
 		<repository>
 			<id>tigase-snapshot</id>
 			<name>Tigase repository</name>
-			<url>http://build.xmpp-test.net/maven/</url>
+			<url>http://maven-repo.tigase.org/repository/snapshot</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -227,12 +233,12 @@
 		<repository>
 			<id>tigase</id>
 			<name>Tigase repository</name>
-			<url>scp://maven.tigase.org:/home/webapp/maven-repository</url>
+			<url>http://maven-repo.tigase.org/repository/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>tigase-snapshot</id>
 			<name>Tigase snapshot repository</name>
-			<url>scp://build.xmpp-test.net:/home/maven/repository</url>
+			<url>http://maven-repo.tigase.org/repository/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>

@@ -74,4 +74,13 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 		// Nothing to do here
 	}
 
+	@Override
+	public String validateItem(CompRepoItem item) {
+		String result = super.validateItem(item);
+		if (result == null) {
+			result = item.validate();
+		}
+		return result;
+	}
+	
 }

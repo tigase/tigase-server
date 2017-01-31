@@ -1,0 +1,15 @@
+[[ServerCertificates]]
+= Server Certificates
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+
+- xref:certspem[Creating and Loading the Server Certificate in pem Files]
+- xref:startcomCertificate[Installing StartCom Certificate in Your Linux System]
+//- xref:keytoolKeystore[Server Certificate Using Keytool and Keystore]

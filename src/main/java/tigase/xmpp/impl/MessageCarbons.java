@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
@@ -79,6 +80,11 @@ public class MessageCarbons
 	
 	private static final String ENABLE_ELEM_NAME = "enable";
 	private static final String DISABLE_ELEM_NAME = "disable";
+	
+	private static final String[] MESSAGE_HINTS_NO_COPY = { Message.ELEM_NAME, "no-copy" };
+	private static final String MESSAGE_HINTS_XMLNS = "urn:xmpp:hints";
+	
+	private static final Function<String,Object> RESOURCES_MAP_FACTORY = (k) -> { return new ConcurrentHashMap<JID,Boolean>(); };
 	
 	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
 	
@@ -167,6 +173,11 @@ public class MessageCarbons
 						|| packet.getElement().getChild("sent", XMLNS) != null) {
 					return;
 				}
+				
+				// support for XEP-0334 Message Processing Hints
+				if (packet.getAttributeStaticStr(MESSAGE_HINTS_NO_COPY, "xmlns") == MESSAGE_HINTS_XMLNS) {
+					return;
+				}
 
 				// if this is private message then do not send carbon copy
 				Element privateEl = packet.getElement().getChild("private", XMLNS);
@@ -191,10 +202,21 @@ public class MessageCarbons
 					// forking of messages sent to bare jid
 					// we need to fork this message
 					skipForkingTo = messageProcessor.getJIDsForMessageDelivery(session);
+					
+					// we should skip forking to JID with enabled message carbons if jid is not from local node
+					for (JID jid : resources.keySet()) {
+						if (session.getParentSession().getResourceForJID(jid) == null)
+							skipForkingTo.add(jid);
+					}
 				} else {
 					skipForkingTo = Collections.singleton(session.getJID());
 				}
-				
+
+				if ( log.isLoggable( Level.FINER ) ){
+					log.log( Level.FINER, "Sending message carbon copy, packet: {0}, resources {1}, skipForkingTo: {2}, session: {3}",
+									 new Object[] { packet, resources, skipForkingTo, session } );
+				}
+
 				for (Map.Entry<JID, Boolean> entry : resources.entrySet()) {
 
 					if (!entry.getValue()) {
@@ -342,16 +364,7 @@ public class MessageCarbons
 		}
 
 		ConcurrentHashMap<JID, Boolean> resources = 
-				(ConcurrentHashMap<JID, Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-		if (resources == null) {
-			synchronized (session.getParentSession()) {
-				resources = (ConcurrentHashMap<JID, Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-				if (resources == null) {
-					resources = new ConcurrentHashMap<JID, Boolean>();
-					session.putCommonSessionData(ENABLED_RESOURCES_KEY, resources);
-				}
-			}
-		}
+				(ConcurrentHashMap<JID, Boolean>) session.computeCommonSessionDataIfAbsent(ENABLED_RESOURCES_KEY, RESOURCES_MAP_FACTORY);
 
 		StanzaType type = packet.getType();
 		if (type == null || type == StanzaType.available) {

@@ -26,7 +26,9 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -87,6 +89,11 @@ public class MessageRouter
 			new ConcurrentSkipListSet<>();
 	private Map<JID, ServerComponent>         components_byId = new ConcurrentHashMap<>();
 	private Map<String, ServerComponent>      components      = new ConcurrentHashMap<>();
+
+	private static final String JVM_STATS_GC_STATISTICS = "JVM/GC-statistics";
+	private static final String JVM_STATS_HEAP_TOTAL = "JVM/HEAP Total ";
+	private static final String JVM_STATS_HEAP_POOLS = "JVM/MemoryPools/HeapMemory/";
+
 
 	//~--- methods --------------------------------------------------------------
 
@@ -245,7 +252,8 @@ public class MessageRouter
 		// let't try to relax restriction and block all packets with error type
 		// 2008-06-16
 		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) && packet
-				.getFrom().equals(packet.getTo()))) {
+				.getFrom().equals(packet.getTo()) 
+				&& (packet.getStanzaFrom() == null || packet.getStanzaFrom().equals(packet.getStanzaTo())))) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Possible infinite loop, dropping packet: {0}", packet);
 			}
@@ -567,14 +575,7 @@ public class MessageRouter
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(1);
 
-		// if (format instanceof DecimalFormat) {
-		// DecimalFormat decf = (DecimalFormat)format;
-		// decf.applyPattern(decf.toPattern()+"%");
-		// }
 		list.add(getName(), "CPU usage", format.format(cpuUsage) + "%", Level.INFO);
-
-		MemoryUsage heap    = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		MemoryUsage nonHeap = ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
 
 		format = NumberFormat.getIntegerInstance();
 		if (format instanceof DecimalFormat) {
@@ -582,16 +583,56 @@ public class MessageRouter
 
 			decf.applyPattern(decf.toPattern() + " KB");
 		}
-		list.add(getName(), "Max Heap mem", format.format(heap.getMax() / 1024), Level.INFO);
-		list.add(getName(), "Used Heap", format.format(heap.getUsed() / 1024), Level.INFO);
-		list.add(getName(), "Free Heap", format.format( heap.getMax() == -1 ? 0 :
-				(heap.getMax() - heap.getUsed()) / 1024), Level.FINE);
-		list.add(getName(), "Max NonHeap mem", format.format(nonHeap.getMax() / 1024), Level
+		list.add(getName(), "Max Heap mem", format.format(runtime.getHeapMemMax() / 1024), Level.INFO);
+		list.add(getName(), "Used Heap", format.format(runtime.getHeapMemUsed() / 1024), Level.INFO);
+		list.add(getName(), "Free Heap", format.format( runtime.getHeapMemMax() == -1 ? -1.0 :
+				(runtime.getHeapMemMax() - runtime.getHeapMemUsed()) / 1024), Level.FINE);
+		list.add(getName(), "Max NonHeap mem", format.format(runtime.getNonHeapMemMax() / 1024), Level
 				.FINE);
-		list.add(getName(), "Used NonHeap", format.format(nonHeap.getUsed() / 1024), Level
+		list.add(getName(), "Used NonHeap", format.format(runtime.getNonHeapMemUsed() / 1024), Level
 				.FINE);
-		list.add(getName(), "Free NonHeap", format.format( nonHeap.getMax() == -1 ? 0 :
-				(nonHeap.getMax() - nonHeap.getUsed()) / 1024), Level.FINE);
+		list.add(getName(), "Free NonHeap", format.format( runtime.getNonHeapMemMax() == -1 ? -1.0 :
+				(runtime.getNonHeapMemMax() - runtime.getNonHeapMemUsed()) / 1024), Level.FINE);
+
+
+		// general JVM/GC info
+		list.add(getName(), "Heap region name", runtime.getOldGenName(), Level.FINE);
+		list.add(getName(), JVM_STATS_GC_STATISTICS, runtime.getGcStatistics(), Level.FINER);
+
+		// Total HEAP usage
+		Level statLevel = Level.FINER;
+		MemoryUsage heapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		String JVM_STATS_USED = "Used [KB]";
+		String JVM_STATS_FREE = "Free [KB]";
+		String JVM_STATS_MAX = "Max [KB]";
+		int factor = 1024;
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_USED, heapMemoryUsage.getUsed() / factor, statLevel);
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_MAX, heapMemoryUsage.getMax() / factor, statLevel);
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_FREE,
+				(heapMemoryUsage.getMax() - heapMemoryUsage.getUsed())/factor, statLevel);
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + "Usage [%]",
+				heapMemoryUsage.getUsed() * 100F / heapMemoryUsage.getMax(), statLevel);
+
+
+		// per-heap-pool metrics
+		for (Map.Entry<String, MemoryPoolMXBean> entry : runtime.getMemoryPoolMXBeans().entrySet()) {
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Name", entry.getValue().getName(), statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Usage/" + JVM_STATS_USED,
+					entry.getValue().getUsage().getUsed() / factor, statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Usage/" + JVM_STATS_MAX,
+					entry.getValue().getUsage().getMax() / factor, statLevel);
+
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Peak Usage/" + JVM_STATS_USED,
+					entry.getValue().getPeakUsage().getUsed() / factor, statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Peak Usage/" + JVM_STATS_MAX,
+					entry.getValue().getPeakUsage().getMax() / factor, statLevel);
+
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Collection Usage/" + JVM_STATS_USED,
+					entry.getValue().getCollectionUsage().getUsed() / factor, statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Collection Usage/" + JVM_STATS_MAX,
+					entry.getValue().getCollectionUsage().getMax() / factor, statLevel);
+
+		}
 	}
 
 	//~--- set methods ----------------------------------------------------------

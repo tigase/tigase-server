@@ -38,9 +38,16 @@ import tigase.conf.Configurator;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.*
 
+class DelayedReloadTaskPlugMan extends Thread {
+	void run() {
+		Thread.sleep(5000);
+	    ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+	}
+}
+
 try {
 
-def SUBMIT = "submit";
+def SUBMIT = "exec";
         
 def p = (Iq)packet
 
@@ -56,7 +63,8 @@ if (!isServiceAdmin) {
 }
 
         
-def submit = Command.getFieldValue(p, SUBMIT);
+//def submit = Command.getFieldValue(p, SUBMIT);
+def submit = p.getElement().findChild(["iq","command","x"] as String[])?.getAttribute("type");
 
 if (!submit) {
         def res = (Iq)p.commandResult(Command.DataType.form)
@@ -142,7 +150,7 @@ else {
         props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
         conf.putProperties("sess-man", props);
                 
-        ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+		new DelayedReloadTaskPlugMan().start();
 		
         def res = (Iq)p.commandResult(Command.DataType.result)
 

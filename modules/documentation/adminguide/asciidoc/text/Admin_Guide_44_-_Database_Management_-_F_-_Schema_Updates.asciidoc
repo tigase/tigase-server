@@ -1,0 +1,15 @@
+[[oldVerSchemas]]
+= Schema Updates
+:author: Daniel wisnewski
+:version: v1.0, October 2015
+:date: 2015-10-05 13:41
+
+This is a repository for Schema updates in case you have to upgrade from older installations.
+
+
+- xref:tigaseServer71[Tigase Server Schema v7.1 Updates] Applies to v7.1.0 and v7.2.0
+- xref:tigase51schemaupgrade[Upgrades to v5.1 of Tigase]
+. xref:derby51upgrade[Derby Database Schema Upgrade for Tigase 5.1]
+. xref:mysql51upgrade[MySQL Database Schema Upgrade for Tigase 5.1]
+. xref:postgresql51upgrade[PostgreSQL Database Schema Upgrade for Tigase 5.1]
+- xref:tigase40schemaUpgrade[MySQL Database Schema Upgrade for Tigase 4.0]

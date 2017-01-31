@@ -101,7 +101,7 @@ class DBSchemaLoader extends SchemaLoader {
 	public static final String DASH = "-";
 	// defaults
 	public static final String DATABASE_TYPE_DEF = "mysql";
-	public static final String SCHEMA_VERSION_DEF = "5-1";
+	public static final String SCHEMA_VERSION_DEF = "7-1";
 	public static final String DATABASE_NAME_DEF = "tigasedb";
 	public static final String DATABASE_HOSTNAME_DEF = "localhost";
 	public static final String TIGASE_USERNAME_DEF = "tigase_user";
@@ -322,7 +322,7 @@ class DBSchemaLoader extends SchemaLoader {
 		String help = "Usage:"
 									+ "$ java -cp \"jars/*.jar\" tigase.util.DBSchemaLoader"
 									+ "\n\t -" + DATABASE_TYPE_KEY + " database_type {derby, mysql, postgresql, sqlserver} "
-									+ "\n\t[-" + SCHEMA_VERSION_KEY + " schema_version {4, 5, 5-1} ]"
+									+ "\n\t[-" + SCHEMA_VERSION_KEY + " schema_version {4, 5, 5-1, 7-1} ]"
 									+ "\n\t[-" + DATABASE_NAME_KEY + " database_name]"
 									+ "\n\t[-" + DATABASE_HOSTNAME_KEY + " database hostname]"
 									+ "\n\t[-" + TIGASE_USERNAME_KEY + " tigase_username]"
@@ -374,6 +374,15 @@ class DBSchemaLoader extends SchemaLoader {
 					if ( line.startsWith( "-- LOAD SCHEMA:" ) ){
 						results.addAll( loadSchemaQueries( variables ) );
 					}
+					if (  line.startsWith( "-- LOAD FILE:" )  && line.trim().contains( "sql" ) )
+					{
+						Matcher matcher = Pattern.compile( "-- LOAD FILE:\\s*(.*\\.sql)" ).matcher( line );
+						if ( matcher.find() ){
+							log.log( Level.FINE,
+											 String.format( "\n\n *** trying to load schema: %1$s \n", matcher.group( 1 ) ) );
+							results.addAll( loadSQLQueries(  matcher.group( 1 ), null, variables ) );
+						}
+					}
 					break;
 				case IN_SQL:
 					if ( line.startsWith( "-- QUERY END:" ) ){
@@ -387,16 +396,6 @@ class DBSchemaLoader extends SchemaLoader {
 						}
 						String substitute = variableSubstitutor.substitute( sql_query, replacementMap );
 						results.add( substitute );
-					}
-					if ( ( line.trim().startsWith( "source" ) || line.trim().startsWith( "run" )
-								 || line.trim().startsWith( "\\i" ) ) && line.trim().contains( "sql" ) ){
-						Matcher matcher = Pattern.compile( res_prefix + "-(.*).sql" ).matcher( line );
-						if ( matcher.find() ){
-							log.log( Level.FINEST,
-											 String.format( "\n\n *** trying to load schema: %1$s \t", matcher.group( 1 ) ) );
-							results.addAll( loadSQLQueries( res_prefix + DASH + matcher.group( 1 ), res_prefix, variables ) );
-						}
-						continue;
 					}
 					if ( line.isEmpty() || line.trim().startsWith( "--" ) ){
 						continue;
@@ -497,6 +496,7 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 	}
 
+	@Override
 	public Result shutdown( Properties variables ) {
 		return shutdownDerby(variables);
 	}
@@ -679,6 +679,7 @@ class DBSchemaLoader extends SchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
+	@Override
 	public Result postInstallation( Properties variables ) {
 		// part 1, check db preconditions
 		if ( !connection_ok ){
@@ -719,6 +720,44 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.WARNING, "Can't finalize: " + ex.getMessage() );
 			return Result.error;
 		}
+	}
+
+	/**
+	 * Method performs post-installation action using using
+	 * {@code *-installer-post.sql} schema file substituting it's variables with
+	 * ones provided.
+	 *
+	 * @param variables set of {@code Properties} with all configuration options
+	 */
+	@Override
+	public Result printInfo( Properties variables ) {
+		// part 1, check db preconditions
+		if ( !connection_ok ){
+			log.log( Level.WARNING, "Connection not validated" );
+			return Result.error;
+		}
+		if ( !db_ok ){
+			log.log( Level.WARNING, "Database not validated" );
+			return Result.error;
+		}
+
+		if ( !schema_ok ){
+			log.log( Level.WARNING, "Database schema is invalid" );
+			return Result.error;
+		}
+
+		String db_conn = getDBUri( variables, true, false );
+		String database = variables.getProperty( DATABASE_TYPE_KEY );
+
+		switch ( database ) {
+			case "mysql":
+				db_conn += "&useUnicode=true&characterEncoding=UTF-8";
+				break;
+		}
+		log.log( Level.INFO, "\n\nDatabase init.properties configuration:\n"
+												 + "\n" + "--user-db=" + database
+												 + "\n" + "--user-db-uri=" + db_conn );
+		return Result.ok;
 	}
 
 	@Override
@@ -1000,6 +1039,12 @@ class DBSchemaLoader extends SchemaLoader {
 			public void execute( DBSchemaLoader helper, Properties variables ) {
 				helper.shutdownDerby( variables );
 			}
+		},
+		PRINT_INFO_TASK( "Database Configuration Details" ) {
+			@Override
+			public void execute( DBSchemaLoader helper, Properties variables ) {
+				helper.printInfo( variables );
+			}
 		};
 		private final String description;
 
@@ -1020,15 +1065,16 @@ class DBSchemaLoader extends SchemaLoader {
 					,ADD_ADMIN_XMPP_ACCOUNT
 					,POST_INSTALLATION
 					,SHUTDOWN_DATABASE
+					,PRINT_INFO_TASK
 			};
 		}
 
 		public static TigaseDBTask[] getSchemaTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, LOAD_SCHEMA_FILE, SHUTDOWN_DATABASE };
+			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, LOAD_SCHEMA_FILE, SHUTDOWN_DATABASE, PRINT_INFO_TASK };
 		}
 
 		public static TigaseDBTask[] getQueryTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE };
+			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE, PRINT_INFO_TASK };
 		}
 	}
 

@@ -43,102 +43,24 @@ public interface StatisticsProviderMBean {
 	 */
 	public Map<String, String> getAllStats(int level);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getCLIOQueueSize();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	public float[] getCLPacketsPerSecHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getCLQueueSize();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getClusterCacheSize();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getClusterCompressionRatio();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getClusterNetworkBytes();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getClusterNetworkBytesPerSecond();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getClusterPackets();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getClusterPacketsPerSec();
 
-///**
-// * Operation exposed for management
-// *
-// * @return java.util.Map<String, String>
-// */
-//public Map getAllStats();
 
 	/**
 	 * Get Attribute exposed for management
@@ -157,311 +79,65 @@ public interface StatisticsProviderMBean {
 	 */
 	public Map<String, String> getComponentStats(String compName, int level);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getConnectionsNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	public int[] getConnectionsNumberHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getCPUsNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getCPUUsage();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	public float[] getCPUUsageHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param statsKeys is a <code>String[]</code>
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	public Map<String, Object> getCurStats(String[] statsKeys);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getDirectMemUsed();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long[]</code>
-	 */
 	public long[] getDirectMemUsedHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getHeapMemUsage();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	public float[] getHeapUsageHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getIQAuthNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getIQOtherNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getIQOtherNumberPerSec();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getMessagesNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getMessagesNumberPerSec();
 
-	/**
-	 * Get Attribute exposed for management
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getName();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getNonHeapMemUsage();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getPresencesNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getPresencesNumberPerSec();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getProcesCPUTime();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getQueueOverflow();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getQueueSize();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getServerConnections();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	public int[] getServerConnectionsHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getSMPacketsNumber();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getSMPacketsNumberPerSec();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	public float[] getSMPacketsPerSecHistory();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getSMQueueSize();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param statsKeys is a <code>String[]</code>
-	 *
-	 * @return a value of {@code Map<String,LinkedList<Object>>}
-	 */
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getSystemDetails();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getUptime();
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/11/29

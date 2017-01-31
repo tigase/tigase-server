@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>7.0.5-SNAPSHOT</version>
+		<version>7.1.1-SNAPSHOT</version>
 		<relativePath>../master</relativePath>
 	</parent>
 
@@ -120,13 +120,13 @@
 								<ignoreImageScaling>true</ignoreImageScaling>
 								<postProcess>
 									<copy todir="${guide_path}/webhelp/css">
-										<fileset dir="asciidoc/css" />
+										<fileset dir="asciidoc/css"></fileset>
 									</copy>
 									<copy todir="${guide_path}/webhelp/images">
-										<fileset dir="asciidoc/images" />
+										<fileset dir="asciidoc/images"></fileset>
 									</copy>
 									<copy todir="${guide_path}/webhelp/files">
-										<fileset dir="asciidoc/files" />
+										<fileset dir="asciidoc/files"></fileset>
 									</copy>
 								</postProcess>
 
@@ -164,13 +164,13 @@
 								<htmlStylesheet>css/docbook-xsl.css</htmlStylesheet>
 								<postProcess>
 									<copy todir="${guide_path}/html_chunk/css">
-										<fileset dir="asciidoc/css" />
+										<fileset dir="asciidoc/css"></fileset>
 									</copy>
 									<copy todir="${guide_path}/html_chunk/images">
-										<fileset dir="asciidoc/images" />
+										<fileset dir="asciidoc/images"></fileset>
 									</copy>
 									<copy todir="${guide_path}/html_chunk/files">
-										<fileset dir="asciidoc/files" />
+										<fileset dir="asciidoc/files"></fileset>
 									</copy>
 								</postProcess>
 							</configuration>
@@ -188,17 +188,19 @@
 								<annotationCss>true</annotationCss>
 								<preProcess>
 									<copy todir="${project.build.directory}/epub3/css">
-										<fileset dir="asciidoc/css" />
+										<fileset dir="asciidoc/css"></fileset>
 									</copy>
 									<copy todir="${project.build.directory}/epub3/images">
-										<fileset dir="asciidoc/images" />
+										<fileset dir="asciidoc/images"></fileset>
 									</copy>
 									<copy todir="${project.build.directory}/epub3/files">
-										<fileset dir="asciidoc/files" />
+										<fileset dir="asciidoc/files"></fileset>
 									</copy>
 								</preProcess>
 								<postProcess>
-									<move file="${project.build.directory}/index.epub" tofile="${guide_path}/epub/${guide_name}Guide.epub" failonerror="false" />
+									<move file="${project.build.directory}/index.epub"
+												tofile="${guide_path}/epub/${guide_name}Guide.epub"
+												failonerror="false" />
 								</postProcess>
 							</configuration>
 						</execution>
@@ -266,6 +268,14 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

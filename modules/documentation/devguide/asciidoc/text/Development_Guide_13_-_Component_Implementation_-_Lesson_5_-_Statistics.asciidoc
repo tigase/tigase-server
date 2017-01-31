@@ -1,0 +1,194 @@
+[[cil5]]
+= Component Implementation - Lesson 5 - Statistics
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+In most cases you'll want to gather some run-time statistics from your component to see how it works, detect possible performance issues or congestion problems. All server statistics are exposed and are accessible via XMPP with ad-hoc commands, HTTP, JMX and some selected statistics are also available via SNMP. As a component developer you don't have to do anything to expose your statistic via any of those protocols, you just have to provide your statistics and the admin will be able to access them any way he wants.
+
+This lesson will teach you how to add your own statistics and how to make sure that the statistics generation doesn't affect application performance.
+
+image:images/spam-statitics-small.png[]
+
+Your component from the very beginning generates some statistics by classes it inherits. Let's add a few statistics to our spam filtering component:
+
+[source,java]
+-----
+@Override
+public void getStatistics(StatisticsList list) {
+  super.getStatistics(list);
+  list.add(getName(), "Spam messages found", totalSpamCounter, Level.INFO);
+  list.add(getName(), "All messages processed", messagesCounter, Level.FINER);
+  if (list.checkLevel(Level.FINEST)) {
+    // Some very expensive statistics generation code...
+  }
+}
+-----
+
+I think the code should be pretty much self-explanatory.
+
+You have to call +super.getStatistics(...)+ to update stats of the parent class. +StatisticsList+ is a collection which keeps all the statistics in a way which is easy to update, search, and retrieve them. You actually don't need to know all the implementation details but if you are interested please refer to the source code and JavaDoc documentation.
+
+The first parameter of the +add(...)+ method is the component name. All the statistics are grouped by the component names to make it easier to look at particular component data. Next is a description of the element. The third parameter is the element value which can be any number or string.
+
+The last parameter is probably the most interesting. The idea has been borrowed from the logging framework. Each statistic item has importance level.  Levels are exactly the same as for logging methods with *SEVERE* the most critical and *FINEST* the least important. This parameter has been added to improve performance and statistics retrieval. When the *StatisticsList* object is created it gets assigned a level requested by the user. If the +add(...)+ method is called with lower priority level then the element is not even added to the list. This saves network bandwidth, improves statistics retrieving speed and is also more clear to present to the end-user.
+
+One thing which may be a bit confusing at first is that, if there is a numerical element added to statistics with *0* value then the Level is always forced to *FINEST*. The assumption is that the administrator is normally not interested *zero-value* statistics, therefore unless he intentionally request the lowest level statistics he won't see elements with *zeros*.
+
+The *if* statement requires some explanation too. Normally adding a new statistics element is not a very expensive operation so passing it with +add(...)+ method at an appropriate level is enough. Sometimes, however preparing statistics data may be quite expensive, like reading/counting some records from database. Statistics can be collected quite frequently therefore it doesn't make sense to collect the statistics at all if there not going to be used as the current level is higher then the item we pass anyway. In such a case it is recommended to test whether the element level will be accepted by the collection and if not skip the whole processing altogether.
+
+As you can see, the API for generating and presenting component statistics is very simple and straightforward. Just one method to overwrite and a simple way to pass your own counters. Below is the whole code of the example component:
+
+[source,java]
+-----
+import java.util.Arrays;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Packet;
+import tigase.stats.StatisticsList;
+import tigase.util.JIDUtils;
+import tigase.xmpp.StanzaType;
+
+public class TestComponent extends AbstractMessageReceiver {
+
+  private static final Logger log =
+  Logger.getLogger(TestComponent.class.getName());
+
+  private static final String BAD_WORDS_KEY = "bad-words";
+  private static final String WHITELIST_KEY = "white-list";
+  private static final String PREPEND_TEXT_KEY = "log-prepend";
+  private static final String SECURE_LOGGING_KEY = "secure-logging";
+  private static final String ABUSE_ADDRESS_KEY = "abuse-address";
+  private static final String NOTIFICATION_FREQ_KEY = "notification-freq";
+
+  private String[] badWords = {"word1", "word2", "word3"};
+  private String[] whiteList = {"admin@localhost"};
+  private String prependText = "Spam detected: ";
+  private String abuseAddress = "abuse@locahost";
+  private int notificationFrequency = 10;
+  private int delayCounter = 0;
+  private boolean secureLogging = false;
+  private long spamCounter = 0;
+  private long totalSpamCounter = 0;
+  private long messagesCounter = 0;
+
+  @Override
+  public void processPacket(Packet packet) {
+    // Is this packet a message?
+    if ("message" == packet.getElemName()) {
+      updateServiceDiscoveryItem(getName(), "messages",
+        "Messages processed: [" + (++messagesCounter) + "]", true);
+      String from = JIDUtils.getNodeID(packet.getElemFrom());
+      // Is sender on the whitelist?
+      if (Arrays.binarySearch(whiteList, from) < 0) {
+        // The sender is not on whitelist so let's check the content
+        Stringbody = packet.getElemCData("/message/body");
+        if (body != null && !body.isEmpty()) {
+          body = body.toLowerCase();
+          for (String word : badWords) {
+            if (body.contains(word)) {
+              log.finest(prependText + packet.toString(secureLogging));
+              ++spamCounter;
+              updateServiceDiscoveryItem(getName(), "spam", "Spam caught: [" +
+                (++totalSpamCounter) + "]", true);
+              return;
+            }
+          }
+        }
+      }
+    }
+    // Not a SPAM, return it for further processing
+    Packet result = packet.swapElemFromTo();
+    addOutPacket(result);
+  }
+
+  @Override
+  public int processingThreads() {
+    return Runtime.getRuntime().availableProcessors();
+  }
+
+  @Override
+  public int hashCodeForPacket(Packet packet) {
+    if (packet.getElemTo() != null) {
+      return packet.getElemTo().hashCode();
+    }
+    // This should not happen, every packet must have a destination
+    // address, but maybe our SPAM checker is used for checking
+    // strange kind of packets too....
+    if (packet.getElemFrom() != null) {
+      return packet.getElemFrom().hashCode();
+    }
+    // If this really happens on your system you should look carefully
+    // at packets arriving to your component and decide a better way
+    // to calculate hashCode
+    return 1;
+  }
+
+  @Override
+  public Map<String, Object> getDefaults(Map<String, Object> params) {
+    Map<String, Object> defs = super.getDefaults(params);
+    defs.put(BAD_WORDS_KEY, badWords);
+    defs.put(WHITELIST_KEY, whiteList);
+    defs.put(PREPEND_TEXT_KEY, prependText);
+    defs.put(SECURE_LOGGING_KEY, secureLogging);
+    defs.put(ABUSE_ADDRESS_KEY, abuseAddress);
+    defs.put(NOTIFICATION_FREQ_KEY, notificationFrequency);
+    return defs;
+  }
+
+  @Override
+  public void setProperties(Map<String, Object> props) {
+    super.setProperties(props);
+    badWords = (String[])props.get(BAD_WORDS_KEY);
+    whiteList = (String[])props.get(WHITELIST_KEY);
+    Arrays.sort(whiteList);
+    prependText = (String)props.get(PREPEND_TEXT_KEY);
+    secureLogging = (Boolean)props.get(SECURE_LOGGING_KEY);
+    abuseAddress = (String)props.get(ABUSE_ADDRESS_KEY);
+    notificationFrequency = (Integer)props.get(NOTIFICATION_FREQ_KEY);
+    updateServiceDiscoveryItem(getName(), null, getDiscoDescription(),
+      "automation", "spam-filtering", true,
+      "tigase:x:spam-filter", "tigase:x:spam-reporting");
+  }
+
+  @Override
+  public synchronized void everyMinute() {
+    super.everyMinute();
+    if ((++delayCounter) >= notificationFrequency) {
+      addOutPacket(Packet.getMessage(abuseAddress, getComponentId(),
+        StanzaType.chat, "Detected spam messages: " + spamCounter,
+        "Spam counter", null, newPacketId("spam-")));
+      delayCounter = 0;
+      spamCounter = 0;
+    }
+  }
+
+  @Override
+  public String getDiscoDescription() {
+    return "Spam filtering";
+  }
+
+  @Override
+  public String getDiscoCategoryType() {
+    return "spam";
+  }
+
+  @Override
+  public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
+    list.add(getName(), "Spam messages found", totalSpamCounter, Level.INFO);
+    list.add(getName(), "All messages processed", messagesCounter, Level.FINE);
+    if (list.checkLevel(Level.FINEST)) {
+      // Some very expensive statistics generation code...
+    }
+  }
+
+}
+-----

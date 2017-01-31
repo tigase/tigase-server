@@ -1,12 +1,7 @@
 package tigase.disteventbus.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventsNameMap<M> {
@@ -35,14 +30,20 @@ public class EventsNameMap<M> {
 			while (dataIt.hasNext()) {
 				Collection<M> d = dataIt.next().getValue();
 				d.remove(data);
+
+				if (d.isEmpty()) {
+					dataIt.remove();
+				}
 			}
+
 		}
 	}
 
 	public void delete(String name, String xmlns, M data) {
 		final String eventName = name == null ? NULL_NAME : name;
+		final String eventXmlns = xmlns == null ? NULL_NAME : xmlns;
 
-		Map<String, Collection<M>> namesData = dataMap.get(xmlns);
+		Map<String, Collection<M>> namesData = dataMap.get(eventXmlns);
 		if (namesData == null)
 			return;
 
@@ -57,14 +58,15 @@ public class EventsNameMap<M> {
 		}
 
 		if (namesData.isEmpty()) {
-			dataMap.remove(xmlns);
+			dataMap.remove(eventXmlns);
 		}
 	}
 
 	public Collection<M> get(String name, String xmlns) {
 		final String eventName = name == null ? NULL_NAME : name;
+		final String eventXmlns = xmlns == null ? NULL_NAME : xmlns;
 
-		Map<String, Collection<M>> namesData = dataMap.get(xmlns);
+		Map<String, Collection<M>> namesData = dataMap.get(eventXmlns);
 		if (namesData == null)
 			return Collections.emptyList();
 
@@ -96,7 +98,7 @@ public class EventsNameMap<M> {
 			Iterator<String> namesIt = e.getValue().keySet().iterator();
 			while (namesIt.hasNext()) {
 				String n = namesIt.next();
-				result.add(new EventName(n == NULL_NAME ? null : n, xmlns));
+				result.add(new EventName(n == NULL_NAME ? null : n, xmlns == NULL_NAME ? null : xmlns));
 			}
 		}
 
@@ -105,24 +107,24 @@ public class EventsNameMap<M> {
 
 	public boolean hasData(String name, String xmlns) {
 		final String eventName = name == null ? NULL_NAME : name;
-		Map<String, Collection<M>> namesData = dataMap.get(xmlns);
+		final String eventXmlns = xmlns == null ? NULL_NAME : xmlns;
+
+		Map<String, Collection<M>> namesData = dataMap.get(eventXmlns);
 		if (namesData == null || namesData.isEmpty())
 			return false;
 
 		Collection<M> dataList = namesData.get(eventName);
-		if (dataList == null || dataList.isEmpty())
-			return false;
-		else
-			return true;
+		return !(dataList == null || dataList.isEmpty());
 	}
 
 	public void put(String name, String xmlns, M data) {
 		final String eventName = name == null ? NULL_NAME : name;
+		final String eventXmlns = xmlns == null ? NULL_NAME : xmlns;
 
-		Map<String, Collection<M>> namesData = dataMap.get(xmlns);
+		Map<String, Collection<M>> namesData = dataMap.get(eventXmlns);
 		if (namesData == null) {
 			namesData = createNamesDataMap();
-			dataMap.put(xmlns, namesData);
+			dataMap.put(eventXmlns, namesData);
 		}
 
 		Collection<M> dataList = namesData.get(eventName);

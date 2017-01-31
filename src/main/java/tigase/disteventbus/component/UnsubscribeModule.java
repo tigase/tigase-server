@@ -1,10 +1,6 @@
 package tigase.disteventbus.component;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
@@ -13,7 +9,7 @@ import tigase.criteria.Criteria;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.impl.EventName;
-import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
+import tigase.disteventbus.impl.LocalEventBus;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.util.TigaseStringprepException;
@@ -24,24 +20,20 @@ import tigase.xmpp.StanzaType;
 
 public class UnsubscribeModule extends AbstractEventBusModule {
 
-	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "iq", "pubsub", "unsubscribe" }, new String[] {
-			null, "http://jabber.org/protocol/pubsub", null });
-
 	public final static String ID = "unsubscribe";
+	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "iq", "pubsub", "unsubscribe" },
+			new String[] { null, "http://jabber.org/protocol/pubsub", null });
+	private final EventHandler eventBusHandlerRemovedHandler = new EventHandler() {
 
-	private final LocalEventBusListener eventBusListener = new LocalEventBusListener() {
-
-		@Override
-		public void onAddHandler(String name, String xmlns, EventHandler handler) {
-		}
-
-		@Override
-		public void onFire(String name, String xmlns, Element event) {
-		}
+		private final String[] NAME_PATH = new String[] { LocalEventBus.HANDLER_REMOVED_EVENT_NAME, "name" };
+		private final String[] XMLNS_PATH = new String[] { LocalEventBus.HANDLER_REMOVED_EVENT_NAME, "xmlns" };
 
 		@Override
-		public void onRemoveHandler(String name, String xmlns, EventHandler handler) {
-			UnsubscribeModule.this.onRemoveHandler(name, xmlns);
+		public void onEvent(String name, String xmlns, Element event) {
+			String n = event.getCData(NAME_PATH);
+			String x = event.getCData(XMLNS_PATH);
+			if (x == null || !x.equals(LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
+				UnsubscribeModule.this.onRemoveHandler(n, x);
 		}
 	};
 
@@ -49,7 +41,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 	public void afterRegistration() {
 		super.afterRegistration();
 
-		context.getEventBusInstance().addListener(eventBusListener);
+		context.getEventBusInstance().addHandler(LocalEventBus.HANDLER_REMOVED_EVENT_NAME,
+				LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
 
 	}
 
@@ -67,9 +60,9 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 		boolean listenedByHandlers = context.getEventBusInstance().hasHandlers(eventName, eventXmlns);
 
 		if (!listenedByHandlers) {
-			for (String node : context.getConnectedNodes()) {
+			for (JID node : context.getConnectedNodes()) {
 				Element se = prepareUnsubscribeElement(new EventName(eventName, eventXmlns), context.getComponentID(), null);
-				sendUnsubscribeRequest("eventbus@" + node, Collections.singleton(se));
+				sendUnsubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 			}
 		}
 	}
@@ -108,7 +101,7 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 			}
 		} else {
 			// request from something out of cluster
-			final Set<Element> subscribedNodes = new HashSet<Element>();
+			final Set<Element> subscribedNodes = new HashSet<>();
 			for (Element subscribe : unsubscribeElements) {
 				EventName parsedName = NodeNameUtil.parseNodeName(subscribe.getAttributeStaticStr("node"));
 				JID jid = JID.jidInstance(subscribe.getAttributeStaticStr("jid"));
@@ -125,8 +118,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 			if (log.isLoggable(Level.FINER))
 				log.finer("Forwarding unsubcribe to: " + context.getConnectedNodes());
 
-			for (String node : context.getConnectedNodes()) {
-				sendUnsubscribeRequest("eventbus@" + node, subscribedNodes);
+			for (JID node : context.getConnectedNodes()) {
+				sendUnsubscribeRequest("eventbus@" + node.getDomain(), subscribedNodes);
 			}
 		}
 		Packet response = packet.okResult((Element) null, 0);
@@ -136,8 +129,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 
 	protected void sendUnsubscribeRequest(String to, Collection<Element> subscriptionElement) {
 		try {
-			Element iq = new Element("iq", new String[] { "from", "to", "type", "id" }, new String[] {
-					context.getComponentID().toString(), to, "set", nextStanzaID() });
+			Element iq = new Element("iq", new String[] { "from", "to", "type", "id" },
+					new String[] { context.getComponentID().toString(), to, "set", nextStanzaID() });
 
 			Element pubsubElem = new Element("pubsub", new String[] { "xmlns" },
 					new String[] { "http://jabber.org/protocol/pubsub" });
@@ -178,7 +171,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 
 	@Override
 	public void unregisterModule() {
-		context.getEventBusInstance().removeListener(eventBusListener);
+		context.getEventBusInstance().removeHandler(LocalEventBus.HANDLER_REMOVED_EVENT_NAME,
+				LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
 		super.unregisterModule();
 	}
 }

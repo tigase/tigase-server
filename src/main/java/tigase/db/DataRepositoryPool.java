@@ -23,17 +23,18 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.stats.StatisticsProviderIfc;
+import tigase.stats.StatisticsList;
+import tigase.xmpp.BareJID;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.xmpp.BareJID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -43,7 +44,7 @@ import tigase.xmpp.BareJID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DataRepositoryPool implements DataRepository {
+public class DataRepositoryPool implements DataRepository, StatisticsProviderIfc {
 	private static final Logger log = Logger.getLogger(DataRepositoryPool.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------
@@ -153,6 +154,16 @@ public class DataRepositoryPool implements DataRepository {
 	@Override
 	public dbTypes getDatabaseType() {
 		return database;
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		list.add(compName, "repository " + getResourceUri() + " connections count", repoPool.size(), Level.FINE);
+		for (DataRepository repo : repoPool) {
+			if (repo instanceof StatisticsProviderIfc) {
+				((StatisticsProviderIfc) repo).getStatistics(compName, list);
+			}
+		}
 	}
 
 	// ~--- methods --------------------------------------------------------------

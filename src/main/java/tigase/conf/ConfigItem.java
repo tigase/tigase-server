@@ -295,7 +295,7 @@ public class ConfigItem
 		Object val = propString.substring(idx_eq + 1);
 		String[] prop = idx_eq == -1 ? new String[] { propString } : new String[] { key, (String) val };
 
-		if (key.matches(".*\\[[LISBlisb]\\]$")) {
+		if (key.matches(".*\\[[FLISBlisb]\\]$")) {
 			char c = key.charAt(key.length() - 2);
 
 			key = key.substring(0, key.length() - 3);

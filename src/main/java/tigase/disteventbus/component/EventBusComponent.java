@@ -2,16 +2,13 @@ package tigase.disteventbus.component;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import javax.script.ScriptEngineManager;
 
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.component.AbstractComponent;
 import tigase.component.AbstractContext;
@@ -22,62 +19,27 @@ import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.conf.ConfigurationException;
 import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.LocalEventBus;
 import tigase.stats.StatisticsList;
-import tigase.xml.Element;
+import tigase.xmpp.JID;
 
-public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
-
-	private class EventBusContextImpl extends AbstractContext implements EventBusContext {
-
-		private final LocalEventBus eventBusInstance;
-
-		public EventBusContextImpl(AbstractComponent<?> component) {
-			super(component);
-			this.eventBusInstance = (LocalEventBus) EventBusFactory.getInstance();
-		}
-
-		@Override
-		public AffiliationStore getAffiliationStore() {
-			return affiliationStore;
-		}
-
-		@Override
-		public Collection<String> getConnectedNodes() {
-			return Collections.unmodifiableCollection(connectedNodes);
-		}
-
-		@Override
-		public LocalEventBus getEventBusInstance() {
-			return eventBusInstance;
-		}
-
-		@Override
-		public SubscriptionStore getSubscriptionStore() {
-			return subscriptionStore;
-		}
-	}
+public class EventBusComponent extends AbstractComponent<EventBusContext>implements ClusteredComponentIfc {
 
 	public static final String COMPONENT_EVENTS_XMLNS = "tigase:eventbus";
-
+	private static final String THREADS_KEY = "threads";
 	private static long counter = 0;
-
 	private final AffiliationStore affiliationStore = new AffiliationStore();
-
-	private final Set<String> connectedNodes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-
 	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
-
-	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
-	private ListenerScriptRegistrar scriptsRegistrar;
-
 	/**
 	 * For cluster nodes.
 	 */
 	private final SubscriptionStore subscriptionStore = new SubscriptionStore();
+	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+
+	private ListenerScriptRegistrar scriptsRegistrar;
 
 	public EventBusComponent() {
 	}
@@ -85,15 +47,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	protected EventBusContext createContext() {
 		return new EventBusContextImpl(this);
-	}
-
-	@Override
-	public synchronized void everySecond() {
-		super.everySecond();
-
-		Element event = new Element("CurrentTime", new String[] { "xmlns" }, new String[] { "tigase:events" });
-		event.addChild(new Element("time", (new Date()).toString()));
-		context.getEventBus().fire(event);
 	}
 
 	@Override
@@ -137,8 +90,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-
-		list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.INFO);
 	}
 
 	@Override
@@ -152,39 +103,34 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	}
 
 	@Override
-	public void nodeConnected(String node) {
-		connectedNodes.add(node);
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
 
-		if (log.isLoggable(Level.FINEST))
-			log.finest("Node added. Known nodes: " + connectedNodes);
+		if (log.isLoggable(Level.FINE))
+			log.fine("Cluster node " + jid + " added to Affiliation Store");
+
+		context.getAffiliationStore().putAffiliation(jid, Affiliation.owner);
 
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
-			((SubscribeModule) module).clusterNodeConnected(node);
+			((SubscribeModule) module).clusterNodeConnected(jid);
 		}
-
 	}
 
 	@Override
-	public void nodeDisconnected(String node) {
-		connectedNodes.remove(node);
-
-		if (log.isLoggable(Level.FINEST))
-			log.finest("Node removed. Known nodes: " + connectedNodes);
+	public void onNodeDisconnected(JID jid) {
+		super.onNodeDisconnected(jid);
 
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
-			((SubscribeModule) module).clusterNodeDisconnected(node);
+			((SubscribeModule) module).clusterNodeDisconnected(jid);
 		}
+		context.getAffiliationStore().removeAffiliation(jid);
 	}
 
 	@Override
 	public void processPacket(tigase.server.Packet packet) {
 		super.processPacket(packet);
-	}
-
-	@Override
-	public void setClusterController(ClusterControllerIfc cl_controller) {
 	}
 
 	@Override
@@ -194,11 +140,54 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		scriptsRegistrar = new ListenerScriptRegistrar(listenersScripts, context, scriptEngineManager);
 
 		AdHocCommandModule<?> adHocCommandModule = getModuleProvider().getModule(AdHocCommandModule.ID);
+		if (adHocCommandModule != null) {
+			adHocCommandModule.register(new AddListenerScriptCommand(scriptEngineManager, scriptsRegistrar));
+			adHocCommandModule.register(new RemoveListenerScriptCommand(listenersScripts, scriptsRegistrar));
+		}
 
-		adHocCommandModule.register(new AddListenerScriptCommand(scriptEngineManager, scriptsRegistrar));
-		adHocCommandModule.register(new RemoveListenerScriptCommand(listenersScripts, scriptsRegistrar));
+		if (props.containsKey("allowed-subscribers")) {
+			String t = (String) props.get("allowed-subscribers");
+			String[] x = t.split(",");
+			for (String string : x) {
+				context.getAffiliationStore().putAffiliation(JID.jidInstanceNS(string), Affiliation.member);
+			}
+		}
 
+		if (props.containsKey(THREADS_KEY)) {
+			Integer threads = (Integer) props.get(THREADS_KEY);
+			context.getEventBusInstance().setThreadPool(threads);
+		}
 		scriptsRegistrar.load();
+	}
+
+	private class EventBusContextImpl extends AbstractContext implements EventBusContext {
+
+		private final LocalEventBus eventBusInstance;
+
+		public EventBusContextImpl(AbstractComponent<?> component) {
+			super(component);
+			this.eventBusInstance = (LocalEventBus) EventBusFactory.getInstance();
+		}
+
+		@Override
+		public AffiliationStore getAffiliationStore() {
+			return affiliationStore;
+		}
+
+		@Override
+		public Collection<JID> getConnectedNodes() {
+			return Collections.unmodifiableCollection(getNodesConnected());
+		}
+
+		@Override
+		public LocalEventBus getEventBusInstance() {
+			return eventBusInstance;
+		}
+
+		@Override
+		public SubscriptionStore getSubscriptionStore() {
+			return subscriptionStore;
+		}
 	}
 
 }

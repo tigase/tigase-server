@@ -1,12 +1,13 @@
 [[authDbUri]]
---auth-db-uri
-=============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --auth-db-uri
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 20:55
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 20:55
 
 *Default value:* +jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass+
 
@@ -14,7 +15,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +db connection-uri+.
 
-*Description:* +connection-uri+ is a full resource uri for user repository data source. (If omitted +user-db-uri+ settings are used.)
+*Description:* +connection-uri+ is a full resource uri for user repository data source. (If omitted xref:userDbUri[+user-db-uri+] settings are used.)
 
 *Available since:* 2.0.0
-

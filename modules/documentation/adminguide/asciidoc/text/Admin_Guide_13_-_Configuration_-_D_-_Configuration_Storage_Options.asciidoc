@@ -1,0 +1,148 @@
+[[confChanges5x]]
+= Configuration Storage Options in Tigase
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+The whole configuration framework for the Tigase server has been redesigned and rewritten for v5.1. This was done to cleanup all the configuration code and logic as well as extend the current functionality to allow for configuration storage in different kinds of repositories - memory, file, database, ...
+
+Although this article is titled configuration changes, version 5.x still follows our policy about backward compatibility. So the changes could be considered extensions rather than complete overhauls.
+
+There is however one change which can affect a few users. Those who use the server and worked with it's configuration remember the mess and confusion related to duality in the server configuration - the +init.properties+ file and +tigase.xml+ file. This is now over.
+
+== Default Behavior
+
+By default Tigase server loads tigase.conf.ConfigurationCache class which stores the whole configuration in memory. Please note that the +init.properties+ file with initial settings is always loaded if it is available at the given location and all settings in this file work exactly as before. For more details, please refer to the online documentation.
+
+A couple of times 'initial configuration' and 'whole configuration' were mentioned. What is this about, what is the difference?
+
+The 'initial configuration' are startup settings provided by the user in the +init.properties+ file. Most of the server elements use far more configuration parameters which are set to sensible default values if they are not provided by the user. The configuration framework in Tigase server always keeps the complete configuration of all active elements. This is implemented in such a way to make it possible to present currently used settings to the end-users or administrators and allow them to change the server parameters during runtime.
+
+== Storing Configuration in SQL Database
+
+There is one more configuration storage implemented right now. It allows you to store the server settings in the SQL database. In most cases this is not quite useful, just opposite, very inconvenient.
+However. there is at least one case where you really want to keep the server configuration in the SQL database. This is in the cluster mode. If you have a Tigase cluster system of 10 or more nodes it is much easier to keep the configuration in a single central location and manage it from there, rather then go to every single machine every time you want to change some settings.
+You can even change any settings for all cluster nodes with a single database query.
+
+You set the SQL storage the same way as you set it for XML file. However, there is one more parameter as you have to provide also database connection string for the server so it knows where to connect to for the settings:
+
+. Parameters in init.properties file:
++
+[source,bash]
+-----
+--tigase-config-repo-class=tigase.conf.ConfigSQLRepository
+--tigase-config-repo-uri=connection-uri
+-----
+. Alternatively you can provide system properties to the JVM:
++
+[source,bash]
+-----
+-Dtigase-config-repo-class=tigase.conf.ConfigSQLRepository
+-Dtigase-config-repo-uri=connection-uri
+-----
+
+Please note, the current implementation for the SQL storage automatically creates the tables necessary to operate if it does not exist. So you don't have to worry about the schema, but you should make sure that the database user used by the Tigase has permissions to create a table.
+
+Configuration is stored in table with following schema:
+
+[source,sql]
+-----
+create table tigase_configuration (
+-- The component name by which the configuration parameter
+-- is used.
+  component_name varchar(127) NOT NULL,
+
+-- The configuration property key name or identifier.
+  key_name varchar(127) NOT NULL,
+
+-- The configuration property value
+  value varchar(8191) NOT NULL,
+
+-- The cluster node by which the configuration property is read,
+-- if empty it will be read by all cluster nodes.
+  cluster_node varchar(255) NOT NULL DEFAULT '',
+
+-- Additional, secondary identifier for the configuration property.
+-- The configuration can be organized in a hierarchical way to allow
+-- multiple occurrences of the same property name for a single
+-- component, for example you can have the same property for
+-- different tcp/ip ports set to a different value:
+-- c2s/5222/port_type=plain
+-- c2s/5223/port_type=ssl
+-- the port number is a secondary identifier.
+  key_node varchar(127) NOT NULL DEFAULT '',
+
+--  Not currently used. In future it will be used to distinguish between
+-- different kind of properties (initial settings, defaults, updated by
+-- user, etc...)
+  flag varchar(32) NOT NULL DEFAULT 'DEFAULT',
+
+-- The system detects basic Java types and stores information about
+-- the property type, when the property is read the original property
+-- type is restored and provided to the component without need for
+-- a parsing or conversion.
+  value_type varchar(8) NOT NULL DEFAULT 'S',
+
+-- It is not currently used. In the future it will be used to reload
+-- settings changed in last, defined period of time. Basically, the
+-- system can automatically check the configuration database to
+-- see whether some properties have been updated, then reload
+-- them and apply automatically.
+  last_update           timestamp,
+
+primary key(cluster_node, component_name, key_node,
+                  key_node, flag));
+-----
+
+== Reverting To the Old Behavior
+
+While using the +tigase.xml+ file is still possible and the old behavior can be preserved, it is now disabled by default. By default the Tigase server reads only +init.properties+ file with initial settings and stores all the complete configuration in memory only.
+
+The +init.properties+ works exactly as before and all old parameters are still working exactly as before. The only difference is the lack of the tigase.xml which is not created or read by default if it is present. The main advantage is that you don't have to remove it each time you change something in the +init.properties+ to pick up new settings.
+
+Firstly we will go into how to re-enable the server to check and use the +tigase.xml+ file to retain functionality with older settings. This is actually very simple to accomplish. The Tigase server now, offers pluggable repository support. This means that you can easily extend current functionality with a different configuration storage by writing own class which reads and writes configuration parameters.
+
+By default class +tigase.conf.ConfigurationCache+ is loaded which stores configuration in memory only.
+
+Please note, the +init.properties+ file is always read if it exists at a given location.
+
+To revert to the old behavior you just need to pass a parameter to Tigase server with a class name which is responsible for keeping server parameters in the old XML file. You can do it in two ways:
+
+. Add a parameter to init.properties file:
++
+[source,bash]
+-----
+--tigase-config-repo-class=tigase.conf.ConfigXMLRepository
+-----
+. Or you can pass a system property to the JVM at the startup time:
++
+[source,bash]
+-----
+-Dtigase-config-repo-class=tigase.conf.ConfigXMLRepository
+-----
+
+== Going Further
+
+As the configuration mechanism in the Tigase server offers pluggable storage engines, you can easily write your own engine by implementing the interface: +tigase.conf.ConfigRepositoryIfc+ or by extending one of current implementations.
+
+The whole configuration framework is pluggable and you can replace it completely if it does not suit you well enough. Your implementation has to extend +tigase.conf.ConfiguratorAbstract+ class and can be set using JVM system property (as this is configuration framework you can't do this via any configuration system):
+
+[source,sh]
+-----
+-Dtigase-configurator=tigase.conf.Configurator
+-----
+
+The example above shows the parameter set to the default configuration framework.
+
+== Message Router Implementation is Configurable Too
+
+The Message router component was the only component which was fixed to the Tigase instance. In theory it could always have been replaced but in practice there was no way of doing it as that was the first element loaded at startup.
+
+Now Tigase message router implementation can be easily replaced to and it can be made a configurable option if needed.
+
+At the server startup time the code creates configurator and calls method: +getMessageRouterClassName()+ which by default returns class: +tigase.server.MessageRouter+. You can extend the configurator and provide any different class name instead which implements required interfaces. You can even make it configureable as it is no longer tied to the server instance.

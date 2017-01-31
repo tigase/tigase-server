@@ -4,9 +4,11 @@ import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
+import tigase.form.Field;
 import tigase.form.Form;
 import tigase.monitor.ConfigurableTask;
 import tigase.monitor.MonitorContext;
+import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
@@ -17,8 +19,11 @@ public class ConfigureTaskCommand implements AdHocCommand {
 
 	private MonitorContext ctx;
 
+	private TasksScriptRegistrar registrar;
+
 	public ConfigureTaskCommand(MonitorContext ctx) {
 		this.ctx = ctx;
+		this.registrar = ctx.getKernel().getInstance(TasksScriptRegistrar.ID);
 	}
 
 	@Override
@@ -38,7 +43,13 @@ public class ConfigureTaskCommand implements AdHocCommand {
 				if ("submit".equals(form.getType())) {
 					final ConfigurableTask taskInstance = ctx.getKernel().getInstance(
 							request.getIq().getStanzaTo().getResource());
-					taskInstance.setNewConfiguration(form);
+
+					registrar.updateConfig(request.getIq().getStanzaTo().getResource(), form);
+
+					form = new Form("form", "Completed", null);
+					form.addField(Field.fieldFixed("Script configured"));
+					response.getElements().add(form.getElement());
+
 					response.completeSession();
 				}
 			}

@@ -64,6 +64,7 @@ import java.util.logging.Logger;
 import javax.script.Bindings;
 
 import static tigase.server.bosh.Constants.*;
+import tigase.xmpp.StreamError;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -135,7 +136,7 @@ public class BoshConnectionManager
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
+	public boolean addOutStreamClosed(Packet packet, BoshSession bs, boolean withTimeout) {
 		packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
 		packet.setPacketTo(bs.getDataReceiver());
 		packet.initVars(packet.getPacketFrom(), packet.getPacketTo());
@@ -148,7 +149,11 @@ public class BoshConnectionManager
 
 		sessions.remove(bs.getSid());
 
-		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
+		if ( withTimeout ){
+			return addOutPacketWithTimeout( packet, stoppedHandler, 15l, TimeUnit.SECONDS );
+		} else {
+			return addOutPacket( packet );
+		}
 	}
 
 	@Override
@@ -295,7 +300,7 @@ public class BoshConnectionManager
 								log.log(Level.FINE, "Policy violation. Closing connection: {0}", p);
 							}
 							try {
-								serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Policy violation.");
+								serv.sendErrorAndStop(Authorization.NOT_ALLOWED, StreamError.PolicyViolation, p, "Policy violation.");
 							} catch (IOException e) {
 								log.log(Level.WARNING,
 										"Problem sending invalid hostname error for sid =  " + sid, e);
@@ -315,7 +320,8 @@ public class BoshConnectionManager
 						}
 					} else {
 						try {
-							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
+							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, 
+									hostname == null ? StreamError.ImproperAddressing : StreamError.HostUnknown, p, "Invalid hostname.");
 						} catch (IOException e) {
 							log.log(Level.WARNING,
 									"Problem sending invalid hostname error for sid =  " + sid, e);
@@ -347,7 +353,7 @@ public class BoshConnectionManager
 						log.log( Level.FINE, "{0} : {1} ({2})",
 													 new Object[] { BOSH_OPERATION_TYPE.INVALID_SID, sid_str, "Invalid SID" } );
 					}
-					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
+					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, null, p, "Invalid SID");
 				}
 				addOutPackets(out_results, bs);
 			} catch (IOException e) {
@@ -482,9 +488,21 @@ public class BoshConnectionManager
 	public JID getJidForBoshSession(BoshSession bs) {
 		return getFromAddress(bs.getSid().toString());
 	}
-	
+
 	@Override
-	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
+	public Element getSeeOtherHostError( Packet packet, BareJID destination) {
+
+		XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
+
+		Integer redirect_port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
+		return see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams",
+																						destination, redirect_port );
+
+	}
+
+	@Override
+	public BareJID getSeeOtherHostForJID(Packet packet, BareJID fromJID, Phase ph) {
 		if (see_other_host_strategy == null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("no see-other-host implementation set");
@@ -492,7 +510,7 @@ public class BoshConnectionManager
 
 			return null;
 		}
-		if (!see_other_host_strategy.isEnabled(ph)) {
+		if (!see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()), ph)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("see-other-host not enabled for the Phase: " + ph.toString());
 			}
@@ -510,9 +528,14 @@ public class BoshConnectionManager
 					: "null") + " in phase: " + ph.toString());
 		}
 
-		return ((see_other_host != null) &&!see_other_host.equals(getDefHostName()))
-				? see_other_host
-				: null;
+		XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
+		Integer redirect_port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
+		return ( ( see_other_host != null )
+						 && ( redirect_port != null
+									|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) )
+					 ? see_other_host
+					 : null;
 	}
 
 	@Override
@@ -646,11 +669,15 @@ public class BoshConnectionManager
 				if (session != null) {
 					try {
 						BareJID fromJID = BareJID.bareJIDInstance(jid);
-						BareJID hostJid = getSeeOtherHostForJID(fromJID, Phase.LOGIN);
+						BareJID hostJid = getSeeOtherHostForJID( packet, fromJID, Phase.LOGIN );
 
 						if (hostJid != null) {
+
+							XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
+							Integer port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 							Element streamErrorElement = see_other_host_strategy.getStreamError(
-									"urn:ietf:params:xml:ns:xmpp-streams", hostJid);
+									"urn:ietf:params:xml:ns:xmpp-streams", hostJid, port);
 							Packet redirectPacket = Packet.packetInstance(streamErrorElement);
 
 							redirectPacket.setPacketTo(packet.getTo());

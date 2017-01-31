@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.xml.Element;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -47,6 +50,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	//~--- fields ---------------------------------------------------------------
 
 	private AuthRepository def = null;
+	private EventBus eventBus = EventBusFactory.getInstance();
 	private ConcurrentSkipListMap<String, AuthRepository> repos =
 		new ConcurrentSkipListMap<String, AuthRepository>();
 
@@ -228,6 +232,11 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 
 		if (repo != null) {
 			repo.removeUser(user);
+			
+			Element event = new Element("remove", new String[] { "xmlns" }, 
+					new String[] { "tigase:user" });
+			event.addChild(new Element("jid", user.toString()));
+			eventBus.fire(event);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain()
@@ -275,4 +284,29 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 			return null;
 		}
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.isUserDisabled(user);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
+					+ ", not even default one!");
+			return false;
+		}		
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.setUserDisabled(user, value);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
+					+ ", not even default one!");
+		}		
+	}		
 }

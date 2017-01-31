@@ -26,21 +26,19 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.osgi.ModulesManagerImpl;
-
-import tigase.util.DNSResolver;
-
-import static tigase.conf.Configurable.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.DNSResolverFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+
+import static tigase.conf.Configurable.*;
 
 /**
  * Describe class MessageRouterConfig here.
@@ -81,23 +79,23 @@ public class MessageRouterConfig {
 			"tigase.server.MessageRouterConfig");
 	private static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME,
-		DEF_AMP_NAME, DEF_WS2S_NAME
+		DEF_AMP_NAME, DEF_WS2S_NAME, DEF_EVENTBUS_NAME
 	};
 	private static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_SSEND_NAME, DEF_SRECV_NAME,
-		DEF_BOSH_NAME, DEF_MONITOR_NAME, DEF_WS2S_NAME
+		DEF_BOSH_NAME, DEF_MONITOR_NAME, DEF_WS2S_NAME, DEF_EVENTBUS_NAME
 	};
 
 	/** Field description */
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY = MSG_RECEIVERS_PROP_KEY +
 			"id-names";
 	private static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL = { DEF_EXT_COMP_NAME,
-			DEF_SM_NAME, DEF_MONITOR_NAME, DEF_AMP_NAME };
+			DEF_SM_NAME, DEF_MONITOR_NAME, DEF_AMP_NAME, DEF_EVENTBUS_NAME };
 	private static final String[] DEF_REGISTRATOR_NAMES_PROP_VAL = { DEF_VHOST_MAN_NAME,
 			DEF_STATS_NAME };
 	private static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME,
-		DEF_AMP_NAME, DEF_WS2S_NAME
+		DEF_AMP_NAME, DEF_WS2S_NAME, DEF_EVENTBUS_NAME
 	};
 	private static final Map<String, String> COMPONENT_CLASSES = new LinkedHashMap<String,
 			String>();
@@ -139,13 +137,11 @@ public class MessageRouterConfig {
 		COMPONENT_CLASSES.put(DEF_MONITOR_NAME, MONITOR_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_AMP_NAME, AMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_WS2S_NAME, WS2S_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_EVENTBUS_NAME, EVENTBUS_CLASS_NAME);
 		COMP_CLUS_MAP.put(SM_COMP_CLASS_NAME, SM_CLUST_COMP_CLASS_NAME);
-		COMP_CLUS_MAP.put(S2S_COMP_CLASS_NAME, S2S_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(C2S_COMP_CLASS_NAME, C2S_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(BOSH_COMP_CLASS_NAME, BOSH_CLUST_COMP_CLASS_NAME);
-		COMP_CLUS_MAP.put(MONITOR_CLASS_NAME, MONITOR_CLUST_CLASS_NAME);
 		COMP_CLUS_MAP.put(WS2S_CLASS_NAME, WS2S_CLUST_CLASS_NAME);
-		COMP_CLUS_MAP.put(VHOST_MAN_CLASS_NAME, VHOST_MAN_CLUST_CLASS_NAME);
 		COMP_CLUS_MAP.put(AMP_CLASS_NAME, AMP_CLUST_CLASS_NAME);
 	}
 
@@ -250,6 +246,8 @@ public class MessageRouterConfig {
 			}
 		}
 		Arrays.sort(rcv_names);
+		log.log(Level.CONFIG, "Configured type: {0}, loading components: {1}",
+													new Object[] {config_type, Arrays.asList( rcv_names )});
 
 		// Now init defaults for all extra components:
 		for (String key : params.keySet()) {
@@ -327,7 +325,7 @@ public class MessageRouterConfig {
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			LOCAL_ADDRESSES_PROP_VALUE = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
 		} else {
-			LOCAL_ADDRESSES_PROP_VALUE = DNSResolver.getDefHostNames();
+			LOCAL_ADDRESSES_PROP_VALUE = DNSResolverFactory.getInstance().getDefaultHosts();
 		}
 		defs.put(LOCAL_ADDRESSES_PROP_KEY, LOCAL_ADDRESSES_PROP_VALUE);
 		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
@@ -419,6 +417,13 @@ public class MessageRouterConfig {
 			cls = (ServerComponent) this.getClass().getClassLoader().loadClass(cls_name)
 					.newInstance();
 		}
+
+		if ( cls != null && cls.getClass().isAnnotationPresent( TigaseDeprecatedComponent.class ) ){
+			TigaseDeprecatedComponent annotation = cls.getClass().getAnnotation( TigaseDeprecatedComponent.class );
+			log.log( Level.WARNING, "Deprecated Component: " + cls.getClass().getCanonicalName()
+															+ ", INFO: " + annotation.note() + "\n" );
+		}
+
 
 		return cls;
 	}

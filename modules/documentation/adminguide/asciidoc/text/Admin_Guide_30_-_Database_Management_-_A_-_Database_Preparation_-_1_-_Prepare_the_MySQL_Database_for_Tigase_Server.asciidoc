@@ -1,0 +1,266 @@
+[[prepareMysql]]
+= Prepare the MySQL Database for the Tigase Server
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This guide describes how to prepare MySQL database for connecting Tigase server.
+
+== Basic Setup
+
+The MySQL database can be prepared in many ways. Most Linux distributions contain tools which allow you to go through all steps from the shell command line. To make sure it works on all platforms in the same way, we will first show how to do it under MySQL command line client.
+
+=== Configuring from MySQL command line tool
+
+Run the MySQL command line client in either Linux or MS Windows environment and enter following instructions:
+
+. Create the database for the Tigase server:
++
+[source,sql]
+-----
+mysql> create database tigasedb;
+-----
+. Add the +tigase_user+ user and grant him access to the +tigasedb+ database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
++
+*Grant access to tigase_user connecting from any network address.*
++
+[source,sql]
+-----
+mysql> GRANT ALL ON tigasedb.* TO tigase_user@'%'
+            IDENTIFIED BY 'tigase_passwd';
+-----
++
+*Grant access to tigase_user connecting from localhost.*
++
+[source,sql]
+-----
+mysql> GRANT ALL ON tigasedb.* TO tigase_user@'localhost'
+            IDENTIFIED BY 'tigase_passwd';
+-----
++
+*Grant access to tigase_user connecting from local machine only.*
++
+[source,sql]
+-----
+mysql> GRANT ALL ON tigasedb.* TO tigase_user
+            IDENTIFIED BY 'tigase_passwd';
+-----
++
+For the Tigase server version 4.x additional permissions must be granted for the database user:
++
+[source,sql]
+-----
+mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user'@'localhost';
+mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user'@'%';
+mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user';
+-----
++
+And now you can update user permission changes in the database:
++
+[source,sql]
+-----
+mysql> FLUSH PRIVILEGES;
+-----
+. Load the proper mysql schema into the database.  Full installations of Tigase will have all the SQL file you need to create and update the database. First, switch to the database you have just created:
++
+[source,sql]
+-----
+mysql> use tigasedb;
+-----
++
+We are assuming you run the mysql client in Linux from the Tigase installation directory.
++
+[source,sql]
+-----
+mysql> source database/mysql-7-1-schema.sql;
+-----
++
+For the Tigase server version v7.1.0 you have to use proper schema version which is 5.1.  You will also need to manually load the PubSub schema as well, current version is v3.2.0.  All modern versions will load previous schemas first so no need to do a manual upgrade.
++
+[source,sql]
+-----
+mysql> source database/mysql-pubsub-schema-3.2.0.sql;
+-----
++
+If you plan to use the Socks5 component, you will also need to add that schema as well.
++
+[source,sql]
+-----
+mysql> source database/mysql-socks5-schema.sql;
+-----
++
+On Windows you have probably to enter the full path, assuming Tigase is installed in C:\Program Files\Tigase:
++
+[source,sql]
+-----
+mysql> source c:/Program Files/Tigase/database/mysql-7-1-schema.sql;
+mysql> source c:/Program Files/Tigase/database/mysql-pubsub-schema-3.2.0.sql;
+mysql> source c:/Program Files/Tigase/database/mysql-socks5-schema.sql;
+-----
++
+
+
+== Configuring From the Linux Shell Command Line
+
+Follow steps below to prepare the MySQL database:
+
+. Create the database space for the Tigase server:
+[source,sql]
+-----
+mysqladmin -p create tigasedb
+-----
+. Add the +tigase_user+ user and grant access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+*Grant access to tigase_user connecting from any network address.*
+[source,sql]
+-----
+echo "GRANT ALL ON tigasedb.* TO tigase_user@'%' \
+            IDENTIFIED BY 'tigase_passwd'; \
+            FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
+-----
+*Grant access to tigase_user connecting from localhost.*
+[source,sql]
+-----
+echo "GRANT ALL ON tigasedb.* TO tigase_user@'localhost' \
+            IDENTIFIED BY 'tigase_passwd'; \
+            FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
+-----
+*Grant access to tigase_user connecting from local machine only.*
+[source,sql]
+-----
+echo "GRANT ALL ON tigasedb.* TO tigase_user \
+            IDENTIFIED BY 'tigase_passwd'; \
+            FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
+-----
+. Load the proper mysql schema into the database.  Full installations of Tigase will have all the SQL file you need to create and update the database.
+[source,sql]
+-----
+mysql -u dbuser -p tigasedb < mysql-schema-7-1.sql
+mysql -u dbuser -p tigasedb < mysql-pubsub-schema-3.2.0.sql
+-----
+
+If you want to use the socks5 component, then oyu will need to include the following line as well:
+[source,sql]
+-----
+mysql -u dbuser -p tigasedb < mysql-socks5-schema.sql
+-----
+
+== Configuring MySQL for UTF-8 Support
+
+In my.conf put following lines:
+
+[source,bash]
+-----
+[mysql]
+default-character-SET=utf8
+
+[client]
+default-character-SET=utf8
+
+[mysqld]
+init_connect='SET collation_connection = utf8_general_ci; SET NAMES utf8;'
+character-set-server=utf8
+default-character-SET=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+-----
+
+Then connect to the database from the command line shell check settings:
+
+[source,sql]
+-----
+SHOW VARIABLES LIKE 'character_set_database';
+SHOW VARIABLES LIKE 'character_set_client';
+-----
+
+If any of these shows something else then 'utf8' then you need to fix it using the command:
+
+[source,sql]
+-----
+ALTER DATABASE tigasedb DEFAULT CHARACTER SET utf8;
+-----
+
+You can now also test your database installation if it accepts UTF-8 data. The easiest way to ensure this is to just to create an account with UTF-8 characters:
+
+[source,sql]
+-----
+call TigAddUserPlainPw('żółw@some.domain.com', 'żółw');
+-----
+
+And then check that the account has been created:
+
+[source,sql]
+-----
+SELECT * FROM tig_users WHERE user_id = 'żółw@some.domain.com';
+-----
+
+If the last command gives you no results it means there is still something wrong with your settings. You might also want to check your shell settings to make sure your command line shell supports UTF-8 characters and passes them correctly to MySQL:
+
+[source,sh]
+-----
+export LANG=en_US.UTF-8
+export LOCALE=UTF-8
+export LESSCHARSET='utf-8'
+-----
+
+It seems that MySQL 5.0.x also needs extra parameters in the connection string: '&amp;useUnicode=true&amp;characterEncoding=UTF-8' while MySQL 5.1.x seems to not need it but it doesn't hurt to have it for both versions. You have to edit 'etc/init.properties' file and append this to the database connection string.
+
+For MySQL 5.1.x, however, you need to also update code for all database stored procedures and functions used by the Tigase. They are updated for Tigase version 4.4.x and up, however if you use an older version of the Tigase server, you can reload stored procedures using the file from SVN.
+
+== Other MySQL Settings Worth Considering
+
+There are a number of other useful options, especially for performance improvements. Please note, you will have to review them as some of them may impact data reliability and are useful for performance or load tests installations only.
+
+[source,bash]
+-----
+# InnoDB seems to be a better choice
+# so lets make it a default DB engine
+default-storage-engine = innodb
+-----
+
+Some the general MySQL settings which mainly affect performance:
+
+[source,bash]
+-----
+key_buffer = 64M
+max_allowed_packet = 32M
+sort_buffer_size = 64M
+net_buffer_length = 64K
+read_buffer_size = 16M
+read_rnd_buffer_size = 16M
+thread_stack = 192K
+thread_cache_size = 8
+query_cache_limit = 10M
+query_cache_size = 64M
+-----
+
+InnoDB specific settings:
+
+[source,bash]
+-----
+# Keep data in a separate file for each table
+innodb_file_per_table = 1
+# Allocate memory for data buffers
+innodb_buffer_pool_size = 1000M
+innodb_additional_mem_pool_size = 100M
+# A location of the MySQL database
+innodb_data_home_dir = /home/databases/mysql/
+innodb_log_group_home_dir = /home/databases/mysql/
+# The main thing here is the 'autoextend' property
+# without it your data file may reach maximum size and
+# no more records can be added to the table.
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_file_size = 10M
+innodb_log_buffer_size = 32M
+# Some other performance affecting settings
+innodb_flush_log_at_trx_commit = 2
+innodb_lock_wait_timeout = 50
+innodb_thread_concurrency = 16
+-----
+
+These settings may not be fully optimized for your system, and have been only tested on our systems. If you have found better settings for your systems, feel free to link:http://tigase.net/contact[let us know].
+//I am certainly not a database expert nor MySQL expert and I do not pretend to be one. So any comments or suggestions you may have are very welcome and appreciated.

@@ -1,0 +1,80 @@
+[[customAuthentication]]
+= Custom Authentication Connectors
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This article presents configuration options available to the administrator and describe how to set Tigase server up to use user accounts data from a different database.
+
+The first thing to know is that Tigase server always opens 2 separate connections to the database. One connection is used for user login data and the other is for all other user data like the user roster, vCard, private data storage, privacy lists and so on...
+
+In this article we still assume that Tigase server keeps user data in it's own database and only login data is retrieved from the external database.
+
+At the moment Tigase offers following authentication connectors:
+
+- 'mysql', 'pgsql', 'derby' - standard authentication connector used to load user login data from the main user database used by the Tigase server. In fact the same physical implementation is used for all JDBC databases.
+- 'drupal' - is the authentication connector used to integrate the Tigase server with link:http://drupal.org/[Drupal CMS].
+- 'libresource' - is the authentication connector used to integrate the Tigase server with link:http://dev.libresource.org/[Libresource Collaboration platform].
+- 'tigase-auth' - is the authentication connector which can be used with any database. It executes stored procedures to perform all actions. Therefore it is a very convenient way to integrate the server with an external database if you don't want to expose the database structure. You just have to provide a set of stored procedures in the database. While implementing all stored procedures expected by the server might be a bit of work it allows you to hide the database structure and change the SP implementation at any time. You can add more actions on user login/logout without restarting or touching the server. And the configuration on the server side is very simple. For detailed description of this implementation please refer to xref:tigaseAuthConnector[Tigase Auth documentation].
+- 'tigase-custom' - is the authentication connector which can be used with any database. Unlike the 'tigase-auth' connector it allows you to define SQL queries in the configuration file. The advantage of this implementation is that you don't have to touch your database. You can use either simple plain SQL queries or stored procedures. The configuration is more difficult as you have to enter carefully all SQL queries in the config file and changing the query usually involves restarting the server. For more details about this implementation and all configuration parameters please refer to xref:custonAuthConnector[Tigase Custom Auth documentation].
+
+As always the simplest way to configure the server is through the +init.properties file+. In the article describing this file you can find long list with all available options and all details how to handle it. For the authentication connector setup however we only need 2 options:
+
+- '--auth-db = connector'
+- '--auth-db-uri = database connection url'
+
+If you happen to keep the user data in the same database as user authentication data you can even skip the second parameter as Tigase automatically assumes settings from the '--user-db-uri' it '--auth-db-uri' is missing.
+
+'--auth-db-uri' stored a standard JDBC connection URL and is exactly the same as for all other settings. For example if you store authentication data in a 'drupal' database on 'localhost' the URL might look like:
+
+[source,bash]
+-----
+--auth-db-uri = jdbc:mysql://localhost/drupal?user=user&password=passwd
+-----
+
+'--auth-db' stored just a connector name or connector implementation class. For convenience Tigase has predefined short names for the most common connectors but you can always use the class name if you know it. You have to use a class name if you want to attach your own authentication connector. The following 2 settings are equal:
+
+[source,bash]
+-----
+--auth-db = tigase-auth
+-----
+
+[source,bash]
+-----
+--auth-db = tigase.db.jdbc.TigaseAuth
+-----
+
+In the same exact way you can setup connector for any different database type:
+
+[source,bash]
+-----
+--auth-db = drupal
+-----
+
+[source,bash]
+-----
+--auth-db = tigase-custom
+-----
+
+You can normally skip configuring connectors for the default Tigase database format: 'mysql', 'pgsql' and 'derby' as they are applied automatically if the parameter is missing.
+
+One more important thing to know is that you will have to modify '--user-db-uri' if you use a custom authentication connector. This is because if you retrieve user login data from the external database this external database is usually managed by an external system. User accounts are added without notifying Tigase server. Then, when the user logs in and tries to retrieve the user roster, the server can not find such a user in the roster database.
+
+To keep user accounts in sync between the authentication database and the main user database you have to add following option to the end of the database connection URL: 'autoCreateUser=true'.
+
+For example:
+
+[source,bash]
+-----
+--user-db-uri=jdbc:mysql://localhost/tigasedb?user=nobody&password=pass&autoCreateUser=true
+-----
+
+If you are interested in even further customizing your authentication connector by writing your own queries or stored procedures, please have a look at 2 following guides:
+
+- xref:tigaseAuthConnector[Tigase Auth guide]
+- xref:custonAuthConnector[Tigase Custom Auth guide]

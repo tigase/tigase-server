@@ -1,0 +1,181 @@
+<html>
+<head>
+<title>Tigase XMPP Server - Admin console</title>
+<style>
+body {
+    margin: 0px;
+}
+.root {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+.header {
+    height: 100px;
+    background-color: #306799;
+    color: white;
+    box-shadow: 0px 3px 3px 0px lightgray;
+}
+.header > div {
+	float: left;
+}
+.header > div > span.title {
+padding-left: 30px;
+display: block;
+width: 300px;
+padding-top: 30px;
+/*float: left;*/
+font-size: 1.6em;
+}
+.header > div > span.subtitle {
+/*float: left;*/
+display: block;
+margin: 5px 0px;
+font-size: 0.9em;
+/*clear: left;*/
+}
+.content {
+    min-height: 600px;
+}
+.content > form > h3, .content > form > div {
+	clear: both;
+}
+.content > form > * {
+	display: block;
+	float: left;
+	padding: 3px;
+}
+.footer {
+    font-size: 0.9em;
+    text-align: center;
+	clear: both;
+}
+ul {
+	padding: 0px 0px;
+	list-style: none;
+}
+li {
+	padding: 0px 1em;
+}
+li > ul > li {
+	margin: 0px -1em;
+	padding: 0px 2em;
+}
+li > a {
+	color: darkblue;
+	font-weight: bold;
+	text-decoration: none;
+}
+table {
+	clear: both;
+	border-spacing: 0px;
+	
+}
+th, td {
+	padding: 5px 10px;	
+	border: 1px solid gray;
+}
+label {
+	clear: both;
+	min-width: 220px;
+}
+input {
+	min-width: 300px;
+}
+input.submit {
+	clear: both;
+}
+</style>
+<% imports.each { 
+      if (it.type == 'css' && it.src) { %>
+<link rel='stylesheet' type='text/css' href='${src}'></link>
+<%    } else if (it.type == 'css' && it.content) { %>
+<style>.test { ${it.content} }</style>
+<%    } else if (it.type == 'script') { %>
+<script src="${it.src}"></script>
+<%    } %>
+<%  } %>
+</head>
+<body>
+<div class="root">
+<div class="header">
+<img style="width: 64px;
+height: 64px;
+padding: 15 15;
+float: left;
+background: radial-gradient(white 5%, rgba(255,255,255,0) 72%);" src="data:image/png;base64,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"/>
+<div>
+<span class="title" style="padding-left: 20px;">Tigase XMPP Server</span>
+<% def currentCommand = model.commands.find { command -> command.node == request.getParameter('_node') && command.jid == request.getParameter('_jid') };
+if (currentCommand) { %><span class="subtitle" style="padding-left: 20px;">${currentCommand.name}</span><% } %>
+</div>
+</div>
+<div class="sidebar" style="width:300px; float: left; background: lightgray;">
+	<ul>
+<% model.commands.findAll { !it.group }.each { it.group = "Other" };
+def groups = model.commands.collect { it.group }.unique().sort().each { group -> %>
+<li ${ (group == request.getParameter('_group')) ? 'style="background: rgba(255,255,255,0.3)"' : '' }><a href="?_group=${java.net.URLEncoder.encode(group ?: '')}">${group}</a><% if (request.getParameter("_group") == group) { %>
+	<ul><% model.commands.findAll { it.group == group }.sort { it.name }.each { command -> %>
+		<li ${ (command.node == request.getParameter('_node') && command.jid == request.getParameter('_jid')) ? 'style="background: rgba(255,255,255,0.4)"' : ''}><a href="?_group=${java.net.URLEncoder.encode(group ?: '')}&_jid=${java.net.URLEncoder.encode(command.jid)}&_node=${java.net.URLEncoder.encode(command.node)}">${command.name}</a><br/><small>${command.jid}</small></li>
+	<% } %></ul><% } %>
+</li>
+<% } %>		
+	</ul>
+</div>
+<div class="content" style="float:left; padding: 0px 50px;">
+<% if (model.formFields) { %>
+<% def table = null; %>
+<form method="POST">
+<% model.formFields?.each { formField -> %>
+<% if (formField.getName() == 'item' && table) { 
+%><tr><% table.each { col ->
+%><td>${ formField.getChildren().find { it.getAttribute("var") == col }?.getChildCData('field/value') ?: '' }</td><%
+	} %></tr><%
+	return;
+} 
+if (table != null) {%></table><%}
+table = null;
+%>
+<% if (formField.getName() == 'title') { %><div class="title"><h3>${formField.getCData()}</h3></div><% return; } %>
+<% if (formField.getName() == 'instructions') { %><div class="instructions">${formField.getCData()}</div><% return; } %>
+<% if (formField.getName() == 'reported') { 
+if (formField.getAttribute("label")) { %><div><b>${formField.getAttribute("label")}</b></div><% }
+table = formField.getChildren().findAll { it.getName() == 'field' }.collect { it.getAttribute("var") } %>
+<table><thead><% table.each { %><th>${it}</th><% } %></thead>
+<% return; } %>
+<% def type = formField.getAttribute('type') ?: 'text-single'; 
+if (type == 'hidden') { %>
+		<input type='hidden' name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}" /><br/>
+<% } else if (type == 'boolean') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<input type="checkbox" name="${formField.getAttribute('var')}" ${(formField.getChildCData('field/value') == 'true' || formField.getChildCData('field/value') == '1') ? 'checked' : ''}/><br/>
+<% } else if (type == 'text-private') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<input type="password" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
+<% } else if (type == 'text-multi' || type == 'jid-multi') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<textarea name="${formField.getAttribute('var')}" rows='6' cols='50'>${formField.getChildren().findAll{ it.getName() == 'value' }.collect {it.getCData()?:''}.join('\n')}</textarea><br/>
+<% } else if (type == 'list-single' || type == 'list-multi') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<select name="${formField.getAttribute('var')}" ${ (type == 'list-multi') ? 'multiple' : ''}><% formField.getChildren().findAll { it.getName() == 'option' }.each { %>
+			<option value='${it.getChildCData(it.getName()+'/value') ?: it.getAttribute('label')}' ${formField.getChildren().find{ child -> (child.getName() == 'value') && (child.getCData() == (it.getChildCData(it.getName()+'/value') ?: it.getAttribute('label'))) } ? 'selected' : ''}>${it.getAttribute('label') ?: it.getChildCData(it.getName()+'/value')}</option>
+<% } %></select><br/>
+<% } else if (type == 'text-single' || type == 'jid-single') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label><input type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
+<% } else if (type == 'fixed') { %>
+		<input style="clear:both;" disabled type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>		
+		<input type='hidden' name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}" /><br/>
+<% } else { %>
+		<label>${formField.getCData() ?: ''}</label>
+<% } %>
+<% } %>
+<% if (table != null) { %></table><% } %>
+<% if (model.formFields?.find { el -> el.getName() == "field" }) { %>
+<input class='submit' name="submit" type="submit"/>
+<% } %>
+</form>
+<% } %>
+</div>
+<div class="footer">Powered by Tigase XMPP Server ${tigase.server.XMPPServer.getImplementationVersion()}</div>
+</body>
+</html>

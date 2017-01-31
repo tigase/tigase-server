@@ -1,0 +1,174 @@
+= Tigase HTTP API
+:author: Daniel Wisnewski & Andrzej Wójcik
+:version: v1.2 August 2015
+:date: 2015-23-08 10:13
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+Welcome to the Tigase HTTP API users guide.  The HTTP API allows you to manage, configure, chat, and send commands to Tigase server using a simple, easy-to-use interface right from your browser!
+We will guide you through setup, running, and going through some features of the HTTP API.
+
+== Requirements
+The HTTP API Requires Tigase version v5.0.3 but we recommend using the latest version of Tigase which will give you the easiest setup and functionality.
+Current versions of Tigase include most of the required files needed to run the API, however you will need to add one more library: servlet-api-3.1.jar which is available link:https://projects.tigase.org/attachments/download/1504/servlet-api-3.1.jar[Here].
+Place that file in your /jars directory and you're all setup and good to go.
+
+*Please note, earlier versions of Tigase installer may have not included another required file: javax.servlet-api.jar*
+
+This file is included in the archive distributions, and may be extracted to the /jars directory from there.
+
+For older versions of the API, please see link:https://projects.tigase.org/projects/tigase-http-api/wiki/Dependencies[the Tigase HTTP API Wiki].
+
+== Setup & Configuration
+Once all the requirements in place, all you need to do is add the following lines to Tigase's init.properties file:
+[source,properties]
+----
+--comp-name-3=http
+--comp-class-3=tigase.http.HttpMessageReceiver
+----
+Note that the class and name number is not important, so long as you don't have anything else with the same number.
+
+With this default configuration Tigase will attempt to start an http server at port 8080 and run the default modules such as RestModule which will add context for the REST API in /rest path.
+RestModule will also load all groovy scripts located in scripts/rest/xxx directories and it will bind it to proper action for the /rest/xxx/ paths.  More than one directory can be used, think of xxx as a wildcard.
+
+=== Advanced Configuration
+The HTTP component has a variety of configuration options, lets see them in detail here
+
+[[httpCompProp]]
+==== Component Properties
+Please note, for settings mentioning {compname} replace them with the exact text found as --comp-name, which may be http, rest, or something you have set custom in init.properties.
+
+{compname}/http/ports[i]=8088,8096::
+    Sets a comma separated list of ports on which the HTTP server listens for connections.  8080 is set by default.
+
+{compname}/2222/socket=ssl::
+    Sets the port you wish the HTTP server to listen to for HTTPS connections to 2222
+
+{compname}/4096/domain=example.com::
+    Sets 4096 as the port number you want to listen to HTTPS connections *AND* set the domain name of the SSL certificate from Tigase XMPP server certificate store to be used.
+
+{compname}/server-class=::
+    Sets the name of the class used to manage the HTTP server. The following names may be used
+    * *tigase.http.jetty.JettyStandaloneHttpServer* - starts standalone Jetty HTTP Server instance *(requires Tigase HTTP API - Jetty HTTP Server)*
+    * *tigase.http.jetty.JettyOSGiHttpServer* - uses Jetty HTTP Server instance available as OSGi service (may be used only in OSGi envoirment) *(requires Tigase HTTP API - Jetty HTTP Server)*
+    * *tigase.http.java.JavaStandaloneHttpServer* - uses HttpServer provided by Java JDK to start standalone HTTP server (may not work on JDK from every JDK provider)
+
+{compname}/http/port::
+    An older version of the /ports[i] setting, it is still supported, but expect to be phased out.
+
+{compname}/setup/admin-credentials::
+    Sets a user and password combination that can access the web installer setup pages. By default administrator JIDs listed in --admins property are granted access, however you may specifiy a specific user and password to give access in addition to those JIDs. +
+    Format is [username:password] So for example, _http/setup/admin-credentials=admin:password_ +
+    Note that this stores the information in *plaintext on init.properties file*, and *this is an optional setting*.
+
+==== Modules
+Tigase HTTP API component provides functionalities as modules which may be enabled or disabled and configured separately.
+Common settings for modules which can be passed in component properties in following format component_name/module_id/module_setting:
+
+- active[B]= Values true/false to enable or disable module
+- context-path= Path of HTTP context under which module should be available
+- vhosts[s]= Comma separated list of virtual hosts under which the module should be availble. If this setting is not set, the HTTP module will be available for all virtual hosts.
+
+With those ideas in mind, lets look at the available modules for the HTTP API.
+
+===== Rest Module
+This module provides support for the REST API.  enable it by using this line in the init.properties file:
+----
+http/RestModule/active[B]=true
+----
+Assuming that comp-name for the class is +http+
+
+rest-scripts-dir=::
+    Path to directory containing scripts processing REST requests.  By default this directory is scripts/rest
+api-keys[s]=::
+    Comma separated list of strings which would be possible to use as keys to pass api-key parameter to request an authorization to execute.
+    If nothing is passed, then no request will be allowed.  To allow any request, this property needs to be set to +open_access+.
+
+===== DNS Webservice Module
+
++dns-webservice+ module provides support for resolution of DNS names using the HTTP protocol.  This might be useful for web applications that need to resolve DNS address to a specific IP.  For example, discover IP and port of WebSocket service to use to connect to XMPP server.
+
+To activate this module, use the following line;
+[source,properties]
+----
+http/dns-webservice/active[B]=true
+----
+Assuming that comp-name for the class is +http+
+
+== Use of the HTTP API
+To begin using the HTTP API, point a browser to the following url
+http://your.server.domain:8080/ui/ and you will be presented with the following image to login with.
+
+image:images/http-login.jpg[]
+
+Use your admin-level XMPP id and it's password to login.  Please use bare JID for logins.
+
+*NOTE: Normal users can login here as well to use chat and basic functions, but they will not have admin privileges as shown in this guide*
+
+== Browser interface walk-through
+
+=== Chat
+
+Chat is the first window that you will see after logging in.  It's quite bare here since there is no roster to speak of.  If you had a roster, users would be shown.
+Lets add a user.  Click the user add icon, and then fill in the fields below.
+
+image:images/http-add-new.jpg[]
+
+Once both users have added and authorized each other's roster listing, the users and groups will be shown on the left, with the right side being used for chat functionality.
+
+image:images/http-chat.jpg[]
+
+=== Discovery
+The Discovery tab encapsulates the service discovery function of XMPP servers, and will provide a list of available services. Clicking on the service will give you options for executing commands, checking settings, MUC rooms and more.
+
+=== Management
+The Management tab is your administration and settings tool for the XMPP server.  Here you can change settings, add and remove users, send server-wide notifications, write and execute scripts, and even obtain server statistics at a glance.
+
+*NOTE: some changes to settings may be instant, and others require a server restart*
+
+=== Statistics
+The statistics tab lists all running components in the server.
+
+== HTTP API Scripting
+Scripts in the HTTP API component are used for processing all of requests.
+
+To add a new action to HTTP API component you need to create a script in Groovy in which there is an implementation of class extending tigase.http.rest.Handler class. The URI of the script will be created from the location of script in scripts folder.
+For example, if TestHandler script with regular a expression will be set to +/test+ and will be placed in +scripts/rest/tested+, the handler will be called for following URI +/rest/tested/test+.
+
+=== Properties
+If you are extending classes, you will need to set the following properties:
+
+regex::
+  regular expression which is used to match request URI and parse parameters embedded in URI, example below:
+
+  /\/([^@\/]+)@([^@\/]+)/
+
+
+requiredRole::
+  Role of the user required to be able to access this URI. Available values: null, "user", "admin". If requiredRole is not null, authentication will be required.
+
+isAsync::
+  If set to true, it will be possible to wait for results, perhaps waiting for an IQ stanza to send results.
+
+=== Properties Containing Closures
+Extended class should also set closures for one or more of the following properties: +execGet+, +execPut+, +execPost+, and +execDelete+ depending on which HTTP action or actions you need to support for the following URI. Each closure *has dynamic arguments lists*.
+Below is a list of arguments passed to closure which describes how and when the list of arguments change.
+
+I) *service*:
+  Implementation of Service interface, used to access database or send/recieve XMPP stanzas.
+
+II) *callback*:
+  Closure which needs to be called to return data. Accepts only one argument of type +String,byte[],Map+. If data is type of Map it will be encoded to JSON or XML depending on 'Content-Type' header.
+
+III) *user*:
+  Will be passed only if +requiredRole+ is not null. *In other cases this argument will not be in arguments list!*
+
+IV) *content*:
+  Parsed content of the request. *Will not be in arguments list if Content-Length of request is empty*. If Content-Type is of XML or JSON type, type returned as Map.  Otherwise it will be an instance of +HttpServletRequest+.
+
+V) *x*:
+  Additional arguments passed to callback are groups from regular expression matching URI. *Groups are not passed as list, but are added to a list of arguments as next arguments*.
+
+If the property for corresponding HTTP action is not set, the component will return a 404 HTTP error.

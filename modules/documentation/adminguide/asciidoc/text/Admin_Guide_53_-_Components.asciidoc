@@ -1,0 +1,47 @@
+[[loadComponent]]
+= Configuring the Tigase Server to Load a Component
+
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+A detailed description of all the configuration options is in the +init.properties+ guide where you can also find information described below and much more. The purpose of this document is to give you a brief introduction on how to load a component into Tigase server without the need to dig through all the details.
+
+I will show how to load 2 components into Tigase server using a configuration in the init.properties file: link:https://projects.tigase.org/projects/tigase-muc[MUC] and link:https://projects.tigase.org/projects/tigase-pubsub[PubSub].
+
+The only step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the +init.properties+ file you use in your installation.
+
+Let's say you want to just add PubSub for now. All you need to do is add 2 lines to the properties file:
+
+[source,bash]
+-----
+--comp-name-1=pubsub
+--comp-class-1=tigase.pubsub.PubSubComponent
+-----
+
+The first line contains the component name 'pubsub' and the main class for this component is: 'tigase.pubsub.PubSubClusterComponent'. It doesn't really matter what the component name is, the only requirement is that it must be unique among other components names. Because you can load many components, it helps to provide descriptive names thus 'pubsub' is a good name for a 'PubSub' component.
+
+You can of course add more components, even PubSub components to the same server. Just remember that each of them would need to have a different name then. For example:
+
+[source,bash]
+-----
+--comp-name-2=pubsub-priv
+--comp-class-2=tigase.pubsub.PubSubComponent
+-----
+
+Although this may be rare, it allows for wide compatibility and platform stability.
+
+Normally, however we want to load few different components like PubSub, MUC, MSN Transport and so on.... Therefore instead of the above second PubSub we can load the MUC component:
+
+[source,bash]
+-----
+--comp-name-2=muc
+--comp-class-2=tigase.muc.MUCComponent
+-----
+
+Changes to the init.properties file will take effect upon server restart.

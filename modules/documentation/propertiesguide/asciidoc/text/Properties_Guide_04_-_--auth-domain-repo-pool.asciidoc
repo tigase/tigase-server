@@ -1,12 +1,13 @@
 [[authDomainRepoPool]]
---auth-domain-repo-pool
-=======================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --auth-domain-repo-pool
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 21:01
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 21:01
 
 *Default value:* +tigase.db.AuthRepositoryMDImpl+
 
@@ -14,7 +15,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'class implementing AuthRepository.'
 
-*Description:* Allows to specify an implementation for per-domain +AuthRepository+ implementation. This is used only if the implementation provided by a default Tigase server package is not sufficient in the particular deployment. The implementation provides a DB (AuthRepository to be more specific) connection pool where each connection (AuthRepository) handles data for a different DNS domain (VHost). This allows for database (user data) sharding to improve the system performance and better balance the load.
+*Description:* Allows to specify an implementation for per-domain +AuthRepository+ implementation. This is used only if the implementation provided by a default Tigase server package is not sufficient in the particular deployment. The implementation provides a DB (AuthRepository to be more specific) connection pool where each connection (AuthRepository) handles data for a different DNS domain (VHost). This allows for database (user data) sharing to improve the system performance and better balance the load.
 
 *Available since:* 5.1.0
-

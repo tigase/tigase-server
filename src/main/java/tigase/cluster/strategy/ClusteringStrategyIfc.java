@@ -31,6 +31,7 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 
 import tigase.server.Packet;
 
+import tigase.stats.StatisticHolder;
 import tigase.stats.StatisticsList;
 
 import tigase.sys.OnlineJidsReporter;
@@ -54,7 +55,7 @@ import java.util.Set;
  * @param <E>
  */
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
-				extends OnlineJidsReporter {
+				extends OnlineJidsReporter, StatisticHolder {
 	
 	/**
 	 * Method description
@@ -89,6 +90,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @param conn
 	 */
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn);
+
+	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId);
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -145,11 +148,11 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * The method returns all cluster nodes currently connected to the cluster.
+	 * The method returns all cluster nodes currently connected to the cluster node.
 	 *
-	 * @return List of all cluster nodes currently connected to the cluster.
+	 * @return List of all cluster nodes currently connected to the cluster node.
 	 */
-	List<JID> getAllNodes();
+	List<JID> getNodesConnected();
 
 	/**
 	 * Returns a ConnectionRecord object associated with this user's full JID if

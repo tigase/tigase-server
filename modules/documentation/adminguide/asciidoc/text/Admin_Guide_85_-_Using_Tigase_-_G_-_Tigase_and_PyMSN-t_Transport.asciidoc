@@ -1,0 +1,188 @@
+[[Pymsn-t]]
+= Tigase and PyMSN-t Transport
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Any XMPP server and any transport can connect with each other through an external component protocol (link:http://www.xmpp.org/extensions/xep-0114.html[XEP-0114]). So all you need to do is to correctly prepare configuration for this protocol on both sides.
+
+_Continue reading to learn how to setup Tigase and PyMSN for working together..._
+
+There are a few basic parameters to set for this protocol:
+
+- *PORT number* - this is a standard thing for any TCP/IP connection. Usually the port number should be above 1024 and for PyMSN-t transport it is usually *5347*.
+- *IP address* - again, a standard thing for any TCP/IP connection. If both applications - XMPP server and transport run on the same machine the IP address should be *127.0.0.1*.
+- *SECRET* - this is kind of connection password. Transport connects to the XMPP server and authenticates itself using this password. So no other unauthorized transport can connect to the XMPP server. For now lets use the password *secret*.
+- *Transport ID* - is an ID in XMPP network. Let's say we want to setup transport for *MSN* for the server *tigase.org*. Transport ID can be: msn.tigase.org. It could be also: *anything.tigase.org* but this name while still valid would be confusing for users and my suggestion is to avoid confusing names. *Note!* Transport ID should resolve to correct IP address. For your tests you can add the ID to +/etc/hosts+ file.
+
+Here is side by side configuration for both applications: PyMSN-t and Tigase to make them work together. Both services are setup with the hostname *test-d*. To make sure both *test-d* and *msn.test-d* resolve to correct IP address an entry to the +/etc/hosts+ file is added:
+
+[source,bash]
+-----
+## In your case the IP address should be probably different.
+192.168.0.13    test-d            msn.test-d
+-----
+
+Tigase server connects to MySQL database (or built-in XMLBD for simpler configuration variant).
+
+I am not going to setup *PyMSN-t* to run in background as a system service. This is specific to the system you use and is covered in transport documentation and your operating system. Most systems have their own scripts to start services so I would recommend to use them. Here howeevr, it is run in the foreground with full logging switched on to the console to make it easier track what happens.
+
+== PyMSN-t - /etc/jabber/pymsn-t.xml file
+
+[source,bash]
+-----
+
+<pymsnt>
+  <!-- The JabberID of the transport -->
+  <jid>msn.test-d</jid>
+  <!-- The public IP or DNS name of the machine
+    the transport is running on -->
+  <host>test-d</host>
+  <!-- The location of the PID file, relative
+    to the PyMSNt directory -->
+  <pid>/var/run/jabber/pymsn-t.pid</pid>
+  <!-- If set, the transport will background
+    itself when run, we don't want to do this right
+    now. -->
+  <!-- <background/> -->
+  <!-- The IP address of the main XMPP server
+    to connect to -->
+  <mainServer>127.0.0.1</mainServer>
+  <!-- The TCP port to connect to the XMPP
+    server on (this is the default for Jabberd2) -->
+  <port>5347</port>
+  <!-- The authentication token to use when
+    connecting to the XMPP server -->
+  <secret>secret</secret>
+  <lang>en</lang>
+  <website>http://test-d/</website>
+  <allowRegister/>
+  <getAllAvatars/>
+  <!-- Please give the port to listen for XMPP
+    socks5 transfers on. Note the standard port number
+    set here is <strong>8010</strong>. This port
+    however is in use on my machine so this is why
+    I had to set it to different value.-->
+  <ftJabberPort>8014</ftJabberPort>
+  <admins>
+    <jid>tus@test-d</jid>
+  </admins>
+  <!-- The logging level
+    0 -> No logging
+    1 -> Log tracebacks
+    2 -> Log tracebacks, warnings and errors
+    3 -> Log everything -->
+  <debugLevel>3</debugLevel>
+  <!-- The file to log to. Leave this disabled
+    for stdout -->
+  <!-- <debugFile>debug.log</debugFile> -->
+</pymsnt>
+-----
+
+== PyMSN-t - run command
+
+[source,sh]
+-----
+python /usr/lib/python2.4/site-packages/pymsn-t/pymsn-t.py \
+  -c /etc/jabber/pymsn-t.xml
+-----
+
+*Note!* the full path to PyMSN-t config file is important.
+
+== PyMSN-t - expected output
+
+[source,bash]
+-----
+A few last lines should look like:
+[2007-05-07 13:00:39] Starting factory
+  <twisted.xish.xmlstream.XmlStreamFactory
+  instance at 0xb7ce80ac>
+[2007-05-07 13:00:39] <twisted.internet.tcp.Connector
+  instance at 0xb7ceb24c> will retry in 2 seconds
+[2007-05-07 13:00:39] Stopping factory
+  <twisted.xish.xmlstream.XmlStreamFactory
+  instance at 0xb7ce80ac>
+[2007-05-07 13:00:41] Starting factory
+  <twisted.xish.xmlstream.XmlStreamFactory
+  instance at 0xb7ce80ac>
+[2007-05-07 13:00:41] <twisted.internet.tcp.Connector
+  instance at 0xb7ceb24c> will retry in 5 seconds
+[2007-05-07 13:00:41] Stopping factory
+  <twisted.xish.xmlstream.XmlStreamFactory
+  instance at 0xb7ce80ac>
+[2007-05-07 13:00:46] Starting factory
+  <twisted.xish.xmlstream.XmlStreamFactory
+  instance at 0xb7ce80ac>
+[2007-05-07 13:00:46] <twisted.internet.tcp.Connector
+  instance at 0xb7ceb24c> will retry in 15 seconds
+[2007-05-07 13:00:46] Stopping factory
+  <twisted.xish.xmlstream.XmlStreamFactory
+  instance at 0xb7ce80ac>
+-----
+
+And PyMSN should continue to print lines until it successfully connects to the Tigase server. When that happens, the following lines should be printed:
+
+[source,bash]
+-----
+[2007-05-07 13:29:04] Starting factory
+  <twisted.xish.xmlstream.XmlStreamFactory instance at 0xb7cf00ac>
+[2007-05-07 13:29:04] INFO ::  ::  :: componentConnected
+  :: PyTransport :: {'xmlstream': <twisted.xish.xmlstream.XmlStream
+  instance at 0xb7d0feac>, 'self': 'instance'}
+-----
+
+== Tigase - etc/tigase.conf file
+
+You may consider removing the last 2 lines from TIGASE_OPTIONS variable to avoid using MySQL for now. Tigase will then use internal XMLDB which doesn't need any special setup. (Just remember to leave closing double quotes...)
+
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+DRV="-Djdbc.drivers=com.mysql.jdbc.Driver"
+CLASSPATH="${CLASSPATH}:libs/jdbc-mysql.jar"
+JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
+TIGASE_CONFIG="etc/tigase-mysql.xml"
+## All TIGASE_OPTIONS settings must be in single line
+## They are split to make them more readable
+TIGASE_OPTIONS="--gen-config-all --admins \"tus@test-d\"
+ --virt-hosts test-d,localhost --debug server
+ --ext-comp \"test-d,msn.test-d,5347,secret,plain,accept\"
+ --user-db mysql --user-db-uri
+ \"jdbc:mysql://localhost/tigase?user=tigase&password=mypass\" "
+-----
+
+== Tigase - run command
+
+[source,sh]
+-----
+./bin/tigase.sh start etc/tigase.conf
+-----
+
+== Tigase - expected output
+
+To see the log output from Tigase server execute following command:
+
+[source,sh]
+-----
+tail -f logs/tigase-console.log
+-----
+
+After transport connects to Tigase server you should see lines like:
+
+[source,bash]
+-----
+2007-05-07 12:29:05
+  ComponentConnectionManager.processHandshake() FINE:
+  Connected to: msn.test-d
+2007-05-07 12:29:05
+  ComponentConnectionManager.updateServiceDiscovery()
+  FINEST: Modifing service-discovery info:
+  <item name="XEP-0114 connected"
+  jid="msn.test-d"/>
+-----
+
+*Note!* There was a bug in the *jabber:iq:register* plugin which caused problems when registering account in transport. Please use build +432+ or later.

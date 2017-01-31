@@ -129,12 +129,12 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 		Element elem = el_stack.peek();
 		if (elem != null) {
-			elem.setCData(cdata.toString());
+			elem.addCData(cdata.toString());
 		}
 	}
 
 	@Override
-	public void endElement(StringBuilder name) {
+	public boolean endElement(StringBuilder name) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("End element name: " + name);
 		}
@@ -146,7 +146,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 			// some packets which may not be processed correctly if we close stream now!
 			//service.xmppStreamClosed();
 			streamClosed = true;
-			return;
+			return true;
 		}    // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
 
 		if (el_stack.isEmpty()) {
@@ -154,6 +154,26 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}    // end of if (tmp_name.equals())
 
 		Element elem = el_stack.pop();
+		int idx = tmp_name.indexOf(':');
+		String tmp_xmlns = null;
+
+		if (idx > 0) {
+			String tmp_name_prefix = tmp_name.substring(0, idx);
+			if (tmp_name_prefix != null) {
+				for (String pref : namespaces.keySet()) {
+					if (tmp_name_prefix.equals(pref)) {
+						tmp_xmlns = namespaces.get(pref);
+						tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
+
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("new_xmlns = " + tmp_xmlns);
+						}
+					}    // end of if (tmp_name.startsWith(xmlns))
+				}      // end of for (String xmlns: namespaces.keys())
+			}		
+		}		
+		if (elem.getName() != tmp_name.intern() || (tmp_xmlns != null && !tmp_xmlns.equals(elem.getXMLNS())))
+			return false;
 
 		if (el_stack.isEmpty()) {
 			elements_number_limit_count = 0;
@@ -165,6 +185,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		} else {
 			el_stack.peek().addChild(elem);
 		}    // end of if (el_stack.isEmpty()) else
+		return true;
 	}
 
 	@Override

@@ -1,0 +1,326 @@
+[[PubSubComp]]
+= PubSub Component
+:author: many authors
+:version: v1.0, September 2015
+:date: 2015-09-30 17:25
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+
+
+== Configuration
+Tigase's Publish Subscribe component is an link:http://www.xmpp.org/extensions/xep-0060.html[XEP-0060] compliant plugin handling all publish and subscribe activity within Tigase server.
+To enable the component the following should be in your init.properties file
+-----
+--comp-name-2 = pubsub
+--comp-class-2 = tigase.pubsub.PubSubComponent
+-----
+
+== Pubsub naming
+Within Tigase, all pubsub component address MUST be domain-based address and not a JID style address.  This was made to simplify communications structure. Tigase will automatically set component names to pubsub.domain, however any messages send to pubsub@domain will result in a +SERVICE_UNAVAILABLE+ error.
+
+Pubsub nodes within Tigase can be found as a combination of JID and node where nodes will be identified akin to service discovery.  For example, to address a friendly node, use the following structure:
+
+[source,xml]
+-----
+<iq to='pubsub.domain'>
+  <query node='friendly node'/>
+</iq>
+-----
+
+[[rosterLimit]]
+== Configure Roster Maxmimum size
+Starting with Tigase v7.1.0, administrators can configure the maximum allowable roster size per user via the init.properties file.
+-----
+sess-man/plugins-conf/jabber\:iqa\:roster/max_roster_size=100
+-----
+This sets the roster limit to 100 entries per user.  It can be set to any integer, however by default no limit is set.
+
+
+== AdHoc Commands
+Similar to the HTTP API, AdHoc commands based on groovy scripts can be sent to this component to do a number of tasks. All scripts for these Ad-hoc commands are found at +sec/main/groovy/tigase/admin+ in source distrubitions, or at link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/show/src/main/groovy/tigase/admin[this link]. To use them, the scripts need to be copied into the +scripts/admin/pubsub+ folder in the Tigase installation directory.
+For all examples, the component address will be +pubsub.example.com+.
+
+=== Create a Node
+Ad-hoc command node: +create-node+
+Required role: Service Administrator
+
+Command requires fields +node+ and +pubsub#node_type+ to be filled with proper values for execution.
+- +node+ Field containing id of node to create.
+- +pubsub#node_type+ Contains one of two possible values.
+  * +leaf-node+ Node that will be published.
+  * +collection+ Node that will contain other nodes.
+
+Other fields are optional fields that can be set to change configuration of newly create node to different configuration than default.
+
+Example call using TCLMT:
+-----
+bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com create-node example admin@example.com leaf
+-----
+
+=== Delete a Node
+Ad-hoc command node: +delete-node+
+Required role: Service Administrator
+
+Command requires +node+ field to be filled.
+- +node+ Field containing id of node to delete.
+
+Example call using TCLMT:
+-----
+bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com delete-node example
+-----
+
+=== Subscribe to a Node
+Ad-hoc command node: +subscribe-node+
+Required role: Service Administrator
+
+Command requires +node+ and +jids+ nodes to be filled.
+- +node+ Field containing node to subscribe to.
+- +jids+ Field containing list of JIDs to subscribe to the node.
+
+Example call using TCLMT:
+-----
+bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com subscribe-node example admin@example.com,test1@example.com
+-----
+
+=== Unsubscribe to a Node
+Ad-hoc command node: +unsubscribe-node+
+Required role: Service Administrator
+
+Command requires +node+ and +jids+ nodes to be filled.
+- +node+ Field containing node to unsubscribe to.
+- +jids+ Field containing list of JIDs to unsubscribe to the node.
+
+Example call using TCLMT:
+-----
+bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com unsubscribe-node example admin@example.com,test2@example.com
+-----
+
+=== Publish an item to a Node
+Ad-hoc command node: +publish-item+
+Required role: Service Administrator
+
+Command requires fields +node+ and +entry+ to be filled.
+- +node+ Field containing id of node to publish to.
+- +item-id+ Field may contain id of entry to publish, can be empty.
+- +entry+ Field should contain multi-line entry content that should be valid XML values for items.
+
+This command due to it's complexity cannot be easily executed by TCLMT using default remote script which provides support for basic adhoc commands.
+Example call using TCLMT:
+-----
+bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com publish-item example item-1 '<entry><title>Example 1</title></entry>'
+-----
+
+Example Groovy script to execute create-node command using JAXMPP2
+[source,java]
+-----
+import tigase.jaxmpp.j2se.Jaxmpp
+import tigase.jaxmpp.core.client.AsyncCallback
+import tigase.jaxmpp.core.client.exceptions.JaxmppException
+import tigase.jaxmpp.core.client.xmpp.stanzas.Stanza
+import tigase.jaxmpp.core.client.SessionObject
+import tigase.jaxmpp.j2se.ConnectionConfiguration
+import tigase.jaxmpp.core.client.xml.Element
+import tigase.jaxmpp.core.client.xml.DefaultElement
+import tigase.jaxmpp.core.client.xmpp.forms.JabberDataElement
+
+Jaxmpp jaxmpp = new Jaxmpp();
+
+jaxmpp.with {
+    getConnectionConfiguration().setConnectionType(ConnectionConfiguration.ConnectionType.socket)
+    getConnectionConfiguration().setUserJID("admin@example.com")
+    getConnectionConfiguration().setUserPassword("admin123")
+}
+
+jaxmpp.login(true);
+
+def packet = IQ.create();
+packet.setAttribute("to", "pubsub.example.com");
+
+Element command = new DefaultElement("command");
+command.setXMLNS("http://jabber.org/protocol/commands");
+command.setAttribute("node", "create-node");
+packet.addChild(command);
+
+Element x = new DefaultElement("x");
+x.setXMLNS("jabber:x:data");
+
+command.addChild(x);
+
+def data = new JabberDataElement(x);
+data.addTextSingleField("node", "example");
+data.addListSingleField("pubsub#node_type", "leaf");
+
+jaxmpp.send(packet, new AsyncCallback() {
+    void onError(Stanza responseStanza, tigase.jaxmpp.core.client.XMPPException.ErrorCondition error) throws JaxmppException {
+        println "received error during processing request";
+    }
+
+    void onSuccess(Stanza responseStanza) throws JaxmppException {
+        x = responseStanza.getFirstChild("command").getFirstChid("x");
+        data = new JabberDataElement(x);
+        def error = data.getField("Error");
+        println "command executed with result = " + (error ? "failure, error = " + error.getFieldValue() : "success");
+    }
+
+    void onTimeout() {
+        println "command timed out"
+    }
+});
+
+Thread.sleep(30000);
+jaxmpp.disconnect();
+-----
+
+== PubSub Node Presence Protocol
+
+*Occupant Use Case*
+=== Log in to Pubsub Node
+To log in to PubSub Node user must send presence to PubSub component with additional information about node:
+[source,xml]
+-----
+<presence
+    from='hag66@shakespeare.lit/pda'
+    id='n13mt3l'
+    to='pubsub.shakespeare.lit'>
+  <pubsub xmlns='tigase:pubsub:1' node='princely_musings'/>
+</presence>
+-----
+
+Component will publish this information in node:
+
+[source,xml]
+-----
+<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>
+  <event xmlns='http://jabber.org/protocol/pubsub#event'>
+    <items node='princely_musings'>
+      <item>
+        <presence xmlns='tigase:pubsub:1' node='princely_musings' jid='hag66@shakespeare.lit/pda' type='available'/>
+      </item>
+    </items>
+  </event>
+</message>
+<message from='pubsub.shakespeare.lit' to='bernardo@denmark.lit' id='bar'>
+  <event xmlns='http://jabber.org/protocol/pubsub#event'>
+    <items node='princely_musings'>
+      <item>
+        <presence xmlns='tigase:pubsub:1' node='princely_musings' jid='hag66@shakespeare.lit/pda' type='available'/>
+      </item>
+    </items>
+  </event>
+</message>
+-----
+And then will send notification with presences of all occupants to new occupant.
+
+=== Log out from PubSub Node
+To logout from single node, user must send presence stanza with type unavailable:
+[source,xml]
+-----
+<presence
+    from='hag66@shakespeare.lit/pda'
+    type='unavailable'
+    to='pubsub.shakespeare.lit'>
+  <pubsub xmlns='tigase:pubsub:1' node='princely_musings'/>
+</presence>
+-----
+Component will send events to all occupants as described:
+[source,xml]
+-----
+<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>
+  <event xmlns='http://jabber.org/protocol/pubsub#event'>
+    <items node='princely_musings'>
+      <item>
+        <presence xmlns='tigase:pubsub:1' node='princely_musings' jid='hag66@shakespeare.lit/pda' type='unavailable'/>
+      </item>
+    </items>
+  </event>
+</message>
+-----
+If component receives presence stanza with type unavailable without specified node, then component will log out user from all nodes he logged before and publish events.
+
+=== Retrieving list of all Node Subscribers
+To retrieve list of node subscribers, node configuration option +tigase#allow_view_subscribers+ must be set to true:
+[source,xml]
+-----
+<iq type='set'
+    from='hamlet@denmark.lit/elsinore'
+    to='pubsub.shakespeare.lit'
+    id='config2'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+    <configure node='princely_musings'>
+      <x xmlns='jabber:x:data' type='submit'>
+        <field var='FORM_TYPE' type='hidden'>
+          <value>http://jabber.org/protocol/pubsub#node_config</value>
+        </field>
+        <field var='tigase#allow_view_subscribers'><value>1</value></field>
+      </x>
+    </configure>
+  </pubsub>
+</iq>
+-----
+When option is enabled, each subscriber may get list of subscribers the same way link:http://xmpp.org/extensions/xep-0060.html#owner-subscriptions-retrieve[as owner].
+[source,xml]
+-----
+<iq type='get'
+    from='hamlet@denmark.lit/elsinore'
+    to='pubsub.shakespeare.lit'
+    id='subman1'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+    <subscriptions node='princely_musings'/>
+  </pubsub>
+</iq>
+-----
+There is extension to filter returned list:
+[source,xml]
+-----
+<iq type='get'
+    from='hamlet@denmark.lit/elsinore'
+    to='pubsub.shakespeare.lit'
+    id='subman1'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+    <subscriptions node='princely_musings'>
+        <filter xmlns='tigase:pubsub:1'>
+            <jid contains='@denmark.lit' />
+        </filter>
+    </subscriptions>
+  </pubsub>
+</iq>
+-----
+In this example will be returned all subscriptions of users from domain "denmark.lit".
+
+[[storeFullXMLLastPresence]]
+== Store Full XML of Last Presence
+A new feature has been implemented in v7.1.0 that allows Tigase to store a more detailed <unavailable/> presence stanza to include timestamps and other information.
+
+=== Requirements
+Ensure that +presence-offline+ plugin is enabled in init.properties.  To do this, add *+presence-offline* to the *--sm-plugins* line.
+
+The following two lines configure options to broadcast probes to offline users.
+-----
+sess-man/plugins-conf/skip-offline=false
+sess-man/plugins-conf/skip-offline-sys=false
+-----
+Without these lines, Tigase will not send presence probes to users that the server knows to be offline.
+
+The full XML presence is stored under the tig_pairs table with a pkey of +last-unavailable-presence+ will look like this:
+[source,xml]
+-----
+<presence from="user@example.com" xmlns="jabber:client" type="unavailable">
+<status>Logged out</status>
+<delay stamp="2015-12-29T16:51:50.748Z" xmlns="urn:xmpp:delay"/></presence>
+-----
+As you can see, the plugin has added a delay stamp which indicates the last time they were seen online. This may be suppressed by using the following line in your init.properties file.
+-----
+sess-man/plugins-conf/delay-stamp=false
+-----
+
+You may also limit probe responses only to newly connected resources.
+-----
+sess-man/plugins-conf/probe-full-jid=true
+-----
+
+When a user logs on, they will receive the same full unavailable presence statements from contacts not logged in.  Also the repository entry containing their last unavailable presence will be removed.
+
+*NOTE: This will increase traffic with users with many people on their rosters.*

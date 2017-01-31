@@ -1,12 +1,13 @@
 [[userRepoPoolSize]]
---user-repo-pool-size
-=====================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --user-repo-pool-size
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:51
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:51
 
 *Default value:* +10+
 
@@ -14,9 +15,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'Number of db connections as integer.'
 
-*Description:* The property allows to set the database connections pool size for the +UserRepository+.
+*Description:* This property allows setting the database connections pool size for the +UserRepository+.
 
-Please note, if not specified than in some cases instead of default for this property setting for --data-repo-pool-size+ can be used. This depends on the repository implementation and the way it is initialized.
+*Please note* if not specified than in some cases instead of default for this property setting for xref:dataRepoPoolSize[+--data-repo-pool-size+] can be used. This depends on the repository implementation and the way it is initialized.
 
 *Available since:* 4.0.0
-

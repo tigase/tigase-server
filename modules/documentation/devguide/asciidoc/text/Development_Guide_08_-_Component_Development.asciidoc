@@ -1,0 +1,27 @@
+[[componentdevelpoment]]
+= Component Development
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+A component in the Tigase is an entity with its own JID address. It can receive packets, process them, and can also generate packets.
+
+An example of the best known components is MUC or PubSub. In Tigase however, almost everything is actually a component: Session Manager, s2s connections manager, Message Router, etc... Components are loaded based on the server configuration, new components can be loaded and activated at run-time. You can easily replace a component implementation and the only change to make is a class name in the configuration entry.
+
+Creating components for Tigase server is an essential part of the server development hence there is a lot of useful API and ready to use code available. This guide should help you to get familiar with the API and how to quickly and efficiently create your own component implementations.
+
+. xref:cil1[Component implementation - Lesson 1 - Basics]
+. xref:cil2[Component implementation - Lesson 2 - Configuration]
+. xref:cil3[Component implementation - Lesson 3 - Multi-Threading]
+. xref:cil4[Component implementation - Lesson 4 - Service Discovery]
+. xref:cil5[Component implementation - Lesson 5 - Statistics]
+. xref:cil6[Component implementation - Lesson 6 - Scripting Support]
+. xref:cil7[Component implementation - Lesson 7 - Data Repository]
+. xref:cil8[Component implementation - Lesson 8 - Startup Time]
+. xref:configurationAPI[Configuration API]
+. xref:packetfiltering[Packet Filtering in Component]

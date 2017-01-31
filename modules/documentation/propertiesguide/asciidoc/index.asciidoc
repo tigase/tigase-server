@@ -1,17 +1,9 @@
-Tigase Properties Guide
-=======================
-Tigase Team <team@tigase.net>
-v1.0, July 2014: Initial
+[[propertiesGuide]]
+= Tigase Properties Guide
 :toc:
 :numbered:
-:website: http://tigase.net
-:Date: 2014-07-23
 
 :leveloffset: 1
-
-:no title:
-
-:no author:
 
 include::text/Properties_Guide_01_-_--admins.asciidoc[]
 
@@ -137,23 +129,28 @@ include::text/Properties_Guide_61_-_--user-repo-pool-size.asciidoc[]
 
 include::text/Properties_Guide_62_-_--vhost-anonymous-enabled.asciidoc[]
 
-include::text/Properties_Guide_63_-_--vhost-max-users.asciidoc[]
+include::text/Properties_Guide_63_-_--vhost-disable-dns-check.asciidoc[]
 
-include::text/Properties_Guide_64_-_--vhost-message-forward-jid.asciidoc[]
+include::text/Properties_Guide_64_-_--vhost-max-users.asciidoc[]
 
-include::text/Properties_Guide_65_-_--vhost-presence-forward-jid.asciidoc[]
+include::text/Properties_Guide_65_-_--vhost-message-forward-jid.asciidoc[]
 
-include::text/Properties_Guide_66_-_--vhost-register-enabled.asciidoc[]
+include::text/Properties_Guide_66_-_--vhost-presence-forward-jid.asciidoc[]
 
-include::text/Properties_Guide_67_-_--vhost-tls-required.asciidoc[]
+include::text/Properties_Guide_67_-_--vhost-register-enabled.asciidoc[]
 
-include::text/Properties_Guide_68_-_--virt-hosts.asciidoc[]
+include::text/Properties_Guide_68_-_--vhost-tls-required.asciidoc[]
 
-include::text/Properties_Guide_69_-_--watchdog_delay.asciidoc[]
+include::text/Properties_Guide_69_-_--virt-hosts.asciidoc[]
 
-include::text/Properties_Guide_70_-_--watchdog_ping_type.asciidoc[]
+include::text/Properties_Guide_70_-_--watchdog_delay.asciidoc[]
 
-include::text/Properties_Guide_71_-_--watchdog_timeout.asciidoc[]
+include::text/Properties_Guide_71_-_--watchdog_ping_type.asciidoc[]
 
-include::text/Properties_Guide_72_-_config-type.asciidoc[]
+include::text/Properties_Guide_72_-_--watchdog_timeout.asciidoc[]
 
+include::text/Properties_Guide_74_-_--ws-allow-unmasked-frames.asciidoc[]
+
+include::text/Properties_Guide_73_-_-config-type.asciidoc[]
+
+include::text/Properties_Guide_75_-_--client-port-delay-listening.asciidoc[]

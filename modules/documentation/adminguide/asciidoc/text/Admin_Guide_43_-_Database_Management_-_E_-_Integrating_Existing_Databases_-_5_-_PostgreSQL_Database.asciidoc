@@ -1,0 +1,52 @@
+[[postgresDB2]]
+= PostgreSQL Database Use
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This guide describes how to configure Tigase server to use link:http://www.postgresql.org/[PostgreSQL] database as a user repository.
+
+If you used an XML based user repository before you can copy all user data to PostgreSQL database using repository management tool. All steps are described below.
+
+== PostgreSQL Database Preparation
+Create new database user account which will be used to connect to your database:
+
+[source,sh]
+-----
+# createuser
+Enter name of user to add: tigase
+Shall the new user be allowed to create databases? (y/n) y
+Shall the new user be allowed to create more new users? (y/n) y
+-----
+
+Now using new database user account create database for your service:
+
+[source,sh]
+-----
+# createdb -U tigase tigasedb
+CREATE DATABASE
+-----
+
+Now you can load the database schema:
+
+[source,sh]
+-----
+# psql -U tigase -d tigasedb -f postgresql-schema.sql
+-----
+
+Now the database is ready for Tigase server to use.
+
+== Server Configuration
+Server configuration is identical as MySQL database setup. The same jdbc module is used to connect to PostgreSQL database as for MySQL. The only difference is the connection string which usually looks like:
+
+[source,bash]
+-----
+jdbc:postgresql://localhost/tigasdb?user=tigase
+-----
+
+So for more detailed guide how to change configuration refer to xref:mysql2database[MySQL database use guide] or if you look for a more automatic configuration file generation refer to xref:3xconfiguration[configuration wizards] page.

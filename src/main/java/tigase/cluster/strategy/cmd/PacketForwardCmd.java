@@ -53,6 +53,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import tigase.server.Priority;
 
 /**
  * Class description
@@ -85,7 +86,7 @@ public class PacketForwardCmd
 	 * @param strategy
 	 */
 	public PacketForwardCmd(String name, DefaultClusteringStrategyAbstract strategy) {
-		super(name);
+		super(name, Priority.HIGH);
 		this.strategy = strategy;
 	}
 

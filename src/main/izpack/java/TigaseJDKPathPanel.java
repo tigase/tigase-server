@@ -22,10 +22,13 @@
 
 package com.izforge.izpack.panels;
 
+import java.io.BufferedReader;
+
 import com.coi.tools.os.win.MSWinConstants;
 import com.coi.tools.os.win.NativeLibException;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
+import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.VariableSubstitutor;
 import com.izforge.izpack.util.AbstractUIHandler;
 import com.izforge.izpack.util.FileExecutor;
@@ -34,11 +37,14 @@ import com.izforge.izpack.util.os.RegistryDefaultHandler;
 import com.izforge.izpack.util.os.RegistryHandler;
 import com.izforge.izpack.gui.IzPanelLayout;
 
+
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -249,7 +255,23 @@ public class TigaseJDKPathPanel extends PathInputPanel implements HyperlinkListe
         {
             if (OsVersion.IS_OSX)
             {
-                chosenPath = OSX_JDK_HOME;
+							Process proc;
+
+							String[] params = { "/usr/libexec/java_home" };
+							String[] output = new String[ 2 ];
+							FileExecutor fe = new FileExecutor();
+							fe.executeCommand( params, output );
+
+							Debug.trace("output[0]: " + output[0]);
+
+							if (output[0] != null && !output[0].trim().isEmpty()) {
+								chosenPath = output[0].trim();
+							} else if ( idata.getVariable("JAVA_HOME") != null ) {
+								chosenPath = (new File(idata.getVariable("JAVA_HOME"))).getParent();
+							}
+							else {
+								chosenPath = OSX_JDK_HOME;
+							}
             }
             else
             {

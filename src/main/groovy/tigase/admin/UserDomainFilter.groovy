@@ -32,7 +32,8 @@ import tigase.server.*
 import tigase.util.*
 import tigase.xmpp.*
 import tigase.xmpp.impl.DomainFilter
-import tigase.vhosts.DomainFilterPolicy
+import tigase.vhosts.filter.CustomDomainFilter
+import tigase.vhosts.filter.DomainFilterPolicy
 import tigase.db.UserRepository
 import tigase.db.UserNotFoundException
 
@@ -41,13 +42,13 @@ import tigase.vhosts.*
 def vhost_man = (VHostManagerIfc)vhostMan
 
 def JID = "jid"
-def DOMAIN = "domain"
-def DOMAIN_LIST = "domainList"
+def FILTERING_POLICY = "fiteringPolicy"
+def FILTERING_LIST = "filteringList"
 
 def p = (Iq)packet
 def jid = Command.getFieldValue(p, JID)
-def domain = Command.getFieldValue(p, DOMAIN)
-def domainList = Command.getFieldValue(p, DOMAIN_LIST)
+def domain = Command.getFieldValue(p, FILTERING_POLICY)
+def domainList = Command.getFieldValue(p, FILTERING_LIST)
 
 if (jid == null || domain == null ||
 	(domain == DomainFilterPolicy.LIST.name() && domainList == null)) {
@@ -55,9 +56,9 @@ if (jid == null || domain == null ||
 	Command.addFieldValue(res, JID, jid ?: "", "jid-single", "User JID")
 	def domainStr = []
   DomainFilterPolicy.values().each { domainStr += it.name() }
-	Command.addFieldValue(res, DOMAIN, domain ?: domainStr[0], "List of domains",
+	Command.addFieldValue(res, FILTERING_POLICY, domain ?: domainStr[0], "List of domains",
 		(String[])domainStr, (String[])domainStr)
-	Command.addFieldValue(res, DOMAIN_LIST, domainList ?: "", "text-single", "Domains List")
+	Command.addFieldValue(res, FILTERING_LIST, domainList ?: "", "text-single", "Domains List")
 	return res
 }
 
@@ -86,17 +87,24 @@ try {
 		DomainFilter.ALLOWED_DOMAINS_KEY, null)
 	def old_value_domains = "";
 
-	if (old_value ==  DomainFilterPolicy.LIST.name()
-		|| old_value ==  DomainFilterPolicy.BLACKLIST.name()) {
-		old_value_domains = repo.getData(bareJID, null,
-			DomainFilter.ALLOWED_DOMAINS_LIST_KEY, null)
+	if (DomainFilterPolicy.valuePoliciesWithDomainListStr().contains(old_value) ) {
+		old_value_domains = repo.getData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, null)
 	}
 
+	if (domainList != null ) {
+		domainList = domainList.replaceAll("\\s","")
+	}
 	def new_value = domain
-	if (domain == DomainFilterPolicy.LIST.name()
-		|| domain == DomainFilterPolicy.BLACKLIST.name()) {
-//		new_value = domainList
-			repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, domainList)
+	if ( DomainFilterPolicy.valuePoliciesWithDomainListStr().contains(domain) ) {
+		if (DomainFilterPolicy.valueof(domain) == DomainFilterPolicy.CUSTOM)
+		{
+			try {
+				CustomDomainFilter.parseRules(domainList)
+			} catch (Exception e) {
+				return "Error parsing rules: " + domainList
+			}
+		}
+		repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, domainList)
 	}
 	repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
 

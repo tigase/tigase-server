@@ -75,7 +75,7 @@ import java.util.Queue;
 	XMLNS
 })
 public class VCardTemp
-				extends XMPPProcessorAbstract {
+				extends VCardXMPPProcessorAbstract {
 	/** Field description */
 	public static final String VCARD_KEY = "vCard";
 
@@ -152,17 +152,7 @@ public class VCardTemp
 					if (elvCard == null) {
 						elvCard = packet.getElement().getChild(VCARD);
 					}
-					if (elvCard != null) {
-						if (log.isLoggable(Level.FINER)) {
-							log.finer("Adding vCard: " + elvCard);
-						}
-						session.setPublicData(ID, VCARD_KEY, elvCard.toString());
-					} else {
-						if (log.isLoggable(Level.FINER)) {
-							log.finer("Removing vCard");
-						}
-						session.removePublicData(ID, VCARD_KEY);
-					}    // end of else
+					setVCard(session, elvCard);
 					result = packet.okResult((String) null, 0);
 
 					break;
@@ -262,6 +252,26 @@ public class VCardTemp
 						"sent to the server, which should not happen: " + packet);
 			}
 		}
+	}
+	
+	@Override
+	protected String getVCardXMLNS() {
+		return XMLNS;
+	}
+	
+	@Override
+	protected void storeVCard(XMPPResourceConnection session, Element elvCard) throws TigaseDBException, NotAuthorizedException {
+		if (elvCard != null) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Adding vCard: " + elvCard);
+			}
+			session.setPublicData(ID, VCARD_KEY, elvCard.toString());
+		} else {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Removing vCard");
+			}
+			session.removePublicData(ID, VCARD_KEY);
+		}    // end of else
 	}
 	
 	private Packet parseXMLData(String data, Packet packet) {

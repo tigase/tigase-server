@@ -109,7 +109,7 @@ public abstract class ActionAbstract
 														ActionResultsHandlerIfc resultsHandler) {
 		this.resultsHandler = resultsHandler;
 
-		String sec_str = (String) props.get(AMP_SECURITY_LEVEL);
+		String sec_str = (String) props.get(SECURITY_PROP_KEY);
 
 		try {
 			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());
@@ -206,10 +206,17 @@ public abstract class ActionAbstract
 		packet.getElement().removeAttribute(TO_RES);
 		packet.getElement().removeAttribute(OFFLINE);
 		packet.getElement().removeAttribute(FROM_CONN_ID);
+		packet.getElement().removeAttribute(SESSION_JID);
 		packet.getElement().removeAttribute(EXPIRED);
 	}
 
 	private boolean checkUserRoster(JID user, JID contact) {
+
+		if ( user.getBareJID().equals( contact.getBareJID() ) ){
+			// this is the same user, no point in checking sub
+			return true;
+		}
+
 		try {
 			String roster_str = user_repository.getData(user.getBareJID(),
 														RosterAbstract.ROSTER);

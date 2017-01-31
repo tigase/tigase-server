@@ -89,11 +89,11 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param ioi
 	 * @param wrapper
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper, final ByteOrder order) throws IOException {
@@ -249,7 +249,7 @@ public class TLSIO implements IOInterface {
 		// return
 		// NEED_READ status all the time and the loop never ends.
 		int loop_cnt = 0;
-		int max_loop_runs = 1000;
+		int max_loop_runs = 100000;
 
 		boolean breakNow = true;
 		
@@ -306,8 +306,9 @@ public class TLSIO implements IOInterface {
 
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.log(Level.WARNING,
-					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}",
-					tlsWrapper.getStatus());
+					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}, io: {1}",
+					new Object[] {tlsWrapper.getStatus() , toString() }
+			);
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
@@ -467,7 +468,7 @@ public class TLSIO implements IOInterface {
 		// It happens extremely rarely and is hard to diagnose. Let's leave it
 		// as it is now which just causes such connections to be closed.
 		int loop_cnt = 0;
-		int max_loop_runs = 1000;
+		int max_loop_runs = 100000;
 
 		do {
 			if (tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
@@ -491,11 +492,18 @@ public class TLSIO implements IOInterface {
 			tlsOutput.flip();
 			wr = io.write(tlsOutput);
 			result += wr;
+
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
+															new Object[] {buff.remaining(), toString() } );
+			}
+
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.warning("Infinite loop detected in writeBuff(buff) TLS code, "
-					+ "tlsWrapper.getStatus(): " + tlsWrapper.getStatus());
+					+ "tlsWrapper.getStatus(): " + tlsWrapper.getStatus()
+									+ ", buff.remaining(): " + buff.remaining() + " io: " + toString() );
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");

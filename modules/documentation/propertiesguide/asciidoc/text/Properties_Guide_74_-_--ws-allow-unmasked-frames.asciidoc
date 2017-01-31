@@ -1,0 +1,19 @@
+[[wsAllowUnmaskedFrames]]
+= --ws-allow-unmasked-frames
+:author: Daniel Wisnewski (Daniel@tigase.net)
+:version: v1.0, April 2016
+:date: 2016-04-04 10:03
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +false+
+
+*Example:* +--ws-allow-unmasked-frames = true+
+
+*Possible values:* +true|false+
+
+*Description:* RFC 6455 specifies that all clients must mask frames that it sends to the server over Websocket connections.  If unmasked frames are sent, regardless of any encryption, the server must close the connection.  Some clients however, may not support masking frames, or you may wish to bypass this security measure for development purposes. This setting, when enabled true, will allow connections over websocket to be unmasked to the server, and may operate without Tigase closing that connection.
+
+*Available since:* 7.1.0

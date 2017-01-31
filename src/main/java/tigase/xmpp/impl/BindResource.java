@@ -24,8 +24,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
@@ -33,14 +31,17 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
@@ -48,9 +49,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPPreprocessorIfc;
 
 /**
  * RFC-3920, 7. Resource Binding
@@ -83,8 +81,11 @@ public class BindResource
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
 			"var" }, new String[] { XMLNS }) };
 
+	private static final String RESOURCE_PREFIX_DEF = "tigase-";
+
+
 	//~--- fields ---------------------------------------------------------------
-	private String resourceDefPrefix = "tigase-";
+	private String resourceDefPrefix = RESOURCE_PREFIX_DEF;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -96,20 +97,17 @@ public class BindResource
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 
-		int hostnameHash = Math.abs( DNSResolver.getDefaultHostname().hashCode() );
-		
+		int hostnameHash = Math.abs( DNSResolverFactory.getInstance().getDefaultHost().hashCode() );
+
 		// Init plugin configuration
-		if (settings.get(DEF_RESOURCE_PREFIX_PROP_KEY) != null) {
-			resourceDefPrefix = hostnameHash + "-" + settings.get(DEF_RESOURCE_PREFIX_PROP_KEY).toString();
-		} else {
-			resourceDefPrefix = hostnameHash + "-" + resourceDefPrefix;
-		}
+		resourceDefPrefix = hostnameHash + "-" + settings.getOrDefault(DEF_RESOURCE_PREFIX_PROP_KEY, RESOURCE_PREFIX_DEF);
+
 	}
 
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		if ((session == null) || session.isServerSession() || !session.isAuthorized()) {
+		if ((session == null) || session.isServerSession() || !session.isAuthorized() || C2SDeliveryErrorProcessor.isDeliveryError( packet )) {
 			return false;
 		}
 		
@@ -128,26 +126,30 @@ public class BindResource
 
 					if (from_jid != null) {
 
-						// Do not replace current settings if there is at least correct
-						// BareJID
-						// already set.
-						if ((packet.getStanzaFrom() == null) 
-								|| (packet.getElemName() == tigase.server.Presence.ELEM_NAME 
-									&& !from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID()))
-								|| (packet.getElemName() != tigase.server.Presence.ELEM_NAME
-									&& !from_jid.equals(packet.getStanzaFrom()))) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
+						// http://xmpp.org/rfcs/rfc6120.html#stanzas-attributes-from
+							if ( packet.getElemName() == tigase.server.Presence.ELEM_NAME
+								 && StanzaType.getSubsTypes().contains( packet.getType() )
+								 && ( packet.getStanzaFrom() == null
+											|| !from_jid.getBareJID().equals( packet.getStanzaFrom().getBareJID() )
+											|| packet.getStanzaFrom().getResource() != null ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
+								log.log( Level.FINEST, "Setting correct from attribute: {0}", from_jid );
 							}
-
-							// No need for the line below, initVars(...) takes care of that
-							// packet.getElement().setAttribute("from", from_jid.toString());
-							packet.initVars(from_jid, packet.getStanzaTo());
+							packet.initVars( JID.jidInstance( from_jid.getBareJID() ), packet.getStanzaTo() );
+						} else if ( ( packet.getStanzaFrom() == null )
+												|| ( ( packet.getElemName() == tigase.server.Presence.ELEM_NAME
+															 && !StanzaType.getSubsTypes().contains( packet.getType() )
+															 || packet.getElemName() != tigase.server.Presence.ELEM_NAME )
+														 && !from_jid.equals( packet.getStanzaFrom() ) ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
+								log.log( Level.FINEST, "Setting correct from attribute: {0}", from_jid );
+							}
+							packet.initVars( from_jid, packet.getStanzaTo() );
 						} else {
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST,
 										"Skipping setting correct from attribute: {0}, is already correct.",
-										from_jid);
+										packet.getStanzaFrom());
 							}
 						}
 					} else {

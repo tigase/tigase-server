@@ -1,0 +1,166 @@
+[[eventBus]]
+= EventBus API in Tigase
+:author: Bartosz Małkowski <bmalkowski@tigase.pl>
+:version: v1.0, December 2015.
+:date: 2015-12-29
+:revision: v1.0
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+EventBus is a custom publish-subscribe mechanism which allows for the use of Event Listener within Tigase Server.  EventBus consists of two separated parts: Distributed EventBus and Local EventBus.
+Local EventBus is only concerned with local event listener, and will operate events locally.  Distributed EventBus is designed to distribute events among cluster nodes.
+For a more detailed overview of EventBus and it's features, please visit link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#eventBus[The Administration Guide].
+
+== EventBus API
+To create instance of EventBus use the following code:
+[source, xml]
+-------
+EventBus eventBus = EventBusFactory.getInstance();
+-------
+
+*NOTE:* Remember, that EventBus is asynchronous. All handlers are called in a different thread than the thread that initially fired the event.
+
+== Distributed EventBus
+Distributed EventBus is designed to distribute events among cluster nodes.
+Events must extends `tigase.xml.Element`:
+
+[source, xml]
+-------
+<EventName xmlns="tigase:demo">
+  <sample_value>1</sample_value>
+</EventName>
+-------
+Events are identified by two elements: name of event and namespace.
+
+
+=== Registering events handlers
+To catch and handle an event published in any node of cluster, EventsHandler must be registered first.
+
+[source, java]
+-------
+EventHandler handler = new EventHandler() {
+    @Override
+    public void onEvent(String name, String xmlns, Element event) {
+        // TODO
+    }
+};
+
+eventBus.addHandler("EventName", "tigase:demo", handler);
+
+-------
+
+It is possible to register handler for all events with a specific xmlns such as tigase:demo below:
+
+[source, java]
+-------
+eventBus.addHandler(null, "tigase:demo", handler);
+-------
+
+Events created on others cluster node, will have attribute `remote` set to `true` and attribute `source` set to event creator node name:
+
+[source, xml]
+-------
+<EventName xmlns="tigase:demo" remote="true" source="node1.example">
+  <sample_value>1</sample_value>
+</EventName>
+-------
+
+=== Publishing events
+
+The only limitation for events are the requirements of name and xmlns. Internal structure may be defined by programmer.
+
+[source, java]
+-------
+Element event = new Element("EventName", new String[]{"xmlns"}, new String[]{"tigase:demo"});
+event.addChild(new Element("sample_value", "1"));
+
+eventBus.fire(event);
+-------
+
+This event will be received by all handlers that are registered for exactly this event, or all events usint the *tigase:demo* namespace on all cluster nodes. It is possible to limit event delivery only to the current Tigase instance (current cluster node), by setting the attribute `local`:
+
+[source, java]
+-------
+Element event = new Element("EventName", new String[]{"xmlns", "local"}, new String[]{"tigase:demo", "true"});
+event.addChild(new Element("sample_value", "1"));
+
+eventBus.fire(event);
+-------
+
+== Local EventBus
+
+Local EventBus is the mechanism to distribute events to all listeners on the same instance of Tigase Server.  Local EventBus uses Java Objects as events and allows for the transmission instance of object (for example `Map` or `Set`).
+
+=== Defining events and handlers classes
+Local EventBus uses own structures of events and handlers.
+
+[source, java]
+.SampleEvent.java
+-------
+public static class SampleEvent implements Event {
+
+    private final String data;
+
+    public SampleEvent(String data) {
+        this.data = data;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+}
+-------
+
+=== Registering events handlers
+
+To catch an event, `EventHandler` must be registered in EventBus:
+
+[source, java]
+-------
+EventHandler handler = new EventHandler() {
+    @Override
+    public void onEvent(Event event) {
+
+    }
+};
+
+eventBus.addHandler(SampleEvent.class, handler);
+-------
+
+The other way to register a handler is by using annotations. Event consumer class must contain the method with a single parameter, and its type must be equal to expected event type.
+
+[source, java]
+.SampleConsumer.java
+-------
+public static class SampleConsumer {
+
+	@HandleEvent
+	public void onCatchSomeNiceEvent(SampleEvent event) {
+	}
+
+	@HandleEvent
+	public void onEvent01(ImportantEvent event) {
+	}
+}
+-------
+
+The instance of class must be registered in Eventbus:
+
+[source, java]
+-------
+eventBus.registerAll(consumer);
+-------
+
+Once this is in place, EventBus will be added as the event handler for two different events.
+
+=== Publishing events
+Publishing events is simple:
+
+[source, java]
+-------
+SampleEvent event = new SampleEvent("data");
+eventBus.fire(event);
+-------

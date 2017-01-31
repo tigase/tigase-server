@@ -1,0 +1,12 @@
+[[tipsAndTricks]]
+= Tips and Tricks
+:author: Daniel Wisnewski
+:version: v1.0
+:date: 2015-13-07 11:32
+
+:toc:
+
+The section contains some short tricks and tips helping in different kinds of issues related to the server administration and maintenance.
+
+- xref:tigaseTip_RuntimeEnvironment[Runtime Environment Tip]
+- xref:bestWebPrax [Best Practices for Connecting to Tigase XMPP server From Web Browser]

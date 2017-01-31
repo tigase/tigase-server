@@ -20,14 +20,15 @@
 --  $Date: $
 --
 
--- QUERY START:
 source database/mysql-schema-4-schema.sql;
--- QUERY END:
 
--- QUERY START:
 source database/mysql-schema-5-1-sp.sql;
--- QUERY END:
 
--- QUERY START:
 source database/mysql-schema-5-1-props.sql;
--- QUERY END:
+
+-- LOAD FILE: database/mysql-schema-4-schema.sql;
+
+-- LOAD FILE: database/mysql-schema-5-1-sp.sql;
+
+-- LOAD FILE: database/mysql-schema-5-1-props.sql;
+ 

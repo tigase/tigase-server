@@ -53,14 +53,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.server.Iq;
+import tigase.server.PolicyViolationException;
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.osgi.ModulesManagerImpl;
 
 /**
- * Class responsible for handling Presence packets
+ * Class responsible for handling Presence packets - deprecated
+ * Use PresenceState and PresenceSubscription classes
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@TigaseDeprecatedComponent(note = "Please remove \'+presence\' from \'--sm-plugins=\' or switch to \'presence-state\' and \'presence-subscription\' plugins")
 public class Presence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {
@@ -228,11 +232,7 @@ public class Presence
 
 		// Probe is always broadcasted with initial presence
 		Element presInit  = session.getPresence();
-		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
-
-		presProbe.setXMLNS(XMLNS);
-		presProbe.setAttribute("type", StanzaType.probe.toString());
-		presProbe.setAttribute("from", session.getBareJID().toString());
+		Element presProbe = prepareProbe( session );
 
 		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
 
@@ -306,9 +306,17 @@ public class Presence
 		}      // end of if (buddies == null)
 	}
 
+	private Element prepareProbe( XMPPResourceConnection session ) throws NotAuthorizedException {
+		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
+		presProbe.setXMLNS(XMLNS);
+		presProbe.setAttribute("type", StanzaType.probe.toString());
+		presProbe.setAttribute("from", session.getBareJID().toString());
+		return presProbe;
+	}
+
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors() * 2;
+		return super.concurrentQueuesNo() * 4;
 	}
 
 	@Override
@@ -348,9 +356,9 @@ public class Presence
 				offlineRosterLastSeen = tmp.split( "," );
 				log.log( Level.CONFIG, "Loaded roster offline last seen config: {0}", tmp );
 			}
-		} else {
-			offlineRosterLastSeen = new String[] {"*"};
-			log.config("No configuration found for Loaded roster offline last seen. - enabling for All clients");
+//		} else {
+//			offlineRosterLastSeen = new String[] {"*"};
+//			log.config("No configuration found for Loaded roster offline last seen. - enabling for All clients");
 		}
 		tmp = (String) settings.get(PRESENCE_GLOBAL_FORWARD);
 		if (tmp != null) {
@@ -582,6 +590,10 @@ public class Presence
 
 					break;
 
+				case out_probe :
+					forwardPresence(results, packet, session.getJID());
+					break;
+					
 				case error :
 					processError(packet, session, results, settings, pres_type);
 
@@ -598,6 +610,8 @@ public class Presence
 						"Can not access user Roster, user session is not authorized yet: {0}",
 						packet);
 				log.log(Level.FINEST, "presence problem...", e);
+			} catch ( PolicyViolationException e ) {
+				log.log( Level.FINE, "Violation of roster items number policy: {0}", packet );
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Error accessing database for presence data: {0}", e);
 			}    // end of try-catch
@@ -710,7 +724,9 @@ public class Presence
 					else {
 				presence.setAttribute("type", StanzaType.unavailable.toString());
 			}    // end of if (t != null) else
-			presence.setAttribute("from", from.toString());
+			if (null != from ) {
+				presence.setAttribute("from", from.toString());
+			}
 			presence.setXMLNS(XMLNS);
 		} else {
 			presence = pres.clone();
@@ -862,7 +878,12 @@ public class Presence
 	}
 
 	public static void rebroadcastPresence(XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
-		Element presence = session.getPresence();
+		if (session.getPresence() == null ) {
+			// user has not sent initial presence yet, ignore
+			return;
+		}
+
+		Element presence = session.getPresence().clone();
 
 		for ( ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors ) {
 			Element extendContent = processor.extend( session, results );
@@ -1321,20 +1342,37 @@ public class Presence
 				}
 			}
 		} else {
-
 			// acording to spec 4.3.2. Server Processing of Inbound Presence Probe
 			// http://xmpp.org/rfcs/rfc6121.html#presence-probe-inbound
 			// If the user's bare JID is in the contact's roster with a subscription
 			// state other
 			// than "From", "From + Pending Out", or "Both", then the contact's server
 			// SHOULD return a presence stanza of type "unsubscribed"
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
-						packet.getStanzaFrom().getBareJID());
+			if (!isAllowedForPresenceProbe(session, packet.getStanzaFrom())) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
+							packet.getStanzaFrom().getBareJID());
+				}
+				sendPresence(StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom()
+						.getBareJID(), results, null);
+			} else {
+				// However, if a server receives a presence probe from a configured
+				// domain of the server itself or another such trusted service, it MAY
+				// provide presence information about the user to that entity.
+				for (XMPPResourceConnection conn : session.getActiveSessions()) {
+					Element pres = conn.getPresence();
+
+					if (pres != null) {
+						sendPresence(null, null, packet.getStanzaFrom(),
+								results, pres);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Received probe, sending presence response to: {0}",
+									packet.getStanzaFrom());
+						}
+					}
+				}
 			}
-			sendPresence(StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom()
-					.getBareJID(), results, null);
 		}    // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 	}
 
@@ -1364,7 +1402,7 @@ public class Presence
 	 */
 	protected void processInSubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// If the buddy is already subscribed then auto-reply with subscribed
 		// presence stanza.
@@ -1421,7 +1459,7 @@ public class Presence
 	 */
 	protected void processInSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
@@ -1443,6 +1481,14 @@ public class Presence
 			}
 			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session,
 					packet.getStanzaFrom()));
+
+			Element delay = packet.getElement().getChild( "delay", "urn:xmpp:delay");
+			if (delay != null ) {
+				// offline packet, lets send probe
+				Element presProbe = prepareProbe( session );
+				sendPresence( null, null, packet.getStanzaFrom(), results, presProbe );
+			}
+
 		}
 	}
 
@@ -1472,7 +1518,7 @@ public class Presence
 	 */
 	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 				packet.getStanzaFrom());
 
@@ -1533,7 +1579,7 @@ public class Presence
 	 */
 	protected void processInUnsubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
@@ -1626,8 +1672,9 @@ public class Presence
 			if (session.getPresence() == null) {
 				first = true;
 			}
-			packet.initVars(session.getJID(), packet.getStanzaTo());
-			final Element presenceEl = packet.getElement();
+			Packet resultPacket = packet.copyElementOnly();
+			resultPacket.initVars(session.getJID(), packet.getStanzaTo());
+			final Element presenceEl = resultPacket.getElement();
 
 			for ( ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors ) {
 				Element extendContent = processor.extend( session, results );
@@ -1726,7 +1773,7 @@ public class Presence
 	 */
 	protected void processOutSubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to resynchronize
@@ -1800,7 +1847,7 @@ public class Presence
 	 */
 	protected void processOutSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to re-synchronize
@@ -1904,20 +1951,22 @@ public class Presence
 			Priority pack_priority = Priority.PRESENCE;
 			int      pres_cnt      = 0;
 
-			for (JID buddy : buddies) {
-				Element child = roster_util.getCustomChild(session, buddy);
+			for ( JID buddy : buddies ) {
+				List<Element> children = roster_util.getCustomChildren( session, buddy );
 
-				if (child != null) {
-					Packet pack = sendPresence(StanzaType.unavailable, buddy, session.getJID(),
-							results, null);
-
-					if (pres_cnt == HIGH_PRIORITY_PRESENCES_NO) {
+				if ( children != null && !children.isEmpty() ){
+					Packet pack = sendPresence( StanzaType.unavailable, buddy, session.getJID(),
+																			results, null );
+					
+					if ( pres_cnt == HIGH_PRIORITY_PRESENCES_NO ){
 						++pres_cnt;
 						pack_priority = Priority.LOWEST;
 					}
-					pack.setPriority(pack_priority);
-					pack.setPacketTo(session.getConnectionId());
-					pack.getElement().addChild(child);
+					pack.setPriority( pack_priority );
+					pack.setPacketTo( session.getConnectionId() );
+					for ( Element child : children ) {
+						pack.getElement().addChild( child );
+					}
 				}
 			}    // end of for (String buddy: buddies)
 		}
@@ -1957,8 +2006,10 @@ public class Presence
 					pres_update.setAttribute("type", StanzaType.unavailable.toString());
 					pres_update.setXMLNS(XMLNS);
 
-					Packet pack_update = Packet.packetInstance(pres_update, session.getJID(), conn
-							.getJID().copyWithoutResource());
+					// accroding to RFC1621, 4.5.2.  Server Processing of Outbound Unavailable Presence
+					// this presece packet should be addressed to fullJID
+					Packet pack_update = Packet.packetInstance( pres_update, session.getJID(),
+																											conn.getJID() );
 
 					pack_update.setPacketTo(conn.getConnectionId());
 					results.offer(pack_update);
@@ -2051,6 +2102,13 @@ public class Presence
 
 	//~--- methods --------------------------------------------------------------
 
+	private boolean isAllowedForPresenceProbe(XMPPResourceConnection session, JID jid) {
+		if (jid == null)
+			return false;
+		
+		return session.getDomain().isTrustedJID(jid);
+	}
+	
 	/**
 	 * Method checks whether a given contact requires sending presence. In case of
 	 * enabling option {@code skipOffline} and user being offline in the roster
@@ -2082,15 +2140,26 @@ public class Presence
 		// if non-system check is enabled during broadcast of non-first initial
 		// presence or offline presence
 		if (!systemCheck) {
-			if (skipOffline &&!roster.isOnline(session, buddy)) {
+			boolean isOnline = roster.isOnline( session, buddy );
+			if ( skipOffline && !isOnline ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "{0} | buddy: {1} is online: {2}",
+									 new Object[] { session.getJID(), buddy, isOnline } );
+				}
 				result = result && false;
 			}
 		}
 		if (skipOfflineSys) {
 			TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
+			boolean isJidOnline = runtime.isJidOnline( buddy );
 
-			if (runtime.hasCompleteJidsInfo() && session.isLocalDomain(buddy.getDomain(),
-					false) &&!runtime.isJidOnline(buddy)) {
+			if ( runtime.hasCompleteJidsInfo()
+					 && session.isLocalDomain( buddy.getDomain(), false )
+					 && !isJidOnline ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "{0} | buddy: {1} is online (sys): {2}",
+																 new Object[] { session.getJID(), buddy, isJidOnline } );
+				}
 				result = result && false;
 			}
 		}

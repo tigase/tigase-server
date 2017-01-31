@@ -1,12 +1,13 @@
 [[userRepoPool]]
---user-repo-pool
-================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --user-repo-pool
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:49
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:49
 
 *Default value:* +tigase.db.UserRepositoryPool+
 
@@ -14,7 +15,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'Name of class implementing UserRepository.'
 
-*Description:* The property allows to specify an implementation for the repository connection pool. This is used only if the implementation provided by a default Tigase server package is not sufficient in the particular deployment. The implementation provides a DB (UserRepository to be more specific) connection pool to improve the data access performance. The repository pool can offer data caching for improved performance or any other features necessary.
+*Description:* The +--user-repo-pool+ property provides an ability to specify an implementation for the repository connection pool. This is used only if the implementation provided by a default Tigase server package is not sufficient in a particular deployment. The implementation provides a DB (UserRepository to be more specific) connection pool to improve the data access performance. The repository pool can offer data caching for improved performance or any other features necessary.
 
 *Available since:* 5.1.0
-

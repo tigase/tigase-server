@@ -1,0 +1,110 @@
+[[LetsEncryptCertificate]]
+= Installing LetsEncrypt Certificates in Your Linux System
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:version: v1.0 November, 2016
+:date: 2016-11-01 12:35
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+LetsEncrypt is a trusted CA that provides free security certificates.  Unlike previously self-signed certificates, we can use LetsEncrypt Certificates to certify your domains from a trusted source.
+To do this, remote into the server hosting Tigase, or login to the computer locally and begin to install git if that is not already on the system.
+
+[source,bash]
+-----
+sudo apt-get install git
+-----
+
+Once the machine installs git, use the following command to download the LetsEncrypt Tools.
+
+[source,bash]
+-----
+sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
+-----
+
+This will download the tools into the computers' /opt/letsencrypt directory.  You will now need to generate the certificates using this tool using the next command.
+
+[source,bash]
+-----
+sudo -H ./letsencrypt-auto certonly --standalone -d domain.com
+-----
+where domain.com is your currently hosted domain.  Be sure that port 443 is forwarded to this computer, and that proper A and DNS records are registered for your domain.
+
+NOTE: Letsencrypt does not allow for wildcards in the domain name, you will need to generate certificates for each subdomain you wish certified by the CA.
+
+Those certificates will be created and will be stored in _/etc/letsencrypt/live/$domain_ and you will need admin privladges to see them.
+
+[source,bash]
+-----
+sudo -i
+**********
+cd /etc/letsencrypt/live/$domain
+
+ls
+
+cert.pem chain.pem fullchain.pem privkey.pem
+-----
+
+In that directory, you will find four certificates:
+- cert.pem
+- chain.pem
+- fullchain.pem
+- privkey.pem
+
+For Tigase, we are only concerned with privkey.pem contents.  Copy that certificate to another directory.
+
+[source,bash]
+-----
+cp privkey.pem /home/user
+-----
+
+At this point we will need to obtain the root and intermediate certificates, this can be done by downloading these certificates from the link:https://letsencrypt.org/certificates/[LetsEncrypt website].
+
+Alternatively, you may obtain them using wget:
+[source,bash]
+-----
+wget https://letsencrypt.org/certs/isrgrootx1.pem
+wget https://letsencrypt.org/certs/letsencryptauthorityx3.pem
+-----
+
+These are the root certificate, and the intermediate certificate signed by root certificate.
+NOTE: IdenTrust cross-signed certificate will not function properly.
+
+Take the contents of your privkey.pem, and combine them with the contents of isrgrootx1.pem and letsencryptauthorityx3.pem into a single pem certificate.  You may wish to name the file after your domain such as mydomain.com.pem.
+Your certificate should look something like this:
+
+[source,certificate]
+------
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAUAqqKu7Z4odo
+...
+og89F9AbWr1mNmyRoScyqMXo
+-----END PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+...
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+FhpodHRwOi8vY3BzLmxldHNlbmNyeXB0Lm9yZzCBqwYIKwYBBQUHAgIwgZ4MgZtU
+...
+bmcgUGFydGllcyBhbmQgb25seSBpbiBhY2NvcmRhbmNlIHdpdGggdGhlIENlcnRp
+-----END CERTIFICATE-----
+------
+
+Place that certificate into your /certs folder of Tigase, and installation of this certificate is done.
+
+You will need to do this for all subdomains you wish to have a certificate for, however, you may be able to import the root and intermediate certificates to your keystore to avoid having to paste the chain certificates for each subdomain.
+
+WARNING: LetsEncrypt certificates expire 90 days from issue and need to be renewed in order for them to remain valid!
+
+== Including letsencrypt cert.pem
+For some installations, you may need to also include the cert.pem contents into your certificate chain to avoid handshake errors.  You will then have 4 certificates in your domain.com.pem file.
+Be sure the order is as follows: cert.pem, privkey.pem, isgrootx1.pem, then letsencryptauthorityx3.pem
+
+If you moved all certs to a single directry, you may combine them using the following command in a *nix operating system.
+[source,bash]
+-----
+cat ./cert.pem ./privkey.pem ./letsencryptauthorityx3.pem ./isrgrootx1.pem > mydomain.com.pem
+-----

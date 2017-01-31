@@ -15,20 +15,15 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author:$
- * $Date$
- *
  */
 package tigase.server.xmppclient;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.BareJID;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostManagerIfc;
+import tigase.xml.Element;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -49,9 +45,11 @@ import java.util.logging.Logger;
 public class SeeOtherHost implements SeeOtherHostIfc {
 
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
+	public static final String REDIRECTION_ENABLED = "see-other-host-redirect-enabled";
 	
 	protected List<BareJID> defaultHost = null;
 	private ArrayList<Phase> active = new ArrayList<Phase>();
+	protected VHostManagerIfc vHostManager = null;
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
@@ -64,6 +62,10 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+		List<VHostItem.DataType> types = new ArrayList<VHostItem.DataType>();
+		types.add(new VHostItem.DataType( REDIRECTION_ENABLED, "see-other-host redirection enabled",
+																			 Boolean.class, Boolean.TRUE ) );
+		VHostItem.registerData( types );
 	}
 
 	@Override
@@ -101,26 +103,14 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	}
 
 	@Override
-	public void setNodes(List<BareJID> nodes) {
+	public void setNodes(List<JID> nodes) {
 		 log.log(Level.CONFIG, "Action invalid for current implementation.");
 	}
 
 	@Override
-	public Element getStreamError( String xmlns, BareJID destination ) {
-		Element error = new Element( "stream:error" );
-		Element seeOtherHost = new Element( "see-other-host", destination.toString() );
-
-		seeOtherHost.setXMLNS( xmlns );
-		error.addChild( seeOtherHost );
-
-		return error;
+	public boolean isEnabled(VHostItem vHost, Phase ph) {
+		return (boolean) vHost.getData( REDIRECTION_ENABLED )
+					 && active.contains( ph );
 	}
-
-	@Override
-	public boolean isEnabled(Phase ph) {
-		return active.contains( ph );
-	}
-
-
 
 }

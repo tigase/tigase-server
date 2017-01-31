@@ -1,0 +1,131 @@
+[[integrateWithLibreSource]]
+= Integrating Tigase Server With LibreSource
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+*This document is still not finished.*
+
+Taken directly from link:http://dev.libresource.org/[LibreSource] page:
+
+_LibreSource is a collaborative platform dedicated to both software development and community building. Based on Java/J2EE technology, LibreSource is a modular web server that users can customize online by combining resources and rights: wiki pages, forum, trackers, files, download areas, etc. All the tools are included and integrated._
+
+== Short Introduction
+Integration between *Tigase* server and *LibreSource* is on a database level. It is implemented in the same way as integration with *Drupal* but with slightly more functions available.
+
+Basically LibreSource system maintains own database with all it's data and Tigase connects to LibreSource database to authenticate users. All user data specific to XMPP service are kept in separate tables which can be located in the same database as LibreSource data or in different database.
+
+Current list of features included in the integration:
+
+- XMPP users authentication against user data stored in LibreSource database.
+- Recording XMPP user on-line status in LibreSource database. This can be displayed on the Web page as additional user info.
+- Recording user last login time and this information can also be available on Web page.
+- Checking user account status. So if the user account is disabled in LibreSource system then this user will not be able to login to XMPP service too.
+- User account creation. This feature might be useful during testing time or user data transition from an old Tigase installation to LibreSource system. _Please note! This feature should be normally disabled on live system. All user account management should be done from LibreSource system because of data caching._
+- User account deletion. _Please note! This feature should be normally disabled on live system. All user account management should be done from LibreSource system because of data caching._
+
+A few assumptions:
+
+. LibreSource data are kept in PostgreSQL database - +libresource+ and database user is demo.
+. For use in cases where Tigase data are stored in MySQL database name is tigase, database user is dbuser and database user password is +dbpass+
+
+== How to set Tigase up
+Now we will focus on setting things up to have both services up and running together. Below is example of the most complex environment to run where LibreSource is using PostgreSQL database and Tigase is using a MySQL database. All basic user data needed for authentication is kept by LibreSource, so Tigase has to connect to PostgreSQL database also in order to authenticate users.
+
+. First you need LibreSource system up and running. Please refer to LS documentation for details.
+. Install Tigase server in the normal way including loading Tigase database schema. Database tables used by Tigase server use different naming convention so you can simply load Tigase DB schema to the same database as LibreSource data. It is also possible and recommended to keep Tigase data in separate database.
+. Using configuration wizards generate configuration for Tigase server to connect to LibreSource database. Here is the sample file with parameters for configuration wizard assuming following setup:
+  - LibreSource data are kept in PostgreSQL database: +libresource,+ user: +demo+
+  - Tigase data are kept in MySQL database: +tigase+, user: +dbuser+, password: +dbpass+
+  - No external components are connected to Tigase server
+  - Tigase works for domain: +domain.net+
++
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+DRV="-Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver"
+
+JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
+TIGASE_CONFIG="etc/tigase-mysql-libresource.xml"
+TIGASE_OPTIONS="--gen-config-def \
+  --user-db mysql \
+  --user-db-uri jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass&autoCreateUser=true \
+  --auth-db libresource \
+  --auth-db-uri jdbc:postgresql://localhost/libresource?user=demo \
+  --virt-hosts domain.net,localhost "
+-----
+. A simpler example where all data (LibreSource and Tigase) are stored in the same database:
+  - LibreSource data are kept in PostgreSQL database: +libresource+, user: +demo+
+  - Tigase data are kept also in PostgreSQL database: +libresource+, user: +demo+
+  - No external components are connected to Tigase server
+  - Tigase works for domain: +domain.net+
++
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+DRV="-Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver"
+
+JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
+TIGASE_CONFIG="etc/tigase-mysql-libresource.xml"
+TIGASE_OPTIONS="--gen-config-def \
+  --user-db pgsql \
+  --user-db-uri jdbc:postgresql://localhost/libresource?user=demo&autoCreateUser=true \
+  --auth-db libresource \
+  --auth-db-uri jdbc:postgresql://localhost/libresource?user=demo \
+  --virt-hosts domain.net,localhost "
+-----
+
+Now, you can run Tigase as normal and it all works.
+
+*Note!* _You have to load Tigase database schema for user data. Please refer to guide for specific database: xref:mysql2database[MySQL] or xref:postgresDB2[PostgreSQL]._
+
+== Migration From an old Tigase Installation to LibreSource
+Tigase package includes additional tools to make it easier to manage and control you installation. One is used to change configuration settings - +config.sh+ and another is used to manipulate user data in repository - +repo.sh+.
+
+Depending on whether you use Tigase version built from sources or binary version these scripts might be available in either +scripts/+ or +bin/+ subdirectories. To make things simpler let's assume they are stored in +scripts/+ directory.
+
+Assuming you have an old Tigase server installation with number of users in MySQL database and you want to migrate all of them to LibreSource there are 2 steps involved:
+
+. User data migration
+. Changing your existing configuration
+
+=== Data Migration
+First we need to migrate user data used for authentication. That data will be used by both services: _LibreSource_ and _Tigase_ and they normally stored in _LibreSource_ database. Therefore we have to use _LibreSource_ database connector to handle the data (write or read). _Tigase_ server will be using _LibreSource_ database for reading only but during migration time we need to write user accounts to LS database. Sample command to migrate user accounts looks like this:
+
+[source,sh]
+-----
+./scripts/repo.sh -sc tigase.db.jdbc.JDBCRepository \
+  -su "jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass" \
+  -dc tigase.db.jdbc.LibreSourceAuth \
+  -du "jdbc:postgresql://localhost/libresource?user=demo" \
+  -cp
+-----
+
+The above command will copy all user accounts from MySQL tigase database to +libresource+ database. Please refer to repository management tool documentation for information how to migrate single or selected user accounts.
+
+If you want to keep all Tigase server data in the same database you have to copy also all other user data like rosters, vCards and so on.
+
+First thing we have to do is load the database schema for Tigase data. Because Tigase tables have distinct names from LibreSource, there is no danger for any conflict. As in the above example let's assume LibreSource's data is stored in libresource database and database user name is +demo+:
+
+[source,sh]
+-----
+psql -q -U demo -d libresource -f database/postgresql-schema.sql
+-----
+
+Now we can load and transfer all user data from MySQL database to LibreSource:
+
+[source,sh]
+-----
+./scripts/repo.sh -sc tigase.db.jdbc.JDBCRepository \
+  -su "jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass" \
+  -dc tigase.db.jdbc.JDBCRepository \
+  -du "jdbc:postgresql://localhost/libresource?user=demo" \
+  -cp
+-----
+
+This command looks siumilar to the previous one. Just a Java class used for handling destination database is different.

@@ -89,7 +89,9 @@ public interface XMPPImplIfc
 	 *
 	 * @return an integer preferred number of processing threads for the plugin.
 	 */
-	int concurrentQueuesNo();
+	default int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors();
+	}
 
 	/**
 	 * Number of threads per single packets queue. Not used anymore. At the moment only

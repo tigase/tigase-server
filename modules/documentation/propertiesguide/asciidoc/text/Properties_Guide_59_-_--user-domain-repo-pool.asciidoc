@@ -1,12 +1,13 @@
 [[userDomainRepoPool]]
---user-domain-repo-pool
-=======================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --user-domain-repo-pool
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:50
+:revision: v2.1
+
 :toc:
 :numbered:
-:website: http://tigase.net/
-:Date: 2013-02-10 01:50
+:website: http://tigase.net/0
 
 *Default value:* +tigase.db.UserRepositoryMDImpl+
 
@@ -14,7 +15,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'Name of class implementing UserRepository.'
 
-*Description:* The property allows specify an implementation for per-domain UserRepository implementation. This is used only if the implementation provided by a default Tigase server package is not sufficient in the particular deployment. The implementation provides a DB (UserRepository to be more specific) connection pool where each connection (UserRepository) handles data for a different DNS domain (VHost). This allows for database (user data) sharding to improve the system performance and better balance the load.
+*Description:* This property allows you to specify an implementation for per-domain UserRepository implementation. This is used only if the implementation provided by a default Tigase server package is not sufficient in the particular deployment. The implementation provides a DB (UserRepository to be more specific) connection pool where each connection (UserRepository) handles data for a different DNS domain (VHost). This allows for database (user data) sharing to improve the system performance and better balance the resource load.
 
 *Available since:* 5.1.0
-

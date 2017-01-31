@@ -382,29 +382,43 @@ public class DrupalWPAuth implements AuthRepository {
 			PreparedStatement pass_st = data_repo.getPreparedStatement(user, SELECT_PASSWORD_QUERY_KEY);
 
 			synchronized (pass_st) {
-				pass_st.setString(1, user.getLocalpart());
-				rs = pass_st.executeQuery();
+				try {
+					pass_st.setString(1, user.getLocalpart());
+					rs = pass_st.executeQuery();
 
-				if (rs.next()) {
-					return rs.getString(1);
-				} else {
-					throw new UserNotFoundException("User does not exist: " + user);
-				}    // end of if (isnext) else
+					if (rs.next()) {
+						return rs.getString(1);
+					} else {
+						throw new UserNotFoundException("User does not exist: " + user);
+					}    // end of if (isnext) else
+				} finally {
+					data_repo.release(null, rs);
+				}
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem with retrieving user password.", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 	}
 
+	@Override
+	public boolean isUserDisabled(BareJID user) 
+					throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");		
+	}
+	
 	private boolean isActive(BareJID user) throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 
-		try {
-			PreparedStatement status_st = data_repo.getPreparedStatement(user, SELECT_STATUS_QUERY_KEY);
+		PreparedStatement status_st = data_repo.getPreparedStatement(user, SELECT_STATUS_QUERY_KEY);
 
-			synchronized (status_st) {
+		synchronized (status_st) {
+			try {
 				status_st.setString(1, user.getLocalpart());
 				rs = status_st.executeQuery();
 
@@ -413,9 +427,9 @@ public class DrupalWPAuth implements AuthRepository {
 				} else {
 					throw new UserNotFoundException("User does not exist: " + user);
 				}    // end of if (isnext) else
+			} finally {
+				data_repo.release(null, rs);
 			}
-		} finally {
-			data_repo.release(null, rs);
 		}
 	}
 

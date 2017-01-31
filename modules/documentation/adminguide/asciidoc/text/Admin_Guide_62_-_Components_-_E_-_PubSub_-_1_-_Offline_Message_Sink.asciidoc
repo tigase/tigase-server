@@ -1,0 +1,106 @@
+[[offlineMessageSink]]
+= Offline Message Sink
+:author: Bartosz Malkowski
+:version: v1.0, October 2015
+:date: 2015-10-07 09:36
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+== Description
+
+Messages sent to offline users is published in PubSub node, from where that message is sent to all the node subscribers as a PubSub notification.
+
+[source,xml]
+-----
+<message from='pubsub.coffeebean.local' to='bard@shakespeare.lit' id='foo'>
+  <event xmlns='http://jabber.org/protocol/pubsub#event'>
+    <items node='message_sink'>
+      <item id='ae890ac52d0df67ed7cfdf51b644e901'>
+        <message type="chat" xmlns="jabber:client" id="x2ps6u0004"
+          to="userB_h6x1bt0002@coffeebean.local"
+          from="userA_uyhx8p0001@coffeebean.local/1149352695-tigase-20">
+          <body>Hello</body>
+        </message>
+      </item>
+    </items>
+  </event>
+</message>
+-----
+
+== Configuration
+The PubSub node must be created and configured beforehand:
+
+=== Create node
+[source.xml]
+-----
+<iq type='set'
+    to='pubsub.coffeebean.local'
+    id='create1'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+    <create node='message_sink'/>
+  </pubsub>
+</iq>
+-----
+
+After that is done, you need to add SessionManager as a publisher:
+
+=== Add sess-man as publisher
+[source,xml]
+-----
+<iq type='set'
+    to='pubsub.coffeebean.local'
+    id='ent2'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+    <affiliations node='message_sink'>
+      <affiliation jid='sess-man@coffeebean.local' affiliation='publisher'/>
+    </affiliations>
+  </pubsub>
+</iq>
+-----
+
+Finally, the AMP plugin must be configured as well
+
+=== init.properties configuration
+[source,bash]
+-----
+sess-man/plugins-conf/amp/msg-pubsub-jid=pubsub.coffeebean.local
+sess-man/plugins-conf/amp/msg-pubsub-node=message_sink
+sess-man/plugins-conf/amp/msg-pubsub-publisher=sess-man@coffeebean.local
+-----
+
+Of course be sure that AMP plugin is in your +--sm-plugins+ line.
+
+== Usage
+Because these sinks use a standard PubSub component, administration of the sink node is identical to any other PubSub node. link:http://www.xmpp.org/extensions/xep-0060[XEP-0060] defines standard PubSub usage and management.
+
+=== Managing Subscriptions
+
+==== Add new Subscriber
+[source,xml]
+-----
+<iq type='set'
+    to='pubsub.coffeebean.local'
+    id='subman2'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+    <subscriptions node='message_sink'>
+      <subscription jid='bard@shakespeare.lit' subscription='subscribed'/>
+    </subscriptions>
+  </pubsub>
+</iq>
+-----
+
+==== Remove Subscriber
+[source,xml]
+-----
+<iq type='set'
+    to='pubsub.coffeebean.local'
+    id='subman2'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+    <subscriptions node='message_sink'>
+      <subscription jid='bard@shakespeare.lit' subscription='none'/>
+    </subscriptions>
+  </pubsub>
+</iq>
+-----

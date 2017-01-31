@@ -1,0 +1,60 @@
+[[registerXMPP]]
+= Register Your Own XMPP Domain
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-08-23 21:05
+:version: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+You can have XMPP service running in your own domain. The only condition right now is that this must be a DNS registered domain and DNS must point to the following DNS address: *tigase.me*. Please note, do not confuse it with tigase.im domain name.
+
+We recommend to use SRV records as this is required by the XMPP specifications but as some DNS services do not allow for SRV records yet we do not require SRV records either. If you want to register: *your-domain.tld* on our XMPP service make sure that either the command:
+
+[source,sh]
+-----
+$ host your-domain.tld
+your-domain.tld has address 94.23.164.209
+-----
+
+displays *94.23.164.209* address or commands:
+
+[source,sh]
+-----
+$ host -t SRV _xmpp-server._tcp.your-domain.tld
+_xmpp-server._tcp.your-domain.tld has SRV record 10 0 5269 tigase.me.
+$ host -t SRV _xmpp-client._tcp.your-domain.tld
+_xmpp-client._tcp.your-domain.tld has SRV record 10 0 5222 tigase.me.
+-----
+
+display *tigase.me* DNS name. We strongly recommend not to use the IP address directly however, as if the service grows too much, it will be much easier for us to migrate and expand it using the DNS name rather then IP address.
+
+If you want to have MUC and PubSub available under your domain, you have to setup DNS for your *muc.your-domain.tld* and *pubsub.your-domain.tld* domains too.
+
+For MUC:
+
+[source,sh]
+-----
+$ host -t SRV _xmpp-server._tcp.muc.your-domain.tld
+_xmpp-server._tcp.muc.your-domain.tld has SRV record 10 0 5269 tigase.me.
+$ host -t SRV _xmpp-client._tcp.muc.your-domain.tld
+_xmpp-client._tcp.muc.your-domain.tld has SRV record 10 0 5222 tigase.me.
+-----
+
+For PubSub :
+
+[source,sh]
+-----
+$ host -t SRV _xmpp-server._tcp.pubsub.your-domain.tld
+_xmpp-server._tcp.pubsub.your-domain.tld has SRV record 10 0 5269 tigase.me.
+$ host -t SRV _xmpp-client._tcp.pubsub.your-domain.tld
+_xmpp-client._tcp.pubsub.your-domain.tld has SRV record 10 0 5222 tigase.me.
+-----
+
+Now, how do you register your domain with our service?
+
+There are a few ways. We recommend checking with the xref:xref:addManageDomain[Add and Manage Domains] section of the documentation on setting that up. If you cannot or don't want to do it on your own, the way described in the guide please send us a message, either via XMPP to admin@tigase.im or the contact form requesting new domain. User registration is available via in-band registration protocol. You can also specify whether you want to allow anonymous authentication to be available for your domain and you can specify maximum number of users for your domain.
+
+Any comments or suggestions are very welcomed.

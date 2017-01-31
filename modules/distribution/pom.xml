@@ -3,6 +3,7 @@
 	<properties>
 		<packaging.type>pom</packaging.type>
 		<dist_path>../..</dist_path>
+		<skip-distribution-deploy>true</skip-distribution-deploy>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +16,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>7.0.5-SNAPSHOT</version>
+		<version>7.1.1-SNAPSHOT</version>
 		<relativePath>../master</relativePath>
 	</parent>
 	
@@ -55,22 +56,22 @@
 								<configuration>
 									<target>
 										<exec executable="sed" output="README">
-											<arg value="-e" />
-											<arg value="s/&lt;[^&gt;]*&gt;//g" />
-											<arg value="-e" />
-											<arg value="s/&lt;[^&gt;]*&gt;//g" />
-											<arg value="-e" />
-											<arg value="s/&amp;[^; ]*;//g" />
-											<arg value="-e" />
-											<arg value="s/${APP_VER}/${project.version}/g" />
-											<arg value="${dist_path}/package.html" />
+											<arg value="-e"/>
+											<arg value="s/&lt;[^>]*>//g"/>
+											<arg value="-e"/>
+											<arg value="s/&#60;[^>]*>//g"/>
+											<arg value="-e"/>
+											<arg value="s/&amp;[^; ]*;//g"/>
+											<arg value="-e"/>
+											<arg value="s/${APP_VER}/${project.version}/g"/>
+											<arg value="${dist_path}/package.html"/>
 										</exec>
 										<exec executable="sed" output="package.html">
-											<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g" />
-											<arg value="${dist_path}/package.html" />
+											<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g"/>
+											<arg value="${dist_path}/package.html"/>
 										</exec>
-										<copy file="${dist_path}/License.html" tofile="License.html" />
-										<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog" />-->
+										<copy file="${dist_path}/License.html" tofile="License.html"/>
+										<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog"/>-->
 
 									</target>
 								</configuration>
@@ -112,7 +113,38 @@
 				</executions>
 			</plugin>
 
-
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.6.1</version>
+				<executions>
+					<execution>
+						<id>default-clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>clean-deps</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${project.basedir}/../../jars</directory>
+									<includes>
+										<include>**/*.jar</include>
+									</includes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -128,6 +160,9 @@
 							<outputDirectory>${project.basedir}/../../jars</outputDirectory>
 							<stripVersion>true</stripVersion>
 							<excludeTransitive>true</excludeTransitive>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<overWriteReleases>true></overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
 					<execution>
@@ -162,47 +197,27 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-http-api</artifactId>
-									<version>1.1.1</version>
+									<version>1.2.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>*.xml</includes>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-http-api</artifactId>
-									<version>1.1.1</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy, **/*.html</includes>
+									<includes>*.xml, **/*.groovy, **/*.html</includes>
 								</artifactItem>
 
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-http-api-jetty</artifactId>
-									<version>1.0.0</version>
+									<version>1.1.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>*.xml</includes>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-http-api-jetty</artifactId>
-									<version>1.0.0</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy</includes>
+									<includes>*.xml, **/*.groovy</includes>
 								</artifactItem>
 
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-muc</artifactId>
-									<version>2.3.0</version>
+									<version>2.4.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
@@ -212,31 +227,31 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-socks5</artifactId>
-									<version>1.1.0</version>
+									<version>1.2.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../../database</outputDirectory>
-									<includes>**/*.sql</includes>
-								</artifactItem>
+                                    <outputDirectory>${project.basedir}/../../database</outputDirectory>
+                                    <includes>**/*.sql</includes>
+                                </artifactItem>
 
-								<artifactItem>
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-pubsub</artifactId>
+                                    <version>3.2.0</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.basedir}/../..</outputDirectory>
+                                    <includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt, **/*.groovy</includes>
+                                </artifactItem>
+
+                                <artifactItem>
 									<groupId>tigase</groupId>
-									<artifactId>tigase-pubsub</artifactId>
-									<version>3.1.0</version>
+									<artifactId>licence-lib</artifactId>
+									<version>1.2.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt</includes>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-pubsub</artifactId>
-									<version>3.1.0</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy</includes>
+									<includes>**/*.groovy,**/keystore-letsencrypt</includes>
 								</artifactItem>
 
 							</artifactItems>
@@ -244,7 +259,47 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<archiveDirectory>${project.basedir}/../..</archiveDirectory>
+					<includes>
+						<include>target/tigase*.?ar</include>
+						<include>jars/tigase*.?ar</include>
+						<include>jars/licence-lib.jar</include>
+					</includes>
+					<processMainArtifact>false</processMainArtifact>
+					<processAttachedArtifacts>false</processAttachedArtifacts>
+					<tsa>${tsa-uri}</tsa>
+					<skip>${sign-skip}</skip>
+					<removeExistingSignatures>true</removeExistingSignatures>
 
+					<keystore>${sign-keystore}</keystore>
+					<alias>${sign-alias}</alias>
+					<storepass>${sign-storepass}</storepass>
+					<keypass>${sign-keypass}</keypass>
+					<verbose>${verbose-log}</verbose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<configuration>
+					<skip>${skip-distribution-deploy}</skip>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -254,103 +309,121 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-server</artifactId>
-			<version>7.0.5-SNAPSHOT</version>
+			<version>7.1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-ext-mailer</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>org.osgi.core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-muc</artifactId>
-			<version>2.3.0</version>
+			<version>2.4.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-pubsub</artifactId>
-			<version>3.1.0</version>
+			<version>3.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-extras</artifactId>
-			<version>1.1.1</version>
+			<version>1.1.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>licence-lib</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-stats-collector-library</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-stats-collector-provider</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-http-api</artifactId>
-			<version>1.1.1</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase.sure.web</groupId>
 			<artifactId>tigase-web-ui</artifactId>
-			<version>2.0</version>
+			<version>2.1.0</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-http-api-jetty</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 			<scope>runtime</scope>
 		</dependency>		
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-message-archiving</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-unified-archive</artifactId>
+			<version>1.0.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-socks5</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-stun</artifactId>
-			<version>1.1.1</version>
+			<version>1.1.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs</artifactId>
-			<version>2.2.1</version>
+			<version>2.3.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs-muc</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs-pubsub</artifactId>
-			<version>1.1.1</version>
+			<version>1.2.0</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-mongodb</artifactId>
-			<version>1.0.1</version>
+			<version>1.1.0</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -360,13 +433,13 @@
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
-			<version>10.9.1.0</version>
+			<version>10.12.1.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derbytools</artifactId>
-			<version>10.9.1.0</version>
+			<version>10.12.1.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -376,21 +449,21 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
+			<version>9.4.1207</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
-			<version>1.2.8</version>
+			<version>1.3.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.12.3</version>
+			<version>2.14.1</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -399,7 +472,7 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>2.1.0</version>
+			<version>2.4.3</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

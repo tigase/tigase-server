@@ -1,12 +1,13 @@
 [[compName]]
---comp-name
-===========
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --comp-name
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 21:54
+:version: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 21:54
 
 *Default value:* 'custom string.'
 
@@ -14,12 +15,11 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'XMPP localnode string.'
 
-*Description:* The property is used to assign name 'name' to the non-standard component which is loaded by the server. It is normally used when you want to load component which is not loaded by the +config-type+ you use. Together with +--comp-class-1+ it allows you to load any extra component to your server configuration. Of course you can load more than just one component. Just use +--comp-name-2+, +--comp-name-3+ and so on... Let's say you want to load the MUC component. You can then put give it a name: +muc+ and the setting would look like:
+*Description:* The --comp-name property is used to assign name 'name' to the non-standard component which is loaded by the server. It is normally used when you want to load components which are not loaded by the +config-type+ you use. Together with +--comp-class-1+ it allows you to load any extra component to your server configuration. Of course you can load more than just one component, just use +--comp-name-2+, +--comp-name-3+ and so on... Let's say you want to load the MUC component. You can then put give it a name: +muc+ and the setting would look like:
 
 [source,bash]
-------------------------------
+-----
 --comp-name-1 = muc
-------------------------------
+-----
 
 *Available since:* 3.0.0
-

@@ -1,0 +1,3220 @@
+[[statsticsDescription]]
+= Statistics description
+:author: Daniel Wisnewski (daniel@tigase.org)
+:date: 2016-04-22 10:40
+:version: v1.0 April 2016
+
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+Statistics are divided between components and processors.  You may see the same statistics collected for multiple components which are defined in common components section.
+Note that statistics are defined by {$component}/statistic so if you wanted Max queue size on pubsub, you would look for +pubsub/Max queue size+.
+Statistics will not be provided by components that are not enabled.
+
+== *Statistics common to components*
+
+These statistics may be found in multiple components and may be seen multiple times.
+For example both s2s and c2s will have Bytes sent statistic, so each can be found the following way:
+[source,properties]
+-----
+s2s/Bytes received
+c2s/Bytes received
+-----
+
+=== add-script last {interval}
+
+The number of times that +add-script+ adhoc command has been run within the last interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++add-script/Average processing time+: The average time in ms, returned as an integer, it takes for +add-script+ to execute.
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/adhoc-command/add-script last hour
+{compname}/adhoc-command/add-script last minute
+{compname}/adhoc-command/add-script last second
+{compname}/adhoc-command/add-script/Average processing time
+-----
+
+=== Average processing time on last 100 runs [ms]
+
+The average processing time in milliseconds for all commands and scripts for this component over the last 100 times component is called.  This number will populate with less than 100 runs, and will continue averaging until 100 runs happens, at that point, it's the most recent 100 instances.
+This statistic will reset every time the server shuts down or restarts.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Average processing time on last 100 runs [ms]
+-----
+
+=== Bytes received
+
+The total number of bytes that the component has received during the current server instance. This statistic resets at server shutdown or restart.
+
+*Statistics Level*: FINE|FINEST
+
+c2s is FINE, all others are FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, c2s, cl-comp, proxy, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Bytes received
+-----
+
+=== Bytes sent
+
+The total number of bytes that the component has sent during the current server instance. This statistic resets at server shutdown or restart.
+
+*Statistics Level*: FINE|FINEST
+
+c2s is FINE, all others are FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, c2s, cl-comp, proxy, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Bytes sent
+-----
+
+=== del-script last {interval}
+
+The number of times that +del-script+ adhoc command has been run within the last interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++del-script/Average processing time+: The average time in ms, returned as an integer, it takes for +del-script+ to execute.
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/adhoc-command/del-script last hour
+{compname}/adhoc-command/del-script last minute
+{compname}/adhoc-command/del-script last second
+{compname}/adhoc-command/del-script/Average processing time
+-----
+
+=== Last {interval} packets
+
+The number of packets that have been handled by this component in the last interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/last hour packets
+{compname}/last minute packets
+{compname}/last second packets
+-----
+
+=== list-commands last {interval}
+
+The number of +list-commands+ requests sent to the component in the last interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++list-commands/Average processing time+: The average time in ms, returned as an integer, it takes for +list-commands+ to execute.
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/list-commands last hour
+{compname}/list-commands last minute
+{compname}/list-commands last second
+{compname}/list-commands/Average processing time
+-----
+
+=== {IN|OUT|Total} queue overflow
+
+The number of times the in or out queue has overflown for this component.  That is there are more packets queues than the max queue size.
+A total statistic is also available that combines both results.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/IN queue overflow
+{compname}/OUT queue overflow
+{compname}/Total queue overflow
+-----
+
+=== {in|out} queue wait: {priority}
+
+The number of packets with {priority} priority currently in the incoming or outgoing queue.
+
+*Available {priority}*: SYSTEM|CLUSTER|HIGH|NORMAL|LOW|PRESENCE|LOWEST
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/In queue wait: SYSTEM
+{compname}/In queue wait: CLUSTER
+{compname}/In queue wait: HIGH
+{compname}/In queue wait: NORMAL
+{compname}/In queue wait: LOW
+{compname}/In queue wait: PRESENCE
+{compname}/In queue wait: LOWEST
+{compname}/Out queue wait: SYSTEM
+{compname}/Out queue wait: CLUSTER
+{compname}/Out queue wait: HIGH
+{compname}/Out queue wait: NORMAL
+{compname}/Out queue wait: LOW
+{compname}/Out queue wait: PRESENCE
+{compname}/Out queue wait: LOWEST
+-----
+
+=== {IN|OUT}_QUEUE processed {type}
+
+The number of stanzas of different types that have been processed VIA the In or Out Queue of this component.  This number will reset at the end of the server instance.
+Each component will have a list of the different types of stanzas it can process.
+
+*Available {type}*:
+[source,list]
+-----
+messages
+presences
+cluster
+other
+IQ no XMLNS
+IQ http://jabber.org/protocol/disco#items
+IQ bind
+IQ jabber:iq:roster
+IQ session
+IQ vCard
+IQ command
+IQ jabber:iq:private
+IQ http://jabber.org/protocol/disco#info
+total IQ
+-----
+
+NOTE: Several statistics are only available from statistics component, shutdown thread will ONLY print the following: messages, presences, cluster, other, IQ no XLMNS, total IQ.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/IN_QUEUE processed messages
+{compname}/IN_QUEUE processed presences
+{compname}/IN_QUEUE processed cluster
+{compname}/IN_QUEUE processed other
+{compname}/IN_QUEUE processed IQ no XMLNS
+{compname}/IN_QUEUE processed IQ http://jabber.org/protocol/disco#items
+{compname}/IN_QUEUE processed IQ http://jabber.org/protocol/disco#info
+{compname}/IN_QUEUE processed IQ bind
+{compname}/IN_QUEUE processed IQ jabber:iq:roster
+{compname}/IN_QUEUE processed IQ jabber:iq:private
+{compname}/IN_QUEUE processed IQ session
+{compname}/IN_QUEUE processed IQ vCard
+{compname}/IN_QUEUE processed IQ command
+{compname}/IN_QUEUE processed total IQ
+{compname}/OUT_QUEUE processed messages
+{compname}/OUT_QUEUE processed presences
+{compname}/OUT_QUEUE processed cluster
+{compname}/OUT_QUEUE processed other
+{compname}/OUT_QUEUE processed IQ no XMLNS
+{compname}/OUT_QUEUE processed IQ http://jabber.org/protocol/disco#items
+{compname}/OUT_QUEUE processed IQ http://jabber.org/protocol/disco#info
+{compname}/OUT_QUEUE processed IQ bind
+{compname}/OUT_QUEUE processed IQ jabber:iq:roster
+{compname}/OUT_QUEUE processed IQ jabber:iq:private
+{compname}/OUT_QUEUE processed IQ session
+{compname}/OUT_QUEUE processed IQ vCard
+{compname}/OUT_QUEUE processed IQ command
+{compname}/OUT_QUEUE processed total IQ
+-----
+
+=== max queue size
+
+The maximum number of items allowed in the packet queue for this component.
+
+*Statistics Level*:
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, muc, monitor, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/max queue size
+-----
+
+=== Open Connections
+
+The number of open connections to the component.
+
+*Statistics Level*: INFO|FINEST
+
+c2s is INFO, all other components are FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, c2s, cl-comp, proxy, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Open connections
+-----
+
+=== Packets received
+
+The total number of packets received by the component from external sources in the current instance.  This number resets at server shutdown or restart.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Packets received
+-----
+
+=== Packets sent
+
+The total number of packets sent by the component in the current instance.  This number resets at server shutdown or restart.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Packets sent
+-----
+
+=== Processed packets thread: {in|out}
+
+How many packets have been processed in and out by each processing thread.  Statistics will provide an array for each processor, listed from 0, 1, 2, 3 etc..
+Let's say that we have 4 threads set for ws2s, a list will be seen like this:
+[source,list]
+-----
+ws2s/Processed packets thread: IN=[2, 6, 4, 2]
+ws2s/Processed packets thread: OUT=[8, 0, 1, 3]
+ws2s/Processed packets thread (outliers) IN=mean: 79.0, deviation: 441, outliers: [in_10-ws2s: 2359]
+ws2s/Processed packets thread (outliers) OUT=mean: 16.5, deviation: 23.2058941, outliers: [out_ws2s: 80]
+-----
+Note that the processor arrray will only have as many threads as the component has as defined in xref:processingthreadsstat[{compname}/Processing threads].
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, pubsub, proxy, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Processed packets thread: IN
+{compname}/Processed packets thread: OUT
+{compname}/Processed packets thread (outliers) IN
+{compname}/Processed packets thread (outliers) OUT
+-----
+
+[[processingthreadsstat]]
+=== processing threads
+
+The number of threads provided for the particular component.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/processing threads
+-----
+
+=== Socket overflow
+
+The number of times that this component has experienced socket overflow and had to drop packets.  This does not include the number of dropped packets.
+
+*Statistics Level*: FINEST
+
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, c2s, cl-comp, proxy, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Socket overflow
+-----
+
+=== Total {in|out} queues wait
+
+The number of packets in the inbound or outbound queue that are currently waiting to be sent.  This includes packets of all types. This is an instant statistics, in that the number in queue is only as many in the queue the moment statistics are gathered.
+
+*Related Statistics*:
++{compname}/Total queue wait+: A combined total of +Total in queue wait+ and +Total out queue wait+ statistics for this component.
++Total queues wait+: A combined total of all component queue wait statistics.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, muc, monitor, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Total in queues wait
+{compname}/Total out queues wait
+{compname}/Total queues wait
+Total queues wait
+-----
+
+=== Total queues overflow
+
+The number of times the component packet wait queue has overflown and had to drop packets.  This statistic does not keep track of the number of dropped packets.
+
+*Related Statistics*:
++total/Total queues overflow+: The combined total of all queue overflow statistics for all components.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc, proxy, pubsub, rest, s2s, sess-man, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Total queues overflow
+total/Total queues overflow
+-----
+
+=== Waiting to send
+
+The number of packets in the component's queue that are waiting to be sent.  This number will usually be 0 however it will grow if a large number of packets are jamming up your system, or your queue sizes are set too low.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, c2s, cl-comp, proxy, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Waiting to send
+-----
+
+=== Watchdog runs
+
+The number of times watchdog has been run on this component to check for stale connections.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, c2s, cl-comp, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Watchdog runs
+-----
+
+=== Watchdog stopped
+
+The number of times watchdog identified and closed a connection it has found to be stale according to the settings in init.properties or by the defaults defined xref:watchdog[in this section].
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, cl-comp, c2s, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Watchdog stopped
+-----
+
+=== Watchdog tests
+
+The number of times watchdog has found a potential stale connection and has conducted a test to determine whether or not to close the connection.  This is per component in the current server instance.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*Available from the following components*:
+[source,list]
+-----
+bosh, cl-comp, c2s, s2s, ws2s
+-----
+
+*List of possible statistics*:
+[source,list]
+-----
+{compname}/Watchdog tests
+-----
+
+== *AMP*
+
+No exclusive amp specific statistics
+
+== *bosh*
+
+=== Bosh sessions
+
+The number of currently open and running BOSH sessions to the server.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+bosh/Bosh sessions
+-----
+
+=== pre-bind-session last {interval}
+
+The number of times the pre-bind-session command has been executed within the last specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++bosh/pre-bind-session/Average processing time+: The average time in ms, returned as an integer, it takes for +pre-bind-session+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+bosh/adhoc-command/pre-bind-session last hour
+bosh/adhoc-command/pre-bind-session last minute
+bosh/adhoc-command/pre-bind-session last second
+bosh/adhoc-command/pre-bind-session/Average processing time
+-----
+
+== *c2s*
+
+No exclusive c2s specific statistics
+
+== *cl-comp*
+
+=== adhoc-command/cluster-nodes-list last {interval}
+
+The number of times per interval that the cluster-nodes-list command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++cl-comp/Adhoc-command/cluster-nodes-list/Average processing time+: The average time in ms, returned as an integer, it takes for +cluster-nodes-list+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/adhoc-command/cluster-nodes-list last hour
+cl-comp/adhoc-command/cluster-nodes-list last minute
+cl-comp/adhoc-command/cluster-nodes-list last second
+cl-comp/adhoc-command/cluster-nodes-list/Average processing time
+-----
+
+=== adhoc-command/force-stop-service last {interval}
+
+The number of times per interval that the force-stop-service command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++cl-comp/Adhoc-command/force-stop-service/Average processing time+: The average time in ms, returned as an integer, it takes for +force-stop-service+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/adhoc-command/force-stop-service last hour
+cl-comp/adhoc-command/force-stop-service last minute
+cl-comp/adhoc-command/force-stop-service last second
+cl-comp/adhoc-command/force-stop-service/Average processing time
+-----
+
+=== adhoc-command/service-keys last {interval}
+
+The number of times per interval that the service-keys command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++cl-comp/Adhoc-command/service-keys/Average processing time+: The average time in ms, returned as an integer, it takes for +service-keys+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/adhoc-command/service-keys last hour
+cl-comp/adhoc-command/service-keys last minute
+cl-comp/adhoc-command/service-keys last second
+cl-comp/adhoc-command/service-keys/Average processing time
+-----
+
+=== adhoc-command/sim-serv-stopped {interval}
+
+The number of times per interval that the sim-serv-stopped command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++cl-comp/Adhoc-command/sim-serv-stopped/Average processing time+: The average time in ms, returned as an integer, it takes for +sim-serv-stopped+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/adhoc-command/sim-serv-stopped last hour
+cl-comp/adhoc-command/sim-serv-stopped last minute
+cl-comp/adhoc-command/sim-serv-stopped last second
+cl-comp/adhoc-command/sim-serv-stopped/Average processing time
+-----
+
+=== Average compression ratio
+
+The average compression ratio of data sent to other clusters during the session.
+
+*Statistics Level*: FINE
+
+*Result Format*: Float
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Average compression ratio
+-----
+
+=== Average decompression ratio
+
+The average compression ratio of data received from other clusters during the session.
+
+*Statistics Level*: FINE
+
+*Result Format*: Float
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Average decompression ratio
+-----
+
+=== Known cluster nodes
+
+The number of cluster nodes currently connected to the server.
+
+*Statistics Level*: INFO
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Known cluster nodes
+-----
+
+=== Last {interval} disconnects
+
+The number of cluster disconnections within the specified interval.
+
+*Available {interval}*: day|hour
+
+*Statistics Level*: FINE
+
+*Result Format*: Comma separated Array.  For day, each array is the number of disconnections each hour, most recent first. For hour each array is the number of disconnections each minute, most recent first.
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Last day disconnects
+cl-comp/Last hour disconnects
+-----
+
+=== Service connected time-outs
+
+The number of time-outs during connection initialization of cluster nodes.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Service connected time-outs
+-----
+
+=== Total disconnects
+
+The number of clusters that have disconnected during the current session.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Total disconnects
+-----
+
+== *eventbus*
+
+No exclusive eventbus specific statistics
+
+== *message-archive*
+
+=== Removal time of expired messages (avg)
+
+The average amount of time in milliseconds it takes to remove expired messages from the repository. This includes manual and automatic removal of messages.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+message-archive/Removal time of expired messages (avg)
+-----
+
+== *message-router*
+
+=== CPUs no
+
+The number of CPUs available on the host machine.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/CPUs no
+-----
+
+=== CPU usage
+
+% of available CPU power used by Tigase Server at the moment statistics are taken.
+Two formats are available for CPU usage: A float integer which expresses a long decimal available from +CPU Usage [%]+, and a string which provides a rounded number with a % sign from +CPU usage+.
+
+*Statistics Level*: FINE
+
+*Result Format*: Float|String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/CPU usage [%]
+message-router/CPU usage
+-----
+
+=== Free Heap
+
+The amount of heap memory that is available for use, expressed in KB
+
+*Statistics Level*: FINE
+
+*Result Format* String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Free Heap
+-----
+
+=== Free NonHeap
+
+The amount of non-heap memory that is available for use, expressed in KB
+
+*Statistics Level*: FINE
+
+*Result Format* String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Free NonHeap
+-----
+
+=== HEAP usage [%]
+
+Total percent of HEAP memory in use by Tigase.
+
+*Statistics Level*: FINE
+
+*Result Format*: Float
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/HEAP usage [%]
+-----
+
+=== Local hostname
+
+The local hostname of the physical server.
+
+*Statistics Level*: INFO
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Local hostname
+-----
+
+=== Load average
+
+The average system load for the previous minute.  The way in which the load average is calculated is operating system specific but is typically a damped time-dependent average.
+
+*Statistics Level*: FINE
+
+*Result Format*: Float
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Load average
+-----
+
+=== Max Heap mem
+
+Maximum amount of heap memory available as defined by JAVA_OPTIONS in tigase.conf, in Kb.
+
+*Statistics Level*: INFO
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Max Heap mem
+-----
+
+=== Max NonHeap mem
+
+Maximum amount of non-heap memory available as defined by JAVA_OPTIONS in tigase.conf, in Kb.
+
+*Statistics Level*: FINE
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Max NonHeap mem
+-----
+
+=== NONHEAP usage [%]
+
+Total amount of NONHEAP memory in use expressed as a percentage.
+
+*Statistics Level*: FINE
+
+*Result Format*: Float
+
+*List of possible statistics*:
+[source,list]
+-----
+message-archive/NONHEAP usage [%]
+-----
+
+=== Threads count
+
+The total number of processing threads available across all components.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Threads count
+-----
+
+=== Uptime
+
+The total amount of time the server has been online for this session.
+
+*Statistics Level*: INFO
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Uptime
+-----
+
+=== Used Heap
+
+The amount of heap memory in use in KB.
+
+*Statistics Level*: INFO
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Used Heap
+-----
+
+=== Used NonHeap
+
+The amount of non-heap memory in use shown in KB.
+
+*Statistics Level*: FINE
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+message-router/Used NonHeap
+-----
+
+== *monitor*
+
+=== adhoc-command/load-errors last {interval}
+
+The number of times per interval that the load-errors command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++monitor/Adhoc-command/load-errors/Average processing time+: The average time in ms, returned as an integer, it takes for +load-errors+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+monitor/adhoc-command/load-errors last hour
+monitor/adhoc-command/load-errors last minute
+monitor/adhoc-command/load-errors last second
+monitor/adhoc-command/load-errors/Average processing time
+-----
+
+== *muc*
+
+=== adhoc-command/remove-room last {interval}
+
+The number of times per interval that the remove-room command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++muc/Adhoc-command/remove-room/Average processing time+: The average time in ms, returned as an integer, it takes for +remove-room+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+monitor/adhoc-command/remove-room last hour
+monitor/adhoc-command/remove-room last minute
+monitor/adhoc-command/remove-room last second
+monitor/adhoc-command/remove-room/Average processing time
+-----
+
+=== adhoc-command/default-room-config last {interval}
+
+The number of times per interval that the default-room-command command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++muc/Adhoc-command/default-room-config/Average processing time+: The average time in ms, returned as an integer, it takes for +default-room-config+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+muc/adhoc-command/default-room-config last hour
+muc/adhoc-command/default-room-config last minute
+muc/adhoc-command/default-room-config last second
+muc/adhoc-command/default-room-config/Average processing time
+-----
+
+== *proxy*
+
+=== Average transfer size in KB
+
+Average size of packets sent through the proxy component during the current session.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+proxy/Average transfer size in KB
+-----
+
+=== KBytes transferred
+
+Total number of Kb transferred through the proxy component.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+proxy/KBytes transferred
+-----
+
+=== Open streams
+
+Number of currently open proxy streams.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+proxy/Open streams
+-----
+
+=== Transfers completed
+
+Number of specific transfers completed through proxy component.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+proxy/Transfers completed
+-----
+
+== *pubsub*
+
+=== Added new nodes
+
+The total number of new nodes that has been added in the current server instance.  This statistic is reset when the server resets.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Added new nodes
+-----
+
+=== adhoc-command/delete-item last {interval}
+
+The number of times per interval that the delete-item command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/adhoc-command/delete-item/Average processing time+: The average time in ms, returned as an integer, it takes for +delete-item+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/adhoc-command/delete-item last hour
+pubsub/adhoc-command/delete-item last minute
+pubsub/adhoc-command/delete-item last second
+pubsub/adhoc-command/delete-item/Average processing time
+-----
+
+=== adhoc-command/delete-node last {interval}
+
+The number of times per interval that the delete-node command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/adhoc-command/delete-node/Average processing time+: The average time in ms, returned as an integer, it takes for +delete-item+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/adhoc-command/delete-node last hour
+pubsub/adhoc-command/delete-node last minute
+pubsub/adhoc-command/delete-node last second
+pubsub/adhoc-command/delete-node/Average processing time
+-----
+
+=== adhoc-command/list-items last {interval}
+
+The number of times per interval that the list-items command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/adhoc-command/list-items/Average processing time+: The average time in ms, returned as an integer, it takes for +list-items+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/adhoc-command/list-items last hour
+pubsub/adhoc-command/list-items last minute
+pubsub/adhoc-command/list-items last second
+pubsub/adhoc-command/list-items/Average processing time
+-----
+
+=== adhoc-command/list-nodes last {interval}
+
+The number of times per interval that the list-nodes command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/adhoc-command/list-nodes/Average processing time+: The average time in ms, returned as an integer, it takes for +list-nodes+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/adhoc-command/list-nodes last hour
+pubsub/adhoc-command/list-nodes last minute
+pubsub/adhoc-command/list-nodes last second
+pubsub/adhoc-command/list-nodes/Average processing time
+-----
+
+=== adhoc-command/publish-item last {interval}
+
+The number of times per interval that the publish-item command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/adhoc-command/publish-item/Average processing time+: The average time in ms, returned as an integer, it takes for +publish-item+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/adhoc-command/publish-item last hour
+pubsub/adhoc-command/publish-item last minute
+pubsub/adhoc-command/publish-item last second
+pubsub/adhoc-command/publish-item/Average processing time
+-----
+
+=== adhoc-command/retrieve-item last {interval}
+
+The number of times per interval that the retrieve-item command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/adhoc-command/retrieve-item/Average processing time+: The average time in ms, returned as an integer, it takes for +retrieve-item+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/adhoc-command/retrieve-item last hour
+pubsub/adhoc-command/retrieve-item last minute
+pubsub/adhoc-command/retrieve-item last second
+pubsub/adhoc-command/retrieve-item/Average processing time
+-----
+
+=== AdHocConfigCommandModule last {interval}
+
+The number of times per interval that the AdHocConfigCommandModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/AdHocConfigCommandModule/Average processing time+: The average time in ms, returned as an integer, it takes for +AdHocConfigCommandModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/AdHocConfigCommandModule last hour
+pubsub/AdHocConfigCommandModule last minute
+pubsub/AdHocConfigCommandModule last second
+pubsub/AdHocConfigCommandModule/Average processing time
+-----
+
+=== Affiliations count (in cache)
+
+The total number of pubsub affiliations that are resident in cache memory.  Affiliations include JIDs that are one of the following; Owner, Publisher, Publish-Only, Member, None, Outcast.  This may not reflect total pubsub affiliations in repository.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Affiliations count (in cache)
+-----
+
+
+=== Average DB write time [ms]
+
+The average time of all DB writes from PubSub component.  Average is calculated using two other statistics: (Total writing time / Database writes)
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Average DB write time [ms]
+-----
+
+=== cache/hits last {interval}
+
+The number of times the cache has achieved a hit within the last interval.  A hit is when a request for information is matched to data that is inside the cache memory.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/cache/hits last hour
+pubsub/cache/hits last minute
+pubsub/cache/hits last second
+-----
+
+=== cache/hit-miss ratio per {interval}
+
+The ratio of cache hits to cache misses over the specified period.  A cache hit is when a request for information from the cache is matched with information in the cache.  A miss is when that information request cannot find a match in cache.  A miss only indicates that that information was not found in the cache, not that it is not in the repository.
+
+*Available {interval}*: hour|minute
+
+*Statistics Level*: FINE
+
+*Result Format*: Float
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/cache/hit-miss ratio per hour
+pubsub/cache/hit-miss ratio per minute
+-----
+
+=== cache/requests last {interval}
+
+The number of memory cache requests made within the last interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/cache/Requests last hour
+pubsub/cache/Requests last minute
+pubsub/cache/Requests last second
+-----
+
+=== Cached nodes
+
+The number of nodes that is currently in memory cache.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Cached nodes
+-----
+
+=== CapsModule
+
+The number of times per interval that the CapsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/CapsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +CapsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/CapsModule last hour
+pubsub/CapsModule last minute
+pubsub/CapsModule last second
+pubsub/CapsModule/Average processing time
+-----
+
+=== db/GetNodeItems requests last {interval}
+
+The number of times +GetNodeItems+ command has been run within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/db/GetNodeItems/Average processing time+: The average time in ms, returned as an integer, it takes for +GetNodeItems+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/db/GetNodeItems last hour
+pubsub/db/GetNodeItems last minute
+pubsub/db/GetNodeItems last second
+pubsub/db/GetNodeItems/Average processing time
+-----
+
+=== DefaultConfigModule last {interval}
+
+The number of times per interval that the DefaultConfigModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/DefaultConfigModule/Average processing time+: The average time in ms, returned as an integer, it takes for +DefaultConfigModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/DefaultConfigModule last hour
+pubsub/DefaultConfigModule last minute
+pubsub/DefaultConfigModule last second
+pubsub/DefaultConfigModule/Average processing time
+-----
+
+=== DiscoverInfoModule last {interval}
+
+The number of times per interval that the DiscoverInfoModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/DiscoverInfoModule/Average processing time+: The average time in ms, returned as an integer, it takes for +DiscoverInfoModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/DiscoverInfoModule last hour
+pubsub/DiscoverInfoModule last minute
+pubsub/DiscoverInfoModule last second
+pubsub/DiscoverInfoModule/Average processing time
+-----
+
+=== DiscoverItemsModule last {interval}
+
+The number of times per interval that the DiscoverItemsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/DiscoverItemsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +DiscoverItemsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/DiscoverItemsModule last hour
+pubsub/DiscoverItemsModule last minute
+pubsub/DiscoverItemsModule last second
+pubsub/DiscoverItemsModule/Average processing time
+-----
+
+=== JabberVersionModule last {interval}
+
+The number of times per interval that the JabberVersionModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/JabberVersionModule/Average processing time+: The average time in ms, returned as an integer, it takes for +JabberVersionModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/JabberVersionModule last hour
+pubsub/JabberVersionModule last minute
+pubsub/JabberVersionModule last second
+pubsub/JabberVersionModule/Average processing time
+-----
+
+=== ManageAffiiationsModule last {interval}
+
+The number of times per interval that the ManageAffiliationsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/ManageAffiliationsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +ManageAffiliationsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/ManageAffiliationsModule last hour
+pubsub/ManageAffiliationsModule last minute
+pubsub/ManageAffiliationsModule last second
+pubsub/ManageAffiliationsModule/Average processing time
+-----
+
+=== ManageSubscriptionModule last {interval}
+
+The number of times per interval that the ManageSubscriptionModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/ManageSubscriptionModule/Average processing time+: The average time in ms, returned as an integer, it takes for +ManageSubscriptionModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/ManageSubscriptionModule last hour
+pubsub/ManageSubscriptionModule last minute
+pubsub/ManageSubscriptionModule last second
+pubsub/ManageSubscriptionModule/Average processing time
+-----
+
+=== NodeConfigModule last {interval}
+
+The number of times per interval that the NodeConfigModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/NodeConfigModule/Average processing time+: The average time in ms, returned as an integer, it takes for +NodeConfigModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/NodeConfigModule last hour
+pubsub/NodeConfigModule last minute
+pubsub/NodeConfigModule last second
+pubsub/NodeConfigModule/Average processing time
+-----
+
+=== NodeCreateModule last {interval}
+
+The number of times per interval that the NodeCreateModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/NodeCreateModule/Average processing time+: The average time in ms, returned as an integer, it takes for +NodeCreateModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/NodeCreateModule last hour
+pubsub/NodeCreateModule last minute
+pubsub/NodeCreateModule last second
+pubsub/NodeCreateModule/Average processing time
+-----
+
+=== NodeDeleteModule last {interval}
+
+The number of times per interval that the NodeDeleteModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/NodeDeleteModule/Average processing time+: The average time in ms, returned as an integer, it takes for +NodeDeleteModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/NodeDeleteModule last hour
+pubsub/NodeDeleteModule last minute
+pubsub/NodeDeleteModule last second
+pubsub/NodeDeleteModule/Average processing time
+-----
+
+=== PresenceCollectorModule last {interval}
+
+The number of times per interval that the PresenceCollectorModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/PresenceCollectorModule/Average processing time+: The average time in ms, returned as an integer, it takes for +PresenceCollectorModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/PresenceCollectorModule last hour
+pubsub/PresenceCollectorModule last minute
+pubsub/PresenceCollectorModule last second
+pubsub/PresenceCollectorModule/Average processing time
+-----
+
+=== PendingSubscriptionModule last {interval}
+
+The number of times per interval that the PendingSubscriptionModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/PendingSubscriptionModule/Average processing time+: The average time in ms, returned as an integer, it takes for +PendingSubscriptionModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/PendingSubscriptionModule last hour
+pubsub/PendingSubscriptionModule last minute
+pubsub/PendingSubscriptionModule last second
+pubsub/PendingSubscriptionModule/Average processing time
+-----
+
+=== PresenceNotifierModule last {interval}
+
+The number of times per interval that the PresenceNotifierModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/PresenceNotifierModule/Average processing time+: The average time in ms, returned as an integer, it takes for +PresenceNotifierModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/PresenceNotifierModule last hour
+pubsub/PresenceNotifierModule last minute
+pubsub/PresenceNotifierModule last second
+pubsub/PresenceNotifierModule/Average processing time
+-----
+
+=== PublishItemModule last {interval}
+
+The number of times per interval that the PublishItemModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/PublishItemModule/Average processing time+: The average time in ms, returned as an integer, it takes for +PublishItemModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/PublishItemModule last hour
+pubsub/PublishItemModule last minute
+pubsub/PublishItemModule last second
+pubsub/PublishItemModule/Average processing time
+-----
+
+=== PurgeItemsModule last {interval}
+
+The number of times per interval that the PurgeItemsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/PurgeItemsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +PurgeItemsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/PurgeItemsModule last hour
+pubsub/PurgeItemsModule last minute
+pubsub/PurgeItemsModule last second
+pubsub/PurgeItemsModule/Average processing time
+-----
+
+=== Repository writes
+
+Number of individual writes to Repository from the pubsub component since startup.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+[source,list]
+-----
+pubsub/Repository writes
+-----
+
+=== RetractItemModule last {interval}
+
+The number of times per interval that the RetractItemModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/RetractItemModule/Average processing time+: The average time in ms, returned as an integer, it takes for +RetractItemModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/RetractItemModule last hour
+pubsub/RetractItemModule last minute
+pubsub/RetractItemModule last second
+pubsub/RetractItemModule/Average processing time
+-----
+
+=== RetrieveAffiliationsModule last {interval}
+
+The number of times per interval that the RetrieveAffiliationsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/RetrieveAffiliationsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +RetrieveAffiliationsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/RetrieveAffiliationsModule last hour
+pubsub/RetrieveAffiliationsModule last minute
+pubsub/RetrieveAffiliationsModule last second
+pubsub/RetrieveAffiliationsModule/Average processing time
+-----
+
+=== RetrieveItemsModule last {interval}
+
+The number of times per interval that the RetrieveItemsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/RetrieveItemsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +RetrieveItemsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/RetrieveItemsModule last hour
+pubsub/RetrieveItemsModule last minute
+pubsub/RetrieveItemsModule last second
+pubsub/RetrieveItemsModule/Average processing time
+-----
+
+=== RetrieveSubscriptionsModule last {interval}
+
+The number of times per interval that the RetrieveSubscriptionsModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/RetrieveSubscriptionsModule/Average processing time+: The average time in ms, returned as an integer, it takes for +RetrieveSubscriptionsModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/RetrieveSubscriptionsModule last hour
+pubsub/RetrieveSubscriptionsModule last minute
+pubsub/RetrieveSubscriptionsModule last second
+pubsub/RetrieveSubscriptionsModule/Average processing time
+-----
+
+=== SubscribeNodeModule last {interval}
+
+The number of times per interval that the SubscribeNodeModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/SubscribeNodeModule/Average processing time+: The average time in ms, returned as an integer, it takes for +SubscribeNodeModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/SubscribeNodeModule last hour
+pubsub/SubscribeNodeModule last minute
+pubsub/SubscribeNodeModule last second
+pubsub/SubscribeNodeModule/Average processing time
+-----
+
+=== Subscription count (in cache)
+
+The total number of pubsub subscriptions that are resident in cache memory.  This may not reflect total pubsub subscriptions in repository.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Subscription count (in cache)
+-----
+
+=== Total writing time
+
+The cumulative total of time pubsub component has written to the database expressed in milliseconds.
+
+*Statistics Level*: FINEST
+
+*Result Format*: String (###ms)
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Total writing time
+-----
+
+=== UnsubscribeNodeModule last {interval}
+
+The number of times per interval that the UnsubscribeNodeModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/UnsubscribeNodeModule/Average processing time+: The average time in ms, returned as an integer, it takes for +UnsubscribeNodeModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/UnsubscribeNodeModule last hour
+pubsub/UnsubscribeNodeModule last minute
+pubsub/UnsubscribeNodeModule last second
+pubsub/UnsubscribeNodeModule/Average processing time
+-----
+
+=== Update subscription calls
+
+Number of times Subscriptions have been updated (this includes new, deleted, and edited).
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/Update subscriptions calls
+-----
+
+=== XmppPingModule last {interval}
+
+The number of times per interval that the XmppPingModule command has been executed.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++pubsub/XmppPingModule/Average processing time+: The average time in ms, returned as an integer, it takes for +XmppPingModule+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+pubsub/XmppPingModule last hour
+pubsub/XmppPingModule last minute
+pubsub/XmppPingModule last second
+pubsub/XmppPingModule/Average processing time
+-----
+
+[[repo-factoryStatistics]]
+== *repo-factory*
+
+=== repo-factory/Number of data repositories
+
+The number of data repositories setup for this XMPP server.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/Number of data repositories
+-----
+
+=== repo-factory/repository {jdbclocation} connections count
+
+The number of connections made to this database.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/repository {jdbclocation} connections count
+-----
+
+=== repo-factory/repository {jdbclocation} reconnections
+
+The number of reconnections made to this database.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/repository {jdbclocation} reconnections
+-----
+
+=== repo-factory/repository {jdbclocation} failed reconnections
+
+The number of reconnections that have failed to connect to this database.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/repository {jdbclocation} failed reconnections
+-----
+
+== *rest*
+
+No exclusive rest specific statistics
+
+== *s2s*
+
+=== adhoc-command/get-cid-connection last {interval}
+
+The number of times get-cid-connection command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++s2s/adhoc-command/get-cid-connection/Average processing time+: The average time in ms, returned as an integer, it takes for +get-cid-connection+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/adhoc-command/get-cid-connection last hour
+s2s/adhoc-command/get-cid-connection last minute
+s2s/adhoc-command/get-cid-connection last second
+s2s/adhoc-command/get-cid-connection/Average processing time
+-----
+
+=== adhoc-command/s2s-bad-state-conns last {interval}
+
+The number of times s2s-bad-state-conns command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/s2s-bad-state-conns/Average processing time+: The average time in ms, returned as an integer, it takes for +s2s-bad-state-conns+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/adhoc-command/s2s-bad-state-conns last hour
+s2s/adhoc-command/s2s-bad-state-conns last minute
+s2s/adhoc-command/s2s-bad-state-conns last second
+s2s/adhoc-command/s2s-bad-state-conns/Average processing time
+-----
+
+=== adhoc-command/reset-bad-state-conns last {interval}
+
+The number of times reset-bad-state-conns command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/reset-bad-state-conns/Average processing time+: The average time in ms, returned as an integer, it takes for +reset-bad-state-conns+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/adhoc-command/reset-bad-state-conns last hour
+s2s/adhoc-command/reset-bad-state-conns last minute
+s2s/adhoc-command/reset-bad-state-conns last second
+s2s/adhoc-command/reset-bad-state-conns/Average processing time
+-----
+
+=== CIDs number
+
+ConnectionID for the server.  This may include multiple CIDs if server is running multiple vhosts.
+
+*Statistics Level*: FINEST
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/CIDs number
+-----
+
+=== Total DB keys
+
+Total number of database keys.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/Total DB keys
+-----
+
+=== Total {incoming|outgoing}
+
+The total number of server-to-server connections, outgoing is local server connecting to other servers, and incoming is connections from other servers.  The results may or may not be the same.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/Total incoming
+s2s/Total outgoing
+-----
+
+=== Total {incoming|outgoing} TLS
+
+The total number of server-to-server connections using TLS, outgoing is local server connecting to other servers, and incoming is connections from other servers.  The results may or may not be the same.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/Total incoming TLS
+s2s/Total outgoing TLS
+-----
+
+=== Total outgoing handshaking
+
+Total number of outgoing connections that are currently handshaking to other servers.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/Total outgoing handshaking
+-----
+
+=== Total control waiting
+
+Total number of connections that were manually told to wait.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/Total control waiting
+-----
+
+=== Total waiting
+
+Total number of connections that are currently waiting for response from other server.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+s2s/Total waiting
+-----
+
+== *sess-man*
+
+=== Active user connections
+
+Number of user connections that are considered active.  An active user is a user that has sent stanzas to the server or through the server within the last 5 minutes.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*list of possible statistics*:
+[source,list]
+-----
+sess-man/Active user connections
+-----
+
+=== adhoc-command/connection-time last {interval}
+
+The number of times connection-time command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/connection-time/Average processing time+: The average time in ms, returned as an integer, it takes for +connection-time+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/connection-time last hour
+sess-man/adhoc-command/connection-time last minute
+sess-man/adhoc-command/connection-time last second
+sess-man/adhoc-command/connection-time/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#add-user last {interval}
+
+The number of times admin#add-user command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#add-user/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#add-user+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#add-user-tracker last {interval}
+
+The number of times admin#add-user-tracker command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#add-user-tracker/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#add-user-tracker+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-tracker last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-tracker last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-tracker last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-tracker/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#announce last {interval}
+
+The number of times admin#announce command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#announce/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#announce+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#announce last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#announce last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#announce last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#announce/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#change-user-password last {interval}
+
+The number of times admin#change-user-password command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#change-user-password/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#change-user-password+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-password last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-password last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-password last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-password/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#delete-user last {interval}
+
+The number of times admin#delete-user command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#delete-user/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#delete-user+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#end-user-session last {interval}
+
+The number of times admin#end-user-session command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#end-user-session/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#end-user-session+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-session last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-session last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-session last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-session/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-active-users last {interval}
+
+The number of times admin#get-active-users command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-active-users/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-active-users+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-users last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-users last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-users last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-users/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-active-user-num last {interval}
+
+The number of times admin#get-active-user-num command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-active-user-num/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-active-user-num+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-user-num last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-user-num last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-user-num last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-user-num/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-idle-users last {interval}
+
+The number of times admin#get-idle-users command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-idle-users/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-idle-users+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num last {interval}
+
+The number of times admin#get-idle-users-num command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-idle-users-num+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last {interval}
+
+The number of times admin#get-online-users-list command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-online-users-list/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-online-users-list+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-users-list/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-top-active-users last {interval}
+
+The number of times admin#get-top-active-users command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-top-active-users/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-top-active-users+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-users last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-users last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-users last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-users/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list last {interval}
+
+The number of times admin#get-registered-users-list command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-registered-users-list+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#get-user-roster last {interval}
+
+The number of times admin#get-user-roster command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#get-user-roster/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#get-user-roster+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#remove-user last {interval}
+
+The number of times admin#remove-user command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#remove-user/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#remove-user+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user/Average processing time
+-----
+
+=== adhoc-command/http://jabber.org/protocol/admin#user-stats last {interval}
+
+The number of times admin#user-stats command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/http://jabber.org/protocol/admin#user-stats/Average processing time+: The average time in ms, returned as an integer, it takes for +admin#user-stats+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats last hour
+sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats last minute
+sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats last second
+sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats/Average processing time
+-----
+
+=== adhoc-command/get-user-info last {interval}
+
+The number of times get-user-info command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/get-user-info/Average processing time+: The average time in ms, returned as an integer, it takes for +get-user-info+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/get-user-info last hour
+sess-man/adhoc-command/get-user-info last minute
+sess-man/adhoc-command/get-user-info last second
+sess-man/adhoc-command/get-user-info/Average processing time
+-----
+
+=== adhoc-command/modify-user last {interval}
+
+The number of times modify-user command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/modify-user/Average processing time+: The average time in ms, returned as an integer, it takes for +modify-user+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/modify-user last hour
+sess-man/adhoc-command/modify-user last minute
+sess-man/adhoc-command/modify-user last second
+sess-man/adhoc-command/modify-user/Average processing time
+-----
+
+=== adhoc-command/oauth-credentials last {interval}
+
+The number of times oauth-credentials command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/oauth-credentials/Average processing time+: The average time in ms, returned as an integer, it takes for +oauth-credentials+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/oauth-credentials last hour
+sess-man/adhoc-command/oauth-credentials last minute
+sess-man/adhoc-command/oauth-credentials last second
+sess-man/adhoc-command/oauth-credentials/Average processing time
+-----
+
+=== adhoc-command/roster-fixer last {interval}
+
+The number of times roster-fixer command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/roster-fixer/Average processing time+: The average time in ms, returned as an integer, it takes for +roster-fixer+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/roster-fixer last hour
+sess-man/adhoc-command/roster-fixer last minute
+sess-man/adhoc-command/roster-fixer last second
+sess-man/adhoc-command/roster-fixer/Average processing time
+-----
+
+=== adhoc-command/roster-fixer-cluster last {interval}
+
+The number of times roster-fixer-cluster command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/roster-fixer-cluster/Average processing time+: The average time in ms, returned as an integer, it takes for +roster-fixer-cluster+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/roster-fixer-cluster last hour
+sess-man/adhoc-command/roster-fixer-cluster last minute
+sess-man/adhoc-command/roster-fixer-cluster last second
+sess-man/adhoc-command/roster-fixer-cluster/Average processing time
+-----
+
+=== adhoc-command/user-domain-perm last {interval}
+
+The number of times user-domain-perm command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/user-domain-perm/Average processing time+: The average time in ms, returned as an integer, it takes for +user-domain-perm+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/user-domain-perm last hour
+sess-man/adhoc-command/user-domain-perm last minute
+sess-man/adhoc-command/user-domain-perm last second
+sess-man/adhoc-command/user-domain-perm/Average processing time
+-----
+
+=== adhoc-command/user-roster-management last {interval}
+
+The number of times user-roster-management command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/user-roster-management/Average processing time+: The average time in ms, returned as an integer, it takes for +user-roster-management+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/user-roster-management last hour
+sess-man/adhoc-command/user-roster-management last minute
+sess-man/adhoc-command/user-roster-management last second
+sess-man/adhoc-command/user-roster-management/Average processing time
+-----
+
+=== adhoc-command/user-roster-management-ext last {interval}
+
+The number of times user-roster-management-ext command has been executed within the specified interval.
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*Sub-level Statistics Available*:
+
++adhoc-command/user-roster-management-ext/Average processing time+: The average time in ms, returned as an integer, it takes for +user-roster-management-ext+ to execute.
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/adhoc-command/user-roster-management-ext last hour
+sess-man/adhoc-command/user-roster-management-ext last minute
+sess-man/adhoc-command/user-roster-management-ext last second
+sess-man/adhoc-command/user-roster-management-ext/Average processing time
+-----
+
+=== Authentication timeouts
+
+The number of connections that have timed out during the authentication process.  Default timeout is 2 minutes.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of available statistics*:
+[source,list]
+-----
+sess-man/Authentication timeouts
+-----
+
+=== Closed user connections
+
+User connections that have been terminated by the user (as opposed to the server).
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of available statistics*:
+[source,list]
+-----
+sess-man/Closed user connections
+-----
+
+=== default-handler/Invalid registrations
+
+Number of invalid registrations attempted with the server
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of available statistics*:
+[source,list]
+-----
+sess-man/default-handler/Invalid registrations
+-----
+
+=== default-handler/Registered users
+
+Number of registered users for this server.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of available statistics*:
+[source,list]
+-----
+sess-man/default-handler/Registered users
+-----
+
+=== Maximum user connections
+
+Maximum number of connections that have been made during server instance, this number includes users connecting multiple times.
+
+*Statistics Level*: INFO
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Maximum user connections
+-----
+
+=== Maximum user sessions {today|yesterday}
+
+The number of most simultaneous sessions within the specified interval.  Today = previous 24 hours, Yesterday = 24 hours after previous 24 hours (does not go by calendar date).
+
+*Statistics Level*: INFO|FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Maximum user sessions today
+sess-man/Maximum user sessions yesterday
+-----
+
+=== Registered accounts
+
+Sum total of registered accounts for the server.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Registered accounts
+-----
+
+=== Open user connections
+
+The current number of open user connections.  This may be interpreted as number of connections from users, however a user can have more than one connection (connection from mobile and PC for example).
+
+*Statistics Level*: INFO
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Open user connections
+-----
+
+=== Open user sessions
+
+The current number of open user sessions.
+
+*Statistics Level*: INFO
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Open user sessions
+-----
+
+=== Total user connections
+
+The cumulative number of connections that have been made to the server during the current instance.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Total user connections
+-----
+
+=== Total user sessions
+
+The cumulative number of sessions that this server has negotiated during the current instance.
+
+*Statistics Level*: FINER
+
+*result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Total user sessions
+-----
+
+=== presence/Users status changes
+
+The number of presence changes for all users that have been conducted during the server instance.
+
+*Stastics Level*: INFO
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/presence/Users status changes
+sess-man/presence-state/Users status changes
+-----
+
+=== sess-man/Processor
+
+Processor statistics will result in a field of labels and values exclusive to that processor.
+The field shows as follows:
+[source,properties]
+-----
+, Queue: 0, AvTime: 0, Runs: 0, Lost: 0
+-----
+Where:
+Queue: Number of packets in process queue
+AvTime: Average time in ms processor takes to conduct it's operation.
+Runs: Number of times Processor has been run.
+Lost: Number of packets lost during processing.
+
+*Statistics Level*: FINEST
+
+*List of possible statistics*:
+[source,list]
+-----
+sess-man/Processor: message carbons
+
+sess-man/Processor: http://jabber.org/protocol/stats
+
+sess-man/Processor: jabber:iq:auth
+
+sess-man/Processor: vcard-temp
+
+sess-man/Processor: amp
+
+sess-man/Processor: presence-subscription
+
+sess-man/Processor: disco
+
+sess-man/Processor: msgoffline
+
+sess-man/Processor: urn:xmpp:blocking
+
+sess-man/Processor: urn:xmpp:ping
+
+sess-man/Processor: jabber:iq:register
+
+sess-man/Processor: urn:ietf:params:xml:ns:xmpp-sasl
+
+sess-man/Processor: prp
+
+sess-man/Processor: presence
+
+sess-man/Processor: message-archive-xep-0136
+
+sess-man/Processor: default-handler
+
+sess-man/Processor: jabber:iq:roster
+
+sess-man/Processor: starttls
+
+sess-man/Processor: presence-state
+
+sess-man/Processor: jabber:iq:version
+
+sess-man/Processor: urn:xmpp:time
+
+sess-man/Processor: session-open
+
+sess-man/Processor: jabber:iq:privacy
+
+sess-man/Processor: urn:ietf:params:xml:ns:xmpp-bind
+
+sess-man/Processor: http://jabber.org/protocol/commands
+
+sess-man/Processor: vcard-xep0292
+
+sess-man/Processor: session-close
+
+sess-man/Processor: urn:ietf:params:xml:ns:xmpp-session
+
+sess-man/Processor: jabber:iq:private
+
+sess-man/Processor: Average amp on last 100 runs [ms]
+
+sess-man/Processor: Average msgoffline on last 100 runs[ms]
+
+These are example scripts included with Tigase for demonstration purposes, it is likely you will not encounter or need them.
+
+sess-man/groovy-example last hour
+
+sess-man/groovy-example last minute
+
+sess-man/groovy-example last second
+
+sess-man/groovy-example/Average processing time
+
+sess-man/hello last hour
+
+sess-man/hello last minute
+
+sess-man/hello last second
+
+sess-man/hello/Average processing time
+-----
+
+== *vhost-man*
+
+=== Checks is anonymous domain
+
+Number of anonymous domain checks that have been run within vhost-man.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+vhost-man/Checks is anonymous domain
+-----
+
+=== Checks: is local domain
+
+Number of local domain checks that have been run within vhost-man.
+
+*Statistics Level*: FINER
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+vhost-man/Checks: is local domain
+-----
+
+=== Get components for local domain
+
+Number of components loaded within local domain.
+
+*Statistics Level*: FINER
+
+*Result Format* Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+vhost-man/Get components for local domain
+-----
+
+=== Get components for non-local domain
+
+Number of components loaded outside local domain.
+
+*Statistics Level*: FINEST
+
+*Result Format* Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+vhost-man/Get components for non-local domain
+-----
+
+=== Number of Vhosts
+
+Number of configured and running Virtual Hosts.
+
+*Statistics Level*: FINE
+
+*Result Format* Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+vhost-man/Number of VHosts
+-----
+
+== *ws2s*
+
+No exclusive ws2s specific statistics

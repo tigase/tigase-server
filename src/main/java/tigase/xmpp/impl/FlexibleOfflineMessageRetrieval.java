@@ -23,32 +23,17 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
 import tigase.server.Command;
 import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.MsgRepository;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -95,6 +80,19 @@ public class FlexibleOfflineMessageRetrieval
 	private final OfflineMessages offlineProcessor = new OfflineMessages();
 	private final MsgRepository.OfflineMessagesProcessor offlineMessagesStamper = new MsgStamper();
 
+	@Override
+	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
+		if (packet.isServiceDisco()) {
+			if (packet.getStanzaTo() == null) {
+				String node = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
+				if (FLEXIBLE_OFFLINE_XMLNS.equals(node))
+					return Authorization.AUTHORIZED;
+			}
+			return null;
+		}
+		return super.canHandle(packet, conn);
+	}	
+	
 	@Override
 	public void init( Map<String, Object> settings ) throws TigaseDBException {
 
@@ -194,10 +192,10 @@ public class FlexibleOfflineMessageRetrieval
 				// we don't have any items elements, only purge or fetch
 				try {
 					if ( fetch && !purge ){
-						Queue<Packet> restorePacketForOffLineUser = restorePacketForOffLineUser( null, session, msg_repo );
+						Queue<Packet> restorePacketForOffLineUser = restorePacketForOffLineUser( null, session, msg_repo );					
 						results.addAll( restorePacketForOffLineUser );
 					} else if ( purge && !fetch ){
-						msg_repo.deleteMessagesToJID( null, session.getJID() );
+						msg_repo.deleteMessagesToJID( null, session );
 					}
 				} catch ( UserNotFoundException | NotAuthorizedException ex ) {
 					log.log( Level.WARNING, "Problem retrieving messages from repository: ", ex );
@@ -235,7 +233,7 @@ public class FlexibleOfflineMessageRetrieval
 						}
 					} else if ( itemsView.isEmpty() && !itemsRemove.isEmpty() ){
 						// ok, all items are 'remove' type
-						int deleteMessagesToJID = msg_repo.deleteMessagesToJID( itemsRemove, session.getJID() );
+						int deleteMessagesToJID = msg_repo.deleteMessagesToJID( itemsRemove, session );
 						if ( deleteMessagesToJID == 0 ){
 							Packet err = Authorization.ITEM_NOT_FOUND.getResponseMessage( packet,
 																																						"Requested item was not found", true );
@@ -259,7 +257,7 @@ public class FlexibleOfflineMessageRetrieval
 
 		try {
 
-			Map<MsgRepository.MSG_TYPES, Long> messagesCount = msg_repo.getMessagesCount( session.getJID() );
+			Map<Enum, Long> messagesCount = msg_repo.getMessagesCount( session.getJID() );
 
 			if ( messagesCount != null && !messagesCount.isEmpty() ){
 				query.addChild( identity );
@@ -268,7 +266,7 @@ public class FlexibleOfflineMessageRetrieval
 				DataForm.addDataForm( query, Command.DataType.result );
 				DataForm.addHiddenField( query, form_type, FLEXIBLE_OFFLINE_XMLNS );
 
-				for ( Map.Entry<MsgRepository.MSG_TYPES, Long> entrySet : messagesCount.entrySet() ) {
+				for ( Map.Entry<Enum, Long> entrySet : messagesCount.entrySet() ) {
 					DataForm.addFieldValue( query, NUMBER_OF_ + entrySet.getKey(), entrySet.getValue().toString() );
 				}
 			}
@@ -295,7 +293,7 @@ public class FlexibleOfflineMessageRetrieval
 	public Queue<Packet> restorePacketForOffLineUser( List<String> db_ids, XMPPResourceConnection conn,
 																										MsgRepository repo )
 			throws UserNotFoundException, NotAuthorizedException {
-		Queue<Element> elems = repo.loadMessagesToJID( db_ids, conn.getJID(), false, offlineMessagesStamper );
+		Queue<Element> elems = repo.loadMessagesToJID( db_ids, conn, false, offlineMessagesStamper );
 
 		if ( elems != null ){
 			LinkedList<Packet> pacs = new LinkedList<Packet>();
@@ -304,16 +302,18 @@ public class FlexibleOfflineMessageRetrieval
 			while ( ( elem = elems.poll() ) != null ) {
 				try {
 					final Packet packetInstance = Packet.packetInstance( elem );
-					packetInstance.setPacketTo( conn.getConnectionId() );
+					if (packetInstance.getElemName() == Iq.ELEM_NAME) {
+						packetInstance.initVars(packetInstance.getStanzaFrom(), conn.getJID());
+					} else {
+						packetInstance.setPacketTo( conn.getConnectionId() );
+					}
 					pacs.offer( packetInstance );
-				} catch ( TigaseStringprepException ex ) {
+				} catch ( TigaseStringprepException | NoConnectionIdException ex ) {
 					log.warning( "Packet addressing problem, stringprep failed: " + elem );
-				} catch ( NoConnectionIdException ex ) {
-					Logger.getLogger( FlexibleOfflineMessageRetrieval.class.getName() ).log( Level.SEVERE, null, ex );
 				}
 			}    // end of while (elem = elems.poll() != null)
 			try {
-				Collections.sort( pacs, offlineProcessor.new StampComparator() );
+				Collections.sort( pacs, new OfflineMessages.StampComparator() );
 			} catch ( NullPointerException e ) {
 				try {
 					log.warning( "Can not sort off line messages: " + pacs + ",\n" + e );

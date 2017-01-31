@@ -198,6 +198,9 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * 
 	 */
 	public UserRepository getRepo(String domain) {
+		if (domain == null ) {
+			return def;
+		}
 		UserRepository result = repos.get(domain);
 
 		if (result == null) {

@@ -24,11 +24,13 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.List;
 import tigase.net.IOServiceListener;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
+import tigase.xml.Element;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -45,4 +47,6 @@ public interface XMPPIOServiceListener<IO extends XMPPIOService<?>> extends IOSe
 	void xmppStreamClosed(IO serv);
 
 	String xmppStreamOpened(IO serv, Map<String, String> attribs);
+	
+	String xmppStreamError(IO serv, List<Element> err_el); 
 }    // XMPPIOServiceListener

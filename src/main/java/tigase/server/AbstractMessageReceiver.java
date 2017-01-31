@@ -29,18 +29,6 @@ package tigase.server;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import tigase.annotations.TODO;
 import tigase.conf.ConfigurationException;
 import tigase.stats.StatisticType;
@@ -48,6 +36,13 @@ import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
+import tigase.util.TigaseStringprepException;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * This is an archetype for all classes processing user-level packets. The
@@ -127,6 +122,8 @@ public abstract class AbstractMessageReceiver
 	public static final String OUTGOING_FILTERS_PROP_VAL =
 			"tigase.server.filters.PacketCounter";
 
+	public static final String PACKET_DELIVERY_RETRY_COUNT_PROP_KEY = "packet-delivery-retry-count";
+
 	/**
 	 * Configuration property key for setting number of threads used by component
 	 * ScheduledExecutorService.
@@ -182,6 +179,7 @@ public abstract class AbstractMessageReceiver
 	private ScheduledExecutorService receiverScheduler     = null;
 	private Timer                    receiverTasks         = null;
 	private int                      schedulerThreads_size = 1;
+	private int                      packetDeliveryRetryCount = 15;
 
 	// Array cache to speed processing up....
 	private final Priority[]                            pr_cache = Priority.values();
@@ -206,11 +204,11 @@ public abstract class AbstractMessageReceiver
 	 * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
 	 * added messages to queue.
 	 */
-	private long                                                statReceivedPacketsOk = 0;
-	private long                                                statSentPacketsEr     = 0;
-	private long                                                statSentPacketsOk     = 0;
-	private ArrayDeque<QueueListener>                           threadsQueue          =
-			null;
+	private long statReceivedPacketsOk = 0;
+	private long statSentPacketsEr = 0;
+	private long statSentPacketsOk = 0;
+	private ArrayDeque<QueueListener> threadsQueueIn = null;
+	private ArrayDeque<QueueListener> threadsQueueOut = null;
 	private final ThreadFactory									threadFactory		  =
 			new ThreadFactory() {
 
@@ -449,7 +447,7 @@ public abstract class AbstractMessageReceiver
 	public void addTimerTask(tigase.util.TimerTask task, long delay) {
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit
 				.MILLISECONDS);
-
+		
 		task.setScheduledFuture(future);
 	}
 	
@@ -471,6 +469,101 @@ public abstract class AbstractMessageReceiver
 	}
 
 	/**
+	 * Method queues and executes timer tasks using ScheduledExecutorService
+	 * which allows using more than one thread for executing tasks. It allows to set
+	 * a timeout to cancel long running tasks
+	 *
+	 * @param task a task implementing {@link tigase.util.TimerTask}
+	 * @param delay in milliseconds delay after which task will be started
+	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
+	 */
+	public void addTimerTaskWithTimeout( final tigase.util.TimerTask task, long delay, long timeout ) {
+		receiverScheduler.schedule( new tigase.util.TimerTask() {
+			@Override
+			public void run() {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Cancelling tigase task (timeout): " + task );
+				}
+				if ( task != null ){
+					task.cancel( true );
+				}
+			}
+		}, timeout, TimeUnit.MILLISECONDS );
+
+		addTimerTask( task, delay );
+	}
+
+	/**
+	 * Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently
+	 * with the given period; please refer to {@link ScheduledExecutorService#scheduleAtFixedRate} javadoc for details.
+	 * It utilizes Tigase {@link tigase.util.TimerTask} and allows setting a timeout to cancel long running tasks
+	 *
+	 * @param task a task implementing {@link tigase.util.TimerTask}
+	 * @param delay in milliseconds, the time to delay first execution
+	 * @param period in milliseconds, the period between successive executions
+	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
+	 */
+	public void addTimerTaskWithTimeout( final tigase.util.TimerTask task, long delay, long period, long timeout ) {
+		receiverScheduler.schedule( new tigase.util.TimerTask() {
+			@Override
+			public void run() {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Cancelling tigase task (timeout): " + task );
+				}
+				if ( task != null ){
+					task.cancel( true );
+				}
+			}
+		}, timeout, TimeUnit.MILLISECONDS );
+
+		addTimerTask( task, delay, period );
+	}
+
+
+	/**
+	 * Helper method used in statistics to find uneven distribution of packet processing
+	 * across processing threads
+	 *
+	 * @param array is an resizable array of {@code QueueListener} containing all processing threads
+	 * @return string containing average value, variance as well as comma separated list of
+	 * outlier threads and number of processed packets; returns empty string if passed array is empty or null
+	 */
+	private static String calculateOutliers(ArrayDeque<AbstractMessageReceiver.QueueListener> array) {
+
+		if (array == null || array.size() == 0)
+			return "";
+
+		long[] allNumbers = new long[array.size()];
+		int idx = 0;
+		long sum = 0;
+		for (QueueListener queueListener : array) {
+			sum += queueListener.packetCounter;
+			allNumbers[idx++] = queueListener.packetCounter;
+		}
+
+		double mean = sum / allNumbers.length;
+
+		double tmp_sum_variance = 0;
+		for (long allNumber : allNumbers) {
+			tmp_sum_variance += Math.pow(allNumber - mean, 2);
+		}
+
+		double deviation = Math.sqrt(tmp_sum_variance / allNumbers.length);
+
+		List<String> outliers = new ArrayList<>();
+		for (QueueListener queueListener : array) {
+			if (Math.abs(queueListener.packetCounter - mean) > (2 * deviation)) {
+				outliers.add(queueListener.getName()+":"+queueListener.packetCounter);
+			}
+		}
+
+		return "mean: " + mean + ", deviation: " + deviation
+				+ (!outliers.isEmpty()
+					? ", outliers: " + outliers.toString()
+					: "");
+	}
+
+	/**
 	 * Method clears, removes all the component routing addresses. After this
 	 * method call the component accepts only packets addressed to default
 	 * routings that is component ID or the component name + '@' + virtual domains
@@ -488,9 +581,11 @@ public abstract class AbstractMessageReceiver
 	 * exceed 1 hour. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
+	@Override
 	public synchronized void everyHour() {
 		packets_per_hour  = statReceivedPacketsOk - last_hour_packets;
 		last_hour_packets = statReceivedPacketsOk;
+		super.everyHour();
 	}
 
 	/**
@@ -502,10 +597,12 @@ public abstract class AbstractMessageReceiver
 	 * exceed 1 minute. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
+	@Override
 	public synchronized void everyMinute() {
 		packets_per_minute  = statReceivedPacketsOk - last_minute_packets;
 		last_minute_packets = statReceivedPacketsOk;
 		receiverTasks.purge();
+		super.everyMinute();
 	}
 
 	/**
@@ -517,9 +614,11 @@ public abstract class AbstractMessageReceiver
 	 * exceed 1 second. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
+	@Override
 	public synchronized void everySecond() {
 		packets_per_second  = statReceivedPacketsOk - last_second_packets;
 		last_second_packets = statReceivedPacketsOk;
+		super.everySecond();
 	}
 
 	/**
@@ -544,13 +643,8 @@ public abstract class AbstractMessageReceiver
 	 * @return a hash code generated for the input thread.
 	 */
 	public int hashCodeForPacket(Packet packet) {
-		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
-				.getPacketFrom())) {
-
-			// This comes from connection manager so the best way is to get hashcode
-			// by the connectionId, which is in the getFrom()
-			return packet.getPacketFrom().hashCode();
-		}
+		// use of getPacketFrom was moved to SM as it worked OK only in use case of SM 
+		// where packet may came from connection manager
 		if ((packet.getPacketTo() != null) &&!getComponentId().equals(packet.getPacketTo())) {
 			return packet.getPacketTo().hashCode();
 		}
@@ -701,7 +795,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a value of <code>int</code>
 	 */
 	public int schedulerThreads() {
-		return 1;
+		return 2;
 	}
 
 	@Override
@@ -761,6 +855,7 @@ public abstract class AbstractMessageReceiver
 		defs.put(SCHEDULER_THREADS_PROP_KEY, schedulerThreads());
 		defs.put(INCOMING_FILTERS_PROP_KEY, INCOMING_FILTERS_PROP_VAL);
 		defs.put(OUTGOING_FILTERS_PROP_KEY, OUTGOING_FILTERS_PROP_VAL);
+		defs.put(PACKET_DELIVERY_RETRY_COUNT_PROP_KEY, packetDeliveryRetryCount);
 
 		return defs;
 	}
@@ -886,11 +981,12 @@ public abstract class AbstractMessageReceiver
 			packetFilter.getStatistics(list);
 		}
 		if (list.checkLevel(Level.FINEST)) {
-			for (QueueListener thread : threadsQueue) {
-				list.add(getName(), "Processed packets thread: " + thread.getName(), thread
-						.packetCounter, Level.FINEST);
-			}
+			list.add(getName(), "Processed packets thread IN", threadsQueueIn.toString(), Level.FINEST);
+			list.add(getName(), "Processed packets thread OUT", threadsQueueOut.toString(), Level.FINEST);
+			list.add(getName(), "Processed packets thread (outliers) IN", calculateOutliers(threadsQueueIn), Level.FINEST);
+			list.add(getName(), "Processed packets thread (outliers) OUT", calculateOutliers(threadsQueueOut), Level.FINEST);
 		}
+		super.getStatistics(list);
 	}
 
 	@Override
@@ -925,9 +1021,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 */
 	public void setMaxQueueSize(int maxQueueSize) {
-		this.maxQueueSize = maxQueueSize;
-		if ((this.maxInQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
-
+		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
+			this.maxQueueSize = maxQueueSize;
+			
 			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
 			// maxQueueSize);
 			// Processing threads number is split to incoming and outgoing queues...
@@ -970,7 +1066,7 @@ public abstract class AbstractMessageReceiver
 		in_queues_size        = processingInThreads();
 		out_queues_size       = processingOutThreads();
 		schedulerThreads_size = schedulerThreads();
-		setMaxQueueSize(maxInQueueSize);
+		setMaxQueueSize(maxQueueSize);
 	}
 
 	@Override
@@ -982,6 +1078,9 @@ public abstract class AbstractMessageReceiver
 	@TODO(note = "Replace fixed filers loading with configurable options for that")
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
+		if (props.get(PACKET_DELIVERY_RETRY_COUNT_PROP_KEY) != null) {
+			packetDeliveryRetryCount = (Integer) props.get(PACKET_DELIVERY_RETRY_COUNT_PROP_KEY);
+		}
 		if (props.get(MAX_QUEUE_SIZE_PROP_KEY) != null) {
 			int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);
 
@@ -1209,22 +1308,24 @@ public abstract class AbstractMessageReceiver
 	}
 
 	private void startThreads() {
-		if (threadsQueue == null) {
-			threadsQueue = new ArrayDeque<QueueListener>(8);
+		if (threadsQueueIn == null) {
+			threadsQueueIn = new ArrayDeque<>(8);
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread = new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
 
 				in_thread.setName("in_" + i + "-" + getName());
 				in_thread.start();
-				threadsQueue.add(in_thread);
+				threadsQueueIn.add(in_thread);
 			}
+		}
+		if (threadsQueueOut == null) {
+			threadsQueueOut = new ArrayDeque<>(8);
 			for (int i = 0; i < out_queues_size; i++) {
-				QueueListener out_thread = new QueueListener(out_queues.get(i), QueueType
-						.OUT_QUEUE);
+				QueueListener out_thread = new QueueListener(out_queues.get(i), QueueType.OUT_QUEUE);
 
 				out_thread.setName("out_" + i + "-" + getName());
 				out_thread.start();
-				threadsQueue.add(out_thread);
+				threadsQueueOut.add(out_thread);
 			}
 		}    // end of if (thread == null || ! thread.isAlive())
 
@@ -1259,15 +1360,9 @@ public abstract class AbstractMessageReceiver
 
 		// stopped = true;
 		try {
-			if (threadsQueue != null) {
-				for (QueueListener in_thread : threadsQueue) {
-					in_thread.threadStopped = true;
-					in_thread.interrupt();
-					while (in_thread.isAlive()) {
-						Thread.sleep(100);
-					}
-				}
-			}
+			stopThread(threadsQueueIn);
+			stopThread(threadsQueueOut);
+
 			if (out_thread != null) {
 				out_thread.threadStopped = true;
 				out_thread.interrupt();
@@ -1276,7 +1371,8 @@ public abstract class AbstractMessageReceiver
 				}
 			}
 		} catch (InterruptedException e) {}
-		threadsQueue = null;
+		threadsQueueIn = null;
+		threadsQueueOut = null;
 		out_thread   = null;
 		if (receiverTasks != null) {
 			receiverTasks.cancel();
@@ -1288,26 +1384,75 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
+	private void stopThread(ArrayDeque<QueueListener> threadsQueue) throws InterruptedException {
+		if (threadsQueue != null) {
+            for (QueueListener in_thread : threadsQueue) {
+                in_thread.threadStopped = true;
+                in_thread.interrupt();
+                while (in_thread.isAlive()) {
+                    Thread.sleep(100);
+                }
+            }
+        }
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	private class PacketReceiverTask
 					extends tigase.util.TimerTask {
 		private ReceiverTimeoutHandler handler = null;
 		private String                 id      = null;
+		private int                    retryCount = packetDeliveryRetryCount;
 		private Packet                 packet  = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay, TimeUnit unit,
-				Packet packet) {
+		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay, TimeUnit unit, Packet packet) {
 			super();
 			this.handler = handler;
-			this.packet  = packet;
-			id           = packet.getFrom().toString() + packet.getStanzaId();
+			this.packet = packet;
+			this.id = packet.getFrom().toString() + packet.getStanzaId();
+
+			String countStr = packet.getElement().getAttributeStaticStr("retryCount");
+			if (countStr != null) {
+				retryCount = Byte.valueOf(countStr);
+				retryCount--;
+			}
+			this.packet.getElement().setAttribute("retryCount", Integer.toString(retryCount));
+
+			if ( retryCount < 0 ) {
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING,
+							"Dropping command packet! Retry limit reached for packet with ID: {0}, retryCount: {1}, packet: {2}",
+							new Object[]{id, retryCount, this.packet});
+				}
+				PacketReceiverTask remove = waitingTasks.remove(id);
+				remove.cancel();
+				return;
+			}
+
+			String delayStr = packet.getElement().getAttributeStaticStr("delay");
+			if (delayStr != null ) {
+				delay = (long)(Long.valueOf(delayStr) * 1.5);
+			}
+
+			this.packet.getElement().setAttribute("delay", Long.toString(delay));
+
 			waitingTasks.put(id, this);
+
 			addTimerTask(this, delay, unit);
 
-			// log.finest("[" + getName() + "]  " + "Added timeout task for: " + id);
+			try {
+				this.packet.initVars();
+			} catch (TigaseStringprepException e) {
+				log.log(Level.WARNING, "Reinitializing packet failed", e);
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"[{0}] Added timeout task for ID: {1}, delay: {2}, retryCount: {3}, packet: {4}",
+						new Object[]{getName(), id, delay, retryCount, this.packet});
+			}
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -1319,12 +1464,11 @@ public abstract class AbstractMessageReceiver
 		 * @param response
 		 */
 		public void handleResponse(Packet response) {
-
-			// waitingTasks.remove(packet.getFrom() + packet.getId());
 			this.cancel();
 
-			// log.finest("[" + getName() + "]  " + "Response received for id: " +
-			// id);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "[{0}] Response received for id: {1}", new Object[]{getName(), id});
+			}
 			handler.responseReceived(packet, response);
 		}
 
@@ -1334,7 +1478,9 @@ public abstract class AbstractMessageReceiver
 		 */
 		public void handleTimeout() {
 
-			// log.finest("[" + getName() + "]  " + "Fired timeout for id: " + id);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "[{0}] Fired timeout for id: {1}", new Object[]{getName(), id});
+			}
 			waitingTasks.remove(id);
 			handler.timeOutExpired(packet);
 		}
@@ -1465,8 +1611,10 @@ public abstract class AbstractMessageReceiver
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(packetCounter);
+		}
 	}
 }    // AbstractMessageReceiver
-
-
-//~ Formatted in Tigase Code Convention on 13/09/21

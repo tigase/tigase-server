@@ -1,0 +1,28 @@
+[[vhostMaxUsers]]
+= --vhost-max-users
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-22 02:44
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +0+
+
+*Example:* +--vhost-max-users = 1000+
+
+*Possible values:* 'integer number.'
+
+*Description:* The +--vhost-max-users+ property specifies how many user accounts can be registered on the installations for all vhosts.
+
+*0 - zero* means unlimited and this is a default. Otherwise greater than zero value specifies accounts number limit.
+
+This is a global property which is overridden by settings for particular vhost.
+
+The default setting is used for all virtual hosts for which the configuration is not defined. This settings is most useful for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It provides an ability to use default values for all of them, instead of having to provide individual configuration for each vhost.
+
+It is also applied as a default value for all new vhosts added at run-time.
+
+*Available since:* 5.2.0

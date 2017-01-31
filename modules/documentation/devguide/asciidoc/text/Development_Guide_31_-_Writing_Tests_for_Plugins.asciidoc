@@ -1,0 +1,133 @@
+[[writingTests]]
+= Writing Tests for Plugins
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+You can write tests in a simple text file which is loaded during test suite runtime.
+
+You simply specify what should be send to the server and what response should be expected from the server. No need to write Java code and recompile the whole test suite for new tests. It means new test cases can be now written easily and quickly which hopefully means more detailed tests for the server.
+
+How it works:
+
+Let's take link:http://www.xmpp.org/extensions/xep-0049.html[XEP-0049] Private XML Storage. Looking into the spec we can see the first example:
+
+Example 1. Client Stores Private Data
+
+*CLIENT:*
+
+[source,xml]
+-----
+<iq type="set" id="1001">
+  <query xmlns="jabber:iq:private">
+    <exodus xmlns="exodus:prefs">
+      <defaultnick>Hamlet</defaultnick>
+    </exodus>
+  </query>
+</iq>
+-----
+
+*SERVER:*
+
+[source,xml]
+<iq type="result" id="1001"/>
+
+This is enough for the first simple test. I have to create text file +JabberIqPrivate.test+ looking like this:
+
+[source,java]
+-----
+send: {
+
+<iq type="set" id="1001">
+  <query xmlns="jabber:iq:private">
+    <exodus xmlns="exodus:prefs">
+      <defaultnick>Hamlet</defaultnick>
+    </exodus>
+  </query>
+</iq>
+}
+
+expect: {
+<iq type="result" id="1001"/>
+}
+-----
+
+And now I can execute the test:
+
+[source,bash]
+-----
+testsuite $ ./scripts/all-tests-runner.sh --single JabberIqPrivate.test
+
+Tigase server home directory: ../server
+Version: 2.8.5-b422
+Database:         xmldb
+Server IP:        127.0.0.1
+Extra parameters: JabberIqPrivate.test
+Starting Tigase:
+Tigase running pid=6751
+
+Running: 2.8.5-b422-xmldb test, IP 127.0.0.1...
+Script name: scripts/single-xmpp-test.xmpt
+Common test:  Common test  ...        failure!
+FAILURE,  (Received result doesnt match expected result.,
+Expected one of: [<iq id="1001" type="result"/>],
+received:
+[<iq id="1001" type="error">
+  <query xmlns="jabber:iq:private">
+    <exodus xmlns="exodus:prefs">
+      <defaultnick>Hamlet</defaultnick>
+    </exodus>
+  </query>
+  <error type="cancel">
+    <feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas"/>
+    <text xml:lang="en" xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">
+      Feature not supported yet.</text>
+  </error>
+</iq>]),
+
+Total: 100ms
+Test time: 00:00:02
+Shutting down Tigase: 6751
+-----
+
+If I just started working on this XEP and there is no code on the server side, the result is perfectly expected although maybe this is not what we want. After a while of working on the server code I can execute the test once again:
+
+[source,bash]
+-----
+testsuite $ ./scripts/all-tests-runner.sh --single JabberIqPrivate.test
+
+Tigase server home directory: ../server
+
+Version: 2.8.5-b422
+
+Database:         xmldb
+
+Server IP:        127.0.0.1
+
+Extra parameters: JabberIqPrivate.test
+
+Starting Tigase:
+
+Tigase running pid=6984
+
+Running: 2.8.5-b422-xmldb test, IP 127.0.0.1...
+
+Script name: scripts/single-xmpp-test.xmpt
+
+Common test:  Common test  ... success,  Total: 40ms
+
+Test time: 00:00:01
+
+Shutting down Tigase: 6984
+-----
+
+This is it. The result we want in a simple and efficient way. We can repeat it as many times we want which is especially important in longer term trials. Every time we change the server code we can re-run tests to make sure we get correct responses from the server.
+
+You can have a look in the current build, with more complete test cases, file for link:https://projects.tigase.org/projects/tigase-testsuite/repository/revisions/master/entry/tests/data/JabberIqPrivate.cot[JabberIqPrivate].
+
+Now my server tests are no longer outdated. Of course not all cases are so simple. Some XEPs require calculations to be done before stanza is sent or to compare received results. A good example for this case is user authentication like SASL and even NON-SASL. But still, there are many cases which can be covered by simple tests: roster management, privacy lists management, vCard, private data storage and so on.

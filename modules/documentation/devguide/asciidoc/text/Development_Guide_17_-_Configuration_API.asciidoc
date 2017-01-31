@@ -1,0 +1,112 @@
+[[configurationAPI]]
+= Configuration API
+:author: not known
+:version: v1.0 initial release
+:date: 2015-07-27 10:25
+
+== Introduction
+The component configuration API is quite simple, it consists of two methods:
+
+[source,java]
+-----
+Map<String, Object> getDefaults(Map<String, Object> params);
+void setProperties(Map<String, Object> properties);
+-----
+
+The first method retrieves configuration defaults from the component while the second sets the new configuration for the component. Although it looks simple, and it is, we should go over some details in order to use them more effectively.
+
+== Component Startup Sequence
+Before we go into all the details it might be helpful to know the full component initialization sequence, how the component is brought to life and when the configuration is set. The component loading and starting sequence looks like this:
+
+. Component class is loaded and a new class instance is created using public constructor with no parameters.
+. Component setName(+compName+); method is called to set a name for the component. This method is (should) be called only once in the components operation.
+. Component +start();+ method is called which starts all the component internal threads. This method, together with +stop();+ can be called many times to put the component processing on hold or restart processing. Developers should normally not be concerned about these, unless he decided to overwrite these methods.
+. Component +getDefaults();+ method is called to retrieve initial settings for the component. This method is normally called only once during operation.
+. User provided configuration is mixed with the component defaults. Settings which the user has provided overwrite existing defaults, leaving the rest unchanged.
+. Component +setProperties();+ is called to set new configuration for the component. This method can be called many times at any point during the component life time.
+. Component +initializationCompleted();+ method is called to notify the component that the global server initialization has been finished. This method is called only once during the server startup time, after all components have been initialized and configured. This method is mainly used by network connection managers which wait with activating socket listeners until the server is fully functional.
+
+The important thing about all the configuration stuff is that the component does not read/ask/request configuration. *The configuration is pushed to the component by the configuration manager.* The +setProperties()+ method can be called at any time and any number of times while the server is running. This design allows for the server reconfiguration during runtime. Developers should be aware of this and properly code the method to allow for the component reconfiguration at runtime.
+
+== Configuration API
+Both API methods operate on Map<String, Object>, hence, essentially the component configuration is just a list of +(key, value)+ pairs. The Object can any of following:
+
+- String
+- Integer
+- Long
+- Double
+- Boolean
+- Array of any of above
+
+It is guaranteed that if the component returns a default configuration entry in any of above types, the +setProperties()+ method sets the configuration entry in the same exact type. This is quite convenient as you can limit type conversions (numbers parsing for example) in your code.
+
+== getDefaults()
+
+[source,java]
+-----
+Map<String, Object> getDefaults(Map<String, Object> params);
+-----
+
+_This method is normally called only once, just after the component instance has been created. It is used to get some initial settings from the component and create a default/initial configuration which can be modified by the user. It is recommended that the component returns all possible settings with it's default values so they can be presented to the end-user for configuration or diagnostic purposes.  No component initialisation can take place here and the developer can not assume that this method is called only once. Every time this method is called it should return only defaults not the settings set with +setProperties()+.  The +Map<String, Object>+ params provided as a parameter to this method can contain some 'hints' or 'pre-initial' parameters which can affect generating default configuration. This is because configuration for some components may be complex and can have many different presets or optimisations depending on the use case. These presets can be used to generate proper default configuration.  If the component implementation extends AbstractMessageReceiver then the implementation of the method should always look like this:_
+
+[source,java]
+-----
+@Override
+public Map<String, Object> getDefaults(Map<String, Object> params) {
+  Map defs = super.getDefaults(params);
+  defs.put(CONF_ENTRY_KEY, conf_entry_val);
+  return defs;
+}
+-----
+
+== setProperties()
+
+[source,java]
+void setProperties(Map<String, Object> properties);
+
+_This method is called to set configuration for the component. It can be called at any time and many times during the server run-time. The configuration will always contain all entries returned by +getDefaults+ method but some of them might be overwritten by user provided settings.  If the component implementation extends +AbstractMessageReceiver+ then the implementation of the method should always look like this:_
+
+[source,java]
+-----
+@Override
+public void setProperties(Map properties) {
+  super.setProperties(properties);
+  int conf_entry_val = (Integer) properties.get(CONF_ENTRY_KEY);
+}
+-----
+
+== Useful Presets
+Normally configuration presets depend on the component implementation and are different for each component. There are a few presets however which are often used commonly by different components:
+
+- +test+ If set it means that the server runs in a test mode, which may mean different things for different components. The component may use this parameter to turn testing mode on.
+- +admins+ If set it provides a list of administrator IDs. These user may have special access permissions for the component. They usually can execute administrator ad-hoc commands.
+- +user-db-uri+ If set it contains the main database connection string. The component may keep its own data.
+
+== Global Configuration Settings
+There are some global settings which are provided to all components and can be used by all of them. Usually they point so some shared resources which can be used by all components.
+
+- *SHARED_USER_REPO_PROP_KEY* is a configuration key for the user repository instance. This instance can be shared among components and used to store component data in database as well as access to user data.
+To access the use repository instance you can use the following code:
+[source,java]
+-----
+UserRepository user_repo;
+user_repo = (UserRepository) properties.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
+-----
+
+- *SHARED_USER_REPO_POOL_PROP_KEY* is a configuration key for the user repository pool which in most cases is just an SQL database. To improve the access to the database a connection pool is created which is realized by creating many UserRepository instances connecting to the same database.
+To access the use repository instance you can use the following code:
+
+[source,java]
+-----
+UserRepository user_repo;
+user_repo = (UserRepository) properties.get(RepositoryFactory.SHARED_USER_REPO_POOL_PROP_KEY);
+-----
+
+- *SHARED_AUTH_REPO_PROP_KEY* is a configuration key for the authentication repository. Components normally do not need access to this repository unless they deal with user authentication and authentication data is kept separately from the rest of the user data.
+To access the use repository instance you can use the following code:
+
+[source,java]
+-----
+AuthRepository auth_repo;
+auth_repo = (AuthRepository) properties.get(RepositoryFactory.SHARED_AUTH_REPO_PROP_KEY);
+-----

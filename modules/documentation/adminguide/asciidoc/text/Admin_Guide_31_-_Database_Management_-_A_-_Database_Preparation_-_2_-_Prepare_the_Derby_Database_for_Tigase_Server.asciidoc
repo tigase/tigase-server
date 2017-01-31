@@ -1,0 +1,74 @@
+[[prepareDerby]]
+= Prepare the Derby Database for the Tigase Server
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-06-21 13:28
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This guide describes how to prepare Derby database for connecting the Tigase server.
+
+== Basic Setup
+
+Preparation of Derby database is quite simple, but the following assumptions are made
+
+- +DerbyDB+ - Derby database name
+- +database/+ directory contains all necessary schema files
+- +jars/+ and +libs/+ directories contains Tigase and Derby binaries
+
+=== General Approach
+
+From the main Tigase directory execute following commands (Linux and Windows accordingly)
+
+*Linux*
+[source,sh]
+-----
+java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar org.apache.derby.tools.ij database/derby-schema-7.1.sql
+-----
+
+*Windows*
+[source,sh]
+-----
+java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs\derby.jar;libs\derbytools.jar;jars\tigase-server.jar org.apache.derby.tools.ij "database\derby-schema-7-1.sql"
+-----
+
+This will create Derby database named DerbyDB in the main Tigase directory and load Tigase schema for version 7.1.
+
+You will need to repeat this process again to add the PubSub schema into the database.
+
+*Linux*
+[source,sh]
+-----
+java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar org.apache.derby.tools.ij database/derby-pubsub-schema-3.2.0.sql
+-----
+
+*Windows*
+[source,sh]
+-----
+java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs\derby.jar;libs\derbytools.jar;jars\tigase-server.jar org.apache.derby.tools.ij "database\derby-pubsub-schema-3.2.0.sql"
+-----
+
+If you wish to use the Sock5 Proxy Component, you will need to add that schema as well:
+
+*Linux*
+[source,sh]
+-----
+java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar org.apache.derby.tools.ij database/derby-socks5-schema.sql
+-----
+
+*Windows*
+[source,sh]
+-----
+java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs\derby.jar;libs\derbytools.jar;jars\tigase-server.jar org.apache.derby.tools.ij "database\derby-socks5-schema.sql"
+-----
+
+== Connecting Tigase to database
+
+Once the database is setup, configure the init.properties file in Tigase and add the following configuration:
+[source,properties]
+-----
+jdbc:derby:{location of derby database};
+-----

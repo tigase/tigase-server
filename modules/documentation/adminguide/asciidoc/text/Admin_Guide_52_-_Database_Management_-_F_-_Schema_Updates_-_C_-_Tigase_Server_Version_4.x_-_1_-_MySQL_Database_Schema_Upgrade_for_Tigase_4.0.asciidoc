@@ -1,0 +1,94 @@
+[[tigase40schemaupgrade]]
+= MySQL Database Schema Upgrade for Tigase 4.0
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+For number of reasons the database schema had to be changed for Tigase server version 4.0. The most important are:
+
+- Compliance with the XMPP RFC which says that each part of JID may have up to 1023 characters. We store in the database user JIDs without resource names thus the maximum possible size of the user id is 2047. There aren't really JIDs that long yet, but we experienced quite long JIDs in a few installations already. So it was decided to prepare Tigase to accept any JID allowed by RFC.
+
+- Performance and flexibility -  the Tigase server now accesses database using stored procedures. This allows for any database storage format and it doesn't really matter for Tigase server what is the database schema how data is organized inside. What it needs is just bunch of stored procedures to access the data. This allows for much more flexibility in storing user data as well as much easier integration with third-party systems as well as organize data in more efficient way.
+
+Therefore when you run the Tigase server now it may (depending on what exact SVN revision you use) refuse to start if it detects that the database schema is not updated. If it happens just follow steps below to update the database schema and start the server again.  Updating of the database schema is very easy and almost fully automated process. Just follow the steps below and you should be able to run the new version of Tigase server in a few minutes or even seconds depending on your database size. It took around 7 minutes to update our database with 200k user accounts on an average machine.
+
+*Note. Do not update the database schema before Tigase server tells you to do so. Be sure to do a database backup before starting the schema update.*
+
+_Please note. I have done a few schema upgrades already in a few different configurations and here are a few tips which might be useful if something goes wrong:_
+
+. *You really, REALLY have to do the DB backup (database dump) before upgrading.* _If you don't you might not be able to revert database on your own._
+. _In case of error:_ *ERROR 1419 (HY000) at line 31 in file: 'database/mysql-schema-4-sp.schema': You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable)* _Restore the database following description found below and run the update again as MySQL super user._
+. _The following error may manifest itself in many ways from the NullPointerException in Tigase server log file to message like this:_ *User does not have access to metadata required to determine stored procedure parameter types. If rights can not be granted, configure connection with "noAccessToProcedureBodies=true" to have driver generate parameters that represent INOUT strings irregardless of actual parameter types.* _The best solution to this is to grant proper permissions to this user. Enter the MySQL command line mode as MySQL super user:_
++
+[source,sql]
+-----
+$ mysql -u root -proot_passwd mysql
+mysql> GRANT SELECT, INSERT, UPDATE ON \`mysql\`.\`proc\` TO 'tigase_user'@'localhost';
+mysql> GRANT SELECT, INSERT, UPDATE ON \`mysql\`.\`proc\` TO 'tigase_user'@'%';
+mysql> GRANT SELECT, INSERT, UPDATE ON \`mysql\`.\`proc\` TO 'tigase_user';
+mysql> FLUSH PRIVILEGES;
+$
+-----
+
+Assumptions:
+
+. *tigasedb* is a database name
+. *tigase_user* is a database user name
+. *mypass* is database user password
+
+First things first - make a database backup:
+
+[source,sh]
+-----
+mysqldump -u tigase_user -pmypass tigasedb > tigasedb_dump.sql
+-----
+
+If you need to restore database for any reason execute following commands:
+
+[source,sh]
+-----
+msyqladmin -u tigase_user -pmypass drop tigasedb
+mysqladmin -u tigase_user -pmypass create tigasedb
+mysql -u tigase_user -pmypass tigasedb < tigasedb_dump.sql
+-----
+
+_Note! You may be required to use_ *root* _user and password to execute mysqladmin commands.  Ok we have the database backup and we know how to restore it. Now we can run schema upgrade script:_
+
+[source,sh]
+-----
+mysql -u tigase_user -pmypass tigasedb < database/mysql-schema-upgrade-to-4.sql
+-----
+
+_The script should generate output like this:_
+
+[source,sh]
+-----
+Droping index for user_id column
+Resizing user_id column to 2049 characters to comply with RFC
+Creating a new index for user_id column for first 765 bytes of the field
+Adding sha1_user_id column
+Adding user_pw column
+Adding last_login column
+Adding last_logout column
+Adding online_status column
+Adding failed_logins column
+Adding account_status column
+Creating a new index for user_pw column
+Creating a new index for last_login column
+Creating a new index for last_logout column
+Creating a new index for account_status column
+Creating a new index for online_status column
+Resizing node column to 255 characters
+Changing pval column type to mediumtext
+Loading stored procedures definitions
+Setting passwords encoding in the database
+Converting database to a new format
+Creating a new index for sha1_user_id column
+Setting schema version to 4.0
+All done, database ready to use!
+-----

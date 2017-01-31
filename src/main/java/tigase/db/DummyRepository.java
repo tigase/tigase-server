@@ -219,4 +219,14 @@ public class DummyRepository implements UserRepository, AuthRepository {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}		
 }

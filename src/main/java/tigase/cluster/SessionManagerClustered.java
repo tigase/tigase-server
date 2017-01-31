@@ -26,13 +26,6 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.script.Bindings;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
@@ -45,14 +38,19 @@ import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
-import tigase.util.DNSResolver;
+import tigase.sys.TigaseRuntime;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
+import tigase.xmpp.*;
+
+import javax.script.Bindings;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class SessionManagerClusteredOld
@@ -113,6 +111,30 @@ public class SessionManagerClustered
 	}
 
 	@Override
+	public synchronized void everySecond() {
+		super.everySecond();
+		if (strategy != null) {
+			strategy.everySecond();
+		}
+	}
+
+	@Override
+	public synchronized void everyMinute() {
+		super.everyMinute();
+		if (strategy != null) {
+			strategy.everyMinute();
+		}
+	}
+
+	@Override
+	public synchronized void everyHour() {
+		super.everyHour();
+		if (strategy != null) {
+			strategy.everyHour();
+		}
+	}
+
+	@Override
 	public boolean fastAddOutPacket(Packet packet) {
 		return super.fastAddOutPacket(packet);
 	}
@@ -157,31 +179,29 @@ public class SessionManagerClustered
 	}
 
 	@Override
-	public void nodeConnected(String node) {
-		log.log(Level.FINE, "Nodes connected: {0}", node);
+	public void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
 
-		JID jid = JID.jidInstanceNS(getName(), node, null);
-
-		strategy.nodeConnected(jid);
-
-		sendAdminNotification( node, STATUS.CONNECETED );
-
+		if (!getComponentId().equals(jid)) {
+			strategy.nodeConnected(jid);
+			
+			sendAdminNotification( jid.getDomain(), STATUS.CONNECETED );
+		}
 	}
 
 	@Override
-	public void nodeDisconnected(String node) {
-		log.log(Level.FINE, "Nodes disconnected: {0}", node);
+	public void onNodeDisconnected(JID jid) {
+		super.onNodeDisconnected(jid);
 
-		JID jid = JID.jidInstanceNS(getName(), node, null);
+		if (!getComponentId().equals(jid)) {
+			strategy.nodeDisconnected(jid);
 
-		strategy.nodeDisconnected(jid);
-
-		// Not sure what to do here, there might be still packets
-		// from the cluster node waiting....
-		// delTrusted(jid);
-
-		sendAdminNotification( node, STATUS.DISCONNECTED );
-
+			// Not sure what to do here, there might be still packets
+			// from the cluster node waiting....
+			// delTrusted(jid);
+			
+			sendAdminNotification(jid.toString(), STATUS.DISCONNECTED);
+		}
 	}
 
 	@Override
@@ -309,19 +329,38 @@ public class SessionManagerClustered
 		}
 		props.put(STRATEGY_CLASS_PROP_KEY, strategy_class);
 		try {
-			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance().forName(
-					strategy_class).newInstance();
+			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance()
+					.forName(strategy_class)
+					.newInstance();
 			Map<String, Object> strat_defs = strat_tmp.getDefaults(params);
 
 			if (strat_defs != null) {
 				props.putAll(strat_defs);
+			}
+		} catch (NoClassDefFoundError e) {
+			log.log(Level.SEVERE, "Can't instantiate clustering strategy for class: " + strategy_class);
+			if (e.getMessage().contains("licence")) {
+				final String[] msg = {
+				                      "ERROR! ACS strategy was enabled with following class configuration",
+				                      "--sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+				                      "but required libraries are missing!",
+				                      "",
+				                      "Please make sure that all tigase-acs*.jar and licence-lib.jar",
+				                      "files are available in the classpath or disable ACS strategy!",
+				                      "(by commenting out above line)",
+				                      "",
+				                      "For more information please peruse ACS documentation.",
+				                      };
+				TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
+			} else {
+				throw new NoClassDefFoundError("Can not instantiate clustering strategy for class");
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not instantiate clustering strategy for class: " +
 					strategy_class, e);
 		}
 
-		String[] local_domains = DNSResolver.getDefHostNames();
+		String[] local_domains = DNSResolverFactory.getInstance().getDefaultHosts();
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
@@ -358,8 +397,9 @@ public class SessionManagerClustered
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		strategy.getStatistics(list);
-
+		if (strategy != null ) {
+			strategy.getStatistics(list);
+		}
 	}
 
 	/**
@@ -398,6 +438,7 @@ public class SessionManagerClustered
 	
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		clusterController = cl_controller;
 		if (strategy != null) {
 			strategy.setClusterController(clusterController);
@@ -417,7 +458,6 @@ public class SessionManagerClustered
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
 		if (props.get(STRATEGY_CLASS_PROP_KEY) != null) {
 			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
@@ -437,10 +477,25 @@ public class SessionManagerClustered
 				strategy.setSessionManagerHandler(this);
 				log.log(Level.CONFIG, "Loaded SM strategy: {0}", strategy_class);
 
-				// strategy.nodeConnected(getComponentId());
-				addTrusted(getComponentId());
 				if (clusterController != null) {
 					strategy.setClusterController(clusterController);
+				}
+			} catch (NoClassDefFoundError e) {
+				log.log(Level.SEVERE, "Can't instantiate clustering strategy for class: " + strategy_class);
+				if (e.getMessage().contains("licence")) {
+					final String[] msg = {"ERROR! ACS strategy was enabled with following class configuration",
+					                      "--sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+					                      "but required libraries are missing!",
+					                      "",
+					                      "Please make sure that all tigase-acs*.jar and licence-lib.jar",
+					                      "files are available in the classpath or disable ACS strategy!",
+					                      "(by commenting out above line)",
+					                      "",
+					                      "For more information please peruse ACS documentation.",
+					                      };
+					TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
+				} else {
+					throw new NoClassDefFoundError("Can not instantiate clustering strategy for class");
 				}
 			} catch (Exception e) {
 				if (!XMPPServer.isOSGi()) {
@@ -451,6 +506,7 @@ public class SessionManagerClustered
 					strategy_class);		
 			}
 		}
+		super.setProperties(props);
 		updateServiceEntity();
 		try {
 			if (props.get(MY_DOMAIN_NAME_PROP_KEY) != null) {
@@ -504,6 +560,16 @@ public class SessionManagerClustered
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
+	}
+
+	@Override
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		try {
+			strategy.handleLocalUserChangedConnId(conn.getBareJID(), conn, oldConnId, newConnId);
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+		}
+		super.xmppStreamMoved(conn, oldConnId, newConnId);
 	}
 
 	private void sendAdminNotification(String node, STATUS stat) {

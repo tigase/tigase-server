@@ -1,0 +1,38 @@
+[[stanzaLimitations]]
+= Stanza Limitations
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.com>
+:version: v1.0, Janurary 2016
+:date: 2016-20-01
+:revision: v1.0
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Although XMPP is robust and can process stanzas of any size in bytes, there are some limitations to keep in mind for Tigase server.
+
+Please keep these in mind when using default Tigase settings and creating custom stanzas.
+
+- Limit to number of attributes of single element = 50 attributes
+- Limit to number of elements = 1024 elements
+- Limit to length of element name = 1024 characters
+- Limit to length of attribute name = 1024 characters
+- Limit to length of attribute value = 10240 characters
+- Limit to length of content of single element CDATA = 1048576b or 1Mb
+
+These values may be changed.
+
+*Note that these limitations are to elements and attributes that may be within a stanza, but do not limit the overall stanza length.*
+
+
+== Escape Characters
+There are special characters that need to be escaped if they are included in the stanza to avoid conflicts. The rules are similar to normal XML escaping.
+The following is a list of characters that need to be escaped and what to use to escape them:
+[source]
+-----
+&    &amp;
+<    &lt;
+>    &gt;
+"    &quot;
+'    &apos;
+-----

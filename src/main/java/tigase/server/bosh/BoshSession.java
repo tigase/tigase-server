@@ -335,11 +335,11 @@ public class BoshSession {
 					: null;
 
 			if (userId != null) {
-				BareJID hostJid = handler.getSeeOtherHostForJID(userId.getBareJID(), Phase.OPEN);
+				BareJID hostJid = handler.getSeeOtherHostForJID(packet, userId.getBareJID(), Phase.OPEN);
 
 				if (hostJid != null) {
 					Element error        = new Element("stream:error");
-					Element seeOtherHost = new Element("see-other-host", hostJid.toString());
+					Element seeOtherHost = handler.getSeeOtherHostError( packet, hostJid);
 
 					seeOtherHost.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
 					error.addChild(seeOtherHost);
@@ -525,7 +525,7 @@ public class BoshSession {
 					if (userJid != null) {
 						Command.addFieldValue(command, "user-jid", userJid.toString());
 					}	
-					handler.addOutStreamClosed(command, this);
+					handler.addOutStreamClosed(command, this, true);
 
 					// out_results.offer(command);
 				}
@@ -575,6 +575,14 @@ public class BoshSession {
 						}
 					}
 				}
+				if (terminate) {
+					Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this),
+							getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+					if (userJid != null) {
+						Command.addFieldValue(command, "user-jid", userJid.toString());
+					}
+					handler.addOutStreamClosed(command, this, true);
+				}
 			} else {
 				log.info("Duplicated packet: " + packet.toString());
 			}
@@ -605,8 +613,15 @@ public class BoshSession {
 				if (userJid != null) {
 					Command.addFieldValue(command, "user-jid", userJid.toString());
 				}	
-				handler.addOutStreamClosed(command, this);
+				handler.addOutStreamClosed(command, this, true);
 
+				command = Command.STREAM_FINISHED.getPacket(handler.getJidForBoshSession(this),
+						getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+				if (userJid != null) {
+					Command.addFieldValue(command, "user-jid", userJid.toString());
+				}	
+				handler.addOutStreamClosed(command, this, false);
+				
 				// out_results.offer(command);
 			} catch (PacketErrorTypeException e) {
 				log.info("Error type and incorrect from bosh client? Ignoring...");
@@ -705,7 +720,7 @@ public class BoshSession {
 				Command.addFieldValue(command, "user-jid", userJid.toString());
 			}			
 
-			handler.addOutStreamClosed(command, this);
+			handler.addOutStreamClosed(command, this, true);
 
 			for (Element packet : waiting_packets) {
 				try {
@@ -719,7 +734,7 @@ public class BoshSession {
 						// pick thread on which it will be processed
 						p.setPacketTo(handler.getJidForBoshSession(this));
 						p.setPacketFrom(getDataReceiver());
-						handler.processUndeliveredPacket(p, "Bosh = disconnected");
+						handler.processUndeliveredPacket(p, null, "Bosh = disconnected");
 					}
 				} catch (TigaseStringprepException ex) {
 					log.warning(
@@ -729,6 +744,14 @@ public class BoshSession {
 //					log.info("Packet processing exception: " + e);
 				}
 			}
+			
+			command = Command.STREAM_FINISHED.getPacket(handler.getJidForBoshSession(this), 
+					getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+			if (userJid != null) {
+				Command.addFieldValue(command, "user-jid", userJid.toString());
+			}			
+
+			handler.addOutStreamClosed(command, this, false);
 			
 			closeAllConnections();
 

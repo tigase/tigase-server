@@ -1,0 +1,115 @@
+[[mongoDBSupport]]
+= Preparing Tigase for MongoDB
+:author: not known
+:version: v1.0 October, 2015
+:date: 2015-01-10 12:22
+
+:toc:
+:numbered:
+:website: http://www.tiagse.org
+
+Tigase now supports MongoDB for auth, settings, and storage repositories. If you wish to use MongoDB for Tigase, please use this guide to help you.
+
+== Dependencies
+
+To run Tigase MongoDB support library requires drivers for MongoDB for Java which can be downloaded from link:https://github.com/mongodb/mongo-java-driver/releases[here]. This driver needs to be placed in +/jars+ directory located in Tigase XMPP Server installation directory.
+
+== Configuration
+
+=== Configuration of user repository for Tigase XMPP Server
+
+To configure Tigase XMPP Server to use MongoDB you need to set +--user-db-uri=+ in etc/init.properties file to proper MongoDB URI pointing to which MongoDB database should be used (it will be created by MongoDB if it does not exist).
++--user-db+ property should not be set to let Tigase XMPP Server autodetect proper implementation of +UserRepository+. Tigase XMPP Server will create proper collections in MongoDB if they do not exist so no schema files are necessary.
+
+Example configuration of XMPP Server pointing to MongoDB database +tigase_test+ in a local instance:
+[source,bash]
+-----
+--user-db-uri=mongodb://localhost/tigase_test
+-----
+If Tigase Server is not able to detect a proper storage layer implementation, it can be forced to use one provided by Tigase using the following lines in +etc/init.properties+ file:
+-----
+--user-db=tigase.mongodb.MongoRepository
+--auth-db=tigase.mongodb.MongoRepository
+-----
+Every component should be able to use proper implementation to support MongoDB using this URI. Also MongoDB URI can be passed as any URI in configuration of any component.
+
+=== Configuration for MUC
+By default, MUC component will use MongoDB to store data if Tigase is configured to use it as a default store. However, if you would like to use a different MongoDB database to store MUC message archive, you can do this by adding the following line to +etc/init.properties+ file:
+[source]
+-----
+muc/history-db-uri=mongodb://localhost/tigase_test
+-----
+If MUC components fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the +init.properties+ file:
+-----
+muc/history-db=tigase.mongodb.muc.MongoHistoryProvider
+-----
+
+=== Configuration for PubSub
+By default, PubSub component will use MongoDB to store data if Tigase is configured to use it as a default store. However, if you would like to use a different MongoDB database to store PubSub component data, you can do this by adding the following line to +etc/init.properties+ file:
+[source]
+-----
+pubsub/pubsub-repo-url=mongodb://localhost/tigase_test
+-----
+If the PubSub components fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the +init.properties+ file:
+-----
+pubsub/pubsub-repo-class=tigase.mongodb.pubsub.PubSubDAOMongo
+-----
+
+=== Configuration for Message Archiving
+By default, the Message Archiving component will use MongoDB to store data if Tigase is configured to use it as a default store. However, if you would like to use a different MongoDB database to store message archives, you can do this by adding the following line to +etc/init.properties+ file:
+[source]
+-----
+message-archive/archive-repo-uri=mongodb://localhost/tigase_test
+-----
+If Message Archiving component fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the +init.properties+ file:
+-----
+message-archive/archive-repo-class=tigase.mongodb.archive.MongoMessageArchiveRepository
+-----
+
+== Schema Description
+This description contains only basic description of schema and only basic part of it. More collections may be created if additional components of Tigase XMPP Server are loaded and configured to use MongoDB.
+
+=== Tigase XMPP Server Schema
+Basic schema for UserRespository and AuthRepository consists of two collections:
+. tig_users - contains list of users
+. tig_nodes - contains data related to users in tree-like way
+
++tig_users+ collection contains the following fields:
+
+.tig_users
+[width="50%",options="header"]
+|=====================================================================
+|Name	      |Description
+|_id	      |id of user which is SHA256 hash of users jid (raw byte array)
+|user_id	  |contains full user jid
+|domain	    |domain to which user belongs for easier lookup of users by domain
+|password	  |password of user (or hash of password)
+|=====================================================================
+
++tig_nodes+ collection contains the following fields
+
+.tig_nodes
+[width="50%",options="header"]
+|=====================================================================
+|Name	    |Description
+|_id	    |id of row autogenerated by MongoDB
+|uid	    |id of user which is SHA256 hash of users jid (raw byte array)
+|node	    |full path of node in tree-like structure separated by / (may not exist)
+|key	    |key for which value for node is set
+|value	  |value which is set for node key
+|=====================================================================
+
+Tigase XMPP Server also uses additional collections for storage of Offline Messages
+
+.msg_history collection
+[width="50%",options="header"]
+|=====================================================================
+|Name	    |Description
+|from	    |full user jid of message sender
+|from_hash	|SHA256 hash of message sender jid as raw byte array
+|to	      |full users jid of message recipient
+|to_hash	|SHA256 hash of message recipient full jid as raw byte array
+|ts	      |timestamp of message as date
+|message	|serialized XML stanza containing message
+|expire-at	|timestamp of expiration of message (if message contains AMP expire-at set)
+|=====================================================================

@@ -22,21 +22,19 @@
 
 package tigase.server.monitor;
 
+import tigase.sys.*;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-import tigase.sys.CPULoadListener;
-import tigase.sys.MemoryChangeListener;
-import tigase.sys.OnlineJidsReporter;
-import tigase.sys.ShutdownHook;
-import tigase.sys.TigaseRuntime;
-
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * Created: Feb 19, 2009 12:31:14 PM
@@ -46,11 +44,10 @@ import java.util.logging.Logger;
  */
 public class MonitorRuntime extends TigaseRuntime {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-					Logger.getLogger(MonitorRuntime.class.getName());
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(MonitorRuntime.class.getName());
 
 	private static MonitorRuntime runtime = null;
 	private final LinkedHashSet<ShutdownHook> shutdownHooks =
@@ -200,7 +197,7 @@ public class MonitorRuntime extends TigaseRuntime {
 							new ThreadGroup(Thread.currentThread().getThreadGroup(),
 							"Tigase Shutdown");
 			for (ShutdownHook shutdownHook : shutdownHooks) {
-				ShutdownHandlerThread thr = 
+				ShutdownHandlerThread thr =
 								new ShutdownHandlerThread(threads, shutdownHook);
 				thr.start();
 				thlist.add(thr);
@@ -226,8 +223,19 @@ public class MonitorRuntime extends TigaseRuntime {
 				sb.append("Locked threads:\n");
 				ThreadInfo[] lockedThreads = thBean.getThreadInfo(tids);
 				for (ThreadInfo threadInfo : lockedThreads) {
-				sb.append("Locked thread " + threadInfo.getThreadName() + " on " +
-								threadInfo.getLockInfo().toString()).append('\n');
+					sb.append("Locked thread ")
+							.append(threadInfo.getThreadName())
+							.append(" on ")
+							.append(threadInfo.getLockInfo().toString())
+							.append(", locked synchronizes: ")
+							.append(Arrays.toString(threadInfo.getLockedSynchronizers()))
+							.append(", locked monitors: ")
+							.append(Arrays.toString(threadInfo.getLockedMonitors()))
+							.append(" by [")
+							.append(threadInfo.getLockOwnerId())
+							.append("] ")
+							.append(threadInfo.getLockOwnerName())
+							.append('\n');
 					StackTraceElement[] ste = threadInfo.getStackTrace();
 					for (StackTraceElement stackTraceElement : ste) {
 						sb.append(stackTraceElement.toString()).append('\n');
@@ -240,6 +248,48 @@ public class MonitorRuntime extends TigaseRuntime {
 				System.out.println(sb.toString());
 				log.warning(sb.toString());
 			}
+
+
+			String SHUTDOWN_THREAD_DUMP = "shutdown-thread-dump";
+			if (System.getProperty(SHUTDOWN_THREAD_DUMP) == null ||
+					Boolean.TRUE.equals(Boolean.valueOf(System.getProperty(SHUTDOWN_THREAD_DUMP)))) {
+
+				try {
+					// we have to configure logger here
+					Logger THREAD_DUMP_LOGGER = Logger.getLogger("ThreadDumpLogger");
+					String threadDumpPath = "logs/thread-dump.log";
+					FileHandler fileHandler = new FileHandler(threadDumpPath, 10000000, 5, true);
+					fileHandler.setLevel(Level.ALL);
+					fileHandler.setFormatter(new Formatter() {
+						@Override
+						public String format(LogRecord record) {
+							return (new Date(record.getMillis()) + ": " + record.getMessage());
+						}
+					});
+
+					THREAD_DUMP_LOGGER.addHandler(fileHandler);
+					THREAD_DUMP_LOGGER.setLevel(Level.ALL);
+					THREAD_DUMP_LOGGER.setUseParentHandlers(false);
+
+					StringBuilder threadDumpBuilder = new StringBuilder("All threads information:\n");
+					for (ThreadInfo threadInfo : ManagementFactory.getThreadMXBean().dumpAllThreads(true, true)) {
+						threadDumpBuilder.append(threadInfo);
+					}
+					threadDumpBuilder.append("\n===========\n\n");
+					THREAD_DUMP_LOGGER.log(Level.INFO, threadDumpBuilder.toString());
+
+					String msg =
+							"Save thread-dump to file: " + threadDumpPath + ", size: " + threadDumpBuilder.length();
+					System.out.println(msg);
+					log.warning(msg);
+				} catch (IOException e) {
+					System.out.println("exception while initialization");
+					e.printStackTrace();
+					log.log(Level.WARNING, "Failed creating thread dumper logger");
+				}
+			}
+
+
 			System.out.println("ShutdownThread finished...");
 			log.warning("ShutdownThread finished...");
 		}

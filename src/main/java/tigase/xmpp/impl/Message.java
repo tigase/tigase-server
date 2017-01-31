@@ -26,36 +26,22 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.server.Packet;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
-
-import tigase.server.Packet;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.annotation.*;
-
-import static tigase.xmpp.impl.Message.*;
+import static tigase.xmpp.impl.Message.ELEM_NAME;
+import static tigase.xmpp.impl.Message.XMLNS;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination
@@ -79,9 +65,11 @@ public class Message
 	/** Class logger */
 	private static final Logger   log    = Logger.getLogger(Message.class.getName());
 	private static final String   DELIVERY_RULES_KEY = "delivery-rules";
+	private static final String   SILENTLY_IGNORE_ERROR_KEY = "silently-ignore-message";
 	protected static final String   XMLNS  = "jabber:client";
 
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
+	private boolean silentlyIgnoreError = false;
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -91,6 +79,10 @@ public class Message
 		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY)
 				? MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY))
 				: MessageDeliveryRules.inteligent;
+
+		silentlyIgnoreError = settings.containsKey(SILENTLY_IGNORE_ERROR_KEY)
+				? Boolean.valueOf((String) settings.get(SILENTLY_IGNORE_ERROR_KEY))
+				: Boolean.FALSE;
 	}
 
 	@Override
@@ -251,6 +243,11 @@ public class Message
 
 	private void processOfflineUser( Packet packet, Queue<Packet> results ) throws PacketErrorTypeException {
 		if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Processing message to offline user, packet: {0}, deliveryRules: {1}",
+						new Object[]{packet, deliveryRules});
+			}
+
 			if (deliveryRules != MessageDeliveryRules.strict) {
 				StanzaType type = packet.getType();
 				if (type == null) {
@@ -277,20 +274,24 @@ public class Message
 						// for each of this types RFC 6121 recomends silent ignoring of stanza
 						// or to return error recipient-unavailable - we will send error as
 						// droping packet without response may not be a good idea
-						results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-								packet, "The recipient is no longer available.", true));
+						if (!silentlyIgnoreError) {
+							results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+									packet, "The recipient is no longer available.", true));
+						}
 				}
 			}
 			else {
-				results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-																																							 "The recipient is no longer available.", true));
+				if ( !silentlyIgnoreError ){
+					results.offer( Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage( packet,
+																																								 "The recipient is no longer available.", true ) );
+				}
 			}
 		}
 	}
 
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
+		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings, this);
 		if (result) {
 			packet.processedBy(id());
 		}
@@ -316,6 +317,11 @@ public class Message
 			if (conn.getPresence() != null &&  conn.getPriority() >= 0)
 				conns.add(conn);
 		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Out of: {0} total connections, only: {1} have non-negative priority",
+					new Object[]{session.getActiveSessions().size(), conns.size()});
+		}
+
 		return conns;
 	}
 

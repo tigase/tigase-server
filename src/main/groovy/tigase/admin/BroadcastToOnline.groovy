@@ -68,7 +68,7 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
 
   Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(), "jid-single", "From address")
 
-  Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "Subject")
+  Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "text-single", "Subject")
 
   def msg_types = ["normal", "headline", "chat" ]
   Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type", (String[])msg_types, (String[])msg_types)
@@ -77,7 +77,7 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
      body = [""]
   }
 
-	Command.addFieldMultiValue(res, MSG_BODY, body)
+	Command.addFieldMultiValue(res, MSG_BODY, body as List)
 
 	if 	( clusterMode  ) {
 		Command.addHiddenField(res, NOTIFY_CLUSTER, true.toString())
@@ -91,7 +91,7 @@ Queue results = new LinkedList()
 if 	( clusterMode && notifyCluster ) {
 	if ( null != clusterStrategy ) {
 		def cluster = (ClusteringStrategyIfc) clusterStrategy
-		List<JID> cl_conns = cluster.getAllNodes()
+		List<JID> cl_conns = cluster.getNodesConnected()
 		if (cl_conns && cl_conns.size() > 0) {
 			cl_conns.each { node ->
 

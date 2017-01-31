@@ -82,9 +82,14 @@ class TigaseInstallerDBHelper {
 			{
 		ArrayList<String> results = new ArrayList<String>();
 		VariableSubstitutor vs = new VariableSubstitutor(variables);
-		BufferedReader br =
-			new BufferedReader(new
-					InputStreamReader(getResource(resource)));
+		BufferedReader br;
+
+		if ( res_prefix == null ){
+			br = new BufferedReader( new InputStreamReader( getResourcePath( resource ) ) );
+		} else {
+			br = new BufferedReader( new InputStreamReader( getResource( resource ) ) );
+		}
+
 		String line = null;
 		String sql_query = "";
 		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
@@ -97,6 +102,14 @@ class TigaseInstallerDBHelper {
 				}
 				if (line.startsWith("-- LOAD SCHEMA:")) {
 					results.addAll(loadSchemaQueries(res_prefix, variables));
+				}
+				if (  line.startsWith( "-- LOAD FILE:" )  && line.trim().contains( "sql" ) )
+				{
+					Matcher matcher = Pattern.compile( "-- LOAD FILE:.*" + res_prefix + "-(.*).sql" ).matcher( line );
+					if ( matcher.find() ){
+						Debug.trace( String.format( "\n\n *** trying to load schema: %1$s \t", matcher.group( 1 ) ) );
+						results.addAll( loadSQLQueries( res_prefix + "-" + matcher.group( 1 ), res_prefix, variables ) );
+					}
 				}
 				break;
 			case IN_SQL:
@@ -136,6 +149,21 @@ class TigaseInstallerDBHelper {
 			}
 
 
+	protected InputStream getResourcePath(String resource)
+	throws ResourceNotFoundException {
+
+
+		File f = new File( resource );
+		InputStream is = null;
+		Debug.trace(String.format( "Getting resource: %1$s @ filename: %2$s",resource, f.getAbsolutePath() ));
+		try {
+			is = new FileInputStream( f );
+		} catch ( FileNotFoundException ex ) {
+			throw new ResourceNotFoundException("could not find: " + resource );
+		}
+		return is;
+	}
+
 	protected InputStream getResource(String resource)
 	throws ResourceNotFoundException {
 		return ResourceManager.getInstance().getInputStream(resource);
@@ -147,9 +175,9 @@ class TigaseInstallerDBHelper {
                 throws Exception {
 
             ArrayList<String> queries = new ArrayList<String>();
-            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-schema", res_prefix, variables));
-            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-sp", res_prefix, variables));
-            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-props", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-7-1-schema", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-7-1-sp", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-7-1-props", res_prefix, variables));
 
 //			System.out.println( "Socks5component variable: " + variablesSource.getVariable(TigaseConfigConst.SOCKS5_COMP) );
 
@@ -316,6 +344,9 @@ class TigaseInstallerDBHelper {
 
                         if ("4.0".equals(schema_version)) {
                             queries = loadSQLQueries(res_prefix + "-schema-upgrade-to-5-1", res_prefix, variables);
+                        }
+                        if ("5.1".equals(schema_version)) {
+                            queries = loadSQLQueries(res_prefix + "-schema-upgrade-to-7-1", res_prefix, variables);
                         }
                         for (String query : queries) {
                             if (!query.isEmpty()) {
@@ -556,10 +587,12 @@ class TigaseInstallerDBHelper {
 						// Table does not exist
 						Statement stmt = conn.createStatement();
 
-						ArrayList<String> queries = loadSQLQueries(res_prefix + "-pubsub-schema", res_prefix, variables);
+						ArrayList<String> queries;
+											queries = loadSQLQueries(res_prefix + "-pubsub-schema-3-2", res_prefix, variables);
+//						queries.addAll( loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables) );
 						for (String query : queries) {
 							if (!query.isEmpty()) {
-								Debug.trace("socks5 schema :: Executing query: " + query);
+								Debug.trace("pubsub schema :: Executing query: " + query);
 								stmt.execute(query);
 							}
 						}
@@ -631,6 +664,7 @@ class TigaseInstallerDBHelper {
 
 		try {
 			Debug.trace("RepositoryFactory.getAuthRepository(" + className + ", " + resource + ",  + null)" );
+			System.setProperty( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "1" );
 			AuthRepository repo = RepositoryFactory.getAuthRepository(
 					className, resource, null);
 
@@ -689,11 +723,6 @@ class TigaseInstallerDBHelper {
 				helper.addXmppAdminAccount(variables, msgTarget);
 			}
 		},
-		POST_INSTALLATION("Post installation actions") {
-			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
-				helper.postInstallation(variables, msgTarget);
-			}
-		},
 		SOCKS5_COMPONENT("Loading socks5 component schema") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.socks5SchemaLoad(variables, msgTarget);
@@ -702,6 +731,11 @@ class TigaseInstallerDBHelper {
 		PUBSUB_COMPONENT("Loading PubSub component schema") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.pubsubSchemaLoad(variables, msgTarget);
+			}
+		},
+		POST_INSTALLATION("Post installation actions") {
+			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.postInstallation(variables, msgTarget);
 			}
 		}
 

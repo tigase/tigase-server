@@ -138,6 +138,8 @@ public class RosterElement {
 					lastSeen = INITIAL_LAST_SEEN_VAL;
 				}
 			}
+			// how roster can be modified as it is read from DB?
+			modified = false;
 		} else {
 			log.warning("Incorrect roster data: " + roster_el.toString());
 		}
@@ -191,9 +193,11 @@ public class RosterElement {
 	}
 
 	public Element getRosterElement() {
-		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
-						STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(),
-						XMLUtils.escape(name), "" + stringpreped });
+		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, STRINGPREP_ATT },
+				new String[] { jid.toString(), subscription.toString(), "" + stringpreped });
+
+		if (name != null)
+			elem.setAttribute(NAME_ATT, XMLUtils.escape(name));
 
 		if ((groups != null) && (groups.length > 0)) {
 			String grps = "";
@@ -266,24 +270,38 @@ public class RosterElement {
 			for (int i = 0; i < groups.length; i++) {
 				this.groups[i] = XMLUtils.unescape(groups[i]);
 			}
-			modified = true;
+		} else {
+			this.groups = null;
 		}
+		modified = true;
 	}
 
-	public final void setName(String name) {
-		String old_name = this.name;
-
-		if (name == null) {
-			this.name = this.jid.getLocalpart();
-			if ((this.name == null) || this.name.trim().isEmpty()) {
-				this.name = this.jid.getBareJID().toString();
-			}
+	public final void setName(final String name) {
+		if(name==this.name || (name!=null && this.name!=null && name.equals(this.name))){
+			return ;
 		} else {
-			this.name = XMLUtils.unescape(name);
+			this.name = name==null?null:XMLUtils.unescape(name);
+			this.modified = true;
 		}
-		if (!this.name.equals(old_name)) {
-			modified = true;
-		}
+		
+		
+
+			
+		
+		
+		
+//		String old_name = this.name;
+//		if (name == null) {
+//			this.name = this.jid.getLocalpart();
+//			if ((this.name == null) || this.name.trim().isEmpty()) {
+//				this.name = this.jid.getBareJID().toString();
+//			}
+//		} else {
+//			this.name = XMLUtils.unescape(name);
+//		}
+//		if (!this.name.equals(old_name)) {
+//			modified = true;
+//		}
 	}
 
 	public void setOnline(String resource, boolean online) {

@@ -1,0 +1,120 @@
+[[loadBalancingExternalComponent]]
+= Load Balancing External Components in Cluster Mode
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2011-07-09 22:45
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This document describes how to load balance any external components using Tigase XMPP Server and how to make Tigase's components work as external components in a cluster mode.
+
+_Please note, all configuration options described here apply to Tigase XMPP Server version 5.1.0 or later._
+
+These are actually 2 separate topics:
+
+. One is to distribute load over many instances of a single component to handle larger traffic, or perhaps for high availability.
+. The second is to make Tigase's components work as an external component and make it work in a cluster mode, even if the component itself does not support cluster mode.
+
+Here are step by step instructions and configuration examples teaching how to achieve both goals.
+
+== Load Balancing External Component
+The first, and most simple scenario is to connect multiple instances of an external component to a single Tigase XMPP Server to distribute load.
+
+There are at least 2 reasons why this would be an optimal solution: one would be to spread load over more instances/machines and the second is to improve reliability in case one component fails the other one can take over the work.
+
+So here is a simple picture showing the use case.
+
+image:images/ExternalCompClustering002.png[]
+
+We have a single machine running Tigase XMPP Server and 2 instances of the MUC component connecting to Tigase.
+
+The server configuration
+
+[source,bash]
+-----
+config-type = --gen-config-def
+--user-db = mysql
+--admins = admin@devel.tigase.org
+--user-db-uri = jdbc:mysql://localhost/db?user=tigase&password=tigase
+--virt-hosts = devel.tigase.org
+
+--comp-name-1 = ext
+--comp-class-1 = tigase.server.ext.ComponentProtocol
+--external = muc.devel.tigase.org:muc-secret:listen:\
+       5270:devel.tigase.org:accept:ReceiverBareJidLB
+-----
+
+And configuration for both instances of the MUC component (identical for both of them):
+
+[source,bash]
+-----
+config-type = --gen-config-comp
+--user-db = mysql
+--admins = admin@devel.tigase.org
+--user-db-uri = jdbc:mysql://localhost/db?user=tigase&password=tigase
+--virt-hosts = devel.tigase.org
+
+--comp-name-1 = muc
+--comp-class-1 = tigase.muc.MUCComponent
+--external = muc.devel.tigase.org:muc-secret:connect:\
+       5270:devel.tigase.org:accept
+-----
+
+For those familiar with Tigase's configuration, this should be pretty basic. The difference is one small element in the server configuration. At the end of the component connection we have *ReceiverBareJidLB*.
+
+This is the load balancing plugin class. Load balancing plugin decides how the traffic is distributed among different component connections that is different component instances. For the MUC component it makes sense to distribute the traffic based on the receiver bare JID because this is the MUC room address. This way we just distribute MUC rooms and traffic over different MUC component instances.
+
+This distribution strategy does not always work for all possible components however. For transports for example this would not work at all. A better way to spread load for transports would be based on the source bare JID. And it is possible if you use plugin with class name: *SenderBareJidLB*.
+
+This are two basic load distribution strategies available now. For some use cases none of them is good enough. If you have PubSub, then you probably want to distribute load based on the PubSub node. There is no plugin for that yet but it is easy enough to write one and put the class name in configuration.
+
+== External Component and Cluster
+If you want to use Tigase's component in a cluster mode which does not have clustering implemented yet there is a way to make it kind of cluster-able. In the previous section we connected many MUC components to a single Tigase server. Now we want to connect a single MUC component to many Tigase servers (or many Tigase cluster nodes).
+
+Let's say we have Tigase XMPP Server working for domain: *xmpp-test.org* and the server is installed on three cluster nodes: *red.xmpp-test.org,* *green.xmpp-test.org* and *blue.xmpp-test.org.*
+
+image:images/ExternalCompClustering003_0.png[]
+
+We want to make it possible to connect the MUC component to all nodes, so here is configuration for the server (for each node is the same):
+
+[source,bash]
+-----
+config-type=--gen-config-def
+--admins=admin@xmpp-test.org
+--virt-hosts = xmpp-test.org
+
+--cluster-mode = true
+--cluster-nodes=red.xmpp-test.org,green.xmpp-test.org,blue.xmpp-test.org
+
+--auth-db=tigase-auth
+--user-db=mysql
+--user-db-uri=jdbc:mysql://localhost/db?user=tigase&password=tigase
+
+--comp-name-1 = ext
+--comp-class-1 = tigase.server.ext.ComponentProtocol
+--external = muc.xmpp-test.org:muc-secret:listen:5270:\
+       xmpp-test.org:accept:ReceiverBareJidLB
+-----
+
+As you can see there is nothing special here. The most interesting part comes on the MUC side.
+
+[source,bash]
+-----
+config-type = --gen-config-comp
+--user-db = mysql
+--admins = admin@xmpp-test.orgg
+--user-db-uri = jdbc:mysql://localhost/db?user=tigase&password=tigase
+
+--virt-hosts = xmpp-test.org
+
+--comp-name-1 = muc
+--comp-class-1 = tigase.muc.MUCComponent
+--external = muc.xmpp-test.org:muc-secret:connect:5270:xmpp-test.org;blue.xmpp-test.org;green.xmpp-test.org,red.xmpp-test.org:accept
+-----
+
+As you can see remote host name is not a simple domain but a character string with a few comma separated parts. The first part is our remote domain and the rest are addresses of the host to connect to. This can be a list of domain names or IP addresses.
+
+Of course it is possible to connect multiple external component to all cluster nodes, this way the whole installation would be really working in the cluster and also load balanced.

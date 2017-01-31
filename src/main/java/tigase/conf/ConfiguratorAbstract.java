@@ -26,54 +26,29 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthRepository;
-import tigase.db.AuthRepositoryMDImpl;
+import tigase.db.*;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
-import tigase.db.DBInitException;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserRepository;
-import tigase.db.UserRepositoryMDImpl;
-
 import tigase.io.TLSUtil;
-
 import tigase.server.AbstractComponentRegistrator;
-import tigase.server.ComponentInfo;
 import tigase.server.ServerComponent;
-
-import tigase.util.ClassUtil;
+import tigase.stats.StatisticsContainer;
+import tigase.stats.StatisticsList;
+import tigase.util.DNSResolverFactory;
 import tigase.util.DataTypes;
-
-import tigase.xml.XMLUtils;
-
 import tigase.xmpp.BareJID;
+
+import javax.script.Bindings;
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import static tigase.io.SSLContextContainerIfc.*;
 
 //~--- JDK imports ------------------------------------------------------------
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogManager;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.script.Bindings;
 
 /**
  * Created: Dec 7, 2009 4:15:31 PM
@@ -83,7 +58,7 @@ import javax.script.Bindings;
  */
 public abstract class ConfiguratorAbstract
 				extends AbstractComponentRegistrator<Configurable>
-				implements RepositoryChangeListenerIfc<ConfigItem> {
+				implements RepositoryChangeListenerIfc<ConfigItem>, StatisticsContainer {
 	/**
 	 * Field description
 	 * @deprecated moved to RepositoryFactory
@@ -218,7 +193,8 @@ public abstract class ConfiguratorAbstract
 			}
 		}
 		configRepo.addRepoChangeListener(this);
-		configRepo.setDefHostname(getDefHostName().getDomain());
+		String host = getDefHostName() != null ? getDefHostName().getDomain() : DNSResolverFactory.getInstance().getDefaultHost();
+		configRepo.setDefHostname(host);
 		try {
 			// loss of generic types is intentional to make parameter match API
 			// and internally all requests are done like:
@@ -280,6 +256,9 @@ public abstract class ConfiguratorAbstract
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "Cannot store configuration.", ex);
 		}
+
+		System.out.println("== " + new Date() + " Server finished starting up and (if there wasn't any error) is ready to use\n");
+
 	}
 
 	@Override
@@ -305,8 +284,8 @@ public abstract class ConfiguratorAbstract
 		Configurable component = getComponent(item.getCompName());
 
 		if (component != null) {
-			Map<String, Object> prop = Collections.singletonMap(item.getConfigKey(), item
-					.getConfigVal());
+			Map<String, Object> prop = new HashMap<>();
+			prop.put(item.getConfigKey(), item.getConfigVal());
 
 			try {
 				component.setProperties(prop);
@@ -753,6 +732,12 @@ public abstract class ConfiguratorAbstract
 	 */
 	public Map<String, Object> getProperties(String nodeId) throws ConfigurationException {
 		return configRepo.getProperties(nodeId);
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		RepositoryFactory.statistics.getStatistics(list);
 	}
 
 	@Override

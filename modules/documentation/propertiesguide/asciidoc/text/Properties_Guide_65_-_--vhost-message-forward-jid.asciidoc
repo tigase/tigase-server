@@ -1,0 +1,26 @@
+[[vhostMessageForwardJid]]
+= --vhost-message-forward-jid
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-22 02:52
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +<null>+
+
+*Example:* +--vhost-message-forward-jid = archive@domain.com+
+
+*Possible values:* 'valid JID'
+
+*Description:* This is a global property for message forwarding for the installation. This property is normally specified on the vhost configuration level, however if you want to forward all messages on your installation and you have many virtual domains this property allows to set message forwarding for all of them. A valid JID must be specified as the forwarding destination. Also a message forwarding plugin must be loaded and activated on the installation for the message forwarding to work.
+
+This is a global property which is overridden by settings for particular vhost.
+
+The null value is used as a default when no configuration is set. This setting is mostly useful for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It provides the ability to configure a default values for all of them, instead of having to provide individual configuration for each vhost.
+
+It is also applied as a default value for all new vhosts added at run-time.
+
+*Available since:* 5.2.0

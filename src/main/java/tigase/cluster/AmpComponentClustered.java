@@ -39,6 +39,7 @@ import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.Priority;
 import tigase.server.amp.AmpComponent;
 import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
 import tigase.util.TigaseStringprepException;
@@ -54,12 +55,6 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 
 	private static final Logger log = Logger.getLogger(AmpComponentClustered.class.getCanonicalName());
 	
-	private Set<BareJID>   connectedNodes          = new CopyOnWriteArraySet<BareJID>() {
-		{
-			add(getDefHostName());
-		}
-	};	
-	
 	private ClusterControllerIfc controller = null;
 	private Set<CommandListener> commandListeners = new CopyOnWriteArraySet<CommandListener>();
 	
@@ -69,10 +64,11 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 	
 	protected void forwardPacket(Packet packet) {
 		List<JID> toNodes = new ArrayList<JID>();
-		for (BareJID jid : connectedNodes) {
-			if (jid.equals(getDefHostName()))
+		for (JID jid : getNodesConnected()) {
+			// jid of local node should not be part of getNodesConnected but let's keep this check for now
+			if (jid.equals(getComponentId()))
 				continue;
-			toNodes.add(JID.jidInstanceNS(getName(), jid.getDomain(), null));
+			toNodes.add(jid);
 		}
 		if (!toNodes.isEmpty())
 			controller.sendToNodes("packet-forward", null, packet.getElement(), getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
@@ -91,6 +87,7 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 	
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		if (controller != null) {
 			for (CommandListener listener : commandListeners) {
 				controller.removeCommandListener(listener);
@@ -104,22 +101,10 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 		}
 	}
 
-	@Override
-	public void nodeConnected(String node) {
-		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
-		connectedNodes.add(nodeJID);
-	}
-
-	@Override
-	public void nodeDisconnected(String node) {
-		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
-		connectedNodes.remove(nodeJID);
-	}
-	
 	protected class PacketForwardCommand extends CommandListenerAbstract {
 
 		public PacketForwardCommand(String name) {
-			super(name);
+			super(name, Priority.HIGH);
 		}
 
 		@Override

@@ -77,7 +77,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 					+ " where tig_users.uid = " + SEE_OTHER_HOST_TABLE + "." + USER_ID;
 
 	private static final String CREATE_STATS_TABLE = "create table " + SEE_OTHER_HOST_TABLE
-			+ " ( " + SERIAL_ID + " serial," + USER_ID + " bigint NOT NULL, "
+			+ " ( " + SERIAL_ID + " serial," + USER_ID + " bigint unsigned NOT NULL, "
 			+ NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
 			+ " constraint tig_see_other_host_constr foreign key (" + USER_ID
 			+ ") references tig_users (" + USER_ID + ")" + ")";
@@ -215,15 +215,19 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 		ResultSet rs = null;
 
 		synchronized (get_host) {
-			get_host.setString(1, user.toString());
+			try {
+				get_host.setString(1, user.toString());
 
-			rs = get_host.executeQuery();
+				rs = get_host.executeQuery();
 
-			if (rs.next()) {
-				return BareJID.bareJIDInstance(rs.getString(NODE_ID));
-			} else {
-				throw new UserNotFoundException("Item does not exist for user: " + user);
-			} // end of if (isnext) else
+				if (rs.next()) {
+					return BareJID.bareJIDInstance(rs.getString(NODE_ID));
+				} else {
+					throw new UserNotFoundException("Item does not exist for user: " + user);
+				} // end of if (isnext) else
+			} finally {
+				data_repo.release(null, rs);
+			}
 		}
 	}
 
@@ -235,20 +239,23 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 		ResultSet rs = null;
 
 		synchronized (get_all) {
+			try {
+				rs = get_all.executeQuery();
 
-			rs = get_all.executeQuery();
-
-			while (rs.next()) {
-				String user_jid = rs.getString("user_id");
-				String node_jid = rs.getString(NODE_ID);
-				try {
-					BareJID user = BareJID.bareJIDInstance(user_jid);
-					BareJID node = BareJID.bareJIDInstance(node_jid);
-					redirectsMap.put(user, node);
-				} catch (TigaseStringprepException ex) {
-					log.warning("Invalid user's or node's JID: " + user_jid + ", " + node_jid);
-				}
-			} // end of if (isnext) else
+				while (rs.next()) {
+					String user_jid = rs.getString("user_id");
+					String node_jid = rs.getString(NODE_ID);
+					try {
+						BareJID user = BareJID.bareJIDInstance(user_jid);
+						BareJID node = BareJID.bareJIDInstance(node_jid);
+						redirectsMap.put(user, node);
+					} catch (TigaseStringprepException ex) {
+						log.warning("Invalid user's or node's JID: " + user_jid + ", " + node_jid);
+					}
+				} // end of if (isnext) else
+			} finally {
+				data_repo.release(null, rs);
+			}
 		}
 		
 		log.info("Loaded " + redirectsMap.size() + " redirect definitions from database.");

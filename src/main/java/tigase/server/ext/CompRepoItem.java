@@ -423,7 +423,8 @@ public class CompRepoItem
 		if (port > 0) {
 			elem.addAttribute(PORT_NO_ATTR, "" + port);
 		}
-		elem.addAttribute(PROTO_XMLNS_ATTR, prop_xmlns);
+		if (prop_xmlns != null)
+			elem.addAttribute(PROTO_XMLNS_ATTR, prop_xmlns);
 		elem.addAttribute(LB_NAME_ATTR, lb.getClass().getName());
 
 		StringBuilder route = new StringBuilder();
@@ -501,6 +502,16 @@ public class CompRepoItem
 	 */
 	void setRemoteDomain(String remote_domain) {
 		this.remoteHost = remote_domain;
+	}
+	
+	String validate() {
+		if (domain == null)
+			return "Domain name is required";
+		if (auth_pass == null)
+			return "Password is required";
+		if (prop_xmlns == null)
+			return "Protocol is required";	
+		return null;
 	}
 
 	//~--- methods --------------------------------------------------------------

@@ -1,0 +1,100 @@
+[[tigaseDBSchema]]
+= Tigase DB Schema Explained
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2011-07-12 00:56
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+The schema basics, how it looks like and brief explanation to all rows can be found in the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/database/mysql-schema-4-schema.sql[schema creation script]. However, this is hardly enough to understand how it works and how all the data is accessed. There are only 3 basic tables which actually keep all the Tigase server users' data: *tig_users*, *tig_nodes* and *tig_pairs*. Therefore it is not clear at first how Tigase's data is organized.
+
+Before you can understand the Tigase XMPP Server database schema, how it works and how to use it, is it essential to know what were the goals of it's development and why it works that way. Let's start with the API as this gives you the best introduction.
+
+Simplified access can be made through methods:
+
+[source,java]
+-----
+void setData(BareJID user, String key, String value);
+String getData(BareJID user, String key);
+-----
+
+And more a complex version:
+
+[source,java]
+-----
+void setData(BareJID user, String subnode, String key, String value);
+String getData(BareJID user, String subnode, String key, String def);
+-----
+Even though the API contains more methods, the rest is more or less a variation of presented above. A complete API description for all access methods is available in JavaDoc documentation in the link:https://projects.tigase.org/projects/tigase-server/repository/entry/trunk/src/main/java/tigase/db/UserRepository.java[UserRepository] interface. So we are not going into too much detail here except for the main idea.
+
+Tigase operates on <*key*, *value*> pairs for the individual user data. The idea behind this was to make the API very simple and also at the same time very flexible, so adding a new plugin or component would not require a database schema change, adding new tables, or conversion of the DB schema to a new version.
+
+As a result the *UserRepository* interface is exposed to all of Tigase's code, mainly the components and plugins (let's call all of them modules). These modules simply call set/get methods to store or access module specific data.
+
+As plugins or components are developed independently it may easily happen that developer choses the same key name to store some information. To avoid key name conflicts in the database a 'node' concept has been introduced. Therefore, most modules when set/get key value they also provide a subnode part, which in most cases is just XMLNS or some other unique string.
+
+The 'node' thing is a little bit like directory in a file system, it may contain subnodes which makes the Tigase database behave like a hierarchical structure. And the notation is also similar to file systems, you use just */* to separate node levels. In practice you can have the database organized like this:
+
+[source,sql]
+-----
+user-name@domain  --> (key, value) pairs
+                   |
+               roster -->
+                       |
+                     item1 --> (key1, value1) pairs.
+                       |
+                     item2 --> (key1, value1) pairs.
+-----
+
+So to access item's 1 data from the roster you could call method like this:
+
+[source,java]
+-----
+getData("user-name@domain", "roster/item1", key1, def1);
+-----
+
+This is huge convenience for the developer, as he can focus on the module logic instead of worrying about data storage implementation and organization. Especially at the prototype phase it speeds development up and allows for a quick experiments with different solutions. In practice, accessing user's roster in such a way would be highly inefficient so the roster is stored a bit differently but you get the idea. Also there is a more complex API used in some places allowing for more direct access to the database and store data in any format optimized for the scenario.
+
+Right now such a hierarchical structure is implemented on top of SQL databases but initially Tigase's database was implemented as an XML structure, so it was natural and simple.
+
+In the SQL database we simulate hierarchical structure with three tables:
+
+. *tig_users* - with main users data, user id (JID), optional password, active flag, creation time and some other basic properties of the account. All of them could be actually stored in tig_pairs but for performance reasons they are in one place to quickly access them with a single, simple query.
+. *tig_nodes* - is a table where the hierarchy is implemented. When Tigase was storing data in XML database the hierarchy was quite complex. However, in a SQL database it resulted in a very slow access to the data and a now more flat structure is used by most components. Please note, every user's entry has something called root node, which is represented by 'root' string;
+. *tig_pairs* - this is the table where all the user's information is stored in form of the <key, value> pairs.
+
+So we now know how the data is organized. Now we are going to learn how to access the data directly in the database using SQL queries.
+
+Let's assume we have a user 'admin@test-d' for whom we want to retrieve the roster. We could simply execute query:
+
+[source,sql]
+-----
+select pval
+  from tig_users, tig_pairs
+  where user_id = 'admin@test-d' and
+        tig_users.uid = tig_pairs.uid and
+        pkey = 'roster';
+-----
+
+However, if multiple modules store data under the key 'roster' for a single user, we would receive multiple results. To access the correct 'roster' we also have to know the node hierarchy for this particular key. The main users roster is stored under the 'root' node, so the query would look like:
+
+[source,sql]
+-----
+select pval
+  from tig_users, tig_nodes, tig_pairs
+  where user_id = 'admin@test-d' and
+            tig_users.uid = tig_nodes.uid and
+            node = 'root' and
+            tig_users.uid = tig_pairs.uid and
+           pkey = 'roster';
+-----
+
+How exactly the information is stored in the *tig_pairs* table depends on the particular module. For the roster it looks a bit like XML content:
+
+[source,xml]
+-----
+<contact jid="all-xmpp-test@test-d" subs="none" preped="simple" name="all-xmpp-test"/>
+-----

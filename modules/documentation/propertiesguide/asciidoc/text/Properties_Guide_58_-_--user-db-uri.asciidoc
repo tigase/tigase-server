@@ -1,12 +1,13 @@
 [[userDbUri]]
---user-db-uri
-=============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --user-db-uri
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:47
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:47
 
 *Default value:* +jdbc:mysql://localhost/tigase?user=root&password=mypass+
 
@@ -14,11 +15,10 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'Database connection URI.'
 
-*Description:* The property specify database connection string - +connection-uri+, where +connection-uri+ is a full resource uri for user repository data source. If you skip this parameter default value is used depending on database type you selected:
-    
+*Description:* The +--user-db-uri+ property specify database connection string - +connection-uri+, where +connection-uri+ is a full resource uri for user repository data source. If you skip this parameter, the default value is used depending on database type you selected:
+
 - jdbc:mysql://localhost/tigase?user=root&password=mypass
 - jdbc:postgresql://localhost/tigase?user=tigase
 - user-repository.xml
 
 *Available since:* 2.0.0
-

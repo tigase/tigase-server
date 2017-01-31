@@ -1,0 +1,30 @@
+[[whyRecentJDK]]
+= Why the most recent JDK?
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+There are many reasons but the main is that we are a small team working on source code. So the whole approach is to make life easier for us, make the project easier to maintain, and development more efficient.
+
+Here is the list:
+
+- *Easy to maintain* - No third-party libraries are used for the project which makes this project much easier to maintain. This simplifies issues of compatibility between particular versions of libraries. This also unifies coding with a single library package without having to rely on specific versions that may not be supported.
+- *Easy to deploy* -  Another reason to not use third-party tools is to make it easier for end-users to install and use the server.
+- *Efficient development* -  As no third-party libraries are used, Tigase needs either to implement many things on its own or use as much as possible of JDK functionality. We try to use as much as possible of existing library provided with JDK and the rest is custom coded.
+
+What features of JDK-1.5 are critical for Tigase development? Why I can't simply re-implement some code to make it compatible with earlier JDK versions?
+
+- *Non-blocking I/O for SSL/TLS* -  This is functionality which can't be simply re-implemented in JDK-1.4. As the whole server uses NIO it doesn't make sense to use blocking I/O for SSL and TLS.
+- *SASL* -  This could be re-implemented for JDK-1.4 without much effort.
+- *Concurrent package* -  This could be re-implemented for JDK-1.4 but takes a lot of work. This is a critical part of the server as it uses multi-threading and concurrent processing.
+- *Security package* -  There number of extensions to the security package which otherwise would not work as easily with earlier versions of JDK.
+
+I think above list is enough to decide to use JDK-1.5. But why JDK-1.6?
+
+- *LinkedHashMap* -  in JDK-1.6 is a basement for the Tigase cache implementation.
+- *Light HTTP server* -  JDK-1.6 offers built-in light HTTP server which is needed to implement HTTP binding (JEP-0124) and HTTP user interface to monitor server activity and work with the server configuration.

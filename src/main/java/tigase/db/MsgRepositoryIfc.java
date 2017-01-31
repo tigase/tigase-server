@@ -29,6 +29,8 @@ import tigase.xmpp.JID;
 import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.XMPPResourceConnection;
 
 //~--- interfaces -------------------------------------------------------------
 /**
@@ -62,8 +64,8 @@ public interface MsgRepositoryIfc extends Repository {
 	/**
 	 * Loads all payloads for the given user's {@link JID} from repository.
 	 *
-	 * @param to     {@link JID} denotes address of the receiver for which payload
-	 *               stored in the repository should be retrieved.
+	 * @param session user session which keeps all the user session data and also
+	 *                gives an access to the user's repository data.
 	 * @param delete boolean parameter controlling whether messages should be
 	 *               removed from repository after they retrieved.
 	 *
@@ -72,7 +74,7 @@ public interface MsgRepositoryIfc extends Repository {
 	 *
 	 * @throws UserNotFoundException
 	 */
-	Queue<Element> loadMessagesToJID( JID to, boolean delete ) throws UserNotFoundException;
+	Queue<Element> loadMessagesToJID( XMPPResourceConnection session, boolean delete ) throws UserNotFoundException;
 
 	/**
 	 * Saves the massage to the repository
@@ -81,8 +83,13 @@ public interface MsgRepositoryIfc extends Repository {
 	 * @param to      {@link JID} denotes address of the receiver
 	 * @param expired {@link Date} object denoting expiration date of the message
 	 * @param msg     {@link Element} payload of the stanza to be saved
+	 * @param userRepo {@link NonAuthUserRepository} instance of non auth user repository 
+	 *					to get user settings for offline messages
+	 * 
+	 * @return {@code true} if the packet was correctly saved to repository,
+	 *         {@code false} otherwise.
 	 *
 	 * @throws UserNotFoundException
 	 */
-	void storeMessage( JID from, JID to, Date expired, Element msg ) throws UserNotFoundException;
+	boolean storeMessage( JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo ) throws UserNotFoundException;
 }

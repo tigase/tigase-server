@@ -68,7 +68,7 @@ public enum Command {
 	 * Command sent from connection manager to the session manager after TLS handshake if
 	 * client sent certificate.
 	 */
-	CLIENT_AUTH(Priority.SYSTEM),
+	TLS_HANDSHAKE_COMPLETE(Priority.SYSTEM),
 
 	/**
 	 * Command sent from session manager to the connection manager after successful
@@ -81,6 +81,12 @@ public enum Command {
 	 * connection or stream has been closed.
 	 */
 	STREAM_CLOSED(Priority.SYSTEM), STREAM_CLOSED_UPDATE(Priority.SYSTEM),
+	
+	/**
+	 * Command sent from a connection manager to the session manager after
+	 * last packet from closed connection stream has been sent.
+	 */
+	STREAM_FINISHED(Priority.NORMAL),
 
 	/**
 	 * Sends a command from SM to the connection holder to confirm whether the

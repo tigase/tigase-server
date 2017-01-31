@@ -1,0 +1,63 @@
+[[mobileoptimizations]]
+= Mobile Optimizations
+:author: Andrzej Wojcik <andrzejw@tigase.org>
+:version: v2.1, January 2015: Added info about MobileV3
+:oldversion: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-05-22 17:57
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+== Problem Description
+In default configuration stanzas are sent to the client when processing is finished, but in mobile environment sending or receiving data drains battery due to use of the radio.
+
+To save energy data should be sent to client only if it is important or client is waiting for it.
+
+== Solution
+When mobile client is entering inactive state it notifies server about it by sending following stanza:
+
+[source,xml]
+-----
+<iq type="set" id="xx">
+<mobile
+  xmlns="http://tigase.org/protocol/mobile#v3"
+  enable="true"/>
+</iq>
+-----
+
+After receiving stanza server starts queuing stanza which should be send to mobile client. What kind of queued stanzas depends on the plugins used and in case of *Mobile v3* presence stanzas are queued as well as message stanzas which are Message Carbons. Any other stanza (such as iq or plain messenge) is sent immediately to the client and every stanza from queue is also sent at this time.
+
+When mobile client is entering active state it notifies server by sending following stanza:
+
+[source,xml]
+-----
+<iq type="set" id="xx">
+<mobile
+  xmlns="http://tigase.org/protocol/mobile#v3"
+  enable="false"/>
+</iq>
+-----
+
+After receiving stanza server sends all queued stanzas to the client.
+
+Also all stanzas from queue will be sent if number of stanzas in queue will reach queue size limit. By default this limit is set to 50.
+
+== Queuing Algorithms
+There are three mobile optimization plugins for Tigase:
+
+- *Mobile v1* - all presence stanzas are kept in queue
+- *Mobile v2* - only last presence from each source is kept in queue
+- *Mobile v3* - only last presence from each source is kept in queue, also Message Carbons are queued
+
+
+If you wish to activate you Mobile v1 plugin you need to send presented above with xmlns attribute value replaced with _http://tigase.org/protocol/mobile#v1_
+
+If you wish to activate you Mobile v2 plugin you need to send presented above with xmlns attribute value replaced with _http://tigase.org/protocol/mobile#v2_
+
+== Configuration
+Mentioned plugins are not activated by default thus additional entries in the init.properties are required:
+
++--sm-plugins=+mobile_v1,+mobile_v2,+mobile_v3
+
+*Only one of these plugins should be enabled*

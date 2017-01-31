@@ -1,0 +1,30 @@
+[[tigaseAuthConnector]]
+= Tigase Auth Connector
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+The Tigase Auth connector with shortcut name: *tigase-auth* is implemented in the class: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/db/jdbc/TigaseAuth.java[tigase.db.jdbc.TigaseAuth]. It allows you to connect to any external database to perform user authentication.
+You can find more details how to setup a custom connector in the xref:customAuthConnector[Custom Authentication Connectors] guide.
+
+To make this connector working you have to prepare your database to offer set of stored procedures for Tigase server to perform all the authentication actions. The best description is the example schema with all the stored procedures defined. Please refer to the Tigase link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/database[SVN repository] for the schema definition files.
+
+Files with the stored procedures implementations are located in link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/database[postgresql-schema-4.sql] file for PostgreSQL database.
+
+The absolute minimum of stored procedures you have to implement is:
+
+- *TigUserLoginPlainPw* - to perform user authentication. The procedure is always called when the user tries to login to the XMPP server. This is the only procedure which must be implemented and actually must work.
+- *TigUserLogout* - to perform user logout. The procedure is always called when the user logouts or disconnects from the server. This procedure must be implemented but it can be empty and can do nothing. It just needs to exist because Tigase expect it to exist and attempts to call it.
+
+With these 2 above stored procedures you can only perform user login/logouts on the external database. You can't register a user account, change user password or remove the user. In many cases this is fine as all the user management is handled by the external system.
+
+If you however want to allow for account management via XMPP you have to implement also following procedures:
+
+- *TigAddUserPlainPw* - to add a new user account
+- *TigRemoveUser* - to remove existing user account
+- *TigUpdatePasswordPlainPw* - to change a user password for existing account

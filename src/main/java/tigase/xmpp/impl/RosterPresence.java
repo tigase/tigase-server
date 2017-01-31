@@ -73,7 +73,7 @@ public class RosterPresence
 	private static final String[][] ELEMENTS = {
 		{ PRESENCE }, Iq.IQ_QUERY_PATH, Iq.IQ_QUERY_PATH
 	};
-	private static final String[]   XMLNSS = { Presence.XMLNS, RosterAbstract.XMLNS,
+	private static final String[]   XMLNSS = { PresenceAbstract.XMLNS, RosterAbstract.XMLNS,
 			RosterAbstract.XMLNS_DYNAMIC };
 	private static final RosterAbstract roster_util = RosterFactory.getRosterImplementation(
 			true);
@@ -83,13 +83,13 @@ public class RosterPresence
 	//~--- fields ---------------------------------------------------------------
 
 	private JabberIqRoster rosterProc   = new JabberIqRoster();
-	private Presence       presenceProc = new Presence();
+	private PresenceState       presenceProc = new PresenceState();
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors() * 2;
+		return super.concurrentQueuesNo() * 2;
 	}
 
 	@Override

@@ -24,26 +24,28 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
-
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.EventHandler;
 import tigase.server.ServiceChecker;
+import tigase.server.XMPPServer;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
-
+import tigase.util.TimerTask;
+import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.cluster.ClusterConnectionManager.CLUSTER_INITIATED_EVENT;
 
 /**
  * Describe class ClientConnectionClustered here.
@@ -73,47 +75,30 @@ public class ClientConnectionClustered
 		}
 	};
 
+    private EventHandler clusterEventHandler = null;
+
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void nodeConnected(String node) {
-		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
-
-		// connectedNodes must be synchronized here. If it is executed concurrently,
-		// then most likely only one connected node will endup in the collection
-		synchronized (connectedNodes) {
-			if (!connectedNodes.contains(nodeJID)) {
-				connectedNodes.add(nodeJID);
-
-				// ugly workaround to sort CopyOnWriteArrayList
-				BareJID[] arr_list = connectedNodes.toArray(new BareJID[connectedNodes.size()]);
-
-				Arrays.sort(arr_list);
-				connectedNodes = new CopyOnWriteArrayList<BareJID>(arr_list);
-				if (see_other_host_strategy != null) {
-					see_other_host_strategy.setNodes(connectedNodes);
-				}
-			}
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
+		
+		List<JID> connectedNodes = getNodesConnectedWithLocal();
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.setNodes(connectedNodes);
 		}
-	}
-
+	}	
+	
 	@Override
-	public void nodeDisconnected(String node) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Disconnected nodes: {0}", node);
-		}
+	public void onNodeDisconnected(JID jid) {
+		super.onNodeDisconnected(jid);
 
-		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
-
-		// if (connectedNodes.contains(nodeJID)) {
-		connectedNodes.remove(nodeJID);
-
-		// }
+		List<JID> connectedNodes = getNodesConnectedWithLocal();
 		if (see_other_host_strategy != null) {
 			see_other_host_strategy.setNodes(connectedNodes);
 		}
 
-		final String hostname = node;
+		final String hostname = jid.getDomain();
 
 		doForAllServices(new ServiceChecker<XMPPIOService<Object>>() {
 			@Override
@@ -149,12 +134,79 @@ public class ClientConnectionClustered
 		}
 		see_other_host_strategy = super.getSeeOtherHostInstance(see_other_host_class);
 		if (see_other_host_strategy != null) {
-			see_other_host_strategy.setNodes(connectedNodes);
+			see_other_host_strategy.setNodes(getNodesConnectedWithLocal());
 		}
 
 		return see_other_host_strategy;
 	}
 
 	@Override
-	public void setClusterController(ClusterControllerIfc cl_controller) {}
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+
+		String delayPortListeningPorp = System.getProperty("client-" + PORT_LISTENING_DELAY_KEY);
+		if (delayPortListeningPorp != null) {
+			props.put(PORT_LISTENING_DELAY_KEY, Boolean.parseBoolean(delayPortListeningPorp));
+		} else {
+			props.put(PORT_LISTENING_DELAY_KEY, true);
+		}
+
+		return props;
+	}
+
+	@Override
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+
+		Configurable component = XMPPServer.getConfigurator().getComponent("cl-comp");
+		if (component != null && component instanceof ClusterConnectionManager) {
+			ClusterConnectionManager clusterConnectionManager = (ClusterConnectionManager)component;
+			if (clusterConnectionManager.isInitialClusterConnectedDone() && props.containsKey(PORT_LISTENING_DELAY_KEY)) {
+				props.put(PORT_LISTENING_DELAY_KEY,false);
+				log.log(Level.WARNING, "Skip delaying opening ports of component: {0} - clustering is already established", getName());
+			}
+		}
+
+		super.setProperties(props);
+	}
+
+    @Override
+    public void start() {
+        super.start();
+
+        if (clusterEventHandler == null) {
+            clusterEventHandler = new EventHandler() {
+                @Override
+                public void onEvent(String name, String xmlns, Element event) {
+                    ClientConnectionClustered.this.connectWaitingTasks();
+                    log.log(Level.WARNING, "Starting listening on ports of component: {0}", ClientConnectionClustered.this.getName());
+                    EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+                }
+            };
+        }
+
+        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, clusterEventHandler);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT, clusterEventHandler);
+        clusterEventHandler = null;
+    }
+
+    @Override
+    public void initializationCompleted() {
+        super.initializationCompleted();
+
+		if (delayPortListening) {
+			addTimerTask(new TimerTask() {
+				@Override
+				public void run() {
+					log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
+					ClientConnectionClustered.this.connectWaitingTasks();
+				}
+			}, connectionDelay * 30);
+		}
+
+    }
 }

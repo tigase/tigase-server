@@ -1,8 +1,6 @@
-Configuration Instructions for Psi
-==================================
+= Configuration Instructions for Psi
 
-Psi - Initial Configuration
----------------------------
+== Psi - Initial Configuration
 
 The first time you run Psi you see a screen like this:
 
@@ -10,17 +8,17 @@ image:images/psi-first-run.png[Psi First Run]
 
 To connect to tigase.org server we need to configure the program. Below are step-by-step instructions for novice users on how to setup Psi.
 
-1. Psi can connect to many Jabber servers at the same time so we have to identify each connection somehow. The first thing to do is assign a name to the connection we just created. As we are going to define connection to tigase.org server let's just name it: *Tigase*.
+1. Psi can connect to many servers at the same time so we have to identify each connection. The first thing to do is assign a name to the connection we just created. As we are going to define connection to tigase.org server let's just name it: *Tigase*.
 +
 image:images/psi-add-account.png[Psi Add Account]
 +
-*Note!* _At the moment you can register an account through link:http://www.tigase.org/user/register[the Web site only].  This is a single account for both services: The Drupal website and Jabber/XMPP service on the tigase.org domain. If you want to have a Jabber account on the *tigase.org* server go to the link:http://www.tigase.org/user/register[registration page], un-tick "Register new account", and go to the point no *5*. You can use guide points 2-4 to register a Jabber account on any other Jabber server._
+*Note!* _At the moment you can register an account through link:http://www.tigase.org/user/register[the Web site only].  This is a single account for both services: The Drupal website and XMPP service on the tigase.org domain. If you want to have a Jabber account on the *tigase.org* server go to the link:http://www.tigase.org/user/register[registration page], un-tick "Register new account", and go to the point no *5*. You can use guide points 2-4 to register a Jabber account on any other Jabber server._
 
 2. When you press the *Add* button you will see next window where you can enter your Jabber account details:
 +
 image:images/psi-register-account-empty.png[Psi Empty Account]
 
-3. Invent your user name for the account on Tigase server. Let's assume your user name is: *frank*. Jabber ID's however consist of 2 parts - your user name and server address. Exactly the same as an e-mail address. As you are registering an account on tigase.org server, you will have to enter in this field: *frank@tigase.org*. Next enter the password of your choice and click the *Register* button.
+3. Invent your user name for the account on Tigase server. Let's assume your user name is: *frank*. Jabber ID's however consist of 2 parts - your user name and server address. Exactly the same as an e-mail address. As you are registering an account on tigase.org server, you will have to enter in this field: *frank@tigase.org*. Next enter your password and click the *Register* button.
 +
 image:images/psi-register-account-nossl.png[Psi Register Account]
 
@@ -28,7 +26,7 @@ image:images/psi-register-account-nossl.png[Psi Register Account]
 +
 image:images/psi-register-account-success.png[Register Account Success]
 +
-It may happen that somebody earlier registered an account with the same name you've selected for yourself. If so, you will receive error message. You will then have to select another user name and try to register again.
+It is possible that somebody may have already registered your chosen username. If so, you will receive error message and will then have to select another user name and try to register again.
 
 5. After clicking the *OK* button you will see a window with your connection and account setup. You can stick with default values for now.
 +
@@ -46,13 +44,14 @@ image:images/psi-connected.png[PSI Connected]
 +
 Now you are connected!
 
+The box also allows you to choose other online statuses which can tell other users if you are away or busy.
+
 
 Well, you are now connected but how to talk to other people? How to add friends to the contact list?
 
 You can send a message to your friends stright away using the *Psi menu* option *New blank message*. It is much more convenient however, if you could see which of your friends is online and available for chatting and if you could start talking to your friend just by clicking on his name.
 
-Short Instructions How to Add Your First Contact
-------------------------------------------------
+== Short Instructions How to Add Your First Contact
 
 1. Click on Psi menu - the button next to the *Online* text. You will see something like this:
 +
@@ -103,9 +102,8 @@ image:images/psi-authorized-window-3.png[PSI Authorized Window 3]
 image:images/psi-kobit-added-authorized.png[PSI Kobit Added Authorized]
 
 
-Well done! 
+Well done!
 
 You are ready to start Jabbering. Good luck.
 
 Where to go next? For detailed Psi documentation refer to the program Wiki page: http://psi-im.org/wiki/Main_Page
-

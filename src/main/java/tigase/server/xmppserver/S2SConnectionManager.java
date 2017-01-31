@@ -115,7 +115,11 @@ public class S2SConnectionManager
 	
 	/** Field description */
 	public static final String S2S_DOMAIN_MAPPING_PROP_VAL = "";
-	
+
+	/** Field description */
+	public static final String S2S_HT_TRAFFIC_THROTTLING_PROP_VAL =
+			"xmpp:15k:0:disc,bin:120m:0:disc";
+
 	/** Field description */
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 
@@ -169,7 +173,7 @@ public class S2SConnectionManager
 	 * Outgoing and incoming connections for a given domains pair (localdomain,
 	 * remotedomain)
 	 */
-	private Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
+	protected Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
 			CIDConnections>(10000);
 	
 	/**
@@ -395,6 +399,14 @@ public class S2SConnectionManager
 		return null;
 	}
 
+	@Override
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
+		// readd packet - this may be good as we would retry to send packet 
+		// which delivery failed due to IO error
+		addPacket(packet);
+		return true;
+	}
+	
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		CID cid = (CID) port_props.get("cid");
@@ -704,6 +716,11 @@ public class S2SConnectionManager
 		return true;
 	}
 
+	@Override
+	public boolean isTlsNeedClientAuthEnabled() {
+		return false;
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
@@ -809,6 +826,21 @@ public class S2SConnectionManager
 		return new int[] { 5269 };
 	}
 
+	/**
+	 * Method from ConnectionManager is overriden as it uses local value S2S_HT_TRAFFIC_THROTTLING_PROP_VAL
+	 * @return
+	 */
+	@Override
+	protected String getDefTrafficThrottling() {
+		String result = ST_TRAFFIC_THROTTLING_PROP_VAL;
+
+		if (isHighThroughput()) {
+			result = S2S_HT_TRAFFIC_THROTTLING_PROP_VAL;
+		}
+
+		return result;
+	}
+
 	@Override
 	protected long getMaxInactiveTime() {
 		return maxInactivityTime;
@@ -826,7 +858,7 @@ public class S2SConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	private CIDConnections createNewCIDConnections(CID cid)
+	protected CIDConnections createNewCIDConnections(CID cid)
 					throws NotLocalhostException, LocalhostException {
 		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
 			throw new NotLocalhostException("This is not a valid localhost: " + cid

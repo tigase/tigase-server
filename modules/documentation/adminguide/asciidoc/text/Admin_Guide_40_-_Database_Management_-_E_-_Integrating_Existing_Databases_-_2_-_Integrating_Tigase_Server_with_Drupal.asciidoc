@@ -1,0 +1,107 @@
+[[integrateWithDrupal]]
+= Integrating Tigase Server with Drupal
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Tigase supports integration with Drupal on many levels. At the moment this guide can work with Drupal version 4.x and 5.x. They may also work with Drupal 6.x but this version hasn't been tested.
+
+First of all, Tigase can authenticate users against a Drupal database which means you have the same user account for both Drupal website and the XMPP server. Moreover in such a configuration all account management is done via Drupal web interface like account creation, password change update user details and so on. Administrator can temporarily disable user account and this is followed by Tigase server too.
+
+== Connecting to Drupal Database
+The best way to setup Tigase with Drupal database is via configuration wizards that is +init.properties+ file where you can put initial setting for Tigase configuration.
+
+If you look in +etc/+ directory of your Tigase installation you should find a few files there. The one we want to base our configuration on is: +init-mysql.properties+. In some older packages the file might be missing, then you can download it from the link:https://projects.tigase.org/projects/tigase-server/repository/changes/etc/init-mysql.properties[SVN repository].
+
+If you look inside the file and strip all the comments you would see following lines:
+
+[source,bash]
+-----
+config-type=--gen-config-def
+--admins=admin@tigase.org,admin@tigase.net
+--user-db=mysql
+--user-db-uri=jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass
+--virt-hosts=tigase.org,tigase.net
+--debug=server
+-----
+
+All you need to connect to Drupal database are 2 following lines:
+
+[source,bash]
+-----
+--auth-db=drupal
+--auth-db-uri=jdbc:mysql://localhost/drupal?user=drupalusr&password=drupalpass
+-----
+
+Let's combine it in a single file called +etc/init-drupal.properties+:
+
+[source,bash]
+-----
+config-type=--gen-config-def
+--admins=admin@tigase.org,admin@tigase.net
+--auth-db=drupal
+--auth-db-uri=jdbc:mysql://localhost/drupal?user=drupalusr&password=drupalpass
+--user-db=mysql
+--user-db-uri=jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass
+--virt-hosts=tigase.org,tigase.net
+--debug=server
+-----
+
+In theory you can load Tigase database schema to Drupal database and then both +db-uris+ would have the same database connection string. More details about setting up and connecting to MySQL database can be found in the xref:prepareMysql[MySQL guide].
+
+You need also to edit +etc/tigase.conf+ file to point to your newly created properties file. The last line which looks like this:
+
+[source,bash]
+-----
+TIGASE_OPTIONS=" --property-file etc/init.properties "
+-----
+
+should be changed to following:
+
+[source,bash]
+-----
+TIGASE_OPTIONS=" --property-file etc/init-drupal.properties "
+-----
+
+Make sure you have Java-6 installed and +JAVA_HOME+ is set to the correct location. If +JAVA_HOME+ is not set you can add following line to +etc/tigase.conf+ file:
+
+[source,bash]
+-----
+JAVA_HOME="/your/java-6-location"
+-----
+
+The best way to check whether the variable is set correctly is with command:
+
+[source,sh]
+-----
+$ ls -l $JAVA_HOME/bin/java
+-----
+
+should list you the file without error.
+
+Check also if the +logs/+ directory is created in your Tigase server location as sometimes unpacking application doesn't create empty directories.
+
+Now when you have the configuration file and databases ready to use you can start the Tigase server with the following command:
+
+[source,sh]
+-----
+./bin/tigase.sh start etc/tigase.conf
+-----
+
+If you run the Tigase server installed from sources the command would be:
+
+[source,sh]
+-----
+./scripts/tigase.sh start etc/tigase.conf
+-----
+
+There are system startup scripts for Gentoo and Mandriva Linux on +bin/+ or +scripts/+ directory which can be used to automatically start the server when system starts.
+
+Now you can register an account on your Drupal website and connect with an XMPP client using the account details.
+
+*Note!* _You have to enable plain password authentication in your XMPP client to connect to Tigase server with Drupal database_

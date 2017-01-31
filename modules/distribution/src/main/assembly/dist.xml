@@ -24,6 +24,7 @@
 				<include>dummy.cer</include>
 				<include>rsa-keystore</include>
 				<include>truststore</include>
+				<include>keystore-letsencrypt</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -97,7 +98,7 @@
 				<exclude>*/**</exclude>
 			</excludes>
 			<fileMode>0644</fileMode>
-			<directoryMode>0744</directoryMode>
+			<directoryMode>0754</directoryMode>
 		</fileSet>
 	</fileSets>
 	<dependencySets>
@@ -118,7 +119,7 @@
 				<include>org.apache.derby:derby</include>
 				<include>org.apache.derby:derbytools</include>
 				<include>mysql:mysql-connector-java</include>
-				<include>postgresql:postgresql</include>
+				<include>org.postgresql:postgresql</include>
 				<!-- other libraries-->
 				<include>org.codehaus.groovy:groovy-all</include>
 				<include>openDMK:jdmkrt</include>

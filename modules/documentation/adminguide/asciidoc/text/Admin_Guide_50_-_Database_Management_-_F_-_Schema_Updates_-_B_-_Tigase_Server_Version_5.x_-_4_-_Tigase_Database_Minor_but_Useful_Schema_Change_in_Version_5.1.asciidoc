@@ -1,0 +1,47 @@
+[[SchemaChange51]]
+= Tigase Database Minor but Useful Schema Change in Version 5.1.0
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-06-05 02:38
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+We have recently made a simple but very useful change to the DB schema in Tigase. It preserves backward compatibility and so your existing schema does not need to be changed, even if you upgrade your installation to the most recent 5.1.0 version.
+
+However, the change is can help to track new accounts creation, therefore this article shows how to make modifications to you schema manually.
+
+The change is related to adding a new field: +acc_create_time+ which stores exact time of user account creation. The time is recorded automatically by the database when a new record in the user table is created. This allows for no extra overhead or resource usage on Tigase.
+
+Along with the new field,  there are slight modifications to 2 other fields: +last_login+ and +last_logout+.
+
+Here is how it looks now:
+
+[source,sql]
+-----
+-- Time the account has been created
+acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
+-- Time of the last user login
+last_login timestamp DEFAULT 0,
+-- Time of the last user logout
+last_logout timestamp DEFAULT 0,
+-----
+
+You can easily update your schema with above changes using a simple SQL query. Enter the MySQL shell and copy-paste following query:
+
+[source,sql]
+-----
+alter table tig_users
+  modify last_login timestamp DEFAULT 0,
+  modify last_logout timestamp DEFAULT 0,
+  add acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP;
+-----
+
+Please note, after executing query above the column +acc_create_time+ will have a null value. To populate the entry for existing records just copy +last_login+ value to +acc_create_time+:
+
+[source,sql]
+-----
+update tig_users set acc_create_time = last_login;
+-----

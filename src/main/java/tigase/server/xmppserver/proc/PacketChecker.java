@@ -24,23 +24,22 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
+import tigase.server.xmppserver.CID;
+import tigase.server.xmppserver.S2SConnectionHandlerIfc;
+import tigase.server.xmppserver.S2SIOService;
+
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolverFactory;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import tigase.server.Packet;
-import tigase.server.xmppserver.CID;
-import tigase.server.xmppserver.S2SIOService;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.server.xmppserver.S2SConnectionHandlerIfc;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolver;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -176,7 +175,7 @@ public class PacketChecker extends S2SAbstractProcessor {
                                         || Arrays.binarySearch(allowedOtherDomainsWithSameIpWhitelist, domain) >= 0) {
                         
                                         try {
-                                                DNSEntry[] entries = DNSResolver.getHostSRV_Entries(domain);
+                                                DNSEntry[] entries = DNSResolverFactory.getInstance().getHostSRV_Entries(domain);
                                                 if (entries != null) {                                                
                                                         String remoteAddress = serv.getRemoteAddress();
                                                         for (DNSEntry entry : entries) {

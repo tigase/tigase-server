@@ -1,0 +1,198 @@
+[[writePluginCode]]
+= Writing Plugin Code
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Stanza processing takes place in 4 steps. A different kind of plugin is responsible for each step of processing:
+
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java[XMPPPreprocessorIfc] - is the interface for packets pre-processing plugins.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPProcessor.java[XMPPProcessorIfc] - is the interface for packets processing plugins.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java[XMPPPostprocessorIfc] - is the interface for packets post-processing plugins.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java[XMPPPacketFilterIfc] - is the interface for processing results filtering.
+
+If you look inside any of these interfaces you will only find a single method. This is where all the packet processing takes place. All of them take a similar set of parameters and below is a description for all of them:
+
+- *Packet packet* - packet is which being processed. This parameter may never be null. Even though this is not an immutable object it mustn't be altered. None of it's fields or attributes can be changed during processing.
+- *XMPPResourceConnection session* - user session which keeps all the user session data and also gives access to the user's data repository. It allows for the storing of information in permanent storage or in memory only during the life of the session. This parameter can be null if there is no online user session at the time of the packet processing.
+- *NonAuthUserRepository repo* - this is a user data storage which is normally used when the user session (parameter above) is null. This repository allows for a very restricted access only. It allows for storing some user private data (but doesn't allow overwriting existing data) like messages for offline users and it also allows for reading user public data like VCards.
+- *Queue<Packet> results* - this a collection with packets which have been generated as input packet processing results. Regardless a response to a user request is sent or the packet is forwarded to it's destination it is always required that a copy of the input packet is created and stored in the *results* queue.
+- *Map<String, Object> settings* - this map keeps plugin specific settings loaded from the Tigase server configuration. In most cases it is unused, however if the plugin needs to access an external database that this is a way to pass the database connection string to the plugin.
+
+After a closer look in some of the interfaces you can see that they extend another interface: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/xmpp/impl/package-summary.html[JavaDoc] documentation for all details.
+
+For purpose of this guide we are implementing a simple plugin for handling all *<message/>* packets that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our Git repository. The code has some comments inside already but this guide goes deeper into the implementation details.
+
+First of all you have to choose what kind of plugin you want to implement. If this is going to be a packet processor you have to implement the *XMPPProcessorIfc* interface, if this is going to be a pre-processor then you have to implement the *XMPPPreprocessorIfc* interface. Of course your implementation can implement more than one interface, even all of them. There are also two abstract helper classes, one of which you should use as a base for all you plugins *XMPPProcessor* or use *AnnotatedXMPPProcessor* for annotation support.
+
+
+== Using annotation support
+The class declaration should look like this (assuming you are implementing just the packet processor):
+
+[source,java]
+-----
+public class Message extends AnnotatedXMPPProcessor
+   implements XMPPProcessorIfc
+-----
+
+The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As we want to process all messages and don't want to spend whole day on thinking about a cool ID, let's say our ID is: _message_.
+
+A plugin informs about it's presence using a static *ID* field and *@Id* annotation placed on class:
+
+[source,java]
+-----
+@Id(ID)
+public class Message extends AnnotatedXMPPProcessor
+   implements XMPPProcessorIfc {
+  protected static final String ID = "message";
+}
+-----
+
+As mentioned before, this plugin receives only this kind of packets for processing which it is interested in. In this example, the plugin is interested only in packets with *<message/>* elements and only if they are in the "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more annotations:
+
+[source,java]
+-----
+@Id(ID)
+@Handles({
+  @Handle(path={ "message" },xmlns="jabber:client")
+})
+public class Message extends AnnotatedXMPPProcessor
+   implements XMPPProcessorIfc {
+  private static final String ID = "message";
+}
+-----
+
+== Using older non-annotation based implementation
+The class declaration should look like this (assuming you are implementing just the packet processor):
+
+[source,java]
+-----
+public class Message extends XMPPProcessor
+   implements XMPPProcessorIfc
+-----
+
+The first thing to create is the plugin *ID* like above.
+
+A plugin informs about it's ID using following code:
+
+[source,java]
+-----
+private static final String ID = "message";
+public String id() { return ID; }
+-----
+
+As mentioned before this plugin receives only this kind of packets for processing which it is interested in. In this example, the plugin is interested only in packets with *<message/>* elements and only if they are in "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more methods:
+
+[source,java]
+-----
+public String[] supElements() {
+  return new String[] {"message"};
+}
+
+public String[] supNamespaces()	{
+  return new String[] {"jabber:client"};
+}
+-----
+
+== Implementation of processing method
+Now we have our plugin prepared for loading in Tigase. The next step is the actual packet processing method. For the complete code, please refer to the plugin in the Git. I will only comment here on elements which might be confusing or add a few more lines of code which might be helpful in your case.
+
+[source,java]
+-----
+@Override
+public void process(Packet packet, XMPPResourceConnection session,
+	NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+	throws XMPPException {
+
+	// For performance reasons it is better to do the check
+	// before calling logging method.
+	if (log.isLoggable(Level.FINEST)) {
+		log.log(Level.FINEST, "Processing packet: {0}", packet);
+	}
+
+	// You may want to skip processing completely if the user is offline.
+	if (session == null) {
+		return;
+	}    // end of if (session == null)
+
+	try {
+
+		// Remember to cut the resource part off before comparing JIDs
+		BareJID id = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
+
+		// Checking if this is a packet TO the owner of the session
+		if (session.isUserId(id)) {
+
+			// Yes this is message to 'this' client
+			Packet result = packet.copyElementOnly();
+
+			// This is where and how we set the address of the component
+			// which should receive the result packet for the final delivery
+			// to the end-user. In most cases this is a c2s or Bosh component
+			// which keep the user connection.
+			result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+
+			// In most cases this might be skipped, however if there is a
+			// problem during packet delivery an error might be sent back
+			result.setPacketFrom(packet.getTo());
+
+			// Don't forget to add the packet to the results queue or it
+			// will be lost.
+			results.offer(result);
+
+			return;
+		}    // end of else
+
+		// Remember to cut the resource part off before comparing JIDs
+		id = (packet.getStanzaFrom() != null) ? packet.getStanzaFrom().getBareJID() : null;
+
+		// Checking if this is maybe packet FROM the client
+		if (session.isUserId(id)) {
+
+			// This is a packet FROM this client, the simplest action is
+			// to forward it to its destination:
+			// Simple clone the XML element and....
+			// ... putting it to results queue is enough
+			results.offer(packet.copyElementOnly());
+
+			return;
+		}
+
+		// Can we really reach this place here?
+		// Yes, some packets don't even have from or to address.
+		// The best example is IQ packet which is usually a request to
+		// the server for some data. Such packets may not have any addresses
+		// And they usually require more complex processing
+		// This is how you check whether this is a packet FROM the user
+		// who is owner of the session:
+		JID jid = packet.getFrom();
+
+		// This test is in most cases equal to checking getElemFrom()
+		if (session.getConnectionId().equals(jid)) {
+
+			// Do some packet specific processing here, but we are dealing
+			// with messages here which normally need just forwarding
+			Element el_result = packet.getElement().clone();
+
+			// If we are here it means FROM address was missing from the
+			// packet, it is a place to set it here:
+			el_result.setAttribute("from", session.getJID().toString());
+
+			Packet result = Packet.packetInstance(el_result, session.getJID(),
+				packet.getStanzaTo());
+
+			// ... putting it to results queue is enough
+			results.offer(result);
+		}
+	} catch (NotAuthorizedException e) {
+		log.warning("NotAuthorizedException for packet: " + packet);
+		results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+				"You must authorize session first.", true));
+	}    // end of try-catch
+}
+-----

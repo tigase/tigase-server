@@ -1,0 +1,75 @@
+[[packetfiltering]]
+= Packet Filtering in Components
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+== The Packet Filter API
+Tigase server offers an API to filter packet traffic inside every component. You can separately filter incoming and outgoing packets.
+
+By filtering we mean intercepting a packet and possibly making some changes to the packet or just blocking the packet completely. By blocking we mean stopping from any further processing and just dropping the packet.
+
+The packet filtering is based on the link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/server/PacketFilterIfc.java[PacketFilterIfc] interface. Please have a look in the JavaDoc documentation to this interface for all the details. The main filtering method is +Packet filter(Packet packet); + which takes packets as an input, processes it, possibly alerting the packet content (may add or remove some payloads) and returns a *Packet* for further processing. If it returns *null* it means the packet is blocked and no further processing is permitted otherwise it returns a *Packet* object which is either the same object it received as a parameter or a modified copy of the original object.
+
+Please note, although *Packet* object is not unmodifiable instance it is recommended to not make any changes on the existing object. The same *Packet* might be processed at the same time by other components or threads, therefore modification of the *Packet* may lead to unpredictable results.
+
+Please refer to an example code in link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/server/PacketFilterIfc.java[PacketCounter] which is a very simple filter counting different types of packets. This filter is by default loaded to all components which might be very helpful for assessing traffic shapes on newly deployed installation. You can get counters for all types of packets, where they are generated, where they flow, what component they put the most load on.
+
+This is because packet filter can also generate and present its own statistics which are accessible via normal statistics monitoring mechanisms. To take advantage of the statistics functionality the packet filter has to implement +void getStatistics(StatisticsList list);+ method. Normally the method can be empty but you can generate and add to the list own statistics from the filter. Please refer to link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/server/filters/PacketCounter.java[PacketCounter] for an example implementation code.
+
+== Configuration
+Packet filters are configurable, that is a list of packet filters can be provided in Tigase server's configuration for each component separately and for each traffic direction. This gives you a great flexibility and control over the data flow inside the Tigase server.
+
+You can for example, load specific packet filters to all connections managers to block specific traffic or specific packet source from sending messages to users on your server. You could also reduce the server overall load by removing certain payload from all packets. The possibilities are endless.
+
+The default configuration is generated in such a way that each component loads a single packet filter - PacketCounter for each traffic direction:
+
+[source,bash]
+-----
+message-router/incoming-filters=tigase.server.filters.PacketCounter
+message-router/outgoing-filters=tigase.server.filters.PacketCounter
+sess-man/incoming-filters=tigase.server.filters.PacketCounter
+sess-man/outgoing-filters=tigase.server.filters.PacketCounter
+c2s/incoming-filters=tigase.server.filters.PacketCounter
+c2s/outgoing-filters=tigase.server.filters.PacketCounter
+s2s/incoming-filters=tigase.server.filters.PacketCounter
+s2s/outgoing-filters=tigase.server.filters.PacketCounter
+bosh/incoming-filters=tigase.server.filters.PacketCounter
+bosh/outgoing-filters=tigase.server.filters.PacketCounter
+muc/incoming-filters=tigase.server.filters.PacketCounter
+muc/outgoing-filters=tigase.server.filters.PacketCounter
+-----
+
+Now, let's say you have a packet filter implemented in class: *com.company.SpamBlocker*. You want to disable PacketCounter on most of the components leaving it only in the message router component and you want to install SpamBlocker in all connection managers.
+
+_Please note, in case of the connection managers 'incoming' and 'outgoing' traffic is probably somehow opposite from what you would normally expect._
+
+- *incoming* is traffic which is submitted to a component by message router and has to be further processed. For connection managers this further processing means sending it out to the network.
+- *outgoing* is traffic which is 'generated' by the component and goes out of the component. Such a packet is submitted to message router which then decides where to send it for further processing. For connection managers *outgoing* traffic is all the packets just received from the network.
+
+According to that we have to apply the SpamBlocker filter to all 'outgoing' traffic in all connection managers. You may also decide that it might be actually useful to compare traffic shape between Bosh connections and standard XMPP c2s connections. So let's leave packet counters for this components too.
+
+Here is our new configuration applying SpamBlocker to connection managers and PacketCounter to a few other components:
+
+[source,bash]
+-----
+message-router/incoming-filters=tigase.server.filters.PacketCounter
+message-router/outgoing-filters=tigase.server.filters.PacketCounter
+sess-man/incoming-filters=
+sess-man/outgoing-filters=
+c2s/incoming-filters=tigase.server.filters.PacketCounter
+c2s/outgoing-filters=tigase.server.filters.PacketCounter,com.company.SpamBlocker
+s2s/incoming-filters=
+s2s/outgoing-filters=com.company.SpamBlocker
+bosh/incoming-filters=tigase.server.filters.PacketCounter
+bosh/outgoing-filters=tigase.server.filters.PacketCounter,com.company.SpamBlocker
+muc/incoming-filters=
+muc/outgoing-filters=
+-----
+
+The simplest way to apply the new configuration is via the init.properties file which is in details described in the _Admin Guide_.

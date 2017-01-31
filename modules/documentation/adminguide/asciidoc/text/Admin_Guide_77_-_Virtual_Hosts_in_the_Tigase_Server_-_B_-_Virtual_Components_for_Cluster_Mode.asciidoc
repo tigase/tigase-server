@@ -1,0 +1,39 @@
+[[virtualComponents]]
+= Virtual Components for the Cluster Mode
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Let's assume you have a cluster installation and you want to include a component in your installation which doesn't support the cluster mode yet. If you put it on all nodes as a separate instances they will work out of sync and overall functionality might be useless. If you put on one node only it will work correctly but it will be visible to users connected to this one node only.
+
+Ideally you would like to have a mechanism to install it on one node and put some redirections on other nodes to forward all packets for this component to a node where this component is working. Redirection on it's own is not enough because the component must be visible in service discovery list and must be visible somehow to users connected to all nodes.
+
+This is where the virtual components are handy. They are visible to users as a local normal component, they seem to be a real local component but in fact they just forward all requests/packets to a cluster node where the real component is working.
+
+Virtual component is a very lightweight ServerComponent implementation in Tigase server. It can pretend to be any kind of component and can redirect all packets to a given address. They can mimic native Tigase components as well as third-party components connected over external component protocol (XEP-0114).
+
+Configuration is very simple and straightforward, in fact it is very similar to configuration of any Tigase component. You set a real component name as a name of the component and a virtual component class name to load. Let's say we want to deploy MUC component this way. The MUC component is visible as +muc.domain.our+ in the installation. Thus the name of the component is: +muc+
+
+[source,bash]
+-----
+--comp-name-1=muc
+--comp-class-1=tigase.cluster.VirtualComponent
+-----
+This is pretty much all you need to load a virtual component. A few other options are needed to point to correct destination addresses for packets forwarding and to set correct service discovery parameters:
+
+[source,bash]
+-----
+muc/redirect-to=muc@cluster-node-with-real-muc.domain.our
+muc/disco-name=Multi User Chat
+muc/disco-node=
+muc/disco-type=text
+muc/disco-category=conference
+muc/disco-features=http://jabber.org/protocol/muc
+-----
+
+That's it.

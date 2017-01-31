@@ -1,0 +1,376 @@
+[[messageArchiving]]
+= Message Archiving Component
+
+:author: Daniel Wisnewski
+:version: v1.0 Sept 2015
+:date: 2015-17-09 13:29
+
+:source: https://projects.tigase.org/projects/message-archiving/wiki/Wiki
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+*NOTE: This component is incomplete and does not support all methods specified in XEP-0136*
+Tigase server supports many of the features in XEP-0136, however it is not yet in full compliance with the XEP. The reason for this is that it uses the archived message date as the thread id of message due to the face that some clients sens messages with no thread id (e.g. Psi, Psi+). Due to this fact it is also possible to query the component about messages without specifying thread ids. For now the component also stores bare JIDs of recipients.
+
+
+== Installation
+
+The message archiving component is not included with the standard build of Tigase, and thus will need to be compiled or downloaded. Here are the two methods:
+
+=== Download
+
+The easiest way is to download the link:https://projects.tigase.org/attachments/download/3435/tigase-message-archiving-1.2.0-SNAPSHOT.jar[tigase-message-archiving-1.2.0-SNAPSHOT.jar] file into your /jars directory.
+
+=== Compile
+
+The Tigase Message Archive component is kept in a separate repository from Tigase-server. It will compile in a similar manner though. Be sure you have Maven 3.0 or later installed. (to check use +mvn version+)
+First, obtain a clone of the repository using the following command:
+[source,bash]
+-----
+$ git clone https://repository.tigase.org/git/message-archiving.git
+-----
+The repository will be downloaded to the /message-archiving/ directory.
+-----
+$cd message-archiving
+/message-archiving$ mvn clean package
+-----
+Once Maven has finished compiling, go into the /target directory and you will find the required jar there. Move that to Tigase's /jars folder and your component is ready to run.
+
+== Configuration
+
+To activate message archiving, place the following lines in the init.properties file:
+[source,bash]
+-----
+--comp-name-3=message-archive
+--comp-class-3=tigase.archive.MessageArchiveComponent
+-----
+These two lines are the component required to be active. As with activating any component, be sure the component name and class match, and that the number is not used by another component.
+-----
+message-archive/archive-repo-uri=jdbc:mysql://localhost/messagearchivedb?user=test&password=test
+-----
+This next line defines that message archives will be stored in a specific database, in this case +messagearchivedb+ hosted on localhost. If this is blank, the archive will be stored in the default user repository.
+-----
+--sm-plugins=message-archive-xep-0136
+sess-man/plugins-conf/message-archive-xep-0136/component-jid=archive@host.com
+-----
+The next line turns on the message archive plugin, while this is not always necessary, in order to configure extra options, this line is needed.
+Finally, this line specifies the name for the component, if left blank the component's JID will be message-archive@local-machine-name.
+
+*NOTE: Message tagging can take up considerable resources!*
+There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experience an increase in resource use with the archive turned on. It is recommended to drecrease the repository connection pool to help balance server load from this component using the following line in init.properties:
+[source,bash]
+-----
+--data-repo-pool-size=5
+-----
+
+[[nonBodyStore]]
+=== Saving Options
+
+By default, Tigase Message Archive will only store the message body with some metadata, this can exclude messages that are lacking a body.  If you decide you wish to save non-body elements within Message Archive, you can now can now configure this using the following line from init.properties:
+-----
+sess-man/plugins-conf/unified-archive/msg-archive-paths[s]=/message/body,/message/subject
+-----
+Where above will set the archive to store messages with <body/> or <subject/> elements.
+
+TIP: Enabling this for elements such as iq, or presence will quickly load the archive.  Configure this setting carefully!
+
+== Usage
+
+Now that we have the archive component running, how do we use it?  Currently, the only way to activate and modify the component is through XMPP stanzas.  Lets first begin by getting our default settings from the component:
+[source,xml]
+----
+<iq type='get' id='prefq'>
+  <pref xmlns='urn:xmpp:archive'/>
+</iq>
+----
+It's a short stanza, but it will tell us what we need to know, Note that you do not need a from or a to for this stanza. The result is as follows:
+[source,xml]
+----
+<iq type='result' id='prefq' to='admin@domain.com/cpu'>
+<pref xmlns='urn:xmpp:archive'>
+<auto save='false'/>
+<default otr='forbid' muc-save="false" save="body"/>
+<method use="prefer" type="auto"/>
+<method use="prefer" type="local"/>
+<method use="prefer" type="manual"/>
+</prefq>
+</iq>
+----
+See below for what these settings mean.
+
+=== XEP-0136 Field Values
+
+<auto/>::
+  - *Required Attributes*
+  * +save=+ Boolean turning archiving on or off
+  - *Optional Settings*
+  * +scope=+ Determines scope of archiving, default is +\'stream'+ which turns off after stream end, or may be +\'global'+ which keeps auto save permanent,
+
+<default/>::
+  Default element sets default settings for OTR and save modes, includes an option for archive expiration.
+  - *Required Attribures*
+  * +otr=+ Specifies setting for Off The Record mode. Available settings are:
+    ** +approve+ The user MUST explicitly approve OTR communication.
+    ** +concede+ Communications MAY be OTR if requested by another user.
+    ** +forbid+ Communications MUST NOT be OTR.
+    ** +oppose+ Communications SHOULD NOT be OTR.
+    ** +prefer+ Communications SHOULD be OTR.
+    ** +require+ Communications MUST be OTR.
+  * +save=+ Specifies the portion of messages to archive, by default it is set to +body+.
+    ** +body+ Archives only the items within the <body/> elements.
+    ** +message+ Archive the entire XML content of each message.
+    ** +stream+ Archive saves every byte of communication between server and client. (Not recommended, high resource use)
+  - *Optional Settings*
+  * +expire=+ Specifies after how many seconds should the server delete saved messages.
+
+<item/>::
+  The Item element specifies settings for a particular entity. These settings will override default settings for the specified JIDS.
+  - *Required Attributes*
+  * +JID=+ The Jabber ID of the entity that you wish to put these settings on, it may be a full JID, bare JID, or just a domain.
+  * +otr=+ Specifies setting for Off The Record mode. Available settings are:
+    ** +approve+ The user MUST explicitly approve OTR communication.
+    ** +concede+ Communications MAY be OTR if requested by another user.
+    ** +forbid+ Communications MUST NOT be OTR.
+    ** +oppose+ Communications SHOULD NOT be OTR.
+    ** +prefer+ Communications SHOULD be OTR.
+    ** +require+ Communications MUST be OTR.
+  * +save=+ Specifies the portion of messages to archive, by default it is set to +body+.
+    ** +body+ Archives only the items within the <body/> elements.
+    ** +message+ Archive the entire XML content of each message.
+    ** +stream+ Archive saves every byte of communication between server and client. (Not recommended, high resource use)
+  - *Optional Settings*
+  * +expire=+ Specifies after how many seconds should the server delete saved messages.
+
+<method/>::
+  This element specifies the user preference for available archiving methods.
+  - *Required Attributes*
+  * +type=+ The type of archiving to set
+    ** +auto+ Preferences for use of automatic archiving on the user's server.
+    ** +local+ Set to use local archiving on user's machine or device.
+    ** +manual+ Preferences for use of manual archiving to the server.
+  * +use=+ Sets level of use for the type
+    ** +prefer+ The selected method should be used if it is available.
+    ** +concede+ This will be used if no other methods are available.
+    ** +forbid+ The associated method MUST not be used.
+
+Now that we have established settings, lets send a stanza changing a few of them:
+[source,xml]
+-----
+<iq type='set' id='pref2'>
+  <pref xmlns='urn:xmpp:archive'>
+    <auto save='true' scope='global'/>
+    <item jid='domain.com' otr='forbid' save='body'/>
+    <method type='auto' use='prefer'/>
+    <method type='local' use='forbid'/>
+    <method type='manual' use='concede'/>
+  </pref>
+</iq>
+-----
+This now sets archiving by default for all users on the domain.com server, forbids OTR, and prefers auto save method for archiving.
+
+== Manual Activation
+
+Turning on archiving requires a simple stanza which will turn on archiving for the use sending the stanza and using default settings.
+[source,xml]
+----
+<iq type='set' id='turnon'>
+  <pref xmlns='urn:xmpp:archive'>
+    <auto save='true'/>
+  </pref>
+</iq>
+----
+A sucessful result will yield this response from the server:
+[source,xml]
+----
+<iq type='result' to='user@domain.com' id='turnon'/>
+----
+Once this is turned on, incoming and outgoing messages from the user will be stored in +tig_ma_msgs+ table in the database.
+
+== Automatic Activation of MUC messages
+
+Enabling this feature allows MUC messages to be stored in the Message Archive repository and are added in the same way as for any other message. For this setting consider the MUC room JID, this will be the "user" that the messages will be archived with.  This is the same JID used for retrevial as well as sending to storage.   Archived MUC messages will be in the same format as normal archival messages with one exception, each message will have a +<name>+ attribute attached which will be the room nick for the user that sent the message.
+This feature is disabled by default.
+
+*NOTE:* It is worth to mention that even if more than on user resources joins the same room and each resource will receive the same messages, then only a single message will be stored in Message Archiving repository.
+It is also important to note that MUC messages are archived to user messages archive only when user is joined to MUC room. For example, if message was sent to room but it was not sent to particular user, it will not be archived.
+
+=== Configuration
+
+Enabling archiving of MUC messages is done by adding one more line to your init.properties file. Along with defining +comp-name+ and +comp-class+ add this line:
+[source,bash]
+-----
+sess-man/plugins-conf/message-archive-xep-0136/store-muc-messages=value
+-----
++value+ may be one of the following values:
+- +user+ Allows value to be set on domain level by user if the domain level setting allows that. [what?]
+- +true+ Enables the feature for all users in every hosted domain. This cannot be overridden by settings for individual domains or users.
+- +false+ Disables the feature for all users in every hosted domain. This cannot be overridden by settings for individual domains or users.
+
+To configure this setting for individual vhosts, you will need to execute a configuration command using one of the following settings:
+- +user+ Allows user to start this feature
+- +true+ Enables feature for users of the configured domain. Users will be unable to disable this feature.
+- +false+ Disables feature for users of the configured domain. Users will be unable to disable this feature.
+
+== Searching for Messages
+
+Tigase Message Archiving Component allows users to query for messages or collections that contain a string. A simple stanza sent to the message archive component will begin a search. For example, the following stanza requests a search for messages with "test failed" in the <body> element. *NOTE:* Searches can *ONLY* be conducted within <body> elements.
+[source,xml]
+-----
+<query xmlns="http://tigase.org/protocol/archive#query">
+    <contains>test failed</contains>
+</query>
+-----
+
+*This query element must be the child of a +list+ or +retrieve+ element.*
+
+Search options include:
+
+- +with=+ Specify JID of user sending message
+- +from=+ Search from this time and date, Format: YYYY-MM-DDTHH:MM:SSZ Time is in 24h set to GMT
+- +end=+ Search until this time and date, Format: YYYY-MM-DDTHH:MM:SSZ Time is in 24h set to GMT
+
+
+=== Example queries
+
+Retrieving messages with "test failed" string with user juliet@capulet.com between 2014-01-01 00:00:00 and 2014-05-01 00:00:00
+[source,xml]
+-----
+<iq type="get" id="query2">
+    <retrieve xmlns='urn:xmpp:archive'
+        with='juliet@capulet.com'
+        from='2014-01-01T00:00:00Z'
+        end='2014-05-01T00:00:00Z'>
+          <query xmlns="http://tigase.org/protocol/archive#query">
+              <contains>test failed</contains>
+          </query>
+    </retrieve>
+</iq>
+-----
+
+Retrieving collections containing messages with "test failed" string with user juliet@capulet.com between 2014-01-01 00:00:00 and 2014-05-01 00:00:00
+[source,xml]
+-----
+<iq type="get" id="query2">
+    <list xmlns='urn:xmpp:archive'
+        with='juliet@capulet.com'
+        from='2014-01-01T00:00:00Z'
+        end='2014-05-01T00:00:00Z'>
+          <query xmlns="http://tigase.org/protocol/archive#query">
+              <contains>test failed</contains>
+          </query>
+    </list>
+</iq>
+-----
+
+== Message Tagging Support
+
+Tigase now is able to support querying message archives based on tags created for the query.  Currently, Tigase can support the following tags to help seach through message archives:
+- +hashtag+ Words prefixed by a hash (#) are stored with a prefix and used as a tag, for example #Tigase
+- +mention+ Words prefixed by an at (@) are stored with a prefix and used as a tag, for example @Tigase
+
+*NOTE:* Tags must be written in messages from users, they do not act as wildcards. To search for #Tigase, a message must have #Tigase in the <body> element.
+
+This feature allows users to query and retrieve messages or collections from the archive that only contain one or more tags.
+
+=== Activating Tagging
+
+To enable this feature, the following line must be in the init.properties file (or may be added with Admin or Web UI)
+[source,bash]
+-----
+message-archiving/tags-support[B]=true
+-----
+Where +message-archiving+ is the class name of the component.
+
+Usage
+~~~~~
+To execute a request, the tags must be individual children elements of the +retrieve+ or +list+ element like the following request:
+[source,xml]
+-----
+<query xmlns="http://tigase.org/protocol/archive#query">
+    <tag>#People</tag>
+    <tag>@User1</tag>
+</query>
+-----
+
+You may also specify specific senders, and limit the time and date that you wish to search through to keep the resulting list smaller.  That can be accomplished by adding more fields to the retrieve element such as +'with'+, +'from+', and +'end'+ . Take a look at the below example:
+[source,xml]
+-----
+<iq type="get" id="query2">
+    <retrieve xmlns='urn:xmpp:archive'
+        with='juliet@capulet.com'
+        from='2014-01-01T00:00:00Z'
+        end='2014-05-01T00:00:00Z'>
+          <query xmlns="http://tigase.org/protocol/archive#query">
+              <tag>#People</tag>
+              <tag>@User1</tag>
+          </query>
+    </retrieve>
+</iq>
+-----
+This stanza is requesting to retrieve messages tagged with @User1 and #people from chats with the user juliet@capulet.com between January 1st, 2014 at 00:00 to May 1st, 2014 at 00:00.
+
+*NOTE:* All times are in Zulu or GMT on a 24h clock.
+
+You can add as many tags as you wish, but each one is an *AND* statement; so the more tags you include, the smaller the results.
+
+=== Tag Searching
+
+You can also retrieve a list of Tags that have already been used and are stored in the message archive. You can search for exact or a partial of the tag or mention.  The following request is searching for tags that are 'like' #test, in this case any tags with #test present will show in a list.
+[source,xml]
+----
+<iq type="set" id="tagquery">
+    <tags xmlns="http://tigase.org/protocol/archive#query" like="#test"/>
+</iq>
+----
+
+The result will return tags with #test in them:
+[source,xml]
+----
+<iq type="result" id="tagquery">
+    <tags xmlns="http://tigase.org/protocol/archive#query" like="#test">
+        <tag>#test1</tag>
+        <tag>#test123</tag>
+        <tag>#testwin</tag>
+        <set xmlns="http://jabber.org/protocol/rsm">
+             <first index='0'>0</first>
+             <last>2</last>
+             <count>3</count>
+        </set>
+    </tags>
+</iq>
+----
+
+You may retrieve a list of tags or mentions by using just the # or @ symbols in the +like=+ field.
+
+[[maPurging]]
+== Purging Information from Message Archive
+
+This feature allows for automatic removal of entries older than a configured number of days from the Message Archive. It is designed to clean up database and keep its size within reasonable boundaries.
+
+There are 4 settings available for this feature:
+To enable the feature:
++message-archive/remove-expired-messages[B]=true+
+
+This setting changes the initial delay after the server is started to begin removing old entries.  In other words, MA purging will not take place until the specified time after the server starts.  Default setting is PT1H, or one hour.
++message-archive/remove-expired-messages-delay=PT2H+
+
+This setting sets how long MA purging will wait between passes to check for and remove old entries. Default setting is P1D which is once a day.
++message-archive/remove-expired-messages-period=PT2D+
+
+*NOTE* that these commands are also compatible with +unified-archive+ component, just replace +message+ with +unified+.
+
+=== Configuration of number of days in VHost
+
+VHost holds a setting that determines how long a message needs to be in archive for it to be considered old and removed.  This can be set independently per Vhost.  This setting can be modified by either using the HTTP admin, or the update item execution in adhoc command.
+
+Command-line utility
+Sets after how many days message should be removed - by default we use 24 hours. So if entry is older than 24 hours then it will be removed, ie. entry from yesterday from 10:11 will be removed after 10:11 after next execution of purge.
+This configuration is done by execution of Update item configuration adhoc command of vhost-man component, where you should select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
+
+In adhoc select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
+
+In HTTP UI select Other, then Update Item Configuration (Vhost-man), select the domain, and from there you can set XEP-0136 retention type, and set number of days at XEP-0136 retention period (in days).
+
+Value of +remove-expired-messages-delay+ and +remove-expired-messages-period+ is in format described at Duration.parse() in Java documentation.

@@ -22,10 +22,9 @@
 
 -- Database stored procedures and functions for Tigase schema version 5.1
 
--- QUERY START:
 source database/mysql-schema-4-sp.sql;
--- QUERY END:
 
+-- LOAD FILE: database/mysql-schema-4-sp.sql
 
 -- QUERY START:
 drop procedure if exists TigUpdatePairs;
@@ -45,5 +44,6 @@ begin
   END IF;
 end //
 -- QUERY END:
+
 
 delimiter ;

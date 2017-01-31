@@ -24,34 +24,35 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.conf.ConfigurationException;
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
-import tigase.stats.StatisticsList;
-import tigase.util.Algorithms;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolver;
-import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
+
+import tigase.conf.ConfigurationException;
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.stats.StatisticsList;
+import tigase.util.Algorithms;
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolverFactory;
+import tigase.xml.Element;
+
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -63,7 +64,10 @@ import tigase.xmpp.XMPPIOService;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ *
+ * @deprecated was replaced by {@link S2SConnectionManager}, will be removed in 7.2.0
  */
+@Deprecated
 public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Object>>
 		implements ConnectionHandlerIfc<XMPPIOService<Object>> {
 	private static final String DB_RESULT_EL_NAME = "db:result";
@@ -574,6 +578,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		return null;
 	}
 
+	@Override
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
+		// readd packet - this may be good as we would retry to send packet 
+		// which delivery failed due to IO error
+		addPacket(packet);
+		return true;
+	}
+	
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
@@ -1173,7 +1185,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		// dumpCurrentStack(Thread.currentThread().getStackTrace());
 		try {
-			DNSEntry dns_entry = DNSResolver.getHostSRV_Entry(remotehost);
+			DNSEntry dns_entry = DNSResolverFactory.getInstance().getHostSRV_Entry(remotehost);
 			Map<String, Object> port_props = new TreeMap<String, Object>();
 
 			port_props.put("remote-ip", dns_entry.getIp());

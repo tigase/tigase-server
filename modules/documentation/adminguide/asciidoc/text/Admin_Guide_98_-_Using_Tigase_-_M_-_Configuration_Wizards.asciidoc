@@ -1,0 +1,129 @@
+[[tigase3xconfiguration]]
+= Configuration Wizards
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+From build #247 you can use configuration generators to easily and quickly create configuration files for every complex case.
+
+Configuring *Tigase* is not too easy to understand and maintain. Even with current command line tools you still have to know what the all options are for.
+
+To make it easier for average administrators or people who run the server for the first time or even for those who want to quickly test *Tigase* server in different scenarios configuration generators have been created. For each generator you can have also a few extra options which allows you to create configuration which you don't need to change for some time.
+
+A few definitions first to make it easier to read the rest:
+
+. *sm* - session manager component.
+. *c2s* - client connection manager component
+. *s2s* - server connection manager component
+. *ext2s* - external component connection manager
+. *ssender* - xref:stanzaSender[StanzaSender component]
+
+The are 4 generators currently available:
+
+. +--gen-config-all+ - creating configuration file with all available components. That is: +sm, c2s, s2s, ext2s, ssender+.
+. +--gen-config-default+ - creating default configuration file. That is configuration which is most likely needed for basic installation. Components included in configuration are: +sm, c2s, s2s+.
+. +--gen-config-sm+ - creating configuration for instance with session manager and external component only. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +sm+ and +ext2s+.
+. +--gen-config-cs+ - creating configuration for instance with components managing network connections. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +c2s, s2s, ext2s+.
+
+For each of above generators you can use additional parameters specifying other configuration details like database type you want to connect to, virtual hosts you want to support, administrator accounts and details for external component connection:
+
+- +--user-db+ db-type - where 'db-type' can be one of possible values: *mysql, pgsql, xml*
+
+- +--user-db-uri+ +connection-uri+ - where 'connection-uri' is a full resource uri for user repository data source. If you skip this parameter default value is used depending on database type you selected:
++
+ -- jdbc:mysql://localhost/tigase?user=root&password=mypass
+ -- jdbc:postgresql://localhost/tigase?user=tigase
+ -- user-repository.xml
++
+- +--auth-db+ +db-type+ - where 'db-type' can be one of possible values: *mysql, pgsql, xml, drupal, libresource* (If omitted 'user-db' settings are used.)
+
+- +--auth-db-uri+ +connection-uri+ - where 'connection-uri' is a full resource uri for user repository data source. (If omitted 'user-db-uri' settings are used.)
+
+- +--ext-comp+ +connection-string+ - possible values: connection string 'localdomain,remotedomain,port,passwd,plain/ssl,accept/connect,routing'
++
+*Note:* It is also possible to generate configuration for many external components. To do so place +--ext-comp_1+ 'parameters' +--ext-comp_2+ 'parameters' and so on...
+
+- +--virt-hosts+ +virtual-hosts-list+ - possible values: list of virtual domains to support 'domain1,domain2'. This option causes to use virtual hosts given here instead of default/automatically detected host names.
+
+- +--admins+ +admin-accounts-list+ - possible values: list of admin accounts: 'user1@domain,user2@domain2'
+
+- +--test+ - this parameter informs that config is generated for test instance, which means that all loggings are turned off
+
+- +--debug+ +tigase-package+ - you can turn on debugs log for thwe selected tigase package. For example if you want to turn debug logs on for package: *tigase.server* then you have to put parameter: +--debug server+. If you have any problems with your server the best way to get help from me is to generate configuration with --debug server and run the server. Then from the +logs/tigase-console.log+ log file I can get all information I need to give you a help.
+
+*Note!* _If configuration file already exists none of existing settings are overwritten. Configuration generator is activated only if config file does not exist at program startup or for config entries which are missing at startup time. So you can as well leave these settings in the file._
+
+*Note!* +tigase.conf+ _property file is NOT read by the tigase server. These properties are read by the bash shell to create a proper Tigase server startup command. It will not work on MS Windows unless you run it in bash (using CygWin for example). On windows however you can use configuration wizards too by preparing proper server startup command manually. For example command for the first below presented conf file would look like (all in single line):_
+
+[source,sh]
+-----
+java -Djdbc.drivers=org.postgresql.Driver
+ -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8
+ -server -Xms100M -Xmx100M
+ -cp "libs/pg73jdbc3.jar;jars/tigase-server.jar;libs/tigase-xmltools.jar;libs/tigase-utils.jar"
+ tigase.server.XMPPServer
+ -c "etc/tigase.xml"
+ --gen-config-def --user-db pgsql
+ --user-db-uri "jdbc:postgresql://localhost/tigase?user=tigase"
+-----
+
+So for example to take advantage of these options you can create tigase.conf and start Tigase server with usual command to generate ''tigase-config.xml'' configuration file:
+
+[source,sh]
+-----
+./bin/tigase.sh run tigase.conf
+-----
+
+A few sample files are included below for your convenience:
+
+- +tigase-def-pgsql.conf+ - default installation with PostgreSQL database support:
++
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+DRV="-Djdbc.drivers=org.postgresql.Driver"
+JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
+
+TIGASE_CONFIG="tigase-pgsql.xml"
+TIGASE_OPTIONS="--gen-config-def --user-db pgsql --user-db-uri jdbc:postgresql://localhost/tigase?user=tigase "
+-----
++
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+DRV="-Djdbc.drivers=org.postgresql.Driver"
+JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
+
+TIGASE_CONFIG="tigase-pgsql.xml"
+TIGASE_OPTIONS="--gen-config-def --user-db pgsql "
+-----
+
+- +tigase-cs.conf+ - installation of network connections management components (no DB is used by this instance):
++
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+JAVA_OPTIONS="${ENC} -server -Xms100M -Xmx100M "
+
+TIGASE_CONFIG="etc/tigase-cs.xml"
+TIGASE_OPTIONS="--gen-config-cs --virt-hosts cs.tigase.org,tigase.org,sm.tigase.org \
+  --ext-comp cs.tigase.org,sm.tigase.org,5678,very-secret,plain,connect"
+-----
+
+- +tigase-sm-mysql.conf+ - installation of session manager instance and resource connection string is the same as default so we can skip '--user-db-uri' parameter:
++
+[source,bash]
+-----
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+DRV="-Djdbc.drivers=com.mysql.jdbc.Driver"
+
+JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
+TIGASE_CONFIG="etc/tigase-sm-mysql.xml"
+TIGASE_OPTIONS="--gen-config-sm --user-db mysql --auth-db mysql --virt-hosts tigase.org,sm.tigase.org \
+  --ext-comp sm.tigase.org,cs.tigase.org,5678,very-secret,plain,accept"
+-----

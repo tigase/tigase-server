@@ -1,0 +1,7 @@
+[[oldStuff]]
+= Old Stuff
+:author: Daniel Wisnewski
+:version: v1.0 July 2015
+:date: 2015-27-07 19:43
+
+This contains sections on old features, or information pertaining to old builds of Tigase.  It is kept here for archival purposes.

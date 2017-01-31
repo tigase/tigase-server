@@ -40,6 +40,7 @@ import static tigase.cluster.strategy.ClusteringStrategyIfc.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
+import tigase.server.Priority;
 
 /**
  *
@@ -53,6 +54,7 @@ public abstract class CommandListenerAbstract
 	//~--- fields ---------------------------------------------------------------
 
 	private String commandName;
+	private Priority priority;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -62,8 +64,9 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param name
 	 */
-	public CommandListenerAbstract(String name) {
+	public CommandListenerAbstract(String name, Priority priority) {
 		setName(name);
+		setPriority(priority);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -114,6 +117,11 @@ public abstract class CommandListenerAbstract
 	}
 
 	@Override
+	public Priority getPriority() {
+		return priority;
+	}
+
+	@Override
 	public void getStatistics(StatisticsList list) {}
 
 	/**
@@ -144,4 +152,9 @@ public abstract class CommandListenerAbstract
 	public final void setName(String name) {
 		commandName = name;
 	}
+
+	public void setPriority(Priority priority) {
+		this.priority = priority;
+	}
+	
 }

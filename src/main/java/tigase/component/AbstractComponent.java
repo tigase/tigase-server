@@ -111,7 +111,7 @@ DisableDisco {
 	/** Modules manager */
 	protected final ModulesManager modulesManager;
 
-	private ResponseManager responseManager;;
+	private ResponseManager responseManager;
 
 	protected PacketWriter writer = new PacketWriter() {
 		@Override
@@ -276,6 +276,10 @@ DisableDisco {
 	 */
 	public ModuleProvider getModuleProvider() {
 		return modulesManager;
+	}
+
+	public ResponseManager getResponseManager() {
+		return responseManager;
 	}
 
 	/**

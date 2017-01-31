@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import tigase.cluster.api.SessionManagerClusteredIfc;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -62,8 +63,7 @@ public abstract class SMNonCachingAllNodes
 
 	//~--- fields ---------------------------------------------------------------
 
-	private CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
-	private SessionManagerHandler     sm            = null;
+	private SessionManagerClusteredIfc     sm            = null;
 
 	// Simple random generator, we do not need a strong randomization here.
 	// Just enough to ensure better traffic distribution
@@ -78,25 +78,17 @@ public abstract class SMNonCachingAllNodes
 
 	@Override
 	public void nodeConnected(JID jid) {
-		boolean result = cl_nodes_list.addIfAbsent(jid);
-
-		log.log(Level.FINE, "Cluster nodes: {0}, added: {1}", new Object[] { cl_nodes_list,
-				result });
 	}
 
 	@Override
 	public void nodeDisconnected(JID jid) {
-		boolean result = cl_nodes_list.remove(jid);
-
-		log.log(Level.FINE, "Cluster nodes: {0}, removed: {1}", new Object[] { cl_nodes_list,
-				result });
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public List<JID> getAllNodes() {
-		return cl_nodes_list;
+	public List<JID> getNodesConnected() {
+		return sm.getNodesConnected();
 	}
 
 	@Override
@@ -124,7 +116,7 @@ public abstract class SMNonCachingAllNodes
 	 * 
 	 */
 	public List<JID> getNodesForJid(JID jid) {
-		return getAllNodes();
+		return getNodesConnected();
 	}
 
 	/**
@@ -159,7 +151,7 @@ public abstract class SMNonCachingAllNodes
 		// Presence status change set by the user have a special treatment:
 		if ((packet.getElemName() == "presence") && (packet.getType() != StanzaType.error) &&
 				(packet.getStanzaFrom() != null) && (packet.getStanzaTo() == null)) {
-			List<JID> result = getAllNodes();
+			List<JID> result = getNodesConnected();
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Presence packet found: {0}, selecting all nodes: {1}",
@@ -205,7 +197,7 @@ public abstract class SMNonCachingAllNodes
 	 * 
 	 */
 	public List<JID> getNodesForUserConnect(JID jid) {
-		return getAllNodes();
+		return getNodesConnected();
 	}
 
 	/*
@@ -224,12 +216,11 @@ public abstract class SMNonCachingAllNodes
 	 * 
 	 */
 	public List<JID> getNodesForUserDisconnect(JID jid) {
-		return getAllNodes();
+		return getNodesConnected();
 	}
 
 	@Override
 	public void getStatistics(StatisticsList list) {
-		list.add("cl-caching-strat", "Connected nodes", cl_nodes_list.size(), Level.INFO);
 	}
 
 	@Override
@@ -248,7 +239,8 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param sm
 	 */
-	public void setSessionManagerHandler(SessionManagerHandler sm) {
+	@Override
+	public void setSessionManagerHandler(SessionManagerClusteredIfc sm) {
 		this.sm = sm;
 	}
 
@@ -312,6 +304,7 @@ public abstract class SMNonCachingAllNodes
 	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
+		List<JID> cl_nodes_list = getNodesConnected();
 		int       size   = cl_nodes_list.size();
 
 		if (size == 0) {

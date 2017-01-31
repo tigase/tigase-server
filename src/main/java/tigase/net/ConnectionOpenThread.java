@@ -152,10 +152,12 @@ public class ConnectionOpenThread
 	public void run() {
 		while (!stopping) {
 			try {
-				selector.select();
+				int select = selector.select();
 
-				// Set<SelectionKey> selected_keys = selector.selectedKeys();
-				// for (SelectionKey sk : selected_keys) {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Selected: " + select + " from selector: " + selector );
+				}
+
 				for (Iterator i = selector.selectedKeys().iterator(); i.hasNext(); ) {
 					SelectionKey sk = (SelectionKey) i.next();
 
@@ -320,9 +322,8 @@ public class ConnectionOpenThread
 			throttling.put(isa.getPort(), new PortThrottlingData(port_throttling));
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
-						"Setting up throttling for the port {0} to {1} connections per second.",
-						new Object[] { isa.getPort(),
-						port_throttling });
+						"Setting up throttling for the port {0} to {1} connections per second. isa: {2}",
+						new Object[] { isa.getPort(), port_throttling, isa });
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Setting up 'accept' channel...");

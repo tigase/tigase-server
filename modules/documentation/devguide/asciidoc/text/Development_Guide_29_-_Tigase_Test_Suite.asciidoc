@@ -1,0 +1,108 @@
+[[testSuite]]
+= Tigase Test Suite
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Tigase Test Suite is an engine which allows you to run tests. Essentially it just executes *TestCase* implementations. The tests may depend on other tests which means they are executed in specific order. For example authentication test is executed after the stream open test which in turn is executed after network socket connection test.
+
+Each *TestCase* implementation may have it's own set of specific parameters. There is a set of common parameters which may be applied to any *TestCase*. As an example of the common parameter you can take *-loop = 10* which specified that the *TestCase* must be executed 10 times. The test specific parameter might be *-user-name = tester* which may set the user name for authentication test.
+
+The engine is very generic and allows you to write any kind of tests but for the Tigase projects the current TestCase implementations mimic an XMPP client and are designed to test XMPP servers.
+
+The suite contains a kind of scripting language which allows you to combine test cases into a test scenarios. The test scenario may contain full set of functional tests for example, another test scenario may contain performance tests and so on.
+
+== Running Tigase Test Suite (TTS)
+To obtain TTS, you will first need to clone the repository
+-----
+git clone https://repository.tigase.org/git/tigase-testsuite.git
+-----
+
+Once cloning is finished, navigate to the TTS root directory and compile with maven:
+-----
+mvn clean install
+-----
+
+Maven will compile TTS and place jars in the necessary locations.  From the same directory, you can begin running TTS using the following command:
+-----
+./scripts/all-tests-runner.sh
+-----
+
+You should see the following, which outlines the possible options to customize your test run
+[source,bash]
+------------
+Run selected or all tests for Tigase server
+----
+Author: Artur Hefczyc <artur_hefczyc@vnu.co.uk>
+Version: 2.0.0
+----
+  --help|-h	This help message
+  --func [mysql|pgsql|derby|mssql|mongodb]
+              Run all functional tests for a single database configuration
+  --lmem [mysql|pgsql|derby|mssql|mongodb]
+              Run low memory tests for a single database configuration
+  --perf [mysql|pgsql|derby|mssql|mongodb]
+              Run all performance tests for a single database configuration
+  --stab [mysql|pgsql|derby|mssql|mongodb]
+              Run all stability tests for a single database
+              configuration
+  --func-all  Run all functional tests for all database
+              configurations
+  --lmem-all  Run low memory tests for all database
+              configurations
+  --perf-all  Run all performance tests for all database
+              configurations
+  --stab-all  Run all stability tests for all database
+              configurations
+  --all-tests Run all functionality and performance tests for
+              database configurations
+  --single test_file.cot
+  --other script_file.xmpt
+----
+  Special parameters only at the beginning of the parameters list
+  --debug|-d                 Turns on debug mode
+  --skip-db-relad|-no-db     Turns off reloading database
+  --skip-server|-no-serv     Turns off Tigase server start
+  --small-mem|-sm            Run in small memory mode
+-----------
+  Other possible parameters are in following order:
+  [server-dir] [server-ip]
+------------
+
+=== Customizing Tigase Test Suite
+You may run the tests from a command line like above, however you may create and edit the /scripts/tests-runner-settings.sh file to fit your Tigase installation and avoid having to have long complex commands as this template shows:
+[source,script]
+-----
+#!/bin/bash
+
+func_rep="func-rep.html"
+perf_rep="perf-rep.html"
+db_name="tigasetest"
+db_user="tigase"
+db_pass="tigase"
+root_user="root"
+root_pass="root"
+
+TESTS=("derby" "mysql" "pgsql" "mssql")
+IPS=("127.0.0.1" "127.0.0.1" "127.0.0.1" "127.0.0.1")
+
+server_timeout=10
+
+server_dir="/home/tigase/tigase-server"
+database="derby"
+#database="mysql"
+server_ip="127.0.0.1"
+
+MS_MEM=100
+MX_MEM=1000
+
+SMALL_MS_MEM=10
+SMALL_MX_MEM=50
+-----
+
+This will allow you to maintain identical settings through multiple runs of TTS.  See the next section for learning how the scripting language works and how you can create and run your own custom tests.

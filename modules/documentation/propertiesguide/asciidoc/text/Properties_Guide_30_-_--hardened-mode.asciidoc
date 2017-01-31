@@ -1,12 +1,13 @@
 [[hardenedMode]]
---hardened-mode
-===============
-Wojciech Kapcia <wojciech.kapcia@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --hardened-mode
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2014-01-07 09:04
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2014-01-07 09:04
 
 *Default value:* +false+
 
@@ -14,9 +15,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +true|false+
 
-*Description:* Enabling hardened mode affects handling of security aspects within Tigase. It turns off workaround for SSL issues, turns off SSLv2 and forces enabling more secure ciphers suites. It also forces requirement of StartTLS.
+*Description:* Enabling hardened mode affects handling of security aspects within Tigase. It turns off workarounds for SSL issues, turns off SSLv2 and forces enabling more secure ciphers suites. It also forces requirement of StartTLS.
 
-Enabling it requires link:http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html[UnlimitedJCEPolicyJDK] installed. It's preferred to use OracleJDK as our tests revealed that using OpenJDK in hardened mode may cause issues with some clients on some platforms.
+Enabling it requires link:http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html[UnlimitedJCEPolicyJDK] installed. We prefer to use OracleJDK as our tests revealed that using OpenJDK in hardened mode may cause issues with some clients on some platforms.
 
 *Available since:* 5.2.0
-

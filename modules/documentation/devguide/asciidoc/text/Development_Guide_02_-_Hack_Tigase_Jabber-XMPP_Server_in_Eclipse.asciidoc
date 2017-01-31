@@ -1,0 +1,89 @@
+[[hackingTigase]]
+= Hack Tigase XMPP Server in Eclipse
+:author: Daniel Wisnewski
+:version: v1.0 August 2015
+:date: 2015-18-08 10:07
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+If you want to write code for *Tigase* server we recommend using link://https://eclipse.org/downloads/[Eclipse IDE].  Either the IDE for Java or Java EE developers will work.
+
+== Requirements
+Eclipse IDE currently requires the use of link:http://www.oracle.com/technetwork/java/javase/downloads/jre7-downloads-1880261.html[Java Runtime Environment 7].  Although this is an outdated version of Java (and Tigase requires JDK version 8) Eclipse has not yet moved to the latest Java Build so you will need both versions installed.
+
+You will also need the M2E plugin for Maven integration, however this can be done inside Elcipse now, so refer to the xref:m2EPlugin[Plugin Installation] section for that.
+
+== Installation
+Eclipse does not come as an installer, but rather an archive.  Extract the directory to a working location wherever you would like.
+Now install the JRE 7 software, location is not important as Eclipse will find it autmoatically.
+
+Before we begin, we will need to clone the repository from git.
+
+=== Linux
+For linux operating systems, navigate to a directory where you want the repository to be cloned to and type the following into terminal.
+
+-----
+git clone https://repository.tigase.org/git/tigase-server.git
+-----
+
+=== Windows
+Please see the Windows coding guide for instructions on how to obtain source code from git.
+If you don't want to install git software specifically, you can use Eclipse's git plugin to obtain the repository without any new software.
+First click on File, then Import...
+Next select from Git folder and the Projects from Git
+
+image:images/win-git1.jpg[]
+
+Click next, and now select clone URI
+
+image:images/win-git2.jpg[]
+
+Now click next, and in this window enter the following into the URI field
+
+-----
+git://repository.tigase.org/git/tigase-server.git
+-----
+The rest of the fields will populate automatically
+
+image:images/win-git3.jpg[]
+
+Select the master branch, and any branches you wish to edit.  *The master branch should be the only one you need, branches are used for specific code changes*
+
+image:images/win-git4.jpg[]
+
+Now select the directory where you wanted to clone the repository to.  This was function as the project root directory you will use later on in the setup.
+
+image:images/win-git5.jpg[]
+
+Once you click next Eclipse will download the repository and any branches you selected to that directory.  Note you will be unable to import this git directory since there are no git a project specific files downloaded.  However, once downloading is complete you may click cancel, and the git repository will remain in the directory you have chosen.
+
+[[m2EPlugin]]
+== Setup
+Once you have the main window open and have established a workspace (where most of your working files will be stored), click on Help and then Install New Software...
+
+image:images/Eclipse-help.jpg[]
+
+Under the Work With field enter the following and press enter:
+http://download.eclipse.org/technology/m2e/releases/
+
+*Note: You may wish to click the Add... button and add the above location as a permanent software location to keep the location in memory*
+
+
+image:images/Eclipse-m2Einstall.jpg[]
+
+You should see the M2 Eclipse software packages show in the main window.  Click the check-box and click Next.  Once the installer is finished it will need to restart Eclipse.
+
+Once that is done, lets connect Eclipse to the cloned repository.
+
+Click File and Import... to bring up the import dialog window.
+Select Maven and then Existing Maven Project.
+
+image:images/Eclipse-importMaven.jpg[]
+
+Now click Next and point the root directory to where you cloned the git repository, Eclipse should automatically see the pom.xml file and show up in the next window.
+
+image:images/Eclipse-importMaven2.jpg[]
+
+Once the import is finished, you are able to now begin working with Tigase's code inside Eclipse!  Happy coding!

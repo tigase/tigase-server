@@ -29,6 +29,8 @@ package tigase.server.amp.cond;
 import tigase.server.amp.ConditionIfc;
 import tigase.server.Packet;
 
+import tigase.xmpp.JID;
+
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -75,6 +77,10 @@ public class MatchResource
 																 ? packet.getStanzaTo().getResource()
 																 : null;
 				String target_resource = packet.getAttributeStaticStr(TO_RES);
+				String from_session_jid_string = packet.getAttributeStaticStr(SESSION_JID);
+				JID from_original_jid = from_session_jid_string != null ? 
+																JID.jidInstance( from_session_jid_string)
+																: null;
 
 				switch (m_val) {
 				case any :
@@ -83,8 +89,11 @@ public class MatchResource
 					break;
 
 				case other :
-					result = (jid_resource != null) && (target_resource != null) &&
-									 !jid_resource.equals(target_resource);
+					result = ( ( jid_resource != null ) && ( target_resource != null )
+										 && !jid_resource.equals( target_resource ) )
+									 
+									 || ( from_original_jid == null && target_resource == null )
+							;
 
 					break;
 

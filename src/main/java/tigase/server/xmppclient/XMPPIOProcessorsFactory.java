@@ -21,15 +21,15 @@
  */
 package tigase.server.xmppclient;
 
+import tigase.osgi.ModulesManagerImpl;
+import tigase.server.ConnectionManager;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.server.ConnectionManager;
 
 /**
  *
@@ -45,6 +45,8 @@ public class XMPPIOProcessorsFactory {
 	
 	static {
 		DEF_PROCESSORS.put(StreamManagementIOProcessor.XMLNS, StreamManagementIOProcessor.class.getCanonicalName());
+		DEF_PROCESSORS.put(StreamErrorCounterIOProcessor.ID, StreamErrorCounterIOProcessor.class.getCanonicalName());
+		DEF_PROCESSORS.put(RegistrationThrottlingProcessor.ID, RegistrationThrottlingProcessor.class.getCanonicalName());
 	}
 	
 	public static XMPPIOProcessor[] updateIOProcessors(ConnectionManager connectionManager,

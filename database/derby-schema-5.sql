@@ -20,14 +20,14 @@
 --  $Date: $
 --
 
--- QUERY START:
 run 'database/derby-schema-4-schema.sql';
--- QUERY END:
 
--- QUERY START:
 run 'database/derby-schema-4-sp.sql';
--- QUERY END:
 
--- QUERY START:
 run 'database/derby-schema-4-props.sql';
--- QUERY END:
+
+-- LOAD FILE: database/derby-schema-4-schema.sql
+
+-- LOAD FILE: database/derby-schema-4-sp.sql
+
+-- LOAD FILE: database/derby-schema-4-props.sql

@@ -1,12 +1,13 @@
 [[nonpriorityQueue]]
---nonpriority-queue
-===================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --nonpriority-queue
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 23:10
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 23:10
 
 *Default value:* +false+
 
@@ -14,9 +15,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +true|false+
 
-*Description:* The property can be used to switch to non-priority queues usage in the Tigase server (value set to 'true'). Using non-priority queues prevents packets reordering. By default the Tigase uses priority queues which means that packets with highest priority may take over packets with lower priority (presence updates) which may result in packets arriving out of order.
+*Description:* The +--nonpriority+ property can be used to switch to non-priority queues usage in Tigase server (value set to 'true'). Using non-priority queues prevents packets reordering. By default Tigase uses priority queues which means that packets with highest priority may take over packets with lower priority (presence updates) which may result in packets arriving out of order.
 
-This may happen however only for packets of different types. That is, messages may take over presence packets, however, one message never takes over another message for the same user. Therefore, out of order packets delivery is not an issue for most cases.
+This may happen however only for packets of different types. That is, messages may take over presence packets. However, one message never takes over another message for the same user. Therefore, out of order packet delivery is not an issue for the most part.
 
 *Available since:* 5.0.0
-

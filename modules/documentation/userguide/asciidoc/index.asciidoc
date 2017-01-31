@@ -1,5 +1,4 @@
-Tigase User Guide
-=================
+= Tigase User Guide
 Tigase Team <team@tigase.com>
 :toc:
 :numbered:
@@ -17,6 +16,7 @@ include::text/User_Guide_03_How_to_use_Tigase_Service.asciidoc[]
 
 include::text/User_Guide_04_Psi_Initial_Configuration.asciidoc[]
 
-include::text/User_Guide_05_Tigase_Service_and_MSN_Transport_from_Client_Side.asciidoc[]
+//MSNTransport removed due to JETI missing from website, is this still supported?
+//include::text/User_Guide_05_Tigase_Service_and_MSN_Transport_from_Client_Side.asciidoc[]
 
-include::text/User_Guide_06_Jeti_and_MSN_Transport_on_tigase.org.asciidoc[]
+//include::text/User_Guide_06_Jeti_and_MSN_Transport_on_tigase.org.asciidoc[]

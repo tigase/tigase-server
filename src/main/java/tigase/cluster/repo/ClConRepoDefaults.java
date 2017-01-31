@@ -24,11 +24,9 @@
 
 package tigase.cluster.repo;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.util.DNSResolver;
-
 import tigase.xmpp.BareJID;
+
+import tigase.util.DNSResolverFactory;
 
 /**
  * Class description
@@ -49,7 +47,7 @@ public abstract class ClConRepoDefaults {
 	 * 
 	 */
 	static String[] getDefaultPropetyItems() {
-		return new String[] { DNSResolver.getDefaultHostname() };
+		return new String[] { DNSResolverFactory.getInstance().getDefaultHost()};
 	}
 
 	/**

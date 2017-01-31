@@ -1,12 +1,13 @@
 [[extcompRepoClass]]
---extcomp-repo-class
-====================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --extcomp-repo-class
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 22:13
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 22:13
 
 *Default value:* +tigase.server.ext.CompConfigRepository+
 
@@ -14,13 +15,12 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'a class name implementing tigase.db.comp.ComponentRepository.'
 
-*Description:* This can be used when '--external' is used to connect external components. The component responsible for maintaining external components connections can be reconfigured at run-time and can store configuration in a separate place, configuration file, database or any other data source. This property specifies implementation for this data source.
+*Description:* This can be used when xref:external[+--external+] is used to connect external components. The component responsible for maintaining external components connections can be reconfigured during run-time and can store configuration in a separate place, configuration file, database or any other data source. This property specifies implementation for this data source.
 
-The property sets a class managing the component repository. There are 3 available now and you can implement and use your own. The 3 available are:
+The property sets a class managing the component repository. There are 3 available now and you can implement and use your own. They are:
 
 - 'tigase.server.ext.CompConfigRepository' which reads settings for external components from configuration only. It works well with ad-hoc commands, you can add, remove and update external component settings but your changes are not saved to any permanent storage.
-- 'tigase.server.ext.CompDBRepository' which reads settings for external components from configuration and from database. As a database backend it uses UserRepository. It works well with ad-hoc commands and your changes are stored in DB and are loaded after server restart. All data are cached in memory so it doesn't cause a significant load on database. As it uses UserRepository data are stored in a format hard for direct modifications in database and because of caching in memory all the data it is also not a good choice in cluster environment as changes made on one node are not quickly propagated to other nodes - a reload ad-hoc command must be called on all nodes.
-- 'tigase.server.ext.CompSQLRepository' which reads initial settings from configuration and also stores data in SQL database. It automatically creates a dedicated DB table with a simple structure suitable for direct modifications with SQL command. It also doesn't cache any data. External component details are read from DB on demand when the component tries to authenticate. As it doesn't cache any data, each authentication request requires DB access therefore it may put some load on DB. On the other hand it allows for easy external components management from a separate application connecting directly to DB and all changes are instantly picked up by all cluster nodes.
+- 'tigase.server.ext.CompDBRepository' which reads settings for external components from configuration and from a database. As a database backend it uses UserRepository. It works well with ad-hoc commands and your changes are stored in DB and are loaded after server restart. All data are cached in memory so it doesn't cause a significant load on database. As it uses UserRepository data are stored in a format hard for direct modifications in database and because of caching in memory all the data it is also not a good choice in cluster environment as changes made on one node are not quickly propagated to other nodes - a reload ad-hoc command must be called on all nodes.
+- 'tigase.server.ext.CompSQLRepository' which reads initial settings from configuration and also stores data in SQL database. It automatically creates a dedicated DB table with a simple structure suitable for direct modification with SQL commands. It also doesn't cache any data. External component details are read from DB on demand when the component tries to authenticate. As it doesn't cache any data, each authentication request requires DB access therefore it may put some load on the DB. On the other hand it allows for easy external component management from a separate application connecting directly to DB and all changes are instantly picked up by all cluster nodes.
 
 *Available since:* 4.3.0
-

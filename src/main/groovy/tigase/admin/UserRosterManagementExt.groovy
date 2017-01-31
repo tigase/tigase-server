@@ -108,7 +108,7 @@ try {
 	if 	( clusterMode && notifyCluster ) {
 		if ( null != clusterStrategy ) {
 			def cluster = (ClusteringStrategyIfc) clusterStrategy
-			List<JID> cl_conns = cluster.getAllNodes()
+			List<JID> cl_conns = cluster.getNodesConnected()
 			if (cl_conns && cl_conns.size() > 0) {
 				cl_conns.each { node ->
 

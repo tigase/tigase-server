@@ -1,26 +1,24 @@
 [[extComp]]
---ext-comp
-==========
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --ext-comp
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 22:05
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 22:05
 
 *Default value:* 'none'
 
 *Example:* --ext-comp = +localdomain,remotedomain,port,passwd,plain,accept+
 
-*Possible values:* 'external connection definition string.'
+*Possible values:* 'external connection definition string.' connection string +localdomain,remotedomain,port,passwd,(plain|ssl),(accept|connect),routing+
 
-*Description:* Deprecated in favor of +--external+. _Support for this property is no longer maintained, please update your installation for the new way to connect external components._
+*Description:* Deprecated in favor of xref:external[+--external+]. _Support for this property is no longer maintained, please update your installation for the new way to connect external components._
 
-The property creates a connection over external component protocol - link:http://xmpp.org/extensions/xep-0114.html[XEP-0114]. The connection can be made to/from any XEP-0114 application: IM transort, MUC, PubSub and others. It is also possible to separate Tigase internal components onto separate instances connected via XEP-0114 connections.
+The +--ext-comp+ property creates a connection over an external component protocol - link:http://xmpp.org/extensions/xep-0114.html[XEP-0114]. The connection can be made to/from any XEP-0114 application such as IM transort, MUC, PubSub and others. It is also possible to separate Tigase internal components onto separate instances connected via XEP-0114 connections.
 
-Possible values: connection string +localdomain,remotedomain,port,passwd,(plain|ssl),(accept|connect),routing+
-
-*Note:* It is also possible to generate configuration for many external components. To do so use +--ext-comp_1 parameters+, +--ext-comp_2 parameters+ and so on...
+*Note:* It is also possible to generate a configuration for many external components. To do so use +--ext-comp_1 parameters+, +--ext-comp_2 parameters+ and so on...
 
 *Available since:* 2.0.0
-
+*Discontiuned since* 4.3.0

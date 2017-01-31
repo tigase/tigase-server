@@ -1,0 +1,42 @@
+[[apiVirtualDomain]]
+= API Description for Virtual Domains Management in the Tigase Server
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+The purpose of this guide is to introduce vhost management in Tigase server. Please refer to the JavaDoc documentation for all specific details not covered in this guide. All interfaces are well documented and you can use existing implementation as an example code base and reference point. The VHost management files are located in the repository and you can browse them using the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main/java/tigase/vhosts[project tracker].
+
+Virtual hosts management in Tigase can be adjusted in many ways through the flexible API. The core elements of the virtual domains management is interface link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostManager.java[VHostManager] class. They are responsible for providing the virtual hosts information to the rest of the Tigase server components. In particular to the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/server/MessageRouter.java[MessageRouter] class which controls how XMPP packets flow inside the server.
+
+The class you most likely want to re-implement is link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostJDBCRepository.java[VHostJDBCRepository] used as a default virtual hosts storage and implementing the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] interface. You might need to have your own implementation in order to store and access virtual hosts in other than Tigase's own data storage. This is especially important if you are going to modify the virtual domains list through systems other than Tigase.
+
+The very basic virtual hosts storage is provided by link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostItem.java[VHostItem] class. This is read only storage and provides the server a bootstrap vhosts data at the first startup time when the database with virtual hosts is empty or is not accessible. Therefore it is advised that all link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostItem.java[VHostItem] implementations extend this class. The example code is provided in the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostJDBCRepository.java[VHostJDBCRepository] file.
+
+All components which may need virtual hosts information or want to interact with virtual hosts management subsystem should implement the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostListener.java[VHostListener] interface. In some cases implementing this interface is necessary to receive packets for processing.
+
+Virtual host information is carried out in 2 forms inside the Tigase server:
+
+. As a *String* value with the domain name
+. As a *link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostItem.java[VHostItem]* which contains all the domain information including the domain name, maximum number of users for this domain, whether the domain is enabled or disabled and so on. The JavaDoc documentation contains all the details about all available fields and usage.
+
+Here is a complete list of all interfaces and classes with a brief description for each of them:
+
+[[vhostManIfc]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostManagerIfc.java[VHostManagerIfc] - is an interface used to access virtual hosts information in all other server components. There is one default implementation of the interface: xref:vhostMgr[VHostManager].
+[[vhostListen]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostListener.java[VHostListener] - is an interface which allows components to interact with the xref:vhostMgr[VHostManager]. The interaction is in both ways. The VHostManager provides virtual hosts information to components and components provide some control data required to correctly route packets to components.
+[[vhostrepo]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] - is an interface used to store and load virtual domains list from the database or any other storage media. There are 2 implementations for this interface: link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VhostConfigRepository.java[VHostConfigRepository] which loads vhosts information for the configuration file and provides read-only storage and - xref:vhostJDBC[VHostJDBCRepository] class which extends link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VhostConfigRepository.java[VHostConfigRepository] and allows for both - reading and saving virtual domains list. +VHostJDBCRepository+ is loaded as a default repository by Tigase server.
+[[vhostItem]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostItem.java[VHostItem] - is a class which allows for keeping all the virtual domain properties. Sometimes the domain name is not sufficient for data processing. The domain may be temporarily disabled, may have a limited number of users and so on. Instances of this class keep all the information about the domain which might be needed by the server components.
+[[vhostMgr]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostManager.java[VHostManager] - the default implementation of the VHostManagerIfc interface. It provides components with the virtual hosts information and manages the virtual hosts list. Processes ad-hoc commands for reloading, updating and removing domains.
+[[vhostConfig]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VhostConfigRepository.java[VHostConfirRepository] - a very basic implementation of the link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] for loading domains list from the configuration file.
+[[vhostJDCB]]
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostJDBCRepository.java[VHostJDBCRepository] - the default implementation of the link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] loaded by Tigase server. It allows to read and store virtual domains list in the database accessible through UserRepository.

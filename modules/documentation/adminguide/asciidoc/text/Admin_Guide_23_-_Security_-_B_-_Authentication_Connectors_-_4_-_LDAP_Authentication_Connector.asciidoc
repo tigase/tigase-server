@@ -1,0 +1,30 @@
+[[LDAPauth]]
+= LDAP Authentication Connector
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-03-30 21:56
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+From version 5.1.0, rev. (build) 2881 Tigase XMPP Server offers support for authenticating users against an LDAP server in *Bind* *Authentication* mode.
+
+Configuration for the LDAP support is really simple you just have to add a few lines to your +init.properties+ file.
+
+[source,bash]
+-----
+# LDAP Authentication connector
+--auth-db = tigase.db.ldap.LdapAuthProvider
+# LDAP connection URI
+--auth-db-uri=ldap://ldap.tigase.com:389
+# LDAP access parameters
+basic-conf/auth-repo-params/user-dn-pattern=cn=USER_ID,ou=people,dc=tigase,dc=org
+-----
+
+Please note the *USER_ID* element, this is a special element of the configuration which is used to authenticate particular user. Tigase LDAP connector replaces it with appropriate data during authentication. You can control what Tigase should put into this part. In your configuration you must replace this string with one of the following:
+
+. *%1$s* - use user name only for authentication (JabberID's localpart)
+. *%2$s* - use domain name only for authentication (JabberID's domain part)
+. *%3$s* - use the whole Jabber ID (JID) for authentication

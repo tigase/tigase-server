@@ -1,0 +1,110 @@
+[[tigaseAdvancedOptions]]
+= Tigase Advanced Options
+:author: Daniel Wisnewski
+:date: 2016-03-28 14:55
+:version: v1.0 March 2016
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+This section is designed to include a number of advanced configuration options available within Tigase, but may not have a relevant section yet to house them.
+
+== Enabling Support for storing offline messages without body content
+
+Tigase now supports the full implementation or XEP-0334, See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
+
+This can be customized by setting a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
+-----
+
+This will require the enabling of AMP plugin, so be sure +--sm-plugins=+amp+ is enabled.
+
+[[emptyNicks]]
+== Enabling Empty Nicknames
+
+Tigase can now support users with empty nicknames.  This can be enabled by adding the following code is in init.properties.
+------
+sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
+------
+
+[[accountRegLimit]]
+== Account Registration Limits
+
+In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  This may be configured by adding the following line in the init.properties file:
+-----
+sess-man/plugins-conf/jabber\:iq\:register/registrations-per-second=10
+-----
+This setting allows for 10 registrations from a single IP per second.  If the limit is exceeded, a +NOT_ALLOWED+ error will be returned.
+
+[[silentIgnore]]
+== Enable Silent Ignore on Packets Delivered to Unavailable Resources
+
+You can now have Tigase ignore packets delivered to unavailable resources to avoid having a packet bounce around and create unnecessary traffic.  You may set this globally, within standard message handling only, or within the AMP component using the following settings:
+
+Globally:
+[source]
+-----
+sess-man/plugins-conf/silently-ignore-message=true
+-----
+Message Processing Only:
+[source]
+-----
+sess-man/plugins-conf/message/silently-ignore-message=true
+-----
+AMP Component:
+[source]
+-----
+sess-man/plugins-conf/amp/silently-ignore-message=true
+-----
+
+[[errorCounting]]
+== Mechanism to count errors within Tigase
+
+A new processor within statistics has been added to count the number of errors that Tigase returns. This processor, named +error-counter+, will count all errors returned by Tigase, however by default the number is always zero if it is not enabled.  It can be found as an MBean object in JMX under +ErrorStatistics+ and contains values for packets with +ERROR+ and grouped by type.
+To enable counting of these errors, you must ensure the processor is included in your --sm-plugins:
+[source,properties]
+-----
+--sm-plugins=error-counter
+-----
+
+=== Including stream errors
+
+Stream +ERROR+ packets are not included in the above counter by default as they are processed separately.
+To enable this to be added to the counter, the following line must be in your init.properties file.
+[source,properties]
+-----
+c2s/processors[s]=stream-error-counter
+-----
+
+[[streamResumptiontimeout]]
+=== Stream resumption default & max-timeout
+
++SteamManagementIOProcessor+ now has a setting that can be used to change the maximum timeout time it will wait for reconnection if a client does not send a time to wait.  Two settings are now available:
+
+[source,properties]
+-----
+c2s/processors/urn\:xmpp\:sm\:3/resumption-timeout[I]=90
+-----
+The above setting in init.properties file will change the default timeout period to 90 seconds.
+
+[source,properties]
+-----
+c2s/processors/urn\:xmpp\:sm\:3/max-resumption-timeout[I]=900
+-----
+This setting will set the maximum time allowed for stream resumption to 900 seconds.  This can be handy if you expect a number of mobile phones to connect to your server and want to avoid duplicate messages being sent back and forth.
+
+[[autoSub]]
+You may setup a server to automatically approve presence subscriptions or roster authorizations for all users.  Say you were hosting bots and wanted to automate the process.  This can be done with the following settings:
+[source,properties]
+-----
+sess-man/plugins-conf/jabber\:iq\:roster/auto-authorize=true
+sess-man/plugins-conf/presence/auto-authorize=true
+-----
+Both of these settings are false by default, and you may use them together or separately.
+The following behavior is followed when they are both activated:
+
+- Upon sending a subscription request - Both contacts will each others' subscription and be added to each others' roster.  Presence information will immediately be exchanged between both parties.
+- Upon sending presence with type either unsubscribe or unsubscribed follows the rules defined in RFC regarding processing of these stanzas (i.e. adjusting subscription type of user/contact), but without forwarding those stanzas to the receiving entity to avoid any notifications to the client. However, a roster push is generated to reflect changes to presence in user roster in a seamless manner.
+- Simply adding an item to the roster (i.e. with <iq/> stanza with correct semantics) will also cause an automatic subscription between the user and the contact in a matter explained above.

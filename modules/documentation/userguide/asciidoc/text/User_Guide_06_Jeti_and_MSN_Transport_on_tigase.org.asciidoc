@@ -1,13 +1,15 @@
-Jeti and MSN Transport on tigase.org
-====================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+[[jetiMSN]]
+= Jeti and MSN Transport on tigase.org
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2009-11-25 15:51
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2009-11-25 15:51
 
-Make sure you are not connected to the *Tigase* server account with another Jabber client at the same time as this may affect your transport configuration.
+Make sure you are not connected to the *Tigase* server account with a Jabber client as this may affect the transport configuration.
 
 Jeti is available on Tigase website, preinstalled and preconfigured. You can run it by clicking on http://www.tigase.org/content/jeti-and-msn-transport-tigaseorg[this link].  Enter you user name and password to login. In my case this is test and \*\*\*.  Click *Login* and go to next page...
 
@@ -56,4 +58,3 @@ For the Jabber client, there is now no difference between MSN contacts and Jabbe
 image:images/jeti-logged-with-msn-online-m.png[Jeti Logged With MSN Online]
 
 You can now communicate with all people regardless if they are available through XMPP or MSN.
-

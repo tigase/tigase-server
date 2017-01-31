@@ -28,40 +28,19 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
 import tigase.server.Iq;
 import tigase.server.Packet;
-
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
 
-import static tigase.xmpp.impl.Privacy.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
+
+import static tigase.xmpp.impl.Privacy.*;
 
 /**
  * Describe class JabberIqPrivacy here.
@@ -75,32 +54,36 @@ import java.util.Queue;
 public class JabberIqPrivacy
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
-	private static final String     ACTIVE_EL_NAME  = "active";
-	private static final String     DEFAULT_EL_NAME = "default";
-	private static final String[][] ELEMENTS        = {
+	protected static final String     ACTIVE_EL_NAME  = "active";
+	protected static final Element     BLOCKED_ELEM = new Element("blocked", new String[] { "xmlns" }, new String[] { "urn:xmpp:blocking:errors" });
+	protected static final String     DEFAULT_EL_NAME = "default";
+	protected static final String[][] ELEMENTS        = {
 		Iq.IQ_QUERY_PATH
 	};
-	private static final String     LIST_EL_NAME    = "list";
+	protected static final String     LIST_EL_NAME    = "list";
 
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger          log = Logger.getLogger(JabberIqPrivacy.class.getName());
-	private static final String    PRESENCE_EL_NAME     = "presence";
-	private static final String    PRESENCE_IN_EL_NAME  = "presence-in";
-	private static final String    PRESENCE_OUT_EL_NAME = "presence-out";
-	private static final String    XMLNS                = "jabber:iq:privacy";
-	private static final String    ID                   = XMLNS;
-	private static final String[]  XMLNSS               = { XMLNS };
-	private static RosterAbstract  roster_util = RosterFactory.getRosterImplementation(
+	protected static Logger          log = Logger.getLogger(JabberIqPrivacy.class.getName());
+	protected static final String    ERROR_EL_NAME        = "error";
+	protected static final String    PRESENCE_EL_NAME     = "presence";
+	protected static final String    PRESENCE_IN_EL_NAME  = "presence-in";
+	protected static final String    PRESENCE_OUT_EL_NAME = "presence-out";
+	protected static final String    XMLNS                = "jabber:iq:privacy";
+	protected static final String    ID                   = XMLNS;
+	protected static final String[]  XMLNSS               = { XMLNS };
+	protected static RosterAbstract  roster_util = RosterFactory.getRosterImplementation(
 			true);
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+	protected static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
 			"var" }, new String[] { XMLNS }) };
-	private static final Comparator<Element> compar = new Comparator<Element>() {
+	protected static final Comparator<Element> compar = new Comparator<Element>() {
 		@Override
 		public int compare(Element el1, Element el2) {
 			String or1 = el1.getAttributeStaticStr(ORDER);
 			String or2 = el2.getAttributeStaticStr(ORDER);
+			if (or1.length() != or2.length())
+				return Integer.compare(or1.length(), or2.length());
 
 			return or1.compareTo(or2);
 		}
@@ -108,13 +91,13 @@ public class JabberIqPrivacy
 
 	//~--- constant enums -------------------------------------------------------
 
-	private enum ITEM_ACTION { allow, deny }
+	protected enum ITEM_ACTION { allow, deny }
 
-	private enum ITEM_SUBSCRIPTIONS {
+	protected enum ITEM_SUBSCRIPTIONS {
 		both, to, from, none
 	}
 
-	private enum ITEM_TYPE {
+	protected enum ITEM_TYPE {
 		jid, group, subscription, all
 	}
 
@@ -127,6 +110,7 @@ public class JabberIqPrivacy
 				.size() == 0)) {
 			return;
 		}
+		Queue<Packet> errors = null;
 		for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
 			Packet res = it.next();
 
@@ -144,7 +128,17 @@ public class JabberIqPrivacy
 				log.log(Level.FINEST, "Packet not allowed to go, removing: {0}", res);
 			}
 			it.remove();
+			
+			// support for sending error responses if packet is blocked
+			Packet error = prepareError(res, session);
+			if (error != null) {
+				if (errors == null)
+					errors = new ArrayDeque<Packet>();
+				errors.offer(error);
+			}
 		}
+		if (errors != null)
+			results.addAll(errors);
 	}
 
 	@Override
@@ -168,7 +162,13 @@ public class JabberIqPrivacy
 			return false;
 		}    // end of if (session == null)
 
-		return !allowed(packet, session);
+		boolean allowed = allowed(packet, session);
+		if (!allowed) {
+			Packet error = prepareError(packet, session);
+			if (error != null)
+				results.offer(error);
+		}
+		return !allowed;
 	}
 
 	@Override
@@ -179,6 +179,9 @@ public class JabberIqPrivacy
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
+		if (session.isAnonymous()) {
+			return;
+		}
 		try {
 			StanzaType type = packet.getType();
 
@@ -206,7 +209,7 @@ public class JabberIqPrivacy
 				break;
 			}    // end of switch (type)
 		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING,
+			log.log(Level.FINEST,
 					"Received privacy request but user session is not authorized yet: {0}", packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
@@ -232,28 +235,10 @@ public class JabberIqPrivacy
 		return XMLNSS;
 	}
 
-	private boolean allowed(Packet packet, XMPPResourceConnection session) {
+	protected boolean allowed(Packet packet, XMPPResourceConnection session) {
 		try {
-
-			// If this is a preprocessing phase, always allow all packets to
-			// make it possible for the client to communicate with the server.
-			if (session.getConnectionId().equals(packet.getPacketFrom())) {
+			if (allowedByDefault(packet, session))
 				return true;
-			}
-
-			// allow packets without from attribute and packets with from attribute same as domain name
-			if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart() ==
-					null) && session.getBareJID().getDomain().equals(packet.getStanzaFrom()
-					.getDomain()))) {
-				return true;
-			}
-
-			// allow packets without to attribute and packets with to attribute same as domain name
-			if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart() ==
-					null) && session.getBareJID().getDomain().equals(packet.getStanzaTo()
-					.getDomain()))) {
-				return true;
-			}
 
 			Element list = Privacy.getActiveList(session);
 
@@ -267,8 +252,18 @@ public class JabberIqPrivacy
 				List<Element> items = list.getChildren();
 
 				if (items != null) {
+					BareJID sessionUserId = session.getBareJID();
+					JID jid = packet.getStanzaFrom();
+					boolean packetIn = true;
+
+					if ((jid == null) || sessionUserId.equals(jid.getBareJID())) {
+						jid = packet.getStanzaTo();
+						packetIn = false;
+					}
+
 					Collections.sort(items, compar);
 					for (Element item : items) {
+						final ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
 						boolean   type_matched = false;
 						boolean   elem_matched = false;
 						ITEM_TYPE type         = ITEM_TYPE.all;
@@ -278,18 +273,32 @@ public class JabberIqPrivacy
 						}            // end of if (item.getAttribute(TYPE) != null)
 
 						String  value         = item.getAttributeStaticStr(VALUE);
-						BareJID sessionUserId = session.getBareJID();
-						JID     jid           = packet.getStanzaFrom();
-						boolean packetIn      = true;
-
-						if ((jid == null) || sessionUserId.equals(jid.getBareJID())) {
-							jid      = packet.getStanzaTo();
-							packetIn = false;
-						}
 						if (jid != null) {
 							switch (type) {
 							case jid :
-								type_matched = jid.toString().contains(value);
+								try {
+
+//									<user@domain/resource> (only that resource matches)
+//									<user@domain> (any resource matches)
+//									<domain/resource> (only that resource matches)
+//									<domain> (the domain itself matches, as does any user@domain or domain/resource)
+									JID jidFromList = JID.jidInstance(value);
+									if (jidFromList.getLocalpart() != null) {
+										if (jidFromList.getResource() != null ) {
+											type_matched = jid.equals(jidFromList);
+										} else if (jidFromList.getResource() == null ) {
+											type_matched = jid.getBareJID().equals(jidFromList.getBareJID());
+										}
+									} else {
+										if (jidFromList.getResource() != null ) {
+											type_matched = jid.equals(jidFromList);
+										} else if (jidFromList.getResource() == null ) {
+											type_matched = jid.getDomain().equals(jidFromList.getDomain());
+										}
+									}
+								} catch ( TigaseStringprepException ex ) {
+									log.log(Level.FINEST, "Exception while creating jid instance for value: " + value, ex);
+								}
 
 								break;
 
@@ -359,26 +368,15 @@ public class JabberIqPrivacy
 							elem_matched = true;
 						} else {
 							for (Element elem : elems) {
-								if ((packet.getElemName() == PRESENCE_EL_NAME) && ((packetIn && (elem
-										.getName() == PRESENCE_IN_EL_NAME)) || (!packetIn && (elem
-										.getName() == PRESENCE_OUT_EL_NAME))) && ((packet.getType() ==
-										null) || (packet.getType() == StanzaType.unavailable))) {
+								if (matchToPrivacyListElement(packetIn, packet, elem, action)) {
 									elem_matched = true;
-
 									break;
 								}
-								if (packetIn && (elem.getName() == packet.getElemName())) {
-									elem_matched = true;
-
-									break;
-								}    // end of if (elem.getName().equals(packet.getElemName()))
-							}      // end of for (Element elem: elems)
-						}        // end of else
+							}
+						} // end of else
 						if (!elem_matched) {
 							break;
 						}        // end of if (!elem_matched)
-
-						ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
 
 						switch (action) {
 						case allow :
@@ -411,8 +409,104 @@ public class JabberIqPrivacy
 
 		return true;
 	}
+	
+	protected boolean allowedByDefault(Packet packet, XMPPResourceConnection session) throws NoConnectionIdException, NotAuthorizedException {
+		// If this is a preprocessing phase, always allow all packets to
+		// make it possible for the client to communicate with the server.
+		if (session.getConnectionId().equals(packet.getPacketFrom())) {
+			return true;
+		}
 
-	private void processGetRequest(final Packet packet,
+		// allow packets without from attribute and packets with from attribute same as domain name
+		if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart()
+				== null) && session.getBareJID().getDomain().equals(packet.getStanzaFrom()
+						.getDomain()))) {
+			return true;
+		}
+
+		// allow packets without to attribute and packets with to attribute same as domain name
+		if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart()
+				== null) && session.getBareJID().getDomain().equals(packet.getStanzaTo()
+						.getDomain()))) {
+			return true;
+		}
+
+		// Always allow packets sent between sessions of same user and
+		// packets sent from user to his bare jid and results of this
+		// packets
+		if (packet.getStanzaFrom() != null && packet.getStanzaTo() != null
+				&& packet.getStanzaFrom().getBareJID().equals(packet.getStanzaTo().getBareJID())) {
+			return true;
+		}
+		
+		if (packet.getType() == StanzaType.error && packet.getStanzaTo() != null && session.isUserId(packet.getStanzaTo().getBareJID())) {
+			// this may be error sent back to sender of blocked request
+			// or even to user who sent packet to blocked user
+			Element error = packet.getElement().findChild(e -> e.getName() == ERROR_EL_NAME);
+			if (error != null && error.findChild(e -> e.getName() == Authorization.NOT_ACCEPTABLE.getCondition()) != null 
+					&& error.findChild(e -> e.getName() == BLOCKED_ELEM.getName() && e.getXMLNS() == BLOCKED_ELEM.getXMLNS()) != null)
+				return true;
+		}
+
+		return false;
+	}
+	
+	protected boolean matchToPrivacyListElement(boolean packetIn, Packet packet, Element elem, ITEM_ACTION action) {
+		if ((packet.getElemName() == PRESENCE_EL_NAME)
+				&& ((packetIn && (elem.getName() == PRESENCE_IN_EL_NAME)) || (!packetIn && (elem.getName() == PRESENCE_OUT_EL_NAME)))
+				&& ((packet.getType() == null) || (packet.getType() == StanzaType.unavailable))) {
+			return true;
+		}
+		if (packetIn && (elem.getName() == packet.getElemName())) {
+			return true;
+		}
+		return false;
+	}
+	
+	protected Packet prepareError(Packet packet, XMPPResourceConnection session) {
+		if (packet.getType() != StanzaType.error) {
+			try {
+				Packet error = null;
+				switch (packet.getElemName()) {
+					case "presence":
+						break;
+					case "message":
+						if (packet.getStanzaFrom() == null || session.isUserId(packet.getStanzaFrom().getBareJID())) {
+							// we need this here to make sure that this error will be sent to user only once
+							// as there might be many outgoing messages as result of sending message to single
+							// user - ie. messages sent to message archive, etc.
+							if (packet.getPacketTo() != null)
+								return null;
+							
+							error = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, null, true);
+							error.getElement().getChild("error").addChild(BLOCKED_ELEM.clone());
+						} else {
+							error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true);
+						}
+						return error;
+					case "iq":
+						if (packet.getType() == StanzaType.get || packet.getType() == StanzaType.set) {
+							if (packet.getStanzaFrom() == null || session.isUserId(packet.getStanzaFrom().getBareJID())) {
+								error = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, null, true);
+								error.getElement().getChild("error").addChild(BLOCKED_ELEM.clone());
+							} else {
+								error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true);
+							}
+						}
+						return error;
+				}
+			} catch (NotAuthorizedException ex) {
+				log.log(Level.FINEST, "Packet droped due to privacy list rules. Error could not be generated properly "
+						+ "as session is not authorized yet, should not happen.", ex);
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.FINER, "Packet dropped due to privacy list rules. Packet is error type already: {0}",
+						packet.toStringSecure());
+			}
+		}
+		return null;
+	}
+
+	protected void processGetRequest(final Packet packet,
 			final XMPPResourceConnection session, final Queue<Packet> results)
 					throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
@@ -458,7 +552,7 @@ public class JabberIqPrivacy
 		}        // end of else
 	}
 
-	private void processSetRequest(final Packet packet,
+	protected void processSetRequest(final Packet packet,
 			final XMPPResourceConnection session, final Queue<Packet> results)
 					throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
@@ -481,15 +575,20 @@ public class JabberIqPrivacy
 
 				if ((items == null) || items.isEmpty()) {
 					// if the list is in use then forbid changes
-					boolean inUse = name.equals(getDefaultListName(session));
+					boolean inUse = session.getCommonSessionData(PRIVACY_LIST_LOADED) != null
+													&& session.getCommonSessionData(DEFAULT) != null;
 
 					if (!inUse) {
 						for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
+							if (activeSession.equals( session)) {
+								// don't apply to the current session
+								continue;
+							}
 							inUse |= name.equals(Privacy.getActiveListName(activeSession));
 						}
 					}
 					if (inUse) {
-						results.offer(Authorization.CONFLICT.getResponseMessage(packet, null, true));
+						results.offer(Authorization.CONFLICT.getResponseMessage(packet, "Can not modify list while being in use by other session", true));
 					} else {
 						Privacy.removeList(session, child);
 						results.offer(packet.okResult((String) null, 0));

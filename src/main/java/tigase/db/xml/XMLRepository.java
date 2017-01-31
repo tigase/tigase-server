@@ -24,6 +24,7 @@ package tigase.db.xml;
 import tigase.db.AuthRepository;
 import tigase.db.AuthRepositoryImpl;
 import tigase.db.AuthorizationException;
+import tigase.db.Repository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
@@ -56,6 +57,7 @@ import java.util.logging.Logger;
  * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Repository.Meta( supportedUris = { "dummy" } )
 public class XMLRepository implements AuthRepository, UserRepository {
 
 	/** Log filed */
@@ -454,4 +456,16 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return auth.getPassword(user);
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) 
+					throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}	
 }

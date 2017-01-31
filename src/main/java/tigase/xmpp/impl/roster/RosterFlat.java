@@ -28,6 +28,8 @@ package tigase.xmpp.impl.roster;
 
 import tigase.db.TigaseDBException;
 
+import tigase.server.PolicyViolationException;
+
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -60,8 +62,6 @@ public class RosterFlat
 	 */
 	private static final Logger log          = Logger.getLogger(RosterFlat.class.getName());
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
-	private static int maxRosterSize         = new Long(Runtime.getRuntime().maxMemory() /
-																							 250000L).intValue();
 
 	private final SimpleDateFormat formatter;
 	{
@@ -85,6 +85,7 @@ public class RosterFlat
 		RosterElement relem = getRosterElementInstance(buddy.copyWithoutResource(), null, null, session);
 
 		relem.setPersistent(false);
+		relem.setSubscription( null );
 		addBuddy(relem, getUserRoster(session));
 
 		if ( log.isLoggable( Level.FINEST ) ){
@@ -125,7 +126,7 @@ public class RosterFlat
 	@Override
 	public void addBuddy(XMPPResourceConnection session, JID buddy, String name,
 											 String[] groups, String otherData)
-					throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
 		RosterElement relem = getRosterElement(session, buddy);
@@ -134,6 +135,17 @@ public class RosterFlat
 			Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 			relem = getRosterElementInstance(buddy, name, groups, session);
+			if (emptyNameAllowed && (name == null || name.isEmpty())) {
+				relem.setName(null);
+			} else if (name == null || name.isEmpty()) {
+				String n = buddy.getLocalpart();
+				if ((n == null) || n.trim().isEmpty()) {
+					n = buddy.getBareJID().toString();
+				}
+				relem.setName(n);
+			} else {
+				relem.setName(name);
+			}
 			relem.setOtherData(otherData);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "1. Added buddy to roster: {0}, name: {1}, item: {2}",
@@ -143,7 +155,7 @@ public class RosterFlat
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
 			} else {
-				throw new TigaseDBException("Too many elements in the user roster.");
+				throw new PolicyViolationException("Too many elements in the user roster. Limit: " + maxRosterSize);
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "2. Added buddy to roster: {0}, name: {1}, item: {2}",
@@ -151,10 +163,18 @@ public class RosterFlat
 															 relem.getName(), relem.getRosterItem() });
 			}
 		} else {
-			if ((name != null) &&!name.isEmpty()) {
+			if (emptyNameAllowed && (name == null || name.isEmpty())) {
+				relem.setName(null);
+			} else if (name == null || name.isEmpty()) {
+				String n = buddy.getLocalpart();
+				if ((n == null) || n.trim().isEmpty()) {
+					n = buddy.getBareJID().toString();
+				}
+				relem.setName(n);
+			} else {
 				relem.setName(name);
 			}
-
+				
 			// Hm, as one user reported this make it impossible to remove the user
 			// from
 			// all groups. Let's comments it out for now to see how it works.
@@ -163,6 +183,7 @@ public class RosterFlat
 			relem.setGroups(groups);
 
 			// }
+			relem.setPersistent( true );
 			saveUserRoster(session);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Updated buddy in roster: {0}", buddy);
@@ -264,7 +285,10 @@ public class RosterFlat
 					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
-		if (relem == null) {
+		// either we don't have such contact or it's not persistend in which case it shouldn't
+		// have subscription -- this is simpler solution instead of reworking whole RosterElement
+		// to allow sub==null
+		if ( relem == null || ( !relem.isPersistent() ) ){
 			return null;
 		} else {
 			return relem.getSubscription();
@@ -288,7 +312,7 @@ public class RosterFlat
 
 			// Skip temporary roster elements added only for online presence tracking
 			// from dynamic roster
-			if (relem.isPersistent()) {
+			if (relem.isPersistent() && !SubscriptionType.none_pending_in.equals(relem.getSubscription())) {
 				items.add(getBuddyItem(relem));
 			}
 		}
@@ -353,7 +377,15 @@ public class RosterFlat
 				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] { name,
 								buddy });
 			}
-			if ((name != null) &&!name.isEmpty()) {
+			if (emptyNameAllowed && (name == null || name.isEmpty())) {
+				relem.setName(null);
+			} else if (name == null || name.isEmpty()) {
+				String n = buddy.getLocalpart();
+				if ((n == null) || n.trim().isEmpty()) {
+					n = buddy.getBareJID().toString();
+				}
+				relem.setName(n);
+			} else {
 				relem.setName(name);
 			}
 			saveUserRoster(session);
@@ -455,7 +487,7 @@ public class RosterFlat
 		String roster_str = session.getData(null, ROSTER, null);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Loaded user roster: {0}", roster_str);
+			log.log(Level.FINEST, "Loaded user {1} roster: {0}", new Object[] {roster_str, session.getjid()});
 		}
 		if ((roster_str != null) &&!roster_str.isEmpty()) {
 			updateRosterHash(roster_str, session);

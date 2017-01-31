@@ -28,23 +28,20 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Presence;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.*;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for queuing packets (usable in connections from mobile
@@ -54,7 +51,7 @@ import java.util.Queue;
  */
 public class MobileV1
 				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPacketFilterIfc {
+				implements XMPPProcessorIfc, ClientStateIndication.Logic {
 	// default values
 	private static final int        DEF_MAX_QUEUE_SIZE_VAL = 50;
 	private static final long       DEF_MAX_TIMEOUT_VAL    = 6 * 60 * 1000;
@@ -143,10 +140,13 @@ public class MobileV1
 
 					setTimeout(session, timeout);
 				}
-				if (session.getSessionData(QUEUE_KEY) == null) {
-					session.putSessionData(QUEUE_KEY, new LinkedBlockingQueue<Packet>());
+
+				if (value) {
+					activate(session, results);
+				} else {
+					deactivate(session, results);
 				}
-				session.putSessionData(XMLNS, value);
+
 				results.offer(packet.okResult((Element) null, 0));
 
 				break;
@@ -183,6 +183,21 @@ public class MobileV1
 	}
 
 	@Override
+	public void activate(XMPPResourceConnection session, Queue<Packet> results) {
+		if (session.getSessionData(QUEUE_KEY) == null) {
+			session.putSessionDataIfAbsent(QUEUE_KEY, new LinkedBlockingQueue<Packet>());
+		}
+		session.putSessionData(XMLNS, true);
+	}
+
+	@Override
+	public void deactivate(XMPPResourceConnection session, Queue<Packet> results) {
+		session.putSessionData(XMLNS, false);
+
+		flushQueue(session, results);
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void filter(Packet _packet, XMPPResourceConnection sessionFromSM,
 			NonAuthUserRepository repo, Queue<Packet> results) {
@@ -202,9 +217,19 @@ public class MobileV1
 				continue;
 			}
 
+			// get parent session to look up for connection for destination
+			XMPPSession parentSession = sessionFromSM.getParentSession();
+			if (parentSession == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session for destination {0} for packet {1} - missing parent session",
+							new Object[] { res.getPacketTo().toString(),
+										   res.toString() });
+				}
+				continue;
+			}
+
 			// get resource connection for destination
-			XMPPResourceConnection session = sessionFromSM.getParentSession()
-					.getResourceForConnectionId(res.getPacketTo());
+			XMPPResourceConnection session = parentSession.getResourceForConnectionId(res.getPacketTo());
 
 			if (session == null) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -217,27 +242,18 @@ public class MobileV1
 				continue;
 			}
 
-			Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
-
 			// if queue is not enabled we do nothing
 			if (!isQueueEnabled(session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("queue is no enabled");
 				}
-				if ((queue != null) &&!queue.isEmpty()) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("sending packets from queue (DISABLED)");
-					}
 
-					Packet p;
-
-					while ((p = queue.poll()) != null) {
-						results.offer(p);
-					}
-				}
+				flushQueue(session, results);
 
 				continue;
 			}
+
+			Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
 
 			// lets check if packet should be queued
 			if (filter(session, res, queue)) {
@@ -253,9 +269,15 @@ public class MobileV1
 					Packet p;
 
 					while ((p = queue.poll()) != null) {
-						results.offer(p);
+						try {
+							// setting destination for packet in case if
+							// stream was resumed and connId changed
+							p.setPacketTo(session.getConnectionId());
+							results.offer(p);
+						} catch (NoConnectionIdException ex) {
+							log.log(Level.FINEST, "should not happen, as connection is ready", ex);
+						}
 					}
-					queue.clear();
 				}
 			}
 		}
@@ -299,6 +321,27 @@ public class MobileV1
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	protected void flushQueue(XMPPResourceConnection session, Queue<Packet> results) {
+		Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
+
+		if ((queue != null) &&!queue.isEmpty()) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("sending packets from queue (DISABLED)");
+			}
+			Packet p;
+			while ((p = queue.poll()) != null) {
+				try {
+					// setting destination for packet in case if
+					// stream was resumed and connId changed
+					p.setPacketTo(session.getConnectionId());
+					results.offer(p);
+				} catch (NoConnectionIdException ex) {
+					log.log(Level.FINEST, "should not happen, as connection is ready", ex);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Check if queuing is enabled

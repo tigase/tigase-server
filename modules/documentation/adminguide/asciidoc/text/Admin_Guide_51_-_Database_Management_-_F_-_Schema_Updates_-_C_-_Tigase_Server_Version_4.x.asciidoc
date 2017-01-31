@@ -1,0 +1,14 @@
+[[tigasev4x]]
+= Tigase Server Version 4.x
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Schema Upgrades for Tigase server version 4.x.
+
+- xref:tigase40schemaUpgrade[MySQL Database Schema Upgrade for Tigase 4.0]

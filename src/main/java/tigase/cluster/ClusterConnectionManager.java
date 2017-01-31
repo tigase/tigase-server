@@ -26,64 +26,47 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.Deflater;
-
-import javax.script.Bindings;
-
-import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusterElement;
-import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.CommandListener;
-import tigase.cluster.api.CommandListenerAbstract;
+import tigase.cluster.api.*;
 import tigase.cluster.repo.ClConConfigRepository;
 import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
-
 import tigase.conf.ConfigurationException;
-
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
-
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.EventHandler;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.osgi.ModulesManagerImpl;
-
 import tigase.server.ConnectionManager;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
-
+import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
+import tigase.util.TimerTask;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
+import javax.script.Bindings;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
 
 /**
  * Class ClusterConnectionManager
@@ -95,7 +78,7 @@ import tigase.xmpp.XMPPIOService;
  */
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
-				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem> {
+				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
 	/** Field description */
 	public static final String CLCON_REPO_CLASS_PROP_KEY = "repository-class";
 
@@ -115,10 +98,17 @@ public class ClusterConnectionManager
 			"cluster-connections-per-node";
 
 	/** Field description */
-	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 2;
+	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 5;
 
 	/** Field description */
+	public static final String CLUSTER_CONNECTIONS_SELECTOR_KEY = "connection-selector";
+	/** Field description */
+	public static final String DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL = ClusterConnectionSelector.class.getCanonicalName();
+	
+	/** Field description */
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
+
+    public static final String CLUSTER_INITIATED_EVENT = "cluster-initiated";
 
 	/** Field description */
 	public static final String COMPRESS_STREAM_PROP_KEY = "compress-stream";
@@ -173,17 +163,32 @@ public class ClusterConnectionManager
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
 
+	public final static String REPO_ITEM_EVENT_NAME = "repo-item-modified";
+	public final static String EVENTBUS_REPO_ITEM_EVENT_XMLNS = "tigase:system:cluster-update";
+	private EventBus eventBus = null;
+
+	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
+	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
+
+
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
 	private ClusterControllerIfc clusterController = null;
+
+	public static enum REPO_ITEM_UPDATE_TYPE {
+		ADDED,
+		UPDATED,
+		REMOVED
+	}
+
 
 	// private String cluster_controller_id = null;
 	private IOServiceStatisticsGetter                                ioStatsGetter =
 			new IOServiceStatisticsGetter();
 	private String                                                   identity_type =
 			IDENTITY_TYPE_VAL;
-	private Map<String, CopyOnWriteArrayList<XMPPIOService<Object>>> connectionsPool =
+	private Map<String, ClusterConnection> connectionsPool =
 			new ConcurrentSkipListMap<>();
 	private boolean                              connect_all = CONNECT_ALL_PROP_VAL;
 	private boolean                              compress_stream = COMPRESS_STREAM_PROP_VAL;
@@ -191,6 +196,8 @@ public class ClusterConnectionManager
 	private int                                  lastDayIdx            = 0;
 	private long[]                               lastHour              = new long[60];
 	private int                                  lastHourIdx           = 0;
+	private MaxDailyCounterQueue<Integer> maxNodes = new MaxDailyCounterQueue<>(31);
+	private int maxNodesWithinLastWeek = 0;
 	private int                                  nodesNo               = 0;
 	private int                                  per_node_conns =
 			CLUSTER_CONNECTIONS_PER_NODE_VAL;
@@ -200,9 +207,27 @@ public class ClusterConnectionManager
 
 	// private long packetsSent = 0;
 	// private long packetsReceived = 0;
+	private ClusterConnectionSelectorIfc connectionSelector = null;
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);
+	private boolean initialClusterConnectedDone = false;
 	private boolean nonClusterTrafficAllowed = true;
+
+	private EventHandler clusterEventHandler = null;
+
+	private final TimerTask repoReloadTimerTask = new TimerTask() {
+		@Override
+		public void run() {
+			try {
+				if (repo != null ) {
+					repo.reload();
+				}
+			} catch (TigaseDBException ex) {
+				log.log(Level.WARNING, "Items reloading failed", ex);
+			}
+		}
+	};
+
 
 	//~--- methods --------------------------------------------------------------
 
@@ -268,6 +293,10 @@ public class ClusterConnectionManager
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
+	boolean isInitialClusterConnectedDone() {
+		return initialClusterConnectedDone;
+	}
+
 	@Override
 	public void itemAdded(ClusterRepoItem repoItem) {
 		log.log(Level.INFO, "Loaded repoItem: {0}", repoItem.toString());
@@ -281,8 +310,8 @@ public class ClusterConnectionManager
 			// we ignore any local addresses
 			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
 									&& !( NetworkInterface.getByInetAddress( addr ) != null );
-			if ( !isCorrect && log.isLoggable( Level.WARNING ) ){
-				log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: {0}", repoItem );
+			if ( !isCorrect && log.isLoggable( Level.CONFIG ) ){
+				log.log( Level.CONFIG, "ClusterRepoItem of local machine, skipping connection attempt: {0}", repoItem );
 			}
 		} catch ( UnknownHostException | SocketException ex ) {
 			log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: " + repoItem, ex );
@@ -305,21 +334,44 @@ public class ClusterConnectionManager
 				addWaitingTask(port_props);
 			}
 
+			sendEvent( REPO_ITEM_UPDATE_TYPE.ADDED, repoItem.getHostname(), repoItem.getSecondaryHostname() );
 			// reconnectService(port_props, connectionDelay);
 		}
 	}
 
 	@Override
-	public void itemRemoved(ClusterRepoItem item) {}
+	public void itemRemoved(ClusterRepoItem item) {
+		sendEvent( REPO_ITEM_UPDATE_TYPE.REMOVED, item.getHostname(), item.getSecondaryHostname() );
+	}
 
 	@Override
-	public void itemUpdated(ClusterRepoItem item) {}
+	public void itemUpdated(ClusterRepoItem item) {
+		sendEvent( REPO_ITEM_UPDATE_TYPE.UPDATED, item.getHostname(), item.getSecondaryHostname() );
+	}
 
 	@Override
-	public void nodeConnected(String node) {}
+	public void nodeConnected(String node) {
+		super.nodeConnected(node);
+
+        maxNodes.add(getNodesConnectedWithLocal().size());
+        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+	}
 
 	@Override
-	public void nodeDisconnected(String node) {}
+	public synchronized void everyHour() {
+		super.everyHour();
+
+        maxNodes.add(getNodesConnectedWithLocal().size());
+        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+	}
+
+	@Override
+	public void nodeDisconnected(String node) {
+		super.nodeDisconnected(node);
+
+        maxNodes.add(getNodesConnectedWithLocal().size());
+        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+	}
 
 	@Override
 	public int processingInThreads() {
@@ -374,7 +426,7 @@ public class ClusterConnectionManager
 
 			return;
 		}
-		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME || packet.getElemName() == "route") {
 			writePacketToSocket(packet);
 		} else {
 
@@ -400,6 +452,17 @@ public class ClusterConnectionManager
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
+				if (p.getAttributeStaticStr(new String[] { Iq.ELEM_NAME, "ping" }, "xmlns") == "urn:xmpp:ping" 
+						&& getDefHostName().getDomain().equals(p.getStanzaTo().getDomain()) 
+						&& p.getStanzaFrom().getDomain().equals(serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY))) {
+					// received PING between cluster nodes to confirm connectivity
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, received XMPP ping", serv);
+					}
+					serv.getSessionData().put("lastConnectivityCheck", System.currentTimeMillis());
+					continue;
+				}
+					
 
 				// ++packetsReceived;
 				Packet result = p;
@@ -423,18 +486,30 @@ public class ClusterConnectionManager
 	}
 
 	@Override
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
+		// readd packet - this may be good as we would retry to send packet 
+		// which delivery failed due to IO error
+		addPacket(packet);
+		return true;
+	}	
+	
+	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
 		// TODO: handle this somehow
 	}
 
-	@Override
-	public void serviceStarted(XMPPIOService<Object> serv) {
-		try {
-			repo.reload();
-		} catch ( TigaseDBException ex ) {
-			log.log( Level.WARNING, "Items reloading failed", ex );
+
+	public int schedulerThreads() {
+		return 4;
+	}
+
+    @Override
+    public void serviceStarted(XMPPIOService<Object> serv) {
+		if (!repoReloadTimerTask.isScheduled()) {
+			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15 * SECOND);
 		}
+
 		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
 
 		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
@@ -453,7 +528,7 @@ public class ClusterConnectionManager
 			// Send init xmpp stream here
 			String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
-			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
+			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
 			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
 					".*@" + remote_host, ".*\\." + remote_host });
 
@@ -484,16 +559,16 @@ public class ClusterConnectionManager
 			Map<String, Object> sessionData = service.getSessionData();
 			String[] routings = (String[]) sessionData.get( PORT_ROUTING_TABLE_PROP_KEY );
 			String addr = (String) sessionData.get( PORT_REMOTE_HOST_PROP_KEY );
-			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get( addr );
+			ClusterConnection conns = connectionsPool.get( addr );
 
 			if (conns == null) {
-				conns = new CopyOnWriteArrayList<>();
+				conns = new ClusterConnection(addr);
 				connectionsPool.put(addr, conns);
 			}
 
 			int size = conns.size();
 
-			conns.remove( service );
+			conns.removeConn( service );
 			if ( log.isLoggable( Level.FINEST ) ){
 				log.log( Level.FINEST, "serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / type={5}",
 								 new Object[] { result, size, connectionsPool, service, conns, service.connectionType() } );
@@ -591,7 +666,7 @@ public class ClusterConnectionManager
 		case accept : {
 			String remote_host = attribs.get("from");
 
-			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
+			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
 			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
 			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] {
 					remote_host,
@@ -687,21 +762,24 @@ public class ClusterConnectionManager
 		props.put(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY, conns_int);
 		props.put(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL);
 
+		props.put(WATCHDOG_PING_TYPE_KEY, WATCHDOG_PING_TYPE.XMPP);
+		props.put(WATCHDOG_DELAY, 30 * SECOND);
+		props.put(WATCHDOG_TIMEOUT, -1 * SECOND);
+		
+		props.put(CLUSTER_CONNECTIONS_SELECTOR_KEY, DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL);
+
+		props.put(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY, EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE);
+		
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
+				"ERROR! Tigase is running in Clustered Mode yet the hostname",
+				"of the machine was resolved to *localhost* which will cause",
+				"malfunctioning of Tigase in clustered environment!",
 				"",
-				"  ---------------------------------------------",
-				"  ERROR! Tigase is running in Clustered Mode yet the hostname",
-				"  of the machine was resolved to *localhost* which will cause",
-				"  malfunctioning of Tigase in clustered environment!",
-				"  ",
-				"  To prevent further issues with the clustering Tigase will be shutdown.",
-				"  ",
-				"  Please make sure that FQDN hostname of the machine is set correctly",
-				"  and restart the server.",
-				"  ---------------------------------------------",
+				"To prevent further issues with the clustering Tigase will be shutdown.",
 				"",
-				"",
+				"Please make sure that FQDN hostname of the machine is set correctly",
+				"and restart the server."
 			} );
 		}
 
@@ -733,6 +811,14 @@ public class ClusterConnectionManager
 				.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
 
+		list.add(getName(), "Max daily cluster nodes count in last month", maxNodes, Level.INFO);
+		list.add(getName(), "Max nodes count within last week", maxNodesWithinLastWeek, Level.INFO);
+
+		if ((!list.checkLevel(Level.FINEST)) && getNodesConnected().size() > 0) {
+			// in FINEST level every component will provide this data
+			list.add(getName(), "Known cluster nodes", getNodesConnected().size(), Level.INFO);
+		}
+
 		// list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(),
 		// packetsReceived,
 		// Level.FINE);
@@ -745,6 +831,7 @@ public class ClusterConnectionManager
 
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		clusterController = cl_controller;
 		clusterController.removeCommandListener(sendPacket);
 		clusterController.setCommandListener(sendPacket);
@@ -771,6 +858,19 @@ public class ClusterConnectionManager
 		if (props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY) != null) {
 			per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		}
+
+		if (props.containsKey(CLUSTER_CONNECTIONS_SELECTOR_KEY)) {
+			String selectorClsName = (String) props.get(CLUSTER_CONNECTIONS_SELECTOR_KEY);
+			try {
+				ClusterConnectionSelectorIfc tmp_selector = (ClusterConnectionSelectorIfc) ModulesManagerImpl.getInstance().forName(selectorClsName).newInstance();
+				tmp_selector.setClusterConnectionHandler(this);
+				tmp_selector.setProperties(props);
+				connectionSelector = tmp_selector;
+			} catch (InstantiationException|ClassNotFoundException|IllegalAccessException ex) {
+				log.log(Level.SEVERE, "Coulnd not create instance of cluster connection selector of class " + selectorClsName, ex);
+			}
+		}
+		
 		connectionDelay = 5 * SECOND;
 		if ((props.size() == 1) || isInitializationComplete()) {
 			super.setProperties(props);
@@ -801,6 +901,8 @@ public class ClusterConnectionManager
 			if (old_repo != null) {
 				old_repo.destroy();
 			}
+			repo.reload();
+
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);
@@ -808,10 +910,74 @@ public class ClusterConnectionManager
 		if (props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY) != null) {
 			elements_number_limit = (Integer) props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 		}
+
+		if (props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY) != null) {
+			boolean eventbus_enabled = (Boolean) props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY);
+			if (eventbus_enabled) {
+				eventBus = EventBusFactory.getInstance();
+			}
+		}
+
+
+
 		super.setProperties(props);
 	}
 
+
+	@Override
+	public void start() {
+		super.start();
+
+		if (clusterEventHandler == null) {
+			clusterEventHandler = new EventHandler() {
+				@Override
+				public void onEvent(String name, String xmlns, Element event) {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "Setting initialClusterConnectedDone to true (was: {0})", initialClusterConnectedDone);
+					}
+
+					initialClusterConnectedDone = true;
+					EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+				}
+			};
+		}
+
+		EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, clusterEventHandler);
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT, clusterEventHandler);
+		clusterEventHandler = null;
+	}
+
 	//~--- methods --------------------------------------------------------------
+	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, String hostname, String secondary ) {
+
+		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
+		if ( eventBus == null || hostname == null ){
+			return;
+		}
+
+		Element event = new Element( REPO_ITEM_EVENT_NAME, new String[] { "xmlns" },
+																 new String[] { EVENTBUS_REPO_ITEM_EVENT_XMLNS } );
+		event.setAttribute( "local", "true" );
+		Element repoItem = new Element( "repo-item" );
+		{
+			repoItem.setAttribute( "action", action.name() );
+			repoItem.addAttribute( "hostname", hostname );
+			repoItem.addAttribute( "secondary", ( null != secondary ? secondary : "" ) );
+		}
+		event.addChild( repoItem );
+
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Sending event: " + event );
+		}
+
+		eventBus.fire( event );
+
+	}
 
 	/**
 	 * Method description
@@ -823,10 +989,10 @@ public class ClusterConnectionManager
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 		String   addr     = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
+		ClusterConnection conns = connectionsPool.get(addr);
 
 		if (conns == null) {
-			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+			conns = new ClusterConnection(addr);
 			connectionsPool.put(addr, conns);
 		}
 
@@ -837,13 +1003,37 @@ public class ClusterConnectionManager
 							 new Object[] { size, connectionsPool, serv, conns } );
 		}
 
-
-		conns.add( serv );
+		// setting userJid to hostname of remote cluster node
+		serv.setUserJid((String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY));
+		
+		conns.addConn(serv );
 		if ( size == 0 && conns.size() > 0 ){
 			updateRoutings(routings, true);
 			log.log(Level.INFO, "Connected to: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
 			clusterController.nodeConnected(addr);
+		}
+
+		try {
+            // initial cluster connection done
+            int connectedSize = getNodesConnected().size();
+            int repoSize = repo.allItems().size();
+            if (log.isLoggable(Level.FINEST)) {
+                log.log(Level.FINEST, "All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
+                        new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
+            }
+
+			if (!initialClusterConnectedDone &&
+                    (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
+                initialClusterConnectedDone = true;
+
+				Element event = new Element(CLUSTER_INITIATED_EVENT);
+                event.setXMLNS(CLUSTER_INITIATED_EVENT);
+                event.setAttribute( "local", "true" );
+				EventBusFactory.getInstance().fire(event);
+			}
+		} catch (TigaseDBException e) {
+            log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
 		}
 
 		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData()
@@ -861,13 +1051,10 @@ public class ClusterConnectionManager
 
 		// ++packetsSent;
 		String ip = p.getTo().getDomain();
+		ClusterConnection conns = connectionsPool.get(ip);
 
-		int                                         code  = Math.abs(hashCodeForPacket(p));
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
-
-		if ((conns != null) && (conns.size() > 0)) {
-			XMPPIOService<Object> serv = conns.get(code % conns.size());
-
+		XMPPIOService<Object> serv = connectionSelector.selectConnection(p, conns);
+		if (serv != null) {
 			return super.writePacketToSocket(serv, p);
 		} else {
 			log.log(Level.WARNING, "No cluster connection to send a packet: {0}", p);
@@ -892,7 +1079,7 @@ public class ClusterConnectionManager
 
 	@Override
 	protected long getMaxInactiveTime() {
-		return 1000 * 24 * HOUR;
+		return 3 * MINUTE;
 	}
 
 	@Override
@@ -1123,7 +1310,7 @@ public class ClusterConnectionManager
 	private class SendPacket
 					extends CommandListenerAbstract {
 		private SendPacket(String name) {
-			super(name);
+			super(name, null);
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -1170,6 +1357,20 @@ public class ClusterConnectionManager
 					"ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
 			serv.forceStop();
 		}
+	}
+	
+	protected class Watchdog extends ConnectionManager.Watchdog {
+
+		@Override
+		protected long getDurationSinceLastTransfer(final XMPPIOService service) {
+			Long lastTransfer = (Long) service.getSessionData().get("lastConnectivityCheck");
+			if (lastTransfer == null) {
+				service.getSessionData().put("lastConnectivityCheck", System.currentTimeMillis() - watchdogTimeout);
+				return watchdogTimeout;
+			}
+			return System.currentTimeMillis() - lastTransfer;
+		}
+		
 	}
 }
 

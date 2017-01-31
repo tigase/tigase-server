@@ -1,0 +1,115 @@
+[[dbSchemaLoader]]
+= +dbSchemaLoader+ Utility
+:author: Daniel Wisnewski
+:author: v1.0, March 2016: Reformatted for AsciiDoc.
+:date: 2016-03-14 14:30
+
+:numbered:
+:toc:
+:website: http://www.tigase.net
+
+Included with Tigase is the +dbSchemaLoader+ Utility, which can be used to apply schema files to databases. It is able to operate with Derby, MySQL, SQLServer, and PostgreSQL databases.
+In order to use this utility with any of the databases, you will need to first have the database environment up and running, and have established user credentials. You may use root or an account with administrator write privileges.
+
+IMPORTANT: All commands in this guide are required to be running from the Tigase installation directory.
+
+== Operation & Variables
+
+First, lets cover the DBSchemaLoader operation and variables:
+
+*Operation*
+The utility is run using the java -cp command from the Tigase installation directory.  Be sure that you have JDK v1.8 or later installed.
+Linux
+[source,command]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader
+-----
+or from a Windows environment
+-----
+java -cp jars/* tigase.util.DBSchemaLoader
+-----
+These commands will be followed by a combination of the following variables
+
+*Variables*
+
+Use the following options to customize. Options in bold are required, {potential options are in brackets}.::
+* *-dbType database_type {derby, mysql, postgresql, sqlserver}*
+* -schemaVersion schema version {4, 5, 5-1}
+* *-dbName database name*
+* -dbHostname database hostname (default is localhost)
+* -dbUser tigase username
+* -dbPass tigase user password
+* -rootUser database root username
+* -rootPass database root password
+* *-file path to sql schema file* {database/derby-schema-7-1.sql}
+* -query sql query to execute
+* -logLevel java logger Level
+* -adminJID comma separated list of admin JIDs
+* -adminJIDpass password (one for all entered JIDs)
+
+With that out of the way, lets look at some examples.
+Lets say you have a new mysql database server with root user root and password rood (to keep things simple, we do not recommend this).  The MySQL database is hosted locally, your command would be as follows:
+[source,cmd]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -rootUser root -rootPass root -schemaVersion -adminJID admin@example.com -adminJIDpass password 7.1 -file database/mysql-schema-7-1.sql
+-----
+This will create the tigasedb database, add an Admin user as admin@example.com with password 'password', and apply the v7.1 schema files. Output will look like this:
+[source,cmd]
+-----
+LogLevel: CONFIG
+
+tigase.util.DBSchemaLoader     	 <init>          	 CONFIG     Properties: [{dbHostname=localhost, logLevel=CONFIG, adminJID=admin@example.com, dbType=mysql, file=database/mysql-schema-7-1.sql, rootUser=root, adminJIDpass=password, dbPass=tigase_pass, dbName=tigasedb, schemaVersion=7.1, rootPass=root, dbUser=tigase_user}]
+
+tigase.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Validating DBConnection, URI: jdbc:mysql://localhost/?user=root&password=root
+
+tigase.util.DBSchemaLoader     	 validateDBConnection 	 CONFIG     DriverManager (available drivers): [[org.apache.derby.jdbc.AutoloadedDriver@10f87f48, org.postgresql.Driver@1b2c6ec2, com.mysql.jdbc.Driver@50040f0c, jTDS 1.3.1]]
+
+tigase.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Connection OK
+tigase.util.DBSchemaLoader     	 validateDBExists 	 INFO       Validating whether DB Exists, URI: jdbc:mysql://localhost/tigasedb?user=tigase_user&password=tigase_pass
+
+tigase.util.DBSchemaLoader     	 validateDBExists 	 INFO       Doesn't exist, creating...
+
+tigase.util.DBSchemaLoader     	 validateDBExists 	 INFO        OK
+
+tigase.util.DBSchemaLoader     	 loadSchemaFile  	 INFO       Loading schema from file: database/mysql-schema-7-1.sql, URI: jdbc:mysql://localhost/tigasedb?user=root&password=root
+tigase.util.DBSchemaLoader     	 loadSchemaFile  	 INFO        completed OK
+
+tigase.util.DBSchemaLoader     	 printInfo       	 INFO
+
+Database init.properties configuration:
+
+--user-db=mysql
+--user-db-uri=jdbc:mysql://localhost/tigasedb user=tigase_user&password=tigase_pass&useUnicode=true&characterEncoding=UTF-8
+-----
+
+TIP: The utility will automatically generate the lines you need to add to your init.properties file to use this database!
+
+At this time, it is suggested to load the PubSub schema since you will have to change very little of the command:
+
+[source,cmd]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -rootUser root -rootPass root -file database/mysql-pubsub-schema-3.2.0.sql
+-----
+
+Should you wish to use the Socks5 Proxy component, you will need to load that schema as well
+[source,cmd]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -rootUser root -rootPass root -file database/mysql-socks5-schema.sql
+-----
+
+At this time you're finished setting up a database for use with Tigase!
+For other databases that are supported, the operations will be very similar with only the -dbType and perhaps the -dbHostname being different.
+
+== -Query function
+
+Should you decide to customize your own functions, or have specific information you want to put into the database, you can use the -query function to perform a single query step.
+[source,cmd]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dpType mysql -dbName tigasedb -rootUser root -rootPass root -query "CREATE TABLE tigasedb.EXTRA_TABLE (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(10) NOT NULL)"
+-----
+Of course this would break the schema for tigasedb by adding an unexpected table,  you will receive the following message:
+-----
+tigase.util.DBSchemaLoader       printInfo          WARNING       Database schema is invalid
+-----
+
+But this is a demonstration how you may run a query through the database without the need to use another tool.  Note that you will need to select the specific database for each query.

@@ -26,34 +26,30 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
-
 import tigase.server.Packet;
-
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolver;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolverFactory;
 
 import java.net.UnknownHostException;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: Jun 14, 2010 12:32:49 PM
@@ -201,7 +197,7 @@ public class CIDConnections {
 	 *
 	 * @param serv
 	 */
-	public void connectionAuthenticated(S2SIOService serv) {
+	public void connectionAuthenticated(S2SIOService serv, CID cid) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
 		}
@@ -226,11 +222,11 @@ public class CIDConnections {
 	 *
 	 * @param sessionId
 	 */
-	public void connectionAuthenticated(String sessionId) {
+	public void connectionAuthenticated(String sessionId, CID cid) {
 		S2SConnection s2s_conn = getS2SConnectionForSessionId(sessionId);
 
 		if (s2s_conn != null) {
-			connectionAuthenticated(s2s_conn.getS2SIOService());
+			connectionAuthenticated(s2s_conn.getS2SIOService(), cid);
 		}
 	}
 
@@ -581,7 +577,7 @@ public class CIDConnections {
 					// using additional domain name mapping to allow usage of intermediate server
 					String serverName = handler.getServerNameForDomain(cid.getRemoteHost());
 					
-					DNSEntry dns_entry     = DNSResolver.getHostSRV_Entry(serverName);
+					DNSEntry dns_entry     = DNSResolverFactory.getInstance().getHostSRV_Entry(serverName);
 					S2SConnection s2s_conn = new S2SConnection(handler, dns_entry.getIp());
 
 					s2s_conn.addControlPacket(verify_req);
@@ -817,7 +813,7 @@ public class CIDConnections {
 			String serverName = handler.getServerNameForDomain(cid.getRemoteHost());
 					
 			// Check DNS entries
-			DNSEntry[] dns_entries = DNSResolver.getHostSRV_Entries(serverName);
+			DNSEntry[] dns_entries = DNSResolverFactory.getInstance().getHostSRV_Entries(serverName);
 
 			// Activate 'missing' connections
 			for (DNSEntry dNSEntry : dns_entries) {

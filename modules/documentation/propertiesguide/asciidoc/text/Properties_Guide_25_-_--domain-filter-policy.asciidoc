@@ -1,6 +1,12 @@
 [[domainFilterPolicy]]
---domain-filter-policy
-======================
+= --domain-filter-policy
+:author: not known
+:version: v1.0 initial release
+:date: 2015-07-15 17:08
+
+:toc:
+:numbered:
+:website: http://tigase.net
 
 *Default value:* +ALL+
 
@@ -8,7 +14,7 @@
 
 *Possible values:* +ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2+
 
-*Description:* The property is a global settings for setting communication filtering for vhosts. This function is kind of extension of the same property which could be set on a single user level. However, in many cases it is desired to control users communication not on per user-level but on the domain level. Domain filtering (communication filtering) allows you to specify with whom users can communicate for a particular domain. It allows to restrict communication for a selected domains or for the entire installation. A default value +ALL+ that users for the domain (by default for all domains) are allowed to communicate with any user on any other domain. Other possible values are:
+*Description:* The +--domain-filter-policy+ property is a global setting for setting communication filtering for vhosts. This function is kind of an extension of the same property which could be set on a single user level. However, in many cases it is desired to control users communication not on per user-level but on the domain level. Domain filtering (communication filtering) allows you to specify with whom users can communicate for a particular domain. It enables restriction of communications for a selected domain or for the entire installation. A default value +ALL+ renders users for the domain (by default for all domains) able to communicate with any user on any other domains. Other possible values are:
 
 . `ALL` a default value allowing users to communicate with anybody on any other domain, including external servers.
 . `LOCAL` allows users to communicate with all users on the same installation on any domain. It only blocks communication with external servers.
@@ -17,10 +23,10 @@
 . `LIST` property allows to set a list of domains (users' JIDs) with which users on the domain can communicate (i.e. _whitelist_).
 . `BLACKLIST` - user can communicate with everybody (like `ALL`), except contacts on listed domains.
 
-This is a global property which is overridden by settings for particular vhost and settings or particular user
+This is a global property which is overridden by settings for particular vhosts and settings for particular users.
 
-A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the init.property file for which there is no individual settings specified. It allows to configure a default values for all of them, instead of having to provide individual configuration for each vhost.
+A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the init.property file for which there is no individual settings specified. It allows default value for all of servers, instead of having to provide individual configuration for each vhost.
 
-It is also applied as a default value for all new vhosts added at run-time.
++ALL+ is also applied as a default value for all new vhosts added at run-time.
 
 *Available since:* 5.2.0

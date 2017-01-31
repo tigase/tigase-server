@@ -1,0 +1,119 @@
+[[mysql2database]]
+= MySQL Database Use
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:date: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This guide describes how to configure Tigase server to use link:http://www.mysql.com/[MySQL] database as a user repository.
+
+If you used an XML based user repository before you can copy all user data to MySQL database using repository management tool. All steps are described below.
+
+== MySQL Database Preparation
+To load db schema to your MySQL instance first create database:
+
+[source,sh]
+-----
+mysqladmin -p create tigase
+-----
+
+And then you can load database schema:
+
+[source,sh]
+-----
+mysql -u dbuser -p tigase < mysql-schema.sql
+-----
+
+== Server Configuration
+Now you have to change configuration to load a jdbc module instead of XML based repository. Using configuration management script, first change class name handling repository.
+
+To see current settings run command:
+
+[source,sh]
+-----
+$ ./scripts/config.sh -c tigase-config.xml -print -key session_1/user-repo-class
+-----
+
+As a result you should see something like:
+
+[source,sh]
+-----
+session_1/user-repo-class = tigase.db.xml.XMLRepository
+-----
+
+You can see that current setting points to the XML repository implementation. To use jdbc module for connecting to MySQL database you have to set tigase.db.jdbc.JDBCRepository class (enter text below in one line):
+
+[source,sh]
+-----
+$ ./scripts/config.sh -c tigase-config.xml -print -key session_1/user-repo-class -value tigase.db.jdbc.JDBCRepository -set
+-----
+
+As a result you will see new value set for the parameter:
+
+[source,bash]
+-----
+session_1/user-repo-class = tigase.db.jdbc.JDBCRepository
+-----
+
+You have also to set the same value as authorization repository unless you want to use different authorization data source:
+
+[source,sh]
+-----
+ $ ./scripts/config.sh -c tigase-config.xml -print -key session_1/auth-repo-class -value tigase.db.jdbc.JDBCRepository -set
+-----
+
+And again as a result we can see:
+
+[source,bash]
+-----
+session_1/auth-repo-class = tigase.db.jdbc.JDBCRepository
+-----
+
+Next step is to set the database connection string. Assuming you have database: *tigase* on *localhost* with database user: *dbuser* and password *dbpass* your connection string will look like this:
+
+[source,bash]
+-----
+jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass
+-----
+
+To set this in your configuration file, you have to the configuration management script 2 times. First for user data repository and second for authorization data repository:
+[source,sh]
+-----
+$ ./scripts/config.sh -c tigase-config.xml -print -key session_1/user-repo-url -value "jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass" -set
+$ ./scripts/config.sh -c tigase-config.xml -print -key session_1/auth-repo-url -value "jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass" -set
+-----
+
+*Note quotes around connection string.* They are needed to make sure the shell won't interpret special characters.
+
+Now the configuration is ready to load the jdbc module and connect to your database.
+
+One more thing you need to do is to tell JVM which jdbc driver to use to connect to database. Depending on your MySQL and jdbc installation it might be: +com.mysql.jdbc.Driver.+ To set is as database driver you have to set is a jdbc.drivers property value. Usually you do this by adding -D parameter to Java call:
+
+[source,sh]
+-----
+ $ java -Djdbc.drivers=com.mysql.jdbc.Driver tigase.server.XMPPServer
+-----
+
+If you use tigase.sh script to run server you will have to add +-Djdbc.drivers=com.mysql.jdbc.Driver+ to the startup script +init.Properties+ property file to +JAVA_OPTIONS+ values.
+
+== User Data Import
+If you previously used an XML based user repository, you can import all data into a MySQL database using repository management tool. This is quite long command so let me list all required parameters first with brief explanation:
+
+. *-cp* copy content of the source repository to destination repository.
+. *-sc* *tigase.db.xml.XMLRepository* source repository class.
+. *-su* *user-repository.xml* source repository connection string - assuming your user repository is in +user-repository.xml+ file.
+. *-dc* *tigase.db.jdbc.JDBCRepository* destination repository class.
+. *-du* *"jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass"* destination repository connection string.
+
+And now whole command. Enter all in one line:
+
+[source,sh]
+-----
+$ ./scripts/repo.sh -cp -sc tigase.db.xml.XMLRepository -su user-repository.xml -dc tigase.db.jdbc.JDBCRepository -du "jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass"
+-----
+
+For more information how to use command line administration tools refer to xref:commandLineTools2[command line tools guide.]

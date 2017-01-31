@@ -7,38 +7,28 @@ if [%1]==[] (
 
 set PWD="%cd%"
 
-:: for tigase 5.0 and below
-::java -Dij.protocol=jdbc:derby: -Dij.database="%1;create=true" ^
-::		-Dderby.system.home=%PWD% ^
-::		-classpath "libs/*" ^
-::		org.apache.derby.tools.ij database/derby-schema-4.sql
-::java -Dij.protocol=jdbc:derby: -Dij.database="%1" ^
-::		-Dderby.system.home=%PWD% ^
-::		-classpath "libs/*" ^
-::		org.apache.derby.tools.ij database/derby-schema-4-sp.schema
-::java -Dij.protocol=jdbc:derby: -Dij.database="%1" ^
-::		-Dderby.system.home=%PWD% ^
-::		-classpath "libs/*" ^
-::		org.apache.derby.tools.ij database/derby-schema-4-props.sql
 
-:: for Tigase 5.1
+set USER_NAME=tigase
+set USER_PASS=%USER_NAME%
+set ROOT_NAME=root
+set ROOT_PASS=%ROOT_USER%
+set DB_HOST=localhost
+set DB_NAME=%1
+set DB_TYPE=derby
+set DB_VERSION=7-1
 
-java -Dij.protocol=jdbc:derby: -Dij.database="%1;create=true" ^
-		-Dderby.system.home=%PWD% ^
-		-classpath jars/* ^
-		org.apache.derby.tools.ij database/derby-schema-5-1.sql > derby-db-create.txt 2>&1
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL
 
-java -Dij.protocol=jdbc:derby: -Dij.database="%1;create=true" ^
-		-Dderby.system.home=%PWD% ^
-		-classpath jars/* ^
-		org.apache.derby.tools.ij database/derby-pubsub-schema-3.0.0.sql > derby-db-create-pubsub.txt 2>&1
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL -file database/%DB_TYPE%-pubsub-schema-3.0.0.sql
+
+
 
 
 if %errorlevel% neq 0 (
-  echo. && echo Error: please check the derby-db-create.txt error file for more details && echo. && echo.
+  echo. && echo Error: please check the logs for more details && echo. && echo.
   exit /b %errorlevel%
 ) else (
-  echo. && echo Success: please look at the derby-db-create.txt file for more details && echo. && echo.
+  echo. && echo Success: please look at the logs for more details && echo. && echo.
   echo configuration: && echo. && echo. && echo --user-db=derby && echo. && echo --user-db-uri=jdbc:derby:%1 && echo. && echo.
   exit /b
 )

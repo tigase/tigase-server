@@ -1,0 +1,82 @@
+[[v5xs2sps]]
+= Server to Server Protocol Settings
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-06-29 21:27
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Tigase server *5.1.0* or later offers new, rewritten from scratch, implementation for s2s communication which allows you to tweak it's configuration to get a better performance in your installation.
+
+S2S (or server to server) protocol is enabled by default with optimal settings chosen. There are however, a set of configuration parameters you can adjust the server behavior to achieve optimal performance on your installation.
+
+This documents describes following elements of the Tigase server configuration:
+
+. Number of concurrent connections to external servers
+. The connection throughput parameters
+. Maximum waiting time for packets addressed to external servers and the connection inactivity time
+. Custom plugins selecting connection to the remote server
+
+== Number of Concurrent Connections
+Normally only one connection to the remote server is required to send XMPP stanza to that server. In some cases however, under a high load, you can get much better throughput and performance if you open multiple connections to the remote server.
+
+This is especially true when the remote server works in a cluster mode. Ideally you want to open a connection to each of the cluster nodes on the remote server. This way you can spread the traffic evenly among cluster nodes and improve the performance for s2s connections.
+
+Tigase server offers 2 different parameters to tweak the number of concurrent, s2s connections:
+
+- 'max-out-total-conns' - the property specifies the maximum outgoing connections the Tigase server opens to any remote XMPP server. This is 'per domain' limit, which means that this limit applies to each of the remote domains Tigase connects to. If it is set to '4' then Tigase opens a maximum of 4 connections to 'jabber.org' plus maximum 4 connections to 'muc.jabber.org' even if this is the same physical server behind the same IP address.
++
+To adjust the limit you have to add following line to the +init.properties+ file:
++
+[source,bash]
+-----
+s2s/max-out-total-conns[I]=2
+-----
+
+- 'max-out-per-ip-conns' - the property specifies the maximum outgoing connections Tigase server opens to any remote XMPP server to its single IP address. This too, is 'per domain' limit, which means that this limit applies to each of the remote domains Tigase connects to. If it is set to '1', and the above limit is set to '4', and the remote server is visible behind 1 IP address, then Tigase opens a maximum of 1 connection to 'jabber.org' plus a maximum of 1 connection to 'muc.jabber.org' and other subdomains.
++
+To adjust the limit you have to add following line to the init.properties file:
++
+[source,bash]
+-----
+s2s/max-out-per-ip-conns[I]=2
+-----
+
+== Connection Throughput
+Of course everybody wants his server to run with maximum throughput. This comes with a cost on resources, usually increased memory usage. This is especially important if you have large number of s2s connections on your installations. High throughput means lots of memory for network buffers for every single s2s connection. You may soon run out of all available memory.
+
+There is one configuration property which allows you to adjust the network buffers for s2s connections to lower your memory usage or increase data throughput for s2s communication.
+
+More details about are available in the init.properties guide under the link to +--net-buff-high-throughput+ property description.
+
+== Maximum Packet Waiting Time and Connection Inactivity Time
+There are 2 timeouts you can set for the component controlling s2s communication.
+
+- 'max-packet-waiting-time' - this sets the maximum time for the packets waiting for sending to some remote server. Sometimes, due to networking problems or DNS problems it might be impossible to send message to remote server right away. Establishing a new connection may take time or there might be communication problems between servers or perhaps the remote server is restarted. Tigase will try a few times to connect to the remote server before giving up. This parameter specifies how long the packet is waiting for sending before it is returned to the sender with an error. The timeout is specified in seconds:
++
+[source,bash]
+-----
+s2s/max-packet-waiting-time[L]=420
+-----
+
+- 'max-inactivity-time' - this parameters specifies the maximum s2s connection inactivity time before it is closed. If a connection is not in use for a long time, it doesn't make sense to keep it open and tie resources up. Tigase closes s2s connection after specified period of time and reconnects when it is necessary. The timeout is specified in seconds:
++
+[source,bash]
+-----
+s2s/max-inactivity-time[L]=900
+-----
+
+== Custom Plugin: Selecting s2s Connection
+Sometimes for very large installations you may want to set larger number of s2s connections to remote servers, especially if they work in cluster of several nodes. In such a case you can also have a control over XMPP packets distribution among s2s connections to a single remote server.
+
+This piece of code is pluggable and you can write your own connection selector. It is enough to implement 'S2SConnectionSelector' interface and set your class name in the configuration using following parameter in +init.properties+ file:
+
+[source,bash]
+-----
+s2s/s2s-conn-selector=YourSelectorImplementation
+-----
+
+The default selector picks connections randomly.

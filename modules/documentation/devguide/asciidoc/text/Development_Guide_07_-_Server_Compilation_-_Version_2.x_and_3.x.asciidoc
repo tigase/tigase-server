@@ -1,0 +1,76 @@
+[[scv23]]
+= Server Compilation - version 2.x and 3.x
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+_Tigase XMPP Server version *4.x* or later need slightly different procedure to compile._
+
+Although the server doesn't need any third-party libraries apart from Java 6.0 (1.6beta2) compliant JVM to run, link:http://ant.apache.org/[Apache Ant] tool and link:http://ant-contrib.sourceforge.net/[Ant-Contrib] are used to build binaries of *Tigase* applications and libraries. Another tools which is needed is a link:http://subversion.tigris.org/[Subversion] which is required to download the most recent sources from *Tigase* repository.
+
+To make it a list, again:
+
+. link:http://java.sun.com/javase/6/webnotes/install/index.html[JDK-1.6] - Java SDK to compile and run *Tigase* applications.
+. link:http://ant.apache.org/[Apache Ant] - the build tool
+. link:http://ant-contrib.sourceforge.net/[Ant-Contrib] - *Apache Ant* extensions used by build script (ant-contrib on gentoo, and ant-optional on Ubuntu)
+. link:http://subversion.tigris.org/[Subversion] - version control system used by *Tigase*.
+
+Install all above in standard way, appropriate for your operating system. It is enough if they are available in system PATH variable so you can execute them from command line.
+
+*Tigase Server* has been divided into a few smaller sub-projects some time ago. In order to have it all working together we need to do compile them one by one. Here is step by step instruction how to do it. Assuming you already run command line shell and changed to directory where you want to keep all *Tigase* files do as follows:
+
+. Get *tigase-utils* sources and compile them:
++
+[source,bash]
+-----
+svn co https://svn.tigase.org/reps/tigase-utils/trunk/ utils
+cd utils
+ant clean jar
+cd ..
+-----
+. Get *tigase-xmltools* sources and compile them:
++
+[source,bash]
+-----
+svn co https://svn.tigase.org/reps/tigase-xmltools/trunk/ xmltools
+cd xmltools
+ant clean jar
+cd ..
+-----
+. Get *tigase-server* sources and compile them:
++
+[source,bash]
+-----
+svn co https://svn.tigase.org/reps/tigase-server/trunk/ server
+cp xmltools/jars/tigase-xmltools.jar server/libs/
+cp utils/jars/tigase-utils.jar server/libs/
+cd server
+ant clean jar
+-----
+
+Now you have *Tigase Server* compiled and ready to run. To check and make sure it is indeed compiled and can be executed you can try to start the server. Assuming you are in the directory where you executed the last compilation command for server sources run following command:
+
+[source,bash]
+-----
+java -cp libs/tigase-utils.jar:libs/tigase-xmltools.jar:jars/tigase-server.jar tigase.server.XMPPServer
+-----
+
+If it all worked correctly you should see output similar to presented below:
+
+[source,bash]
+-----
+2006-10-04 17:00:38  ConfigRepository.init()        WARNING:  Can not open existing configuration file
+2006-10-04 17:00:38  XMLDB.setupNewDB()                  INFO:     Create empty DB.
+2006-10-04 17:00:38  MessageRouter.addRegistrator()      INFO:     Adding registrator: Configurator
+2006-10-04 17:00:38  MessageRouter.addComponent()        INFO:     Adding component: Configurator
+2006-10-04 17:00:38  Configurator.setupLogManager()      WARNING:  DONE
+2006-10-04 17:00:38  Configurator.setupLogManager()      WARNING:  DONE
+2006-10-04 17:00:39  XMLRepository.()              WARNING:  Can not open existing user repository file
+-----
+
+Now you can proceed to configuration document to learn how to tweak server settings or you can just start hacking server code and do experiments.

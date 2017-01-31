@@ -26,6 +26,9 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import tigase.db.TigaseDBException;
 
 import tigase.xml.DomBuilderHandler;
@@ -74,42 +77,42 @@ import java.util.Queue;
  */
 public class Privacy {
 	/** Field description */
-	protected static final String ACTION = "action";
+	public static final String ACTION = "action";
 
 	/** Field description */
-	protected static final String ACTIVE = "active-list";
+	public static final String ACTIVE = "active-list";
 
 	/** Field description */
-	protected static final String DEFAULT = "default-list";
+	public static final String DEFAULT = "default-list";
 
 	/** Field description */
-	protected static final String ITEM = "item";
+	public static final String ITEM = "item";
 
 	/** Field description */
-	protected static final String LIST = "list";
+	public static final String LIST = "list";
 
 	/** Field description */
-	protected static final String NAME = "name";
+	public static final String NAME = "name";
 
 	/** Field description */
-	protected static final String ORDER = "order";
+	public static final String ORDER = "order";
 
 	/** Field description */
-	protected static final String PRIVACY = "privacy";
+	public static final String PRIVACY = "privacy";
 
 	/** Field description */
-	protected static final String PRIVACY_LIST = "privacy-list";
+	public static final String PRIVACY_LIST = "privacy-list";
 
 	/** Field description */
-	protected static final String STANZAS = "stanzas";
+	public static final String STANZAS = "stanzas";
 
 	/** Field description */
-	protected static final String TYPE = "type";
+	public static final String TYPE = "type";
 
 	/** Field description */
-	protected static final String VALUE = "value";
+	public static final String VALUE = "value";
 
-	private static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";
+	public static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";
 
 	/**
 	 * Private logger for class instances.
@@ -208,9 +211,8 @@ public class Privacy {
 	 */
 	public static Element getDefaultList(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		Element sessionDefaultList = null;
+		Element sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
 		if (session.getCommonSessionData(PRIVACY_LIST_LOADED) == null) {
-			sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
 			if ( sessionDefaultList == null ){
 				String defaultListName = getDefaultListName( session );
 				if ( defaultListName != null ){
@@ -420,6 +422,101 @@ public class Privacy {
 		}
 	}
 
+	public static List<String> getBlocked(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
+		Element list = getDefaultList(session);
+		List<String> ulist = null;
+		if(list != null) {
+			ulist = list.mapChildren(item -> isBlockItem(item), item -> item.getAttributeStaticStr(VALUE));
+		}
+		return ulist;				
+	}
+	
+	public static boolean block(XMPPResourceConnection session, String jid) throws NotAuthorizedException, TigaseDBException {
+		String name = getDefaultListName(session);
+		if(name == null) {
+			name = "default";
+		}
+		Element list = getList(session,name);			
+		if(list != null) {
+			if (list.findChild(item -> jid.equals(item.getAttributeStaticStr(VALUE)) && isBlockItem(item)) != null)
+				return false;
+		}
+		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});		
+		list_new.addChild(new Element(ITEM,new String[]{TYPE,ACTION,VALUE,ORDER},new String[]{"jid","deny",jid,"0"}));
+		if (list != null) {
+			List<Element> items = list.getChildren();
+			if (items != null) {
+				Collections.sort(items, JabberIqPrivacy.compar);
+				for (int i = 0; i < items.size(); i++) {
+					items.get(i).setAttribute(ORDER, "" + (i + 1));
+				}
+				list_new.addChildren(items);
+			}
+		}
+		updateList(session, name, list_new);
+		return true;
+	}
+	
+	public static boolean unblock(XMPPResourceConnection session, String jid) throws NotAuthorizedException, TigaseDBException {
+		String name = getDefaultListName(session);
+		Element list = getList(session,name);
+		if(list == null)
+			return false;
+		
+		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});	
+		List<Element> items = list.findChildren(item -> !jid.equals(item.getAttributeStaticStr(VALUE)) || !isBlockItem(item));
+		if (items != null) {
+			Collections.sort(items, JabberIqPrivacy.compar);
+			for (int i = 0; i < items.size(); i++) {
+				items.get(i).setAttribute(ORDER, "" + (i + 1));
+			}
+			list_new.addChildren(items);
+		}
+	
+		updateList(session, name, list_new);
+		
+		return false;		
+	}
+
+	public static List<String> unblockAll(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
+		String name = getDefaultListName(session);
+		Element list = getList(session,name);
+		if(list == null)
+			return null;
+
+		List<String> ulist = list.mapChildren(item -> isBlockItem(item), item -> item.getAttributeStaticStr(VALUE));
+		
+		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});			
+		List<Element> items = list.findChildren(item -> !isBlockItem(item));
+		if (items != null) {
+			Collections.sort(items, JabberIqPrivacy.compar);
+			for (int i = 0; i < items.size(); i++) {
+				items.get(i).setAttribute(ORDER, "" + (i + 1));
+			}
+			list_new.addChildren(items);
+		}
+	
+		updateList(session, name, list_new);
+		
+		return ulist;				
+	}	
+	
+	private static void updateList(XMPPResourceConnection session, String name, Element list_new) throws NotAuthorizedException, TigaseDBException {
+		addList(session,list_new);
+		Privacy.setDefaultList(session, list_new);
+		if(getDefaultList(session) == null) {
+			Privacy.setActiveList(session, name);
+		}
+		else if(name.equals(getActiveListName(session))) {
+			session.putCommonSessionData(ACTIVE, list_new);
+			session.putSessionData(ACTIVE, list_new);
+		}		
+	}
+	
+	private static boolean isBlockItem(Element item) {
+		return "jid".equals(item.getAttributeStaticStr(TYPE)) && "deny".equals(item.getAttributeStaticStr(ACTION)) && item.getChildren() == null;
+	}
+	
 }    // Privacy
 
 

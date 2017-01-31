@@ -1,0 +1,43 @@
+[[tigase41virtualHosts]]
+= Virtual Hosts in Tigase Server
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Tigase server supports multiple virtual hosts in a single server installation. This is supported via link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/vhosts/VHostManagerIfc.java[VHostManager] - the new Tigase server component added recently to the implementation. Virtual hosts can be added or removed, enabled or disabled during runtime without restarting the service or disrupting normal operation.
+
+This document describes how virtual hosts work in Tigase server and how to get the most out of this feature in your installation.
+
+The simplest and default way to set virtual hosts is in the server configuration. You can either edit manually the +init.properties+ file or use the graphical installer/configuration program to set the property. If you want to edit it manually search for '--virt-hosts' property for more detailed description.
+
+Alternatively you can use the GUI installer as shown below to set a list of virtual hosts.
+
+image:images/tigase-basic-config-vhosts.png[]
+
+This method however has many disadvantages. It requires a server restart after each change, and the configuration file is not the best place to store long list of virtual domains. Furthermore you can not set any additional parameters for the domain other than whether it exists or not.
+
+There is another way to store and control virtual domains in Tigase. That information can be put in the database and managed using ad-hoc commands. List of domains can be modified outside Tigase server through any third-party system or web application and the server reloads the list of when received *VHOSTS_RELOAD* ad-hoc command.
+
+There are 2 more ad-hoc commands which allow you to add/update and remove virtual hosts via XMPP protocol:
+
+- *VHOSTS_UPDATE* - for adding new virtual host or changing parameters of the existing domain
+- *VHOSTS_REMOVE* - for removing existing virtual domain from the list of the server domains.
+
+By default, both commands cause the vhosts list to update in the permanent repository. This is however link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] implementation dependent feature and can be changed in your repository implementation.
+
+Commands for virtual domain management can be executed using any XMPP client with proper support for service discovery and ad-hoc commands, for example link:http://psi-im.org/[Psi]. Commands are accepted only when they are sent by the service administrator.
+
+Please refer to documents listed below for more detailed information on the following topics:
+
+// - ////<<managingVirtualDomainsMissing,////Managing Virtual Domains Using Psi Client.
+- xref:ad-hocCommands[Specification for ad-hoc Commands Used to Manage Virtual Domains].
+- xref:virtualComponents[Virtual Components for the Tigase Cluster]
+
+You may also want to reference these for additonal information
+- xref:addManageDomain[API Description for Virtual Domains Management in Tigase Server].
+- link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html_chunk/virtHosts.html[virtHosts Property guide]

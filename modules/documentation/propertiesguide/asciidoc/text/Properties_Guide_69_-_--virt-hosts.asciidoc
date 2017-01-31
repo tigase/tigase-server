@@ -1,0 +1,27 @@
+[[virtHosts]]
+= --virt-hosts
+:author: not known
+:version: v1.0 initial release
+:Date: 2013-02-10 01:53
+
+*Default value:* 'hostname'
+
+*Example:* +--virt-hosts = domain1,domain2,domain3+
+
+*Possible values:* 'comma separated list of domains.'
+
+*Description:* The +--virt-hosts+ property allows to set a list of virtual domains served by the installation. This is just a list of virtual domains loaded at the startup time. Domains can be added, removed, disabled or updated at runtime. All the actual domain metadata are stored in the database.
+
+Some metadata for vhosts can be also provided in the +init.properties+ configuration file using this property. Domain is separated with ':' from its metadata. For boolean values '-' in front of the parameter means the feature is *off*. `+` or nothing  means it is *on*. If a parameter requires some additional settings it is provided in form: +param=val+.
+
+Here is an example:
+
+[source,bash]
+-----
+--virt-hosts=domain1:-anon:register:-tls-required:s2s-secret=s2spasswd:\
+  domain-filter=LOCAL:max-users=1000,domain2,\
+  domain3:c2s-ports-allowed=5222;5223;5280;5290
+  domain3:domain-filter=LIST=whitedomain1;whitedomain2;whitedomain3
+-----
+
+*Available since:* 4.3.0

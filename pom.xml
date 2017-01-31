@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>7.0.5-SNAPSHOT</version>
+		<version>7.1.1-SNAPSHOT</version>
 		<relativePath>modules/master</relativePath>
 	</parent>
 
@@ -81,6 +81,18 @@
 					</instructions>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -93,14 +105,21 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<source>1.7</source>
+							<source>1.8</source>
 							<quiet>true</quiet>
 							<aggregate>true</aggregate>
+							<includeDependencySources>true</includeDependencySources>
+							<dependencySourceIncludes>
+								<dependencySourceInclude>tigase:*</dependencySourceInclude>
+							</dependencySourceIncludes>
+
 							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
 							<destDir>docs/javadoc</destDir>
 
 							<finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
 							<jarOutputDirectory>pack</jarOutputDirectory>
+
+							<additionalparam>-Xdoclint:none</additionalparam>
 						</configuration>
 					</execution>
 				</executions>
@@ -122,13 +141,49 @@
 					<threadCount>10</threadCount>	
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<archiveDirectory>${project.basedir}</archiveDirectory>
+					<includes>
+						<include>target/tigase*.?ar</include>
+						<include>jars/tigase*.?ar</include>
+					</includes>
+					<processMainArtifact>false</processMainArtifact>
+					<processAttachedArtifacts>false</processAttachedArtifacts>
+					<tsa>${tsa-uri}</tsa>
+					<skip>${sign-skip}</skip>
+
+					<keystore>${sign-keystore}</keystore>
+					<alias>${sign-alias}</alias>
+					<storepass>${sign-storepass}</storepass>
+					<keypass>${sign-keypass}</keypass>
+					<verbose>${verbose-log}</verbose>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-utils</artifactId>
-			<version>3.4.4</version>
+			<version>3.5.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-xmltools</artifactId>
+			<version>3.5.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

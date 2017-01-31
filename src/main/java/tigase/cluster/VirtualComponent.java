@@ -24,40 +24,31 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.conf.Configurable;
-
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-
 import tigase.server.ComponentInfo;
-
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-
-import tigase.vhosts.VHostListener;
-import tigase.vhosts.VHostManagerIfc;
-
-import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.conf.Configurable;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.util.DNSResolverFactory;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostListener;
+import tigase.vhosts.VHostManagerIfc;
+import tigase.xml.Element;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The purpose of this component implementation is to forward packets to a
@@ -248,7 +239,7 @@ public class VirtualComponent
 			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
 
 			for (String node : cl_nodes) {
-				if (!node.equals(DNSResolver.getDefaultHostname())) {
+				if (!node.equals(DNSResolverFactory.getInstance().getDefaultHost())) {
 					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
 
 					break;
@@ -301,7 +292,7 @@ public class VirtualComponent
 	@Override
 	public void setName(String name) {
 		this.name        = name;
-		this.componentId = JID.jidInstanceNS(name, DNSResolver.getDefaultHostname(), null);
+		this.componentId = JID.jidInstanceNS(name, DNSResolverFactory.getInstance().getDefaultHost(), null);
 	}
 
 	@Override

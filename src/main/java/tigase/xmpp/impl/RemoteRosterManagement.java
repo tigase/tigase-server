@@ -73,11 +73,6 @@ public class RemoteRosterManagement
 	}
 
 	@Override
-	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
-	}
-
-	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
 					XMPPResourceConnection session, NonAuthUserRepository repo,
 					Queue<Packet> results, Map<String, Object> settings)

@@ -46,6 +46,12 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.db.DBInitException;
+import tigase.db.NonAuthUserRepository;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.XMPPResourceConnection;
 
 /**
  *
@@ -53,15 +59,17 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 
-	public static final long MSGS_STORE_LIMIT_VAL = 100;
+	public static final String OFFLINE_MSGS_KEY = "offline-msgs";
+	private static final long MSGS_STORE_LIMIT_VAL = 100;
 	public static final String MSGS_STORE_LIMIT_KEY = "store-limit";
+	private static final String MSGS_USER_STORE_LIMIT_ENABLE_KEY = "user-store-limit-enable";
 	
 	protected static final int MAX_QUEUE_SIZE = 1000;
 	
 	private static final Map<String, MsgRepositoryIfc> repos =
 			new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
 	
-public enum MSG_TYPES { none(0), message(1), presence(2);
+	public enum MSG_TYPES { none(0), message(1), presence(2);
 
     private final int numVal;
 
@@ -111,7 +119,10 @@ public enum MSG_TYPES { none(0), message(1), presence(2);
 	protected DelayQueue<MsgDBItem> expiredQueue = new DelayQueue<MsgDBItem>();
 	protected long broadcastMessagesLastCleanup = 0;
 	protected Map<String,BroadcastMsg> broadcastMessages = new ConcurrentHashMap<String,BroadcastMsg>();
-		
+
+	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
+	private boolean msgs_user_store_limit = false;
+	
 	protected abstract void loadExpiredQueue(int max);
 	protected abstract void loadExpiredQueue(Date expired);
 	protected abstract void deleteMessage(T db_id);
@@ -120,13 +131,47 @@ public enum MSG_TYPES { none(0), message(1), presence(2);
 	protected abstract void ensureBroadcastMessageRecipient(String id, BareJID recipient);
 	protected abstract void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
 
-	public abstract Map<MSG_TYPES,Long> getMessagesCount(JID to)  throws UserNotFoundException;
+	public abstract Map<Enum,Long> getMessagesCount(JID to)  throws UserNotFoundException;
 	public abstract List<Element> getMessagesList(JID to)  throws UserNotFoundException;
-	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids, JID to, boolean delete,
+	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids,  XMPPResourceConnection session, boolean delete,
 																		OfflineMessagesProcessor proc ) throws UserNotFoundException;
-	public abstract	int deleteMessagesToJID( List<String> db_ids, JID to) throws UserNotFoundException;
+	public abstract	int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session) throws UserNotFoundException;
 
+	@Override
+	public void initRepository(String conn_str, Map<String, String> map)
+			throws DBInitException {
+		
+		if (map != null) {
+			String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
+			
+			if (msgs_store_limit_str != null) {
+				msgs_store_limit = Long.parseLong(msgs_store_limit_str);
+			}
+			
+			String msgs_user_store_limit_enable = map.get(MSGS_USER_STORE_LIMIT_ENABLE_KEY);
+			if (msgs_user_store_limit_enable != null) {
+				msgs_user_store_limit = Boolean.parseBoolean(msgs_user_store_limit_enable);
+			}			
+		}
+	}	
 
+	protected long getMsgsStoreLimit(BareJID userJid, NonAuthUserRepository userRepo) {
+		if (msgs_user_store_limit) {
+			try {
+				String limitStr = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, null);
+				if (limitStr != null) {
+					long limit = Long.parseLong(limitStr);
+					// in case of 0 we need to disable offline storage - not to save all as in case of store-limit
+					if (limit == 0)
+						limit = -1;
+					return limit;
+				}
+			} catch (UserNotFoundException ex) {
+				// should not happen
+			}
+		}
+		return msgs_store_limit;
+	}
 
 	public BroadcastMsg getBroadcastMsg(String id) {
 		return broadcastMessages.get(id);

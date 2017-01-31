@@ -1,0 +1,29 @@
+[[mavenguide]]
+= A Very Short Maven Guide
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+If you don't use link:http://maven.apache.org/[Maven] at all or use it once a year you may find the document a useful maven commands reminder:
+
+== Snapshot Compilation and Snapshot Package Generation
+- +mvn compile+ - compilation of the snapshot package
+- +mvn package+ - create snapshot jar file
+- +mvn install+ - install in local repository shanpshot jar file
+- +mvn deploy+ - deploy to the remote repository snapshot jar file
+
+== Release Compilation, Generation
+
+- +mvn release:prepare+ prepare the project for a new version release
+- +mvn release:perform+ execute new version release generation
+
+== Generating tar.gz, tar.bz2 File With Sources Only
+
+- +mvn -DdescriptorId=src assembly:assembly+
+
+Any of these commands will work when your commandline is in a directory with a pom.xml file.  This file will instruct what Maven will do.

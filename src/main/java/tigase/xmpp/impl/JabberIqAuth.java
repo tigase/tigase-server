@@ -110,10 +110,6 @@ public class JabberIqAuth
 
 	//~--- methods --------------------------------------------------------------
 
-	@Override
-	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
-	}
 
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {

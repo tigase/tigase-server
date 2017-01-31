@@ -1,0 +1,54 @@
+[[testSuideScripts]]
+= Test Suite Scripting Language
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+The test suite contains scripting language which allows you to combine test cases into a test scenarios. On the lowest level, however the language is designed to allow you to describe the test by setting test parameters, test comments, identification and so on.
+
+Let's look at the example test description.
+
+[source,java]
+-----
+Short name@test-id-1;test-id-2: Short description for the test case
+{
+ -loop = 10
+ -user-name = Frank
+ # This is a comment which is ignored
+}
+>> Long, detailed description of the test case <<
+-----
+
+Meaning of all elements:
+
+. *Short name* is any descriptive name you want. It doesn't need to be unique, just something which tells you what this test is about. @ is a separator between the short name and the test ids.
+. *test-id-1;test-id-2* is a semicolon separated of the test cases IDs. The tests cases are executed in the listed order. And listing them there means that the test-id-2 depends on test-id-1. Normally you don't have to list all the dependencies because all mandatory dependencies are included automatically. Which means if you have an authentication test case the suite adds the network socket connection and stream opening tests automatically. Sometimes however, there are dependencies which are optional or multiple mandatory dependencies and you need to select which one has to be executed. As a good example is the authentications test case. There are many authentication tests: PLAIN-AUTH, SASL-DIGESTMD5, SASL-PLAIN, DIGEST-AUTH and they are all mandatory for most of other tests like roster, presence and so on. One of the authentication tests is a default dependency but if you put on the list different authentication it will be used instead of default one.
+. *:* is a separator between test cases ids list and the short test description.
+. *Short test description* is placed between : - colon and opening *{* - curly bracket. This is usually quite brief, single line test description.
+. *{  }* curly brackets contain all the test parameters, like how many times the test has to be executed or run the test in a separate thread, user name, host IP address for the network connection and many others.
+. *>>  <<* inside the double greater than and double less than you put a very long, multiple line test description.
+
+As for the testing script between open curly brackets { and close one } you can put all the test case parameters you wish. The format for it is:
+
+*-parameter-name = value*
+
+Parameter names always start with *-*. Note, some parameters don't require any value. They can exist on their own without any value assigned:
+
+*-debug-on-error*
+
+This imitates if you were to put *yes* or *true* as the value.
+
+The scripting language includes also support for variables which can be assigned any value and used multiple times later on. You assign a value to the variable the same way as you assign it to the parameter:
+
+*$(variable-name) = value*
+
+The variable name must be always enclosed with brackets *()* and start with *$*.
+
+The value may be enclosed within double quotes *""* or double quotes may be omitted. If this is a simple string like a number or character string consisting only of digits, letters, underscore *_* and hyphen *-* then you can omit double quotes otherwise you must enclose the value.
+
+The test case descriptions can be nested inside other test case descriptions. Nested test case descriptions inherit parameters and variables from outer test case description.

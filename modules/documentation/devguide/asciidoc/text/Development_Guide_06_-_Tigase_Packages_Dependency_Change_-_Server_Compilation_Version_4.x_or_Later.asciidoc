@@ -1,0 +1,43 @@
+[[scv4ol]]
+= Tigase Packages Dependency Change - Server Compilation Version 4.x or Later
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+The dependency for link:https://projects.tigase.org/projects/tigase-utils[Tigase Utils Package] has changed. This is important for everybody who builds the Tigase server manually from sources using link:http://ant.apache.org/[Ant] tool. The link:http://maven.apache.org/[Maven] handles all the dependencies automatically and scripts have been updated.
+
+Please keep reading for more details how to compile the server from sources in current repositories.
+
+If you have an old *Tigase MUC* or *Tigase Extras* package lying in the _server/libs/_ directory please remove it now. You have to update it too and copy it over to the _server/jars/_ directory after you completed steps below.
+
+For all those who build the server from sources manually using link:http://ant.apache.org/[Ant] here is a short guide:
+
+. Checkout all the sources first:
++
+- link:https://projects.tigase.org/projects/tigase-xmltools/repository[https://projects.tigase.org/projects/tigase-xmltools/repository]
+- link:https://projects.tigase.org/projects/tigase-utils/repository[https://projects.tigase.org/projects/tigase-utils/repository]
+- link:https://projects.tigase.org/projects/tigase-server/repository[https://projects.tigase.org/projects/tigase-server/repository]
+. Build the Tigase XMLTools and copy the jar file over to the *utils* and*server* libs/ directory
++
+- +cd xmltools+
+- +ant clean jar-dist+
+- +cp jars/tigase-xmltools.jar ../utils/libs+
+- +cp jars/tigase-xmltools.jar ../server/libs+
+. Build the Tigase Utils and copy the jar file to the *server* _libs/_ directory
++
+- +cd ../utils+
+- +ant clean jar-dist+
+- +cp jars/tigase-utils.jar ../server/libs+
+. Build the Tigase Server binary
++
+- +cd ../server+
+- +ant clean jar-dist+
+
+This is a very short guide but I hope it helps. If you have any problems, please let me know.
+
+Addendum: starting with version 5.2.0 all libraries and jar files for the server are in jars/ directory; however with that version we strongly encourage to switch to maven build system as we are phasing out Ant - please follow guide Tigase XMPP Server 5.2.0 and Later - Compilation and Generating Distribution Packages

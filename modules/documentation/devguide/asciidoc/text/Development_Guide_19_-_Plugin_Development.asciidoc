@@ -1,0 +1,17 @@
+[[pluginDev]]
+= Plugin Development
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+This is a set of documents explaining details what is a plugin, how they are designed and how they work inside the Tigase server. The last part of the documentation explains step by step creating the code for a new plugin.
+
+- xref:writePluginCode[Writing Plugin Code]
+- xref:pluginConf[Plugin Configuration]
+- xref:packetprocess[How Packets are Processed by the SM and Plugins]
+- xref:saslcmac[SASL Custom Mechanisms and Configuration]

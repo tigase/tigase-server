@@ -1,12 +1,13 @@
 [[boshExtraHeadersFile]]
---bosh-extra-headers-file
-=========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --bosh-extra-headers-file
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-03-20 01:00
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-03-20 01:00
 
 *Default value:* +etc/bosh-extra-headers.txt+
 
@@ -14,19 +15,18 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'path to a file on the filesystem.'
 
-*Description:* The property allows you to specify a path to a text file with additional HTTP headers which will be sent to a Bosh client with each request. This gives some extra flexibility for Bosh clients running on some systems with special requirements for the HTTP headers and some additional settings.
+*Description:* This property allows you to specify a path to a text file with additional HTTP headers which will be sent to a Bosh client with each request. This gives some extra flexibility for Bosh clients running on some systems with special requirements for the HTTP headers and some additional settings.
 
 By default a file distributed with the installation contains following content:
 
 [source,bash]
-------------------------------
+-----
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, POST, OPTIONS
 Access-Control-Allow-Headers: Content-Type
 Access-Control-Max-Age: 86400
-------------------------------
+-----
 
 This can be modified, removed or replaced with a different content on your installation.
 
 *Available since:* 5.1.0
-

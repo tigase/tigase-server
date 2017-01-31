@@ -27,7 +27,7 @@ public class DiscoveryMonitorModule extends DiscoveryModule<MonitorContext> {
 
 	@Override
 	protected void processAdHocCommandItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-	RepositoryException {
+			RepositoryException {
 		if (jid.getResource() != null && isAdHocCompatible(context.getKernel().getInstance(jid.getResource()))) {
 			final Object taskInstance = context.getKernel().getInstance(jid.getResource());
 
@@ -59,7 +59,7 @@ public class DiscoveryMonitorModule extends DiscoveryModule<MonitorContext> {
 
 	@Override
 	protected void processDiscoInfo(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-	RepositoryException {
+			RepositoryException {
 		if (jid.getResource() == null) {
 			super.processDiscoInfo(packet, jid, node, senderJID);
 		} else if (jid.getResource() != null && context.getKernel().getInstance(jid.getResource()) != null) {
@@ -83,7 +83,7 @@ public class DiscoveryMonitorModule extends DiscoveryModule<MonitorContext> {
 
 	@Override
 	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-	RepositoryException {
+			RepositoryException {
 		if (node == null && jid.getResource() == null) {
 			Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
 

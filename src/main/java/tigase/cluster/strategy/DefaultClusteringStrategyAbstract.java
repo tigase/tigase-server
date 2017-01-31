@@ -29,25 +29,23 @@ package tigase.cluster.strategy;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.SessionManagerClusteredIfc;
-import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
-
+import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
-
+import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
-import tigase.stats.StatisticsList;
-
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -57,7 +55,7 @@ import java.util.logging.Logger;
  *
  * @param <E>
  */
-public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
+public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 				implements ClusteringStrategyIfc<E> {
 	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
 
@@ -67,8 +65,40 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	private static final Logger log = Logger.getLogger(
 			DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-	
+	protected String comp = "sess-man";
+	protected String prefix = "strategy/" + this.getClass().getSimpleName() + "/";
+
 	//~--- fields ---------------------------------------------------------------
+
+	@Override
+	public void statisticExecutedIn(long executionTime) {
+
+	}
+
+	@Override
+	public void everyHour() {
+
+	}
+
+	@Override
+	public void everyMinute() {
+
+	}
+
+	@Override
+	public void everySecond() {
+
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+
+	}
+
+	@Override
+	public void setStatisticsPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
 	/** Field description */
 	protected ClusterControllerIfc cluster = null;
@@ -81,7 +111,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	private JID ampJID = null;
 
 	/** Field description */
-	protected CopyOnWriteArrayList<JID> cl_nodes_list   = new CopyOnWriteArrayList<JID>();
 	private Set<CommandListener>        commands =
 			new CopyOnWriteArraySet<CommandListener>();
 	private ErrorForwarding             errorForwarding = ErrorForwarding.drop;
@@ -127,7 +156,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	public boolean containsJidLocally(JID jid) {
 		return false;
 	}
-	
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {}
 
@@ -152,21 +180,10 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 		// Do nothing
 	}
-	
-	@Override
-	public void nodeConnected(JID jid) {
-		boolean result = cl_nodes_list.addIfAbsent(jid);
-
-		log.log(Level.FINE, "Cluster nodes: {0}, added: {1}", new Object[] { cl_nodes_list,
-				result });
-	}
 
 	@Override
-	public void nodeDisconnected(JID jid) {
-		boolean result = cl_nodes_list.remove(jid);
-
-		log.log(Level.FINE, "Cluster nodes: {0}, removed: {1}", new Object[] { cl_nodes_list,
-				result });
+	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		// Do nothing
 	}
 
 	@Override
@@ -247,8 +264,8 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public List<JID> getAllNodes() {
-		return cl_nodes_list;
+	public List<JID> getNodesConnected() {
+		return sm.getNodesConnected();
 	}
 
 	@Override
@@ -323,7 +340,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		if (isSuitableForForward(packet)) {
 
 			// nodes = metadata.getNodesForJid(jidLookup);
-			nodes = getAllNodes();
+			nodes = getNodesConnected();
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Selected nodes: {0}, for packet: {1}", new Object[] {
 						nodes,
@@ -341,10 +358,10 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 	@Override
 	public void getStatistics(StatisticsList list) {
-		list.add("cluster-strat", "Connected nodes", cl_nodes_list.size(), Level.INFO);
 		for (CommandListener cmd : commands) {
 			cmd.getStatistics(list);
 		}
+		getStatistics("sess-man/",list);
 	}
 
 	@Override
@@ -454,6 +471,18 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		// component.
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 			return false;
+		}
+		
+		// server needs to respond on Iq stanzas sent to bare jid, but there is
+		// no need to forward it to cluster node with users session
+		if (packet.getElemName() == Iq.ELEM_NAME && packet.getStanzaTo() != null 
+				&& packet.getStanzaTo().getResource() == null)
+			return false;
+
+		if (packet.getElemName() == Message.ELEM_NAME && packet.getType() != StanzaType.error && ampJID.equals(packet.getPacketFrom())) {
+			Element amp = packet.getElement().getChild("amp", "http://jabber.org/protocol/amp");
+			if (amp != null && amp.getAttributeStaticStr("status") == null)
+				return false;
 		}
 
 		if (packet.getElemName() == Message.ELEM_NAME && packet.getType() != StanzaType.error && ampJID.equals(packet.getPacketFrom())) {

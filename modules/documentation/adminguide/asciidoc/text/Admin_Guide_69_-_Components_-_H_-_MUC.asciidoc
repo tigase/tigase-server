@@ -1,0 +1,153 @@
+[[tigaseMUC]]
+= Tigase MUC Component
+:author: not known
+:version: v1.0 October 2015
+:date: 2015-10-01 15:00
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+Tigase MUC component is included in all Tigase distributions, to enable MUCs have the following lines in your +init.properties+ file:
+
+-----
+--comp-name-4 = muc
+--comp-class-4 = tigase.muc.MUCComponent
+-----
+
+== Configuration Options
+- *room-log-directory* +
+Directory to store chat logs
+-----
+muc/room-log-directory=/var/log/muc/
+-----
+
+- *message-filter-enabled* +
+To disable filter and allow MUC transfer all subelements in <message/> set:
+-----
+muc/message-filter-enabled[B]=false
+-----
+
+For example, this allows users to send XHTML stanzas through MUC chatrooms on your server.
+
+- *presence-filter-enabled* +
+To disable filter and allow MUC transfer all subelements in <presence/> set:
+-----
+muc/presence-filter-enabled[B]=false
+-----
+
+- *search-ghosts-every-minute* +
+To enable pinging occupants every minute
+-----
+muc/search-ghosts-every-minute[B]=true
+-----
+
+- *ghostbuster-enabled* +
+To disable active searching of ghosts in MUC Rooms:
+-----
+muc/ghostbuster-enabled[B]=false
+-----
+
+- *muc-allow-chat-states* +
+To allow transfer of chat-states in MUC messages:
+-----
+muc/muc-allow-chat-states[B]=true
+-----
+
+- *muc-lock-new-room* +
+To turn off default locking newly created rooms:
+-----
+muc/muc-lock-new-room[B]=false
+-----
+By default new room will be locked until owner submit room configuration.
+
+- *muc-multi-item-allowed*
+To disable joining from few resources to sinlge nickname:
+-----
+muc/muc-multi-item-allowed[B]=false
+-----
+
+=== History Providers Parameters
+- *history-db* +
+Database type. By default the same what is used as User Repository in Server.
+Provided types: +derby+, +mysql+, +memory+, +pgsql+, +sqlserver+, +none+.
+-----
+muc/history-db=none
+-----
+
+- *history-db-uri* +
+URI for database, if should be used different than default from Tigase Server:
+-----
+muc/history-db-uri=jdbc:derby:/database/tigasedbmuc
+-----
+
+=== Public log
+- *muc-logger-class* +
+To set custom class for MUC logger:
+-----
+muc/muc-logger-class=com.example.CustomLogger
+-----
+Class must implment interface +tigase.muc.logger.MucLogger+.
+
+=== Modules
+Each module can be configured to use custom implementation by including it in the init.properties, the defaults are as follows:
+[source,properties]
+-----
+muc/modules/jabber:iq:version[S]=tigase.component.modules.impl.JabberVersionModule
+muc/modules/owner[S]=tigase.muc.modules.RoomConfigurationModule
+muc/modules/presences[S]=tigase.muc.modules.PresenceModuleImpl
+muc/modules/groupchat[S]=tigase.muc.modules.GroupchatMessageModule
+muc/modules/invitations[S]=tigase.muc.modules.MediatedInvitationModule
+muc/modules/urn:xmpp:ping[S]=tigase.component.modules.impl.XmppPingModule
+muc/modules/unique[S]=tigase.muc.modules.UniqueRoomNameModule
+muc/modules/disco[S]=tigase.muc.modules.DiscoveryModule
+muc/modules/iqforwarder[S]=tigase.muc.modules.IqStanzaForwarderModule
+muc/modules/admin[S]=tigase.muc.modules.ModeratorModule
+muc/modules/privatemessages[S]=tigase.muc.modules.PrivateMessageModule
+muc/modules/commands[S]=tigase.component.modules.impl.AdHocCommandModule
+-----
+
+[[mucRoomConfig]]
+=== Room Configuration options
+In addition to the default Room configuration options defined in the MUC specification Tigase offers following as well:
+
+Tigase MUC Options::
+- tigase#presence_delivery_logic - allows configuring logic determining which presence should be used by occupant in the room while using multiple-resource connections under one nickname, following options are available:
+  * PREFERE_PRIORITY
+  * PREFERE_LAST
+- tigase#presence_filtering - (boolean) when enabled broadcasts presence only to selected affiliation groups
+- tigase#presence_filtered_affiliations - when enabled tigase#presence_filtering is enabled one can select affiliation which should receive presences, following are possible to select from:
+  * owner
+  * admin
+  * member
+  * none
+  * outcast
+- muc#roomconfig_maxusers - Allows configuring of maximum users of room.
+
+
+Configuring default room configuration in init.properties::
+-----
+muc/default_room_config/<option>=<value>
+-----
+for example:
+-----
+muc/default_room_config/tigase#presence_delivery_logic=PREFERE_LAST
+-----
+
+Configuration per-room::
+Per room configuration is done using IQ stanzas defined in the specification, for example:
+[source,xml]
+-----
+<iq type="set" to="roomname@muc.domain" id="config1">
+    <query xmlns="http://jabber.org/protocol/muc#owner">
+        <x xmlns="jabber:x:data" type="submit">
+            <field type="boolean" var="tigase#presence_filtering">
+                <value>1</value>
+            </field>
+            <field type="list-multi" var="tigase#presence_filtered_affiliations">
+                <value>owner</value>
+            </field>
+        </x>
+    </query>
+</iq>
+-----

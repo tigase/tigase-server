@@ -38,6 +38,13 @@ import tigase.conf.Configurator;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.*
 
+class DelayedReloadTask extends Thread {
+	void run() {
+		Thread.sleep(5000);
+	    ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+	}
+}
+
 try {
 
 	def ACTION = "action";
@@ -49,7 +56,7 @@ try {
 	def COMP_NAME = "comp-name";
 	def COMP_CLASS = "comp-class";
 
-	def SUBMIT = "submit";
+	def SUBMIT = "confirm";
 
 	def getComponentProperties = { comp_name, comp_class ->
 		def conf = XMPPServer.getConfigurator();
@@ -242,7 +249,7 @@ try {
 			mrProps.put(MessageRouterConfig.MSG_RECEIVERS_NAMES_PROP_KEY, (compNames as String[]));
 			conf.putProperties("message-router", mrProps);
                         
-			((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+			new DelayedReloadTask().start();
 			Command.addTextField(res, "Note", "Operation successful.")
 
 			return res;
@@ -307,7 +314,7 @@ try {
 			mrProps.put(MessageRouterConfig.MSG_RECEIVERS_PROP_KEY + comp_name + ".class", comp_class)
 			conf.putProperties("message-router", mrProps);
                         
-			((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+			new DelayedReloadTask().start();
 			Command.addTextField(res, "Note", "Operation successful.");
 			return res;
 		}

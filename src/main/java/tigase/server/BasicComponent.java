@@ -26,26 +26,8 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.script.Bindings;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
@@ -56,7 +38,8 @@ import tigase.osgi.OSGiScriptEngineManager;
 import tigase.server.script.AddScriptCommand;
 import tigase.server.script.CommandIfc;
 import tigase.server.script.RemoveScriptCommand;
-import tigase.util.DNSResolver;
+import tigase.stats.StatisticsList;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
@@ -66,6 +49,18 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Created: Oct 17, 2009 7:49:05 PM
  *
@@ -73,7 +68,7 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public class BasicComponent
-				implements Configurable, XMPPService, VHostListener {
+				implements Configurable, XMPPService, VHostListener, ClusteredComponentIfc {
 	/** Field description */
 	public static final String ALL_PROP_KEY = "ALL";
 
@@ -94,10 +89,9 @@ public class BasicComponent
 	protected VHostManagerIfc vHostManager          = null;
 	private ComponentInfo     cmpInfo               = null;
 	private JID               compId                = null;
-	private String            DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
+	private String            DEF_HOSTNAME_PROP_VAL = null;
 	private String            name                  = null;
-	private BareJID           defHostname = BareJID.bareJIDInstanceNS(
-			DEF_HOSTNAME_PROP_VAL);
+	private BareJID           defHostname = null;
 
 	/** Field description */
 	protected Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String,
@@ -107,11 +101,18 @@ public class BasicComponent
 			EnumSet<CmdAcl>>(20);
 
 	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
+	protected Set<String>       trusted = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager     = null;
 	private String              scriptsBaseDir          = null;
 	private String              scriptsCompDir          = null;
 	private ServiceEntity       serviceEntity           = null;
 	private boolean             initializationCompleted = false;
+	private String[]		    trustedProp = null;
+	
+	private final CopyOnWriteArrayList<JID> connectedNodes = new CopyOnWriteArrayList<JID>();
+	private final List<JID> connectedNodes_ro = Collections.unmodifiableList(connectedNodes);
+	private final CopyOnWriteArrayList<JID> connectedNodesWithLocal = new CopyOnWriteArrayList<JID>();
+	private final List<JID> connectedNodesWithLocal_ro = Collections.unmodifiableList(connectedNodesWithLocal);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -134,7 +135,7 @@ public class BasicComponent
 	 * @return a value of <code>boolean</code>
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
-		boolean result = isAdmin(jid);
+		boolean result = isAdmin(jid) || isTrusted(jid);
 
 		if (result) {
 			return true;
@@ -205,6 +206,32 @@ public class BasicComponent
 		return false;
 	}
 
+	public void everyHour() {
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.everyHour();
+		}		
+	}
+	
+	public void everyMinute() {
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.everyMinute();
+		}		
+	}
+	
+	public void everySecond() {
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.everySecond();
+		}		
+	}	
+	
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
 	@Override
 	public boolean handlesLocalDomains() {
 		return false;
@@ -235,6 +262,8 @@ public class BasicComponent
 		binds.put(CommandIfc.ADMN_DISC, serviceEntity);
 		binds.put(CommandIfc.SCRIPT_BASE_DIR, scriptsBaseDir);
 		binds.put(CommandIfc.SCRIPT_COMP_DIR, scriptsCompDir);
+		binds.put(CommandIfc.CONNECTED_NODES, connectedNodes);
+		binds.put(CommandIfc.CONNECTED_NODES_WITH_LOCAL, connectedNodesWithLocal);
 		binds.put(CommandIfc.COMPONENT_NAME, getName());
 		binds.put(CommandIfc.COMPONENT, this);
 	}
@@ -249,7 +278,61 @@ public class BasicComponent
 //      getComponentId() });
 //  Thread.dumpStack();
 	}
-
+	
+	@Override
+	public void nodeConnected(String node) {
+		JID jid = JID.jidInstanceNS(getName(), node, null);
+		boolean added = false;
+		
+		synchronized (connectedNodesWithLocal) {
+			if (!connectedNodesWithLocal.contains(jid)) {
+				JID[] tmp = connectedNodesWithLocal.toArray(new JID[connectedNodesWithLocal.size() + 1]);
+				tmp[tmp.length-1] = jid;
+				Arrays.sort(tmp);
+				int pos = Arrays.binarySearch(tmp, jid);
+				connectedNodesWithLocal.add(pos, jid);
+				added = true;
+			}
+		}
+		
+		synchronized (connectedNodes) {
+			if (!connectedNodes.contains(jid) && !getComponentId().equals(jid)) {
+				JID[] tmp = connectedNodes.toArray(new JID[connectedNodes.size() + 1]);
+				tmp[tmp.length-1] = jid;
+				Arrays.sort(tmp);
+				int pos = Arrays.binarySearch(tmp, jid);
+				connectedNodes.add(pos, jid);
+				added = true;
+			}
+		}
+		
+		if (added) {
+			log.log(Level.FINE, "Node connected: {0}", node);
+			onNodeConnected(jid);
+			refreshTrustedJids();
+		}
+	}
+	
+	@Override
+	public void nodeDisconnected(String node) {
+		JID jid = JID.jidInstanceNS(getName(), node, null);
+		boolean removed = false;
+		
+		synchronized (connectedNodesWithLocal) {
+			removed |= connectedNodesWithLocal.remove(jid);
+		}
+		
+		synchronized (connectedNodes) {
+			removed |= connectedNodes.remove(jid);
+		}
+		
+		if (removed) {
+			log.log(Level.FINE, "Node disonnected: {0}", node);
+			onNodeDisconnected(jid);
+			refreshTrustedJids();
+		}
+	}
+	
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart()) &&
@@ -257,7 +340,7 @@ public class BasicComponent
 			processScriptCommand(packet, results);
 		}
 	}
-
+	
 	@Override
 	public void release() {}
 
@@ -288,6 +371,11 @@ public class BasicComponent
 			log.log(Level.FINEST, "Modifying service-discovery info, removing: {0}", item);
 		}
 		serviceEntity.removeItems(item);
+	}
+	
+	@Override
+	public void setClusterController(ClusterControllerIfc cl_controller) {
+		
 	}
 
 	/**
@@ -394,7 +482,7 @@ public class BasicComponent
 		Map<String, Object> defs = new LinkedHashMap<String, Object>(50);
 
 		defs.put(COMPONENT_ID_PROP_KEY, compId.toString());
-		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
+		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
 		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
 
 		String[] adm = null;
@@ -414,6 +502,11 @@ public class BasicComponent
 		defs.put(SCRIPTS_DIR_PROP_KEY, scripts_dir);
 		defs.put(COMMAND_PROP_NODE + "/" + ALL_PROP_KEY, CmdAcl.ADMIN.name());
 
+		String trusted_def = System.getProperty(TRUSTED_PROP_KEY);
+		if (trusted_def != null) {
+			defs.put(TRUSTED_PROP_KEY, trusted_def.split(","));
+		}
+		
 		return defs;
 	}
 
@@ -649,6 +742,16 @@ public class BasicComponent
 		return name;
 	}
 
+	public void getStatistics(StatisticsList list) {
+		String compName = getName();
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.getStatistics(compName, list);
+		}
+		if (connectedNodes.size() > 0) {
+			list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.FINEST);
+		}
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -758,11 +861,26 @@ public class BasicComponent
 		return false;
 	}
 
+	public boolean isTrusted(JID jid) {
+		if (trusted.contains(jid.getBareJID().toString()))
+			return true;
+				
+		return isAdmin(jid);
+	}
+	
+	public boolean isTrusted(String jid) {
+		return trusted.contains(jid);
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setName(String name) {
 		this.name = name;
+
+		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
+		defHostname = BareJID.bareJIDInstanceNS( DEF_HOSTNAME_PROP_VAL );
+
 		try {
 			compId = JID.jidInstance(name, defHostname.getDomain(), null);
 		} catch (TigaseStringprepException ex) {
@@ -772,6 +890,13 @@ public class BasicComponent
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+		if (props.size() > 1) {
+			if (props.get(TRUSTED_PROP_KEY) != null) {
+				trustedProp = (String[]) props.get(TRUSTED_PROP_KEY);				
+			}
+		}
+		nodeConnected(defHostname.getDomain());
+		refreshTrustedJids();
 		if (isInitializationComplete()) {
 
 			// Do we really need to do this again?
@@ -793,7 +918,7 @@ public class BasicComponent
 		}
 		if (props.get(DEF_HOSTNAME_PROP_KEY) != null) {
 			defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
-		}
+			}
 
 		String[] admins_tmp = (String[]) props.get(ADMINS_PROP_KEY);
 
@@ -847,6 +972,22 @@ public class BasicComponent
 
 	//~--- methods --------------------------------------------------------------
 
+	public List<JID> getNodesConnected() {
+		return connectedNodes_ro;
+	}
+	
+	public List<JID> getNodesConnectedWithLocal() {
+		return connectedNodesWithLocal_ro;
+	}
+	
+	protected void onNodeConnected(JID jid) {
+		
+	}
+	
+	protected void onNodeDisconnected(JID jid) {
+		
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -975,6 +1116,10 @@ public class BasicComponent
 		File             file       = null;
 		AddScriptCommand addCommand = new AddScriptCommand();
 		Bindings         binds      = scriptEngineManager.getBindings();
+		List<String>     extensions = new ArrayList<>();
+		for ( ScriptEngineFactory engineFactory :  scriptEngineManager.getEngineFactories()) {
+			extensions.addAll( engineFactory.getExtensions());
+		}
 
 		initBindings(binds);
 
@@ -991,7 +1136,7 @@ public class BasicComponent
 				File adminDir = new File(scriptsPath);
 
 				if ((adminDir != null) && adminDir.exists()) {
-					for (File f : adminDir.listFiles()) {
+					for ( File f : adminDir.listFiles( new ExtFilter( extensions ) ) ) {
 
 						// Just regular files here....
 						if (f.isFile() &&!f.toString().endsWith("~") &&!f.isHidden())  {
@@ -1084,9 +1229,9 @@ public class BasicComponent
 								}
 							}
 							if (!found) {
-								log.log(Level.CONFIG,
-										"{0}: skipping admin script {1}, id: {2}, descr: {3}, group: {4} for component: {5} or class: {6}", new Object[] {
-										getName(), file, cmdId, cmdDescr, cmdGroup, comp, compClass });
+								log.log( Level.FINEST,
+												 "{0}: skipping admin script {1}, id: {2}, descr: {3}, group: {4} for component: {5} or class: {6}",
+												 new Object[] { getName(), file, cmdId, cmdDescr, cmdGroup, comp, compClass } );
 
 								continue;
 							}
@@ -1108,6 +1253,48 @@ public class BasicComponent
 			} catch (IOException | ScriptException e) {
 				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
 			}
+		}
+	}
+	
+	private void refreshTrustedJids() {
+		synchronized (connectedNodesWithLocal) {
+			trusted.clear();
+			if (trustedProp != null) {
+				for (String trustedStr : trustedProp) {
+					if (trustedStr.contains("{clusterNode}")) {
+						for (JID nodeJid : connectedNodesWithLocal) {
+							String node = nodeJid.getDomain();
+							String jid = trustedStr.replace("{clusterNode}", node);
+							trusted.add(jid);	
+						}
+					} else {
+						trusted.add(trustedStr);
+					}
+				}
+			}
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "component {0} got trusted jids set as {1}", new Object[] { getName(), trusted });
+		}
+	}
+
+	private class ExtFilter
+					implements FileFilter {
+
+		List<String> extensions;
+
+		public ExtFilter( List<String> extensions ) {
+			this.extensions = extensions;
+		}
+
+		@Override
+		public boolean accept( File file ) {
+
+			boolean matched = false;
+			for ( String extension : extensions ) {
+				matched |= file.isFile() && file.getName().toLowerCase().endsWith( extension );
+			}
+			return matched;
 		}
 	}
 }

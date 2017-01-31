@@ -1,0 +1,175 @@
+[[manualinstall]]
+= Manual Installation in Console Mode
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Our preferred way to install the Tigase server is using xref:guiinstall[GUI installer] and configuration program which comes with one of the binary packages. Please pick up the latest version of the JAR file in our link:http://www.tigase.org/filebrowser/tigase-server[download section].
+
+In many cases however this is not always possible to use the GUI installer. In many cases you have just an ssh access or even a direct access in console mode only. We are going to provide a text-only installer in one of the next releases but for the time being you can use our binary packages to install the server manually. Please continue reading to learn how to install and setup the server in a few easy steps...
+
+If you have an old version of the Tigase server running and working and you intend to upgrade it please always backup the old version first.
+
+== Get the Binary Package
+
+Have a look at our link:http://www.tigase.org/filebrowser/tigase-server[download area]. Always pick the latest version of the package available. For manual installation either *zip* or *tar.gz* file is available. Pick one of files with filename looking like: *tigase-server-x.y.z-bv.tar.gz* or *tigase-server-x.y.z-bv.zip* where 'x', 'y', 'z' and 'v' are version numbers and they change from a release to release.
+
+== Unpack the Package
+
+Unpack the file using command for the tar.gz file:
+
+[source,sh]
+-----
+ $ tar -xzvf tigase-server-x.y.z-bv.tar.gz
+-----
+
+or for the zip file:
+
+[source,sh]
+-----
+ $ unzip tigase-server-x.y.z-bv.zip
+-----
+
+A new directory will be created: *tigase-server-x.y.z-bv/*.
+
+Sometimes after unpacking package on unix system startup script doesn't have execution permissions. To fix the problem you have to run following command:
+
+[source,sh]
+-----
+ $ chmod u+x ./scripts/tigase.sh
+-----
+
+== Prepare Configuration
+
+If you look inside the new directory, it should like this output:
+
+[source,sh]
+-----
+ $ ls -l
+total 316K
+-rw-r--r--  1 265K 2008-12-15 22:24 ChangeLog
+-rw-r--r--  1  37K 2008-12-15 22:24 License.html
+-rw-r--r--  1 1.1K 2008-12-15 22:24 README
+drwxr-xr-x  6  204 2009-02-03 13:25 certs/
+drwxr-xr-x 22  748 2009-02-03 13:25 database/
+drwxr-xr-x  3  102 2008-12-15 22:24 docs/
+drwxr-xr-x  4  136 2009-02-03 13:25 etc/
+drwxr-xr-x  3  102 2009-02-03 13:25 jars/
+drwxr-xr-x 12  408 2009-02-03 13:25 libs/
+drwxr-xr-x  2   68 2008-12-15 22:24 logs/
+-rw-r--r--  1 1.5K 2008-12-15 22:24 package.html
+drwxr-xr-x  7  238 2009-02-03 13:25 scripts/
+-----
+
+At the moment the most important is the etc/ directory with 2 files:
+
+[source,sh]
+-----
+ $ ls -l etc/
+total 8.0K
+-rw-r--r-- 1  97 2008-12-15 22:24 init.properties
+-rw-r--r-- 1 333 2008-12-15 22:24 tigase.conf
+-----
+
+A Small change in the tigase.conf file is needed. Find the line setting for *JAVA_HOME*:
+
+[source,sh]
+-----
+JAVA_HOME="${JDKPath}"
+-----
+
+and replace *$\{JDKPath}* with a path to Java installation on your system.
+
+You need also to edit the init.properties file. It contains initial parameters normally set by the configuration program. As this is a manual installation, you will have to edit this document yourself. It contains already a few lines:
+
+[source,sh]
+-----
+ $ cat etc/init.properties
+config-type=--gen-config-def
+--admins=admin@$HOST_NAME
+--virt-hosts = $HOST_NAME
+--debug=server
+-----
+
+You have to replace *$HOST_NAME* with a domain name used for your XMPP installation. Let's say this is \'*jabber.your-great.net*'. Your init.properties should look like this then:
+
+[source,sh]
+-----
+ $ cat etc/init.properties
+config-type=--gen-config-def
+--admins=admin@jabber.your-great.net
+--virt-hosts = jabber.your-great.net
+--debug=server
+-----
+
+You can also use multiple virtual domains if you want. Please have a look at the detailed description for *--virt-hosts* property in the init.properties guide and also more detailed information in the Virtual Hosts section of the Tigase Server guide.
+
+You will also need to configure connection to the database. First you have to decide what database you want to use: *Derby*, *MySQL* or *PostgreSQL*. Then there are to more properties you have to add to the *init.properties:* *--user-db* and *--user-db-uri.* The first property specifies the database type you use and the second the database connection string. For simplicity let's assume you want to use *Derby* database with files located in directory */var/lib/tigase/derby*. 2 more lines need to be added to the *init.properties* file:
+
+[source,sh]
+-----
+ $ cat etc/init.properties
+config-type=--gen-config-def
+--admins=admin@jabber.your-great.net
+--virt-hosts = jabber.your-great.net
+--debug=server
+--user-db=derby
+--user-db-uri=jdbc:derby:/var/lib/tigase/derby
+-----
+
+This is enough basic configuration to have your Tigase server installation running.
+
+== Prepare Database
+
+Normally the database is prepared for you during the installation process. Now you are on your own. As in section above we prepare your first installation to run with the *Derby* database. Creating and preparing the Derby database is actually quite easy if you use a helper script: link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/scripts/db-create-derby.sh[./scripts/db-create-derby.sh]. The file might not be in your *scripts/* directory if you have an earlier version of the package. Simply download it from the link provided if it is missing and put it in the *scripts/* directory and execute it with the database location as the parameter:
+
+[source,sh]
+-----
+ $ ./scripts/db-create-derby.sh /var/lib/tigase/derby
+-----
+
+There will be lots of output but if there is no error at the end of the output it means your database has been created and it is ready to use.
+
+*NOTE:* There might be filesystem access restrictions for the directory: */var/lib/* and you might want/need to select a different location.
+
+== Start the Server
+
+You can start the server using the tigase file found in the scripts sub-directory of Tigase server base directory. There, select the type of linux you have, debian, gentoo, mendriva or redhat.  In the root server directory type the following command:
+
+[source,bash]
+-----
+./scripts/{OS}/init.d/tigase start etc/tigase.conf
+-----
+Where {OS} is your *nix operating system.
+
+and you should get the output like this:
+
+[source,sh]
+-----
+Starting Tigase:
+nohup: redirecting stderr to stdout
+Tigase running pid=18103
+-----
+
+== Check if it is Working
+
+The server is started already but how do you know if it is really working and there were no problems. Have a look in the *logs/* directory. There should be a few files in there:
+
+[source,sh]
+-----
+ $ ls -l logs/
+total 40K
+-rw-r--r-- 1 20K 2009-02-03 21:48 tigase-console.log
+-rw-r--r-- 1 16K 2009-02-03 21:48 tigase.log.0
+-rw-r--r-- 1   0 2009-02-03 21:48 tigase.log.0.lck
+-rw-r--r-- 1   6 2009-02-03 21:48 tigase.pid
+-----
+
+The first 2 files are the most interesting for us: *tigase-console.log* and *tigase.log.0*. The first one contains very limited information and only the most important entries. Have a look inside and check if there are any *WARNING* or *SEVERE* entries. If not everything should be fine.
+
+Now you can connect with an XMPP client of your choice. The first thing to do would be registering the first account - the admin account from your init.properties file: admin@jabber.your-great.net. Refer to your client documentation how to register a new account.

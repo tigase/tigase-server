@@ -1,0 +1,47 @@
+[[multiplesessionmanagers]]
+= Two or More SessionManagers
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+In the most cases just one SessionManager object is used for Tigase server installation. A single SM can handle multiple virtual domains with separate SSL certificates for each domain.
+
+Sometimes, however you need a different configuration for each domain. For example, if you wish to use a separate database for a selected domain or you need a different set of plugins for each domain. For one domain you might want to allow user registration via XMPP and for another you might want to disable this feature.  In this case you need to load more than one session manager.
+
+For Tigase, this is not a problem. You just need to add another component in the configuration and adjust default settings.
+
+The question is now how does Tigase server know which session manager it has to forward packets received from the network? Keep in mind, there is only one component responsible for handling client connections. So it needs to know which session manager is the receiver for certain packets.  Of course you can set domain names in session manager too, but that may not be enough. Tigase server supports cluster mode configuration where session manager can be run on a separate machine. So packet routings rules cannot be controlled by just the domain name. Therefore client connection manager (*c2s*) must know which session manager is responsible for handling the packet received from the network.
+
+To solve the problem a *routing* concept has been introduced. You can define packet routings based on the domain name set during XMPP stream initialization.  Each time the *c2s* component receives packet from the network it tries to resolve destination component for the packet based on the current routings table. If you look in you server XML configuration file and search for *c2s* configuration section you can find routing node. Default configuration for the routing table is quite simple, just a single regular expression:
+
+[source,bash]
+-----
+   <node name="routings">
+    <map>
+     <entry key=".+" type="String" value="sess-man%40tigase.org"/>
+     <entry key="multi-mode" type="Boolean" value="true"/>
+    </map>
+   </node>
+-----
+
+As you can see this routing table forwards all packets to a single destination - the session manager located on the *tigase.org* server.
+
+Now let's say we have two session managers, each of them is responsible for a separate +domain.sm1@tigase.org+ handling requests for *tigase.org* and +sm2@tigase.net+ handling requests for domain *tigase.net*. The modifications to the configuration to properly spread the traffic between the two session managers would look like this:
+
+[source,bash]
+-----
+   <node name="routings">
+    <map>
+     <entry key="tigase.org" type="String" value="sm1%40tigase.org"/>
+     <entry key="tigase.net" type="String" value="sm2%40tigase.net"/>
+     <entry key="multi-mode" type="Boolean" value="true"/>
+    </map>
+   </node>
+-----
+
+Please remember that a key is a regular expression in Java style: link:http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html[Pattern.html]. You can match more than a single domain with the key, for example: _tigase.+_ to match all domains starting with *tigase*. The expression, however won't match domain: *xmpp.tigase.org*. To match this domain the expression would need to be: _.+tigase.+_.

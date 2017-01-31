@@ -1,0 +1,38 @@
+[[watchdogTimeout]]
+= --watchdog_timeout
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2014-02-07 18:13
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +1740000+
+
+*Example:* +--watchdog_timeout=60000+
+
+*Possible values:* 'any integer.'
+
+*Description:* The +watchdog_timeout+ property allows for fine-tuning ConnectionManager Watchdog (service responsible for detecting broken connections and closing them). Timeout property relates to the amount of time (in miliseconds) after which lack of response/activity on a given connection will considered such connection as broken an close it. In addition to global configuration presented above a per component configuration is possible:
+
+[source,bash]
+-----
+<ConnectionManager component>/watchdog_timeout[L]=60000
+-----
+
+for example (for ClusterConnectionManager):
+
+[source,bash]
+-----
+cl-comp/watchdog_timeout[L]=150000
+-----
+
+All related configuration options:
+
+- --watchdog_ping_type
+- --watchdog_delay
+- --watchdog_timeout
+
+*Available since:* 5.2.1

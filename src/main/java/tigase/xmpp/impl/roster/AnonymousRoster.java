@@ -29,7 +29,8 @@ import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.Presence;
+import tigase.xmpp.impl.PresenceAbstract;
+import tigase.xmpp.impl.PresenceState;
 //import tigase.xmpp.impl.Roster;
 //import tigase.xmpp.impl.Presence;
 
@@ -57,7 +58,7 @@ public class AnonymousRoster implements DynamicRosterIfc {
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
 			Set<JID> direct_presences =
-			    (Set<JID>)session.getSessionData(Presence.DIRECT_PRESENCE);
+			    (Set<JID>)session.getSessionData(PresenceState.DIRECT_PRESENCE);
 			if (direct_presences != null) {
 				JID[] result = new JID[direct_presences.size()];
 				int i = 0;

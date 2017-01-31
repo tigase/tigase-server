@@ -1,0 +1,16 @@
+[[serverCompilation]]
+= Server Compilation
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:11
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+List of documents describing how to work with sources and how to compile them.
+
+- xref:compile[Tigase XMPP Server 5.2.0 and Later - Compilation and Generating Distribution Packages]
+- xref:scv4ol[Tigase Packages Dependency Change - Server Compilation Version 4.x or Later]
+- xref:scv23[Server Compilation - Version 2.x and 3.x]

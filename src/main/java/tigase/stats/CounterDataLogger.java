@@ -23,7 +23,7 @@ import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -228,29 +228,6 @@ public class CounterDataLogger
 	private long           last_s2s_packets    = 0;
 	private long           last_sm_packets     = 0;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cpu_usage
-	 * @param mem_usage
-	 * @param uptime
-	 * @param vhosts
-	 * @param sm_packets
-	 * @param muc_packets
-	 * @param pubsub_packets
-	 * @param c2s_packets
-	 * @param s2s_packets
-	 * @param ext_packets
-	 * @param presences
-	 * @param messages
-	 * @param iqs
-	 * @param registered
-	 * @param c2s_conns
-	 * @param s2s_conns
-	 * @param bosh_conns
-	 *
-	 */
 	public void addStatsLogEntry(float cpu_usage, float mem_usage, long uptime, int vhosts,
 			long sm_packets, long muc_packets, long pubsub_packets, long c2s_packets,
 			long s2s_packets, long ext_packets, long presences, long messages, long iqs,
@@ -319,7 +296,7 @@ public class CounterDataLogger
 
 	@Override
 	public void init(Map<String, Object> archivizerConf) {
-		defaultHostname = DNSResolver.getDefaultHostname();
+		defaultHostname = DNSResolverFactory.getInstance().getDefaultHost();
 		try {
 			String resource = (String) archivizerConf.get(DB_URL_PROP_KEY);
 			if (resource == null ) {

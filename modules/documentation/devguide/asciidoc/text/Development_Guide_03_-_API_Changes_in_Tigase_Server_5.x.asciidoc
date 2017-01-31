@@ -1,0 +1,82 @@
+[[apiChanges]]
+= API changes in the Tigase Server 5.x
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+The API changes can effect you only if you develop own code to run inside Tigase server. The changes are not extensive but in some circumstances may require many simple changes in a few files.
+
+All the changes are related to introducing tigase.xmpp.JID and tigase.xmpp.BareJID classes. It is recommended to use them for all operations performed on the user JID instead of the String class which was used before changes.
+
+There are a few advantages to using the new classes. First of all they do all the user JID checking and parsing, they also perform stringprep processing. Therefore if you use data kept by instance of the JID or BareJID you can be sure they are valid and correct.
+
+These are not all advantages however. JID parsing code appears to use a lot of CPU power to conduct it's operations. JIDs and parts of the JIDs are used in many places of the stanza processing and the parsing is performed over and over again in all these places, wasting CPU cycles, memory and time.  Therefore, great performance benefits can be gained from these new class are in if, once parsed, JIDs are reused in all further stanza processing.
+
+This is where the tigase.server.Packet class comes in handy. Instances of the Packet class encloses XML stanza and pre-parses some, the most commonly used elements of the stanza, stanza source and destination addresses among them. As an effect there are all new methods available in the class:
+
+[source,java]
+-----
+JID getStanzaFrom();
+JID getStanzaTo();
+JID getFrom();
+JID getTo();
+JID getPacketFrom();
+JID getPacketTo();
+-----
+
+Whereas following methods are still available but have been deprecated:
+
+[source,java]
+-----
+String getElemFrom();
+String getElemTo();
+-----
+
+Please refer to the JavaDoc documentation for the link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/server/Packet.html[+Packet+] class and methods to learn all the details of these methods and difference between them.
+
+Another difference is that you can no longer create the +Packet+ instance using a constructor. Instead there are a few factory methods available:
+
+[source,java]
+-----
+static Packet packetInstance(Element elem);
+static Packet packetInstance(Element elem,
+    JID stanzaFrom, JID stanzaTo);
+-----
+
+Again, please refer to the JavaDoc documentation for all the details. The main point of using these methods is that they actually return an instance of one of the following classes instead of the +Packet+ class: +Iq+, +Presence+ or +Message+.
+
+There is also a number of utility methods helping with creating a copy of the Packet instance preserving as much pre-parsed data as possible:
+
+[source,java]
+-----
+Packet copyElementOnly();
+Packet errorResult(...);
+Packet okResult(...);
+Packet swapFromTo();
+Packet swapStanzaFromTo();
+-----
+
+We try to keep the link:http://docs.tigase.org/tigase-server/snapshot/javadoc/[JavaDoc] documentation as complete as possible. Please contact us if you find missing or incorrect information.
+
+The main point is to reuse +JID+ or +BareJID+ instances in your code as much as possible. You never know, your code may run in highly loaded systems with throughput of 100k XMPP packets per second.
+
+Another change. This one a bit risky as it is very difficult to find all places where this could be used. There are several utility classes and methods which accept source and destination address of a stanza and produce something.  There was a great confusion with them, as in some of them the first was the source address and in others the destination address. All the code has been re-factored to keep the parameter order the same in all places. Right now the policy is: *source address first*.  Therefore in all places where there was a method:
+
+[source,java]
+-----
+Packet method(String to, String from);
+-----
+
+it has been changed to:
+
+[source,java]
+-----
+Packet method(JID from, JID to);
+-----
+
+As far as I know most of these method were used only by myself so I do not expect much trouble for other developers.

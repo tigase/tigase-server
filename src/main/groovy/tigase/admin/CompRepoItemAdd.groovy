@@ -29,6 +29,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
 AS:Component: vhost-man,ext
+AS:ComponentClass: tigase.server.ext.ComponentProtocol
  */
 
 package tigase.admin
@@ -85,7 +86,7 @@ def oldItem = item.getKey() != null ? repo.getItem(item.getKey()) : null;
 def result = p.commandResult(Command.DataType.result)
 if (oldItem == null) {
 	def validateResult = repo.validateItem(item)
-	if (validateResult == null || (isServiceAdmin && !item.getKey().isEmpty())) {
+	if (validateResult == null && (isServiceAdmin && !item.getKey().isEmpty())) {
 		repo.addItem(item)
 		Command.addTextField(result, "Note", "Operation successful.")
 		if (validateResult != null) {

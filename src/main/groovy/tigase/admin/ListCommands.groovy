@@ -24,7 +24,7 @@
 
  AS:Description: Get list available commands
  AS:CommandId: list-commands
- AS:Group: Scripts
+ AS:Group: Example scripts
  AS:ComponentClass: tigase.server.BasicComponent
  */
 package tigase.admin
@@ -68,6 +68,7 @@ else if (type == "groups") {
 }
 else if (type == "commands") {
 	def group = Command.getFieldValue(p, "group");
+	Command.addHiddenField(result, "group", group ?: "");
 	Command.addInstructions(result, "Following commands are available" + (group ? " for group $group" : ""));
 	def x = Command.getData(result).find { it.getName() == "x" && it.getXMLNS() };
 	def reported = new Element("reported");

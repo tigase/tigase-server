@@ -1,0 +1,13 @@
+[[tigase41packetFiltering]]
+= Packet Filtering
+:author: not known
+:version: v1.0 initial release
+:date: 2015-07-13 16:39
+
+:toc:
+
+Tigase offers different ways to filter XMPP packets flying through the server. The most common use for packet filtering is to restrict users from sending or receiving packets based on the sender or received address.
+
+There are also different possible scenarios: time based filtering, content filtering, volume filtering and so on.
+
+All pages in this section describe different filtering strategies.

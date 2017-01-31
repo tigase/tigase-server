@@ -22,12 +22,11 @@
 
 package tigase.auth.mechanisms;
 
-import java.util.Map;
-
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import javax.security.sasl.SaslServerFactory;
+import java.util.Map;
 
 public class TigaseSaslServerFactory implements SaslServerFactory {
 
@@ -38,25 +37,32 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 
 	@Override
 	public SaslServer createSaslServer(final String mechanism, final String protocol, final String serverName,
-			final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
-		if (mechanism.equals("SCRAM-SHA-1")) {
-			return new SaslSCRAM(props, callbackHandler);
-		} else if (mechanism.equals("PLAIN")) {
-			return new SaslPLAIN(props, callbackHandler);
-		} else if (mechanism.equals("ANONYMOUS")) {
-			return new SaslANONYMOUS(props, callbackHandler);
-		} else if (mechanism.equals("EXTERNAL")) {
-			return new SaslEXTERNAL(props, callbackHandler);
-		} else
-			// if (mechanism.equals("DIGEST-MD5")) {
-			// return new SaslDigestMD5(props, callbackHandler);
-			// }
-			throw new SaslException("Mechanism not supported yet.");
+									   final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
+		switch (mechanism) {
+			case SaslSCRAM.NAME:
+				return new SaslSCRAM(props, callbackHandler);
+			case SaslSCRAMPlus.NAME:
+				return new SaslSCRAMPlus(props, callbackHandler);
+			case "PLAIN":
+				return new SaslPLAIN(props, callbackHandler);
+			case "ANONYMOUS":
+				return new SaslANONYMOUS(props, callbackHandler);
+			case "EXTERNAL":
+				return new SaslEXTERNAL(props, callbackHandler);
+			default:
+				throw new SaslException("Mechanism not supported yet.");
+		}
 	}
 
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
-		return new String[] { "PLAIN", "ANONYMOUS", "EXTERNAL" };
+		return new String[]{
+				SaslSCRAMPlus.NAME,
+				SaslSCRAM.NAME,
+				"PLAIN",
+				"EXTERNAL",
+				"ANONYMOUS",
+		};
 	}
 
 }

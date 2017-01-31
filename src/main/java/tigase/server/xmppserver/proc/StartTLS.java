@@ -82,7 +82,7 @@ public class StartTLS
 					log.log(Level.FINEST, "{0}, Starting TLS handshaking server side.", serv);
 				}
 				serv.getSessionData().put("TLS", "TLS");
-				serv.startTLS(false, handler.isTlsWantClientAuthEnabled());
+				serv.startTLS(false, handler.isTlsWantClientAuthEnabled(), handler.isTlsNeedClientAuthEnabled());
 			} catch (IOException ex) {
 				log.log(Level.INFO, "Problem with TLS initialization.", ex);
 			}
@@ -98,7 +98,7 @@ public class StartTLS
 					log.log(Level.FINEST, "{0}, Starting TLS handshaking client side.", serv);
 				}
 				serv.getSessionData().put("TLS", "TLS");
-				serv.startTLS(true, handler.isTlsWantClientAuthEnabled());
+				serv.startTLS(true, handler.isTlsWantClientAuthEnabled(), handler.isTlsNeedClientAuthEnabled());
 			} catch (IOException ex) {
 				log.log(Level.INFO, "Problem with TLS initialization.", ex);
 			}

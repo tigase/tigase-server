@@ -1,0 +1,25 @@
+[[databasemgnt]]
+= Database Management
+:author: daniel wisnewski
+:version: v1.0 July 2015
+:date: 2015-07-16 12:49
+
+:website: http://tigase.net
+
+Tigase is coded to perform with multiple database types and numbers.
+Owing to it's versatile nature, there are some tools and procedures that may be of use to certain administrators.
+
+== Recommended database versions
+As of v7.1.0 here are the minimum and recommended versions of databases for use with Tigase:
+
+
+[width="100%",frame="topbot",options="header"]
+|=================================
+|Database   |Recommended Version  |Minimum Version  |Additional Information
+|DerbyDB    |10.12.1.1            |10.12.1.1        |Included with Tigase XMPP Server
+|MySQL      |5.6                  |5.5              |
+|SQLServer  |2012                 |2008 R2          |
+|MongoDB    |2.6                  |2.6              |Driver not working with mongoDB 3.0 or newer.
+|=================================
+
+Although Tigase may support other versions of databases, these are the ones we are most familiar with in offering support and advice.  Use of databases outside these guidelines may result in unforeseen errors.

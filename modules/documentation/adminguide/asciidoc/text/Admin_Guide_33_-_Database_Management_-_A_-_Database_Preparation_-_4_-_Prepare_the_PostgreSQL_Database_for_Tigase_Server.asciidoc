@@ -1,0 +1,97 @@
+[[preparePostgresql]]
+= Prepare the PostgreSQL Database for the Tigase Server
+:author: Andrzej Wojcik <andrzejw@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-06-16 09:38
+:Revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This guide describes how to prepare PostgreSQL database for connecting to Tigase server.
+
+== Basic Setup
+
+The PostgreSQL database can be prepared in many ways. Below are presented two possible ways. The following assumptions apply to both methods:
+
+- +admin_db_user+ - database user with admin rights
+- +tigase_user+ - database user for Tigase
+- +tigasedb+ - database for Tigase
+
+=== Configuring from PostgreSQL Command Line Tool
+
+Run the PostgreSQL command line client and enter following instructions:
+
+. Add the +tigase_user+:
++
+[source,sql]
+-----
+psql=# create role tigase_user with login password 'tigase123';
+-----
+. Create the database for the Tigase server with +tigase_user+ as owner of database:
++
+[source,sql]
+-----
+psql=# create database tigasedb owner tigase_user;
+-----
+. Load database schema to initialize the Tigase server from the file that corresponds to the version of Tigase you want to use. First you need to switch to +tigasedb+.
++
+[source,sql]
+-----
+psql=# \connect tigasedb
+-----
++
+Begin by applying the basic Schema
++
+[source,sql]
+-----
+psql=# \i database/postgresql-schema-7-1.sql
+-----
++
+Continue by adding the PubSub Schema
++
+[source,sql]
+-----
+psql=# \i database/postgresql-pubsub-schema-3.2.0.sql
+-----
++
+And finally if you wish to use Socks5 Proxy component, add that schema:
+[source,sql]
+-----
+psql=# \i database/postgresql-socks5-schema.sql
+-----
+
+=== Configuring From the Linux Shell Command Line
+
+Follow steps below to prepare the PostgreSQL database:
+
+. Add the +tigase_user+:
++
+[source,sql]
+-----
+createuser -U admin_db_user -W -D -R -S -P tigase_user
+-----
++
+You will be asked for credentials for admin_db_user and password for new database user.
+. Create the database for the Tigase server with tigase_user as owner of database:
++
+[source,sql]
+-----
+createdb -U admin_db_user -W -O tigase_user tigasedb
+-----
+. Load database schema to initialize the Tigase server from the file that corresponds to the Tigase version you want to use.
++
+[source,sql]
+-----
+psql -q -U tigase_user -W tigasedb -f database/postgresql-schema-7-1.sql
+psql -q -U tigase_user -W tigasedb -f database/postgresql-pubsub-schema-3.2.0.sql
+-----
++
+If you want to use the socks5 proxy component, then add the following line:
++
+[source,sql]
+-----
+psql -q -U tigase_user -W tigasedb -f database/postgresql-socks5-schema.sql
+-----
+The above commands should be executed from the main Tigase directory. The initialization schema file should be also available locally in database/ directory of your Tigase installation.

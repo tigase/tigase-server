@@ -1,0 +1,16 @@
+[[configuration]]
+= Configuration
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 12:28
+:revision: 2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+
+When the user tries to setup the client for the first time he comes across 2 configuration files: *tigase.conf* and *init.properties* in the /etc folder. Here is a brief explanation what all those files are about and in other sections you can learn all the details needed to configure the server.
+
+. xref:initPropertiesGuide[init.properties] file is a simple text file with server parameters in form: *key* = *value*. When the XML configuration file is missing the Tigase server reads *init.properties* file and uses parameters found there as defaults for generation of the XML file. Therefore if you change the *init.properties* file you normally have to stop the server, remove the XML file and start the server again. All the settings from the *init.properties* are read and applied to the XML configuration. The properties file is easy to read and very safe to modify. At the moment this is the recommended way change the server configuration.
+. xref:manualconfig[tigase.conf] is the Tigase server startup configuration. It is actually not used by the server itself. It rather contains operating system settings and environment parameters to correctly run the link:http://java.sun.com/[Java Virtual Machine]. It is only useful on the unix-like systems with Bash shell. If you run the server on MS Windows systems *tigase.bat* and *wrapper.conf* files are used instead. The *tigase.conf* file is read and loaded by the *scripts/tigase.sh* shell script which also scans the operating system environment for Java VM and other tools needed.

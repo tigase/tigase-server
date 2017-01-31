@@ -21,20 +21,19 @@
  */
 package tigase.db.jdbc;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.Repository;
+import tigase.stats.CounterValue;
+import tigase.stats.StatisticsProviderIfc;
+import tigase.stats.StatisticsList;
+import tigase.xmpp.BareJID;
+
+import java.sql.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.Repository;
-import tigase.xmpp.BareJID;
 
 /**
  * Created: Sep 3, 2010 5:55:41 PM
@@ -43,7 +42,7 @@ import tigase.xmpp.BareJID;
  * @version $Rev$
  */
 @Repository.Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
-public class DataRepositoryImpl implements DataRepository {
+public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc {
 	private static final Logger log = Logger.getLogger(DataRepositoryImpl.class.getName());
 
 	/** Field description */
@@ -97,6 +96,9 @@ public class DataRepositoryImpl implements DataRepository {
 	private String table_schema = null;
 	private int query_timeout = QUERY_TIMEOUT;
 	private int db_conn_timeout = DB_CONN_TIMEOUT;
+
+	private CounterValue reconnectionCounter = null;
+	private CounterValue reconnectionFailedCounter = null;
 
 	@Override
 	public boolean checkTable(String tableName) throws SQLException {
@@ -287,6 +289,8 @@ public class DataRepositoryImpl implements DataRepository {
 							 new Object[] { table_schema, database.toString(), driverClass } );
 		}
 		try {
+			reconnectionCounter = new CounterValue("repository " + getResourceUri() + " reconnections", Level.FINER);
+			reconnectionFailedCounter = new CounterValue("repository " + getResourceUri() + " failed reconnections", Level.FINER);
 			initRepo();
 
 			if (!check_table_query.isEmpty()) {
@@ -423,10 +427,13 @@ public class DataRepositoryImpl implements DataRepository {
 	 */
 	private void initRepo() throws SQLException {
 
-		// Statement stmt = null;
-		ResultSet rs = null;
 
+		boolean failure = true;
 		try {
+			if (conn != null) {
+				reconnectionCounter.inc();
+				log.log(Level.INFO, "Reconnecting connection: {0}", reconnectionCounter);
+			}
 			synchronized (db_statements) {
 				db_statements.clear();
 				DriverManager.setLoginTimeout(db_conn_timeout);
@@ -435,14 +442,19 @@ public class DataRepositoryImpl implements DataRepository {
 				derby_mode = db_conn.startsWith("jdbc:derby");
 				initPreparedStatements();
 
+				failure = false;
 				// stmt = conn.createStatement();
 			}
 		} finally {
-			release(null, rs);
+			release(null, null);
 
+			if (failure) {
+				reconnectionFailedCounter.inc();
+				log.log(Level.INFO, "Reconnecting connection failed: {0}", reconnectionFailedCounter);
+			}
 			// release(stmt, rs);
 			// stmt = null;
-			rs = null;
+//			rs = null;
 		}
 	}
 
@@ -486,6 +498,14 @@ public class DataRepositoryImpl implements DataRepository {
 
 	@Override
 	public void releaseRepoHandle(DataRepository repo) {
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		long reconnections = list.getValue(compName, reconnectionCounter.getName(), 0L) + reconnectionCounter.getValue();
+		list.add(compName, reconnectionCounter.getName(), reconnections, Level.FINER);
+		long failedReconnections = list.getValue(compName, reconnectionFailedCounter.getName(), 0L) + reconnectionFailedCounter.getValue();
+		list.add(compName, reconnectionFailedCounter.getName(),failedReconnections, Level.FINER);
 	}
 	
 	private class DBQuery {

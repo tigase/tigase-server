@@ -1,0 +1,26 @@
+[[cil8]]
+= Component Implementation - Lesson 8 - Startup Time
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2011-05-27 22:52
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+A startup hook in the Tigase is different from the shutdown hook.
+
+This is because you cannot really tell when exactly the startup time is. Is it when the application started, is it when configuration is loaded, is it when all objects are initialized. And this might be even different for each component. Therefore, in fact, there is no startup hook in Tigase in the same sense as the shutdown hook.
+
+There are a few methods which are called at startup time in the following order:
+
+. *Constructor* - there is of course constructor which has no parameters.  However it does not guarantee that this instance of the component will be used at all. The object could be created just to call +getDefaults(...)+ and may be destroyed afterwards.
+. *void setName(String name)* - the second call for the component is to set it's unique name within a Tigase instance. It still does not mean too much from the component run-time point of view but some components initialize service discovery data at this point.
+. *void start()* - this is a second void which means the component can start it's internal jobs or worker threads or whatever it needs for future activity. Component's queues and threads are initialized at this point.
+. *Map<String, Object> getDefaults(Map params)* - this is the next call made by configuration manager to collect all the default settings for the component. To help generate default settings, configuration manager passes general properties (starting with '--') in the Map as parameter to the component. As a result it expects specific settings applicable to the component only (not starting with '--').
+. *setProperties(Map<String, Object> props)* - after collecting component's defaults, the connection manager combines them with configuration options (not starting with '--', but starting with the component name) loaded from configuration repository (init.properties file, database, possibly other files). Then the final configuration is passed to the component with +setProperties(...)+ method call. Database connections are usually initialized at this point.
+. *void initializationCompleted()* - this method is called for all components after all components are loaded and configuration was set (via +setProperties(...)+ method call) for all components.
+
+
+Therefore, the +initializationCompleted()+ hook is the best point if you want to be sure that Tigase server is fully loaded, initialized and functional.

@@ -1,0 +1,23 @@
+[[configType]]
+= -config-type
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 07:22
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +-config-type:--gen-config-def+
+
+*Possible values:* +--gen-config-def|--gen-config-all|--gen-config-sm|--gen-config-cs|--gen-config-comp+
+
+*Description:* Probably the only such a property not starting with double hyphen. It sets the server type and determines what components are included in the generated XML file. Possible values are listed below:
+
+- '--gen-config-all' - creating configuration file with all available components. That is: session manager, client-to-server connection manager, server-to-server connection manager, one external component connection manager, stanza sender and stanza receiver.
+- '--gen-config-def' - creating default configuration file. That is configuration which is most likely needed for a typical installation. Components included in configuration are: session manager, client-to-server connection manager and server-to-server connection manager.
+- '--gen-config-sm' - creating configuration for instance with session manager and external component only. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +sm+ and +ext2s+.
+- '--gen-config-cs' - creating configuration for instance with components managing network connections. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +c2s+, +s2s+, +ext2s+.
+- '--gen-config-comp' - generating a configuration with only one component - component managing external components connection, either XEP-0114 or XEP-0225. This is used to deploy a Tigase instance as external component connecting to the main server. You have to add more components handled by this instance, usually these are MUC, PubSub or any other custom components. You have to refer to description for xref:compName[--comp-name] and xref:compClass[--comp-class] properties to learn how to add components to the Tigase instance. You also have to configure the external component connection, domain name, password, port, etc... Please look for a description for --external and --bind-ext-hostnames properties.
+
+*Available since:* 2.0.0

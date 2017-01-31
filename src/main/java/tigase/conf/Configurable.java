@@ -129,6 +129,9 @@ public interface Configurable
 	public static final String DEF_COMP_PROT_NAME = "ext";
 
 	/** Field description */
+	public static final String DEF_EVENTBUS_NAME = "eventbus";
+	
+	/** Field description */
 	public static final String DEF_EXT_COMP_NAME = "ext-comp";
 
 	/** Field description */
@@ -158,6 +161,9 @@ public interface Configurable
 	/** Field description */
 	public static final String DEF_WS2S_NAME = "ws2s";
 
+	/** Field description */
+	public static final String EVENTBUS_CLASS_NAME = "tigase.disteventbus.component.EventBusComponent";
+	
 	/** Field description */
 	public static final String EXT_COMP_CLASS_NAME =
 			"tigase.server.xmppcomponent.ComponentConnectionManager";
@@ -196,7 +202,7 @@ public interface Configurable
 	/**
 	 * Constant <code>GEN_CONFIG_DEF</code> keeps parameter name for the most
 	 * typical configuration: SessionManager, ClientConnectionManager and
-	 * ServerConnectionManager loaded.
+	 * S2SConnectionManager loaded.
 	 */
 	public static final String GEN_CONFIG_DEF = GEN_CONFIG + "-default";
 
@@ -263,7 +269,7 @@ public interface Configurable
 
 	/** Field description */
 	public static final String MONITOR_CLASS_NAME =
-			"tigase.server.monitor.MonitorComponent";
+			"tigase.monitor.MonitorComponent";
 
 	/** Field description */
 	public static final String MONITOR_CLUST_CLASS_NAME = "tigase.cluster.MonitorClustered";

@@ -1,12 +1,13 @@
 [[sslCertsLocation]]
---ssl-certs-location
-====================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --ssl-certs-location
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:11
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:11
 
 *Default value:* +certs/+
 
@@ -14,7 +15,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'location of SSL certificates directory on the filesystem.'
 
-*Description:* The option allows you to specify location where SSL certificates are stored. Meaning of this property depends on the SSL container <sslContainerClass,class implementation>>. By default it just points to the directory where the server SSL certificates are stored in files in PEM format.
+*Description:* This option allows you to specify the location where SSL certificates are stored. The meaning of this property depends on the SSL container xref:sslContainerClass[class implementation]. By default it just points to the directory where the server SSL certificates are stored in files in PEM format.
 
 *Available since:* 5.1.0
-

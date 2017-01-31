@@ -1,12 +1,13 @@
 [[trusted]]
---trusted
-=========
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --trusted
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:40
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:40
 
 *Default value:* +none+
 
@@ -14,7 +15,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'comma separated list of user bare JIDs.'
 
-*Description:* The property allows to specify a list of accounts which are considered as trusted, thus can perform some specific actions on the server. They can execute some commands, send a broadcast message, set MOTD and so on. The configuration is similar to --adimins setting.
+*Description:* The +--trusted+ property allows users to specify a list of accounts which are considered as trusted, thus whom can perform some specific actions on the server. They can execute some commands, send a broadcast message, set MOTD and so on. The configuration is similar to xref:admins[--adimins] setting.
 
 *Available since:* 3.0.0
-

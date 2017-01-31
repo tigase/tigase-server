@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import tigase.io.jdk18.SNISSLContextContainer;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -156,7 +157,7 @@ public interface SSLContextContainerIfc {
 	 * Constant <code>SSL_CONTAINER_CLASS_VAL</code> keeps default container
 	 * implementation class loaded if none is specified in configuration file.
 	 */
-	public static final String SSL_CONTAINER_CLASS_VAL = SSLContextContainer.class.getName();
+	public static final String SSL_CONTAINER_CLASS_VAL = SNISSLContextContainer.class.getName();
 
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_KEY</code> is a key pointing to a

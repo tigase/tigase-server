@@ -75,7 +75,7 @@ def isServiceAdmin = admins.contains(stanzaFromBare);
 
 def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
 def rosterAction = Command.getFieldValue(packet, ROSTER_ACTION)
-def rosterBuddyList = Command.getFieldValues(packet, ROSTER_BUDDY_LIST)
+def rosterBuddyList = Command.getFieldValues(packet, ROSTER_BUDDY_LIST) as List;
 
 //def rosterNotifyCluster = Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER)
 
@@ -116,6 +116,12 @@ def updateRoster = { sess, online, jid, i_jid, i_name, i_subscr ->
   		  Element item = new Element("item",
 	  		  (String[])["jid", "subscription"], (String[])[i_jid, "remove"])
   		  rosterUtil.updateBuddyChange(conn, results, item)
+			  Element pres = new Element("presence",
+				  (String[])["from", "to", "type", "xmlns"], (String[])[jid, i_jid, "unsubscribed", "jabber:client"]);
+			  results.offer(Packet.packetInstance(pres))
+			  pres = new Element("presence",
+				  (String[])["from", "to", "type", "xmlns"], (String[])[jid, i_jid, "unsubscribe", "jabber:client"]);
+			  results.offer(Packet.packetInstance(pres))
 			  res_report += "Buddy: "+ i_jid + " removed"
 		  } else {
 			  if (rosterUtil.containsBuddy(conn, i_jid)) {
@@ -195,12 +201,12 @@ rosterBuddyList.each {
 		if (!remove_item) {
 
 			Element pres = new Element("presence",
-				(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
-					"probe"])
+				(String[])["from", "to", "type", "xmlns"], (String[])[rosterOwnerJid, rosterItemJid,
+					"probe", "jabber:client"])
 			results.offer(Packet.packetInstance(pres))
 			pres = new Element("presence",
-				(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid,
-					"probe"])
+				(String[])["from", "to", "type", "xmlns"], (String[])[rosterItemJid, rosterOwnerJid,
+					"probe", "jabber:client"])
 			results.offer(Packet.packetInstance(pres))
 		}
 

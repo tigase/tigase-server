@@ -26,15 +26,16 @@ package tigase.server.monitor;
 
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
-
 import tigase.stats.StatisticsList;
 
 //~--- JDK imports ------------------------------------------------------------
+
 
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+
 import tigase.conf.ConfigurationException;
 
 //~--- classes ----------------------------------------------------------------
@@ -44,7 +45,9 @@ import tigase.conf.ConfigurationException;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ * @deprecated Use {@link  tigase.monitor.MonitorComponent} instead.
  */
+@Deprecated
 public class MonitorComponent extends AbstractMessageReceiver {
 	private static final Logger log = Logger.getLogger(MonitorComponent.class.getName());
 

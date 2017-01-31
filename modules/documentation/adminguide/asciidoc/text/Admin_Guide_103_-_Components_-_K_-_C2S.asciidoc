@@ -1,0 +1,37 @@
+[[c2scomponent]]
+= Client to Server Communication
+:author: Daniel Wisnewski (daniel@tigase.org)
+:date: 2016-06-23 08:20
+:version: v1.0 June 2016
+
+Client to server communication is an integral part of XMPP communication.  C2S handles all client communication to the server, and is responsible for filtering and handling remote communications.
+C2S CAN be disabled, however doing so will only allow communication of internal components, and S2S communications.
+
+= Configuration
+
+== Resumption timeout
+It is now possible to set a default stream resumption timeout that the server uses.  This allows control of how long a server will wait for a reconnection from a client.  This can be particularly helpful to manage mobile clients connecting to your server as they may not have complete coverage, and you do not want to close the stream right away.
+By default, Tigase sets this value to 60 seconds.
+
+[source,properties]
+-----
+c2s/processors/urn\:xmpp\:sm\:3/resumption-timeout[I]=90
+-----
+This sets the default timeout to 90 seconds.  You may, if you choose, specify a maximum timout time, which will allow the server to wait between the default and maximum before a connection is closed.
+[source,properties]
+-----
+c2s/processors/urn\:xmpp\:sm\:3/max-resumption-timeout[I]=900
+-----
+
+NOTE: If the max-resumption-timeout is not set, it will always equal the resumption-timeout number, or default is none is set.
+
+Available since v7.1.0
+
+[[packetRedelivery]]
+== Packet Redelivery
+Normally packets are handled by C2S and are typically processed in the first run, however if that fails to send, a retry of sending that packet will occur after 60 seconds.  If that second try fails, the delay will increase by a factor of 1.5.  This means that the next retry will occur at 90, 135, and so on until the retry count is reached.  By default this count is 15, however it can be changed by using the following setting:
+[source,properties]
+-----
+c2s/packet-delivery-retry-count[I]=5
+-----
+This setting prevents packet redelivery attempts from continuing into infinity (or when the host machine runs out of memory).

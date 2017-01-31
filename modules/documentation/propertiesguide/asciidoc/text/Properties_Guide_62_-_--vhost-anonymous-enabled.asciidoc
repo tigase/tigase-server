@@ -1,12 +1,13 @@
 [[vhostAnonymousEnabled]]
---vhost-anonymous-enabled
-=========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --vhost-anonymous-enabled
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-22 02:37
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-22 02:37
 
 *Default value:* +true+
 
@@ -14,13 +15,12 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +true|false+
 
-*Description:* The property specifies whether anonymous user login is allowed for the installation for all vhosts. 
+*Description:* The +--vhost-anonymous-enabled+ property specifies whether anonymous user logins are allowed for the installation for all vhosts.
 
 This is a global property which is overridden by settings for particular vhost.
 
-A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It allows to configure a default values for all of them, instead of having to provide individual configuration for each vhost.
+Default settings for all virtual hosts are used when this property is not defined. This settings is useful mostly for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It allows the configuration of default values for all of them, instead of having to provide individual configuration for each vhost.
 
 It is also applied as a default value for all new vhosts added at run-time.
 
 *Available since:* 5.2.0
-

@@ -1,0 +1,111 @@
+[[logs]]
+= Tigase Log Guide
+:author: Daniel Wisnewski
+:version: v1.0 August 2015
+:date: 2015-10-08 12:13
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+Tigase has multiple levels of logging available to help provide targeted and detailed information on processes, components, or traffic. In these documents we will look at where tigase generates logs, what they contain, and how we can customize them to our needs.
+
+The list of available documents here is presented from the Tigase root directory.
+[source,list]
+-----
+*/*
+derby.log
+install.log
+
+*/etc*
+config-dump.properties
+
+*/logs*
+tigase.log.#
+tigase.pid
+tigase-console.log
+-----
+
+
+== install.log
+This log file is a basic list of files that are made on install of Tigase server.  Although you may not need to use it, it can provide a handy list to see if any files were not written to your hard drive upon installation.
+
+== derby.log
+If you are using the derby database installed with Tigase installer, this is the startup log for the database itself.  Issues that might be related to the database, can be found in this file.  Typically, if everything works okay, it's a very small file with only 10 lines.  It is overwritten on startup of the datbase.
+
+== config-dump.properties
+The config-dump.properties is dump file of all your properties listed for every option within Tigase and components.  The structure of the log lines is as follows.
+-------
+modulename/settingformodulename[Data type]=value(s)
+-------
+Lets take the value for admins, listing who is administrator for the server.
+-----
+basic-conf/admins[s]=admin@jabber.freehost.org, administrator@jabber.freehost.org, fJones@jabber.freehost.org
+-----
+The admin parameter which is an array of strings noted by the s, has 3 users listed.
+*NOTE* you can lookup the available Data types in the xref:initPropertiesGuide[init.properties guide].
+
+This file is re-written every time tigase starts.
+
+== tigase.log.#
+The tigase.log files are where the majority of logging will take place. The rules for writing to these longs can be manipulated by editing files in the int.properties file.  To see how, see the xref:debuggingTigase[Debugging Tigase] section of this manual for more details about how to turn on debug logging, and how to manipulate log settings.
+Entries to these logs are made in the following format:
+-----
+2015-08-10 13:09:41.504 [main]      Sctipr.init()         INFO: Initilized script command, id: comp-manager, lang:Groovy, ext: groovy
+-----
+The format of these logs is below:
+<timestamp> <thread_name> <class>.<method>    <log_level>: <message> <thread_name>. This can vary - for components it would be <direction>_<int>_<component name>, for plugins it will just be the plugin name.
+
+Let's look at another example from the log file.
+-----
+2015-08-10 12:31:40.893 [in_14_muc] InMemoryMucRepository.createNewRoom()   FINE: Creating new room 'chatroom@muc.localhost.com'
+-----
+The process ID may sometimes come in a different format such as `[in_14-muc]` which specifies the component (muc) along with the process thread identifier (14).  As you can see, the format otherwise is nearly identical.
+
+tigase.log can get very large in size rather quickly reaching it's maximum size.  To prevent the loss of information, we have implemented a rotating file system.  The server begins writing to tigase.log.0 when it is first run, and continues to dump information until the log size limit is hit. At this point, Tigase renames tigase.log.0 as tigase.log.1. A new tigase.log.0 will be created, and Tigase will begin logging to this file.  When this file is full, tigase.log.1 will be renamed tigase.log.2 and tigase.log.0 will be renamed tigase.log.1.  Using this scheme, tigase.log.0 will *always* be your most recent log.
+
+By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of 10 files. You can edit these values by editing the init.properties guide and adding the following lines.
+
+[source,bash]
+-----
+basic-conf/logging/java.util.logging.FileHandler.limit=20000000
+basic-conf/logging/java.util.logging.FileHandler.count=15
+-----
+This code, if entered into the init.properties file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
+
+_You may see a tigase.log.0.ick file in the directory while the server is running.  This is a temporary file only and is deleted once Tigase is cleanly shut down._
+
+== statistics.log.#
+Statistics log will duplicate any information that is related to sending of statistics to Tigase if you are using an unlicenced copy of Tigase XMPP server.  Mainly it will consist output of +LicenceChecker+.  The numbering logic will be the same as tigase.log.# files.
+
+== tigase.pid
+tigase.pid is a file that just contains the Process ID or PID for the current run of Tigase. It is only valid for the current or most recent run cycle and is overwritten every time Tigase starts.
+
+
+== tigase-console.log
+This file contains information related to Tigase's running environment, and is a dump from the server itself on what is being loaded, when, and if any issues are encountered.
+It will start by loading Java classes (consequently making sure the Java environment is present and functioning).  Then it will begin loading the configuration file, and adding default values to settings that have not been customized.  You can then see all the components being loaded, and settings added where default values are needed.  Lastly you will see a log of any plugins that are loaded, and any parameters therein.
+You may see tags such as INFO or WARNING in the logs. Although they may contain important information, the program will continue to operate as normal are not of too great concern.
+
+ERROR flags are issues you will want to pay attention as they may list problems that prevent Tigase or components from properly functioning.
+
+*NOTE* Windows does not create this file, rather the output is shown in the commandline and is not dumped to a file.
+
+If Tigase is gracefully shut down, tigase-console.log will add statistics from the server's operation life in the following format.
+-----
+component/statistic = value
+-----
+_Any component that may have a statistic, whether used or not, will place a value here_
+
+This file can be handy if you are tracking issues in the server.
+
+tigase-console.log is appended during each run session of the server.
+
+== Log File Location
+You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following line in your init.properties file:
+[source,properties]
+-----
+basic-conf/logging/java.util.logging.FileHandler.pattern=/var/log/tigase/tigase.log
+-----
+
+This setting changes the log file location to /var/log/tigase/ where all log files will be made.  Files in the original location will be left.

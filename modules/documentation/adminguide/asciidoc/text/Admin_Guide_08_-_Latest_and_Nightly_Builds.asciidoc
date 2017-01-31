@@ -1,0 +1,39 @@
+[[TSBupdates]]
+= Tigase Server Binary Updates
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: 2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+
+Most open source projects try to make sure that the nightly builds compile correctly so that these builds can be used. However, we at Tigase believe that these builds should be seperated until they are thoroughly tested and released. Although lots of installations out there we know of just run from our nightly builds, this puts an extra responsibility to make sure all code is functional and will constantly work. Therefore, our general approach is to run all basic functionality tests before each code commit to make sure it works correctly. This does not guarantee that there will never be a problem, but it is a precaution from preventing bad builds from arriving in the hands of our customers.
+
+Some users on the other hand, like to be on the bleeding edge and regularly use our nightly builds exploring new code changes and playing with new features before they are put to a full release. Others prefer to stick to stable and fully tested public releases. Others however, want something from the middle, the most recent features, but bug fixes, something like a beta or a release-candidate state.
+
+Should you choose to use the nighly builds, a few things you should consider:
+- Changes may be made to the code that can negatively affect performance.
+- Changes may be made to the code that can negatively affect security.
+We *highly* recommend testing these builds in your environments before upgrading.
+
+With these considerations in mind, we provide nightly builds at link:http://build.xmpp-test.net/nightlies/dists/[this link] which provides directories by date.
+
+Standard naming format is tigase-server-x.x.x-SNAPSHOT-byyyy.*
+x.x.x is the major version the builds are working towards, with yyyy being the specific build.
+*Note individual days may have the same builds as noted by the byyyy section of the file.*
+
+Just like the standard distributions, the builds are available with the following extensions:
+. .jar - Java installer version
+. .exe - Windows binary installer version
+. -javadoc.jar - Java installer for javadoc only
+. -dist.zip - Compressed binaries with no dependencies.
+. -dist.tar.gz - tarball compressed binaries with no dependencies.
+. -dist-max.zip - Compressed binaries with all dependencies.
+. -dist-max.tar.gz - tarball compressed binaries with all dependencies.
+
+We also provide automated testing of each of our nightly builds for each supported databases.  Tests are done with both functional and low memory parameters in mind, and are available link:http://build.xmpp-test.net/nightlies/tests/[at this link].  These tests can provide a quick examination of function before upgrading your current build.
+
+The latest Cluster tests are available at link:http://graph.cluster-c.xmpp-test.net/latest/[this link] which shows performance and traffic use under strain using the latest available build of Tigase.

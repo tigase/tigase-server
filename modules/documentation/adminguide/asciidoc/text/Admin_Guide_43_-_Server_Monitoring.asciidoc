@@ -1,8 +1,0 @@
-Server Monitoring
-=================
-
-All the documentation and resources related to the Tigase server monitoring.
-
-include::Admin_Guide_44_-_Server_Monitoring_-_A_-_Setting_up_Remote_Monitoring_in_the_Server.asciidoc[]
-
-include::Admin_Guide_44_-_Server_Monitoring_-_B_-_Retrieving_statistics.asciidoc[]

@@ -1,12 +1,13 @@
 [[admins]]
---admins
-========
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= --admins
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 07:42
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 07:42
 
 *Default value:* none
 
@@ -19,4 +20,3 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 *Possible values:* list of admin accounts: +user1@domain,user2@domain2+
 
 *Available since:* 2.0.0
-

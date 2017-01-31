@@ -35,6 +35,8 @@ import tigase.server.XMPPServer;
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -43,6 +45,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 
 /**
  * XEP-0092: Software Version
@@ -77,6 +80,38 @@ public class JabberIqVersion
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	@Override
+	public void processFromUserPacket( JID connectionId, Packet packet, XMPPResourceConnection session,
+																		 NonAuthUserRepository repo, Queue<Packet> results,
+																		 Map<String, Object> settings )
+			throws PacketErrorTypeException {
+			// Check whether the packet is addressed to the server or some other, XMPP entity
+			if ((packet.getStanzaTo() == null)
+					|| session.isLocalDomain(packet.getStanzaTo().toString(), false)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Calling method: {0}, for packet={1}, for session={2}",
+							new Object[] { "processFromUserToServerPacket",
+							packet, session });
+				}
+				processFromUserToServerPacket(connectionId, packet, session, repo, results,
+						settings);
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Calling method: {0}, for packet={1}, for session={2}",
+							new Object[] { "processFromUserOutPacket",
+							packet, session });
+				}
+				processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
+			}
+	}
+
+	@Override
+	public void processFromUserOutPacket(JID connectionId, Packet packet,
+			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) {
+		results.offer(packet.copyElementOnly());
 	}
 
 	@Override

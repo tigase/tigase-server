@@ -23,11 +23,15 @@
 
 package tigase.server.xmppclient;
 
-import java.util.List;
-import java.util.Map;
+import tigase.xmpp.BareJID;
+
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
 
-import tigase.xmpp.BareJID;
+import java.util.List;
+import java.util.Map;
+import tigase.xmpp.JID;
 
 /**
  * @author Wojtek
@@ -73,7 +77,7 @@ public interface SeeOtherHostIfc {
 	 *
 	 * @param nodes current list of nodes
 	 */
-	void setNodes(List<BareJID> nodes);
+	void setNodes(List<JID> nodes);
 
 	// ~--- properties ----------------------------------------------------------
 	void getDefaults( Map<String, Object> defs, Map<String, Object> params );
@@ -87,15 +91,39 @@ public interface SeeOtherHostIfc {
 	 * @param destination BareJID address of the redirect destination
 	 * @return element containing stream:error message
 	 */
-	Element getStreamError( String xmlns, BareJID destination );
+	default Element getStreamError( String xmlns, BareJID destination, Integer port ) {
+		Element error = new Element( "stream:error" );
+		Element seeOtherHost = new Element( "see-other-host", destination.toString() + (port != null ? ":"+port : "") );
+
+		seeOtherHost.setXMLNS( xmlns );
+		error.addChild( seeOtherHost );
+
+		return error;
+	}
 
 	/**
 	 * Performs check whether redirect is enabled in the given phase
 	 * by default see-other-host redirect is only active in stream:open phase
 	 *
+	 * @param vHost vHost for which redirection should be performed
 	 * @param ph phase for which the check should be performed
 	 * @return boolean value indicating whether to perform or not redirect for
 	 * the phase passed as argument
 	 */
-	boolean isEnabled(Phase ph);
+	boolean isEnabled(VHostItem vHost, Phase ph);
+
+	/**
+	 * Method validates whether a redirection for a particular hostname and
+	 * resulting redirection hastname is required
+	 *
+	 * @param defaultHost     default hostname of the particular machine
+	 * @param redirectionHost destination hostname
+	 *
+	 * @return {@code true} if the redirection is required, otherwise
+	 *         {@code false}
+	 */
+	default boolean isRedirectionRequired( BareJID defaultHost, BareJID redirectionHost ) {
+		return !defaultHost.equals( redirectionHost );
+	}
+
 }

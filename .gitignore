@@ -65,4 +65,17 @@ database/pubsub-db-migrate.sh
 database/sqlserver-pubsub-schema-3.0.0.sql
 derby.log
 tigase/setup
+.idea/
+tigase-server.iml
 /bin/
+/out/
+database/derby-message-archiving-schema-1.3.0.sql
+database/mysql-message-archiving-schema-1.3.0.sql
+database/postgresql-message-archiving-schema-1.3.0.sql
+database/sqlserver-message-archiving-schema-1.3.0.sql
+src/main/groovy/tigase/admin/DeleteItem.groovy
+src/main/groovy/tigase/admin/ListItems.groovy
+src/main/groovy/tigase/admin/ListNodes.groovy
+src/main/groovy/tigase/admin/RetrieveItem.groovy
+etc/installation-id
+etc/*.licence*

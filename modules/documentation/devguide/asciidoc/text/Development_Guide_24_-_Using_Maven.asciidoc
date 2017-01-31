@@ -1,0 +1,11 @@
+[[usingmaven]]
+= Using Maven
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Documents Describing Maven Use with the Tigase Projects

@@ -26,33 +26,25 @@ package tigase.stats;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.IOException;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerInvocationHandler;
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: Aug 24, 2009 12:35:28 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
+ *
+ * @deprecated {@link tigase.stats.JavaJMXProxyOpt} - optimised JMXProxy class should be used. This
+ * class will be removed in the next version after 7.1.0
  */
+@Deprecated
 public class JavaJMXProxy
 				implements StatisticsProviderMBean, NotificationListener {
 	private static final Logger log = Logger.getLogger(JavaJMXProxy.class.getName());
@@ -118,19 +110,6 @@ public class JavaJMXProxy
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param id
-	 * @param hostname
-	 * @param port
-	 * @param userName
-	 * @param password
-	 * @param delay
-	 * @param interval
-	 * @param loadHistory
-	 */
 	public JavaJMXProxy(String id, String hostname, int port, String userName,
 			String password, long delay, long interval, boolean loadHistory) {
 		this.id          = id;
@@ -147,22 +126,10 @@ public class JavaJMXProxy
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param listener
-	 */
 	public void addJMXProxyListener(JMXProxyListener listener) {
 		listeners.add(listener);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws Exception
-	 */
 	public void connect() throws Exception {
 		this.jmxUrl = new JMXServiceURL("rmi", "", 0, this.urlPath);
 
@@ -235,10 +202,6 @@ public class JavaJMXProxy
 		System.out.println("Unsupported JMX notification: {notification.getType()}");
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void start() {
 		if (updater == null) {
 			updater = new StatisticsUpdater();
@@ -246,10 +209,6 @@ public class JavaJMXProxy
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void update() {
 		if (tigBean != null) {
 

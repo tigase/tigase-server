@@ -34,9 +34,11 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.MsgRepositoryIfc;
+import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+import tigase.db.UserRepository;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionResultsHandlerIfc;
@@ -64,6 +66,7 @@ public class Store
 	private MsgRepositoryIfc repo               = null;
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
+	private NonAuthUserRepositoryImpl nonAuthUserRepo;
 
 	{
 		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
@@ -123,7 +126,7 @@ public class Store
 
 					elem.addChild(x);
 				}
-				repo.storeMessage(packet.getStanzaFrom(), packet.getStanzaTo(), expired, elem);
+				repo.storeMessage(packet.getStanzaFrom(), packet.getStanzaTo(), expired, elem, nonAuthUserRepo);
 			} catch (UserNotFoundException ex) {
 				log.info("User not found for offline message: " + packet);
 			}
@@ -164,6 +167,9 @@ public class Store
 	public void setProperties(Map<String, Object> props, ActionResultsHandlerIfc handler) {
 		super.setProperties(props, handler);
 
+		UserRepository user_repository = (UserRepository) props.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
+		nonAuthUserRepo = new NonAuthUserRepositoryImpl(user_repository, null, true);
+		
 		String db_uri = (String) props.get(AMP_MSG_REPO_URI_PROP_KEY);
 		String db_cls = (String) props.get(AMP_MSG_REPO_CLASS_PROP_KEY);
 		

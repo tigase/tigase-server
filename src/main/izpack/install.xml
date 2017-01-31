@@ -205,8 +205,12 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="mysql-schema-5-1-schema" src="database/mysql-schema-5-1-schema.sql"/>
 		<res id="mysql-schema-5-1-sp" src="database/mysql-schema-5-1-sp.sql"/>
 		<res id="mysql-schema-5-1-props" src="database/mysql-schema-5-1-props.sql"/>
+		<res id="mysql-schema-7-1-schema" src="database/mysql-schema-7-1-schema.sql"/>
+		<res id="mysql-schema-7-1-sp" src="database/mysql-schema-7-1-sp.sql"/>
+		<res id="mysql-schema-7-1-props" src="database/mysql-schema-7-1-props.sql"/>
 		<res id="mysql-schema-upgrade-to-4" src="database/mysql-schema-upgrade-to-4.sql"/>
 		<res id="mysql-schema-upgrade-to-5-1" src="database/mysql-schema-upgrade-to-5-1.sql"/>
+		<res id="mysql-schema-upgrade-to-7-1" src="database/mysql-schema-upgrade-to-7-1.sql"/>
 
 		<res id="postgresql-installer-create-db" src="database/postgresql-installer-create-db.sql"/>
 		<res id="postgresql-installer-post" src="database/postgresql-installer-post.sql"/>
@@ -216,8 +220,12 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="postgresql-schema-5-1-schema" src="database/postgresql-schema-5-1-schema.sql"/>
 		<res id="postgresql-schema-5-1-sp" src="database/postgresql-schema-5-1-sp.sql"/>
 		<res id="postgresql-schema-5-1-props" src="database/postgresql-schema-5-1-props.sql"/>
+		<res id="postgresql-schema-7-1-schema" src="database/postgresql-schema-7-1-schema.sql"/>
+		<res id="postgresql-schema-7-1-sp"     src="database/postgresql-schema-7-1-sp.sql"/>
+		<res id="postgresql-schema-7-1-props"  src="database/postgresql-schema-7-1-props.sql"/>
 		<res id="postgresql-schema-upgrade-to-4" src="database/postgresql-schema-upgrade-to-4.sql"/>
 		<res id="postgresql-schema-upgrade-to-5-1" src="database/postgresql-schema-upgrade-to-5-1.sql"/>
+		<res id="postgresql-schema-upgrade-to-7-1" src="database/postgresql-schema-upgrade-to-7-1.sql"/>
 
 		<res id="derby-installer-create-db" src="database/derby-installer-create-db.sql"/>
 		<res id="derby-installer-post" src="database/derby-installer-post.sql"/>
@@ -227,13 +235,21 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="derby-schema-5-1-schema" src="database/derby-schema-5-1-schema.sql"/>
 		<res id="derby-schema-5-1-sp" src="database/derby-schema-5-1-sp.sql"/>
 		<res id="derby-schema-5-1-props" src="database/derby-schema-5-1-props.sql"/>
+		<res id="derby-schema-7-1-schema" src="database/derby-schema-7-1-schema.sql"/>
+		<res id="derby-schema-7-1-sp"     src="database/derby-schema-7-1-sp.sql"/>
+		<res id="derby-schema-7-1-props"  src="database/derby-schema-7-1-props.sql"/>
 		<res id="derby-schema-upgrade-to-5-1" src="database/derby-schema-upgrade-to-5-1.sql"/>
+		<res id="derby-schema-upgrade-to-7-1" src="database/derby-schema-upgrade-to-7-1.sql"/>
 
 		<res id="sqlserver-installer-create-db" src="database/sqlserver-installer-create-db.sql"/>
 		<res id="sqlserver-installer-post" src="database/sqlserver-installer-post.sql"/>
 		<res id="sqlserver-schema-5-1-schema" src="database/sqlserver-schema-5-1-schema.sql"/>
 		<res id="sqlserver-schema-5-1-sp" src="database/sqlserver-schema-5-1-sp.sql"/>
 		<res id="sqlserver-schema-5-1-props" src="database/sqlserver-schema-5-1-props.sql"/>
+		<res id="sqlserver-schema-7-1-schema" src="database/sqlserver-schema-7-1-schema.sql"/>
+		<res id="sqlserver-schema-7-1-sp"     src="database/sqlserver-schema-7-1-sp.sql"/>
+		<res id="sqlserver-schema-7-1-props"  src="database/sqlserver-schema-7-1-props.sql"/>
+		<res id="sqlserver-schema-upgrade-to-7-1" src="database/sqlserver-schema-upgrade-to-7-1.sql"/>
 
 		<!-- Socks5 component schema files -->
 		<res id="derby-socks5-schema" src="database/derby-socks5-schema.sql"/>
@@ -242,10 +258,18 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
 
 		<!-- PubSub component schema files -->
-		<res id="derby-pubsub-schema" src="database/derby-pubsub-schema-3.0.0.sql"/>
-		<res id="mysql-pubsub-schema" src="database/mysql-pubsub-schema-3.0.0.sql"/>
-		<res id="sqlserver-pubsub-schema" src="database/sqlserver-pubsub-schema-3.0.0.sql"/>
-		<res id="postgresql-pubsub-schema" src="database/postgresql-pubsub-schema-3.0.0.sql"/>
+		<res id="derby-pubsub-schema-3.0.0" src="database/derby-pubsub-schema-3.0.0.sql"/>
+		<res id="derby-pubsub-schema-3.1.0" src="database/derby-pubsub-schema-3.1.0.sql"/>
+		<res id="derby-pubsub-schema-3-2" src="database/derby-pubsub-schema-3.2.0.sql"/>
+		<res id="mysql-pubsub-schema-3.0.0" src="database/mysql-pubsub-schema-3.0.0.sql"/>
+		<res id="mysql-pubsub-schema-3.1.0" src="database/mysql-pubsub-schema-3.1.0.sql"/>
+		<res id="mysql-pubsub-schema-3-2" src="database/mysql-pubsub-schema-3.2.0.sql"/>
+		<res id="sqlserver-pubsub-schema-3.0.0" src="database/sqlserver-pubsub-schema-3.0.0.sql"/>
+		<res id="sqlserver-pubsub-schema-3.1.0" src="database/sqlserver-pubsub-schema-3.1.0.sql"/>
+		<res id="sqlserver-pubsub-schema-3-2" src="database/sqlserver-pubsub-schema-3.2.0.sql"/>
+		<res id="postgresql-pubsub-schema-3.0.0" src="database/postgresql-pubsub-schema-3.0.0.sql"/>
+		<res id="postgresql-pubsub-schema-3.1.0" src="database/postgresql-pubsub-schema-3.1.0.sql"/>
+		<res id="postgresql-pubsub-schema-3-2" src="database/postgresql-pubsub-schema-3.2.0.sql"/>
 
 
 	</resources>
@@ -502,6 +526,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
 					<include name="jetty-osgi-boot.jar"/>
 					<include name="tigase-http-api.jar"/>
+					<include name="javax.servlet-api.jar"/>
 					<include name="tigase-web-ui.war"/>
 					<include name="javax.servlet-api.jar"/>
 					<include name="jetty-continuation.jar"/>

@@ -28,19 +28,16 @@ package tigase.server.xmppsession;
 
 import tigase.db.RepositoryFactory;
 
-import tigase.osgi.ModulesManagerImpl;
-
-import tigase.util.DNSResolver;
-
 import tigase.xmpp.*;
 
-import static tigase.conf.Configurable.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.osgi.ModulesManagerImpl;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.conf.Configurable.GEN_SM_PLUGINS;
+import static tigase.conf.Configurable.GEN_TEST;
 
 /**
  * Describe class SessionManagerConfig here.
@@ -98,6 +95,9 @@ public abstract class SessionManagerConfig {
 
 	/** Field description */
 	protected static final String SM_THREADS_POOL_PROP_VAL = "default";
+	
+	protected static final String SM_THREADS_FACTOR_PROP_KEY = "sm-threads-factor";
+	protected static final int SM_THREADS_FACTOR_PROP_VAL = 1;
 
 	protected static final String AUTH_TIMEOUT_PROP_KEY = "auth-timeout";
 	protected static final long AUTH_TIMEOUT_PROP_VAL = 120;
@@ -105,10 +105,6 @@ public abstract class SessionManagerConfig {
 	/** Field description */
 	protected static final String STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY =
 			"stale-connection-closer-queue-size";
-	private static String[] ADMINS_PROP_VAL = { "admin@localhost", "admin@hostname" };
-	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = { "localhost", "hostname" };
-	private static String[] CLUSTER_NODES_PROP_VAL     = { "sess-man@localhost" };
-	private static String[] HOSTNAMES_PROP_VAL         = { "localhost", "hostname" };
 
 	// public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
@@ -122,10 +118,11 @@ public abstract class SessionManagerConfig {
 		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy",
 		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
-		"presence",
+		"presence-state", "presence-subscription",
 
 		// "basic-filter",
-		"disco", "domain-filter", "zlib", "amp", "message-carbons"
+		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time",
+		"urn:xmpp:csi:0"
 	};
 
 	/**
@@ -139,10 +136,11 @@ public abstract class SessionManagerConfig {
 		"jabber:iq:roster", "jabber:iq:privacy", "jabber:iq:version",
 		"http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
-		"presence",
+		"presence-state", "presence-subscription",
 
 		// "basic-filter",
-		"disco", "domain-filter", "zlib", "amp", "message-carbons"
+		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time",
+		"urn:xmpp:csi:0"
 	};
 	private static final String[] PLUGINS_FULL_PROP_VAL = {
 		sessionCloseProcId, sessionOpenProcId, defaultHandlerProcId, "jabber:iq:register",
@@ -151,10 +149,11 @@ public abstract class SessionManagerConfig {
 		"jabber:iq:roster", "jabber:iq:privacy", "jabber:iq:version",
 		"http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
-		"presence",
+		"presence-state", "presence-subscription",
 
 		// "basic-filter",
-		"disco", "domain-filter", "zlib", "amp", "message-carbons"
+		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time",
+		"urn:xmpp:csi:0"
 	};
 	private static String[]      TRUSTED_PROP_VAL = { "admin@localhost", "admin@hostname" };
 	private static final boolean SKIP_PRIVACY_PROP_VAL = false;
@@ -198,12 +197,13 @@ public abstract class SessionManagerConfig {
 	public static void getDefaults(Map<String, Object> props, Map<String, Object> params) {
 		props.put(ADMIN_SCRIPTS_PROP_KEY, ADMIN_SCRIPTS_PROP_VAL);
 
-		boolean full_comps = (params.get(RepositoryFactory.GEN_AUTH_DB) == null) || params
-				.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("mysql") || params.get(
-				RepositoryFactory.GEN_AUTH_DB).toString().equals("pgsql") || params.get(
-				RepositoryFactory.GEN_AUTH_DB).toString().equals("derby") || params.get(
-				RepositoryFactory.GEN_AUTH_DB).toString().equals("sqlserver") || params.get(
-				RepositoryFactory.GEN_AUTH_DB).toString().equals("tigase-auth");
+		boolean full_comps = (params.get(RepositoryFactory.GEN_AUTH_DB) == null)
+												 || params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("mysql")
+												 || params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("pgsql")
+												 || params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("derby")
+												 || params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("sqlserver")
+												 || params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("tigase.mongodb.MongoRepository")
+												 || params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("tigase-auth");
 		LinkedHashSet<String> plugins = new LinkedHashSet<String>(32);
 
 		if ((Boolean) params.get(GEN_TEST)) {
@@ -255,22 +255,6 @@ public abstract class SessionManagerConfig {
 
 		props.put(SKIP_PRIVACY_PROP_KEY, (skip_privacy != null) && skip_privacy.equals(
 				"true"));
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			HOSTNAMES_PROP_VAL         = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
-			ANONYMOUS_DOMAINS_PROP_VAL = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			HOSTNAMES_PROP_VAL         = DNSResolver.getDefHostNames();
-			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
-		}
-		if (params.get(GEN_TRUSTED) != null) {
-			TRUSTED_PROP_VAL = ((String) params.get(GEN_TRUSTED)).split(",");
-		} else {
-			TRUSTED_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-			for (int i = 0; i < TRUSTED_PROP_VAL.length; i++) {
-				TRUSTED_PROP_VAL[i] = "admin@" + HOSTNAMES_PROP_VAL[i];
-			}    // end of for (int i = 0; i < TRUSTED_PROP_VAL.length; i++)
-		}
-		props.put(TRUSTED_PROP_KEY, TRUSTED_PROP_VAL);
 		props.put(AUTO_CREATE_OFFLINE_USER_PROP_KEY, AUTO_CREATE_OFFLINE_USER_PROP_VAL);
 
 		String sm_threads_pool = SM_THREADS_POOL_PROP_VAL;

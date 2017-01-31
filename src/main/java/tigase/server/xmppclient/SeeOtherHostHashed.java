@@ -24,6 +24,7 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Arrays;
 import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -31,6 +32,7 @@ import tigase.xmpp.BareJID;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
+import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -63,7 +65,17 @@ public class SeeOtherHostHashed extends SeeOtherHost {
 
 
 	@Override
-	public void setNodes(List<BareJID> connectedNodes) {
-		this.connectedNodes = connectedNodes;
+	public void setNodes(List<JID> connectedNodes) {
+		synchronized (this) {
+			JID[] arr_in = connectedNodes.toArray(new JID[connectedNodes.size()]);
+			BareJID[] arr_out = new BareJID[arr_in.length];
+			
+			for (int i=0; i<arr_in.length; i++) {
+				arr_out[i] = BareJID.bareJIDInstanceNS(null, arr_in[i].getDomain());
+			}
+
+			Arrays.sort(arr_out);
+			this.connectedNodes = new CopyOnWriteArrayList<BareJID>(arr_out);
+		}
 	}
 }

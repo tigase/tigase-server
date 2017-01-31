@@ -1,0 +1,43 @@
+[[mysql51upgrade]]
+= MySQL Database Schema Upgrade for Tigase 5.1
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-04-21 03:58
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+The schema upgrade is very simple and safe but make sure the current database schema is in version 4.0.
+
+Assumptions:
+
+. *tigasedb* is a database name
+. *tigase_user* is a database user name
+. *mypass* is database user password
+
+First things first - make a database backup:
+
+[source,sh]
+-----
+mysqldump -u tigase_user -pmypass tigasedb > tigasedb_dump.sql
+-----
+
+If you need to restore database for any reason execute following commands:
+
+[source,sh]
+-----
+msyqladmin -u tigase_user -pmypass drop tigasedb
+mysqladmin -u tigase_user -pmypass create tigasedb
+mysql -u tigase_user -pmypass tigasedb < tigasedb_dump.sql
+-----
+
+_Note! You may be required to use root user and his password to execute mysqladmin commands._
+
+Now we can run schema upgrade script
+
+[source,sh]
+-----
+mysql -u tigase_user -pmypass tigasedb < database/mysql-schema-upgrade-to-5-1.sql
+-----

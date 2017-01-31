@@ -1,0 +1,22 @@
+[[tigase51schemaupgrade]]
+= Tigase 5.1 Database Schema Upgrade
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-07-16 11:10
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+We had to make a small change to the database schema for Tigase version 5.1.0.
+
+It does not affect data or data structure, only the way in which some data is accessed in database. We added one more stored procedure which has to be installed in database if you upgrade your installation from a previous Tigase version
+
+The schema upgrade is very simple and safe but make sure the current database schema is in version 4.0.
+If you happen to use ancient version of Tigase earlier than 4.0 and you want to upgrade to 5.1, you have to run xref:tigase40schemaupgrade[4.0 upgrade script] first.
+
+Please follow detailed guide for the database applicable to your installation: xref:derby51upgrade[Derby], xref:mysql51upgrade[MySQL], xref:postgresql51upgrade[PostgreSQL].
+
+- xref:derby51upgrade[Derby Database Schema Upgrade for Tigase 5.1]
+- xref:mysql51upgrade[MySQL Database Schema Upgrade for Tigase 5.1]
+- xref:postgresql51upgrade[PostgreSQL Database Schema Upgrade for Tigase 5.1]

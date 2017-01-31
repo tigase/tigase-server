@@ -1,0 +1,276 @@
+[[eventBus]]
+= Eventbus
+:author: Bartosz Malkowski
+:date: 2015-04-09 8:56
+:version: v1.0 September 2015
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+New for Tigase version 7.1.0, is an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know an event has occured!
+Lets begin with setup and requirements.
+
+Eventbus is based on a limited http://www.xmpp.org/extensions/xep-0060.html[PubSub] specification. Events are delivered to subscribers as a normal PubSub notification.
+
+Each component or client may subscribe for specific types of events. Only components on cluster nodes are allowed to publish events.
+
+== Setup
+Eventbus is enabled by default on v7.1.0 b4001 and later, no setup needed!
+
+== How it Works
+Events in Eventbus are identified by two elements: name of event and its namespace:
+[source, xml]
+-------
+<EventName xmlns="tigase:demo">
+  <sample_value>1</sample_value>
+</EventName>
+-------
+Where event name is `EventName` and namespace is `tigase:demo`.
+
+Listeners may subscribe for a specific event or for all events with specific a namespace. Because in pubsub, only one node name exists, so we have to add a way to convert the event name and namespace to a node name:
+[source]
+-------
+nodename = eventname + "|" + namespace
+-------
+So for example, to subscribe to `<EventName xmlns="tigase:demo">`, node must be: `EventName|tigase:demo`. If you wish to subscribe to all events with a specific namespace, use an asterisk (`*`) instead of the event name: +*|tigase:demo+.
+
+[NOTE]
+===============================
+If client is subscribed to /*|tigase:demo node, then events will not be sent from node /*|tigase:demo, but from the *real* node (in this case: `EventName|tigase:demo`).
+===============================
+
+[[availableTasks]]
+== Available Tasks
+Eventbus monitoring has several pre-defined tasks that can be monitored and set to trigger. What follows is the list of tasks with the options attributed to each task.
+
+- *disk-task* - Used to check disk usage. +
+Available Options
+  . +enabled[B]+ - Enable or disable task, Boolean value.
+  . +period[I]+ - Period of running check, Integer value.
+  . +threshold+ - Percentage of used space on disk, Float value.
+
+- *cpu-temp-task* - Used to check CPU temperature. +
+Available Options
+  . +enabled[B]+ - Enable or disable task, Boolean value.
+  . +period[I]+ - Period of running check, Integer value.
+  . +cpuTempThreshold[I]+ - Temperature threshold of CPU in °C.
+
+- *load-checker-task* - Used to check system load. +
+Available Options
+. +enabled[B]+ - Enable or disable task, Boolean value.
+. +period[I]+ - Period of running check, Integer value.
+. +averageLoadThreshold[L]+ - Average percent load threshold, Long value.
+
+- *memory-checker-task* - Used to check memory usage. +
+Available Options
+. +enabled[B]+ - Enable or disable task, Boolean value.
+. +period[I]+ - Period of running check, Integer value.
+. +maxHeapMemUsagePercentThreshold[I]+ - Alarm when percent of used Heap memory is larger than, Integer value.
+. +maxNonHeapMemUsagePercentThreshold[I]+ - Alarm when percent of used Non Heap memory is larger than, Integer value.
+
+- *logger-task* - Used to transmit log entries depending on level entered. +
+. +enabled[B]+ - Enable or disable task, Boolean value.
+. +levelThreshold+ - Minimal log level that will be the threshold. Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, and ALL.
+
+- *connections-task* - Used to check users disconnections. +
+*NOTE: The event will be generated only if both thresholds (amount and percentage) will be fulfilled.* +
+. +enabled[B]+ - Enable or disable task, Boolean value.
+. +period[I]+ - Period of running check in ms, Integer value.
+. +thresholdMinimal[I]+ - Minimal amount of disconnected users required to generate alarm.
+. +threshold[I]+ - Minimal percent of disconnected users required to generate alarm.
+
+== Configuration
+Configuration of the eventbus monitor can be done one of two ways; either by lines in init.properties file, or by sending XMPP stanzas to the server.  You may also send XMPP stanzas VIA HTTP REST.
+XMPP stanza configurations will override ones in init.properties, but they will only last until the server restarts.
+
+=== init.properties
+Tasks can be configured in the init.properties file. See xref:availableTasks[available tasks] for the tasks that can be setup.
+
+To enable a specific monitor task, use the following line:
+-----
+monitor/$TASKNAME/enabled[B]=true
+-----
+Where monitor is the component name for tigase.monitor.MonitorComponent, and $TASKNAME is one of the xref:availableTasks[available task names].
+
+This format will be the same for other settings for tasks.  For example:
+-----
+monitor/$TASKNAME/period[I]=1000
+-----
+which sets the check period to 1000 milliseconds.
+
+*NOTE* Once triggers have been activated, they will become dormant.  Think of these as one-shot settings.
+
+==== Subscription Limitations
+To define list of JIDs allowed to subscribe for events:
+[source, bash]
+-----
+eventbus/affiliations/allowedSubscribers=francisco@denmark.lit,bernardo@denmark.lit
+-----
+If this is left blank, all users can subscribe.
+
+=== Configuration via XMPP
+We can also configure the eventbus monitor component using XMPP stanzas. This allows us to set and change configurations during server runtime. This is done using a series of +iq+ stanzas send to the monitor component.
+
+We can query each component for its current settings using the following stanza.
+[source,xml]
+-----
+<iq type="set" to="monitor@$DOMAIN/disk-task" id="aad0a">
+<command xmlns="http://jabber.org/protocol/commands" node="x-config"/>
+</iq>
+-----
+
+The server will return the component current settings which will make things easier if you wish to edit them. In this case, the server has returned the following to us
+[source,xml]
+-----
+<iq from="monitor@$DOMAIN/disk-task" type="result" id="aad0a" to="alice@coffeebean.local/Psi+">
+<command xmlns="http://jabber.org/protocol/commands" status="executing" node="x-config" sessionid="0dad3436-a029-4082-b0e0-04d838c6c0da">
+<x xmlns="jabber:x:data" type="">
+<title>Task Configuration</title>
+<instructions/>
+<field type="boolean" label="Enabled" var="x-task#enabled">
+<value>0</value>
+</field>
+<field type="text-single" label="Period [ms]" var="x-task#period">
+<value>60000</value>
+</field>
+<field type="text-single" label="Disk usage ratio threshold" var="threshold">
+<value>0.8</value>
+</field>
+</x>
+</command>
+</iq>
+-----
+This tells us that the disk-task setting is not active, has a period of 60000ms, and will trigger when disk usage is over 80%.
+
+To send new settings to the monitor component, we can send a similar stanza back to the monitor component.
+
+[source,xml]
+-----
+<iq type="set" to="monitor@$DOMAIN/disk-task" id="aad1a">
+<command xmlns="http://jabber.org/protocol/commands" node="x-config" sessionid="0dad3436-a029-4082-b0e0-04d838c6c0da">
+<x xmlns="jabber:x:data" type="submit">
+<field type="boolean" var="x-task#enabled">
+<value>0</value>
+</field>
+<field type="text-single" var="x-task#period">
+<value>60000</value>
+</field>
+<field type="text-single" var="threshold">
+<value>0.8</value>
+</field>
+</x>
+</command>
+</iq>
+-----
+
+To which a successful update will give you an XMPP success stanza to let you know everything is set correctly.
+
+(Include what the response will be from this setting!)
+
+Alternatively, you can update specific settings by editing a single field without adding anything else. For example, if we just wanted to turn the +disk-task+ on we could send the following stanza:
+
+[source,xml]
+-----
+<iq type="set" to="monitor@$HOSTNAME/disk-task" id="ab53a">
+<command xmlns="http://jabber.org/protocol/commands" node="x-config">
+<x xmlns="jabber:x:data" type="submit">
+<field type="boolean" var="x-task#enabled">
+<value>1</value>
+</field>
+</x>
+</command>
+</iq>
+-----
+
+To set any other values, do not forget that certain parts may need to be changed, specifically the
+*<field type="boolean" var=x-task#enabled">*  fields. +
+- Your field type will be defined by the type of variable specified in the xref:availableTasks [Available Tasks] section. +
+- +var=x task#+ will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section, minus the data type parameter.
+
+== Getting the Message
+Without a place to send messages to, eventbus will just trigger and shut down. There are two different methods that eventbus can deliver alarm messages and relevant data; XMPP messages and using the mailer extension.
+
+=== XMPP notification
+In order to retrieve notifications, a subscription to the +eventbus@tigase.org+ user must be made.
+Keep in mind that subscriptions are not persistent across server restarts, or triggers. +
+The eventbus schema is very similar to most XMPP subscription requests but with a few tweaks to differentiate it if you wanted to subscribe to a certain task or all of them. Each task is considered a node, and each node has the following pattern: +eventName|eventXMLNS+. Since each monitoring task has the +tigase:monitor:event+ event XMLNS, we just need to pick the event name from the list of tasks.
+So like the above example, our event node for the disk task will be +disk-task|tigase:monitor:event+.
+Applied to an XMPP stanza, it will look something like this:
+[source,xml]
+-----
+<iq type='set'
+    to='eventbus@tigase.org'
+    id='sub1'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+    <subscribe node='disk-taskEvent|tigase:monitor:event' jid='$USER_JID'/>
+  </pubsub>
+</iq>
+-----
+Don't forget to replace $USER_JID with the bare JID of the user you want to receive those messages. You can even have them sent to a MUC or any component with a JID.
+Available events are as follows:
+- disk-taskEvent for +disk-task+
+- LoggerMonitorEvent for +logger-task+
+- HeapMemoryMonitorEvent for +memory-checker-task+
+- LoadAverageMonitorEvent for +load-checker-task+
+- CPUTempMonitorEvent for +cpu-temp-task+
+- UsersDisconnected for +connections-task+
+
+Alternatively, you can also subscribe to all events within the eventbus by using a wildcard * in place of the event XMLNS like this example:
+[source,xml]
+-----
+<iq type='set'
+    to='eventbus@tigase.org'
+    id='sub1'>
+  <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+    <subscribe node='*|tigase:monitor:event' jid='$USER_JID'/>
+  </pubsub>
+</iq>
+-----
+
+=== Sample notification from Eventbus
+[source, xml]
+-------
+<message from='eventbus.shakespeare.lit' to='francisco@denmark.lit' id='foo'>
+  <event xmlns='http://jabber.org/protocol/pubsub#event'>
+    <items node='EventName|tigase:demo'>
+      <item>
+        <EventName xmlns="tigase:demo" eventSource="samplecomponent.shakespeare.lit'" eventTimestamp="1444216850">
+          <sample_value>1</sample_value>
+        </EventName>
+      </item>
+    </items>
+  </event>
+</message>
+-------
+
+[[monitorMailer]]
+== Mailer Extension
+Tigase Server Monitor Mailer Extension (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.
+
+For v7.1.0 versions and later, TSMME is already included in your distribution package and no extra installation is needed.
+
+For versions older than 7.1.0 TSMME requires two files to operate:
+
+- A compiled build of tigase mailer from link:https://projects.tigase.org/projects/tigase-server-ext-mailer/repository[its repository]. Place the compiled .jar file into /jars directory.
+
+- javax.mail.jar file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the /jars directory.
+
+[source,properties]
+-----
+monitor/mailer-smtp-host=mail.tigase.org
+monitor/mailer-smtp-port=587
+monitor/mailer-smtp-username=sender
+monitor/mailer-smtp-password=********
+monitor/mailer-from-address=sender@tigase.org
+monitor/mailer-to-addresses=receiver@tigase.org,admin@tigase.org
+-----
+
+- +monitor/mailer-smtp-host+ - SMTP Server hostname.
+- +monitor/mailer-smtp-port+ - SMTP Server port.
+- +monitor/mailer-smtp-usernam+ - name of sender account.
+- +monitor/mailer-smtp-password+ - password of sender account.
+- +monitor/mailer-from-address+ - sender email address. It will be set in field from in email.
+- +monitor/mailer-to-addresses+ - comma separated notification receivers email addresses.
+
+It is recommended to create a specific e-mail address in your mail server for this purpose only, as the account settings are stored in plaintext without encryption.

@@ -1,0 +1,113 @@
+[[windowsInstallation]]
+= Windows Installation
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Tigase server installation should be started with downloading the Tigase installer server from our link:https://projects.tigase.org/attachments/download/273/tigase-server-3.3.2-b889.exe[download area]. This guide describes installation procedure for the branch 3.x of the server so please pick up the latest version of the Tigase 3.x.
+
+The Windows binary package is an executable file containing an installer. Run the file and the server will be installed and icons will be added to your Windows start menu. Locate the Tigase group in your menu and execute: "Install Tigase service" which will install the Tigase server as the system service and it will be automatically started whenever your system starts.
+
+If you are going to use the Tigase server with MySQL database have a look now in the directory where the Tigase server is installed. There is a directory +etc/+. Have a look inside and find file called +init.properties+. Open the file with a text editor and make sure you added there 2 following lines:
+
+[source,bash]
+-----
+--user-db=mysql
+--user-db-uri=jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass
+-----
+
+The content of the file should look like the example screenshot below:
+
+image:images/init_properties1.jpg[]
+
+== MySQL Database Installation
+
+The section describes installation and configuration of the MySQL database to work with Tigase server.
+
+Download the binary package from MySQL download area at link:http://dev.mysql.com/downloads/mysql/5.0.html#win32[mysql.com]. Make sure you select executable proper for your operating system.
+
+Run the installation program and follow default installation steps. When the installation is complete find the MySQL elements in the Windows Start menu and run the MySQL Configuration Wizard. Follow the wizard and make sure to check settings against the screenshots in the guide below.
+
+In Welcome window just press 'Next'.(pic.1)
+
+image:images/sql1.JPG[]
+
+In the next window select option: 'Detailed Configuration' and press 'Next' (pic. 2)
+
+image:images/sql2.JPG[]
+
+On the next screen select option: 'Server Machine' and press 'Next' (pic. 3)
+
+image:images/sql3.JPG[]
+
+On the forth windows leave the default" 'Multifunctional Database' and press 'Next' (pic. 4)
+
+image:images/sql4.JPG[]
+
+On the step number five just press 'Next' using defaults. (pic. 5)
+
+image:images/sql5.JPG[]
+
+Again, on window 6 select the default - 'Decision Support (DSS)/OLAP' and press 'Next' (pic.6)
+
+image:images/sql6.JPG[]
+
+Make sure you switch OFF the 'Strict mode' and and press 'Next' (pic. 7)
+
+image:images/sql7.JPG[]
+
+On the character encoding page select: 'Manual Selected Default Character set/ Collation' and  'utf8', press 'Next' (pic.8)
+
+image:images/sql8.JPG[]
+
+On next window select 'Include Bin Directory in Windows PATH' and press 'Next' (pic.9)
+
+image:images/sql9.JPG[]
+
+On this window just enter the database super user password and make sure you remember it. When ready press 'Next' (pic. 10)
+
+image:images/sql10.JPG[]
+
+This is the last screen. Press 'Execute' to save the configuration parameters. (pic. 11)
+
+image:images/sql11.JPG[]
+
+When the configuration is saved you can repeat all the steps and change settings at any time by running: *START => Programs => MYSQL=> MYSQL serwer machine=>  MySQL Server Instance Config Wizard*
+
+Now we have to setup Tigase database. From the Start menu run the MySQL console and enter all commands below finishing them with *<ENTER>*:
+
+. Create the database:
++
+[source,sql]
+-----
+mysql>create database tigasedb;
+-----
+. Add database user:
++
+[source,bash]
+-----
+mysql> GRANT ALL ON tigasedb.* TO tigase_user@'%' IDENTIFIED BY 'tigase_passwd';
+mysql> GRANT ALL ON tigasedb.* TO tigase_user@'localhost' IDENTIFIED BY 'tigase_passwd';
+mysql> GRANT ALL ON tigasedb.* TO tigase_user IDENTIFIED BY 'tigase_passwd';
+mysql> FLUSH PRIVILEGES;
+-----
+. Load Tigase database schema:
++
+[source,bash]
+-----
+mysql> use tigasedb;
+mysql> source c:/Program Files/Tigase/database/mysql-schema.sql;
+-----
+
+There is a small configuration bug in the installation of Tigase version 3.x. If you look in the *run.bat* file in the Tigase directory you have to replace string *inital.propereties* with *init.properties*.
+
+You can now restart your machine and all services including the MySQL database and the Tigase server should be running. Alternatively if you don't want to restart your computer you can start both services manually if you know how to do it.
+
+When the system is up and running you can connect with any XMPP client (Psi for example) to your server to see if it is working.
+
+Now, you can tweak the server configuration further. Use the guide describing init.properties file for configuration details.

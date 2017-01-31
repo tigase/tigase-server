@@ -1,0 +1,143 @@
+[[stanzaSender]]
+= StanzaSender
+
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+StanzaSender is a component which makes it easier to integrate XMPP server with other third-party tools.
+
+It simply allows you to send stanzas from your application without implementing any XMPP specific code. The component regularly reads specified data source for XMPP packets to send. The data source can be a SQL database, directory on your filesystem, or anything you might want.
+
+If you have a Web application for example for which you want to send notifications of an event to selected users you can install link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main/java/tigase/server/ssender[StanzaSender] component on your Tigase server. It will help you to easily distribute your messages to end-users.
+
+== How it Works
+
+The module itself doesn't do anything, it just schedules tasks and sends stanzas which come from anywhere. To do the actual work of retrieving stanzas from data source the component uses *tasks*.
+
+In theory the task can retrieve XMPP packets for sending from any location or may just generate stanzas on its own.
+
+In practice there are 2 *tasks* already implemented and ready to use. You can treat them as a sample code for implementation of your own tasks customised for your specific needs or you can just use these tasks as they are.
+
+The tasks which are available are:
+
+- +FileTask+ retrieving stanzas from directory in file system.
+- +JDBCTask+ retrieving stanzas from SQL database.
+
+=== FileTask
+
++FileTask+ implements tasks for cyclic retrieving stanzas from a directory and sending them to the StanzaHandler object.
+
+It looks for any new stanza to send. Any single file can contain only a single stanza to send and any entry in database table can also contain only a single stanza to send. Files on hard disk and records in databases are deleted after it is read.
+
+Any file in a given directory is treated the same way - Tigase assumes it contains valid XML data with XMPP stanza to send. You can however set in configuration, using wildchars which files contain stanzas. All stanzas must contain complete data including correct "_from_" and "_to_" attributes.
+
+By default it is looking for +*.stanza+ files in +/var/spool/jabber/+ folder but you can specify different directory names in the initialization string. Here is a sample initialization strings:
+
+- +/var/spool/jabber/*.stanza+
+- +/var/spool/jabber/*+
+
+The last is equal to:
+
+- +/var/spool/jabber/+
+
+Note the last forward slash '/' is required in such case if the last element of the path is a directory.
+
+*Please note! Tigase must have writing permissions for this directory, otherwise it may not function properly.*
+
+=== JDBCTask
+
++JDBCTask+ implements tasks for cyclic retrieving stanzas from database and sending them to the StanzaHandler object.
+
+Database table format:
+
+- *id* - numerical unique record identifier.
+- *stanza* - text field containing valid XML data with XMPP stanza to send.
+
+Any record in this table is treated the same way - Tigase assumes it contains valid XML data with XMPP stanza to send. No other data are allowed in this table. All stanzas must be complete including correct "_from_" and "_to_" attributes.
+
+By default it is looking for stanzas in +xmpp_stanza+ table, but you can specify a different table name in the connection string. For example:
+
++jdbc:mysql://localhost/tigasedb?user=tigase&password=pass&table=xmpp_stanza+
+
+Please note the last parameter which is specific to +JDBCTask+. You can specify the table name which stores stanzas for sending, if omitted default value is: +xmpp_stanza+.
+
+== Configuration
+
+StanzaSender is a Tigase component so the configuration is similar to that of all other components. The simplest way to get the settings for *StanzaSender* is by generating a configuration with all possible components. To do this you have to run Tigase server with +--gen-config-all+ parameter set.
+
+By default this component name is *ssend* and here is a content of the configuration file for *StanzaSender*:
+
+It is one of +msg-receivers+:
+
+[source,bash]
+-----
+<entry type="String[]" key="id-names">
+  ...
+  <item value="ssend"/>
+</entry>
+-----
+
+To activate the component and a specify class name for it following entries has been added:
+
+[source,bash]
+-----
+<entry value="true" type="Boolean" key="ssend.active"/>
+<entry value="tigase.server.ssender.StanzaSender" type="String" key="ssend.class"/>
+-----
+
+And the main settings section for the component:
+
+[source,bash]
+-----
+<component name="ssend">
+  <map>
+   <entry value="10" type="Long" key="default-interval"/>
+   <entry value="1000" type="Integer" key="max-queue-size"/>
+   <entry type="String[]" key="stanza-listeners">
+    <item value="jdbc"/>
+    <item value="file"/>
+   </entry>
+  </map>
+  <node name="file">
+   <map>
+    <entry value="true" type="Boolean" key="active"/>
+    <entry value="tigase.server.ssender.FileTask" type="String" key="class-name"/>
+    <entry value="/var/spool/jabber/*.stanza" type="String" key="init-string"/>
+    <entry value="10" type="Long" key="interval"/>
+   </map>
+  </node>
+  <node name="jdbc">
+   <map>
+    <entry value="true" type="Boolean" key="active"/>
+    <entry value="tigase.server.ssender.JDBCTask" type="String" key="class-name"/>
+    <entry value="jdbc:mysql://localhost/tigase?user=tigase&
+        password=mypass&table=xmpp_stanza"
+      type="String" key="init-string"/>
+    <entry value="10" type="Long" key="interval"/>
+   </map>
+  </node>
+ </component>
+-----
+
+Most parameters should be pretty clear but some may need a little explanation.
+
+=== General +StanzaSender+ parameters:
+
+- *default-interval* number which specifies in seconds how often should the task look in data source for new packets to send.
+- *max-queue-size* is a number which specifies internal packets queue size. This is used to prevent the component from consuming all the memory for data in case the component can not process them.
+- *stanza-listeners* is a list of task names to load. Each task can read XMPP packets to send from different data sources. You can load as many listeners (tasks) as you need. Each task must read stanzas from different data sources.
+
+For each task from the +stanza-listeners+ list there is a separate section with parameters for each task:
+
+- *active* boolean switch allowing you to turn on/off the task without removing configuration completely.
+- *class-name* Java class name which implements the task. This class must extend +tigase.server.ssender.SenderTask+ and it is loaded at runtime.
+- *init-string* is kind of data source connection string. For database it is just database connection string, for file system this is just a directory name. It may be even different for different tasks. The 2 tasks already implemented have some specific features: +FileTask+ allows you to use wild-chars in directory/ file name specification and +JDBCTask+ allows you to specify additional parameter at the end of JDBC connection string - database table name. For specific examples look at above config sections.
+- *interval* is a number which allows you to specify different interval in seconds for checking data source for each task.
+
+*NOTE:* Each task has own separate parameters list.

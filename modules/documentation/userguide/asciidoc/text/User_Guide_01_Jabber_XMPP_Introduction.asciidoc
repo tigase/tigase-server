@@ -1,16 +1,14 @@
-Jabber/XMPP introduction
-========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+= Jabber/XMPP introduction
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2009-11-25 15:51
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2009-11-25 15:51
 
-Jabber/XMPP is Instant Messaging Technology
--------------------------------------------
-
-All federated *Jabber/XMPP* servers are connected in one global communications network allowing you to send messages to friends who have accounts on other Jabber servers.
+== Jabber/XMPP is Instant Messaging Technology
+All federated *XMPP* servers are connected in one global communications network allowing you to send messages to friends who have accounts on other Jabber servers.
 
 This is very much like sending e-mail but the difference between Jabber and e-mail is the same as the difference between sending a traditional mail and talking on the phone.
 
@@ -18,13 +16,12 @@ All messages sent through Jabber are sent instantly and you also receive respons
 
 There exists similar technologies to Jabber like Yahoo, MSN, and ICQ. There are, however, quite a few differences.
 
-Jabber is an open standard which means everybody can know how it works, everybody can implement their own software connecting to the network both client and server side.
+XMPP is an open standard which means everybody can know how it works, everybody can implement their own software connecting to the network both client and server side.
 
 The server side is actually the biggest difference and advantage. Many companies have offices in different locations, and such instant messaging technology could be very useful to employees for communication. Companies are not inclined to allow confidential discussions to go outside the company's network. Especially if it is not very secure to leave such information on third party public servers.
 
-Jabber on the other hand, allows you to deploy server software on your own company network. Employees can then talk securely and all information remains on the company's secure network. Of course if offices are located in different locations or countries then all messages are transmitted over the public network - the Internet. This is not a problem since Jabber supports SSL/TLS - secure encrypted connections which helps you protect your discussion.
+XMPP servers on the other hand, allows you to deploy server software on your own company network. Employees can then talk securely and all information remains on the company's secure network. Of course if offices are located in different locations or countries then all messages are transmitted over the public network - the Internet. This is not a problem since XMPP supports SSL/TLS - secure encrypted connections which helps you protect your discussion.
 
 Then if your employees need to contact customers outside your company, the whole discussion can go through your server and a server located on the customer side.
 
-There are many other scenarios and use cases but I hope this brief introduction gives you an idea of the differences and advantages of Jabber technology.
-
+There are many other scenarios and use cases but I hope this brief introduction gives you an idea of the differences and advantages of XMPP technology.

@@ -40,11 +40,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
+
 import tigase.conf.ConfigurationException;
+
 import tigase.db.comp.ComponentRepository;
+
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
+
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ext.handlers.BindProcessor;
@@ -57,11 +62,15 @@ import tigase.server.ext.handlers.StartTLSProcessor;
 import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import tigase.server.ext.lb.LoadBalancerIfc;
+
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+
+import java.text.MessageFormat;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
@@ -382,8 +391,7 @@ public class ComponentProtocol
 
 		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Processing socket: {0}, data: {0}", new Object[] { serv,
-						p });
+				log.log(Level.FINEST, "Processing socket data: {0}, from socket: {1}", new Object[] { p, serv });
 			}
 
 			boolean processed = false;
@@ -438,6 +446,14 @@ public class ComponentProtocol
 	}
 
 	@Override
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
+		// readd packet - this may be good as we would retry to send packet 
+		// which delivery failed due to IO error
+		addPacket(packet);
+		return true;
+	}
+	
+	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
 		// TODO: handle this somehow
@@ -463,9 +479,9 @@ public class ComponentProtocol
 			// Well, that's a but, we should not be here...
 			log.fine("XMLNS not set, accepting a new connection with xmlns auto-detection.");
 		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " +
-						result);
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "cid: {0}, sending: {1}, sessionData: {2}",
+								 new Object[] { serv.getSessionData().get( "cid" ), result, serv.getSessionData() } );
 			}
 			result = handler.serviceStarted(serv);
 		}
@@ -753,7 +769,7 @@ public class ComponentProtocol
 			// connection
 			if (result == null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("LB could not select connection, trying traditional way");
+					log.finest("LB could not select connection, or there is only one connection, trying traditional way");
 				}
 				for (ComponentConnection componentConnection : conns) {
 					ComponentIOService serv = componentConnection.getService();

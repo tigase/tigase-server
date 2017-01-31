@@ -1,0 +1,26 @@
+[[vhostTlsRequired]]
+= --vhost-tls-required
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-22 03:05
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* +false+
+
+*Example:* +--vhost-tls-required = true+
+
+*Possible values:* +true|false+
+
+*Description:* This property is a global settings to switch on/off TLS required mode on the Tigase installation. Setting this property to +false+ does not turn TLS off. The TLS is still available on the server but as an option and this is the client's decision whether to use encryption or not. If the property is set to true the server will not allow for user authentication or sending any other user data before TLS handshaking is completed.
+
+This is a global property which is overridden by settings for particular vhost.
+
+The +false+ value is used as a default when no configuration is set. This settings is useful for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It allows admins to configure default values for all of them, instead of having to provide individual configuration for each vhost.
+
+It is also applied as a default value for all new vhosts added at run-time.
+
+*Available since:* 5.2.0

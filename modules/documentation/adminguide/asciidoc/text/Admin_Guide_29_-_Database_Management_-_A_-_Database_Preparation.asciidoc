@@ -1,0 +1,21 @@
+[[databasePreperation]]
+= Database Preparation
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:author: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-07-15 06:42
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Tigase uses generally the same database schema and the same set of stored procedures and functions on every database. However, the schema creation scripts and code for stored procedures is different for each database. Therefore the manual process to prepare database is different for each database system.
+
+Of course the simplest and easiest way to prepare database is to use Tigase installer or webinstaller which automates the whole process. Sometimes this is not possible. A second option is to use the +DBSchemaLoader+ utility in Tigase. If either of those won't work, or won't suit your needs,  provided are set of guides describing initialization and preparation process for each supported database.
+
+-xref:dbSchemaLoader[The DBSchemaLoader Utility]
+- xref:prepareMysql[Prepare the MySQL Database for the Tigase Server]
+- xref:hashedPasswords[Hashed User Passwords in Database]
+- xref:prepareDerby[Prepare the Derby Database for the Tigase Server]
+- xref:prepareMssql[Prepare the MS SQL Server Database for the Tigase Server]
+- xref:preparePostgresql[Prepare the PostgreSQL Database for the Tigase Server]

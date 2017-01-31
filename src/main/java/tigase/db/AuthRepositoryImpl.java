@@ -71,6 +71,7 @@ public class AuthRepositoryImpl
 			"tigase.db.UserAuthRepositoryImpl");
 
 	/** Field description */
+	protected static final String DISABLED_KEY   = "disabled";
 	protected static final String PASSWORD_KEY   = "password";
 	private static final String[] non_sasl_mechs = { "password", "digest" };
 	private static final String[] sasl_mechs     = { "PLAIN", "DIGEST-MD5", "CRAM-MD5" };
@@ -225,7 +226,21 @@ public class AuthRepositoryImpl
 		return repo.getData(user, PASSWORD_KEY);
 	}
 
-
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		String value = repo.getData(user, DISABLED_KEY);
+		return Boolean.parseBoolean(value);
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		if (value == null || !value) {
+			repo.removeData(user, DISABLED_KEY);
+		} else {
+			repo.setData(user, DISABLED_KEY, String.valueOf(value));
+		}
+	}
+	
 	// ~--- methods --------------------------------------------------------------
 	private boolean saslAuth(final Map<String, Object> props)
 					throws AuthorizationException {

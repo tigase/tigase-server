@@ -26,21 +26,20 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.osgi.ModulesManagerImpl;
+import tigase.stats.StatisticsContainerIfc;
+import tigase.stats.StatisticsProviderIfc;
+import tigase.stats.StatisticsList;
+import tigase.util.ClassUtil;
+
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtil;
 
 /**
  * Describe class RepositoryFactory here.
@@ -94,10 +93,13 @@ public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String AUTH_REPO_POOL_SIZE_PROP_KEY = "auth-repo-pool-size";
 
+	public static final int REPO_POOL_SIZE_FACTOR_PROP_VAL = 4;
+
 	// AuthRepository properties
 
 	/** Field description */
-	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = Math.max( 10, Runtime.getRuntime().availableProcessors()
+																																			 * REPO_POOL_SIZE_FACTOR_PROP_VAL);
 
 	/** Field description */
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
@@ -129,7 +131,8 @@ public abstract class RepositoryFactory {
 	// DataRepository properties
 
 	/** Field description */
-	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = Math.max( 10, Runtime.getRuntime().availableProcessors()
+																																			 * REPO_POOL_SIZE_FACTOR_PROP_VAL );
 
 	// repositories classes and URLs
 
@@ -157,13 +160,12 @@ public abstract class RepositoryFactory {
 	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
 
 	/** Field description */
-	public static final String GEN_USER_DB = "--user-db";
-
-	/** Field description */
-	public static final String GEN_USER_DB_URI = "--user-db-uri";
+	public static final String GEN_USER_DB_PROP_KEY = "user-db";
+	public static final String GEN_USER_DB = "--" + GEN_USER_DB_PROP_KEY;
 
 	/** Field description */
 	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
+	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
 
 	/** Field description */
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
@@ -264,7 +266,8 @@ public abstract class RepositoryFactory {
 	// UserRepository properties
 
 	/** Field description */
-	public static final int USER_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final int USER_REPO_POOL_SIZE_PROP_VAL = Math.max( 10, Runtime.getRuntime().availableProcessors()
+																																			 * REPO_POOL_SIZE_FACTOR_PROP_VAL);
 
 	/** Field description */
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
@@ -278,15 +281,17 @@ public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String DATABASE_TYPE_PROP_KEY = "database-type";
 
+	public static final StatisticsContainerIfc statistics = new RepositoryFactoryStatisticsContainer();
+
 	private static final Logger log = Logger.getLogger(RepositoryFactory.class.getCanonicalName());
 	
 	/** Field description */
 	private static final ConcurrentMap<String, UserRepository> user_repos =
-			new ConcurrentHashMap<String, UserRepository>(5);
+			new ConcurrentHashMap<String, UserRepository>(USER_REPO_POOL_SIZE_PROP_VAL);
 	private static final ConcurrentMap<String, DataRepository> data_repos =
-			new ConcurrentHashMap<String, DataRepository>(10);
+			new ConcurrentHashMap<String, DataRepository>(DATA_REPO_POOL_SIZE_PROP_VAL);
 	private static final ConcurrentMap<String, AuthRepository> auth_repos =
-			new ConcurrentHashMap<String, AuthRepository>(5);
+			new ConcurrentHashMap<String, AuthRepository>(AUTH_REPO_POOL_SIZE_PROP_VAL);
 
 	private static final CopyOnWriteArraySet<Class> internalRepositoryClasses = new CopyOnWriteArraySet<Class>();
 	
@@ -331,7 +336,7 @@ public abstract class RepositoryFactory {
 			}
 		}		
 		if (params == null) {
-			params = new LinkedHashMap<String, String>(10);
+			params = new LinkedHashMap<String, String>(AUTH_REPO_POOL_SIZE_PROP_VAL);
 		}
 		cls = getRepoClass(cls);
 
@@ -416,7 +421,7 @@ public abstract class RepositoryFactory {
 			}
 		}
 		if (params == null) {
-			params = new LinkedHashMap<String, String>(10);
+			params = new LinkedHashMap<String, String>(DATA_REPO_POOL_SIZE_PROP_VAL);
 		}
 		cls = getRepoClass(cls);
 
@@ -600,14 +605,21 @@ public abstract class RepositoryFactory {
 							DBInitException {
 		String cls = class_name;
 
-		if (cls == null) {
-			cls = System.getProperty(USER_REPO_CLASS_PROP_KEY);
-			if (cls == null) {
-				cls = getRepoClassName(UserRepository.class, resource);
-			}	
+		if (resource == null ) {
+			resource = System.getProperty( GEN_USER_DB_URI_PROP_KEY );
+		}
+
+		if ( cls == null ){
+			cls = System.getProperty( USER_REPO_CLASS_PROP_KEY );
+			if ( cls == null ){
+				cls = getRepoClassName( UserRepository.class, resource );
+				if ( cls == null ){
+					cls = System.getProperty( GEN_USER_DB_PROP_KEY );
+				}
+			}
 		}
 		if (params == null) {
-			params = new LinkedHashMap<String, String>(10);
+			params = new LinkedHashMap<String, String>(USER_REPO_POOL_SIZE_PROP_VAL);
 		}
 		cls = getRepoClass(cls);
 
@@ -664,6 +676,26 @@ public abstract class RepositoryFactory {
 
 		return repo;
 	}
+
+	public static class RepositoryFactoryStatisticsContainer implements StatisticsContainerIfc {
+
+		@Override
+		public String getName() {
+			return "repo-factory";
+		}
+
+		@Override
+		public void getStatistics(StatisticsList list) {
+			list.add(getName(), "Number of data repositories", data_repos.size(), Level.FINE);
+			for (DataRepository dataRepository : data_repos.values()) {
+				if (dataRepository instanceof StatisticsProviderIfc) {
+					((StatisticsProviderIfc) dataRepository).getStatistics(getName(), list);
+				}
+			}
+		}
+
+	}
+
 }    // RepositoryFactory
 
 

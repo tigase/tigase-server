@@ -21,25 +21,23 @@
  */
 package tigase.server.xmppclient;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.net.IOServiceListener;
 import tigase.net.SocketThread;
-import tigase.server.Command;
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
+import tigase.server.*;
+import tigase.stats.StatisticsList;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class implements XEP-0198 Stream Management
@@ -70,9 +68,12 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	// various strings used as key to store data in maps
 	private static final String ACK_REQUEST_COUNT_KEY = "ack-request-count";
 	private static final int DEF_ACK_REQUEST_COUNT_VAL = 10;
+	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
+	private static final String DELAY_XMLNS = "urn:xmpp:delay";
 	private static final String INGORE_UNDELIVERED_PRESENCE_KEY = "ignore-undelivered-presence";
 	private static final String IN_COUNTER_KEY = XMLNS + "_in";
 	private static final String MAX_RESUMPTION_TIMEOUT_KEY = XMLNS + "_resumption-timeout";
+	private static final String MAX_RESUMPTION_TIMEOUT_PROP_KEY = "max-resumption-timeout";
 	private static final String OUT_COUNTER_KEY = XMLNS + "_out";
 	private static final String RESUMPTION_TASK_KEY = XMLNS + "_resumption-task";
 	private static final String RESUMPTION_TIMEOUT_PROP_KEY = "resumption-timeout";
@@ -82,14 +83,21 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private static final Element[] FEATURES = { new Element("sm", new String[] { "xmlns" },
 			new String[] { XMLNS }) };
 	
+	private static final SimpleDateFormat formatter;
 	private final ConcurrentHashMap<String,XMPPIOService> services = new ConcurrentHashMap<String,XMPPIOService>();
 	
 	private boolean ignoreUndeliveredPresence = true;
+	private int max_resumption_timeout = 15 * 60;
 	private int resumption_timeout = 60;
 	private int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
 	
 	private ConnectionManager connectionManager;
-			
+		
+	static {
+		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+	}	
+	
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
 	 * 
@@ -135,34 +143,40 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				return false;
 			}
 			else if (packet.getElemName() == ENABLE_NAME) {
-				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, newOutQueue());
+				OutQueue outQueue = newOutQueue();
+				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, outQueue);
 				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, newCounter());
 				
 				
 				String id = null;
 				String location = null;
-				int max = resumption_timeout;
+				int timeout = resumption_timeout;
 
 				if (resumption_timeout > 0 && packet.getElement().getAttributeStaticStr(RESUME_ATTR) != null) {
+					outQueue.setResumptionEnabled(true);
 					String maxStr = packet.getElement().getAttributeStaticStr(MAX_ATTR);
 					if (maxStr != null) {
-						max = Math.min(max, Integer.parseInt(maxStr));
+						timeout = Math.min(max_resumption_timeout, Integer.parseInt(maxStr));
 					}
 					id = UUID.randomUUID().toString();
 					location = connectionManager.getDefHostName().toString();
 					service.getSessionData().putIfAbsent(STREAM_ID_KEY, id);
-					service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, max);
+					service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, timeout);
 					
 					services.put(id, service);
 				}
 				try {
 					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'"
-							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) 
+							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + timeout + "'" : "" )
 							+ ( location != null ? " " + LOCATION_ATTR + "='" + location + "'" : "" ) + " />");
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "{0}, started StreamManagement with resumption timeout set to = {1}", 
+								new Object[] { service.toString(), (id != null ? resumption_timeout : null) });
+					}
 				}
 				catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception during sending <enabled/>, stopping...", ex);
+						log.log(Level.FINE, service.toString() + ", exception during sending <enabled/>, stopping...", ex);
 					}
 					service.forceStop();
 				}
@@ -176,7 +190,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					resumeStream(service, id, Integer.parseInt(h));
 				} catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception while resuming stream for user " 
+						log.log(Level.FINE, service.toString() + ", exception while resuming stream for user " 
 								+ service.getUserJid() + " with id " + id, ex);
 					}
 					
@@ -194,7 +208,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				
 				int val = Integer.parseInt(valStr);
 				OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
-				outQueue.ack(val);
+				if (outQueue != null) {
+					outQueue.ack(val);
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "{0}, outQueue already null while processing: {1}", new Object[] { service, packet });
+					}
+				}
 			}
 			else if (packet.getElemName() == REQ_NAME) {
 				int value = ((Counter) service.getSessionData().get(IN_COUNTER_KEY)).get();
@@ -205,10 +225,11 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				}
 				catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception during sending <a/> as "
-								+ "response for <r/>, stopping...", ex);
+						log.log(Level.FINE, service.toString() + ", exception during sending <a/> as "
+								+ "response for <r/>, not stopping serivce as it "
+								+ "will be stopped after processing all incoming data...", ex);
 					}
-					service.forceStop();
+					//service.forceStop();
 				}
 			}
 			return true;
@@ -281,9 +302,14 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					
 					// resending packets thru new connection
 					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
-					List<Packet> packetsToResend = new ArrayList<Packet>(outQueue.getQueue());
-					for (Packet packet : packetsToResend) {
-						newService.addPacketToSend(packet);
+					List<OutQueue.Entry> packetsToResend = new ArrayList<OutQueue.Entry>(outQueue.getQueue());
+					for (OutQueue.Entry entry : packetsToResend) {
+						Packet packetToResend = entry.getPacketWithStamp();
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "{0}, resuming stream with id = {1} resending unacked packet = {2}",
+									new Object[] { service, id, packetToResend });
+						}
+						newService.addPacketToSend(packetToResend);
 					}
 										
 					// if there is any packet waiting we need to write them to socket
@@ -383,6 +409,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		// resumption but those clients are not compatible with XEP-0198 and 
 		// resumption so this should not happen
 		if (isResumptionEnabled(service)) {
+			if (service.getSessionData().getOrDefault(XMPPIOService.STREAM_CLOSING, false) == Boolean.TRUE) {
+				services.remove(id, service);
+				connectionManager.serviceStopped(service);
+				sendErrorsForQueuedPackets(service);
+				return false;
+			}
+
 			if (!services.containsKey(id)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, service stopped - resumption enabled but service not available", new Object[] { service });
@@ -432,6 +465,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 
 	@Override
 	public void setProperties(Map<String,Object> props) {
+		if (props.containsKey(MAX_RESUMPTION_TIMEOUT_PROP_KEY)) {
+			this.max_resumption_timeout = (Integer) props.get(MAX_RESUMPTION_TIMEOUT_PROP_KEY);
+		}
 		if (props.containsKey(RESUMPTION_TIMEOUT_PROP_KEY)) {
 			this.resumption_timeout = (Integer) props.get(RESUMPTION_TIMEOUT_PROP_KEY);
 		}
@@ -481,6 +517,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 
 			// get old out queue
 			OutQueue outQueue = (OutQueue) oldService.getSessionData().get(OUT_COUNTER_KEY);
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "{0}, resuming stream with id = {1} with {2} packets waiting for ack, local h = {3} and remote h = {4}",
+						new Object[] { service, id, outQueue.waitingForAck(), outQueue.get(), h });
+			}
 			outQueue.ack(h);
 
 			// move required data from old XMPPIOService session data to new service session data
@@ -536,12 +576,20 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		
 		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);		
 		if (outQueue != null) {
-			Packet packet = null;
+			OutQueue.Entry e = null;
 			
-			while ((packet = outQueue.queue.poll()) != null) {				
-				connectionManager.processUndeliveredPacket(packet, null);
+			while ((e = outQueue.queue.poll()) != null) {
+				connectionManager.processUndeliveredPacket(e.getPacketWithStamp(), e.stamp, null);
 			}
 		}
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+	}
+
+	@Override
+	public void streamError(XMPPIOService service, StreamError streamErrorName) {
 	}
 	
 	/**
@@ -561,6 +609,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			String id = (String) service.getSessionData().get(STREAM_ID_KEY);			
 			if (services.remove(id, service)) {
 				//service.getSessionData().put(SERVICE_STOP_ALLOWED_KEY, true);
+				service.clearWaitingPackets();
 				connectionManager.serviceStopped(service);
 				sendErrorsForQueuedPackets(service);
 			}
@@ -618,7 +667,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	 */
 	public static class OutQueue extends Counter {
 		
-		private final ArrayDeque<Packet> queue = new ArrayDeque<Packet>();
+		private final ArrayDeque<Entry> queue = new ArrayDeque<Entry>();
+		
+		private boolean resumptionEnabled = false;
 		
 		/**
 		 * Append packet to waiting for ack queue
@@ -628,7 +679,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		public void append(Packet packet) {
 			if (!packet.wasProcessedBy(XMLNS)) {
 				packet.processedBy(XMLNS);
-				queue.offer(packet);
+
+				queue.offer(new Entry(packet));
 				inc();
 			}
 		}
@@ -650,6 +702,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			}
 		}
 		
+		public void setResumptionEnabled(boolean enabled) {
+			resumptionEnabled = enabled;
+		}
+		
 		/**
 		 * Returns size of queue containing packets waiting for ack
 		 * 
@@ -665,9 +721,31 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		 * 
 		 * 
 		 */
-		protected ArrayDeque<Packet> getQueue() {
+		protected ArrayDeque<Entry> getQueue() {
 			return queue;
 		}
 		
+		public class Entry {
+			private final Packet packet;
+			private final long stamp = System.currentTimeMillis();
+			
+			public Entry(Packet packet) {
+				this.packet = packet;
+			}
+			
+			public Packet getPacketWithStamp() {
+				if (packet.getElemName() != Iq.ELEM_NAME && !packet.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
+					String stamp = null;
+					synchronized (formatter) {
+						stamp = formatter.format(this.stamp);
+					}
+					String from = packet.getStanzaTo() != null ? packet.getStanzaTo().getDomain() : packet.getPacketTo().getDomain();
+					Element x = new Element( "delay", new String[] {
+						"from", "stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" } );
+					packet.getElement().addChild(x);					
+				}
+				return packet;
+			}
+		}
 	}
 }

@@ -60,18 +60,20 @@ else if (cfgfile == null) {
 	Command.addFieldValue(result, CFGFILE_TYPE, "init.properties", "File", filesArray, filesArray);
 }
 else {
-	def filepath = null;
+	def filepath = []
 	switch (cfgfile) {
 		case "init.properties":
-			filepath = initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY).tokenize(',');
+			if (initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY) != null ) {
+				filepath = initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY).tokenize(',');
+			}
 			break;
 
 		case "tigase.conf":
 			def filenames = ["/etc/default/tigase", "/etc/tigase/tigase.conf", "etc/tigase.conf"];
 			filenames.each { it ->
 				def file = new File(it);
-				if (!filepath && file.exists()) {
-					filepath = it;
+				if (filepath.size() == 0 && file.exists()) {
+					filepath.add(it);
 				}
 			};
 			break;

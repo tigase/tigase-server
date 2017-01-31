@@ -1,0 +1,95 @@
+[[maven2support]]
+= Maven 2.x Support
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Addendum: for a more recent guide please follow Tigase XMPP Server 5.2.0 and Later - Compilation and Generating Distribution Packages.
+
+Thanks to link:http://www.tigase.org/user/2[bmalkow] you can now build Tigase server from sources using link:http://maven.apache.org/[Maven 2.x] tool.  This should greatly simplify first steps with Tigase code and it was requested by many of those trying to get the server running from sources.  Maven repository with Tigase packages is located at address: link:http://maven.tigase.org/[maven.tigase.org].  Now all you need to compile sources and generate packages needed to run the server is just a few simple steps below:
+
+. Download and install Maven 2.x
+. Checkout Tigase server sources from link:http://www.tigase.org/content/=[Subversion] repository:
+
+[source,bash]
+-----
+svn co https://svn.tigase.org/reps/tigase-server/trunk/ tigase-server
+-----
+. Now go to directory with server code:
+
+[source,bash]
+-----
+cd tigase-server
+-----
+. And run maven command to generate server package:
+
+[source,bash]
+-----
+mvn assembly:assembly
+-----
+. After maven finished his work there should be new subdirectory created: target. Go to this directory now:
+
+[source,bash]
+-----
+cd target/
+-----
+. and list content of this directory.  On Linux, Unix system:
+
+[source,bash]
+-----
+ls -l
+-----
++
+On MS Windows system:
++
+[source,bash]
+-----
+dir
+-----
+. You should see at least 2 files like these:
++
+[source,bash]
+-----
+tigase-server-2.4.0-SNAPSHOT-prodenv.tar.gz
+tigase-server-2.4.0-SNAPSHOT-prodenv.zip
+-----
+. Unpack one of these files whichever you like:
++
+[source,bash]
+-----
+tar -xzvf tigase-server-2.4.0-SNAPSHOT-prodenv.tar.gz
+-----
++
+or
++
+[source,bash]
+-----
+unzip tigase-server-2.4.0-SNAPSHOT-prodenv.zip
+-----
+. New directory will be created in our case it will be: +tigase-server-2.4.0-SNAPSHOT/+. Now go to this directory:
++
+[source,bash]
+-----
+cd tigase-server-2.4.0-SNAPSHOT/
+-----
+. Now almost everything is ready to run the server. Almost because sometimes on Unix like (including Linux) operating systems you have to change script execution bit before you can run it:
++
+[source,bash]
+-----
+chmod u+x bin/*
+-----
+. Now you can run Tigase server:
++
+[source,bash]
+-----
+./bin/tigase.sh run etc/tigase.conf
+-----
++
+You can get a few warnings about missing configuration file (which will be automatically created) and user repository file (which will be automatically created when you register first user).
+
+For your convenience there are a few other startup files in +etc/+ directory. You can look and modify them according to your needs.

@@ -22,16 +22,19 @@
 
 package tigase.xmpp.impl;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class implements static methods used to create packets to resend messages undelivered 
@@ -45,7 +48,8 @@ public class C2SDeliveryErrorProcessor {
 	
 	public static final String ELEM_NAME = "delivery-error";
 	public static final String XMLNS = "http://tigase.org/delivery-error";
-	
+	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
+		
 	/**
 	 * Filters packets created by processors to remove delivery-error payload
 	 * 
@@ -59,7 +63,7 @@ public class C2SDeliveryErrorProcessor {
 		for (Packet p : results) {
 			if (p.getElemName() != tigase.server.Message.ELEM_NAME)
 				continue;
-			
+
 			Element elem = p.getElement();
 			Element error = elem.getChildStaticStr(ELEM_NAME);
 			if (error != null && error.getXMLNS() == XMLNS) {
@@ -69,6 +73,14 @@ public class C2SDeliveryErrorProcessor {
 					elem.removeChild(error);
 				}
 			}
+		}
+	}
+
+	public static void filterErrorElement(Element messageElem) {
+		Element error = messageElem.getChildStaticStr(ELEM_NAME);
+		if (error != null && error.getXMLNS() == XMLNS) {
+			// removing error element
+			messageElem.removeChild(error);
 		}
 	}
 	
@@ -84,26 +96,62 @@ public class C2SDeliveryErrorProcessor {
 	 * @return 
 	 */
 	public static boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, 
-			Queue<Packet> results, Map<String, Object> settings) {
+			Queue<Packet> results, Map<String, Object> settings, Message messageProcessor) {
 		if (packet.getElemName() != tigase.server.Message.ELEM_NAME)
 			return false;
 
-		if (!isDeliveryError(packet))
+		Element deliveryError = getDeliveryError(packet);
+		if (deliveryError == null)
 			return false;
 		
 		try {
 			// We should ignore messages sent to bare jid if message contains delivery-error 
 			// payload and other connection is currently active - this is needed to reduce
 			// issues related to duplication of messages
-			return (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null 
-					&& session != null && !session.getActiveSessions().isEmpty());
+			// This would be better if we would check if there is any active session but also
+			// if there was any active session then message was processed!
+			if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null && session != null) {
+				if (packet.getElemName() != Message.ELEM_NAME)
+					return true;
+				
+				List<XMPPResourceConnection> sessionsForMessageDelivery = messageProcessor.getConnectionsForMessageDelivery(session);
+				
+				if (sessionsForMessageDelivery.isEmpty())
+					return false;
+				
+				String delay = deliveryError.getAttributeStaticStr("stamp");
+				if (delay == null)
+					return true;
+				
+				// maybe we should forward data to only active sessions which were not available at this point??
+				// how to get time of error? or maybe original time of message? timestamp might be slow while 
+				// in other case we might get issues with servers in other timezones!
+				long time = Long.parseLong(delay);
+				
+				for (XMPPResourceConnection conn : sessionsForMessageDelivery) {
+					if (conn.getCreationTime() <= time)
+						continue;
+					
+					Packet result = packet.copyElementOnly();
+					result.setPacketFrom(packet.getPacketTo());
+					result.setPacketTo(conn.getConnectionId());
+					results.offer(result);
+				}
+				return true;
+			}
+			
+			return false;
 		} catch (NotAuthorizedException ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("NotAuthorizedException while processing undelivered message from "
 					+ "C2S, packet = " + packet);
 			}
+		} catch (NoConnectionIdException ex) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("NotAuthorizedException while processing undelivered message from "
+					+ "C2S, packet = " + packet);
+			}
 		}
-
 		return false;
 	}
 	
@@ -120,16 +168,32 @@ public class C2SDeliveryErrorProcessor {
 	}
 
 	/**
+	 * Finds delivery-error element in packet and returns it
+	 * 
+	 * @param packet
+	 * @return true - if packet is delivery-error
+	 */
+	public static Element getDeliveryError(Packet packet) {
+		Element elem = packet.getElement();
+		Element error = elem.getChildStaticStr(ELEM_NAME);
+		return (error != null && error.getXMLNS() == XMLNS) ? error : null;
+	}	
+	
+	/**
 	 * Creates delivery-error packets to send to session manager to reprocess
 	 * undelivered packets
 	 * 
 	 * @param packet
 	 * @return 
 	 */
-	public static Packet makeDeliveryError(Packet packet)  {
+	public static Packet makeDeliveryError(Packet packet, Long stamp)  {
 		Packet result = packet.copyElementOnly();
 		result.setPacketFrom(packet.getPacketTo());
-		result.getElement().addChild(new Element(ELEM_NAME, new String[] { "xmlns" }, new String[] { XMLNS }));
+		Element error = new Element(ELEM_NAME, new String[] { "xmlns" }, new String[] { XMLNS });
+		if (stamp != null) {
+			error.setAttribute("stamp", String.valueOf(stamp));
+		}
+		result.getElement().addChild(error);
 		return result;
 	}
 }

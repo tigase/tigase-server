@@ -1,0 +1,25 @@
+[[cil7]]
+= Component Implementation - Lesson 7 - Data Repository
+:author: not known
+:version: v1.0 initial release
+:date: 2015-07-27 16:19
+
+== ConfigRepository
+There are cases when you want to store some data permanently by your component. You can of course use the component configuration to provide some database connection settings, implement your own database connector and store records you need. There is, however, a very simple and useful framework which allows you to read and store some data transparently in either a database or a disk file. The framework also supports ad-hoc command interface straight away so you can manipulate your component data using an XMPP client.
+
+In order to use it one needs to extend +tigase.db.comp.ConfigRepository+ abstract class.
+
+== RepositoryFactory
+In order to have more freedom while accessing repositories it's possible to use +tigase.db.RepositoryFactory+ and any of the methods that pertain to desired type of repository one wants to access (auth, user, data):
+
+* +RepositoryFactory.getAuthRepository()+
+* +RepositoryFactory.getUserRepository()+
+* +RepositoryFactory.getDataRepository()+
+
+Each method takes same set of arguments:
+
+* __class_name__ - qualified name of the class that implements aforementioned repositories type
+* _URI_ - repository URI
+* _params_ - map containing additional configuration for the connection.
+
+If there is already available repository for the `<class_name><URI>` identifier then it's returned, otherwise new instance is created.

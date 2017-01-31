@@ -1,0 +1,123 @@
+[[tigaseServer71]]
+= Tigase Server Schema v7.1 Updates
+:author: Daniel Wisnewski
+:version: v1.0 October 2015
+:Date: 2015-10-12 15:36
+
+:numbered:
+:website: http://www.tigase.org
+
+[[v710notice]]
+== *FOR ALL USERS UPGRADING TO v7.1.0 FROM A v7.0.2 INSTALLATION*
+The schema has changed for the main database, and the pubsub repository.  In order to upgrade to the new schemas, you will need to do the following: +
+
+1. Upgrade the Main database schema to v7.1 using the database/${DB_TYPE}-schema-upgrade-to-7-1.sql file
+
+2. Upgrade the Pubsub Schema to v3.1.0 using the database/${DB_TYPE}-pubsub-schema-3.1.0.sql file
+
+3. Upgrade the Pubsub Schema to v3.2.0 using the database/${DB_TYPE}-pubsub-schema-3.2.0.sql file
+
+All three commands may be done at the same time in that order, it is suggested you make a backup of your current database to prevent data loss.
+
+
+== Tigase Schema Change for v7.1
+Tigase has made changes to its database to include primary keys in the tig_pairs table to improve performance of the Tigase server.  This is an auto-incremented column for Primary Key items appended to the previous schema.
+
+*You MUST update your database to be compliant with the new v7.1 schema.  If you do not, Tigase will not function properly.*
+
+_This change will affect all users of Tigase using v7.1.0 and newer._
+
+If you are installing a new version of v7.1.0 on a new database, the schema should automatically be installed.
+
+First, shut down any running instances of Tigase to prevent conflicts with database editing.  Then from command line use the DBSchemaLoader class to run the -schema-upgrade-to-7.1.sql file to the database.  The command is as follows:
+
+In a linux environment
+[source,bash]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${HOSTNAME} -dbType ${DB_TYPE} -rootUser ${ROOT_USER} -dbPass ${DB_USER_PASS} -dbName ${DB_NAME} -schemaVersion ${DB_VERSION} -rootPass ${ROOT_USER_PASS} -dbUser ${DB_USER}  -adminJID "${ADMIN_JID}" -adminJIDpass ${ADMIN_JID_PASS}  -logLevel ALL -file database/${DB_TYPE}-schema-upgrade-to-7-1.sql
+-----
+
+In a windows environment
+[source,bash]
+-----
+java -cp jars/* tigase.util.DBSchemaLoader -dbHostname ${HOSTNAME} -dbType ${DB_TYPE} -rootUser ${ROOT_USER} -dbPass ${DB_USER_PASS} -dbName ${DB_NAME} -schemaVersion ${DB_VERSION} -rootPass ${ROOT_USER_PASS} -dbUser ${DB_USER}  -adminJID "${ADMIN_JID}" -adminJIDpass ${ADMIN_JID_PASS}  -logLevel ALL -file database/${DB_TYPE}-schema-upgrade-to-7-1.sql
+-----
+
+All variables will be required, they are as follows: +
+
+* ${HOSTNAME} - Hostname of the database you wish to upgrade. +
+* ${DB_TYPE} - Type of database [derby, mysql, postgresql, sqlserver]. +
+* ${ROOT_USER} - Username of root user. +
+* ${ROOT_USER_PASS} - Password of specified root user. +
+* ${DB_USER} - Login of user that can edit database. +
+* ${DB_USER_PASS} - Password of the specified user. +
+* ${DB_NAME} - Name of the database to be edited. +
+* ${DB_VERSION} - In this case, we want this to be 7.1. +
+* ${ADMIN_JID} - Bare JID of a database user with admin privileges.  Must be contained within quotation marks. +
+* ${ADMIN_JID_PASS} - Password of associated admin JID. +
+
+Please note that the SQL file for the update will have an associated database with the filename.  i.e. postgresql-update-to-7.1.sql for postgresql database.
+
+A finalized command will look something like this:
+[source,bash]
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname localhost -dbType mysql -rootUser root -rootPass root -dbUser admin -dbPass admin -schemaVersion 7.1 -dbName Tigasedb -adminJID "admin@local.com" -adminJIDPass adminpass -logLevel ALL -file database/mysql-schema-upgrade-to-7.1.sql
+-----
+
+Once this has successfully executed, you may restart you server.  Watch logs for any db errors that may indicate an incomplete schema upgrade.
+
+
+[[pubSub71]]
+== Changes to Pubsub Schema
+Tigase has had a change to the PubSub Schema, to upgrade to PubSub Schema v7.1 without having to reform your databases, use this guide to update your databases to be compatible with the new version of Tigase.
+
+*NOTE* Current PubSub Schema is v3.2.0, you will need to repeat these instructions for v3.1.0 and then v3.2.0 before you run Tigase V7.1.0.
+
+The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
+To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate PubSub schema to your MySQL and it will add the new storage procedure.
+
+All these files should be in your /database folder within Tigase, however if you are missing the appropriate files, use the links below and place them into that folder.
+
+The MySQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/entry/database/mysql-pubsub-schema-3.1.0.sql[Here].
+
+The Derby schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/derby-pubsub-schema-3.1.0.sql[Here].
+
+The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/postgresql-pubsub-schema-3.1.0.sql[Here].
+
+The MS SQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/sqlserver-pubsub-schema-3.1.0.sql[Here].
+
+The same files are also included in all distributions of v7.1.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
+
+
+You can use a utility in Tigase to update the schema using the following command from the Tigase root:
+Linux
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader
+-----
+or from a Windows environment
+-----
+java -cp jars/* tigase.util.DBSchemaLoader
+-----
+*NOTE: Some variation may be necessary depending on how your java build uses -cp option*
+
+Use the following options to customize. Options in bold are required.::
+* *[-dbType database_type {derby, mysql, postgresql, sqlserver}]*
+* [-schemaVersion schema version {4, 5, 5-1} ]
+* *[-dbName database name]*
+* [-dbHostname database hostname] (default is localhost)
+* [-dbUser tigase username]
+* [-dbPass tigase user password]
+* *[-rootUser database root username]*
+* *[-rootPass database root password]*
+* *[-file path to sql schema file]*
+* [-query sql query to execute]
+* [-logLevel java logger Level]
+* [-adminJID comma separated list of admin JIDs]
+* [-adminJIDpass password (one for all entered JIDs]
+
+*Arguments take following precedent: query, file, whole schema*
+
+As a result your final command should look something like this:
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -dbUser root -dbPass password -file database/mysql-pubsub-schema-3.1.0.sql
+-----
