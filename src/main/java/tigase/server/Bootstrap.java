@@ -102,7 +102,8 @@ public class Bootstrap implements Lifecycle {
 
 		DependencyGrapher dg = new DependencyGrapher();
 		dg.setKernel(kernel);
-		System.out.println(dg.getDependencyGraph());
+
+		log.log(Level.CONFIG, dg.getDependencyGraph());
 
 		MessageRouter mr = kernel.getInstance("message-router");
 		mr.start();
