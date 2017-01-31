@@ -23,14 +23,20 @@ package tigase.server.xmppserver;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.server.xmppserver.S2SConnectionManager.DomainServerNameMapper;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author andrzej
  */
 public class S2SConnectionManagerDomainServerNameMapperTest extends TestCase {
-	
+
+	private static final Logger log = TestLogger.getLogger(S2SConnectionManagerDomainServerNameMapperTest.class);
+
 	@Test
 	public void testSortingOfMappings() {
 		DomainServerNameMapper mapper = new DomainServerNameMapper();
@@ -45,7 +51,7 @@ public class S2SConnectionManagerDomainServerNameMapperTest extends TestCase {
 		mapper.addEntry("test1.test", "test7");
 		mapper.addEntry("test1.test.local", "test8");
 		
-		//System.out.println(mapper.toString());
+		log.log(Level.FINE, mapper.toString());
 		
 		// checking assertions to make sure that due to sorting of mappings
 		// mappings are used in proper order

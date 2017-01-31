@@ -1,11 +1,16 @@
 package tigase.xmpp.impl;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.TestLogger;
 
 public class TokenBucketPoolTest {
+
+	private static final Logger log = TestLogger.getLogger(TokenBucketPoolTest.class);
 
 	private static final double makeTest(final TokenBucketPool t, final long testTime) throws InterruptedException {
 		long registrations = 0;
@@ -19,7 +24,7 @@ public class TokenBucketPoolTest {
 			Thread.sleep(3);
 		}
 
-		System.out.println("Received " + registrations + " events in " + ((endTime - startTime) / 1000.0) + " seconds ("
+		log.log(Level.FINE, "Received " + registrations + " events in " + ((endTime - startTime) / 1000.0) + " seconds ("
 				+ registrations / ((endTime - startTime) / 1000.0) + " eps).");
 
 		return registrations / ((endTime - startTime) / 1000.0);

@@ -18,12 +18,14 @@
  */
 package tigase.vhosts.filter;
 
-import java.util.HashSet;
-
-import org.junit.Before;
 import org.junit.Test;
+import tigase.TestLogger;
 
-import static org.junit.Assert.*;
+import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -31,13 +33,15 @@ import static org.junit.Assert.*;
  */
 public class DomainFilterPolicyTest {
 
+	private static final Logger log = TestLogger.getLogger(DomainFilterPolicyTest.class);
+
 	public DomainFilterPolicyTest() {
 	}
 
 
 	@Test
 	public void testValuePoliciesWithDomainListStr() {
-		System.out.println( "valuePoliciesWithDomainListStr" );
+		log.log(Level.FINE, "valuePoliciesWithDomainListStr" );
 		HashSet<String> result = DomainFilterPolicy.valuePoliciesWithDomainListStr();
 		assertEquals( true, result.contains( DomainFilterPolicy.CUSTOM.name()) );
 		assertEquals( true, result.contains( DomainFilterPolicy.LIST.name()) );
@@ -50,7 +54,7 @@ public class DomainFilterPolicyTest {
 
 	@Test
 	public void testIsDomainListRequired() {
-		System.out.println( "isDomainListRequired" );
+		log.log(Level.FINE,  "isDomainListRequired" );
 		assertEquals( false, DomainFilterPolicy.ALL.isDomainListRequired() );
 		assertEquals( true, DomainFilterPolicy.BLACKLIST.isDomainListRequired() );
 		assertEquals( false, DomainFilterPolicy.BLOCK.isDomainListRequired() );

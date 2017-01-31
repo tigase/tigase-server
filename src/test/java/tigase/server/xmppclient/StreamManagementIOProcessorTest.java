@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 import static junit.framework.TestCase.assertEquals;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppclient.StreamManagementIOProcessor.OutQueue;
@@ -43,6 +44,8 @@ public class StreamManagementIOProcessorTest extends TestCase {
 	
 	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
 	private static final String DELAY_XMLNS = "urn:xmpp:delay";
+
+	private static final Logger log = TestLogger.getLogger(StreamManagementIOProcessorTest.class);
 		
 	@Test
 	public void testValidateOutQueueOverflowToZero() {
@@ -58,7 +61,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
-				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+				log.log(Level.SEVERE, null, ex);
 			}
 		}
 
@@ -85,7 +88,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
-				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+				log.log(Level.SEVERE, null, ex);
 			}
 		}
 
@@ -95,7 +98,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
-				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+				log.log(Level.SEVERE, null, ex);
 			}
 		}
 
@@ -123,7 +126,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
-				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+				log.log(Level.SEVERE, null, ex);
 			}
 		}
 
@@ -143,7 +146,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 					new String[]{String.valueOf("id-1"), "from@example.com", "to@example.com"}));
 			queue.append(p);
 		} catch (TigaseStringprepException ex) {
-			Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+			log.log(Level.SEVERE, null, ex);
 		}
 		
 		queue.getQueue().forEach((OutQueue.Entry e) ->
@@ -161,7 +164,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 					new String[]{String.valueOf("id-1"), "from@example.com", "to@example.com"}));
 			queue.append(p);
 		} catch (TigaseStringprepException ex) {
-			Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+			log.log(Level.SEVERE, null, ex);
 		}
 		
 		queue.getQueue().forEach((OutQueue.Entry e) ->
@@ -175,7 +178,7 @@ public class StreamManagementIOProcessorTest extends TestCase {
 					new String[]{String.valueOf("id-2"), "from@example.com", "to@example.com"}));
 			queue.append(p);
 		} catch (TigaseStringprepException ex) {
-			Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+			log.log(Level.SEVERE, null, ex);
 		}
 		
 		queue.getQueue().forEach((OutQueue.Entry e) ->

@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import tigase.TestLogger;
 import tigase.auth.callbacks.*;
 import tigase.util.Base64;
 
@@ -15,9 +16,13 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SaslSCRAMTest
 		extends TestCase {
+
+	private static final Logger log = TestLogger.getLogger(SaslSCRAMTest.class);
 
 	@Test
 	public void testH() {
@@ -120,13 +125,13 @@ public class SaslSCRAMTest
 
 		SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
 		try {
-			System.out.println(">> " + new String(CFM));
+			log.log(Level.FINE, ">> " + new String(CFM));
 			byte[] sfm = m.evaluateResponse(CFM);
-			System.out.println("<< " + new String(sfm));
+			log.log(Level.FINE, "<< " + new String(sfm));
 			Assert.assertArrayEquals(SFM, sfm);
-			System.out.println(">> " + new String(CSM));
+			log.log(Level.FINE, ">> " + new String(CSM));
 			byte[] ssm = m.evaluateResponse(CSM);
-			System.out.println("<< " + new String(ssm));
+			log.log(Level.FINE, "<< " + new String(ssm));
 			Assert.assertArrayEquals(SSM, ssm);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -172,13 +177,13 @@ public class SaslSCRAMTest
 
 		SaslSCRAM m = create("FRzY+hc9N+LsAg==", "eYv8DHH2O5ttq6TmWzgs", "test");
 		try {
-			System.out.println(">> " + new String(CFM));
+			log.log(Level.FINE, ">> " + new String(CFM));
 			byte[] sfm = m.evaluateResponse(CFM);
-			System.out.println("<< " + new String(sfm));
+			log.log(Level.FINE, "<< " + new String(sfm));
 			Assert.assertArrayEquals(SFM, sfm);
-			System.out.println(">> " + new String(CSM));
+			log.log(Level.FINE, ">> " + new String(CSM));
 			byte[] ssm = m.evaluateResponse(CSM);
-			System.out.println("<< " + new String(ssm));
+			log.log(Level.FINE, "<< " + new String(ssm));
 //			Assert.assertArrayEquals(SSM, ssm);
 		} catch (Exception e) {
 			e.printStackTrace();

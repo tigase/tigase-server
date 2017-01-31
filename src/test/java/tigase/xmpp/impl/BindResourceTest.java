@@ -18,6 +18,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.TestLogger;
 import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Packet;
@@ -35,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +51,9 @@ import static org.junit.Assert.*;
  */
 public class BindResourceTest extends ProcessorTestCase {
 
-	BindResource bindResource;
+	private static final Logger log = TestLogger.getLogger(BindResourceTest.class);
+
+	private BindResource bindResource;
 
 	public BindResourceTest() {
 	}
@@ -83,29 +88,28 @@ public class BindResourceTest extends ProcessorTestCase {
 		Queue<Packet> results = new ArrayDeque<>();
 
 		// message / non-presence
-		System.out.println( p.getElement() +"" );
-		System.out.println(  );
+		log.log(Level.FINE, p.getElement() +"" );
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n" );
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n" );
 
 		p.getElement().setAttribute( "from", senderJid.getBareJID().toString());
-		System.out.println( p.getElement() +"" );
+		log.log(Level.FINE,  p.getElement() +"" );
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n");
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n");
 
 		p.getElement().removeAttribute("from");
-		System.out.println( p.getElement()  +"");
+		log.log(Level.FINE,  p.getElement()  +"");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n"  );
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n"  );
 
 		// presence -- non-sub
-		System.out.println( "====="  );
+		log.log(Level.FINE,  "====="  );
 
 		Element presenceEl = new Element("presence",
 				new String[] { "from" },
@@ -113,54 +117,53 @@ public class BindResourceTest extends ProcessorTestCase {
 		p = Packet.packetInstance(presenceEl);
 		p.setPacketFrom(senderSession.getConnectionId());
 
-		System.out.println( p.getElement() +"" );
-		System.out.println(  );
+		log.log(Level.FINE,  p.getElement() +"" );
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n" );
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n" );
 
 		p.getElement().setAttribute( "from", senderJid.getBareJID().toString());
-		System.out.println( p.getElement() +"" );
+		log.log(Level.FINE,  p.getElement() +"" );
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n");
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n");
 
 		p.getElement().removeAttribute("from");
-		System.out.println( p.getElement()  +"");
+		log.log(Level.FINE,  p.getElement()  +"");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n"  );
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n"  );
 
 		// presence -- sub
-		System.out.println( "====="  );
+		log.log(Level.FINE,  "====="  );
 
 		p.getElement().setAttribute( "type", "subscribe");
 		p.getElement().setAttribute( "from", senderJid.toString());
 		p = Packet.packetInstance(p.getElement());
 		p.setPacketFrom(senderSession.getConnectionId());
 
-		System.out.println( p.getElement() +"" );
+		log.log(Level.FINE,  p.getElement() +"" );
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(JID.jidInstance( senderJid.getBareJID()), p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n" );
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n" );
 
 		p.getElement().setAttribute( "from", senderJid.getBareJID().toString());
-		System.out.println( p.getElement() +"" );
+		log.log(Level.FINE,  p.getElement() +"" );
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(JID.jidInstance( senderJid.getBareJID()), p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n");
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n");
 
 		p.getElement().removeAttribute("from");
-		System.out.println( p.getElement()  +"");
+		log.log(Level.FINE,  p.getElement()  +"");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(JID.jidInstance( senderJid.getBareJID()), p.getStanzaFrom());
-		System.out.println( p.getStanzaFrom() +"\n"  );
+		log.log(Level.FINE,  p.getStanzaFrom() +"\n"  );
 
 
 	}

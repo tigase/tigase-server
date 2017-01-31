@@ -2,24 +2,19 @@ package tigase.auth.mechanisms;
 
 import junit.framework.TestCase;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import tigase.auth.callbacks.*;
+import tigase.TestLogger;
 import tigase.util.Base64;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
-import java.io.IOException;
-
-import static gnu.inet.encoding.DecompositionMappings.m;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SaslSCRAMPlusTest
 		extends TestCase {
 
+	private static final Logger log = TestLogger.getLogger(SaslSCRAMPlusTest.class);
+	
 	private SaslSCRAMPlus create(String salt, String snonce, String password, byte[] bindingData) {
 		SaslSCRAMTest.TestCallbackHandler h = new SaslSCRAMTest.TestCallbackHandler();
 		h.setBindingData(bindingData);
@@ -44,8 +39,8 @@ public class SaslSCRAMPlusTest
 		req = Base64.decode(CFM);
 		rsp = m.evaluateResponse(req);
 
-		System.out.println(new String(rsp));
-		System.out.println(new String(Base64.decode(SFM)));
+		log.log(Level.FINE, new String(rsp));
+		log.log(Level.FINE, new String(Base64.decode(SFM)));
 
 		req = Base64.decode(CSM);
 		rsp = m.evaluateResponse(req);

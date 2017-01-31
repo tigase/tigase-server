@@ -1,6 +1,7 @@
 package tigase.conf;
 
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 
 import java.io.BufferedReader;
@@ -8,6 +9,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -17,6 +20,8 @@ import static org.junit.Assert.assertNull;
  */
 public class ConfigReaderTest {
 
+	private static final Logger log = TestLogger.getLogger(ConfigReaderTest.class);
+	
 	@Test
 	public void test1() throws Exception {
 
@@ -165,16 +170,16 @@ public class ConfigReaderTest {
 	private void displayFile(File f) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(f));
 		String line = null;
-		System.out.println("file content: " + f.getAbsolutePath());
+		log.log(Level.FINE, "file content: " + f.getAbsolutePath());
 		while ((line = reader.readLine()) != null) {
-			System.out.println(line);
+			log.log(Level.FINE, line);
 		}
 	}
 
 	private void assertMapEquals(Map<String,Object> expected, Map actual, String prefix) {
 		for (Map.Entry e : expected.entrySet()) {
 			Object value = actual.get(e.getKey());
-			System.out.println("checking key = " + prefix + e.getKey());
+			log.log(Level.FINE, "checking key = " + prefix + e.getKey());
 			if (e.getValue() == null) {
 				assertNull(value);
 				continue;

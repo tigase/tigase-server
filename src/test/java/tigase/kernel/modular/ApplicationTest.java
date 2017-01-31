@@ -23,6 +23,7 @@ package tigase.kernel.modular;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.component.PropertiesBeanConfigurator;
 import tigase.kernel.core.RegistrarKernel;
 import tigase.kernel.modular.c1.Component1Registrar;
@@ -36,17 +37,9 @@ import java.util.logging.Logger;
 
 public class ApplicationTest {
 
+	private static final Logger log = TestLogger.getLogger(ApplicationTest.class);
+
 	public ApplicationTest() {
-		Logger logger = Logger.getLogger("tigase.kernel");
-
-		// create a ConsoleHandler
-		Handler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
-		logger.addHandler(handler);
-		logger.setLevel(Level.ALL);
-
-		if (logger.isLoggable(Level.CONFIG))
-			logger.config("Logger successfully initialized");
 	}
 
 	@Test

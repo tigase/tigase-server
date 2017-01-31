@@ -18,6 +18,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.TestLogger;
 import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
 import tigase.db.xml.XMLRepository;
@@ -37,8 +38,8 @@ import java.util.logging.Logger;
  * @author andrzej
  */
 public abstract class ProcessorTestCase  {
-	
-	private static Logger log;
+
+	private static final Logger log = TestLogger.getLogger(ProcessorTestCase.class);
 	
 	private SessionManagerHandler loginHandler;
 	private Kernel kernel;

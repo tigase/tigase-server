@@ -2,6 +2,7 @@ package tigase.server;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.db.AuthRepositoryMDImpl;
 import tigase.db.UserRepositoryMDImpl;
 import tigase.kernel.core.Kernel;
@@ -13,6 +14,8 @@ import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -22,6 +25,8 @@ import static org.junit.Assert.assertNotNull;
 @Ignore
 public class BootstrapTest {
 
+	private static final Logger log = TestLogger.getLogger(BootstrapTest.class);
+	
 	private Map<String, Object> props = new HashMap<>();
 
 	@Test
@@ -67,9 +72,9 @@ public class BootstrapTest {
 			Field commandsAcl = BasicComponent.class.getDeclaredField("commandsACL");
 			commandsAcl.setAccessible(true);
 			Map<String,EnumSet<CmdAcl>> val = (Map<String, EnumSet<CmdAcl>>) commandsAcl.get(sm);
-			System.out.println("ACL = " + val);
+			log.log(Level.FINE, "ACL = " + val);
 			EnumSet<CmdAcl> acl = val.get("ala-ma-kota");
-			System.out.println("" + acl.getClass() + ", " + acl);
+			log.log(Level.FINE, "" + acl.getClass() + ", " + acl);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

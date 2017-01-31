@@ -18,36 +18,26 @@
  */
 package tigase.xmpp.impl;
 
-import tigase.db.AuthRepository;
+import org.junit.*;
+import tigase.TestLogger;
 import tigase.db.TigaseDBException;
-import tigase.db.UserRepository;
-import tigase.db.xml.XMLRepository;
-
 import tigase.server.Packet;
-import tigase.server.xmppsession.SessionManagerHandler;
-
-import tigase.xmpp.BareJID;
+import tigase.util.LogFormatter;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
-
-import tigase.util.LogFormatter;
-import tigase.util.TigaseStringprepException;
-import tigase.vhosts.filter.DomainFilterPolicy;
-import tigase.vhosts.VHostItem;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.junit.*;
 
 import static tigase.xmpp.impl.DomainFilter.ALLOWED_DOMAINS_KEY;
 import static tigase.xmpp.impl.DomainFilter.ALLOWED_DOMAINS_LIST_KEY;
@@ -59,7 +49,8 @@ import static tigase.xmpp.impl.DomainFilter.ALLOWED_DOMAINS_LIST_KEY;
 public class DomainFilterTest extends ProcessorTestCase {
 
 	private DomainFilter domainFilter;
-	private static Logger log;
+	private static final Logger log = TestLogger.getLogger(DomainFilterTest.class);
+
 	String domain = "domain";
 	JID recp1 = JID.jidInstanceNS( "user1", domain + 1, "resource1" );
 	JID sameDomainUser = JID.jidInstanceNS( "user2", domain + 1, "resource2" );
@@ -69,21 +60,6 @@ public class DomainFilterTest extends ProcessorTestCase {
 	ArrayDeque<Packet> results;
 	Packet p;
 	XMPPResourceConnection session;
-
-	@BeforeClass
-	public static void setUpLogger() throws TigaseDBException, IOException {
-		Level lvl;
-//		lvl = Level.ALL;
-		lvl = Level.CONFIG;
-		ConsoleHandler consoleHandler = new ConsoleHandler();
-		consoleHandler.setLevel( lvl );
-		consoleHandler.setFormatter( new LogFormatter() );
-		log = Logger.getLogger( DomainFilter.class.getName() );
-		log.setUseParentHandlers( false );
-		log.setLevel( lvl );
-		log.addHandler( consoleHandler );
-
-	}
 
 	@Before
 	@Override

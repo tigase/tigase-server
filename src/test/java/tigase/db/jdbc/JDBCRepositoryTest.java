@@ -18,12 +18,12 @@
  */
 package tigase.db.jdbc;
 
-import tigase.db.DBInitException;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserRepository;
-
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
+import tigase.TestLogger;
+import tigase.db.*;
 import tigase.xmpp.BareJID;
 
 import java.time.LocalDateTime;
@@ -36,13 +36,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.*;
-
 /**
  *
  * @author Wojtek
  */
 public class JDBCRepositoryTest {
+
+	private static final Logger log = TestLogger.getLogger(JDBCRepositoryTest.class);
 
 	UserRepository repo = null;
 	boolean initialised = false;
@@ -52,7 +52,6 @@ public class JDBCRepositoryTest {
 
 	@Before
 	public void setUp() {
-
 		HashMap map = new LinkedHashMap();
 		map.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "2");
 
@@ -63,6 +62,7 @@ public class JDBCRepositoryTest {
 //		repositoryURI = "jdbc:postgresql://localhost/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
 //		repositoryURI = "jdbc:derby:/Users/wojtek/dev/tigase/tigase-server/derbyDb";
 //		repositoryURI = "mongodb://localhost/tigase_test?autoCreateUser=true";
+		log.log(Level.FINE, "repositoryURI: " + repositoryURI);
 		Assume.assumeNotNull(repositoryURI);
 		repo = new JDBCRepository();
 		try {
@@ -80,12 +80,12 @@ public class JDBCRepositoryTest {
 		if ( user == null ){
 			user = BareJID.bareJIDInstanceNS( "user", "domain" );
 		}
-		System.out.println( "retrieve: " + user + " / thread: " + Thread.currentThread().getName() );
+		log.log(Level.FINE, "retrieve: " + user + " / thread: " + Thread.currentThread().getName() );
 		try {
 //			repo.getData( user, "privacy", "default-list", null );
 			repo.addUser( user );
 		} catch ( UserExistsException ex ) {
-			System.out.println( "User exists, ignore: " + ex.getUserId() );
+			log.log(Level.FINE, "User exists, ignore: " + ex.getUserId() );
 		} catch ( TigaseDBException ex ) {
 			Logger.getLogger( JDBCRepositoryTest.class.getName() ).log( Level.SEVERE, null, ex );
 		}
@@ -110,7 +110,7 @@ public class JDBCRepositoryTest {
 	@Test
 	public void testGetData() throws InterruptedException {
 
-		System.out.println( "repo: " + repo );
+		log.log(Level.FINE, "repo: " + repo );
 		if ( repo != null ){
 			LocalDateTime localNow = LocalDateTime.now();
 //			getData( null );

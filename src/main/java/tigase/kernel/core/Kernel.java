@@ -201,7 +201,7 @@ public class Kernel {
 			try {
 				((UnregisterAware) i).beforeUnregister();
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				log.log(Level.WARNING, "Problem during unregistering bean", e);
 			}
 		}
@@ -335,7 +335,8 @@ public class Kernel {
 			try {
 				initBean(bc, new HashSet<BeanConfig>(), 0);
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				log.log(Level.SEVERE, "Exception getting instance", e);
 				throw new KernelException(e);
 			}
 		}
@@ -369,7 +370,7 @@ public class Kernel {
 			try {
 				bc.getKernel().initBean(bc, new HashSet<BeanConfig>(), 0);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.log(Level.SEVERE, "Exception getting instance", e);
 				throw new KernelException(e);
 			}
 			injectIfRequired(bc);
@@ -703,7 +704,8 @@ public class Kernel {
 
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			log.log(Level.SEVERE, "Exception", e);
 			throw new KernelException("Can't inject bean " + beanConfig + " to dependend beans.", e);
 		}
 	}
@@ -1134,7 +1136,8 @@ public class Kernel {
 		try {
 			unloadInjectedBean(unregisteredBeanConfig);
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			log.log(Level.SEVERE, "Exception during unregistering", e);
 			throw new KernelException("Can't unload bean " + beanName + " from depenent beans", e);
 		} finally {
 			dependencyManager.unregister(beanName);
@@ -1172,7 +1175,8 @@ public class Kernel {
 				try {
 					kernel.unloadInjectedBean(beanConfig);
 				} catch (Exception e) {
-					e.printStackTrace();
+//					e.printStackTrace();
+					log.log(Level.SEVERE, "Exception during un-registering", e);
 					throw new KernelException(
 							"Can't unload bean " + beanConfig.getBeanName() + " from depenent beans in kernel " +
 									kernel.getName(), e);

@@ -18,6 +18,7 @@
  */
 package tigase.vhosts.filter;
 
+import tigase.TestLogger;
 import tigase.xmpp.JID;
 
 import tigase.util.TigaseStringprepException;
@@ -26,6 +27,8 @@ import tigase.vhosts.filter.Rule.RuleType;
 import java.text.ParseException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,6 +42,8 @@ import static org.junit.Assert.*;
  */
 public class CustomDomainFilterTest {
 
+	private static final Logger log = TestLogger.getLogger(CustomDomainFilterTest.class);
+	
 	public CustomDomainFilterTest() {
 	}
 
@@ -59,7 +64,7 @@ public class CustomDomainFilterTest {
 
 	@Test
 	public void testParseRules() throws TigaseStringprepException, ParseException {
-		System.out.println( "parseRules" );
+		log.log(Level.FINE, "parseRules" );
 
 		Set<Rule> expResult = new TreeSet<>();
 		Rule rule = new Rule( 1, true, RuleType.self, null );
@@ -86,7 +91,7 @@ public class CustomDomainFilterTest {
 
 	@Test
 	public void testParseRulesString() throws TigaseStringprepException, ParseException {
-		System.out.println( "parseRules" );
+		log.log(Level.FINE,  "parseRules" );
 		String rulseString = "4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com";
 
 		Set<Rule> expResult = new TreeSet<>();

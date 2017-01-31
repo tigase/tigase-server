@@ -18,16 +18,17 @@
  */
 package tigase.vhosts;
 
-import tigase.vhosts.filter.DomainFilterPolicy;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-
-import java.util.Arrays;
-
 import junit.framework.TestCase;
 import org.junit.Assert;
-import org.junit.Test;
+import tigase.TestLogger;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.filter.DomainFilterPolicy;
+import tigase.xml.Element;
 import tigase.xmpp.JID;
+
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,11 +36,12 @@ import tigase.xmpp.JID;
  */
 public class VHostItemTest extends TestCase {
 
+	private static final Logger log = TestLogger.getLogger(VHostItemTest.class);
+
 	public void testVHostItem() throws TigaseStringprepException {
 		assertEquals( new VHostItem( "lowercase.com" ), new VHostItem( "lowercase.com" ) );
 		assertEquals( new VHostItem( "CAPITAL.COM" ), new VHostItem( "capital.com" ) );
 		assertNotSame( new VHostItem( "CAPITAL.COM" ), new VHostItem( "lowercase.com" ) );
-
 	}
 
 	public void testVHostDomainPolicy() throws TigaseStringprepException {
@@ -101,7 +103,7 @@ public class VHostItemTest extends TestCase {
 		vHostItem.initFromPropertyString("domain1:domain-filter=CUSTOM=4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com" );
 		assertEquals( DomainFilterPolicy.CUSTOM, vHostItem.getDomainFilter() );
 		final String toPropertyString = vHostItem.toPropertyString();
-		System.out.println( "to property string: " + toPropertyString );
+		log.log(Level.FINE, "to property string: " + toPropertyString );
 		assertTrue("different" , toPropertyString.contains( "domain-filter=CUSTOM=4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com" )  );
 
 

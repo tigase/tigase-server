@@ -23,6 +23,7 @@ package tigase.kernel;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
@@ -37,14 +38,10 @@ import java.util.logging.Logger;
 
 public class RegistratBeanCyclicTest {
 
+	private static final Logger log = TestLogger.getLogger(RegistratBeanCyclicTest.class);
+
 	@Test
 	public void test01() {
-		Logger logger = Logger.getLogger("tigase");
-		Handler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
-		logger.addHandler(handler);
-		logger.setLevel(Level.ALL);
-
 		Kernel k = new RegistrarKernel();
 		k.setName("root");
 		k.registerBean(A.class).exec();
@@ -59,7 +56,7 @@ public class RegistratBeanCyclicTest {
 		Assert.assertSame(b, ((Kernel) k.getInstance("a#KERNEL")).getInstance("b"));
 		Assert.assertSame(c, ((Kernel) ((Kernel) k.getInstance("a#KERNEL")).getInstance("b#KERNEL")).getInstance("c"));
 
-		System.out.println(gr.getDependencyGraph());
+		log.log(Level.FINE, gr.getDependencyGraph());
 	}
 
 	@Bean(name = "a")

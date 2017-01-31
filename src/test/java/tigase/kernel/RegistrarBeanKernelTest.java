@@ -2,6 +2,7 @@ package tigase.kernel;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.component.PropertiesBeanConfigurator;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -11,23 +12,17 @@ import tigase.kernel.core.Kernel;
 import tigase.kernel.core.RegistrarKernel;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by andrzej on 05.03.2016.
  */
 public class RegistrarBeanKernelTest {
 
+	private static final Logger log = TestLogger.getLogger(KernelTest.class);
+
 	public RegistrarBeanKernelTest() {
-//		Logger logger = Logger.getLogger("tigase.kernel");
-//
-//		// create a ConsoleHandler
-//		Handler handler = new ConsoleHandler();
-//		handler.setLevel(Level.ALL);
-//		logger.addHandler(handler);
-//		logger.setLevel(Level.ALL);
-//
-//		if (logger.isLoggable(Level.CONFIG))
-//			logger.config("Logger successfully initialized");
 	}
 
 	@Test
@@ -41,7 +36,7 @@ public class RegistrarBeanKernelTest {
 		//krnl.startSubKernels();
 
 		DependencyGrapher dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Assert.assertNotNull(krnl.getInstance("RegistrarBean"));
 
@@ -54,7 +49,7 @@ public class RegistrarBeanKernelTest {
 		krnl.gc();
 
 		dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Assert.assertTrue(krnl.isBeanClassRegistered("RegistrarBean"));
 		boolean exception = false;
@@ -79,7 +74,7 @@ public class RegistrarBeanKernelTest {
 		//krnl.startSubKernels();
 
 		DependencyGrapher dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Assert.assertNotNull(krnl.getInstance("RegistrarBean"));
 
@@ -107,7 +102,7 @@ public class RegistrarBeanKernelTest {
 		Assert.assertNull(((DummyBeanUser) rb1k.getInstance("DummyBeanUser")).dummyBean);
 
 		dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 	}
 
 	@Test
@@ -122,7 +117,7 @@ public class RegistrarBeanKernelTest {
 		//krnl.startSubKernels();
 
 		DependencyGrapher dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Assert.assertNotNull(krnl.getInstance("RegistrarBean"));
 
@@ -146,7 +141,7 @@ public class RegistrarBeanKernelTest {
 		Assert.assertNull(((DummyBean2User) rb1k.getInstance("DummyBean2User")).dummyBean);
 
 		dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 	}
 
 
@@ -162,7 +157,7 @@ public class RegistrarBeanKernelTest {
 		//krnl.startSubKernels();
 
 		DependencyGrapher dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Assert.assertNotNull(krnl.getInstance("RegistrarBean"));
 
@@ -205,7 +200,7 @@ public class RegistrarBeanKernelTest {
 		Assert.assertNotNull(((DummyBean34User) rb1k.getInstance("DummyBean34User")).dummyBean3User);
 
 		dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 	}
 
 	@Test
@@ -221,7 +216,7 @@ public class RegistrarBeanKernelTest {
 		//krnl.startSubKernels();
 
 		DependencyGrapher dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Assert.assertNotNull(krnl.getInstance("RegistrarBean"));
 
@@ -260,7 +255,7 @@ public class RegistrarBeanKernelTest {
 
 
 		dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 	}
 
 	@Bean(name="DummyBean")

@@ -25,6 +25,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
@@ -37,22 +38,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
 public class KernelTest {
 
+	private static final Logger log = TestLogger.getLogger(KernelTest.class);
+
 	public KernelTest() {
-//		Logger logger = Logger.getLogger("tigase.kernel");
-//
-//		// create a ConsoleHandler
-//		Handler handler = new ConsoleHandler();
-//		handler.setLevel(Level.ALL);
-//		logger.addHandler(handler);
-//		logger.setLevel(Level.ALL);
-//
-//		if (logger.isLoggable(Level.CONFIG))
-//			logger.config("Logger successfully initialized");
 	}
 
 	@BeforeClass
@@ -76,7 +71,7 @@ public class KernelTest {
 		krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
 
 		DependencyGrapher dg = new DependencyGrapher(krnl);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		Bean1 b1 = krnl.getInstance("bean1");
 		Bean2 b2 = krnl.getInstance("bean2");
@@ -137,7 +132,7 @@ public class KernelTest {
 		assertEquals(3, b1.getTableOfSpecial().length);
 		assertEquals(3, b1.getCollectionOfSpecial().size());
 
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 	}
 
@@ -276,7 +271,7 @@ public class KernelTest {
 		assertEquals(3, bean1.getTableOfSpecial().length);
 
 		DependencyGrapher dg = new DependencyGrapher(krnlParent);
-		System.out.println(dg.getDependencyGraph());
+		log.log(Level.FINE, dg.getDependencyGraph());
 
 		assertEquals(b5ch1, krnlChild1.getInstance("bean5"));
 		assertEquals(b51parent, krnlChild1.getInstance("bean51"));
@@ -319,7 +314,7 @@ public class KernelTest {
 		krnl.registerBean("bean5").asClass(Bean5.class).setPinned(false).withFactory(Bean5Factory.class).exec();
 
 		PlantUMLGrapher g = new PlantUMLGrapher(krnl);
-		System.out.println(g.getDependencyGraph());
+		log.log(Level.FINE, g.getDependencyGraph());
 
 		Assert.assertEquals(1, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
 

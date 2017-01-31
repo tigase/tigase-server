@@ -127,7 +127,7 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 	}
 
 	public void setParent(SSLContextContainerIfc parent) {
-		System.out.println(this.getClass().getCanonicalName() + "setting root = " + parent);
+		log.log(Level.FINE, "setting root = " + parent);
 		this.parent = parent;
 	}
 
@@ -186,7 +186,7 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 
 		// empty method to ensure that parent will not be injected to root instance
 		public void setParent(SSLContextContainerIfc parent) {
-			System.out.println(this.getClass().getCanonicalName() + "setting root = " + parent);
+			log.log(Level.FINE, "setting root = " + parent);
 		}
 	}
 }

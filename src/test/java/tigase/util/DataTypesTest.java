@@ -19,6 +19,10 @@
 package tigase.util;
 
 import org.junit.Test;
+import tigase.TestLogger;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +32,8 @@ import static org.junit.Assert.*;
  */
 public class DataTypesTest {
 
+	private static final Logger log = TestLogger.getLogger(DataTypesTest.class);
+	
 	@Test
 	public void testParseNum() {
 
@@ -41,7 +47,7 @@ public class DataTypesTest {
 
 	@Test
 	public void testParseSizeInt() {
-		System.out.println( "parseSizeInt" );
+		log.log(Level.FINE, "parseSizeInt" );
 		assertEquals( 1, DataTypes.parseSizeInt( "1", 1 ) );
 		assertEquals( 1024, DataTypes.parseSizeInt( "1k", 1 ) );
 		assertEquals( 1024 * 1024, DataTypes.parseSizeInt( "1m", 1 ) );

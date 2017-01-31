@@ -1,14 +1,9 @@
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import junit.framework.TestCase;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -16,6 +11,15 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.*;
 
 /**
  * Test class for JabberIqPrivacyTest
@@ -26,6 +30,8 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public class JabberIqPrivacyTest extends ProcessorTestCase {
 
+	private static final Logger log = TestLogger.getLogger(JabberIqPrivacyTest.class);
+	
 	private JabberIqPrivacy privacyFilter;
 	private ArrayDeque<Packet> results;
 
@@ -287,7 +293,7 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 				new String[]{"from", "to"},
 				new String[]{testJID, jid.toString()}));
 		boolean isAllowed = privacyFilter.allowed(presence, session);
-		System.out.println("Privacy item: " + listJID + ", tested item: " + testJID + ", result: " + isAllowed);
+		log.log(Level.FINE, "Privacy item: " + listJID + ", tested item: " + testJID + ", result: " + isAllowed);
 		if (shouldBeAllowed) {
 			assertTrue(isAllowed);
 		} else {
