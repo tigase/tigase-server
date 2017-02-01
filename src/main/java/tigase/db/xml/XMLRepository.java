@@ -51,7 +51,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 @Repository.Meta( supportedUris = { "memory://.*" } )
-public class XMLRepository implements Repository, DataSource, DataSourcePool, AuthRepository, UserRepository {
+public class XMLRepository
+		implements Repository, DataSource, AuthRepository, UserRepository {
 
 	/** Log filed */
 	private static final String USER_STR = "User: ";
@@ -95,11 +96,6 @@ public class XMLRepository implements Repository, DataSource, DataSourcePool, Au
 		} catch (NodeNotFoundException e) {
 			throw new UserNotFoundException(USER_STR + user + NOT_FOUND_STR, e);
 		}      // end of try-catch
-	}
-
-	@Override
-	public void addRepo(Repository repo) {
-
 	}
 
 	@Override

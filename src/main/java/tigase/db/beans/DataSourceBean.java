@@ -137,7 +137,12 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 			if (poolCls != null)
 				return poolCls;
 
-			Class<? extends DataSourcePool> poolClass = DataSourceHelper.getDefaultClass(DataSourcePool.class, uri);
+			Class<? extends DataSourcePool> poolClass = null;
+			try {
+				poolClass = DataSourceHelper.getDefaultClass(DataSourcePool.class, uri);
+			} catch (DBInitException ex) {
+				// ok, no problem - it maybe a data source without a pool
+			}
 			return poolClass == null ? null : poolClass.getCanonicalName();
 		}
 
