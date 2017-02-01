@@ -47,10 +47,15 @@ import java.util.Map;
  * @version $Rev$
  */
 @Repository.Meta( supportedUris = { "dummy" } )
-public class DummyRepository implements UserRepository, AuthRepository {
+public class DummyRepository implements Repository, DataSource, DataSourcePool, UserRepository, AuthRepository {
 
 	@Override
 	public void addDataList(BareJID user, String subnode, String key, String[] list) {}
+
+	@Override
+	public void addRepo(Repository repo) {
+
+	}
 
 	@Override
 	public void addUser(BareJID user) {}

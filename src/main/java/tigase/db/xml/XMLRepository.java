@@ -21,14 +21,7 @@ package tigase.db.xml;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthRepository;
-import tigase.db.AuthRepositoryImpl;
-import tigase.db.AuthorizationException;
-import tigase.db.Repository;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
+import tigase.db.*;
 
 import tigase.xmpp.BareJID;
 
@@ -57,8 +50,8 @@ import java.util.logging.Logger;
  * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Repository.Meta( supportedUris = { "dummy" } )
-public class XMLRepository implements AuthRepository, UserRepository {
+@Repository.Meta( supportedUris = { "memory://.*" } )
+public class XMLRepository implements Repository, DataSource, DataSourcePool, AuthRepository, UserRepository {
 
 	/** Log filed */
 	private static final String USER_STR = "User: ";
@@ -102,6 +95,11 @@ public class XMLRepository implements AuthRepository, UserRepository {
 		} catch (NodeNotFoundException e) {
 			throw new UserNotFoundException(USER_STR + user + NOT_FOUND_STR, e);
 		}      // end of try-catch
+	}
+
+	@Override
+	public void addRepo(Repository repo) {
+
 	}
 
 	@Override

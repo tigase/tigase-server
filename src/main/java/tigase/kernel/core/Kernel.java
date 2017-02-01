@@ -190,9 +190,9 @@ public class Kernel {
 									  "For more information please peruse ACS documentation.",};
 				TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
 			}
-			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "'", e);
+			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName()  + "' (class: " + beanConfig.getClazz() + ")", e);
 		} catch (Exception e) {
-			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "'", e);
+			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "' (class: " + beanConfig.getClazz() + ")" , e);
 		}
 	}
 
@@ -550,7 +550,8 @@ public class Kernel {
 					try {
 						initBean(b, createdBeansConfig, deep + 1);
 					} catch (KernelException ex) {
-						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + ", skipping injection of this bean", ex);
+						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean");
+						log.log(Level.CONFIG, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean", ex);
 						Object i = b.getKernel().beanInstances.remove(b);
 						b.setState(State.registered);
 						continue;
@@ -725,7 +726,8 @@ public class Kernel {
 					injectDependencies(bean, dep, new HashSet<BeanConfig>(), 0, false);
 				}
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " unloading bean " + depbc.getBeanName(), e);
+				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName());
+				log.log(Level.CONFIG, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName(), e);
 				try {
 					Object i = depbc.getKernel().beanInstances.remove(depbc);
 					State oldState = depbc.getState();

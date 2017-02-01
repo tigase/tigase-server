@@ -82,7 +82,7 @@ public class DataSourceHelper {
 			}
 		}
 		if (supported.isEmpty())
-			throw new DBInitException("Not found class supporting uri = " + uri);
+			throw new DBInitException("[DataSourceHelper] Not found class supporting uri = " + uri);
 		T result = null;
 		for (T clazz : supported) {
 			if (result == null)
