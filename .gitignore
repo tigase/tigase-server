@@ -80,3 +80,7 @@ src/main/groovy/tigase/admin/RetrieveItem.groovy
 etc/installation-id
 etc/*.licence*
 modules/documentation/text/components
+database/*-pubsub-schema*
+database/*-muc*
+database/*-unified-archive-schema*
+database/muc-db-migrate.*
