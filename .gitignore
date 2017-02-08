@@ -79,3 +79,4 @@ src/main/groovy/tigase/admin/ListNodes.groovy
 src/main/groovy/tigase/admin/RetrieveItem.groovy
 etc/installation-id
 etc/*.licence*
+modules/documentation/text/components
