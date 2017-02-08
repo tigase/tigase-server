@@ -295,6 +295,17 @@
 									<includes>**/*.sql</includes>
 								</artifactItem>
 
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-message-archiving</artifactId>
+                                    <version>1.3.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.basedir}/../../modules/documentation/text/components/tigase-message-archiving</outputDirectory>
+                                    <includes>**/*.asciidoc,**/*.css</includes>
+                                </artifactItem>
+
+
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-unified-archive</artifactId>
@@ -304,6 +315,16 @@
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
 									<includes>**/*.sql</includes>
 								</artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-unified-archive</artifactId>
+                                    <version>1.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.basedir}/../../modules/documentation/text/components/tigase-unified-archive</outputDirectory>
+                                    <includes>**/*.asciidoc,**/*.css</includes>
+                                </artifactItem>
 
 								<artifactItem>
 									<groupId>tigase</groupId>
