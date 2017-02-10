@@ -27,6 +27,8 @@ import tigase.conf.ConfigHolder;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
@@ -107,6 +109,47 @@ public class Bootstrap implements Lifecycle {
 
 		MessageRouter mr = kernel.getInstance("message-router");
 		mr.start();
+
+//		StringBuilder sb = new StringBuilder("\n======");
+//		sb.append("\n");
+//		final Collection<BeanConfig> beanConfigs = kernel.getDependencyManager().getBeanConfigs();
+//		for (BeanConfig beanConfig : beanConfigs) {
+//			sb.append("bean config: ").append(beanConfig).append("\n");
+//			final Set<BeanConfig> registeredBeans = beanConfig.getRegisteredBeans();
+//			for (BeanConfig registeredBean : registeredBeans) {
+//				sb.append("  -> registered bean: ").append(registeredBean).append("\n");
+//				final Set<BeanConfig> registeredBeans1 = registeredBean.getRegisteredBeans();
+//				for (BeanConfig beanConfig1 : registeredBeans1) {
+//					sb.append("    -> registered bean1: ").append(beanConfig1).append("\n");
+//				}
+//			}
+//		}
+//		sb.append("======\n");
+//		System.out.println(sb);
+
+		kernel.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(beanConfig -> (beanConfig.getState() == BeanConfig.State.initialized))
+				.forEach(beanConfig -> {
+					final Object instance = kernel.getInstance(beanConfig.getBeanName());
+					if (instance instanceof Initializable) {
+						((Initializable) instance).completed();
+					}
+
+					beanConfig.getKernel().getDependencyManager().getBeanConfigs()
+							.stream()
+							.filter(registeredBeanConfig ->
+									        (registeredBeanConfig.getState() == BeanConfig.State.initialized))
+							.forEach(registeredBeanConfig -> {
+								final Object registeredInstance = registeredBeanConfig.getKernel().getInstance(registeredBeanConfig.getBeanName());
+								if (registeredInstance instanceof Initializable) {
+									((Initializable) registeredInstance).completed();
+								}
+
+							});
+				});
+
 
 		try {
 			File f = new File("etc/config-dump.properties");

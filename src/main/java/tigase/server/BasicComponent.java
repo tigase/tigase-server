@@ -1284,6 +1284,8 @@ public class BasicComponent
 		reloadScripts();
 		cmpInfo = new ComponentInfo(getName(), this.getClass());
 
+		System.out.println("Loading component: " + cmpInfo);
+
 		initializationCompleted();
 	}
 

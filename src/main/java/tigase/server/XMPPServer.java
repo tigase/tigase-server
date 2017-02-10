@@ -31,6 +31,8 @@ import tigase.kernel.core.BeanConfig;
 import tigase.util.ClassUtil;
 import tigase.xml.XMLUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -134,7 +136,8 @@ public final class XMPPServer {
 			bootstrap = new Bootstrap();
 			bootstrap.init(args);
 			bootstrap.start();
-			System.out.println("==\nServer finished starting up and (if there wasn't any error) is ready to use\n==");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
+			System.out.println("== " + sdf.format(new Date()) + " Server finished starting up and (if there wasn't any error) is ready to use\n");
 //		} catch ( ConfigurationException e ) {
 //			System.err.println( "" );
 //			System.err.println( "  --------------------------------------" );

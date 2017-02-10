@@ -1068,6 +1068,7 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public void setSchedulerThreads_size(int size) {
+		log.log(Level.FINE, "Setting scheduler size to: {0}", new Object[] {size});
 		if (schedulerThreads_size != size) {
 			this.schedulerThreads_size = size;
 
@@ -1190,6 +1191,10 @@ public abstract class AbstractMessageReceiver
 	 * @param unit
 	 */
 	protected void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "adding timer, task: {0}, delay: {1}, TimeUnit: {2}, receiverScheduler: {3}",
+			        new Object[]{task, delay, unit, receiverScheduler});
+		}
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, unit);
 
 		task.setScheduledFuture(future);
@@ -1241,6 +1246,11 @@ public abstract class AbstractMessageReceiver
 	}
 
 	private void startThreads() {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG,
+			        "Starting threads, in_queues_size: {0}, out_queues_size: {1}, schedulerThreads_size: {2}",
+			        new Object[]{in_queues_size, out_queues_size, schedulerThreads_size});
+		}
 		if (threadsQueueIn == null) {
 			threadsQueueIn = new ArrayDeque<>(8);
 			for (int i = 0; i < in_queues_size; i++) {

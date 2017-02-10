@@ -420,6 +420,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	@Override
 	public void initializationCompleted() {
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "isInitializationComplete(): {0}",
+			        new Object[]{isInitializationComplete()});
+		}
+
 		if (isInitializationComplete()) {
 
 			// Do we really need to do this again?
@@ -434,7 +439,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
     }
 
     protected void connectWaitingTasks() {
-        if (log.isLoggable(Level.FINER)) {
+	    if (log.isLoggable(Level.FINER)) {
             log.log(Level.FINER, "Connecting waitingTasks: {0}",
                     new Object[]{waitingTasks});
         }
@@ -1224,6 +1229,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	private ConnectionListenerImpl startService(Map<String, Object> port_props) {
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "Starting service: {0}", new Object[]{port_props});
+		}
 		if (port_props == null) {
 			throw new NullPointerException("port_props cannot be null.");
 		}
@@ -1572,7 +1580,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			if (connectionOpenListener != null)
 				connectionManager.releaseListener(connectionOpenListener);
 
-			connectionOpenListener = connectionManager.startService(getProps());
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "connectionManager: {0}, changedFields: {1}, props: {2}",
+				        new Object[]{connectionManager, changedFields, getProps()});
+			}
+
+			if (connectionManager.isInitializationComplete()) {
+				connectionOpenListener = connectionManager.startService(getProps());
+			}
 		}
 
 		protected Map<String, Object> getProps() {
@@ -1640,6 +1655,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		@Override
 		public void initialize() {
+		}
+
+		@Override
+		public void completed() {
+			// start ports only in initialization is completed!
 			if (ports == null) {
 				ports = connectionManager.getDefPorts();
 			}

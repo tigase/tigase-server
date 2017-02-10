@@ -12,4 +12,7 @@ public interface Initializable {
 	 */
 	void initialize();
 
+	default void completed() {
+	}
+
 }
