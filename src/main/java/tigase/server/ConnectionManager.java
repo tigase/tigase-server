@@ -1655,11 +1655,20 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		@Override
 		public void initialize() {
+			// can we re-initialize the bean?
+			if (connectionManager.isInitializationComplete()) {
+				openPorts();
+			}
+			register(kernel);
 		}
 
 		@Override
 		public void completed() {
 			// start ports only in initialization is completed!
+			openPorts();
+		}
+
+		void openPorts() {
 			if (ports == null) {
 				ports = connectionManager.getDefPorts();
 			}
@@ -1677,9 +1686,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					kernel.registerBean(name).asClass(cls).exec();
 				}
 			}
-
-
-			register(kernel);
 		}
 	}
 }    // ConnectionManager
