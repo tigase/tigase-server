@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  */
 public class Kernel {
 
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
+	protected final static Logger log = Logger.getLogger(Kernel.class.getName());
 
 	private static final ThreadLocal<DelayedDependencyInjectionQueue> DELAYED_DEPENDENCY_INJECTION = new ThreadLocal<>();
 
@@ -74,6 +74,8 @@ public class Kernel {
 	public Kernel(String name) {
 		this.name = name;
 
+		log.setLevel(Level.CONFIG);
+
 		BeanConfig bc = dependencyManager.createBeanConfig(this, "kernel", Kernel.class);
 		bc.setPinned(true);
 		dependencyManager.register(bc);
@@ -84,6 +86,11 @@ public class Kernel {
 	protected static void initBean(BeanConfig tmpBC, Set<BeanConfig> createdBeansConfig, int deep)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		final BeanConfig beanConfig = tmpBC instanceof DelegatedBeanConfig ? ((DelegatedBeanConfig) tmpBC).original : tmpBC;
+
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[{0}] Initialising bean, bc={1}, createdBeansConfig={2}, deep={3}",
+			        new Object[] {tmpBC.getBeanName(), tmpBC, createdBeansConfig, deep});
+		}
 
 		if (beanConfig.getState() == State.initialized)
 			return;
@@ -171,8 +178,9 @@ public class Kernel {
 				BeanFactory<?> factory = beanConfig.getKernel().getInstance(beanConfig.getFactory());
 				return factory.createInstance();
 			} else {
-				if (log.isLoggable(Level.FINER))
+				if (log.isLoggable(Level.FINER)) {
 					log.finer("[" + getName() + "] Creating instance of bean " + beanConfig.getBeanName());
+				}
 				Class<?> clz = beanConfig.getClazz();
 
 				return clz.newInstance();
@@ -359,6 +367,11 @@ public class Kernel {
 	public <T> T getInstance(String beanName) {
 		BeanConfig bc = dependencyManager.getBeanConfig(beanName);
 
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[{0}] Creating instance of bean {1}: bc={2}, parent={3}, state={4}",
+			        new Object[] {getName(), beanName, bc, parent, (bc != null ? bc.getState() : "n/a")});
+		}
+
 		if (bc == null && parent != null && parent.isBeanClassRegistered(beanName)) {
 			return parent.getInstance(beanName);
 		}
@@ -441,6 +454,18 @@ public class Kernel {
 	 */
 	public Kernel getParent() {
 		return parent;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("Kernel{");
+		sb.append("dependencyManager=").append(dependencyManager);
+		sb.append(", currentlyUsedConfigBuilder=").append(currentlyUsedConfigBuilder);
+		sb.append(", forceAllowNull=").append(forceAllowNull);
+		sb.append(", name='").append(name).append('\'');
+		sb.append(", parent=").append(parent);
+		sb.append('}');
+		return sb.toString();
 	}
 
 	void setParent(Kernel parent) {
@@ -538,12 +563,14 @@ public class Kernel {
 		BeanConfig[] dependentBeansConfigs = dependencyManager.getBeanConfig(dep);
 		ArrayList<Object> dataToInject = new ArrayList<Object>();
 
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[{0}] Injecting dependencies, bean: {1}, dep: {2}, createdBeansConfig: {3}, deep: {4}",
+			        new Object[] {getName(), bean, dep, createdBeansConfig, deep});
+		}
+
 		for (BeanConfig b : dependentBeansConfigs) {
 			if (b == null) {
-//				if (dep.getType() != null && (Collection.class.isAssignableFrom(dep.getType()) || dep.getType().isArray()))
-					continue;
-
-//				dataToInject.add(null);
+				continue;
 			} else {
 				Object beanToInject = b.getKernel().getInstance(b);
 				if (beanToInject == null) {
@@ -712,6 +739,12 @@ public class Kernel {
 	}
 
 	void injectDependencies(Collection<Dependency> dps) {
+
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[{0}] Injecting dependencies, dps: {1}",
+			        new Object[] {getName(), dps});
+		}
+
 		for (Dependency dep : dps) {
 			BeanConfig depbc = dep.getBeanConfig();
 
@@ -956,6 +989,11 @@ public class Kernel {
 	}
 
 	public void finishDependecyDelayedInjection(DelayedDependencyInjectionQueue queue) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[{0}] Finishing injecting dependencies, queue: {1}",
+			        new Object[] {getName(), queue});
+		}
+
 		if (queue == null) {
 			return;
 		}
@@ -1273,6 +1311,14 @@ public class Kernel {
 
 		public boolean checkStartingKernel(Kernel kernel) {
 			return Kernel.this == kernel;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder("DelayedDependencyInjectionQueue{");
+			sb.append("queue=").append(queue);
+			sb.append('}');
+			return sb.toString();
 		}
 	}
 

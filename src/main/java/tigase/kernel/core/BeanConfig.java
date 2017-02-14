@@ -177,7 +177,17 @@ public class BeanConfig {
 
 	@Override
 	public String toString() {
-		return beanName + ":" + clazz.getName();
+		final StringBuilder sb = new StringBuilder("BeanConfig{");
+		sb.append("beanName='").append(beanName).append('\'');
+		sb.append(", clazz=").append(clazz);
+		sb.append(", exportable=").append(exportable);
+		sb.append(", pinned=").append(pinned);
+		sb.append(", factory=").append(factory);
+		sb.append(", kernel=").append(kernel.getName());
+		sb.append(", source=").append(source);
+		sb.append(", state=").append(state);
+		sb.append('}');
+		return sb.toString();
 	}
 
 	public Set<BeanConfig> getRegisteredBeans() {
