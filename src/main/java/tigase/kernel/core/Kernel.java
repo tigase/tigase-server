@@ -580,6 +580,12 @@ public class Kernel {
 						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean");
 						log.log(Level.CONFIG, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean", ex);
 						Object i = b.getKernel().beanInstances.remove(b);
+						if (i instanceof RegistrarBean) {
+							((RegistrarBean) i).unregister(b.getKernel());
+							Kernel parent = b.getKernel().getParent();
+							parent.unregister(b.getBeanName() + "#KERNEL");
+							b.setKernel(parent);
+						}
 						b.setState(State.registered);
 						continue;
 					}
