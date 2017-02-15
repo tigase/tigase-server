@@ -448,6 +448,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
             watchdog.start();
         }
         delayPortListening = false;
+		portsConfigBean.start();
     }
 
     @Override
@@ -640,7 +641,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		sslContextContainer.start();
 		super.start();
 
-		portsConfigBean.start();
 		if (!delayPortListening) {
 			connectWaitingTasks();
 		}
@@ -1549,7 +1549,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-	public static class PortConfigBean implements ConfigurationChangedAware, Initializable {
+	public static class PortConfigBean implements ConfigurationChangedAware, Initializable, UnregisterAware {
 
 		@Inject
 		private ConnectionManager connectionManager;
@@ -1573,7 +1573,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		@Override
 		public void beanConfigurationChanged(Collection<String> changedFields) {
-			if (connectionManager == null)
+			if (connectionManager == null || !connectionManager.isInitializationComplete() || connectionManager.delayPortListening)
 				return;
 
 			if (connectionOpenListener != null)
@@ -1585,6 +1585,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 
 			connectionOpenListener = connectionManager.startService(getProps());
+		}
+
+		@Override
+		public void beforeUnregister() {
+			if (connectionOpenListener != null)
+				connectionManager.releaseListener(connectionOpenListener);
 		}
 
 		protected Map<String, Object> getProps() {
@@ -1616,7 +1622,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	@Bean(name = "connections", parent = ConnectionManager.class, exportable = true)
-	public static class PortsConfigBean implements RegistrarBeanWithDefaultBeanClass {
+	public static class PortsConfigBean implements RegistrarBeanWithDefaultBeanClass, Initializable {
 
 		@Inject
 		private ConnectionManager connectionManager;
@@ -1650,23 +1656,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			this.kernel = null;
 		}
 		
-
-		public void setConnectionManager(ConnectionManager connectionManager) {
-			this.connectionManager = connectionManager;
-			if (connectionManager.isInitializationComplete()) {
-				openPorts();
-			}
-		}
-
-		public void start() {
-			openPorts();
-		}
-
-		public void stop() {
-			// nothing to do for now
-		}
-		
-		void openPorts() {
+		@Override
+		public void initialize() {
 			if (ports == null) {
 				ports = connectionManager.getDefPorts();
 			}
@@ -1685,6 +1676,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				}
 			}
 		}
+
+		public void start() {
+			if (portsBeans != null) {
+				Arrays.stream(portsBeans).forEach(portBean -> portBean.initialize());
+			}
+		}
+
+		public void stop() {
+			// nothing to do for now
+		}
+		
 	}
 }    // ConnectionManager
 
