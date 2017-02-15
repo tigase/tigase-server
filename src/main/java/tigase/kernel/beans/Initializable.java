@@ -11,8 +11,5 @@ public interface Initializable {
 	 * use.
 	 */
 	void initialize();
-
-	default void completed() {
-	}
-
+	
 }

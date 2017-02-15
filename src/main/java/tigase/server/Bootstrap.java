@@ -27,8 +27,6 @@ import tigase.conf.ConfigHolder;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
-import tigase.kernel.beans.Initializable;
-import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
@@ -126,30 +124,6 @@ public class Bootstrap implements Lifecycle {
 //		}
 //		sb.append("======\n");
 //		System.out.println(sb);
-
-		kernel.getDependencyManager()
-				.getBeanConfigs()
-				.stream()
-				.filter(beanConfig -> (beanConfig.getState() == BeanConfig.State.initialized))
-				.forEach(beanConfig -> {
-					final Object instance = kernel.getInstance(beanConfig.getBeanName());
-					if (instance instanceof Initializable) {
-						((Initializable) instance).completed();
-					}
-
-					beanConfig.getKernel().getDependencyManager().getBeanConfigs()
-							.stream()
-							.filter(registeredBeanConfig ->
-									        (registeredBeanConfig.getState() == BeanConfig.State.initialized))
-							.forEach(registeredBeanConfig -> {
-								final Object registeredInstance = registeredBeanConfig.getKernel().getInstance(registeredBeanConfig.getBeanName());
-								if (registeredInstance instanceof Initializable) {
-									((Initializable) registeredInstance).completed();
-								}
-
-							});
-				});
-
 
 		try {
 			File f = new File("etc/config-dump.properties");

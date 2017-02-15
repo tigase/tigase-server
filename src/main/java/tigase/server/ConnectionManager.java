@@ -432,11 +432,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 		super.initializationCompleted();
 		initializationCompleted = true;
-
-        if (!delayPortListening) {
-            connectWaitingTasks();
-        }
-    }
+	}
 
     protected void connectWaitingTasks() {
 	    if (log.isLoggable(Level.FINER)) {
@@ -643,10 +639,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public void start() {
 		sslContextContainer.start();
 		super.start();
-		for (Map<String, Object> params : waitingTasks) {
-			reconnectService(params, connectionDelay);
+
+		portsConfigBean.start();
+		if (!delayPortListening) {
+			connectWaitingTasks();
 		}
-		waitingTasks.clear();
+
 		setupWatchdogThread();
 		if ( null != watchdog ){
 			watchdog.start();
@@ -664,6 +662,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		for (IO service : services.values()) {
 			service.forceStop();
 		}
+		portsConfigBean.stop();
 		super.stop();
 		sslContextContainer.stop();
 	}
@@ -1585,9 +1584,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				        new Object[]{connectionManager, changedFields, getProps()});
 			}
 
-			if (connectionManager.isInitializationComplete()) {
-				connectionOpenListener = connectionManager.startService(getProps());
-			}
+			connectionOpenListener = connectionManager.startService(getProps());
 		}
 
 		protected Map<String, Object> getProps() {
@@ -1619,7 +1616,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	@Bean(name = "connections", parent = ConnectionManager.class, exportable = true)
-	public static class PortsConfigBean implements RegistrarBeanWithDefaultBeanClass, Initializable {
+	public static class PortsConfigBean implements RegistrarBeanWithDefaultBeanClass {
 
 		@Inject
 		private ConnectionManager connectionManager;
@@ -1652,22 +1649,23 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		public void unregister(Kernel kernel) {
 			this.kernel = null;
 		}
+		
 
-		@Override
-		public void initialize() {
-			// can we re-initialize the bean?
+		public void setConnectionManager(ConnectionManager connectionManager) {
+			this.connectionManager = connectionManager;
 			if (connectionManager.isInitializationComplete()) {
 				openPorts();
 			}
-			register(kernel);
 		}
 
-		@Override
-		public void completed() {
-			// start ports only in initialization is completed!
+		public void start() {
 			openPorts();
 		}
 
+		public void stop() {
+			// nothing to do for now
+		}
+		
 		void openPorts() {
 			if (ports == null) {
 				ports = connectionManager.getDefPorts();
