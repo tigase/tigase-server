@@ -178,6 +178,7 @@ public final class XMPPServer {
 	 * @return implementation of {@link tigase.conf.ConfiguratorAbstract}
 	 *         interface.
 	 */
+	@Deprecated
 	public static ConfiguratorAbstract getConfigurator() {
 		return config;
 	}
