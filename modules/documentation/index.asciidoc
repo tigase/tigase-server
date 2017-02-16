@@ -616,6 +616,8 @@ include::text/dev/Development_Guide_41_-_API_Description_for_Virtual_Domains_Man
 
 include::text/dev/Development_Guide_44_-_Stanza_Limitations.asciidoc[]
 
+include::text/dev/CodeStyleGuide.asciidoc[]
+
 //Components
 
 :leveloffset: 1
