@@ -738,7 +738,7 @@ public class OfflineMessages
 
 	}
 
-	@Bean(name = "pubsub-publisher-notifier", parent = OfflineMessages.class, active = false)
+	@Bean(name = "msg-offline-pubsub-publisher-notifier", parent = SessionManager.class, active = false, exportable = true)
 	public static class PubSubPublisherNotifier implements Notifier {
 		@ConfigField(desc = "PubSub component JID", alias = MSG_PUBSUB_JID)
 		private String pubSubJID;
