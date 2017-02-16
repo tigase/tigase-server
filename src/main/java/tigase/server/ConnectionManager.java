@@ -431,7 +431,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			return;
 		}
 		super.initializationCompleted();
-		initializationCompleted = true;
+		//initializationCompleted = true;
 	}
 
     protected void connectWaitingTasks() {
@@ -641,6 +641,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		sslContextContainer.start();
 		super.start();
 
+		initializationCompleted = true;
 		if (!delayPortListening) {
 			connectWaitingTasks();
 		}
@@ -656,6 +657,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if ( null != watchdog ) {
 			watchdog.shutdown();
 		}
+		initializationCompleted = false;
 		this.releaseListeners();
 
 		// when stopping connection manager we need to stop all active connections as well
