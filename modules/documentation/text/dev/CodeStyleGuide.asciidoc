@@ -237,9 +237,9 @@ Identifiers use only ASCII letters and digits, and, in a small number of cases n
 ** parameter description,
 ** return tag;
 * empty tag should be included for following tags:
-* `@params`
-* `@return`
-* `@throws`
+** `@params`
+** `@return`
+** `@throws`
 
 [[javadoc-where-required]]
 === Usage
