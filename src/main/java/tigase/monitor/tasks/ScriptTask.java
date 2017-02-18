@@ -1,14 +1,18 @@
 package tigase.monitor.tasks;
 
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import tigase.kernel.beans.Initializable;
-import tigase.kernel.beans.Inject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ScriptTask extends AbstractConfigurableTask implements Initializable {
+
+	private static final Logger log = Logger.getLogger(ScriptTask.class.getName());
 
 	@Inject
 	protected Bindings bindings;
@@ -29,7 +33,10 @@ public class ScriptTask extends AbstractConfigurableTask implements Initializabl
 		try {
 			engine.eval(script, bindings);
 		} catch (ScriptException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Execution failed for the monitoring script: {0}", new Object[]{getScript()});
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Execution failed for the monitoring script: " + getScript(), e);
+			}
 		}
 	}
 
