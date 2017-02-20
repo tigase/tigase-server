@@ -48,7 +48,7 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 
 	@Override
 	public boolean isDiscoNonAdmin() {
-		return true;
+		return false;
 	}
 
 	@Override
