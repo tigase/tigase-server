@@ -26,8 +26,7 @@ x.x.x is the major version the builds are working towards, with yyyy being the s
 *Note individual days may have the same builds as noted by the byyyy section of the file.*
 
 Just like the standard distributions, the builds are available with the following extensions:
-. .jar - Java installer version
-. .exe - Windows binary installer version
+
 . -javadoc.jar - Java installer for javadoc only
 . -dist.zip - Compressed binaries with no dependencies.
 . -dist.tar.gz - tarball compressed binaries with no dependencies.

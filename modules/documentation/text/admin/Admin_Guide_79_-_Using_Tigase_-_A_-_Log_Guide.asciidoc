@@ -31,7 +31,7 @@ tigase-console.log
 This log file is a basic list of files that are made on install of Tigase server.  Although you may not need to use it, it can provide a handy list to see if any files were not written to your hard drive upon installation.
 
 == derby.log
-If you are using the derby database installed with Tigase installer, this is the startup log for the database itself.  Issues that might be related to the database, can be found in this file.  Typically, if everything works okay, it's a very small file with only 10 lines.  It is overwritten on startup of the datbase.
+If you are using the derby database installed with Tigase, this is the startup log for the database itself.  Issues that might be related to the database, can be found in this file.  Typically, if everything works okay, it's a very small file with only 10 lines.  It is overwritten on startup of the datbase.
 
 == config-dump.properties
 The config-dump.properties is dump file of all your properties listed for every option within Tigase and components.  The structure of the log lines is as follows.

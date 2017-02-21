@@ -44,14 +44,6 @@ This will:
 - grab all latest versions of all declared dependencies and put them in jars/ directory
 - create both types of distribution packages (-dist and -dist-max) and place them in pack/ directory
 
-In order to create installer packages you have to execute two shell scripts:
-
-[source,bash]
------
-./scripts/installer-prepare.sh
-./scripts/installer-generate.sh
------
-
 However, in order for them to succeed you have to build the server first using maven as described earlier. You should also have git, python2, docutils and LaTeX distributions installed (please see src/main/izpack/README.txt for details).
 
 == Running Server

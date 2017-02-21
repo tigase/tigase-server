@@ -20,7 +20,6 @@ Before you begin installing Tigase server onto your system, please make sure the
 
 This is a set of documents allowing you to quickly start with our software. Every document provides an introduction to a single topic allowing you to start using/developing or just working on the subject.  Please have a look at the documents list below to find a topic you are looking for. If you don't find a document for the topic you need please link:http://www.tigase.net/contact[let us know].
 
-- xref:guiinstall[Installation using GUI installer]
 - xref:webinstall[Installation Using Web Installer]
 - xref:consoleinstall[Installing using console installer]
 - xref:manualinstall[Manual installation in console mode]
