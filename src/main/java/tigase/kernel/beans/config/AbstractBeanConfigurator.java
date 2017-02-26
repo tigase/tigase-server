@@ -86,7 +86,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 									&& !(value instanceof BeanDefinition)
 									&& kernel.getDependencyManager().getBeanConfig(property) == null
 									&& (!(bean instanceof RegistrarBean) || ((Kernel) kernel.getInstance(beanConfig.getBeanName() + "#KERNEL")).getDependencyManager().getBeanConfig(property) == null)) {
-								log.warning(
+								log.config(
 										"Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName() + "'. Ignoring!");
 							}
 							break;
