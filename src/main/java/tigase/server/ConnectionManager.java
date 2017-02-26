@@ -255,7 +255,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@ConfigField(desc = "Limit of size for network buffer for connection")
 	private int net_buffer_limit = 0;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
-	private boolean                   initializationCompleted = false;
+	private boolean started = false;
 	@Inject
 	private PortsConfigBean           portsConfigBean;
 	@Inject(nullAllowed = true)
@@ -431,7 +431,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			return;
 		}
 		super.initializationCompleted();
-		//initializationCompleted = true;
+		//started = true;
 	}
 
     protected void connectWaitingTasks() {
@@ -641,9 +641,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		sslContextContainer.start();
 		super.start();
 
-		initializationCompleted = true;
+		started = true;
 		if (!delayPortListening) {
 			connectWaitingTasks();
+		} else {
+			log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
 		}
 
 		setupWatchdogThread();
@@ -657,7 +659,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if ( null != watchdog ) {
 			watchdog.shutdown();
 		}
-		initializationCompleted = false;
+		started = false;
 		this.releaseListeners();
 
 		// when stopping connection manager we need to stop all active connections as well
@@ -890,11 +892,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected void addWaitingTask(Map<String, Object> conn) {
 
         if (log.isLoggable(Level.FINER)) {
-            log.log(Level.FINER, "Adding waiting task: {0}, initializationCompleted: {1}, delayPortListening: {2}, to: {3}",
-                    new Object[]{conn, initializationCompleted, delayPortListening, waitingTasks});
+            log.log(Level.FINER, "Adding waiting task: {0}, started: {1}, delayPortListening: {2}, to: {3}",
+                    new Object[]{conn, started, delayPortListening, waitingTasks});
         }
 
-        if (initializationCompleted && !delayPortListening) {
+        if (started && !delayPortListening) {
             reconnectService(conn, connectionDelay);
         } else {
             waitingTasks.add(conn);
