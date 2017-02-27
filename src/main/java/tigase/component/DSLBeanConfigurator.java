@@ -162,7 +162,7 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		Map<String, Object> dump = new LinkedHashMap<>(props);
 		dumpConfiguration(dump, kernel);
 
-		new ConfigWriter().write(f, dump);
+		new ConfigWriter().resolveVariables().write(f, dump);
 	}
 
 	private void dumpConfiguration(Map<String, Object> dump, Kernel kernel) {

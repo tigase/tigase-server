@@ -160,7 +160,7 @@ Very similar to properties based configuration, in fact values are passed in sam
 |=============================================
 
 === Using values from System Properties and Environment Variables
-Now it is possible to use values of system properties and environment variables and assign them to bean properties.
+Now it is possible to use values of https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html[system properties] and https://docs.oracle.com/javase/tutorial/essential/environment/env.html[environment variables] and assign them to bean properties.
 For this purpose we added functions which can be used in DSL and which will return values of:
 
 system property:: `prop('property-name')` or `prop('property-name','default value')`

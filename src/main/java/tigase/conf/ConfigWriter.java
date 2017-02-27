@@ -37,6 +37,8 @@ public class ConfigWriter {
 
 	private int indent = 0;
 
+	private boolean resolveVariables = false;
+
 	public ConfigWriter() {}
 
 	public static Map<String, Object> buildTree(Map<String, Object> props) {
@@ -83,6 +85,11 @@ public class ConfigWriter {
 		});
 
 		return result;
+	}
+
+	public ConfigWriter resolveVariables() {
+		this.resolveVariables = true;
+		return this;
 	}
 
 	public void write(File f, Map<String, Object> props) throws IOException {
@@ -144,7 +151,9 @@ public class ConfigWriter {
 				writer.write(newLine);
 			}
 		} else if (obj instanceof ConfigReader.Variable) {
-			if (obj instanceof ConfigReader.EnvironmentVariable) {
+			if (resolveVariables) {
+				writeObject(writer, ((ConfigReader.Variable) obj).calculateValue(), newLine);
+			} else if (obj instanceof ConfigReader.EnvironmentVariable) {
 				ConfigReader.EnvironmentVariable variable = (ConfigReader.EnvironmentVariable) obj;
 				writer.write("env('");
 				writer.write(variable.getName());
