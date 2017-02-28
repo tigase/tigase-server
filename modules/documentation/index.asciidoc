@@ -192,11 +192,19 @@ include::text/admin/Admin_Guide_53_-_Components.asciidoc[]
 
 include::text/admin/Admin_Guide_54_-_Components_-_A_-_StanzaSender.asciidoc[]
 
+include::text/components/http-api/documentation/HTTP_API_Component.asciidoc[]
+
+include::text/components/http-api/documentation/HTTP_Server.asciidoc[]
+
+include::text/components/http-api/documentation/HTTP_File_Upload_Component.asciidoc[]
+
 include::text/admin/Admin_Guide_56_-_Components_-_B_-_Tigase_HTTP_API_-_1_-_REST_API_Guide.asciidoc[]
 
 include::text/admin/Admin_Guide_57_-_Components_-_B_-_Tigase_HTTP_API_-_2_-_Admin_UI.asciidoc[]
 
 include::text/admin/Admin_Guide_58_-_Components_-_B_-_Tigase_HTTP_API_-_3_-_Web_Client.asciidoc[]
+
+
 
 :leveloffset: 2
 
@@ -489,5 +497,3 @@ include::text/properties/Properties_Guide_75_-_--client-port-delay-listening.asc
 :leveloffset: 1
 
 include::text/components/pubsub/documentation/index.asciidoc[]
-
-include::text/components/http-api/documentation/index.asciidoc[]

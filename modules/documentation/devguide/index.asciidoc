@@ -59,6 +59,10 @@ include::text/Development_Guide_16_-_Component_Implementation_-_Lesson_8_-_Start
 
 include::text/Development_Guide_17_-_Configuration_API.asciidoc[]
 
+include::text/components/http-api/documentation/HTTP_API_Component_modules.asciidoc[]
+
+include::text/components/http-api/documentation/REST_API.asciidoc[]
+
 include::text/Development_Guide_18_-_Packet_Filtering_in_Component.asciidoc[]
 
 include::text/Development_Guide_43_-_EventBus_API.asciidoc[]
@@ -137,11 +141,3 @@ include::text/Development_Guide_41_-_API_Description_for_Virtual_Domains_Managem
 include::text/Development_Guide_44_-_Stanza_Limitations.asciidoc[]
 
 include::text/CodeStyleGuide.asciidoc[]
-
-//Components
-
-:leveloffset: 1
-
-include::text/components/pubsub/documentation/index.asciidoc[]
-
-include::text/components/http-api/documentation/index.asciidoc[]

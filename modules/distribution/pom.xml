@@ -213,6 +213,16 @@
 									<outputDirectory>${project.basedir}/../../modules/documentation/text/components/http-api</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
+								
+								<artifactItem>
+									<groupId>tigase</groupId>
+									<artifactId>tigase-http-api</artifactId>
+									<version>1.3.0-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.basedir}/../../modules/documentation/devguide/text/components/http-api</outputDirectory>
+									<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
 
 								<artifactItem>
 									<groupId>tigase</groupId>
