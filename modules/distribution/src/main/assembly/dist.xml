@@ -38,6 +38,8 @@
 			<directory>../../docs</directory>
 			<outputDirectory>docs</outputDirectory>
 			<includes>
+				<include>Development_Guide/html_chunk/**/*</include>
+				<include>Development_Guide/pdf/**/*</include>
 				<include>User_Guide/html_chunk/**/*</include>
 				<include>User_Guide/pdf/**/*</include>
 				<include>javadoc/**/*</include>
