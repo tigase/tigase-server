@@ -89,7 +89,7 @@ public class RoutingsContainer {
 
 	}
 
-	@Bean(name="routingComputer", parent = ClientConnectionManager.class)
+	@Bean(name="routingComputer", parent = ClientConnectionManager.class, active = true)
 	public static class SingleMode extends AbstractRoutingComputer {
 
 		private String routing;

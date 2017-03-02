@@ -64,7 +64,7 @@ import tigase.xmpp.XMPPSession;
  * 
  * @author andrzej
  */
-@Bean(name = MessageCarbons.ID, parent = SessionManager.class)
+@Bean(name = MessageCarbons.ID, parent = SessionManager.class, active = true)
 public class MessageCarbons 
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPacketFilterIfc

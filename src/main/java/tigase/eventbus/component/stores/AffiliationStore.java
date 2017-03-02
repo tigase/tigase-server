@@ -29,7 +29,7 @@ import tigase.xmpp.JID;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Bean(name = "affiliations", parent = EventBusComponent.class)
+@Bean(name = "affiliations", parent = EventBusComponent.class, active = true)
 public class AffiliationStore {
 
 	private final Map<JID, Affiliation> affiliations = new ConcurrentHashMap<JID, Affiliation>();

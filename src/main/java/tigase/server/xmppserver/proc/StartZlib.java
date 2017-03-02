@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "StartZlib", parent = S2SConnectionManager.class)
+@Bean(name = "StartZlib", parent = S2SConnectionManager.class, active = true)
 public class StartZlib extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StartZlib.class.getName());
 	private static final Element features = new Element("compression",

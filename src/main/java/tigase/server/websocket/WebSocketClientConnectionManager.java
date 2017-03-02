@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @author andrzej
  */
-@Bean(name="ws2s", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="ws2s", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
 public class WebSocketClientConnectionManager
 				extends tigase.server.xmppclient.ClientConnectionManager {
 	

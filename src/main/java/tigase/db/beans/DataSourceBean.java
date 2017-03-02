@@ -43,7 +43,7 @@ import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
 /**
  * Created by andrzej on 09.03.2016.
  */
-@Bean(name="dataSource", parent = Kernel.class, exportable = true)
+@Bean(name="dataSource", parent = Kernel.class, active = true, exportable = true)
 public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBean> implements
 																				   ComponentStatisticsProvider {
 

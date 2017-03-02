@@ -17,10 +17,6 @@
  */
 package tigase.component.adhoc;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import tigase.component.adhoc.AdHocResponse.State;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -29,12 +25,16 @@ import tigase.util.SimpleCache;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class description
  *
  *
  */
-@Bean(name = "adHocCommandManager")
+@Bean(name = "adHocCommandManager", active = true)
 public class AdHocCommandManager {
 
 	@Inject(nullAllowed = true)

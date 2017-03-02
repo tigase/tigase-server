@@ -1,8 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.util.Date;
-import java.util.HashSet;
-
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -16,7 +13,10 @@ import tigase.server.monitor.MonitorRuntime;
 import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
-@Bean(name = "memory-checker-task")
+import java.util.Date;
+import java.util.HashSet;
+
+@Bean(name = "memory-checker-task", active = true)
 public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.HeapMemoryMonitorEvent";

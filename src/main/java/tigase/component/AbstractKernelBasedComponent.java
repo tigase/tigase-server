@@ -131,7 +131,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		this.updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), !isDiscoNonAdmin());
 	}
 
-	@Bean(name = "writer")
+	@Bean(name = "writer", active = true)
 	public static final class DefaultPacketWriter implements PacketWriter {
 
 		protected final Logger log = Logger.getLogger(this.getClass().getName());

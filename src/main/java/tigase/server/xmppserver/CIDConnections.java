@@ -861,7 +861,7 @@ public class CIDConnections {
 		}
 	}
 
-	@Bean(name = "cidConnectionsOpenerService", parent = S2SConnectionManager.class)
+	@Bean(name = "cidConnectionsOpenerService", parent = S2SConnectionManager.class, active = true)
 	public static class CIDConnectionsOpenerService {
 		// TODO: #1195 - estimate proper default value
 		@ConfigField(desc = "Numer of threads for opening outgoing connections")

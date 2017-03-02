@@ -1,7 +1,5 @@
 package tigase.monitor.modules;
 
-import java.util.Collection;
-
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
@@ -17,7 +15,9 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-@Bean(name = "x-delete-task")
+import java.util.Collection;
+
+@Bean(name = "x-delete-task", active = true)
 public class DeleteScriptTaskCommand implements AdHocCommand {
 
 	@Inject

@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author Wojtek
  */
-@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
 public class SeeOtherHost implements SeeOtherHostIfc, Initializable {
 
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());

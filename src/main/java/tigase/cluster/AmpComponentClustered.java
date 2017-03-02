@@ -46,7 +46,7 @@ import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
  *
  * @author andrzej
  */
-@Bean(name="amp", parent=Kernel.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name="amp", parent=Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
 public class AmpComponentClustered extends AmpComponent implements ClusteredComponentIfc {
 
 	private static final Logger log = Logger.getLogger(AmpComponentClustered.class.getCanonicalName());

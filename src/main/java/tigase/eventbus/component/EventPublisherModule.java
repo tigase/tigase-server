@@ -21,10 +21,6 @@
 
 package tigase.eventbus.component;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.logging.Level;
-
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.eventbus.EventRoutingSelector;
@@ -44,7 +40,11 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
-@Bean(name = EventPublisherModule.ID)
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.logging.Level;
+
+@Bean(name = EventPublisherModule.ID, active = true)
 public class EventPublisherModule extends AbstractEventBusModule implements Initializable, UnregisterAware {
 
 	public final static String ID = "publisher";

@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-@Bean(name = "subscriptionStore", parent = EventBusComponent.class)
+@Bean(name = "subscriptionStore", parent = EventBusComponent.class, active = true)
 public class SubscriptionStore {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());

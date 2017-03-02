@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "Dialback", parent = S2SConnectionManager.class)
+@Bean(name = "Dialback", parent = S2SConnectionManager.class, active = true)
 public class Dialback
 				extends S2SAbstractProcessor {
 	private static final Logger log                =

@@ -264,7 +264,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	/**
 	 * Bean used to provide MsgRepository implementations
 	 */
-	@Bean(name = "msgRepository", parent = Kernel.class, exportable = true)
+	@Bean(name = "msgRepository", parent = Kernel.class, active = true, exportable = true)
 	public static class MsgRepositoryMDBean extends MDRepositoryBeanWithStatistics<MsgRepositoryIfc>
 			implements MsgRepositoryIfc {
 

@@ -21,9 +21,6 @@
 
 package tigase.eventbus.component;
 
-import java.util.*;
-import java.util.logging.Level;
-
 import tigase.component.exceptions.ComponentException;
 import tigase.component.responses.AsyncCallback;
 import tigase.criteria.Criteria;
@@ -46,7 +43,10 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-@Bean(name = SubscribeModule.ID)
+import java.util.*;
+import java.util.logging.Level;
+
+@Bean(name = SubscribeModule.ID, active = true)
 public class SubscribeModule extends AbstractEventBusModule implements Initializable, UnregisterAware {
 
 	public final static String ID = "subscribe";

@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "stats", parent = Kernel.class)
+@Bean(name = "stats", parent = Kernel.class, active = true)
 public class StatisticsCollector
 				extends AbstractComponentRegistrator<StatisticsContainer>
 				implements ShutdownHook {

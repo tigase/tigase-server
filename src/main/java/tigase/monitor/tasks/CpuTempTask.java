@@ -1,14 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -20,7 +11,16 @@ import tigase.monitor.MonitorComponent;
 import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
-@Bean(name = "cpu-temp-task")
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Bean(name = "cpu-temp-task", active = true)
 public class CpuTempTask extends AbstractConfigurableTimerTask implements Initializable {
 
 	public static final String CPU_TEMP_MONITOR_EVENT_NAME = "tigase.monitor.tasks.CPUTempMonitorEvent";

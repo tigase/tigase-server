@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Wojtek
  */
-@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true, selectors = {BeanSelector.ClusterMode.class})
 public class SeeOtherHostHashed extends SeeOtherHost {
 
 //	protected List<BareJID> defaultHost = null;

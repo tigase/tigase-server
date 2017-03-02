@@ -31,8 +31,6 @@ import tigase.kernel.core.Kernel;
 import tigase.kernel.core.PlantUMLGrapher;
 import tigase.kernel.core.RegistrarKernel;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,7 +57,7 @@ public class RegistratBeanCyclicTest {
 		log.log(Level.FINE, gr.getDependencyGraph());
 	}
 
-	@Bean(name = "a")
+	@Bean(name = "a", active = true)
 	public static class A
 			implements RegistrarBean {
 
@@ -75,7 +73,7 @@ public class RegistratBeanCyclicTest {
 		}
 	}
 
-	@Bean(name = "b")
+	@Bean(name = "b", active = true)
 	public static class B
 			implements RegistrarBean {
 
@@ -95,7 +93,7 @@ public class RegistratBeanCyclicTest {
 		}
 	}
 
-	@Bean(name = "c")
+	@Bean(name = "c", active = true)
 	public static class C {
 
 		@Inject

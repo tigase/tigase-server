@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 16.11.2016.
  */
-@Bean(name = RegistrationThrottlingProcessor.ID)
+@Bean(name = RegistrationThrottlingProcessor.ID, active = true)
 public class RegistrationThrottlingProcessor
 		implements XMPPIOProcessor {
 

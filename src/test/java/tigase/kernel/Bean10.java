@@ -26,7 +26,7 @@ import tigase.kernel.beans.Inject;
 
 import java.util.Set;
 
-@Bean(name = "bean10")
+@Bean(name = "bean10", active = true)
 public class Bean10 {
 
 	@Inject(type = Special.class, nullAllowed = true)

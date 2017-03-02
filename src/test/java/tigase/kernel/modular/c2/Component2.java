@@ -26,7 +26,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.modular.Component;
 
-@Bean(name = "Component2")
+@Bean(name = "Component2", active = true)
 public class Component2 implements Component {
 
 

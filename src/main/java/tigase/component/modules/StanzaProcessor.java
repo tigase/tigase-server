@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = "stanzaProcessor")
+@Bean(name = "stanzaProcessor", active = true)
 public class StanzaProcessor {
 
 	private Logger log = Logger.getLogger(this.getClass().getName());

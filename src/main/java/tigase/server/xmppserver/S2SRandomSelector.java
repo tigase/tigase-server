@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "s2sRandomSelector", parent = S2SConnectionManager.class)
+@Bean(name = "s2sRandomSelector", parent = S2SConnectionManager.class, active = true)
 public class S2SRandomSelector implements S2SConnectionSelector {
 	private static final Logger log = Logger.getLogger(S2SRandomSelector.class.getName());
 

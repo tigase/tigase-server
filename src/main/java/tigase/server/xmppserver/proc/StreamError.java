@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "StreamError", parent = S2SConnectionManager.class)
+@Bean(name = "StreamError", parent = S2SConnectionManager.class, active = true)
 public class StreamError extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StreamError.class.getName());
 

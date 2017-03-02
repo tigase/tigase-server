@@ -54,7 +54,7 @@ import java.util.Queue;
  * @author <a href="mailto:bmalkow@tigase.org">Bartosz Małkowski</a>
  * @version $Rev$
  */
-@Bean(name = UrnXmppPing.ID, parent = SessionManager.class)
+@Bean(name = UrnXmppPing.ID, parent = SessionManager.class, active = true)
 public class UrnXmppPing
 				extends XMPPProcessorAbstract {
 	private static final Logger     log = Logger.getLogger(UrnXmppPing.class.getName());

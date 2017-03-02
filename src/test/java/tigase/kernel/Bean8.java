@@ -26,7 +26,7 @@ import tigase.kernel.beans.Converter;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 
-@Bean(name = "bean8")
+@Bean(name = "bean8", active = true)
 public class Bean8 {
 
 	@Inject(nullAllowed = false)

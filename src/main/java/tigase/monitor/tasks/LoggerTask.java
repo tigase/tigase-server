@@ -1,9 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.logging.*;
-
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -16,7 +12,11 @@ import tigase.util.DateTimeFormatter;
 import tigase.util.LogFormatter;
 import tigase.xml.Element;
 
-@Bean(name = "logger-task")
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.logging.*;
+
+@Bean(name = "logger-task", active = true)
 public class LoggerTask extends AbstractConfigurableTask implements Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();

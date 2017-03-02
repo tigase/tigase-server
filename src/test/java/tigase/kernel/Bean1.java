@@ -1,11 +1,11 @@
 package tigase.kernel;
 
-import java.util.Set;
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 
-@Bean(name = "bean1")
+import java.util.Set;
+
+@Bean(name = "bean1", active = true)
 public class Bean1 {
 
 	@Inject(nullAllowed = true)

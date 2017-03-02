@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="s2s", parent=Kernel.class)
+@Bean(name="s2s", parent=Kernel.class, active = true)
 public class S2SConnectionManager
 				extends ConnectionManager<S2SIOService>
 				implements S2SConnectionHandlerIfc<S2SIOService> {
@@ -793,7 +793,7 @@ public class S2SConnectionManager
 		return result;
 	}
 
-	@Bean(name = "domainServerNameMapper", parent = S2SConnectionManager.class)
+	@Bean(name = "domainServerNameMapper", parent = S2SConnectionManager.class, active = true)
 	public static class DomainServerNameMapper {
 		
 		private class Entry implements Comparable<Entry>{

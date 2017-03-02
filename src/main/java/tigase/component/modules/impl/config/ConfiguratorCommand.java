@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 
 import static java.util.Collections.sort;
 
-@Bean(name = "BeanConfiguratorAdHocCommand")
+@Bean(name = "BeanConfiguratorAdHocCommand", active = true)
 public class ConfiguratorCommand implements AdHocCommand {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());

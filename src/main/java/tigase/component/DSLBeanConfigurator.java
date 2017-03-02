@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 /**
  * Created by andrzej on 11.08.2016.
  */
-@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
+@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true)
 public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 	private static final Logger log = Logger.getLogger(DSLBeanConfigurator.class.getCanonicalName());

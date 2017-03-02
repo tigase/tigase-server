@@ -41,7 +41,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "alert", parent = AmpComponent.class)
+@Bean(name = "alert", parent = AmpComponent.class, active = true)
 public class Alert extends ActionAbstract {
 	private static final String name = "alert";
 

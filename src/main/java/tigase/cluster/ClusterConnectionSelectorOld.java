@@ -36,7 +36,7 @@ import java.util.Map;
  * 
  * @author andrzej
  */
-@Bean(name = "clusterConnectionSelector")
+@Bean(name = "clusterConnectionSelector", active = true)
 public class ClusterConnectionSelectorOld implements ClusterConnectionSelectorIfc {
 
 	private ClusterConnectionHandler handler;

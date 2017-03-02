@@ -62,7 +62,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = JabberIqAuth.ID, parent = SessionManager.class)
+@Bean(name = JabberIqAuth.ID, parent = SessionManager.class, active = true)
 public class JabberIqAuth
 				extends AbstractAuthPreprocessor
 				implements XMPPProcessorIfc {

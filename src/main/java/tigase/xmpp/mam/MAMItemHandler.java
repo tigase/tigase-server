@@ -39,7 +39,7 @@ import java.util.TimeZone;
  *
  * Created by andrzej on 19.07.2016.
  */
-@Bean(name = "mamItemHandler", parent = QueryModule.class)
+@Bean(name = "mamItemHandler", parent = QueryModule.class, active = true)
 public class MAMItemHandler implements MAMRepository.ItemHandler {
 
 	private static final SimpleDateFormat TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX");

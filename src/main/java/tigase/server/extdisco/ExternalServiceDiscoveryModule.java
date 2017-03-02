@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 06.09.2016.
  */
-@Bean(name = "extDiscoModule", parent = ExternalServiceDiscoveryComponent.class)
+@Bean(name = "extDiscoModule", parent = ExternalServiceDiscoveryComponent.class, active = true)
 public class ExternalServiceDiscoveryModule implements Module {
 
 	private static final Logger log = Logger.getLogger(ExternalServiceDiscoveryModule.class.getCanonicalName());

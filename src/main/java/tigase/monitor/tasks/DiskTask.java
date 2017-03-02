@@ -1,15 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -22,7 +12,17 @@ import tigase.util.DateTimeFormatter;
 import tigase.util.OSUtils;
 import tigase.xml.Element;
 
-@Bean(name = "disk-task")
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Bean(name = "disk-task", active = true)
 public class DiskTask extends AbstractConfigurableTimerTask implements Initializable {
 
 	public static final String DISK_USAGE_MONITOR_EVENT_NAME = "tigase.monitor.tasks.DiskUsageMonitorEvent";

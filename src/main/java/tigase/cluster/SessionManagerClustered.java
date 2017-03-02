@@ -45,7 +45,6 @@ import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserSessionEvent;
 import tigase.stats.StatisticsList;
-import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -65,7 +64,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Bean(name = "sess-man", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "sess-man", parent = Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
 public class SessionManagerClustered
 				extends SessionManager
 				implements ClusteredComponentIfc, SessionManagerClusteredIfc {

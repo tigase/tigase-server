@@ -40,7 +40,7 @@ import java.util.Map;
  * 
  * @author andrzej
  */
-@Bean(name = "clusterConnectionSelector", parent = ClusterConnectionManager.class)
+@Bean(name = "clusterConnectionSelector", parent = ClusterConnectionManager.class, active = true)
 public class ClusterConnectionSelector implements ClusterConnectionSelectorIfc {
 
 	protected static final String CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-sys-connections-per-node";

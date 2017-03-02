@@ -53,7 +53,7 @@ import static tigase.server.amp.cond.ExpireAt.NAME;
  *
  * @author andrzej
  */
-@Bean(name = "broadcast", parent = AmpComponent.class)
+@Bean(name = "broadcast", parent = AmpComponent.class, active = true)
 public class Broadcast implements AmpFeatureIfc {
 	
 	private static final Logger log  = Logger.getLogger(Broadcast.class.getName());

@@ -7,7 +7,7 @@ import tigase.xmpp.BareJID;
 
 import java.util.Map;
 
-@Bean(name = "configItemRepository", parent = MonitorComponent.class)
+@Bean(name = "configItemRepository", parent = MonitorComponent.class, active = true)
 public class TaskConfigItemJDBCRepository extends UserRepoRepository<TaskConfigItem> {
 
 	private final static String CONFIG_KEY = "monitor-tasks";

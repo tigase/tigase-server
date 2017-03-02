@@ -83,7 +83,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="sess-man", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="sess-man", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
 public class SessionManager
 		extends AbstractMessageReceiver
 		implements Configurable, SessionManagerHandler, OnlineJidsReporter, RegistrarBean {
@@ -2372,7 +2372,7 @@ public class SessionManager
 	}
 
 
-	@Bean(name = defaultHandlerProcId, parent = SessionManager.class)
+	@Bean(name = defaultHandlerProcId, parent = SessionManager.class, active = true)
 	public static class DefaultHandlerProc
 			extends XMPPProcessor
 			implements XMPPProcessorIfc {
@@ -2460,7 +2460,7 @@ public class SessionManager
 	}
 
 
-	@Bean(name = sessionCloseProcId, parent = SessionManager.class)
+	@Bean(name = sessionCloseProcId, parent = SessionManager.class, active = true)
 	public static class SessionCloseProc
 			extends XMPPProcessor
 			implements XMPPProcessorIfc {
@@ -2493,7 +2493,7 @@ public class SessionManager
 	}
 
 
-	@Bean(name = sessionOpenProcId, parent = SessionManager.class)
+	@Bean(name = sessionOpenProcId, parent = SessionManager.class, active = true)
 	public static class SessionOpenProc
 			extends XMPPProcessor
 			implements XMPPProcessorIfc {

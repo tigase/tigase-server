@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = JabberIqRegister.ID, parent = SessionManager.class)
+@Bean(name = JabberIqRegister.ID, parent = SessionManager.class, active = true)
 public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc, Initializable, UnregisterAware {
 	public static final String ID = "jabber:iq:register";
 	public static final String REGISTRATION_PER_SECOND_PROP_KEY = "registrations-per-second";

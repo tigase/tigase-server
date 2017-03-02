@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "sslContextContainer", parent = ConnectionManager.class)
+@Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true)
 public class SSLContextContainer extends SSLContextContainerAbstract {
 
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
@@ -177,7 +177,7 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 		}
 	}
 
-	@Bean(name = "rootSslContextContainer", parent = Kernel.class, exportable = true)
+	@Bean(name = "rootSslContextContainer", parent = Kernel.class, active = true, exportable = true)
 	public static class Root extends SSLContextContainer {
 
 		public Root() {

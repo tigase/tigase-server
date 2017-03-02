@@ -21,11 +21,6 @@
 
 package tigase.eventbus.component;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.eventbus.EventRoutedTransientFiller;
@@ -43,7 +38,12 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 
-@Bean(name = EventReceiverModule.ID)
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Bean(name = EventReceiverModule.ID, active = true)
 public class EventReceiverModule extends AbstractEventBusModule {
 
 	private static final Logger log = Logger.getLogger(EventReceiverModule.class.getCanonicalName());

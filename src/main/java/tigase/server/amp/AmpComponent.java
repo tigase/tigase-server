@@ -54,7 +54,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="amp", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="amp", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
 public class AmpComponent
 				extends AbstractMessageReceiver
 				implements ActionResultsHandlerIfc, RegistrarBean {

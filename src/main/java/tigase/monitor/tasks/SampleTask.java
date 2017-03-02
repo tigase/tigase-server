@@ -1,7 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.util.Date;
-
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -10,7 +8,9 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.xml.Element;
 
-@Bean(name = "sample-task")
+import java.util.Date;
+
+@Bean(name = "sample-task", active = true)
 public class SampleTask extends AbstractConfigurableTimerTask implements Initializable {
 
 	@Inject

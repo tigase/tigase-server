@@ -387,7 +387,7 @@ public class KernelTest {
 		assertEquals(4, b10.getTableOfSpecial().length);
 	}
 
-	@Bean(name = "customTypesConverter")
+	@Bean(name = "customTypesConverter", active = true)
 	public static class CustomTypesConverter extends DefaultTypesConverter {
 
 		@Override

@@ -258,14 +258,14 @@ public class RegistrarBeanKernelTest {
 		log.log(Level.FINE, dg.getDependencyGraph());
 	}
 
-	@Bean(name="DummyBean")
+	@Bean(name="DummyBean", active = true)
 	public static class DummyBean {
 
 		public DummyBean() {}
 
 	}
 
-	@Bean(name="DummyBeanUser")
+	@Bean(name="DummyBeanUser", active = true)
 	public static class DummyBeanUser {
 
 		@Inject(nullAllowed = true)
@@ -275,14 +275,14 @@ public class RegistrarBeanKernelTest {
 
 	}
 
-	@Bean(name="DummyBean2", exportable = true)
+	@Bean(name="DummyBean2", active = true, exportable = true)
 	public static class DummyBean2 {
 
 		public DummyBean2() {}
 
 	}
 
-	@Bean(name="DummyBean2User")
+	@Bean(name="DummyBean2User", active = true)
 	public static class DummyBean2User {
 
 		@Inject(nullAllowed = true)
@@ -292,14 +292,14 @@ public class RegistrarBeanKernelTest {
 
 	}
 
-	@Bean(name="DummyBean3")
+	@Bean(name="DummyBean3", active = true)
 	public static class DummyBean3 {
 
 		public DummyBean3() {}
 
 	}
 
-	@Bean(name="DummyBean3User")
+	@Bean(name="DummyBean3User", active = true)
 	public static class DummyBean3User {
 
 		@Inject
@@ -309,14 +309,14 @@ public class RegistrarBeanKernelTest {
 
 	}
 
-	@Bean(name="DummyBean4", exportable = true)
+	@Bean(name="DummyBean4", active = true, exportable = true)
 	public static class DummyBean4 {
 
 		public DummyBean4() {}
 
 	}
 
-	@Bean(name="DummyBean4User")
+	@Bean(name="DummyBean4User", active = true)
 	public static class DummyBean4User {
 
 		@Inject
@@ -326,7 +326,7 @@ public class RegistrarBeanKernelTest {
 
 	}
 
-	@Bean(name="DummyBean34User")
+	@Bean(name="DummyBean34User", active = true)
 	public static class DummyBean34User {
 
 		@Inject(nullAllowed = true)
@@ -337,7 +337,7 @@ public class RegistrarBeanKernelTest {
 
 	}
 
-	@Bean(name="RegistrarBean")
+	@Bean(name="RegistrarBean", active = true)
 	public static class RegistrarBeanImpl implements RegistrarBean {
 
 
@@ -356,7 +356,7 @@ public class RegistrarBeanKernelTest {
 		}
 	}
 
-	@Bean(name="RegistrarBean")
+	@Bean(name="RegistrarBean", active = true)
 	public static class RegistrarBeanImplWithLink implements RegistrarBean {
 
 
@@ -378,7 +378,7 @@ public class RegistrarBeanKernelTest {
 	}
 
 
-	@Bean(name="RegistrarBean")
+	@Bean(name="RegistrarBean", active = true)
 	public static class RegistrarBeanImplWithLink2 implements RegistrarBean {
 
 
@@ -398,7 +398,7 @@ public class RegistrarBeanKernelTest {
 		}
 	}
 
-	@Bean(name="RegistrarBean")
+	@Bean(name="RegistrarBean", active = true)
 	public static class RegistrarBeanImplWithLink3 implements RegistrarBean {
 
 
@@ -420,7 +420,7 @@ public class RegistrarBeanKernelTest {
 		}
 	}
 
-	@Bean(name="RegistrarBean")
+	@Bean(name="RegistrarBean", active = true)
 	public static class RegistrarBeanImplWithLink4 implements RegistrarBean {
 
 

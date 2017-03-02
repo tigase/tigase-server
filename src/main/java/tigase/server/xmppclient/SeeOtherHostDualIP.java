@@ -200,7 +200,7 @@ public class SeeOtherHostDualIP
 
 	}
 
-	@Bean(name = "dualIPRepository", parent = SeeOtherHostDualIP.class)
+	@Bean(name = "dualIPRepository", parent = SeeOtherHostDualIP.class, active = true)
 	public static class DualIPRepositoryWrapper extends MDRepositoryBeanWithStatistics<DualIPRepository>
 			implements DualIPRepository<DataSource> {
 

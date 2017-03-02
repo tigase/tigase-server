@@ -1,9 +1,5 @@
 package tigase.monitor.modules;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.impl.DiscoveryModule;
@@ -20,7 +16,11 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-@Bean(name = DiscoveryModule.ID)
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@Bean(name = DiscoveryModule.ID, active = true)
 public class DiscoveryMonitorModule extends DiscoveryModule {
 
 	@Inject

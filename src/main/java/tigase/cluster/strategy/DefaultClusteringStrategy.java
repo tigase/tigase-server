@@ -51,7 +51,7 @@ import java.util.logging.Logger;
  *
  * @param <E>
  */
-@Bean(name = "strategy", parent = SessionManagerClustered.class)
+@Bean(name = "strategy", parent = SessionManagerClustered.class, active = true)
 public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 				extends DefaultClusteringStrategyAbstract<E> {
 	/** Field description */

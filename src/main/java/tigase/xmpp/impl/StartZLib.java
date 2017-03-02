@@ -54,7 +54,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = StartZLib.ID, parent = SessionManager.class)
+@Bean(name = StartZLib.ID, parent = SessionManager.class, active = true)
 public class StartZLib
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {

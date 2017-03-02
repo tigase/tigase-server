@@ -38,7 +38,7 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "drop", parent = AmpComponent.class)
+@Bean(name = "drop", parent = AmpComponent.class, active = true)
 public class Drop extends ActionAbstract {
 	private static final String name = "drop";
 

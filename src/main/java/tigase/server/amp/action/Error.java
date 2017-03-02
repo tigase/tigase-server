@@ -41,7 +41,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "error", parent = AmpComponent.class)
+@Bean(name = "error", parent = AmpComponent.class, active = true)
 public class Error extends ActionAbstract {
 	private static final String name = "error";
 	private static final String FAILED_RULES_PATH = "error/failed-rules";

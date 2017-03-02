@@ -39,7 +39,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-@Bean(name = "defaultTypesConverter")
+@Bean(name = "defaultTypesConverter", active = true)
 public class DefaultTypesConverter
 		implements TypesConverter {
 

@@ -49,7 +49,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SUB_NONE;
  */
 @Id(PresenceSubscription.ID)
 @Handle(path = { PresenceAbstract.PRESENCE_ELEMENT_NAME }, xmlns = PresenceAbstract.CLIENT_XMLNS)
-@Bean(name = PresenceSubscription.ID, parent = SessionManager.class)
+@Bean(name = PresenceSubscription.ID, parent = SessionManager.class, active = true)
 public class PresenceSubscription extends PresenceAbstract {
 	
 	/**

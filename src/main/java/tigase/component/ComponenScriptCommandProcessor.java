@@ -11,7 +11,7 @@ import tigase.xmpp.JID;
 import java.util.List;
 import java.util.Queue;
 
-@Bean(name = "scriptCommandProcessor")
+@Bean(name = "scriptCommandProcessor", active = true)
 public class ComponenScriptCommandProcessor implements ScriptCommandProcessor {
 
 	@Inject(bean = "component", nullAllowed = false)

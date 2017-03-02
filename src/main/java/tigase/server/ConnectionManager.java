@@ -1625,7 +1625,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	}
 
-	@Bean(name = "connections", parent = ConnectionManager.class, exportable = true)
+	@Bean(name = "connections", parent = ConnectionManager.class, active = true, exportable = true)
 	public static class PortsConfigBean implements RegistrarBeanWithDefaultBeanClass, Initializable {
 
 		@Inject

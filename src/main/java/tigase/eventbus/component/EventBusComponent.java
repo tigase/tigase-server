@@ -39,7 +39,7 @@ import tigase.xmpp.JID;
 import javax.script.ScriptEngineManager;
 import java.util.logging.Level;
 
-@Bean(name = "eventbus", parent = Kernel.class)
+@Bean(name = "eventbus", parent = Kernel.class, active = true)
 public class EventBusComponent extends AbstractKernelBasedComponent implements ClusteredComponentIfc {
 
 	public EventBusComponent() {

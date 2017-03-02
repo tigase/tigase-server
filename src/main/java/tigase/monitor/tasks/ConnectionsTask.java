@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = "connections-task")
+@Bean(name = "connections-task", active = true)
 public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();

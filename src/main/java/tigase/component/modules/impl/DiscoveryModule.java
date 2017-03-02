@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Bean(name = DiscoveryModule.ID)
+@Bean(name = DiscoveryModule.ID, active = true)
 public class DiscoveryModule extends AbstractModule {
 
 	public final static String DISCO_INFO_XMLNS = "http://jabber.org/protocol/disco#info";

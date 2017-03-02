@@ -40,7 +40,7 @@ import tigase.xmpp.mam.QueryParser;
  *
  * Created by andrzej on 19.07.2016.
  */
-@Bean(name = "mamGetFormModule")
+@Bean(name = "mamGetFormModule", active = true)
 public class GetFormModule implements Module {
 
 	@Inject(bean = "mamQueryParser")

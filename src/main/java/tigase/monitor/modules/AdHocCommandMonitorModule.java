@@ -15,7 +15,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-@Bean(name = AdHocCommandModule.ID)
+@Bean(name = AdHocCommandModule.ID, active = true)
 public class AdHocCommandMonitorModule extends AdHocCommandModule implements Initializable {
 
 	private ConfigureTaskCommand configCommand;

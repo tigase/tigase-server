@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 @StreamFeatures({
 		@StreamFeature(elem = "csi", xmlns = ClientStateIndication.XMLNS)
 })
-@Bean(name = ClientStateIndication.ID, parent = SessionManager.class)
+@Bean(name = ClientStateIndication.ID, parent = SessionManager.class, active = true)
 public class ClientStateIndication extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc, XMPPPacketFilterIfc {
 

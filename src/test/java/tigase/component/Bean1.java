@@ -7,7 +7,7 @@ import tigase.xmpp.JID;
 /**
  * Created by bmalkow on 19.10.2015.
  */
-@Bean(name = "bean1")
+@Bean(name = "bean1", active = true)
 public class Bean1 {
 
 	private String field1;

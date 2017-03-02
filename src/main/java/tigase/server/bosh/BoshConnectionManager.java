@@ -59,7 +59,7 @@ import static tigase.server.bosh.Constants.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="bosh", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="bosh", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
 public class BoshConnectionManager
 				extends ClientConnectionManager
 				implements BoshSessionTaskHandler {

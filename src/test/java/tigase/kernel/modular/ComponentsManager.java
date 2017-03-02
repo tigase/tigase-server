@@ -27,7 +27,7 @@ import tigase.kernel.beans.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@Bean(name = "componentsManager")
+@Bean(name = "componentsManager", active = true)
 public class ComponentsManager {
 
 	@Inject(nullAllowed = true)

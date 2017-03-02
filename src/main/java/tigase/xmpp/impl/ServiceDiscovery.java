@@ -60,7 +60,7 @@ import java.util.logging.Level;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Bean(name = ServiceDiscovery.ID, parent = SessionManager.class)
+@Bean(name = ServiceDiscovery.ID, parent = SessionManager.class, active = true)
 public class ServiceDiscovery
 				extends XMPPProcessorAbstract {
 	protected static final String     ID       = "disco";

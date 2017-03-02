@@ -32,7 +32,7 @@ import tigase.xml.Element;
  *
  *
  */
-@Bean(name = JabberVersionModule.ID)
+@Bean(name = JabberVersionModule.ID, active = true)
 public class JabberVersionModule extends AbstractModule {
 
 	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get").add(

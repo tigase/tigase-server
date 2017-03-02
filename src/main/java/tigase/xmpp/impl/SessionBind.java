@@ -57,7 +57,7 @@ import static tigase.xmpp.impl.SessionBind.XMLNS;
 	@StreamFeature(elem="session", xmlns=XMLNS)
 )
 @DiscoFeatures({ XMLNS })
-@Bean(name = SessionBind.XMLNS, parent = SessionManager.class)
+@Bean(name = SessionBind.XMLNS, parent = SessionManager.class, active = true)
 public class SessionBind
 				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc {

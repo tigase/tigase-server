@@ -69,7 +69,7 @@ import static tigase.xmpp.impl.VCardTemp.*;
 @DiscoFeatures({
 	XMLNS
 })
-@Bean(name = VCardTemp.ID, parent = SessionManager.class)
+@Bean(name = VCardTemp.ID, parent = SessionManager.class, active = true)
 public class VCardTemp
 				extends VCardXMPPProcessorAbstract {
 	/** Field description */

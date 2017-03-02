@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "store", parent = AmpComponent.class)
+@Bean(name = "store", parent = AmpComponent.class, active = true)
 public class Store
 				extends ActionAbstract implements Initializable, UnregisterAware {
 	private static final Logger log  = Logger.getLogger(Store.class.getName());

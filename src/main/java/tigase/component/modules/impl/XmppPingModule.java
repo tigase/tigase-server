@@ -25,7 +25,7 @@ import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
-@Bean(name = XmppPingModule.ID)
+@Bean(name = XmppPingModule.ID, active = true)
 public class XmppPingModule extends AbstractModule {
 
 	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get").add(

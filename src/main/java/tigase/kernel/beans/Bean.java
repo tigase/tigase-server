@@ -26,7 +26,7 @@ public @interface Bean {
 	 * Is active by default
 	 * @return
 	 */
-	boolean active() default true;
+	boolean active();
 
 	boolean exportable() default false;
 

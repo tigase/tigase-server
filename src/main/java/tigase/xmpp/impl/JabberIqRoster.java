@@ -54,7 +54,7 @@ import static tigase.xmpp.impl.PresenceSubscription.AUTO_AUTHORIZE_PROP_KEY;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = JabberIqRoster.ID, parent = SessionManager.class)
+@Bean(name = JabberIqRoster.ID, parent = SessionManager.class, active = true)
 public class JabberIqRoster
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {

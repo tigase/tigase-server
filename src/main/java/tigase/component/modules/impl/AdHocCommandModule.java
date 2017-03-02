@@ -17,11 +17,6 @@
  */
 package tigase.component.modules.impl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocCommandManager;
@@ -37,7 +32,12 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
-@Bean(name = AdHocCommandModule.ID)
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+
+@Bean(name = AdHocCommandModule.ID, active = true)
 public class AdHocCommandModule extends AbstractModule implements Initializable {
 
 	public static interface ScriptCommandProcessor {

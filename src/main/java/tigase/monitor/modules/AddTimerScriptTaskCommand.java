@@ -1,11 +1,5 @@
 package tigase.monitor.modules;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
@@ -20,7 +14,12 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-@Bean(name = "x-add-timer-task")
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import java.util.ArrayList;
+import java.util.List;
+
+@Bean(name = "x-add-timer-task", active = true)
 public class AddTimerScriptTaskCommand implements AdHocCommand {
 
 	@Inject

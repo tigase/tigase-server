@@ -62,7 +62,7 @@ import java.util.logging.Logger;
 	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.BLOCK}, xmlns = BlockingCommand.XMLNS),
 	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.UNBLOCK}, xmlns = BlockingCommand.XMLNS)})
 @HandleStanzaTypes({StanzaType.set, StanzaType.get})
-@Bean(name = BlockingCommand.ID, parent = SessionManager.class)
+@Bean(name = BlockingCommand.ID, parent = SessionManager.class, active = true)
 public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProcessorIfc {
 
 	private static final Logger log = Logger.getLogger(BlockingCommand.class.getName());

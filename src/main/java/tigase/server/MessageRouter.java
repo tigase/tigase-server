@@ -66,7 +66,7 @@ import static tigase.server.MessageRouterConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="message-router", parent=Kernel.class)
+@Bean(name="message-router", parent=Kernel.class, active = true)
 public class MessageRouter
 				extends AbstractMessageReceiver
 				implements MessageRouterIfc {

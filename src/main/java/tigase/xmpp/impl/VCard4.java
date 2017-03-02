@@ -57,7 +57,7 @@ import static tigase.xmpp.impl.VCard4.*;
 @DiscoFeatures({
 	XMLNS
 })
-@Bean(name = VCard4.ID, parent = SessionManager.class)
+@Bean(name = VCard4.ID, parent = SessionManager.class, active = true)
 public class VCard4 extends VCardXMPPProcessorAbstract {
 	
 	private static final Logger log = Logger.getLogger(VCard4.class.getCanonicalName());

@@ -51,7 +51,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "PacketChecker", parent = S2SConnectionManager.class)
+@Bean(name = "PacketChecker", parent = S2SConnectionManager.class, active = true)
 public class PacketChecker extends S2SAbstractProcessor {
 
         private static final Logger log = Logger.getLogger(PacketChecker.class.getName());

@@ -28,7 +28,7 @@ import static tigase.xmpp.impl.EntityTime.ID;
 @Id(EntityTime.XMLNS)
 @Handles({ @Handle(path = { Iq.ELEM_NAME, EntityTime.TIME }, xmlns = EntityTime.XMLNS) })
 @DiscoFeatures({ EntityTime.XMLNS })
-@Bean(name = ID, parent = SessionManager.class)
+@Bean(name = ID, parent = SessionManager.class, active = true)
 public class EntityTime extends XMPPProcessorAbstract {
 
 	protected static final String XMLNS = "urn:xmpp:time";

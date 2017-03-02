@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
+@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true)
 public class PropertiesBeanConfigurator
 		extends AbstractBeanConfigurator {
 

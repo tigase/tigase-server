@@ -32,7 +32,7 @@ import tigase.stats.StatisticsList;
 /**
  * Created by andrzej on 07.03.2016.
  */
-@Bean(name="userRepository", parent = Kernel.class, exportable = true)
+@Bean(name="userRepository", parent = Kernel.class, exportable = true, active = true)
 public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
 
 	@Override

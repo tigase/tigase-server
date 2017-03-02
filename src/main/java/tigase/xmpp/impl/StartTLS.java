@@ -51,7 +51,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = StartTLS.ID, parent = SessionManager.class)
+@Bean(name = StartTLS.ID, parent = SessionManager.class, active = true)
 public class StartTLS
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc {

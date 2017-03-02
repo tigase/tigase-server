@@ -21,8 +21,6 @@
 
 package tigase.eventbus.component;
 
-import java.util.*;
-
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.impl.DiscoveryModule;
@@ -38,7 +36,9 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 
-@Bean(name = DiscoveryModule.ID)
+import java.util.*;
+
+@Bean(name = DiscoveryModule.ID, active = true)
 public class EventbusDiscoveryModule extends DiscoveryModule {
 
 	@Inject

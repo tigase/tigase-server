@@ -1,10 +1,5 @@
 package tigase.monitor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.script.ScriptException;
-
 import tigase.db.TigaseDBException;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
@@ -16,7 +11,11 @@ import tigase.monitor.TaskConfigItem.Type;
 import tigase.monitor.tasks.ScriptTask;
 import tigase.monitor.tasks.ScriptTimerTask;
 
-@Bean(name = TasksScriptRegistrar.ID)
+import javax.script.ScriptException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Bean(name = TasksScriptRegistrar.ID, active = true)
 public class TasksScriptRegistrar {
 
 	public static final String ID = "TasksScriptRegistrar";

@@ -51,7 +51,7 @@ import static tigase.xmpp.impl.BindResource.ID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = ID, parent = SessionManager.class)
+@Bean(name = ID, parent = SessionManager.class, active = true)
 public class BindResource
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc {

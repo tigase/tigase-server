@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  *
  * @author andrzej
  */
-@Bean(name="bosh", parent=Kernel.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name="bosh", parent=Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
 public class BoshConnectionClustered
 				extends BoshConnectionManager
 				implements ClusteredComponentIfc {

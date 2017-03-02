@@ -58,7 +58,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
 	@Handle(path = { PresenceAbstract.PRESENCE_ELEMENT_NAME }, xmlns = PresenceAbstract.CLIENT_XMLNS),
 	@Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = RosterAbstract.XMLNS_LOAD)
 })
-@Bean(name = PresenceState.ID, parent = SessionManager.class)
+@Bean(name = PresenceState.ID, parent = SessionManager.class, active = true)
 public class PresenceState extends PresenceAbstract implements XMPPStopListenerIfc {
 
 	/**

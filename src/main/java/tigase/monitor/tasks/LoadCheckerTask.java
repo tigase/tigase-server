@@ -1,8 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.util.Date;
-import java.util.HashSet;
-
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -16,7 +13,10 @@ import tigase.server.monitor.MonitorRuntime;
 import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
-@Bean(name = "load-checker-task")
+import java.util.Date;
+import java.util.HashSet;
+
+@Bean(name = "load-checker-task", active = true)
 public class LoadCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	public static final String MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoadAverageMonitorEvent";

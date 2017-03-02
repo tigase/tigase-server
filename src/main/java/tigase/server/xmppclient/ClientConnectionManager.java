@@ -61,7 +61,7 @@ import java.util.zip.Deflater;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="c2s", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="c2s", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
 public class ClientConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>> {
 	/**

@@ -63,7 +63,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "vhost-man", parent = Kernel.class, exportable = true)
+@Bean(name = "vhost-man", parent = Kernel.class, active = true, exportable = true)
 public class VHostManager
 				extends AbstractComponentRegistrator<VHostListener>
 				implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
@@ -374,7 +374,7 @@ public class VHostManager
 		return repo;
 	}
 
-	@Bean(name = "vhostRepository", parent = VHostManager.class)
+	@Bean(name = "vhostRepository", parent = VHostManager.class, active = true)
 	public static class DefVHostRepositoryBean extends AbstractSDComponentRepositoryBean<VHostItem> {
 
 		private ComponentRepository<VHostItem> repo = null;

@@ -86,7 +86,7 @@ import java.util.zip.Deflater;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "cl-comp", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "cl-comp", parent = Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
 				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
@@ -1229,7 +1229,7 @@ public class ClusterConnectionManager
 
 	}
 
-	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class)
+	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class, active = true)
 	public static class DefClConRepositoryBean extends AbstractSDComponentRepositoryBean<ClusterRepoItem> {
 
 		private ComponentRepository<ClusterRepoItem> repo = null;

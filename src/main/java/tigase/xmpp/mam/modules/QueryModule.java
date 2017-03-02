@@ -43,7 +43,7 @@ import tigase.xmpp.mam.QueryParser;
  *
  * Created by andrzej on 19.07.2016.
  */
-@Bean(name = "mamQueryModule")
+@Bean(name = "mamQueryModule", active = true)
 public class QueryModule implements Module {
 
 	private static final String[] FEATURES = { "urn:xmpp:mam:1" };

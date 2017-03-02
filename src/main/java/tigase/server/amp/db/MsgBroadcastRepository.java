@@ -128,7 +128,7 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 
 	}
 
-	@Bean(name = "msgBroadcastRepository", parent = AmpComponent.class)
+	@Bean(name = "msgBroadcastRepository", parent = AmpComponent.class, active = true)
 	public static class MsgBroadcastRepositoryBean extends MDRepositoryBeanWithStatistics<MsgBroadcastRepository>
 			implements MsgBroadcastRepositoryIfc {
 

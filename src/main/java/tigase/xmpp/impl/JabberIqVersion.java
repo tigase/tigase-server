@@ -54,7 +54,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = JabberIqVersion.ID, parent = SessionManager.class)
+@Bean(name = JabberIqVersion.ID, parent = SessionManager.class, active = true)
 public class JabberIqVersion
 				extends XMPPProcessorAbstract {
 	private static final Logger     log = Logger.getLogger(JabberIqVersion.class.getName());

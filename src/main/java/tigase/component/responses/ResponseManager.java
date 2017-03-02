@@ -1,17 +1,13 @@
 package tigase.component.responses;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.xmpp.JID;
 
-@Bean(name = "responseManager")
+import java.util.*;
+import java.util.logging.Logger;
+
+@Bean(name = "responseManager", active = true)
 public class ResponseManager {
 
 	protected static final class Entry {

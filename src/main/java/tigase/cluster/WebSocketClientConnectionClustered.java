@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Bean(name="ws2s", parent=Kernel.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name="ws2s", parent=Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
 public class WebSocketClientConnectionClustered
 				extends WebSocketClientConnectionManager
 				implements ClusteredComponentIfc {

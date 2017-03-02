@@ -50,7 +50,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  *
  * Created by andrzej on 29.02.2016.
  */
-@Bean(name = "certificate-container", parent = Kernel.class, exportable = true)
+@Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true)
 public class CertificateContainer implements CertificateContainerIfc, Initializable {
 
 	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());

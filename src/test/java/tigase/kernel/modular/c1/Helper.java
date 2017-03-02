@@ -23,7 +23,7 @@ package tigase.kernel.modular.c1;
 
 import tigase.kernel.beans.Bean;
 
-@Bean(name = "Helper")
+@Bean(name = "Helper", active = true)
 public class Helper {
 	public String doSomething(String request) {
 		return "h:" + request;
