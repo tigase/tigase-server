@@ -194,6 +194,8 @@ include::text/admin/Admin_Guide_54_-_Components_-_A_-_StanzaSender.asciidoc[]
 
 include::text/components/http-api/documentation/HTTP_API_Component.asciidoc[]
 
+include::text/components/http-api/documentation/HTTP_API_Component_modules.asciidoc[]
+
 include::text/components/http-api/documentation/HTTP_Server.asciidoc[]
 
 include::text/components/http-api/documentation/HTTP_File_Upload_Component.asciidoc[]
