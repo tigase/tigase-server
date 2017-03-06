@@ -219,7 +219,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final String MSG_DELETE_ID_QUERY =
 															"delete from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = ?";
 	private static final String MSG_SELECT_EXPIRED_QUERY =
-															"select * from " + MSG_TABLE + " where expired is not null order by expired";
+															"select * from " + MSG_TABLE + " where expired is not null order by expired limit ?";
 	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null and expired <= ? order by expired";
 
@@ -1160,6 +1160,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 			synchronized (select_expired_st) {
 				try {
+					select_expired_st.setInt(1, min_elements);
 					rs = select_expired_st.executeQuery();
 
 					DomBuilderHandler domHandler = new DomBuilderHandler();
