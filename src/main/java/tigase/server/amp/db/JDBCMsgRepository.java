@@ -197,6 +197,8 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 															"delete from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = ?";
 	private static final String MSG_SELECT_EXPIRED_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null order by expired limit ?";
+	private static final String DERBY_MSG_SELECT_EXPIRED_QUERY =
+															"select * from " + MSG_TABLE + " where expired is not null order by expired FETCH FIRST ? ROWS ONLY";
 	private static final String MSSQL_MSG_SELECT_EXPIRED_QUERY =
 			"SELECT * FROM ( SELECT " + MSG_TABLE + ".*, ROW_NUMBER() OVER (ORDER BY UID DESC) AS RN FROM " +
 					MSG_TABLE + ") AS X WHERE RN <= ?";
@@ -250,6 +252,9 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 				case sqlserver:
 				case jtds:
 					msg_select_expired = MSSQL_MSG_SELECT_EXPIRED_QUERY;
+					break;
+				case derby:
+					msg_select_expired = DERBY_MSG_SELECT_EXPIRED_QUERY;
 					break;
 				default:
 					msg_select_expired = MSG_SELECT_EXPIRED_QUERY;
