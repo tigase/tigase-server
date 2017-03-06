@@ -1,0 +1,339 @@
+[[HTTPUseageExamples]]
+= HTTP API Usage Examples
+:author: Andrzej Wójcik
+:date: 2017-03-03 10:22
+:version: v12.0 November 2016
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+== Usage examples
+
+In the newest version of Tigase HTTP API (v1.2.0 and newer) you may find more a detailed description and examples of adhoc commands at _/rest/_ url of your local Tigase XMPP Server and Tigase HTTP API component installation.
+
+Below are examples of use for some of scripts available for Tigase HTTP API component.
+
+=== Retrieving user avatar
+
+Request using GET method for url /rest/avatar/admin@test-domain.com will return avatar image for user admin@test-domain.com if avatar is set in user vcard or will return http error 404. Example of full url for avatar of user admin@domain.com
+
+[source,xml]
+-----
+http://localhost:8080/rest/avatar/admin@domain.com
+-----
+
+Entering this url in browser will execute GET request.
+
+=== Retrieving list of available adhoc commands
+
+==== Using XML format
+
+To retrieve a list of available commands, make a request using GET method for `/rest/adhoc/sess-man@domain.com` where `sess-man@domain.com` is jid of component you wish to see commands for.
+For example, entering following url: http://localhost:8080/rest/adhoc/sess-man@domain.com in browser will retrieve list of all ad-hoc commands available at sess-man@domain.com. This action is protected by authentication done using @HTTP Basic Authentication@. Valid credentials are credentials of users available in user database of this Tigase XMPP Server instalation (username is bare jid with domain part).
+
+Below is example result of that request:
+[source,xml]
+-----
+<items>
+  <item>
+    <jid>sess-man@domain.com</jid>
+    <node>http://jabber.org/protocol/admin#get-active-users</node>
+    <name>Get list of active users</name>
+  </item>
+  <item>
+    <jid>sess-man@domain.com</jid>
+    <node>del-script</node>
+    <name>Remove command script</name>
+  </item>
+  <item>
+    <jid>sess-man@domain.com</jid>
+    <node>add-script</node>
+    <name>New command script</name>
+  </item>
+</items>
+-----
+
+==== Using JSON format
+
+To retrieve a list of available commands in JSON, we need to pass `Content-Type: application/json` to HTTP header of request or add `type` parameter set to `application/json`.
+Example result below:
+
+[source,json]
+-----
+{
+    "items": [
+        {
+            "jid": "sess-man@domain.com",
+            "node": "http://jabber.org/protocol/admin#get-active-users",
+            "name": "Get list of active users"
+        },
+        {
+            "jid": "sess-man@domain.com",
+            "node": "del-script",
+            "name": "Remove command script"
+        },
+        {
+            "jid": "sess-man@domain.com",
+            "node": "add-script",
+            "name": "New command script"
+        }
+    ]
+}
+-----
+
+== Executing example ad-hoc commands
+
+=== Retrieving list of active users
+
+==== Uusing XML
+
+To execute the command to get a list of active users, make a request using POST method for `/rest/adhoc/sess-man@domain.com` sending the following content (request requires authentication using Basic HTTP Authentication):
+
+[source,xml]
+-----
+<command>
+  <node>http://jabber.org/protocol/admin#get-active-users</node>
+  <fields>
+    <item>
+      <var>domainjid</var>
+      <value>domain.com</value>
+    </item>
+    <item>
+      <var>max_items</var>
+      <value>25</value>
+    </item>
+  </fields>
+</command>
+-----
+
+In this request we passed all the parameters needed to execute adhoc command. We passed the node of the adhoc command and values for fields required by that command. We passed values of "domain.com" for "domainjid" field and "25" for "max_items" field. We also need to pass `Content-Type: text/xml` to HTTP header of request or add `type` parameter set to `text/xml`.
+
+NOTE: In case of multi value fields use following format:
+
+[source,xml]
+-----
+<value>
+    <item>first-value</item>
+    <item>second-value</item>
+</value>
+-----
+
+Below is example result for request presented above:
+
+[source,xml]
+-----
+<command>
+  <jid>sess-man@domain.com</jid>
+  <node>http://jabber.org/protocol/admin#get-active-users</node>
+  <fields>
+    <item>
+      <var>Users: 2</var>
+      <label>text-multi</label>
+      <value>admin@domain.com</value>
+      <value>user1@domain.com</value>
+    </item>
+  </fields>
+</command>
+-----
+
+==== Using JSON
+
+To execute the command to get active users in JSON format, make a request using POST method for /rest/adhoc/sess-man@domain.com sending the following content (request requires authentication using Basic HTTP Authentication):
+
+[source,xml]
+-----
+{
+  "command" : {
+    "node" : "http://jabber.org/protocol/admin#get-active-users",
+    "fields" : [
+      {
+        "var" : "domainjid",
+        "value" : "domain.com"
+      },
+      {
+        "var" : "max_items",
+        "value" : "25"
+      }
+    ]
+  }
+}
+-----
+
+In this request we passed all parameters needed to execute adhoc command. We passed the node of adhoc command and values for fields required by adhoc command.  In this case we passed value of "domain.com" for "domainjid" field and "25" for "max_items" field.
+
+Below is an example result for request presented above:
+
+[source,xml]
+-----
+{
+    "command": {
+        "jid": "sess-man@domain.com",
+        "node": "http://jabber.org/protocol/admin#get-active-users",
+        "fields": [
+            {
+                "var": "Users: 1",
+                "label": "text-multi",
+                "value": [
+                  "admin@domain.com",
+                  "user1@domain.com"
+                ]
+            }
+        ]
+    }
+}
+-----
+
+=== Ending a user session
+
+To execute the end user session command, make a request using POST method for `/rest/adhoc/sess-man@domain.com`. The Context of what is sent, may differ depending on circumstance.  For example, it may require authentication using _Basic HTTP Authentication_ with admin credentials.
+_sess-man@domain.com_ in URL is the JID of session manager component which usually is in form of _sess-man@domain_ where `domain` is hosted domain name.
+
+==== Using XML
+
+To execute the command using XML content you need to set HTTP header `Content-Type` to `application/xml`
+
+[source,xml]
+-----
+<command>
+  <node>http://jabber.org/protocol/admin#end-user-session</node>
+  <fields>
+    <item>
+      <var>accountjids</var>
+      <value>
+        <item>test@domain.com</item>
+      </value>
+    </item>
+  </fields>
+</command>
+-----
+
+Where `test@domain.com` is JID of user which should be disconnected.
+
+As a result server will return following XML:
+
+[source,xml]
+-----
+<command>
+  <jid>sess-man@domain.com</jid>
+  <node>http://jabber.org/protocol/admin#end-user-session</node>
+  <fields>
+    <item>
+      <var>Notes</var>
+      <type>text-multi</type>
+      <value>Operation successful for user test@domain.com/resource</value>
+     </item>
+  </fields>
+</command>
+-----
+
+To confirm that user `test@domain.com` with resource `resouce` was connected and has been disconnected.
+
+If the user was not connected server will return following response:
+
+[source,xml]
+-----
+<command>
+  <jid>sess-man@domain.com</jid>
+  <node>http://jabber.org/protocol/admin#end-user-session</node>
+  <fields />
+</command>
+-----
+
+==== Using JSON
+
+To execute command using JSON you will need to set HTTP header `Content-Type` to `application/json`
+
+[source,xml]
+-----
+{
+  "command" : {
+  	"node": "http://jabber.org/protocol/admin#end-user-session",
+  	"fields": [
+		{
+	    	"var" : "accountjids",
+			"value" : [
+				"test@domain.com"
+			]
+		}
+  	]
+  }
+}
+-----
+
+Where `test@domain.com` is JID of user which should be disconnected
+
+As a result, the server will return following JSON:
+[source,json]
+-----
+{
+  "command" : {
+    "jid" : "sess-man@domain.com",
+    "node" : "http://jabber.org/protocol/admin#end-user-session",
+    "fields" : [
+      {
+        "var" : "Notes",
+        "type" : "text-multi",
+        "value" : [
+          "Operation successful for user test@domain.com/resource"
+        ]
+      }
+   ]
+  }
+}
+-----
+
+To confirm that user `test@domain.com` with resource `resouce` was connect and it was disconnected.
+
+If user was not connected server will return the following response:
+[source,json]
+-----
+{
+  "command" : {
+    "jid" : "sess-man@domain.com",
+    "node" : "http://jabber.org/protocol/admin#end-user-session",
+    "fields" : []
+  }
+}
+-----
+
+== Sending any XMPP Stanza
+
+XMPP messages or any other XMPP stanza can be sent using this API by sending an HTTP POST request to (by default) `http://localhost:8080/rest/stream/?api-key=API_KEY` with serialized XMPP stanza as a content, where `API_KEY` is the API key for HTTP API. This is set in _etc/init.properties_ as _rest/api-keys[s]_ of HTTP API, ie. test as API KEY in `http/rest/api-keys[s]=test_key` for _http_ component.
+Also, each request needs to be authorized by sending a valid administrator JID and password as user and password of BASIC HTTP authorization method.
+Content of HTTP request should be encoded in `UTF-8` and `Content-Type` should be set to `application/xml`.
+
+=== Handling of request
+
+If the sent XMPP stanza does not contain a `from` attribute, then the HTTP API component will provide it's own JID.
+If `iq` stanza is being sent, and no `from` attribute is set then the received response will be returned as the content of the HTTP response.
+Successful requests will return HTTP response code 200.
+
+=== Examples
+
+.Sending an XMPP message with from set to HTTP API component to full JID
+Data needs to be sent as a HTTP POST request content to `/rest/stream/?api-key=API_KEY` URL of the HTTP API component to deliver the message _Example message 1_ to _test@example.com/resource-1_.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
+.Sending an XMPP message with `from` set to HTTP API component to a bare JID
+Data needs to be sent as a HTTP POST request content to `/rest/stream/?api-key=API_KEY` URL of the HTTP API component to deliver message _Example message 2_ to _test@example.com_.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com">
+    <body>Example message 2</body>
+</message>
+-----
+
+.Sending an XMPP message with `from` set to specified JID and to a recipients' full JID
+Data needs to be sent as a HTTP POST request content to `/rest/stream/?api-key=API_KEY` URL of the HTTP API component to deliver message _Example message 3_ to _test@example.com/resource-1_ with sender of message set to _sender@example.com_.
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from="sender@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----

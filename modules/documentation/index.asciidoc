@@ -202,9 +202,13 @@ include::text/components/http-api/documentation/HTTP_File_Upload_Component.ascii
 
 include::text/admin/Admin_Guide_56_-_Components_-_B_-_Tigase_HTTP_API_-_1_-_REST_API_Guide.asciidoc[]
 
+include::text/HTTP_API_Usage_Examples.asciidoc[]
+
 include::text/admin/Admin_Guide_57_-_Components_-_B_-_Tigase_HTTP_API_-_2_-_Admin_UI.asciidoc[]
 
 include::text/admin/Admin_Guide_58_-_Components_-_B_-_Tigase_HTTP_API_-_3_-_Web_Client.asciidoc[]
+
+include::text/Pre-bind_Bosh.asciidoc[]
 
 
 

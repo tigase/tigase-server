@@ -1,0 +1,120 @@
+= BOSH HTTP Pre-Binding
+:author: unknown
+:version: v1.0
+:date: 2017-03-03
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+== Bosh (HTTP) Pre-Binding
+
+Binding a user session is done by sendidng a request using HTTP POST method for `/rest/adhoc/bosh@domain.com` with the following content:
+
+NOTE: Request requires authentication using Basic HTTP Authentication
+
+[source,xml]
+-----
+<command>
+  <node>pre-bind-bosh-session</node>
+  <fields>
+    <item>
+      <var>from</var>
+      <value>user_jid@domain/resource</value>
+    </item>
+    <item>
+      <var>hold</var>
+      <value>1</value>
+    </item>
+    <item>
+      <var>wait</var>
+      <value>60</value>
+    </item>
+  </fields>
+</command>
+-----
+
+== Configuration
+The Following parameters can be adjusted:
+
+- *from* This will be the JID of the user. You may change the `<value/>` node of the item identified by the `from` variable; this can be either a FullJID or a BareJID. In the latter case, a random resource will be generated for the session being bound.
+
+- *hold* value. By changing value of `<value/>` node of the item identified by `hold` variable. This value matches the `hold` attribute specified in link:http://xmpp.org/extensions/xep-0124.html#session-request[XEP-0124: Session Creation Response]
+
+- *wait* value. By changing value of `<value/>` node of the item identified by `wait` variable. This value matchesthe  `wait` attribute specified in link:http://xmpp.org/extensions/xep-0124.html#session-request[XEP-0124: Session Creation Response]
+
+As a response one will receive and XML with the result containing additionally available session and RID that can be used in the client to attach to the session, e.g.:
+
+[source,xml]
+-----
+<command>
+  <jid>bosh@vhost</jid>
+  <node>pre-bind-bosh-session</node>
+  <fields>
+    <item>
+      <var>from</var>
+      <label>jid-single</label>
+      <value>user_jid@domain/resource</value>
+    </item>
+    <item>
+      <var>hostname</var>
+      <label>jid-single</label>
+      <value>node_hostname</value>
+    </item>
+    <item>
+      <var>rid</var>
+      <label>text-single</label>
+      <value>9929332</value>
+    </item>
+    <item>
+      <var>sid</var>
+      <label>text-single</label>
+      <value>3f1b6e70-8528-44bb-8f23-77e7c4a8cf1a</value>
+    </item>
+    <item>
+      <var>hold</var>
+      <label>text-single</label>
+      <value>1</value>
+    </item>
+    <item>
+      <var>wait</var>
+      <label>text-single</label>
+      <value>60</value>
+    </item>
+  </fields>
+</command>
+-----
+
+For example, having the above XML request stored in `prebind` file, one can execute the request using `$curl`:
+[source,bash]
+-----
+>curl -X POST -d @prebind http://admin%40domain:pass@domain:8080/rest/adhoc/bosh@domain --header "Content-Type:text/xml"
+-----
+
+==== Using JSON
+
+To execute the command to pre-bind BOSH session in JSON format, make a request using POST method to `/rest/adhoc/bosh@domain.com` sending the following content:
+
+[source,xml]
+-----
+{
+  "command" : {
+    "node" : "pre-bind-bosh-session"",
+    "fields" : [
+      {
+        "var" : "from",
+        "value" : "user_jid@domain/resource"
+      },
+      {
+        "var" : "hold",
+        "value" : "1"
+      },
+      {
+        "var" : "wait",
+        "value" : "60"
+      }
+    ]
+  }
+}
+-----
+This example replicates the same request presented above in XML format.
