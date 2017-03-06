@@ -23,48 +23,24 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
+import tigase.db.*;
 import tigase.db.DataRepository.dbTypes;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-import tigase.db.UserNotFoundException;
-
 import tigase.server.Packet;
-
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-
 import tigase.util.Algorithms;
 import tigase.util.SimpleCache;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
-
-import java.security.NoSuchAlgorithmException;
-import java.sql.DataTruncation;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.NonAuthUserRepositoryImpl;
-import tigase.vhosts.VHostItem;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.security.NoSuchAlgorithmException;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -220,6 +196,10 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 															"delete from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = ?";
 	private static final String MSG_SELECT_EXPIRED_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null order by expired limit ?";
+	private static final String MSSQL_MSG_SELECT_EXPIRED_QUERY =
+			"SELECT * FROM ( SELECT " + MSG_TABLE + ".*, ROW_NUMBER() OVER (ORDER BY UID DESC) AS RN FROM " +
+					MSG_TABLE + ") AS X WHERE RN <= ?";
+
 	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null and expired <= ? order by expired";
 
@@ -324,6 +304,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private String msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
 	private String msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
 	private String add_user_jid_id = ADD_USER_JID_ID_QUERY;
+	private String msg_select_expired = MSG_SELECT_EXPIRED_QUERY;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
@@ -359,12 +340,15 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
 			switch (data_repo.getDatabaseType()) {
 				case sqlserver:
+				case jtds:
 					msg_ensure_broadcast_recipient = SQLSERVER_MSG_ENSURE_BROADCAT_RECIPIETN;
 					msg_insert_message_to_broadcast = SQLSERVER_MSG_INSERT_MESSAGE_TO_BROADCAST;
+					msg_select_expired = MSSQL_MSG_SELECT_EXPIRED_QUERY;
 					break;
 				default:
 					msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
 					msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
+					msg_select_expired = MSG_SELECT_EXPIRED_QUERY;
 					break;
 			}
 			switch (data_repo.getDatabaseType()) {
@@ -388,7 +372,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			data_repo.initPreparedStatement(MSG_SELECT_LIST_TO_JID_QUERY, MSG_SELECT_LIST_TO_JID_QUERY);
 			data_repo.initPreparedStatement(MSG_DELETE_TO_JID_QUERY, MSG_DELETE_TO_JID_QUERY);
 			data_repo.initPreparedStatement(MSG_DELETE_ID_QUERY, MSG_DELETE_ID_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
+			data_repo.initPreparedStatement(msg_select_expired, msg_select_expired);
 			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
 					MSG_SELECT_EXPIRED_BEFORE_QUERY);
 			data_repo.initPreparedStatement(msg_count_for_limit_query,
@@ -1156,7 +1140,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		try {
 			ResultSet rs = null;
 			PreparedStatement select_expired_st =
-					data_repo.getPreparedStatement(null, MSG_SELECT_EXPIRED_QUERY);
+					data_repo.getPreparedStatement(null, msg_select_expired);
 
 			synchronized (select_expired_st) {
 				try {
