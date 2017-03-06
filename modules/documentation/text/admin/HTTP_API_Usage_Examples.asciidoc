@@ -12,25 +12,25 @@
 
 In the newest version of Tigase HTTP API (v1.2.0 and newer) you may find more a detailed description and examples of adhoc commands at _/rest/_ url of your local Tigase XMPP Server and Tigase HTTP API component installation.
 
-Below are examples of use for some of scripts available for Tigase HTTP API component.
+Below are some examples of some of the scripts available for Tigase HTTP API component.
 
 === Retrieving user avatar
 
-Request using GET method for url /rest/avatar/admin@test-domain.com will return avatar image for user admin@test-domain.com if avatar is set in user vcard or will return http error 404. Example of full url for avatar of user admin@domain.com
+Request using GET method for url /rest/avatar/admin@test-domain.com will return an avatar image for user admin@test-domain.com if an avatar is set in user vcard or will otherwise return a http error 404. Example of full url for avatar of user admin@domain.com
 
 [source,xml]
 -----
 http://localhost:8080/rest/avatar/admin@domain.com
 -----
 
-Entering this url in browser will execute GET request.
+Entering this url in will execute GET request.  It may be possible to use the url in your browser.
 
 === Retrieving list of available adhoc commands
 
 ==== Using XML format
 
-To retrieve a list of available commands, make a request using GET method for `/rest/adhoc/sess-man@domain.com` where `sess-man@domain.com` is jid of component you wish to see commands for.
-For example, entering following url: http://localhost:8080/rest/adhoc/sess-man@domain.com in browser will retrieve list of all ad-hoc commands available at sess-man@domain.com. This action is protected by authentication done using @HTTP Basic Authentication@. Valid credentials are credentials of users available in user database of this Tigase XMPP Server instalation (username is bare jid with domain part).
+To retrieve a list of available adhoc commands, make a request using GET method for `/rest/adhoc/sess-man@domain.com` where `sess-man@domain.com` is jid of component you wish to see commands for.
+For example, entering the following url: http://localhost:8080/rest/adhoc/sess-man@domain.com in your browser will retrieve a list of all ad-hoc commands available at sess-man@domain.com. This action is protected by authentication done using `HTTP Basic Authentication`. Valid credentials will be those of users available in user database of this Tigase XMPP Server instalation (username in barejid form).
 
 Below is example result of that request:
 [source,xml]
@@ -56,7 +56,7 @@ Below is example result of that request:
 
 ==== Using JSON format
 
-To retrieve a list of available commands in JSON, we need to pass `Content-Type: application/json` to HTTP header of request or add `type` parameter set to `application/json`.
+To retrieve a list of available adhoc commands in JSON, we need to pass `Content-Type: application/json` to HTTP header of request or add `type` parameter set to `application/json`.
 Example result below:
 
 [source,json]
@@ -139,7 +139,7 @@ Below is example result for request presented above:
 
 ==== Using JSON
 
-To execute the command to get active users in JSON format, make a request using POST method for /rest/adhoc/sess-man@domain.com sending the following content (request requires authentication using Basic HTTP Authentication):
+To execute the command to get active users in JSON format, make a request using POST method for /rest/adhoc/sess-man@domain.com sending the following content (this request also requires authentication using Basic HTTP Authentication):
 
 [source,xml]
 -----
@@ -227,7 +227,7 @@ As a result server will return following XML:
 </command>
 -----
 
-To confirm that user `test@domain.com` with resource `resouce` was connected and has been disconnected.
+This will confirm that user `test@domain.com` with resource `resouce` was connected and has been disconnected.
 
 If the user was not connected server will return following response:
 
@@ -242,7 +242,7 @@ If the user was not connected server will return following response:
 
 ==== Using JSON
 
-To execute command using JSON you will need to set HTTP header `Content-Type` to `application/json`
+To execute the command using JSON you will need to set HTTP header `Content-Type` to `application/json`
 
 [source,xml]
 -----
@@ -261,7 +261,7 @@ To execute command using JSON you will need to set HTTP header `Content-Type` to
 }
 -----
 
-Where `test@domain.com` is JID of user which should be disconnected
+Where `test@domain.com` is JID of user who will be disconnected
 
 As a result, the server will return following JSON:
 [source,json]
