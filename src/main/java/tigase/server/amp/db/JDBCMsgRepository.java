@@ -25,6 +25,7 @@ package tigase.server.amp.db;
 
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.db.DataRepository.dbTypes;
 import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.SimpleCache;
@@ -196,6 +197,10 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 															"delete from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = ?";
 	private static final String MSG_SELECT_EXPIRED_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null order by expired limit ?";
+	private static final String MSSQL_MSG_SELECT_EXPIRED_QUERY =
+			"SELECT * FROM ( SELECT " + MSG_TABLE + ".*, ROW_NUMBER() OVER (ORDER BY UID DESC) AS RN FROM " +
+					MSG_TABLE + ") AS X WHERE RN <= ?";
+
 	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null and expired <= ? order by expired";
 
@@ -232,6 +237,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 	@ConfigField(desc = "Query to count messages for limit")
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
 	private String add_user_jid_id = ADD_USER_JID_ID_QUERY;
+	private String msg_select_expired = MSG_SELECT_EXPIRED_QUERY;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
@@ -240,6 +246,15 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 	@Override
 	public void setDataSource(DataRepository data_repo) {
 		try {
+			switch (data_repo.getDatabaseType()) {
+				case sqlserver:
+				case jtds:
+					msg_select_expired = MSSQL_MSG_SELECT_EXPIRED_QUERY;
+					break;
+				default:
+					msg_select_expired = MSG_SELECT_EXPIRED_QUERY;
+					break;
+			}
 			switch (data_repo.getDatabaseType()) {
 				case mysql:
 					add_user_jid_id = ADD_USER_JID_ID_QUERY_MYSQL;
@@ -261,7 +276,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 			data_repo.initPreparedStatement(MSG_SELECT_LIST_TO_JID_QUERY, MSG_SELECT_LIST_TO_JID_QUERY);
 			data_repo.initPreparedStatement(MSG_DELETE_TO_JID_QUERY, MSG_DELETE_TO_JID_QUERY);
 			data_repo.initPreparedStatement(MSG_DELETE_ID_QUERY, MSG_DELETE_ID_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
+			data_repo.initPreparedStatement(msg_select_expired, msg_select_expired);
 			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
 					MSG_SELECT_EXPIRED_BEFORE_QUERY);
 			data_repo.initPreparedStatement(msg_count_for_limit_query,
@@ -900,7 +915,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 		try {
 			ResultSet rs = null;
 			PreparedStatement select_expired_st =
-					data_repo.getPreparedStatement(null, MSG_SELECT_EXPIRED_QUERY);
+					data_repo.getPreparedStatement(null, msg_select_expired);
 
 			synchronized (select_expired_st) {
 				try {

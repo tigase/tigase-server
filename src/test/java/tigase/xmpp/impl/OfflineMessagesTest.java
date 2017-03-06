@@ -26,6 +26,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
+import tigase.server.amp.JDBCMsgRepository;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -34,6 +35,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static tigase.db.RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY;
 
 /**
  *
@@ -250,8 +252,19 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 	private static class MsgRepositoryIfcImpl implements OfflineMessages.OfflineMsgRepositoryIfc {
 
 		private final Queue<Packet> stored = new ArrayDeque();
-		
+		JDBCMsgRepository jdbcMsgRepository = null;
+
 		public MsgRepositoryIfcImpl() {
+//			try {
+//				Map<String,String> params = new HashMap<>();
+//				params.put(DATA_REPO_POOL_SIZE_PROP_KEY,"1");
+//
+//				jdbcMsgRepository = new JDBCMsgRepository();
+//				String jdbcuri = "jdbc:";
+//				jdbcMsgRepository.initRepository(jdbcuri, params);
+//			} catch (DBInitException e) {
+//				e.printStackTrace();
+//			}
 		}
 
 		@Override
@@ -261,16 +274,24 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 
 		@Override
 		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException {
-			Queue<Element> res = new LinkedList<Element>();
-			for ( Packet pac : stored ) {
-				res.add( pac.getElement());
+			if (jdbcMsgRepository != null ) {
+				return jdbcMsgRepository.loadMessagesToJID(session,delete);
+			} else {
+				Queue<Element> res = new LinkedList<Element>();
+				for (Packet pac : stored) {
+					res.add(pac.getElement());
+				}
+				return res;
 			}
-			return res;
 		}
 		
 		@Override
 		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo) throws UserNotFoundException {
-			return stored.offer(Packet.packetInstance(msg, from, to));
+			if (jdbcMsgRepository != null ) {
+				return jdbcMsgRepository.storeMessage(from, to, expired, msg, userRepo);
+			} else {
+				return stored.offer(Packet.packetInstance(msg, from, to));
+			}
 		}
 		
 		@Override
