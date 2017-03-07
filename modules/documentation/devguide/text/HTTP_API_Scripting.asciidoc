@@ -1,4 +1,4 @@
-[[stanzaLimitations]]
+[[HTTPApiScripting]]
 = HTTP API Scripting
 :author: Andrzej Wójcik
 :version: v2.0, March 2017
