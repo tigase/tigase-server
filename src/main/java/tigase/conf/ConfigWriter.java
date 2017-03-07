@@ -322,7 +322,7 @@ public class ConfigWriter {
 				writer.write(" = ");
 			}
 			if (indent == 0 && e.getKey().startsWith("--") && (e.getValue() instanceof String)) {
-				writer.write((String) e.getValue());
+				writeString(writer, (String) e.getValue());
 				writer.write("\n");
 			} else {
 				writeObject(writer, e.getValue());
@@ -368,13 +368,24 @@ public class ConfigWriter {
 		if (str == null)
 			return;
 
-		if (str.contains("=") || str.contains(":") || str.contains(",") || str.contains("[") || str.contains("]") || str.contains("#")) {
+		if (hasRestrictedChars(str)) {
 			writer.append('\'');
 			writer.write(str);
 			writer.append('\'');
 		} else {
 			writer.write(str);
 		}
+	}
+
+	private static final char[] RESTRICTED_CHARS = "=:,[]#+-*/".toCharArray();
+
+	private static boolean hasRestrictedChars(String str) {
+		for (char ch : RESTRICTED_CHARS) {
+			if (str.indexOf(ch) > -1) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

@@ -585,6 +585,9 @@ public class ConfigReader {
 				default:
 					throw new UnsupportedOperationException();
 			}
+			if (value instanceof String && o != Operation.add) {
+				throw new UnsupportedOperationException("Cannot " + o.name() + " a String");
+			}
 			operations.add(o);
 			values.add(value);
 		}

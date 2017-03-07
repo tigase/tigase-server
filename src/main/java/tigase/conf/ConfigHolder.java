@@ -236,6 +236,11 @@ public class ConfigHolder {
 						ds.put("auth-type", (String) v);
 					}
 				}
+				if (k.equals("--sm-cluster-strategy-class")) {
+					toAdd.put("sess-man/strategy/class", v.toString());
+					toAdd.put("sess-man/strategy/active", "true");
+				    toRemove.add(k);
+				}
 				if (k.contains("pubsub-repo-url")) {
 					props.put("dataSource/pubsub/uri", v);
 					dataSourceNames.add("pubsub");
