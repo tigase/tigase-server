@@ -13,6 +13,8 @@ Tigase Team <team@tigase.com>
 //intro
 include::text/Development_Guide_01_-_Basic_Information.asciidoc[]
 
+include::text/CodeStyleGuide.asciidoc[]
+
 //writing for Tigase
 include::text/Development_Guide_02_-_Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
 
@@ -60,6 +62,8 @@ include::text/Development_Guide_16_-_Component_Implementation_-_Lesson_8_-_Start
 include::text/Development_Guide_17_-_Configuration_API.asciidoc[]
 
 include::text/components/http-api/documentation/REST_API.asciidoc[]
+
+include::text/HTTP_API_Scripting.asciidoc[]
 
 include::text/Development_Guide_18_-_Packet_Filtering_in_Component.asciidoc[]
 
@@ -137,5 +141,3 @@ include::text/Development_Guide_39_-_Why_the_Most_Recent_JDK.asciidoc[]
 include::text/Development_Guide_41_-_API_Description_for_Virtual_Domains_Management_in_the_Tigase_Server.asciidoc[]
 
 include::text/Development_Guide_44_-_Stanza_Limitations.asciidoc[]
-
-include::text/CodeStyleGuide.asciidoc[]

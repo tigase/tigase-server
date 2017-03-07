@@ -1,0 +1,41 @@
+[[stanzaLimitations]]
+= HTTP API Scripting
+:author: Andrzej Wójcik
+:version: v2.0, March 2017
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+== Scripting introduction
+
+Scripts in the HTTP API component are used for processing all of requests.
+
+To add a new action to the HTTP API component, you will need to create a script written in Groovy for which there will be implementation of class extending `tigase.http.rest.Handler` class.
+The URI of script will be created from the file's location of in the scripts folder. For example, if script `TestHandler` with regular expression will be set to `/test` and will be placed in `scripts/rest/tested`, the handler will be called for using the following URI: `/rest/tested/test`.
+
+=== Properties
+
+If you are extending classes you will need to set following properties:
+
+* *regex* - Regular expression which is used to match the request URI and parse parameters embedded in the URI. For example: `/\/([^@\/]+)@([^@\/]+)/`
+
+* *requiredRole* - Required role of user in order to be able to access this URI. Available values are: null, "user", and "admin". If `requiredRole` is not null, authentication will be required.
+
+* *isAsync* - If set to true, it will be possible to wait for results, for example waiting for an response IQ stanza.
+
+=== Properties containing closures
+
+Extended class should also set closures for one or more of following properties: execGet, execPut, execPost, and execDelete depending on which HTTP action or actions you need to support for the URI. *Each closure has a dynamic arguments list*. Below is list of arguments passed to closure which describes how and when the list of arguments changes:
+
+. *service* - Implementation of Service interface. This is used to access the server database or send/receive XMPP stanzas.
+
+. *callback* - The `callback` closure needs to be called to return data. `callback` accepts only one argument of type String,byte[],Map. If data is type of Map it will be encoded to JSON or XML depending of 'Content-Type' header.
+
+. *user* - Will be passed only if `requiredRole` is not null. *In all other cases this argument will not be in arguments list!*
+
+. *content* - Parsed content of request. This closure will not be in arguments list if Content-Length of request is empty. If Content-Type is XML or JSON returned as Map, otherwise it will be an instance of `HttpServletRequest`.
+
+. *x* - Additional arguments passed to callback are groups from regular expression matching the URI. *Groups are not passed as a list, but are added to list of arguments as next arguments.*
+
+If property for corresponding HTTP action is not set, then the component will return a 404 HTTP error.
