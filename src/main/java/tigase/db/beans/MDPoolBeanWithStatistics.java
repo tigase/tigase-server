@@ -50,7 +50,7 @@ public abstract class MDPoolBeanWithStatistics<S extends Repository, T extends M
 	private S defProxy;
 
 	@ConfigField(desc = "Enable statistics", alias = "statistics")
-	private boolean statisticsEnabled = false;
+	private boolean statisticsEnabled = true;
 
 	private final Class<S> repoClazz;
 

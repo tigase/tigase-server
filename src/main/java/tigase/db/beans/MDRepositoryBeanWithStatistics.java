@@ -45,7 +45,7 @@ public abstract class MDRepositoryBeanWithStatistics<T extends DataSourceAware>
 	private ConcurrentHashMap<String, T> reposProxy = new ConcurrentHashMap<>();
 
 	@ConfigField(desc = "Enable statistics", alias = "statistics")
-	private boolean statisticsEnabled = false;
+	private boolean statisticsEnabled = true;
 
 	private final Class<?>[] repoInterfaces;
 
