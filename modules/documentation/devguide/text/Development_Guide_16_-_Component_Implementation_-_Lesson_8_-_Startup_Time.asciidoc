@@ -1,26 +1,52 @@
 [[cil8]]
-= Component Implementation - Lesson 8 - Startup Time
+= Component Implementation - Lesson 8 - Lifecycle of a component
+:author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2011-05-27 22:52
+:date: 2017-03-08 18:11
 :revision: v2.1
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
+== Initialization of a component
+
 A startup hook in the Tigase is different from the shutdown hook.
 
 This is because you cannot really tell when exactly the startup time is. Is it when the application started, is it when configuration is loaded, is it when all objects are initialized. And this might be even different for each component. Therefore, in fact, there is no startup hook in Tigase in the same sense as the shutdown hook.
 
-There are a few methods which are called at startup time in the following order:
+There are a few methods which are called at startup time of a component in the following order:
 
-. *Constructor* - there is of course constructor which has no parameters.  However it does not guarantee that this instance of the component will be used at all. The object could be created just to call +getDefaults(...)+ and may be destroyed afterwards.
-. *void setName(String name)* - the second call for the component is to set it's unique name within a Tigase instance. It still does not mean too much from the component run-time point of view but some components initialize service discovery data at this point.
-. *void start()* - this is a second void which means the component can start it's internal jobs or worker threads or whatever it needs for future activity. Component's queues and threads are initialized at this point.
-. *Map<String, Object> getDefaults(Map params)* - this is the next call made by configuration manager to collect all the default settings for the component. To help generate default settings, configuration manager passes general properties (starting with '--') in the Map as parameter to the component. As a result it expects specific settings applicable to the component only (not starting with '--').
-. *setProperties(Map<String, Object> props)* - after collecting component's defaults, the connection manager combines them with configuration options (not starting with '--', but starting with the component name) loaded from configuration repository (init.properties file, database, possibly other files). Then the final configuration is passed to the component with +setProperties(...)+ method call. Database connections are usually initialized at this point.
-. *void initializationCompleted()* - this method is called for all components after all components are loaded and configuration was set (via +setProperties(...)+ method call) for all components.
+. *Constructor* - there is of course constructor which has no parameters.  However it does not guarantee that this instance of the component will be used at all. The object could be created just to get default values of a config fields and may be destroyed afterwards.
+. *Getters/Setters* - at second step of initialization of a component, Kernel configures component by reading and setting values of fields annotated with `@ConfigField()` annotation. If there is a public getter or setter for the same name as an annotated field - it will be used.
+. *void beanConfigurationChanged(Collection<String> changedFields)* _(optional) - if component implements `ConfigurationChangedAware` interface, this method will be called to notify component about fields which values were changed. It is useful if same component internal depends on configuration stored in more than one field, as it allows you to reconfigure this internal once.
+. *void register(Kernel kernel)* _(optional)_ - if component implements `RegistrarBean` interface this method is called to allow registration of component private beans.
+. *Dependency Injection* - during this time Kernel injects beans to component fields annotated with `@Inject`. If public getters or setters for this fields exist - kernel will use them.
+. *void initialized()* _(optional)_ - called if component implements `Initializable` interface to notify it that configuration is set and dependencies are injected.
+. *void start()* - during this call component starts it's internal jobs or worker threads or whatever it needs for future activity. Component's queues and threads are initialized at this point. *_(after this method returns the component is ready)_*
+
+Therefore, the +start()+ hook is the best point if you want to be sure that component is fully loaded, initialized and functional.
+
+TIP: Component instance may be started and stopped only once, however new instances of the same component with the same name may be created during Tigase XMPP Server uptime, ie. as a result of a server reconfiguration.
+
+== Reconfiguration
+
+During lifecycle of a component instance it may happen that Tigase XMPP Server will be reconfigured. If change in configuration of this component will not be related to it's activity, then Kernel will set values of changes fields annotated with `@ConfigField()`. In this case public field setters may be used.
+
+TIP: If component implements `ConfigurationChangedAware` interface, then method *void beanConfigurationChanged(Collection<String> changedFields)* will be called to notify component about fields which values were changed. It is useful if same component internal depends on configuration stored in more than one field, as it allows you to reconfigure this internal once.
 
 
-Therefore, the +initializationCompleted()+ hook is the best point if you want to be sure that Tigase server is fully loaded, initialized and functional.
+== Update of injected dependencies
+
+During lifecycle of a component instance it may happen that due to reconfiguration of a server other bean needs to be injected as a dependency to a component. In this case Tigase Kernel will inject dependencies to fields annotated with `@Inject` which value needs to be updated.
+
+== Stopping a component
+
+Component instance may be stopped at any point of Tigase XMPP Server runtime, ie. due to reconfiguration, or due to server graceful shutdown.
+
+In both cases following methods of a component will be called:
+
+. *void stop()* - first method stops component internal processing queues.
+. *void beforeUnregister()* _(optional)_ - if component implements @UnregisterAware@ interface this method is called to notify instance of a component that it is being unloaded.
+. *void unregister(Kernel kernel)* _(optional)_ - if component implements `RegistrarBean` called to give component a way to unregister beans (if needed).
