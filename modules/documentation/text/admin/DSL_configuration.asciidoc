@@ -175,6 +175,10 @@ user {
 }
 ----
 
+WARNING: For properties which accepts lists it is not allowed to set value using variable/property with comma separated values like `value1,value2` wrapped in `[]`, ie.
+`property = [ env('some-variable') ]`. It needs to be set in following way `property = env('some-variable')`
+
+
 === Computed values
 With DSL configuration format we introduce support for computable values for properties. It is now possible to set value which is result of a computation, ie. concatenation of a strings or very simple mathematical expression.
 We currently support only following mathematical operations:
@@ -196,6 +200,9 @@ bean {
   # timeout = 300000L
 }
 ----
+
+WARNING: For properties which accepts lists it is not allowed to set value using computed values with comma separated values like `value1,value2` wrapped in `[]`, ie.
+`property = [ env('some-variable') + ',other-value' ]`. It needs to be set in following way `property = env('some-variable') + ',other-value'`.
 
 == Example configuration file in DSL
 ----
