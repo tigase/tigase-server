@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
 		<packaging.type>pom</packaging.type>
-		<dist_path>../..</dist_path>
+		<dist_path>../server/</dist_path>
 		<skip-distribution-deploy>true</skip-distribution-deploy>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
@@ -17,7 +17,6 @@
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
 		<version>7.2.0-SNAPSHOT</version>
-		<relativePath>../master</relativePath>
 	</parent>
 	
 	<profiles>
@@ -150,21 +149,21 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.8</version>
 				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.basedir}/../../jars</outputDirectory>
-							<stripVersion>true</stripVersion>
-							<excludeTransitive>true</excludeTransitive>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<overWriteReleases>true></overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-						</configuration>
-					</execution>
+					<!--<execution>-->
+						<!--<id>copy-dependencies</id>-->
+						<!--<phase>validate</phase>-->
+						<!--<goals>-->
+							<!--<goal>copy-dependencies</goal>-->
+						<!--</goals>-->
+						<!--<configuration>-->
+							<!--<outputDirectory>${project.basedir}/../../jars</outputDirectory>-->
+							<!--<stripVersion>true</stripVersion>-->
+							<!--<excludeTransitive>true</excludeTransitive>-->
+							<!--<overWriteIfNewer>true</overWriteIfNewer>-->
+							<!--<overWriteReleases>true></overWriteReleases>-->
+							<!--<overWriteSnapshots>true</overWriteSnapshots>-->
+						<!--</configuration>-->
+					<!--</execution>-->
 					<execution>
 						<id>copy-old-pubsub</id>
 						<phase>validate</phase>
