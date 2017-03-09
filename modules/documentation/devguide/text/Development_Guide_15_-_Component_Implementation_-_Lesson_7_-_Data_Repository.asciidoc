@@ -9,17 +9,122 @@ There are cases when you want to store some data permanently by your component. 
 
 In order to use it one needs to extend +tigase.db.comp.ConfigRepository+ abstract class.
 
-== RepositoryFactory
-In order to have more freedom while accessing repositories it's possible to use +tigase.db.RepositoryFactory+ and any of the methods that pertain to desired type of repository one wants to access (auth, user, data):
+== Accessing other repositories
+In order to have more freedom while accessing repositories it's possible to use:
 
-* +RepositoryFactory.getAuthRepository()+
-* +RepositoryFactory.getUserRepository()+
-* +RepositoryFactory.getDataRepository()+
+* *AuthRepository*
+* *UserRepository*
+* custom repository implementation which implements *DataSourceAware* interface
 
-Each method takes same set of arguments:
+To use *AuthRepository* or *UserRepository* you need only to declare fields properly and annotated them with *@Inject*. This fields must be part of a class managed by Tigase Kernel - class of a component or any class annotated with *@Bean* annotation.
+For that classes proper instances of repositories will be injected by dependency injection.
 
-* __class_name__ - qualified name of the class that implements aforementioned repositories type
-* _URI_ - repository URI
-* _params_ - map containing additional configuration for the connection.
+.Example usage of AuthRepository and UserRepository
+[source,java]
+----
+@Inject
+private AuthRepository authRepository;
+@Inject
+private UserRepository userRepository;
+----
 
-If there is already available repository for the `<class_name><URI>` identifier then it's returned, otherwise new instance is created.
+As mentioned it is also possible to use custom repository class. For our example let's assume it will be class implementing *TestRepositoryIfc* and our implementation will be using JDBC.
+
+.TestRepositoryIfc
+[source,java]
+----
+public interface TestRepositoryIfc<DS extends DataSource> extends DataSourceAware<DS> {
+  // Example method
+  void addItem(BareJID userJid, String item) throws RepositoryException;
+}
+----
+
+Next we need to prepare our actual implementation of repository - class responsible for execution of SQL statements. In this class we need to implement all of methods from our interface
+and method *void setDataSource(DataSource dataSource)* which comes from *DataSourceAware* interface. In this method we need to initialize data source, ie. create prepared statements.
+
+[source,java]
+----
+@Repository.Meta(supportedUris = "jdbc:.*")
+public static class JDBCTestRepository implements TestRepositoryIfc<DataRepository> {
+
+  private static final String SOME_STATEMENT = "select * from tig_users";
+
+  private DataRepository repository;
+
+  @Override
+  public void setDataSource(DataRepository repository) {
+    // here we need to initialize required prepared statements
+    try {
+      repository.initPreparedStatement(SOME_STATEMENT, SOME_STATEMENT);
+    } catch (SQLException ex) {
+      throw new RuntimeException("Could not initialize repository", ex);
+    }
+    this.repository = repository;
+  }
+
+  @Override
+  public void addItem(BareJID userJid, String item) throws RepositoryException {
+    try {
+      PreparedStatement stmt = repository.getPreparedStatement(userJid, SOME_STATEMENT);
+      synchronized (stmt) {
+        // do what needs to be done
+      }
+    } catch (SQLException ex) {
+      throw new RepositoryException(ex);
+    }
+  }
+}
+----
+
+With that in place we need to create class which will take care of adding support for multi-database setup. In our case it will be *TestRepositoryMDBean*, which will take care of discovery of repository class, initialization and reinjection of data source.
+
+[source,java]
+----
+@Bean(name = "repository", parent = TestComponent.class, active = true)
+public static class TestRepositoryMDBean extends MDRepositoryBeanWithStatistics<TestRepositoryIfc>
+    implements TestRepositoryIfc {
+
+  public TestRepositoryMDBean() {
+    super(TestRepositoryIfc.class);
+  }
+
+  @Override
+  public Class<?> getDefaultBeanClass() {
+    return TestRepositoryConfigBean.class;
+  }
+
+  @Override
+  public void setDataSource(DataSource dataSource) {
+    // nothing to do here
+  }
+
+  @Override
+  public void addItem(BareJID userJid, String item) throws RepositoryException {
+    getRepository(userJid.getDomain()).addItem(userJid, item);
+  }
+
+  @Override
+  protected Class<? extends TestRepositoryIfc> findClassForDataSource(DataSource dataSource)
+				throws DBInitException {
+    return DataSourceHelper.getDefaultClass(TestRepositoryIfc.class, dataSource.getResourceUri());
+  }
+
+  public static class TestRepositoryConfigBean extends MDRepositoryConfigBean<TestRepositoryIfc> {
+  }
+}
+----
+
+Most of this code will be the same in all implementations based on MDRepositoryBeanWithStatistics. In our case only custom method is *void addItem(...)* which uses *getRepository(String domain)* method to retrieve correct repository for a domain.
+
+While this is more difficult to implement than in previous version, it gives you support for multi database setup and provides you with statistics of database query times which may be used for diagnosis.
+
+As you can also see, we've annotated *TestRepositoryMDBean* with *@Bean* annotation which will force Tigase Kernel to load it every time *TestComponent* will be loaded. This way it is possible to inject instance of this class as a dependency to any bean used by this component (ie. component, module, etc.) by just creating a field and annotating it:
+
+[source,java]
+----
+@Inject
+private TestRepositoryIfc testRepository;
+----
+
+TIP: In *testRepository* field instance of *TestRepositoryMDBean* will be injected.
+

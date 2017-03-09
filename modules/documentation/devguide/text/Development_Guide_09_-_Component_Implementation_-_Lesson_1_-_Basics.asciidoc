@@ -1,8 +1,9 @@
 [[cil1]]
 = Component Implementation - Lesson 1 - Basics
+:author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-01-06 20:22
+:date: 2017-03-08 21:00
 :revision: v2.1
 
 :toc:
@@ -20,24 +21,80 @@ Let's get started and create the Tigase component:
 [source,java]
 -----
 import java.util.logging.Logger;
-import tigase.server.AbstractMessageReceiver;
+import tigase.component.AbstractKernelBasedComponent;
 import tigase.server.Packet;
 
-public class TestComponent extends AbstractMessageReceiver {
+public class TestComponent extends AbstractKernelBasedComponent {
 
   private static final Logger log = Logger.getLogger(TestComponent.class.getName());
 
   @Override
-  public void processPacket(Packet packet) {
-    log.finest("My packet: " + packet.toString());
+  public String getComponentVersion() {
+    String version = this.getClass().getPackage().getImplementationVersion();
+    return version == null ? "0.0.0" : version;
   }
 
+  @Override
+  public boolean isDiscoNonAdmin() {
+    return false;
+  }
+
+  @Override
+  protected void registerModules(Kernel kernel) {
+    // here we need to register modules responsible for processing packets
+  }
+  
 }
 -----
 
-The only element mandatory when you extend *AbstractMessageReceiver* is the implementation of *void processPacket(Packet packet)* method. This is actually logical as the main task for your component is processing packets. Class name for our new component is *TestComponent* and we have also initialized a separated logger for this class. Doing This is very useful as it allows us to easily find log entries created by our class.
+As you can see we have 3 mandatory methods when we extends *AbstractKernelBasedComponent*:
+
+* *String getComponentVersion()* which returns version of a component for logging purposes
+* *boolean isDiscoNonAdmin()* which decides if component will be visible for users other that server administrators
+* *void registerModules(Kernel kernel)* which allows you to register component modules responsible for actual processing of packets
+
+TIP: If you decide you do not want to use modules for processing packets (even though we strongly suggest to use them, as thanks to modules components are easily extendable) you can implement one more method *void processPacket(Packet packet)* which will be called for every packet sent to a component.
+This method is actually logical as the main task for your component is processing packets.
+
+Class name for our new component is *TestComponent* and we have also initialized a separated logger for this class. Doing This is very useful as it allows us to easily find log entries created by our class.
 
 With these a few lines of code you have a fully functional Tigase component which can be loaded to the Tigase server; it can receive and process packets, shows as an element on service discovery list (for administrators only), responds to administrator ad-hoc commands, supports scripting, generates statistics, can be deployed as an external component, and a few other things.
+
+Next important step is to create modules responsible for processing packets. For now let's create module responsible for handling messages by appending them to log file:
+[source,java]
+----
+@Bean(name = "test-module", parent = TestComponent.class, active = true)
+public static class TestModule extends AbstractModule {
+
+  private static final Logger log = Logger.getLogger(TestModule.class.getCanonicalName());
+
+  private static final Criteria CRITERIA = ElementCriteria.name("message");
+
+  @Override
+  public String[] getFeatures() {
+    return new String[0];
+  }
+
+  @Override
+  public Criteria getModuleCriteria() {
+    return CRITERIA;
+  }
+
+  @Override
+  public void process(Packet packet) throws ComponentException, TigaseStringprepException {
+    log.finest("My packet: " + packet.toString());
+  }
+}
+----
+
+Instance of *Criteria* class returned by *Criteria getModuleCriteria()* is used by component class to decide if packet should be processed by this module or not.
+In this case we returned instance which matches any packet which is a *message*.
+
+Method *String[] getFeatures()* returns array of *String*s which are used to generate a list of features supported by component. This features are returned during service discovery of a component.
+
+And finally we have a very important method @void packet(Packet packet)* which is main processing method of a component. If component will receive packet that matches criteria returned by module - this method will be called.
+
+But how we can send packet from a module? *AbstractModule* contains method *void write(Packet packet)* which you can use to send packets from a component.
 
 Before we go any further with the implementation let's configure the component in Tigase server so it is loaded next time the server starts.
 Assuming our *init.properties* file looks like this one:
@@ -46,22 +103,22 @@ Assuming our *init.properties* file looks like this one:
 -----
 config-type = --gen-config-def
 --debug = server
---user-db = derby
---admins = admin@devel.tigase.org
---user-db-uri = jdbc:derby:/Tigase/tigasedb
 --virt-hosts = devel.tigase.org
---comp-name-1 = muc
---comp-class-1 = tigase.muc.MUCComponent
---comp-name-2 = pubsub
---comp-class-2 = tigase.pubsub.PubSubComponent
+admins = [ 'admin@devel.tigase.org' ]
+dataSource {
+  default () {
+    uri = 'jdbc:derby:/Tigase/tigasedb'
+  }
+}
+muc() {}
+pubsub() {}
 -----
 
 We can see that it already is configured to load two other components: *MUC* and *PubSub*. Let's add a third - our new component to the configuration file by appending two following lines in the properties file:
 
 [source,java]
 -----
---comp-name-3 = test
---comp-class-3 = TestComponent
+test(class: TestComponent) {}
 -----
 
 Now we have to remove the *etc/tigase.xml* file and restart the server.
@@ -79,11 +136,9 @@ Another way to find out if the component has been loaded is by looking at the lo
 MessageRouter.setProperties() FINER: Loading and registering message receiver: test
 MessageRouter.addRouter() INFO: Adding receiver: TestComponent
 MessageRouter.addComponent() INFO: Adding component: TestComponent
-MessageRouter.addComponent() FINER: Adding: test component to basic-conf registrator.
-Configurator.componentAdded() CONFIG:  component: test
 -----
 
-If your component did not load you should first check configuration files. Maybe you forgot to remove the *tigase.xml* file before restarting the server or alternatively the Tigase could not find your class at startup time. Make sure your class is in *CLASSPATH* or copy a JAR file with your class to Tigase *libs/* directory.
+If your component did not load you should first check configuration files. Maybe you forgot to remove the *tigase.xml* file before restarting the server or alternatively the Tigase could not find your class at startup time. Make sure your class is in *CLASSPATH* or copy a JAR file with your class to Tigase *jars/* directory.
 
 Assuming everything went well and your component is loaded by the sever and it shows on the service discovery list as on the screenshot above you can double click on it to get a window with a list of ad-hoc commands - administrator scripts. A window on the screenshot shows only two basic commands for adding and removing script which is a good start.
 
@@ -97,11 +152,11 @@ As we can see with just a few lines of code our new component is quite mighty an
 
 Now, the time has come to the most important question. Can our new component do something useful, that is can it receive and process XMPP packets?
 
-Let's try it out. Using you favorite client send a message to JID: *test@devel.tigase.org* (assuming your server is configured for *devel.tigase.org* domain). You can either use kind of XML console in your client or just send a plain message to the component JID. According to our code in *processPacket(...)* method it should log our message. For this test I have sent a message with subject: "_test message_" and body: "_this is a test_". The log file should contain following entry:
+Let's try it out. Using you favorite client send a message to JID: *test@devel.tigase.org* (assuming your server is configured for *devel.tigase.org* domain). You can either use kind of XML console in your client or just send a plain message to the component JID. According to our code in *process(...)* method it should log our message. For this test I have sent a message with subject: "_test message_" and body: "_this is a test_". The log file should contain following entry:
 
 [source,bash]
 -----
-TestComponent.processPacket() FINEST: My packet: to=null, from=null,
+TestModule.process() FINEST: My packet: to=null, from=null,
 data=<message from="admin@devel.tigase.org/devel"
   to="test@devel.tigase.org" id="abcaa" xmlns="jabber:client">
   <subject>test message</subject>
@@ -109,4 +164,4 @@ data=<message from="admin@devel.tigase.org/devel"
 </message>, XMLNS=jabber:client, priority=NORMAL
 -----
 
-If this is a case we can be sure that everything works as expected and all we now have to do is to fill the *processPacket(...)* method with some useful code.
+If this is a case we can be sure that everything works as expected and all we now have to do is to fill the *process(...)* method with some useful code.
