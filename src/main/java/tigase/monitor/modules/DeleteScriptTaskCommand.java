@@ -1,13 +1,12 @@
 package tigase.monitor.modules;
 
-import java.util.Collection;
-
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
+import tigase.monitor.MonitorComponent;
 import tigase.monitor.MonitorContext;
 import tigase.monitor.MonitorTask;
 import tigase.monitor.TasksScriptRegistrar;
@@ -15,7 +14,10 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-public class DeleteScriptTaskCommand implements AdHocCommand {
+import java.util.Collection;
+
+public class DeleteScriptTaskCommand
+		implements AdHocCommand {
 
 	private MonitorContext monitorContext;
 
@@ -35,8 +37,9 @@ public class DeleteScriptTaskCommand implements AdHocCommand {
 
 				Collection<String> taskNames = monitorContext.getKernel().getNamesOf(MonitorTask.class);
 
-				form.addField(Field.fieldListSingle("delete_task", "", "Task to delete", taskNames.toArray(new String[] {}),
-						taskNames.toArray(new String[] {})));
+				form.addField(
+						Field.fieldListSingle("delete_task", "", "Task to delete", taskNames.toArray(new String[]{}),
+											  taskNames.toArray(new String[]{})));
 
 				response.getElements().add(form.getElement());
 				response.startSession();
@@ -50,8 +53,9 @@ public class DeleteScriptTaskCommand implements AdHocCommand {
 					if (i instanceof MonitorTask) {
 						((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).delete(
 								taskName);
-					} else
+					} else {
 						throw new RuntimeException("Are you kidding me?");
+					}
 				}
 
 				form = new Form("form", "Completed", null);
@@ -79,7 +83,7 @@ public class DeleteScriptTaskCommand implements AdHocCommand {
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return monitorContext.getKernel().getInstance(MonitorComponent.class).isAdmin(jid);
 	}
 
 }

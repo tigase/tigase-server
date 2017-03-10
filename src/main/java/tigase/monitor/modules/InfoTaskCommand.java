@@ -6,11 +6,13 @@ import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Form;
 import tigase.monitor.InfoTask;
+import tigase.monitor.MonitorComponent;
 import tigase.monitor.MonitorContext;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-public class InfoTaskCommand implements AdHocCommand {
+public class InfoTaskCommand
+		implements AdHocCommand {
 
 	public static final String NODE = "x-info";
 
@@ -50,7 +52,7 @@ public class InfoTaskCommand implements AdHocCommand {
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return ctx.getKernel().getInstance(MonitorComponent.class).isAdmin(jid);
 	}
 
 }
