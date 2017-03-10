@@ -20,8 +20,10 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = "cpu-temp-task", active = true)
-public class CpuTempTask extends AbstractConfigurableTimerTask implements Initializable {
+@Bean(name = "cpu-temp-task", parent = MonitorComponent.class, active = true)
+public class CpuTempTask
+		extends AbstractConfigurableTimerTask
+		implements Initializable {
 
 	public static final String CPU_TEMP_MONITOR_EVENT_NAME = "tigase.monitor.tasks.CPUTempMonitorEvent";
 
@@ -38,12 +40,12 @@ public class CpuTempTask extends AbstractConfigurableTimerTask implements Initia
 	private final HashSet<String> triggeredEvents = new HashSet<String>();
 	@Inject
 	private MonitorComponent component;
+	@ConfigField(desc = "CPU Temperature threshold")
+	private int cpuTempThreshold = 90;
 	private float[] cpu_freq = new float[Runtime.getRuntime().availableProcessors()];
 	private int cpu_temp;
 	private int[] cpu_thrott_pr = new int[Runtime.getRuntime().availableProcessors()];
 	private int[] cpu_thrott_st = new int[Runtime.getRuntime().availableProcessors()];
-	@ConfigField(desc = "CPU Temperature threshold")
-	private int cpuTempThreshold = 90;
 	@Inject
 	private EventBus eventBus;
 

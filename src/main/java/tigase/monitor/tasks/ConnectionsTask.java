@@ -18,8 +18,10 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = "connections-task", active = true)
-public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
+@Bean(name = "connections-task", parent = MonitorComponent.class, active = true)
+public class ConnectionsTask
+		extends AbstractConfigurableTimerTask
+		implements InfoTask, Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
 	protected static final Logger log = Logger.getLogger(ConnectionsTask.class.getName());
@@ -29,36 +31,37 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 	@Inject
 	protected EventBus eventBus;
 	private int lastOnlineUsers;
-	@ConfigField(desc = "Minimal amount of disconnected users")
-	private int thresholdMinimal = 10;
 	@ConfigField(desc = "Percent of disconnected users")
 	private int threshold = 80;
+	@ConfigField(desc = "Minimal amount of disconnected users")
+	private int thresholdMinimal = 10;
 
 	/**
 	 * Creates alarm event if required. Event will be created only if both
 	 * conditions will met.
 	 *
-	 * @param currentOnlineUsers
-	 *            current amount of online users.
-	 * @param lastOnlineUsers
-	 *            previous amount of online users.
-	 * @param thresholdMinimal
-	 *            minimal amount of disconnected users to create alarm event.
-	 * @param threshold
-	 *            percent of disconnected users to create alarm event.
+	 * @param currentOnlineUsers current amount of online users.
+	 * @param lastOnlineUsers previous amount of online users.
+	 * @param thresholdMinimal minimal amount of disconnected users to create alarm event.
+	 * @param threshold percent of disconnected users to create alarm event.
+	 *
 	 * @return event or <code>null</code>.
 	 */
-	public static Element createAlarmEvent(int currentOnlineUsers, int lastOnlineUsers, int thresholdMinimal, int threshold) {
+	public static Element createAlarmEvent(int currentOnlineUsers, int lastOnlineUsers, int thresholdMinimal,
+										   int threshold) {
 		final int delta = currentOnlineUsers - lastOnlineUsers;
 		final float percent = (lastOnlineUsers == 0 ? 1 : ((float) delta) / (float) lastOnlineUsers) * 100;
 
-		if (log.isLoggable(Level.FINE))
-			log.fine("Data: lastOnlineUsers=" + lastOnlineUsers + "; currentOnlineUsers=" + currentOnlineUsers + "; delta="
-					+ delta + "; percent=" + percent + "; thresholdMinimal=" + thresholdMinimal + "; threshold=" + threshold);
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Data: lastOnlineUsers=" + lastOnlineUsers + "; currentOnlineUsers=" + currentOnlineUsers +
+							 "; delta=" + delta + "; percent=" + percent + "; thresholdMinimal=" + thresholdMinimal +
+							 "; threshold=" + threshold);
+		}
 
 		if (-1 * delta >= thresholdMinimal && -1 * percent >= threshold) {
-			if (log.isLoggable(Level.FINE))
+			if (log.isLoggable(Level.FINE)) {
 				log.fine("Creating event!");
+			}
 
 			Element event = new Element(USERS_DISCONNECTEED_EVENT_NAME);
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
@@ -66,15 +69,17 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 			event.addChild(new Element("disconnectionsPercent", "" + (-1 * percent)));
 
 			return event;
-		} else
+		} else {
 			return null;
+		}
 	}
 
 	@Override
 	public Form getCurrentConfiguration() {
 		Form x = super.getCurrentConfiguration();
 		x.addField(Field.fieldTextSingle("threshold", "" + threshold, "Percent of disconnected users"));
-		x.addField(Field.fieldTextSingle("thresholdMinimal", "" + thresholdMinimal, "Minimal amount of disconnected users"));
+		x.addField(Field.fieldTextSingle("thresholdMinimal", "" + thresholdMinimal,
+										 "Minimal amount of disconnected users"));
 		return x;
 	}
 
@@ -103,14 +108,15 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 
 	@Override
 	public void initialize() {
-		eventBus.registerEvent(USERS_DISCONNECTEED_EVENT_NAME, "Fired when too many users disconnected in the same time",
-				false);
+		eventBus.registerEvent(USERS_DISCONNECTEED_EVENT_NAME,
+							   "Fired when too many users disconnected in the same time", false);
 	}
 
 	@Override
 	protected void run() {
-		if (log.isLoggable(Level.FINEST))
+		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Running task...");
+		}
 
 		SessionManager sess = (SessionManager) XMPPServer.getComponent(SessionManager.class);
 

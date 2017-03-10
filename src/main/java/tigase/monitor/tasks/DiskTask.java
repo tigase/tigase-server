@@ -22,8 +22,10 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = "disk-task", active = true)
-public class DiskTask extends AbstractConfigurableTimerTask implements Initializable {
+@Bean(name = "disk-task", parent = MonitorComponent.class, active = true)
+public class DiskTask
+		extends AbstractConfigurableTimerTask
+		implements Initializable {
 
 	public static final String DISK_USAGE_MONITOR_EVENT_NAME = "tigase.monitor.tasks.DiskUsageMonitorEvent";
 
@@ -45,32 +47,32 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 
 	private void findAllRoots() {
 		switch (OSUtils.getOSType()) {
-		case windows:
-			File[] winRoots = File.listRoots();
-			roots = winRoots;
-			break;
-		case linux:
-			File[] linRoots = getLinuxRoots();
-			roots = linRoots;
-			break;
-		case sunos:
-		case solaris:
-			File[] solRoots = getSolarisRoots();
-			roots = solRoots;
-			break;
-		case mac:
-			File[] macRoots = getMacRoots();
-			roots = macRoots;
-			break;
-		default:
-			File[] otherRoots = File.listRoots();
-			if (otherRoots.length == 1) {
-				File[] mtabRoots = getLinuxRoots();
-				if (mtabRoots != null && mtabRoots.length > 1) {
-					otherRoots = mtabRoots;
+			case windows:
+				File[] winRoots = File.listRoots();
+				roots = winRoots;
+				break;
+			case linux:
+				File[] linRoots = getLinuxRoots();
+				roots = linRoots;
+				break;
+			case sunos:
+			case solaris:
+				File[] solRoots = getSolarisRoots();
+				roots = solRoots;
+				break;
+			case mac:
+				File[] macRoots = getMacRoots();
+				roots = macRoots;
+				break;
+			default:
+				File[] otherRoots = File.listRoots();
+				if (otherRoots.length == 1) {
+					File[] mtabRoots = getLinuxRoots();
+					if (mtabRoots != null && mtabRoots.length > 1) {
+						otherRoots = mtabRoots;
+					}
+					roots = otherRoots;
 				}
-				roots = otherRoots;
-			}
 		}
 	}
 
@@ -94,8 +96,8 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Analyzing line: " + line);
 				}
-				if (line.contains("proc") || line.contains("devfs") || line.contains("tmpfs") || line.contains("sysfs")
-						|| line.contains("devpts") || line.contains("securityfs")) {
+				if (line.contains("proc") || line.contains("devfs") || line.contains("tmpfs") ||
+						line.contains("sysfs") || line.contains("devpts") || line.contains("securityfs")) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Found virtual fs line, omitting...");
 					}

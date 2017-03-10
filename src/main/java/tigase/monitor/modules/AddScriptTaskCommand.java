@@ -9,6 +9,7 @@ import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
+import tigase.monitor.MonitorComponent;
 import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -20,8 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Bean(name = "x-add-task", active = true)
-public class AddScriptTaskCommand implements AdHocCommand {
+public class AddScriptTaskCommand
+		implements AdHocCommand {
 
+	@Inject
+	private MonitorComponent component;
 	@Inject
 	private Kernel kernel;
 
@@ -47,8 +51,9 @@ public class AddScriptTaskCommand implements AdHocCommand {
 				}
 
 				form.addField(Field.fieldTextSingle("scriptName", "", "Script name"));
-				form.addField(Field.fieldListSingle("scriptExtension", "", "Script engine", labels.toArray(new String[] {}),
-						values.toArray(new String[] {})));
+				form.addField(
+						Field.fieldListSingle("scriptExtension", "", "Script engine", labels.toArray(new String[]{}),
+											  values.toArray(new String[]{})));
 				form.addField(Field.fieldTextMulti("scriptContent", "", "Script"));
 
 				response.getElements().add(form.getElement());
@@ -62,7 +67,8 @@ public class AddScriptTaskCommand implements AdHocCommand {
 					String scriptContent = form.getAsString("scriptContent");
 
 					((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).registerScript(scriptName,
-							scriptExtension, scriptContent);
+																										scriptExtension,
+																										scriptContent);
 
 				}
 				form = new Form("form", "Completed", null);
@@ -90,7 +96,7 @@ public class AddScriptTaskCommand implements AdHocCommand {
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return component.isAdmin(jid);
 	}
 
 }

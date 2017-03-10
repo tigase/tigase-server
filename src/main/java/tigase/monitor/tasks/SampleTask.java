@@ -6,12 +6,15 @@ import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
+import tigase.monitor.MonitorComponent;
 import tigase.xml.Element;
 
 import java.util.Date;
 
-@Bean(name = "sample-task", active = true)
-public class SampleTask extends AbstractConfigurableTimerTask implements Initializable {
+@Bean(name = "sample-task", parent = MonitorComponent.class, active = true)
+public class SampleTask
+		extends AbstractConfigurableTimerTask
+		implements Initializable {
 
 	@Inject
 	private EventBus eventBus;

@@ -9,6 +9,7 @@ import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
+import tigase.monitor.MonitorComponent;
 import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -20,8 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Bean(name = "x-add-timer-task", active = true)
-public class AddTimerScriptTaskCommand implements AdHocCommand {
+public class AddTimerScriptTaskCommand
+		implements AdHocCommand {
 
+	@Inject
+	private MonitorComponent component;
 	@Inject
 	private Kernel kernel;
 
@@ -48,8 +52,9 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 
 				form.addField(Field.fieldTextSingle("scriptName", "", "Script name"));
 				form.addField(Field.fieldTextSingle("delay", "1000", "Delay"));
-				form.addField(Field.fieldListSingle("scriptExtension", "", "Script engine", labels.toArray(new String[] {}),
-						values.toArray(new String[] {})));
+				form.addField(
+						Field.fieldListSingle("scriptExtension", "", "Script engine", labels.toArray(new String[]{}),
+											  values.toArray(new String[]{})));
 				form.addField(Field.fieldTextMulti("scriptContent", "", "Script"));
 
 				response.getElements().add(form.getElement());
@@ -64,7 +69,9 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 					Long delay = form.getAsLong("delay");
 
 					((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).registerTimerScript(scriptName,
-							scriptExtension, scriptContent, delay);
+																											 scriptExtension,
+																											 scriptContent,
+																											 delay);
 				}
 
 				form = new Form("form", "Completed", null);
@@ -92,7 +99,7 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return component.isAdmin(jid);
 	}
 
 }

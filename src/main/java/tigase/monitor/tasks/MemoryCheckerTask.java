@@ -16,8 +16,10 @@ import tigase.xml.Element;
 import java.util.Date;
 import java.util.HashSet;
 
-@Bean(name = "memory-checker-task", active = true)
-public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
+@Bean(name = "memory-checker-task", parent = MonitorComponent.class, active = true)
+public class MemoryCheckerTask
+		extends AbstractConfigurableTimerTask
+		implements InfoTask, Initializable {
 
 	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.HeapMemoryMonitorEvent";
 	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.NonHeapMemoryMonitorEvent";
@@ -44,11 +46,13 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	public Form getCurrentConfiguration() {
 		Form form = super.getCurrentConfiguration();
 
-		form.addField(Field.fieldTextSingle("maxHeapMemUsagePercentThreshold", String.valueOf(maxHeapMemUsagePercentThreshold),
-				"Alarm when heap mem usage is bigger than [%]"));
+		form.addField(Field.fieldTextSingle("maxHeapMemUsagePercentThreshold",
+											String.valueOf(maxHeapMemUsagePercentThreshold),
+											"Alarm when heap mem usage is bigger than [%]"));
 
 		form.addField(Field.fieldTextSingle("maxNonHeapMemUsagePercentThreshold",
-				String.valueOf(maxNonHeapMemUsagePercentThreshold), "Alarm when non-heap mem usage is bigger than [%]"));
+											String.valueOf(maxNonHeapMemUsagePercentThreshold),
+											"Alarm when non-heap mem usage is bigger than [%]"));
 
 		return form;
 	}
@@ -73,17 +77,18 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	public Form getTaskInfo() {
 		Form result = new Form("", "Memory Information", "");
 		result.addField(Field.fieldTextSingle("heapMemMax", Long.toString(runtime.getHeapMemMax()), "Heap Memory Max"));
-		result.addField(Field.fieldTextSingle("heapMemUsed", Long.toString(runtime.getHeapMemUsed()), "Heap Memory Used"));
+		result.addField(
+				Field.fieldTextSingle("heapMemUsed", Long.toString(runtime.getHeapMemUsed()), "Heap Memory Used"));
 		result.addField(Field.fieldTextSingle("heapMemUsedPercentage", Float.toString(runtime.getHeapMemUsage()),
-				"Heap Memory Used [%]"));
-		result.addField(
-				Field.fieldTextSingle("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax()), "Non-Heap Memory Max"));
-		result.addField(
-				Field.fieldTextSingle("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed()), "Non-Heap Memory Used"));
+											  "Heap Memory Used [%]"));
+		result.addField(Field.fieldTextSingle("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax()),
+											  "Non-Heap Memory Max"));
+		result.addField(Field.fieldTextSingle("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed()),
+											  "Non-Heap Memory Used"));
 		result.addField(Field.fieldTextSingle("nonHeapMemUsedPercentage", Float.toString(runtime.getNonHeapMemUsage()),
-				"Non-Heap Memory Used [%]"));
-		result.addField(
-				Field.fieldTextSingle("directMemUsed", Long.toString(runtime.getDirectMemUsed()), "Direct Memory Used"));
+											  "Non-Heap Memory Used [%]"));
+		result.addField(Field.fieldTextSingle("directMemUsed", Long.toString(runtime.getDirectMemUsed()),
+											  "Direct Memory Used"));
 
 		return result;
 	}
@@ -107,8 +112,9 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 			event.addChild(new Element("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax())));
 			event.addChild(new Element("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed())));
 			event.addChild(new Element("directMemUsed", Long.toString(runtime.getDirectMemUsed())));
-			event.addChild(new Element("message", "Heap memory usage is higher than " + maxHeapMemUsagePercentThreshold
-					+ " and it equals " + curHeapMemUsagePercent));
+			event.addChild(new Element("message",
+									   "Heap memory usage is higher than " + maxHeapMemUsagePercentThreshold +
+											   " and it equals " + curHeapMemUsagePercent));
 
 			if (!triggeredEvents.contains(event.getName())) {
 				eventBus.fire(event);
@@ -129,8 +135,9 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 			event.addChild(new Element("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax())));
 			event.addChild(new Element("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed())));
 			event.addChild(new Element("directMemUsed", Long.toString(runtime.getDirectMemUsed())));
-			event.addChild(new Element("message", "Non-Heap memory usage is higher than " + maxNonHeapMemUsagePercentThreshold
-					+ " and it equals " + curHeapMemUsagePercent));
+			event.addChild(new Element("message",
+									   "Non-Heap memory usage is higher than " + maxNonHeapMemUsagePercentThreshold +
+											   " and it equals " + curHeapMemUsagePercent));
 
 			if (!triggeredEvents.contains(event.getName())) {
 				eventBus.fire(event);

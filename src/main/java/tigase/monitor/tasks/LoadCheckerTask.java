@@ -16,8 +16,10 @@ import tigase.xml.Element;
 import java.util.Date;
 import java.util.HashSet;
 
-@Bean(name = "load-checker-task", active = true)
-public class LoadCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
+@Bean(name = "load-checker-task", parent = MonitorComponent.class, active = true)
+public class LoadCheckerTask
+		extends AbstractConfigurableTimerTask
+		implements InfoTask, Initializable {
 
 	public static final String MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoadAverageMonitorEvent";
 	private final static DateTimeFormatter dtf = new DateTimeFormatter();
@@ -44,7 +46,7 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 		Form form = super.getCurrentConfiguration();
 
 		form.addField(Field.fieldTextSingle("averageLoadThreshold", String.valueOf(averageLoadThreshold),
-				"Alarm when AverageLoad is bigger than"));
+											"Alarm when AverageLoad is bigger than"));
 
 		return form;
 	}
@@ -52,7 +54,8 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 	@Override
 	public Form getTaskInfo() {
 		Form result = new Form("", "Load Information", "");
-		result.addField(Field.fieldTextSingle("averageLoad", Double.toString(runtime.getLoadAverage()), "Load Average"));
+		result.addField(
+				Field.fieldTextSingle("averageLoad", Double.toString(runtime.getLoadAverage()), "Load Average"));
 
 		return result;
 	}
@@ -70,8 +73,9 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
-			event.addChild(new Element("message", "Average Load is higher than " + averageLoadThreshold + " and it is equals "
-					+ Double.toString(curAverageLoad)));
+			event.addChild(new Element("message",
+									   "Average Load is higher than " + averageLoadThreshold + " and it is equals " +
+											   Double.toString(curAverageLoad)));
 
 			if (!triggeredEvents.contains(event.getName())) {
 				eventBus.fire(event);

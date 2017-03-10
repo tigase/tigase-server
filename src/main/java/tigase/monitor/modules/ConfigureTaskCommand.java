@@ -8,12 +8,14 @@ import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.ConfigurableTask;
+import tigase.monitor.MonitorComponent;
 import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-public class ConfigureTaskCommand implements AdHocCommand {
+public class ConfigureTaskCommand
+		implements AdHocCommand {
 
 	public static final String NODE = "x-config";
 
@@ -41,7 +43,8 @@ public class ConfigureTaskCommand implements AdHocCommand {
 			} else {
 				Form form = new Form(data);
 				if ("submit".equals(form.getType())) {
-					final ConfigurableTask taskInstance = kernel.getInstance(request.getIq().getStanzaTo().getResource());
+					final ConfigurableTask taskInstance = kernel.getInstance(
+							request.getIq().getStanzaTo().getResource());
 
 					registrar.updateConfig(request.getIq().getStanzaTo().getResource(), form);
 
@@ -70,7 +73,7 @@ public class ConfigureTaskCommand implements AdHocCommand {
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return kernel.getInstance(MonitorComponent.class).isAdmin(jid);
 	}
 
 }
