@@ -34,7 +34,7 @@ You compile server with maven using project distribution profile (dist):
 
 [source,bash]
 -----
-mvn -Pdist -f modules/master/pom.xml clean install
+mvn -Pdist clean install
 -----
 
 This will:
@@ -47,10 +47,11 @@ This will:
 However, in order for them to succeed you have to build the server first using maven as described earlier.
 
 == Running Server
-Afterwards you can run the server with the regular shell script:
+Afterwards you can run the server with the regular shell script from within `server` module:
 
 [source,bash]
 -----
+cd server
 ./scripts/tigase.sh start etc/tigase.conf
 -----
 
