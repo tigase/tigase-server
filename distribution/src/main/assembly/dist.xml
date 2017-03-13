@@ -18,7 +18,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../certs</directory>
+            <directory>../server/certs</directory>
 			<outputDirectory>certs</outputDirectory>
 			<includes>
 				<include>dummy.cer</include>
@@ -28,32 +28,39 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../database</directory>
+			<directory>../server/database</directory>
 			<outputDirectory>database</outputDirectory>
 			<includes>
 				<include>*</include>
 			</includes>
 		</fileSet>
+        <fileSet>
+            <directory>target/dist</directory>
+            <outputDirectory>./</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../docs</directory>
+            <outputDirectory>docs</outputDirectory>
+            <includes>
+                <include>Development_Guide/html_chunk/**/*</include>
+                <include>Development_Guide/pdf/**/*</include>
+                <include>User_Guide/html_chunk/**/*</include>
+                <include>User_Guide/pdf/**/*</include>
+                <include>javadoc/**/*</include>
+            </includes>
+        </fileSet>
 		<fileSet>
-			<directory>../../docs</directory>
-			<outputDirectory>docs</outputDirectory>
-			<includes>
-				<include>Development_Guide/html_chunk/**/*</include>
-				<include>Development_Guide/pdf/**/*</include>
-				<include>User_Guide/html_chunk/**/*</include>
-				<include>User_Guide/pdf/**/*</include>
-				<include>javadoc/**/*</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<directory>../../win-stuff</directory>
+			<directory>../server/win-stuff</directory>
 			<outputDirectory>win-stuff</outputDirectory>
 			<includes>
 				<include>*/**</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../etc</directory>
+			<directory>../server/etc</directory>
 			<outputDirectory>etc</outputDirectory>
 			<includes>
 				<include>bosh-extra-headers.txt</include>
@@ -69,14 +76,14 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../src/main/groovy/tigase/admin</directory>
+			<directory>../server/src/main/groovy/tigase/admin</directory>
 			<outputDirectory>scripts/admin</outputDirectory>
 			<includes>
 				<include>**/*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../scripts</directory>
+			<directory>../server/scripts</directory>
 			<outputDirectory>scripts</outputDirectory>
 			<includes>
 				<include>**/*</include>

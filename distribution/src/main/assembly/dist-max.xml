@@ -18,7 +18,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../certs</directory>
+			<directory>../server/certs</directory>
 			<outputDirectory>certs</outputDirectory>
 			<includes>
 				<include>dummy.cer</include>
@@ -28,14 +28,21 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../database</directory>
+			<directory>../server/database</directory>
 			<outputDirectory>database</outputDirectory>
 			<includes>
 				<include>*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../docs</directory>
+			<directory>target/dist</directory>
+			<outputDirectory>./</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../docs</directory>
 			<outputDirectory>docs</outputDirectory>
 			<includes>
 				<include>Development_Guide/html_chunk/**/*</include>
@@ -46,14 +53,14 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../win-stuff</directory>
+			<directory>../server/win-stuff</directory>
 			<outputDirectory>win-stuff</outputDirectory>
 			<includes>
 				<include>*/**</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../etc</directory>
+			<directory>../server/etc</directory>
 			<outputDirectory>etc</outputDirectory>
 			<includes>
 				<include>bosh-extra-headers.txt</include>
@@ -70,35 +77,49 @@
 		</fileSet>
 		<!-- OSGi configuration file -->
 		<fileSet>
-			<directory>../../conf</directory>
+			<directory>../server/conf</directory>
 			<outputDirectory>conf</outputDirectory>
 			<includes>
 				<include>config.properties</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../../src/main/groovy/tigase/admin</directory>
+			<directory>../server/src/main/groovy/tigase/admin</directory>
 			<outputDirectory>scripts/admin</outputDirectory>
 			<includes>
 				<include>**/*</include>
 			</includes>
 		</fileSet>
+        <fileSet>
+            <directory>../server/scripts</directory>
+            <outputDirectory>scripts</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude></exclude>
+            </excludes>
+            <fileMode>0744</fileMode>
+            <directoryMode>0744</directoryMode>
+        </fileSet>
 		<fileSet>
-			<directory>../../jars</directory>
+			<directory>../server/jars</directory>
 			<outputDirectory>jars</outputDirectory>
 			<includes>
 				<include>**/*.old</include>
 			</includes>
 		</fileSet>
-		<fileSet>
-			<directory>../../scripts</directory>
-			<outputDirectory>scripts</outputDirectory>
-			<includes>
-				<include>**/*</include>
-			</includes>
-			<fileMode>0744</fileMode>
-			<directoryMode>0744</directoryMode>
-		</fileSet>
+        <fileSet>
+            <directory>../server/certs</directory>
+            <outputDirectory>certs</outputDirectory>
+            <includes>
+                <include>dummy.cer</include>
+                <include>rsa-keystore</include>
+                <include>truststore</include>
+                <include>keystore-letsencrypt</include>
+            </includes>
+        </fileSet>
+
 		<fileSet>
 			<directory>./</directory>
 			<outputDirectory>/logs</outputDirectory>

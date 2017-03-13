@@ -7,7 +7,6 @@
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>tigase</groupId>
 	<artifactId>tigase-server-dist</artifactId>
 	<name>Tigase XMPP Server Distribution builder</name>
 
@@ -105,7 +104,7 @@
 							</descriptors>
 							<tarLongFileMode>gnu</tarLongFileMode>
 							<finalName>tigase-server-${project.version}-b${gitVersion}</finalName>
-							<outputDirectory>../../pack</outputDirectory>
+							<outputDirectory>${dist-dir}</outputDirectory>
 							<!--<appendAssemblyId>false</appendAssemblyId>-->
 						</configuration>
 					</execution>
@@ -123,24 +122,6 @@
 							<goal>clean</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>clean-deps</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<filesets>
-								<fileset>
-									<directory>${project.basedir}/../../jars</directory>
-									<includes>
-										<include>**/*.jar</include>
-									</includes>
-									<followSymlinks>false</followSymlinks>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 			
@@ -149,21 +130,6 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.8</version>
 				<executions>
-					<!--<execution>-->
-						<!--<id>copy-dependencies</id>-->
-						<!--<phase>validate</phase>-->
-						<!--<goals>-->
-							<!--<goal>copy-dependencies</goal>-->
-						<!--</goals>-->
-						<!--<configuration>-->
-							<!--<outputDirectory>${project.basedir}/../../jars</outputDirectory>-->
-							<!--<stripVersion>true</stripVersion>-->
-							<!--<excludeTransitive>true</excludeTransitive>-->
-							<!--<overWriteIfNewer>true</overWriteIfNewer>-->
-							<!--<overWriteReleases>true></overWriteReleases>-->
-							<!--<overWriteSnapshots>true</overWriteSnapshots>-->
-						<!--</configuration>-->
-					<!--</execution>-->
 					<execution>
 						<id>copy-old-pubsub</id>
 						<phase>validate</phase>
@@ -180,7 +146,7 @@
 									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.basedir}/../../jars</outputDirectory>
+							<outputDirectory>${project.build.directory}/dist/jars</outputDirectory>
 							<stripVersion>false</stripVersion>
 							<useBaseVersion>true</useBaseVersion>
 						</configuration>
@@ -199,7 +165,7 @@
 									<version>1.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist</outputDirectory>
 									<includes>*.xml, **/*.groovy, **/*.html</includes>
 								</artifactItem>
 
@@ -209,7 +175,7 @@
 									<version>1.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.basedir}/../../modules/documentation/text/components/http-api</outputDirectory>
+									<outputDirectory>${project.basedir}/../documentation/text/components/http-api</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 								
@@ -219,7 +185,7 @@
 									<version>1.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.basedir}/../../modules/documentation/devguide/text/components/http-api</outputDirectory>
+									<outputDirectory>${project.basedir}/../documentation/devguide/text/components/http-api</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -229,7 +195,7 @@
 									<version>1.2.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist</outputDirectory>
 									<includes>*.xml, **/*.groovy</includes>
 								</artifactItem>
 
@@ -239,7 +205,7 @@
 									<version>2.5.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist/scripts</outputDirectory>
 									<includes>**/*.groovy</includes>
 								</artifactItem>
 
@@ -249,7 +215,7 @@
                                     <version>2.5.0-SNAPSHOT</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.basedir}/../..</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/dist</outputDirectory>
                                     <includes>**/*.sql,**/*.sh,**/*.cmd</includes>
                                 </artifactItem>
 
@@ -259,7 +225,7 @@
                                     <version>2.5.0-SNAPSHOT</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.basedir}/../../modules/documentation/text/components/muc</outputDirectory>
+                                    <outputDirectory>${project.basedir}/../documentation/text/components/muc</outputDirectory>
                                     <includes>**/*.asciidoc,**/*.css</includes>
                                 </artifactItem>
 
@@ -270,7 +236,7 @@
 									<version>1.2.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-                                    <outputDirectory>${project.basedir}/../../database</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/dist/database</outputDirectory>
                                     <includes>**/*.sql</includes>
                                 </artifactItem>
 
@@ -280,7 +246,7 @@
 									<version>3.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist</outputDirectory>
 									<includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt,**/*.groovy</includes>
 								</artifactItem>
 
@@ -290,7 +256,7 @@
 									<version>3.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../../modules/documentation/text/components/pubsub</outputDirectory>
+									<outputDirectory>${project.basedir}/../documentation/text/components/pubsub</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -300,7 +266,7 @@
 									<version>1.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist</outputDirectory>
 									<includes>**/*.sql</includes>
 								</artifactItem>
 
@@ -310,7 +276,7 @@
                                     <version>1.3.0-SNAPSHOT</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.basedir}/../../modules/documentation/text/components/tigase-message-archiving</outputDirectory>
+                                    <outputDirectory>${project.basedir}/../documentation/text/components/tigase-message-archiving</outputDirectory>
                                     <includes>**/*.asciidoc,**/*.css</includes>
                                 </artifactItem>
 
@@ -321,7 +287,7 @@
 									<version>1.1.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist</outputDirectory>
 									<includes>**/*.sql</includes>
 								</artifactItem>
 
@@ -331,7 +297,7 @@
                                     <version>1.1.0-SNAPSHOT</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.basedir}/../../modules/documentation/text/components/tigase-unified-archive</outputDirectory>
+                                    <outputDirectory>${project.basedir}/../documentation/text/components/tigase-unified-archive</outputDirectory>
                                     <includes>**/*.asciidoc,**/*.css</includes>
                                 </artifactItem>
 
@@ -341,7 +307,7 @@
 									<version>1.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
+									<outputDirectory>${project.build.directory}/dist</outputDirectory>
 									<includes>**/*.groovy,**/keystore-letsencrypt</includes>
 								</artifactItem>
 
@@ -364,7 +330,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<archiveDirectory>${project.basedir}/../..</archiveDirectory>
+					<archiveDirectory>${dist_path}</archiveDirectory>
 					<includes>
 						<include>target/tigase*.?ar</include>
 						<include>jars/tigase*.?ar</include>

@@ -2,13 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
 		<packaging.type>pom</packaging.type>
-		<dist_path>../../..</dist_path>
-		<guide_path>${dist_path}/docs/Development_Guide</guide_path>
+		<!--<guide_path>${project.build.directory}/docs/Development_Guide</guide_path>-->
+        <guide_path>${myproject.basedir}/distribution-docs/Development_Guide</guide_path>
 		<guide_name>Development</guide_name>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>tigase</groupId>
 	<artifactId>tigase-server-docs-devel</artifactId>
 	<name>Tigase XMPP Server Documentation - Development Guide</name>
 

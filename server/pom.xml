@@ -5,7 +5,6 @@
 		<tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
 	<name>Tigase XMPP Server</name>
 	<packaging>${packaging.type}</packaging>
@@ -121,11 +120,14 @@
 								<dependencySourceInclude>tigase:*</dependencySourceInclude>
 							</dependencySourceIncludes>
 
-							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
-							<destDir>docs/javadoc</destDir>
+                            <quiet>true</quiet>
+                            <maxmemory>512m</maxmemory>
+
+                            <!--<destDir>${project.build.directory}/docs/javadoc</destDir>-->
+                            <destDir>${myproject.basedir}/distribution-docs/javadoc</destDir>
 
 							<finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
-							<jarOutputDirectory>pack</jarOutputDirectory>
+							<jarOutputDirectory>${dist-dir}</jarOutputDirectory>
 
 							<additionalparam>-Xdoclint:none</additionalparam>
 						</configuration>

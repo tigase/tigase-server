@@ -5,8 +5,9 @@
 		<slf4j.version>1.7.5</slf4j.version>
 		<packet.version>7.1.0</packet.version>
 		<packaging.type>bundle</packaging.type>
-		<dir>target</dir>
+        <dist-dir>${myproject.basedir}/distribution-packages/</dist-dir>
 		<maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
 		<sign-keystore>/path/to/jks.keystore</sign-keystore>
 		<sign-alias>alias</sign-alias>
@@ -61,7 +62,7 @@
 
 	<organization>
 		<name>"Tigase, Inc."</name>
-		<url>http://www.tigase.org</url>
+		<url>http://www.tigase.net</url>
 	</organization>
 
 	<modules>
@@ -102,9 +103,7 @@
 
 	<build>
 
-		<directory>${dir}</directory>
 		<finalName>${project.artifactId}-${gitVersion}</finalName>
-		<!--<finalName>tigase-server-${project.version}-b${gitVersion}</finalName>-->
 
 		<plugins>
 			<plugin>
@@ -192,25 +191,27 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<quiet>true</quiet>
-							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
-							<destDir>docs/javadoc</destDir>
-							<maxmemory>512m</maxmemory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.commonjava.maven.plugins</groupId>
+                <artifactId>directory-maven-plugin</artifactId>
+                <version>0.1</version>
+                <executions>
+                    <execution>
+                        <id>directories</id>
+                        <goals>
+                            <goal>directory-of</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <property>myproject.basedir</property>
+                            <project>
+                                <groupId>tigase</groupId>
+                                <artifactId>tigase-server-master</artifactId>
+                            </project>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 
