@@ -24,6 +24,7 @@ package tigase.stats;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -77,10 +78,13 @@ public class StatisticsInvocationHandler<S>
 
 			try {
 				return method.invoke(this.instance, args);
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				methodStatistics.executionFailed();
+				if (ex instanceof UndeclaredThrowableException) {
+					ex = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
+				}
 				if (ex instanceof InvocationTargetException) {
-					throw ex.getCause();
+					throw ((InvocationTargetException) ex).getTargetException();
 				} else {
 					throw ex;
 				}
@@ -88,7 +92,18 @@ public class StatisticsInvocationHandler<S>
 				methodStatistics.updateExecutionTime(System.currentTimeMillis() - start);
 			}
 		} else {
-			return method.invoke(this.instance, args);
+			try {
+				return method.invoke(this.instance, args);
+			} catch (Throwable ex) {
+				if (ex instanceof UndeclaredThrowableException) {
+					ex = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
+				}
+				if (ex instanceof InvocationTargetException) {
+					throw ((InvocationTargetException) ex).getTargetException();
+				} else {
+					throw ex;
+				}
+			}
 		}
 	}
 

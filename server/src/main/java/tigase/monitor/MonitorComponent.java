@@ -3,6 +3,7 @@ package tigase.monitor;
 import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
+import tigase.kernel.beans.Bean;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.modules.*;
 import tigase.server.monitor.MonitorRuntime;
@@ -10,6 +11,7 @@ import tigase.util.TimerTask;
 
 import javax.script.ScriptEngineManager;
 
+@Bean(name = "monitor", parent = Kernel.class, active = true)
 public class MonitorComponent extends AbstractKernelBasedComponent {
 
 	private final TimerTaskService timerTaskService = new TimerTaskService() {

@@ -26,6 +26,7 @@ import tigase.kernel.beans.Inject;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateParsingException;
 import java.util.Map;
@@ -128,6 +129,10 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 	}
 	protected TrustManager[] getTrustManagers() {
 		return certificateContainer.getTrustManagers();
+	}
+	@Override
+	public KeyStore getTrustStore() {
+		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
 	}
 	protected KeyManager[] createCertificate(String alias) throws Exception {
 		return certificateContainer.createCertificate(alias);

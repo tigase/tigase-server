@@ -204,13 +204,10 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 			}
 		}
 
-		MsgDBItem<T> item = null;
+		MsgDBItem<T> item = expiredQueue.poll();
 
-		while (item == null) {
-			try {
-				item = expiredQueue.take();
-			} catch (InterruptedException ex) {
-			}
+		if (item == null) {
+			return null;
 		}
 
 		if (delete) {
@@ -274,7 +271,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
 		public MsgRepositoryMDBean() {
-			super(MsgRepositoryIfc.class);
+			super(MsgRepositoryIfc.class,OfflineMsgRepositoryIfc.class);
 		}
 
 		@Override

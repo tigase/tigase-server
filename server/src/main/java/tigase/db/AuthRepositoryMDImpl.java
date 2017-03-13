@@ -27,7 +27,6 @@ import tigase.db.beans.AuthRepositoryMDPoolBean;
 import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
-import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 
 import java.util.Map;
@@ -219,10 +218,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 		if (repo != null) {
 			repo.removeUser(user);
 
-			Element event = new Element("remove", new String[] { "xmlns" },
-					new String[] { "tigase:user" });
-			event.addChild(new Element("jid", user.toString()));
-			eventBus.fire(event);
+			eventBus.fire(new UserRepository.UserRemovedEvent(user));
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain()

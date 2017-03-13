@@ -74,6 +74,8 @@ public class ConnectionsTask
 		}
 	}
 
+	public ConnectionsTask() {}
+
 	@Override
 	public Form getCurrentConfiguration() {
 		Form x = super.getCurrentConfiguration();

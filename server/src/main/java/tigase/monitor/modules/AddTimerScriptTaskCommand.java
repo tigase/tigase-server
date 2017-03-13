@@ -20,7 +20,7 @@ import javax.script.ScriptEngineManager;
 import java.util.ArrayList;
 import java.util.List;
 
-@Bean(name = "x-add-timer-task", active = true)
+@Bean(name = "x-add-timer-task", parent = MonitorComponent.class, active = true)
 public class AddTimerScriptTaskCommand
 		implements AdHocCommand {
 

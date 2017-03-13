@@ -246,7 +246,7 @@ public class TLSWrapper {
 	 * @param revocationEnabled
 	 * 
 	 */
-	public CertCheckResult getCertificateStatus(boolean revocationEnabled) {
+	public CertCheckResult getCertificateStatus(boolean revocationEnabled, SSLContextContainerIfc sslContextContainer) {
 		Certificate[] peerChain = null;
 
 		try {
@@ -260,7 +260,7 @@ public class TLSWrapper {
 		}
 
 		try {
-			return CertificateUtil.validateCertificate(peerChain, TLSUtil.getTrustStore(), revocationEnabled);
+			return CertificateUtil.validateCertificate(peerChain, sslContextContainer.getTrustStore(), revocationEnabled);
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "Problem validating certificate", ex);
 		}

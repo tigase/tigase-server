@@ -23,14 +23,16 @@ package tigase.db.beans;
 
 import tigase.db.DataSourceAware;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.stats.ComponentStatisticsProvider;
 import tigase.stats.StatisticsInvocationHandler;
 import tigase.stats.StatisticsList;
-import tigase.stats.ComponentStatisticsProvider;
 
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 /**
  * Extended version of MDRepositoryBean class with support for statistics gathering.
@@ -126,6 +128,9 @@ public abstract class MDRepositoryBeanWithStatistics<T extends DataSourceAware>
 	}
 
 	public void wrapInProxy(String name, T repo) {
+		Class<?>[] repoInterfaces = Stream.concat(Arrays.stream(this.repoInterfaces), Stream.of(DataSourceAware.class))
+				.filter(cls -> cls.isAssignableFrom(repo.getClass()))
+				.toArray(size -> new Class<?>[size]);
 		StatisticsInvocationHandler handler = new StatisticsInvocationHandler(name, repo, repoInterfaces);
 		T proxy = (T) Proxy.newProxyInstance(repo.getClass().getClassLoader(), repoInterfaces, handler);
 		handlers.put(name, handler);

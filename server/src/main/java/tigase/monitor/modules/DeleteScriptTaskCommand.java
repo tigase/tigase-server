@@ -18,7 +18,7 @@ import tigase.xmpp.JID;
 
 import java.util.Collection;
 
-@Bean(name = "x-delete-task", active = true)
+@Bean(name = "x-delete-task", parent = MonitorComponent.class, active = true)
 public class DeleteScriptTaskCommand
 		implements AdHocCommand {
 

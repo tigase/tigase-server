@@ -6,10 +6,7 @@ import tigase.component.modules.impl.DiscoveryModule;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
-import tigase.monitor.AdHocTask;
-import tigase.monitor.ConfigurableTask;
-import tigase.monitor.InfoTask;
-import tigase.monitor.MonitorTask;
+import tigase.monitor.*;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -20,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Bean(name = DiscoveryModule.ID, active = true)
+@Bean(name = DiscoveryModule.ID, parent = MonitorComponent.class, active = true)
 public class DiscoveryMonitorModule extends DiscoveryModule {
 
 	@Inject

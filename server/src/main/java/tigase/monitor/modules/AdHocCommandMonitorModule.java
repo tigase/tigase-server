@@ -9,19 +9,22 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
+import tigase.monitor.MonitorComponent;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-@Bean(name = AdHocCommandModule.ID, active = true)
+@Bean(name = AdHocCommandModule.ID, parent = MonitorComponent.class, active = true)
 public class AdHocCommandMonitorModule extends AdHocCommandModule implements Initializable {
 
+	@Inject
 	private ConfigureTaskCommand configCommand;
 
 	private final AdHocCommandManager customCommandsManager = new AdHocCommandManager();
 
+	@Inject
 	private InfoTaskCommand infoCommand;
 
 	@Inject
@@ -41,9 +44,6 @@ public class AdHocCommandMonitorModule extends AdHocCommandModule implements Ini
 
 	@Override
 	public void initialize() {
-		this.infoCommand = new InfoTaskCommand(kernel);
-		this.configCommand = new ConfigureTaskCommand(kernel);
-
 		super.initialize();
 	}
 

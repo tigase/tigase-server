@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.*;
 
-@Bean(name = "logger-task", active = true)
+@Bean(name = "logger-task", parent = MonitorComponent.class, active = true)
 public class LoggerTask extends AbstractConfigurableTask implements Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();

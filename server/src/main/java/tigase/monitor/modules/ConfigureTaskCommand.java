@@ -6,6 +6,8 @@ import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.ConfigurableTask;
 import tigase.monitor.MonitorComponent;
@@ -14,18 +16,20 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+import static tigase.monitor.modules.ConfigureTaskCommand.NODE;
+
+@Bean(name = NODE, parent = MonitorComponent.class, active = true)
 public class ConfigureTaskCommand
 		implements AdHocCommand {
-
+	
 	public static final String NODE = "x-config";
 
+	@Inject
 	private Kernel kernel;
-
+	@Inject
 	private TasksScriptRegistrar registrar;
 
-	public ConfigureTaskCommand(Kernel kernel) {
-		this.kernel = kernel;
-		this.registrar = kernel.getInstance(TasksScriptRegistrar.ID);
+	public ConfigureTaskCommand() {
 	}
 
 	@Override

@@ -133,7 +133,11 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 
 	@Override
 	public KeyStore getTrustStore() {
-		return null;
+		KeyStore trustStore = super.getTrustStore();
+		if (trustStore == null && parent != null) {
+			trustStore = parent.getTrustStore();
+		}
+		return trustStore;
 	}
 
 	@Override

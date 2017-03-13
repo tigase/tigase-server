@@ -5,21 +5,26 @@ import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Form;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+import static tigase.monitor.modules.InfoTaskCommand.NODE;
+
+@Bean(name = NODE, parent = MonitorComponent.class, active = true)
 public class InfoTaskCommand
 		implements AdHocCommand {
 
 	public static final String NODE = "x-info";
 
+	@Inject
 	private Kernel kernel;
 
-	public InfoTaskCommand(Kernel kernel) {
-		this.kernel = kernel;
+	public InfoTaskCommand() {
 	}
 
 	@Override
