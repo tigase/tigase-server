@@ -35,7 +35,7 @@ server/database/*-unified-archive-*
 server/database/muc-db-migrate.*derby.log
 server/tigase/setup
 .idea/
-tigase-server.iml
+*.iml
 /bin/
 /out/
 src/main/groovy/tigase/admin/DeleteItem.groovy
