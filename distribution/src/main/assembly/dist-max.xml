@@ -53,7 +53,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../server/win-stuff</directory>
+			<directory>src/main/resources/win-stuff</directory>
 			<outputDirectory>win-stuff</outputDirectory>
 			<includes>
 				<include>*/**</include>
