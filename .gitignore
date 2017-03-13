@@ -45,3 +45,6 @@ src/main/groovy/tigase/admin/RetrieveItem.groovy
 etc/installation-id
 etc/*.licence*
 documentation/text/components
+documentation/devguide/text/components
+distribution-docs
+distribution-packages
