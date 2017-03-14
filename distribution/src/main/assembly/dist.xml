@@ -42,7 +42,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>../docs</directory>
+            <directory>../distribution-docs</directory>
             <outputDirectory>docs</outputDirectory>
             <includes>
                 <include>Development_Guide/html_chunk/**/*</include>
