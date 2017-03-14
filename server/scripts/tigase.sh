@@ -138,7 +138,7 @@ CLASSPATH="`ls -d ${TIGASE_HOME}/${LIB_DIR}/*.jar 2>/dev/null | grep -v wrapper 
 LOGBACK="-Dlogback.configurationFile=$TIGASE_HOME/etc/logback.xml"
 
 if [ -n "${OSGI}" ] && ${OSGI} ; then
-	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -jar ${JAR_FILE}"
+	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -Dfelix.config.properties=file:$TIGASE_HOME/etc/config.properties -jar ${JAR_FILE}"
 else
 	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} ${TIGASE_RUN}"
 fi
