@@ -226,7 +226,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			if (!repo.userExists(getRepoUser())) {
 				repo.addUser(getRepoUser());
 			}
-			repo.addUser(getRepoUser());
 		} catch (UserExistsException e) {
 
 			// This is expected when the Items repository has been already running on

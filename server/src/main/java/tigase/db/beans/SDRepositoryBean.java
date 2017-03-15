@@ -153,6 +153,7 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 	public void initialize() {
 		eventBus.registerAll(this);
 		beanConfigurationChanged(Collections.singleton("uri"));
+		setRepository(kernel.getInstance("instance"));
 	}
 
 	@Override

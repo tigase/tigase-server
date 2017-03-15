@@ -300,6 +300,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		public void initialize() {
 			eventBus.registerAll(this);
 			beanConfigurationChanged(Collections.singleton("uri"));
+			setDataSourceAware(kernel.getInstance("instance"));
 		}
 
 		@Override
