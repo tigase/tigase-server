@@ -193,7 +193,7 @@ Once this is turned on, incoming and outgoing messages from the user will be sto
 Enabling this feature allows MUC messages to be stored in the Message Archive repository and are added in the same way as for any other message. For this setting consider the MUC room JID, this will be the "user" that the messages will be archived with.  This is the same JID used for retrevial as well as sending to storage.   Archived MUC messages will be in the same format as normal archival messages with one exception, each message will have a +<name>+ attribute attached which will be the room nick for the user that sent the message.
 This feature is disabled by default.
 
-*NOTE:* It is worth to mention that even if more than on user resources joins the same room and each resource will receive the same messages, then only a single message will be stored in Message Archiving repository.
+*NOTE:* It is worth it to mention that even if more than on user resources joins the same room and each resource will receive the same messages, then only a single message will be stored in Message Archiving repository.
 It is also important to note that MUC messages are archived to user messages archive only when user is joined to MUC room. For example, if message was sent to room but it was not sent to particular user, it will not be archived.
 
 === Configuration
@@ -204,14 +204,16 @@ Enabling archiving of MUC messages is done by adding one more line to your init.
 sess-man/plugins-conf/message-archive-xep-0136/store-muc-messages=value
 -----
 +value+ may be one of the following values:
-- +user+ Allows value to be set on domain level by user if the domain level setting allows that. [what?]
+
+- +user+ Allows value to be set on the domain level by users if the domain level setting allows for that.
 - +true+ Enables the feature for all users in every hosted domain. This cannot be overridden by settings for individual domains or users.
 - +false+ Disables the feature for all users in every hosted domain. This cannot be overridden by settings for individual domains or users.
 
 To configure this setting for individual vhosts, you will need to execute a configuration command using one of the following settings:
-- +user+ Allows user to start this feature
+
+- +user+ Allows user to start this feature.
 - +true+ Enables feature for users of the configured domain. Users will be unable to disable this feature.
-- +false+ Disables feature for users of the configured domain. Users will be unable to disable this feature.
+- +false+ Disables feature for users of the configured domain. Users will be unable to enable this feature.
 
 == Searching for Messages
 
