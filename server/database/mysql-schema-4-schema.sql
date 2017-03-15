@@ -48,9 +48,9 @@ create table if not exists tig_users (
 	-- Time the account has been created
 	acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
 	-- Time of the last user login
-	last_login timestamp DEFAULT 0,
+	last_login timestamp NULL DEFAULT NULL,
 	-- Time of the last user logout
-	last_logout timestamp DEFAULT 0,
+	last_logout timestamp NULL DEFAULT NULL,
 	-- User online status, if > 0 then user is online, the value
 	-- indicates the number of user connections.
 	-- It is incremented on each user login and decremented on each
