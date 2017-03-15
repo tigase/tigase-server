@@ -90,7 +90,7 @@ public static class TestModule extends AbstractModule {
 Instance of *Criteria* class returned by *Criteria getModuleCriteria()* is used by component class to decide if packet should be processed by this module or not.
 In this case we returned instance which matches any packet which is a *message*.
 
-Method *String[] getFeatures()* returns array of *String*s which are used to generate a list of features supported by component. This features are returned during service discovery of a component.
+Method *String[] getFeatures()* returns array of `String` items which are used to generate a list of features supported by component. This features are returned during service discovery of a component.
 
 And finally we have a very important method @void packet(Packet packet)* which is main processing method of a component. If component will receive packet that matches criteria returned by module - this method will be called.
 

@@ -28,7 +28,7 @@ public String getDiscoCategoryType() {
 }
 -----
 
-Please note, there is no such *\'spam'* category type defined in the link:http://xmpp.org/registrar/disco-categories.html[Service Discovery Identities registry]. It has been used here as a demonstration only. Please refer to the Service Discovery Identities registry document for a list of categories and types and pick the one most suitable for you.
+Please note, there is no such *'spam'* category type defined in the link:http://xmpp.org/registrar/disco-categories.html[Service Discovery Identities registry]. It has been used here as a demonstration only. Please refer to the Service Discovery Identities registry document for a list of categories and types and pick the one most suitable for you.
 
 After you have added the two above methods and restarted the server with updated code, have a look at the service discovery window. You should see something like on the screenshot.
 
