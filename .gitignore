@@ -48,3 +48,6 @@ documentation/text/components
 documentation/devguide/text/components
 distribution-docs
 distribution-packages
+server/logs
+server/etc/acs.licence
+server/etc/config-dump.properties
