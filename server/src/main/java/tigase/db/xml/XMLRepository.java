@@ -317,6 +317,11 @@ public class XMLRepository
 	}
 
 	@Override
+	public void loggedIn(BareJID user) throws TigaseDBException {
+		auth.loggedIn(user);
+	}
+
+	@Override
 	public synchronized boolean otherAuth(final Map<String, Object> props)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.otherAuth(props);

@@ -95,6 +95,10 @@ public class AuthRepositoryImpl
 		this.repo = repo;
 	}
 
+	@Override
+	public void loggedIn(BareJID jid) throws TigaseDBException {
+
+	}
 
 	@Override
 	public void addUser(BareJID user, final String password)

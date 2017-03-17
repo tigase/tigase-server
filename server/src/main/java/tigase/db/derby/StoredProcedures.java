@@ -821,6 +821,27 @@ public class StoredProcedures {
 		}
 	}
 
+	public static void tigUpdateLoginTime(final String userId) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps =
+				conn.prepareStatement("update tig_users set last_login = current timestamp where lower(user_id) =  ?");
+
+			ps.setString(1, userId.toLowerCase());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
 	private static String encodePassword(String encMethod, String userId, String userPw) {
 		if ((encMethod != null) && "MD5-PASSWORD".equals(encMethod)) {
 			return md5(userPw);

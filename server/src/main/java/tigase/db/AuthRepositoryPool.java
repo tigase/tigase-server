@@ -157,6 +157,21 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 			throws DBInitException {}
 
 	@Override
+	public void loggedIn(BareJID user) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.loggedIn(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}
+
+	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
 

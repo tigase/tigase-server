@@ -187,6 +187,13 @@ public interface AuthRepository extends Repository {
 	 */
 	long getUsersCount(String domain);
 
+	/**
+	 * Do some actions on repository, when user logs in. (for example update <code>last_login_time</code>)
+	 * @param jid JID of logged user.
+	 * @throws TigaseDBException if an error occurs
+	 */
+	void loggedIn(BareJID jid) throws TigaseDBException;
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -212,6 +219,7 @@ public interface AuthRepository extends Repository {
 	 *                if an error occurs
 	 *
 	 */
+	@Deprecated
 	boolean otherAuth(Map<String, Object> authProps)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
@@ -244,6 +252,7 @@ public interface AuthRepository extends Repository {
 	 *
 	 * @param authProps a <code>Map</code> value with parameters for authentication.
 	 */
+	@Deprecated
 	void queryAuth(Map<String, Object> authProps);
 
 	/**

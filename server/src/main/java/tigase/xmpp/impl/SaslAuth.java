@@ -297,6 +297,9 @@ public class SaslAuth
 					}
 					session.removeSessionData(SASL_SERVER_KEY);
 					session.authorizeJID(jid, anonymous);
+					if (session.getAuthRepository() != null) {
+						session.getAuthRepository().loggedIn(jid);
+					}
 					results.offer(packet.swapFromTo(createReply(ElementType.success,
 							challengeData), null, null));
 				} else if (!ss.isComplete()) {

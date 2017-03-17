@@ -167,6 +167,9 @@ public class DummyRepository implements Repository, DataSource, DataSourcePool, 
 	public void initRepository(String string, Map<String, String> params) {}
 
 	@Override
+	public void loggedIn(BareJID jid) throws TigaseDBException {}
+
+	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {}
 
 	@Override

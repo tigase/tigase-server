@@ -29,10 +29,7 @@ import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
 import tigase.xmpp.BareJID;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,6 +69,7 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 	private static final String USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
 	private static final String USERS_DOMAIN_COUNT_QUERY =
 		"select count(*) from tig_users where user_id like ?";
+	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -209,6 +207,7 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 			data_repo.initPreparedStatement(USER_LOGOUT_QUERY, USER_LOGOUT_QUERY);
 			data_repo.initPreparedStatement(USERS_COUNT_QUERY, USERS_COUNT_QUERY);
 			data_repo.initPreparedStatement(USERS_DOMAIN_COUNT_QUERY, USERS_DOMAIN_COUNT_QUERY);
+			data_repo.initPreparedStatement(DEF_UPDATELOGINTIME_QUERY, DEF_UPDATELOGINTIME_QUERY);
 
 			if ((params != null) && (params.get("init-db") != null)) {
 				data_repo.getPreparedStatement(null, INIT_DB_QUERY).executeQuery();
@@ -228,6 +227,20 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 			synchronized (user_logout_sp) {
 				user_logout_sp.setString(1, user.toString());
 				user_logout_sp.execute();
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		}
+	}
+
+	@Override
+	public void loggedIn(BareJID user) throws TigaseDBException {
+		try {
+			PreparedStatement ps = data_repo.getPreparedStatement(user, DEF_UPDATELOGINTIME_QUERY);
+
+			synchronized (ps) {
+				ps.setString(1, user.toString());
+				ps.execute();
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);

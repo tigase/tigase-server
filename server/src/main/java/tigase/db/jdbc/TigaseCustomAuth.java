@@ -34,10 +34,7 @@ import javax.security.auth.callback.*;
 import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -212,6 +209,8 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	 */
 	public static final String DEF_USERLOGOUT_KEY = "user-logout-query";
 
+	public static final String DEF_UPDATELOGINTIME_KEY = "update-login-time-query";
+
 	/** Field description */
 	public static final String DEF_USERS_COUNT_KEY = "users-count-query";
 
@@ -279,8 +278,10 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	
 	public static final String DEF_DISABLEACCOUNT_QUERY = "{ call TigDisableAccount(?) }";
 	
-	public static final String DEF_ENABLEACCOUNT_QUERY = "{ call TigEnableAccount(?) }";	
-	
+	public static final String DEF_ENABLEACCOUNT_QUERY = "{ call TigEnableAccount(?) }";
+
+	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
+
 	/** Field description */
 	public static final String DEF_NONSASL_MECHS = "password";
 
@@ -303,7 +304,8 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	private String listdisabledaccounts_query = DEF_LISTDISABLEDACCOUNTS_QUERY;
 	private String disableaccount_query = DEF_DISABLEACCOUNT_QUERY;
 	private String enableaccount_query = DEF_ENABLEACCOUNT_QUERY;
-	
+	private String updatelastlogin_query = DEF_UPDATELOGINTIME_QUERY;
+
 
 	// It is better just to not call the query if it is not defined by the user
 	// By default it is null then and not called.
@@ -521,6 +523,11 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
 			}
 
+			updatelastlogin_query = getParamWithDef(params, DEF_UPDATELOGINTIME_KEY, DEF_UPDATELOGINTIME_QUERY);
+			if (updatelastlogin_query != null) {
+				data_repo.initPreparedStatement(updatelastlogin_query, updatelastlogin_query);
+			}
+
 			userscount_query =
 					getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
 
@@ -566,6 +573,27 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 
 			throw new DBInitException(
 					"Problem initializing jdbc connection: " + connection_str, e);
+		}
+	}
+
+	@Override
+	public void loggedIn(BareJID user) throws TigaseDBException {
+		if (updatelastlogin_query == null) {
+			return;
+		}
+
+		try {
+			PreparedStatement ps =
+					data_repo.getPreparedStatement(user, updatelastlogin_query);
+
+			if (ps != null) {
+				synchronized (ps) {
+					ps.setString(1, user.toString());
+					ps.execute();
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
 		}
 	}
 

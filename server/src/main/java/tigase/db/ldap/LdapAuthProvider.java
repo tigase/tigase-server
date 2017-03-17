@@ -207,6 +207,10 @@ public class LdapAuthProvider implements AuthRepository {
 	}
 
 	@Override
+	public void loggedIn(BareJID jid) throws TigaseDBException {
+	}
+
+	@Override
 	public boolean otherAuth(Map<String, Object> props) throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String proto = (String) props.get(PROTOCOL_KEY);
 

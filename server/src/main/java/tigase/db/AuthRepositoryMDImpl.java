@@ -238,6 +238,18 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 		}
 	}
 
+	public void loggedIn(BareJID user) throws TigaseDBException{
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.loggedIn(user);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain()
+							+ ", not even default one!");
+		}	}
+
+
 	@Override
 	public void updatePassword(BareJID user, String password) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());

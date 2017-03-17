@@ -241,6 +241,11 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 	}
 
 	@Override
+	public void loggedIn(BareJID jid) throws TigaseDBException {
+		updateLastLogin(jid);
+	}
+
+	@Override
 	public boolean otherAuth(final Map<String, Object> props)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String proto = (String) props.get(PROTOCOL_KEY);

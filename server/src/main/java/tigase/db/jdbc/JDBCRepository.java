@@ -115,6 +115,8 @@ public class JDBCRepository
 	private static final String DATA_FOR_NODE_QUERY = "select pval from " + DEF_PAIRS_TBL +
 																										" where (nid = ?) AND (pkey = ?)";
 
+	private static final String UPDATE_LAST_LOGIN_QUERY = "update "+DEF_USERS_TBL+" set last_login=? where user_id=?";
+
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
@@ -622,6 +624,7 @@ public class JDBCRepository
 			data_repo.initPreparedStatement(INSERT_KEY_VAL_QUERY, INSERT_KEY_VAL_QUERY);
 			data_repo.initPreparedStatement(REMOVE_KEY_DATA_QUERY, REMOVE_KEY_DATA_QUERY);
 			data_repo.initPreparedStatement(UPDATE_PAIRS_QUERY, UPDATE_PAIRS_QUERY);
+			data_repo.initPreparedStatement(UPDATE_LAST_LOGIN_QUERY, UPDATE_LAST_LOGIN_QUERY);
 			auth = new AuthRepositoryImpl(this);
 
 			// initRepo();
@@ -637,6 +640,11 @@ public class JDBCRepository
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		auth.logout(user);
+	}
+
+	@Override
+	public void loggedIn(BareJID user) throws TigaseDBException {
+		auth.loggedIn(user);
 	}
 
 	@Override
