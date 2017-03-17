@@ -89,9 +89,28 @@
 		</fileSet>
 		<fileSet>
 			<directory>../../jars</directory>
+
 			<outputDirectory>jars</outputDirectory>
 			<includes>
-				<include>**/*.old</include>
+                <include>**/tigase-server*</include>
+                <include>**/tigase-acs*</include>
+                <include>**/tigase-acs-muc*</include>
+                <include>**/tigase-acs-pubsub*</include>
+                <include>**/tigase-muc*</include>
+                <include>**/tigase-pubsub*</include>
+                <include>**/tigase-extras*</include>
+                <include>**/tigase-stats-collector-library*</include>
+                <include>**/tigase-stats-collector-provider*</include>
+                <include>**/tigase-http-api*</include>
+                <include>**/tigase-http-api-jetty*</include>
+                <include>**/tigase-message-archiving*</include>
+                <include>**/tigase-unified-archive*</include>
+                <include>**/tigase-socks5*</include>
+                <include>**/tigase-stun*</include>
+                <include>**/tigase-mongodb*</include>
+                <include>**/tigase-ext-mailer*</include>
+                <include>**/licence-lib*</include>
+                <include>**/tigase-web-ui*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -125,29 +144,6 @@
 				<exclude>junit:junit</exclude>
 			</excludes>-->
 			<includes>
-				<!--tigase libraries-->
-				<include>tigase:tigase-server</include>
-				<!--<include>tigase:tigase-utils</include>-->
-				<!--<include>tigase:tigase-xmltools</include>-->
-				<include>tigase:tigase-acs</include>
-				<include>tigase:tigase-acs-muc</include>
-				<include>tigase:tigase-acs-pubsub</include>
-				<include>tigase:tigase-muc</include>
-				<include>tigase:tigase-pubsub</include>
-				<include>tigase:tigase-extras</include>
-				<include>tigase:licence-lib</include>
-				<include>tigase:tigase-stats-collector-library</include>
-				<include>tigase:tigase-stats-collector-provider</include>
-				<include>tigase:tigase-http-api</include>
-				<include>tigase:tigase-http-api-jetty</include>
-				<include>tigase.sure.web:tigase-web-ui</include>
-				<include>tigase:tigase-message-archiving</include>
-				<include>tigase:tigase-unified-archive</include>
-				<include>tigase:tigase-socks5</include>
-				<include>tigase:tigase-stun</include>
-				<include>tigase:tigase-mongodb</include>
-				<include>tigase:tigase-ext-mailer</include>
-
 				<!--database libraries-->
 				<include>org.apache.derby:derby</include>
 				<include>org.apache.derby:derbytools</include>

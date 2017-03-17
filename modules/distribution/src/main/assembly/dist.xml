@@ -17,6 +17,15 @@
 				<include>package.html</include>
 			</includes>
 		</fileSet>
+        <fileSet>
+            <directory>../server/jars</directory>
+            <outputDirectory>jars</outputDirectory>
+            <includes>
+                <include>**/tigase-server*</include>
+                <include>**/tigase-http-api*</include>
+                <include>**/tigase-web-ui*</include>
+            </includes>
+        </fileSet>
 		<fileSet>
 			<directory>../../certs</directory>
 			<outputDirectory>certs</outputDirectory>
@@ -109,12 +118,6 @@
 			<unpack>false</unpack>
 			<!--<scope>runtime</scope>-->
 			<includes>
-				<!--tigase libraries-->
-				<include>tigase:tigase-server</include>
-				<include>tigase:tigase-http-api</include>
-				<include>tigase.sure.web:tigase-web-ui</include>
-				<include>javax.servlet:javax.servlet-api</include>
-
 				<!--database libraries-->
 				<include>org.apache.derby:derby</include>
 				<include>org.apache.derby:derbytools</include>
