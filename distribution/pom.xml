@@ -146,27 +146,6 @@
                         </configuration>
                     </execution>
 					<execution>
-						<id>copy-old-pubsub</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-pubsub</artifactId>
-									<version>2.2.0</version>
-									<destFileName>tigase-pubsub-2.2.0.jar.old</destFileName>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>${project.build.directory}/dist/jars</outputDirectory>
-							<stripVersion>false</stripVersion>
-							<useBaseVersion>true</useBaseVersion>
-						</configuration>
-					</execution>
-					<execution>
 						<id>tigase-resources</id>
 						<phase>validate</phase>
 						<goals>

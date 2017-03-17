@@ -106,13 +106,6 @@
 			<directory>../server/jars</directory>
 			<outputDirectory>jars</outputDirectory>
 			<includes>
-				<include>**/*.old</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<directory>../server/jars</directory>
-			<outputDirectory>jars</outputDirectory>
-			<includes>
                 <include>**/tigase-server*</include>
                 <include>**/tigase-acs*</include>
                 <include>**/tigase-acs-muc*</include>
@@ -132,7 +125,6 @@
                 <include>**/tigase-ext-mailer*</include>
                 <include>**/licence-lib*</include>
                 <include>**/tigase-web-ui*</include>
-				<include>**/*.old</include>
 			</includes>
 		</fileSet>
         <fileSet>
