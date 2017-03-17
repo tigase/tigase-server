@@ -131,7 +131,7 @@
                 <include>**/tigase-mongodb*</include>
                 <include>**/tigase-ext-mailer*</include>
                 <include>**/licence-lib*</include>
-                <include>**/ttigase-web-ui*</include>
+                <include>**/tigase-web-ui*</include>
 				<include>**/*.old</include>
 			</includes>
 		</fileSet>
