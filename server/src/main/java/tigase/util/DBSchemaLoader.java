@@ -18,21 +18,17 @@
  */
 package tigase.util;
 
+import tigase.db.AuthRepository;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.xmpp.BareJID;
+
 import java.io.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Properties;
-import java.util.Set;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.AuthRepository;
-import tigase.xmpp.BareJID;
 
 /**
  * Simple utility class allowing various Database operations, including
@@ -329,7 +325,7 @@ class DBSchemaLoader extends SchemaLoader {
 									+ "\n\t[-" + TIGASE_PASSWORD_KEY + " tigase_userpass]"
 									+ "\n\t[-" + ROOT_USERNAME_KEY + " database_root_username]"
 									+ "\n\t[-" + ROOT_PASSWORD_KEY + " database_root_password]"
-									+ "\n\t[-" + FILE_KEY + " path_to_sql_schema_file]"
+									+ "\n\t[-" + FILE_KEY + " comma separated list of path_to_sql_schema_file(s)]"
 									+ "\n\t[-" + QUERY_KEY + " sql_query_to_execute]"
 									+ "\n\t[-" + LOG_LEVEL_KEY + " java logger Level]"
 									+ "\n\t[-" + ADMIN_JID_KEY + " comma separated list of admin JIDs]"
@@ -841,17 +837,20 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.WARNING, "Error: empty query" );
 			return Result.error;
 		}
-		String fileName = fileNameObj.toString();
+
+		String[] fileName = fileNameObj.toString().split(",");
 
 		String db_conn = getDBUri( variables, true, true );
-		log.log( Level.INFO,
-						 String.format( "Loading schema from file: %1$s, URI: %2$s",
-														fileName, db_conn ) );
+		log.log(Level.INFO,
+		        String.format("Loading schema from file(s): %1$s, URI: %2$s", Arrays.toString(fileName), db_conn));
 		try {
 			try ( Connection conn = DriverManager.getConnection( db_conn ) ;
 						Statement stmt = conn.createStatement() ) {
 
-				ArrayList<String> queries = loadSQLQueries( fileName, null, variables );
+				ArrayList<String> queries = new ArrayList<>();
+				for (String file : fileName) {
+					queries.addAll(loadSQLQueries(file, null, variables));
+				}
 				for ( String query : queries ) {
 					if ( !query.isEmpty() ){
 						log.log( Level.FINEST, "Executing query: " + query );

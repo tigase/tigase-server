@@ -32,10 +32,12 @@ create_database() {
 
 java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL
 
-java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL -file database/${DB_TYPE}-pubsub-schema-3.0.0.sql
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL -file database/${DB_TYPE}-message-archiving-schema-1.3.0.sql,database/${DB_TYPE}-pubsub-schema-3.3.0.sql,database/${DB_TYPE}-muc-schema-2.5.0.sql,database/${DB_TYPE}-socks5-schema.sql
 
 
-  echo -e "\n\n\nconfiguration:\n\n--user-db=mysql\n--user-db-uri=jdbc:mysql://$DB_HOST:3306/$DB_NAME?user=$USER_NAME&password=$USER_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"
+  echo -e "dataSource {\n    default {\n        uri = 'jdbc:mysql://$DB_HOST:3306/$DB_NAME?user=$USER_NAME&password=$USER_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true'\n    }\n}"
+
+
 
 }
 

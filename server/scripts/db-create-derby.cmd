@@ -19,7 +19,7 @@ set DB_VERSION=7-1
 
 java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL
 
-java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL -file database/%DB_TYPE%-pubsub-schema-3.0.0.sql
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL -file database/%DB_TYPE%-message-archiving-schema-1.3.0.sql,database/%DB_TYPE%-pubsub-schema-3.3.0.sql,database/%DB_TYPE%-muc-schema-2.5.0.sql,database/%DB_TYPE%-socks5-schema.sql
 
 
 
