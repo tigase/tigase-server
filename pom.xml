@@ -162,7 +162,7 @@
 					<processMainArtifact>false</processMainArtifact>
 					<processAttachedArtifacts>false</processAttachedArtifacts>
 					<tsa>${tsa-uri}</tsa>
-					<skip>${sign-skip}</skip>
+					<skip>${sign-skip-server}</skip>
 
 					<keystore>${sign-keystore}</keystore>
 					<alias>${sign-alias}</alias>

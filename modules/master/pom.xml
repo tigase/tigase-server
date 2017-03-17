@@ -13,6 +13,7 @@
 		<sign-storepass>storepass</sign-storepass>
 		<sign-keypass>keypass</sign-keypass>
 		<sign-skip>true</sign-skip>
+        <sign-skip-server>true</sign-skip-server>
 		<verbose-log>false</verbose-log>
 		<tsa-uri></tsa-uri>
 	</properties>
