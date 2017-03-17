@@ -73,10 +73,10 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 
 		kernel.registerBean("timerTaskService").asInstance(timerTaskService).exec();
 	}
-
+	
 	@Override
-	public void initialize() {
-		super.initialize();
+	public void start() {
+		super.start();
 		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();
 	}
 }
