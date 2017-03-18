@@ -24,8 +24,14 @@ source database/mysql-schema-7-1-sp.sql;
 -- LOAD FILE: database/mysql-schema-7-1-sp.sql
 
 -- QUERY START:
+drop procedure if exists TigUpdateLoginTime;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
 -- It sets last_login time to the current timestamp
-create procedure TigUserLogout(_user_id varchar(2049) CHARSET utf8)
+create procedure TigUpdateLoginTime(_user_id varchar(2049) CHARSET utf8)
 begin
 	update tig_users
 		set last_login = CURRENT_TIMESTAMP
