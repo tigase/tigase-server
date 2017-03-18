@@ -40,7 +40,7 @@ public class JabberVersionModule extends AbstractModule {
 
 	public final static String ID = "jabber:iq:version";
 
-	@Inject(bean = "component")
+	@Inject(bean = "service")
 	private AbstractKernelBasedComponent component;
 
 	public JabberVersionModule() {

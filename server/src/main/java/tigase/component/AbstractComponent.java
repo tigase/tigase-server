@@ -17,15 +17,6 @@
  */
 package tigase.component;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.script.Bindings;
-
 import tigase.component.modules.Module;
 import tigase.component.modules.StanzaProcessor;
 import tigase.component.responses.AsyncCallback;
@@ -38,6 +29,14 @@ import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
+
+import javax.script.Bindings;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Base class for implement XMPP Component.
@@ -201,7 +200,7 @@ public abstract class AbstractComponent extends AbstractMessageReceiver implemen
 	public static class DefaultPacketWriter implements PacketWriter {
 
 		protected final Logger log = Logger.getLogger(this.getClass().getName());
-		@Inject(bean = "component")
+		@Inject(bean = "service")
 		private AbstractComponent component;
 		@Inject
 		private ResponseManager responseManager;

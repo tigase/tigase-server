@@ -14,7 +14,7 @@ import java.util.Queue;
 @Bean(name = "scriptCommandProcessor", active = true)
 public class ComponenScriptCommandProcessor implements ScriptCommandProcessor {
 
-	@Inject(bean = "component", nullAllowed = false)
+	@Inject(bean = "service", nullAllowed = false)
 	private BasicComponent component;
 
 	@Override

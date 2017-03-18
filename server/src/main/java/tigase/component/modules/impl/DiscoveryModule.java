@@ -49,7 +49,7 @@ public class DiscoveryModule extends AbstractModule {
 	@Inject(nullAllowed = true)
 	private AdHocCommandModule adHocCommandModule;
 
-	@Inject(bean = "component")
+	@Inject(bean = "service")
 	private BasicComponent component;
 
 	private Criteria criteria;

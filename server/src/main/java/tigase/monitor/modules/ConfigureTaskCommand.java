@@ -25,6 +25,8 @@ public class ConfigureTaskCommand
 	public static final String NODE = "x-config";
 
 	@Inject
+	private MonitorComponent component;
+	@Inject
 	private Kernel kernel;
 	@Inject
 	private TasksScriptRegistrar registrar;
@@ -77,7 +79,7 @@ public class ConfigureTaskCommand
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return kernel.getInstance(MonitorComponent.class).isAdmin(jid);
+		return component.isAdmin(jid);
 	}
 
 }

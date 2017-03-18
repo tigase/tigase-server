@@ -328,8 +328,9 @@ public class Kernel {
 		//TODO - check if null should be passed here
 		final List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanClass, null, null, allowNonExportable);
 
-		if (bcs.size() > 1)
+		if (bcs.size() > 1) {
 			throw new KernelException("Too many beans implemented class " + beanClass);
+		}
 		else if (bcs.isEmpty() && this.parent != null && this.parent != this) {
 			return this.parent.getInstance(beanClass, false);
 		}

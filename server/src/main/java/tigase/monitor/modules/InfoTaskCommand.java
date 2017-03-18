@@ -22,6 +22,8 @@ public class InfoTaskCommand
 	public static final String NODE = "x-info";
 
 	@Inject
+	private MonitorComponent component;
+	@Inject
 	private Kernel kernel;
 
 	public InfoTaskCommand() {
@@ -57,7 +59,7 @@ public class InfoTaskCommand
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return kernel.getInstance(MonitorComponent.class).isAdmin(jid);
+		return component.isAdmin(jid);
 	}
 
 }
