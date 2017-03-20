@@ -9,9 +9,244 @@
 :numbered:
 :website: http://www.tigase.org
 
-Statistics are divided between components and processors.  You may see the same statistics collected for multiple components which are defined in common components section.
+Statistics are divided between data sources, components and processors.  You may see the same statistics collected for multiple components which are defined in common components section.
 Note that statistics are defined by {$component}/statistic so if you wanted Max queue size on pubsub, you would look for +pubsub/Max queue size+.
 Statistics will not be provided by components that are not enabled.
+
+== Data source statistics
+Data sources used to access data storages such as JDBC (databases) or MongoDB provide statistcs related to stability of connections to data storage and number of open connections.
+
+=== Number of active data sources
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+dataSource/Number of data sources
+----
+
+=== URI of {dataSourceName}
+
+*Statistics Level*: FINE
+
+*Result Format*: String
+
+*List of possible statistics*:
+[source,list]
+----
+dataSource/{dataSourceName}/uri
+----
+
+=== Number of connections for {dataSourceName}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+dataSource/{dataSourceName}/connections count
+----
+
+=== Number of reconnections for {dataSourceName}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+dataSource/{dataSourceName}/reconnections
+----
+
+=== Number of failed reconnections for {dataSourceName}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+dataSource/{dataSourceName}/failed reconnections
+----
+
+== User repository statistics of {repo}
+
+For every {method} declared in `UserRepository` we gather execution statistics. This statistics are collected separately for every data source for which user repository is defined.
+
+=== Average processing time of {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+userRepository/{repo}/{method}/Average processing time
+----
+
+=== Number of executions of a {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+userRepository/{repo}/{method}/Executions
+----
+
+=== Number of exceptions of a {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+userRepository/{repo}/{method}/Exceptions during execution
+----
+
+=== Number of executions of a {method} in last {interval}
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+userRepository/{repo}/{method}/Excutions last {interval}
+----
+
+== Auth repository statistics of {repo}
+
+For every {method} declared in `AuthRepository` we gather execution statistics. This statistics are collected separately for every data source for which authentication repository is defined.
+
+=== Average processing time of {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+authRepository/{repo}/{method}/Average processing time
+----
+
+=== Number of executions of a {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+authRepository/{repo}/{method}/Executions
+----
+
+=== Number of exceptions of a {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+authRepository/{repo}/{method}/Exceptions during execution
+----
+
+=== Number of executions of a {method} in last {interval}
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+authRepository/{repo}/{method}/Excutions last {interval}
+----
+
+== Statistics common to custom {compname} component repositories
+
+These statistics may be found in many components which are using repository implementations created just for them.
+An example of such components may be:
+
+amp:: with msgBroadcastRepository as {repo} name,
+message-archive:: with repositoryPool as a {repo} name,
+muc:: with muc-dao as a {repo} name,
+pubsub:: with dao as a {repo} name,
+sess-man:: with msgRepository as a {repo} name
+
+For custom component repositories we gather statistics in a same way as we do for user and authorization repositories.
+Statistics are collected on per {method} basis separately for every data source ({dataSourceName}) for which repository is defined.
+
+=== Average processing time of {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+{compname}/{repo}/{dataSourceName}/{method}/Average processing time
+----
+
+=== Number of executions of a {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+{compname}/{repo}/{dataSourceName}/{method}/Executions
+----
+
+=== Number of exceptions of a {method}
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+{compname}/{repo}/{dataSourceName}/{method}/Exceptions during execution
+----
+
+=== Number of executions of a {method} in last {interval}
+
+*Available {interval}*: hour|minute|second
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+----
+{compname}/{repo}/{dataSourceName}/{method}/Excutions last {interval}
+----
 
 == *Statistics common to components*
 
