@@ -330,8 +330,8 @@
 						<include>jars/tigase*.?ar</include>
 						<include>jars/licence-lib.jar</include>
 					</includes>
-					<processMainArtifact>true</processMainArtifact>
-					<processAttachedArtifacts>true</processAttachedArtifacts>
+					<processMainArtifact>false</processMainArtifact>
+					<processAttachedArtifacts>false</processAttachedArtifacts>
 					<tsa>${tsa-uri}</tsa>
                     <skip>${sign-skip-server}</skip>
 					<removeExistingSignatures>true</removeExistingSignatures>
