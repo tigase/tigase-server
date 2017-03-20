@@ -21,13 +21,22 @@
  */
 package tigase.auth;
 
-import java.security.Provider;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.auth.callbacks.CallbackHandlerFactoryIfc;
+import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.*;
+import tigase.kernel.core.Kernel;
+import tigase.server.xmppsession.SessionManager;
+import tigase.xmpp.XMPPResourceConnection;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslServerFactory;
+import java.security.Provider;
+import java.security.Security;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Describe class TigaseSaslProvider here.
@@ -36,7 +45,10 @@ import javax.security.sasl.SaslServerFactory;
  * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-public class TigaseSaslProvider extends Provider {
+@Bean(name = "sasl-provider", parent = SessionManager.class, active = true)
+public class TigaseSaslProvider
+		extends Provider
+		implements Initializable, UnregisterAware, RegistrarBean {
 
 	public static final String FACTORY_KEY = "factory";
 
@@ -50,31 +62,86 @@ public class TigaseSaslProvider extends Provider {
 
 	private static final double VERSION = 1.0;
 
+	@Inject
+	private CallbackHandlerFactoryIfc callbackHandlerFactory;
+
+	@Inject
+	private MechanismSelector mechanismSelector;
+
+	@Inject(nullAllowed = true)
+	private CopyOnWriteArraySet<SaslServerFactory> saslServerFactories = new CopyOnWriteArraySet<>();
+
+	private ConcurrentHashMap<SaslServerFactory, List<Service>> saslServerFactoriesServices = new ConcurrentHashMap<>();
+
 	@SuppressWarnings("unchecked")
-	public TigaseSaslProvider(Map<String, Object> settings) {
+	public TigaseSaslProvider() {
 		super(MY_NAME, VERSION, INFO);
+	}
 
-		Class<? extends SaslServerFactory> facClass;
-		if (settings.containsKey(FACTORY_KEY)) {
-			try {
-				facClass = (Class<? extends SaslServerFactory>) Class.forName(settings.get(FACTORY_KEY).toString());
-			} catch (ClassNotFoundException e) {
-				log.log(Level.SEVERE, "Unknown factory class", e);
-				throw new RuntimeException(e);
-			}
-		} else
-			facClass = tigase.auth.mechanisms.TigaseSaslServerFactory.class;
-
-		try {
-			SaslServerFactory tmp = facClass.newInstance();
-			String[] mech = tmp.getMechanismNames(new HashMap<String, Object>());
-			for (String name : mech) {
-				log.config("Registering SASL mechanism '" + name + "' with factory " + facClass.getName());
-				putService(new Provider.Service(this, "SaslServerFactory", name, facClass.getName(), null, null));
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't instantiate factory", e);
-			throw new RuntimeException(e);
+	public void setSaslServerFactories(CopyOnWriteArraySet<SaslServerFactory> saslServerFactories) {
+		this.saslServerFactories.stream().filter(factory -> saslServerFactories == null || !saslServerFactories.contains(factory)).forEach(this::unregisterFactory);
+		if (saslServerFactories != null) {
+			saslServerFactories.stream().filter(factory -> !this.saslServerFactories.contains(factory)).forEach(this::registerFactory);
 		}
+		this.saslServerFactories = saslServerFactories == null ? new CopyOnWriteArraySet<>() : saslServerFactories;
+	}
+
+	@Override
+	public void beforeUnregister() {
+		Security.removeProvider(MY_NAME);
+	}
+
+	@Override
+	public void initialize() {
+		Security.insertProviderAt(this, 1);
+	}
+
+	public CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
+								  Map<String, Object> settings)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		return callbackHandlerFactory.create(mechanismName, session, repo, settings);
+	}
+
+	public Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories,
+											   XMPPResourceConnection session) {
+		return mechanismSelector.filterMechanisms(serverFactories, session);
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+	}
+
+	private void registerFactory(SaslServerFactory factory) {
+		String factoryClassName = factory.getClass().getName();
+
+		List<Service> services = Arrays.stream(factory.getMechanismNames(new HashMap<>()))
+				.map(name -> new Provider.Service(this, "SaslServerFactory", name, factoryClassName, null, null))
+				.collect(Collectors.toList());
+
+		services.forEach(this::putService);
+		saslServerFactoriesServices.put(factory,services);
+	}
+
+	private void unregisterFactory(SaslServerFactory factory) {
+		List<Service> services = saslServerFactoriesServices.remove(factory);
+		if (services != null) {
+			services.forEach(this::removeService);
+		}
+	}
+
+	@Override
+	protected synchronized void putService(Service s) {
+		log.config("Registering SASL mechanism '" + s.getAlgorithm() + "' with factory " + s.getClassName());
+		super.putService(s);
+	}
+
+	@Override
+	protected synchronized void removeService(Service s) {
+		log.config("Unregistering SASL mechanism '" + s.getAlgorithm() + "' with factory " + s.getClassName());
+		super.removeService(s);
 	}
 }

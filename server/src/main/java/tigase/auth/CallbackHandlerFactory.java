@@ -1,22 +1,26 @@
 package tigase.auth;
 
-import java.util.Map;
-
-import javax.security.auth.callback.CallbackHandler;
-
+import tigase.auth.callbacks.CallbackHandlerFactoryIfc;
 import tigase.auth.impl.AuthRepoPlainCallbackHandler;
 import tigase.auth.impl.ScramCallbackHandler;
 import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.Bean;
 import tigase.xmpp.XMPPResourceConnection;
+
+import javax.security.auth.callback.CallbackHandler;
+import java.util.Map;
 
 /**
  * Factory of {@linkplain CallbackHandler CallbackHandlers}.
- * 
+ *
  */
-public class CallbackHandlerFactory {
+@Bean(name = "callback-handler-factory", parent = TigaseSaslProvider.class, active = true)
+public class CallbackHandlerFactory
+		implements CallbackHandlerFactoryIfc {
 
 	private static final String CALLBACK_HANDLER_KEY = "callbackhandler";
 
+	@Override
 	public CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
 			Map<String, Object> settings) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		String handlerClassName = getHandlerClassname(mechanismName, session, repo, settings);

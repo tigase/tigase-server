@@ -660,6 +660,26 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		public void setExportable(boolean exportable) {
 			this.exportable = exportable;
 		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder("BeanConfig{");
+			sb.append("beanName='").append(beanName).append('\'');
+			sb.append(", clazz=").append(clazzName);
+			sb.append(", exportable=").append(exportable);
+			sb.append(", active=").append(active);
+			sb.append(", props=[");
+			Iterator<Map.Entry> it = entrySet().iterator();
+			while (it.hasNext()) {
+				Entry e = it.next();
+				sb.append("" + e.getKey()).append("=").append("" + e.getValue());
+				if (it.hasNext()) {
+					sb.append(", ");
+				}
+			}
+			sb.append('}');
+			return sb.toString();
+		}
 	}
 
 }

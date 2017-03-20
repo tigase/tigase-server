@@ -22,12 +22,13 @@
 
 package tigase.xmpp.impl;
 
-import tigase.auth.*;
+import tigase.auth.TigaseSaslProvider;
+import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.mechanisms.SaslANONYMOUS;
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
@@ -40,7 +41,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import java.security.Security;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,9 +84,8 @@ public class SaslAuth
 
 	private final Map<String, Object> props = new HashMap<String, Object>();
 
-	private CallbackHandlerFactory callbackHandlerFactory = new CallbackHandlerFactory();
-
-	private MechanismSelector mechanismSelector;
+	@Inject
+	private TigaseSaslProvider saslProvider;
 
 	@Override
 	public int concurrentQueuesNo() {
@@ -108,33 +107,7 @@ public class SaslAuth
 	public String id() {
 		return ID;
 	}
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		if (settings != null) {
-			props.putAll(settings);
-		}
-		super.init(settings);
-
-		// we should remove existing tigase.sasl provider if it is not instance of TigaseSaslProvider
-		// as it can be loaded from other bundle in OSGi which will cause many issues with instanceof
-		// and casting and it is NOT possible to update implementation without removing it first
-		if (!(Security.getProvider("tigase.sasl") instanceof TigaseSaslProvider)) {
-			Security.removeProvider("tigase.sasl");
-		}
-		Security.insertProviderAt(new TigaseSaslProvider(settings), 1);
-
-		MechanismSelectorFactory mechanismSelectorFactory = new MechanismSelectorFactory();
-
-		try {
-			mechanismSelector = mechanismSelectorFactory.create(settings);
-		} catch (Exception e) {
-			log.severe("Can't create SASL Mechanism Selector");
-
-			throw new RuntimeException("Can't create SASL Mechanism Selector", e);
-		}
-	}
-
+	
 	/**
 	 * Method description
 	 *
@@ -201,7 +174,7 @@ public class SaslAuth
 						session.removeSessionData(ALLOWED_SASL_MECHANISMS_KEY);
 
 						if (allowedMechanisms == null) {
-							allowedMechanisms = mechanismSelector.filterMechanisms(Sasl.getSaslServerFactories(),
+							allowedMechanisms = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(),
 																				   session);
 						}
 
@@ -211,7 +184,7 @@ public class SaslAuth
 														"Mechanism '" + mechanismName + "' is not allowed");
 						}
 
-						CallbackHandler cbh = callbackHandlerFactory.create(mechanismName, session, repo, settings);
+						CallbackHandler cbh = saslProvider.create(mechanismName, session, repo, settings);
 
 						ss = Sasl.createSaslServer(mechanismName, "xmpp", session.getDomain().getVhost().getDomain(),
 												   props, cbh);
@@ -350,7 +323,7 @@ public class SaslAuth
 		if ((session == null) || session.isAuthorized()) {
 			return null;
 		} else {
-			Collection<String> auth_mechs = mechanismSelector.filterMechanisms(Sasl.getSaslServerFactories(), session);
+			Collection<String> auth_mechs = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(), session);
 			Element[] mechs = new Element[auth_mechs.size()];
 			int idx = 0;
 

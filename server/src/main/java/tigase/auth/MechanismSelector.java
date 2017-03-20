@@ -28,13 +28,11 @@ package tigase.auth;
 
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
+import javax.security.sasl.SaslServerFactory;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Map;
 
-import javax.security.sasl.SaslServerFactory;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface for implementing selectors of SASL mechanisms.
@@ -55,14 +53,7 @@ public interface MechanismSelector {
 	 */
 	Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories,
 			XMPPResourceConnection session);
-
-	/**
-	 * Initialize selector.
-	 *
-	 * @param settings
-	 *            settings of {@link tigase.xmpp.impl.SaslAuth} plugin.
-	 */
-	void init(Map<String, Object> settings);
+	
 }
 
 

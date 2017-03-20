@@ -26,14 +26,11 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.auth.CallbackHandlerFactory;
-import tigase.auth.MechanismSelector;
-import tigase.auth.MechanismSelectorFactory;
 import tigase.auth.TigaseSaslProvider;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -44,7 +41,6 @@ import tigase.xmpp.*;
 
 import javax.security.auth.callback.*;
 import javax.security.sasl.Sasl;
-import java.security.Security;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Queue;
@@ -90,36 +86,10 @@ public class JabberIqAuth
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
 			"var" }, new String[] { XMLNS }) };
 
-	//~--- fields ---------------------------------------------------------------
-
-	private CallbackHandlerFactory callbackHandlerFactory = new CallbackHandlerFactory();
-	private MechanismSelector      mechanismSelector;
+	@Inject
+	private TigaseSaslProvider saslProvider;
 
 	//~--- methods --------------------------------------------------------------
-
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-
-		// we should remove existing tigase.sasl provider if it is not instance of TigaseSaslProvider
-		// as it can be loaded from other bundle in OSGi which will cause many issues with instanceof
-		// and casting and it is NOT possible to update implementation without removing it first
-		if (!(Security.getProvider("tigase.sasl") instanceof TigaseSaslProvider)) {
-			Security.removeProvider("tigase.sasl");
-		}
-		Security.insertProviderAt(new TigaseSaslProvider(settings), 1);
-		super.init(settings);
-
-		MechanismSelectorFactory mechanismSelectorFactory = new MechanismSelectorFactory();
-
-		try {
-			mechanismSelector = mechanismSelectorFactory.create(settings);
-		} catch (Exception e) {
-			log.severe("Can't create SASL Mechanism Selector");
-
-			throw new RuntimeException("Can't create SASL Mechanism Selector", e);
-		}
-	}
 
 	@Override
 	public String id() {
@@ -182,7 +152,7 @@ public class JabberIqAuth
 			case get :
 				try {
 					StringBuilder            response = new StringBuilder("<username/>");
-					final Collection<String> auth_mechs = mechanismSelector.filterMechanisms(Sasl
+					final Collection<String> auth_mechs = saslProvider.filterMechanisms(Sasl
 							.getSaslServerFactories(), session);
 
 					if (auth_mechs.contains("PLAIN") || auth_mechs.contains("DIGEST-MD5")) {
@@ -291,7 +261,7 @@ public class JabberIqAuth
 			Object> settings, XMPPResourceConnection session, BareJID user_id, String password,
 			String digest) {
 		try {
-			CallbackHandler cbh = callbackHandlerFactory.create("PLAIN", session, repo,
+			CallbackHandler cbh = saslProvider.create("PLAIN", session, repo,
 					settings);
 			final NameCallback nc = new NameCallback("Authentication identity", user_id
 					.getLocalpart());

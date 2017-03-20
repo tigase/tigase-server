@@ -4,6 +4,8 @@ import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.auth.mechanisms.SaslSCRAMPlus;
 import tigase.auth.mechanisms.TigaseSaslServerFactory;
 import tigase.cert.CertificateUtil;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.vhosts.VHostItem;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -12,12 +14,12 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+@Bean(name = "mechanism-selector", parent = TigaseSaslProvider.class, active = true)
 public class DefaultMechanismSelector implements MechanismSelector {
 
-	private final Set<String> allowedMechanisms = new HashSet<String>();
-
-	protected Map<String, Object> settings;
-
+	@ConfigField(desc = "List of allowed SASL mechanisms", alias = "allowed-mechanisms")
+	private final HashSet<String> allowedMechanisms = new HashSet<String>();
+	
 	@Override
 	public Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories, XMPPResourceConnection session) {
 		final Map<String, ?> props = new HashMap<String, Object>();
@@ -32,20 +34,7 @@ public class DefaultMechanismSelector implements MechanismSelector {
 		}
 		return result;
 	}
-
-	@Override
-	public void init(Map<String, Object> settings) {
-		this.settings = settings;
-		String tmp;
-
-		tmp = (String) settings.get("enabled-mechanisms");
-		if (tmp != null) {
-			String[] a = tmp.split(",");
-			if (a != null)
-				allowedMechanisms.addAll(Arrays.asList(a));
-		}
-	}
-
+	
 	protected boolean isAllowedForDomain(final String mechanismName, final VHostItem vhost) {
 		final String[] saslAllowedMechanisms = vhost.getSaslAllowedMechanisms();
 		if (saslAllowedMechanisms != null && saslAllowedMechanisms.length > 0) {

@@ -22,12 +22,16 @@
 
 package tigase.auth.mechanisms;
 
+import tigase.auth.TigaseSaslProvider;
+import tigase.kernel.beans.Bean;
+
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import javax.security.sasl.SaslServerFactory;
 import java.util.Map;
 
+@Bean(name = "tigaseSaslServerFactory", parent = TigaseSaslProvider.class, active = true)
 public class TigaseSaslServerFactory implements SaslServerFactory {
 
 	public static final String ANONYMOUS_MECHANISM_ALLOWED = "anonymous-mechanism-allowed";
