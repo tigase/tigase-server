@@ -2000,9 +2000,8 @@ public class SessionManager
 		} catch (TigaseStringprepException ex) {
 
 			// should not happen
-			log.log(Level.SEVERE, "exception processing presence update for session = {0}" +
-					" and packet = {1}", new Object[] { session,
-					packet });
+			log.log(Level.SEVERE,
+			        "exception processing presence update for session = " + session + " and packet = " + packet, ex);
 		}
 	}
 
