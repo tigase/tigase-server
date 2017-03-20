@@ -99,8 +99,6 @@ There is also a method which allow you to schedule tasks executed at certain tim
 addTimerTask(tigase.util.TimerTask task, long delay);
 -----
 
-There is one more method which can be used which is not directly related to multi-threading, but might be very helpful for executing some actions at a very specific point of time. This is the point of time when the server has just been initialized, that is all components have been created and received their configuration for the first time. When this happens Tigase calls `void initializationCompleted()` method for each server component. You can overwrite this method to execute some actions at the time when you are sure the your component is initialized and configured but has not been started yet.
-
 Here is a code of an example component and module which uses all the API discussed in this article:
 
 .Example component code

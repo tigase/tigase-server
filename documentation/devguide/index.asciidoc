@@ -59,8 +59,6 @@ include::text/Development_Guide_15_-_Component_Implementation_-_Lesson_7_-_Data_
 
 include::text/Development_Guide_16_-_Component_Implementation_-_Lesson_8_-_Startup_Time.asciidoc[]
 
-include::text/Development_Guide_17_-_Configuration_API.asciidoc[]
-
 include::text/components/http-api/documentation/REST_API.asciidoc[]
 
 include::text/HTTP_API_Scripting.asciidoc[]

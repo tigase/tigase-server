@@ -36,7 +36,7 @@ image:images/dev/spam-filtering-disco-small.png[]
 
 Although this was easy, this particular change doesn't affect anything apart from just a visual appearance. Let's get then to more advanced and more useful changes.
 
-One of the limitations of methods above is that you can not update or change component information at run-time with these methods. They are called only once during +setProperties(...)+ method call and the component service discovery information is created and prepared for later use. Sometimes, however it is useful to be able to change the service discovery during run-time.
+One of the limitations of methods above is that you can not update or change component information at run-time with these methods. They are called only once during initialization of a component when component service discovery information is created and prepared for later use. Sometimes, however it is useful to be able to change the service discovery during run-time.
 
 In our simple spam filtering component let's show how many messages have been checked out as part of the service discovery description string. Every time we receive a message we can to call:
 
