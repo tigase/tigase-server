@@ -91,7 +91,7 @@ For example, having the above XML request stored in `prebind` file, one can exec
 >curl -X POST -d @prebind http://admin%40domain:pass@domain:8080/rest/adhoc/bosh@domain --header "Content-Type:text/xml"
 -----
 
-==== Using JSON
+=== Using JSON
 
 To execute the command to pre-bind BOSH session in JSON format, make a request using POST method to `/rest/adhoc/bosh@domain.com` sending the following content:
 
