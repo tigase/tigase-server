@@ -192,23 +192,23 @@ include::text/admin/Admin_Guide_53_-_Components.asciidoc[]
 
 include::text/admin/Admin_Guide_54_-_Components_-_A_-_StanzaSender.asciidoc[]
 
-include::text/components/http-api/documentation/HTTP_API_Component.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
 
-include::text/components/http-api/documentation/HTTP_API_Component_modules.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]
 
-include::text/components/http-api/documentation/HTTP_Server.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
 
-include::text/components/http-api/documentation/HTTP_File_Upload_Component.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_File_Upload_Component.asciidoc[]
 
 include::text/admin/Admin_Guide_56_-_Components_-_B_-_Tigase_HTTP_API_-_1_-_REST_API_Guide.asciidoc[]
 
-include::text/HTTP_API_Usage_Examples.asciidoc[]
+include::text/admin/HTTP_API_Usage_Examples.asciidoc[]
 
 include::text/admin/Admin_Guide_57_-_Components_-_B_-_Tigase_HTTP_API_-_2_-_Admin_UI.asciidoc[]
 
 include::text/admin/Admin_Guide_58_-_Components_-_B_-_Tigase_HTTP_API_-_3_-_Web_Client.asciidoc[]
 
-include::text/Pre-bind_Bosh.asciidoc[]
+include::text/admin/Pre-bind_Bosh.asciidoc[]
 
 
 
@@ -276,7 +276,7 @@ include::text/admin/Admin_Guide_77_-_Virtual_Hosts_in_the_Tigase_Server_-_B_-_Vi
 
 :leveloffset: 2
 
-include::text/Components/External_Service_Discovery_Component.asciidoc[]
+include::text/components/External_Service_Discovery_Component.asciidoc[]
 
 :leveloffset: 1
 
