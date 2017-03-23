@@ -1,21 +1,20 @@
 package tigase.xmpp.impl;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import junit.framework.TestCase;
-import org.junit.After;
+
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
-import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * Test class for JabberIqPrivacyTest
@@ -173,6 +172,43 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 			
 			assertTrue(privacyFilter.allowed(presence, session));
 		}
+
+	@Test
+	public void testStanzaType() throws Exception {
+		JID jid = JID.jidInstance("test@example/res-1");
+		JID connId = JID.jidInstance("c2s@example.com/asdasd");
+		XMPPResourceConnection session = getSession(connId, jid);
+
+		checkStanzaType(session, "get", null, 1, StanzaType.result);
+		checkStanzaType(session, "set", new Element("active"), 1, StanzaType.result);
+		checkStanzaType(session, "error", null, 0, null);
+		checkStanzaType(session, "result", null, 0, null);
+		checkStanzaType(session, "probe", null, 1, StanzaType.error);
+		checkStanzaType(session, null, null, 1, StanzaType.error);
+	}
+
+	private void checkStanzaType(XMPPResourceConnection session, String type, Element additionalChild,
+	                             int expectedResultSize, StanzaType expectedStanzaType)
+			throws TigaseStringprepException, XMPPException {
+		Element iq = new Element("iq");
+		if (type != null) {
+			iq.setAttribute("type", type);
+		}
+		Element query = new Element("query", new String[]{"xmlns"}, new String[]{JabberIqPrivacy.XMLNS});
+		if (null != additionalChild) {
+			query.addChild(additionalChild);
+		}
+		iq.addChild(query);
+		Packet p = Packet.packetInstance(iq);
+		privacyFilter.process(p, session, null, results, null);
+		assertEquals(expectedResultSize, results.size());
+		if (expectedResultSize > 0) {
+			Packet result = results.poll();
+			assertNotNull(result);
+			assertEquals(Iq.ELEM_NAME, result.getElemName());
+			assertEquals(expectedStanzaType, result.getType());
+		}
+	}
 
 	@Test
 	public void testFilterJidCase() throws Exception {
