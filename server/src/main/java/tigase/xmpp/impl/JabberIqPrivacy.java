@@ -188,29 +188,15 @@ public class JabberIqPrivacy
 		try {
 			StanzaType type = packet.getType();
 
-			switch (type) {
-			case get :
+			if (type == StanzaType.get) {
 				processGetRequest(packet, session, results);
 
-				break;
-
-			case set :
+			} else if (type == StanzaType.set) {
 				processSetRequest(packet, session, results);
 
-				break;
-
-			case result :
-			case error :
-
-				// Ignore
-				break;
-
-			default :
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Request type is incorrect", false));
-
-				break;
-			}    // end of switch (type)
+			} else if (type != StanzaType.result && type != StanzaType.error) {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Request type is incorrect", false));
+			}
 		} catch (NotAuthorizedException e) {
 			log.log(Level.FINEST,
 					"Received privacy request but user session is not authorized yet: {0}", packet);
