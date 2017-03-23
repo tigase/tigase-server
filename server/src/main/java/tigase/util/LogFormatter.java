@@ -48,7 +48,7 @@ public class LogFormatter
 			new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
 	private static int DATE_TIME_LEN = 24;
 	private static int LEVEL_OFFSET  = 12;
-	private static int MED_LEN       = 35;
+	private static int MED_LEN       = 40;
 	private static int TH_NAME_LEN   = 17;
 
 	//~--- fields ---------------------------------------------------------------

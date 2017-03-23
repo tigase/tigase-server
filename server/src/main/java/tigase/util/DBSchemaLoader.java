@@ -21,12 +21,17 @@ package tigase.util;
 import tigase.db.AuthRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
+import tigase.util.ui.console.CommandlineParameter;
+import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.BareJID;
 
 import java.io.*;
 import java.sql.*;
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +45,7 @@ import java.util.regex.Pattern;
  * <li>{@code dbType} - type of the database, possible values are:
  * {@code mysql}, {@code postgresql}, {@code derby}, {@code sqlserver};
  * <li>{@code schemaVersion} - schema version to be loaded, , possible values
- * are: {@code 5-1}, {@code 5}, {@code 4};
+ * are: {@code 7-2}, {@code 7-1}, {@code 5-1}, {@code 5}, {@code 4};
  * <li>{@code dbName} - name of the database to be created/used;
  * <li>{@code dbHostname} - hostname of the database;
  * <li>{@code dbUser} - username of the regular user;
@@ -64,52 +69,51 @@ class DBSchemaLoader extends SchemaLoader {
 	private boolean db_ok = false;
 	/** Denotes whether schema has proper version */
 	private boolean schema_ok = false;
-	/** Denotes whether schema exists */
-	private boolean schema_exists = false;
 	/** Holds map of all replacement variables */
 	private Map<String, String> replacementMap = new HashMap<String, String>();
 	private static final Logger log = Logger.getLogger( DBSchemaLoader.class.getCanonicalName() );
-	// drivers
-	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
-	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
-	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-	public static final String SQLSERVER_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
 	// queries
 	public static final String JDBC_CHECKUSERTABLE_QUERY = "select count(*) from tig_users";
 	public static final String JDBC_GETSCHEMAVER_QUERY = "select TigGetDBProperty('schema-version')";
 	public static final String DERBY_GETSCHEMAVER_QUERY = "values TigGetDBProperty('schema-version')";
 	public static final String SQLSERVER_GETSCHEMAVER_QUERY = "select dbo.TigGetDBProperty('schema-version')";
-	private String schema_ver_query = JDBC_GETSCHEMAVER_QUERY;
-	// keys
-	public static final String DATABASE_TYPE_KEY = "dbType";
-	public static final String SCHEMA_VERSION_KEY = "schemaVersion";
-	public static final String DATABASE_NAME_KEY = "dbName";
-	public static final String DATABASE_HOSTNAME_KEY = "dbHostname";
-	public static final String TIGASE_USERNAME_KEY = "dbUser";
-	public static final String TIGASE_PASSWORD_KEY = "dbPass";
-	public static final String ROOT_USERNAME_KEY = "rootUser";
-	public static final String ROOT_PASSWORD_KEY = "rootPass";
-	public static final String QUERY_KEY = "query";
-	public static final String FILE_KEY = "file";
-	public static final String ADMIN_JID_KEY = "adminJID";
-	public static final String ADMIN_JID_PASS_KEY = "adminJIDpass";
-	public static final String LOG_LEVEL_KEY = "logLevel";
-	public static final String USE_SSL = "useSSL";
-	public static final String DASH = "-";
-	// defaults
-	public static final String DATABASE_TYPE_DEF = "mysql";
-	public static final String SCHEMA_VERSION_DEF = "7-1";
-	public static final String DATABASE_NAME_DEF = "tigasedb";
-	public static final String DATABASE_HOSTNAME_DEF = "localhost";
-	public static final String TIGASE_USERNAME_DEF = "tigase_user";
-	public static final String TIGASE_PASSWORD_DEF = "tigase_pass";
-	public static final String ROOT_USERNAME_DEF = "root";
-	public static final String ROOT_PASSWORD_DEF = "root";
-	public static final String LOG_LEVEL_DEF = "CONFIG";
 
 	enum SQL_LOAD_STATE {
 
 		INIT, IN_SQL;
+	}
+
+	enum PARAMETERS {
+		DATABASE_TYPE("dbType","mysql"),
+		SCHEMA_VERSION("schemaVersion","7-1"),
+		DATABASE_NAME("dbName","tigasedb"),
+		DATABASE_HOSTNAME("dbHostname","localhost"),
+		TIGASE_USERNAME("dbUser","tigase_user"),
+		TIGASE_PASSWORD("dbPass","tigase_pass"),
+		ROOT_USERNAME("rootUser","root"),
+		ROOT_PASSWORD("rootPass","root"),
+		LOG_LEVEL("logLevel","CONFIG"),
+		USE_SSL("useSSL","false"),
+		QUERY("query",null),
+		FILE("file",null),
+		ADMIN_JID("adminJID",null),
+		ADMIN_JID_PASS("adminJIDpass",null);
+
+		private String name = null;
+		private String defaultValue = null;
+
+		PARAMETERS(String name, String defaultValue) {
+			this.name = name;
+			this.defaultValue = defaultValue;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getDefaultValue() {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -121,55 +125,27 @@ class DBSchemaLoader extends SchemaLoader {
 	 */
 	public DBSchemaLoader( Properties props ) {
 
-		// set defaults
-		if ( props.get( DATABASE_TYPE_KEY ) == null ){
-			props.setProperty( DATABASE_TYPE_KEY, DATABASE_TYPE_DEF );
-		}
-		if ( props.get( SCHEMA_VERSION_KEY ) == null ){
-			props.setProperty( SCHEMA_VERSION_KEY, SCHEMA_VERSION_DEF );
-		}
-		if ( props.get( DATABASE_NAME_KEY ) == null ){
-			props.setProperty( DATABASE_NAME_KEY, DATABASE_NAME_DEF );
-		}
-		if ( props.get( DATABASE_HOSTNAME_KEY ) == null ){
-			props.setProperty( DATABASE_HOSTNAME_KEY, DATABASE_HOSTNAME_DEF );
-		}
-		if ( props.get( TIGASE_USERNAME_KEY ) == null ){
-			props.setProperty( TIGASE_USERNAME_KEY, TIGASE_USERNAME_DEF );
-		}
-		if ( props.get( TIGASE_PASSWORD_KEY ) == null ){
-			props.setProperty( TIGASE_PASSWORD_KEY, TIGASE_PASSWORD_DEF );
-		}
-		if ( props.get( ROOT_USERNAME_KEY ) == null ){
-			props.setProperty( ROOT_USERNAME_KEY, ROOT_USERNAME_DEF );
-		}
-		if ( props.get( ROOT_PASSWORD_KEY ) == null ){
-			props.setProperty( ROOT_PASSWORD_KEY, ROOT_PASSWORD_DEF );
-		}
-		if ( props.get( LOG_LEVEL_KEY ) == null ){
-			props.setProperty( LOG_LEVEL_KEY, LOG_LEVEL_DEF );
-		}
-
-		// convert all properties to replacement map which allow usage
-		// of variables in schema files
-		for ( String key : props.stringPropertyNames() ) {
-			replacementMap.put( "${" + key + "}", props.get( key ).toString() );
+		for (PARAMETERS p : PARAMETERS.values()) {
+			final String property = props.getProperty(p.getName(), p.getDefaultValue());
+			if (null != property || null != p.getDefaultValue()) {
+				replacementMap.put("${" + p.getName() + "}", property);
+			}
 		}
 
 		// configure logger
-		Level lvl = Level.parse( String.valueOf( props.get( LOG_LEVEL_KEY ) ) );
+		Level lvl = Level.parse( String.valueOf( props.getProperty( PARAMETERS.LOG_LEVEL.getName(), PARAMETERS.LOG_LEVEL.getDefaultValue() ) ) );
 
 		System.out.println( "LogLevel: " + lvl );
 
 		Handler handler = new ConsoleHandler();
 		handler.setLevel( lvl );
-		handler.setFormatter( new myFormatter() );
+		handler.setFormatter( new LogFormatter() );
 		log.setUseParentHandlers( false );
 		log.addHandler( handler );
 		log.setLevel( lvl );
 
-		log.log( Level.CONFIG, String.format( "Properties: %1$s", Arrays.asList( props ) ) );
-		
+		log.log(Level.CONFIG, "Properties: {0}", new Object[]{props});
+
 	}
 
 	/**
@@ -180,11 +156,86 @@ class DBSchemaLoader extends SchemaLoader {
 	 *             parameters.
 	 */
 	public static void main( String[] args ) {
+		ParameterParser parser = new ParameterParser(true);
 
-		Properties otherArgs = parseArgs( args );
+		parser.addOption(new CommandlineParameter.Builder("T", PARAMETERS.DATABASE_TYPE.getName()).description(
+				"Database server type")
+				                 .options("derby", "mysql", "postgresql", "sqlserver")
+				                 .defaultValue(PARAMETERS.DATABASE_TYPE.getDefaultValue())
+				                 .required(true)
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS.SCHEMA_VERSION.getName()).description(
+				"Intended version of the schema to be loaded")
+				                 .options("4", "5", "5-1", "7-1")
+				                 .required(true)
+				                 .defaultValue(PARAMETERS.SCHEMA_VERSION.getDefaultValue())
+				                 .build());
 
-		DBSchemaLoader dbHelper = new DBSchemaLoader( otherArgs );
-		DBSchemaLoader.execute( dbHelper, otherArgs );
+		parser.addOption(new CommandlineParameter.Builder("D", PARAMETERS.DATABASE_NAME.getName()).description(
+				"Name of the database that will be created and to which schema will be loaded")
+				                 .defaultValue(PARAMETERS.DATABASE_NAME.getDefaultValue())
+				                 .required(true)
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("H", PARAMETERS.DATABASE_HOSTNAME.getName()).description(
+				"Address of the database instance")
+				                 .defaultValue(PARAMETERS.DATABASE_HOSTNAME.getDefaultValue())
+				                 .required(true)
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("U", PARAMETERS.TIGASE_USERNAME.getName()).description(
+				"Name of the user that will be created specifically to access Tigase XMPP Server")
+				                 .defaultValue(PARAMETERS.TIGASE_USERNAME.getDefaultValue())
+				                 .required(true)
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("P", PARAMETERS.TIGASE_PASSWORD.getName()).description(
+				"Password of the user that will be created specifically to access Tigase XMPP Server")
+				                 .defaultValue(PARAMETERS.TIGASE_PASSWORD.getDefaultValue())
+				                 .required(true)
+				                 .secret()
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("R", PARAMETERS.ROOT_USERNAME.getName()).description(
+				"Database root account username used to create tigase user and database")
+				                 .defaultValue(PARAMETERS.ROOT_USERNAME.getDefaultValue())
+				                 .required(true)
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("A", PARAMETERS.ROOT_PASSWORD.getName()).description(
+				"Database root account password used to create tigase user and database")
+				                 .defaultValue(PARAMETERS.ROOT_PASSWORD.getDefaultValue())
+				                 .secret()
+				                 .required(true)
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("F", PARAMETERS.FILE.getName()).description(
+				"Comma separated list of SQL files that will be processed").build());
+		parser.addOption(new CommandlineParameter.Builder("L", PARAMETERS.LOG_LEVEL.getName()).description(
+				"Java Logger level during loading process")
+				                 .defaultValue(PARAMETERS.LOG_LEVEL.getDefaultValue())
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("S", PARAMETERS.USE_SSL.getName()).description(
+				"Enable SSL support for database connection (if database supports it)")
+				                 .requireArguments(false)
+				                 .defaultValue(PARAMETERS.USE_SSL.getDefaultValue())
+				                 .build());
+		parser.addOption(new CommandlineParameter.Builder("J", PARAMETERS.ADMIN_JID.getName()).description(
+				"Comma separated list of administrator JID(s)").build());
+		parser.addOption(new CommandlineParameter.Builder("N", PARAMETERS.ADMIN_JID_PASS.getName()).description(
+				"Password that will be used for the entered JID(s) - one for all configured administrators")
+				                 .secret()
+				                 .build());
+
+		Properties properties = null;
+		if (null == args || args.length == 0 || (properties = parser.parseArgs(args)) == null) {
+			System.out.println(parser.getHelp());
+			System.exit(0);
+		} else {
+			System.out.println("properties: " + properties);
+		}
+
+		DBSchemaLoader dbHelper = new DBSchemaLoader(properties);
+
+		Scanner sc = new Scanner(System.in);
+		log.log(Level.ALL, "Please press any key to continue");
+		sc.nextLine();
+
+		DBSchemaLoader.execute(dbHelper, properties);
 	}
 
 	/**
@@ -196,11 +247,11 @@ class DBSchemaLoader extends SchemaLoader {
 	 */
 	private static void execute( DBSchemaLoader helper, Properties props ) {
 
-		// Get list of appropriate takst and execute them;
+		// Get list of appropriate task and execute them;
 		TigaseDBTask[] tasks;
-		if ( props.getProperty( QUERY_KEY ) != null ){
+		if ( props.getProperty( PARAMETERS.QUERY.getName() ) != null ){
 			tasks = Tasks.getQueryTasks();
-		} else if ( props.getProperty( FILE_KEY ) != null ){
+		} else if ( props.getProperty( PARAMETERS.FILE.getName() ) != null ){
 			tasks = Tasks.getSchemaTasks();
 		} else {
 			tasks = Tasks.getTasksInOrder();
@@ -208,139 +259,6 @@ class DBSchemaLoader extends SchemaLoader {
 		for ( TigaseDBTask task : tasks ) {
 			task.execute( helper, props );
 		}
-	}
-
-	/**
-	 * Simple parser of command line arguments passed as parameter which converts
-	 * them into key-value {@code Properties}. If the argument list is empty then
-	 * a help outlining possible parameters is printed.
-	 *
-	 * @param args set of command line arguments.
-	 * @return {@link Properties} object created from provided set of arguments.
-	 */
-	private static Properties parseArgs( String[] args ) {
-		Properties props = new Properties();
-		if ( args == null || args.length == 0 ){
-			System.out.println( help() );
-			System.exit( 0 );
-		} else {
-			for ( int i = 0 ; i < args.length ; i++ ) {
-				switch ( args[i] ) {
-					case DASH + DATABASE_TYPE_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( DATABASE_TYPE_KEY, args[i] );
-						}
-						break;
-					case DASH + SCHEMA_VERSION_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( SCHEMA_VERSION_KEY, args[i] );
-						}
-						break;
-					case DASH + DATABASE_NAME_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( DATABASE_NAME_KEY, args[i] );
-						}
-						break;
-					case DASH + DATABASE_HOSTNAME_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( DATABASE_HOSTNAME_KEY, args[i] );
-						}
-						break;
-					case DASH + TIGASE_USERNAME_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( TIGASE_USERNAME_KEY, args[i] );
-						}
-						break;
-					case DASH + TIGASE_PASSWORD_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( TIGASE_PASSWORD_KEY, args[i] );
-						}
-						break;
-					case DASH + ROOT_USERNAME_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( ROOT_USERNAME_KEY, args[i] );
-						}
-						break;
-					case DASH + ROOT_PASSWORD_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( ROOT_PASSWORD_KEY, args[i] );
-						}
-						break;
-					case DASH + FILE_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( FILE_KEY, args[i] );
-						}
-						break;
-					case DASH + QUERY_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( QUERY_KEY, args[i] );
-						}
-						break;
-					case DASH + ADMIN_JID_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( ADMIN_JID_KEY, args[i] );
-						}
-						break;
-					case DASH + ADMIN_JID_PASS_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( ADMIN_JID_PASS_KEY, args[i] );
-						}
-						break;
-					case DASH + LOG_LEVEL_KEY:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( LOG_LEVEL_KEY, args[i].toUpperCase() );
-						}
-						break;
-					case DASH + USE_SSL:
-						if ( args.length > i + 1 ){
-							i++;
-							props.setProperty( USE_SSL, args[i] );
-						}
-						break;
-				}
-			}
-		}
-		return props;
-	}
-
-	/**
-	 * Creates and returns list of possible parameters.
-	 *
-	 * @return {@code String} describing possible parameters.
-	 */
-	private static String help() {
-		String help = "Usage:"
-									+ "$ java -cp \"jars/*.jar\" tigase.util.DBSchemaLoader"
-									+ "\n\t -" + DATABASE_TYPE_KEY + " database_type {derby, mysql, postgresql, sqlserver} "
-									+ "\n\t[-" + SCHEMA_VERSION_KEY + " schema_version {4, 5, 5-1, 7-1} ]"
-									+ "\n\t[-" + DATABASE_NAME_KEY + " database_name]"
-									+ "\n\t[-" + DATABASE_HOSTNAME_KEY + " database hostname]"
-									+ "\n\t[-" + TIGASE_USERNAME_KEY + " tigase_username]"
-									+ "\n\t[-" + TIGASE_PASSWORD_KEY + " tigase_userpass]"
-									+ "\n\t[-" + ROOT_USERNAME_KEY + " database_root_username]"
-									+ "\n\t[-" + ROOT_PASSWORD_KEY + " database_root_password]"
-									+ "\n\t[-" + FILE_KEY + " comma separated list of path_to_sql_schema_file(s)]"
-									+ "\n\t[-" + QUERY_KEY + " sql_query_to_execute]"
-									+ "\n\t[-" + LOG_LEVEL_KEY + " java logger Level]"
-									+ "\n\t[-" + USE_SSL + " true|false -- enable SSL support if database supports it]"
-									+ "\n\t[-" + ADMIN_JID_KEY + " comma separated list of admin JIDs]"
-									+ "\n\t[-" + ADMIN_JID_PASS_KEY + " password (one for all entered JIDs]"
-									+ "\n\targuments take following precedent: query, file, whole schema"
-									+ "\n\t(i.e. file superseeds schema execution, query superseeds file execution).";
-		return help;
 	}
 
 	/**
@@ -360,10 +278,9 @@ class DBSchemaLoader extends SchemaLoader {
 	 */
 	private ArrayList<String> loadSQLQueries( String resource, String res_prefix, Properties variables )
 			throws IOException {
-		log.log( Level.FINER,
-						 String.format( "Loading queries, resource: %1$s, res_prefix: %2$s ", resource, res_prefix ) );
+		log.log(Level.FINER, "Loading queries, resource: {0}, res_prefix: {1} ", new Object[]{resource, res_prefix});
 		ArrayList<String> results = new ArrayList<>();
-		boolean path = res_prefix == null ? true : false;
+		boolean path = res_prefix == null;
 		BufferedReader br = new BufferedReader( new InputStreamReader( getResource( resource, path ) ) );
 		String line;
 		String sql_query = "";
@@ -382,8 +299,8 @@ class DBSchemaLoader extends SchemaLoader {
 					{
 						Matcher matcher = Pattern.compile( "-- LOAD FILE:\\s*(.*\\.sql)" ).matcher( line );
 						if ( matcher.find() ){
-							log.log( Level.FINE,
-											 String.format( "\n\n *** trying to load schema: %1$s \n", matcher.group( 1 ) ) );
+							log.log(Level.FINE, "\n\n *** trying to load schema: {0} \n",
+							        new Object[]{matcher.group(1)});
 							results.addAll( loadSQLQueries(  matcher.group( 1 ), null, variables ) );
 						}
 					}
@@ -398,8 +315,11 @@ class DBSchemaLoader extends SchemaLoader {
 						if ( sql_query.endsWith( "//" ) ){
 							sql_query = sql_query.substring( 0, sql_query.length() - 2 );
 						}
-						String substitute = variableSubstitutor.substitute( sql_query, replacementMap );
-						results.add( substitute );
+						for ( Map.Entry<String, String> entry : replacementMap.entrySet() ) {
+							sql_query = sql_query.replace( entry.getKey(), entry.getValue() );
+						}
+
+						results.add( sql_query );
 					}
 					if ( line.isEmpty() || line.trim().startsWith( "--" ) ){
 						continue;
@@ -429,16 +349,14 @@ class DBSchemaLoader extends SchemaLoader {
 	private ArrayList<String> loadSchemaQueries( Properties variables )
 			throws IOException {
 
-		String res_prefix = variables.get( DATABASE_TYPE_KEY ).toString();
-		String version = variables.get( SCHEMA_VERSION_KEY ).toString();
+		String res_prefix = variables.getProperty( PARAMETERS.DATABASE_TYPE.getName() );
+		String version = variables.getProperty( PARAMETERS.SCHEMA_VERSION.getName() );
 		ArrayList<String> queries = new ArrayList<>();
 		queries.addAll( loadSQLQueries( res_prefix + "-schema-" + version + "-schema", res_prefix, variables ) );
 		queries.addAll( loadSQLQueries( res_prefix + "-schema-" + version + "-sp", res_prefix, variables ) );
 		queries.addAll( loadSQLQueries( res_prefix + "-schema-" + version + "-props", res_prefix, variables ) );
-		log.log( Level.FINE,
-						 String.format( "Loading schema queries: %1$s // %2$s",
-														Arrays.asList( queries ),
-														queries.toArray() ) );
+		log.log(Level.FINE, "Loading schema queries: {0} // {1}",
+		        new Object[]{queries, queries.toArray()});
 		return queries;
 	}
 
@@ -466,9 +384,7 @@ class DBSchemaLoader extends SchemaLoader {
 		} catch ( FileNotFoundException ex ) {
 			Logger.getLogger( DBSchemaLoader.class.getName() ).log( Level.SEVERE, null, ex );
 		}
-		log.log( Level.FINEST,
-						 String.format( "Getting resource: %1$s @ filename: %2$s",
-														resource, f.getAbsolutePath() ) );
+		log.log(Level.FINEST, "Getting resource: {0} @ filename: {1}", new Object[]{resource, f.getAbsolutePath()});
 		return is;
 	}
 
@@ -487,13 +403,12 @@ class DBSchemaLoader extends SchemaLoader {
 				while ( drivers.hasMoreElements() ) {
 					availableDrivers.add( drivers.nextElement().toString() );
 				}
-				log.log( Level.CONFIG, "DriverManager (available drivers): " + Arrays.asList( availableDrivers ) );
+				log.log( Level.CONFIG, "DriverManager (available drivers): " +  availableDrivers );
 				conn.close();
 				connection_ok = true;
 				log.log( Level.INFO, "Connection OK" );
 				return Result.ok;
 			} catch ( SQLException e ) {
-				//e.printStackTrace();
 				log.log( Level.WARNING, e.getMessage() );
 				return Result.error;
 			}
@@ -507,7 +422,7 @@ class DBSchemaLoader extends SchemaLoader {
 	
 	public Result shutdownDerby( Properties variables ) {
 		String db_conn = getDBUri( variables, false, true );
-		String database = variables.getProperty( DATABASE_TYPE_KEY );
+		String database = variables.getProperty( PARAMETERS.DATABASE_TYPE.getName() );
 		if ( "derby".equals( database ) ){
 			log.log( Level.INFO, "Validating DBConnection, URI: " + db_conn );
 			if ( db_conn == null ){
@@ -520,12 +435,11 @@ class DBSchemaLoader extends SchemaLoader {
 					while ( drivers.hasMoreElements() ) {
 						availableDrivers.add( drivers.nextElement().toString() );
 					}
-					log.log( Level.CONFIG, "DriverManager (available drivers): " + Arrays.asList( availableDrivers ) );
+					log.log( Level.CONFIG, "DriverManager (available drivers): " +  availableDrivers ) ;
 					conn.close();
 					connection_ok = true;
 					log.log( Level.INFO, "Connection OK" );
 				} catch ( SQLException e ) {
-					//e.printStackTrace();
 					log.log( Level.WARNING, e.getMessage() );
 				}
 			}
@@ -540,7 +454,7 @@ class DBSchemaLoader extends SchemaLoader {
 			return Result.error;
 		}
 
-		String res_prefix = variables.get( DATABASE_TYPE_KEY ).toString();
+		String res_prefix = variables.getProperty( PARAMETERS.DATABASE_TYPE.getName() );
 		db_ok = false;
 		String db_conn = getDBUri( variables, true, false );
 		log.log( Level.INFO, "Validating whether DB Exists, URI: " + db_conn );
@@ -605,7 +519,8 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.WARNING, "Database not validated" );
 			return Result.error;
 		}
-		schema_exists = false;
+		/* Denotes whether schema exists */
+		boolean schema_exists = false;
 		schema_ok = false;
 		String db_conn = getDBUri( variables, true, false );
 		log.log( Level.INFO, "Validating DBSchema, URI: " + db_conn );
@@ -623,7 +538,7 @@ class DBSchemaLoader extends SchemaLoader {
 					log.log( Level.INFO, "Schema exists, users: " + users );
 				}
 
-				schema_ver_query = JDBC_GETSCHEMAVER_QUERY;
+				String schema_ver_query = JDBC_GETSCHEMAVER_QUERY;
 				if ( db_conn.startsWith( "jdbc:sqlserver" ) || db_conn.startsWith( "jdbc:jtds:sqlserver" ) ){
 					schema_ver_query = SQLSERVER_GETSCHEMAVER_QUERY;
 					if ( db_conn.startsWith( "jdbc:derby" ) ){
@@ -632,7 +547,7 @@ class DBSchemaLoader extends SchemaLoader {
 				}
 
 				query = schema_ver_query;
-				String loadedSchemaVersion = variables.get( SCHEMA_VERSION_KEY ).toString().replace( "-", "." );
+				String loadedSchemaVersion = variables.getProperty( PARAMETERS.SCHEMA_VERSION.getName() ).replace( "-", "." );
 				rs = stmt.executeQuery( query );
 				if ( rs.next() ){
 					String schema_version = rs.getString( 1 );
@@ -648,7 +563,7 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.INFO, "Schema OK, accounts number: " + users );
 			return Result.ok;
 		}
-		if ( !schema_exists ){
+		if ( !schema_exists){
 			db_conn = getDBUri( variables, true, true );
 			log.log( Level.INFO, "DB schema doesn't exists, creating one..., URI: " + db_conn );
 			try {
@@ -702,7 +617,7 @@ class DBSchemaLoader extends SchemaLoader {
 
 		// part 2, acquire reqired fields and validate them
 		String db_conn = getDBUri( variables, true, true );
-		String res_prefix = variables.get( DATABASE_TYPE_KEY ).toString();
+		String res_prefix = variables.getProperty( PARAMETERS.DATABASE_TYPE.getName() );
 		log.log( Level.INFO, "Post Installation, URI: " + db_conn );
 		try {
 			log.log( Level.INFO, "Finalizing..." );
@@ -751,7 +666,7 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 
 		String db_conn = getDBUri( variables, true, false );
-		String database = variables.getProperty( DATABASE_TYPE_KEY );
+		String database = variables.getProperty( PARAMETERS.DATABASE_TYPE.getName() );
 
 		switch ( database ) {
 			case "mysql":
@@ -760,9 +675,14 @@ class DBSchemaLoader extends SchemaLoader {
 				}
 				break;
 		}
-		log.log( Level.INFO, "\n\nDatabase init.properties configuration:\n"
-												 + "\n" + "--user-db=" + database
-												 + "\n" + "--user-db-uri=" + db_conn );
+
+		log.log( Level.INFO,"\n\nDatabase init.properties configuration:\n"
+		        + "dataSource {\n"
+				+ "    default {\n"
+				+ "        uri = '" + db_conn + "'\n"
+				+ "    }\n"
+				+ "}\n");
+
 		return Result.ok;
 	}
 
@@ -783,8 +703,8 @@ class DBSchemaLoader extends SchemaLoader {
 			return Result.error;
 		}
 
-		// part 2, acquire reqired fields and validate them
-		Object admins = variables.get( ADMIN_JID_KEY );
+		// part 2, acquire required fields and validate them
+		Object admins = variables.getProperty( PARAMETERS.ADMIN_JID.getName() );
 		Set<BareJID> jids = new LinkedHashSet<>();
 		if ( admins != null ){
 			String[] adminsStr = admins.toString().split( "," );
@@ -800,7 +720,7 @@ class DBSchemaLoader extends SchemaLoader {
 			return Result.warning;
 		}
 
-		Object pwdObj = variables.get( ADMIN_JID_PASS_KEY );
+		Object pwdObj = variables.getProperty( PARAMETERS.ADMIN_JID_PASS.getName() );
 		if ( pwdObj == null ){
 			log.log( Level.WARNING, "Error: No admin password enetered" );
 			return Result.warning;
@@ -815,7 +735,7 @@ class DBSchemaLoader extends SchemaLoader {
 			params.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf( 1 ) );
 
 			log.log( Level.CONFIG, "RepositoryFactory.getAuthRepository(" + null + ", "
-														 + dbUri + "," + Arrays.asList( params ) + ")" );
+														 + dbUri + "," +  params + ")" );
 			AuthRepository repo = RepositoryFactory.getAuthRepository( null, dbUri, params );
 			for ( BareJID jid : jids ) {
 				repo.addUser( jid, pwd );
@@ -842,7 +762,7 @@ class DBSchemaLoader extends SchemaLoader {
 			return Result.error;
 		}
 
-		Object fileNameObj = variables.get( FILE_KEY );
+		Object fileNameObj = variables.getProperty( PARAMETERS.FILE.getName() );
 		if ( fileNameObj == null ){
 			log.log( Level.WARNING, "Error: empty query" );
 			return Result.error;
@@ -899,7 +819,7 @@ class DBSchemaLoader extends SchemaLoader {
 			return;
 		}
 
-		Object queryObj = variables.get( QUERY_KEY );
+		Object queryObj = variables.getProperty( PARAMETERS.QUERY.getName() );
 		if ( queryObj == null ){
 			log.log( Level.WARNING, "Error: empty query" );
 			return;
@@ -950,15 +870,15 @@ class DBSchemaLoader extends SchemaLoader {
 	 */
 	private static String getDBUri( Properties props, boolean includeDbName, boolean useRootCredentials ) {
 		String db_uri = "jdbc:";
-		String database = props.getProperty( DATABASE_TYPE_KEY );
+		String database = props.getProperty( PARAMETERS.DATABASE_TYPE.getName() );
 		String USERNAME;
 		String PASSWORD;
 		if ( useRootCredentials ){
-			USERNAME = ROOT_USERNAME_KEY;
-			PASSWORD = ROOT_PASSWORD_KEY;
+			USERNAME = PARAMETERS.ROOT_USERNAME.getName();
+			PASSWORD = PARAMETERS.ROOT_PASSWORD.getName();
 		} else {
-			USERNAME = TIGASE_USERNAME_KEY;
-			PASSWORD = TIGASE_PASSWORD_KEY;
+			USERNAME = PARAMETERS.TIGASE_USERNAME.getName();
+			PASSWORD = PARAMETERS.TIGASE_USERNAME.getName();
 		}
 
 		switch ( database ) {
@@ -971,12 +891,12 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 		switch ( database ) {
 			case "derby":
-				db_uri += props.getProperty( DATABASE_NAME_KEY ) + ";create=true";
+				db_uri += props.getProperty( PARAMETERS.DATABASE_NAME.getName() ) + ";create=true";
 				break;
 			case "sqlserver":
-				db_uri += "//" + props.getProperty( DATABASE_HOSTNAME_KEY );
+				db_uri += "//" + props.getProperty( PARAMETERS.DATABASE_HOSTNAME.getName() );
 				if ( includeDbName ){
-					db_uri += ";databaseName=" + props.getProperty( DATABASE_NAME_KEY );
+					db_uri += ";databaseName=" + props.getProperty( PARAMETERS.DATABASE_NAME.getName() );
 				}
 				db_uri += ";user=" + props.getProperty( USERNAME );
 				if ( props.getProperty( PASSWORD ) != null
@@ -986,14 +906,14 @@ class DBSchemaLoader extends SchemaLoader {
 				db_uri += ";schema=dbo";
 				db_uri += ";lastUpdateCount=false";
 				db_uri += ";cacheMetaData=false";
-				if ( Boolean.valueOf(props.getProperty(USE_SSL)) ) {
+				if ( Boolean.valueOf(props.getProperty(PARAMETERS.USE_SSL.getName())) ) {
 					db_uri += ";encrypt=true";
 				}
 				break;
 			default:
-				db_uri += "//" + props.getProperty( DATABASE_HOSTNAME_KEY ) + "/";
+				db_uri += "//" + props.getProperty( PARAMETERS.DATABASE_HOSTNAME.getName() ) + "/";
 				if ( includeDbName ){
-					db_uri += props.getProperty( DATABASE_NAME_KEY );
+					db_uri += props.getProperty( PARAMETERS.DATABASE_NAME.getName() );
 				} else if (database.equals( "postgresql")) {
 					db_uri +=  "postgres" ;
 				}
@@ -1002,10 +922,10 @@ class DBSchemaLoader extends SchemaLoader {
 						 && !props.getProperty( PASSWORD ).isEmpty() ){
 					db_uri += "&password=" + props.getProperty( PASSWORD );
 				}
-				if ( Boolean.valueOf(props.getProperty(USE_SSL)) ) {
+				if ( Boolean.valueOf(props.getProperty(PARAMETERS.USE_SSL.getName())) ) {
 					db_uri += "&useSSL=true";
 				}
-				else if ( props.getProperty(USE_SSL) != null ) {
+				else if ( props.getProperty(PARAMETERS.USE_SSL.getName()) != null ) {
 					// explicitly disable SSL to avoid a warning by the driver
 					db_uri += "&useSSL=false";
 				}
@@ -1107,45 +1027,5 @@ class DBSchemaLoader extends SchemaLoader {
 		String getDescription();
 
 		abstract void execute( DBSchemaLoader helper, Properties variables );
-	}
-
-	/**
-	 * Simple helper class allowing to substituting variables.
-	 */
-	static class variableSubstitutor {
-
-		/**
-		 * Method substitutes all occurrences of items in string based on the
-		 * substitution map.
-		 *
-		 * @param str            input string in which replacement should be made.
-		 * @param replacementMap replacement map listing all replacement patterns.
-		 *
-		 * @return string with replaced items.
-		 */
-		static String substitute( String str, Map<String, String> replacementMap ) {
-			String replaced = str;
-			for ( Map.Entry<String, String> entry : replacementMap.entrySet() ) {
-				replaced = replaced.replace( entry.getKey(), entry.getValue() );
-			}
-			return replaced;
-		}
-	}
-}
-
-class myFormatter extends java.util.logging.Formatter {
-
-	@Override
-	public String format( LogRecord rec ) {
-		StringBuilder buf = new StringBuilder( 1000 );
-
-		buf.append( String.format( "%-30s \t %-15s \t %-10s %4$s",
-															 rec.getSourceClassName(),
-															 rec.getSourceMethodName(),
-															 rec.getLevel(),
-															 rec.getMessage() ) );
-		buf.append( "\n" );
-
-		return buf.toString();
 	}
 }
