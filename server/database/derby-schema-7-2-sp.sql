@@ -33,3 +33,120 @@ LANGUAGE JAVA
 MODIFIES SQL DATA
 EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUpdateLoginTime';
 -- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_AddMessage("to" varchar(2049), "from" varchar(2049), "type" int, "ts" timestamp, "message" varchar(32672), "expired" timestamp, "limit" bigint)
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.addMessage';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_GetMessagesByIds("to" varchar(2049), msg_id1 varchar(50), _msg_id2 varchar(50), _msg_id3 varchar(50), _msg_id4 varchar(50))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.getMessagesByIds';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_GetMessagesCount("to" varchar(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.getMessagesCount';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_ListMessages("to" varchar(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.listMessages';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_DeleteMessages("to" varchar(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.deleteMessages';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_DeleteMessagesByIds("to" varchar(2049), msg_id1 varchar(50), _msg_id2 varchar(50), _msg_id3 varchar(50), _msg_id4 varchar(50))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.deleteMessagesByIds';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_DeleteMessage(msg_id bigint)
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.deleteMessage';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_GetExpiredMessages("limit" int)
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.getExpiredMessages';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_OfflineMessages_GetExpiredMessagesBefore("before" timestamp)
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.getExpiredMessagesBefore';
+-- QUERY END:
+
+
+-- ------------ Broadcast Messages
+-- QUERY START:
+CREATE procedure Tig_BroadcastMessages_AddMessage("msg_id" varchar(128), "expired" timestamp, "msg" varchar(32672))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+EXTERNAL NAME 'tigase.db.derby.MsgBroadcastRepositoryStoredProcedures.addMessage';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_BroadcastMessages_AddMessageRecipient("msg_id" varchar(128), "jid" varchar(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+EXTERNAL NAME 'tigase.db.derby.MsgBroadcastRepositoryStoredProcedures.addMessageRecipient';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_BroadcastMessages_GetMessages("expired" timestamp)
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgBroadcastRepositoryStoredProcedures.getMessages';
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure Tig_BroadcastMessages_GetMessages("msg_id" varchar(128))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgBroadcastRepositoryStoredProcedures.getMessageRecipients';
+-- QUERY END:
