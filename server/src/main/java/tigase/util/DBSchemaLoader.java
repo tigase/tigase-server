@@ -755,7 +755,9 @@ class DBSchemaLoader extends SchemaLoader {
 
 		switch ( database ) {
 			case "mysql":
-				db_conn += "&useUnicode=true&characterEncoding=UTF-8";
+				if (!db_conn.contains("unicode=true")) {
+					db_conn += "&useUnicode=true&characterEncoding=UTF-8";
+				}
 				break;
 		}
 		log.log( Level.INFO, "\n\nDatabase init.properties configuration:\n"

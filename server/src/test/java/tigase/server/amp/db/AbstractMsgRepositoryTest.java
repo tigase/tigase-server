@@ -70,6 +70,8 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 		}
 	};
 
+	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
+	protected boolean checkEmoji = true;
 	protected DS dataSource;
 	protected MsgRepository repo;
 	private JID sender;
@@ -111,7 +113,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 			throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
 		List<Packet> messages = new ArrayList<>();
 		for (int i=0; i<5; i++) {
-			Packet message = Message.getMessage(sender, recipient, StanzaType.chat, "Body " + UUID.randomUUID().toString(), null, null, UUID.randomUUID().toString());
+			Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null, null, UUID.randomUUID().toString());
 			assertTrue(repo.storeMessage(sender, recipient, null, message.getElement(), null));
 			messages.add(message);
 		}
@@ -182,7 +184,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 
 			List<Packet> messages = new ArrayList<>();
 			for (int i = 0; i < 5; i++) {
-				Packet message = Message.getMessage(sender, recipient, StanzaType.chat, "Body " + UUID.randomUUID().toString(), null, null,
+				Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null, null,
 													UUID.randomUUID().toString());
 				assertTrue(repo.storeMessage(sender, recipient, expire, message.getElement(), null));
 				messages.add(message);
@@ -227,6 +229,12 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 	
 	protected abstract <T> T getMsgId(String msgIdStr);
 
-
+	protected String generateRandomBody() {
+		String body = "Body " + UUID.randomUUID().toString();
+		if (checkEmoji) {
+			body += emoji;
+		}
+		return body;
+	}
 
 }

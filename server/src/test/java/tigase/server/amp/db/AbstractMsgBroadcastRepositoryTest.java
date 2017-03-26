@@ -68,6 +68,8 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 		}
 	};
 
+	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
+	protected static boolean checkEmoji = true;
 	protected DS dataSource;
 	protected MsgBroadcastRepository repo;
 	private static BareJID jid;
@@ -85,7 +87,7 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 		jid = BareJID.bareJIDInstance("broadcast-" + UUID.randomUUID(), "example.com");
 		msgId = "test-" + UUID.randomUUID().toString();
 		msg = new Element("message");
-		msg.addChild(new Element("body", "Testing broadcast messages"));
+		msg.addChild(new Element("body", "Testing broadcast messages" + (checkEmoji ? emoji : "")));
 	}
 
 	@Before
