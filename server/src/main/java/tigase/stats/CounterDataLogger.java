@@ -22,16 +22,18 @@ package tigase.stats;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
-
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.util.DNSResolverFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static tigase.db.RepositoryFactory.GEN_USER_DB_URI_PROP_KEY;
 
 /**
  * Created: Apr 20, 2010 6:39:05 PM
@@ -39,7 +41,7 @@ import static tigase.db.RepositoryFactory.GEN_USER_DB_URI_PROP_KEY;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class CounterDataLogger
-				implements StatisticsArchivizerIfc {
+				implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
 	/**
 	 * SQL INT UNSIGNED
 	 */
@@ -228,6 +230,11 @@ public class CounterDataLogger
 	private long           last_s2s_packets    = 0;
 	private long           last_sm_packets     = 0;
 
+	@ConfigField(desc = "Database URL", alias = DB_URL_PROP_KEY)
+	private String databaseUrl = null;
+	@ConfigField(desc = "Frequency")
+	private long frequency = -1;
+
 	public void addStatsLogEntry(float cpu_usage, float mem_usage, long uptime, int vhosts,
 			long sm_packets, long muc_packets, long pubsub_packets, long c2s_packets,
 			long s2s_packets, long ext_packets, long presences, long messages, long iqs,
@@ -295,17 +302,8 @@ public class CounterDataLogger
 	}
 
 	@Override
-	public void init(Map<String, Object> archivizerConf) {
-		defaultHostname = DNSResolverFactory.getInstance().getDefaultHost();
-		try {
-			String resource = (String) archivizerConf.get(DB_URL_PROP_KEY);
-			if (resource == null ) {
-				resource = System.getProperty(GEN_USER_DB_URI_PROP_KEY);
-			}
-			initRepository(resource, null);
-		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
-		}
+	public long getFrequency() {
+		return frequency;
 	}
 
 	/**
@@ -333,6 +331,21 @@ public class CounterDataLogger
 
 	@Override
 	public void release() {}
+
+	@Override
+	public void initialize() {
+		beanConfigurationChanged(Collections.emptyList());
+	}
+
+	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		defaultHostname = DNSResolverFactory.getInstance().getDefaultHost();
+		try {
+			initRepository(databaseUrl, null);
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
+		}
+	}
 
 	private void checkDB() throws SQLException {
 		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();

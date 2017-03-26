@@ -26,9 +26,9 @@ package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.ConfigurationException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Command;
 import tigase.server.Iq;
@@ -74,20 +74,33 @@ public class BoshConnectionManager
 	//~--- fields ---------------------------------------------------------------
 
 	private int[]                  PORTS               = { DEF_PORT_NO };
+	@ConfigField(desc = "Minimal allowed polling time", alias = MIN_POLLING_PROP_KEY)
 	private long                   min_polling         = MIN_POLLING_PROP_VAL;
+	@ConfigField(desc = "Maximal allowed wait time", alias = MAX_WAIT_DEF_PROP_KEY)
 	private long                   max_wait            = MAX_WAIT_DEF_PROP_VAL;
+	@ConfigField(desc = "Maximal allowed pause time", alias = MAX_PAUSE_PROP_KEY)
 	private long                   max_pause           = MAX_PAUSE_PROP_VAL;
+	@ConfigField(desc = "Maximal allowed time of inactivity", alias = MAX_INACTIVITY_PROP_KEY)
 	private long                   max_inactivity      = MAX_INACTIVITY_PROP_VAL;
+	@ConfigField(desc = "Maximal number of hold requests", alias = HOLD_REQUESTS_PROP_KEY)
 	private int                    hold_requests       = HOLD_REQUESTS_PROP_VAL;
+	@ConfigField(desc = "Maximal number of concurrent quests", alias = CONCURRENT_REQUESTS_PROP_KEY)
 	private int                    concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private ReceiverTimeoutHandler stoppedHandler      = newStoppedHandler();
 	private ReceiverTimeoutHandler startedHandler      = newStartedHandler();
+	@ConfigField(desc = "Maximal size of batch", alias = MAX_BATCH_SIZE_KEY)
 	private int                    max_batch_size      = MAX_BATCH_SIZE_VAL;
+	@ConfigField(desc = "Delay before closing BOSH session", alias = BOSH_SESSION_CLOSE_DELAY_PROP_KEY)
 	private long                   bosh_session_close_delay =
 			BOSH_SESSION_CLOSE_DELAY_DEF_VAL;
+	@ConfigField(desc = "Batch queue timeout", alias = BATCH_QUEUE_TIMEOUT_KEY)
 	private long                   batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
+	@ConfigField(desc = "Limit of number of packets waiting to send for a single session", alias = MAX_SESSION_WAITING_PACKETS_KEY)
 	private int					   maxSessionWaitingPackets = MAX_SESSION_WAITING_PACKETS_VAL;
+	@ConfigField(desc = "Should send node hostname a BOSH element attribute", alias = SEND_NODE_HOSTNAME_KEY)
 	private boolean				   sendNodeHostname	   = SEND_NODE_HOSTNAME_VAL;
+	@ConfigField(desc = "SID logger level", alias = SID_LOGGER_KEY)
+	private String sidLoggerLevel = SID_LOGGER_VAL;
 
 	protected enum BOSH_OPERATION_TYPE {
 
@@ -434,25 +447,6 @@ public class BoshConnectionManager
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-
-		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
-		props.put(MIN_POLLING_PROP_KEY, MIN_POLLING_PROP_VAL);
-		props.put(MAX_INACTIVITY_PROP_KEY, MAX_INACTIVITY_PROP_VAL);
-		props.put(CONCURRENT_REQUESTS_PROP_KEY, CONCURRENT_REQUESTS_PROP_VAL);
-		props.put(HOLD_REQUESTS_PROP_KEY, HOLD_REQUESTS_PROP_VAL);
-		props.put(MAX_PAUSE_PROP_KEY, MAX_PAUSE_PROP_VAL);
-		props.put(MAX_BATCH_SIZE_KEY, MAX_BATCH_SIZE_VAL);
-		props.put(BATCH_QUEUE_TIMEOUT_KEY, BATCH_QUEUE_TIMEOUT_VAL);
-		props.put(MAX_SESSION_WAITING_PACKETS_KEY, MAX_SESSION_WAITING_PACKETS_VAL);
-		props.put(SEND_NODE_HOSTNAME_KEY, SEND_NODE_HOSTNAME_VAL );
-		props.put(SID_LOGGER_KEY, SID_LOGGER_VAL);
-
-		return props;
-	}
-
-	@Override
 	public String getDiscoCategoryType() {
 		return "c2s";
 	}
@@ -535,53 +529,13 @@ public class BoshConnectionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		if (props.get(MAX_WAIT_DEF_PROP_KEY) != null) {
-			max_wait = (Long) props.get(MAX_WAIT_DEF_PROP_KEY);
-			log.info("Setting max_wait to: " + max_wait);
+	public void setSidLoggerLevel(String loggerLevel) {
+		Level level = Level.OFF;
+		if (loggerLevel != null) {
+			level = Level.parse(loggerLevel);
 		}
-		if (props.get(MIN_POLLING_PROP_KEY) != null) {
-			min_polling = (Long) props.get(MIN_POLLING_PROP_KEY);
-			log.info("Setting min_polling to: " + min_polling);
-		}
-		if (props.get(MAX_INACTIVITY_PROP_KEY) != null) {
-			max_inactivity = (Long) props.get(MAX_INACTIVITY_PROP_KEY);
-			log.info("Setting max_inactivity to: " + max_inactivity);
-		}
-		if (props.get(CONCURRENT_REQUESTS_PROP_KEY) != null) {
-			concurrent_requests = (Integer) props.get(CONCURRENT_REQUESTS_PROP_KEY);
-			log.info("Setting concurrent_requests to: " + concurrent_requests);
-		}
-		if (props.get(HOLD_REQUESTS_PROP_KEY) != null) {
-			hold_requests = (Integer) props.get(HOLD_REQUESTS_PROP_KEY);
-			log.info("Setting hold_requests to: " + hold_requests);
-		}
-		if (props.get(MAX_PAUSE_PROP_KEY) != null) {
-			max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
-			log.info("Setting max_pause to: " + max_pause);
-		}
-		if (props.get(MAX_BATCH_SIZE_KEY) != null) {
-			max_batch_size = (Integer) props.get(MAX_BATCH_SIZE_KEY);
-			log.info("Setting max_batch_size to: " + max_batch_size);
-		}
-		if (props.get(BATCH_QUEUE_TIMEOUT_KEY) != null) {
-			batch_queue_timeout = (Long) props.get(BATCH_QUEUE_TIMEOUT_KEY);
-			log.info("Setting batch_queue_timeout to: " + batch_queue_timeout);
-		}
-		if (props.get(MAX_SESSION_WAITING_PACKETS_KEY) != null) {
-			maxSessionWaitingPackets = (Integer) props.get(MAX_SESSION_WAITING_PACKETS_KEY);
-			log.info("Setting max session waiting packets to: " + maxSessionWaitingPackets);
-		}
-		if (props.get(SEND_NODE_HOSTNAME_KEY) != null) {
-			sendNodeHostname = (Boolean) props.get(SEND_NODE_HOSTNAME_KEY);
-		}
-		if (props.size() == 1 && props.get(SID_LOGGER_KEY) != null) {
-			Level lvl = Level.parse( (String)props.get(SID_LOGGER_KEY) );
-			setupSidlogger( lvl );
-			log.info("Setting SID log level to: " + lvl);
-		}
+		this.sidLoggerLevel = level.getName();
+		setupSidlogger(level);
 	}
 
 	//~--- methods --------------------------------------------------------------

@@ -22,6 +22,10 @@
 package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigurationChangedAware;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +34,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
@@ -41,7 +47,7 @@ import java.util.logging.Logger;
  * @author wojtek
  */
 public class CounterDataFileLogger
-		implements StatisticsArchivizerIfc {
+		implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
 
 	/* logger instance */
 	private static final Logger log = Logger.getLogger( CounterDataFileLogger.class.getName() );
@@ -60,19 +66,28 @@ public class CounterDataFileLogger
 	private static final String STATISTICS_LEVE_KEY = "stats-level";
 
 	/* Field holding directory path configuration */
+	@ConfigField(desc = "Directory path", alias = DIRECTORY_KEY)
 	private static String directory = "logs/stats";
 	/* Field holding file prefix configuration */
+	@ConfigField(desc = "Name of a file", alias = FILENAME_KEY)
 	private static String filename = "stats";
 	/* Field holding configuration whether include or not unixtime into filename */
+	@ConfigField(desc = "Should include unix time", alias = UNIXTIME_KEY)
 	private static boolean includeUnixTime = true;
 	/* Field holding configuration whether include or not datetime timestamp into filename */
+	@ConfigField(desc = "Should include date time", alias = DATETIME_KEY)
 	private static boolean includeDateTime = true;
 
 	/* Field holding datetime format configuration */
+	@ConfigField(desc = "Format of a date time", alias = DATETIME_FORMAT_KEY)
 	private static String dateTimeFormat = "yyyy-MM-dd_HH:mm:ss";
 
 	/* Field holding level of the statistics configuration */
+	@ConfigField(desc = "Statistics detail level", alias = STATISTICS_LEVE_KEY)
 	private static Level statsLevel = Level.ALL;
+
+	@ConfigField(desc = "Frequency")
+	private long frequency = -1;
 
 	/* Variable for SimpleDateFormat */
 	private static SimpleDateFormat sdf;
@@ -108,43 +123,23 @@ public class CounterDataFileLogger
 	}
 
 	@Override
-	public void init( Map<String, Object> archivizerConf ) {
-		if ( null != archivizerConf.get( DIRECTORY_KEY ) ){
-			directory = String.valueOf( archivizerConf.get( DIRECTORY_KEY ) );
-		}
-		new File( directory ).mkdirs();
-		log.log( Level.CONFIG, "Setting CounterDataFileLogger directory to: {0}", directory );
-
-		if ( null != archivizerConf.get( FILENAME_KEY ) ){
-			filename = (String) archivizerConf.get( FILENAME_KEY );
-		}
-		log.log( Level.CONFIG, "Setting CounterDataFileLogger filename to: {0}", filename );
-
-		if ( null != archivizerConf.get( UNIXTIME_KEY ) ){
-			includeUnixTime = Boolean.valueOf( (String) archivizerConf.get( UNIXTIME_KEY ) );
-		}
-		log.log( Level.CONFIG, "Setting CounterDataFileLogger includeUnixTime to: {0}", includeUnixTime );
-
-		if ( null != archivizerConf.get( DATETIME_KEY ) ){
-			includeDateTime = Boolean.valueOf( (String) archivizerConf.get( DATETIME_KEY ) );
-		}
-		log.log( Level.CONFIG, "Setting CounterDataFileLogger includeDateTime to: {0}", includeDateTime );
-
-		if ( null != archivizerConf.get( DATETIME_FORMAT_KEY ) ){
-			dateTimeFormat = (String) archivizerConf.get( DATETIME_FORMAT_KEY );
-		}
-		log.log( Level.CONFIG, "Setting CounterDataFileLogger dateTimeFormat to: {0}", dateTimeFormat );
-		sdf = new SimpleDateFormat( dateTimeFormat );
-
-		if ( null != archivizerConf.get( STATISTICS_LEVE_KEY ) ){
-			statsLevel = Level.parse( (String) archivizerConf.get( STATISTICS_LEVE_KEY ) );
-		}
-		log.log( Level.CONFIG, "Setting CounterDataFileLogger statsLevel to: {0}", statsLevel );
-
+	public void release() {
+		// pass
 	}
 
 	@Override
-	public void release() {
-		// pass
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		new File( directory ).mkdirs();
+		sdf = new SimpleDateFormat( dateTimeFormat );
+	}
+
+	@Override
+	public long getFrequency() {
+		return frequency;
+	}
+
+	@Override
+	public void initialize() {
+		beanConfigurationChanged(Collections.emptyList());
 	}
 }

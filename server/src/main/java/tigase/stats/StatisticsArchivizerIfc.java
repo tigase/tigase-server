@@ -24,8 +24,6 @@ package tigase.stats;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
-
 //~--- interfaces -------------------------------------------------------------
 
 /**
@@ -35,10 +33,11 @@ import java.util.Map;
  * @version $Rev$
  */
 public interface StatisticsArchivizerIfc {
+
+	long getFrequency();
+
 	void execute(StatisticsProvider sp);
-
-	void init(Map<String, Object> archivizerConf);
-
+	
 	void release();
 }
 

@@ -26,11 +26,13 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.sys.ShutdownHook;
@@ -45,7 +47,7 @@ import tigase.xmpp.StanzaType;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,17 +63,11 @@ import java.util.logging.Logger;
 @Bean(name = "stats", parent = Kernel.class, active = true)
 public class StatisticsCollector
 				extends AbstractComponentRegistrator<StatisticsContainer>
-				implements ShutdownHook {
+				implements ShutdownHook, RegistrarBean {
 	public static final String ERRORS_STATISTICS_MBEAN_NAME =
 			"tigase.stats:type=ErrorStatistics";
 	public static final String STATISTICS_MBEAN_NAME =
 			"tigase.stats:type=StatisticsProvider";
-
-	public static final String STATS_ARCHIVIZERS = "--stats-archiv";
-
-	public static final String STATS_ARCHIVIZERS_PROP_KEY = "stats-archiv";
-
-	public static final String STATS_HISTORY = "--stats-history";
 
 	public static final String STATS_HISTORY_SIZE_PROP_KEY = "stats-history-size";
 
@@ -82,28 +78,31 @@ public class StatisticsCollector
 	public static final String STATS_HIGH_MEMORY_LEVEL_KEY = "stats-high-memory-level";
 
 	/** Field description */
-	public static final long    STATS_UPDATE_INTERVAL_PROP_VAL = 10l;
 	private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
 	private static final Logger log = Logger.getLogger(StatisticsCollector.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
+	@ConfigField(desc = "History size", alias = STATS_HISTORY_SIZE_PROP_KEY)
 	private int                                  historySize                 = 0;
 	private TimerTask                            initializationCompletedTask = null;
 	private ServiceEntity                        serviceEntity               = null;
 	private StatisticsProvider                   sp                          = null;
 	private ErrorsStatisticsProvider			 esp						 = null;
-	private final Map<String, StatisticsArchivizerIfc> archivizers =
-			new ConcurrentSkipListMap<>();
+	@Inject
+	private StatisticsArchivizerIfc[] archivizers = new StatisticsArchivizerIfc[0];
+	private Map<StatisticsArchivizerIfc, TimerTask> archiverTasks = new ConcurrentHashMap<>();
 	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
 
 	// private ServiceEntity stats_modules = null;
 	private Level statsLevel       = Level.INFO;
 	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
 	private final Timer everyX = new Timer("stats-timer", true);
+	@ConfigField(desc = "Update interval", alias = STATS_UPDATE_INTERVAL_PROP_KEY)
 	private long  updateInterval   = 10;
+	@ConfigField(desc = "High memory level", alias = STATS_HIGH_MEMORY_LEVEL_KEY)
 	private int   highMemoryLevel  = 95;
-
+	
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -314,14 +313,6 @@ public class StatisticsCollector
 		super.release();
 		sp.stop();
 		statsArchivTasks.cancel();
-
-		for (String stat_arch_key : archivizers.keySet()) {
-			StatisticsArchivizerIfc stat_arch = archivizers.remove(stat_arch_key);
-
-			if (stat_arch != null) {
-				stat_arch.release();
-			}
-		}
 	}
 
 	@Override
@@ -374,45 +365,6 @@ public class StatisticsCollector
 		if (stats != null) {
 			stats.getStatistics(list);
 		}
-	}
-
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs             = super.getDefaults(params);
-		String              statsArchivizers = (String) params.get(STATS_ARCHIVIZERS);
-
-		if ((statsArchivizers != null) &&!statsArchivizers.isEmpty()) {
-			String[] archivs = statsArchivizers.split(",");
-
-			defs.put(STATS_ARCHIVIZERS_PROP_KEY, archivs);
-		}
-
-		int    hSize         = historySize;
-		long   updateInt     = updateInterval;
-		String stats_history = (String) params.get(STATS_HISTORY);
-
-		if (stats_history != null) {
-			String[] st_pars = stats_history.split(",");
-
-			try {
-				hSize = Integer.parseInt(st_pars[0]);
-			} catch (NumberFormatException ex) {
-				log.log(Level.CONFIG, "Invalid statistics history size settings: {0}",
-						st_pars[0]);
-			}
-			if (st_pars.length > 1) {
-				try {
-					updateInt = Long.parseLong(st_pars[1]);
-				} catch (NumberFormatException ex) {
-					log.log(Level.CONFIG, "Invalid statistics update interval: {0}", st_pars[1]);
-				}
-			}
-		}
-		defs.put(STATS_HISTORY_SIZE_PROP_KEY, hSize);
-		defs.put(STATS_UPDATE_INTERVAL_PROP_KEY, updateInt);
-		defs.put(STATS_HIGH_MEMORY_LEVEL_KEY, highMemoryLevel);
-
-		return defs;
 	}
 
 	@Override
@@ -489,23 +441,13 @@ public class StatisticsCollector
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
+	public void register(Kernel kernel) {
+		
+	}
 
-		String[] archivs = (String[]) props.get(STATS_ARCHIVIZERS_PROP_KEY);
+	@Override
+	public void unregister(Kernel kernel) {
 
-		if (archivs != null) {
-			initStatsArchivizers(archivs, props);
-		}
-		if (props.get(STATS_HISTORY_SIZE_PROP_KEY) != null) {
-			historySize = (Integer) props.get(STATS_HISTORY_SIZE_PROP_KEY);
-		}
-		if (props.get(STATS_UPDATE_INTERVAL_PROP_KEY) != null) {
-			updateInterval = (Long) props.get(STATS_UPDATE_INTERVAL_PROP_KEY);
-		}
-		if (props.get(STATS_HIGH_MEMORY_LEVEL_KEY) != null) {
-			highMemoryLevel = (Integer) props.get(STATS_HIGH_MEMORY_LEVEL_KEY);
-		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -517,81 +459,36 @@ public class StatisticsCollector
 		esp.update(sp);
 	}
 
-	private void initStatsArchivizers(final String[] archivs, final Map<String,
-			Object> props) {
-		for (String stat_arch_key : archivizers.keySet()) {
-			StatisticsArchivizerIfc stat_arch = archivizers.remove(stat_arch_key);
-
-			if (stat_arch != null) {
-				stat_arch.release();
-			}
+	public void setArchivizers(StatisticsArchivizerIfc[] archivizers) {
+		if (archivizers == null) {
+			archivizers = new StatisticsArchivizerIfc[0];
 		}
-		initializationCompletedTask = new TimerTask() {
-			@Override
-			public void run() {
-				for (String arch_prop : archivs) {
-					try {
-						String[]                      arch_prop_a = arch_prop.split(":");
-						String                        arch_class  = arch_prop_a[0];
-						String                        arch_name   = arch_prop_a[1];
-						final StatisticsArchivizerIfc stat_arch = (StatisticsArchivizerIfc) Class
-								.forName(arch_class).newInstance();
-
-						stat_arch.init(getArchivizerConf(arch_name, props));
-
-						long freq = -1;
-
-						if (arch_prop_a.length > 2) {
-							try {
-								freq = Long.parseLong(arch_prop_a[2]);
-							} catch (Exception e) {
-								freq = -1;
-							}
-						}
-
-						// Some archivizers run in regular intervals of time
-						// some others run each time statistics collection has completed.
-						if (freq > 0) {
-							statsArchivTasks.schedule(new TimerTask() {
-								@Override
-								public void run() {
-									stat_arch.execute(sp);
-								}
-							}, freq * 1000, freq * 1000);
-						} else {
-							archivizers.put(arch_name, stat_arch);
-						}
-						log.log(Level.CONFIG, "Loaded statistics archivizer: {0} for class: {1}",
-								new Object[] { arch_name,
-								arch_class });
-					} catch (Exception e) {
-						log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop,
-								e);
-					}
-				}
+		List<StatisticsArchivizerIfc> newArchivizers = Arrays.asList(archivizers);
+		Arrays.stream(this.archivizers).filter(it -> !newArchivizers.contains(it)).forEach(it -> {
+			TimerTask tt = this.archiverTasks.get(it);
+			if (tt != null) {
+				tt.cancel();
 			}
-		};
+		});
+		List<StatisticsArchivizerIfc> oldArchivizers = Arrays.asList(this.archivizers);
+		this.archivizers = archivizers;
+		Arrays.stream(this.archivizers)
+				.filter(it -> !oldArchivizers.contains(it))
+				.filter(it -> it.getFrequency() > 0)
+				.forEach(it -> {
+					TimerTask tt = new TimerTask() {
+						@Override
+						public void run() {
+							it.execute(sp);
+						}
+					};
+					statsArchivTasks.schedule(tt, it.getFrequency() * 1000, it.getFrequency() * 1000);
+					this.archiverTasks.put(it, tt);
+		});
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	private Map<String, Object> getArchivizerConf(String name, Map<String, Object> props) {
-		Map<String, Object> result    = new LinkedHashMap<String, Object>(4);
-		String              key_start = STATS_ARCHIVIZERS_PROP_KEY + "/" + name + "/";
-
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(key_start)) {
-				String key = entry.getKey().substring(key_start.length());
-
-				log.log(Level.CONFIG, "Found {0} property: {1} = {2}", new Object[] { name, key,
-						entry.getValue() });
-				result.put(key, entry.getValue());
-			}
-		}
-
-		return result;
-	}
-
+	
 	//~--- inner classes --------------------------------------------------------
 
 	private class ArchivizerRunner
@@ -615,10 +512,9 @@ public class StatisticsCollector
 					synchronized (this) {
 						this.wait();
 					}
-					for (Map.Entry<String, StatisticsArchivizerIfc> archiv_entry : archivizers
-							.entrySet()) {
-						archiv_entry.getValue().execute(sp);
-					}
+					Arrays.stream(archivizers)
+							.filter(archiv -> archiv.getFrequency() <= 0)
+							.forEach(archiv -> archiv.execute(sp));
 				} catch (InterruptedException ex) {
 
 					// Ignore...

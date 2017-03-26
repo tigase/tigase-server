@@ -62,11 +62,6 @@ public static class TestModule extends AbstractModule {
   private boolean secureLogging = false;
 
   @Override
-  public String[] getFeatures() {
-    return new String[0];
-  }
-
-  @Override
   public Criteria getModuleCriteria() {
     return CRITERIA;
   }

@@ -26,24 +26,28 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DataRepository;
 import tigase.db.DBInitException;
+import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
-
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.server.XMPPServer;
-
 import tigase.sys.TigaseRuntime;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
 import java.text.NumberFormat;
-
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+
+import static tigase.db.RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Mar 25, 2010 8:55:11 PM
@@ -52,7 +56,7 @@ import java.util.Map;
  * @version $Rev$
  */
 public class CounterDataArchivizer
-				implements StatisticsArchivizerIfc {
+				implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
 	public static final String DB_URL_PROP_KEY = "db-url";
 	public static final String KEY_FIELD_PROP_KEY = "key-field";
 	public static final String TABLE_NAME_PROP_KEY = "table-name";
@@ -77,13 +81,21 @@ public class CounterDataArchivizer
 	private DataRepository data_repo          = null;
 	private String         init_entry_query   = null;
 
+	@ConfigField(desc = "Database URL", alias = DB_URL_PROP_KEY)
+	private String databaseUrl = null;
 	// private PreparedStatement initEntry = null;
+	@ConfigField(desc = "Table name", alias = TABLE_NAME_PROP_KEY)
 	private String tableName          = DEF_TABLE_NAME;
+	@ConfigField(desc = "Key field", alias = KEY_FIELD_PROP_KEY)
 	private String keyField           = DEF_KEY_FIELD_NAME;
 	private String update_entry_query = null;
 
+
 	// private PreparedStatement updateEntry = null;
+	@ConfigField(desc = "Value field", alias = VAL_FIELD_PROP_KEY)
 	private String valueField = DEF_VALUE_FIELD_NAME;
+	@ConfigField(desc = "Frequency")
+	private long frequency = -1;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -100,44 +112,6 @@ public class CounterDataArchivizer
 		initData(SERVER_CONNECTIONS_TEXT, format.format(sp.getServerConnections()));
 		initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
 		initData(VHOSTS_TEXT, format.format(sp.getStats("vhost-man", "Number of VHosts", 0)));
-	}
-
-	@Override
-	public void init(Map<String, Object> conf) {
-		String prop = (String) conf.get(TABLE_NAME_PROP_KEY);
-
-		if (prop != null) {
-			tableName = prop;
-		}
-		prop = (String) conf.get(KEY_FIELD_PROP_KEY);
-		if (prop != null) {
-			keyField = prop;
-		}
-		prop = (String) conf.get(VAL_FIELD_PROP_KEY);
-		if (prop != null) {
-			valueField = prop;
-		}
-		log.log(Level.SEVERE, "Initialize stats archive, table: {0} ", tableName);
-		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField +
-				") " + " (select ?, ? from " + tableName + " where " + keyField +
-				" = ? HAVING count(*)=0)";
-		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " +
-				keyField + " = ?";
-		create_table_query = "CREATE TABLE " + tableName + " ( " + keyField +
-				" varchar(255) NOT NULL DEFAULT '0', " + valueField +
-				" varchar(255) NOT NULL DEFAULT '0'," + "  PRIMARY KEY ( " + keyField + " ));";
-		try {
-			initRepository((String) conf.get(DB_URL_PROP_KEY), null);
-			initData(VERSION_TEXT, XMPPServer.getImplementationVersion());
-			initData(CPU_USAGE_TEXT, "0");
-			initData(MEM_USAGE_TEXT, "0");
-			initData(USER_CONNECTIONS_TEXT, "0");
-			initData(SERVER_CONNECTIONS_TEXT, "0");
-			initData(VHOSTS_TEXT, "0");
-			initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
-		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
-		}
 	}
 
 	public void initData(String key, String value) {
@@ -191,6 +165,43 @@ public class CounterDataArchivizer
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
+	}
+
+	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		log.log(Level.SEVERE, "Initialize stats archive, table: {0} ", tableName);
+		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField +
+				") " + " (select ?, ? from " + tableName + " where " + keyField +
+				" = ? HAVING count(*)=0)";
+		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " +
+				keyField + " = ?";
+		create_table_query = "CREATE TABLE " + tableName + " ( " + keyField +
+				" varchar(255) NOT NULL DEFAULT '0', " + valueField +
+				" varchar(255) NOT NULL DEFAULT '0'," + "  PRIMARY KEY ( " + keyField + " ));";
+		try {
+			Map<String,String> params = new HashMap<>();
+			params.put(DATA_REPO_POOL_SIZE_PROP_KEY, "1");
+			initRepository(databaseUrl, params);
+			initData(VERSION_TEXT, XMPPServer.getImplementationVersion());
+			initData(CPU_USAGE_TEXT, "0");
+			initData(MEM_USAGE_TEXT, "0");
+			initData(USER_CONNECTIONS_TEXT, "0");
+			initData(SERVER_CONNECTIONS_TEXT, "0");
+			initData(VHOSTS_TEXT, "0");
+			initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
+		}
+	}
+
+	@Override
+	public long getFrequency() {
+		return frequency;
+	}
+
+	@Override
+	public void initialize() {
+		beanConfigurationChanged(Collections.emptyList());
 	}
 
 	private void checkDB() throws SQLException {

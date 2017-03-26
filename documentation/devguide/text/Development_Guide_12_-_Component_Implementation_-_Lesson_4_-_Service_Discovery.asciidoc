@@ -34,6 +34,10 @@ After you have added the two above methods and restarted the server with updated
 
 image:images/dev/spam-filtering-disco-small.png[]
 
+Now let's add method which will allow our module +TestModule+ to return supported features. This way our component will automatically report features supported by all it's modules.
+To do so we need to implement a method *String[] getFeatures()* which returns array of `String` items. This items are used to generate a list of features supported by component.
+List of features supported by all modules are retrieved during service discovery of a component by +DiscoveryModule+.
+
 Although this was easy, this particular change doesn't affect anything apart from just a visual appearance. Let's get then to more advanced and more useful changes.
 
 One of the limitations of methods above is that you can not update or change component information at run-time with these methods. They are called only once during initialization of a component when component service discovery information is created and prepared for later use. Sometimes, however it is useful to be able to change the service discovery during run-time.
@@ -175,6 +179,7 @@ public class TestComponent extends AbstractKernelBasedComponent {
   @Override
   protected void registerModules(Kernel kernel) {
     // here we need to register modules responsible for processing packets
+    kernel.registerBean("disco").asClass(DiscoveryModule.class).exec();
   }
 
 }

@@ -236,6 +236,8 @@ include::text/admin/Admin_Guide_65_-_Components_-_F_-_Server_Monitoring_-_1_-_Se
 
 include::text/admin/Admin_Guide_66_-_Components_-_F_-_Server_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
 
+include::text/admin/Configuration_of_statistics_loggers.asciidoc[]
+
 include::text/admin/Admin_Guide_102_-_Statistics_Descriptions.asciidoc[]
 
 :leveloffset: 2
@@ -443,10 +445,6 @@ include::text/properties/Properties_Guide_46_-_--ssl-certs-location.asciidoc[]
 include::text/properties/Properties_Guide_47_-_--ssl-container-class.asciidoc[]
 
 include::text/properties/Properties_Guide_48_-_--ssl-def-cert-domain.asciidoc[]
-
-include::text/properties/Properties_Guide_49_-_--stats-archiv.asciidoc[]
-
-include::text/properties/Properties_Guide_50_-_--stats-history.asciidoc[]
 
 include::text/properties/Properties_Guide_51_-_--stringprep-processor.asciidoc[]
 

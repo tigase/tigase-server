@@ -254,6 +254,10 @@ public class ConfigHolder {
 					toRemove.add(k);
 					toAdd.put(k.replace("/plugins-conf/", "/"), v);
 				}
+				if (k.startsWith("stats/stats-archiv/")) {
+					toRemove.add(k);
+					toAdd.put(k.replace("stats/stats-archiv/", "stats/"), v);
+				}
 			});
 
 			List<String> userDbDomains = new ArrayList<>();
@@ -326,6 +330,30 @@ public class ConfigHolder {
 						props.put("monitoring/" + tmp[0] + "/active", "true");
 						props.put("monitoring/" + tmp[0] + "/port", tmp[1]);
 					}
+				}
+			}
+
+			String statsArchiv = (String) props.remove("--stats-archiv");
+			if (statsArchiv != null) {
+				Arrays.stream(statsArchiv.split(",")).forEach( archiver -> {
+					String[] parts = archiver.split(":");
+					String k = "stats/" + parts[1];
+					props.put(k + "/class", parts[0]);
+					props.put(k + "/active", "true");
+					if (parts.length > 2) {
+						props.put(k + "/frequency", parts[2]);
+					}
+					if ("tigase.mongo.stats.CounterDataLoggerMongo".equals(parts[1]) || "tigase.stats.CounterDataLogger".equals(parts[1])) {
+						props.putIfAbsent(k + "/db-url", props.get("dataSource/default/uri"));
+					}
+				});
+			}
+			String statsHistory = (String) props.remove("--stats-history");
+			if (statsHistory != null) {
+				String[] parts = statsHistory.split(",");
+				props.putIfAbsent("stats/stats-history-size", parts[0]);
+				if (parts.length > 1) {
+					props.putIfAbsent("stats/stats-update-interval", parts[1]);
 				}
 			}
 

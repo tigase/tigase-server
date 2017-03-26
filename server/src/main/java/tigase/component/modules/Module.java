@@ -32,13 +32,17 @@ import tigase.util.TigaseStringprepException;
  */
 public interface Module {
 
+	String[] EMPTY_FEATURES = new String[0];
+
 	/**
 	 * Returns XMPP features offered by module. Features will be returned by
 	 * Service Discovery.
 	 *
 	 * @return array of features or <code>null</code>.
 	 */
-	String[] getFeatures();
+	default String[] getFeatures() {
+		return EMPTY_FEATURES;
+	}
 
 	/**
 	 * Returns critera used by Component to select module to handle incoming
