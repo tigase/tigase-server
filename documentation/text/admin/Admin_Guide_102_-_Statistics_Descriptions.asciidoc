@@ -17,6 +17,7 @@ Statistics will not be provided by components that are not enabled.
 Data sources used to access data storages such as JDBC (databases) or MongoDB provide statistcs related to stability of connections to data storage and number of open connections.
 
 === Number of active data sources
+It is a number of defined and active data sources (ie. connection pools). It is not a number of connections to data sources as it varies and is listed separately for every defined data source.
 
 *Statistics Level*: FINE
 
@@ -81,6 +82,7 @@ dataSource/{dataSourceName}/failed reconnections
 For every {method} declared in `UserRepository` we gather execution statistics. This statistics are collected separately for every data source for which user repository is defined.
 
 === Average processing time of {method}
+It is average time taken by call of {method} for this data source since creation of data source (most likely from server startup). It includes time taken by calls which thrown exception, etc.
 
 *Statistics Level*: FINE
 
