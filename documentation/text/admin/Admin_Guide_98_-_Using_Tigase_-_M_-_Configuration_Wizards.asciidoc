@@ -21,11 +21,10 @@ A few definitions first to make it easier to read the rest:
 . *c2s* - client connection manager component
 . *s2s* - server connection manager component
 . *ext2s* - external component connection manager
-. *ssender* - xref:stanzaSender[StanzaSender component]
 
 The are 4 generators currently available:
 
-. +--gen-config-all+ - creating configuration file with all available components. That is: +sm, c2s, s2s, ext2s, ssender+.
+. +--gen-config-all+ - creating configuration file with all available components. That is: +sm, c2s, s2s, ext2s+.
 . +--gen-config-default+ - creating default configuration file. That is configuration which is most likely needed for basic installation. Components included in configuration are: +sm, c2s, s2s+.
 . +--gen-config-sm+ - creating configuration for instance with session manager and external component only. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +sm+ and +ext2s+.
 . +--gen-config-cs+ - creating configuration for instance with components managing network connections. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +c2s, s2s, ext2s+.

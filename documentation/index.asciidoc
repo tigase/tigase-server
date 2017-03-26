@@ -190,8 +190,6 @@ include::text/admin/Admin_Guide_53_-_Components.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/Admin_Guide_54_-_Components_-_A_-_StanzaSender.asciidoc[]
-
 include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
 
 include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]

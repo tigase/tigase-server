@@ -1,6 +1,0 @@
-; $Id: $
-name = Short news
-description = Short news displaying from short_news table.
-package = Tigase
-
-core = 6.x

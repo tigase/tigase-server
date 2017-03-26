@@ -30,52 +30,7 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_tig_users_1] ON [dbo].[tig_users]
 	[uid] ASC
 ) ON [PRIMARY]
 GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[short_news](
-	[snid] [bigint] IDENTITY(1,1) NOT NULL,
-	[publishing_time] [datetime] NOT NULL CONSTRAINT [DF_short_news_publishing_time]  DEFAULT (getdate()),
-	[news_type] [nvarchar](50) NULL,
-	[author] [nvarchar](128) NOT NULL,
-	[subject] [nvarchar](128) NOT NULL,
-	[body] [nvarchar](1024) NOT NULL,
- CONSTRAINT [PK_short_news] PRIMARY KEY CLUSTERED 
-(
-	[snid] ASC
-) ON [PRIMARY]
-) ON [PRIMARY]
 
-GO
-
-CREATE NONCLUSTERED INDEX [IX_short_news] ON [dbo].[short_news] 
-(
-	[publishing_time] ASC
-) ON [PRIMARY]
-GO
-
-CREATE NONCLUSTERED INDEX [IX_short_news_1] ON [dbo].[short_news] 
-(
-	[author] ASC
-) ON [PRIMARY]
-GO
-
-CREATE NONCLUSTERED INDEX [IX_short_news_2] ON [dbo].[short_news] 
-(
-	[news_type] ASC
-) ON [PRIMARY]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[xmpp_stanza](
-	[id] [bigint] IDENTITY(1,1) NOT NULL,
-	[stanza] [text] NOT NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-
-GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

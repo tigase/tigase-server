@@ -26,31 +26,6 @@
 --  createdb -U tigase tigase
 --  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
-
-create table short_news (
-  -- Automatic record ID
-  snid            serial,
-  -- Automaticly generated timestamp and automaticly updated on change
-  publishing_time timestamp default now(),
-	-- Optional news type: 'shorts', 'minis', 'techs', 'funs'....
-	news_type				varchar(10),
-  -- Author JID
-  author          varchar(128) NOT NULL,
-  -- Short subject - this is short news, right?
-  subject         varchar(128) NOT NULL,
-  -- Short news message - this is short news, right?
-  body            varchar(1024) NOT NULL,
-  primary key(snid)
-);
-create index publishing_time on short_news (publishing_time);
-create index author on short_news (author);
-create index news_type on short_news (news_type);
-
-create table xmpp_stanza (
-			 id serial,
-			 stanza text NOT NULL
-);
-
 create table tig_users (
        uid bigint NOT NULL,
 

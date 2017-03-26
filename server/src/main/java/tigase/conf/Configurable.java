@@ -145,13 +145,7 @@ public interface Configurable
 
 	/** Field description */
 	public static final String DEF_SM_NAME = "sess-man";
-
-	/** Field description */
-	public static final String DEF_SRECV_NAME = "srecv";
-
-	/** Field description */
-	public static final String DEF_SSEND_NAME = "ssend";
-
+	
 	/** Field description */
 	public static final String DEF_STATS_NAME = "stats";
 
@@ -296,14 +290,7 @@ public interface Configurable
 	/** Field description */
 	public static final String SM_COMP_CLASS_NAME =
 			"tigase.server.xmppsession.SessionManager";
-
-	/** Field description */
-	public static final String SRECV_COMP_CLASS_NAME =
-			"tigase.server.sreceiver.StanzaReceiver";
-
-	/** Field description */
-	public static final String SSEND_COMP_CLASS_NAME = "tigase.server.ssender.StanzaSender";
-
+	
 	/** Field description */
 	public static final String STANZA_WHITE_CHAR_ACK = "white-char";
 
