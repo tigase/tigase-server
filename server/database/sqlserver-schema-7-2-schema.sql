@@ -221,3 +221,20 @@ if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_of
     create index IX_tig_offline_messages_receiver_sha1_sender_sha1 on [dbo].[tig_offline_messages] (receiver_sha1, sender_sha1);
 -- QUERY END:
 GO
+
+-- QUERY START:
+if object_id('dbo.tig_cluster_nodes') is null
+    create table [dbo].[tig_cluster_nodes] (
+        hostname nvarchar(450) not null,
+        secondary nvarchar(512),
+        password nvarchar(255) not null,
+		last_update [datetime] default getdate(),
+		port int,
+		cpu_usage double precision not null,
+		mem_usage double precision not null,
+
+		constraint [PK_tig_cluster_nodes] PRIMARY KEY ClUSTERED ( [hostname] asc ) on [PRIMARY],
+		constraint [IX_tig_cluster_nodes_hostname] unique nonclustered ( [hostname] asc) on [PRIMARY]
+    );
+-- QUERY END:
+GO

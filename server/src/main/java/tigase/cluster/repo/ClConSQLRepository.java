@@ -26,13 +26,15 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.*;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
@@ -78,44 +80,6 @@ public class ClConSQLRepository
 					+ " from " + TABLE_NAME;
 	private static final String DELETE_ITEM_QUERY =
 					"delete from " + TABLE_NAME + " where (" + HOSTNAME_COLUMN + " = ?)";
-	private static final String CREATE_TABLE_QUERY_MYSQL =
-					"create table " + TABLE_NAME + " ("
-					+ "  " + HOSTNAME_COLUMN + " varchar(255) not null,"
-					+ "  " + SECONDARY_HOSTNAME_COLUMN + " varchar(255),"
-					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
-					+ "  " + LASTUPDATE_COLUMN
-					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
-					+ "  " + PORT_COLUMN + " int,"
-					+ "  " + CPU_USAGE_COLUMN + " double precision unsigned not null,"
-					+ "  " + MEM_USAGE_COLUMN + " double precision unsigned not null,"
-					+ "  primary key(" + HOSTNAME_COLUMN + "))"
-					+ " ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC";
-	private static final String CREATE_TABLE_QUERY =
-					"create table " + TABLE_NAME + " ("
-					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
-					+ "  " + SECONDARY_HOSTNAME_COLUMN + " varchar(512),"
-					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
-					+ "  " + LASTUPDATE_COLUMN
-					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-					+ "  " + PORT_COLUMN + " int,"
-					+ "  " + CPU_USAGE_COLUMN + " double precision not null,"
-					+ "  " + MEM_USAGE_COLUMN + " double precision not null,"
-					+ "  primary key(" + HOSTNAME_COLUMN + "))";
-	private static final String CREATE_TABLE_QUERY_SQLSERVER =
-					"create table [dbo].[" + TABLE_NAME + "] ("
-					+ "  " + HOSTNAME_COLUMN + " nvarchar(512) not null,"
-					+ "  " + SECONDARY_HOSTNAME_COLUMN + " nvarchar(512),"
-					+ "  " + PASSWORD_COLUMN + " nvarchar(255) not null,"
-					+ "  " + LASTUPDATE_COLUMN
-					+ " [datetime] NULL,"
-					+ "  " + PORT_COLUMN + " int,"
-					+ "  " + CPU_USAGE_COLUMN + " double precision not null,"
-					+ "  " + MEM_USAGE_COLUMN + " double precision not null,"
-					+ " CONSTRAINT [PK_" + TABLE_NAME + "] PRIMARY KEY CLUSTERED ( [" + HOSTNAME_COLUMN + "] ASC ) ON [PRIMARY], "
-					+ " CONSTRAINT [IX_" + TABLE_NAME + "_" + HOSTNAME_COLUMN + "] UNIQUE NONCLUSTERED ( [" + HOSTNAME_COLUMN + "] ASC ) ON [PRIMARY] "
-					+ ") ON [PRIMARY]"
-					+ "ALTER TABLE [dbo].[" + TABLE_NAME + "] ADD  CONSTRAINT "
-					+ "[DF_" + TABLE_NAME + "_" + LASTUPDATE_COLUMN + "]  DEFAULT (getdate()) FOR [" + LASTUPDATE_COLUMN + "] ";
 	private static final String INSERT_ITEM_QUERY =
 					"insert into " + TABLE_NAME + " ("
 					+ HOSTNAME_COLUMN + ", "
@@ -176,7 +140,6 @@ public class ClConSQLRepository
 		try {
 			checkDB(data_repo);
 
-			// data_repo.initPreparedStatement(CHECK_TABLE_QUERY, CHECK_TABLE_QUERY);
 			data_repo.initPreparedStatement(GET_ITEM_QUERY, GET_ITEM_QUERY);
 			data_repo.initPreparedStatement(GET_ALL_ITEMS_QUERY, GET_ALL_ITEMS_QUERY);
 			data_repo.initPreparedStatement(INSERT_ITEM_QUERY, INSERT_ITEM_QUERY);
@@ -329,63 +292,16 @@ public class ClConSQLRepository
 	 * @throws SQLException
 	 */
 	private void checkDB(DataRepository data_repo) throws SQLException {
-		Statement st = null;
+		if (!data_repo.checkTable(TABLE_NAME)) {
+			log.info("DB for external component is not OK, stopping server...");
 
-		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();
-		String createTableQuery;
-
-		switch ( databaseType ) {
-			case mysql:
-				createTableQuery = CREATE_TABLE_QUERY_MYSQL;
-				break;
-			case jtds:
-			case sqlserver:
-				createTableQuery = CREATE_TABLE_QUERY_SQLSERVER;
-				break;
-			default:
-				createTableQuery = CREATE_TABLE_QUERY;
-				break;
-		}
-
-		Statement stmt = null;
-		
-		try {
-			if (!data_repo.checkTable(TABLE_NAME)) {
-				log.info("DB for external component is not OK, creating missing tables...");
-
-				st = data_repo.createStatement(null);
-				st.executeUpdate(createTableQuery);
-				log.info("DB for external component created OK");
-			}
-
-			try {
-				stmt = data_repo.createStatement(null);
-				stmt.executeQuery("select " + SECONDARY_HOSTNAME_COLUMN + " from " + TABLE_NAME + " where " + HOSTNAME_COLUMN + " IS NOT NULL");
-			} catch (SQLException ex) {
-				// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
-				String alterTable = null;
-				switch (data_repo.getDatabaseType()) {
-					case derby:
-					case mysql:
-					case postgresql:
-						alterTable = "alter table " + TABLE_NAME + " add " + SECONDARY_HOSTNAME_COLUMN + " varchar(512)";
-						break;
-					case jtds:
-					case sqlserver:
-						alterTable = "alter table " + TABLE_NAME + " add " + SECONDARY_HOSTNAME_COLUMN + " nvarchar(512)";
-						break;
-				}
-				try {
-					stmt.execute(alterTable);
-				} catch (SQLException ex1) {
-					log.log(Level.SEVERE, "could not alter table " + TABLE_NAME + " to add missing column by SQL:\n" + alterTable, ex1);
-				}
-			}
-
-
-		} finally {
-			data_repo.release(st, null);
-			st = null;
+			System.err.println("");
+			System.err.println("  --------------------------------------");
+			System.err.println("  ERROR! Terminating the server process.");
+			System.err.println("  Problem initializing the server: missing tig_cluster_nodes table on " +
+									   data_repo.getResourceUri());
+			System.err.println("  Please fix the problem and start the server again.");
+			System.exit(1);
 		}
 	}
 }

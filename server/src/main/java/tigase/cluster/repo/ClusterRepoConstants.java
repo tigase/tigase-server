@@ -40,6 +40,6 @@ public interface ClusterRepoConstants {
 
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 
-	public static final String TABLE_NAME = "cluster_nodes";
+	public static final String TABLE_NAME = "tig_cluster_nodes";
 }
 

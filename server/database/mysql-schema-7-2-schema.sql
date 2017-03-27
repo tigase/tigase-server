@@ -185,3 +185,18 @@ create table if not exists tig_offline_messages (
 ) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 -- QUERY END:
 
+-- ------------ Clustering support
+
+-- QUERY START:
+create table if not exists tig_cluster_nodes (
+    hostname varchar(255) not null,
+    secondary varchar(512),
+    password varchar(255),
+    last_update timestamp(6) default current_timestamp(6) on update current_timestamp(6),
+    port int,
+    cpu_usage double precision unsigned not null,
+    mem_usage double precision unsigned not null,
+    primary key (hostname)
+) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+-- QUERY END:
+
