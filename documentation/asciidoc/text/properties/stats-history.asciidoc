@@ -1,0 +1,26 @@
+[[statsHistory]]
+= --stats-history
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-04-15 20:55
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* 'none'
+
+*Example:* +--stats-history=2160,10+
+
+*Possible values:* +SIZE-NUM,INTERVAL_NUM+
+
+*Description:* Tigase XMPP Server can store server statistics internally for a given period of time. This allows you to connect to a running system and collect all the server metrics along with historic data which are stored on the server.
+
+This is very useful when something happens on your production system you can connect and see when exactly this happened and what other metrics looked around this time.
+
+The property value consists of comma separated, 2 integer numbers. The first is a size of the buffer. That is how many complete sets of historic metrics to store in memory. The second specified how often to probe metrics on the server.
+
+Please be aware that Tigase XMPP Server produces about 1,000 different metrics of the system. Therefore caching large number of statistics sets requires lots of memory.
+
+*Available since:* 5.0.0

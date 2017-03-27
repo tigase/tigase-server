@@ -1,0 +1,58 @@
+[[statsArchiv]]
+= --stats-archiv
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2014-06-10 18:21
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* 'By default, --stats-archiv is not listed in the init.properties file'
+
+*Example:* +--stats-archiv=tigase.stats.CounterDataFileLogger:stats-file-logger:60,tigase.stats.CounterDataLogger:stats-logger:60+
+
+*Possible values:* 'comma separated list of statistics archivers:' +<class>:<name>:<frequency>+
+
+*Description:* +--stats-archiv+ configuration property allow enabling and configuring components responsible for storing statistic information. As a parameter, it takes comma separated list of all archivers that we want to enable. Each entry follows same pattern: <class>:<name>:<frequency>, where:
+
+- <class> - is the class of any archiver implementing +tigase.stats.StatisticsArchivizerIfc+ interface
+- <name> - is the name of particular archiver under which it will be identified in Tigase
+- <frequency> - is the time interval between subsequent execution of the archiver +.execute()+ method (in seconds).
+
+Currently following archivers classes are available:
+
+- +tigase.stats.CounterDataArchivizer+ - every execution put current basic server metrics (CPU usage, memory usage, number of user connections, uptime) into database (overwrites previous entry);
+- +tigase.stats.CounterDataLogger+ - every execution insert new row with new set of number of server statistics (CPU usage, memory usage, number of user connections per connector, number of processed packets of different types, uptime, etc) into the database
+- +tigase.stats.CounterDataFileLogger+ - every execution store all server statistics into separate file.
+
+It's possible to configure each archiver by adding following entry to the +etc/init.properties+ file:
+
+[source,bash]
+-----
+<statistics_component_name>/stats-archiv/<name>/<property>=<value>
+-----
+
+For example, if we want to enable CounterDataFileLogger that stores statistics every 60 seconds:
+
+[source,bash]
+-----
+--stats-archiv=tigase.stats.CounterDataFileLogger:stats-file-logger:60
+-----
+
+We can configure it further with following options:
+
+[source,bash]
+-----
+stats/stats-archiv/stats-file-logger/stats-directory=logs/server_statistics
+stats/stats-archiv/stats-file-logger/stats-filename=stat
+stats/stats-archiv/stats-file-logger/stats-unixtime=false
+stats/stats-archiv/stats-file-logger/stats-datetime=true
+stats/stats-archiv/stats-file-logger/stats-datetime-format=HH:mm:ss
+stats/stats-archiv/stats-file-logger/stats-level=FINE
+-----
+
+which configures accordingly: directory to which files should be saved, filename prefix, whether to include or not unix timestamp in filename, whether to include or not datetime timestamp, control format of timestamp (using java DateFormat pattern) and also set level of the statistics we want to save (using java Logger.Level)
+
+*Available since:* 5.2.0
