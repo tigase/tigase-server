@@ -89,7 +89,7 @@ public class StatisticsCollector
 	private ServiceEntity                        serviceEntity               = null;
 	private StatisticsProvider                   sp                          = null;
 	private ErrorsStatisticsProvider			 esp						 = null;
-	@Inject
+	@Inject(nullAllowed = true)
 	private StatisticsArchivizerIfc[] archivizers = new StatisticsArchivizerIfc[0];
 	private Map<StatisticsArchivizerIfc, TimerTask> archiverTasks = new ConcurrentHashMap<>();
 	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
