@@ -16,7 +16,7 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.util;
+package tigase.db.util;
 
 import java.util.Properties;
 

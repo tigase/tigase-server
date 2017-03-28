@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -cp "jars/*" tigase.util.DBSchemaLoader "$@"
+java -cp "jars/*" tigase.db.util.DBSchemaLoader "$@"

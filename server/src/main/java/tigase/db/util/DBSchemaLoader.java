@@ -16,11 +16,12 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.util;
+package tigase.db.util;
 
 import tigase.db.AuthRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
+import tigase.util.LogFormatter;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.BareJID;
@@ -86,6 +87,7 @@ class DBSchemaLoader extends SchemaLoader {
 	enum PARAMETERS {
 		DATABASE_TYPE("dbType","mysql"),
 		SCHEMA_VERSION("schemaVersion","7-1"),
+//		COMPONENTS("components","message-archiving,pubsub,muc,sock5"),
 		DATABASE_NAME("dbName","tigasedb"),
 		DATABASE_HOSTNAME("dbHostname","localhost"),
 		TIGASE_USERNAME("dbUser","tigase_user"),
@@ -170,7 +172,11 @@ class DBSchemaLoader extends SchemaLoader {
 				                 .required(true)
 				                 .defaultValue(PARAMETERS.SCHEMA_VERSION.getDefaultValue())
 				                 .build());
-
+//		parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS.COMPONENTS.getName()).description(
+//				"Comma-separated list of components for which schema should be loaded")
+//				                 .options("message-archiving","pubsub","muc","sock5","unified-archive")
+//				                 .defaultValue(PARAMETERS.COMPONENTS.getDefaultValue())
+//				                 .build());
 		parser.addOption(new CommandlineParameter.Builder("D", PARAMETERS.DATABASE_NAME.getName()).description(
 				"Name of the database that will be created and to which schema will be loaded")
 				                 .defaultValue(PARAMETERS.DATABASE_NAME.getDefaultValue())

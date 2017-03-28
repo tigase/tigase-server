@@ -39,22 +39,22 @@ First, backup your database before performing any actions and shut down Tigase X
 Then from the Tigase installation directory run the following command:
 [source,bash]
 -----
-java -cp "jars/*" tigase.util.DBSchemaLoader -dbType {derby,mysql,postgresql,sqlserver} - dbHostname {db address} -dbName {dbname} -rootUser root -rootPass root -file database/{dbtype}-socks5-schema.sql
+java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbType {derby,mysql,postgresql,sqlserver} - dbHostname {db address} -dbName {dbname} -rootUser root -rootPass root -file database/{dbtype}-socks5-schema.sql
 -----
 You should see the following dialogue
 -----
 LogLevel: CONFIG
-tigase.util.DBSchemaLoader     	 <init>          	 CONFIG     Properties: [{dbHostname=localhost, logLevel=CONFIG, dbType=derby, file=database/derby-socks5-schema.sql, rootUser=root, dbPass=tigase_pass, dbName=tigasedb, schemaVersion=7-1, rootPass=root, dbUser=tigase_user}]
-tigase.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Validating DBConnection, URI: jdbc:derby:tigasedb;create=true
-tigase.util.DBSchemaLoader     	 validateDBConnection 	 CONFIG     DriverManager (available drivers): [[jTDS 1.3.1, org.apache.derby.jdbc.AutoloadedDriver@34a245ab, com.mysql.jdbc.Driver@3941a79c, org.postgresql.Driver@6e2c634b]]
-tigase.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Connection OK
-tigase.util.DBSchemaLoader     	 validateDBExists 	 INFO       Validating whether DB Exists, URI: jdbc:derby:tigasedb;create=true
-tigase.util.DBSchemaLoader     	 validateDBExists 	 INFO       Exists OK
-tigase.util.DBSchemaLoader     	 loadSchemaFile  	 INFO       Loading schema from file: database/derby-socks5-schema.sql, URI: jdbc:derby:tigasedb;create=true
-tigase.util.DBSchemaLoader     	 loadSchemaFile  	 INFO        completed OK
-tigase.util.DBSchemaLoader     	 shutdownDerby   	 INFO       Validating DBConnection, URI: jdbc:derby:tigasedb;create=true
-tigase.util.DBSchemaLoader     	 shutdownDerby   	 WARNING    Database 'tigasedb' shutdown.
-tigase.util.DBSchemaLoader     	 printInfo       	 INFO
+tigase.db.util.DBSchemaLoader     	 <init>          	 CONFIG     Properties: [{dbHostname=localhost, logLevel=CONFIG, dbType=derby, file=database/derby-socks5-schema.sql, rootUser=root, dbPass=tigase_pass, dbName=tigasedb, schemaVersion=7-1, rootPass=root, dbUser=tigase_user}]
+tigase.db.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Validating DBConnection, URI: jdbc:derby:tigasedb;create=true
+tigase.db.util.DBSchemaLoader     	 validateDBConnection 	 CONFIG     DriverManager (available drivers): [[jTDS 1.3.1, org.apache.derby.jdbc.AutoloadedDriver@34a245ab, com.mysql.jdbc.Driver@3941a79c, org.postgresql.Driver@6e2c634b]]
+tigase.db.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Connection OK
+tigase.db.util.DBSchemaLoader     	 validateDBExists 	 INFO       Validating whether DB Exists, URI: jdbc:derby:tigasedb;create=true
+tigase.db.util.DBSchemaLoader     	 validateDBExists 	 INFO       Exists OK
+tigase.db.util.DBSchemaLoader     	 loadSchemaFile  	 INFO       Loading schema from file: database/derby-socks5-schema.sql, URI: jdbc:derby:tigasedb;create=true
+tigase.db.util.DBSchemaLoader     	 loadSchemaFile  	 INFO        completed OK
+tigase.db.util.DBSchemaLoader     	 shutdownDerby   	 INFO       Validating DBConnection, URI: jdbc:derby:tigasedb;create=true
+tigase.db.util.DBSchemaLoader     	 shutdownDerby   	 WARNING    Database 'tigasedb' shutdown.
+tigase.db.util.DBSchemaLoader     	 printInfo       	 INFO
 
 Database init.properties configuration:
 

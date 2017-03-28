@@ -36,13 +36,13 @@ First, shut down any running instances of Tigase to prevent conflicts with datab
 In a linux environment
 [source,bash]
 -----
-java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${HOSTNAME} -dbType ${DB_TYPE} -rootUser ${ROOT_USER} -dbPass ${DB_USER_PASS} -dbName ${DB_NAME} -schemaVersion ${DB_VERSION} -rootPass ${ROOT_USER_PASS} -dbUser ${DB_USER}  -adminJID "${ADMIN_JID}" -adminJIDpass ${ADMIN_JID_PASS}  -logLevel ALL -file database/${DB_TYPE}-schema-upgrade-to-7-1.sql
+java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbHostname ${HOSTNAME} -dbType ${DB_TYPE} -rootUser ${ROOT_USER} -dbPass ${DB_USER_PASS} -dbName ${DB_NAME} -schemaVersion ${DB_VERSION} -rootPass ${ROOT_USER_PASS} -dbUser ${DB_USER}  -adminJID "${ADMIN_JID}" -adminJIDpass ${ADMIN_JID_PASS}  -logLevel ALL -file database/${DB_TYPE}-schema-upgrade-to-7-1.sql
 -----
 
 In a windows environment
 [source,bash]
 -----
-java -cp jars/* tigase.util.DBSchemaLoader -dbHostname ${HOSTNAME} -dbType ${DB_TYPE} -rootUser ${ROOT_USER} -dbPass ${DB_USER_PASS} -dbName ${DB_NAME} -schemaVersion ${DB_VERSION} -rootPass ${ROOT_USER_PASS} -dbUser ${DB_USER}  -adminJID "${ADMIN_JID}" -adminJIDpass ${ADMIN_JID_PASS}  -logLevel ALL -file database/${DB_TYPE}-schema-upgrade-to-7-1.sql
+java -cp jars/* tigase.db.util.DBSchemaLoader -dbHostname ${HOSTNAME} -dbType ${DB_TYPE} -rootUser ${ROOT_USER} -dbPass ${DB_USER_PASS} -dbName ${DB_NAME} -schemaVersion ${DB_VERSION} -rootPass ${ROOT_USER_PASS} -dbUser ${DB_USER}  -adminJID "${ADMIN_JID}" -adminJIDpass ${ADMIN_JID_PASS}  -logLevel ALL -file database/${DB_TYPE}-schema-upgrade-to-7-1.sql
 -----
 
 All variables will be required, they are as follows: +
@@ -63,7 +63,7 @@ Please note that the SQL file for the update will have an associated database wi
 A finalized command will look something like this:
 [source,bash]
 -----
-java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname localhost -dbType mysql -rootUser root -rootPass root -dbUser admin -dbPass admin -schemaVersion 7.1 -dbName Tigasedb -adminJID "admin@local.com" -adminJIDPass adminpass -logLevel ALL -file database/mysql-schema-upgrade-to-7.1.sql
+java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbHostname localhost -dbType mysql -rootUser root -rootPass root -dbUser admin -dbPass admin -schemaVersion 7.1 -dbName Tigasedb -adminJID "admin@local.com" -adminJIDPass adminpass -logLevel ALL -file database/mysql-schema-upgrade-to-7.1.sql
 -----
 
 Once this has successfully executed, you may restart you server.  Watch logs for any db errors that may indicate an incomplete schema upgrade.
@@ -92,11 +92,11 @@ The same files are also included in all distributions of v7.2.0 in +[tigaseroot]
 You can use a utility in Tigase to update the schema using the following command from the Tigase root:
 Linux
 -----
-java -cp "jars/*" tigase.util.DBSchemaLoader
+java -cp "jars/*" tigase.db.util.DBSchemaLoader
 -----
 or from a Windows environment
 -----
-java -cp jars/* tigase.util.DBSchemaLoader
+java -cp jars/* tigase.db.util.DBSchemaLoader
 -----
 *NOTE: Some variation may be necessary depending on how your java build uses -cp option*
 
@@ -119,5 +119,5 @@ Use the following options to customize. Options in bold are required.::
 
 As a result your final command should look something like this:
 -----
-java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -dbUser root -dbPass password -file database/mysql-pubsub-schema-3.1.0.sql
+java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbType mysql -dbName tigasedb -dbUser root -dbPass password -file database/mysql-pubsub-schema-3.1.0.sql
 -----
