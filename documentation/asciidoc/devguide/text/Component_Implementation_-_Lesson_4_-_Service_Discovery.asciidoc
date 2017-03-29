@@ -32,7 +32,7 @@ Please note, there is no such *'spam'* category type defined in the link:http://
 
 After you have added the two above methods and restarted the server with updated code, have a look at the service discovery window. You should see something like on the screenshot.
 
-image:images/dev/spam-filtering-disco-small.png[]
+image:images/spam-filtering-disco-small.png[]
 
 Now let's add method which will allow our module +TestModule+ to return supported features. This way our component will automatically report features supported by all it's modules.
 To do so we need to implement a method *String[] getFeatures()* which returns array of `String` items. This items are used to generate a list of features supported by component.
@@ -55,7 +55,7 @@ _A small performance note, in some cases calling +updateServiceDiscoveryItem(...
 
 The first parameter is the component JID presented on the service discovery list. However, Tigase server may work for many virtual hosts so the hostname part is added by the lower level functions and we only provide the component name here. The second parameter is the service discovery node which is usually '*null*' for top level disco elements. Third is the item description (which is actually called 'name' in the disco specification). The last parameter specifies if the element is visible to administrators only.
 
-image:images/dev/spam-filter-counter-small.png[]
+image:images/spam-filter-counter-small.png[]
 
 The complete method code is presented below and the screenshot above shows how the element of the service discovery for our component can change if we apply our code and send a few messages to the component.
 

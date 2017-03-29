@@ -34,13 +34,13 @@ Almost done, almost... In our old implementation these two variables are Java ar
 
 As our component is now ready to cooperate with the scripting API, I will demonstrate now how to add remove or change elements of these collections using a script and ad-hoc commands.
 
-image:images/dev/test-comp-newscript.png[]
+image:images/test-comp-newscript.png[]
 
 First, browse the server service discovery and double click on the test component. If you use link:http://psi-im.org/[Psi] client this should bring to you a new window with ad-hoc commands list. Other clients may present available ad-hoc commands differently.
 
 The screenshot below shows how this may look. You have to provide some description for the script and an ID string. We use Groovy in this guide but you can as well use any different scripting language.
 
-image:images/dev/badwords-list-script.png[]
+image:images/badwords-list-script.png[]
 
 Please refer to the Tigase scripting documentation for all the details how to add support for more languages. From the Tigase API point of view it all looks the same. You have to select a proper language from the pull-down list on windows shown on the right. If your preferred language is not on the list, it means it is not installed properly and Tigase is unable to detect it.
 
@@ -294,4 +294,3 @@ public static class TestModule extends AbstractModule {
   }
 }
 ----
-

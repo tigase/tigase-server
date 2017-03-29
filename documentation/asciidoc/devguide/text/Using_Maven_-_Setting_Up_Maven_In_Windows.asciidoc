@@ -16,7 +16,7 @@ Because Maven does not come with an installer, there is a manual install process
 
 == Setting up Environment Variables
 The Environment Variables panel is brought up from the Control Panel by clicking *System and Security* > *System* > *Advanced System Settings*.
-Now click the image:images/dev/Env-button.jpg[Environment Variables] button at the bottom of the panel and the Environment Variables panel will show.
+Now click the image:images/Env-button.jpg[Environment Variables] button at the bottom of the panel and the Environment Variables panel will show.
 
 *IMPORTANT NOTICE: CHANGING THESE SETTINGS CAN BREAK OTHER FUNCTIONS IN THE OPERATING SYSTEM.  DO NOT FOLLOW THIS GUIDE IF YOU DO NOT KNOW WHAT YOU ARE DOING!*
 
@@ -26,7 +26,7 @@ We need to first add two variable paths to the System variables to account for M
 
 Click on New...
 
-image:images/dev/Env-New.jpg[]
+image:images/Env-New.jpg[]
 
 For the Name, use M2_HOME, and for the variable enter the path to maven, which in this case is
 ----

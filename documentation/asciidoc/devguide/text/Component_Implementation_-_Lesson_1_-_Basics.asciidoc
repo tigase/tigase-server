@@ -43,7 +43,7 @@ public class TestComponent extends AbstractKernelBasedComponent {
   protected void registerModules(Kernel kernel) {
     // here we need to register modules responsible for processing packets
   }
-  
+
 }
 -----
 
@@ -118,7 +118,7 @@ Now we have to restart the server.
 
 There are a few ways to check whether our component has been loaded to the server. Probably the easiest is to connect to the server from an administrator account and look at the service discovery list.
 
-image:images/dev/service-disco-test-comp-admin-300.png[]
+image:images/service-disco-test-comp-admin-300.png[]
 
 If everything goes well you should see an entry on the list similar to the highlighted one on the screenshot. The component description is "_Undefined description_" which is a default description and we can change it later on, the component default JID is: *test@devel.tigase.org*, where *devel.tigase.org* is the server domain and test is the component name.
 
@@ -135,11 +135,11 @@ If your component did not load you should first check configuration files. Maybe
 
 Assuming everything went well and your component is loaded by the sever and it shows on the service discovery list as on the screenshot above you can double click on it to get a window with a list of ad-hoc commands - administrator scripts. A window on the screenshot shows only two basic commands for adding and removing script which is a good start.
 
-image:images/dev/commands-list-test-200.png[]
+image:images/commands-list-test-200.png[]
 
 Moreover, you can browse the server statistics in the service discovery window to find your new test component on the list. If you click on the component it shows you a window with component statistics, very basic packets counters.
 
-image:images/dev/service-disco-stats-200.png[]
+image:images/service-disco-stats-200.png[]
 
 As we can see with just a few lines of code our new component is quite mighty and can do a lot of things without much effort from the developer side.
 

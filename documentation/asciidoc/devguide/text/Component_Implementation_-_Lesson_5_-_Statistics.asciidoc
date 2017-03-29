@@ -13,7 +13,7 @@ In most cases you'll want to gather some run-time statistics from your component
 
 This lesson will teach you how to add your own statistics and how to make sure that the statistics generation doesn't affect application performance.
 
-image:images/dev/spam-statitics-small.png[]
+image:images/spam-statitics-small.png[]
 
 Your component from the very beginning generates some statistics by classes it inherits. Let's add a few statistics to our spam filtering component:
 
