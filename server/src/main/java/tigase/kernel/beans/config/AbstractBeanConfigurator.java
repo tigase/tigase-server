@@ -502,7 +502,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			boolean matches = false;
 
 			for (Class p : parents) {
-				matches |= !p.isAssignableFrom(requiredClass);
+				matches |= p.isAssignableFrom(requiredClass);
 			}
 
 			if (!matches)

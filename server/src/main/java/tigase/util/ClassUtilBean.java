@@ -20,10 +20,9 @@
  */
 package tigase.util;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +39,9 @@ public class ClassUtilBean {
 	public ClassUtilBean() {
 		try {
 			classes.addAll(ClassUtil.getClassesFromClassPath());
+			// support for handling debugging test cases started by Maven Surefire Plugin
+			// as without it Tigase Kernel is not able to see annotated beans
+			classes.addAll(getClassesFromSurefireClassLoader());
 		} catch (IOException|ClassNotFoundException e) {
 			log.log(Level.SEVERE, "Could not initialize list of classes", e);
 		}
@@ -55,5 +57,50 @@ public class ClassUtilBean {
 			instance = new ClassUtilBean();
 		}
 		return instance;
+	}
+
+	private Set<Class<?>> getClassesFromSurefireClassLoader() {
+		Set<Class<?>> classes_set = new TreeSet<Class<?>>(new ClassComparator());
+		String classpath = System.getProperty("surefire.test.class.path");
+
+		if (classpath == null) {
+			return classes_set;
+		}
+		// System.out.println("classpath: "+classpath);
+		StringTokenizer stok = new StringTokenizer(classpath, File.pathSeparator, false);
+
+		while (stok.hasMoreTokens()) {
+			String path = stok.nextToken();
+			File file = new File(path);
+
+			if (file.exists()) {
+				try {
+					if (file.isDirectory()) {
+
+						// System.out.println("directory: "+path);
+						Set<String> class_names = ClassUtil.getClassNamesFromDir(file);
+
+						tigase.osgi.util.ClassUtil.getClassesFromNames(Thread.currentThread().getContextClassLoader(),
+																	   class_names).stream().forEach(classes_set::add);
+					} // end of if (file.isDirectory())
+
+					if (file.isFile()) {
+
+						// System.out.println("jar file: "+path);
+						Set<String> class_names = ClassUtil.getClassNamesFromJar(file);
+
+						//classes_set.addAll(tigase.osgi.util.ClassUtil.getClassesFromNames(class_names));
+						tigase.osgi.util.ClassUtil.getClassesFromNames(Thread.currentThread().getContextClassLoader(),
+																	   class_names).stream().forEach(classes_set::add);
+
+						// System.out.println("Loaded jar file: "+path);
+					} // end of if (file.isFile())
+				} catch (ClassNotFoundException|IOException ex) {
+					log.log(Level.WARNING, "Could not load classes for " + file.getAbsolutePath());
+				}
+			} // end of if (file.exists())
+		} // end of while (stok.hasMoreTokens())
+
+		return classes_set;
 	}
 }

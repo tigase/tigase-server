@@ -22,6 +22,7 @@ package tigase.component;
 
 import tigase.conf.ConfigWriter;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * Created by andrzej on 11.08.2016.
  */
-@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true)
+@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true, selectors = { BeanSelector.Always.class })
 public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 	private static final Logger log = Logger.getLogger(DSLBeanConfigurator.class.getCanonicalName());

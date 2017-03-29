@@ -26,6 +26,7 @@ import tigase.cert.CertificateUtil;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
@@ -50,7 +51,8 @@ import static tigase.io.SSLContextContainerIfc.*;
  *
  * Created by andrzej on 29.02.2016.
  */
-@Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true)
+@Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true, selectors = {
+		BeanSelector.Always.class})
 public class CertificateContainer implements CertificateContainerIfc, Initializable {
 
 	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());

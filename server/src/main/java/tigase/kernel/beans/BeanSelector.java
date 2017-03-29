@@ -20,6 +20,8 @@
  */
 package tigase.kernel.beans;
 
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
+import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.Kernel;
 
 /**
@@ -46,19 +48,46 @@ public interface BeanSelector {
 		}
 	}
 
-	class NonClusterMode implements BeanSelector {
+	class NonClusterMode extends DefaultMode {
 
 		@Override
 		public boolean shouldRegister(Kernel kernel) {
-			return !Boolean.valueOf(System.getProperty("cluster-mode", "false"));
+			return super.shouldRegister(kernel) && !Boolean.valueOf(System.getProperty("cluster-mode", "false"));
 		}
 	}
 
-	class ClusterMode implements BeanSelector {
+	class ClusterMode extends DefaultMode {
 
 		@Override
 		public boolean shouldRegister(Kernel kernel) {
-			return Boolean.valueOf(System.getProperty("cluster-mode", "false"));
+			return super.shouldRegister(kernel) && Boolean.valueOf(System.getProperty("cluster-mode", "false"));
 		}
+	}
+
+	class SetupMode implements BeanSelector {
+
+		@Override
+		public boolean shouldRegister(Kernel kernel) {
+			return "setup".equals(BeanSelector.getConfigType(kernel));
+		}
+	}
+
+	class DefaultMode implements BeanSelector {
+
+		@Override
+		public boolean shouldRegister(Kernel kernel) {
+			String type = BeanSelector.getConfigType(kernel);
+			return type == null || "default".equals(type) || "--gen-config-def".equals(type);
+		}
+	}
+
+	static String getConfigType(Kernel kernel) {
+		while (kernel.getParent() != null) {
+			kernel = kernel.getParent();
+		}
+		if (kernel.isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
+			return (String) kernel.getInstance(AbstractBeanConfigurator.class).getProperties().get("config-type");
+		}
+		return null;
 	}
 }
