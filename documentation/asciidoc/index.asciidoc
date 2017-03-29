@@ -68,8 +68,6 @@ include::text/admin/2/Configuration_-_B_-_Startup_Files.asciidoc[]
 
 include::text/admin/2/Configuration_-_C_-_Settings_for_High_Load_Systems.asciidoc[]
 
-include::text/admin/2/Configuration_-_D_-_Configuration_Options.asciidoc[]
-
 include::text/admin/2/Configuration_-_E_-_JVM_settings.asciidoc[]
 
 include::text/admin/2/Configuration_-_F_-_Sess-man.asciidoc[]
@@ -274,7 +272,7 @@ include::text/admin/5/Components_-_K_-_C2S.asciidoc[]
 
 include::text/admin/5/Components_-_L_-_Socks5.asciidoc[]
 
-include::text/components/External_Service_Discovery_Component.asciidoc[]
+include::text/admin/5/Components_-_M_-_External_Service_Discovery_Component.asciidoc[]
 
 :leveloffset: 1
 
