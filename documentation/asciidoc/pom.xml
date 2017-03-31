@@ -406,6 +406,7 @@
 										<include>**/*</include>
 									</includes>
 								</fileset>
+							</filesets>
 							<!--<verbose>true</verbose>-->
 						</configuration>
 					</execution>
