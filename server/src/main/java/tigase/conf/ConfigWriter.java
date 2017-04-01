@@ -93,9 +93,13 @@ public class ConfigWriter {
 	}
 
 	public void write(File f, Map<String, Object> props) throws IOException {
-		try (FileWriter writer = new FileWriter(f)) {
-			writeMap(writer, props);
+		try (FileWriter writer = new FileWriter(f, false)) {
+			write(writer, props);
 		}
+	}
+
+	public void write(Writer writer, Map<String, Object> props) throws IOException {
+		writeMap(writer, props);
 	}
 
 	private void writeObject(Writer writer, Object obj) throws IOException {
@@ -379,7 +383,7 @@ public class ConfigWriter {
 
 	private static final char[] RESTRICTED_CHARS = "=:,[]#+-*/".toCharArray();
 
-	private static boolean hasRestrictedChars(String str) {
+	public static boolean hasRestrictedChars(String str) {
 		for (char ch : RESTRICTED_CHARS) {
 			if (str.indexOf(ch) > -1) {
 				return true;
