@@ -100,6 +100,20 @@
 				<packaging.type>bundle</packaging.type>
 			</properties>
 		</profile>
+		<profile>
+			<id>benchmark</id>
+			<activation>
+				<property>
+					<name>benchmark-tests</name>
+				</property>
+			</activation>
+			<modules>
+				<module>benchmark-tests</module>
+			</modules>
+			<properties>
+				<packaging.type>bundle</packaging.type>
+			</properties>
+		</profile>
 	</profiles>
 
 	<build>

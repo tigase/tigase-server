@@ -2,7 +2,7 @@
  * PacketCounter.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,124 +20,160 @@
  *
  */
 
-
-
 package tigase.server.filters;
-
-//~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
 import tigase.server.QueueType;
-
 import tigase.stats.StatisticsList;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map.Entry;
 
-/**
- * Created: Jun 8, 2009 1:47:31 PM
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
 public class PacketCounter
-				implements PacketFilterIfc {
-	private long                               clusterCounter = 0;
-	private long[]                             iqCounters     = new long[1];
-	private int                                lastNodeNo     = -1;
-	private Logger                             log = Logger.getLogger(this.getClass()
-			.getName());
-	private long                               msgCounter     = 0;
-	private String                             name           = null;
-	private long                               otherCounter   = 0;
-	private long                               presCounter    = 0;
-	private QueueType                          qType          = null;
-	private ConcurrentHashMap<String, Integer> iqCounterIdx = new ConcurrentHashMap<String,
-			Integer>();
+		implements PacketFilterIfc {
 
-	//~--- methods --------------------------------------------------------------
+	private final static String DETAILED_OTHER_STATISTICS_KEY = "detailed-other-statistics";
+	private final TypeCounter iqCounter = new TypeCounter("IQ");
+	private final Map<String, TypeCounter> otherCounters = new ConcurrentHashMap<>();
+	private long clusterCounter = 0;
+	private boolean detailedOtherStat = true;
+	private long msgCounter = 0;
+	private String name = null;
+	private long otherCounter = 0;
+	private long presCounter = 0;
+	private QueueType qType = null;
+	private long total = 0;
+
+	public PacketCounter() {
+		final String tmp = System.getProperty(DETAILED_OTHER_STATISTICS_KEY);
+		if (null != tmp) {
+			detailedOtherStat = Boolean.valueOf(tmp);
+		}
+	}
+
+	public PacketCounter(boolean detailedOtherStat) {
+		this.detailedOtherStat = detailedOtherStat;
+	}
 
 	@Override
 	public Packet filter(Packet packet) {
-		if (packet.getElemName() == "message") {
+		total++;
+		final String elemName = packet.getElemName();
+		if (elemName == "message") {
 			++msgCounter;
-
-			return packet;
-		}
-		if (packet.getElemName() == "presence") {
+		} else if (elemName == "presence") {
 			++presCounter;
-
-			return packet;
-		}
-		if (packet.getElemName() == "cluster") {
+		} else if (elemName == "cluster") {
 			++clusterCounter;
-
-			return packet;
-		}
-		++otherCounter;
-		if (packet.getElemName() == "iq") {
+		} else if (elemName == "iq") {
 			String xmlns = ((Iq) packet).getIQXMLNS();
+			iqCounter.incrementCounter((xmlns != null) ? xmlns : ((Iq) packet).getIQChildName());
+		} else {
+			++otherCounter;
 
-			incIQCounter((xmlns != null)
-					? xmlns
-					: ((Iq) packet).getIQChildName());
+			if (detailedOtherStat) {
+				String xmlns = packet.getXMLNS() != null ? packet.getXMLNS() : "no XMLNS";
+				String element = elemName;
+
+				TypeCounter counter = otherCounters.get(xmlns);
+				if (counter == null) {
+					counter = new TypeCounter("other " + xmlns);
+					otherCounters.put(xmlns, counter);
+				}
+				counter.incrementCounter(element);
+			}
 		}
-
 		return packet;
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
-	@Override
-	public void init(String name, QueueType qType) {
-		this.name  = name;
-		this.qType = qType;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public void getStatistics(StatisticsList list) {
+		list.add(name, qType.name() + " processed", total, Level.FINER);
 		list.add(name, qType.name() + " processed messages", msgCounter, Level.FINER);
 		list.add(name, qType.name() + " processed presences", presCounter, Level.FINER);
 		list.add(name, qType.name() + " processed cluster", clusterCounter, Level.FINER);
 		list.add(name, qType.name() + " processed other", otherCounter, Level.FINER);
-		list.add(name, qType.name() + " processed IQ no XMLNS", iqCounters[0], Level.FINER);
 
-		long iqs = iqCounters[0];
+		iqCounter.getStatistics(list);
 
-		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
-			list.add(name, qType.name() + " processed IQ " + iqCounter.getKey(),
-					iqCounters[iqCounter.getValue()], Level.FINER);
-			iqs += iqCounters[iqCounter.getValue()];
+		if (detailedOtherStat & list.checkLevel(Level.FINEST)) {
+			otherCounters.values().forEach(typeCounter -> typeCounter.getStatistics(list));
 		}
-		list.add(name, qType.name() + " processed total IQ", iqs, Level.FINER);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	@Override
+	public void init(String name, QueueType qType) {
+		this.name = name;
+		this.qType = qType;
+	}
 
-	private synchronized void incIQCounter(String xmlns) {
-		if (xmlns == null) {
-			++iqCounters[0];
-		} else {
-			Integer idx = iqCounterIdx.get(xmlns);
+	private class MutableLong {
 
-			if (idx == null) {
-				iqCounters = Arrays.copyOf(iqCounters, iqCounters.length + 1);
-				idx        = iqCounters.length - 1;
-				iqCounterIdx.put(xmlns, idx);
+		long value = 0;
+
+		private long get() {
+			return value;
+		}
+
+		private void increment() {
+			++value;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+	}
+
+	private class TypeCounter {
+
+		private final Map<String, MutableLong> counter = new ConcurrentHashMap<>();
+		private final String counterName;
+		private final MutableLong total = new MutableLong();
+		private final MutableLong withoutValue = new MutableLong();
+
+		public TypeCounter(String name) {
+			this.counterName = name;
+		}
+
+		public Map<String, MutableLong> getCounter() {
+			return counter;
+		}
+
+		public void getStatistics(StatisticsList list) {
+			list.add(name, qType.name() + " processed " + counterName, total.get(), Level.FINEST);
+			if (this.withoutValue.get() > 0) {
+				list.add(name, qType.name() + " processed " + counterName + " no XMLNS", this.withoutValue.get(),
+				         Level.FINEST);
 			}
-			++iqCounters[idx];
+			for (Entry<String, MutableLong> xmlnsValues : counter.entrySet()) {
+				list.add(name, qType.name() + " processed " + counterName + " " + xmlnsValues.getKey(),
+				         xmlnsValues.getValue().get(), Level.FINEST);
+
+			}
+		}
+
+		public long getTotal() {
+			return total.get();
+		}
+
+		synchronized public void incrementCounter(String param) {
+			total.increment();
+			if (param == null) {
+				withoutValue.increment();
+			} else {
+				MutableLong count = counter.get(param);
+				if (count == null) {
+					count = new MutableLong();
+					counter.put(param, count);
+				}
+				count.increment();
+			}
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/04/24
