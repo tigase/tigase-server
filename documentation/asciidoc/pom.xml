@@ -393,13 +393,6 @@
 						<configuration>
 							<filesets>
 								<fileset>
-									<directory>${guide_path}</directory>
-									<followSymlinks>false</followSymlinks>
-									<includes>
-										<include>**/*</include>
-									</includes>
-								</fileset>
-								<fileset>
 									<directory>text/components</directory>
 									<followSymlinks>false</followSymlinks>
 									<includes>
