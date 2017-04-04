@@ -51,6 +51,8 @@ We also use block between `{}` chars to define properties which are related to b
 Which means this properties will be passed only to this instance of Tigase PubSub Component, same as it was before where we needed to add prefix.
 Entries after `\#` are comments, to pass `#` you need to wrap whole part containing it in `''`, ie. `'test#242'`
 
+WARNING: If a string value assigned to a property contains any char from a following list `=:,[]#+-*/` it needs to be wrapped in a `''`.
+
 === Setting property
 To set property you just write property name followed by `=` and value to set. This is always done in context of bean which configuration property you want to set.
 ----
@@ -72,7 +74,7 @@ beanName (class: className, active: activeValue, exportable: exportableValue) {
 }
 ----
 where `beanName` is name under which you want to configure bean.
-`beanName` must be wrapped in `''`, if `beanName` contains characters like `=,:/` and is recommended, if `beanName` is numeric only.
+`beanName` must be wrapped in `''`, if `beanName` contains characters like `=:,[]#+-*/` and is recommended, if `beanName` is numeric only.
 
 Inside block between `(` and `)` you can define:
 
@@ -209,9 +211,9 @@ WARNING: For properties which accepts lists it is not allowed to set value using
 # Enable cluster mode
 --cluster-mode = true
 # Enable debugging for server and xmpp.impl
---debug = server,xmpp.impl
+--debug = 'server,xmpp.impl'
 # Set list of virtual hosts (old way)
---virt-hosts = zeus,test
+--virt-hosts = 'example.com,test-1.example.com,test-2.example.com'
 
 # Configure list of administrator jids
 admins = [ 'admin@zeus', 'http@macbook-pro-andrzej.local' ]
@@ -226,7 +228,7 @@ dataSource {
     }
 
     # Configure data source with name exaple.com (will be used by domain example.com)
-    example.com () {
+    'example.com' () {
         uri = 'jdbc:mysq://127.0.0.1/example?user=test&password=test&autoCreateUser=true'
     }
 }

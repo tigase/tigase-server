@@ -148,7 +148,7 @@ public class ConfigHolder {
 		try {
 			Map<String, Object> loaded = new ConfigReader().read(initPropertiesPath.toFile());
 			props.putAll(loaded);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Failed to load configuration from file " + initPropertiesPath, e);
 		}
 	}

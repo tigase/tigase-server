@@ -272,9 +272,9 @@ public class DefaultTypesConverter
 					Type[] actualTypes = pt.getActualTypeArguments();
 					try {
 						Map result = (Map) expectedType.newInstance();
-						for (Map.Entry<String, String> e : ((Map<String, String>) value).entrySet()) {
+						for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
 							Object k = convert(unescape(e.getKey()), actualTypes[0]);
-							Object v = convert(unescape(e.getValue()), actualTypes[1]);
+							Object v = e.getValue() instanceof String ? convert(unescape((String) e.getValue()), actualTypes[1]) : e.getValue();
 							result.put(k, v);
 						}
 						return (T) result;

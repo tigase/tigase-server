@@ -25,6 +25,7 @@ import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfiguratorAbstract;
+import tigase.conf.LoggingBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.DependencyGrapher;
@@ -96,6 +97,9 @@ public class Bootstrap implements Lifecycle {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
 		configurator.setProperties(config.getProperties());
 		ModulesManagerImpl.getInstance().setBeanConfigurator(configurator);
+
+		kernel.registerBean("logging").asClass(LoggingBean.class).setActive(true).setPinned(true).exec();
+		kernel.getInstance("logging");
 
 		// if null then we register global subbeans
 		configurator.registerBeans(null, null, config.getProperties());

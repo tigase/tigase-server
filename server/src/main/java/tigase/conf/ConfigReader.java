@@ -94,231 +94,254 @@ public class ConfigReader {
 
 	private Map<String, Object> process(Reader reader) throws IOException {
 		holder.map = new HashMap<>();
+		int line = 1;
+		int pos = 0;
 		int read = 0;
-		while ((read = reader.read()) != -1) {
-			char c = (char) read;
+		try {
+			while ((read = reader.read()) != -1) {
+				char c = (char) read;
 
-			if (holder.state == State.QUOTE) {
-				if (holder.quoteChar == c) {
-					holder.parent.value = holder.sb.toString();
-					holder = holder.parent;
-				} else {
-					holder.sb.append(c);
-				}
-				continue;
-			}
-			if (holder.state == State.COMMENT) {
-				if (c != '\n')
-					continue;
-				holder = holder.parent;
-			}
+				pos++;
 
-			switch (c) {
-				case '#': {
-					StateHolder tmp = new StateHolder();
-					tmp.state = State.COMMENT;
-					tmp.parent = holder;
-					holder = tmp;
-					continue;
-				}
-				case ':':
-				case '=':
-					if (holder.key != null) {
+				if (holder.state == State.QUOTE) {
+					if (holder.quoteChar == c) {
+						holder.parent.value = holder.sb.toString();
+						holder = holder.parent;
+					} else {
 						holder.sb.append(c);
+					}
+					if (c == '\n') {
+						line++;
+						pos = 0;
+					}
+					continue;
+				}
+				if (holder.state == State.COMMENT) {
+					if (c != '\n') continue;
+					holder = holder.parent;
+				}
+
+				switch (c) {
+					case '#': {
+						StateHolder tmp = new StateHolder();
+						tmp.state = State.COMMENT;
+						tmp.parent = holder;
+						holder = tmp;
+						continue;
+					}
+					case ':':
+					case '=':
+						if (holder.key != null) {
+							holder.sb.append(c);
+							break;
+						}
+						holder.key = holder.value != null ? holder.value.toString() : holder.sb.toString().trim();
+						holder.value = null;
+						holder.sb = new StringBuilder();
+						break;
+
+					case '[': {
+						StateHolder tmp = new StateHolder();
+						tmp.state = State.LIST;
+						tmp.parent = holder;
+						tmp.list = new ArrayList();
+						holder = tmp;
 						break;
 					}
-					holder.key = holder.value != null ? holder.value.toString() : holder.sb.toString().trim();
-					holder.value = null;
-					holder.sb = new StringBuilder();
-					break;
-
-				case '[': {
-					StateHolder tmp = new StateHolder();
-					tmp.state = State.LIST;
-					tmp.parent = holder;
-					tmp.list = new ArrayList();
-					holder = tmp;
-					break;
-				}
-				case ']': {
-					List val = holder.list;
-					if (holder.value == null) {
-						String valueStr = holder.sb.toString().trim();
-						if (!valueStr.isEmpty()) {
-							Object value = decodeValue(valueStr);
-							holder.list.add(value);
+					case ']': {
+						List val = holder.list;
+						if (holder.value == null) {
+							String valueStr = holder.sb.toString().trim();
+							if (!valueStr.isEmpty()) {
+								Object value = decodeValue(valueStr);
+								holder.list.add(value);
+							}
+						} else {
+							holder.list.add(holder.value);
 						}
-					} else {
-						holder.list.add(holder.value);
-					}
 //					if (holder.value != null) {
 //						val.add(holder.value instanceof String ? decodeValue((String) holder.value) : holder.value);
 //					}
-					holder = holder.parent;
-					holder.value = val;
-					break;
-				}
-				case '\'':
-				case '\"': {
-					StateHolder tmp = new StateHolder();
-					tmp.state = State.QUOTE;
-					tmp.parent = holder;
-					holder = tmp;
-					holder.quoteChar = c;
-					break;
-				}
-				case '{': {
-					if (holder.key == null) {
-						holder.key = (holder.value != null && holder.value instanceof String) ? ((String) holder.value).trim() : holder.sb.toString().trim();
-					}
-					holder.sb = new StringBuilder();
-					StateHolder tmp = new StateHolder();
-					tmp.state = State.MAP;
-					tmp.parent = holder;
-					tmp.map = (holder.value instanceof AbstractBeanConfigurator.BeanDefinition) ? ((Map) holder.value) : new HashMap();
-					holder = tmp;
-					break;
-				}
-				case '}': {
-					Map val = holder.map;
-					holder = holder.parent;
-					// special use case to convert maps with active or class into bean definition
-					if (val != null && (val.containsKey("active") || val.containsKey("class"))) {
-						AbstractBeanConfigurator.BeanDefinition bean = new AbstractBeanConfigurator.BeanDefinition();
-						bean.setBeanName(holder.key);
-						Object v = val.remove("class");
-						if (v != null) {
-							bean.setClazzName((String) v);
-						}
-						v = val.remove("active");
-						if (v != null) {
-							bean.setActive((Boolean) v);
-						}
-						bean.putAll(val);
-						holder.value = bean;
-					} else {
+						holder = holder.parent;
 						holder.value = val;
-					}
-					break;
-				}
-				case '(': {
-					String key = (holder.value != null && holder.value instanceof String) ? ((String) holder.value).trim() : holder.sb.toString().trim();
-					StateHolder tmp = new StateHolder();
-					switch (key) {
-						case "env":
-							tmp.state = State.ENVIRONMENT;
-							tmp.variable = new ConfigReader.EnvironmentVariable();
-							break;
-						case "prop":
-							tmp.state = State.PROPERTY;
-							tmp.variable = new ConfigReader.PropertyVariable();
-							break;
-						default:
-							holder.key = key;
-							tmp.state = State.BEAN;
-							tmp.bean = new AbstractBeanConfigurator.BeanDefinition();
-							tmp.bean.setBeanName(holder.key);
-							break;
-					}
-					tmp.parent = holder;
-					holder = tmp;
-					break;
-				}
-				case ')': {
-					Object val = null;
-					switch (holder.state) {
-						case ENVIRONMENT:
-							((EnvironmentVariable) holder.variable).setName(holder == null ? "" : holder.value.toString().trim());
-							val = holder.variable;
-							break;
-						case PROPERTY:
-							PropertyVariable prop = (PropertyVariable) holder.variable;
-							String value = holder.value.toString().trim();
-							if (prop.getName() == null) {
-								prop.setName(value);
-							} else {
-								prop.setDefValue(value);
-							}
-							val = holder.variable;
-							break;
-						case BEAN:
-							val = holder.bean;
-							Object val1 = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
-							setBeanDefinitionValue(val1);
-							break;
-					}
-					holder = holder.parent;
-					holder.value = val;
-					break;
-				}
-				case ',':
-				case '\n':
-					if (holder.variable != null && holder.state != State.PROPERTY) {
-						if (holder.variable instanceof CompositeVariable) {
-							Object value = holder.value;
-							if (value == null) {
-								value = decodeValue(holder.sb.toString());
-							}
-
-							((CompositeVariable) holder.variable).add(value);
-						}
-						holder.value = holder.variable;
-						holder.variable = null;
-					}
-					switch (holder.state) {
-						case MAP:
-							if (holder.key == null || holder.key.isEmpty()) {
-								break;
-							}
-							holder.map.put(holder.key, holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim()));
-							break;
-						case LIST:
-							if (holder.value == null) {
-								String valueStr = holder.sb.toString().trim();
-								if (valueStr.isEmpty()) {
-									break;
-								}
-								Object value = decodeValue(valueStr);
-								holder.list.add(value);
-							} else {
-								holder.list.add(holder.value);
-							}
-							break;
-						case BEAN:
-							Object val = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
-							setBeanDefinitionValue(val);
-							break;
-						case PROPERTY:
-							((PropertyVariable) holder.variable).setName(holder.value.toString().trim());
-							holder.value = holder.variable;
-							break;
-					}
-					holder.key = null;
-					holder.sb = new StringBuilder();
-					holder.value = null;
-					break;
-				case '+':
-				case '-':
-				case '/':
-				case '*':
-					Object value = holder.value;
-					if (value == null) {
-						value = decodeValue(holder.sb.toString());
-					}
-					if (holder.key != null && value != null) {
-						holder.value = null;
-						holder.sb = new StringBuilder();
-						if (holder.variable == null) {
-							CompositeVariable var = new CompositeVariable();
-							holder.variable = var;
-						}
-						((CompositeVariable) holder.variable).add(c, value);
 						break;
 					}
-				default:
-					holder.sb.append(c);
-					break;
+					case '\'':
+					case '\"': {
+						StateHolder tmp = new StateHolder();
+						tmp.state = State.QUOTE;
+						tmp.parent = holder;
+						holder = tmp;
+						holder.quoteChar = c;
+						break;
+					}
+					case '{': {
+						if (holder.key == null) {
+							holder.key = (holder.value != null && holder.value instanceof String)
+										 ? ((String) holder.value).trim()
+										 : holder.sb.toString().trim();
+						}
+						holder.sb = new StringBuilder();
+						StateHolder tmp = new StateHolder();
+						tmp.state = State.MAP;
+						tmp.parent = holder;
+						tmp.map = (holder.value instanceof AbstractBeanConfigurator.BeanDefinition)
+								  ? ((Map) holder.value)
+								  : new HashMap();
+						holder = tmp;
+						break;
+					}
+					case '}': {
+						Map val = holder.map;
+						holder = holder.parent;
+						// special use case to convert maps with active or class into bean definition
+						if (val != null && (val.containsKey("active") || val.containsKey("class"))) {
+							AbstractBeanConfigurator.BeanDefinition bean = new AbstractBeanConfigurator.BeanDefinition();
+							bean.setBeanName(holder.key);
+							Object v = val.remove("class");
+							if (v != null) {
+								bean.setClazzName((String) v);
+							}
+							v = val.remove("active");
+							if (v != null) {
+								bean.setActive((Boolean) v);
+							}
+							bean.putAll(val);
+							holder.value = bean;
+						} else {
+							holder.value = val;
+						}
+						break;
+					}
+					case '(': {
+						String key = (holder.value != null && holder.value instanceof String)
+									 ? ((String) holder.value).trim()
+									 : holder.sb.toString().trim();
+						StateHolder tmp = new StateHolder();
+						switch (key) {
+							case "env":
+								tmp.state = State.ENVIRONMENT;
+								tmp.variable = new ConfigReader.EnvironmentVariable();
+								break;
+							case "prop":
+								tmp.state = State.PROPERTY;
+								tmp.variable = new ConfigReader.PropertyVariable();
+								break;
+							default:
+								holder.key = key;
+								tmp.state = State.BEAN;
+								tmp.bean = new AbstractBeanConfigurator.BeanDefinition();
+								tmp.bean.setBeanName(holder.key);
+								break;
+						}
+						tmp.parent = holder;
+						holder = tmp;
+						break;
+					}
+					case ')': {
+						Object val = null;
+						switch (holder.state) {
+							case ENVIRONMENT:
+								((EnvironmentVariable) holder.variable).setName(
+										holder == null ? "" : holder.value.toString().trim());
+								val = holder.variable;
+								break;
+							case PROPERTY:
+								PropertyVariable prop = (PropertyVariable) holder.variable;
+								String value = holder.value.toString().trim();
+								if (prop.getName() == null) {
+									prop.setName(value);
+								} else {
+									prop.setDefValue(value);
+								}
+								val = holder.variable;
+								break;
+							case BEAN:
+								val = holder.bean;
+								Object val1 = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+								setBeanDefinitionValue(val1);
+								break;
+						}
+						holder = holder.parent;
+						holder.value = val;
+						break;
+					}
+					case '\n':
+						line++;
+						pos = 0;
+						// there should be no break here!
+					case ',':
+						if (holder.variable != null && holder.state != State.PROPERTY) {
+							if (holder.variable instanceof CompositeVariable) {
+								Object value = holder.value;
+								if (value == null) {
+									value = decodeValue(holder.sb.toString());
+								}
+
+								((CompositeVariable) holder.variable).add(value);
+							}
+							holder.value = holder.variable;
+							holder.variable = null;
+						}
+						switch (holder.state) {
+							case MAP:
+								if (holder.key == null || holder.key.isEmpty()) {
+									break;
+								}
+								holder.map.put(holder.key, holder.value != null
+														   ? holder.value
+														   : decodeValue(holder.sb.toString().trim()));
+								break;
+							case LIST:
+								if (holder.value == null) {
+									String valueStr = holder.sb.toString().trim();
+									if (valueStr.isEmpty()) {
+										break;
+									}
+									Object value = decodeValue(valueStr);
+									holder.list.add(value);
+								} else {
+									holder.list.add(holder.value);
+								}
+								break;
+							case BEAN:
+								Object val = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+								setBeanDefinitionValue(val);
+								break;
+							case PROPERTY:
+								((PropertyVariable) holder.variable).setName(holder.value.toString().trim());
+								holder.value = holder.variable;
+								break;
+						}
+						holder.key = null;
+						holder.sb = new StringBuilder();
+						holder.value = null;
+						break;
+					case '+':
+					case '-':
+					case '/':
+					case '*':
+						Object value = holder.value;
+						if (value == null) {
+							value = decodeValue(holder.sb.toString());
+						}
+						if (holder.key != null && value != null) {
+							holder.value = null;
+							holder.sb = new StringBuilder();
+							if (holder.variable == null) {
+								CompositeVariable var = new CompositeVariable();
+								holder.variable = var;
+							}
+							((CompositeVariable) holder.variable).add(c, value);
+							break;
+						}
+					default:
+						holder.sb.append(c);
+						break;
+				}
 			}
+		} catch (UnsupportedOperationException ex) {
+			throw new UnsupportedOperationException(ex.getMessage() + " at line " + line + " char " + pos);
 		}
 		if (holder.state != State.MAP || holder.parent != null) {
 			throw new IOException("Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);

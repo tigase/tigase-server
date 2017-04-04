@@ -323,10 +323,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		for (BeanDefinition cfg : beanDefinitionsFromConfig.values()) {
 			try {
 				Class<?> clazz = cfg.getClazzName() == null ? beansFromAnnotations.get(cfg.getBeanName()) : ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
+				BeanConfig oldBc = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
 				if (clazz == null) {
 					if (bean != null && bean instanceof RegistrarBeanWithDefaultBeanClass) {
 						clazz = ((RegistrarBeanWithDefaultBeanClass) bean).getDefaultBeanClass();
+					} else if (oldBc != null) {
+						clazz = oldBc.getClazz();
 					}
+
 					if (clazz == null) {
 						log.log(Level.WARNING, "unknown class {0} for bean {1}, skipping registration of a bean",
 								new Object[] { cfg.getClazzName(), cfg.getBeanName() });
@@ -339,7 +343,6 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 				toUnregister.remove(cfg.getBeanName());
 
-				BeanConfig oldBc = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
 				if (oldBc != null && oldBc.getClazz().equals(clazz) && (oldBc.isExportable() || cfg.isExportable() == oldBc.isExportable())) {
 					kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
 				} else {
