@@ -39,6 +39,22 @@ create procedure TigUpgradeMsgHistory()
 begin
     if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'msg_history') then
         alter table msg_history rename tig_offline_messages;
+    else
+        create table if not exists tig_offline_messages (
+            msg_id bigint unsigned not null auto_increment,
+            ts timestamp(6) default current_timestamp(6),
+            expired timestamp null default null,
+            sender varchar(2049),
+            sender_sha1 char(128),
+            receiver varchar(2049) not null,
+            receiver_sha1 char(128),
+            msg_type int not null default 0,
+            message mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null,
+            primary key (msg_id),
+            key tig_offline_messages_expired_index (expired),
+            key tig_offline_messages_receiver_sha1_index (receiver_sha1),
+            key tig_offline_messages_receiver_sha1_sender_sha1_index (receiver_sha1, sender_sha1)
+        ) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;        
     end if;
 
     if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'expired') then
@@ -165,24 +181,6 @@ call TigUpgradeMsgHistory();
 
 -- QUERY START:
 drop procedure if exists TigUpgradeMsgHistory;
--- QUERY END:
-
--- QUERY START:
-create table if not exists tig_offline_messages (
-    msg_id bigint unsigned not null auto_increment,
-    ts timestamp(6) default current_timestamp(6),
-    expired timestamp null default null,
-    sender varchar(2049),
-    sender_sha1 char(128),
-    receiver varchar(2049) not null,
-    receiver_sha1 char(128),
-	msg_type int not null default 0,
-	message mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null,
-	primary key (msg_id),
-    key tig_offline_messages_expired_index (expired),
-    key tig_offline_messages_receiver_sha1_index (receiver_sha1),
-    key tig_offline_messages_receiver_sha1_sender_sha1_index (receiver_sha1, sender_sha1)
-) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 -- QUERY END:
 
 -- ------------ Clustering support

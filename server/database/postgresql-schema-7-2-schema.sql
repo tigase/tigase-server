@@ -25,6 +25,18 @@ do $$
 begin
     if to_regclass('public.msg_history') is not null then
         alter table msg_history rename to tig_offline_messages;
+    else
+        create table if not exists tig_offline_messages (
+            msg_id bigserial,
+            ts timestamp default now(),
+            expired timestamp,
+            sender varchar(2049),
+            receiver varchar(2049) not null,
+            msg_type int not null default 0,
+            message text not null,
+
+            primary key(msg_id)
+        );
     end if;
 
     if exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'message' and udt_name = 'varchar') then
@@ -63,7 +75,7 @@ begin
         alter receiver set not null;
 
     if to_regclass('public.tig_offline_messages_pkey') is null then
-        alter table tig_offline_messages add primary key (msg_id)
+        alter table tig_offline_messages add primary key (msg_id);
     end if;
 
     if to_regclass('public.broadcast_msgs') is not null then
@@ -121,20 +133,6 @@ begin
         drop table user_jid;
     end if;
 end$$;
--- QUERY END:
-
--- QUERY START:
-create table if not exists tig_offline_messages (
-    msg_id bigserial,
-    ts timestamp default now(),
-    expired timestamp,
-    sender varchar(2049),
-    receiver varchar(2049) not null,
-	msg_type int not null default 0,
-	message text not null,
-
-	primary key(msg_id)
-);
 -- QUERY END:
 
 -- QUERY START:

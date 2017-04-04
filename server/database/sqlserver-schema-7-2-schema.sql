@@ -17,7 +17,7 @@
 --
 -- Database stored procedures and functions for Tigase schema version 7.2.0
 
--- LOAD FILE: database/sqlserver-schema-7-2-schema.sql
+-- LOAD FILE: database/sqlserver-schema-7-1-schema.sql
 
 -- QUERY START:
 SET QUOTED_IDENTIFIER ON
@@ -35,6 +35,25 @@ if exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offlin
     alter table tig_offline_messages alter column message nvarchar(max) not null;
 -- QUERY END:
 GO
+
+-- QUERY START:
+if object_id('dbo.tig_offline_messages') is null
+    create table tig_offline_messages (
+        msg_id [bigint] IDENTITY(1,1),
+        ts [datetime] DEFAULT getdate(),
+        expired [datetime],
+        sender nvarchar(2049),
+        sender_sha1 varbinary(20),
+        receiver nvarchar(2049) not null,
+        receiver_sha1 varbinary(20) not null,
+	    msg_type int not null default 0,
+	    message nvarchar(max),
+
+	    primary key (msg_id)
+    );
+-- QUERY END:
+GO
+
 -- QUERY START:
 if not exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'receiver')
 begin
@@ -183,24 +202,6 @@ GO
 -- QUERY START:
 if object_id('dbo.user_jid') is not null
     drop table user_jid;
--- QUERY END:
-GO
-
--- QUERY START:
-if object_id('dbo.tig_offline_messages') is null
-    create table tig_offline_messages (
-        msg_id [bigint] IDENTITY(1,1),
-        ts [datetime] DEFAULT getdate(),
-        expired [datetime],
-        sender nvarchar(2049),
-        sender_sha1 varbinary(20),
-        receiver nvarchar(2049) not null,
-        receiver_sha1 varbinary(20) not null,
-	    msg_type int not null default 0,
-	    message nvarchar(max),
-
-	    primary key (msg_id)
-    );
 -- QUERY END:
 GO
 
