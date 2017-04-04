@@ -26,7 +26,11 @@ import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.BareJID;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.ConsoleHandler;
@@ -287,11 +291,17 @@ class DBSchemaLoader extends SchemaLoader {
 		log.log(Level.FINER, "Loading queries, resource: {0}, res_prefix: {1} ", new Object[]{resource, res_prefix});
 		ArrayList<String> results = new ArrayList<>();
 		boolean path = res_prefix == null;
-		BufferedReader br = new BufferedReader( new InputStreamReader( getResource( resource, path ) ) );
-		String line;
+
+		final Path p = Paths.get(path ? resource : "database/" + resource + ".sql");
+
+		if (!Files.exists(p)) {
+			log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
+			return results;
+		}
+
 		String sql_query = "";
 		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
-		while ( ( line = br.readLine() ) != null ) {
+		for (String line : Files.readAllLines(p)) {
 			switch ( state ) {
 				case INIT:
 					if ( line.startsWith( "-- QUERY START:" ) ){
@@ -337,7 +347,6 @@ class DBSchemaLoader extends SchemaLoader {
 					break;
 			}
 		}
-		br.close();
 		return results;
 	}
 
@@ -364,34 +373,6 @@ class DBSchemaLoader extends SchemaLoader {
 		log.log(Level.FINE, "Loading schema queries: {0} // {1}",
 		        new Object[]{queries, queries.toArray()});
 		return queries;
-	}
-
-	/**
-	 * Created an {@code InputStream} for the desired resource.
-	 *
-	 * @param resource name of the resource for which an {@link InputStream}
-	 *                 should be created, either excerpt of the name or a
-	 *                 full/relative path to the schema {@code .sql} file.
-	 * @param path     denotes whether passed resource name is a full path to the
-	 *                 file ({@code true}) or a simple resource mapping
-	 *                 ({@code false}).
-	 * @return an {@code InputStream} for the desired resource.
-	 */
-	protected InputStream getResource( String resource, boolean path ) {
-		File f;
-		if ( path ){
-			f = new File( resource );
-		} else {
-			f = new File( "database/" + resource + ".sql" );
-		}
-		InputStream is = null;
-		try {
-			is = new FileInputStream( f );
-		} catch ( FileNotFoundException ex ) {
-			Logger.getLogger( DBSchemaLoader.class.getName() ).log( Level.SEVERE, null, ex );
-		}
-		log.log(Level.FINEST, "Getting resource: {0} @ filename: {1}", new Object[]{resource, f.getAbsolutePath()});
-		return is;
 	}
 
 	@Override
