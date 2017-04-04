@@ -77,7 +77,7 @@ public interface BeanSelector {
 		@Override
 		public boolean shouldRegister(Kernel kernel) {
 			String type = BeanSelector.getConfigType(kernel);
-			return type == null || "default".equals(type) || "--gen-config-def".equals(type);
+			return type == null || "default".equals(type) || "--gen-config-def".equals(type) || "--gen-config-default".equals(type);
 		}
 	}
 

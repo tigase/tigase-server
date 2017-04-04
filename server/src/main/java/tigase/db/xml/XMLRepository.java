@@ -22,12 +22,10 @@ package tigase.db.xml;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.*;
-
-import tigase.xmpp.BareJID;
-
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
+import tigase.xmpp.BareJID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,9 +48,9 @@ import java.util.logging.Logger;
  * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Repository.Meta( supportedUris = { "memory://.*" } )
+@Repository.Meta( supportedUris = {"memory://.*" } )
 public class XMLRepository
-		implements Repository, DataSource, AuthRepository, UserRepository {
+		implements Repository, DataSourceAware<XMLDataSource>, AuthRepository, UserRepository {
 
 	/** Log filed */
 	private static final String USER_STR = "User: ";
@@ -285,29 +283,13 @@ public class XMLRepository
 	}
 
 	@Override
-	public synchronized void initRepository(String file, Map<String, String> params) {
-		String file_name = file;
-
-		log.log( Level.FINEST, "Initializing repository, file: {0}, params: {1}",
-						 new Object[] { file, params } );
-
-		try {
-			int idx = file.indexOf("?");
-
-			if (idx > 0) {
-				file_name = file.substring(0, idx);
-			}
-
-			if (file.contains("autoCreateUser=true")) {
-				autoCreateUser = true;
-			}    // end of if (db_conn.contains())
-
-			auth = new AuthRepositoryImpl(this);
-			xmldb = new XMLDB(file_name);
-		} catch (Exception e) {
-			log.warning("Can not open existing user repository file, creating new one, " + e);
-			xmldb = XMLDB.createDB(file_name, "users", "user");
-		}      // end of try-catch
+	public synchronized void initRepository(String file, Map<String, String> params) throws DBInitException {
+		if (xmldb == null) {
+			log.log(Level.FINEST, "Initializing repository, file: {0}, params: {1}", new Object[]{file, params});
+			XMLDataSource dataSource = new XMLDataSource();
+			dataSource.initRepository(file, params);
+			setDataSource(dataSource);
+		}
 	}
 
 	@Override
@@ -466,5 +448,16 @@ public class XMLRepository
 	public void setUserDisabled(BareJID user, Boolean value) 
 					throws UserNotFoundException, TigaseDBException {
 		throw new TigaseDBException("Feature not supported");
-	}	
+	}
+
+	@Override
+	public void setDataSource(XMLDataSource dataSource) {
+		String file = dataSource.getResourceUri();
+		if (file.contains("autoCreateUser=true")) {
+			autoCreateUser = true;
+		}    // end of if (db_conn.contains())
+		xmldb = dataSource.getXMLDB();
+		auth = new AuthRepositoryImpl(this);
+
+	}
 }
