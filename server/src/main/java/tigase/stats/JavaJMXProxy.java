@@ -235,9 +235,9 @@ public class JavaJMXProxy
 			messagesPerSec       = tigBean.getMessagesNumberPerSec();
 			presencesPerSec      = tigBean.getPresencesNumberPerSec();
 
-			// iqOtherNumber = tigBean.getIQOtherNumber();
-			// iqOtherPerSec = tigBean.getIQOtherNumberPerSec();
-			// iqAuthNumber = tigBean.getIQAuthNumber();
+			iqOtherNumber = tigBean.getIQOtherNumber();
+			iqOtherPerSec = tigBean.getIQOtherNumberPerSec();
+			iqAuthNumber = tigBean.getIQAuthNumber();
 			cpuUsage             = tigBean.getCPUUsage();
 			heapUsage            = tigBean.getHeapMemUsage();
 			nonHeapUsage         = tigBean.getNonHeapMemUsage();

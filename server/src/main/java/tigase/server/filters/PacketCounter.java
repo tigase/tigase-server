@@ -98,10 +98,11 @@ public class PacketCounter
 		list.add(name, qType.name() + " processed cluster", clusterCounter, Level.FINER);
 		list.add(name, qType.name() + " processed other", otherCounter, Level.FINER);
 
-		iqCounter.getStatistics(list);
+		iqCounter.getStatistics(list, Level.FINER);
 
-		if (detailedOtherStat & list.checkLevel(Level.FINEST)) {
-			otherCounters.values().forEach(typeCounter -> typeCounter.getStatistics(list));
+		final Level finer = Level.FINER;
+		if (detailedOtherStat & list.checkLevel(finer)) {
+			otherCounters.values().forEach(typeCounter -> typeCounter.getStatistics(list, finer));
 		}
 	}
 
@@ -146,14 +147,18 @@ public class PacketCounter
 		}
 
 		public void getStatistics(StatisticsList list) {
-			list.add(name, qType.name() + " processed " + counterName, total.get(), Level.FINEST);
+			getStatistics(list, Level.FINEST);
+		}
+
+		public void getStatistics(StatisticsList list, Level level) {
+			list.add(name, qType.name() + " processed " + counterName, total.get(), level);
 			if (this.withoutValue.get() > 0) {
 				list.add(name, qType.name() + " processed " + counterName + " no XMLNS", this.withoutValue.get(),
-				         Level.FINEST);
+				         level);
 			}
 			for (Entry<String, MutableLong> xmlnsValues : counter.entrySet()) {
 				list.add(name, qType.name() + " processed " + counterName + " " + xmlnsValues.getKey(),
-				         xmlnsValues.getValue().get(), Level.FINEST);
+				         xmlnsValues.getValue().get(), level);
 
 			}
 		}

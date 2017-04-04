@@ -26,6 +26,7 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.QueueType;
 import tigase.sys.TigaseRuntime;
 import tigase.util.AllHistoryCache;
 import tigase.util.FloatHistoryCache;
@@ -625,6 +626,7 @@ public class StatisticsProvider
 		private long              prevClusterPackets               = 0L;
 		private float             prevClusterPacketsPerSec         = 0;
 		private float             prevCpuUsage                     = 0f;
+		private float             prevIqOtherNumber                = 0;
 		private float             prevIqOtherNumberPerSec          = 0;
 		private long              prevMessagesNumber               = 0;
 		private float             prevMessagesPerSec               = 0;
@@ -646,7 +648,9 @@ public class StatisticsProvider
 		private Timer             updateTimer                      = null;
 
 		// private long lastUpdate = 0;
-		private StatisticsList allStats = new StatisticsList(Level.FINER);
+		private Level level = Level.FINER;
+//		private Level level = Level.FINEST;
+		private StatisticsList allStats = new StatisticsList(level);
 
 		//~--- constructors -------------------------------------------------------
 
@@ -706,7 +710,7 @@ public class StatisticsProvider
 				allStats     = new StatisticsList(Level.FINEST);
 				runs_counter = 0;
 			} else {
-				allStats = new StatisticsList(Level.FINER);
+				allStats = new StatisticsList(level);
 			}
 			theRef.getAllStats(allStats);
 			if (allHistory != null) {
@@ -760,6 +764,19 @@ public class StatisticsProvider
 					prevMessagesNumber)) / 4f;
 			prevMessagesPerSec          = temp;
 			prevMessagesNumber          = messagesNumber;
+
+			iqAuthNumber = allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " processed IQ jabber:iq:auth", 0L)
+			+ allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " processed IQ jabber:iq:auth", 0L)
+			+ allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " processed other urn:ietf:params:xml:ns:xmpp-sasl", 0L)
+			+ allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " processed other urn:ietf:params:xml:ns:xmpp-sasl", 0L);
+
+			iqOtherNumber = allStats.getCompIq(SM_COMP);
+
+			temp = iqOtherNumberPerSec;
+			iqOtherNumberPerSec = (prevIqOtherNumberPerSec + (temp * 2f) + (iqOtherNumber - prevIqOtherNumber)) / 4f;
+			prevIqOtherNumberPerSec = temp;
+			prevIqOtherNumber = iqOtherNumber;
+
 			clusterNetworkBytesSent     = allStats.getValue(CL_COMP, "Bytes sent", 0L);
 			clusterNetworkBytesReceived = allStats.getValue(CL_COMP, "Bytes received", 0L);
 			clusterNetworkBytes         = clusterNetworkBytesSent + clusterNetworkBytesReceived;
@@ -811,13 +828,6 @@ public class StatisticsProvider
 					}
 				}
 			}
-
-			// System.out.println("clusterPackets: " + clusterPackets +
-			// ", smPackets: " + smPackets +
-			// ", clientConnections: " + clientConnections);
-//			if (log.isLoggable(Level.FINEST)) {
-//				log.log(Level.FINEST, "Update finished");
-//			}
 		}
 
 		private void updateSystemDetails() {
