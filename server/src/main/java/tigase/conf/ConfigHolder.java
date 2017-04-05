@@ -62,7 +62,7 @@ public class ConfigHolder {
 	private Map<String, Object> props = new LinkedHashMap<>();
 	private Path initPropertiesPath;
 
-	public void loadConfiguration(String[] args) {
+	public void loadConfiguration(String[] args) throws IOException, ConfigReader.ConfigException {
 		List<String> settings = new LinkedList<>();
 		ConfiguratorAbstract.parseArgs(props, settings, args);
 
@@ -144,13 +144,9 @@ public class ConfigHolder {
 		format = Format.properties;
 	}
 
-	private void loadFromDSLFiles() {
-		try {
-			Map<String, Object> loaded = new ConfigReader().read(initPropertiesPath.toFile());
-			props.putAll(loaded);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to load configuration from file " + initPropertiesPath, e);
-		}
+	private void loadFromDSLFiles() throws IOException, ConfigReader.ConfigException {
+		Map<String, Object> loaded = new ConfigReader().read(initPropertiesPath.toFile());
+		props.putAll(loaded);
 	}
 
 	private void loadFromPropertiesFiles() {

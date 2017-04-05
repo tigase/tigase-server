@@ -24,6 +24,7 @@ package tigase.server;
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.conf.ConfigHolder;
+import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.conf.LoggingBean;
 import tigase.eventbus.EventBusFactory;
@@ -60,7 +61,8 @@ public class Bootstrap implements Lifecycle {
 		kernel = new Kernel("root");
 	}
 
-	public void init(String[] args) {
+	public void init(String[] args) throws ConfigReader.ConfigException, IOException {
+
 		config.loadConfiguration(args);
 		configureLogManager();
 	}

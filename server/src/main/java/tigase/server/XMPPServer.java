@@ -25,9 +25,11 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.kernel.KernelException;
 import tigase.kernel.core.BeanConfig;
+import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtil;
 import tigase.xml.XMLUtils;
 
@@ -137,22 +139,27 @@ public final class XMPPServer {
 			bootstrap.init(args);
 			bootstrap.start();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
-			System.out.println("== " + sdf.format(new Date()) + " Server finished starting up and (if there wasn't any error) is ready to use\n");
-//		} catch ( ConfigurationException e ) {
-//			System.err.println( "" );
-//			System.err.println( "  --------------------------------------" );
-//			System.err.println( "  ERROR! Terminating the server process." );
-//			System.err.println( "  Invalid configuration data: " + e );
-//			System.err.println( "  Please fix the problem and start the server again." );
-//			System.exit( 1 );
+			System.out.println("== " + sdf.format(new Date()) +
+									   " Server finished starting up and (if there wasn't any error) is ready to use\n");
+		} catch ( ConfigReader.UnsupportedOperationException e ) {
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"ERROR! Terminating the server process.",
+					e.getMessage() + " at line " + e.getLine() + " position " + e.getPosition(),
+					"Line: " + e.getLineContent(),
+					"Please fix the problem and start the server again."
+			});
+		} catch ( ConfigReader.ConfigException e ) {
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"ERROR! Terminating the server process.",
+					"Issue with configuration file: " + e,
+					"Please fix the problem and start the server again."
+			});
 		} catch ( Exception e ) {
-			System.err.println( "" );
-			System.err.println( "  --------------------------------------" );
-			System.err.println( "  ERROR! Terminating the server process." );
-			System.err.println( "  Problem initializing the server: " + e );
-			System.err.println( "  Please fix the problem and start the server again." );
-			e.printStackTrace();
-			System.exit( 1 );
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"ERROR! Terminating the server process.",
+					"Problem initializing the server: " + e,
+					"Please fix the problem and start the server again."
+			});
 		}
 	}
 

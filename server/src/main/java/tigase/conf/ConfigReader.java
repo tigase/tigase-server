@@ -71,13 +71,13 @@ public class ConfigReader {
 		});
 	}
 
-	public Map<String, Object> read(Reader reader) throws IOException {
+	public Map<String, Object> read(Reader reader) throws IOException, ConfigException {
 		BufferedReader buffReader = new BufferedReader(reader);
 		Map<String, Object> props = process(buffReader);
 		return props;
 	}
 
-	public Map<String, Object> read(File f) throws IOException {
+	public Map<String, Object> read(File f) throws IOException, ConfigException {
 		Map<String, Object> props;
 
 		try (FileReader reader = new FileReader(f)) {
@@ -92,15 +92,20 @@ public class ConfigReader {
 //		props.entrySet().forEach();
 //	}
 
-	private Map<String, Object> process(Reader reader) throws IOException {
+	private Map<String, Object> process(Reader reader) throws IOException, ConfigException {
 		holder.map = new HashMap<>();
 		int line = 1;
 		int pos = 0;
 		int read = 0;
+		StringBuilder lineContent = new StringBuilder();
 		try {
 			while ((read = reader.read()) != -1) {
 				char c = (char) read;
-
+				if (c != '\n') {
+					lineContent.append(c);
+				} else  {
+					lineContent = new StringBuilder();
+				}
 				pos++;
 
 				if (holder.state == State.QUOTE) {
@@ -340,11 +345,19 @@ public class ConfigReader {
 						break;
 				}
 			}
-		} catch (UnsupportedOperationException ex) {
-			throw new UnsupportedOperationException(ex.getMessage() + " at line " + line + " char " + pos);
+		} catch (java.lang.UnsupportedOperationException ex) {
+			while ((read = reader.read()) != -1) {
+				char c = (char) read;
+				if (c != '\n') {
+					lineContent.append(c);
+				} else {
+					break;
+				}
+			}
+			throw new UnsupportedOperationException(ex.getMessage(), line, pos, lineContent.toString(), ex);
 		}
 		if (holder.state != State.MAP || holder.parent != null) {
-			throw new IOException("Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);
+			throw new InvalidFormatException("Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);
 		}
 
 		if (holder.key != null && !holder.key.isEmpty()) {
@@ -352,6 +365,51 @@ public class ConfigReader {
 		}
 
 		return holder.map;
+	}
+
+	public static class ConfigException extends Exception {
+
+		public ConfigException(String msg) {
+			super(msg);
+		}
+
+		public ConfigException(String msg, Throwable cause) {
+			super(msg, cause);
+		}
+	}
+
+	public static class InvalidFormatException extends ConfigException {
+
+		public InvalidFormatException(String msg) {
+			super(msg);
+		}
+
+	}
+
+	public static class UnsupportedOperationException extends ConfigException {
+
+		private final int line;
+		private final int position;
+		private final String lineContent;
+
+		public UnsupportedOperationException(String msg, int line, int position, String lineContent, Throwable cause) {
+			super(msg, cause);
+			this.line = line;
+			this.position = position;
+			this.lineContent = lineContent;
+		}
+
+		public int getLine() {
+			return line;
+		}
+
+		public int getPosition() {
+			return position;
+		}
+
+		public String getLineContent() {
+			return lineContent;
+		}
 	}
 
 	private static Pattern INTEGER_PATTERN = Pattern.compile("([0-9]+)([lL]*)");
@@ -552,7 +610,7 @@ public class ConfigReader {
 			Object first = values.get(0);
 			if (first instanceof String) {
 				if (!operations.stream().allMatch(o -> o == Operation.add)) {
-					throw new UnsupportedOperationException("Invalid operation for String!");
+					throw new java.lang.UnsupportedOperationException("Invalid operation for String!");
 				}
 				return ((List<String>) (List) values).stream().collect(Collectors.joining());
 			} else if (first instanceof Number) {
@@ -582,7 +640,7 @@ public class ConfigReader {
 
 				return values.stream().findFirst().get();
 			} else {
-				throw new UnsupportedOperationException("Cannot calculate composite variable!");
+				throw new java.lang.UnsupportedOperationException("Cannot calculate composite variable!");
 			}
 		}
 
@@ -606,10 +664,10 @@ public class ConfigReader {
 					o = Operation.divide;
 					break;
 				default:
-					throw new UnsupportedOperationException();
+					throw new java.lang.UnsupportedOperationException();
 			}
 			if (value instanceof String && o != Operation.add) {
-				throw new UnsupportedOperationException("Cannot " + o.name() + " a String");
+				throw new java.lang.UnsupportedOperationException("Cannot " + o.name() + " a String");
 			}
 			operations.add(o);
 			values.add(value);
