@@ -80,6 +80,10 @@ include::text/admin/2/Configuration_-_G_-_Virtual_Hosts_-_1_-_Ad-hoc_Commands.as
 
 include::text/admin/2/Configuration_-_G_-_Virtual_Hosts_-_2_-_Virtual_Components.asciidoc[]
 
+:leveloffset: 2
+
+include::text/admin/2/Configuration_-_H_-_Logging.asciidoc[]
+
 :leveloffset: 1
 
 include::text/admin/3/Security.asciidoc[]

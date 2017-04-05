@@ -29,8 +29,10 @@ stats/stats-high-memory-level[I]=95
 
 == New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/3802[#3802] Implementation and API of LocalEventBus and ClusteredEventBus has been unified and is now available as EventBus.
+- #5005 Detailed logging configuration is now available in DSL format. See xref:[customLogging] for more details.
 
 == Fixes
 - #3611 Fixed TheadExceptionHandler caused by ACS unable to read PubSub schema changes.
 - #3910 Fixed NPE in SessionManager when session is closed during execution of everyMinute method.
 - #3911 Fixed issue of dropping connections during thread load distribution.
+- link:https://projects.tigase.org/issues/4776[#4776] DBSchemaLoader now asks for user credentials if parameter is missing.
