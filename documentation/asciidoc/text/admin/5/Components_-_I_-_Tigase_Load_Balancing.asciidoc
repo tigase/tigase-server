@@ -55,7 +55,7 @@ For `SeeOtherHostDB` implementation there are additional options:
 - `c2s/cm-see-other-host/get-all-query-timeout` - allows to set timeout for executed queries.
 
 === SeeOtherHostDualIP
-This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `cluster_nodes` table will be used (and appropriate repository implementation will be used).
+This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `tig_cluster_nodes` table will be used (and appropriate repository implementation will be used).
 
 To enable this redirection mechanism following configuration / class should be used:
 
@@ -72,7 +72,7 @@ It's possible to configure it on per-connection-manager basis
 
 It offers following configuration options:
 
-- `data-source` - configuration of the source of redirection information - by default internal Tigase `cluster_nodes` table will be used (and appropriate repository implementation will be used); alternatively it's possible to use `eventbus` source;
+- `data-source` - configuration of the source of redirection information - by default internal Tigase `tig_cluster_nodes` table will be used (and appropriate repository implementation will be used); alternatively it's possible to use `eventbus` source;
 - `db-url` - a JDBC connection URI which should be used to query redirect information; if not configured `--user-db-uri` will be used;
 - `get-all-data-query` - a SQL helper query which should return all redirection data from database;
 - `get-all-query-timeout` - allows to set timeout for executed queries;
@@ -84,7 +84,7 @@ All options can be configured either globally (without providing type parameter)
 ----
 --cm-see-other-host/db-url=jdbc:<database>://<uri>
 --cm-see-other-host/data-source=<class implementing tigase.server.xmppclient.SeeOtherHostDualIP.DualIPRepository>
---cm-see-other-host/get-all-data-query=select * from cluster_nodes
+--cm-see-other-host/get-all-data-query=select * from tig_cluster_nodes
 --cm-see-other-host/get-all-query-timeout=10
 --cm-see-other-host/fallback-redirection-host=<hostname>
 ----
@@ -94,7 +94,7 @@ or on per-component basis
 ----
 <connector>/cm-see-other-host/db-url[S]=jdbc:<database>://<uri>
 <connector>/cm-see-other-host/data-source[S]=<class implementing tigase.server.xmppclient.SeeOtherHostDualIP.DualIPRepository>
-<connector>/cm-see-other-host/get-all-data-query[S]=select * from cluster_nodes
+<connector>/cm-see-other-host/get-all-data-query[S]=select * from tig_cluster_nodes
 <connector>/cm-see-other-host/get-all-query-timeout[I]=10
 <connector>/cm-see-other-host/fallback-redirection-host[S]=<hostname>
 ----

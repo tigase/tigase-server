@@ -31,6 +31,7 @@ import tigase.db.DataRepository;
 import tigase.db.Repository;
 import tigase.db.RepositoryFactory;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
+import tigase.sys.TigaseRuntime;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -295,13 +296,11 @@ public class ClConSQLRepository
 		if (!data_repo.checkTable(TABLE_NAME)) {
 			log.info("DB for external component is not OK, stopping server...");
 
-			System.err.println("");
-			System.err.println("  --------------------------------------");
-			System.err.println("  ERROR! Terminating the server process.");
-			System.err.println("  Problem initializing the server: missing tig_cluster_nodes table on " +
-									   data_repo.getResourceUri());
-			System.err.println("  Please fix the problem and start the server again.");
-			System.exit(1);
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"ERROR! Terminating the server process.",
+					"Problem initializing the server: missing tig_cluster_nodes table on " + data_repo.getResourceUri(),
+					"Please fix the problem and start the server again."
+			}, 1);
 		}
 	}
 }
