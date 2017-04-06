@@ -28,6 +28,7 @@ package tigase.server;
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.kernel.KernelException;
+import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.core.BeanConfig;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtil;
@@ -139,8 +140,13 @@ public final class XMPPServer {
 			bootstrap.init(args);
 			bootstrap.start();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
-			System.out.println("== " + sdf.format(new Date()) +
-									   " Server finished starting up and (if there wasn't any error) is ready to use\n");
+			if (new BeanSelector.SetupMode().shouldRegister(bootstrap.getKernel())) {
+				System.out.println("== " + sdf.format(new Date()) +
+										   " Please setup server at http://localhost:8080/\n");
+			} else {
+				System.out.println("== " + sdf.format(new Date()) +
+										   " Server finished starting up and (if there wasn't any error) is ready to use\n");
+			}
 		} catch ( ConfigReader.UnsupportedOperationException e ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
 					"ERROR! Terminating the server process.",
