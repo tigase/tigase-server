@@ -707,7 +707,7 @@ public class Kernel {
 							}
 							injectIfRequired(depbc);
 						} catch (Exception e) {
-							//	e.printStackTrace();
+							log.log(Level.SEVERE, "Exception injecting bean if required", e);
 						}
 					//}
 				}
