@@ -344,13 +344,16 @@ include::text/admin/6/Using_Tigase_-_R_-_Anonymous_Users.asciidoc[]
 
 :leveloffset: 1
 
-Appendix I - Statistics Descriptions
+= Appendix I - Statistics Descriptions
 
 include::text/admin/7/Statistics_Descriptions.asciidoc[]
 
-Appendix II - Properties Guide
-
 :leveloffset: 1
+
+
+= Appendix II - Properties Guide
+
+:leveloffset: 2
 
 include::text/properties/admins.asciidoc[]
 
