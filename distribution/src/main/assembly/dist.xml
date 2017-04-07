@@ -133,6 +133,7 @@
 
 				<!--HTTP API component dependencies-->
 				<include>javax.servlet:javax.servlet-api</include>
+				<include>tigase-http-api-jetty</include>
 
 			</includes>
 		</dependencySet>
