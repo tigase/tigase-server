@@ -131,6 +131,9 @@
 				<include>openDMK:jdmkrt</include>
 				<include>net.sourceforge.jtds:jtds</include>
 
+				<!--HTTP API component dependencies-->
+				<include>javax.servlet:javax.servlet-api</include>
+
 			</includes>
 		</dependencySet>
 	</dependencySets>
