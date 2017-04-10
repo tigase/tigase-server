@@ -22,8 +22,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
@@ -34,6 +32,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.*;
 import tigase.server.Message;
 import tigase.server.xmppsession.SessionManager;
@@ -52,15 +51,18 @@ import java.util.regex.Pattern;
 
 /**
  * JEP-0077: In-Band Registration
- * 
- * 
+ * <p>
+ * <p>
  * Created: Thu Feb 16 13:14:06 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 @Bean(name = JabberIqRegister.ID, parent = SessionManager.class, active = true)
-public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc, Initializable, UnregisterAware {
+public class JabberIqRegister
+		extends XMPPProcessor
+		implements XMPPProcessorIfc, Initializable, UnregisterAware {
+
 	public static final String ID = "jabber:iq:register";
 	public static final String REGISTRATION_PER_SECOND_PROP_KEY = "registrations-per-second";
 	public static final String REGISTRATION_BLACKLIST_PROP_KEY = "registration-blacklist";
@@ -73,61 +75,43 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 	public static final String OAUTH_CONSUMERSECRET_PROP_KEY = "oauth-consumer-secret";
 	public static final String SIGNED_FORM_REQUIRED_PROP_KEY = "signed-form-required";
 	private static final int REMOTE_ADDRESS_IDX = 2;
-	private static final String[][] ELEMENTS = { Iq.IQ_QUERY_PATH };
-	private static final String[] XMLNSS = { "jabber:iq:register" };
-	private static final String[] IQ_QUERY_USERNAME_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "username" };
-	private static final String[] IQ_QUERY_REMOVE_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "remove" };
-	private static final String[] IQ_QUERY_PASSWORD_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "password" };
-	private static final String[] IQ_QUERY_EMAIL_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "email" };
+	private static final String[][] ELEMENTS = {Iq.IQ_QUERY_PATH};
+	private static final String[] XMLNSS = {"jabber:iq:register"};
+	private static final String[] IQ_QUERY_USERNAME_PATH = {Iq.ELEM_NAME, Iq.QUERY_NAME, "username"};
+	private static final String[] IQ_QUERY_REMOVE_PATH = {Iq.ELEM_NAME, Iq.QUERY_NAME, "remove"};
+	private static final String[] IQ_QUERY_PASSWORD_PATH = {Iq.ELEM_NAME, Iq.QUERY_NAME, "password"};
+	private static final String[] IQ_QUERY_EMAIL_PATH = {Iq.ELEM_NAME, Iq.QUERY_NAME, "email"};
 	private static final Element[] FEATURES = {
-			new Element("register", new String[] { "xmlns" }, new String[] { "http://jabber.org/features/iq-register" }) };
+			new Element("register", new String[]{"xmlns"}, new String[]{"http://jabber.org/features/iq-register"})};
 	private static final Element[] DISCO_FEATURES = {
-			new Element("feature", new String[] { "var" }, new String[] { "jabber:iq:register" }) };
-	/**
-	 * Private logger for class instances.
-	 */
-	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
+			new Element("feature", new String[]{"var"}, new String[]{"jabber:iq:register"})};
 	private static final BareJID smJid = BareJID.bareJIDInstanceNS("sess-man");
-	/**
-	 * Whitelist properties
-	 */
-
+	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
+	@Inject
+	private CaptchaProvider captchaProvider;
+	@ConfigField(desc = "CAPTCHA Required")
+	private boolean captchaRequired = false;
 	@Inject
 	private EventBus eventBus;
-	@Inject
-	private UserRepository userRepository;
-
-	private TokenBucketPool tokenBucket = new TokenBucketPool();
-	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
-	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
-	private String welcomeMessage = null;
-	private boolean whitelistRegistrationOnly = false;
+	@ConfigField(desc = "Maximum CAPTCHA repetition in session")
+	private int maxCaptchaRepetition = 3;
 	private String oauthConsumerKey;
 	private String oauthConsumerSecret;
+	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
+	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
 	private boolean signedFormRequired = false;
-	private long statsRegisteredUsers;
 	private long statsInvalidRegistrations;
-
-	// ~--- methods
-	// --------------------------------------------------------------
-
-	@Override
-	public void beforeUnregister() {
-		eventBus.unregisterAll(this);
-	}
-
-	private static String parseRemoteAddressFromJid(JID from) {
-		try {
-			String connectionId = from.getResource();
-			return connectionId.split("_")[REMOTE_ADDRESS_IDX];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
-	}
+	private long statsRegisteredUsers;
+	private TokenBucketPool tokenBucket = new TokenBucketPool();
+	@Inject
+	private UserRepository userRepository;
+	private String welcomeMessage = null;
+	private boolean whitelistRegistrationOnly = false;
 
 	private static boolean contains(List<CIDRAddress> addresses, String address) {
-		if (address == null)
+		if (address == null) {
 			return false;
+		}
 		for (CIDRAddress cidrAddress : addresses) {
 			if (cidrAddress.inRange(address)) {
 				return true;
@@ -145,327 +129,45 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 		return splitList;
 	}
 
-	public void setOAuthCredentials(String oauthConsumerKey, String oauthConsumerSecret) {
-		this.oauthConsumerKey = oauthConsumerKey;
-		this.oauthConsumerSecret = oauthConsumerSecret;
-	}
-
-	@Override
-	public String id() {
-		return ID;
-	}
-
-	@Override
-	public void initialize() {
-		eventBus.registerAll(this);
+	private static String parseRemoteAddressFromJid(JID from) {
 		try {
-			welcomeMessage = userRepository.getData(smJid, ID, "welcome-message");
-		} catch (TigaseDBException ex) {
-			log.log(Level.WARNING, "failed to read current welcome message from user repository", ex);
+			String connectionId = from.getResource();
+			return connectionId.split("_")[REMOTE_ADDRESS_IDX];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
 		}
 	}
 
-	/**{@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 *             TODO: Implement registration form configurable and loading
-	 *             all the fields from the registration form TODO: rewrite the
-	 *             plugin using the XMPPProcessorAbstract API
-	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings) throws XMPPException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toString());
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	private tigase.server.Message createWelcomeMessage(String username, XMPPResourceConnection session)
+			throws TigaseStringprepException {
+		if (welcomeMessage == null) {
+			return null;
 		}
-		if (session == null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Session is null, ignoring");
-			}
 
-			return;
-		} // end of if (session == null)
+		JID jid = JID.jidInstance(username, session.getDomainAsJID().getDomain());
 
-		BareJID id = session.getDomainAsJID().getBareJID();
+		Element messageEl = new Element("message");
+		messageEl.setXMLNS(Message.CLIENT_XMLNS);
+		messageEl.addChild(new Element("body", welcomeMessage));
 
-		if (packet.getStanzaTo() != null) {
-			id = packet.getStanzaTo().getBareJID();
-		}
-		try {
-
-			// I think it does not make sense to check the 'to', just the
-			// connection
-			// ID
-			// if ((id.equals(session.getDomain()) ||
-			// id.equals(session.getUserId().toString()))
-			// && packet.getFrom().equals(session.getConnectionId())) {
-			// Wrong thinking. The user may send an request from his own account
-			// to register with a transport or any other service, then the
-			// connection
-			// ID matches the session id but this is still not a request to the
-			// local
-			// server. The TO address must be checked too.....
-			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
-			if ((packet.getPacketFrom() != null) && packet.getPacketFrom().equals(session.getConnectionId())
-					&& (!session.isAuthorized() || (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
-
-				// We want to allow password change but not user registration if
-				// registration is disabled. The only way to tell apart
-				// registration
-				// from password change is to check whether the user is
-				// authenticated.
-				// For authenticated user the request means password change,
-				// otherwise
-				// registration attempt.
-				// Account deregistration is also called under authenticated
-				// session, so
-				// it should be blocked here if registration for domain is
-				// disabled.
-				// Assuming if user cannot register account he cannot also
-				// deregister account
-				Element request = packet.getElement();
-				boolean remove = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
-
-				if (!session.isAuthorized() || remove) {
-					if (!isRegistrationAllowedForConnection(packet.getFrom())) {
-						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-								"Registration is not allowed for this connection.", true));
-						++statsInvalidRegistrations;
-						return;
-					}
-
-					if (!session.getDomain().isRegisterEnabled()) {
-						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-								"Registration is not allowed for this domain.", true));
-						++statsInvalidRegistrations;
-						return;
-					}
-
-					if (!isTokenInBucket(packet.getFrom())) {
-						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-								"Server is busy. Too many registrations. Try later.", true));
-						++statsInvalidRegistrations;
-						return;
-					}
-				}
-
-				Authorization result = Authorization.NOT_AUTHORIZED;
-				StanzaType type = packet.getType();
-
-				switch (type) {
-				case set:
-
-					// Is it registration cancel request?
-					Element elem = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH);
-
-					if (elem != null) {
-
-						// Yes this is registration cancel request
-						// According to JEP-0077 there must not be any
-						// more subelements apart from <remove/>
-						elem = request.findChildStaticStr(Iq.IQ_QUERY_PATH);
-						if (elem.getChildren().size() > 1) {
-							result = Authorization.BAD_REQUEST;
-						} else {
-							try {
-								result = session.unregister(packet.getStanzaFrom().toString());
-
-								Packet ok_result = packet.okResult((String) null, 0);
-
-								// We have to set SYSTEM priority for the packet
-								// here,
-								// otherwise the network connection is closed
-								// before the
-								// client received a response
-								ok_result.setPriority(Priority.SYSTEM);
-								results.offer(ok_result);
-
-								Packet close_cmd = Command.CLOSE.getPacket(session.getSMComponentId(),
-										session.getConnectionId(), StanzaType.set, session.nextStanzaId());
-
-								close_cmd.setPacketTo(session.getConnectionId());
-								close_cmd.setPriority(Priority.LOWEST);
-								results.offer(close_cmd);
-							} catch (NotAuthorizedException e) {
-								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-										"You must authorize session first.", true));
-							} // end of try-catch
-						}
-					} else {
-						String user_name;
-						String password;
-						String email;
-						if (signedFormRequired) {
-							final String expectedToken = UUID.nameUUIDFromBytes(
-									(session.getConnectionId() + "|" + session.getSessionId()).getBytes()).toString();
-
-							FormSignatureVerifier verifier = new FormSignatureVerifier(oauthConsumerKey, oauthConsumerSecret);
-							Element queryEl = request.getChild("query", "jabber:iq:register");
-							Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
-							if (formEl == null) {
-								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-										"Use Signed Registration Form", true));
-								++statsInvalidRegistrations;
-								return;
-							}
-							Form form = new Form(formEl);
-							if (!expectedToken.equals(form.getAsString("oauth_token"))) {
-								log.finest("Received oauth_token is different that sent one.");
-								results.offer(
-										Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_token", true));
-								++statsInvalidRegistrations;
-								return;
-							}
-							if (!oauthConsumerKey.equals(form.getAsString("oauth_consumer_key"))) {
-								log.finest("Unknown oauth_consumer_key");
-								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_consumer_key",
-										true));
-								++statsInvalidRegistrations;
-								return;
-							}
-							try {
-								long timestamp = verifier.verify(packet.getStanzaTo(), form);
-								user_name = form.getAsString("username");
-								password = form.getAsString("password");
-								email = form.getAsString("email");
-							} catch (FormSignerException e) {
-								log.fine("Form Signature Validation Problem: " + e.getMessage());
-								results.offer(
-										Authorization.BAD_REQUEST.getResponseMessage(packet, "Invalid form signature", true));
-								++statsInvalidRegistrations;
-								return;
-							}
-						} else {
-							// No, so assuming this is registration of a new
-							// user or change registration details for existing
-							// user
-							user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
-							password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
-							email = request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
-						}
-						String pass_enc = null;
-						if (null != password) {
-							pass_enc = XMLUtils.unescape(password);
-						}
-						Map<String, String> reg_params = null;
-
-						if ((email != null) && !email.trim().isEmpty()) {
-							reg_params = new LinkedHashMap<String, String>();
-							reg_params.put("email", email);
-						}
-						result = session.register(user_name, pass_enc, reg_params);
-						if (result == Authorization.AUTHORIZED) {
-							String localPart = BareJID.parseJID(user_name)[0];
-							if (localPart == null || localPart.isEmpty()) {
-								localPart = user_name;
-							}
-							tigase.server.Message msg = createWelcomeMessage(localPart, session);
-							if (msg != null) {
-								results.offer(msg);
-							}
-							results.offer(result.getResponseMessage(packet, null, false));
-						} else {
-							++statsInvalidRegistrations;
-							results.offer(result.getResponseMessage(packet, "Unsuccessful registration attempt", true));
-						}
-					}
-
-					break;
-
-				case get: {
-					if (signedFormRequired) {
-						results.offer(packet.okResult(prepareRegistrationForm(session), 0));
-					} else
-						results.offer(
-								packet.okResult("<instructions>" + "Choose a user name and password for use with this service."
-										+ "Please provide also your e-mail address." + "</instructions>" + "<username/>"
-										+ "<password/>" + "<email/>", 1));
-
-					break;
-				}
-				case result:
-
-					// It might be a registration request from transport for
-					// example...
-					Packet pack_res = packet.copyElementOnly();
-
-					pack_res.setPacketTo(session.getConnectionId());
-					results.offer(pack_res);
-
-					break;
-
-				default:
-					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", true));
-
-					break;
-				} // end of switch (type)
-			} else {
-				if (session.isUserId(id)) {
-
-					// It might be a registration request from transport for
-					// example...
-					Packet pack_res = packet.copyElementOnly();
-
-					pack_res.setPacketTo(session.getConnectionId());
-					results.offer(pack_res);
-				} else {
-					results.offer(packet.copyElementOnly());
-				}
-			}
-		} catch (TigaseStringprepException ex) {
-			results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
-					"Incorrect user name, stringprep processing failed.", true));
-		} catch (NotAuthorizedException e) {
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
-		} catch (TigaseDBException e) {
-			log.warning("Database problem: " + e);
-			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-					"Database access problem, please contact administrator.", true));
-		} // end of try-catch
+		return new Message(messageEl, session.getDomainAsJID(), jid);
 	}
 
-	private Element prepareRegistrationForm(final XMPPResourceConnection session) throws NoConnectionIdException {
-		Element query = new Element("query", new String[] { "xmlns" }, XMLNSS);
-		query.addChild(new Element("instructions", "Use the enclosed form to register."));
-		Form form = new Form(SignatureCalculator.SUPPORTED_TYPE, "Contest Registration",
-				"Please provide the following information to sign up for our special contests!");
-
-		form.addField(Field.fieldTextSingle("username", "", "Username"));
-		form.addField(Field.fieldTextPrivate("password", "", "Password"));
-		form.addField(Field.fieldTextSingle("email", "", "Email"));
-
-		SignatureCalculator sc = new SignatureCalculator(oauthConsumerKey, oauthConsumerSecret);
-		sc.setOauthToken(
-				UUID.nameUUIDFromBytes((session.getConnectionId() + "|" + session.getSessionId()).getBytes()).toString());
-		sc.addEmptyFields(form);
-
-		query.addChild(form.getElement());
-		return query;
-	}
-	
-	protected boolean isTokenInBucket(final JID from) {
-		String remoteAdress = parseRemoteAddressFromJid(from);
-		if (remoteAdress == null || remoteAdress.isEmpty())
-			remoteAdress = "<default>";
-		return tokenBucket.consume(remoteAdress);
-	}
-
-
-	protected boolean isRegistrationAllowedForConnection(JID from) {
-		String remoteAdress = parseRemoteAddressFromJid(from);
-		if (whitelistRegistrationOnly) {
-			return contains(registrationWhitelist, remoteAdress);
-		}
-		return !contains(registrationBlacklist, remoteAdress);
-	}
-	
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		list.add(getComponentInfo().getName(), "Registered users", statsRegisteredUsers, Level.INFO);
 		list.add(getComponentInfo().getName(), "Invalid registrations", statsInvalidRegistrations, Level.INFO);
+	}
+
+	@Override
+	public String id() {
+		return ID;
 	}
 
 	@Override
@@ -497,35 +199,426 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 		String registrationsPerSecond = (String) settings.get(REGISTRATION_PER_SECOND_PROP_KEY);
 		if (registrationsPerSecond != null) {
 			this.tokenBucket.setDefaultRate(Long.parseLong(registrationsPerSecond));
-			log.config("Accounts registration limit is set to " + this.tokenBucket.getDefaultRate() + " per "
-					+ this.tokenBucket.getDefaultPer() + " sec");
+			log.config("Accounts registration limit is set to " + this.tokenBucket.getDefaultRate() + " per " +
+							   this.tokenBucket.getDefaultPer() + " sec");
 		}
 
 	}
 
-	private tigase.server.Message createWelcomeMessage(String username, XMPPResourceConnection session)
-			throws TigaseStringprepException {
-		if (welcomeMessage == null) {
-			return null;
+	@Override
+	public void initialize() {
+		eventBus.registerAll(this);
+		try {
+			welcomeMessage = userRepository.getData(smJid, ID, "welcome-message");
+		} catch (TigaseDBException ex) {
+			log.log(Level.WARNING, "failed to read current welcome message from user repository", ex);
 		}
-
-		JID jid = JID.jidInstance(username, session.getDomainAsJID().getDomain());
-
-		Element messageEl = new Element("message");
-		messageEl.setXMLNS(Message.CLIENT_XMLNS);
-		messageEl.addChild(new Element("body", welcomeMessage));
-
-		return new Message(messageEl, session.getDomainAsJID(), jid);
 	}
 
-	public void setWelcomeMessage(String message) throws TigaseDBException {
-		userRepository.setData(smJid, ID, "welcome-message", message);
-		eventBus.fire(new WelcomeMessageChangedEvent(message));
+	protected boolean isRegistrationAllowedForConnection(JID from) {
+		String remoteAdress = parseRemoteAddressFromJid(from);
+		if (whitelistRegistrationOnly) {
+			return contains(registrationWhitelist, remoteAdress);
+		}
+		return !contains(registrationBlacklist, remoteAdress);
+	}
+
+	public boolean isSignedFormRequired() {
+		return signedFormRequired;
+	}
+
+	public void setSignedFormRequired(boolean required) {
+		this.signedFormRequired = required;
+	}
+
+	protected boolean isTokenInBucket(final JID from) {
+		String remoteAdress = parseRemoteAddressFromJid(from);
+		if (remoteAdress == null || remoteAdress.isEmpty()) {
+			remoteAdress = "<default>";
+		}
+		return tokenBucket.consume(remoteAdress);
 	}
 
 	@HandleEvent
 	public void onWelcomeMessageChange(WelcomeMessageChangedEvent event) {
 		this.welcomeMessage = event.getMessage();
+	}
+
+	private Element prepareCaptchaRegistrationForm(final XMPPResourceConnection session)
+			throws NoConnectionIdException {
+		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
+		query.addChild(new Element("instructions", "Use the enclosed form to register."));
+		Form form = new Form("form", "Contest Registration",
+							 "Please provide the following information to sign up for our special contests!");
+		form.addField(Field.fieldHidden("FORM_TYPE", "jabber:iq:register"));
+
+		Field field = Field.fieldTextSingle("username", "", "Username");
+		field.setRequired(true);
+		form.addField(field);
+		field = Field.fieldTextPrivate("password", "", "Password");
+		field.setRequired(true);
+		form.addField(field);
+		field = Field.fieldTextSingle("email", "", "Email");
+		field.setRequired(true);
+		form.addField(field);
+
+		CaptchaProvider.CaptchaItem captcha = captchaProvider.generateCaptcha();
+		session.putSessionData("jabber:iq:register:captcha", captcha);
+		field = Field.fieldTextSingle("captcha", "", captcha.getCaptchaRequest(session));
+		field.setRequired(true);
+		form.addField(field);
+
+		query.addChild(form.getElement());
+		return query;
+	}
+
+	private Element prepareSignedRegistrationForm(final XMPPResourceConnection session) throws NoConnectionIdException {
+		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
+		query.addChild(new Element("instructions", "Use the enclosed form to register."));
+		Form form = new Form(SignatureCalculator.SUPPORTED_TYPE, "Contest Registration",
+							 "Please provide the following information to sign up for our special contests!");
+
+		form.addField(Field.fieldTextSingle("username", "", "Username"));
+		form.addField(Field.fieldTextPrivate("password", "", "Password"));
+		form.addField(Field.fieldTextSingle("email", "", "Email"));
+
+		SignatureCalculator sc = new SignatureCalculator(oauthConsumerKey, oauthConsumerSecret);
+		sc.setOauthToken(UUID.nameUUIDFromBytes((session.getConnectionId() + "|" + session.getSessionId()).getBytes())
+								 .toString());
+		sc.addEmptyFields(form);
+
+		query.addChild(form.getElement());
+		return query;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * <br><br>
+	 * <p>
+	 * TODO: Implement registration form configurable and loading
+	 * all the fields from the registration form TODO: rewrite the
+	 * plugin using the XMPPProcessorAbstract API
+	 */
+	@Override
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.toString());
+		}
+		if (session == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Session is null, ignoring");
+			}
+
+			return;
+		} // end of if (session == null)
+
+		BareJID id = session.getDomainAsJID().getBareJID();
+
+		if (packet.getStanzaTo() != null) {
+			id = packet.getStanzaTo().getBareJID();
+		}
+		try {
+
+			// I think it does not make sense to check the 'to', just the
+			// connection
+			// ID
+			// if ((id.equals(session.getDomain()) ||
+			// id.equals(session.getUserId().toString()))
+			// && packet.getFrom().equals(session.getConnectionId())) {
+			// Wrong thinking. The user may send an request from his own account
+			// to register with a transport or any other service, then the
+			// connection
+			// ID matches the session id but this is still not a request to the
+			// local
+			// server. The TO address must be checked too.....
+			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
+			if ((packet.getPacketFrom() != null) && packet.getPacketFrom().equals(session.getConnectionId()) &&
+					(!session.isAuthorized() ||
+							(session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
+
+				// We want to allow password change but not user registration if
+				// registration is disabled. The only way to tell apart
+				// registration
+				// from password change is to check whether the user is
+				// authenticated.
+				// For authenticated user the request means password change,
+				// otherwise
+				// registration attempt.
+				// Account deregistration is also called under authenticated
+				// session, so
+				// it should be blocked here if registration for domain is
+				// disabled.
+				// Assuming if user cannot register account he cannot also
+				// deregister account
+				Element request = packet.getElement();
+				boolean remove = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
+
+				if (!session.isAuthorized() || remove) {
+					if (!isRegistrationAllowedForConnection(packet.getFrom())) {
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+																				   "Registration is not allowed for this connection.",
+																				   true));
+						++statsInvalidRegistrations;
+						return;
+					}
+
+					if (!session.getDomain().isRegisterEnabled()) {
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+																				   "Registration is not allowed for this domain.",
+																				   true));
+						++statsInvalidRegistrations;
+						return;
+					}
+
+					if (!isTokenInBucket(packet.getFrom())) {
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+																				   "Server is busy. Too many registrations. Try later.",
+																				   true));
+						++statsInvalidRegistrations;
+						return;
+					}
+				}
+
+				Authorization result = Authorization.NOT_AUTHORIZED;
+				StanzaType type = packet.getType();
+
+				switch (type) {
+					case set:
+
+						// Is it registration cancel request?
+						Element elem = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH);
+
+						if (elem != null) {
+
+							// Yes this is registration cancel request
+							// According to JEP-0077 there must not be any
+							// more subelements apart from <remove/>
+							elem = request.findChildStaticStr(Iq.IQ_QUERY_PATH);
+							if (elem.getChildren().size() > 1) {
+								result = Authorization.BAD_REQUEST;
+							} else {
+								try {
+									result = session.unregister(packet.getStanzaFrom().toString());
+
+									Packet ok_result = packet.okResult((String) null, 0);
+
+									// We have to set SYSTEM priority for the packet
+									// here,
+									// otherwise the network connection is closed
+									// before the
+									// client received a response
+									ok_result.setPriority(Priority.SYSTEM);
+									results.offer(ok_result);
+
+									Packet close_cmd = Command.CLOSE.getPacket(session.getSMComponentId(),
+																			   session.getConnectionId(),
+																			   StanzaType.set, session.nextStanzaId());
+
+									close_cmd.setPacketTo(session.getConnectionId());
+									close_cmd.setPriority(Priority.LOWEST);
+									results.offer(close_cmd);
+								} catch (NotAuthorizedException e) {
+									results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+																								  "You must authorize session first.",
+																								  true));
+								} // end of try-catch
+							}
+						} else {
+							String user_name;
+							String password;
+							String email;
+							if (captchaRequired) {
+								CaptchaProvider.CaptchaItem captcha = (CaptchaProvider.CaptchaItem) session.getSessionData(
+										"jabber:iq:register:captcha");
+
+								if (captcha == null) {
+									log.finest("CAPTCHA is required");
+									results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "CAPTCHA is " +
+											"required. Please reload your registration form.", true));
+									++statsInvalidRegistrations;
+									return;
+								}
+
+								Element queryEl = request.getChild("query", "jabber:iq:register");
+								Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
+								Form form = new Form(formEl);
+
+								String capResp = form.getAsString("captcha");
+
+								if (!captcha.isResponseValid(session, capResp)) {
+									captcha.incraseErrorCounter();
+									log.finest("Invalid captcha");
+									++statsInvalidRegistrations;
+									results.offer(
+											Authorization.NOT_ALLOWED.getResponseMessage(packet, "Invalid captcha",
+																						 true));
+
+									if (captcha.getErrorCounter() >= maxCaptchaRepetition) {
+										log.finest("Blocking session with not-solved captcha");
+										session.removeSessionData("jabber:iq:register:captcha");
+									}
+									return;
+								}
+
+								user_name = form.getAsString("username");
+								password = form.getAsString("password");
+								email = form.getAsString("email");
+							} else if (signedFormRequired) {
+								final String expectedToken = UUID.nameUUIDFromBytes(
+										(session.getConnectionId() + "|" + session.getSessionId()).getBytes())
+										.toString();
+
+								FormSignatureVerifier verifier = new FormSignatureVerifier(oauthConsumerKey,
+																						   oauthConsumerSecret);
+								Element queryEl = request.getChild("query", "jabber:iq:register");
+								Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
+								if (formEl == null) {
+									results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+																							   "Use Signed Registration Form",
+																							   true));
+									++statsInvalidRegistrations;
+									return;
+								}
+								Form form = new Form(formEl);
+								if (!expectedToken.equals(form.getAsString("oauth_token"))) {
+									log.finest("Received oauth_token is different that sent one.");
+									results.offer(
+											Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_token",
+																						 true));
+									++statsInvalidRegistrations;
+									return;
+								}
+								if (!oauthConsumerKey.equals(form.getAsString("oauth_consumer_key"))) {
+									log.finest("Unknown oauth_consumer_key");
+									results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+																							   "Unknown oauth_consumer_key",
+																							   true));
+									++statsInvalidRegistrations;
+									return;
+								}
+								try {
+									long timestamp = verifier.verify(packet.getStanzaTo(), form);
+									user_name = form.getAsString("username");
+									password = form.getAsString("password");
+									email = form.getAsString("email");
+								} catch (FormSignerException e) {
+									log.fine("Form Signature Validation Problem: " + e.getMessage());
+									results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+																							   "Invalid form signature",
+																							   true));
+									++statsInvalidRegistrations;
+									return;
+								}
+							} else {
+								// No, so assuming this is registration of a new
+								// user or change registration details for existing
+								// user
+								user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
+								password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+								email = request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
+							}
+							String pass_enc = null;
+							if (null != password) {
+								pass_enc = XMLUtils.unescape(password);
+							}
+							Map<String, String> reg_params = null;
+
+							if ((email != null) && !email.trim().isEmpty()) {
+								reg_params = new LinkedHashMap<String, String>();
+								reg_params.put("email", email);
+							}
+							result = session.register(user_name, pass_enc, reg_params);
+							if (result == Authorization.AUTHORIZED) {
+								session.removeSessionData("jabber:iq:register:captcha");
+								String localPart = BareJID.parseJID(user_name)[0];
+								if (localPart == null || localPart.isEmpty()) {
+									localPart = user_name;
+								}
+								tigase.server.Message msg = createWelcomeMessage(localPart, session);
+								if (msg != null) {
+									results.offer(msg);
+								}
+								results.offer(result.getResponseMessage(packet, null, false));
+							} else {
+								++statsInvalidRegistrations;
+								results.offer(
+										result.getResponseMessage(packet, "Unsuccessful registration attempt", true));
+							}
+						}
+
+						break;
+
+					case get: {
+						if (captchaRequired) {
+							// captcha
+							results.offer(packet.okResult(prepareCaptchaRegistrationForm(session), 0));
+						} else if (signedFormRequired) {
+							results.offer(packet.okResult(prepareSignedRegistrationForm(session), 0));
+						} else {
+							results.offer(packet.okResult(
+									"<instructions>" + "Choose a user name and password for use with this service." +
+											"Please provide also your e-mail address." + "</instructions>" +
+											"<username/>" + "<password/>" + "<email/>", 1));
+						}
+
+						break;
+					}
+					case result:
+
+						// It might be a registration request from transport for
+						// example...
+						Packet pack_res = packet.copyElementOnly();
+
+						pack_res.setPacketTo(session.getConnectionId());
+						results.offer(pack_res);
+
+						break;
+
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect",
+																				   true));
+
+						break;
+				} // end of switch (type)
+			} else {
+				if (session.isUserId(id)) {
+
+					// It might be a registration request from transport for
+					// example...
+					Packet pack_res = packet.copyElementOnly();
+
+					pack_res.setPacketTo(session.getConnectionId());
+					results.offer(pack_res);
+				} else {
+					results.offer(packet.copyElementOnly());
+				}
+			}
+		} catch (TigaseStringprepException ex) {
+			results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
+																		 "Incorrect user name, stringprep processing failed.",
+																		 true));
+		} catch (NotAuthorizedException e) {
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+																		  "You are not authorized to change registration settings.\n" +
+																				  e.getMessage(), true));
+		} catch (TigaseDBException e) {
+			log.warning("Database problem: " + e);
+			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+																				 "Database access problem, please contact administrator.",
+																				 true));
+		} // end of try-catch
+	}
+
+	public void setOAuthCredentials(String oauthConsumerKey, String oauthConsumerSecret) {
+		this.oauthConsumerKey = oauthConsumerKey;
+		this.oauthConsumerSecret = oauthConsumerSecret;
+	}
+
+	public void setWelcomeMessage(String message) throws TigaseDBException {
+		userRepository.setData(smJid, ID, "welcome-message", message);
+		eventBus.fire(new WelcomeMessageChangedEvent(message));
 	}
 
 	@Override
@@ -562,14 +655,6 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 		}
 	}
 
-	public boolean isSignedFormRequired() {
-		return signedFormRequired;
-	}
-
-	public void setSignedFormRequired(boolean required) {
-		this.signedFormRequired = required;
-	}
-
 	/**
 	 * As in
 	 * http://commons.apache.org/proper/commons-net/jacoco/org.apache.commons
@@ -586,17 +671,6 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 
 		final int high;
 		final int low;
-
-		private CIDRAddress(int high, int low) {
-			this.high = high;
-			this.low = low;
-		}
-
-		static int toInteger(String address) {
-			Matcher matcher = IP_PATTERN.matcher(address);
-			matcher.matches();
-			return matchAddress(matcher);
-		}
 
 		static int matchAddress(Matcher matcher) {
 			int addr = 0;
@@ -634,6 +708,17 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 			return new CIDRAddress(broadcast, network);
 		}
 
+		static int toInteger(String address) {
+			Matcher matcher = IP_PATTERN.matcher(address);
+			matcher.matches();
+			return matchAddress(matcher);
+		}
+
+		private CIDRAddress(int high, int low) {
+			this.high = high;
+			this.low = low;
+		}
+
 		boolean inRange(String address) {
 			int diff = toInteger(address) - low;
 			return diff >= 0 && (diff <= (high - low));
@@ -657,4 +742,4 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc,
 		}
 
 	}
-} // JabberIqRegister
+}
