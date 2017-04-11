@@ -22,12 +22,13 @@
 
 package tigase.auth.impl;
 
-//~--- JDK imports ------------------------------------------------------------
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.auth.AuthRepositoryAware;
+import tigase.auth.DomainAware;
+import tigase.auth.callbacks.VerifyPasswordCallback;
+import tigase.auth.mechanisms.AbstractSasl;
+import tigase.db.AuthRepository;
+import tigase.db.TigaseDBException;
+import tigase.xmpp.BareJID;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -35,13 +36,11 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
-
-import tigase.auth.AuthRepositoryAware;
-import tigase.auth.DomainAware;
-import tigase.auth.callbacks.VerifyPasswordCallback;
-import tigase.auth.mechanisms.AbstractSasl;
-import tigase.db.AuthRepository;
-import tigase.xmpp.BareJID;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is implementation of {@linkplain CallbackHandler} to use with old
@@ -50,7 +49,9 @@ import tigase.xmpp.BareJID;
  * {@linkplain AuthRepository#plainAuth(BareJID, String)} to password
  * verification.
  */
-public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthRepositoryAware, DomainAware {
+public class AuthRepoPlainCallbackHandler
+		implements CallbackHandler, AuthRepositoryAware, DomainAware {
+
 	protected String domain;
 
 	protected BareJID jid = null;
@@ -73,6 +74,20 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
+		}
+
+		try {
+			if (repo.isUserDisabled(jid)) {
+				authCallback.setAuthorized(false);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "User {0} is disabled", jid);
+				}
+				return;
+			}
+		} catch (TigaseDBException e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Cannot check if user " + jid + " is enabled", e);
+			}
 		}
 
 		String authorId = authCallback.getAuthorizationID();

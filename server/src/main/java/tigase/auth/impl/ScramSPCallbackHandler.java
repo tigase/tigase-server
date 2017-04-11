@@ -7,6 +7,7 @@ import tigase.auth.callbacks.*;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
+import tigase.db.TigaseDBException;
 import tigase.util.Base64;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPResourceConnection;
@@ -36,7 +37,8 @@ import java.util.logging.Logger;
  * <code>salt</code> - 20 bytes,<br>
  * <code>saltedPassword</code> - 20 bytes.
  */
-public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware {
+public class ScramSPCallbackHandler
+		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware {
 
 	protected BareJID jid = null;
 	protected Logger log = Logger.getLogger(this.getClass().getName());
@@ -69,6 +71,20 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
+		}
+
+		try {
+			if (repo.isUserDisabled(jid)) {
+				authCallback.setAuthorized(false);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "User {0} is disabled", jid);
+				}
+				return;
+			}
+		} catch (TigaseDBException e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Cannot check if user " + jid + " is enabled", e);
+			}
 		}
 
 		String authorId = authCallback.getAuthorizationID();
@@ -122,8 +138,10 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 				throw new RuntimeException(e);
 			}
 		}
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, "Channel binding {0}: {1}", new Object[]{callback.getRequestedBindType(), Base64.encode(callback.getBindingData())});
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Channel binding {0}: {1}",
+					new Object[]{callback.getRequestedBindType(), Base64.encode(callback.getBindingData())});
+		}
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
@@ -135,8 +153,9 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 		}
 		try {
 			String pwd = repo.getPassword(jid);
-			if (pwd == null)
+			if (pwd == null) {
 				throw new SaslException("User " + jid + " not found.");
+			}
 			byte[] buffer = Base64.decode(pwd);
 			this.salt = new byte[20];
 			this.saltedPassword = new byte[20];

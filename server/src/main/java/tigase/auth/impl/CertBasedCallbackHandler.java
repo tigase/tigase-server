@@ -1,15 +1,5 @@
 package tigase.auth.impl;
 
-import java.io.IOException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
 import tigase.auth.SessionAware;
 import tigase.auth.callbacks.ValidateCertificateData;
 import tigase.auth.mechanisms.SaslEXTERNAL;
@@ -18,7 +8,17 @@ import tigase.util.TigaseStringprepException;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPResourceConnection;
 
-public class CertBasedCallbackHandler implements CallbackHandler, SessionAware {
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import java.io.IOException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class CertBasedCallbackHandler
+		implements CallbackHandler, SessionAware {
 
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 
@@ -42,7 +42,8 @@ public class CertBasedCallbackHandler implements CallbackHandler, SessionAware {
 					}
 
 					Certificate cert = (Certificate) session.getSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY);
-					final String[] authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert).toArray(new String[] {});
+					final String[] authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert)
+							.toArray(new String[]{});
 
 					for (String string : authJIDs) {
 						if (defaultAuthzid != null) {

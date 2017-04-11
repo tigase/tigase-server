@@ -7,6 +7,7 @@ import tigase.auth.callbacks.*;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
+import tigase.db.TigaseDBException;
 import tigase.util.Base64;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPResourceConnection;
@@ -23,7 +24,8 @@ import java.security.cert.Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware {
+public class ScramCallbackHandler
+		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware {
 
 	private final SecureRandom random = new SecureRandom();
 	private final byte[] salt;
@@ -54,6 +56,20 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
+		}
+
+		try {
+			if (repo.isUserDisabled(jid)) {
+				authCallback.setAuthorized(false);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "User {0} is disabled", jid);
+				}
+				return;
+			}
+		} catch (TigaseDBException e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Cannot check if user " + jid + " is enabled", e);
+			}
 		}
 
 		String authorId = authCallback.getAuthorizationID();
@@ -107,8 +123,12 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 				throw new RuntimeException(e);
 			}
 		}
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}", new Object[]{callback.getRequestedBindType(), callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()), session});
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}",
+					new Object[]{callback.getRequestedBindType(),
+								 callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()),
+								 session});
+		}
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
@@ -147,7 +167,8 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 				callback.setSaltedPassword(new byte[]{});
 			} else {
 
-				byte[] saltedPassword = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(pwd), salt, pbkd2Iterations);
+				byte[] saltedPassword = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(pwd), salt,
+															 pbkd2Iterations);
 
 				callback.setSaltedPassword(saltedPassword);
 			}
