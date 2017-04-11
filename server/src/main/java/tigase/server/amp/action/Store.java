@@ -216,23 +216,28 @@ public class Store
 			expiredProcessor = new Thread("expired-processor") {
 				@Override
 				public void run() {
-					while (true) {
-						Element elem = repo.getMessageExpired(0, true);
+					try {
+						Thread.sleep(90 * 1000);
+						while (true) {
+							Element elem = repo.getMessageExpired(0, true);
 
-						if (elem != null) {
-							elem.addAttribute(OFFLINE, "1");
-							elem.addAttribute(EXPIRED, "1");
-							try {
-								resultsHandler.addOutPacket(Packet.packetInstance(elem));
-							} catch (TigaseStringprepException ex) {
-								log.info("Stringprep error for offline message loaded from DB: " + elem);
+							if (elem != null) {
+								elem.addAttribute(OFFLINE, "1");
+								elem.addAttribute(EXPIRED, "1");
+								try {
+									resultsHandler.addOutPacket(Packet.packetInstance(elem));
+								} catch (TigaseStringprepException ex) {
+									log.info("Stringprep error for offline message loaded from DB: " + elem);
+								}
+							}
+							if (Thread.interrupted()) {
+								log.info("stopping expired-processor");
+								expiredProcessor = null;
+								return;
 							}
 						}
-						if (Thread.interrupted()) {
-							log.info("stopping expired-processor");
-							expiredProcessor = null;
-							return;
-						}
+					} catch (InterruptedException e) {
+						log.log(Level.WARNING, "Could not initialize expired processor", e);
 					}
 				}
 			};
