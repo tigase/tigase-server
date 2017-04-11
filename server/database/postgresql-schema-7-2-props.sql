@@ -1,6 +1,6 @@
 --
 --  Tigase Jabber/XMPP Server
---  Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+--  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
 --
 --  This program is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU Affero General Public License as published by
@@ -15,16 +15,18 @@
 --  along with this program. Look for COPYING file in the top folder.
 --  If not, see http://www.gnu.org/licenses/.
 --
---
+--  $Rev: $
+--  Last modified by $Author: $
+--  $Date: $
 
---  To load schema to PostgreSQL database execute following commands:
---
---  createuser tigase
---  createdb -U tigase tigase
---  psql -q -U tigase -d tigase -f postgresql-schema.sql
+-- QUERY START:
+-- This is a dummy user who keeps all the database-properties
+select TigAddUserPlainPw('db-properties', NULL);
+-- QUERY END:
 
--- LOAD FILE: database/sqlserver-schema-7-2-schema.sql
+select now(), ' - Setting schema version to 7.2';
 
--- LOAD FILE: database/sqlserver-schema-7-2-sp.sql
+-- QUERY START:
+select TigPutDBProperty('schema-version', '7.2');
+-- QUERY END:
 
--- LOAD FILE: database/sqlserver-schema-7-2-props.sql

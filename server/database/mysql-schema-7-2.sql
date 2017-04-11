@@ -21,10 +21,10 @@ source database/mysql-schema-7-2-schema.sql;
 
 source database/mysql-schema-7-2-sp.sql;
 
-source database/mysql-schema-7-1-props.sql;
+source database/mysql-schema-7-2-props.sql;
 
 -- LOAD FILE: database/mysql-schema-7-2-schema.sql;
 
 -- LOAD FILE: database/mysql-schema-7-2-sp.sql;
 
--- LOAD FILE: database/mysql-schema-7-1-props.sql;
+-- LOAD FILE: database/mysql-schema-7-2-props.sql;

@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 public class JDBCRepository
 				implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
 	/** Field description */
-	public static final String CURRENT_DB_SCHEMA_VER = "7.1";
+	public static final String CURRENT_DB_SCHEMA_VER = "7.2";
 
 	/** Field description */
 	public static final String DEF_MAXIDS_TBL = "tig_max_ids";
@@ -86,7 +86,7 @@ public class JDBCRepository
 
 	/** Field description */
 	public static final String SCHEMA_UPGRADE_LINK =
-		"Administration Guide > Tigase Server Schema v7.1 Updates (available locally in docs directory and online http://docs.tigase.org)";
+		"Administration Guide > Tigase Server Schema v7.2 Updates (available locally in docs directory and online http://docs.tigase.org)";
 	private static final String ADD_NODE_QUERY          = "{ call TigAddNode(?, ?, ?) }";
 	private static final String ADD_USER_PLAIN_PW_QUERY =
 		"{ call TigAddUserPlainPw(?, ?) }";

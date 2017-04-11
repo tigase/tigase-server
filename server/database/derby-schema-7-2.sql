@@ -17,14 +17,14 @@
 --
 --
 
---  To load schema to PostgreSQL database execute following commands:
---
---  createuser tigase
---  createdb -U tigase tigase
---  psql -q -U tigase -d tigase -f postgresql-schema.sql
+run 'database/derby-schema-7-2-schema.sql';
 
--- LOAD FILE: database/sqlserver-schema-7-2-schema.sql
+run 'database/derby-schema-7-2-sp.sql';
 
--- LOAD FILE: database/sqlserver-schema-7-2-sp.sql
+run 'database/derby-schema-7-2-props.sql';
 
--- LOAD FILE: database/sqlserver-schema-7-2-props.sql
+-- LOAD FILE: database/derby-schema-7-2-schema.sql
+
+-- LOAD FILE: database/derby-schema-7-2-sp.sql
+
+-- LOAD FILE: database/derby-schema-7-2-props.sql

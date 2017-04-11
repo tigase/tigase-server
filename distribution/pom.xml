@@ -160,7 +160,7 @@
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/dist</outputDirectory>
-									<includes>*.xml, **/*.groovy, **/*.html</includes>
+									<includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt,*.xml, **/*.groovy, **/*.html</includes>
 								</artifactItem>
 
 								<artifactItem>

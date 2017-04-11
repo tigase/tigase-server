@@ -17,14 +17,11 @@
 --
 --
 
---  To load schema to PostgreSQL database execute following commands:
---
---  createuser tigase
---  createdb -U tigase tigase
---  psql -q -U tigase -d tigase -f postgresql-schema.sql
+-- This is a dummy user who keeps all the database-properties
+-- QUERY START:
+call TigAddUserPlainPw('db-properties', NULL);
+-- QUERY END:
 
--- LOAD FILE: database/sqlserver-schema-7-2-schema.sql
-
--- LOAD FILE: database/sqlserver-schema-7-2-sp.sql
-
--- LOAD FILE: database/sqlserver-schema-7-2-props.sql
+-- QUERY START:
+call TigPutDBProperty('schema-version', '7.2');
+-- QUERY END:

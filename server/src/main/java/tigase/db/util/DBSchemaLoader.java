@@ -103,7 +103,8 @@ class DBSchemaLoader extends SchemaLoader {
 		QUERY("query",null),
 		FILE("file",null),
 		ADMIN_JID("adminJID",null),
-		ADMIN_JID_PASS("adminJIDpass",null);
+		ADMIN_JID_PASS("adminJIDpass",null),
+		IGNORE_MISSING_FILES("ignoreMissingFiles", "false");
 
 		private String name = null;
 		private String defaultValue = null;
@@ -230,6 +231,10 @@ class DBSchemaLoader extends SchemaLoader {
 				"Password that will be used for the entered JID(s) - one for all configured administrators")
 				                 .secret()
 				                 .build());
+		parser.addOption(new CommandlineParameter.Builder(null, PARAMETERS.IGNORE_MISSING_FILES.getName()).description(
+				"Force ignoring missing files errors")
+								 .defaultValue(PARAMETERS.IGNORE_MISSING_FILES.getDefaultValue())
+								 .build());
 
 		Properties properties = null;
 		if (null == args || args.length == 0 || (properties = parser.parseArgs(args)) == null) {
@@ -295,8 +300,12 @@ class DBSchemaLoader extends SchemaLoader {
 		final Path p = Paths.get(path ? resource : "database/" + resource + ".sql");
 
 		if (!Files.exists(p)) {
-			log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
-			return results;
+			if ("true".equals(variables.getProperty(PARAMETERS.IGNORE_MISSING_FILES.getName(), PARAMETERS.IGNORE_MISSING_FILES.getDefaultValue()))) {
+				log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
+				return results;
+			} else {
+				throw new IOException("Required file at " + p.toString() + " doesn't exist!");
+			}
 		}
 
 		String sql_query = "";
