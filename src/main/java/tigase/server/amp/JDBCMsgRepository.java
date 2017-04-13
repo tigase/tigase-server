@@ -195,15 +195,15 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final String MSG_DELETE_ID_QUERY =
 															"delete from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = ?";
 	private static final String MSG_SELECT_EXPIRED_QUERY =
-															"select * from " + MSG_TABLE + " where expired is not null order by expired limit ?";
+															"select * from " + MSG_TABLE + " where " + MSG_EXPIRED_COLUMN + " is not null order by " + MSG_EXPIRED_COLUMN + " limit ?";
 	private static final String DERBY_MSG_SELECT_EXPIRED_QUERY =
-															"select * from " + MSG_TABLE + " where expired is not null order by expired FETCH FIRST ? ROWS ONLY";
+															"select * from " + MSG_TABLE + " where " + MSG_EXPIRED_COLUMN + " is not null order by " + MSG_EXPIRED_COLUMN + " FETCH FIRST ? ROWS ONLY";
 	private static final String MSSQL_MSG_SELECT_EXPIRED_QUERY =
-			"SELECT * FROM ( SELECT " + MSG_TABLE + ".*, ROW_NUMBER() OVER (ORDER BY UID DESC) AS RN FROM " +
-					MSG_TABLE + ") AS X WHERE RN <= ?";
+			"SELECT * FROM ( SELECT " + MSG_TABLE + ".*, ROW_NUMBER() OVER (ORDER BY " + MSG_EXPIRED_COLUMN + " ASC) AS RN FROM " +
+					MSG_TABLE + " WHERE " + MSG_EXPIRED_COLUMN + " is not null) AS X WHERE RN <= ?";
 
 	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY =
-															"select * from " + MSG_TABLE + " where expired is not null and expired <= ? order by expired";
+															"select * from " + MSG_TABLE + " where " + MSG_EXPIRED_COLUMN + " is not null and " + MSG_EXPIRED_COLUMN + " <= ? order by " + MSG_EXPIRED_COLUMN;
 
 	private static final String MYSQL_CREATE_BROADCAST_MSGS_TABLE =
 							"create table broadcast_msgs ( " + "  "
