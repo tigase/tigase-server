@@ -246,9 +246,9 @@ class DBSchemaLoader extends SchemaLoader {
 
 		DBSchemaLoader dbHelper = new DBSchemaLoader(properties);
 
-		Scanner sc = new Scanner(System.in);
-		log.log(Level.ALL, "Please press any key to continue");
-		sc.nextLine();
+//		Scanner sc = new Scanner(System.in);
+//		log.log(Level.ALL, "Please press any key to continue");
+//		sc.nextLine();
 
 		DBSchemaLoader.execute(dbHelper, properties);
 	}
