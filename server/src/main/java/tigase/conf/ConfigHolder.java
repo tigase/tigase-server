@@ -197,7 +197,7 @@ public class ConfigHolder {
 			Map<String, Object> toAdd = new HashMap<>();
 			List<String> toRemove = new ArrayList<>();
 
-			List<String> dataSourceNames = new ArrayList<>();
+			//List<String> dataSourceNames = new ArrayList<>();
 			Map<String, Map<String,String>> dataSources = new HashMap<>();
 
 			props.forEach((k,v) -> {
@@ -239,7 +239,8 @@ public class ConfigHolder {
 				}
 				if (k.contains("pubsub-repo-url")) {
 					props.put("dataSource/pubsub/uri", v);
-					dataSourceNames.add("pubsub");
+					props.put("dataSource/pubsub/active", "true");
+					props.put("pubsub/dao/default/data-source", "pubsub");
 					toRemove.add(k);
 				}
 				if (k.startsWith("http/port/")) {
@@ -256,8 +257,8 @@ public class ConfigHolder {
 				}
 			});
 
-			List<String> userDbDomains = new ArrayList<>();
-			List<String> authDbDomains = new ArrayList<>();
+//			List<String> userDbDomains = new ArrayList<>();
+//			List<String> authDbDomains = new ArrayList<>();
 			dataSources.forEach((domain, cfg) -> {
 				String userType = cfg.get("user-type");
 				String userUri = cfg.get("user-uri");
@@ -265,20 +266,17 @@ public class ConfigHolder {
 				String authUri = cfg.get("auth-uri");
 
 				if (userUri != null) {
-					if (!domain.equals("default")) {
-						userDbDomains.add(domain);
-						authDbDomains.add(domain);
-						dataSourceNames.add(domain);
-					}
 					props.put("dataSource/" + domain + "/uri", userUri);
+					props.put("dataSource/" + domain + "/active", "true");
+					props.put("userRepository/" + domain + "/active", "true");
+					props.put("authRepository/" + domain + "/active", "true");
 				}
 
 				if ((authUri != null) && (userUri == null || !userUri.contains(authUri))) {
-					if (!authDbDomains.contains(domain))
-						authDbDomains.add(domain);
-					dataSourceNames.add(domain + "-auth");
 					props.put("dataSource/" + domain + "-auth/uri", authUri);
-					props.put("authRepository/" + domain + "/uri", "dataSource:" + domain + "-auth");
+					props.put("dataSource/" + domain + "-auth/active", "true");
+					props.put("authRepository/" + domain + "/data-source", domain + "-auth");
+					props.put("authRepository/" + domain + "/active", "true");
 				}
 
 				if (userType != null && !userType.equals("mysql") && !userType.equals("pgsql") && !userType.equals("derby")
@@ -291,16 +289,6 @@ public class ConfigHolder {
 					props.put("authRepository/" + domain + "/cls", cls);
 				}
 			});
-
-			if (!dataSourceNames.isEmpty()) {
-				props.put("dataSource/domains", dataSourceNames);
-			}
-			if (!userDbDomains.isEmpty()) {
-				props.put("userRepository/domains", userDbDomains);
-			}
-			if (!authDbDomains.isEmpty()) {
-				props.put("authRepository/domains", authDbDomains);
-			}
 
 			String external = (String) props.remove("--external");
 			if (external != null) {

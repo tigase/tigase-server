@@ -456,7 +456,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			if (isBeanClassRegisteredInParentKernel(kernel.getParent(), annotation.name(), cls))
 				continue;
 
-			BeanConfig beanConfig = kernel.registerBean(cls).execWithoutInject();
+			kernel.registerBean(cls).execWithoutInject();
 		}
 	}
 

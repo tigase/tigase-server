@@ -104,7 +104,7 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 	public void everySecond() {
 
 	}
-
+	
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
 		String name = getName();

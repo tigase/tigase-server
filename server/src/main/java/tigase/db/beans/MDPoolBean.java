@@ -36,10 +36,7 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 	public static final String REPO_CLASS = "repo-class";
 	public static final String POOL_CLASS = "pool-class";
 	public static final String POOL_SIZE = "pool-size";
-
-	@ConfigField(desc = "Domains")
-	private String[] domains = {};
-
+	
 	@ConfigField(desc = "Bean name")
 	private String name;
 
@@ -55,10 +52,8 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 	@Override
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
-		registerConfigBean("default");
-
-		for (String domain : domains) {
-			registerConfigBean(domain);
+		if (!kernel.isBeanClassRegistered("default")){
+			registerConfigBean("default");
 		}
 	}
 

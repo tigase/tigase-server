@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -70,10 +69,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 
 	@ConfigField(desc = "Create repositories for: every UserRepository, every data source, listed data sources")
 	protected SelectorType dataSourceSelection = SelectorType.List;
-
-	@ConfigField(desc = "List of domains for which we create separate instances")
-	protected CopyOnWriteArrayList<String> domains = new CopyOnWriteArrayList<>();
-
+	
 	private final Map<String,T> repositories = new ConcurrentHashMap<>();
 	private Kernel kernel;
 
@@ -143,16 +139,14 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 				case List:
 					registerIfNotExists("default");
 
-					for (String name : domains) {
-						registerIfNotExists(name);
-					}
+					// manual registration is already possible by configuring new subbeans
 					break;
 			}
 		}
 	}
 
 	public void registerIfNotExists(String name) {
-		if (!kernel.isBeanClassRegistered("default")) {
+		if (!kernel.isBeanClassRegistered(name)) {
 			Class<?> cls = getDefaultBeanClass();
 			kernel.registerBean(name).asClass(cls).exec();
 		}

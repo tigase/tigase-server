@@ -122,6 +122,10 @@ public class Kernel {
 			bean = beanConfig.getKernel().getInstance(beanConfig);
 		}
 
+		if (bean instanceof RegistrarBean) {
+			((RegistrarBean) bean).register(beanConfig.getKernel());
+		}
+
 		BeanConfigurator beanConfigurator;
 		try {
 			if (beanConfig.getKernel().isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
@@ -138,11 +142,7 @@ public class Kernel {
 		} else {
 			AbstractBeanConfigurator.registerBeansForBeanOfClass(beanConfig.getKernel(), bean.getClass());
 		}
-
-		if (bean instanceof RegistrarBean) {
-			((RegistrarBean) bean).register(beanConfig.getKernel());
-		}
-
+		
 		beanConfig.getKernel().finishDependecyDelayedInjection(queue);
 
 
@@ -640,8 +640,10 @@ public class Kernel {
 //			}
 //		}
 
-		final HashSet<BeanConfig> related = new HashSet<>();
-		dependencyManager.getDependenciesTo(beanConfig).stream().forEach(d -> related.add(d.getBeanConfig()));
+		final Set<BeanConfig> related = dependencyManager.getDependenciesTo(beanConfig)
+				.stream()
+				.map(d -> d.getBeanConfig())
+				.collect(Collectors.toSet());
 		while (true) {
 			HashSet<BeanConfig> toAdd = new HashSet<>();
 
@@ -718,6 +720,7 @@ public class Kernel {
 							initBean(beanConfig, new HashSet<BeanConfig>(), 0);
 						} catch (Exception e) {
 							// cannot initialize beanconfig -- skipping injecting
+							log.log(Level.SEVERE, "Exception injecting bean if required", e);
 							return;
 						}
 					}

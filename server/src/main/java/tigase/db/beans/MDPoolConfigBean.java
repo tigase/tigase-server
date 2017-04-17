@@ -125,10 +125,10 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 			if (bc.getBeanName().startsWith("repo-")) {
 				try {
 					Integer pos = Integer.parseInt(bc.getBeanName().replace("repo-", ""));
-					if (poolCls == null || pos >= poolSize) {
+					if (getRepositoryPoolClassName() == null || pos >= poolSize) {
 						kernel.unregister(bc.getBeanName());
 					}
-				} catch (NumberFormatException ex) {
+				} catch (NumberFormatException|DBInitException ex) {
 					// this is not instance create by us, ignoring
 				}
 			}
