@@ -90,7 +90,7 @@ class DBSchemaLoader extends SchemaLoader {
 
 	enum PARAMETERS {
 		DATABASE_TYPE("dbType","mysql"),
-		SCHEMA_VERSION("schemaVersion","7-1"),
+		SCHEMA_VERSION("schemaVersion","7-2"),
 //		COMPONENTS("components","message-archiving,pubsub,muc,sock5"),
 		DATABASE_NAME("dbName","tigasedb"),
 		DATABASE_HOSTNAME("dbHostname","localhost"),
@@ -173,7 +173,7 @@ class DBSchemaLoader extends SchemaLoader {
 				                 .build());
 		parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS.SCHEMA_VERSION.getName()).description(
 				"Intended version of the schema to be loaded")
-				                 .options("4", "5", "5-1", "7-1")
+				                 .options("4", "5", "5-1", "7-1", "7-2")
 				                 .required(true)
 				                 .defaultValue(PARAMETERS.SCHEMA_VERSION.getDefaultValue())
 				                 .build());
