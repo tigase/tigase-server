@@ -216,6 +216,8 @@ class DBSchemaLoader extends SchemaLoader {
 				                 .build());
 		parser.addOption(new CommandlineParameter.Builder("F", PARAMETERS.FILE.getName()).description(
 				"Comma separated list of SQL files that will be processed").build());
+		parser.addOption(new CommandlineParameter.Builder("Q", PARAMETERS.QUERY.getName()).description(
+				"Custom query to be executed").build());
 		parser.addOption(new CommandlineParameter.Builder("L", PARAMETERS.LOG_LEVEL.getName()).description(
 				"Java Logger level during loading process")
 				                 .defaultValue(PARAMETERS.LOG_LEVEL.getDefaultValue())
@@ -810,10 +812,6 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.INFO, "Connection not validated" );
 			return;
 		}
-		if ( !db_ok ){
-			log.log( Level.INFO, "Database not validated" );
-			return;
-		}
 
 		Object queryObj = variables.getProperty( PARAMETERS.QUERY.getName() );
 		if ( queryObj == null ){
@@ -1014,7 +1012,7 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 
 		public static TigaseDBTask[] getQueryTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE, PRINT_INFO_TASK };
+			return new TigaseDBTask[] { VALIDATE_CONNECTION, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE };
 		}
 	}
 
