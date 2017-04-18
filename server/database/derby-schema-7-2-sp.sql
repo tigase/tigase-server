@@ -22,11 +22,6 @@ run 'database/derby-schema-7-1-sp.sql';
 -- LOAD FILE: database/derby-schema-7-1-sp.sql
 
 -- QUERY START:
-drop procedure TigPutDBProperty;
--- QUERY END:
-
-
--- QUERY START:
 CREATE procedure TigUpdateLoginTime(userId varchar(2049))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
@@ -44,7 +39,7 @@ EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.addMessage';
 -- QUERY END:
 
 -- QUERY START:
-CREATE procedure Tig_OfflineMessages_GetMessagesByIds("to" varchar(2049), msg_id1 varchar(50), _msg_id2 varchar(50), _msg_id3 varchar(50), _msg_id4 varchar(50))
+CREATE procedure Tig_OfflineMessages_GetMessagesByIds("to" varchar(2049), "msg_id1" varchar(50), "_msg_id2" varchar(50), "_msg_id3" varchar(50), "_msg_id4" varchar(50))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
 READS SQL DATA
@@ -80,7 +75,7 @@ EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.deleteMessages';
 -- QUERY END:
 
 -- QUERY START:
-CREATE procedure Tig_OfflineMessages_DeleteMessagesByIds("to" varchar(2049), msg_id1 varchar(50), _msg_id2 varchar(50), _msg_id3 varchar(50), _msg_id4 varchar(50))
+CREATE procedure Tig_OfflineMessages_DeleteMessagesByIds("to" varchar(2049), "msg_id1" varchar(50), "_msg_id2" varchar(50), "_msg_id3" varchar(50), "_msg_id4" varchar(50))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
 MODIFIES SQL DATA
@@ -143,7 +138,7 @@ EXTERNAL NAME 'tigase.db.derby.MsgBroadcastRepositoryStoredProcedures.getMessage
 -- QUERY END:
 
 -- QUERY START:
-CREATE procedure Tig_BroadcastMessages_GetMessages("msg_id" varchar(128))
+CREATE procedure Tig_BroadcastMessages_GetMessageRecipients("msg_id" varchar(128))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
 READS SQL DATA
