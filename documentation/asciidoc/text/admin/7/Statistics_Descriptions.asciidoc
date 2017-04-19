@@ -1,5 +1,5 @@
 [[statsticsDescription]]
-= Statistics description
+= Appendix I - Statistics description
 :author: Daniel Wisnewski (daniel@tigase.org)
 :date: 2016-04-22 10:40
 :version: v2.0 April 2017
