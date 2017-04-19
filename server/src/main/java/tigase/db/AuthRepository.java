@@ -28,10 +28,10 @@ package tigase.db;
 
 import tigase.xmpp.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
-
-
+import java.util.HashMap;
 import java.util.Map;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface <code>AuthRepository</code> defines a proxy bridge between user
@@ -278,7 +278,42 @@ public interface AuthRepository extends Repository {
 	 */
 	void updatePassword(BareJID user, String password)
 					throws UserNotFoundException, TigaseDBException;
-	
+
+	enum AccountStatus {
+		active(1),
+		disabled(0),
+		pending(-2),
+		system(-1),
+		vip(2),
+		paid(3);
+
+		private static final HashMap<Integer, AccountStatus> statuses = new HashMap<>();
+
+		static {
+			for (AccountStatus v : AccountStatus.values()) {
+				statuses.put(v.getValue(), v);
+			}
+		}
+
+		private final int value;
+
+		public static AccountStatus byValue(int value) {
+			return statuses.get(value);
+		}
+
+		AccountStatus(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+	}
+
+	AccountStatus getAccountStatus(BareJID user) throws TigaseDBException;
+
+	void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException;
+
 	boolean isUserDisabled(BareJID user) 
 					throws UserNotFoundException, TigaseDBException;
 	

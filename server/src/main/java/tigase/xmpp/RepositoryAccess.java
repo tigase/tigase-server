@@ -26,27 +26,21 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthorizationException;
-import tigase.db.AuthRepository;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
-
+import tigase.db.*;
+import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
-
 import tigase.vhosts.VHostItem;
+import tigase.xml.Element;
+import tigase.xmpp.impl.JabberIqRegister;
 
-import static tigase.db.NonAuthUserRepository.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.UUID;
+
+import static tigase.db.NonAuthUserRepository.OFFLINE_DATA_NODE;
+import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class RepositoryAccess here.
@@ -419,77 +413,20 @@ public abstract class RepositoryAccess {
 		return register(name_param, pass_param, reg_params);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name_param
-	 * @param pass_param
-	 * @param reg_params
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>Authorization</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 */
-	public Authorization register(String name_param, String pass_param, Map<String,
-			String> reg_params)
+	public Authorization changeRegistration(final String name_param, final String pass_param,
+											final Map<String, String> registr_params)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-
-		// Some clients send plain user name and others send
-		// jid as user name. Let's resolve this here.
-		String user_name = BareJID.parseJID(name_param)[0];
-
-		if ((user_name == null) || user_name.trim().isEmpty()) {
-			user_name = name_param;
-		}    // end of if (user_mame == null || user_name.equals(""))
-		if (isAuthorized()) {
-			return changeRegistration(user_name, pass_param, reg_params);
+		if ((name_param == null) || name_param.equals("") || (pass_param == null) ||
+				pass_param.equals("")) {
+			return Authorization.BAD_REQUEST;
 		}
-
-		// new user registration, let's check limits...
-		if (!domain.isRegisterEnabled()) {
-			throw new NotAuthorizedException("Registration is now allowed for this domain");
-		}
-		if (domain.getMaxUsersNumber() > 0) {
-			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Current number of users for domain: " + domain.getVhost()
-						.getDomain() + " is: " + domainUsers);
-			}
-			if (domainUsers >= domain.getMaxUsersNumber()) {
-				throw new NotAuthorizedException("Maximum users number for the domain exceeded.");
-			}
-		}
-		if ((user_name == null) || user_name.equals("") || (pass_param == null) || pass_param
-				.equals("")) {
-			return Authorization.NOT_ACCEPTABLE;
-		}
-		try {
-			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
-					.getDomain()), pass_param);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "User added: {0}, pass: {1}", new Object[]{BareJID.toString(user_name, getDomain().getVhost()
-								.getDomain()), pass_param});
-			}
-			setRegistration(user_name, pass_param, reg_params);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}", new Object[]{BareJID.toString(user_name, getDomain()
-								.getVhost().getDomain()), pass_param, reg_params});
-			}
+		if (getUserName().equals(name_param)) {
+			setRegistration(name_param, pass_param, registr_params);
 
 			return Authorization.AUTHORIZED;
-		} catch (UserExistsException e) {
-			return Authorization.CONFLICT;
-		} catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-
-			return Authorization.INTERNAL_SERVER_ERROR;
-		}    // end of try-catch
+		} else {
+			return Authorization.NOT_AUTHORIZED;
+		}
 	}
 
 	/**
@@ -617,6 +554,8 @@ public abstract class RepositoryAccess {
 	 *
 	 *
 	 * @param name_param
+	 * @param pass_param
+	 * @param reg_params
 	 *
 	 *
 	 *
@@ -625,12 +564,12 @@ public abstract class RepositoryAccess {
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
+	 * @deprecated Replaced by code in {@link JabberIqRegister#doRegisterNewAccount(Packet, Element, XMPPResourceConnection, Queue)}
 	 */
-	public Authorization unregister(String name_param)
+	@Deprecated
+	public Authorization register(String name_param, String pass_param, Map<String,
+			String> reg_params)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-		if (!isAuthorized()) {
-			return Authorization.FORBIDDEN;
-		}
 
 		// Some clients send plain user name and others send
 		// jid as user name. Let's resolve this here.
@@ -639,39 +578,50 @@ public abstract class RepositoryAccess {
 		if ((user_name == null) || user_name.trim().isEmpty()) {
 			user_name = name_param;
 		}    // end of if (user_mame == null || user_name.equals(""))
-		if (getUserName().equals(user_name)) {
-			try {
-				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
-						.getDomain()));
-				try {
-					repo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
-							.getDomain()));
-				} catch (UserNotFoundException ex) {
-
-					// We ignore this error here. If auth_repo and user_repo are in fact
-					// the same
-					// database, then user has been already removed with the
-					// auth_repo.removeUser(...)
-					// then the second call to user_repo may throw the exception which is
-					// fine.
-				}
-
-				// We mark the session as no longer authorized to prevent data access through
-				// this session.
-				logout();
-
-				// Session authorized is returned only to indicate successful operation.
-				return Authorization.AUTHORIZED;
-			} catch (UserNotFoundException e) {
-				return Authorization.REGISTRATION_REQUIRED;
-			} catch (TigaseDBException e) {
-				log.log(Level.SEVERE, "Repository access exception.", e);
-
-				return Authorization.INTERNAL_SERVER_ERROR;
-			}    // end of catch
-		} else {
-			return Authorization.FORBIDDEN;
+		if (isAuthorized()) {
+			return changeRegistration(user_name, pass_param, reg_params);
 		}
+
+		// new user registration, let's check limits...
+		if (!domain.isRegisterEnabled()) {
+			throw new NotAuthorizedException("Registration is now allowed for this domain");
+		}
+		if (domain.getMaxUsersNumber() > 0) {
+			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Current number of users for domain: " + domain.getVhost()
+						.getDomain() + " is: " + domainUsers);
+			}
+			if (domainUsers >= domain.getMaxUsersNumber()) {
+				throw new NotAuthorizedException("Maximum users number for the domain exceeded.");
+			}
+		}
+		if ((user_name == null) || user_name.equals("") || (pass_param == null) || pass_param
+				.equals("")) {
+			return Authorization.NOT_ACCEPTABLE;
+		}
+		try {
+			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
+					.getDomain()), pass_param);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "User added: {0}, pass: {1}", new Object[]{BareJID.toString(user_name, getDomain().getVhost()
+								.getDomain()), pass_param});
+			}
+			setRegistration(user_name, pass_param, reg_params);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}", new Object[]{BareJID.toString(user_name, getDomain()
+								.getVhost().getDomain()), pass_param, reg_params});
+			}
+
+			return Authorization.AUTHORIZED;
+		} catch (UserExistsException e) {
+			return Authorization.CONFLICT;
+		} catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+
+			return Authorization.INTERNAL_SERVER_ERROR;
+		}    // end of try-catch
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -1247,38 +1197,9 @@ public abstract BareJID getBareJID() throws NotAuthorizedException;
 		return base + "/" + subnode;
 	}
 
-	private Authorization changeRegistration(final String name_param,
-			final String pass_param, final Map<String, String> registr_params)
-					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-		if ((name_param == null) || name_param.equals("") || (pass_param == null) ||
-				pass_param.equals("")) {
-			return Authorization.BAD_REQUEST;
-		}
-		if (getUserName().equals(name_param)) {
-			setRegistration(name_param, pass_param, registr_params);
-
-			return Authorization.AUTHORIZED;
-		} else {
-			return Authorization.NOT_AUTHORIZED;
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	private boolean isLoginAllowed() throws AuthorizationException {
-		if (isAuthorized()) {
-			throw new AuthorizationException("User session already authenticated. " +
-					"Subsequent login is forbidden. You must loggin on a different connection.");
-		}
-
-		return true;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
 	// ~--- set methods ----------------------------------------------------------
-	private void setRegistration(final String name_param, final String pass_param,
-			final Map<String, String> registr_params)
+	public void setRegistration(final String name_param, final String pass_param,
+								final Map<String, String> registr_params)
 					throws TigaseDBException, TigaseStringprepException {
 		try {
 			authRepo.updatePassword(BareJID.bareJIDInstance(name_param, getDomain().getVhost()
@@ -1295,6 +1216,83 @@ public abstract BareJID getBareJID() throws NotAuthorizedException;
 			// } catch (TigaseDBException e) {
 			// log.log(Level.SEVERE, "Repository access exception.", e);
 		}    // end of try-catch
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isLoginAllowed() throws AuthorizationException {
+		if (isAuthorized()) {
+			throw new AuthorizationException("User session already authenticated. " +
+					"Subsequent login is forbidden. You must loggin on a different connection.");
+		}
+
+		return true;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name_param
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Authorization</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 * @throws TigaseStringprepException
+	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, Queue)}
+	 */
+	@Deprecated
+	public Authorization unregister(String name_param)
+					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
+		if (!isAuthorized()) {
+			return Authorization.FORBIDDEN;
+		}
+
+		// Some clients send plain user name and others send
+		// jid as user name. Let's resolve this here.
+		String user_name = BareJID.parseJID(name_param)[0];
+
+		if ((user_name == null) || user_name.trim().isEmpty()) {
+			user_name = name_param;
+		}    // end of if (user_mame == null || user_name.equals(""))
+		if (getUserName().equals(user_name)) {
+			try {
+				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
+						.getDomain()));
+				try {
+					repo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
+							.getDomain()));
+				} catch (UserNotFoundException ex) {
+
+					// We ignore this error here. If auth_repo and user_repo are in fact
+					// the same
+					// database, then user has been already removed with the
+					// auth_repo.removeUser(...)
+					// then the second call to user_repo may throw the exception which is
+					// fine.
+				}
+
+				// We mark the session as no longer authorized to prevent data access through
+				// this session.
+				logout();
+
+				// Session authorized is returned only to indicate successful operation.
+				return Authorization.AUTHORIZED;
+			} catch (UserNotFoundException e) {
+				return Authorization.REGISTRATION_REQUIRED;
+			} catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Repository access exception.", e);
+
+				return Authorization.INTERNAL_SERVER_ERROR;
+			}    // end of catch
+		} else {
+			return Authorization.FORBIDDEN;
+		}
 	}
 }    // RepositoryAccess
 

@@ -26,31 +26,27 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthorizationException;
 import tigase.db.AuthRepository;
+import tigase.db.AuthorizationException;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
+import tigase.server.Packet;
 import tigase.server.Presence;
-import tigase.server.XMPPServer;
-import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
+import tigase.xmpp.impl.JabberIqRegister;
 
-//~--- JDK imports ------------------------------------------------------------
-
-
-
-
-
-
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.function.Function;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -168,7 +164,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param jid
 	 * @param anonymous
-	 * @throws TigaseStringprepException 
+	 * @throws TigaseStringprepException
 	 */
 	public void authorizeJID(BareJID jid, boolean anonymous) throws TigaseStringprepException {
 		authState = Authorization.AUTHORIZED;
@@ -208,7 +204,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param key
 	 * @param valueFactory
-	 * @return 
+	 * @return
 	 */
 	public Object computeCommonSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
 		if (parentSession != null) {
@@ -216,7 +212,7 @@ public class XMPPResourceConnection
 		}
 		return valueFactory.apply(key);
 	}
-	
+
 	/**
 	 * Method checks if in session data is value for passed {@code key} and
 	 * returns it if exists. If not then it uses passed {@code valueFactory} to
@@ -226,12 +222,12 @@ public class XMPPResourceConnection
 	 * @param key
 	 * @param valueFactory
 	 * @return
-	 */	
+	 */
 	public Object computeSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
 		lastAccessed = System.currentTimeMillis();
 		return sessionData.computeIfAbsent(key, valueFactory);
 	}
-	
+
 	/**
 	 * Returns full user JID for this session without throwing the
 	 * <code>NotAuthorizedException</code> exception if session is not authorized
@@ -377,7 +373,7 @@ public class XMPPResourceConnection
 			parentSession.putCommonSessionData(key, value);
 		}
 	}
-	
+
 	/**
 	 * Method sets passed value under passed {@code key} in common {@code sessionData} kept
 	 * in {@code parentSession} but only if there is no value for this {@code key} already
@@ -424,7 +420,7 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * Method sets passed value under passed {@code key} in {@code sessionData} 
+	 * Method sets passed value under passed {@code key} in {@code sessionData}
 	 * but only if there is no value for this {@code key} already
 	 *
 	 * @param key
@@ -434,8 +430,8 @@ public class XMPPResourceConnection
 	public Object putSessionDataIfAbsent(String key, Object value) {
 		lastAccessed = System.currentTimeMillis();
 		return sessionData.putIfAbsent(key, value);
-	}	
-	
+	}
+
 	@Override
 	public void queryAuth(Map<String, Object> authProps) throws TigaseDBException {
 		super.queryAuth(authProps);
@@ -508,12 +504,39 @@ public class XMPPResourceConnection
 					 + "]";
 	}
 
-	@Override
-	public Authorization unregister(String name_param)
-					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-		Authorization auth_res = super.unregister(name_param);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	public void setPresence(Element packet) {
+		putSessionData(PRESENCE_KEY, packet);
 
-		return auth_res;
+		// Parse resource priority:
+		String pr_str = packet.getCDataStaticStr(Presence.PRESENCE_PRIORITY_PATH);
+
+		if (pr_str != null) {
+			int pr = 1;
+
+			try {
+				pr = Integer.decode(pr_str);
+			} catch (NumberFormatException e) {
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Incorrect priority value: " + pr_str + ", setting 1 as default.");
+				}
+				pr = 1;
+			}
+			setPriority(pr);
+		} else {
+			// workaround for case when presence update came before presence was broadcasted due to
+			// loading of roster data in roster processing thread
+			if (getPriority() != 0 && !"unavailable".equals(packet.getAttributeStaticStr("type"))) {
+				packet.addChild(new Element("priority", String.valueOf(getPriority())));
+			}
+			putSessionData(PRESENCE_KEY, packet);
+		}
+		loginHandler.handlePresenceSet(this);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -955,38 +978,15 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
+	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, * Queue)}
 	 */
-	public void setPresence(Element packet) {
-		putSessionData(PRESENCE_KEY, packet);
+	@Override
+	@Deprecated
+	public Authorization unregister(String name_param)
+			throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
+		Authorization auth_res = super.unregister(name_param);
 
-		// Parse resource priority:
-		String pr_str = packet.getCDataStaticStr(Presence.PRESENCE_PRIORITY_PATH);
-
-		if (pr_str != null) {
-			int pr = 1;
-
-			try {
-				pr = Integer.decode(pr_str);
-			} catch (NumberFormatException e) {
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("Incorrect priority value: " + pr_str + ", setting 1 as default.");
-				}
-				pr = 1;
-			}
-			setPriority(pr);
-		} else {
-			// workaround for case when presence update came before presence was broadcasted due to 
-			// loading of roster data in roster processing thread
-			if (getPriority() != 0 && !"unavailable".equals(packet.getAttributeStaticStr("type"))) {
-				packet.addChild(new Element("priority", String.valueOf(getPriority())));
-			}
-			putSessionData(PRESENCE_KEY, packet);
-		}
-		loginHandler.handlePresenceSet(this);
+		return auth_res;
 	}
 
 	/**
@@ -1060,7 +1060,7 @@ public class XMPPResourceConnection
 		String tls = (String) getSessionData("starttls");
 		return tls != null && "true".equals(tls);
 	}
-	
+
 	public boolean isTlsRequired() {
 		VHostItem vhost = getDomain();
 		try {
@@ -1076,7 +1076,7 @@ public class XMPPResourceConnection
 			return vhost.isTlsRequired();
 		}
 	}
-	
+
 }    // XMPPResourceConnection
 
 

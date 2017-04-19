@@ -4,16 +4,13 @@ package tigase.db.derby;
 
 import tigase.util.Algorithms;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
-
 import java.sql.*;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -657,6 +654,30 @@ public class StoredProcedures {
 		}
         }
 
+	public static int tigAccountStatus(final String user) throws SQLException {
+		try (Connection conn = DriverManager.getConnection("jdbc:default:connection")) {
+			conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+			PreparedStatement ps = conn.prepareStatement(
+					"SELECT account_status FROM tig_users WHERE lower(user_id) = ?");
+			ps.setString(1, user);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+			throw new SQLException("User " + user + " does not exists.");
+		}
+	}
+
+	public static void tigUpdateAccountStatus(final String user, final int status) throws SQLException {
+		try (Connection conn = DriverManager.getConnection("jdbc:default:connection")) {
+			conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+			PreparedStatement ps = conn.prepareStatement(
+					"UPDATE tig_users SET account_status = ? WHERE lower(user_id) = ?");
+			ps.setInt(1, status);
+			ps.setString(2, user);
+			ps.executeUpdate();
+		}
+	}
 
 	/**
 	 * Method description

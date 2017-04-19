@@ -309,4 +309,14 @@ public class LdapAuthProvider implements AuthRepository {
 					throws UserNotFoundException, TigaseDBException {
 		throw new TigaseDBException("Feature not supported");
 	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return AccountStatus.active;
+	}
 }

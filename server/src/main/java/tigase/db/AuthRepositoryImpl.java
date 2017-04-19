@@ -28,32 +28,18 @@ package tigase.db;
 
 import tigase.util.Algorithms;
 import tigase.util.Base64;
-
 import tigase.xmpp.BareJID;
 
-import static tigase.db.AuthRepository.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
+import javax.security.auth.callback.*;
+import javax.security.sasl.*;
 import java.io.IOException;
-
 import java.security.NoSuchAlgorithmException;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class AuthRepositoryImpl here.
@@ -72,6 +58,7 @@ public class AuthRepositoryImpl
 
 	/** Field description */
 	protected static final String DISABLED_KEY   = "disabled";
+	protected static final String ACCOUNT_STATUS_KEY = "account_status";
 	protected static final String PASSWORD_KEY   = "password";
 	private static final String[] non_sasl_mechs = { "password", "digest" };
 	private static final String[] sasl_mechs     = { "PLAIN", "DIGEST-MD5", "CRAM-MD5" };
@@ -231,17 +218,36 @@ public class AuthRepositoryImpl
 	}
 
 	@Override
-	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		String value = repo.getData(user, DISABLED_KEY);
-		return Boolean.parseBoolean(value);
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		String value = repo.getData(user, ACCOUNT_STATUS_KEY);
+		return value == null ? null : AccountStatus.valueOf(value);
 	}
-	
+
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		AccountStatus st = getAccountStatus(user);
+		if (st == null) {
+			String value = repo.getData(user, DISABLED_KEY);
+			return Boolean.parseBoolean(value);
+		} else {
+			return st == AccountStatus.disabled;
+		}
+	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus value) throws TigaseDBException {
+		if (value == null) {
+			repo.removeData(user, ACCOUNT_STATUS_KEY);
+		} else {
+			repo.setData(user, ACCOUNT_STATUS_KEY, value.name());
+		}
+	}
+
 	@Override
 	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
-		if (value == null || !value) {
-			repo.removeData(user, DISABLED_KEY);
-		} else {
-			repo.setData(user, DISABLED_KEY, String.valueOf(value));
+		AccountStatus status = getAccountStatus(user);
+		if (status == AccountStatus.active || status == AccountStatus.disabled) {
+			setAccountStatus(user, value ? AccountStatus.active : AccountStatus.disabled);
 		}
 	}
 	

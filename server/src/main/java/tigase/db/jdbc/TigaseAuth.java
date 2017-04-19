@@ -427,7 +427,17 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 					throws UserNotFoundException, TigaseDBException {
 		throw new TigaseDBException("Feature not supported");	
 	}
-	
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return AccountStatus.active;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	private boolean saslAuth(final Map<String, Object> props)

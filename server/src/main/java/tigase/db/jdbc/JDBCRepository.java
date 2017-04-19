@@ -1299,6 +1299,16 @@ public class JDBCRepository
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return auth.isUserDisabled(user);
 	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		auth.setAccountStatus(user, status);
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return auth.getAccountStatus(user);
+	}
 	
 	@Override
 	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {

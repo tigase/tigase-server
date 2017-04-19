@@ -154,3 +154,19 @@ READS SQL DATA
 DYNAMIC RESULT SETS 1
 EXTERNAL NAME 'tigase.db.derby.MsgBroadcastRepositoryStoredProcedures.getMessageRecipients';
 -- QUERY END:
+
+-- QUERY START:
+CREATE PROCEDURE TigUpdateAccountStatus("userId" VARCHAR(2049), "status" INT)
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+MODIFIES SQL DATA
+EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUpdateAccountStatus';
+-- QUERY END:
+
+--  QUERY START:
+CREATE PROCEDURE TigAccountStatus("userId" VARCHAR(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigAccountStatus';
+-- QUERY END:

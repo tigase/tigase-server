@@ -236,5 +236,15 @@ public class DummyRepository implements Repository, DataSource, DataSourcePool, 
 	@Override
 	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
 		throw new TigaseDBException("Feature not supported");
-	}		
+	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return AccountStatus.active;
+	}
 }

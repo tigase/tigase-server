@@ -272,3 +272,27 @@ end;
 $$ LANGUAGE 'plpgsql';
 -- QUERY END:
 
+-- QUERY START:
+CREATE OR REPLACE FUNCTION TigUpdateAccountStatus(_user_id VARCHAR(2049), _status INT)
+    RETURNS VOID
+AS $$
+BEGIN
+    UPDATE tig_users
+    SET account_status = _status
+    WHERE lower(user_id) = lower(_user_id);
+    RETURN;
+END;
+$$ LANGUAGE 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+CREATE OR REPLACE FUNCTION TigAccountStatus(_user_id VARCHAR(2049))
+    RETURNS TABLE(status INT)
+AS $$
+BEGIN
+    RETURN QUERY SELECT account_status
+                 FROM tig_users
+                 WHERE lower(user_id) = lower(_user_id);
+END;
+$$ LANGUAGE 'plpgsql';
+-- QUERY END:

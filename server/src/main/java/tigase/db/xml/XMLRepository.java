@@ -451,6 +451,16 @@ public class XMLRepository
 	}
 
 	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return AccountStatus.active;
+	}
+
+	@Override
 	public void setDataSource(XMLDataSource dataSource) {
 		String file = dataSource.getResourceUri();
 		if (file.contains("autoCreateUser=true")) {

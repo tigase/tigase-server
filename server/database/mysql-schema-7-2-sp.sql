@@ -215,6 +215,34 @@ end //
 
 delimiter ;
 
+-- ------------
+
+-- QUERY START:
+drop procedure if exists TigUpdateAccountStatus;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigAccountStatus;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+-- Set user account status
+create procedure TigUpdateAccountStatus(_user_id varchar(2049) CHARSET utf8, _status INT)
+    begin
+        update tig_users set account_status = _status where sha1_user_id = sha1(lower(_user_id));
+    end //
+-- QUERY END:
+
+-- QUERY START:
+-- Get user account status
+create procedure TigAccountStatus(_user_id varchar(2049) CHARSET utf8)
+    begin
+        select account_status from tig_users where sha1_user_id = sha1(lower(_user_id));
+    end //
+-- QUERY END:
+
+delimiter ;
 
 -- ------------ Broadcast Messages
 

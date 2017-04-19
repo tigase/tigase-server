@@ -34,7 +34,10 @@ import javax.security.auth.callback.*;
 import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -218,11 +221,17 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	public static final String DEF_USERS_DOMAIN_COUNT_KEY = "" + "users-domain-count-query";
 
 	public static final String DEF_LISTDISABLEDACCOUNTS_KEY= "users-list-disabled-accounts-query";
-	
+
+	@Deprecated
 	public static final String DEF_DISABLEACCOUNT_KEY = "user-disable-account-query";
-	
-	public static final String DEF_ENABLEACCOUNT_KEY = "user-enable-account-query";	
-	
+
+	@Deprecated
+	public static final String DEF_ENABLEACCOUNT_KEY = "user-enable-account-query";
+
+	public static final String DEF_UPDATEACCOUNTSTATUS_KEY = "user-update-account-status-query";
+
+	public static final String DEF_ACCOUNTSTATUS_KEY = "user-account-status-query";
+
 	/**
 	 * Comma separated list of NON-SASL authentication mechanisms. Possible
 	 * mechanisms are: <code>password</code> and <code>digest</code>.
@@ -275,10 +284,14 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			+ "select count(*) from tig_users where user_id like ?";
 
 	public static final String DEF_LISTDISABLEDACCOUNTS_QUERY = "{ call TigDisabledAccounts() }";
-	
-	public static final String DEF_DISABLEACCOUNT_QUERY = "{ call TigDisableAccount(?) }";
-	
-	public static final String DEF_ENABLEACCOUNT_QUERY = "{ call TigEnableAccount(?) }";
+
+	@Deprecated public static final String DEF_DISABLEACCOUNT_QUERY = "{ call TigDisableAccount(?) }";
+
+	@Deprecated public static final String DEF_ENABLEACCOUNT_QUERY = "{ call TigEnableAccount(?) }";
+
+	public static final String DEF_UPDATEACCOUNTSTATUS_QUERY = "{ call TigUpdateAccountStatus(?, ?) }";
+
+	public static final String DEF_ACCOUNTSTATUS_QUERY = "{ call TigAccountStatus(?) }";
 
 	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
 
@@ -302,8 +315,10 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	private String userlogin_query = DEF_USERLOGIN_QUERY;
 	private String userdomaincount_query = DEF_USERS_DOMAIN_COUNT_QUERY;
 	private String listdisabledaccounts_query = DEF_LISTDISABLEDACCOUNTS_QUERY;
-	private String disableaccount_query = DEF_DISABLEACCOUNT_QUERY;
-	private String enableaccount_query = DEF_ENABLEACCOUNT_QUERY;
+	@Deprecated private String disableaccount_query = DEF_DISABLEACCOUNT_QUERY;
+	@Deprecated private String enableaccount_query = DEF_ENABLEACCOUNT_QUERY;
+	private String accountstatus_query = DEF_ACCOUNTSTATUS_QUERY;
+	private String updateaccountstatus_query = DEF_UPDATEACCOUNTSTATUS_QUERY;
 	private String updatelastlogin_query = DEF_UPDATELOGINTIME_QUERY;
 
 
@@ -474,11 +489,40 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	}
 
 	@Override
-	public void initRepository(final String connection_str, Map<String, String> params)
-			throws DBInitException {
+	public AccountStatus getAccountStatus(final BareJID user) throws TigaseDBException {
+		if (accountstatus_query == null) {
+			return null;
+		}
 		try {
-			if (data_repo == null)
+			ResultSet rs = null;
+			PreparedStatement get_status = data_repo.getPreparedStatement(user, accountstatus_query);
+
+			synchronized (get_status) {
+				try {
+					get_status.setString(1, user.toString());
+					rs = get_status.executeQuery();
+
+					if (rs.next()) {
+						int v = rs.getInt(1);
+						return AccountStatus.byValue(v);
+					} else {
+						throw new UserNotFoundException("User does not exist: " + user);
+					}
+				} finally {
+					data_repo.release(null, rs);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem with retrieving account status.", e);
+		}
+	}
+
+	@Override
+	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
+		try {
+			if (data_repo == null) {
 				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			}
 			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
 
 			if (initdb_query != null) {
@@ -503,21 +547,19 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
 			}
 
-			updatepassword_query =
-					getParamWithDef(params, DEF_UPDATEPASSWORD_KEY, DEF_UPDATEPASSWORD_QUERY);
+			updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY, DEF_UPDATEPASSWORD_QUERY);
 
 			if ((updatepassword_query != null)) {
 				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
 			}
 
 			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
-			if (userlogin_query  != null) {
+			if (userlogin_query != null) {
 				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
 				userlogin_active = true;
 			}
 
-			userlogout_query =
-					getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_QUERY);
+			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_QUERY);
 
 			if ((userlogout_query != null)) {
 				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
@@ -528,41 +570,46 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 				data_repo.initPreparedStatement(updatelastlogin_query, updatelastlogin_query);
 			}
 
-			userscount_query =
-					getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
+			userscount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
 
 			if ((userscount_query != null)) {
 				data_repo.initPreparedStatement(userscount_query, userscount_query);
 			}
 
-			userdomaincount_query =
-					getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY,
-							DEF_USERS_DOMAIN_COUNT_QUERY);
+			userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY, DEF_USERS_DOMAIN_COUNT_QUERY);
 
 			if ((userdomaincount_query != null)) {
 				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);
 			}
-			
-			listdisabledaccounts_query = getParamWithDef(params, DEF_LISTDISABLEDACCOUNTS_KEY, 
-					DEF_LISTDISABLEDACCOUNTS_QUERY);
+
+			listdisabledaccounts_query = getParamWithDef(params, DEF_LISTDISABLEDACCOUNTS_KEY,
+														 DEF_LISTDISABLEDACCOUNTS_QUERY);
 			if (listdisabledaccounts_query != null) {
 				data_repo.initPreparedStatement(listdisabledaccounts_query, listdisabledaccounts_query);
 			}
 
-			disableaccount_query = getParamWithDef(params, DEF_DISABLEACCOUNT_KEY, 
-					DEF_DISABLEACCOUNT_QUERY);
+			disableaccount_query = getParamWithDef(params, DEF_DISABLEACCOUNT_KEY, DEF_DISABLEACCOUNT_QUERY);
 			if (disableaccount_query != null) {
 				data_repo.initPreparedStatement(disableaccount_query, disableaccount_query);
 			}
-			
-			enableaccount_query = getParamWithDef(params, DEF_ENABLEACCOUNT_KEY, 
-					DEF_ENABLEACCOUNT_QUERY);
+
+			enableaccount_query = getParamWithDef(params, DEF_ENABLEACCOUNT_KEY, DEF_ENABLEACCOUNT_QUERY);
 			if (enableaccount_query != null) {
 				data_repo.initPreparedStatement(enableaccount_query, enableaccount_query);
 			}
-			
-			nonsasl_mechs =
-					getParamWithDef(params, DEF_NONSASL_MECHS_KEY, DEF_NONSASL_MECHS).split(",");
+
+			updateaccountstatus_query = getParamWithDef(params, DEF_UPDATEACCOUNTSTATUS_KEY,
+														DEF_UPDATEACCOUNTSTATUS_QUERY);
+			if (updateaccountstatus_query != null) {
+				data_repo.initPreparedStatement(updateaccountstatus_query, updateaccountstatus_query);
+			}
+
+			accountstatus_query = getParamWithDef(params, DEF_ACCOUNTSTATUS_KEY, DEF_ACCOUNTSTATUS_QUERY);
+			if (accountstatus_query != null) {
+				data_repo.initPreparedStatement(accountstatus_query, accountstatus_query);
+			}
+
+			nonsasl_mechs = getParamWithDef(params, DEF_NONSASL_MECHS_KEY, DEF_NONSASL_MECHS).split(",");
 			sasl_mechs = getParamWithDef(params, DEF_SASL_MECHS_KEY, DEF_SASL_MECHS).split(",");
 
 			if ((params != null) && (params.get("init-db") != null)) {
@@ -571,30 +618,14 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		} catch (Exception e) {
 			data_repo = null;
 
-			throw new DBInitException(
-					"Problem initializing jdbc connection: " + connection_str, e);
+			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 	}
 
 	@Override
-	public void loggedIn(BareJID user) throws TigaseDBException {
-		if (updatelastlogin_query == null) {
-			return;
-		}
-
-		try {
-			PreparedStatement ps =
-					data_repo.getPreparedStatement(user, updatelastlogin_query);
-
-			if (ps != null) {
-				synchronized (ps) {
-					ps.setString(1, user.toString());
-					ps.execute();
-				}
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem accessing repository.", e);
-		}
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		AccountStatus s = getAccountStatus(user);
+		return s == AccountStatus.disabled;
 	}
 
 	@Override
@@ -783,48 +814,47 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		}
 	}
 
-		@Override
-	public boolean isUserDisabled(BareJID user) 
-					throws UserNotFoundException, TigaseDBException {
-		try {
-			ResultSet rs = null;
-			PreparedStatement list_disabledaccounts
-					= data_repo.getPreparedStatement(user, listdisabledaccounts_query);
+	@Override
+	public void loggedIn(BareJID user) throws TigaseDBException {
+		if (updatelastlogin_query == null) {
+			return;
+		}
 
-			synchronized (list_disabledaccounts) {
-				try {
-					rs = list_disabledaccounts.executeQuery();
-					while (rs.next()) {
-						String accountJid = rs.getString(1);
-						if (user.toString().equals(accountJid)) {
-							return true;
-						}
-					}
-				} finally {
-					data_repo.release(null, rs);
+		try {
+			PreparedStatement ps = data_repo.getPreparedStatement(user, updatelastlogin_query);
+
+			if (ps != null) {
+				synchronized (ps) {
+					ps.setString(1, user.toString());
+					ps.execute();
 				}
 			}
 		} catch (SQLException e) {
-			throw new TigaseDBException("Problem with checking if user account is disabled", e);
+			throw new TigaseDBException("Problem accessing repository.", e);
 		}
-		return false;
 	}
-	
+
 	@Override
-	public void setUserDisabled(BareJID user, Boolean value) 
-					throws UserNotFoundException, TigaseDBException {
+	public void setAccountStatus(BareJID user, AccountStatus value) throws TigaseDBException {
 		try {
-			String query = (value == null || !value)
-					? enableaccount_query : disableaccount_query;
-			PreparedStatement changeState = data_repo.getPreparedStatement(user, query);
-			
+			PreparedStatement changeState = data_repo.getPreparedStatement(user, updateaccountstatus_query);
 			synchronized (changeState) {
 				changeState.setString(1, user.toString());
+				changeState.setInt(2, value.getValue());
 				changeState.execute();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new TigaseDBException("Problem with changing user account state", e);
+		}
+	}
+
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException {
+		AccountStatus status = getAccountStatus(user);
+		if (status == AccountStatus.active || status == AccountStatus.disabled) {
+			setAccountStatus(user, value ? AccountStatus.active : AccountStatus.disabled);
 		}
 	}
 	// ~--- methods --------------------------------------------------------------

@@ -379,3 +379,41 @@ end
 -- QUERY END:
 GO
 
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUpdateAccountStatus')
+DROP PROCEDURE [dbo].[TigUpdateAccountStatus]
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Upate account status
+CREATE PROCEDURE [dbo].[TigUpdateAccountStatus]
+        @_user_id NVARCHAR(2049),
+        @_status  INT
+AS
+    BEGIN
+        UPDATE dbo.tig_users
+        SET account_status = @_status
+        WHERE user_id = @_user_id;
+    END
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigAccountStatus')
+    DROP PROCEDURE [dbo].[TigAccountStatus]
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Returns account_status
+CREATE PROCEDURE [dbo].[TigAccountStatus]
+        @_user_id NVARCHAR(2049)
+AS
+    BEGIN
+        SELECT account_status
+        FROM tig_users
+        WHERE user_id = @_user_id;
+    END
+-- QUERY END:
+GO
