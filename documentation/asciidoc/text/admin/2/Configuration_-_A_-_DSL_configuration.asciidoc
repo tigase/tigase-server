@@ -281,3 +281,20 @@ sess-man {
     strategy (class: tigase.server.cluster.strategy.OnlineUsersCachingStrategy) {}
 }
 ----
+
+== Default configuration
+Tigase XMPP Server is packaged with a basic init.properties file that tells the server to start up in setup mode.
+
+[source,properties]
+-----
+'config-type' = 'setup'
+
+http () {
+    setup () {
+        'admin-user' = 'admin'
+    'admin-password' = 'tigase'
+    }
+}
+-----
+
+This tells Tigase to operate in a setup mode, and tells the http component to allow login with the username and password admin/tigase.  With this you can enter the setup process that is covered in xref:webinstall[this section].
