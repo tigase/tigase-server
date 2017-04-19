@@ -326,8 +326,6 @@ class DBSchemaLoader extends SchemaLoader {
 					{
 						Matcher matcher = Pattern.compile( "-- LOAD FILE:\\s*(.*\\.sql)" ).matcher( line );
 						if ( matcher.find() ){
-							log.log(Level.FINE, "\n\n *** trying to load schema: {0} \n",
-							        new Object[]{matcher.group(1)});
 							results.addAll( loadSQLQueries(  matcher.group( 1 ), null, variables ) );
 						}
 					}
@@ -555,7 +553,7 @@ class DBSchemaLoader extends SchemaLoader {
 				}
 			}
 		} catch ( SQLException e ) {
-			log.log( Level.WARNING, "Exception, posibly schema hasn't been loaded yet.");
+			log.log( Level.WARNING, "Exception, possibly schema hasn't been loaded yet.");
 		}
 		if ( schema_ok ){
 			log.log( Level.INFO, "Schema OK, accounts number: " + users );
@@ -634,7 +632,7 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.INFO, " completed OK" );
 			return Result.ok;
 		} catch ( SQLException | IOException ex ) {
-			log.log( Level.WARNING, "Can't finalize: " + ex.getMessage() );
+			log.log( Level.SEVERE, "\n\n\n=====\nCan't finalize: " + ex.getMessage() + "\n=====\n\n" );
 			return Result.error;
 		}
 	}
@@ -720,7 +718,7 @@ class DBSchemaLoader extends SchemaLoader {
 
 		Object pwdObj = variables.getProperty( PARAMETERS.ADMIN_JID_PASS.getName() );
 		if ( pwdObj == null ){
-			log.log( Level.WARNING, "Error: No admin password enetered" );
+			log.log( Level.WARNING, "Error: No admin password entered" );
 			return Result.warning;
 		}
 		String pwd = pwdObj.toString();
@@ -795,7 +793,7 @@ class DBSchemaLoader extends SchemaLoader {
 			log.log( Level.INFO, " completed OK" );
 			return Result.ok;
 		} catch ( SQLException | IOException | NullPointerException ex ) {
-			log.log( Level.WARNING, "Can't finalize: " + ex.getMessage() );
+			log.log( Level.SEVERE, "\n\n\n=====\nCan't finalize: " + ex.getMessage() + "\n=====\n\n" );
 			return Result.error;
 		}
 	}
