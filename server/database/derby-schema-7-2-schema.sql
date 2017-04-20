@@ -85,3 +85,16 @@ call Tig_OfflineMessages_Migrate();
 -- QUERY START:
 drop procedure Tig_OfflineMessages_Migrate;
 -- QUERY END:
+
+-- QUERY START:
+create table tig_cluster_nodes (
+    hostname varchar(512) not null,
+	secondary varchar(512),
+    password varchar(255) not null,
+    last_update timestamp default current_timestamp,
+    port int,
+    cpu_usage double precision not null,
+    mem_usage double precision not null,
+    primary key (hostname)
+);
+-- QUERY END:
