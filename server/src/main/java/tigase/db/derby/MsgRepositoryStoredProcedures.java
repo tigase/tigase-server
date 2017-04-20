@@ -120,6 +120,26 @@ public class MsgRepositoryStoredProcedures {
 		}
 	}
 
+	public static void getMessages(String receiver, ResultSet[] data)
+			throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			String receiverSha1 = Algorithms.hexDigest(receiver.toString(), "", "SHA");
+			PreparedStatement stmt = conn.prepareStatement(
+					"select om.message, om.msg_id" + " from tig_offline_messages om" + " where om.receiver_sha1 = ?");
+			stmt.setString(1, receiverSha1);
+
+			data[0] = stmt.executeQuery();
+		} catch (NoSuchAlgorithmException e) {
+			throw new SQLException(e);
+		} finally {
+			conn.close();
+		}
+	}
+
 	public static void getMessagesByIds(String receiver, String msgId1, String msgId2, String msgId3, String msgId4, ResultSet[] data)
 			throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");

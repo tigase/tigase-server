@@ -39,6 +39,15 @@ EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.addMessage';
 -- QUERY END:
 
 -- QUERY START:
+CREATE procedure Tig_OfflineMessages_GetMessages("to" varchar(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+READS SQL DATA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.getMessages';
+-- QUERY END:
+
+-- QUERY START:
 CREATE procedure Tig_OfflineMessages_GetMessagesByIds("to" varchar(2049), "msg_id1" varchar(50), "_msg_id2" varchar(50), "_msg_id3" varchar(50), "_msg_id4" varchar(50))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
