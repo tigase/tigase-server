@@ -849,6 +849,10 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 	}
 
+	public String getDBUri(Properties props) {
+		return getDBUri(props, true, false);
+	}
+
 	/**
 	 * Helper method used to generate proper database URI depending on properties.
 	 *

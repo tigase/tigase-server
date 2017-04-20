@@ -36,6 +36,8 @@ public abstract class SchemaLoader {
 	public static SchemaLoader newInstance(Properties props) {
 		return new DBSchemaLoader(props);
 	}
+
+	public abstract String getDBUri(Properties props);
 	
 	/**
 	 * Method validates whether the connection can at least be established. If yes
