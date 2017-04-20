@@ -46,7 +46,7 @@ public class MsgRepositoryStoredProcedures {
 
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("select 1 from SYS.SYSTABLES where tablename = UPPER('msg_history') is not null");
+			ResultSet rs = stmt.executeQuery("select 1 from SYS.SYSTABLES where tablename = UPPER('msg_history')");
 			boolean hasTable = rs.next();
 			rs.close();
 
