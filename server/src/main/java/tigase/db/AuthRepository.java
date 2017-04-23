@@ -314,9 +314,11 @@ public interface AuthRepository extends Repository {
 
 	void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException;
 
+	@Deprecated
 	boolean isUserDisabled(BareJID user) 
 					throws UserNotFoundException, TigaseDBException;
-	
+
+	@Deprecated
 	void setUserDisabled(BareJID user, Boolean value) 
 					throws UserNotFoundException, TigaseDBException;
 	
