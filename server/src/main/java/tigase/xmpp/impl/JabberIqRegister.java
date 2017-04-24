@@ -90,12 +90,10 @@ public class JabberIqRegister
 	private CaptchaProvider captchaProvider;
 	@ConfigField(desc = "CAPTCHA Required")
 	private boolean captchaRequired = false;
-	@ConfigField(desc = "Email confirmation is required")
-	private boolean emailConfirmationRequired = false;
 	@Inject
 	private EventBus eventBus;
 	@Inject(nullAllowed = true)
-	private MailConfirmationTokenSender mailConfirmationTokenSender;
+	private AccountValidator[] validators = null;
 	@ConfigField(desc = "Maximum CAPTCHA repetition in session")
 	private int maxCaptchaRepetition = 3;
 	private String oauthConsumerKey;
@@ -149,20 +147,27 @@ public class JabberIqRegister
 	protected void createAccount(XMPPResourceConnection session, String user_name, VHostItem domain, String password,
 								 String email, Map<String, String> reg_params)
 			throws XMPPProcessorException, TigaseStringprepException, TigaseDBException {
-		if (emailConfirmationRequired && (email == null || email.isEmpty())) {
-			throw new XMPPProcessorException(Authorization.NOT_ACCEPTABLE, "Email address is required");
-		}
 
 		final BareJID jid = BareJID.bareJIDInstanceNS(user_name, domain.getVhost().getDomain());
+
+		if (validators != null) {
+			for (AccountValidator validator : validators) {
+				validator.checkRequiredParameters(jid, reg_params);
+			}
+		}
 
 		try {
 			session.getAuthRepository()
 					.addUser(BareJID.bareJIDInstance(user_name, domain.getVhost().getDomain()), password);
 
-			if (emailConfirmationRequired) {
-				session.getAuthRepository().setAccountStatus(jid, AuthRepository.AccountStatus.pending);
-				if (mailConfirmationTokenSender != null) {
-					mailConfirmationTokenSender.sendToken(jid, email, reg_params);
+
+			boolean confirmationRequired = false;
+			if (validators != null) {
+				for (AccountValidator validator : validators) {
+					confirmationRequired |= validator.sendAccountValidation(jid, reg_params);
+				}
+				if (confirmationRequired) {
+					session.getAuthRepository().setAccountStatus(jid, AuthRepository.AccountStatus.pending);
 				}
 			}
 
@@ -176,7 +181,7 @@ public class JabberIqRegister
 				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}",
 						new Object[]{BareJID.toString(user_name, domain.getVhost().getDomain()), password, reg_params});
 			}
-			eventBus.fire(new UserRegisteredEvent(jid, email, emailConfirmationRequired, reg_params));
+			eventBus.fire(new UserRegisteredEvent(jid, email, confirmationRequired, reg_params));
 		} catch (UserExistsException e) {
 			throw new XMPPProcessorException(Authorization.CONFLICT);
 		}
@@ -456,9 +461,6 @@ public class JabberIqRegister
 			}
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "failed to read current welcome message from user repository", ex);
-		}
-		if (emailConfirmationRequired && mailConfirmationTokenSender == null) {
-			log.warning("No Mail Confirmation Sender!!!");
 		}
 	}
 
@@ -740,12 +742,16 @@ public class JabberIqRegister
 		}
 	}
 
-	public interface MailConfirmationTokenSender {
+	public interface AccountValidator {
 
-		void sendToken(BareJID jid, String email, Map<String, String> reg_params);
+		void checkRequiredParameters(BareJID jid, Map<String,String> reg_params) throws XMPPProcessorException;
+
+		boolean sendAccountValidation(BareJID jid, Map<String,String> reg_params);
+
+		BareJID validateAccount(String token);
 
 	}
-
+	
 	/**
 	 * As in
 	 * http://commons.apache.org/proper/commons-net/jacoco/org.apache.commons
@@ -823,16 +829,16 @@ public class JabberIqRegister
 	public static class UserRegisteredEvent {
 
 		private String email;
-		private boolean emailConfirmationRequired;
+		private boolean confirmationRequired;
 		private Map<String, String> params;
 		private BareJID user;
 
-		public UserRegisteredEvent(BareJID user, String email, boolean emailConfirmationRequired,
+		public UserRegisteredEvent(BareJID user, String email, boolean confirmationRequired,
 								   Map<String, String> params) {
 			this.user = user;
 			this.email = email;
 			this.params = params;
-			this.emailConfirmationRequired = emailConfirmationRequired;
+			this.confirmationRequired = confirmationRequired;
 		}
 
 		public String getEmail() {
@@ -859,12 +865,12 @@ public class JabberIqRegister
 			this.user = user;
 		}
 
-		public boolean isEmailConfirmationRequired() {
-			return emailConfirmationRequired;
+		public boolean isConfirmationRequired() {
+			return confirmationRequired;
 		}
 
-		public void setEmailConfirmationRequired(boolean emailConfirmationRequired) {
-			this.emailConfirmationRequired = emailConfirmationRequired;
+		public void setConfirmationRequired(boolean confirmationRequired) {
+			this.confirmationRequired = confirmationRequired;
 		}
 	}
 
