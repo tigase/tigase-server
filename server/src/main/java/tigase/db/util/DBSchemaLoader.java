@@ -874,7 +874,7 @@ class DBSchemaLoader extends SchemaLoader {
 			PASSWORD = PARAMETERS.ROOT_PASSWORD.getName();
 		} else {
 			USERNAME = PARAMETERS.TIGASE_USERNAME.getName();
-			PASSWORD = PARAMETERS.TIGASE_USERNAME.getName();
+			PASSWORD = PARAMETERS.TIGASE_PASSWORD.getName();
 		}
 
 		switch ( database ) {
