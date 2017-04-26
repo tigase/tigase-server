@@ -100,6 +100,7 @@ class DBSchemaLoader extends SchemaLoader {
 		ROOT_PASSWORD("rootPass","root"),
 		LOG_LEVEL("logLevel","CONFIG"),
 		USE_SSL("useSSL","false"),
+		GET_URI("getURI","false"),
 		QUERY("query",null),
 		FILE("file",null),
 		ADMIN_JID("adminJID",null),
@@ -233,15 +234,27 @@ class DBSchemaLoader extends SchemaLoader {
 				"Password that will be used for the entered JID(s) - one for all configured administrators")
 				                 .secret()
 				                 .build());
+		parser.addOption(new CommandlineParameter.Builder(null, PARAMETERS.GET_URI.getName()).description(
+				"Generate database URI")
+				                 .requireArguments(false)
+				                 .defaultValue(PARAMETERS.GET_URI.getDefaultValue())
+				                 .build());
 		parser.addOption(new CommandlineParameter.Builder(null, PARAMETERS.IGNORE_MISSING_FILES.getName()).description(
 				"Force ignoring missing files errors")
 								 .defaultValue(PARAMETERS.IGNORE_MISSING_FILES.getDefaultValue())
 								 .build());
 
 		Properties properties = null;
+
 		if (null == args || args.length == 0 || (properties = parser.parseArgs(args)) == null) {
 			System.out.println(parser.getHelp());
 			System.exit(0);
+		} else if (parser.getOptionByName(PARAMETERS.GET_URI.getName()).isPresent() &&
+				parser.getOptionByName(PARAMETERS.GET_URI.getName()).get().getValue().isPresent() &&
+				Boolean.valueOf(parser.getOptionByName(PARAMETERS.GET_URI.getName()).get().getValue().get())) {
+			System.out.println(DBSchemaLoader.getDBUri(properties,true,false));
+			System.exit(0);
+
 		} else {
 			System.out.println("properties: " + properties);
 		}
