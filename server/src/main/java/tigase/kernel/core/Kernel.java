@@ -28,6 +28,7 @@ import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
 import tigase.sys.TigaseRuntime;
+import tigase.util.ExceptionUtilities;
 import tigase.util.ReflectionHelper;
 
 import java.lang.reflect.*;
@@ -769,7 +770,9 @@ public class Kernel {
 					injectDependencies(bean, dep, new HashSet<BeanConfig>(), 0, false);
 				}
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName());
+				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName() + ExceptionUtilities
+						.getExceptionRootCause(e, true));
+
 				log.log(Level.CONFIG, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName(), e);
 				try {
 					Object i = depbc.getKernel().beanInstances.remove(depbc);
