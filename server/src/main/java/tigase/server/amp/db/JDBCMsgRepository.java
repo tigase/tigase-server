@@ -26,6 +26,7 @@ package tigase.server.amp.db;
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
+import tigase.util.ExceptionUtilities;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
@@ -94,7 +95,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 			data_repo.initPreparedStatement(MSGS_GET_EXPIRED_MESSAGES, MSGS_GET_EXPIRED_MESSAGES);
 			data_repo.initPreparedStatement(MSGS_GET_EXPIRED_MESSAGES_BEFORE, MSGS_GET_EXPIRED_MESSAGES_BEFORE);
 		} catch (SQLException ex) {
-			log.log(Level.WARNING, "MsgRepository not initialized due to exception", ex);
+			log.log(Level.WARNING, "MsgRepository not initialized due to exception", ExceptionUtilities.getExceptionRootCause(ex,true));
 			throw new RuntimeException("Could not initialize JDBCMsgRepository instance for " + data_repo.getResourceUri(), ex);
 		}
 
