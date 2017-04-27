@@ -29,6 +29,7 @@ import tigase.conf.ConfiguratorAbstract;
 import tigase.conf.LoggingBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
@@ -102,6 +103,8 @@ public class Bootstrap implements Lifecycle {
 
 		kernel.registerBean("logging").asClass(LoggingBean.class).setActive(true).setPinned(true).exec();
 		kernel.getInstance("logging");
+
+		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
 
 		// if null then we register global subbeans
 		configurator.registerBeans(null, null, config.getProperties());

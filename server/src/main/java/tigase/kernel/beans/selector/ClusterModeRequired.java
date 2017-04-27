@@ -1,8 +1,8 @@
 /*
- * BeanSelector.java
+ * ClusterModeRequired.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,26 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
+ *
  */
-package tigase.kernel.beans;
+package tigase.kernel.beans.selector;
 
-import tigase.kernel.core.Kernel;
+import java.lang.annotation.*;
 
 /**
- * Interface used by bean configurators to detect is additional beans should be registered
- *
- * Created by andrzej on 10.03.2016.
+ * Marks bean as it required cluster mode value to be equal to value of active property.
  */
-public interface BeanSelector {
+@Target({ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface ClusterModeRequired {
 
-	/**
-	 * Method needs to return true if bean in which annotation class implementing this interface is specified
-	 * and this bean should be registered
-	 *
-	 * @param clazz
-	 * @param kernel
-	 * @return
-	 */
-	boolean shouldRegister(Class clazz, Kernel kernel);
-	
+	boolean active();
+
 }

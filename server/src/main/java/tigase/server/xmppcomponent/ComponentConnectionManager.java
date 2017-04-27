@@ -24,19 +24,14 @@ package tigase.server.xmppcomponent;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
+import tigase.kernel.core.Kernel;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
@@ -44,11 +39,12 @@ import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.*;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -60,6 +56,8 @@ import tigase.xmpp.XMPPIOService;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "ext-comp", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.ComponentMode})
 public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<Object>>
 		implements XMPPService {
 

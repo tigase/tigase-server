@@ -29,7 +29,9 @@ package tigase.cluster;
 import tigase.cluster.api.*;
 import tigase.conf.Configurable;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
@@ -57,7 +59,9 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "cluster-contr", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class}, active = true, exportable = true)
+@Bean(name = "cluster-contr", parent = Kernel.class, active = true, exportable = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ClusterModeRequired(active = true)
 public class ClusterController
 				extends AbstractComponentRegistrator<ClusteredComponentIfc>
 				implements Configurable, ClusterControllerIfc {

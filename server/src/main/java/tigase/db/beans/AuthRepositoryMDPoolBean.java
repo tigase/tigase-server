@@ -24,6 +24,8 @@ package tigase.db.beans;
 import tigase.db.AuthRepository;
 import tigase.db.AuthRepositoryMDImpl;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.BasicComponent;
 import tigase.stats.StatisticsCollector;
@@ -33,6 +35,8 @@ import tigase.stats.StatisticsList;
  * Created by andrzej on 08.03.2016.
  */
 @Bean(name="authRepository", parent = Kernel.class, exportable = true, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
 
 	@Override

@@ -28,9 +28,11 @@ package tigase.server.amp;
 
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
@@ -54,7 +56,9 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="amp", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="amp", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ClusterModeRequired(active = false)
 public class AmpComponent
 				extends AbstractMessageReceiver
 				implements ActionResultsHandlerIfc, RegistrarBean {

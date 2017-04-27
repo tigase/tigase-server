@@ -29,7 +29,9 @@ package tigase.cluster;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.eventbus.EventListener;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.ServiceChecker;
 import tigase.server.bosh.BoshConnectionManager;
@@ -46,7 +48,9 @@ import java.util.logging.Logger;
  *
  * @author andrzej
  */
-@Bean(name="bosh", parent=Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name="bosh", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
+@ClusterModeRequired(active = true)
 public class BoshConnectionClustered
 				extends BoshConnectionManager
 				implements ClusteredComponentIfc {

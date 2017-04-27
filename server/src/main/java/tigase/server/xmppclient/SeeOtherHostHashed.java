@@ -26,7 +26,7 @@ package tigase.server.xmppclient;
 
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
@@ -48,7 +48,8 @@ import java.util.logging.Logger;
  *
  * @author Wojtek
  */
-@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true)
+@ClusterModeRequired(active = true)
 public class SeeOtherHostHashed extends SeeOtherHost {
 
 //	protected List<BareJID> defaultHost = null;

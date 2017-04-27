@@ -27,8 +27,10 @@ package tigase.server.bosh;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.Command;
 import tigase.server.Iq;
@@ -59,7 +61,9 @@ import static tigase.server.bosh.Constants.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="bosh", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="bosh", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
+@ClusterModeRequired(active = false)
 public class BoshConnectionManager
 				extends ClientConnectionManager
 				implements BoshSessionTaskHandler {

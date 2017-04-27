@@ -40,9 +40,11 @@ import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
@@ -53,10 +55,7 @@ import tigase.server.ServiceChecker;
 import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
-import tigase.util.Algorithms;
-import tigase.util.ReflectionHelper;
-import tigase.util.TigaseStringprepException;
-import tigase.util.TimeUtils;
+import tigase.util.*;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -86,7 +85,9 @@ import java.util.zip.Deflater;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "cl-comp", parent = Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "cl-comp", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ClusterModeRequired(active = true)
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
 				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {

@@ -34,6 +34,6 @@ public @interface Bean {
 
 	Class[] parents() default {};
 
-	Class<? extends BeanSelector>[] selectors() default { BeanSelector.DefaultMode.class };
+	Class<? extends BeanSelector>[] selectors() default { };
 
 }

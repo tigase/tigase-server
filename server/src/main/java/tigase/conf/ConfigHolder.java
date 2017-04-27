@@ -201,6 +201,25 @@ public class ConfigHolder {
 			Map<String, Map<String,String>> dataSources = new HashMap<>();
 
 			props.forEach((k,v) -> {
+				if (k.equals("config-type")) {
+					switch ((String) v) {
+						case "--gen-config-all":
+						case "--gen-config-default":
+							toAdd.put(k, "default");
+							break;
+						case "--gen-config-sm":
+							toAdd.put(k, "session-manager");
+							break;
+						case "--gen-config-cs":
+							toAdd.put(k, "connection-managers");
+							break;
+						case "--gen-config-comp":
+							toAdd.put(k, "component");
+							break;
+						default:
+							break;
+					}
+				}
 				if (k.startsWith("--comp-name")) {
 					String suffix = k.replace("--comp-name-", "");
 					String name = ((String) v).trim();

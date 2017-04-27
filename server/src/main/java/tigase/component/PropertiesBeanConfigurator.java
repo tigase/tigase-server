@@ -23,7 +23,6 @@ package tigase.component;
 
 import tigase.kernel.BeanUtils;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
@@ -34,7 +33,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true, selectors = { BeanSelector.Always.class })
+@Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true)
 public class PropertiesBeanConfigurator
 		extends AbstractBeanConfigurator {
 

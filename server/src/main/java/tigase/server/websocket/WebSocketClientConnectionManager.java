@@ -27,8 +27,10 @@ package tigase.server.websocket;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.net.SocketType;
 import tigase.server.xmppclient.XMPPIOProcessor;
@@ -45,7 +47,9 @@ import java.util.List;
  *
  * @author andrzej
  */
-@Bean(name="ws2s", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="ws2s", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
+@ClusterModeRequired(active = false)
 public class WebSocketClientConnectionManager
 				extends tigase.server.xmppclient.ClientConnectionManager {
 	

@@ -85,7 +85,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 							if (!property.contains("/")
 									&& !(value instanceof BeanDefinition)
 									&& kernel.getDependencyManager().getBeanConfig(property) == null
-									&& (!(bean instanceof RegistrarBean) || ((Kernel) kernel.getInstance(beanConfig.getBeanName() + "#KERNEL")).getDependencyManager().getBeanConfig(property) == null)) {
+									&& (!(bean instanceof RegistrarBean) || (kernel.getDependencyManager().getBeanConfig(beanConfig.getBeanName() + "#KERNEL") != null && ((Kernel) kernel.getInstance(beanConfig.getBeanName() + "#KERNEL")).getDependencyManager().getBeanConfig(property) == null))) {
 								log.config(
 										"Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName() + "'. Ignoring!");
 							}
@@ -516,18 +516,27 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		}
 
 		Class<? extends BeanSelector>[] selectors = annotation.selectors();
-		if (selectors.length == 0)
-			return annotation;
-
-		for (Class<? extends BeanSelector> selectorCls : selectors) {
-			try {
-				BeanSelector selector = selectorCls.newInstance();
-				if (!selector.shouldRegister(kernel))
-					return null;
-			} catch (InstantiationException | IllegalAccessException e) {
-				log.log(Level.SEVERE, "could not instantiate BeanSelector " + selectorCls.getCanonicalName() +
-						" for " + cls.getCanonicalName(), e);
+		if (selectors.length > 0) {
+			for (Class<? extends BeanSelector> selectorCls : selectors) {
+				try {
+					BeanSelector selector = selectorCls.newInstance();
+					if (!selector.shouldRegister(cls, kernel)) return null;
+				} catch (InstantiationException | IllegalAccessException e) {
+					log.log(Level.SEVERE,
+							"could not instantiate BeanSelector " + selectorCls.getCanonicalName() + " for " + cls.getCanonicalName(), e);
+				}
 			}
+		}
+
+		try {
+			BeanSelector selector = kernel.getInstance(BeanSelector.class);
+			if (selector != null) {
+				if (!selector.shouldRegister(cls, kernel)) {
+					return null;
+				}
+			}
+		} catch (KernelException ex) {
+			log.log(Level.FINEST, "Could not find implementation of bean selector, skipping bean selection...");
 		}
 		return annotation;
 	}

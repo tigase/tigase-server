@@ -24,6 +24,8 @@ package tigase.db.beans;
 import tigase.db.UserRepository;
 import tigase.db.UserRepositoryMDImpl;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.BasicComponent;
 import tigase.stats.StatisticsCollector;
@@ -33,6 +35,8 @@ import tigase.stats.StatisticsList;
  * Created by andrzej on 07.03.2016.
  */
 @Bean(name="userRepository", parent = Kernel.class, exportable = true, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
 
 	@Override

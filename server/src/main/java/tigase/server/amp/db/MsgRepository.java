@@ -25,6 +25,8 @@ import tigase.db.*;
 import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.BasicComponent;
@@ -262,6 +264,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	 * Bean used to provide MsgRepository implementations
 	 */
 	@Bean(name = "msgRepository", parent = Kernel.class, active = true, exportable = true)
+	@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 	public static class MsgRepositoryMDBean extends MDRepositoryBeanWithStatistics<MsgRepositoryIfc>
 			implements MsgRepositoryIfc {
 

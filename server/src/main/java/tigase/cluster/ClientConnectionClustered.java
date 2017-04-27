@@ -29,7 +29,9 @@ package tigase.cluster;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.eventbus.EventListener;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
@@ -53,7 +55,9 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "c2s", parent = Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "c2s", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
+@ClusterModeRequired(active = true)
 public class ClientConnectionClustered
 				extends ClientConnectionManager
 				implements ClusteredComponentIfc {

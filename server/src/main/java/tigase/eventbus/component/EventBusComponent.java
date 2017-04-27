@@ -32,6 +32,8 @@ import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.component.stores.Affiliation;
 import tigase.eventbus.component.stores.AffiliationStore;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.JID;
@@ -40,6 +42,8 @@ import javax.script.ScriptEngineManager;
 import java.util.logging.Level;
 
 @Bean(name = "eventbus", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 public class EventBusComponent extends AbstractKernelBasedComponent implements ClusteredComponentIfc {
 
 	public EventBusComponent() {

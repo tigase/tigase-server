@@ -30,6 +30,8 @@ import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -56,6 +58,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name="s2s", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 public class S2SConnectionManager
 				extends ConnectionManager<S2SIOService>
 				implements S2SConnectionHandlerIfc<S2SIOService> {

@@ -39,10 +39,12 @@ import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.server.script.CommandIfc;
@@ -83,7 +85,9 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="sess-man", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="sess-man", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
+@ClusterModeRequired(active = false)
 public class SessionManager
 		extends AbstractMessageReceiver
 		implements Configurable, SessionManagerHandler, OnlineJidsReporter, RegistrarBean {

@@ -28,7 +28,8 @@ package tigase.server;
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.kernel.KernelException;
-import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
+import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.BeanConfig;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtil;
@@ -140,7 +141,7 @@ public final class XMPPServer {
 			bootstrap.init(args);
 			bootstrap.start();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
-			if (new BeanSelector.SetupMode().shouldRegister(bootstrap.getKernel())) {
+			if (ServerBeanSelector.getConfigType(bootstrap.getKernel()) == ConfigTypeEnum.SetupMode) {
 				System.out.println("== " + sdf.format(new Date()) +
 										   " Please setup server at http://localhost:8080/\n");
 			} else {

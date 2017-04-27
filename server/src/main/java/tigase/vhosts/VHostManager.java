@@ -36,6 +36,8 @@ import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
@@ -64,6 +66,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "vhost-man", parent = Kernel.class, active = true, exportable = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode})
 public class VHostManager
 				extends AbstractComponentRegistrator<VHostListener>
 				implements VHostManagerIfc, StatisticsContainer, RegistrarBean {

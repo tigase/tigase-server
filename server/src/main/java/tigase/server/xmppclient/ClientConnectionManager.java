@@ -31,15 +31,18 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.net.SocketType;
 import tigase.server.*;
 import tigase.util.Base64;
-import tigase.util.*;
+import tigase.util.RoutingsContainer;
+import tigase.util.TigaseStringprepException;
 import tigase.util.TimerTask;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
@@ -61,7 +64,9 @@ import java.util.zip.Deflater;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="c2s", parent=Kernel.class, active = true, selectors = {BeanSelector.NonClusterMode.class})
+@Bean(name="c2s", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
+@ClusterModeRequired(active = false)
 public class ClientConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>> {
 	/**

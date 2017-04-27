@@ -35,9 +35,11 @@ import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.RouteEvent;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
@@ -64,7 +66,9 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Bean(name = "sess-man", parent = Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "sess-man", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
+@ClusterModeRequired(active = true)
 public class SessionManagerClustered
 				extends SessionManager
 				implements ClusteredComponentIfc, SessionManagerClusteredIfc {

@@ -31,7 +31,6 @@ import tigase.conf.ConfiguratorAbstract;
 import tigase.conf.MonitoringBeanIfc;
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
@@ -67,7 +66,7 @@ import static tigase.server.MessageRouterConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="message-router", parent=Kernel.class, active = true, selectors = { BeanSelector.Always.class })
+@Bean(name="message-router", parent=Kernel.class, active = true)
 public class MessageRouter
 				extends AbstractMessageReceiver
 				implements MessageRouterIfc {

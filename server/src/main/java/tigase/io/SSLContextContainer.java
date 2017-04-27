@@ -27,7 +27,6 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
@@ -48,7 +47,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true, selectors = {BeanSelector.Always.class})
+@Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true)
 public class SSLContextContainer extends SSLContextContainerAbstract {
 
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());

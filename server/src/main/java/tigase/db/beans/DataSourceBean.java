@@ -28,9 +28,14 @@ import tigase.db.DataSourcePool;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.BasicComponent;
-import tigase.stats.*;
+import tigase.stats.ComponentStatisticsProvider;
+import tigase.stats.StatisticsCollector;
+import tigase.stats.StatisticsList;
+import tigase.stats.StatisticsProviderIfc;
 
 import java.util.Collections;
 import java.util.Map;
@@ -44,6 +49,8 @@ import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
  * Created by andrzej on 09.03.2016.
  */
 @Bean(name="dataSource", parent = Kernel.class, active = true, exportable = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBean> implements
 																				   ComponentStatisticsProvider {
 

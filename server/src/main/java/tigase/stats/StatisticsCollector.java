@@ -33,6 +33,8 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.sys.ShutdownHook;
@@ -61,6 +63,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "stats", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 public class StatisticsCollector
 				extends AbstractComponentRegistrator<StatisticsContainer>
 				implements ShutdownHook, RegistrarBean {

@@ -24,8 +24,10 @@ package tigase.cluster;
 
 import tigase.cluster.api.*;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.selector.ClusterModeRequired;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -46,7 +48,9 @@ import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
  *
  * @author andrzej
  */
-@Bean(name="amp", parent=Kernel.class, active = true, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name="amp", parent=Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ClusterModeRequired(active = true)
 public class AmpComponentClustered extends AmpComponent implements ClusteredComponentIfc {
 
 	private static final Logger log = Logger.getLogger(AmpComponentClustered.class.getCanonicalName());
