@@ -107,29 +107,6 @@
 					</dependencies>
 					<executions>
 						<execution>
-							<id>generate-webhelp</id>
-							<goals>
-								<goal>generate-webhelp</goal>
-							</goals>
-							<configuration>
-								<targetDirectory>${guide_path}/webhelp/</targetDirectory>
-								<!--<imgSrcPath>../html/</imgSrcPath>-->
-								<ignoreImageScaling>true</ignoreImageScaling>
-								<postProcess>
-									<copy todir="${guide_path}/webhelp/css">
-										<fileset dir="css"></fileset>
-									</copy>
-									<copy todir="${guide_path}/webhelp/images">
-										<fileset dir="images"></fileset>
-									</copy>
-									<copy todir="${guide_path}/webhelp/files">
-										<fileset dir="files"></fileset>
-									</copy>
-								</postProcess>
-
-							</configuration>
-						</execution>
-						<execution>
 							<id>generate-pdf</id>
 							<goals>
 								<goal>generate-pdf</goal>
