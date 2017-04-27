@@ -3,9 +3,9 @@
 	<properties>
 		<packaging.type>pom</packaging.type>
 		<!--<guide_path>${project.build.directory}/docs/User_Guide</guide_path>-->
-        <guide_path>${myproject.basedir}/distribution-docs/User_Guide</guide_path>
+        <guide_path>${myproject.basedir}/distribution-docs/Administration_Guide</guide_path>
 		<guide_filename>index</guide_filename>
-		<guide_name>User</guide_name>
+		<guide_name>Administration</guide_name>
         <skip-distribution-deploy>true</skip-distribution-deploy>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
@@ -20,7 +20,7 @@
 		<artifactId>tigase-server-asciidoc</artifactId>
 		<version>7.2.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<modules>
 		<module>devguide</module>
 	</modules>
@@ -279,7 +279,7 @@
 									<outputDirectory>text/components/http-api</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
-								
+
                                 <artifactItem>
                                     <groupId>tigase</groupId>
                                     <artifactId>tigase-muc</artifactId>
@@ -289,7 +289,7 @@
                                     <outputDirectory>text/components/muc</outputDirectory>
                                     <includes>**/*.asciidoc,**/*.css</includes>
                                 </artifactItem>
-								
+
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-pubsub</artifactId>
@@ -299,7 +299,7 @@
 									<outputDirectory>text/components/pubsub</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
-								
+
 		                        <artifactItem>
                                     <groupId>tigase</groupId>
                                     <artifactId>tigase-message-archiving</artifactId>
@@ -309,7 +309,7 @@
                                     <outputDirectory>text/components/tigase-message-archiving</outputDirectory>
                                     <includes>**/*.asciidoc,**/*.css</includes>
                                 </artifactItem>
-								
+
 								<artifactItem>
                                     <groupId>tigase</groupId>
                                     <artifactId>tigase-unified-archive</artifactId>
@@ -379,7 +379,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.6</version>
@@ -406,9 +406,9 @@
 				</executions>
 			</plugin>
 		</plugins>
-		
+
 	</build>
-	
+
 	<!-- Documentation Dependencies -->
 	<dependencies>
 		<dependency>
@@ -427,9 +427,9 @@
 			<version>1.3.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	
-	
-	
+
+
+
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -445,4 +445,3 @@
 		</pluginRepository>
 	</pluginRepositories>
 </project>
-
