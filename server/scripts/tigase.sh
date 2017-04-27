@@ -155,7 +155,7 @@ case "${1}" in
       exit 1
     fi
 
-    echo "STARTED Tigase `date`" >> ${TIGASE_CONSOLE_LOG}
+    echo -e "==========\nSTARTED Tigase `date` using:\n    ${0} ${1} ${2} ${3}\n==========" >> ${TIGASE_CONSOLE_LOG}
 
     nohup sh -c "exec $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1" >/dev/null &
     echo $! > $TIGASE_PID
