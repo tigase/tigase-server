@@ -361,10 +361,6 @@
 					</execution>
 					<execution>
 						<phase>generate-resources</phase>
-						<id>generate-webhelp</id>
-					</execution>
-					<execution>
-						<phase>generate-resources</phase>
 						<id>generate-epub3</id>
 					</execution>
 				</executions>
