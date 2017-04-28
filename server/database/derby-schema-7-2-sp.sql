@@ -163,7 +163,7 @@ MODIFIES SQL DATA
 EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUpdateAccountStatus';
 -- QUERY END:
 
---  QUERY START:
+-- QUERY START:
 CREATE PROCEDURE TigAccountStatus("userId" VARCHAR(2049))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
