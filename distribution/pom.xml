@@ -139,7 +139,7 @@
                         <configuration>
                             <outputDirectory>../server/jars</outputDirectory>
                             <stripVersion>true</stripVersion>
-                            <excludeTransitive>true</excludeTransitive>
+                            <excludeTransitive>false</excludeTransitive>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <overWriteReleases>true></overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
@@ -314,9 +314,10 @@
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
-			<artifactId>tigase-extras</artifactId>
+			<artifactId>tigase-extras-all</artifactId>
 			<version>1.2.0-SNAPSHOT</version>
 			<scope>runtime</scope>
+            <type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
