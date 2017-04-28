@@ -1023,11 +1023,17 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 
 		public static TigaseDBTask[] getSchemaTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, LOAD_SCHEMA_FILE, SHUTDOWN_DATABASE, PRINT_INFO_TASK };
+			return new TigaseDBTask[]{
+					VALIDATE_CONNECTION,
+					VALIDATE_DB_EXISTS,
+					LOAD_SCHEMA_FILE,
+					POST_INSTALLATION,
+					SHUTDOWN_DATABASE,
+					PRINT_INFO_TASK};
 		}
 
 		public static TigaseDBTask[] getQueryTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE };
+			return new TigaseDBTask[] {VALIDATE_CONNECTION, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE};
 		}
 	}
 
