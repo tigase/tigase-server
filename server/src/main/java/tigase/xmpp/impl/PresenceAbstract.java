@@ -28,6 +28,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.TigaseDBException;
 
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 
 import tigase.xmpp.*;
@@ -84,6 +85,10 @@ public abstract class PresenceAbstract
 
 	/** Field description */
 	protected RosterAbstract roster_util           = getRosterUtil();
+
+	// This is required to make sure that dynamic roster will get initialized
+	@Inject(nullAllowed = true)
+	private DynamicRoster dynamicRoster;
 
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all

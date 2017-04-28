@@ -21,15 +21,17 @@
 package tigase.conf;
 
 import org.junit.Test;
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.CmdAcl;
+import tigase.xmpp.impl.roster.DynamicRosterTest;
+import tigase.xmpp.impl.roster.DynamicRosterTest123;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by andrzej on 27.04.2017.
@@ -79,6 +81,35 @@ public class ConfigHolderTest {
 				});
 			});
 		});
+	}
+
+	@Test
+	public void testConversionOfDynamicRosterClasses() throws IOException {
+		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
+		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(
+				new String[]{"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest,tigase.xmpp.impl.roster.DynamicRosterTest123"}));
+
+		reader.convertFromOldFormat();
+
+		Map<String, Object> result = ConfigWriter.buildTree(props);
+		Map<String, Object> sessMan = (Map<String, Object>) result.get("sess-man");
+		assertNotNull(sessMan);
+		AbstractBeanConfigurator.BeanDefinition dynamicRoster = (AbstractBeanConfigurator.BeanDefinition) sessMan.get("dynamic-rosters");
+		assertNotNull(dynamicRoster);
+		assertTrue(dynamicRoster.isActive());
+		assertNull(dynamicRoster.getClazzName());
+
+		assertFalse(dynamicRoster.isEmpty());
+
+		AbstractBeanConfigurator.BeanDefinition roster = (AbstractBeanConfigurator.BeanDefinition) dynamicRoster.get("DynamicRosterTest");
+		assertNotNull(roster);
+		assertTrue(roster.isActive());
+		assertEquals(DynamicRosterTest.class.getCanonicalName(), roster.getClazzName());
+
+		roster = (AbstractBeanConfigurator.BeanDefinition) dynamicRoster.get("DynamicRosterTest123");
+		assertNotNull(roster);
+		assertTrue(roster.isActive());
+		assertEquals(DynamicRosterTest123.class.getCanonicalName(), roster.getClazzName());
 	}
 
 }

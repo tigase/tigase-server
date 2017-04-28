@@ -30,6 +30,7 @@ import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -140,6 +141,10 @@ public class Presence
 	private long             usersStatusChanges    = 0;
 	private static final List<ExtendedPresenceProcessorIfc> extendedPresenceProcessors = new ArrayList<>();
 
+	// This is required to make sure that dynamic roster will get initialized
+	@Inject(nullAllowed = true)
+	private DynamicRoster dynamicRoster;
+	
 	// ~--- methods --------------------------------------------------------------
 
 	/**

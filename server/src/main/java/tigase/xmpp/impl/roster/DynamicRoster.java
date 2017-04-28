@@ -26,19 +26,22 @@ package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.core.Kernel;
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class DynamicRoster here.
@@ -49,15 +52,18 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class DynamicRoster {
-	private static final String DYNAMIC_ROSTERS         = "dynamic-rosters";
-	private static final String DYNAMIC_ROSTERS_CLASSES = "dynamic-roster-classes";
-
+@Bean(name = "dynamic-rosters", parent = SessionManager.class, active = false)
+public class DynamicRoster implements RegistrarBean
+{
 	/**
 	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRoster");
 
+	@Inject(nullAllowed = true)
+	private DynamicRosterIfc[] dynamicRosters;
+
+	private static DynamicRoster instance;
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -111,49 +117,7 @@ public abstract class DynamicRoster {
 			}
 		}
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param settings
-	 */
-	public static void init_settings(final Map<String, Object> settings) {
-		DynamicRosterIfc[] dynr = (DynamicRosterIfc[]) settings.get(DYNAMIC_ROSTERS);
-
-		if (dynr == null) {
-			log.finer("Initializing dynamic rosters...");
-
-			String dynclss = (String) settings.get(DYNAMIC_ROSTERS_CLASSES);
-
-			if (dynclss != null) {
-				String[]                    dyncls = dynclss.split(",");
-				ArrayList<DynamicRosterIfc> al     = new ArrayList<DynamicRosterIfc>(50);
-
-				for (String cls : dyncls) {
-					try {
-						DynamicRosterIfc dri = (DynamicRosterIfc) Class.forName(cls).newInstance();
-
-						if (settings.get(cls + ".init") != null) {
-							dri.init((String) settings.get(cls + ".init"));
-						} else {
-							dri.init(settings);
-						}
-						al.add(dri);
-						log.log(Level.INFO, "Initialized dynamic roster: {0}", cls);
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Problem initializing dynmic roster class: {0}, {1}",
-								new Object[] { cls,
-								e });
-					}
-				}
-				if (al.size() > 0) {
-					settings.put(DYNAMIC_ROSTERS, al.toArray(new DynamicRosterIfc[al.size()]));
-				}
-			}
-		}
-	}
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -270,24 +234,8 @@ public abstract class DynamicRoster {
 	 *
 	 * @return a value of <code>DynamicRosterIfc[]</code>
 	 */
-	public static DynamicRosterIfc[] getDynamicRosters(final Map<String, Object> settings) {
-		DynamicRosterIfc[] dynr = null;
-
-		if (settings != null) {
-			synchronized (settings) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Initializing settings.");
-				}
-				init_settings(settings);
-			}
-			dynr = (DynamicRosterIfc[]) settings.get(DYNAMIC_ROSTERS);
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Settings parameter is NULL");
-			}
-		}
-
-		return dynr;
+	public static DynamicRosterIfc[] getDynamicRosters(Map<String, Object> settings) {
+		return instance == null ? null : instance.dynamicRosters;
 	}
 
 	/**
@@ -379,6 +327,16 @@ public abstract class DynamicRoster {
 				dri.setItemExtraData(item);
 			}
 		}
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+		
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 }
 

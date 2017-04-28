@@ -272,8 +272,18 @@ public class ConfigHolder {
 					toAdd.put(k.replace("http/port/", "httpServer/connections/"), v);
 				}
 				if (k.startsWith("sess-man/plugins-conf/")) {
-					toRemove.add(k);
-					toAdd.put(k.replace("/plugins-conf/", "/"), v);
+					if (k.equals("sess-man/plugins-conf/dynamic-roster-classes")) {
+						toAdd.put("sess-man/dynamic-rosters/active", "true");
+						for (String clazzName : v.toString().split(",")) {
+							String[] parts = clazzName.split("\\.");
+							toAdd.put("sess-man/dynamic-rosters/" + parts[parts.length - 1] + "/active", "true");
+							toAdd.put("sess-man/dynamic-rosters/" + parts[parts.length - 1] + "/class", clazzName);
+						}
+						toRemove.add(k);
+					} else {
+						toRemove.add(k);
+						toAdd.put(k.replace("/plugins-conf/", "/"), v);
+					}
 				}
 				if (k.startsWith("stats/stats-archiv/")) {
 					toRemove.add(k);

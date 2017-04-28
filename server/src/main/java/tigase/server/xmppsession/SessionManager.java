@@ -172,6 +172,8 @@ public class SessionManager
 			long[]>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
 			new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
+	// This is not used any more as plugins settings are passed by annotation and configuration injection
+	@Deprecated
 	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
 			Map<String, Object>>(20);
 	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
