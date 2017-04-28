@@ -29,10 +29,7 @@ import tigase.util.DataTypes;
 import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,6 +90,10 @@ public class ConfigHolder {
 						new Object[]{initPropsFile, initPropsFileOld});
 
 				break;
+		}
+		try (Writer w = new StringWriter()) {
+			new ConfigWriter().resolveVariables().write(w, props);
+			log.log(Level.CONFIG, "Loaded configuration:\n" + w.toString());
 		}
 	}
 

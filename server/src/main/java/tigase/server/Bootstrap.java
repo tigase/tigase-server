@@ -63,7 +63,6 @@ public class Bootstrap implements Lifecycle {
 	}
 
 	public void init(String[] args) throws ConfigReader.ConfigException, IOException {
-
 		config.loadConfiguration(args);
 		configureLogManager();
 	}
