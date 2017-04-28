@@ -156,13 +156,9 @@ public class BindResource
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 							"You must bind the resource first: " +
 							"http://www.xmpp.org/rfcs/rfc3920.html#bind", true));
-					if (log.isLoggable(Level.INFO)) {
-						log.log(Level.INFO, "Session details: connectionId={0}, sessionId={1}",
-								new Object[] { session.getConnectionId(),
-								session.getSessionId() });
-					}
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Session more detais: JID={0}", session.getjid());
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Session details: JID={0}, connectionId={1}, sessionId={2}",
+						        new Object[]{session.getjid(), session.getConnectionId(), session.getSessionId()});
 					}
 
 					return true;
