@@ -57,14 +57,10 @@ public class ClConConfigRepository
 		implements ShutdownHook, Initializable, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
-
-	public static final String AUTORELOAD_INTERVAL_PROP_KEY = "repo-autoreload-interval";
-	public static final String AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY = "repo-auto-remove-obsolete-items";
-	public static final long AUTORELOAD_INTERVAL_PROP_VAL = 15;
-
+	
 	//~--- fields ---------------------------------------------------------------
 
-	@ConfigField(desc = "Automatically remove obsolote items")
+	@ConfigField(desc = "Automatically remove obsolote items", alias = "repo-auto-remove-obsolete-items")
 	protected boolean auto_remove_obsolete_items = true;
 	protected long lastReloadTime = 0;
 	protected long lastReloadTimeFactor = 10;
@@ -73,7 +69,7 @@ public class ClConConfigRepository
 	private EventBus eventBus;
 
 	public ClConConfigRepository() {
-		autoReloadInterval = AUTORELOAD_INTERVAL_PROP_VAL;
+		autoReloadInterval = 15;
 
 		if (getItem(DNSResolverFactory.getInstance().getDefaultHost()) == null) {
 			ClusterRepoItem item = getItemInstance();
@@ -208,47 +204,7 @@ public class ClConConfigRepository
 					 || ( oldItem.getPortNo() != newItem.getPortNo() )
 					 || !Objects.equals( oldItem.getSecondaryHostname(), newItem.getSecondaryHostname() );
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-
-
-	@Deprecated
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-		super.getDefaults(defs, params);
-		defs.put(AUTORELOAD_INTERVAL_PROP_KEY, AUTORELOAD_INTERVAL_PROP_VAL);
-		defs.put(AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY, true);
-
-		String[] items_arr = (String[]) defs.get(getConfigKey());
-
-		for (String it : items_arr) {
-			ClusterRepoItem item = getItemInstance();
-
-			item.initFromPropertyString(it);
-			addItem(item);
-		}
-		if (getItem(DNSResolverFactory.getInstance().getDefaultHost()) == null) {
-			ClusterRepoItem item = getItemInstance();
-
-			item.initFromPropertyString(DNSResolverFactory.getInstance().getDefaultHost());
-			addItem(item);
-		}
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	@Deprecated
-	@Override
-	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
-		Long autoreload_interval = (Long) props.get(AUTORELOAD_INTERVAL_PROP_KEY);
-		auto_remove_obsolete_items = (boolean) props.get(AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY);
-
-		setAutoReloadInterval(autoreload_interval);
-		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
-	}
-
+	
 	@Override
 	public String shutdown() {
 		String host = DNSResolverFactory.getInstance().getDefaultHost();

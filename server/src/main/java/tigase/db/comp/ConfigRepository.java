@@ -49,7 +49,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	@ConfigField(desc = "Automatic items load interval")
+	@ConfigField(desc = "Automatic items load interval", alias = "repo-autoreload-interval")
 	protected long autoReloadInterval = 0;
 	@ConfigField(desc = "Items in repository")
 	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>( String.CASE_INSENSITIVE_ORDER );

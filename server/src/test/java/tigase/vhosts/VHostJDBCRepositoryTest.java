@@ -18,15 +18,9 @@
  */
 package tigase.vhosts;
 
-import tigase.util.TigaseStringprepException;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import static tigase.vhosts.VHostJDBCRepository.*;
+import tigase.util.TigaseStringprepException;
 
 public class VHostJDBCRepositoryTest extends TestCase {
 
@@ -35,10 +29,7 @@ public class VHostJDBCRepositoryTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		Map<String, Object> properties = new HashMap<>();
-		properties.put( DOMAINS_PER_USER_LIMIT_PROP_KEY, DOMAINS_PER_USER_LIMIT_PROP_VAL );
 		vHostJDBCRepository = new VHostJDBCRepository();
-		vHostJDBCRepository.setProperties(properties);
 	}
 
 	@Test

@@ -26,25 +26,21 @@ package tigase.db.comp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
-
 import tigase.kernel.beans.Inject;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-
 import tigase.xmpp.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
-
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Oct 3, 2009 3:55:27 PM
@@ -78,32 +74,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 *
 	 */
 	public abstract BareJID getRepoUser();
-
-	@Deprecated
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-
-		// Something to initialize database with, in case it is empty
-		// Otherwise the server would not work at all with empty Items database
-		super.getDefaults(defs, params);
-
-		// Do not create defaults for this, let it to use the shared repo pool as
-		// a default one. Only if the user sets settings manually it means he wants
-		// a different from the shared default.
-//  // Now the real items data storage:
-//  String repo_class = DERBY_REPO_CLASS_PROP_VAL;
-//  String repo_uri = DERBY_REPO_URL_PROP_VAL;
-//
-//  if (params.get(GEN_USER_DB) != null) {
-//    repo_class = (String) params.get(GEN_USER_DB);
-//  }
-//
-//  if (params.get(GEN_USER_DB_URI) != null) {
-//    repo_uri = (String) params.get(GEN_USER_DB_URI);
-//  }
-//  defs.put(REPO_CLASS_PROP_KEY, repo_class);
-//  defs.put(REPO_URI_PROP_KEY, repo_uri);
-	}
 
 	/**
 	 * Method description
@@ -163,62 +133,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 */
-	@Deprecated
-	@Override
-	public void setProperties(Map<String, Object> properties) {
-
-		// Let's load items from configuration first. Later we can overwrite
-		// them with items settings in the database.
-		super.setProperties(properties);
-
-		String repo_class = (String) properties.get(REPO_CLASS_PROP_KEY);
-		String repo_uri   = (String) properties.get(REPO_URI_PROP_KEY);
-
-		if (repo_uri != null) {
-			log.log(Level.INFO,
-							"Initializing custom component repository: {0}, db connection: {1}",
-							new Object[] { repo_class,
-														 repo_uri });
-			try {
-				repo = RepositoryFactory.getUserRepository(repo_class, repo_uri, null);
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can't initialize Items repository", e);
-				repo = null;
-			}
-		}
-		if (repo == null) {
-			repo = (UserRepository) properties.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
-			log.config("Using shared repository instance.");
-		}
-		if (repo != null) {
-
-			// If this is the first run of the Items manager the database might not
-			// be properly initialized yet....
-			try {
-				if (!repo.userExists(getRepoUser())) {
-					repo.addUser(getRepoUser());
-				}
-				repo.addUser(getRepoUser());
-			} catch (UserExistsException e) {
-
-				// This is expected when the Items repository has been already running on
-				// this databaseso and can be ignored.
-			} catch (Exception e) {
-
-				// This is not expected so let's signal an error:
-				log.log(Level.SEVERE,
-								"Problem with adding '" + getRepoUser() + "' user to the database", e);
-			}
-			reload();
-		}
-	}
 
 	public void setRepo(UserRepository userRepository) {
 		this.repo = userRepository;

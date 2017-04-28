@@ -772,7 +772,7 @@ public class Kernel {
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName() + ExceptionUtilities
 						.getExceptionRootCause(e, true));
-
+				                                                                                                                                                                                             	
 				log.log(Level.CONFIG, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName(), e);
 				try {
 					Object i = depbc.getKernel().beanInstances.remove(depbc);
