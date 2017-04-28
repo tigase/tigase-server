@@ -24,26 +24,18 @@ package tigase.server.script;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.server.*;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import tigase.server.BasicComponent;
-import tigase.server.CmdAcl;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -86,13 +78,13 @@ public class AddScriptCommand extends AbstractScriptCommand {
 
 		adminCommands.put(as.getCommandId(), as);
 
-		Map<String, EnumSet<CmdAcl>> commandsACL = (Map<String,
-			EnumSet<CmdAcl>>) binds.get(COMMANDS_ACL);
-		EnumSet<CmdAcl> acl = commandsACL.get(as.getCommandId());
+		Map<String, Set<CmdAcl>> commandsACL = (Map<String,
+			Set<CmdAcl>>) binds.get(COMMANDS_ACL);
+		Set<CmdAcl> acl = commandsACL.get(as.getCommandId());
 
 		if (acl != null) {
 			for (CmdAcl cmdAcl : acl) {
-				if (cmdAcl != CmdAcl.ADMIN) {
+				if (cmdAcl.getType() != CmdAcl.Type.ADMIN) {
 					as.setAdminOnly(false);
 
 					break;

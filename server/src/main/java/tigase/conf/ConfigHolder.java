@@ -40,6 +40,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static tigase.conf.Configurable.GEN_SM_PLUGINS;
@@ -169,7 +171,7 @@ public class ConfigHolder {
 			return props;
 		}
 
-		private void loadFromPropertyStrings(List<String> settings) {
+		protected Map<String, Object> loadFromPropertyStrings(List<String> settings) {
 			for (String propString : settings) {
 				int idx_eq = propString.indexOf('=');
 
@@ -190,15 +192,18 @@ public class ConfigHolder {
 
 				props.put(key, val);
 			}
+			return props;
 		}
 
-		private void convertFromOldFormat() {
+		protected void convertFromOldFormat() {
 			// converting old component configuration to new one
 			Map<String, Object> toAdd = new HashMap<>();
 			List<String> toRemove = new ArrayList<>();
 
 			//List<String> dataSourceNames = new ArrayList<>();
 			Map<String, Map<String,String>> dataSources = new HashMap<>();
+
+			Pattern commandsPattern = Pattern.compile("^([^\\/]+)\\/command\\/(.+)$");
 
 			props.forEach((k,v) -> {
 				if (k.equals("config-type")) {
@@ -273,6 +278,24 @@ public class ConfigHolder {
 				if (k.startsWith("stats/stats-archiv/")) {
 					toRemove.add(k);
 					toAdd.put(k.replace("stats/stats-archiv/", "stats/"), v);
+				}
+				if (k.contains("/command/")) {
+					Matcher m = commandsPattern.matcher(k);
+					if (m.matches()) {
+						String cmp = m.group(1);
+						String cmdId = m.group(2).replace("\\:", ":");
+						Map<String, Object> acls = (Map<String, Object>) toAdd.computeIfAbsent(cmp + "/commands",
+																							   (k1) -> new HashMap<>());
+						List<String> values = Arrays.stream(v.toString().split(",")).map(x -> {
+							int idx = x.indexOf(':');
+							if (idx > 0) {
+								return x.substring(idx + 1);
+							}
+							return x;
+						}).collect(Collectors.toList());
+						acls.put(cmdId, values.size() > 1 ? values : values.get(0));
+						toRemove.add(k);
+					}
 				}
 			});
 

@@ -64,6 +64,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,8 +109,7 @@ public class BasicComponent
 			CommandIfc>(20);
 	private boolean                      nonAdminCommands = false;
 	@ConfigField(alias = "commands", desc = "Commands ACL")
-	private ConcurrentHashMap<String, EnumSet<CmdAcl>> commandsACL = new ConcurrentHashMap<String,
-			EnumSet<CmdAcl>>(20);
+	private ConcurrentHashMap<String, CopyOnWriteArraySet<CmdAcl>> commandsACL = new ConcurrentHashMap<>(20);
 
 	@ConfigField(desc = "List of admins JIDs", alias = "admins")
 	protected ConcurrentSkipListSet<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
@@ -169,7 +169,7 @@ public class BasicComponent
 			return true;
 		}
 
-		EnumSet<CmdAcl> acl = commandsACL.get(ALL_PROP_KEY);
+		Set<CmdAcl> acl = commandsACL.get(ALL_PROP_KEY);
 
 		if (acl != null) {
 			result = checkCommandAcl(jid, acl);
@@ -195,9 +195,9 @@ public class BasicComponent
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
-	public boolean checkCommandAcl(JID jid, EnumSet<CmdAcl> acl) {
+	public boolean checkCommandAcl(JID jid, Set<CmdAcl> acl) {
 		for (CmdAcl cmdAcl : acl) {
-			switch (cmdAcl) {
+			switch (cmdAcl.getType()) {
 			case ALL :
 				return true;
 
@@ -215,17 +215,19 @@ public class BasicComponent
 
 				break;
 
+			case NONE:
+				return false;
+
 			case DOMAIN :
-				if (jid.getDomain().equals(cmdAcl.getAclVal())) {
+				if (cmdAcl.isDomainAllowed(jid.getDomain())) {
 					return true;
 				}
 
 				break;
 
 			case JID :
-			case OTHER :
 			default :
-				if (jid.getBareJID().toString().equals(cmdAcl.getAclVal())) {
+				if (cmdAcl.isJIDAllowed(jid.getBareJID())) {
 					return true;
 				}
 			}
@@ -926,14 +928,13 @@ public class BasicComponent
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 	}
 
-	public void setCommandsACL(ConcurrentHashMap<String,EnumSet<CmdAcl>> commandsACL) {
+	public void setCommandsACL(ConcurrentHashMap<String,CopyOnWriteArraySet<CmdAcl>> commandsACL) {
 		this.commandsACL = commandsACL;
-		boolean nonAdmin = false;
-		EnumSet<CmdAcl> adminOnlyAcl = EnumSet.of(CmdAcl.ADMIN);
-		for (EnumSet<CmdAcl> acl : commandsACL.values()) {
-			nonAdmin |= !acl.equals(adminOnlyAcl);
-		}
-		this.nonAdminCommands = nonAdmin;
+		this.nonAdminCommands = commandsACL.entrySet()
+				.stream()
+				.filter(e -> (!e.getValue().contains(CmdAcl.ADMIN)) || e.getValue().size() > 1)
+				.findAny()
+				.isPresent();
 	}
 
 	public void setScriptsBaseDir(String scriptsBaseDir) {

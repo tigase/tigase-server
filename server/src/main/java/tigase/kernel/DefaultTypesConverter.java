@@ -24,6 +24,7 @@ package tigase.kernel;
 import tigase.conf.ConfigReader;
 import tigase.kernel.beans.Bean;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.server.CmdAcl;
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.XMLUtils;
@@ -134,6 +135,8 @@ public class DefaultTypesConverter
 				return expectedType.cast(JID.jidInstance(value.toString().trim()));
 			} else if (expectedType.equals(BareJID.class)) {
 				return expectedType.cast(BareJID.bareJIDInstance(value.toString().trim()));
+			} else if (expectedType.equals(CmdAcl.class)) {
+				return expectedType.cast(new CmdAcl(value.toString().trim()));
 			} else if (expectedType.equals(String.class)) {
 				return expectedType.cast(String.valueOf(value.toString().trim()));
 			} else if (expectedType.equals(Long.class)) {
@@ -274,7 +277,7 @@ public class DefaultTypesConverter
 						Map result = (Map) expectedType.newInstance();
 						for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
 							Object k = convert(unescape(e.getKey()), actualTypes[0]);
-							Object v = e.getValue() instanceof String ? convert(unescape((String) e.getValue()), actualTypes[1]) : e.getValue();
+							Object v = e.getValue() instanceof String ? convert(unescape((String) e.getValue()), actualTypes[1]) : convert(e.getValue(), actualTypes[1]);
 							result.put(k, v);
 						}
 						return (T) result;

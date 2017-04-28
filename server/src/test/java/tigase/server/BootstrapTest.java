@@ -11,13 +11,14 @@ import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppsession.SessionManager;
 
 import java.lang.reflect.Field;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by andrzej on 07.03.2016.
@@ -67,19 +68,27 @@ public class BootstrapTest {
 		assertNotNull(authRepository);
 		assertNotNull(authRepository.getRepo("default"));
 
+		assertCommandACL(kernel, "ala-ma-kota", new CmdAcl("LOCAL"));
+		assertCommandACL(kernel, "ala-ma-kota1", new CmdAcl("test.com"));
+		assertCommandACL(kernel, "ala-ma-kota2", new CmdAcl("ala@test.com"));
+
+		return bootstrap;
+	}
+
+	private void assertCommandACL(Kernel kernel, String cmdId, CmdAcl expectedAcl) {
 		try {
 			SessionManager sm = kernel.getInstance(SessionManager.class);
 			Field commandsAcl = BasicComponent.class.getDeclaredField("commandsACL");
 			commandsAcl.setAccessible(true);
-			Map<String,EnumSet<CmdAcl>> val = (Map<String, EnumSet<CmdAcl>>) commandsAcl.get(sm);
+			Map<String,Set<CmdAcl>> val = (Map<String, Set<CmdAcl>>) commandsAcl.get(sm);
 			log.log(Level.FINE, "ACL = " + val);
-			EnumSet<CmdAcl> acl = val.get("ala-ma-kota");
+			Set<CmdAcl> acl = val.get(cmdId);
+			assertTrue(acl.stream().filter(a -> a.equals(expectedAcl)).findAny().isPresent());
 			log.log(Level.FINE, "" + acl.getClass() + ", " + acl);
+			System.out.print("cmd " + cmdId + " = " + acl + ", expected = " + expectedAcl);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
-		return bootstrap;
 	}
 
 	public Map<String, Object> getProps() {
@@ -87,7 +96,9 @@ public class BootstrapTest {
 
 		//props.put("userRepository/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
 		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
-		props.put("sess-man/commands/ala-ma-kota", "DOMAIN");
+		props.put("sess-man/commands/ala-ma-kota", "LOCAL");
+		props.put("sess-man/commands/ala-ma-kota1", "test.com");
+		props.put("sess-man/commands/ala-ma-kota2", "ala@test.com");
 		props.put("c2s/incoming-filters", "tigase.server.filters.PacketCounter,tigase.server.filters.PacketCounter");
 
 		return props;
