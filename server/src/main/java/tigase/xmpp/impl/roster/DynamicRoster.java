@@ -26,9 +26,7 @@ package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.*;
 import tigase.kernel.core.Kernel;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
@@ -53,8 +51,8 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "dynamic-rosters", parent = SessionManager.class, active = false)
-public class DynamicRoster implements RegistrarBean
-{
+public class DynamicRoster
+		implements RegistrarBean, Initializable, UnregisterAware {
 	/**
 	 * Private logger for class instances.
 	 */
@@ -337,6 +335,18 @@ public class DynamicRoster implements RegistrarBean
 	@Override
 	public void unregister(Kernel kernel) {
 
+	}
+
+	@Override
+	public void beforeUnregister() {
+		if (instance == this) {
+			instance = null;
+		}
+	}
+
+	@Override
+	public void initialize() {
+		instance = this;
 	}
 }
 
