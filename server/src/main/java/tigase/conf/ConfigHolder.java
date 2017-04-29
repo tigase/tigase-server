@@ -147,6 +147,10 @@ public class ConfigHolder {
 		format = Format.properties;
 	}
 
+	public Path getConfigFilePath() {
+		return initPropertiesPath;
+	}
+
 	private void loadFromDSLFiles() throws IOException, ConfigReader.ConfigException {
 		Map<String, Object> loaded = new ConfigReader().read(initPropertiesPath.toFile());
 		props.putAll(loaded);

@@ -20,6 +20,7 @@
  */
 package tigase.component;
 
+import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.*;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 	private static final Logger log = Logger.getLogger(DSLBeanConfigurator.class.getCanonicalName());
+	private ConfigHolder configHolder;
 
 	private Map<String, Object> props;
 
@@ -155,6 +157,15 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 	public void setProperties(Map<String, Object> props) {
 		this.props = props;
+	}
+
+	public ConfigHolder getConfigHolder() {
+		return configHolder;
+	}
+
+	public void setConfigHolder(ConfigHolder config) {
+		this.configHolder = config;
+		setProperties(config.getProperties());
 	}
 
 	public void dumpConfiguration(File f) throws IOException {

@@ -26,20 +26,16 @@ Get configuration file
 
 AS:Description: Get configuration file
 AS:CommandId: get-config-file
-AS:Component: basic-conf
+AS:Component: message-router
 */
 
 package tigase.admin
 
-import java.io.File;
+import tigase.component.DSLBeanConfigurator
+import tigase.kernel.core.Kernel
+import tigase.server.Command
+import tigase.server.Packet
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
-import tigase.conf.*
-import tigase.io.*
-
-def repo = (ComponentRepository)comp_repo
 def p = (Packet)packet
 def admins = (Set)adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
@@ -63,9 +59,7 @@ else {
 	def filepath = []
 	switch (cfgfile) {
 		case "init.properties":
-			if (initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY) != null ) {
-				filepath = initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY).tokenize(',');
-			}
+			filepath = [((Kernel) kernel).getInstance(DSLBeanConfigurator).getConfigHolder().getConfigFilePath().toString()];
 			break;
 
 		case "tigase.conf":

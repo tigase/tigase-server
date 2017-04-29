@@ -97,7 +97,7 @@ public class Bootstrap implements Lifecycle {
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
-		configurator.setProperties(config.getProperties());
+		configurator.setConfigHolder(config);
 		ModulesManagerImpl.getInstance().setBeanConfigurator(configurator);
 
 		kernel.registerBean("logging").asClass(LoggingBean.class).setActive(true).setPinned(true).exec();

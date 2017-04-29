@@ -44,6 +44,7 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
+import javax.script.Bindings;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
@@ -102,6 +103,9 @@ public class MessageRouter
 	private Map<JID, ServerComponent>         components_byId = new ConcurrentHashMap<>();
 	private Map<String, ServerComponent>      components      = new ConcurrentHashMap<>();
 
+	@Inject(bean = "kernel")
+	private Kernel kernel;
+	
 	@Inject
 	private Set<ServerComponent> componentsAll;
 
@@ -268,6 +272,12 @@ public class MessageRouter
 		super.initialize();
 		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im",
 				false);
+	}
+
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put("kernel", kernel);
 	}
 
 	@Override

@@ -26,20 +26,14 @@ Get any file
 
 AS:Description: Get any file
 AS:CommandId: get-any-file
-AS:Component: basic-conf
+AS:Component: message-router
 */
 
 package tigase.admin
 
-import java.io.File;
+import tigase.server.Command
+import tigase.server.Packet
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
-import tigase.conf.*
-import tigase.io.*
-
-def repo = (ComponentRepository)comp_repo
 def p = (Packet)packet
 def admins = (Set)adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
