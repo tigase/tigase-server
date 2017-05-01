@@ -27,8 +27,10 @@ import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.conf.LoggingBean;
+import tigase.db.beans.DataSourceBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.KernelException;
 import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
@@ -113,6 +115,11 @@ public class Bootstrap implements Lifecycle {
 
 		log.log(Level.CONFIG, dg.getDependencyGraph());
 
+		// this is called to make sure that data sources are properly initialized
+		DataSourceBean dataSource = kernel.getInstance(DataSourceBean.class);
+		if (dataSource == null || dataSource.getDataSourceNames().isEmpty()) {
+			throw new KernelException("Failed to initialize data sources!");
+		}
 		MessageRouter mr = kernel.getInstance("message-router");
 		mr.start();
 

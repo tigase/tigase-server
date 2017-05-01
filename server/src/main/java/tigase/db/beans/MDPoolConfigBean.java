@@ -34,7 +34,10 @@ import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.db.beans.MDPoolBean.*;
 
@@ -68,6 +71,8 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 
 	@ConfigField(alias = POOL_CLASS, desc = "Class implementing repository pool", allowAliasFromParent = false)
 	protected String poolCls;
+
+	private boolean skipInitializationErrors = false;
 
 	protected abstract Class<? extends A> getRepositoryIfc();
 	protected abstract String getRepositoryPoolClassName() throws DBInitException;
@@ -114,7 +119,7 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 			}
 			kernel.finishDependecyDelayedInjection(queue);
 			unloadOldBeans();
-		} catch (DBInitException|ClassNotFoundException ex) {
+		} catch (DBInitException|ClassNotFoundException|InstantiationException|InvocationTargetException|IllegalAccessException ex) {
 			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for name '" + name + "'", ex);
 		}
 	}
@@ -166,7 +171,21 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 			try {
 				initRepository(repo);
 			} catch (DBInitException ex) {
-				throw new RuntimeException("Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name + "'", ex);
+				if (skipInitializationErrors) {
+					// maybe we should not ignore this error but delay initialization and await successful database initialization?
+					// or maybe we should unload this bean totally as it is not working as it should?
+					// Two things to consider:
+					// * initialization during bootstrap
+					// * initialization during reconfiguration of server
+					Logger.getLogger(this.getClass().getCanonicalName())
+							.log(Level.WARNING,
+								 "Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name +
+										 "'", ex);
+				} else {
+					throw new RuntimeException(
+							"Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name + "'",
+							ex);
+				}
 			}
 
 			if (repository instanceof RepositoryPool && !(repo instanceof RepositoryPool)) {
@@ -183,16 +202,22 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 
 	public void setRepository(A repo) {
 		this.repository = repo;
-		if (instances != null) {
-			for (A instance : instances) {
-				if (repository instanceof RepositoryPool && !(instance instanceof RepositoryPool)) {
-					((RepositoryPool<A>) repository).addRepo(instance);
+		if (repo != null) {
+			if (instances != null) {
+				for (A instance : instances) {
+					if (repository instanceof RepositoryPool && !(instance instanceof RepositoryPool)) {
+						((RepositoryPool<A>) repository).addRepo(instance);
+					}
 				}
 			}
 		}
 
 		if (mdPool != null) {
-			mdPool.addRepo(name, repo);
+			if (repo != null) {
+				mdPool.addRepo(name, repo);
+			} else {
+				mdPool.removeRepo(name);
+			}
 			if ("default".equals(name)) {
 				mdPool.setDefault(repo);
 			}

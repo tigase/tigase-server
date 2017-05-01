@@ -578,7 +578,7 @@ public class Kernel {
 				if (beanToInject == null) {
 					try {
 						initBean(b, createdBeansConfig, deep + 1);
-					} catch (KernelException ex) {
+					} catch (InvocationTargetException|KernelException|InstantiationException ex) {
 						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean");
 						log.log(Level.CONFIG, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean", ex);
 						Object i = b.getKernel().beanInstances.remove(b);
@@ -592,7 +592,7 @@ public class Kernel {
 						continue;
 					}
 					beanToInject = b.getKernel().getInstance(b);
-				}
+ 				}
 				if (beanToInject == null) // && dep.getType() != null && (Collection.class.isAssignableFrom(dep.getType()) || dep.getType().isArray()))
 					continue;
 				// it may happen that we create link in parent kernel to bean in subkernel and both are marked
@@ -749,6 +749,25 @@ public class Kernel {
 		}
 	}
 
+	void injectDependency(Dependency dep)
+			throws IllegalAccessException, InstantiationException, InvocationTargetException {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[{0}] Injecting dependency, dep: {1}",
+					new Object[] {getName(), dep});
+		}
+
+		BeanConfig depbc = dep.getBeanConfig();
+		if (depbc.getState() == State.initialized || depbc.getState() == State.instanceCreated) {
+			Object bean = depbc.getKernel().getInstance(depbc);
+			if (bean == null) {
+				log.log(Level.FINEST, "skipping injection of dependencies to " + dep + " as there is no bean instance");
+				return;
+			}
+
+			injectDependencies(bean, dep, new HashSet<BeanConfig>(), 0, false);
+		}
+	}
+
 	void injectDependencies(Collection<Dependency> dps) {
 
 		if (log.isLoggable(Level.CONFIG)) {
@@ -760,15 +779,7 @@ public class Kernel {
 			BeanConfig depbc = dep.getBeanConfig();
 
 			try {
-				if (depbc.getState() == State.initialized || depbc.getState() == State.instanceCreated) {
-					Object bean = depbc.getKernel().getInstance(depbc);
-					if (bean == null) {
-						log.log(Level.FINEST, "skipping injection of dependencies to " + dep + " as there is no bean instance");
-						continue;
-					}
-
-					injectDependencies(bean, dep, new HashSet<BeanConfig>(), 0, false);
-				}
+				injectDependency(dep);
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() + ")" + " unloading bean " + depbc.getBeanName() + ExceptionUtilities
 						.getExceptionRootCause(e, true));
@@ -1001,7 +1012,8 @@ public class Kernel {
 		return null;
 	}
 
-	public void finishDependecyDelayedInjection(DelayedDependencyInjectionQueue queue) {
+	public void finishDependecyDelayedInjection(DelayedDependencyInjectionQueue queue)
+			throws IllegalAccessException, InstantiationException, InvocationTargetException {
 		if (log.isLoggable(Level.CONFIG)) {
 			log.log(Level.CONFIG, "[{0}] Finishing injecting dependencies, queue: {1}",
 			        new Object[] {getName(), queue});
@@ -1312,9 +1324,13 @@ public class Kernel {
 	}
 
 	public class DelayedDependencyInjectionQueue {
-		private final Queue<DelayedDependenciesInjection> queue = new ArrayDeque<>();
+		private final ArrayDeque<DelayedDependenciesInjection> queue = new ArrayDeque<>();
 
 		public boolean offer(DelayedDependenciesInjection item) {
+			DelayedDependenciesInjection last = queue.peekLast();
+			if (last != null && last.equals(item)) {
+				return true;
+			}
 			return queue.offer(item);
 		}
 
@@ -1343,8 +1359,22 @@ public class Kernel {
 			this.dependencies = deps;
 		}
 
-		public void inject() {
-			Kernel.this.injectDependencies(dependencies);
+		public void inject() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+			for (Dependency dep : dependencies) {
+				Kernel.this.injectDependency(dep);
+			}
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof DelayedDependenciesInjection) {
+				DelayedDependenciesInjection o = (DelayedDependenciesInjection) obj;
+				if (o.dependencies.size() != dependencies.size()) {
+					return false;
+				}
+				return o.dependencies.containsAll(dependencies) && dependencies.containsAll(o.dependencies);
+			}
+			return super.equals(obj);
 		}
 	}
 }
