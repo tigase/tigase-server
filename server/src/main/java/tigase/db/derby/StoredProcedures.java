@@ -28,6 +28,46 @@ public class StoredProcedures {
 
 	//~--- methods --------------------------------------------------------------
 
+	private static String encodePassword(String encMethod, String userId, String userPw) {
+		if ((encMethod != null) && "MD5-PASSWORD".equals(encMethod)) {
+			return md5(userPw);
+		} else if ((encMethod != null) && "MD5-USERID-PASSWORD".equals(encMethod)) {
+			return md5(userId + userPw);
+		} else if ((encMethod != null) && "MD5-USERNAME-PASSWORD".equals(encMethod)) {
+			return md5(userId.substring(0, userId.indexOf("@")) + userPw);
+		} else {
+			return userPw;
+		}
+
+	}
+
+	private static String md5(String data) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			if (data != null) {
+				md.update(data.getBytes(UTF8));
+			}
+
+			byte[] digest = md.digest();
+
+			return Algorithms.bytesToHex(digest);
+		} catch (Exception e) {
+			throw new RuntimeException("Error on encoding password", e);
+		}
+	}
+
+	public static void tigAccountStatus(final String user, ResultSet[] data) throws SQLException {
+		try (Connection conn = DriverManager.getConnection("jdbc:default:connection")) {
+			conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+			PreparedStatement ps = conn.prepareStatement(
+					"SELECT account_status FROM tig_users WHERE lower(user_id) = ?");
+			ps.setString(1, user);
+			data[0] = ps.executeQuery();
+			throw new SQLException("User " + user + " does not exists.");
+		}
+	}
+
 	/**
 	 * Method description
 	 *
@@ -324,7 +364,7 @@ public class StoredProcedures {
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 *
 	 * @throws SQLException
 	 */
@@ -602,6 +642,38 @@ public class StoredProcedures {
 		}
 	}
 
+	public static void tigUpdateAccountStatus(final String user, final int status) throws SQLException {
+		try (Connection conn = DriverManager.getConnection("jdbc:default:connection")) {
+			conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+			PreparedStatement ps = conn.prepareStatement(
+					"UPDATE tig_users SET account_status = ? WHERE lower(user_id) = ?");
+			ps.setInt(1, status);
+			ps.setString(2, user);
+			ps.executeUpdate();
+		}
+	}
+
+	public static void tigUpdateLoginTime(final String userId) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps = conn.prepareStatement(
+					"update tig_users set last_login = current timestamp where lower(user_id) =  ?");
+
+			ps.setString(1, userId.toLowerCase());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
         /**
          *
          * @param nid
@@ -653,31 +725,6 @@ public class StoredProcedures {
 			conn.close();
 		}
         }
-
-	public static int tigAccountStatus(final String user) throws SQLException {
-		try (Connection conn = DriverManager.getConnection("jdbc:default:connection")) {
-			conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-			PreparedStatement ps = conn.prepareStatement(
-					"SELECT account_status FROM tig_users WHERE lower(user_id) = ?");
-			ps.setString(1, user);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				return rs.getInt(1);
-			}
-			throw new SQLException("User " + user + " does not exists.");
-		}
-	}
-
-	public static void tigUpdateAccountStatus(final String user, final int status) throws SQLException {
-		try (Connection conn = DriverManager.getConnection("jdbc:default:connection")) {
-			conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-			PreparedStatement ps = conn.prepareStatement(
-					"UPDATE tig_users SET account_status = ? WHERE lower(user_id) = ?");
-			ps.setInt(1, status);
-			ps.setString(2, user);
-			ps.executeUpdate();
-		}
-	}
 
 	/**
 	 * Method description
@@ -839,56 +886,6 @@ public class StoredProcedures {
 			throw e;
 		} finally {
 			conn.close();
-		}
-	}
-
-	public static void tigUpdateLoginTime(final String userId) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");
-
-		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-		try {
-			PreparedStatement ps =
-				conn.prepareStatement("update tig_users set last_login = current timestamp where lower(user_id) =  ?");
-
-			ps.setString(1, userId.toLowerCase());
-			ps.executeUpdate();
-		} catch (SQLException e) {
-
-			// e.printStackTrace();
-			// log.log(Level.SEVERE, "SP error", e);
-			throw e;
-		} finally {
-			conn.close();
-		}
-	}
-
-	private static String encodePassword(String encMethod, String userId, String userPw) {
-		if ((encMethod != null) && "MD5-PASSWORD".equals(encMethod)) {
-			return md5(userPw);
-		} else if ((encMethod != null) && "MD5-USERID-PASSWORD".equals(encMethod)) {
-			return md5(userId + userPw);
-		} else if ((encMethod != null) && "MD5-USERNAME-PASSWORD".equals(encMethod)) {
-			return md5(userId.substring(0, userId.indexOf("@")) + userPw);
-		} else {
-			return userPw;
-		}
-
-	}
-
-	private static String md5(String data) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-
-			if (data != null) {
-				md.update(data.getBytes(UTF8));
-			}
-
-			byte[] digest = md.digest();
-
-			return Algorithms.bytesToHex(digest);
-		} catch (Exception e) {
-			throw new RuntimeException("Error on encoding password", e);
 		}
 	}
 }
