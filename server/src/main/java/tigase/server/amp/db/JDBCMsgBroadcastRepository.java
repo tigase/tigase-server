@@ -22,6 +22,8 @@
 package tigase.server.amp.db;
 
 import tigase.db.DataRepository;
+import tigase.db.Repository;
+import tigase.db.Schema;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -44,6 +46,7 @@ import static tigase.server.amp.db.JDBCMsgRepository.Meta;
  * Created by andrzej on 15.03.2016.
  */
 @Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,DataRepository> {
 
 	private static final Logger log = Logger.getLogger(JDBCMsgBroadcastRepository.class.getCanonicalName());

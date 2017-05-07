@@ -310,11 +310,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			if (beanConfig != null && beanConfig.getState() == BeanConfig.State.initialized) {
 				kernel.registerBean(cls).setSource(BeanConfig.Source.annotation).registeredBy(beanConfig).exec();
 			} else {
-				kernel.registerBean(cls).setSource(BeanConfig.Source.annotation).registeredBy(beanConfig).execWithoutInject();
+				kernel.registerBean(cls)
+						.setSource(BeanConfig.Source.annotation)
+						.registeredBy(beanConfig)
+						.execWithoutInject();
 			}
 
 			bc = kernel.getDependencyManager().getBeanConfig(name);
-			if (bc.getState() == BeanConfig.State.inactive && hasDirectConfiguration(bc)) {
+			if (bc != null && bc.getState() == BeanConfig.State.inactive && hasDirectConfiguration(bc)) {
 				log.log(Level.CONFIG, "bean " + bc.getBeanName() + " is disabled but configuration is specified");
 			}
 		});
@@ -671,6 +674,37 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 		public void setExportable(boolean exportable) {
 			this.exportable = exportable;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof AbstractBeanConfigurator.BeanDefinition) {
+				AbstractBeanConfigurator.BeanDefinition o1 = (AbstractBeanConfigurator.BeanDefinition) o;
+				if (!beanName.equals(o1.beanName)) {
+					return false;
+				}
+				if (clazzName == null) {
+					if (o1.clazzName != null)
+						return false;
+				} else {
+					if (!clazzName.equals(o1.clazzName)) {
+						return false;
+					}
+				}
+				if (exportable != o1.exportable) {
+					return false;
+				}
+				if (active != o1.active) {
+					return false;
+				}
+				return super.equals(o);
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return super.hashCode() * 21 + Objects.hash(beanName, clazzName, exportable, active);
 		}
 
 		@Override

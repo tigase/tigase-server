@@ -25,5 +25,8 @@ source database/mysql-schema-5-1-schema.sql;
 
 
 -- QUERY START:
-ALTER TABLE tig_pairs ADD `pid` INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+call TigExecuteIfNot(
+    (select count(1) from information_schema.COLUMNS where TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tig_pairs' AND COLUMN_NAME = 'pid'),
+    "ALTER TABLE tig_pairs ADD `pid` INT NOT NULL AUTO_INCREMENT PRIMARY KEY"
+);
 -- QUERY END:

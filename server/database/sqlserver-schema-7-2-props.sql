@@ -24,6 +24,7 @@ GO
 
 -- QUERY START:
 -- This is a dummy user who keeps all the database-properties
+if not exists (select 1 from tig_users where user_id = 'db-properties')
 exec dbo.TigAddUserPlainPw 'db-properties', NULL;
 -- QUERY END:
 GO

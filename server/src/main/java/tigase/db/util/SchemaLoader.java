@@ -18,13 +18,21 @@
  */
 package tigase.db.util;
 
+import tigase.osgi.util.ClassUtilBean;
+import tigase.util.ui.console.CommandlineParameter;
+import tigase.util.ui.console.ParameterParser;
+import tigase.xmpp.BareJID;
+
+import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  *
  * @author andrzej
  */
-public abstract class SchemaLoader {
+public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	
 	public static enum Result {
 		ok,
@@ -32,49 +40,145 @@ public abstract class SchemaLoader {
 		warning,
 		skipped
 	}
+
+	public interface Parameters {
+
+		List<CommandlineParameter> getSetupOptions();
+
+		void parseUri(String uri);
+
+		void parseArguments(String[] args);
+
+		void setProperties(Properties props);
+
+		void setAdmins(List<BareJID> admins, String password);
+
+		void setDbRootCredentials(String username, String password);
+
+	}
 	
-	public static SchemaLoader newInstance(Properties props) {
-		return new DBSchemaLoader(props);
+	public static SchemaLoader newInstance(String type) {
+		if (type == null) {
+			throw new RuntimeException("Missing dbType property");
+		}
+		SchemaLoader schemaLoader = getSchemaLoaderInstances()
+				.filter(instance -> instance.isSupported(type))
+				.findAny()
+				.get();
+		return schemaLoader;
 	}
 
-	public abstract String getDBUri(Properties props);
-	
+	public static SchemaLoader newInstanceForURI(String uri) {
+		int idx = uri.indexOf(":");
+		if (idx < 0) {
+			throw new RuntimeException("Unsupported URI");
+		}
+		String type = uri.substring(0, idx);
+		return newInstance(type);
+	}
+
+	private static Stream<Class<?>> getSchemaLoaderClasses() {
+		return ClassUtilBean.getInstance()
+				.getAllClasses()
+				.stream()
+				.filter(clazz -> SchemaLoader.class.isAssignableFrom(clazz))
+				.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()));
+	}
+
+	private static Stream<SchemaLoader> getSchemaLoaderInstances() {
+		return getSchemaLoaderClasses().map(clazz -> {
+			SchemaLoader loader = null;
+			try {
+				loader = (SchemaLoader) clazz.newInstance();
+			} catch (IllegalAccessException | InstantiationException e) {
+				e.printStackTrace();
+			}
+			return loader;
+		}).filter(instance -> instance != null);
+	}
+
 	/**
-	 * Method validates whether the connection can at least be established. If yes
-	 * then appropriate flag is set.
+	 * Main method allowing pass arguments to the class and setting all logging to
+	 * be printed to console.
 	 *
-	 * @param variables set of {@code Properties} with all configuration options
+	 * @param args key-value (in the form of {@code "-<variable> value"})
+	 *             parameters.
 	 */
-	public abstract Result validateDBConnection( Properties variables );
+	public static void main( String[] args ) {
+		ParameterParser parser = new ParameterParser(true);
+
+		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(loader -> loader.getSupportedTypes().stream()).map(x -> (String) x).sorted().toArray(x -> new String[x]);
+		parser.addOption(new CommandlineParameter.Builder("T", DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
+				"Database server type")
+								 .options(supportedTypes)
+								 .defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
+								 .required(true)
+								 .build());
+
+		Properties properties = null;
+
+		if (null == args || args.length == 0 || (properties = parser.parseArgs(args)) == null) {
+			System.out.println(parser.getHelp());
+			System.exit(0);
+		} else {
+			System.out.println("properties: " + properties);
+		}
+
+		String type = properties.getProperty(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName());
+
+		SchemaLoader dbHelper = newInstance(type);
+
+		Parameters params = dbHelper.createParameters();
+		params.parseArguments(args);
+
+		dbHelper.execute(params);
+	}
+	
+	public abstract P createParameters();
+
+	public abstract void execute(Parameters params);
+
+	public abstract void init(P props);
+
+	public abstract List<String> getSupportedTypes();
+
+	public boolean isSupported(String dbType) {
+		return getSupportedTypes().contains(dbType);
+	}
+
+	public abstract String getDBUri();
+
+	/**
+	 * Method validates whether the connection can at least be eI stablished. If yes
+	 * then appropriate flag is set.
+	 */
+	public abstract Result validateDBConnection();
 
 	/**
 	 * Method, if the connection is validated by {@code validateDBConnection},
 	 * checks whether desired database exists. If not it creates such database
 	 * using {@code *-installer-create-db.sql} schema file substituting it's
 	 * variables with ones provided.
-	 *
-	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	public abstract Result validateDBExists( Properties variables );
-	public abstract Result validateDBSchema( Properties variables );
-	public abstract Result postInstallation( Properties variables );
-	public abstract Result printInfo( Properties variables );
+	public abstract Result validateDBExists();
+	public abstract Result postInstallation();
+	public abstract Result printInfo();
 
 	/**
 	 * Method attempts to add XMPP admin user account to the database using
 	 * {@code AuthRepository}.
-	 *
-	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	public abstract Result addXmppAdminAccount( Properties variables );
+	public abstract Result addXmppAdminAccount();
 
 	/**
 	 * Method checks whether the connection to the database is possible and that
 	 * database of specified name exists. If yes then a schema file from
 	 * properties is loaded.
 	 *
-	 * @param variables set of {@code Properties} with all configuration options
+	 * @param fileName set of {@code String} with path to file
 	 */
-	public abstract Result loadSchemaFile( Properties variables );
-	public abstract Result shutdown( Properties variables );
+	public abstract Result loadSchemaFile( String fileName );
+	public abstract Result shutdown();
+
+	public abstract Result loadSchema(String schemaId, String version);
 }

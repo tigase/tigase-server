@@ -107,6 +107,7 @@ public class BeanConfigBuilder {
 	public BeanConfig execWithoutInject() {
 		if (beanConfig == null) {
 			log.warning("Bean " + clazz + " cannot be registered, because Kernel cannot create configuration for this bean.");
+			kernel.currentlyUsedConfigBuilder = null;
 			return null;
 		}
 
@@ -136,25 +137,35 @@ public class BeanConfigBuilder {
 	}
 
 	public BeanConfigBuilder setActive(boolean active) {
-		if (active) beanConfig.setState(null);
-		else
-			beanConfig.setState(BeanConfig.State.inactive);
+		if (beanConfig != null) {
+			if (active) {
+				beanConfig.setState(null);
+			} else {
+				beanConfig.setState(BeanConfig.State.inactive);
+			}
+		}
 		return this;
 	}
 
 	public BeanConfigBuilder setPinned(boolean pinned) {
-		beanConfig.setPinned(pinned);
+		if (beanConfig != null) {
+			beanConfig.setPinned(pinned);
+		}
 		return this;
 	}
 
 	public BeanConfigBuilder setSource(BeanConfig.Source source) {
-		beanConfig.setSource(source);
+		if (beanConfig != null) {
+			beanConfig.setSource(source);
+		}
 		return this;
 	}
 
 	public BeanConfigBuilder registeredBy(BeanConfig parent) {
 		if (parent != null) {
-			beanConfig.addRegisteredBy(parent);
+			if (beanConfig != null) {
+				beanConfig.addRegisteredBy(parent);
+			}
 		}
 		return this;
 	}

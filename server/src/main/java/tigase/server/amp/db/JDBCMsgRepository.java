@@ -49,6 +49,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Repository.Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 	private static final Logger log = Logger.getLogger(JDBCMsgRepository.class.getName());
 

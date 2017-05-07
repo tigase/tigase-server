@@ -89,6 +89,7 @@ import static tigase.db.AuthRepository.Meta;
  * @version $Rev$
  */
 @Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRepository> {
 
 	/**

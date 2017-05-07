@@ -24,7 +24,9 @@
 do $$
 begin
     if to_regclass('public.msg_history') is not null then
-        alter table msg_history rename to tig_offline_messages;
+        if to_regclass('public.tig_offline_messages') is null then
+            alter table msg_history rename to tig_offline_messages;
+        end if;
     else
         create table if not exists tig_offline_messages (
             msg_id bigserial,
@@ -79,8 +81,10 @@ begin
     end if;
 
     if to_regclass('public.broadcast_msgs') is not null then
-        alter table broadcast_msgs rename to tig_broadcast_messages;
-        alter table tig_broadcast_messages alter msg type text;
+        if to_regclass('tig_broadcast_messages') is null then
+            alter table broadcast_msgs rename to tig_broadcast_messages;
+            alter table tig_broadcast_messages alter msg type text;
+        end if;
     else
         create table if not exists tig_broadcast_messages (
             id varchar(128) not null,

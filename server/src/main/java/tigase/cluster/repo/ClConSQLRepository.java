@@ -26,10 +26,7 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
+import tigase.db.*;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.sys.TigaseRuntime;
 
@@ -50,6 +47,7 @@ import java.util.logging.Logger;
  * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 @Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class ClConSQLRepository
 				extends ClConConfigRepository
 				implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem,DataRepository> {

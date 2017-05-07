@@ -21,7 +21,7 @@
 --
 
 -- QUERY START:
-create table tig_users (
+create table if not exists tig_users (
 	uid bigserial,
 
 	-- Jabber User ID
@@ -49,26 +49,56 @@ create table tig_users (
 );
 -- QUERY END:
 -- QUERY START:
-create unique index user_id on tig_users ( lower(user_id) );
+do $$
+begin
+    if to_regclass('public.user_id') is null then
+        create unique index user_id on tig_users ( lower(user_id) );
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index user_pw on tig_users (user_pw);
+do $$
+begin
+    if to_regclass('public.user_pw') is null then
+        create index user_pw on tig_users (user_pw);
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index last_login on tig_users (last_login);
+do $$
+begin
+    if to_regclass('public.last_login') is null then
+        create index last_login on tig_users (last_login);
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index last_logout on tig_users (last_logout);
+do $$
+begin
+    if to_regclass('public.last_logout') is null then
+        create index last_logout on tig_users (last_logout);
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index account_status on tig_users (account_status);
+do $$
+begin
+    if to_regclass('public.account_status') is null then
+        create index account_status on tig_users (account_status);
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index online_status on tig_users (online_status);
+do $$
+begin
+    if to_regclass('public.online_status') is null then
+        create index online_status on tig_users (online_status);
+    end if;
+end$$;
 -- QUERY END:
 
 -- QUERY START:
-create table tig_nodes (
+create table if not exists tig_nodes (
        nid bigserial,
        parent_nid bigint,
        uid bigint NOT NULL references tig_users(uid),
@@ -79,20 +109,40 @@ create table tig_nodes (
 );
 -- QUERY END:
 -- QUERY START:
-create unique index tnode on tig_nodes ( parent_nid, uid, node );
+do $$
+begin
+    if to_regclass('public.tnode') is null then
+        create unique index tnode on tig_nodes ( parent_nid, uid, node );
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index node on tig_nodes ( node );
+do $$
+begin
+    if to_regclass('public.node') is null then
+        create index node on tig_nodes ( node );
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index nuid on tig_nodes (uid);
+do $$
+begin
+    if to_regclass('public.nuid') is null then
+        create index nuid on tig_nodes (uid);
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index parent_nid on tig_nodes (parent_nid);
+do $$
+begin
+    if to_regclass('public.parent_nid') is null then
+        create index parent_nid on tig_nodes (parent_nid);
+    end if;
+end$$;
 -- QUERY END:
 
 -- QUERY START:
-create table tig_pairs (
+create table if not exists tig_pairs (
        nid bigint references tig_nodes(nid),
        uid bigint NOT NULL references tig_users(uid),
 
@@ -101,11 +151,26 @@ create table tig_pairs (
 );
 -- QUERY END:
 -- QUERY START:
-create index pkey on tig_pairs ( pkey );
+do $$
+begin
+    if to_regclass('public.pkey') is null then
+        create index pkey on tig_pairs ( pkey );
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index puid on tig_pairs (uid);
+do $$
+begin
+    if to_regclass('public.puid') is null then
+        create index puid on tig_pairs (uid);
+    end if;
+end$$;
 -- QUERY END:
 -- QUERY START:
-create index pnid on tig_pairs (nid);
+do $$
+begin
+    if to_regclass('public.pnid') is null then
+        create index pnid on tig_pairs (nid);
+    end if;
+end$$;
 -- QUERY END:

@@ -21,7 +21,12 @@
 
 -- QUERY START:
 -- This is a dummy user who keeps all the database-properties
-select TigAddUserPlainPw('db-properties', NULL);
+do $$
+begin
+if not exists( select 1 from tig_users where user_id = 'db-properties' ) then
+    perform TigAddUserPlainPw('db-properties', NULL);
+end if;
+end$$;
 -- QUERY END:
 
 select now(), ' - Setting schema version to 7.2';

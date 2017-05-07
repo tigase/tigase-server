@@ -48,6 +48,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCRepository
 				implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
 	/** Field description */

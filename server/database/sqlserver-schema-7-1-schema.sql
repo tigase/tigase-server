@@ -33,6 +33,7 @@ IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = object_id('dbo.tig_pairs')
 GO
 
 -- QUERY START:
+IF object_id('dbo.PK_tig_pairs') is null
 ALTER TABLE [dbo].[tig_pairs]
    ADD [pid] [bigint] IDENTITY(1,1) NOT NULL,
    CONSTRAINT [PK_tig_pairs] PRIMARY KEY CLUSTERED ( [pid] ASC ) ON [PRIMARY]

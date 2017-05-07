@@ -61,10 +61,7 @@ public class ServerBeanSelector implements BeanSelector {
 			kernel = kernel.getParent();
 		}
 
-		String type = "default";
-		if (kernel.isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
-			type = (String) kernel.getInstance(AbstractBeanConfigurator.class).getProperties().getOrDefault("config-type", "default");
-		}
+		String type = getProperty(kernel, "config-type", "default");
 		switch (type) {
 			case "--gen-config-def":
 			case "--gen-config-default":
@@ -75,7 +72,20 @@ public class ServerBeanSelector implements BeanSelector {
 		return ConfigTypeEnum.valueForId(type);
 	}
 
-	private static boolean getClusterMode(Kernel kernel) {
-		return Boolean.valueOf(System.getProperty("cluster-mode", "false"));
+	protected static <T> T getProperty(Kernel kernel, String name, T defValue) {
+		if (kernel.isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
+			return  (T) kernel.getInstance(AbstractBeanConfigurator.class).getProperties().getOrDefault(name, defValue);
+		}
+		return defValue;
+	}
+
+	public static boolean getClusterMode(Kernel kernel) {
+		Object val = getProperty(kernel, "--cluster-mode", false);
+		if (val instanceof Boolean) {
+			return (Boolean) val;
+		} else {
+			return Boolean.valueOf((String) val);
+		}
+
 	}
 }

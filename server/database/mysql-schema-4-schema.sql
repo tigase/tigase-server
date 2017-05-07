@@ -76,9 +76,32 @@ ENGINE=InnoDB default character set utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 -- QUERY END:
 
 -- QUERY START:
+drop procedure if exists TigExecuteIfNot;
+-- QUERY END:
 
-CREATE INDEX part_of_user_id ON tig_users (user_id(255));
+delimiter //
 
+-- QUERY START:
+create procedure TigExecuteIfNot(cond int, query text)
+begin
+set @s = (select if (
+        cond <= 0,
+        query,
+        'select 1'
+    ));
+prepare stmt from @s;
+execute stmt;
+deallocate prepare stmt;
+end //
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigExecuteIfNot(
+    (select count(1) from information_schema.statistics where table_schema = database() and table_name = 'tig_users' and index_name = 'part_of_user_id'),
+    "CREATE INDEX part_of_user_id ON tig_users (user_id(255))"
+);
 -- QUERY END:
 
 -- QUERY START:

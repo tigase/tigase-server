@@ -45,7 +45,14 @@ public interface Repository {
 		boolean isDefault() default false;
 		String[] supportedUris();
 	}
-	
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public static @interface SchemaId {
+		String id();
+		String name();
+	}
+
 	/**
 	 * The method is called to initialize the data repository. Depending on the implementation
 	 * all the initialization parameters can be passed either via <code>resource_uri</code>

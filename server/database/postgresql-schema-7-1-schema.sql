@@ -23,5 +23,10 @@
 -- LOAD FILE: database/postgresql-schema-5-1-schema.sql
 
 -- QUERY START:
-ALTER TABLE tig_pairs ADD COLUMN pid BIGSERIAL PRIMARY KEY;
+do $$
+begin
+    if not exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_pairs' and column_name = 'pid') then
+        ALTER TABLE tig_pairs ADD COLUMN pid BIGSERIAL PRIMARY KEY;
+    end if;
+end$$;
 -- QUERY END:

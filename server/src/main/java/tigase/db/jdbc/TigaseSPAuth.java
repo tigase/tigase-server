@@ -21,6 +21,11 @@
  */
 package tigase.db.jdbc;
 
+import tigase.auth.mechanisms.AbstractSaslSCRAM;
+import tigase.db.*;
+import tigase.util.Base64;
+import tigase.xmpp.BareJID;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -29,18 +34,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.auth.mechanisms.AbstractSaslSCRAM;
-import tigase.db.AuthorizationException;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-import tigase.util.Base64;
-import tigase.xmpp.BareJID;
-
 /**
  * Tigase Salted Password Auth.
  * 
  */
+@Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class TigaseSPAuth extends TigaseCustomAuth {
 
 	private static final Logger log = Logger.getLogger(TigaseSPAuth.class.getName());

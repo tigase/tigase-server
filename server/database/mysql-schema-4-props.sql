@@ -22,7 +22,10 @@
 
 -- QUERY START:
 -- This is a dummy user who keeps all the database-properties
-call TigAddUserPlainPw('db-properties', NULL);
+call TigExecuteIfNot(
+    (select count(1) from tig_users where user_id = 'db-properties'),
+    "call TigAddUserPlainPw('db-properties', NULL)"
+);
 -- QUERY END:
 
 select NOW(), ' - Setting schema version to 4.0';

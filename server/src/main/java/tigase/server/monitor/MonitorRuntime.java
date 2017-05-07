@@ -55,9 +55,12 @@ public class MonitorRuntime extends TigaseRuntime {
 	private final LinkedList<OnlineJidsReporter> onlineJidsReporters =
 					new LinkedList<OnlineJidsReporter>();
 
+	private Thread mainShutdownThread;
+
 	private MonitorRuntime() {
 		super();
-		Runtime.getRuntime().addShutdownHook(new MainShutdownThread());
+		mainShutdownThread = new MainShutdownThread();
+		Runtime.getRuntime().addShutdownHook(mainShutdownThread);
 	}
 	
 	public static MonitorRuntime getMonitorRuntime() {

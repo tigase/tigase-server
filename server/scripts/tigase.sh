@@ -226,6 +226,11 @@ case "${1}" in
     sh -c "exec $TIGASE_CMD"
     ;;
 
+  upgrade-schema)
+    echo "Upgrading database schema:"
+    sh -c "${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager upgrade-schema ${TIGASE_OPTIONS}"
+    ;;
+
   check|status)
     echo "Checking arguments to Tigase: "
     echo "OSGI            =  $OSGI"

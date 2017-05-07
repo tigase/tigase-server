@@ -25,6 +25,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- QUERY START:
+IF object_id('dbo.tig_users') IS NULL
 CREATE TABLE [dbo].[tig_users](
 	[uid] [bigint] IDENTITY(1,1) NOT NULL,
 
@@ -60,31 +61,37 @@ CREATE TABLE [dbo].[tig_users](
 -- QUERY END:
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_account_status' )
 CREATE NONCLUSTERED INDEX [IX_tig_users_account_status] ON [dbo].[tig_users] ([account_status] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_last_login' )
 CREATE NONCLUSTERED INDEX [IX_tig_users_last_login] ON [dbo].[tig_users] ([last_login] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_last_logout' )
 CREATE NONCLUSTERED INDEX [IX_tig_users_last_logout] ON [dbo].[tig_users] ( [last_logout] ASC)  ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_online_status' )
 CREATE NONCLUSTERED INDEX [IX_tig_users_online_status] ON [dbo].[tig_users] ([online_status] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_user_id_fragment' )
 CREATE NONCLUSTERED INDEX [IX_tig_users_user_id_fragment] ON [dbo].[tig_users] ( [user_id_fragment] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_user_pw' )
 CREATE NONCLUSTERED INDEX [IX_tig_users_user_pw] ON [dbo].[tig_users] ([user_pw] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
@@ -92,6 +99,7 @@ GO
 
 
 -- QUERY START:
+IF object_id('dbo.tig_nodes') IS NULL
 CREATE TABLE [dbo].[tig_nodes](
 	[nid] [bigint] IDENTITY(1,1) NOT NULL,
 	[parent_nid] [bigint] NULL,
@@ -104,21 +112,25 @@ CREATE TABLE [dbo].[tig_nodes](
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_nodes') and name = 'IX_tig_nodes_node' )
 CREATE NONCLUSTERED INDEX [IX_tig_nodes_node] ON [dbo].[tig_nodes] ( [node] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_nodes') and name = 'IX_tig_nodes_parent_nid' )
 CREATE NONCLUSTERED INDEX [IX_tig_nodes_parent_nid] ON [dbo].[tig_nodes] ( [parent_nid] ASC ) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_nodes') and name = 'IX_tig_nodes_uid' )
 CREATE NONCLUSTERED INDEX [IX_tig_nodes_uid] ON [dbo].[tig_nodes] ( [uid] ASC ) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if object_id('dbo.FK_tig_nodes_tig_users') is null
 ALTER TABLE [dbo].[tig_nodes]  WITH CHECK ADD  CONSTRAINT [FK_tig_nodes_tig_users] FOREIGN KEY([uid])
 REFERENCES [dbo].[tig_users] ([uid])
 -- QUERY END:
@@ -131,6 +143,7 @@ GO
 
 
 -- QUERY START:
+IF object_id('dbo.tig_pairs') IS NULL
 CREATE TABLE [dbo].[tig_pairs](
 	[nid] [bigint] NULL,
 	[uid] [bigint] NOT NULL,
@@ -141,21 +154,25 @@ CREATE TABLE [dbo].[tig_pairs](
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_pairs') and name = 'IX_tig_pairs_nid' )
 CREATE NONCLUSTERED INDEX [IX_tig_pairs_nid] ON [dbo].[tig_pairs] ( [nid] ASC ) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_pairs') and name = 'IX_tig_pairs_pkey' )
 CREATE NONCLUSTERED INDEX [IX_tig_pairs_pkey] ON [dbo].[tig_pairs] ( [pkey] ASC ) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_pairs') and name = 'IX_tig_pairs_uid' )
 CREATE NONCLUSTERED INDEX [IX_tig_pairs_uid] ON [dbo].[tig_pairs] ( [uid] ASC ) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
+if object_id('dbo.FK_tig_pairs_tig_nodes') is null
 ALTER TABLE [dbo].[tig_pairs]  WITH CHECK ADD  CONSTRAINT [FK_tig_pairs_tig_nodes] FOREIGN KEY([nid])
 REFERENCES [dbo].[tig_nodes] ([nid])
 -- QUERY END:
@@ -167,6 +184,7 @@ ALTER TABLE [dbo].[tig_pairs] CHECK CONSTRAINT [FK_tig_pairs_tig_nodes]
 GO
 
 -- QUERY START:
+if object_id('dbo.FK_tig_pairs_tig_users') is null
 ALTER TABLE [dbo].[tig_pairs]  WITH CHECK ADD  CONSTRAINT [FK_tig_pairs_tig_users] FOREIGN KEY([uid])
 REFERENCES [dbo].[tig_users] ([uid])
 -- QUERY END:
