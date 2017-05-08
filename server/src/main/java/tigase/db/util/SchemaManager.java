@@ -29,6 +29,7 @@ import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
+import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 import tigase.kernel.core.RegistrarKernel;
@@ -153,7 +154,7 @@ public class SchemaManager {
 	}
 
 	public void readConfig(File file) throws IOException, ConfigReader.ConfigException {
-		config = new ConfigReader().read(new File("/Users/andrzej/Development/runtime/tigase-bootstrap/etc/init.properties"));
+		config = new ConfigReader().read(file);
 	}
 
 	public void readConfig(String configString) throws IOException, ConfigReader.ConfigException {
@@ -392,6 +393,8 @@ public class SchemaManager {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
 		configurator.setProperties(config);
 		ModulesManagerImpl.getInstance().setBeanConfigurator(configurator);
+
+		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
 
 		return kernel;
 	}

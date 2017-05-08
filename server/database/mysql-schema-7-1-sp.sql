@@ -63,11 +63,11 @@ begin
   then
     update tig_pairs tp, tig_users tu, tig_nodes tn set pval = _tval
     where (tu.sha1_user_id = sha1(lower('db-properties'))) AND (tu.uid = tp.uid)
-      AND (tp.pkey = _tkey) AND (tn.node = "root");
+      AND (tp.pkey = _tkey) AND (tn.node = 'root');
   else
     insert into tig_pairs (pkey, pval, uid, nid)
           select _tkey, _tval, tu.uid, tn.nid from tig_users tu left join tig_nodes tn on tn.uid=tu.uid
-        where (tu.sha1_user_id = sha1(lower('db-properties')) and tn.node="root");
+        where (tu.sha1_user_id = sha1(lower('db-properties')) and tn.node='root');
   end if;
 end //
 -- QUERY END:
