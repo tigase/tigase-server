@@ -30,7 +30,9 @@ public class ConfigReaderTest {
 		root.put("test123", "2313");
 		root.put("tes22", "223");
 		root.put("x-gy+=x",123);
-		root.put("env-1", new ConfigReader.EnvironmentVariable("PATH"));
+		root.put("env-1", new ConfigReader.EnvironmentVariable("PATH", null));
+		root.put("env-2", new ConfigReader.EnvironmentVariable("test-1", null));
+		root.put("env-3", new ConfigReader.EnvironmentVariable("test-2", "test"));
 		root.put("prop-1", new ConfigReader.PropertyVariable("java.vendor", null));
 		root.put("prop-2", new ConfigReader.PropertyVariable("java.version", "-1"));
 
@@ -49,7 +51,7 @@ public class ConfigReaderTest {
 		root.put("comp-prop2", compositeVariable);
 
 		List list = new ArrayList();
-		list.add(new ConfigReader.EnvironmentVariable("USER"));
+		list.add(new ConfigReader.EnvironmentVariable("USER", null));
 		root.put("env-list", list);
 		list = new ArrayList();
 		list.add(1);
@@ -138,6 +140,10 @@ public class ConfigReaderTest {
 		assertMapEquals(root, parsed, "/");
 
 		assertEquals(root, parsed);
+
+		assertEquals(System.getenv("PATH"), ((ConfigReader.Variable) root.get("env-1")).calculateValue());
+		assertEquals(System.getenv("test-1"), ((ConfigReader.Variable) root.get("env-2")).calculateValue());
+		assertEquals(Optional.ofNullable(System.getenv("test-2")).orElse("test"), ((ConfigReader.Variable) root.get("env-3")).calculateValue());
 	}
 
 	@Test

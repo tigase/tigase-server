@@ -247,12 +247,8 @@ public class ConfigReader {
 						Object val = null;
 						switch (holder.state) {
 							case ENVIRONMENT:
-								((EnvironmentVariable) holder.variable).setName(
-										holder == null ? "" : holder.value.toString().trim());
-								val = holder.variable;
-								break;
 							case PROPERTY:
-								PropertyVariable prop = (PropertyVariable) holder.variable;
+								AbstractEnvironmentPropertyVariable prop = (AbstractEnvironmentPropertyVariable) holder.variable;
 								String value = holder.value.toString().trim();
 								if (prop.getName() == null) {
 									prop.setName(value);
@@ -276,7 +272,7 @@ public class ConfigReader {
 						pos = 0;
 						// there should be no break here!
 					case ',':
-						if (holder.variable != null && holder.state != State.PROPERTY) {
+						if (holder.variable != null && (holder.state != State.PROPERTY && holder.state != State.ENVIRONMENT)) {
 							if (holder.variable instanceof CompositeVariable) {
 								Object value = holder.value;
 								if (value == null) {
@@ -313,8 +309,9 @@ public class ConfigReader {
 								Object val = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
 								setBeanDefinitionValue(val);
 								break;
+							case ENVIRONMENT:
 							case PROPERTY:
-								((PropertyVariable) holder.variable).setName(holder.value.toString().trim());
+								((AbstractEnvironmentPropertyVariable) holder.variable).setName(holder.value.toString().trim());
 								holder.value = holder.variable;
 								break;
 						}
@@ -508,51 +505,15 @@ public class ConfigReader {
 
 	}
 
-	public static class EnvironmentVariable implements Variable {
-
-		private String name;
-
-		public EnvironmentVariable() {
-		}
-
-		public EnvironmentVariable(String name) {
-			this.setName(name);
-		}
-
-		protected String getName() {
-			return name;
-		}
-
-		protected void setName(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public Object calculateValue() {
-			return System.getenv(name);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof EnvironmentVariable) {
-				EnvironmentVariable v = (EnvironmentVariable) obj;
-				if (v.name == this.name || (v.name != null && v.name.equals(this.name))) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
-
-	public static class PropertyVariable implements Variable {
+	public static abstract class AbstractEnvironmentPropertyVariable implements Variable {
 
 		private String name;
 		private String defValue;
 
-		public PropertyVariable() {
+		protected AbstractEnvironmentPropertyVariable() {
 		}
 
-		public PropertyVariable(String name, String defValue) {
+		protected AbstractEnvironmentPropertyVariable(String name, String defValue) {
 			this.setName(name);
 			this.setDefValue(defValue);
 		}
@@ -574,14 +535,9 @@ public class ConfigReader {
 		}
 
 		@Override
-		public Object calculateValue() {
-			return System.getProperty(name, defValue);
-		}
-
-		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof PropertyVariable) {
-				PropertyVariable v = (PropertyVariable) obj;
+			if (obj instanceof AbstractEnvironmentPropertyVariable) {
+				AbstractEnvironmentPropertyVariable v = (AbstractEnvironmentPropertyVariable) obj;
 
 				if (v.name == this.name || (v.name != null && v.name.equals(this.name))) {
 					if (v.defValue == this.defValue || (v.defValue != null && v.defValue.equals(this.defValue))) {
@@ -591,6 +547,43 @@ public class ConfigReader {
 			}
 			return false;
 		}
+	}
+
+	public static class EnvironmentVariable extends AbstractEnvironmentPropertyVariable {
+
+		public EnvironmentVariable() {
+		}
+
+		public EnvironmentVariable(String name, String defValue) {
+			super(name, defValue);
+		}
+
+		@Override
+		public Object calculateValue() {
+			Object val = System.getenv(getName());
+			if (val == null) {
+				val = getDefValue();
+			}
+			return val;
+		}
+
+	}
+
+	public static class PropertyVariable extends AbstractEnvironmentPropertyVariable {
+
+		public PropertyVariable() {
+		}
+
+		public PropertyVariable(String name, String defValue) {
+			super(name, defValue);
+		}
+
+
+		@Override
+		public Object calculateValue() {
+			return System.getProperty(getName(), getDefValue());
+		}
+		
 	}
 
 	public static class CompositeVariable implements Variable {

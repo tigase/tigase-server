@@ -161,6 +161,10 @@ public class ConfigWriter {
 				ConfigReader.EnvironmentVariable variable = (ConfigReader.EnvironmentVariable) obj;
 				writer.write("env('");
 				writer.write(variable.getName());
+				if (variable.getDefValue() != null) {
+					writer.write("', '");
+					writer.write(variable.getDefValue());
+				}
 				writer.write("')");
 				if (newLine != null) {
 					writer.write(newLine);
