@@ -38,6 +38,9 @@ import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtilBean;
+import tigase.util.ui.console.CommandlineParameter;
+import tigase.util.ui.console.ParameterParser;
+import tigase.util.ui.console.Task;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,32 +74,33 @@ public class SchemaManager {
 		return o1.getId().compareTo(o2.getId());
 	};
 
+	private CommandlineParameter ROOT_USERNAME = new CommandlineParameter.Builder("R", DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME.getName())
+			.description("Database root account username used to create tigase user and database")
+			.build();
+
+	private CommandlineParameter ROOT_PASSWORD = new CommandlineParameter.Builder("A", DBSchemaLoader.PARAMETERS_ENUM.ROOT_PASSWORD.getName())
+			.description("Database root account password used to create tigase user and database")
+			.secret()
+			.build();
+
+	private CommandlineParameter CONFIG_FILE = new CommandlineParameter.Builder(null, ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.replace("--",""))
+			.defaultValue(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF)
+			.description("Path to configuration file")
+			.requireArguments(true)
+			.required(true)
+			.build();
+
+
 	private final List<Class<?>> repositoryClasses;
 	private Map<String, Object> config;
 
 	private String rootUser;
 	private String rootPass;
 
-	public static void main(String argv[]) throws IOException, ConfigReader.ConfigException {
+	public static void main(String args[]) throws IOException, ConfigReader.ConfigException {
 		try {
-			if (argv.length == 0) {
-				return;
-			}
-			switch (argv[0]) {
-				case "upgrade-schema":
-					int i = -1;
-					for (int j = 0; j < argv.length; j++) {
-						if (ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.equals(argv[j]) && argv.length > j + 1) {
-							i = j + 1;
-						}
-					}
-					String fileName = i < 0 ? ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF : argv[i];
-					upgradeSchema(fileName);
-					break;
-				default:
-					System.out.println("Unknown action!");
-					break;
-			}
+			SchemaManager schemaManager = new SchemaManager();
+			schemaManager.execute(args);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -104,9 +108,37 @@ public class SchemaManager {
 		}
 	}
 
-	public static void upgradeSchema(String config) throws IOException, ConfigReader.ConfigException {
+	public void execute(String args[]) throws Exception {
+		ParameterParser parser = new ParameterParser(false);
+		parser.addOption(ROOT_USERNAME);
+		parser.addOption(ROOT_PASSWORD);
+		parser.addOption(CONFIG_FILE);
+
+		parser.setTasks(new Task[] {
+				new Task.Builder().name("upgrade-schema")
+						.description("Upgrade schema of databases specified in your config file")
+						.function(this::upgradeSchema).build()
+		});
+
+		Properties props = parser.parseArgs(args);
+		Optional<Task> task = parser.getTask();
+		if (props != null && task.isPresent()) {
+			task.get().execute(props);
+		} else {
+			System.out.println(parser.getHelp());
+		}
+	}
+
+	public void upgradeSchema(Properties props) throws IOException, ConfigReader.ConfigException {
+		Optional<String> config = getProperty(props, CONFIG_FILE);
+		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
+		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
+
 		SchemaManager schemaManager = new SchemaManager();
-		schemaManager.readConfig(new File(config));
+		schemaManager.readConfig(new File(config.get()));
+		if (rootUser.isPresent() && rootPass.isPresent()) {
+			schemaManager.setDbRootCredentials(rootUser.get(), rootPass.get());
+		}
 
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.SchemaInfo>> result = schemaManager.getDataSourcesAndSchemas();
 		log.info("found " + result.size() + " data sources to upgrade...");
@@ -133,6 +165,14 @@ public class SchemaManager {
 			});
 		});
 		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+	}
+
+	public static Optional<String> getProperty(Properties props, CommandlineParameter parameter) {
+		Optional<String> value = Optional.ofNullable(props.getProperty(parameter.getFullName(false).get()));
+		if (!value.isPresent()) {
+			return parameter.getDefaultValue();
+		}
+		return value;
 	}
 
 	public SchemaManager() {

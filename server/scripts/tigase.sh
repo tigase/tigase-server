@@ -227,8 +227,9 @@ case "${1}" in
     ;;
 
   upgrade-schema)
-    echo "Upgrading database schema:"
-    sh -c "${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager upgrade-schema ${TIGASE_OPTIONS}"
+    TMP="${@:3}"
+    echo "Upgrading database schema: ${TMP}"
+    sh -c "${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager upgrade-schema ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
   check|status)
