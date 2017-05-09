@@ -1071,15 +1071,19 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 		protected void init() {
 			if (dbRootUser == null || dbRootPass == null) {
-				SystemConsole console = new SystemConsole();
-				console.writeLine("");
-				if (dbRootUser == null) {
-					dbRootUser = console.readLine(
-							"Database root account username used to create tigase user and database at " + dbHostname +" : ");
-				}
-				if (dbRootPass == null) {
-					dbRootPass = new String(console.readPassword(
-							"Database root account password used to create tigase user and database at " + dbHostname + " : "));
+				if (!"derby".equals(dbType)) {
+					SystemConsole console = new SystemConsole();
+					console.writeLine("");
+					if (dbRootUser == null) {
+						dbRootUser = console.readLine(
+								"Database root account username used to create tigase user and database at " +
+										dbHostname + " : ");
+					}
+					if (dbRootPass == null) {
+						dbRootPass = new String(console.readPassword(
+								"Database root account password used to create tigase user and database at " +
+										dbHostname + " : "));
+					}
 				}
 			}
 		}

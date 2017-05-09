@@ -231,9 +231,8 @@ public class MsgRepositoryStoredProcedures {
 
 			int affectedRows = stmt.executeUpdate();
 
-			stmt = conn.prepareStatement("select ? from sysibm.sysdummy1");
-			stmt.setInt(1, affectedRows);
-			data[0] = stmt.executeQuery();
+			Statement stmt1 = conn.createStatement();
+			data[0] = stmt1.executeQuery("select " + affectedRows + " from sysibm.sysdummy1");
 		} catch (NoSuchAlgorithmException e) {
 			throw new SQLException(e);
 		} finally {
@@ -270,9 +269,8 @@ public class MsgRepositoryStoredProcedures {
 
 			int affectedRows = stmt.executeUpdate();
 
-			stmt = conn.prepareStatement("select ? from sysibm.sysdummy1");
-			stmt.setInt(1, affectedRows);
-			data[0] = stmt.executeQuery();
+			Statement stmt1 = conn.createStatement();
+			data[0] = stmt1.executeQuery("select " + affectedRows + " from sysibm.sysdummy1");
 		} catch (NoSuchAlgorithmException e) {
 			throw new SQLException(e);
 		} finally {
@@ -280,7 +278,7 @@ public class MsgRepositoryStoredProcedures {
 		}
 	}
 
-	public static void deleteMessage(Long msgId, ResultSet[] data)
+	public static void deleteMessage(Long msgId)
 			throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -291,10 +289,6 @@ public class MsgRepositoryStoredProcedures {
 			stmt.setLong(1, msgId);
 
 			int affectedRows = stmt.executeUpdate();
-
-			stmt = conn.prepareStatement("select ? from sysibm.sysdummy1");
-			stmt.setInt(1, affectedRows);
-			data[0] = stmt.executeQuery();
 		} finally {
 			conn.close();
 		}

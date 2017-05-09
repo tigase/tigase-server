@@ -29,6 +29,7 @@ import org.junit.runners.MethodSorters;
 import org.junit.runners.model.Statement;
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.*;
+import tigase.db.util.SchemaLoader;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
@@ -39,6 +40,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.ProcessorTestCase;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -79,11 +81,27 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 	private XMPPResourceConnection recipientSession;
 
 	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
-		DataSource dataSource = RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
+		DataSource dataSource = DataSourceHelper.getDefaultClass(DataSource.class, uri).newInstance();//RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
 		dataSource.initRepository(uri, new HashMap<>());
 		return (DS) dataSource;
 	}
 
+	@BeforeClass
+	public static void loadSchema() {
+		if (uri.startsWith("jdbc:")) {
+			SchemaLoader loader = SchemaLoader.newInstance("jdbc");
+			SchemaLoader.Parameters params = loader.createParameters();
+			params.parseUri(uri);
+			params.setDbRootCredentials(null, null);
+			loader.init(params);
+			loader.validateDBConnection();
+			loader.validateDBExists();
+			Assert.assertEquals(SchemaLoader.Result.ok, loader.loadSchema(Schema.SERVER_SCHEMA_ID, "7.2.0"));
+			loader.postInstallation();
+			loader.shutdown();
+		}
+	}
+	
 	@Before
 	public void setup() throws Exception {
 		super.setUp();
@@ -106,6 +124,24 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 		repo.deleteMessagesToJID(null, recipientSession);
 		repo = null;
 		super.tearDown();
+	}
+
+	@AfterClass
+	public static void cleanDerby() {
+		if (uri.contains("jdbc:derby:")) {
+			File f = new File("derby_test");
+			if (f.exists()) {
+				if (f.listFiles() != null) {
+					Arrays.asList(f.listFiles()).forEach(f2 -> {
+						if (f2.listFiles() != null) {
+							Arrays.asList(f2.listFiles()).forEach(f3 -> f3.delete());
+						}
+						f2.delete();
+					});
+				}
+				f.delete();
+			}
+		}
 	}
 
 	@Test

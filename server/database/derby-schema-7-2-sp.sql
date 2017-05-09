@@ -97,7 +97,6 @@ CREATE procedure Tig_OfflineMessages_DeleteMessage(msg_id bigint)
 PARAMETER STYLE JAVA
 LANGUAGE JAVA
 MODIFIES SQL DATA
-DYNAMIC RESULT SETS 1
 EXTERNAL NAME 'tigase.db.derby.MsgRepositoryStoredProcedures.deleteMessage';
 -- QUERY END:
 

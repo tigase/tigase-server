@@ -334,12 +334,16 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 			}
 
 			if (delete) {
-				PreparedStatement delete_to_jid_st =
-						data_repo.getPreparedStatement(to, MSGS_DELETE_MESSAGES);
+				rs = null;
+				try {
+					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement(to, MSGS_DELETE_MESSAGES);
 
-				synchronized (delete_to_jid_st) {
-					delete_to_jid_st.setString(1, to.toString());
-					delete_to_jid_st.executeUpdate();
+					synchronized (delete_to_jid_st) {
+						delete_to_jid_st.setString(1, to.toString());
+						rs = delete_to_jid_st.executeQuery();
+					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLException e) {
