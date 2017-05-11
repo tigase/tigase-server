@@ -346,7 +346,7 @@
 		<dependency>
 			<groupId>tigase.sure.web</groupId>
 			<artifactId>tigase-web-ui</artifactId>
-			<version>2.1.0</version>
+			<version>2.2.0-SNAPSHOT</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
