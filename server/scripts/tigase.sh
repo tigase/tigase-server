@@ -39,7 +39,10 @@
 
 function usage()
 {
-  echo "Usage: $0 {start|stop|run|clear|clearrestart|restart|check|status} [params-file.conf]"
+  echo "";
+  echo "Usage: $0 {start|stop|run|clear|clearrestart|restart|check|status|upgrade-schema} [params-file.conf] [parameters]"
+  echo "";
+  echo -e "\tFor upgrade-schema task please add --help as a parameter a for list of parameters supported by this task."
   exit 1
 }
 
