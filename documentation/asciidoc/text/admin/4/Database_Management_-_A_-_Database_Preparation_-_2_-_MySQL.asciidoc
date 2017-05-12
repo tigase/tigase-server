@@ -264,3 +264,19 @@ innodb_thread_concurrency = 16
 
 These settings may not be fully optimized for your system, and have been only tested on our systems. If you have found better settings for your systems, feel free to link:http://tigase.net/contact[let us know].
 //I am certainly not a database expert nor MySQL expert and I do not pretend to be one. So any comments or suggestions you may have are very welcome and appreciated.
+
+[[emojisupportSQL]]
+=== Support for emoji and other icons
+Tigase Database Schema can support emojis and other icons, however by using UTF-8 in `mysqld` settings will not allow this.  To employ settings to support emojis and other icons, we recommend you use the following in your MySQL configuration file:
+
+[source,properties]
+-----
+[mysqld]
+character-set-server = utf8mb4
+collation-server = utf8mb4_bin
+-----
+
+Doing this, Tigase XMPP Server Database will still use `utf8` character set, with `utf8_general_ci` as collation, and only fields which require support for emojis will be converted to `utf8mb4`.
+
+NOTE:Database URI passed in Tigase XMPP Server config *must not* contain `&characterEncoding=UTF-8` as in other case it will override `utf8mb4` client charset with `utf8` charset!
+NOTE:Tigase XMPP Server databases should be created with `utf8_general_ci collation` as it will work properly and is fastest from `utf8` collations supported by MySQL
