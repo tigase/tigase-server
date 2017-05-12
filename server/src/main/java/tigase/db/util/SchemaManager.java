@@ -20,7 +20,9 @@ package tigase.db.util;
 
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
+import tigase.conf.ConfigBuilder;
 import tigase.conf.ConfigReader;
+import tigase.conf.ConfigWriter;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.db.*;
 import tigase.db.beans.*;
@@ -29,6 +31,7 @@ import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
@@ -38,13 +41,13 @@ import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtilBean;
+import tigase.util.DNSResolverFactory;
+import tigase.util.setup.SetupHelper;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -73,6 +76,13 @@ public class SchemaManager {
 			return -1;
 		return o1.getId().compareTo(o2.getId());
 	};
+	
+	private static Stream<String> getActiveNonCoreComponentNames() {
+		return SetupHelper.getAvailableComponents().stream()
+				.filter(def -> def.isActive())
+				.filter(def -> !def.isCoreComponent())
+				.map(bean -> bean.getName());
+	}
 
 	private CommandlineParameter ROOT_USERNAME = new CommandlineParameter.Builder("R", DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME.getName())
 			.description("Database root account username used to create tigase user and database")
@@ -88,6 +98,11 @@ public class SchemaManager {
 			.description("Path to configuration file")
 			.requireArguments(true)
 			.required(true)
+			.build();
+
+	private CommandlineParameter COMPONENTS = new CommandlineParameter.Builder("C", "components").description(
+			"List of enabled components identifiers to load schema for")
+			.defaultValue(getActiveNonCoreComponentNames().collect(Collectors.joining(",")))
 			.build();
 
 
@@ -109,15 +124,17 @@ public class SchemaManager {
 	}
 
 	public void execute(String args[]) throws Exception {
-		ParameterParser parser = new ParameterParser(false);
-		parser.addOption(ROOT_USERNAME);
-		parser.addOption(ROOT_PASSWORD);
-		parser.addOption(CONFIG_FILE);
+		ParameterParser parser = new ParameterParser(true);
 
 		parser.setTasks(new Task[] {
 				new Task.Builder().name("upgrade-schema")
 						.description("Upgrade schema of databases specified in your config file")
-						.function(this::upgradeSchema).build()
+						.additionalParameterSupplier(this::upgradeSchemaParametersSupplier)
+						.function(this::upgradeSchema).build(),
+				new Task.Builder().name("install-schema")
+						.description("Install schema to database")
+						.additionalParameterSupplier(this::installSchemaParametersSupplier)
+						.function(this::installSchema).build()
 		});
 
 		Properties props = parser.parseArgs(args);
@@ -129,13 +146,61 @@ public class SchemaManager {
 		}
 	}
 
+	private List<CommandlineParameter> installSchemaParametersSupplier() {
+
+		List<CommandlineParameter> options = new ArrayList<>();
+		options.add(COMPONENTS);
+		options.addAll(SchemaLoader.getMainCommandlineParameters());
+		return options;
+	}
+
+	public void installSchema(Properties props) throws IOException, ConfigReader.ConfigException {
+		String type = props.getProperty(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName());
+		SchemaLoader loader = SchemaLoader.newInstance(type);
+		SchemaLoader.Parameters params = loader.createParameters();
+		params.setProperties(props);
+		loader.init(params);
+		String dbUri = loader.getDBUri();
+
+		Set<String> components = getProperty(props, COMPONENTS, (listStr) -> (Set<String>) new HashSet<>(
+				Arrays.asList(listStr.split(",")))).orElse(Collections.emptySet());
+		String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
+		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
+																 Optional.ofNullable(components), Optional.empty(), vhosts,
+																 Optional.empty(), Optional.empty());
+
+		Map<String, Object> config = configBuilder.build();
+		List<String> output = loadSchemas(config, props, "Schema installation finished");
+
+		output.add("");
+		output.add("Example init.properties configuration file:");
+		output.add("");
+		try (StringWriter writer = new StringWriter()) {
+			new ConfigWriter().write(writer, config);
+			output.addAll(Arrays.stream(writer.toString().split("\n")).collect(Collectors.toList()));
+		}
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+	}
+
+	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
+		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, CONFIG_FILE);
+	}
+
 	public void upgradeSchema(Properties props) throws IOException, ConfigReader.ConfigException {
-		Optional<String> config = getProperty(props, CONFIG_FILE);
+		Optional<String> configFile = getProperty(props, CONFIG_FILE);
+		try (FileReader reader = new FileReader(configFile.get())) {
+			Map<String, Object> config = new ConfigReader().read(reader);
+			List<String> output = loadSchemas(config, props, "Schema upgrade finished");
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+		}
+	}
+
+	private List<String> loadSchemas(Map<String, Object> config, Properties props, String title) throws IOException, ConfigReader.ConfigException {
 		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
 		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
 
 		SchemaManager schemaManager = new SchemaManager();
-		schemaManager.readConfig(new File(config.get()));
+		schemaManager.setConfig(config);
 		if (rootUser.isPresent() && rootPass.isPresent()) {
 			schemaManager.setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
@@ -146,7 +211,7 @@ public class SchemaManager {
 		log.info("begining upgrade...");
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = schemaManager.loadSchemas();
 		log.info("schema upgrade finished!");
-		List<String> output = new ArrayList<>(Arrays.asList("\tSchema upgrade finished"));
+		List<String> output = new ArrayList<>(Arrays.asList("\t" + title));
 		results.forEach((k,v) -> {
 			output.add("");
 			output.add("Data source: " + k.getName() + " with uri " + k.getResourceUri());
@@ -164,7 +229,7 @@ public class SchemaManager {
 				}
 			});
 		});
-		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+		return output;
 	}
 
 	public static Optional<String> getProperty(Properties props, CommandlineParameter parameter) {
@@ -173,6 +238,15 @@ public class SchemaManager {
 			return parameter.getDefaultValue();
 		}
 		return value;
+	}
+
+	public static <T> Optional<T> getProperty(Properties props, CommandlineParameter parameter, Function<String, T> converter) {
+		Optional<String> value = getProperty(props, parameter);
+		if (!value.isPresent()) {
+			return Optional.empty();
+		}
+		T result = converter.apply(value.get());
+		return Optional.ofNullable(result);
 	}
 
 	public SchemaManager() {
@@ -199,8 +273,16 @@ public class SchemaManager {
 
 	public void readConfig(String configString) throws IOException, ConfigReader.ConfigException {
 		try (StringReader reader = new StringReader(configString)) {
-			config = new ConfigReader().read(reader);
+			readConfig(reader);
 		}
+	}
+
+	public void readConfig(Reader reader) throws IOException, ConfigReader.ConfigException {
+		config = new ConfigReader().read(reader);
+	}
+
+	public void setConfig(Map<String, Object> config) {
+		this.config = config;
 	}
 
 	public void setDbRootCredentials(String user, String pass) {

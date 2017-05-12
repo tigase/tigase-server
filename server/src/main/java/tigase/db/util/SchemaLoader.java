@@ -18,14 +18,21 @@
  */
 package tigase.db.util;
 
+import tigase.conf.ConfigBuilder;
+import tigase.conf.ConfigWriter;
 import tigase.osgi.util.ClassUtilBean;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.BareJID;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
@@ -42,13 +49,9 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	public interface Parameters {
-
-		List<CommandlineParameter> getSetupOptions();
-
+		
 		void parseUri(String uri);
-
-		void parseArguments(String[] args);
-
+		
 		void setProperties(Properties props);
 
 		void setAdmins(List<BareJID> admins, String password);
@@ -56,7 +59,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		void setDbRootCredentials(String username, String password);
 
 	}
-	
+
 	public static SchemaLoader newInstance(String type) {
 		if (type == null) {
 			throw new RuntimeException("Missing dbType property");
@@ -97,6 +100,28 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		}).filter(instance -> instance != null);
 	}
 
+	public static List<CommandlineParameter> getMainCommandlineParameters() {
+		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(
+				loader -> loader.getSupportedTypes().stream())
+				.map(x -> (String) x)
+				.sorted()
+				.toArray(x -> new String[x]);
+		return Arrays.asList(
+				new CommandlineParameter.Builder("T", DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
+						"Database server type")
+						.options(supportedTypes)
+						.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
+						.valueDependentParametersProvider(SchemaLoader::getDbTypeDependentParameters)
+						.required(true)
+						.build()
+		);
+	}
+
+	private static List<CommandlineParameter> getDbTypeDependentParameters(String type) {
+		SchemaLoader loader = newInstance(type);
+		return loader.getCommandlineParameters();
+	}
+
 	/**
 	 * Main method allowing pass arguments to the class and setting all logging to
 	 * be printed to console.
@@ -107,13 +132,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public static void main( String[] args ) {
 		ParameterParser parser = new ParameterParser(true);
 
-		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(loader -> loader.getSupportedTypes().stream()).map(x -> (String) x).sorted().toArray(x -> new String[x]);
-		parser.addOption(new CommandlineParameter.Builder("T", DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
-				"Database server type")
-								 .options(supportedTypes)
-								 .defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
-								 .required(true)
-								 .build());
+		parser.addOptions(getMainCommandlineParameters());
 
 		Properties properties = null;
 
@@ -129,7 +148,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		SchemaLoader dbHelper = newInstance(type);
 
 		Parameters params = dbHelper.createParameters();
-		params.parseArguments(args);
+		params.setProperties(properties);
 
 		dbHelper.execute(params);
 	}
@@ -148,6 +167,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	public abstract String getDBUri();
 
+	public abstract List<CommandlineParameter> getSetupOptions();
+
+	public abstract List<CommandlineParameter> getCommandlineParameters();
+
 	/**
 	 * Method validates whether the connection can at least be eI stablished. If yes
 	 * then appropriate flag is set.
@@ -162,7 +185,24 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	 */
 	public abstract Result validateDBExists();
 	public abstract Result postInstallation();
-	public abstract Result printInfo();
+	public Result printInfo() {
+		String dataSourceUri = getDBUri();
+
+		ConfigBuilder builder = new ConfigBuilder();
+		builder.withBean(ds -> ds.name("dataSource").withBean(def -> def.name("default").with("uri", dataSourceUri)));
+
+		String configStr = null;
+		try (StringWriter writer = new StringWriter()) {
+			new ConfigWriter().write(writer, builder.build());
+			configStr = writer.toString();
+		} catch (IOException ex) {
+			// should not happen
+			configStr = "Failure: " + ex.getMessage();
+		}
+		Logger.getLogger(this.getClass().getCanonicalName())
+				.log(Level.INFO, "\n\nDatabase init.properties configuration:\n{0}\n", new Object[]{configStr});
+		return Result.ok;
+	}
 
 	/**
 	 * Method attempts to add XMPP admin user account to the database using

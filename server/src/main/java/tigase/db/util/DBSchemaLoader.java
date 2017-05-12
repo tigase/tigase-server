@@ -25,7 +25,6 @@ import tigase.db.TigaseDBException;
 import tigase.server.XMPPServer;
 import tigase.util.LogFormatter;
 import tigase.util.ui.console.CommandlineParameter;
-import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.SystemConsole;
 import tigase.xmpp.BareJID;
 
@@ -514,24 +513,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			return Result.error;
 		}
 
-		String db_conn = getDBUri(true, false );
-
-		switch ( params.getDbType() ) {
-			case "mysql":
-				if (!db_conn.contains("unicode=true")) {
-					db_conn += "&useUnicode=true&characterEncoding=UTF-8";
-				}
-				break;
-		}
-
-		log.log( Level.INFO,"\n\nDatabase init.properties configuration:\n"
-		        + "dataSource {\n"
-				+ "    default {\n"
-				+ "        uri = '" + db_conn + "'\n"
-				+ "    }\n"
-				+ "}\n");
-
-		return Result.ok;
+		return super.printInfo();
 	}
 
 	@Override
@@ -745,6 +727,97 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				break;
 		}
 		return db_uri;
+	}
+
+	public List<CommandlineParameter> getCommandlineParameters() {
+		List<CommandlineParameter> options = new ArrayList<>();
+
+		options.add(new CommandlineParameter.Builder("T", PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
+				"Database server type")
+							.defaultValue(PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
+							.required(true)
+							.build());
+//			parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS_ENUM.SCHEMA_VERSION.getName()).description(
+//					"Intended version of the schema to be loaded")
+//									 .options("4", "5", "5-1", "7-1", "7-2")
+//									 .required(true)
+//									 .defaultValue(PARAMETERS_ENUM.SCHEMA_VERSION.getDefaultValue())
+//									 .build());
+//		parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS_ENUM.COMPONENTS.getName()).description(
+//				"Comma-separated list of components for which schema should be loaded")
+//				                 .options("message-archiving","pubsub","muc","sock5","unified-archive")
+//				                 .defaultValue(PARAMETERS_ENUM.COMPONENTS.getDefaultValue())
+//				                 .build());
+
+		getSetupOptions().stream().forEach(options::add);
+
+		options.add(new CommandlineParameter.Builder("F", PARAMETERS_ENUM.FILE.getName()).description(
+				"Comma separated list of SQL files that will be processed").build());
+		options.add(new CommandlineParameter.Builder("Q", PARAMETERS_ENUM.QUERY.getName()).description(
+				"Custom query to be executed").build());
+		options.add(new CommandlineParameter.Builder("L", PARAMETERS_ENUM.LOG_LEVEL.getName()).description(
+				"Java Logger level during loading process")
+							.defaultValue(PARAMETERS_ENUM.LOG_LEVEL.getDefaultValue())
+							.build());
+		options.add(new CommandlineParameter.Builder("J", PARAMETERS_ENUM.ADMIN_JID.getName()).description(
+				"Comma separated list of administrator JID(s)").build());
+		options.add(new CommandlineParameter.Builder("N", PARAMETERS_ENUM.ADMIN_JID_PASS.getName()).description(
+				"Password that will be used for the entered JID(s) - one for all configured administrators")
+							.secret()
+							.build());
+		options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.GET_URI.getName()).description(
+				"Generate database URI")
+							.requireArguments(false)
+							.defaultValue(PARAMETERS_ENUM.GET_URI.getDefaultValue())
+							.build());
+		options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.IGNORE_MISSING_FILES.getName()).description(
+				"Force ignoring missing files errors")
+							.defaultValue(PARAMETERS_ENUM.IGNORE_MISSING_FILES.getDefaultValue())
+							.build());
+		return options;
+	}
+
+	public List<CommandlineParameter> getSetupOptions() {
+		List<CommandlineParameter> options = new ArrayList<>();
+		options.add(new CommandlineParameter.Builder("D", PARAMETERS_ENUM.DATABASE_NAME.getName()).description(
+				"Name of the database that will be created and to which schema will be loaded")
+							.defaultValue(PARAMETERS_ENUM.DATABASE_NAME.getDefaultValue())
+							.required(true)
+							.build());
+		options.add(new CommandlineParameter.Builder("H", PARAMETERS_ENUM.DATABASE_HOSTNAME.getName()).description(
+				"Address of the database instance")
+							.defaultValue(PARAMETERS_ENUM.DATABASE_HOSTNAME.getDefaultValue())
+							.required(true)
+							.build());
+		options.add(new CommandlineParameter.Builder("U", PARAMETERS_ENUM.TIGASE_USERNAME.getName()).description(
+				"Name of the user that will be created specifically to access Tigase XMPP Server")
+							.defaultValue(PARAMETERS_ENUM.TIGASE_USERNAME.getDefaultValue())
+							.required(true)
+							.build());
+		options.add(new CommandlineParameter.Builder("P", PARAMETERS_ENUM.TIGASE_PASSWORD.getName()).description(
+				"Password of the user that will be created specifically to access Tigase XMPP Server")
+							.defaultValue(PARAMETERS_ENUM.TIGASE_PASSWORD.getDefaultValue())
+							.required(true)
+							.secret()
+							.build());
+		options.add(new CommandlineParameter.Builder("R", PARAMETERS_ENUM.ROOT_USERNAME.getName()).description(
+				"Database root account username used to create tigase user and database")
+							.defaultValue(PARAMETERS_ENUM.ROOT_USERNAME.getDefaultValue())
+							.required(true)
+							.build());
+		options.add(new CommandlineParameter.Builder("A", PARAMETERS_ENUM.ROOT_PASSWORD.getName()).description(
+				"Database root account password used to create tigase user and database")
+							.defaultValue(PARAMETERS_ENUM.ROOT_PASSWORD.getDefaultValue())
+							.secret()
+							.required(true)
+							.build());
+		options.add(new CommandlineParameter.Builder("S", PARAMETERS_ENUM.USE_SSL.getName()).description(
+				"Enable SSL support for database connection (if database supports it)")
+							.requireArguments(false)
+							.defaultValue(PARAMETERS_ENUM.USE_SSL.getDefaultValue())
+							.type(Boolean.class)
+							.build());
+		return options;
 	}
 
 	enum Tasks implements TigaseDBTask {
@@ -988,65 +1061,6 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		}
 
 		@Override
-		public void parseArguments(String[] args) {
-			ParameterParser parser = new ParameterParser(true);
-
-			parser.addOption(new CommandlineParameter.Builder("T", PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
-					"Database server type")
-									 .defaultValue(PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
-									 .required(true)
-									 .build());
-//			parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS_ENUM.SCHEMA_VERSION.getName()).description(
-//					"Intended version of the schema to be loaded")
-//									 .options("4", "5", "5-1", "7-1", "7-2")
-//									 .required(true)
-//									 .defaultValue(PARAMETERS_ENUM.SCHEMA_VERSION.getDefaultValue())
-//									 .build());
-//		parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS_ENUM.COMPONENTS.getName()).description(
-//				"Comma-separated list of components for which schema should be loaded")
-//				                 .options("message-archiving","pubsub","muc","sock5","unified-archive")
-//				                 .defaultValue(PARAMETERS_ENUM.COMPONENTS.getDefaultValue())
-//				                 .build());
-
-			getSetupOptions().stream().forEach(option -> parser.addOption(option));
-
-			parser.addOption(new CommandlineParameter.Builder("F", PARAMETERS_ENUM.FILE.getName()).description(
-					"Comma separated list of SQL files that will be processed").build());
-			parser.addOption(new CommandlineParameter.Builder("Q", PARAMETERS_ENUM.QUERY.getName()).description(
-					"Custom query to be executed").build());
-			parser.addOption(new CommandlineParameter.Builder("L", PARAMETERS_ENUM.LOG_LEVEL.getName()).description(
-					"Java Logger level during loading process")
-									 .defaultValue(PARAMETERS_ENUM.LOG_LEVEL.getDefaultValue())
-									 .build());
-			parser.addOption(new CommandlineParameter.Builder("J", PARAMETERS_ENUM.ADMIN_JID.getName()).description(
-					"Comma separated list of administrator JID(s)").build());
-			parser.addOption(new CommandlineParameter.Builder("N", PARAMETERS_ENUM.ADMIN_JID_PASS.getName()).description(
-					"Password that will be used for the entered JID(s) - one for all configured administrators")
-									 .secret()
-									 .build());
-			parser.addOption(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.GET_URI.getName()).description(
-					"Generate database URI")
-									 .requireArguments(false)
-									 .defaultValue(PARAMETERS_ENUM.GET_URI.getDefaultValue())
-									 .build());
-			parser.addOption(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.IGNORE_MISSING_FILES.getName()).description(
-					"Force ignoring missing files errors")
-									 .defaultValue(PARAMETERS_ENUM.IGNORE_MISSING_FILES.getDefaultValue())
-									 .build());
-
-			Properties properties = null;
-
-			if (null == args || args.length == 0 || (properties = parser.parseArgs(args)) == null) {
-				System.out.println(parser.getHelp());
-				System.exit(0);
-			} else {
-				System.out.println("properties: " + properties);
-			}
-
-			setProperties(properties);
-		}
-
-		@Override
 		public void setProperties(Properties props) {
 			logLevel = getProperty(props, PARAMETERS_ENUM.LOG_LEVEL, val -> Level.parse(val));
 			ingoreMissingFiles = getProperty(props, PARAMETERS_ENUM.IGNORE_MISSING_FILES, val -> Boolean.valueOf(val));
@@ -1114,49 +1128,6 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				this.dbRootUser = this.dbUser;
 				this.dbRootPass = this.dbPass;
 			}
-		}
-
-		public List<CommandlineParameter> getSetupOptions() {
-			List<CommandlineParameter> options = new ArrayList<>();
-			options.add(new CommandlineParameter.Builder("D", PARAMETERS_ENUM.DATABASE_NAME.getName()).description(
-					"Name of the database that will be created and to which schema will be loaded")
-									 .defaultValue(PARAMETERS_ENUM.DATABASE_NAME.getDefaultValue())
-									 .required(true)
-									 .build());
-			options.add(new CommandlineParameter.Builder("H", PARAMETERS_ENUM.DATABASE_HOSTNAME.getName()).description(
-					"Address of the database instance")
-									 .defaultValue(PARAMETERS_ENUM.DATABASE_HOSTNAME.getDefaultValue())
-									 .required(true)
-									 .build());
-			options.add(new CommandlineParameter.Builder("U", PARAMETERS_ENUM.TIGASE_USERNAME.getName()).description(
-					"Name of the user that will be created specifically to access Tigase XMPP Server")
-									 .defaultValue(PARAMETERS_ENUM.TIGASE_USERNAME.getDefaultValue())
-									 .required(true)
-									 .build());
-			options.add(new CommandlineParameter.Builder("P", PARAMETERS_ENUM.TIGASE_PASSWORD.getName()).description(
-					"Password of the user that will be created specifically to access Tigase XMPP Server")
-									 .defaultValue(PARAMETERS_ENUM.TIGASE_PASSWORD.getDefaultValue())
-									 .required(true)
-									 .secret()
-									 .build());
-			options.add(new CommandlineParameter.Builder("R", PARAMETERS_ENUM.ROOT_USERNAME.getName()).description(
-					"Database root account username used to create tigase user and database")
-									 .defaultValue(PARAMETERS_ENUM.ROOT_USERNAME.getDefaultValue())
-									 .required(true)
-									 .build());
-			options.add(new CommandlineParameter.Builder("A", PARAMETERS_ENUM.ROOT_PASSWORD.getName()).description(
-					"Database root account password used to create tigase user and database")
-									 .defaultValue(PARAMETERS_ENUM.ROOT_PASSWORD.getDefaultValue())
-									 .secret()
-									 .required(true)
-									 .build());
-			options.add(new CommandlineParameter.Builder("S", PARAMETERS_ENUM.USE_SSL.getName()).description(
-					"Enable SSL support for database connection (if database supports it)")
-									 .requireArguments(false)
-									 .defaultValue(PARAMETERS_ENUM.USE_SSL.getDefaultValue())
-									 .type(Boolean.class)
-									 .build());
-			return options;
 		}
 
 		public Boolean getIngoreMissingFiles() {

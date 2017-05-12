@@ -21,6 +21,7 @@
 
 package tigase.kernel.beans.config;
 
+import tigase.conf.AbstractConfigBuilder;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.TypesConverter;
@@ -725,6 +726,47 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			}
 			sb.append('}');
 			return sb.toString();
+		}
+
+		public static class Builder extends AbstractConfigBuilder<BeanDefinition, Builder> {
+
+			private final Map<String, Object> parent;
+
+			public Builder(Map<String, Object> parent) {
+				super(new AbstractBeanConfigurator.BeanDefinition());
+				this.parent = parent;
+			}
+
+			public Builder() {
+				this(null);
+			}
+
+			public Builder active(boolean active) {
+				map.setActive(active);
+				return this;
+			}
+
+			public Builder name(String name) {
+				map.setBeanName(name);
+				return this;
+			}
+
+			public Builder clazz(Class<?> clazz) {
+				map.setClazzName(clazz == null ? null : clazz.getCanonicalName());
+				return this;
+			}
+
+			public Builder clazz(String clazz) {
+				map.setClazzName(clazz);
+				return this;
+			}
+
+			public BeanDefinition build() {
+				if (parent != null) {
+					parent.put(map.getBeanName(), map);
+				}
+				return map;
+			}
 		}
 	}
 
