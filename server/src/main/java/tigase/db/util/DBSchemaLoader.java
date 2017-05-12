@@ -30,9 +30,8 @@ import tigase.xmpp.BareJID;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
@@ -655,6 +654,52 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					}
 				}
 				return Result.ok;
+			});
+		}
+	}
+
+	public Result destroyDataSource() {
+		if ( !connection_ok ){
+			log.log( Level.INFO, "Connection not validated" );
+			return Result.error;
+		}
+
+		if ("derby".equals(params.getDbType())) {
+			shutdown();
+			Path path = Paths.get(params.getDbName());
+			try {
+				Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+						Files.delete(file);
+						return FileVisitResult.CONTINUE;
+					}
+
+					@Override
+					public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+						Files.delete(dir);
+						return FileVisitResult.CONTINUE;
+					}
+				});
+				return Result.ok;
+			} catch (IOException ex) {
+				log.log(Level.SEVERE, "Failed to remove path " + path.toString(), ex);
+				return Result.error;
+			}
+		} else {
+			String db_conn = getDBUri(false, true);
+			log.log(Level.INFO, "Dropping database, URI: " + db_conn);
+			return withStatement(db_conn, stmt -> {
+				String query = "drop database " + params.getDbName();
+				log.log(Level.FINEST, "Executing query: " + query);
+				try {
+					stmt.execute(query);
+					stmt.close();
+					return Result.ok;
+				} catch (SQLException ex) {
+					log.log(Level.WARNING, "Query failed: " + query + ", " + ex.getMessage());
+					return Result.warning;
+				}
 			});
 		}
 	}

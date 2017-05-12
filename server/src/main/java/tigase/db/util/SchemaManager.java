@@ -85,11 +85,11 @@ public class SchemaManager {
 	}
 
 	private CommandlineParameter ROOT_USERNAME = new CommandlineParameter.Builder("R", DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME.getName())
-			.description("Database root account username used to create tigase user and database")
+			.description("Database root account username used to create/remove tigase user and database")
 			.build();
 
 	private CommandlineParameter ROOT_PASSWORD = new CommandlineParameter.Builder("A", DBSchemaLoader.PARAMETERS_ENUM.ROOT_PASSWORD.getName())
-			.description("Database root account password used to create tigase user and database")
+			.description("Database root account password used to create/remove tigase user and database")
 			.secret()
 			.build();
 
@@ -104,7 +104,6 @@ public class SchemaManager {
 			"List of enabled components identifiers to load schema for")
 			.defaultValue(getActiveNonCoreComponentNames().collect(Collectors.joining(",")))
 			.build();
-
 
 	private final List<Class<?>> repositoryClasses;
 	private Map<String, Object> config;
@@ -134,7 +133,12 @@ public class SchemaManager {
 				new Task.Builder().name("install-schema")
 						.description("Install schema to database")
 						.additionalParameterSupplier(this::installSchemaParametersSupplier)
-						.function(this::installSchema).build()
+						.function(this::installSchema).build(),
+				new Task.Builder().name("destroy-schema")
+						.description("Destroy database and schemas")
+						.additionalParameterSupplier(this::destroySchemaParametersSupplier)
+						.function(this::destroySchema).build()
+
 		});
 
 		Properties props = parser.parseArgs(args);
@@ -146,11 +150,58 @@ public class SchemaManager {
 		}
 	}
 
+	private List<CommandlineParameter> destroySchemaParametersSupplier() {
+		List<CommandlineParameter> options = new ArrayList<>();
+		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, CONFIG_FILE));
+		options.addAll(SchemaLoader.getMainCommandlineParameters(true));
+		return options;
+	}
+
+	public void destroySchema(Properties props) throws IOException, ConfigReader.ConfigException {
+		fixShutdownThreadIssue();
+		String type = props.getProperty(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName());
+		Map<String, Object> config = null;
+		if (type != null) {
+			SchemaLoader loader = SchemaLoader.newInstance(type);
+			SchemaLoader.Parameters params = loader.createParameters();
+			params.setProperties(props);
+			loader.init(params);
+			String dbUri = loader.getDBUri();
+
+			String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
+			ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
+																	 Optional.empty(), Optional.empty(), vhosts,
+																	 Optional.empty(), Optional.empty());
+
+			config = configBuilder.build();
+		} else {
+			Optional<String> configFile = getProperty(props, CONFIG_FILE);
+			try (FileReader reader = new FileReader(configFile.get())) {
+				 config = new ConfigReader().read(reader);
+			}
+		}
+
+		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
+		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
+		
+		setConfig(config);
+		if (rootUser.isPresent() && rootPass.isPresent()) {
+			setDbRootCredentials(rootUser.get(), rootPass.get());
+		}
+
+		Map<String, DataSourceInfo> result = getDataSources();
+		log.info("found " + result.size() + " data sources to destroy...");
+		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
+		log.info("data sources  destruction finished!");
+		List<String> output = prepareOutput("Data source destruction finished", results);
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+	}
+
 	private List<CommandlineParameter> installSchemaParametersSupplier() {
 
 		List<CommandlineParameter> options = new ArrayList<>();
 		options.add(COMPONENTS);
-		options.addAll(SchemaLoader.getMainCommandlineParameters());
+		options.addAll(SchemaLoader.getMainCommandlineParameters(false));
 		return options;
 	}
 
@@ -199,18 +250,21 @@ public class SchemaManager {
 		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
 		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
 
-		SchemaManager schemaManager = new SchemaManager();
-		schemaManager.setConfig(config);
+		setConfig(config);
 		if (rootUser.isPresent() && rootPass.isPresent()) {
-			schemaManager.setDbRootCredentials(rootUser.get(), rootPass.get());
+			setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
 
-		Map<SchemaManager.DataSourceInfo, List<SchemaManager.SchemaInfo>> result = schemaManager.getDataSourcesAndSchemas();
+		Map<SchemaManager.DataSourceInfo, List<SchemaManager.SchemaInfo>> result = getDataSourcesAndSchemas();
 		log.info("found " + result.size() + " data sources to upgrade...");
 
 		log.info("begining upgrade...");
-		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = schemaManager.loadSchemas();
+		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
 		log.info("schema upgrade finished!");
+		return prepareOutput(title, results);
+	}
+
+	private List<String> prepareOutput(String title, Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results) {
 		List<String> output = new ArrayList<>(Arrays.asList("\t" + title));
 		results.forEach((k,v) -> {
 			output.add("");
@@ -303,6 +357,19 @@ public class SchemaManager {
 //		return getSchemaFileName(schemaInfo, ds.getResourceUri());
 //	}
 
+	public Map<DataSourceInfo, List<ResultEntry>> destroySchemas(Collection<DataSourceInfo> dataSources) {
+		return dataSources.stream().map(e -> new Pair<>(e, destroySchemas(e))).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+	}
+
+	public List<ResultEntry> destroySchemas(DataSource ds) {
+		return executeWithSchemaLoader(ds, (schemaLoader, handler) -> {
+			List<ResultEntry> results = new ArrayList<>();
+			log.log(Level.FINEST, "removing database for data source " + ds);
+			results.add(new ResultEntry("Destroying data source", schemaLoader.destroyDataSource(), handler));
+			return results;
+		});
+	}
+
 	public Map<DataSourceInfo, List<ResultEntry>> loadSchemas() {
 		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas();
 		return dataSourceSchemas.entrySet()
@@ -326,6 +393,28 @@ public class SchemaManager {
 			return Collections.EMPTY_LIST;
 		}
 
+		return executeWithSchemaLoader(ds, (schemaLoader, handler) -> {
+			List<ResultEntry> results = new ArrayList<>();
+			results.add(new ResultEntry("Checking if database exists", schemaLoader.validateDBExists(), handler));
+			log.log(Level.FINER, "loading schemas for data source " + ds);
+			schemas.sort(SCHEMA_INFO_COMPARATOR);
+			results.addAll(schemas.stream().filter(schema -> schema.isValid()).map(schema -> {
+				log.log(Level.FINER, "loading schema with id ='" + schema + "'");
+				return new ResultEntry(
+						"Loading schema: " + schema.getName() + ", version: " + schema.getVersion(),
+						schemaLoader.loadSchema(schema.getId(), schema.getVersion()), handler);
+			}).collect(Collectors.toList()));
+
+			if (schemas.stream().filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId())).findAny().isPresent()) {
+				results.add(new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(), handler));
+			}
+
+			results.add(new ResultEntry("Post installation action", schemaLoader.postInstallation(), handler));
+			return results;
+		});
+	}
+
+	private List<ResultEntry> executeWithSchemaLoader(DataSource ds, SchemaLoaderExecutor function) {
 		SchemaLoader schemaLoader = SchemaLoader.newInstanceForURI(ds.getResourceUri());
 		List<ResultEntry> results = new ArrayList<>();
 
@@ -350,22 +439,9 @@ public class SchemaManager {
 		schemaLoader.init(params);
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));
-		results.add(new ResultEntry("Checking if database exists", schemaLoader.validateDBExists(), handler));
 
-		log.log(Level.FINER, "loading schemas for data source " + ds);
-		schemas.sort(SCHEMA_INFO_COMPARATOR);
-		results.addAll(schemas.stream().filter(schema -> schema.isValid()).map(schema -> {
-			log.log(Level.FINER, "loading schema with id ='" + schema + "'");
-			return new ResultEntry(
-					"Loading schema: " + schema.getName() + ", version: " + schema.getVersion(),
-					schemaLoader.loadSchema(schema.getId(), schema.getVersion()), handler);
-		}).collect(Collectors.toList()));
+		results.addAll(function.execute(schemaLoader, handler));
 
-		if (schemas.stream().filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId())).findAny().isPresent()) {
-			results.add(new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(), handler));
-		}
-
-		results.add(new ResultEntry("Post installation action", schemaLoader.postInstallation(), handler));
 		schemaLoader.shutdown();
 		return results;
 	}
@@ -526,6 +602,12 @@ public class SchemaManager {
 		configurator.registerBeans(null, null, config);
 
 		List<BeanConfig> repoBeans = crawlKernel(repositoryClasses, kernel, configurator, config);
+		fixShutdownThreadIssue();
+		return repoBeans;
+	}
+
+	private void fixShutdownThreadIssue() {
+		MonitorRuntime.getMonitorRuntime();
 		try {
 			Field f = MonitorRuntime.class.getDeclaredField("mainShutdownThread");
 			f.setAccessible(true);
@@ -534,7 +616,6 @@ public class SchemaManager {
 		} catch (NoSuchFieldException | IllegalAccessException ex) {
 			log.log(Level.FINEST, "There was an error with unregistration of shutdown hook", ex);
 		}
-		return repoBeans;
 	}
 
 	private List<BeanConfig> crawlKernel(List<Class<?>> repositoryClasses, Kernel kernel,
@@ -749,5 +830,9 @@ public class SchemaManager {
 		public V getValue() {
 			return value;
 		}
+	}
+
+	public interface SchemaLoaderExecutor {
+		List<ResultEntry> execute(SchemaLoader schemaLoader, SchemaManagerLogHandler handler);
 	}
 }

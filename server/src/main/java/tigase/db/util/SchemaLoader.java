@@ -100,7 +100,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		}).filter(instance -> instance != null);
 	}
 
-	public static List<CommandlineParameter> getMainCommandlineParameters() {
+	public static List<CommandlineParameter> getMainCommandlineParameters(boolean forceNotRequired) {
 		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(
 				loader -> loader.getSupportedTypes().stream())
 				.map(x -> (String) x)
@@ -110,9 +110,9 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 				new CommandlineParameter.Builder("T", DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
 						"Database server type")
 						.options(supportedTypes)
-						.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
+						//.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
 						.valueDependentParametersProvider(SchemaLoader::getDbTypeDependentParameters)
-						.required(true)
+						.required(!forceNotRequired)
 						.build()
 		);
 	}
@@ -132,7 +132,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public static void main( String[] args ) {
 		ParameterParser parser = new ParameterParser(true);
 
-		parser.addOptions(getMainCommandlineParameters());
+		parser.addOptions(getMainCommandlineParameters(false));
 
 		Properties properties = null;
 
@@ -221,4 +221,5 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public abstract Result shutdown();
 
 	public abstract Result loadSchema(String schemaId, String version);
+	public abstract Result destroyDataSource();
 }

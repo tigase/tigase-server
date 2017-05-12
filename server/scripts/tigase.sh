@@ -229,7 +229,7 @@ case "${1}" in
     sh -c "exec $TIGASE_CMD"
     ;;
 
-  upgrade-schema|install-schema)
+  upgrade-schema|install-schema|destroy-schema)
     TMP="${@:3}"
     echo "Upgrading database schema: ${TMP}"
     sh -c "${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager ${1} ${TIGASE_OPTIONS} ${TMP}"
