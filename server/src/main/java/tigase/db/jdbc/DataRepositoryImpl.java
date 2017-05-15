@@ -25,11 +25,12 @@ import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.Repository;
 import tigase.stats.CounterValue;
-import tigase.stats.StatisticsProviderIfc;
 import tigase.stats.StatisticsList;
+import tigase.stats.StatisticsProviderIfc;
 import tigase.xmpp.BareJID;
 
 import java.sql.*;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -166,6 +167,21 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 			// stmt = null;
 		}
 		return result;
+	}
+
+	@Override
+	public void checkConnectivity(Duration watchdogTime) {
+		try {
+			if (watchdogTime.toMillis() < (System.currentTimeMillis() - lastConnectionValidated)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "checking connection status {0}, last query executed {1}ms ago",
+							new Object[]{this, (System.currentTimeMillis() - lastConnectionValidated)});
+				}
+				checkConnection();
+			}
+		} catch (SQLException ex) {
+			log.log(Level.FINER, "Exception during repository reinitialization", ex);
+		}
 	}
 
 	@Override

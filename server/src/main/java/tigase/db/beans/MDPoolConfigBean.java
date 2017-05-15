@@ -200,6 +200,10 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 		repo.initRepository(getUri(), Collections.EMPTY_MAP);
 	}
 
+	protected A getRepository() {
+		return repository;
+	}
+
 	public void setRepository(A repo) {
 		this.repository = repo;
 		if (repo != null) {

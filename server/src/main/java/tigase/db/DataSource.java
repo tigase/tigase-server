@@ -21,6 +21,8 @@
  */
 package tigase.db;
 
+import java.time.Duration;
+
 /**
  * Created by andrzej on 09.03.2016.
  */
@@ -33,5 +35,9 @@ public interface DataSource extends Repository {
 	 *         string.
 	 */
 	String getResourceUri();
+
+	default void checkConnectivity(Duration watchdogTime) {
+
+	}
 
 }

@@ -36,6 +36,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.Duration;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -176,6 +177,8 @@ public class DefaultTypesConverter
 				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
 						val.equalsIgnoreCase("on") || val.equals("1"));
 				return (T) Boolean.valueOf(b);
+			} else if (expectedType.equals(Duration.class)) {
+				return (T) Duration.parse(value.toString().trim());
 			} else if (expectedType.equals(byte[].class) && value.toString().startsWith("string:")) {
 				return (T) value.toString().substring(7).getBytes();
 			} else if (expectedType.equals(byte[].class) && value.toString().startsWith("base64:")) {

@@ -28,6 +28,8 @@ import tigase.db.DataSourcePool;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
@@ -37,11 +39,13 @@ import tigase.stats.StatisticsCollector;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
 
@@ -54,7 +58,12 @@ import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
 public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBean> implements
 																				   ComponentStatisticsProvider {
 
+	private static final Logger log = Logger.getLogger(DataSourceBean.class.getCanonicalName());
+
 	private final Map<String, DataSource> repositories = new ConcurrentHashMap<>();
+
+	private ScheduledExecutorService executorService = null;
+	private int watchdogs = 0;
 
 	@Inject
 	private EventBus eventBus;
@@ -132,7 +141,41 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 		return DataSourceMDConfigBean.class;
 	}
 
-	public static class DataSourceMDConfigBean extends MDPoolConfigBean<DataSource, DataSourceMDConfigBean> {
+	protected ScheduledFuture addWatchdogTask(Runnable task, Duration frequency) {
+		synchronized (this) {
+			if (executorService == null) {
+				executorService = Executors.newSingleThreadScheduledExecutor();
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "created watchdog executor");
+				}
+			}
+			watchdogs++;
+			return executorService.scheduleAtFixedRate(task, frequency.toMillis(), frequency.toMillis(), TimeUnit.MILLISECONDS);
+		}
+	}
+
+	protected void removeWatchdogTask(ScheduledFuture scheduledFuture) {
+		synchronized (this) {
+			scheduledFuture.cancel(true);
+			watchdogs--;
+			if (watchdogs == 0) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "destroying watchdog executor");
+				}
+				executorService.shutdown();
+				executorService = null;
+			}
+		}
+	}
+
+	public static class DataSourceMDConfigBean
+			extends MDPoolConfigBean<DataSource, DataSourceMDConfigBean>
+			implements UnregisterAware {
+
+		private ScheduledFuture future = null;
+
+		@ConfigField(desc = "Watchdog data source frequency", alias = "watchdog-frequency")
+		private Duration watchdogFrequency = Duration.ofHours(1);
 
 		@Override
 		protected Class<? extends DataSource> getRepositoryIfc() {
@@ -153,6 +196,55 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 			return poolClass == null ? null : poolClass.getCanonicalName();
 		}
 
+		public void setWatchdogFrequency(Duration watchdogFrequency) {
+			this.watchdogFrequency = watchdogFrequency;
+			updateWatchdogTask();
+		}
+
+		@Override
+		public void initialize() {
+			super.initialize();
+			updateWatchdogTask();
+		}
+
+		@Override
+		public void beforeUnregister() {
+			if (future != null) {
+				if (mdPool != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "unregistering watchdog for data source {0}", name);
+					}
+					((DataSourceBean) mdPool).removeWatchdogTask(future);
+				}
+			}
+		}
+
+		private void executeWatchdog() {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "execution of watchdog for data source {0}", name);
+			}
+			this.getRepository().checkConnectivity(watchdogFrequency);
+		}
+
+		private void updateWatchdogTask() {
+			if (mdPool != null) {
+				DataSourceBean dataSourceBean = (DataSourceBean) mdPool;
+				if (future != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "unregistering watchdog for data source {0}", name);
+					}
+					dataSourceBean.removeWatchdogTask(future);
+				}
+
+				if (!watchdogFrequency.isZero()) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "registering watchdog for data source {0} with frequency {1}",
+								new Object[]{name, watchdogFrequency});
+					}
+					dataSourceBean.addWatchdogTask(this::executeWatchdog, watchdogFrequency);
+				}
+			}
+		}
 	}
 
 	public static class DataSourceChangedEvent {

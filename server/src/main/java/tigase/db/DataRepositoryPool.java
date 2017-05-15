@@ -23,14 +23,15 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import tigase.stats.StatisticsProviderIfc;
 import tigase.stats.StatisticsList;
+import tigase.stats.StatisticsProviderIfc;
 import tigase.xmpp.BareJID;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -65,6 +66,11 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 	 */
 	public void addRepo(DataRepository repo) {
 		repoPool.addIfAbsent(repo);
+	}
+
+	@Override
+	public void checkConnectivity(Duration watchdogTime) {
+		repoPool.forEach(repo -> repo.checkConnectivity(watchdogTime));
 	}
 
 	/**
