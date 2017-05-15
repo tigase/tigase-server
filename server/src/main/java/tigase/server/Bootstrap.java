@@ -81,6 +81,9 @@ public class Bootstrap implements Lifecycle {
 			if (e.getKey().startsWith("--")) {
 				String key = e.getKey().substring(2);
 				System.setProperty(key, e.getValue().toString());
+				if (CLUSTER_MODE.equals(e.getKey())) {
+					System.setProperty("tigase.cache", "false");
+				}					
 			}
 		}
 

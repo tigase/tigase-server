@@ -24,6 +24,7 @@ package tigase.server.amp.db;
 import tigase.db.*;
 import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
@@ -62,6 +63,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	private static final long MSGS_STORE_LIMIT_VAL = 100;
 	public static final String MSGS_STORE_LIMIT_KEY = "store-limit";
 	private static final String MSGS_USER_STORE_LIMIT_ENABLE_KEY = "user-store-limit-enable";
+	private static final String NULL_STR = "NULL";
 	
 	protected static final int MAX_QUEUE_SIZE = 1000;
 	
@@ -69,6 +71,9 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 			new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
 	private ReentrantLock expiredMessagesLock;
 	private Condition expiredMessagesCondition;
+
+	@Inject
+	private UserRepository userRepository;
 
 	public enum MSG_TYPES { none(0), message(1), presence(2);
 
@@ -164,20 +169,22 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 	}	
 
-	protected long getMsgsStoreLimit(BareJID userJid, NonAuthUserRepository userRepo) {
+	protected long getMsgsStoreLimit(BareJID userJid, NonAuthUserRepository userRepo) throws UserNotFoundException {
 		if (msgs_user_store_limit) {
-			try {
-				String limitStr = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, null);
-				if (limitStr != null) {
-					long limit = Long.parseLong(limitStr);
-					// in case of 0 we need to disable offline storage - not to save all as in case of store-limit
-					if (limit == 0)
-						limit = -1;
-					return limit;
-				}
-			} catch (UserNotFoundException ex) {
-				// should not happen
+			String limitStr = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, NULL_STR);
+			if (limitStr == null) {
+				throw new UserNotFoundException("User " + userJid + " not found in user repository");
 			}
+			if (NULL_STR != limitStr) {
+				long limit = Long.parseLong(limitStr);
+				// in case of 0 we need to disable offline storage - not to save all as in case of store-limit
+				if (limit == 0) {
+					limit = -1;
+				}
+				return limit;
+			}
+		} else if (!userRepository.userExists(userJid)) {
+			throw new UserNotFoundException("User " + userJid + " not found in user repository");
 		}
 		return msgs_store_limit;
 	}

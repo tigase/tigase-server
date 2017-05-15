@@ -447,52 +447,13 @@ public class JDBCRepository
 
 	@Override
 	public long getUserUID(BareJID user_id) throws TigaseDBException {
-		Long cache_res = (Long) cache.get(user_id.toString());
-
-		if (cache_res != null) {
-			return cache_res.longValue();
-		}    // end of if (result != null)
-
-		long result = -1;
-
 		try {
-			result = getUserUID(null, user_id);
+			return getUserUID(null, user_id);
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error retrieving user UID from repository: ", e);
 		}
-		cache.put(user_id.toString(), Long.valueOf(result));
-
-		return result;
 	}
-
-	public long getUserUID(DataRepository repo, BareJID user_id) throws SQLException {
-		long result  = -1;
-
-		ResultSet rs = null;
-		PreparedStatement uid_sp = null;
-
-		if (repo == null) {
-			uid_sp = data_repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
-		} else {
-			uid_sp = repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
-		}
-		synchronized (uid_sp) {
-			try {
-				uid_sp.setString(1, user_id.toString());
-				rs = uid_sp.executeQuery();
-				if (rs.next()) {
-					result = rs.getLong(1);
-				} else {
-					result = -1;
-				}
-			} finally {
-				data_repo.release(null, rs);
-			}
-		}
-
-		return result;
-	}
-
+	
 	@Override
 	public List<BareJID> getUsers() throws TigaseDBException {
 		ResultSet rs = null;
@@ -1221,6 +1182,47 @@ public class JDBCRepository
 		if (result > 0) {
 			cache.put(user_id + "/" + node_path, Long.valueOf(result));
 		}    // end of if (result > 0)
+
+		return result;
+	}
+
+	private long getUserUID(DataRepository repo, BareJID user_id) throws SQLException {
+		Long cache_res = (Long) cache.get(user_id.toString());
+
+		if (cache_res != null) {
+			return cache_res.longValue();
+		}    // end of if (result != null)
+
+		long result = getUserUIDDirect(repo, user_id);
+		cache.put(user_id.toString(), Long.valueOf(result));
+
+		return result;
+	}
+
+	private long getUserUIDDirect(DataRepository repo, BareJID user_id) throws SQLException {
+		long result  = -1;
+
+		ResultSet rs = null;
+		PreparedStatement uid_sp = null;
+
+		if (repo == null) {
+			uid_sp = data_repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
+		} else {
+			uid_sp = repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
+		}
+		synchronized (uid_sp) {
+			try {
+				uid_sp.setString(1, user_id.toString());
+				rs = uid_sp.executeQuery();
+				if (rs.next()) {
+					result = rs.getLong(1);
+				} else {
+					result = -1;
+				}
+			} finally {
+				data_repo.release(null, rs);
+			}
+		}
 
 		return result;
 	}

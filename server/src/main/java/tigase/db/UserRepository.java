@@ -232,6 +232,7 @@ public interface UserRepository extends Repository {
 	 * number if the user exists and negative if the user was not found in the repository.
 	 * @throws TigaseDBException if there is a problem with accessing user repository.
 	 */
+	@Deprecated
 	long getUserUID(BareJID user) throws TigaseDBException;
 
 	/**
