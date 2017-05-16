@@ -231,8 +231,7 @@ case "${1}" in
 
   upgrade-schema|install-schema|destroy-schema)
     TMP="${@:3}"
-    echo "Upgrading database schema: ${TMP}"
-    sh -c "${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager ${1} ${TIGASE_OPTIONS} ${TMP}"
+    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager ${1} ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
   check|status)

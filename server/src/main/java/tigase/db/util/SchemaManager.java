@@ -123,19 +123,20 @@ public class SchemaManager {
 	}
 
 	public void execute(String args[]) throws Exception {
+		String scriptName = System.getProperty("scriptName");
 		ParameterParser parser = new ParameterParser(true);
 
 		parser.setTasks(new Task[] {
 				new Task.Builder().name("upgrade-schema")
-						.description("Upgrade schema of databases specified in your config file")
+						.description("Upgrade schema of databases specified in your config file - it's not possible to specify parameters")
 						.additionalParameterSupplier(this::upgradeSchemaParametersSupplier)
 						.function(this::upgradeSchema).build(),
 				new Task.Builder().name("install-schema")
-						.description("Install schema to database")
+						.description("Install schema to database - it requires specifying database parameters where schema will be installed (config file will be ignored)")
 						.additionalParameterSupplier(this::installSchemaParametersSupplier)
 						.function(this::installSchema).build(),
 				new Task.Builder().name("destroy-schema")
-						.description("Destroy database and schemas")
+						.description("Destroy database and schemas (DANGEROUS)")
 						.additionalParameterSupplier(this::destroySchemaParametersSupplier)
 						.function(this::destroySchema).build()
 
@@ -146,10 +147,16 @@ public class SchemaManager {
 		if (props != null && task.isPresent()) {
 			task.get().execute(props);
 		} else {
-			System.out.println(parser.getHelp());
+			String executionCommand = null;
+			if (scriptName != null) {
+				executionCommand = "$ " + scriptName + " [task] [params-file.conf] [options]" + "\n\t\t" +
+						"if the option defines default then <value> is optional";
+			}
+
+			System.out.println(parser.getHelp(executionCommand));
 		}
 	}
-
+	                                                                                                                             
 	private List<CommandlineParameter> destroySchemaParametersSupplier() {
 		List<CommandlineParameter> options = new ArrayList<>();
 		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, CONFIG_FILE));
