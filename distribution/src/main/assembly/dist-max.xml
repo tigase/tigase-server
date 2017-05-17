@@ -112,6 +112,7 @@
                 <include>**/tigase-acs-pubsub*</include>
                 <include>**/tigase-muc*</include>
                 <include>**/tigase-pubsub*</include>
+				<include>**/tigase-push*.jar</include>
                 <include>**/tigase-extras*.jar</include>
                 <include>**/tigase-stats-collector-library*</include>
                 <include>**/tigase-stats-collector-provider*</include>
