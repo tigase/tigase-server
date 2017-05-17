@@ -298,3 +298,5 @@ http () {
 -----
 
 This tells Tigase to operate in a setup mode, and tells the http component to allow login with the username and password admin/tigase.  With this you can enter the setup process that is covered in xref:webinstall[this section].
+
+There are other options for config-type: `default`, `session-manager`, `connection-managers`, and `component`.  For more information, visit xref:configType[Config Type] property description.
