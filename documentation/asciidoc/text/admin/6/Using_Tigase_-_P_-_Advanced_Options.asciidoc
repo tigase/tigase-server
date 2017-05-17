@@ -10,6 +10,22 @@
 
 This section is designed to include a number of advanced configuration options available within Tigase, but may not have a relevant section yet to house them.
 
+[[XEP0077CAPCHA]]
+== Using CAPTCHA for in-band registration
+To reduce false or spam registrations to Tigase XMPP Server, there is now the ability to add CAPTCHA forms as a part of the in-band registration.  The CAPTCHA will generate a random math equation and ask the user registering a new account to answer it.  This may be enabled as a sub-option of enabling registration in init.properties:
+[source,properties]
+-----
+'sess-man' {
+    'jabber:iq:register' {
+        captchaRequired = 'true'
+    }
+}
+-----
+
+NOTE: Because some clients do not refresh a registration form after an uncessfull attempt, this option allows 3 retries with the same CAPTCHA.
+
+3 unsucessful attempts will result in the captcha being invalidated and a client will recieve an error message.
+
 == Enabling Support for storing offline messages without body content
 
 Tigase now supports the full implementation or XEP-0334, See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
@@ -33,10 +49,36 @@ sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
 == Account Registration Limits
 
 In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  This may be configured by adding the following line in the init.properties file:
+[source,properties]
 -----
-sess-man/plugins-conf/jabber\:iq\:register/registrations-per-second=10
+'registration-throttling' () {
+    limit = 10
 -----
 This setting allows for 10 registrations from a single IP per second.  If the limit is exceeded, a +NOT_ALLOWED+ error will be returned.
+
+It is possible to create two seperate counters as well:
+[source,properties]
+-----
+'registration-throttling' () {
+    limit = 10
+}
+c2s {
+    'registration-throttling' (class: tigase.server.xmppclient.RegistrationThrottling) {
+        limit = 3
+    }
+}
+-----
+Here we have one for c2s with a limit of 3, and a global for all other connection managers set at 10.
+
+You can also set individual components limits as well:
+[source,properties]
+-----
+ws2s {
+    'registration-throttling' (class: tigase.server.xmppclient.RegistrationThrottling) {
+        limit = 7
+    }
+}
+-----
 
 [[silentIgnore]]
 == Enable Silent Ignore on Packets Delivered to Unavailable Resources

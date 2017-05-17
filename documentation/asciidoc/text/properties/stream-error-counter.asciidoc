@@ -1,0 +1,17 @@
+[[stream-error-counter]]
+= stream-error-counter
+:author: Daniel Wisnewski
+:version: v2.0, May 2017
+:date: 2017-05-12
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* none
+
+*Example:* `c2s/processors[s]=stream-error-counter`
+
+*Description:* Add stream-error-counter to comma seperated processors of components for which you wish to count the number of stream errors made.  Without enabling this, statistics will return 0.
+
+*Available since:* 7.1.0

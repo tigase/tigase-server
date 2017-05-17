@@ -453,6 +453,8 @@ include::text/properties/ssl-container-class.asciidoc[]
 
 include::text/properties/ssl-def-cert-domain.asciidoc[]
 
+include::text/properties/stream-error-counter.asciidoc[]
+
 include::text/properties/stringprep-proecssor.asciidoc[]
 
 include::text/properties/test.asciidoc[]

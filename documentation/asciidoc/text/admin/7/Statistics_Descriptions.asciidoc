@@ -219,6 +219,7 @@ LOWEST
 |{IN/OUT}_QUEUE processed {type}
 |The number of stanzas of different types that have been processed VIA the In or Out Queue of this component.  This number will reset at the end of the server instance.
 Each component will have a list of the different types of stanzas it can process. |FINER |Integer |
+#
 messages
 presences
 cluster
@@ -233,7 +234,8 @@ IQ command
 IQ jabber:iq:private
 IQ http://jabber.org/protocol/disco#info
 total IQ
-|`{compname}/IN_QUEUE processed messages`
+|`{compname}/IN_QUEUE processed`
+`{compname}/IN_QUEUE processed messages`
 `{compname}/IN_QUEUE processed presences`
 `{compname}/IN_QUEUE processed cluster`
 `{compname}/IN_QUEUE processed other`
@@ -296,6 +298,10 @@ Note that the processor arrray will only have as many threads as the component h
 |processing threads
 |The number of threads provided for the particular component. |FINER |Integer |
 |`{compname}/processing threads`
+
+|stream-error-counter
+|The number of errors counted during the operation of the server for this component.  Will only be available if xref:stream-error-counter[stream-error-counter] is enabled in init.properties, otherwise will be 0. |FINE |Integer |
+|`{compname}/processors/stream-error-counter`
 
 |Socket overflow
 |The number of times that this component has experienced socket overflow and had to drop packets.  This does not include the number of dropped packets. |FINEST |Integer |
@@ -366,7 +372,7 @@ second
 
 == *c2s*
 
-No exclusive c2s specific statistics
+No exclusive c2s specific statistics.
 
 == *cl-comp*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
@@ -455,7 +461,7 @@ hour
 |===================================================================================================
 == *eventbus*
 
-No exclusive eventbus specific statistics
+No exclusive eventbus specific statistics.
 
 == *message-archive*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
@@ -1593,4 +1599,4 @@ Lost: Number of packets lost during processing. +
 
 == *ws2s*
 
-No exclusive ws2s specific statistics
+No exclusive ws2s specific statistics.
