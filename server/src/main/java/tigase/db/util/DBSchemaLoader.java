@@ -1182,6 +1182,21 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		public void setIngoreMissingFiles(Boolean ingoreMissingFiles) {
 			this.ingoreMissingFiles = ingoreMissingFiles;
 		}
+
+		@Override
+		public String toString() {
+			return "[" + Arrays.stream(this.getClass().getDeclaredFields()).map(field -> {
+				String result = field.getName() + ": ";
+				Object value;
+				try {
+					field.setAccessible(true);
+					value = field.get(this);
+				} catch (Exception ex) {
+					value = "Error!";
+				}
+				return result + value;
+			}).collect(Collectors.joining(", ")) + "]";
+		}
 	}
 
 	public interface SQLCommand<C, R> {
