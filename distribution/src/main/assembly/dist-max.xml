@@ -205,6 +205,15 @@
 				<include>com.sun.mail:javax.mail</include>
 				<include>com.sun.mail:smtp</include>
 
+				<!-- Tigase Push - APNs-->
+				<include>com.notnoop.apns:apns</include>
+				<include>commons-httpclient:commons-httpclient:</include>
+				<include>commons-logging:commons-logging</include>
+				<include>commons-codec:commons-codec</include>
+				<include>com.fasterxml.jackson.core:jackson-databind</include>
+				<include>com.fasterxml.jackson.core:jackson-annotations</include>
+				<include>com.fasterxml.jackson.core:jackson-core</include>
+
 			</includes>
 		</dependencySet>
 	</dependencySets>
