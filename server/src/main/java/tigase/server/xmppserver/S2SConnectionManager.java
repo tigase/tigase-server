@@ -178,6 +178,9 @@ public class S2SConnectionManager
 	@Inject
 	private DomainServerNameMapper domainServerNameMapper;
 
+	@Inject
+	private List<S2SFilterIfc> filters = Collections.emptyList();
+
 	/**
 	 * List of processors which should handle all traffic incoming from the
 	 * network. In most cases if not all, these processors handle just protocol
@@ -347,9 +350,15 @@ public class S2SConnectionManager
 			for (S2SProcessor proc : processors) {
 				processed |= proc.process(p, serv, results);
 				writePacketsToSocket(serv, results);
-				if (proc.stopProcessing())
-					break;
 			}
+
+			if (!processed) {
+				for (S2SFilterIfc filter : filters) {
+					processed |= filter.filter(p, serv, results);
+					writePacketsToSocket(serv, results);
+				}
+			}
+
 			if (!processed) {
 
 				// Sometimes xmlns is not set for the packet. Usually it does not

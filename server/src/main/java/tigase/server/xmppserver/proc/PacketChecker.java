@@ -52,7 +52,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "PacketChecker", parent = S2SConnectionManager.class, active = true)
-public class PacketChecker extends S2SAbstractProcessor {
+public class PacketChecker extends S2SAbstractFilter {
 
         private static final Logger log = Logger.getLogger(PacketChecker.class.getName());
 
@@ -71,12 +71,7 @@ public class PacketChecker extends S2SAbstractProcessor {
         private String[] allowedOtherDomainsWithSameIpWhitelist = null;
         
         //~--- methods --------------------------------------------------------------
-
-		@Override
-		public int order() {
-			return 0;
-		}
-		
+        
         @Override
         public void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props) {
                 super.init(handler, props);
@@ -109,7 +104,7 @@ public class PacketChecker extends S2SAbstractProcessor {
         }
         
         @Override
-        public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
+        public boolean filter(Packet p, S2SIOService serv, Queue<Packet> results) {
                 if ((p.getXMLNS() == XMLNS_SERVER_VAL) || (p.getXMLNS() == XMLNS_CLIENT_VAL)) {
                         if ((p.getStanzaFrom() == null) || (p.getStanzaFrom().getDomain().trim().isEmpty())
                                 || (p.getStanzaTo() == null) || p.getStanzaTo().getDomain().trim().isEmpty()) {
@@ -202,10 +197,6 @@ public class PacketChecker extends S2SAbstractProcessor {
                 return allowed;
         }
 
-        @Override
-        public boolean stopProcessing() {
-                return true;
-        }
 }
 
 
