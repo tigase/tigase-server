@@ -214,6 +214,10 @@
 				<include>com.fasterxml.jackson.core:jackson-annotations</include>
 				<include>com.fasterxml.jackson.core:jackson-core</include>
 
+				<!-- Tigase Push - FCM-->
+				<include>tigase:jaxmpp-core</include>
+				<include>tigase:jaxmpp-j2se</include>
+
 			</includes>
 		</dependencySet>
 	</dependencySets>
