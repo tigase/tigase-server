@@ -40,7 +40,7 @@
 function usage()
 {
   echo "";
-  echo "Usage: $0 {start|stop|run|clear|clearrestart|restart|check|status|install-schema|upgrade-schema} [params-file.conf] [parameters]"
+  echo "Usage: $0 {start|stop|run|clear|clearrestart|restart|check|status|install-schema|upgrade-schema|upgrade-config} [params-file.conf] [parameters]"
   echo "";
   echo -e "\tFor upgrade-schema task please add --help as a parameter a for list of parameters supported by this task."
   exit 1
@@ -232,6 +232,11 @@ case "${1}" in
   upgrade-schema|install-schema|destroy-schema)
     TMP="${@:3}"
     sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager ${1} ${TIGASE_OPTIONS} ${TMP}"
+    ;;
+
+  upgrade-config)
+    TMP="${@:3}"
+    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} tigase.conf.ConfigHolder ${1} ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
   check|status)

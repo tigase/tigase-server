@@ -23,13 +23,19 @@ package tigase.conf;
 import tigase.db.RepositoryFactory;
 import tigase.kernel.beans.Bean;
 import tigase.server.ext.ComponentProtocol;
+import tigase.server.monitor.MonitorRuntime;
 import tigase.server.xmppsession.SessionManagerConfig;
+import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtilBean;
 import tigase.util.DataTypes;
+import tigase.util.ui.console.CommandlineParameter;
+import tigase.util.ui.console.ParameterParser;
+import tigase.util.ui.console.Task;
 import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,6 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static tigase.conf.ConfigHolder.Format.dsl;
 import static tigase.conf.Configurable.GEN_SM_PLUGINS;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
@@ -60,6 +67,87 @@ public class ConfigHolder {
 	private Format format = null;
 	private Map<String, Object> props = new LinkedHashMap<>();
 	private Path initPropertiesPath;
+
+	public static void main(String[] args) throws Exception {
+		String scriptName = System.getProperty("scriptName");
+		ParameterParser parser = new ParameterParser(true);
+
+		parser.setTasks(new Task[]{new Task.Builder().name("upgrade-config")
+										   .description(
+												   "Checks configuration file and upgrades it if needed")
+										   .function(ConfigHolder::upgradeConfig).build()});
+		parser.addOption(new CommandlineParameter.Builder(null, ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.replace("--", ""))
+								  .defaultValue(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF)
+								  .description("Path to configuration file")
+								  .requireArguments(true)
+								  .required(true)
+								  .build());
+
+		Properties props = parser.parseArgs(args);
+		Optional<Task> task = parser.getTask();
+		if (props != null && task.isPresent()) {
+			task.get().execute(props);
+		} else {
+			String executionCommand = null;
+			if (scriptName != null) {
+				executionCommand = "$ " + scriptName + " [task] [params-file.conf] [options]" + "\n\t\t" +
+						"if the option defines default then <value> is optional";
+			}
+
+			System.out.println(parser.getHelp(executionCommand));
+		}
+	}
+
+	private static void upgradeConfig(Properties args) throws Exception {
+		String configFile = (String) args.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.replace("--", ""));
+		ConfigHolder holder = new ConfigHolder();
+		holder.props.put(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY, configFile);
+
+		holder.fixShutdownThreadIssue();
+
+		try {
+			List<String> output = new ArrayList<>();
+			holder.detectPathAndFormat();
+			switch (holder.format) {
+				case dsl:
+					holder.loadFromDSLFiles();
+					TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+							"Configuration file " + configFile + " is in DSL format and is valid."
+					});
+					break;
+				case properties:
+					holder.loadFromPropertiesFiles();
+					Path initPropsFile = holder.initPropertiesPath;
+					Path initPropsFileOld = initPropsFile.resolveSibling(holder.initPropertiesPath.getFileName() + ".old");
+					holder.props = ConfigWriter.buildTree(holder.props);
+					try {
+						Files.deleteIfExists(initPropsFileOld);
+						Files.move(initPropsFile, initPropsFileOld);
+						holder.saveToDSLFile(initPropsFile.toFile());
+					} catch (IOException ex) {
+						TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+								"Error! Failed to save upgraded configuration file", ex.getMessage()
+						});
+					}
+					TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+							"Configuration file " + configFile + " was converted to DSL format.",
+							"Previous version of a configuration file was saved at " + initPropsFileOld
+					});
+					break;
+			}
+		} catch ( ConfigReader.UnsupportedOperationException e ) {
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"ERROR! Error in configuration file: " + configFile,
+					e.getMessage() + " at line " + e.getLine() + " position " + e.getPosition(),
+					"Line: " + e.getLineContent()
+			});
+		} catch ( ConfigReader.ConfigException e ) {
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"ERROR! Error in configuration file: " + configFile,
+					"Issue with configuration file: " + e
+			});
+		}
+	}
 
 	public void loadConfiguration(String[] args) throws IOException, ConfigReader.ConfigException {
 		List<String> settings = new LinkedList<>();
@@ -135,7 +223,7 @@ public class ConfigHolder {
 					String line;
 					while ((line = reader.readLine()) != null) {
 						if (line.contains("{") && !line.contains("{clusterNode}")) {
-							format = Format.dsl;
+							format = dsl;
 							return;
 						}
 					}
@@ -487,4 +575,17 @@ public class ConfigHolder {
 
 		}
 	}
+
+	private void fixShutdownThreadIssue() {
+		MonitorRuntime.getMonitorRuntime();
+		try {
+			Field f = MonitorRuntime.class.getDeclaredField("mainShutdownThread");
+			f.setAccessible(true);
+			MonitorRuntime monitorRuntime = MonitorRuntime.getMonitorRuntime();
+			Runtime.getRuntime().removeShutdownHook((Thread) f.get(monitorRuntime));
+		} catch (NoSuchFieldException | IllegalAccessException ex) {
+			log.log(Level.FINEST, "There was an error with unregistration of shutdown hook", ex);
+		}
+	}
+
 }
