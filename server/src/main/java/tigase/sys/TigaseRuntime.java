@@ -78,15 +78,15 @@ public abstract class TigaseRuntime {
 				oldMemPool = memoryPoolMXBean;
 
 				memoryPoolMXBeans.put("old",memoryPoolMXBean);
-				log.log(Level.INFO, "Using {0} memory pool for reporting (old) memory usage.", memoryPoolMXBean.getName());
+				log.log(Level.CONFIG, "Using {0} memory pool for reporting (old) memory usage.", memoryPoolMXBean.getName());
 			}
 			if (memoryPoolMXBean.getName().toLowerCase().contains("survivor")) {
 				memoryPoolMXBeans.put("survivor",memoryPoolMXBean);
-				log.log(Level.INFO, "Using {0} memory pool for reporting survivor memory usage.", memoryPoolMXBean.getName());
+				log.log(Level.CONFIG, "Using {0} memory pool for reporting survivor memory usage.", memoryPoolMXBean.getName());
 			}
 			if (memoryPoolMXBean.getName().toLowerCase().contains("eden")) {
 				memoryPoolMXBeans.put("eden",memoryPoolMXBean);
-				log.log(Level.INFO, "Using {0} memory pool for reporting eden memory usage.", memoryPoolMXBean.getName());
+				log.log(Level.CONFIG, "Using {0} memory pool for reporting eden memory usage.", memoryPoolMXBean.getName());
 			}
 		}
 	}
