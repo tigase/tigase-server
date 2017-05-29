@@ -105,6 +105,13 @@ public class ConfigHolder {
 
 		holder.fixShutdownThreadIssue();
 
+		if (!new File(configFile).exists()) {
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"Configuration file " + configFile + " does not exist."
+			});
+			return;
+		}
+
 		try {
 			List<String> output = new ArrayList<>();
 			holder.detectPathAndFormat();
