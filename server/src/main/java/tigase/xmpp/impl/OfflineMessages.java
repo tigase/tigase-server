@@ -168,8 +168,7 @@ public class OfflineMessages
 
 				Authorization saveResult = savePacketForOffLineUser( packet, msg_repo, repo );
 				Packet result = null;
-
-				notify(packet, conn, queue, settings);
+				notifyNewOfflineMessage(packet, conn, queue, settings);
 
 				switch (saveResult) {
 					case SERVICE_UNAVAILABLE:
@@ -225,6 +224,10 @@ public class OfflineMessages
 								log.finer("Sending off-line messages: " + packets.size());
 							}
 							results.addAll(packets);
+
+							if(!packets.isEmpty()) {
+								notifyOfflineMessagesRetrieved(conn, results);
+							}
 						}    // end of if (packets != null)
 					} catch (UserNotFoundException e) {
 						log.info("Something wrong, DB problem, cannot load offline messages. " + e);
@@ -581,9 +584,15 @@ public class OfflineMessages
 		return false;
 	}
 
-	protected void notify(Packet packet, XMPPResourceConnection conn, Queue<Packet> queue, Map<String, Object> settings) {
+	protected void notifyNewOfflineMessage(Packet packet, XMPPResourceConnection conn, Queue<Packet> queue, Map<String, Object> settings) {
 		if (notifiers != null) {
-			notifiers.forEach(notirier -> notirier.notify(packet, conn, queue, settings));
+			notifiers.forEach(notifier -> notifier.notifyNewOfflineMessage(packet, conn, queue, settings));
+		}
+	}
+
+	protected void notifyOfflineMessagesRetrieved(XMPPResourceConnection conn, Queue<Packet> queue) {
+		if (notifiers != null) {
+			notifiers.forEach(notifier -> notifier.notifyOfflineMessagesRetrieved(conn, queue));
 		}
 	}
 
@@ -734,7 +743,11 @@ public class OfflineMessages
 
 	public interface Notifier {
 
-		void notify(Packet packet, XMPPResourceConnection conn, Queue<Packet> queue, Map<String, Object> settings);
+		void notifyNewOfflineMessage(Packet packet, XMPPResourceConnection conn, Queue<Packet> queue, Map<String, Object> settings);
+
+		default void notifyOfflineMessagesRetrieved(XMPPResourceConnection session, Queue<Packet> results) {
+			// default implementation does nothing...
+		}
 
 	}
 
@@ -747,7 +760,7 @@ public class OfflineMessages
 		@ConfigField(desc = "PubSub offline message publisher", alias = MSG_PUBSUB_PUBLISHER)
 		private String defaultPublisher;
 
-		public void notify(final Packet packet, final XMPPResourceConnection conn, final Queue<Packet> queue,
+		public void notifyNewOfflineMessage(final Packet packet, final XMPPResourceConnection conn, final Queue<Packet> queue,
 									Map<String, Object> settings) {
 			if (pubSubJID == null || pubSubNode == null)
 				return;

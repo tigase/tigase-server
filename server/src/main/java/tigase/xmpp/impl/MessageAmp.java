@@ -160,7 +160,7 @@ public class MessageAmp
 					Authorization saveResult = offlineProcessor.savePacketForOffLineUser(packet, msg_repo, repo);
 					Packet result = null;
 
-					offlineProcessor.notify(packet, session, results, settings);
+					offlineProcessor.notifyNewOfflineMessage(packet, session, results, settings);
 
 					switch (saveResult) {
 						case SERVICE_UNAVAILABLE:
@@ -274,6 +274,10 @@ public class MessageAmp
 								log.finer("Sending off-line messages: " + packets.size());
 							}
 							results.addAll(packets);
+
+							if(!packets.isEmpty()) {
+								offlineProcessor.notifyOfflineMessagesRetrieved(session, results);
+							}
 						}    // end of if (packets != null)
 					} catch (UserNotFoundException e) {
 						log.info("Something wrong, DB problem, cannot load offline messages. " + e);
