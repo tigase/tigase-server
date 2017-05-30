@@ -76,6 +76,12 @@ public class SchemaManager {
 			return -1;
 		return o1.getId().compareTo(o2.getId());
 	};
+
+	private static Stream<String> getNonCoreComponentNames() {
+		return SetupHelper.getAvailableComponents().stream()
+				.filter(def -> !def.isCoreComponent())
+				.map(bean -> bean.getName());
+	}
 	
 	private static Stream<String> getActiveNonCoreComponentNames() {
 		return SetupHelper.getAvailableComponents().stream()
@@ -101,8 +107,9 @@ public class SchemaManager {
 			.build();
 
 	private CommandlineParameter COMPONENTS = new CommandlineParameter.Builder("C", "components").description(
-			"List of enabled components identifiers to load schema for")
-			.defaultValue(getActiveNonCoreComponentNames().collect(Collectors.joining(",")))
+			"List of enabled components identifiers (+/-)")
+			.defaultValue(getActiveNonCoreComponentNames().sorted().collect(Collectors.joining(",")))
+			.options(getNonCoreComponentNames().sorted().toArray(x -> new String[x]))
 			.build();
 
 	private final List<Class<?>> repositoryClasses;
@@ -177,7 +184,7 @@ public class SchemaManager {
 
 			String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 			ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
-																	 Optional.empty(), Optional.empty(), vhosts,
+																	 Optional.empty(), Optional.empty(), Optional.empty(), vhosts,
 																	 Optional.empty(), Optional.empty());
 
 			config = configBuilder.build();
@@ -220,11 +227,30 @@ public class SchemaManager {
 		loader.init(params);
 		String dbUri = loader.getDBUri();
 
-		Set<String> components = getProperty(props, COMPONENTS, (listStr) -> (Set<String>) new HashSet<>(
-				Arrays.asList(listStr.split(",")))).orElse(Collections.emptySet());
+		Map<String, Set<String>> changes = getProperty(props, COMPONENTS,
+													   (listStr) -> Arrays.asList(listStr.split(","))).orElse(
+				Collections.emptyList())
+				.stream()
+				.collect(Collectors.groupingBy((v) -> v.startsWith("-") ? "-" : "+", Collectors.mapping(
+						(v) -> (v.startsWith("-") || v.startsWith("+")) ? v.substring(1) : v, Collectors.toSet())));
+
+		Set<String> components = getActiveNonCoreComponentNames().collect(Collectors.toSet());
+
+		changes.forEach((k,v) -> {
+			switch (k) {
+				case "+":
+					components.addAll(v);
+					break;
+				case "-":
+					components.removeAll(v);
+					break;
+			}
+		});
+
+
 		String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
-																 Optional.ofNullable(components), Optional.empty(), vhosts,
+																 Optional.ofNullable(components), Optional.ofNullable(changes.get("+")), Optional.empty(), vhosts,
 																 Optional.empty(), Optional.empty());
 
 		Map<String, Object> config = configBuilder.build();

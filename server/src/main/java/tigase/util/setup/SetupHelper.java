@@ -68,7 +68,7 @@ public class SetupHelper {
 	}
 
 	public static ConfigBuilder generateConfig(ConfigTypeEnum configType, String dbUri, boolean clusterMode, boolean acs,
-											   Optional<Set<String>> optionalComponentsOption, Optional<Set<String>> pluginsOption,
+											   Optional<Set<String>> optionalComponentsOption, Optional<Set<String>> forceEnabledComponentsOptions, Optional<Set<String>> pluginsOption,
 											   String[] virtualDomains, Optional<String[]> admins,
 											   Optional<HttpSecurity> httpSecurity) {
 		ConfigBuilder builder = new ConfigBuilder().with("config-type", configType.id().toLowerCase());
@@ -77,7 +77,7 @@ public class SetupHelper {
 			builder.with("--cluster-mode", "true");
 		}
 		builder.with("--virt-hosts", Arrays.stream(virtualDomains).collect(Collectors.joining(",")))
-				.with("admin", admins)
+				.with("admins", admins)
 				.with("--debug", "server");
 
 		builder.withBean(ds -> ds.name("dataSource").withBean(def -> def.name("default").with("uri", dbUri)));
@@ -115,7 +115,10 @@ public class SetupHelper {
 					ConfigType ct = def.getClazz().getAnnotation(ConfigType.class);
 
 					if (optionalComponents.contains(def.getName())) {
-						return def.isActive() == false || (ct != null && !Arrays.asList(ct.value()).contains(configType));
+						return def.isActive() == false ||
+								(ct != null && !Arrays.asList(ct.value()).contains(configType)) ||
+								(forceEnabledComponentsOptions.isPresent() &&
+										forceEnabledComponentsOptions.get().contains(def.getName()));
 					} else {
 						return def.isActive() == true && (ct != null && Arrays.asList(ct.value()).contains(configType));
 					}

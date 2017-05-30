@@ -168,12 +168,19 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 		System.out.println( "LogLevel: " + lvl );
 
-		Handler handler = new ConsoleHandler();
-		handler.setLevel( lvl );
-		handler.setFormatter( new LogFormatter() );
 		log.setUseParentHandlers( false );
-		log.addHandler( handler );
 		log.setLevel( lvl );
+
+		Arrays.stream(log.getHandlers())
+				.filter((handler) -> handler instanceof ConsoleHandler)
+				.findAny()
+				.orElseGet(() -> {
+					Handler handler = new ConsoleHandler();
+					handler.setLevel(lvl);
+					handler.setFormatter(new LogFormatter());
+					log.addHandler(handler);
+					return handler;
+				});
 
 		log.log(Level.CONFIG, "Parameters: {0}", new Object[]{params});
 		this.params = params;
