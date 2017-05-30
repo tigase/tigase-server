@@ -579,7 +579,8 @@ public class Kernel {
 					try {
 						initBean(b, createdBeansConfig, deep + 1);
 					} catch (InvocationTargetException|KernelException|InstantiationException ex) {
-						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean");
+						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean" + ExceptionUtilities
+								.getExceptionRootCause(ex, true));
 						log.log(Level.CONFIG, "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" + ", skipping injection of this bean", ex);
 						Object i = b.getKernel().beanInstances.remove(b);
 						if (i instanceof RegistrarBean) {
