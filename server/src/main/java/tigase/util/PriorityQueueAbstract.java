@@ -24,6 +24,9 @@ package tigase.util;
 
 //~--- classes ----------------------------------------------------------------
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Works like a LinkedBlockingQueue using the put() and take() methods but
  * with an additional priority integer parameter. The elemnt returned from
@@ -38,6 +41,8 @@ package tigase.util;
  * @version $Rev$
  */
 public abstract class PriorityQueueAbstract<E> {
+
+	private static final Logger log = Logger.getLogger(PriorityQueueAbstract.class.getName());
 
 	/** Field description */
 	public static final String NONPRIORITY_QUEUE = "nonpriority-queue";
@@ -156,13 +161,7 @@ public abstract class PriorityQueueAbstract<E> {
 			result.init(maxPriority, maxSize);
 		}
 
-//  System.out.println("Initialized queue implementation: " + result.getClass().getName());
+		log.log(Level.CONFIG, "Initialized queue implementation: " + result.getClass().getName());
 		return result;
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
