@@ -407,6 +407,9 @@ public class ConfigHolder {
 						toRemove.add(k);
 					}
 				}
+				if (k.equals("--" + SessionManagerConfig.SM_THREADS_POOL_PROP_KEY)) {
+					props.put("sess-man/" + SessionManagerConfig.SM_THREADS_POOL_PROP_KEY, v);
+				}
 			});
 
 //			List<String> userDbDomains = new ArrayList<>();

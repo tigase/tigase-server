@@ -144,6 +144,8 @@ public class SessionManager
 	private boolean          skipPrivacy = false;
 	@ConfigField(desc = "Factor for number of threads per plugin", alias = SessionManagerConfig.SM_THREADS_FACTOR_PROP_KEY)
 	private int          pluginsThreadFactor = 1;
+	@ConfigField(desc = "Default processors threads pool size", alias = SessionManagerConfig.SM_THREADS_POOL_PROP_KEY)
+	private String smThreadsPool = SessionManagerConfig.SM_THREADS_POOL_PROP_VAL;
 	@Inject
 	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
 	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
@@ -760,7 +762,36 @@ public class SessionManager
 			}
 		}
 	}
+	
+	public void setSmThreadsPool(String val) {
+		this.smThreadsPool = val;
+		if (!SM_THREADS_POOL_PROP_VAL.equals(val)) {
+			String[] threads_pool_params = val.split(":");
+			int size = 100;
+			if (threads_pool_params.length > 1) {
+				try {
+					size = Integer.parseInt(threads_pool_params[1]);
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Incorrect threads pool size: {0}, setting default to 100",
+							threads_pool_params[1]);
+					size = 100;
+				}
+			}
 
+			try {
+				ProcessorWorkerThread worker = new ProcessorWorkerThread();
+				ProcessingThreads<ProcessorWorkerThread> pt = new ProcessingThreads<>(worker, size, maxQueueSize,
+																					  defPluginsThreadsPool);
+				workerThreads.put(defPluginsThreadsPool, pt);
+				if (isInitializationComplete()) {
+					log.log(Level.CONFIG, "Created a default thread pool: {0}", size);
+				}
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "");
+			}
+		}
+	}
+	
 	@Override
 	public void initialize() {
 		super.initialize();

@@ -78,7 +78,7 @@ public abstract class SessionManagerConfig {
 	protected static final String SM_THREADS_POOL_CUSTOM_PROP_VAL = "custom";
 
 	/** Field description */
-	protected static final String SM_THREADS_POOL_PROP_KEY = "sm-threads-pool";
+	public static final String SM_THREADS_POOL_PROP_KEY = "sm-threads-pool";
 
 	/** Field description */
 	protected static final String SM_THREADS_POOL_PROP_VAL = "default";
