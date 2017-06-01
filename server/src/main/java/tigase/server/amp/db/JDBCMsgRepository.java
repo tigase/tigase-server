@@ -401,6 +401,8 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 					Packet.elemToString(msg) });
 		}
 
+		boolean result = false;
+
 		try {
 			long msgs_store_limit = getMsgsStoreLimit(to.getBareJID(), userRepo);
 
@@ -432,7 +434,10 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 				}
 				insert_msg_st.setLong(7, msgs_store_limit);
 				
-				insert_msg_st.executeUpdate();
+				ResultSet rs = insert_msg_st.executeQuery();
+				if (rs.next()) {
+					result = rs.getLong(1) != 0;
+				}
 			}
 
 			if (expired != null) {
@@ -450,7 +455,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
-		return true;
+		return result;
 	}
 
 	@Override
