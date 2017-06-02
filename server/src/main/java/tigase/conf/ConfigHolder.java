@@ -487,6 +487,20 @@ public class ConfigHolder {
 					}
 					toRemove.add(k);
 				}
+				if (k.startsWith("basic-conf/logging/")) {
+					String t = k.replace("basic-conf/logging/","");
+					if (t.contains(".")) {
+						int idx = t.lastIndexOf('.');
+						if (idx > 0) {
+							String group = t.substring(0, idx);
+							String key = t.substring(idx+1);
+							Map<String, Object> logging = (Map<String, Object>) toAdd.computeIfAbsent("logging", (k1) -> new HashMap<>());
+							Map<String, Object> handler = (Map<String, Object>) logging.computeIfAbsent(group, (k1) -> new HashMap<>());
+							handler.put(key, v);
+							toRemove.add(k);
+						}
+					}
+				}
 			});
 
 //			List<String> userDbDomains = new ArrayList<>();
