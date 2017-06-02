@@ -152,7 +152,7 @@ public class Kernel {
 		}
 
 		// there is no need to wait to initialize parent beans, it there any?
-		if (bean instanceof Initializable) {
+		if (bean instanceof Initializable && beanConfig.getState() != State.initialized) {
 			((Initializable) bean).initialize();
 		}
 		tmpBC.setState(State.initialized);
