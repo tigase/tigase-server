@@ -73,15 +73,16 @@ public class ConfigHolder {
 		ParameterParser parser = new ParameterParser(true);
 
 		parser.setTasks(new Task[]{new Task.Builder().name("upgrade-config")
-										   .description(
-												   "Checks configuration file and upgrades it if needed")
+										   .description("Checks configuration file and upgrades it if needed")
 										   .function(ConfigHolder::upgradeConfig).build()});
-		parser.addOption(new CommandlineParameter.Builder(null, ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.replace("--", ""))
-								  .defaultValue(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF)
-								  .description("Path to configuration file")
-								  .requireArguments(true)
-								  .required(true)
-								  .build());
+		parser.addOption(new CommandlineParameter.Builder(null,
+														  ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.replace("--",
+																												  "")).defaultValue(
+				ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF)
+								 .description("Path to configuration file")
+								 .requireArguments(true)
+								 .required(true)
+								 .build());
 
 		Properties props = parser.parseArgs(args);
 		Optional<Task> task = parser.getTask();
@@ -106,9 +107,8 @@ public class ConfigHolder {
 		holder.fixShutdownThreadIssue();
 
 		if (!new File(configFile).exists()) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"Configuration file " + configFile + " does not exist."
-			});
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"Configuration file " + configFile + " does not exist."});
 			return;
 		}
 
@@ -118,41 +118,41 @@ public class ConfigHolder {
 			switch (holder.format) {
 				case dsl:
 					holder.loadFromDSLFiles();
-					TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-							"Configuration file " + configFile + " is in DSL format and is valid."
-					});
+					TigaseRuntime.getTigaseRuntime()
+							.shutdownTigase(new String[]{
+									"Configuration file " + configFile + " is in DSL format and is valid."});
 					break;
 				case properties:
 					holder.loadFromPropertiesFiles();
 					Path initPropsFile = holder.initPropertiesPath;
-					Path initPropsFileOld = initPropsFile.resolveSibling(holder.initPropertiesPath.getFileName() + ".old");
+					Path initPropsFileOld = initPropsFile.resolveSibling(
+							holder.initPropertiesPath.getFileName() + ".old");
 					holder.props = ConfigWriter.buildTree(holder.props);
 					try {
 						Files.deleteIfExists(initPropsFileOld);
 						Files.move(initPropsFile, initPropsFileOld);
 						holder.saveToDSLFile(initPropsFile.toFile());
 					} catch (IOException ex) {
-						TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-								"Error! Failed to save upgraded configuration file", ex.getMessage()
-						});
+						TigaseRuntime.getTigaseRuntime()
+								.shutdownTigase(new String[]{"Error! Failed to save upgraded configuration file",
+															 ex.getMessage()});
 					}
-					TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-							"Configuration file " + configFile + " was converted to DSL format.",
-							"Previous version of a configuration file was saved at " + initPropsFileOld
-					});
+					TigaseRuntime.getTigaseRuntime()
+							.shutdownTigase(
+									new String[]{"Configuration file " + configFile + " was converted to DSL format.",
+												 "Previous version of a configuration file was saved at " +
+														 initPropsFileOld});
 					break;
 			}
-		} catch ( ConfigReader.UnsupportedOperationException e ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"ERROR! Error in configuration file: " + configFile,
-					e.getMessage() + " at line " + e.getLine() + " position " + e.getPosition(),
-					"Line: " + e.getLineContent()
-			});
-		} catch ( ConfigReader.ConfigException e ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"ERROR! Error in configuration file: " + configFile,
-					"Issue with configuration file: " + e
-			});
+		} catch (ConfigReader.UnsupportedOperationException e) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Error in configuration file: " + configFile,
+												 e.getMessage() + " at line " + e.getLine() + " position " +
+														 e.getPosition(), "Line: " + e.getLineContent()});
+		} catch (ConfigReader.ConfigException e) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Error in configuration file: " + configFile,
+												 "Issue with configuration file: " + e});
 		}
 	}
 
@@ -208,8 +208,7 @@ public class ConfigHolder {
 		String property_filenames = (String) props.remove(PROPERTY_FILENAME_PROP_KEY);
 		if (property_filenames == null) {
 			property_filenames = PROPERTY_FILENAME_PROP_DEF;
-			log.log(Level.WARNING, "No property file not specified! Using default one {0}",
-					property_filenames);
+			log.log(Level.WARNING, "No property file not specified! Using default one {0}", property_filenames);
 		}
 
 		if (property_filenames != null) {
@@ -301,11 +300,12 @@ public class ConfigHolder {
 			List<String> toRemove = new ArrayList<>();
 
 			//List<String> dataSourceNames = new ArrayList<>();
-			Map<String, Map<String,String>> dataSources = new HashMap<>();
+			Map<String, Map<String, String>> dataSources = new HashMap<>();
 
 			Pattern commandsPattern = Pattern.compile("^([^\\/]+)\\/command\\/(.+)$");
+			Pattern processorsPattern = Pattern.compile("^([^\\/]+)\\/processors\\/(.+)$");
 
-			props.forEach((k,v) -> {
+			props.forEach((k, v) -> {
 				if (k.equals("config-type")) {
 					switch ((String) v) {
 						case "--gen-config-all":
@@ -332,44 +332,87 @@ public class ConfigHolder {
 					String active = "true";
 					toAdd.put(name + "/class", cls);
 					toAdd.put(name + "/active", active);
-				}
-				if (k.endsWith("/processors")) {
-					toAdd.put(k.replace("/processors", "/beans"), v);
-					toRemove.add(k);
-				}
-				if (k.startsWith("--user-db") || k.startsWith("--auth-db")) {
+
+					if ("tigase.http.HttpMessageReceiver".equals(cls)) {
+						props.entrySet().stream().filter(e -> e.getKey().startsWith(name + "/http/")).forEach(e -> {
+							String key = e.getKey().replace(name + "/http/", "");
+							Map<String, Object> httpServerCfg = (Map<String, Object>) toAdd.computeIfAbsent(
+									"httpServer", (k1) -> new HashMap<>());
+							if (key.equals("server-class")) {
+								httpServerCfg.put("class", e.getValue());
+								toRemove.add(e.getKey());
+							} else if (key.equals("ports")) {
+								Map<String, Object> connections = (Map<String, Object>) httpServerCfg.computeIfAbsent(
+										"connections", (k1) -> new HashMap<>());
+								for (int port : ((int[]) e.getValue())) {
+									connections.compute(String.valueOf(port), (k1, v1) -> {
+										if (v1 == null) {
+											v1 = new HashMap<>();
+										}
+										((Map) v1).put("active", true);
+										return v1;
+									});
+								}
+								if (!Arrays.stream((int[]) e.getValue()).filter(v1 -> v1 == 8080).findAny().isPresent()) {
+									connections.compute(String.valueOf(8080), (k1, v1) -> {
+										if (v1 == null) {
+											v1 = new HashMap<>();
+										}
+										((Map) v1).put("active", true);
+										return v1;
+									});
+								}
+								toRemove.add(e.getKey());
+							} else if (key.endsWith("/socket") || key.endsWith("/domain")) {
+								Map<String, Object> connections = (Map<String, Object>) httpServerCfg.computeIfAbsent(
+										"connections", (k1) -> new HashMap<>());
+								String[] parts = key.split("/");
+								String port = parts[0];
+								Map<String, Object> portCfg = (Map<String, Object>) connections.computeIfAbsent(port, (k1) -> new HashMap<>());
+								portCfg.put(parts[1], e.getValue());
+
+								toRemove.add(e.getKey());
+							} else {
+								httpServerCfg.put(key, e.getValue());
+								toRemove.add(e.getKey());
+							}
+						});
+					}
+
+				} if (k.startsWith("--user-db") || k.startsWith("--auth-db") || k.startsWith("--amp-repo")) {
 					String domain = "default";
 					if (k.endsWith("]")) {
 						domain = k.substring(k.indexOf('[') + 1, k.length() - 1);
 					}
 					toRemove.add(k);
 
-					Map<String,String> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
-					if (k.startsWith("--user-db-uri"))  {
+					Map<String, String> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
+					if (k.startsWith("--user-db-uri")) {
 						ds.put("user-uri", (String) v);
 					} else if (k.startsWith("--user-db")) {
 						ds.put("user-type", (String) v);
 					}
-					if (k.startsWith("--auth-db-uri"))  {
+					if (k.startsWith("--auth-db-uri")) {
 						ds.put("auth-uri", (String) v);
 					} else if (k.startsWith("--auth-db")) {
 						ds.put("auth-type", (String) v);
+					}
+					if (k.startsWith("--amp-repo-uri")) {
+						ds.put("amp-uri", (String) v);
+					} else if (k.startsWith("--amp-repo-class")) {
+						ds.put("amp-type", (String) v);
 					}
 				}
 				if (k.equals("--sm-cluster-strategy-class")) {
 					toAdd.put("sess-man/strategy/class", v.toString());
 					toAdd.put("sess-man/strategy/active", "true");
-				    toRemove.add(k);
+					toRemove.add(k);
 				}
 				if (k.contains("pubsub-repo-url")) {
 					props.put("dataSource/pubsub/uri", v);
 					props.put("dataSource/pubsub/active", "true");
 					props.put("pubsub/dao/default/data-source", "pubsub");
 					toRemove.add(k);
-				}
-				if (k.startsWith("http/port/")) {
-					toRemove.add(k);
-					toAdd.put(k.replace("http/port/", "httpServer/connections/"), v);
 				}
 				if (k.startsWith("sess-man/plugins-conf/")) {
 					if (k.equals("sess-man/plugins-conf/dynamic-roster-classes")) {
@@ -410,6 +453,40 @@ public class ConfigHolder {
 				if (k.equals("--" + SessionManagerConfig.SM_THREADS_POOL_PROP_KEY)) {
 					props.put("sess-man/" + SessionManagerConfig.SM_THREADS_POOL_PROP_KEY, v);
 				}
+				if (k.endsWith("/processors")) {
+					String cmp = k.replace("/processors", "");
+					Arrays.stream((String[]) v).forEach(procId -> {
+						toAdd.compute(cmp, (k1, v1) -> {
+							if (v1 == null) {
+								v1 = new HashMap<>();
+							}
+							((Map<String, Object>) v1).compute(procId, (k2, v2) -> {
+								if (v2 == null) {
+									v2 = new HashMap<>();
+								}
+								((Map) v2).put("active", true);
+								return v2;
+							});
+							return v1;
+						});
+						toAdd.put(cmp + "/" + procId + "/active", true);
+					});
+					toRemove.add(k);
+				}
+				if (k.contains("/processors/")) {
+					Matcher m = processorsPattern.matcher(k);
+					if (m.matches()) {
+						String cmp = m.group(1);
+						String key = m.group(2).replace("\\:", ":");
+						String[] parts = key.split("/");
+						Map<String, Object> cmpCfg = (Map<String, Object>) toAdd.computeIfAbsent(cmp,
+																								 (k1) -> new HashMap<>());
+						Map<String, Object> procCfg = (Map<String, Object>) cmpCfg.computeIfAbsent(parts[0],
+																								   (k1) -> new HashMap<>());
+						procCfg.put(parts[1], v);
+					}
+					toRemove.add(k);
+				}
 			});
 
 //			List<String> userDbDomains = new ArrayList<>();
@@ -419,6 +496,8 @@ public class ConfigHolder {
 				String userUri = cfg.get("user-uri");
 				String authType = cfg.get("auth-type");
 				String authUri = cfg.get("auth-uri");
+				String ampUri = cfg.get("amp-uri");
+				String ampType = cfg.get("amp-type");
 
 				if (userUri != null) {
 					props.put("dataSource/" + domain + "/uri", userUri);
@@ -434,8 +513,15 @@ public class ConfigHolder {
 					props.put("authRepository/" + domain + "/active", "true");
 				}
 
-				if (userType != null && !userType.equals("mysql") && !userType.equals("pgsql") && !userType.equals("derby")
-						&& !userType.equals("sqlserver")) {
+				if (ampUri != null && (userUri == null || !userUri.equals(ampUri))) {
+					props.put("dataSource/" + domain + "-amp/uri", authUri);
+					props.put("dataSource/" + domain + "-amp/active", "true");
+					props.put("msgRepository/" + domain + "/data-source", domain + "-amp");
+					props.put("msgRepository/" + domain + "/active", "true");
+				}
+
+				if (userType != null && !userType.equals("mysql") && !userType.equals("pgsql") &&
+						!userType.equals("derby") && !userType.equals("sqlserver")) {
 					String cls = RepositoryFactory.getRepoClass(userType);
 					props.put("userRepository/" + domain + "/cls", cls);
 				}
@@ -443,11 +529,14 @@ public class ConfigHolder {
 					String cls = RepositoryFactory.getRepoClass(userType);
 					props.put("authRepository/" + domain + "/cls", cls);
 				}
+				if (ampType != null) {
+					props.put("msgRepository/domain/cls", ampType);
+				}
 			});
 
 			String external = (String) props.remove("--external");
 			if (external != null) {
-				props.forEach((k,v) -> {
+				props.forEach((k, v) -> {
 					if (k.endsWith("/class") && v.equals(ComponentProtocol.class.getCanonicalName())) {
 						toAdd.put(k.replace("/class", "/repository/items"), v);
 					}
@@ -474,7 +563,7 @@ public class ConfigHolder {
 
 			String statsArchiv = (String) props.remove("--stats-archiv");
 			if (statsArchiv != null) {
-				Arrays.stream(statsArchiv.split(",")).forEach( archiver -> {
+				Arrays.stream(statsArchiv.split(",")).forEach(archiver -> {
 					String[] parts = archiver.split(":");
 					String k = "stats/" + parts[1];
 					props.put(k + "/class", parts[0]);
@@ -482,7 +571,8 @@ public class ConfigHolder {
 					if (parts.length > 2) {
 						props.put(k + "/frequency", parts[2]);
 					}
-					if ("tigase.mongo.stats.CounterDataLoggerMongo".equals(parts[1]) || "tigase.stats.CounterDataLogger".equals(parts[1])) {
+					if ("tigase.mongo.stats.CounterDataLoggerMongo".equals(parts[1]) ||
+							"tigase.stats.CounterDataLogger".equals(parts[1])) {
 						props.putIfAbsent(k + "/db-url", props.get("dataSource/default/uri"));
 					}
 				});
@@ -499,8 +589,9 @@ public class ConfigHolder {
 			Iterator<Map.Entry<String, Object>> it = props.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<String, Object> e = it.next();
-				if (e.getKey().startsWith("--comp-"))
+				if (e.getKey().startsWith("--comp-")) {
 					it.remove();
+				}
 			}
 
 			for (String k : toRemove) {
@@ -513,35 +604,42 @@ public class ConfigHolder {
 			// and converting concurrency settings as well
 			String plugins = (String) props.remove(GEN_SM_PLUGINS);
 			if (plugins != null) {
-				Set<XMPPProcessor> knownProcessors = ClassUtilBean.getInstance().getAllClasses().stream()
-						.filter(cls -> XMPPProcessor.class.isAssignableFrom(cls) && !(Modifier.isAbstract(cls.getModifiers()) || Modifier.isInterface(cls.getModifiers())))
+				Set<XMPPProcessor> knownProcessors = ClassUtilBean.getInstance()
+						.getAllClasses()
+						.stream()
+						.filter(cls -> XMPPProcessor.class.isAssignableFrom(cls) &&
+								!(Modifier.isAbstract(cls.getModifiers()) || Modifier.isInterface(cls.getModifiers())))
 						.map(cls -> {
 							try {
 								return (XMPPProcessor) cls.newInstance();
-							} catch (InstantiationException|IllegalAccessException e) {
+							} catch (InstantiationException | IllegalAccessException e) {
 								log.log(Level.WARNING, "Failed to instanticate");
 								return null;
 							}
 						})
 						.collect(Collectors.toSet());
 
-				StringBuilder smBeans = new StringBuilder();
-				Map<String,String> plugins_concurrency = new HashMap<>();
+				Map<String, String> plugins_concurrency = new HashMap<>();
 				String[] parts = plugins.split(",");
 				for (String part : parts) {
 					String[] tmp = part.split("=");
-					final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-') ? tmp[0].substring(1) : tmp[0];
+					final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-')
+										? tmp[0].substring(1)
+										: tmp[0];
+					boolean active = !tmp[0].startsWith("-");
+
+					props.put("sess-man/" + name + "/active", String.valueOf(active));
 
 					if (tmp.length > 1) {
 						plugins_concurrency.put(name, tmp[1]);
 					}
-					if (smBeans.length() != 0)
-						smBeans.append(",");
-					smBeans.append(tmp[0]);
 
 					try {
 
-						XMPPImplIfc proc = knownProcessors.stream().filter(p -> p != null && name.equals(p.id())).findFirst().orElse(null);
+						XMPPImplIfc proc = knownProcessors.stream()
+								.filter(p -> p != null && name.equals(p.id()))
+								.findFirst()
+								.orElse(null);
 
 						if (proc != null) {
 							Bean ann = proc.getClass().getAnnotation(Bean.class);
@@ -555,7 +653,6 @@ public class ConfigHolder {
 						log.log(Level.WARNING, "not able to get instance of processor " + name, ex);
 					}
 				}
-				props.put("sess-man/beans", smBeans.toString());
 
 				String concurrency = (String) props.get(SessionManagerConfig.PLUGINS_CONCURRENCY_PROP_KEY);
 				if (concurrency != null) {
@@ -565,19 +662,21 @@ public class ConfigHolder {
 					}
 				}
 
-				for (Map.Entry<String,String> e : plugins_concurrency.entrySet()) {
+				for (Map.Entry<String, String> e : plugins_concurrency.entrySet()) {
 					String prefix = "sess-man/" + e.getKey() + "/";
 					String[] tmp = e.getValue().split(":");
 					try {
 						props.put(prefix + "threadsNo", Integer.parseInt(tmp[0]));
 					} catch (Exception ex) {
-						log.log(Level.WARNING, "Plugin " + e.getKey() + " concurrency parsing error for: " + tmp[0], ex);
+						log.log(Level.WARNING, "Plugin " + e.getKey() + " concurrency parsing error for: " + tmp[0],
+								ex);
 					}
 					if (tmp.length > 1) {
 						try {
 							props.put(prefix + "queueSize", Integer.parseInt(tmp[1]));
 						} catch (Exception ex) {
-							log.log(Level.WARNING, "Plugin " + e.getKey() + " queueSize parsing error for: " + tmp[1], ex);
+							log.log(Level.WARNING, "Plugin " + e.getKey() + " queueSize parsing error for: " + tmp[1],
+									ex);
 						}
 					}
 				}
