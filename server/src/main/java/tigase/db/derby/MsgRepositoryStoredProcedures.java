@@ -87,8 +87,9 @@ public class MsgRepositoryStoredProcedures {
 				ResultSet rs = stmt.executeQuery();
 				if (rs.next()) {
 					long count = rs.getLong(1);
-					if (count > limit) {
+					if (count >= limit) {
 						rs.close();
+						data[0]  = conn.createStatement().executeQuery("select 1 from sysibm.sysdummy1 where 1=0");
 						return;
 					}
 				}
@@ -96,7 +97,7 @@ public class MsgRepositoryStoredProcedures {
 			}
 
 			PreparedStatement stmt = conn.prepareStatement("insert into tig_offline_messages (receiver, receiver_sha1, sender, sender_sha1, msg_type, ts, message, expired ) " +
-																   "values (?, ?, ?, ?, ?, ?, ?, ?)");
+																   "values (?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, receiver.toString());
 			stmt.setString(2, receiverSha1);
 			stmt.setString(3, sender.toString());
@@ -110,7 +111,7 @@ public class MsgRepositoryStoredProcedures {
 				stmt.setTimestamp(8, expired);
 			}
 
-			stmt.executeUpdate();
+			stmt.execute();
 			data[0] = stmt.getGeneratedKeys();
 			
 		} catch (NoSuchAlgorithmException e) {
