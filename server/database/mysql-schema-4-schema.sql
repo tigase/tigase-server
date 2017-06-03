@@ -76,10 +76,27 @@ ENGINE=InnoDB default character set utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 -- QUERY END:
 
 -- QUERY START:
+drop procedure if exists TigExecuteIf;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigExecuteIfNot;
 -- QUERY END:
 
 delimiter //
+
+-- QUERY START:
+create procedure TigExecuteIf(cond int, query text)
+begin
+set @s = (select if (
+        cond > 0,
+        query,
+        'select 1'
+    ));
+prepare stmt from @s;
+execute stmt;
+deallocate prepare stmt;
+end //
+-- QUERY END:
 
 -- QUERY START:
 create procedure TigExecuteIfNot(cond int, query text)
@@ -96,6 +113,13 @@ end //
 -- QUERY END:
 
 delimiter ;
+
+-- QUERY START:
+call TigExecuteIf(
+	(select count(1) from information_schema.columns where table_schema = database() and table_name = 'tig_users' and IS_NULLABLE = 'NO' and COLUMN_DEFAULT = '0000-00-00 00:00:00'),
+	"alter table tig_users modify column last_login timestamp NULL DEFAULT NULL, modify column last_logout timestamp NULL DEFAULT NULL"
+);
+-- QUERY END:
 
 -- QUERY START:
 call TigExecuteIfNot(
