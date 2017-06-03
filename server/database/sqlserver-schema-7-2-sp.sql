@@ -61,6 +61,7 @@ create procedure [dbo].[Tig_OfflineMessages_AddMessage]
     @_limit bigint
 as
 begin
+    set nocount on;
     declare
         @_msg_count bigint,
         @_msg_id bigint;
@@ -77,6 +78,7 @@ begin
 	end
 
 	select @_msg_id as msg_id;
+	set nocount off;
 end
 -- QUERY END:
 GO
@@ -175,8 +177,10 @@ create procedure  [dbo].[Tig_OfflineMessages_DeleteMessages]
     @_to nvarchar(2049)
 as
 begin
+    set nocount on;
     delete from tig_offline_messages where receiver_sha1 = HASHBYTES('SHA1', lower(@_to))
     select @@ROWCOUNT as affected_rows;
+    set nocount off;
 end
 -- QUERY END:
 GO
@@ -196,6 +200,7 @@ create procedure [dbo].[Tig_OfflineMessages_DeleteMessagesByIds]
     @_msg_id4 nvarchar(50)
 as
 begin
+    set nocount on;
     delete from tig_offline_messages
     where receiver_sha1 = HASHBYTES('SHA1', lower(@_to))
         and (
@@ -205,6 +210,7 @@ begin
             or (@_msg_id4 is not null and msg_id = @_msg_id4)
         );
     select @@ROWCOUNT as affected_rows;
+    set nocount off;
 end
 -- QUERY END:
 GO
@@ -220,8 +226,10 @@ create procedure [dbo].[Tig_OfflineMessages_DeleteMessage]
     @_msg_id bigint
 as
 begin
+    set nocount on;
     delete from tig_offline_messages where msg_id = @_msg_id;
     select @@ROWCOUNT as affected_rows;
+    set nocount off;
 end
 -- QUERY END:
 GO
