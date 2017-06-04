@@ -64,7 +64,6 @@ public class StoredProcedures {
 					"SELECT account_status FROM tig_users WHERE lower(user_id) = ?");
 			ps.setString(1, user);
 			data[0] = ps.executeQuery();
-			throw new SQLException("User " + user + " does not exists.");
 		}
 	}
 
@@ -615,7 +614,9 @@ public class StoredProcedures {
 
 			ResultSet rs = ps3.executeQuery();
 
-			rs.next();
+			if (!rs.next()) {
+				return;
+			}
 
 			long uid = rs.getLong(1);
 			PreparedStatement ps1 = conn.prepareStatement("delete from tig_pairs where uid = ?");
