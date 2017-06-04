@@ -247,7 +247,7 @@ public class AuthRepositoryImpl
 	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
 		AccountStatus status = getAccountStatus(user);
 		if (status == AccountStatus.active || status == AccountStatus.disabled) {
-			setAccountStatus(user, value ? AccountStatus.active : AccountStatus.disabled);
+			setAccountStatus(user, value ? AccountStatus.disabled : AccountStatus.active);
 		}
 	}
 	

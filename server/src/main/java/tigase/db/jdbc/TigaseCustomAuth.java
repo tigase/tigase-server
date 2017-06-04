@@ -855,7 +855,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 					throws UserNotFoundException, TigaseDBException {
 		AccountStatus status = getAccountStatus(user);
 		if (status == AccountStatus.active || status == AccountStatus.disabled) {
-			setAccountStatus(user, value ? AccountStatus.active : AccountStatus.disabled);
+			setAccountStatus(user, value ? AccountStatus.disabled : AccountStatus.active);
 		}
 	}
 	// ~--- methods --------------------------------------------------------------

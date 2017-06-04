@@ -31,17 +31,19 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.xml.*
-import tigase.vhosts.*
+import tigase.db.AuthRepository
+import tigase.db.TigaseDBException
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Iq
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
+import tigase.xmpp.BareJID
 
 def JID = "accountjid"
 def EMAIL = "email"
 
-def p = (Packet)packet
+def p = (Iq)packet
 def auth_repo = (AuthRepository)authRepository
 def user_repo = (UserRepository)userRepository
 def vhost_man = (VHostManagerIfc)vhostMan
@@ -67,7 +69,7 @@ if (userJid == null) {
 
 def result = null;
 try {
-	bareJID = BareJID.bareJIDInstance(userJid)
+	def bareJID = BareJID.bareJIDInstance(userJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
 		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
@@ -85,14 +87,14 @@ try {
 			Command.addFieldValue(result, EMAIL, user_repo.getData(bareJID, "email") ?: "", "text-single",
 					"Email address")
 			
-			Command.addCheckBoxField(result, "Account enabled", !authRepository.isUserDisabled(bareJID));
+			Command.addCheckBoxField(result, "Account enabled", !auth_repo.getAccountStatus(bareJID) == AuthRepository.AccountStatus.active);
 //			-- add disabled/enabled? vcard? roster?
 		} else {
 			result = p.commandResult(Command.DataType.result);
 			user_repo.setData(bareJID, "email", userEmail);
 			Command.addTextField(result, "Note", "Operation successful");
 			try {
-				authRepository.setUserDisabled(bareJID, !Command.getCheckBoxFieldValue(p, "Account enabled"));
+				auth_repo.setAccountStatus(bareJID, Command.getCheckBoxFieldValue(p, "Account enabled") ? AuthRepository.AccountStatus.active : AuthRepository.AccountStatus.disabled);
 			} catch (TigaseDBException ex) {
 				Command.addTextField(result, "Warning", "Account state was not changed as it is not supported by used auth repository: " + ex.getMessage());
 			}
