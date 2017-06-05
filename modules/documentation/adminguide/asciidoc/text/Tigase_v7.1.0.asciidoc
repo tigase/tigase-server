@@ -152,7 +152,7 @@ The Web Installer Setup Page, available through http://yourserver.com/8080/setup
 
 === Offline Message Receipts Storage now Configurable
 
-Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineMessageReceipts[more details here].
+Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineFiltering[more details here].
 
 === Account Registration Limits
 
