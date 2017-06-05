@@ -111,52 +111,55 @@ Server response:
 [[nonBodyElements]]
 == Storing offline messages without body content
 Tigase can now store offline messages without <body/> content.
+
 See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
 
-Support also added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
------
-sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
------
+This can include message receipts, and messages with specific `do-not-store` tags.
 
-
-[[addOfflinePaths]]
-== Adding Custom Storage Paths
 Support has been added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
 -----
 sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
 -----
+This example results in two settings:
 
-[[offlineMessageReceipts]]
-== Message Receipts
-Tigase AMP component has support for message receipts and storage.  By default, offline message delivery receipts will be sent to offline message storage.  Note this WILL count against the total number of stored offline messages as explored earlier.
+`/message/received[urn:xmpp:receipts]`
 
-=== Offline Storage
-It is possible to set storage of message receipts, and add other types to save:
+Results in storage of messages with a `recieved` subelement and with the xlmns set to `urn:xmpp:receipts`
+
+`/message/store-offline`
+
+Results in storing messages with a `store-offline` subelement without checking xmlns.
+
+=== Filtering of offline storage
+It is possible to set storage of other types to save:
 [source,properties]
 -----
-sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline,-/message/do-not-store
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/store-offline,-/message/do-not-store
 -----
 The above setting in the init.properties file will do three things:
-- Messages with a <received> subelement of xmlns set to urn:xmpp:receipts will now be stored.
 - Messages with <store-offline> subelement will be stored without checking for associated xmlns.
 - Messages with <do-not-store> element *will not* be saved.
 
 Any of these can be adjusted for your installation, remember that a '-' will stop storage of messages with the indicated property.
 Messages will be checked by these matchers and if any of them result in a positive they will override default settings.
-Matcher logic uses left to right ordering, in that matches on the first statement will ignore/override later listed matchers.
 
-For example, if you wanted to store messages with <received> element, but not ones with <plain> element:
-*THIS STATEMENT WILL NOT WORK*
+For example, if you wanted to store messages with <received> element, but not ones with <plain> element, your filter will look like this:
 [source,properties]
 -----
 sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received,-/message/plain
 -----
+However....
 
-As it will just store all messages with <receieved> subelement.  The below statement will properly filter your results.
+NOTE: THE ABOVE STATEMENT WILL NOT WORK As it will just store all messages with <receieved> subelement.
+
+The below statement will properly filter your results.
+
 [source,properties]
 -----
 sess-man/plugins-conf/amp/msg-store-offline-paths[s]=-/message/plain,/message/received
 -----
+
+Filtering logic is done in order from left to right.  Matches on the first statement will ignore or override matches listed afterwards.
 
 [[disableOfflineMessages]]
 == Disabling Offline Messages
