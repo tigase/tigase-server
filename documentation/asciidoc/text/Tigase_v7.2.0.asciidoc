@@ -135,3 +135,9 @@ It is now possible to set connection testing to databases when connections are i
 - link:https://projects.tigase.org/issues/5394[#5394] Loading main Derby schema no longer throws exceptions.
 - link:https://projects.tigase.org/issues/5450[#5450] Server no longer automatically shuts down when default or other db can not be found or accessed.
 - link:https://projects.tigase.org/issues/5480[#5480] Fixed issue in Derby DB where obtaining offline messages results in SQLException.
+- link:https://projects.tigase.org/issues/5525[#5525] Fixed S2S `invalid-namespace` error being returned during connection establishment.
+
+== Component Changes
+
+=== PubSub
+- link:https://projects.tigase.org/issues/5033[#5033] PubSub now compatable with using emojis in pubsub items.
