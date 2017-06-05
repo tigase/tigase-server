@@ -25,7 +25,12 @@ create database ${dbName};
 -- QUERY END: create database
 
 -- QUERY START: add user
-create user ${dbUser} with password '${dbPass}';
+do $$
+begin
+IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${dbUser}') THEN
+	create user ${dbUser} with password '${dbPass}';
+end if;
+end$$;
 -- QUERY END: add user
 
 -- QUERY START: GRANT ALL
