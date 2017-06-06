@@ -759,6 +759,27 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					db_uri += ";encrypt=true";
 				}
 				break;
+			case "postgresql":
+				db_uri += "//" + params.getDbHostname() + "/";
+				if ( includeDbName ){
+					db_uri += params.getDbName();
+				} else if (useRootCredentials) {
+					db_uri += "postgres";
+				}
+				db_uri += "?user=" + USERNAME;
+				if ( PASSWORD != null
+						&& !PASSWORD.isEmpty() ){
+					db_uri += "&password=" + PASSWORD;
+				}
+				if ( Boolean.TRUE.equals(params.isUseSSL()) ) {
+					db_uri += "&useSSL=true";
+				}
+				else if ( Boolean.FALSE.equals(params.isUseSSL()) ) {
+					// explicitly disable SSL to avoid a warning by the driver
+					db_uri += "&useSSL=false";
+				}
+				break;
+
 			default:
 				db_uri += "//" + params.getDbHostname() + "/";
 				if ( includeDbName ){
