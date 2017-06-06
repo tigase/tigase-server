@@ -540,7 +540,7 @@ public class ConfigHolder {
 					props.put("userRepository/" + domain + "/cls", cls);
 				}
 				if (authType != null && !authType.equals("tigase-custom-auth")) {
-					String cls = RepositoryFactory.getRepoClass(userType);
+					String cls = RepositoryFactory.getRepoClass(authType);
 					props.put("authRepository/" + domain + "/cls", cls);
 				}
 				if (ampType != null) {
