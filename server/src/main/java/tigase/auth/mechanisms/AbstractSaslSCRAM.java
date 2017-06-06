@@ -28,7 +28,8 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class AbstractSaslSCRAM extends AbstractSasl {
+public abstract class AbstractSaslSCRAM
+		extends AbstractSasl {
 
 	public static final String TLS_UNIQUE_ID_KEY = "TLS_UNIQUE_ID_KEY";
 	public static final String LOCAL_CERTIFICATE_KEY = "LOCAL_CERTIFICATE_KEY";
@@ -36,16 +37,37 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 	protected final static byte[] DEFAULT_SERVER_KEY = "Server Key".getBytes();
 	private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	private static final Charset CHARSET = Charset.forName("UTF-8");
-	private final static Pattern CLIENT_FIRST_MESSAGE = Pattern.compile("^(?<gs2Header>(?:y|n|p=(?<cbName>[a-zA-z0-9.-]+)),"
-			+ "(?:a=(?<authzid>(?:[\\x21-\\x2B\\x2D-\\x7E]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)"
-			+ "?n=(?<username>(?:[\\x21-\\x2B\\x2D-\\x7E]|=2C|=3D)+),r=(?<nonce>[\\x21-\\x2B\\x2D-\\x7E]+)(?:,.*)?)$");
-	private final static Pattern CLIENT_LAST_MESSAGE = Pattern.compile("^(?<withoutProof>c=(?<cb>[a-zA-Z0-9/+=]+),"
-			+ "(?:r=(?<nonce>[\\x21-\\x2B\\x2D-\\x7E]+))(?:,.*)?),p=(?<proof>[a-zA-Z0-9/+=]+)$");
+	private final static Pattern CLIENT_FIRST_MESSAGE = Pattern.compile(
+			"^(?<gs2Header>(?:y|n|p=(?<cbName>[a-zA-z0-9.-]+))," +
+					"(?:a=(?<authzid>(?:[\\x21-\\x2B\\x2D-\\x7E]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)" +
+					"?n=(?<username>(?:[\\x21-\\x2B\\x2D-\\x7E]|=2C|=3D)+),r=(?<nonce>[\\x21-\\x2B\\x2D-\\x7E]+)(?:,.*)?)$");
+	private final static Pattern CLIENT_LAST_MESSAGE = Pattern.compile("^(?<withoutProof>c=(?<cb>[a-zA-Z0-9/+=]+)," +
+																			   "(?:r=(?<nonce>[\\x21-\\x2B\\x2D-\\x7E]+))(?:,.*)?),p=(?<proof>[a-zA-Z0-9/+=]+)$");
+
+	public enum BindType {
+		/**
+		 * Client doesn't support channel binding.
+		 */
+		n,
+		/**
+		 * Client does support channel binding but thinks the server does not.
+		 */
+		y,
+		/**
+		 * Client requires channel binding: <code>tls-unique</code>.
+		 */
+		tls_unique,
+		/**
+		 * Client requires channel binding: <code>tls-server-end-point</code>.
+		 */
+		tls_server_end_point
+	}
 	private final String algorithm;
 	private final byte[] clientKeyData;
 	private final String mechanismName;
 	private final byte[] serverKeyData;
 	private final String serverNonce;
+	private byte[] bindingData = null;
 	private String cfmAuthzid;
 	private String cfmBareMessage;
 	private String cfmCbname;
@@ -53,33 +75,12 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 	private String cfmUsername;
 	private byte[] clientKey;
 	private Random random = new SecureRandom();
+	private BindType requestedBindType;
 	private byte[] saltedPassword;
 	private String sfmMessage;
 	private String sfmNonce;
 	private Step step = Step.clientFirstMessage;
 	private byte[] storedKey;
-	private BindType requestedBindType;
-	private byte[] bindingData = null;
-
-	protected AbstractSaslSCRAM(String mechanismName, String algorithm, byte[] clientKey, byte[] serverKey,
-								Map<? super String, ?> props, CallbackHandler callbackHandler) {
-		super(props, callbackHandler);
-		this.mechanismName = mechanismName;
-		this.algorithm = algorithm;
-		this.clientKeyData = clientKey;
-		this.serverKeyData = serverKey;
-		serverNonce = randomString();
-	}
-
-	protected AbstractSaslSCRAM(String mechanismName, String algorithm, byte[] clientKey, byte[] serverKey,
-								Map<? super String, ?> props, CallbackHandler callbackHandler, String serverOnce) {
-		super(props, callbackHandler);
-		this.mechanismName = mechanismName;
-		this.algorithm = algorithm;
-		this.clientKeyData = clientKey;
-		this.serverKeyData = serverKey;
-		this.serverNonce = serverOnce;
-	}
 
 	public static byte[] hi(String algorithm, byte[] password, final byte[] salt, final int iterations)
 			throws InvalidKeyException, NoSuchAlgorithmException {
@@ -115,14 +116,33 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		return str.getBytes(CHARSET);
 	}
 
+	protected AbstractSaslSCRAM(String mechanismName, String algorithm, byte[] clientKey, byte[] serverKey,
+								Map<? super String, ?> props, CallbackHandler callbackHandler) {
+		super(props, callbackHandler);
+		this.mechanismName = mechanismName;
+		this.algorithm = algorithm;
+		this.clientKeyData = clientKey;
+		this.serverKeyData = serverKey;
+		serverNonce = randomString();
+	}
+
+	protected AbstractSaslSCRAM(String mechanismName, String algorithm, byte[] clientKey, byte[] serverKey,
+								Map<? super String, ?> props, CallbackHandler callbackHandler, String serverOnce) {
+		super(props, callbackHandler);
+		this.mechanismName = mechanismName;
+		this.algorithm = algorithm;
+		this.clientKeyData = clientKey;
+		this.serverKeyData = serverKey;
+		this.serverNonce = serverOnce;
+	}
+
 	protected byte[] calculateC() {
 		try {
 			final ByteArrayOutputStream result = new ByteArrayOutputStream();
 
 			result.write(this.cfmGs2header.getBytes());
 
-			if (this.requestedBindType == BindType.tls_unique
-					|| this.requestedBindType == BindType.tls_server_end_point) {
+			if (this.requestedBindType == BindType.tls_unique || this.requestedBindType == BindType.tls_server_end_point) {
 				result.write(bindingData);
 			}
 			return result.toByteArray();
@@ -136,11 +156,17 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
 		final char t = cfmGs2header.charAt(0);
 
-		if ('n' == t) return BindType.n;
-		else if ('y' == t) return BindType.y;
-		else if ("tls-unique".equals(cfmCbname)) return BindType.tls_unique;
-		else if ("tls-server-end-point".equals(cfmCbname)) return BindType.tls_server_end_point;
-		else throw new SaslException("Unsupported channel binding type");
+		if ('n' == t) {
+			return BindType.n;
+		} else if ('y' == t) {
+			return BindType.y;
+		} else if ("tls-unique".equals(cfmCbname)) {
+			return BindType.tls_unique;
+		} else if ("tls-server-end-point".equals(cfmCbname)) {
+			return BindType.tls_server_end_point;
+		} else {
+			throw new SaslException("Unsupported channel binding type");
+		}
 	}
 
 	@Override
@@ -181,10 +207,12 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		return new SecretKeySpec(key, "Hmac" + algorithm);
 	}
 
-	protected byte[] processClientFirstMessage(byte[] data) throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
+	protected byte[] processClientFirstMessage(byte[] data)
+			throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
 		Matcher r = CLIENT_FIRST_MESSAGE.matcher(new String(data, CHARSET));
-		if (!r.matches())
+		if (!r.matches()) {
 			throw new SaslException("Bad challenge syntax");
+		}
 
 		this.cfmGs2header = r.group("gs2Header");
 		this.cfmCbname = r.group("cbName");
@@ -195,8 +223,9 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		this.cfmUsername = r.group("username");
 		final String cfmNonce = r.group("nonce");
 
-		if (this.cfmAuthzid == null)
+		if (this.cfmAuthzid == null) {
 			this.cfmAuthzid = this.cfmUsername;
+		}
 
 		checkRequestedBindType(requestedBindType);
 
@@ -208,12 +237,19 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 
 		handleCallbacks(nc, ic, sc, pc, cc);
 
-		if (pc.getSaltedPassword() == null)
+		if (pc.getSaltedPassword() == null) {
 			throw new SaslException("Unknown user");
+		}
+
+		if (pc.getSaltedPassword().length == 0) {
+			if (log.isLoggable(Level.WARNING)) {
+				log.log(Level.WARNING, "User {0} exists, but his password is empty.", cfmUsername);
+			}
+			throw new SaslException("Unknown user");
+		}
 
 		validateBindingsData(requestedBindType, cc.getBindingData());
 		this.bindingData = cc.getBindingData();
-
 
 		this.sfmNonce = cfmNonce + serverNonce;
 
@@ -231,10 +267,12 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		return sfmMessage.getBytes();
 	}
 
-	protected byte[] processClientLastMessage(byte[] data) throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
+	protected byte[] processClientLastMessage(byte[] data)
+			throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
 		Matcher r = CLIENT_LAST_MESSAGE.matcher(new String(data, CHARSET));
-		if (!r.matches())
+		if (!r.matches()) {
 			throw new SaslException("Bad challenge syntax");
+		}
 
 		final String clmWithoutProof = r.group("withoutProof");
 		final byte[] clmCb = Base64.decode(r.group("cb"));
@@ -245,9 +283,10 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		if (!(new String(clmCb, CHARSET)).startsWith(cfmGs2header)) {
 			throw new XmppSaslException(SaslError.not_authorized, "Invalid GS2 header");
 		} else if (!Arrays.equals(clmCb, calculatedCb)) {
-			if (log.isLoggable(Level.FINEST))
+			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Channel bindings does not match. expected: {0}; received: {1}",
 						new Object[]{calculatedCb, clmCb});
+			}
 			throw new XmppSaslException(SaslError.not_authorized, "Channel bindings does not match");
 		}
 
@@ -271,8 +310,8 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		if (ac.isAuthorized() == true) {
 			authorizedId = ac.getAuthorizedID();
 		} else {
-			throw new XmppSaslException(SaslError.invalid_authzid, "SCRAM: " + cfmAuthzid + " is not authorized to act as "
-					+ cfmAuthzid);
+			throw new XmppSaslException(SaslError.invalid_authzid,
+										"SCRAM: " + cfmAuthzid + " is not authorized to act as " + cfmAuthzid);
 		}
 
 		byte[] serverKey = hmac(key(saltedPassword), serverKeyData);
@@ -323,29 +362,10 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		return r;
 	}
 
-	public enum BindType {
-		/**
-		 * Client doesn't support channel binding.
-		 */
-		n,
-		/**
-		 * Client does support channel binding but thinks the server does not.
-		 */
-		y,
-		/**
-		 * Client requires channel binding: <code>tls-unique</code>.
-		 */
-		tls_unique,
-		/**
-		 * Client requires channel binding: <code>tls-server-end-point</code>.
-		 */
-		tls_server_end_point
-	}
-
 	private enum Step {
 		clientFinalMessage,
 		clientFirstMessage,
-		finished;
+		finished
 	}
 
 }
