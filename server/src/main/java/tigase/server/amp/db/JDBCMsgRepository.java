@@ -433,10 +433,11 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 					insert_msg_st.setTimestamp(6, time);
 				}
 				insert_msg_st.setLong(7, msgs_store_limit);
-				
-				ResultSet rs = insert_msg_st.executeQuery();
-				if (rs.next()) {
-					result = rs.getLong(1) != 0;
+
+				try (ResultSet rs = insert_msg_st.executeQuery()) {
+					if (rs.next()) {
+						result = rs.getLong(1) != 0;
+					}
 				}
 			}
 
