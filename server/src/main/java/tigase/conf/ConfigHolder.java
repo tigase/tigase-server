@@ -562,6 +562,11 @@ public class ConfigHolder {
 				props.put("admins", admins.split(","));
 			}
 
+			String trusted = (String) props.remove("--trusted");
+			if (trusted != null) {
+				props.put("trusted", trusted.split(","));
+			}
+
 			String monitoring = (String) props.remove("--monitoring");
 			if (monitoring != null) {
 				props.put("monitoring/active", "true");
