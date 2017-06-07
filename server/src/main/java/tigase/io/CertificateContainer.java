@@ -130,16 +130,23 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	@Override
 	public KeyManager[] createCertificate(String alias) throws NoSuchAlgorithmException, CertificateException, SignatureException,
 			NoSuchProviderException, InvalidKeyException, IOException, UnrecoverableKeyException, KeyStoreException {
+		final KeyManagerFactory keyManagerFactory = createCertificateKmf(alias);
+		KeyManager[] kms = keyManagerFactory.getKeyManagers();
+		log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
+		return kms;
+	}
+
+	private KeyManagerFactory createCertificateKmf(String alias)
+			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
+			       NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
 		KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
 		X509Certificate cert = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
-				keyPair);
+		                                                                   keyPair);
 		CertificateEntry entry = new CertificateEntry();
 
 		entry.setPrivateKey(keyPair.getPrivate());
 		entry.setCertChain(new Certificate[]{cert});
-		KeyManager[] kms = addCertificateEntry(entry, alias, true).getKeyManagers();
-		log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
-		return kms;
+		return addCertificateEntry(entry, alias, true);
 	}
 
 	@Override
@@ -567,14 +574,24 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		 */
 		@Override
 		public X509Certificate[] getCertificateChain(String alias) {
+			KeyManagerFactory kmf;
 			if (alias == null)
 				alias = def_cert_alias;
-			KeyManagerFactory kmf = SSLContextContainerAbstract.find(kmfs, alias);
+			kmf = SSLContextContainerAbstract.find(kmfs, alias);
 			if (kmf == null) {
 				alias = def_cert_alias;
 				kmf = SSLContextContainer.find(kmfs, alias);
 			}
-			return ((X509KeyManager) kmf.getKeyManagers()[0]).getCertificateChain(alias);
+			// we still don't have kmf so it's unknown domain, we should create and use default
+			if (kmf == null) {
+				try {
+					kmf = createCertificateKmf(alias);
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Failed to create certificate for alias: " + alias, e);
+				}
+			}
+
+			return kmf != null ? ((X509KeyManager) kmf.getKeyManagers()[0]).getCertificateChain(alias) : null;
 		}
 
 		/**
@@ -586,14 +603,24 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		 */
 		@Override
 		public PrivateKey getPrivateKey(String alias) {
+			KeyManagerFactory kmf;
 			if (alias == null)
 				alias = def_cert_alias;
-			KeyManagerFactory kmf = SSLContextContainerAbstract.find(kmfs, alias);
+			kmf = SSLContextContainerAbstract.find(kmfs, alias);
 			if (kmf == null) {
 				alias = def_cert_alias;
 				kmf = SSLContextContainer.find(kmfs, alias);
 			}
-			return ((X509KeyManager) kmf.getKeyManagers()[0]).getPrivateKey(alias);
+			// we still don't have kmf so it's unknown domain, we should create and use default
+			if (kmf == null) {
+				try {
+					kmf = createCertificateKmf(alias);
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Failed to create certificate for alias: " + alias, e);
+				}
+			}
+
+			return kmf != null ? ((X509KeyManager) kmf.getKeyManagers()[0]).getPrivateKey(alias) : null ;
 		}
 
 	}
