@@ -208,7 +208,15 @@ public class SchemaManager {
 		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
 		log.info("data sources  destruction finished!");
 		List<String> output = prepareOutput("Data source destruction finished", results);
-		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+		boolean error = results.values()
+				.stream()
+				.flatMap(entries -> entries.stream())
+				.map(entry -> entry.result)
+				.filter(r -> r == SchemaLoader.Result.error)
+				.findAny()
+				.isPresent();
+		TigaseRuntime.getTigaseRuntime()
+				.shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
 	}
 
 	private List<CommandlineParameter> installSchemaParametersSupplier() {
@@ -254,8 +262,9 @@ public class SchemaManager {
 																 Optional.empty(), Optional.empty());
 
 		Map<String, Object> config = configBuilder.build();
-		List<String> output = loadSchemas(config, props, "Schema installation finished");
+		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
 
+		List<String> output = prepareOutput("Schema installation finished", results);
 		output.add("");
 		output.add("Example init.properties configuration file:");
 		output.add("");
@@ -263,7 +272,14 @@ public class SchemaManager {
 			new ConfigWriter().write(writer, config);
 			output.addAll(Arrays.stream(writer.toString().split("\n")).collect(Collectors.toList()));
 		}
-		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+		boolean error = results.values()
+				.stream()
+				.flatMap(entries -> entries.stream())
+				.map(entry -> entry.result)
+				.filter(r -> r == SchemaLoader.Result.error)
+				.findAny()
+				.isPresent();
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
 	}
 
 	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
@@ -274,12 +290,20 @@ public class SchemaManager {
 		Optional<String> configFile = getProperty(props, CONFIG_FILE);
 		try (FileReader reader = new FileReader(configFile.get())) {
 			Map<String, Object> config = new ConfigReader().read(reader);
-			List<String> output = loadSchemas(config, props, "Schema upgrade finished");
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]));
+			Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
+			List<String> output = prepareOutput("Schema upgrade finished", results);
+			boolean error = results.values()
+					.stream()
+					.flatMap(entries -> entries.stream())
+					.map(entry -> entry.result)
+					.filter(r -> r == SchemaLoader.Result.error)
+					.findAny()
+					.isPresent();
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
 		}
 	}
 
-	private List<String> loadSchemas(Map<String, Object> config, Properties props, String title) throws IOException, ConfigReader.ConfigException {
+	private Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> loadSchemas(Map<String, Object> config, Properties props) throws IOException, ConfigReader.ConfigException {
 		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
 		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
 
@@ -294,7 +318,7 @@ public class SchemaManager {
 		log.info("begining upgrade...");
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
 		log.info("schema upgrade finished!");
-		return prepareOutput(title, results);
+		return results;
 	}
 
 	private List<String> prepareOutput(String title, Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results) {
