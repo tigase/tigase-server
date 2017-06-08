@@ -199,9 +199,12 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 //						if (forBean.containsKey(field.getName()) || (cf != null && !cf.alias().isEmpty() && forBean.containsKey(cf.alias()))) {
 //							return;
 //						}
-						Object v1 = cfg.get(field.getName());
-						if (v1 == null && cf != null && !cf.alias().isEmpty()) {
-							v1 = cfg.get(cf.alias());
+						Object v1 = null;
+						if (cfg != null) {
+							v1 = cfg.get(field.getName());
+							if (v1 == null && cf != null && !cf.alias().isEmpty()) {
+								v1 = cfg.get(cf.alias());
+							}
 						}
 						String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
 						forBean.put(prop, v1 == null ? v : v1);
