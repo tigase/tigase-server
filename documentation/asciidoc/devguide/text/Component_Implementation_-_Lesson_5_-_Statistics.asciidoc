@@ -180,11 +180,11 @@ public static class TestModule extends AbstractModule {
     return CRITERIA;
   }
 
-  public int getMessagesCounter() {
+  public long getMessagesCounter() {
     return messagesCounter;
   }
 
-  public int getTotalSpamCounter() {
+  public long getTotalSpamCounter() {
     return totalSpamCounter;
   }
 

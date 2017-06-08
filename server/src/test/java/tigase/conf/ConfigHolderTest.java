@@ -112,4 +112,15 @@ public class ConfigHolderTest {
 		assertEquals(DynamicRosterTest123.class.getCanonicalName(), roster.getClazzName());
 	}
 
+	@Test
+	public void testConversionOfGlobalProperties() throws IOException {
+		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
+		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList("--max-queue-size=10000"));
+
+		reader.convertFromOldFormat();
+
+		Map<String, Object> result = ConfigWriter.buildTree(props);
+		assertEquals(10000, result.get("max-queue-size"));
+	}
+
 }

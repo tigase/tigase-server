@@ -66,7 +66,11 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		return result;
 	}
 
-	public abstract String getComponentVersion();
+	public String getComponentVersion() {
+		String version = this.getClass().getPackage().getImplementationVersion();
+		return version == null ? "0.0.0" : version;
+	}
+
 
 	public Kernel getKernel() {
 		return this.kernel;

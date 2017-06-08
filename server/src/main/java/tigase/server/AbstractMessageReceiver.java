@@ -159,13 +159,13 @@ public abstract class AbstractMessageReceiver
 	// ~--- fields ---------------------------------------------------------------
 	// private static final TigaseTracer tracer =
 	// TigaseTracer.getTracer("abstract");
-	private int  in_queues_size      = 1;
+	private int  in_queues_size        = processingInThreads();
+	private int  out_queues_size       = processingOutThreads();
 	private long last_hour_packets   = 0;
 	private long last_minute_packets = 0;
 	private long last_second_packets = 0;
-	private int  out_queues_size     = 1;
 
-	@ConfigField(desc = "Maximal size of internal queues")
+	@ConfigField(desc = "Maximal size of internal queues", alias = "max-queue-size")
 	protected int                    maxQueueSize          = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxInQueueSize        = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxOutQueueSize       = MAX_QUEUE_SIZE_PROP_VAL;
@@ -194,10 +194,8 @@ public abstract class AbstractMessageReceiver
 
 	// PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 	@ConfigField(desc = "Incoming filters", alias = INCOMING_FILTERS_PROP_KEY)
-	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
-			new CopyOnWriteArrayList<PacketFilterIfc>();
-	private final List<PriorityQueueAbstract<Packet>> in_queues =
-			new ArrayList<PriorityQueueAbstract<Packet>>(pr_cache.length);
+	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters = new CopyOnWriteArrayList<>();
+	private final List<PriorityQueueAbstract<Packet>> in_queues = new ArrayList<>(pr_cache.length);
 
 	/**
 	 * Variable <code>statAddedMessagesEr</code> keeps counter of unsuccessfuly

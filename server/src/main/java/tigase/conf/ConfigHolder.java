@@ -567,6 +567,11 @@ public class ConfigHolder {
 				props.put("trusted", trusted.split(","));
 			}
 
+			Integer maxQueueSize = Integer.valueOf((String)props.remove("--max-queue-size"));
+			if (maxQueueSize != null) {
+				props.put("max-queue-size", maxQueueSize);
+			}
+
 			String monitoring = (String) props.remove("--monitoring");
 			if (monitoring != null) {
 				props.put("monitoring/active", "true");

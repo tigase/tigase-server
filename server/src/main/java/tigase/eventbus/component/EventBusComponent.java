@@ -49,15 +49,6 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 	public EventBusComponent() {
 	}
 
-	// private final Map<String, ListenerScript> listenersScripts = new
-	// ConcurrentHashMap<String, ListenerScript>();
-
-	@Override
-	public String getComponentVersion() {
-		String version = this.getClass().getPackage().getImplementationVersion();
-		return version == null ? "0.0.0" : version;
-	}
-
 	@Override
 	public String getDiscoCategory() {
 		return "pubsub";

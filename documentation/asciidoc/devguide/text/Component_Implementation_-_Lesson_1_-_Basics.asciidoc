@@ -82,10 +82,10 @@ public static class TestModule extends AbstractModule {
 }
 ----
 
-Instance of *Criteria* class returned by *Criteria getModuleCriteria()* is used by component class to decide if packet should be processed by this module or not.
+Instance of `Criteria` class returned by `Criteria getModuleCriteria()` is used by component class to decide if packet should be processed by this module or not.
 In this case we returned instance which matches any packet which is a *message*.
 
-And finally we have a very important method @void packet(Packet packet)* which is main processing method of a component. If component will receive packet that matches criteria returned by module - this method will be called.
+And finally we have a very important method `void process(Packet packet)` which is main processing method of a component. If component will receive packet that matches criteria returned by module - this method will be called.
 
 But how we can send packet from a module? *AbstractModule* contains method *void write(Packet packet)* which you can use to send packets from a component.
 

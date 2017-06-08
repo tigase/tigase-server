@@ -46,12 +46,6 @@ public class ExternalServiceDiscoveryComponent extends AbstractKernelBasedCompon
 	}
 
 	@Override
-	public String getComponentVersion() {
-		String version = this.getClass().getPackage().getImplementationVersion();
-		return version == null ? "0.0.0" : version;
-	}
-
-	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);

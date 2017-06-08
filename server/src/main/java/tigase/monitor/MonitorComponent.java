@@ -31,12 +31,6 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 	};
 
 	@Override
-	public String getComponentVersion() {
-		String version = this.getClass().getPackage().getImplementationVersion();
-		return version == null ? "0.0.0" : version;
-	}
-
-	@Override
 	public String getDiscoCategory() {
 		return "component";
 	}
