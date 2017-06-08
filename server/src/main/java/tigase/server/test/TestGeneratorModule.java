@@ -66,7 +66,6 @@ public class TestGeneratorModule
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		System.out.println(packet.toString().replace("\n", ""));
 		if (isPostCommand(packet)) {
 			runCommand(packet);
 		} else {
