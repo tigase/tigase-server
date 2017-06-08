@@ -46,6 +46,7 @@ import tigase.util.setup.SetupHelper;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
+import tigase.xmpp.BareJID;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -76,6 +77,8 @@ public class SchemaManager {
 			return -1;
 		return o1.getId().compareTo(o2.getId());
 	};
+	private String adminPass = null;
+	private List<BareJID> admins = null;
 
 	private static Stream<String> getNonCoreComponentNames() {
 		return SetupHelper.getAvailableComponents().stream()
@@ -255,11 +258,14 @@ public class SchemaManager {
 			}
 		});
 
-
+		
 		String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
 																 Optional.ofNullable(components), Optional.ofNullable(changes.get("+")), Optional.empty(), vhosts,
 																 Optional.empty(), Optional.empty());
+
+		admins = params.getAdmins();
+		adminPass = params.getAdminPassword();
 
 		Map<String, Object> config = configBuilder.build();
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
@@ -493,6 +499,7 @@ public class SchemaManager {
 		if (rootUser != null || rootPass != null) {
 			params.setDbRootCredentials(rootUser, rootPass);
 		}
+		params.setAdmins(admins, adminPass);
 		schemaLoader.init(params);
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));

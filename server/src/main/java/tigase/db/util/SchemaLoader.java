@@ -54,6 +54,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		
 		void setProperties(Properties props);
 
+		List<BareJID> getAdmins();
+
+		String getAdminPassword();
+
 		void setAdmins(List<BareJID> admins, String password);
 
 		void setDbRootCredentials(String username, String password);

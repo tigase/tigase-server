@@ -1021,10 +1021,12 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			return query;
 		}
 
+		@Override
 		public String getAdminPassword() {
 			return adminPassword;
 		}
 
+		@Override
 		public List<BareJID> getAdmins() {
 			return admins == null ? Collections.emptyList() : admins;
 		}
