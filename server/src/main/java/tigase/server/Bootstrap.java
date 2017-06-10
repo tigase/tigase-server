@@ -80,7 +80,11 @@ public class Bootstrap implements Lifecycle {
 		for (Map.Entry<String, Object> e : config.getProperties().entrySet()) {
 			if (e.getKey().startsWith("--")) {
 				String key = e.getKey().substring(2);
-				System.setProperty(key, e.getValue().toString());
+				Object value = e.getValue();
+				if (value instanceof ConfigReader.Variable) {
+					value = ((ConfigReader.Variable) value).calculateValue();
+				}
+				System.setProperty(key, value.toString());
 				if (CLUSTER_MODE.equals(e.getKey())) {
 					System.setProperty("tigase.cache", "false");
 				}					
