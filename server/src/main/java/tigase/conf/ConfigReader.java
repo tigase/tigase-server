@@ -154,6 +154,19 @@ public class ConfigReader {
 						break;
 					}
 					case ']': {
+						if (holder.variable != null && (holder.state != State.PROPERTY && holder.state != State.ENVIRONMENT)) {
+							if (holder.variable instanceof CompositeVariable) {
+								Object value = holder.value;
+								if (value == null) {
+									value = decodeValue(holder.sb.toString());
+								}
+
+								((CompositeVariable) holder.variable).add(value);
+							}
+							holder.value = holder.variable;
+							holder.variable = null;
+						}
+
 						List val = holder.list;
 						if (holder.value == null) {
 							String valueStr = holder.sb.toString().trim();
@@ -323,19 +336,33 @@ public class ConfigReader {
 					case '-':
 					case '/':
 					case '*':
-						Object value = holder.value;
-						if (value == null) {
-							value = decodeValue(holder.sb.toString());
-						}
-						if (holder.key != null && value != null) {
-							holder.value = null;
-							holder.sb = new StringBuilder();
-							if (holder.variable == null) {
-								CompositeVariable var = new CompositeVariable();
-								holder.variable = var;
+						if (holder.state == State.LIST) {
+							if (holder.value != null) {
+								Object value = holder.value;
+								holder.value = null;
+								holder.sb = new StringBuilder();
+								if (holder.variable == null) {
+									CompositeVariable var = new CompositeVariable();
+									holder.variable = var;
+								}
+								((CompositeVariable) holder.variable).add(c, value);
+								break;
 							}
-							((CompositeVariable) holder.variable).add(c, value);
-							break;
+						} else {
+							Object value = holder.value;
+							if (value == null) {
+								value = decodeValue(holder.sb.toString());
+							}
+							if (holder.key != null && value != null) {
+								holder.value = null;
+								holder.sb = new StringBuilder();
+								if (holder.variable == null) {
+									CompositeVariable var = new CompositeVariable();
+									holder.variable = var;
+								}
+								((CompositeVariable) holder.variable).add(c, value);
+								break;
+							}
 						}
 					default:
 						holder.sb.append(c);

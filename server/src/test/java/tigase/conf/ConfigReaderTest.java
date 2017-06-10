@@ -4,10 +4,7 @@ import org.junit.Test;
 import tigase.TestLogger;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -171,6 +168,37 @@ public class ConfigReaderTest {
 
 		assertEquals(root, parsed);
 		assertEquals(props, ConfigReader.flatTree(parsed));
+	}
+
+	@Test
+	public void testReadingListOfItemsWithVariables1() throws IOException, ConfigReader.ConfigException {
+		String tmp = "paths = [ '/xxx/yyy/zzz', 'aaa/' + env('HOME') + '/ccc', 'eee/fff/ggg' ]";
+		Map<String, Object> data = new ConfigReader().read(new StringReader(tmp));
+		List paths = (List<String>) data.get("paths");
+		assertEquals(3, paths.size());
+		assertEquals("/xxx/yyy/zzz", paths.get(0).toString());
+		assertEquals("aaa/" + System.getenv("HOME") + "/ccc", ((ConfigReader.Variable) paths.get(1)).calculateValue());
+		assertEquals("eee/fff/ggg", paths.get(2).toString());
+	}
+
+	@Test
+	public void testReadingListOfItemsWithVariables2() throws IOException, ConfigReader.ConfigException {
+		String tmp = "paths = [\n'/xxx/yyy/zzz',\n'aaa/' + env('HOME') + '/ccc'\n]";
+		Map<String, Object> data = new ConfigReader().read(new StringReader(tmp));
+		List paths = (List<String>) data.get("paths");
+		assertEquals(2, paths.size());
+		assertEquals("/xxx/yyy/zzz", paths.get(0).toString());
+		assertEquals("aaa/" + System.getenv("HOME") + "/ccc", ((ConfigReader.Variable) paths.get(1)).calculateValue());
+	}
+
+	@Test
+	public void testReadingListOfItemsWithVariables3() throws IOException, ConfigReader.ConfigException {
+		String tmp = "paths = [ 'admin@localhost', '' + env('USER') + '@localhost' ]";
+		Map<String, Object> data = new ConfigReader().read(new StringReader(tmp));
+		List paths = (List<String>) data.get("paths");
+		assertEquals(2, paths.size());
+		assertEquals("admin@localhost", paths.get(0).toString());
+		assertEquals("" + System.getenv("USER") + "@localhost", ((ConfigReader.Variable) paths.get(1)).calculateValue());
 	}
 
 	private void displayFile(File f) throws IOException {
