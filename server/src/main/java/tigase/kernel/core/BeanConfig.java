@@ -46,6 +46,8 @@ public class BeanConfig {
 	private Set<BeanConfig> registeredBeans = new HashSet<>();
 	private Set<BeanConfig> registeredBy = new HashSet<>();
 
+	private String beanInstanceName = null;
+
 	BeanConfig(String id, Class<?> clazz) {
 		super();
 		this.beanName = id;
@@ -77,7 +79,7 @@ public class BeanConfig {
 	public String getBeanName() {
 		return beanName;
 	}
-
+	
 	/**
 	 * Returns class of bean.
 	 *
@@ -213,6 +215,14 @@ public class BeanConfig {
 
 	public Set<BeanConfig> getRegisteredBy() {
 		return registeredBy;
+	}
+
+	protected String getBeanInstanceName() {
+		return beanInstanceName == null ? getBeanName() : beanInstanceName;
+	}
+
+	protected void setBeanInstanceName(String beanInstanceName) {
+		this.beanInstanceName = beanInstanceName;
 	}
 
 	/**

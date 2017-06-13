@@ -30,6 +30,7 @@ public class RegistrarBeanKernelTest {
 
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
+		krnl.registerBean(DefaultTypesConverter.class).exec();
 		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
 		krnl.registerBean(RegistrarBeanImpl.class).exec();
 
@@ -67,6 +68,7 @@ public class RegistrarBeanKernelTest {
 
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
+		krnl.registerBean(DefaultTypesConverter.class).exec();
 		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink.class).exec();
@@ -110,6 +112,7 @@ public class RegistrarBeanKernelTest {
 
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
+		krnl.registerBean(DefaultTypesConverter.class).exec();
 		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean2.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink2.class).exec();
@@ -150,6 +153,7 @@ public class RegistrarBeanKernelTest {
 
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
+		krnl.registerBean(DefaultTypesConverter.class).exec();
 		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean3.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink3.class).exec();

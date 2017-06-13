@@ -63,7 +63,12 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 		String name;
 		while (result != null && (name = kernels.poll()) != null) {
-			result = (Map<String, Object>) result.get(name);
+			Object r = result.get(name);
+			if (r instanceof Map) {
+				result = (Map<String, Object>) r;
+			} else {
+				result = null;
+			}
 		}
 
 		return result != null;
@@ -229,13 +234,14 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 	}
 
 	private BeanDefinition getBeanDefinitionFromDump(Map<String, Object> dump, String name) {
-		Map<String, Object> tmp = (Map<String, Object>) dump.get(name);
+		Object tmp = dump.get(name);
 
 		if (tmp == null || (!(tmp instanceof BeanDefinition))) {
 			BeanDefinition def = new BeanDefinition();
 			def.setBeanName(name);
-			if (tmp != null)
-				def.putAll(tmp);
+			if (tmp != null && tmp instanceof Map) {
+				def.putAll((Map<String, Object>) tmp);
+			}
 			dump.put(name, def);
 			tmp = def;
 		}

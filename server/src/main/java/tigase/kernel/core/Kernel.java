@@ -48,7 +48,7 @@ public class Kernel {
 
 	private static final ThreadLocal<DelayedDependencyInjectionQueue> DELAYED_DEPENDENCY_INJECTION = new ThreadLocal<>();
 
-	private final Map<BeanConfig, Object> beanInstances = new HashMap<BeanConfig, Object>();
+	private final Map<String, Object> beanInstances = new HashMap<>();
 
 	private final DependencyManager dependencyManager = new DependencyManager();
 
@@ -109,9 +109,10 @@ public class Kernel {
 				k.setName(beanConfig.getBeanName());
 				beanConfig.getKernel().registerBean(beanConfig.getBeanName() + "#KERNEL").asInstance(k).exec();
 				beanConfig.setKernel(k);
+				beanConfig.setBeanInstanceName("service");
 			}
 			bean = beanConfig.getKernel().createNewInstance(beanConfig);
-			beanConfig.getKernel().putBeanInstance(beanConfig, bean);
+			beanConfig.getKernel().putBeanInstance(beanConfig.getBeanInstanceName(), bean);
 			createdBeansConfig.add(beanConfig);
 			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
 				Kernel parent = beanConfig.getKernel().getParent();
@@ -306,7 +307,8 @@ public class Kernel {
 			beanConfig = ((DelegatedBeanConfig) beanConfig).original;
 		}
 //		return (T) beanConfig.getKernel().beanInstances.get(beanConfig);
-		return (T) beanConfig.getKernel().beanInstances.get(beanConfig);
+		String beanInstanceName = beanConfig.getBeanInstanceName();
+		return (T) beanConfig.getKernel().beanInstances.get(beanInstanceName);
 	}
 
 	/**
@@ -860,8 +862,8 @@ public class Kernel {
 		String destinationName;
 	}
 
-	void putBeanInstance(BeanConfig beanConfig, Object beanInstance) {
-		Object oldBeanInstance = this.beanInstances.put(beanConfig, beanInstance);
+	void putBeanInstance(String beanName, Object beanInstance) {
+		Object oldBeanInstance = this.beanInstances.put(beanName, beanInstance);
 		if (oldBeanInstance instanceof UnregisterAware && oldBeanInstance != beanInstance) {
 			((UnregisterAware) oldBeanInstance).beforeUnregister();
 		}
@@ -869,6 +871,10 @@ public class Kernel {
 			((Kernel) beanInstance).setParent(this);
 		}
 		//beanConfig.setState(State.initialized);
+	}
+
+	void putBeanInstance(BeanConfig beanConfig, Object beanInstance) {
+		putBeanInstance(beanConfig.getBeanName(), beanInstance);
 	}
 
 	/**
@@ -1068,13 +1074,14 @@ public class Kernel {
 				if (beanConfig instanceof DelegatedBeanConfig) {
 					beanConfig = ((DelegatedBeanConfig) beanConfig).getOriginal();
 				}
-				Object i = beanConfig.getKernel().beanInstances.remove(beanConfig);
+				Object i = beanConfig.getKernel().beanInstances.remove(beanConfig.getBeanInstanceName());
 				fireUnregisterAware(i);
 				if (i instanceof RegistrarBean) {
 					((RegistrarBean) i).unregister(beanConfig.getKernel());
 					Kernel parent = beanConfig.getKernel().getParent();
 					parent.unregister(beanConfig.getBeanName() + "#KERNEL");
 					beanConfig.setKernel(parent);
+					beanConfig.setBeanInstanceName(null);
 				}
 				beanConfig.setState(State.inactive);
 				unloadInjectedBean(beanConfig);
@@ -1258,7 +1265,8 @@ public class Kernel {
 				log.finer("[" + getName() + "] Found registred bean " + beanName + ". Unregistering...");
 
 			BeanConfig oldBeanConfig = dependencyManager.unregister(beanName);
-			Object i = oldBeanConfig.getKernel().beanInstances.remove(oldBeanConfig);
+			Object i = oldBeanConfig.getKernel().beanInstances.remove(oldBeanConfig.getBeanInstanceName());
+			oldBeanConfig.setBeanInstanceName(null);
 			if (oldBeanConfig.getState() == State.initialized)
 				fireUnregisterAware(i);
 
