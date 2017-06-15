@@ -4,6 +4,7 @@ import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
@@ -12,10 +13,15 @@ import tigase.server.monitor.MonitorRuntime;
 import tigase.util.TimerTask;
 
 import javax.script.ScriptEngineManager;
+import java.util.ArrayList;
+import java.util.List;
 
 @Bean(name = "monitor", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 public class MonitorComponent extends AbstractKernelBasedComponent {
+
+	@Inject
+	private List<MonitorExtension> extensions = new ArrayList<>();
 
 	private final TimerTaskService timerTaskService = new TimerTaskService() {
 
