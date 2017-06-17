@@ -20,7 +20,7 @@ import java.util.List;
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 public class MonitorComponent extends AbstractKernelBasedComponent {
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private List<MonitorExtension> extensions = new ArrayList<>();
 
 	private final TimerTaskService timerTaskService = new TimerTaskService() {
