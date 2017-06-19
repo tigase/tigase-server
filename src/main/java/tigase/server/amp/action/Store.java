@@ -26,27 +26,21 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.db.MsgRepositoryIfc;
-import tigase.db.NonAuthUserRepositoryImpl;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
+import tigase.db.*;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionResultsHandlerIfc;
-import tigase.server.amp.JDBCMsgRepository;
 import tigase.server.amp.MsgRepository;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created: May 1, 2010 11:32:59 AM
@@ -186,7 +180,12 @@ public class Store
 						log.log(Level.CONFIG,
 										"Reading properties: (" + entry.getKey() + ", " + entry.getValue() +
 										")");
-						db_props.put(entry.getKey(), entry.getValue().toString());
+						if (entry.getValue() instanceof String[]) {
+							String[] val = (String[]) entry.getValue();
+							db_props.put(entry.getKey(), Stream.of(val).collect(Collectors.joining(",")));
+						} else {
+							db_props.put(entry.getKey(), entry.getValue().toString());
+						}
 					}
 				}
 

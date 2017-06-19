@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static tigase.server.amp.AmpFeatureIfc.*;
 
@@ -153,7 +155,12 @@ public class MessageAmp
 			Map<String, String> db_props = new HashMap<String, String>(4);
 
 			for (Map.Entry<String, Object> entry : settings.entrySet()) {
-				db_props.put(entry.getKey(), entry.getValue().toString());
+				if (entry.getValue() instanceof String[]) {
+					String[] val = (String[]) entry.getValue();
+					db_props.put(entry.getKey(), Stream.of(val).collect(Collectors.joining(",")));
+				} else {
+					db_props.put(entry.getKey(), entry.getValue().toString());
+				}
 			}
 
 			// Initialization of repository can be done here and in Store

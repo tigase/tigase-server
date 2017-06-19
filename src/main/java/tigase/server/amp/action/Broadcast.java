@@ -22,36 +22,32 @@
 
 package tigase.server.amp.action;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Presence;
-import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionResultsHandlerIfc;
 import tigase.server.amp.AmpFeatureIfc;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_CLASS_PARAM;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_URI_PARAM;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY;
-import static tigase.server.amp.AmpFeatureIfc.AMP_XMLNS;
-import static tigase.server.amp.AmpFeatureIfc.CONDITION_ATT;
 import tigase.server.amp.MsgRepository;
-import static tigase.server.amp.cond.ExpireAt.NAME;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static tigase.server.amp.cond.ExpireAt.NAME;
 
 /**
  *
@@ -257,7 +253,12 @@ public class Broadcast implements AmpFeatureIfc {
 						log.log(Level.CONFIG,
 										"Reading properties: (" + entry.getKey() + ", " + entry.getValue() +
 										")");
-						db_props.put(entry.getKey(), entry.getValue().toString());
+						if (entry.getValue() instanceof String[]) {
+							String[] val = (String[]) entry.getValue();
+							db_props.put(entry.getKey(), Stream.of(val).collect(Collectors.joining(",")));
+						} else {
+							db_props.put(entry.getKey(), entry.getValue().toString());
+						}
 					}
 				}
 
