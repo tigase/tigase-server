@@ -139,7 +139,8 @@ public class MessageAmp
 	@Override
 	public void postProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		if ((offlineProcessor != null) && (session == null || !messageProcessor.hasConnectionForMessageDelivery(session))) {
+		if ((offlineProcessor != null) && (session == null || (packet.getElemName() == Message.ELEM_NAME &&
+				!messageProcessor.hasConnectionForMessageDelivery(session)))) {
 			if (packet.getElemName() == tigase.server.Message.ELEM_NAME 
 					&& packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
 				return;

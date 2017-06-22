@@ -155,7 +155,8 @@ public class OfflineMessages
 	public void postProcess( final Packet packet, final XMPPResourceConnection conn,
 													 final NonAuthUserRepository repo, final Queue<Packet> queue,
 													 Map<String, Object> settings ) {
-		if ( conn == null || !message.hasConnectionForMessageDelivery(conn) ){
+		if (conn == null
+				|| (packet.getElemName() == Message.ELEM_NAME && !message.hasConnectionForMessageDelivery(conn))) {
 			try {
 				if (packet.getElemName() == tigase.server.Message.ELEM_NAME
 						&& packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
