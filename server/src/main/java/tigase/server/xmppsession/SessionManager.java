@@ -1732,7 +1732,7 @@ public class SessionManager
 		}
 
 		// walkTm = System.currentTimeMillis() - startTime;
-		if (!stop && !packet.wasProcessed()) {
+		if (!stop) {
 			for (XMPPPostprocessorIfc postproc : postProcessors.values()) {
 				String plug_id      = postproc.id();
 				long[] postProcTime = null;
