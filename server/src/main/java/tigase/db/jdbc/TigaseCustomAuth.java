@@ -25,6 +25,7 @@ package tigase.db.jdbc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.*;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
@@ -285,11 +286,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			+ "select count(*) from tig_users where user_id like ?";
 
 	public static final String DEF_LISTDISABLEDACCOUNTS_QUERY = "{ call TigDisabledAccounts() }";
-
-	@Deprecated public static final String DEF_DISABLEACCOUNT_QUERY = "{ call TigDisableAccount(?) }";
-
-	@Deprecated public static final String DEF_ENABLEACCOUNT_QUERY = "{ call TigEnableAccount(?) }";
-
+	
 	public static final String DEF_UPDATEACCOUNTSTATUS_QUERY = "{ call TigUpdateAccountStatus(?, ?) }";
 
 	public static final String DEF_ACCOUNTSTATUS_QUERY = "{ call TigAccountStatus(?) }";
@@ -308,29 +305,42 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	// ~--- fields ---------------------------------------------------------------
 
 	private DataRepository data_repo = null;
+	@ConfigField(desc = "Database initialization query which is run after the server is started", alias = DEF_INITDB_KEY)
 	private String initdb_query = DEF_INITDB_QUERY;
+	@ConfigField(desc = "Retrieves user password from the database for given user_id (JID)", alias = DEF_GETPASSWORD_KEY)
 	private String getpassword_query = DEF_GETPASSWORD_QUERY;
+	@ConfigField(desc = "Removes a user from the database", alias = DEF_DELUSER_KEY)
 	private String deluser_query = DEF_DELUSER_QUERY;
+	@ConfigField(desc = "Query adding a new user to the database", alias = DEF_ADDUSER_KEY)
 	private String adduser_query = DEF_ADDUSER_QUERY;
+	@ConfigField(desc = "Updates (changes) password for a given user_id (JID)", alias = DEF_UPDATEPASSWORD_KEY)
 	private String updatepassword_query = DEF_UPDATEPASSWORD_QUERY;
+	@ConfigField(desc = "Performs user login", alias = DEF_USERLOGIN_KEY)
 	private String userlogin_query = DEF_USERLOGIN_QUERY;
+	@ConfigField(desc = "Count users for domain", alias = DEF_USERS_DOMAIN_COUNT_KEY)
 	private String userdomaincount_query = DEF_USERS_DOMAIN_COUNT_QUERY;
+	@ConfigField(desc = "Lists disabled accounts", alias = DEF_LISTDISABLEDACCOUNTS_KEY)
 	private String listdisabledaccounts_query = DEF_LISTDISABLEDACCOUNTS_QUERY;
-	@Deprecated private String disableaccount_query = DEF_DISABLEACCOUNT_QUERY;
-	@Deprecated private String enableaccount_query = DEF_ENABLEACCOUNT_QUERY;
+	@ConfigField(desc = "Checks account status", alias = DEF_ACCOUNTSTATUS_KEY)
 	private String accountstatus_query = DEF_ACCOUNTSTATUS_QUERY;
+	@ConfigField(desc = "Updates (changes) account status", alias = DEF_UPDATEACCOUNTSTATUS_KEY)
 	private String updateaccountstatus_query = DEF_UPDATEACCOUNTSTATUS_QUERY;
+	@ConfigField(desc = "Updates last login/logout timestamps", alias = DEF_UPDATELOGINTIME_KEY)
 	private String updatelastlogin_query = DEF_UPDATELOGINTIME_QUERY;
 
 
 	// It is better just to not call the query if it is not defined by the user
 	// By default it is null then and not called.
+	@ConfigField(desc = "Performs user logout", alias = DEF_USERLOGOUT_KEY)
 	private String userlogout_query = null;
+	@ConfigField(desc = "Counts users", alias = DEF_USERS_COUNT_KEY)
 	private String userscount_query = DEF_USERS_COUNT_QUERY;
 	private boolean userlogin_active = false;
 
 	// private String userlogout_query = DEF_USERLOGOUT_QUERY;
+	@ConfigField(desc = "Comma separated list of SASL authentication mechanisms", alias = DEF_SASL_MECHS_KEY)
 	private String[] sasl_mechs = DEF_SASL_MECHS.split(",");
+	@ConfigField(desc = "Comma separated list of NON-SASL authentication mechanisms", alias = DEF_NONSASL_MECHS_KEY)
 	private String[] nonsasl_mechs = DEF_NONSASL_MECHS.split(",");
 
 	// ~--- methods --------------------------------------------------------------
@@ -485,8 +495,58 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 
 	// ~--- methods --------------------------------------------------------------
 	@Override
-	public void setDataSource(DataRepository dataSource) {
-		data_repo = dataSource;
+	public void setDataSource(DataRepository data_repo) throws DBInitException {
+		try {
+			if (initdb_query != null) {
+				data_repo.initPreparedStatement(initdb_query, initdb_query);
+			}
+			if ((adduser_query != null)) {
+				data_repo.initPreparedStatement(adduser_query, adduser_query);
+			}
+			if ((deluser_query != null)) {
+				data_repo.initPreparedStatement(deluser_query, deluser_query);
+			}
+			if ((getpassword_query != null)) {
+				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
+			}
+			if ((updatepassword_query != null)) {
+				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
+			}
+			if (userlogin_query != null) {
+				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
+				userlogin_active = true;
+			}
+			if ((userlogout_query != null)) {
+				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
+			}
+			if (updatelastlogin_query != null) {
+				data_repo.initPreparedStatement(updatelastlogin_query, updatelastlogin_query);
+			}
+			if ((userscount_query != null)) {
+				data_repo.initPreparedStatement(userscount_query, userscount_query);
+			}
+			if ((userdomaincount_query != null)) {
+				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);
+			}
+			if (listdisabledaccounts_query != null) {
+				data_repo.initPreparedStatement(listdisabledaccounts_query, listdisabledaccounts_query);
+			}
+			if (updateaccountstatus_query != null) {
+				data_repo.initPreparedStatement(updateaccountstatus_query, updateaccountstatus_query);
+			}
+			if (accountstatus_query != null) {
+				data_repo.initPreparedStatement(accountstatus_query, accountstatus_query);
+			}
+
+			this.data_repo = data_repo;
+
+			if (initdb_query != null) {
+				initDb();
+			}
+		} catch (SQLException ex) {
+			data_repo = null;
+			throw new DBInitException("Could not initialize TigaseCustomAuth instance", ex);
+		}
 	}
 
 	@Override
@@ -519,99 +579,44 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	}
 
 	@Override
+	@Deprecated
 	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
-			if (data_repo == null) {
-				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
-			}
 			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
 
-			if (initdb_query != null) {
-				data_repo.initPreparedStatement(initdb_query, initdb_query);
-			}
-
 			adduser_query = getParamWithDef(params, DEF_ADDUSER_KEY, DEF_ADDUSER_QUERY);
-
-			if ((adduser_query != null)) {
-				data_repo.initPreparedStatement(adduser_query, adduser_query);
-			}
-
+			
 			deluser_query = getParamWithDef(params, DEF_DELUSER_KEY, DEF_DELUSER_QUERY);
-
-			if ((deluser_query != null)) {
-				data_repo.initPreparedStatement(deluser_query, deluser_query);
-			}
-
+			
 			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, DEF_GETPASSWORD_QUERY);
-
-			if ((getpassword_query != null)) {
-				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
-			}
 
 			updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY, DEF_UPDATEPASSWORD_QUERY);
 
-			if ((updatepassword_query != null)) {
-				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
-			}
-
 			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
-			if (userlogin_query != null) {
-				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
-				userlogin_active = true;
-			}
 
 			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_QUERY);
 
-			if ((userlogout_query != null)) {
-				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
-			}
-
 			updatelastlogin_query = getParamWithDef(params, DEF_UPDATELOGINTIME_KEY, DEF_UPDATELOGINTIME_QUERY);
-			if (updatelastlogin_query != null) {
-				data_repo.initPreparedStatement(updatelastlogin_query, updatelastlogin_query);
-			}
 
 			userscount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
 
-			if ((userscount_query != null)) {
-				data_repo.initPreparedStatement(userscount_query, userscount_query);
-			}
-
 			userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY, DEF_USERS_DOMAIN_COUNT_QUERY);
-
-			if ((userdomaincount_query != null)) {
-				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);
-			}
-
+			
 			listdisabledaccounts_query = getParamWithDef(params, DEF_LISTDISABLEDACCOUNTS_KEY,
 														 DEF_LISTDISABLEDACCOUNTS_QUERY);
-			if (listdisabledaccounts_query != null) {
-				data_repo.initPreparedStatement(listdisabledaccounts_query, listdisabledaccounts_query);
-			}
-
-			disableaccount_query = getParamWithDef(params, DEF_DISABLEACCOUNT_KEY, DEF_DISABLEACCOUNT_QUERY);
-			if (disableaccount_query != null) {
-				data_repo.initPreparedStatement(disableaccount_query, disableaccount_query);
-			}
-
-			enableaccount_query = getParamWithDef(params, DEF_ENABLEACCOUNT_KEY, DEF_ENABLEACCOUNT_QUERY);
-			if (enableaccount_query != null) {
-				data_repo.initPreparedStatement(enableaccount_query, enableaccount_query);
-			}
 
 			updateaccountstatus_query = getParamWithDef(params, DEF_UPDATEACCOUNTSTATUS_KEY,
 														DEF_UPDATEACCOUNTSTATUS_QUERY);
-			if (updateaccountstatus_query != null) {
-				data_repo.initPreparedStatement(updateaccountstatus_query, updateaccountstatus_query);
-			}
 
 			accountstatus_query = getParamWithDef(params, DEF_ACCOUNTSTATUS_KEY, DEF_ACCOUNTSTATUS_QUERY);
-			if (accountstatus_query != null) {
-				data_repo.initPreparedStatement(accountstatus_query, accountstatus_query);
-			}
 
 			nonsasl_mechs = getParamWithDef(params, DEF_NONSASL_MECHS_KEY, DEF_NONSASL_MECHS).split(",");
 			sasl_mechs = getParamWithDef(params, DEF_SASL_MECHS_KEY, DEF_SASL_MECHS).split(",");
+
+			if (data_repo == null) {
+				DataRepository dataRepo= RepositoryFactory.getDataRepository(null, connection_str, params);
+				setDataSource(dataRepo);
+			}
 
 			if ((params != null) && (params.get("init-db") != null)) {
 				initDb();

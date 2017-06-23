@@ -204,7 +204,7 @@ public class ConfigHolder {
 		new ConfigWriter().write(f, props);
 	}
 
-	protected void detectPathAndFormat() {
+	protected Format detectPathAndFormat() {
 		String property_filenames = (String) props.remove(PROPERTY_FILENAME_PROP_KEY);
 		if (property_filenames == null) {
 			property_filenames = PROPERTY_FILENAME_PROP_DEF;
@@ -228,9 +228,18 @@ public class ConfigHolder {
 				try (BufferedReader reader = new BufferedReader(new FileReader(property_filename))) {
 					String line;
 					while ((line = reader.readLine()) != null) {
-						if (line.contains("{") && !line.contains("{clusterNode}")) {
+						if (line.startsWith("--user-db")) {
+							break;
+						}
+						if (line.contains("{")) {
+							if (line.contains("{clusterNode}"))
+								continue;
+
+							if (line.contains("{ call") && !(line.contains("\'{ call") || line.contains("\"{ call")))
+								continue;
+							
 							format = dsl;
-							return;
+							return format;
 						}
 					}
 				} catch (IOException e) {
@@ -239,6 +248,7 @@ public class ConfigHolder {
 			}
 		}
 		format = Format.properties;
+		return format;
 	}
 
 	public Path getConfigFilePath() {

@@ -67,6 +67,8 @@ public interface Repository {
 	 * call.
 	 */
 	@Deprecated
-	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;	
+	default void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		
+	}
 	
 }

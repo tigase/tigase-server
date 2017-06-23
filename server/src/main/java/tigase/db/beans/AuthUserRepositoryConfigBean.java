@@ -21,6 +21,7 @@
  */
 package tigase.db.beans;
 
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.*;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
@@ -30,13 +31,20 @@ import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by andrzej on 09.03.2016.
  */
-public abstract class AuthUserRepositoryConfigBean<T extends Repository, U extends AuthUserRepositoryConfigBean<T,U>> extends MDPoolConfigBean<T,U> implements ConfigurationChangedAware, Initializable, UnregisterAware {
+public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserRepositoryConfigBean<T,U>> extends MDPoolConfigBean<T,U> implements ConfigurationChangedAware, Initializable, UnregisterAware {
+
+	private static final Logger log = Logger.getLogger(AuthUserRepositoryConfigBean.class.getCanonicalName());
 
 	@Inject
 	private EventBus eventBus;
@@ -62,13 +70,25 @@ public abstract class AuthUserRepositoryConfigBean<T extends Repository, U exten
 	}
 
 	@Override
-	protected void initRepository(T repository) throws DBInitException {
-		if (repository instanceof DataSourceAware) {
+	protected void initRepository(T repository) throws RepositoryException {
+		boolean initialized = false;
+		if (repository instanceof Repository) {
+			try {
+				Method m = repository.getClass().getDeclaredMethod("initRepository", String.class, Map.class);
+				if (m.getAnnotation(Deprecated.class) == null) {
+					log.log(Level.WARNING, "Class {0} is using deprecated initialization using method initRepository()", repository.getClass().getCanonicalName());
+					((Repository) repository).initRepository(getUri(), new HashMap<>());
+					initialized = true;
+				}
+			} catch (NoSuchMethodException|SecurityException ex) {
+				// ignoring exception
+			}
+		}
+		if (!initialized && repository instanceof DataSourceAware) {
 			((DataSourceAware) repository).setDataSource(dataSource);
 		}
-		super.initRepository(repository);
 	}
-
+	
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		if (dataSourceBean != null) {

@@ -19,11 +19,13 @@
 
 package tigase.db.xml;
 
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.Repository;
 import tigase.xml.db.XMLDB;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +47,12 @@ public class XMLDataSource implements DataSource {
 	}
 
 	@Override
+	public void initialize(String file) throws RepositoryException {
+		initRepository(file, new HashMap<>());
+	}
+
+	@Override
+	@Deprecated
 	public void initRepository(String file, Map<String, String> params) throws DBInitException {
 		this.resource_uri = file;
 		String file_name = file;

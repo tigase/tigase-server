@@ -132,6 +132,7 @@ public class AuthRepositoryImpl
 	}
 
 	@Override
+	@Deprecated
 	public void initRepository(final String string, Map<String, String> params)
 					throws DBInitException {}
 

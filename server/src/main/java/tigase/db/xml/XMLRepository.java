@@ -283,6 +283,7 @@ public class XMLRepository
 	}
 
 	@Override
+	@Deprecated
 	public synchronized void initRepository(String file, Map<String, String> params) throws DBInitException {
 		if (xmldb == null) {
 			log.log(Level.FINEST, "Initializing repository, file: {0}, params: {1}", new Object[]{file, params});

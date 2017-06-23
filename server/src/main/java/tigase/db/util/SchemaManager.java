@@ -20,6 +20,7 @@ package tigase.db.util;
 
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
+import tigase.component.exceptions.RepositoryException;
 import tigase.conf.ConfigBuilder;
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfigWriter;
@@ -759,6 +760,12 @@ public class SchemaManager {
 		}
 
 		@Override
+		public void initialize(String connStr) throws RepositoryException {
+			// nothing to do
+		}
+
+		@Override
+		@Deprecated
 		public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 			// nothing to do
 		}

@@ -21,6 +21,7 @@
  */
 package tigase.db.beans;
 
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.DataSourceHelper;
@@ -205,6 +206,11 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 		public void initialize() {
 			super.initialize();
 			updateWatchdogTask();
+		}
+
+		@Override
+		protected void initRepository(DataSource repo) throws RepositoryException {
+			repo.initialize(getUri());
 		}
 
 		@Override

@@ -42,6 +42,7 @@ public class ExtServiceDiscoveryUserRepoRepository extends UserRepoRepository<Ex
 	}
 
 	@Override
+	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 
 	}

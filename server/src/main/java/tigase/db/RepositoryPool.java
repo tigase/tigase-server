@@ -24,7 +24,7 @@ package tigase.db;
 /**
  * Created by andrzej on 08.03.2016.
  */
-public interface RepositoryPool<T extends Repository> extends Repository {
+public interface RepositoryPool<T> extends Repository {
 
 	void addRepo(T repo);
 

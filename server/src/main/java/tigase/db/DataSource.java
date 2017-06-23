@@ -21,6 +21,8 @@
  */
 package tigase.db;
 
+import tigase.component.exceptions.RepositoryException;
+
 import java.time.Duration;
 
 /**
@@ -35,6 +37,8 @@ public interface DataSource extends Repository {
 	 *         string.
 	 */
 	String getResourceUri();
+
+	void initialize(String connStr) throws RepositoryException;
 
 	default void checkConnectivity(Duration watchdogTime) {
 

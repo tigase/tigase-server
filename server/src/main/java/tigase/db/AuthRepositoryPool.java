@@ -153,6 +153,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws DBInitException {}
 

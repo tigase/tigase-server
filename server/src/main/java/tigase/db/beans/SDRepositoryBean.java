@@ -21,6 +21,7 @@
  */
 package tigase.db.beans;
 
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.DataSourceAware;
@@ -134,7 +135,11 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 	public void setRepository(A repository) {
 		if (repository != null) {
 			initializeRepository(repository);
-			repository.setDataSource(dataSource);
+			try {
+				repository.setDataSource(dataSource);
+			} catch (RepositoryException ex) {
+				throw new RuntimeException("Failed to initialize repository", ex);
+			}
 		}
 		this.repository = repository;
 	}

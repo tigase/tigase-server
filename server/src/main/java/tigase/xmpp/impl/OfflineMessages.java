@@ -640,6 +640,7 @@ public class OfflineMessages
 		}
 
 		@Override
+		@Deprecated
 		public void initRepository(String conn_str, Map<String, String> map) {
 			// nothing to do here as we base on UserRepository which is already initialized
 		}

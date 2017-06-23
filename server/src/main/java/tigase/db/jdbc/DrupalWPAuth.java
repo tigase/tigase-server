@@ -159,16 +159,11 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 
 	//~--- methods --------------------------------------------------------------
 	@Override
-	public void setDataSource(DataRepository dataSource) {
-		data_repo = dataSource;
-	}
-
-	@Override
-	public void initRepository(final String connection_str, Map<String, String> params)
-			throws DBInitException {
+	public void setDataSource(DataRepository dataSource) throws DBInitException {
 		try {
-			if (data_repo == null)
-				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			data_repo = dataSource;
+
+			String connection_str = dataSource.getResourceUri();
 
 			if (connection_str.contains("online_status=true")) {
 				online_status = true;
@@ -200,6 +195,20 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 			query = "update " + users_tbl + " set online_status=online_status+? where " + name_fld
 					+ " = ?";
 			data_repo.initPreparedStatement(UPDATE_ONLINE_STATUS_QUERY_KEY, query);
+		} catch (SQLException ex) {
+			data_repo = null;
+			throw new DBInitException("Failed to initialize repository " + this.getClass().getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	@Deprecated
+	public void initRepository(final String connection_str, Map<String, String> params)
+			throws DBInitException {
+		try {
+			if (data_repo == null)
+				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+
 		} catch (Exception e) {
 			data_repo = null;
 

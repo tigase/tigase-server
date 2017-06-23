@@ -26,17 +26,78 @@ import tigase.server.CmdAcl;
 import tigase.xmpp.impl.roster.DynamicRosterTest;
 import tigase.xmpp.impl.roster.DynamicRosterTest123;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
 
 /**
  * Created by andrzej on 27.04.2017.
  */
 public class ConfigHolderTest {
+
+	@Test
+	public void testFormatDetection() throws IOException {
+		ConfigHolder holder = new ConfigHolder();
+
+		File tmp = File.createTempFile("test_", ".properties");
+		try (Writer w = new FileWriter(tmp)) {
+			w.append("--auth-db[domain4.com]=tigase-custom")
+					.append("\n")
+					.append("--auth-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password")
+					.append("\n")
+					.append("basic-conf/auth-repo-params/domain4.com/user-login-query={ call UserLogin(?, ?) }")
+					.append("\n")
+					.append("basic-conf/auth-repo-params/domain4.com/user-logout-query={ call UserLogout(?) }")
+					.append("\n")
+					.append("basic-conf/auth-repo-params/domain4.com/sasl-mechs=PLAIN,DIGEST-MD5")
+					.append("\n")
+					.append("--user-db[domain4.com]=mysql")
+					.append("\n")
+					.append("--user-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password")
+					.append("\n");
+		}
+
+		holder.getProperties().put(PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath());
+
+		ConfigHolder.Format format = holder.detectPathAndFormat();
+
+		tmp.delete();
+		
+		assertEquals(ConfigHolder.Format.properties, format);
+
+		tmp = File.createTempFile("test_", ".properties");
+		try (Writer w = new FileWriter(tmp)) {
+			w.append("authRepository () {")
+					.append("\n")
+					.append("'domain4.com' () {")
+					.append("\n")
+					.append("'user-login-query' = '{ call UserLogin(?, ?) }'")
+					.append("\n")
+					.append("'user-logout-query' = \"{ call UserLogout(?) }\"")
+					.append("\n")
+					.append("'sasl-mechs' = 'PLAIN,DIGEST-MD5'")
+					.append("\n")
+					.append("}")
+					.append("\n")
+					.append("}")
+					.append("\n");
+		}
+
+		holder.getProperties().put(PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath());
+
+		format = holder.detectPathAndFormat();
+
+		tmp.delete();
+
+		assertEquals(ConfigHolder.Format.dsl, format);
+	}
 
 	@Test
 	public void testConversionOfAdHocCommandsACLs() throws IOException {

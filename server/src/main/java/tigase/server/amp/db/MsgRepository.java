@@ -152,6 +152,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	public abstract	int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session) throws UserNotFoundException;
 
 	@Override
+	@Deprecated
 	public void initRepository(String conn_str, Map<String, String> map)
 			throws DBInitException {
 		
@@ -345,6 +346,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 
 		@Override
+		@Deprecated
 		public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 
 		}

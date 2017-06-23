@@ -30,18 +30,13 @@ package tigase.cluster.repo;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import tigase.db.DBInitException;
+import tigase.db.Repository;
+
+import java.io.*;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.DBInitException;
-import tigase.db.Repository;
 
 /**
  *
@@ -82,6 +77,7 @@ public class ClConDirRepository
 	}
 
 	@Override
+	@Deprecated
 	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
 		// Nothing to do here
 		super.initRepository(conn_str, params);

@@ -26,27 +26,17 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
-
+import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.util.DataTypes;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.FileWriter;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Set;
-import tigase.db.DBInitException;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2009 2:02:41 PM
@@ -322,6 +312,7 @@ public class ConfigurationCache
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do..
 	}	

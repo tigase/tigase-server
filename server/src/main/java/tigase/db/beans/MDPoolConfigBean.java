@@ -21,8 +21,8 @@
  */
 package tigase.db.beans;
 
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
-import tigase.db.Repository;
 import tigase.db.RepositoryFactory;
 import tigase.db.RepositoryPool;
 import tigase.kernel.beans.Initializable;
@@ -44,7 +44,9 @@ import static tigase.db.beans.MDPoolBean.*;
 /**
  * Created by andrzej on 08.03.2016.
  */
-public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConfigBean<A,B>> implements Initializable, ConfigurationChangedAware, RegistrarBean {
+public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implements Initializable, ConfigurationChangedAware, RegistrarBean {
+
+	private static final Logger log = Logger.getLogger(MDPoolConfigBean.class.getCanonicalName());
 
 	@Inject
 	protected MDPoolBean<A,B> mdPool;
@@ -76,6 +78,7 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 
 	protected abstract Class<? extends A> getRepositoryIfc();
 	protected abstract String getRepositoryPoolClassName() throws DBInitException;
+	protected abstract void initRepository(A repo) throws RepositoryException;
 
 	protected String getRepositoryClassName() throws DBInitException {
 		if (cls != null)
@@ -170,7 +173,7 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 		for (A repo :  toInitialize) {
 			try {
 				initRepository(repo);
-			} catch (DBInitException ex) {
+			} catch (RepositoryException ex) {
 				if (skipInitializationErrors) {
 					// maybe we should not ignore this error but delay initialization and await successful database initialization?
 					// or maybe we should unload this bean totally as it is not working as it should?
@@ -196,10 +199,6 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 		this.instances = instances;
 	}
 
-	protected void initRepository(A repo) throws DBInitException {
-		repo.initRepository(getUri(), Collections.EMPTY_MAP);
-	}
-
 	protected A getRepository() {
 		return repository;
 	}
@@ -210,7 +209,7 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 			if (instances != null) {
 				for (A instance : instances) {
 					if (repository instanceof RepositoryPool && !(instance instanceof RepositoryPool)) {
-						((RepositoryPool<A>) repository).addRepo(instance);
+						((RepositoryPool) repository).addRepo(instance);
 					}
 				}
 			}

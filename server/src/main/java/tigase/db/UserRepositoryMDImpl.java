@@ -277,6 +277,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws DBInitException {
 		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: "

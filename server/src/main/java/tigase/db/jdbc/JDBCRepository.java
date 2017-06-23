@@ -547,16 +547,11 @@ public class JDBCRepository
 
 	//~--- methods --------------------------------------------------------------
 	@Override
-	public void setDataSource(DataRepository dataSource) {
+	public void setDataSource(DataRepository dataSource) throws DBInitException {
 		data_repo = dataSource;
-	}
 
-	@Override
-	public void initRepository(final String connection_str, Map<String, String> params)
-					throws DBInitException {
+		String connection_str = data_repo.getResourceUri();
 		try {
-			if (data_repo == null)
-				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
 			checkDBSchema();
 			if (connection_str.contains("autoCreateUser=true")) {
 				autoCreateUser = true;
@@ -578,8 +573,7 @@ public class JDBCRepository
 			data_repo.initPreparedStatement(ADD_USER_PLAIN_PW_QUERY, ADD_USER_PLAIN_PW_QUERY);
 			data_repo.initPreparedStatement(REMOVE_USER_QUERY, REMOVE_USER_QUERY);
 			data_repo.initPreparedStatement(ADD_NODE_QUERY, ADD_NODE_QUERY);
-			data_repo.initPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY,
-																			COUNT_USERS_FOR_DOMAIN_QUERY);
+			data_repo.initPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY, COUNT_USERS_FOR_DOMAIN_QUERY);
 			data_repo.initPreparedStatement(DATA_FOR_NODE_QUERY, DATA_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(KEYS_FOR_NODE_QUERY, KEYS_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(NODES_FOR_NODE_QUERY, NODES_FOR_NODE_QUERY);
@@ -591,9 +585,20 @@ public class JDBCRepository
 
 			// initRepo();
 			log.log(Level.INFO, "Initialized database connection: {0}", connection_str);
-		} catch (Exception e) {
+		} catch (SQLException ex) {
 			data_repo = null;
+			throw new DBInitException("Could not initialize repository", ex);
+		}
+	}
 
+	@Override
+	@Deprecated
+	public void initRepository(final String connection_str, Map<String, String> params)
+					throws DBInitException {
+		try {
+			if (data_repo == null)
+				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+		} catch (Exception e) {
 			throw new DBInitException("Problem initializing jdbc connection: " +
 																connection_str, e);
 		}

@@ -21,7 +21,6 @@
  */
 package tigase.db.beans;
 
-import tigase.db.Repository;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBeanWithDefaultBeanClass;
 import tigase.kernel.beans.config.ConfigField;
@@ -30,7 +29,7 @@ import tigase.kernel.core.Kernel;
 /**
  * Created by andrzej on 08.03.2016.
  */
-public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>> implements RegistrarBeanWithDefaultBeanClass {
+public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements RegistrarBeanWithDefaultBeanClass {
 
 	public static final String REPO_URI = "repo-uri";
 	public static final String REPO_CLASS = "repo-class";

@@ -1,23 +1,19 @@
 package tigase.db.ldap;
 
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.db.*;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.util.Base64;
+import tigase.xmpp.BareJID;
+
 import javax.naming.Context;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import tigase.db.AuthRepository;
-import tigase.db.AuthorizationException;
-import tigase.db.DBInitException;
-import tigase.db.Repository;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-import tigase.util.Base64;
-import tigase.xmpp.BareJID;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Repository.Meta( supportedUris = { "ldaps?:.*" } )
 public class LdapAuthProvider implements AuthRepository {
@@ -124,8 +120,10 @@ public class LdapAuthProvider implements AuthRepository {
 	 */
 	public static final String USER_DN_PATTERN_KEY = "user-dn-pattern";
 
+	@ConfigField(desc = "LDAP provider URL", alias = "uri")
 	private String providerUrl;
 
+	@ConfigField(desc = "User DN pattern", alias = USER_DN_PATTERN_KEY)
 	private String userDnPattern;
 
 	@Override
@@ -191,8 +189,9 @@ public class LdapAuthProvider implements AuthRepository {
 	public long getUsersCount(String domain) {
 		return -1;
 	}
-
+	
 	@Override
+	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		this.userDnPattern = params.get(USER_DN_PATTERN_KEY);
 		this.providerUrl = resource_uri;

@@ -104,6 +104,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 	}
 
 	@Override
+	@Deprecated
 	public void initRepository(String conn_str, Map<String, String> map)
 			throws DBInitException {
 		if (initialized) {

@@ -46,6 +46,7 @@ public class TaskConfigItemJDBCRepository extends UserRepoRepository<TaskConfigI
 	}
 
 	@Override
+	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do
 	}

@@ -21,11 +21,13 @@
  */
 package tigase.db;
 
+import tigase.component.exceptions.RepositoryException;
+
 /**
  * Created by andrzej on 09.03.2016.
  */
 public interface DataSourceAware<T extends DataSource> {
 
-	void setDataSource(T dataSource);
+	void setDataSource(T dataSource) throws RepositoryException;
 
 }
