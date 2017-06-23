@@ -310,7 +310,7 @@ public class ConfigHolder {
 			List<String> toRemove = new ArrayList<>();
 
 			//List<String> dataSourceNames = new ArrayList<>();
-			Map<String, Map<String, String>> dataSources = new HashMap<>();
+			Map<String, Map<String, Object>> dataSources = new HashMap<>();
 
 			Pattern commandsPattern = Pattern.compile("^([^\\/]+)\\/command\\/(.+)$");
 			Pattern processorsPattern = Pattern.compile("^([^\\/]+)\\/processors\\/(.+)$");
@@ -396,7 +396,7 @@ public class ConfigHolder {
 					}
 					toRemove.add(k);
 
-					Map<String, String> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
+					Map<String, Object> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
 					if (k.startsWith("--user-db-uri")) {
 						ds.put("user-uri", (String) v);
 					} else if (k.startsWith("--user-db")) {
@@ -511,17 +511,33 @@ public class ConfigHolder {
 						}
 					}
 				}
+				if (k.startsWith("basic-conf/auth-repo-params/")) {
+					String[] tmp = k.replace("basic-conf/auth-repo-params/", "").split("/");
+					String domain = "default";
+					String prop = null;
+					if (tmp.length == 1) {
+						prop = tmp[0];
+					} else {
+						domain = tmp[0];
+						prop = tmp[1];
+					}
+					Map<String, Object> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
+					Map<String, Object> authParams = (Map<String, Object>) ds.computeIfAbsent("auth-params", (x) -> new HashMap<String, Object>());
+					authParams.put(prop, v.toString());
+					toRemove.add(k);
+				}
 			});
 
 //			List<String> userDbDomains = new ArrayList<>();
 //			List<String> authDbDomains = new ArrayList<>();
 			dataSources.forEach((domain, cfg) -> {
-				String userType = cfg.get("user-type");
-				String userUri = cfg.get("user-uri");
-				String authType = cfg.get("auth-type");
-				String authUri = cfg.get("auth-uri");
-				String ampUri = cfg.get("amp-uri");
-				String ampType = cfg.get("amp-type");
+				String userType = (String) cfg.get("user-type");
+				String userUri = (String) cfg.get("user-uri");
+				String authType = (String) cfg.get("auth-type");
+				String authUri = (String) cfg.get("auth-uri");
+				String ampUri = (String) cfg.get("amp-uri");
+				String ampType = (String) cfg.get("amp-type");
+				Map<String, Object> authParams = (Map<String, Object>) cfg.get("auth-params");
 
 				if (userUri != null) {
 					props.put("dataSource/" + domain + "/uri", userUri);
@@ -554,7 +570,12 @@ public class ConfigHolder {
 					props.put("authRepository/" + domain + "/cls", cls);
 				}
 				if (ampType != null) {
-					props.put("msgRepository/domain/cls", ampType);
+					props.put("msgRepository/" + domain + "/cls", ampType);
+				}
+				if (authParams != null) {
+					authParams.forEach((k,v) -> {
+						props.put("authRepository/" + domain + "/" + k, v);
+					});
 				}
 			});
 

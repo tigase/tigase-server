@@ -100,6 +100,35 @@ public class ConfigHolderTest {
 	}
 
 	@Test
+	public void testConversionOfAuthRepositoryOptions() throws IOException {
+		StringBuilder w = new StringBuilder();
+		w.append("--auth-db[domain4.com]=tigase-custom")
+				.append("\n")
+				.append("--auth-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password")
+				.append("\n")
+				.append("basic-conf/auth-repo-params/domain4.com/user-login-query={ call UserLogin(?, ?) }")
+				.append("\n")
+				.append("basic-conf/auth-repo-params/domain4.com/user-logout-query={ call UserLogout(?) }")
+				.append("\n")
+				.append("basic-conf/auth-repo-params/domain4.com/sasl-mechs=PLAIN,DIGEST-MD5")
+				.append("\n")
+				.append("--user-db[domain4.com]=mysql")
+				.append("\n")
+				.append("--user-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password")
+				.append("\n");
+		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
+		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(w.toString().split("\n")));
+
+		reader.convertFromOldFormat();
+
+		Map<String, Object> result = ConfigWriter.buildTree(props);
+
+		assertNotNull(result.get("authRepository"));
+		assertNotNull(((Map)result.get("authRepository")).get("domain4.com"));
+		assertEquals("{ call UserLogin(?, ?) }", ((Map) ((Map)result.get("authRepository")).get("domain4.com")).get("user-login-query"));
+	}
+
+	@Test
 	public void testConversionOfAdHocCommandsACLs() throws IOException {
 		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
 		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(
