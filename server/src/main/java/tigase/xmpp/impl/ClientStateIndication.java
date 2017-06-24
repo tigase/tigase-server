@@ -1,9 +1,10 @@
 package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
-import tigase.osgi.ModulesManagerImpl;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 })
 @Bean(name = ClientStateIndication.ID, parent = SessionManager.class, active = true)
 public class ClientStateIndication extends AnnotatedXMPPProcessor
-		implements XMPPProcessorIfc, XMPPPacketFilterIfc {
+		implements XMPPProcessorIfc, XMPPPacketFilterIfc, RegistrarBean {
 
 	private static final Logger log = Logger.getLogger(ClientStateIndication.class.getCanonicalName());
 
@@ -38,23 +39,8 @@ public class ClientStateIndication extends AnnotatedXMPPProcessor
 	protected static final String ACTIVE_NAME = "active";
 	protected static final String INACTIVE_NAME = "inactive";
 
-	private Logic logic = new MobileV2();
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-
-		if (settings.containsKey("logic")) {
-			String cls = (String) settings.get("logic");
-			try {
-				logic = (Logic) ModulesManagerImpl.getInstance().forName(cls).newInstance();
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-				log.log(Level.SEVERE, "Could not create instance of class", ex);
-			}
-		}
-
-		logic.init(settings);
-	}
+	@Inject
+	private Logic logic;
 
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
@@ -95,6 +81,16 @@ public class ClientStateIndication extends AnnotatedXMPPProcessor
 		if (session == null || !session.isAuthorized())
 			return null;
 		return super.supStreamFeatures(session);
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+		kernel.registerBean("logic").asClass(MobileV2.class).exec();
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 
 	public interface Logic extends XMPPPacketFilterIfc {

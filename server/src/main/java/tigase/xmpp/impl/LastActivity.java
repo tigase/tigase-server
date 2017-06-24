@@ -26,6 +26,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -92,6 +93,7 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 	private final static EnumSet<SubscriptionType> inTypes = EnumSet.of(SubscriptionType.both, SubscriptionType.from);
 	private final static EnumSet<SubscriptionType> outTypes = EnumSet.of(SubscriptionType.both, SubscriptionType.to);
 
+	@ConfigField(desc = "Protection level", alias = PROTECTION_LEVEL_KEY)
 	private ProtectionLevel protectionLevel = ProtectionLevel.ALL;
 
 	private static long getLastActivity(NonAuthUserRepository repo, BareJID requestedJid) throws UserNotFoundException {
@@ -153,13 +155,6 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 		} else {
 			results.offer(preventFromINFLoop(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "Unknown last activity time", false)));
 		}
-	}
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-		if (settings.containsKey(PROTECTION_LEVEL_KEY))
-			protectionLevel = ProtectionLevel.valueOf((String) settings.get(PROTECTION_LEVEL_KEY));
 	}
 
 	@Override

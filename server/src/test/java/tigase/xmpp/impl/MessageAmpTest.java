@@ -31,6 +31,7 @@ import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -53,8 +54,9 @@ public class MessageAmpTest extends ProcessorTestCase {
 		messageAmp = getInstance(MessageAmp.class);
 		Map<String,Object> settings = new HashMap<String,Object>();
 		ampJid = JID.jidInstance("amp@example1.com");
-		settings.put("amp-jid", ampJid.toString());
-		messageAmp.init(settings);
+		Field f = messageAmp.getClass().getDeclaredField("ampJID");
+		f.setAccessible(true);
+		f.set(messageAmp, ampJid);
 	}
 	
 	@After
@@ -143,9 +145,12 @@ public class MessageAmpTest extends ProcessorTestCase {
 
 		// testing silently ignoring error responses
 		results.clear();
-		final HashMap<String, Object> settings = new HashMap<String,Object>();
-		settings.put( "silently-ignore-message", "true");
-		messageAmp.init(settings);
+
+		Message messageProcessor = ((Kernel) this.getInstance("amp#KERNEL")).getInstance(Message.class);
+		Field f = messageProcessor.getClass().getDeclaredField("silentlyIgnoreError");
+		f.setAccessible(true);
+		f.set(messageProcessor, true);
+
 
 		messageAmp.process(packet, null, null, results, null);
 		assertTrue("result was generated", results.isEmpty());

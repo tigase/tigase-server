@@ -24,6 +24,10 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
@@ -54,10 +58,8 @@ import static tigase.xmpp.impl.roster.RosterAbstract.ROSTER;
 @Handles({ @Handle(path = { PresenceAbstract.PRESENCE_ELEMENT_NAME }, xmlns = PresenceAbstract.CLIENT_XMLNS),
 		@Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = RosterAbstract.XMLNS) })
 @Bean(name = PresenceOffline.ID, parent = SessionManager.class, active = false)
-public class PresenceOffline extends PresenceAbstract implements XMPPStopListenerIfc {
+public class PresenceOffline extends PresenceAbstract implements XMPPStopListenerIfc, Initializable, UnregisterAware {
 
-	public static final String PRESENCE_REPO_CLASS_PROP_KEY = "presence-repo-class";
-	public static final String PRESENCE_REPO_URI_PROP_KEY = "presence-repo-uri";
 	public static final String CACHE_SIZE_PROP_KEY = "cache-size";
 	protected static final String ID = "presence-offline";
 	private static final Logger log = Logger.getLogger(PresenceOffline.class.getCanonicalName());
@@ -65,81 +67,40 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 			StanzaType.unsubscribe, StanzaType.unsubscribed);
 	private final static String LAST_OFFLINE_PRESENCE_KEY = "last-offline-presence";
 	private final static String DELAY_STAMP_KEY = "delay-stamp";
-	private final int cacheSizeDef = 1000;
+	@ConfigField(desc = "Default cache size", alias = CACHE_SIZE_PROP_KEY)
+	private int cacheSize = 1000;
 	private final SimpleParser parser = SingletonFactory.getParserInstance();
 	private final String presenceSessionEventName = "start-stop";
 	private final EventBus eventBus = EventBusFactory.getInstance();
 	private final SimpleDateFormat formatter;
 
-	// private final static String EVENTBUS_PRESENCE_SESSION_XMLNS =
-	// "tigase:user:presence-session";
+	@ConfigField(desc = "Add delay stamp to offline presences", alias = DELAY_STAMP_KEY)
 	boolean delayStamp = true;
+	@Inject
 	private UserRepository userRepository = null;
-	private LRUConcurrentCache<BareJID, Element> presenceCache = null;
-	private LRUConcurrentCache<BareJID, Map<BareJID, RosterElement>> rosterCache = null;
+	private LRUConcurrentCache<BareJID, Element> presenceCache = new LRUConcurrentCache<>(10000);
+	private LRUConcurrentCache<BareJID, Map<BareJID, RosterElement>> rosterCache = new LRUConcurrentCache<>(10000);
 
 	{
 		this.formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		this.formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
+	
+	@Override
+	public void initialize() {
+		eventBus.registerAll(this);
+	}
 
 	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		// configuring static settings in common methods
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
 
-		PresenceAbstract.initSettings(settings);
-
-		String tmp;
-
-		tmp = (String) settings.get(DELAY_STAMP_KEY);
-		delayStamp = (tmp != null) ? Boolean.parseBoolean(tmp) : delayStamp;
-		log.log(Level.CONFIG, "Adding offline presence delay stamp to: {0}", delayStamp);
-
-		presenceCache = new LRUConcurrentCache<>(10000);
-		rosterCache = new LRUConcurrentCache<>(10000);
-
-		String repo_uri = (String) settings.get(PRESENCE_REPO_URI_PROP_KEY);
-		String repo_cls = (String) settings.get(PRESENCE_REPO_CLASS_PROP_KEY);
-
-		if (repo_uri == null) {
-			repo_uri = System.getProperty(PRESENCE_REPO_URI_PROP_KEY);
-			if (repo_uri == null) {
-				repo_uri = System.getProperty(RepositoryFactory.GEN_USER_DB_URI_PROP_KEY);
-			}
-		}
-		if (repo_cls == null) {
-			repo_cls = System.getProperty(PRESENCE_REPO_CLASS_PROP_KEY);
-		}
-		if (repo_uri != null) {
-			Map<String, String> db_props = new HashMap<String, String>(4);
-
-			for (Map.Entry<String, Object> entry : settings.entrySet()) {
-				db_props.put(entry.getKey(), entry.getValue().toString());
-			}
-
-			try {
-				userRepository = RepositoryFactory.getUserRepository(repo_cls, repo_uri, db_props);
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | DBInitException ex) {
-				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
-			}
-
-		}
-
-		int cacheSize = cacheSizeDef;
-
-		String cacheSizeStr = (String) settings.get(CACHE_SIZE_PROP_KEY);
-		if (cacheSizeStr != null) {
-			try {
-				cacheSize = Integer.parseInt(cacheSizeStr);
-			} catch (NumberFormatException e) {
-				log.log(Level.WARNING, "Using default cache value: " + cacheSize, e);
-			}
-		}
-
+	public void setCacheSize(int size) {
+		this.cacheSize = size;
+		
 		presenceCache = new LRUConcurrentCache<>(cacheSize);
 		rosterCache = new LRUConcurrentCache<>(cacheSize);
-
-		eventBus.registerAll(this);
 	}
 
 	protected boolean isNotOnlySession(XMPPResourceConnection session) {

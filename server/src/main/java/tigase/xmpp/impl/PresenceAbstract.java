@@ -29,6 +29,7 @@ package tigase.xmpp.impl;
 import tigase.db.TigaseDBException;
 
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 
 import tigase.xmpp.*;
@@ -77,8 +78,12 @@ public abstract class PresenceAbstract
 	private static final Logger     log = Logger.getLogger(PresenceAbstract.class.getName());
 	//private static final String[]   PRESENCE_PRIORITY_PATH  = { "presence", "priority" };
 	//private static final String[]   XMLNSS                  = { XMLNS, RosterAbstract.XMLNS_LOAD };
+
+	@ConfigField(desc = "Skip offline sys", alias = SKIP_OFFLINE_SYS_PROP_KEY)
 	private static boolean          skipOfflineSys          = true;
+	@ConfigField(desc = "Skip offline", alias = SKIP_OFFLINE_PROP_KEY)
 	protected static boolean          skipOffline             = false;
+	@ConfigField(desc = "Probe full JID", alias = PRESENCE_PROBE_FULL_JID_KEY)
 	protected static boolean probeFullJID = false;
 
 	//~--- fields ---------------------------------------------------------------
@@ -89,6 +94,30 @@ public abstract class PresenceAbstract
 	// This is required to make sure that dynamic roster will get initialized
 	@Inject(nullAllowed = true)
 	private DynamicRoster dynamicRoster;
+
+	public boolean isSkipOfflineSys() {
+		return skipOfflineSys;
+	}
+
+	public void setSkipOfflineSys(boolean skipOfflineSys) {
+		PresenceAbstract.skipOfflineSys = skipOfflineSys;
+	}
+
+	public boolean isSkipOffline() {
+		return skipOffline;
+	}
+
+	public void setSkipOffline(boolean skipOffline) {
+		PresenceAbstract.skipOffline = skipOffline;
+	}
+
+	public boolean getProbeFullJID() {
+		return probeFullJID;
+	}
+
+	public void setProbeFullJID(boolean probeFullJID) {
+		PresenceAbstract.probeFullJID = probeFullJID;
+	}
 
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
@@ -208,7 +237,7 @@ public abstract class PresenceAbstract
 	}
 
 //	@Override
-	protected static void initSettings(Map<String, Object> settings) throws TigaseDBException {
+	protected void initSettings(Map<String, Object> settings) throws TigaseDBException {
 
 		// Init plugin configuration
 		String tmp;

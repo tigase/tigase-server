@@ -27,12 +27,10 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
-
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -75,6 +73,7 @@ public class MobileV2
 
 	//~--- fields ---------------------------------------------------------------
 
+	@ConfigField(desc = "Max queue size", alias = MAX_QUEUE_SIZE_KEY)
 	private int maxQueueSize = DEF_MAX_QUEUE_SIZE_VAL;
 
 	//~--- methods --------------------------------------------------------------
@@ -82,17 +81,6 @@ public class MobileV2
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-
-		Integer maxQueueSizeVal = (Integer) settings.get(MAX_QUEUE_SIZE_KEY);
-
-		if (maxQueueSizeVal != null) {
-			maxQueueSize = maxQueueSizeVal;
-		}
 	}
 
 	@Override

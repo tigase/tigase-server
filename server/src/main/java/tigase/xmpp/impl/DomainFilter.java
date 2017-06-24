@@ -63,7 +63,7 @@ public class DomainFilter
 	private static final String[]   XMLNSS   = { ALL_NAMES };
 
 	/** default local hostname */
-	private static String local_hostname;
+	private static String local_hostname = DNSResolverFactory.getInstance().getDefaultHost();
 	
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
@@ -258,12 +258,6 @@ public class DomainFilter
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	@Override
-	public void init( Map<String, Object> settings ) throws TigaseDBException {
-		super.init( settings );
-		local_hostname = DNSResolverFactory.getInstance().getDefaultHost();
 	}
 
 	@Override

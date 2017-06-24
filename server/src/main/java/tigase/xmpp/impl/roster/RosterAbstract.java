@@ -795,7 +795,23 @@ public abstract class RosterAbstract {
 			boolean sent)
 					throws NotAuthorizedException, TigaseDBException;
 
-	public void setProperties( Map<String, Object> settings ) {
+	public static boolean isEmptyNameAllowed() {
+		return emptyNameAllowed;
+	}
+
+	public static void setEmptyNameAllowed(boolean emptyNameAllowed) {
+		RosterAbstract.emptyNameAllowed = emptyNameAllowed;
+	}
+
+	public static int getMaxRosterSize() {
+		return maxRosterSize;
+	}
+
+	public static void setMaxRosterSize(int maxRosterSize) {
+		RosterAbstract.maxRosterSize = maxRosterSize;
+	}
+
+	public void setProperties(Map<String, Object> settings ) {
 		if ( settings.get( "empty_name_enabled" ) != null ){
 			emptyNameAllowed = Boolean.valueOf( (String) settings.get( "empty_name_enabled" ) );
 		}

@@ -136,12 +136,6 @@ public class OfflineMessages
 	public String id() {
 		return ID;
 	}
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-		defHost = DNSResolverFactory.getInstance().getDefaultHost();
-	}
 	
 	/**
 	 * {@inheritDoc}

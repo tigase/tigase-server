@@ -435,7 +435,26 @@ public class ConfigHolder {
 						toRemove.add(k);
 					} else {
 						toRemove.add(k);
-						toAdd.put(k.replace("/plugins-conf/", "/"), v);
+						k = k.replace("/plugins-conf/", "/");
+						if (k.endsWith("/amp/msg-offline")) {
+							toAdd.put(k.replace("/msg-offline", "/msgoffline/active"), v);
+						} else if (k.endsWith("/presence-state/disable-roster-lazy-loading")) {
+							k = k.replace("/disable-roster-lazy-loading", "/enable-roster-lazy-loading");
+							if ("true".equals(v)) {
+								toAdd.put(k, false);
+							} else {
+								toAdd.put(k, true);
+							}
+						} else if (k.equals("/presence-state/extended-presence-processors")) {
+							String k1 = k.replace("presence-state/extended-presence-processors", "");
+							for (String ext : v.toString().split(",")) {
+								String[] parts = ext.split(".");
+								toAdd.put(k + "/" + parts[parts.length-1] + "/class", ext);
+								toAdd.put(k + "/" + parts[parts.length-1] + "/active", true);
+							}
+						} else {
+							toAdd.put(k, v);
+						}
 					}
 				}
 				if (k.startsWith("stats/stats-archiv/")) {

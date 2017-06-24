@@ -62,6 +62,7 @@ import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
 import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.*;
@@ -311,8 +312,16 @@ public class SessionManager
 		if (proc != null) {
 			if (allPlugins.add(proc)) {
 				Map<String, Object> settings = new HashMap<>();
+				try {
+					Method m = proc.getClass().getDeclaredMethod("init", Map.class);
+					if (m.getAnnotation(Deprecated.class) == null) {
+						log.log(Level.WARNING, "processor " + proc.getClass().getCanonicalName() + " is using deprecated init() method!");
+						proc.init(settings);
+					}
+				} catch (NoSuchMethodException|SecurityException ex) {
+					// ignoring...
+				}
 				//settings.put("sm-jid", getComponentId());
-				proc.init(settings);
 				eventBus.registerAll(proc);
 			}
 			if (proc instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {

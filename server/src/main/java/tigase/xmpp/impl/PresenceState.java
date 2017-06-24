@@ -26,13 +26,13 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
-import tigase.osgi.ModulesManagerImpl;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.Handle;
@@ -68,7 +68,7 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 	 */
 	public static final String DIRECT_PRESENCE = "direct-presences";
 
-	public static final String DISABLE_ROSTER_LAZY_LOADING_KEY = "disable-roster-lazy-loading";
+	public static final String ENABLE_ROSTER_LAZY_LOADING_KEY = "enable-roster-lazy-loading";
 	
 	public static final String EXTENDED_PRESENCE_PROCESSORS_KEY = "extended-presence-processors";
 
@@ -95,67 +95,17 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 	private static final String[]   PRESENCE_C_PATH         = { PRESENCE_ELEMENT_NAME, "c" };
 	private static final Set<StanzaType> TYPES = new HashSet<>(Arrays.asList(StanzaType.available, StanzaType.unavailable, StanzaType.probe, StanzaType.error, StanzaType.result, null));
 		
-	
+	@ConfigField(desc = "Send last seen infomations for matching clients", alias = OFFLINE_ROSTER_LAST_SEEN_PROP_KEY)
 	private String[]         offlineRosterLastSeen = null;
+	@ConfigField(desc = "Forward all presences to following JID", alias = PRESENCE_GLOBAL_FORWARD)
 	private JID              presenceGLobalForward = null;
-	private static boolean	 rosterLazyLoading       = true;
+	@ConfigField(desc = "Enable roster lazy loading", alias = ENABLE_ROSTER_LAZY_LOADING_KEY)
+	private boolean	 rosterLazyLoading       = true;
 	private long             usersStatusChanges    = 0;
-	private static final List<ExtendedPresenceProcessorIfc> extendedPresenceProcessors = new ArrayList<>();
+	@Inject(nullAllowed = true)
+	private List<ExtendedPresenceProcessorIfc> extendedPresenceProcessors = new ArrayList<>();
 
 	// ~--- methods --------------------------------------------------------------
-	
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		// configuring static settings in common methods
-		PresenceAbstract.initSettings(settings);
-		
-		String tmp = null;
-
-		tmp = (String) settings.get( OFFLINE_ROSTER_LAST_SEEN_PROP_KEY );
-		if ( tmp != null ){
-			if ( tmp.contains( "off" ) ){
-				offlineRosterLastSeen = null;
-			} else {
-				offlineRosterLastSeen = tmp.split( "," );
-				log.log( Level.CONFIG, "Loaded roster offline last seen config: {0}", tmp );
-			}
-//		} else {
-//			offlineRosterLastSeen = new String[] {"*"};
-//			log.config("No configuration found for Loaded roster offline last seen. - enabling for All clients");
-		}
-		
-		tmp = (String) settings.get(PRESENCE_GLOBAL_FORWARD);
-		if (tmp != null) {
-			try {
-				presenceGLobalForward = JID.jidInstance(tmp);
-			} catch (TigaseStringprepException ex) {
-				presenceGLobalForward = null;
-				log.log(Level.WARNING, "Presence global forward misconfiguration, cannot parse JID {0}", tmp);
-			}
-		}
-		
-		tmp = (String) settings.get(DISABLE_ROSTER_LAZY_LOADING_KEY);
-		rosterLazyLoading = (tmp == null || !Boolean.parseBoolean(tmp));
-
-		tmp = (String) settings.get(EXTENDED_PRESENCE_PROCESSORS_KEY);
-
-		String[] extPresenceProcessorsClasses = tmp != null ? tmp.split( ",") : null ;
-
-		if ( extPresenceProcessorsClasses != null ){
-			for ( String clazz : extPresenceProcessorsClasses ) {
-				try {
-					ExtendedPresenceProcessorIfc processor = (ExtendedPresenceProcessorIfc) ModulesManagerImpl.getInstance().forName( clazz ).newInstance();
-
-					extendedPresenceProcessors.add( processor );
-					log.log(Level.CONFIG, "Loadeded ExtendedPresenceProcessor: {0}", processor.getClass());
-
-				} catch ( ClassNotFoundException | InstantiationException | IllegalAccessException ex ) {
-					Logger.getLogger(PresenceAbstract.class.getName() ).log( Level.SEVERE, null, ex );
-				}
-			}
-		}
-		
-	}
 	
 	@Override
 	public Set<StanzaType> supTypes() {
@@ -445,7 +395,7 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 		}      // end of if (direct_presence != null)
 	}
 	
-	public static void rebroadcastPresence(XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
+	public void rebroadcastPresence(XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
 		if (session.getPresence() == null ) {
 			// user has not sent initial presence yet, ignore
 			return;

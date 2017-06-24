@@ -27,8 +27,8 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
@@ -71,23 +71,12 @@ public class Message
 	private static final String   SILENTLY_IGNORE_ERROR_KEY = "silently-ignore-message";
 	protected static final String   XMLNS  = "jabber:client";
 
+	@ConfigField(desc = "Message delivery rules", alias = DELIVERY_RULES_KEY)
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
+	@ConfigField(desc = "Silently ignore errors", alias = SILENTLY_IGNORE_ERROR_KEY)
 	private boolean silentlyIgnoreError = false;
 	//~--- methods --------------------------------------------------------------
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-
-		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY)
-				? MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY))
-				: MessageDeliveryRules.inteligent;
-
-		silentlyIgnoreError = settings.containsKey(SILENTLY_IGNORE_ERROR_KEY)
-				? Boolean.valueOf((String) settings.get(SILENTLY_IGNORE_ERROR_KEY))
-				: Boolean.FALSE;
-	}
-
+	
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
 		C2SDeliveryErrorProcessor.filter(packet, session, repo, results, null);

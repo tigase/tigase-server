@@ -28,7 +28,6 @@ package tigase.xmpp.impl;
 
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -68,16 +67,19 @@ public class MessageAmp
 	private static final Logger     log = Logger.getLogger(MessageAmp.class.getName());
 	private static final String     XMLNS                = "http://jabber.org/protocol/amp";
 	private static final String[]   XMLNSS = { "jabber:client", "jabber:client", "msgoffline" };
-	private static Element[]        DISCO_FEATURES = { new Element("feature",
-			new String[] { "var" }, new String[] { XMLNS }),
-			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
-	private static String defHost;
+	private static final Element[] DISCO_FEATURES_WITH_OFFLINE = {
+			new Element("feature", new String[]{"var"}, new String[]{XMLNS}),
+			new Element("feature", new String[]{"var"}, new String[]{"msgoffline"})};
+	private static final Element[] DISCO_FEATURES_WITHOUT_OFFLINE = new Element[]{
+			new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
+	private static String defHost = DNSResolverFactory.getInstance().getDefaultHost();
 
 //	private static final String STATUS_ATTRIBUTE_NAME = "status";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private JID             ampJID           = null;
+	@ConfigField(desc = "AMP component JID", alias = AMP_JID_PROP_KEY)
+	private JID             ampJID           = JID.jidInstanceNS("amp@" + defHost);
 	@Inject
 	private MsgRepositoryIfc   msg_repo         = null;
 	@Inject(nullAllowed = true)
@@ -92,43 +94,6 @@ public class MessageAmp
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-
-		defHost = DNSResolverFactory.getInstance().getDefaultHost();
-
-		if(offlineProcessor!=null)
-			offlineProcessor.init(settings);
-		
-		if(messageProcessor!=null)
-			messageProcessor.init(settings);
-
-		String ampJIDstr = (String) settings.get(AMP_JID_PROP_KEY);
-
-		if (null != ampJIDstr) {
-			ampJID = JID.jidInstanceNS(ampJIDstr);
-		} else {
-			ampJID = JID.jidInstanceNS("amp@" + defHost);
-		}
-		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}", new Object[] {
-				AMP_JID_PROP_KEY,
-				ampJID });
-
-		String off_val = (String) settings.get(MSG_OFFLINE_PROP_KEY);
-
-		if (off_val == null) {
-			off_val = System.getProperty(MSG_OFFLINE_PROP_KEY);
-		}
-		if ((off_val != null) &&!Boolean.parseBoolean(off_val)) {
-			log.log(Level.CONFIG, "Offline messages storage: {0}", new Object[] { off_val });
-			offlineProcessor = null;
-			DISCO_FEATURES = new Element[] { new Element("feature", new String[] { "var" },
-					new String[] { XMLNS }) };
-		}
-		
 	}
 
 	@Override
@@ -330,7 +295,7 @@ public class MessageAmp
 
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return DISCO_FEATURES;
+		return offlineProcessor == null ? DISCO_FEATURES_WITHOUT_OFFLINE : DISCO_FEATURES_WITH_OFFLINE;
 	}
 
 	@Override

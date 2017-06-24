@@ -18,30 +18,20 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
-
 import org.junit.After;
-
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import tigase.server.Packet;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.lang.reflect.Field;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -55,7 +45,6 @@ public class MessageTest extends ProcessorTestCase {
 	@Override
 	public void setUp() throws Exception {
 		messageProcessor = new Message();
-		messageProcessor.init(new HashMap<String,Object>());
 		super.setUp();
 	}
 	
@@ -83,9 +72,9 @@ public class MessageTest extends ProcessorTestCase {
 
 		// testing silently ignoring error responses
 		results.clear();
-		final HashMap<String, Object> settings = new HashMap<String,Object>();
-		settings.put( "silently-ignore-message", "true");
-		messageProcessor.init(settings);
+		Field f = messageProcessor.getClass().getDeclaredField("silentlyIgnoreError");
+		f.setAccessible(true);
+		f.set(messageProcessor, true);
 
 		messageProcessor.process(packet, null, null, results, null);
 		assertTrue("result was generated", results.isEmpty());

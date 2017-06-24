@@ -25,8 +25,8 @@
 package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
@@ -78,23 +78,24 @@ public class BindResource
 
 
 	//~--- fields ---------------------------------------------------------------
+	@ConfigField(desc = "Automatic resource assignment prefix", alias = DEF_RESOURCE_PREFIX_PROP_KEY)
+	private String resourcePrefix = null;
 	private String resourceDefPrefix = RESOURCE_PREFIX_DEF;
 
 	//~--- methods --------------------------------------------------------------
+
+	public BindResource() {
+		setResourcePrefix(RESOURCE_PREFIX_DEF);
+	}
 
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-
-		int hostnameHash = Math.abs( DNSResolverFactory.getInstance().getDefaultHost().hashCode() );
-
-		// Init plugin configuration
-		resourceDefPrefix = hostnameHash + "-" + settings.getOrDefault(DEF_RESOURCE_PREFIX_PROP_KEY, RESOURCE_PREFIX_DEF);
-
+	public void setResourcePrefix(String resourcePrefix) {
+		this.resourcePrefix = resourcePrefix;
+		this.resourceDefPrefix = Math.abs( DNSResolverFactory.getInstance().getDefaultHost().hashCode() ) + "-" + resourceDefPrefix;
 	}
 
 	@Override

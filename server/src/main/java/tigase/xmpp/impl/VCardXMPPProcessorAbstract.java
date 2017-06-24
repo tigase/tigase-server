@@ -5,23 +5,26 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.xml.Element;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPProcessorAbstract;
+import tigase.xmpp.XMPPResourceConnection;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import tigase.db.TigaseDBException;
-import tigase.xml.Element;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPResourceConnection;
 
 /**
  *
  * @author andrzej
  */
-public abstract class VCardXMPPProcessorAbstract extends XMPPProcessorAbstract {
+public abstract class VCardXMPPProcessorAbstract extends XMPPProcessorAbstract implements Initializable,
+																						  UnregisterAware {
 	
 	private static final Pattern DATA_URI_PATTERN = Pattern.compile("data:(.+);base64,(.+)");
 	private static final Pattern TEL_URI_PATTERN = Pattern.compile("tel:(.+)");
@@ -30,11 +33,15 @@ public abstract class VCardXMPPProcessorAbstract extends XMPPProcessorAbstract {
 	
 	private static Map<String, VCardXMPPProcessorAbstract> PROCESSORS = new ConcurrentHashMap<>();
 	private static Map<String, Converter> CONVERTERS = new ConcurrentHashMap<>();
-	
+
 	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
+	public void initialize() {
 		PROCESSORS.put(this.id(), this);
+	}
+
+	@Override
+	public void beforeUnregister() {
+		PROCESSORS.remove(this.id(), this);
 	}
 	
 	protected abstract String getVCardXMLNS();

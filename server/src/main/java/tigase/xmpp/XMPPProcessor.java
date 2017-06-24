@@ -145,6 +145,7 @@ public abstract class XMPPProcessor
 	}
 
 	@Override
+	@Deprecated
 	public void init(Map<String, Object> settings) throws TigaseDBException {}
 
 	@Override

@@ -27,19 +27,15 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.TigaseDBException;
-
+import tigase.server.ComponentInfo;
 import tigase.server.Packet;
-
 import tigase.stats.StatisticsList;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
 import java.util.Set;
-import tigase.server.ComponentInfo;
-import tigase.server.ServerComponent;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * This is a base interface for all session manager plugins. There are packet
@@ -127,6 +123,7 @@ public interface XMPPImplIfc
 	 *          file.
 	 * @throws TigaseDBException
 	 */
+	@Deprecated
 	void init(Map<String, Object> settings) throws TigaseDBException;
 
 	/**

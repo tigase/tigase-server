@@ -26,11 +26,9 @@ import tigase.db.*;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.form.*;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.Initializable;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.server.Message;
 import tigase.server.xmppsession.SessionManager;
@@ -47,6 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * JEP-0077: In-Band Registration
@@ -60,7 +59,8 @@ import java.util.regex.Pattern;
 @Bean(name = JabberIqRegister.ID, parent = SessionManager.class, active = true)
 public class JabberIqRegister
 		extends XMPPProcessor
-		implements XMPPProcessorIfc, Initializable, UnregisterAware {
+		implements XMPPProcessorIfc, Initializable, UnregisterAware, RegistrarBean
+{
 
 	public static final String ID = "jabber:iq:register";
 	public static final String REGISTRATION_PER_SECOND_PROP_KEY = "registrations-per-second";
@@ -96,10 +96,17 @@ public class JabberIqRegister
 	private AccountValidator[] validators = null;
 	@ConfigField(desc = "Maximum CAPTCHA repetition in session")
 	private int maxCaptchaRepetition = 3;
+	@ConfigField(desc = "OAuth consumer key", alias = OAUTH_CONSUMERKEY_PROP_KEY)
 	private String oauthConsumerKey;
+	@ConfigField(desc = "OAuth consumer secret", alias = OAUTH_CONSUMERSECRET_PROP_KEY)
 	private String oauthConsumerSecret;
-	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
-	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
+	@ConfigField(desc = "Registration blacklist", alias = REGISTRATION_BLACKLIST_PROP_KEY)
+	private LinkedList<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
+	@ConfigField(desc = "Registration whitelist", alias = REGISTRATION_WHITELIST_PROP_KEY)
+	private LinkedList<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
+	@ConfigField(desc = "Registrations per second", alias = REGISTRATION_PER_SECOND_PROP_KEY)
+	private long registrationsPerSecond = 0;
+	@ConfigField(desc = "Require form signed with OAuth", alias = SIGNED_FORM_REQUIRED_PROP_KEY)
 	private boolean signedFormRequired = false;
 	private long statsInvalidRegistrations;
 	private long statsRegisteredUsers;
@@ -107,6 +114,7 @@ public class JabberIqRegister
 	@Inject
 	private UserRepository userRepository;
 	private String welcomeMessage = null;
+	@ConfigField(desc = "Allow registration only for whitelisted addresses", alias = WHITELIST_REGISTRATION_ONLY_PROP_KEY)
 	private boolean whitelistRegistrationOnly = false;
 
 	private static boolean contains(List<CIDRAddress> addresses, String address) {
@@ -121,9 +129,9 @@ public class JabberIqRegister
 		return false;
 	}
 
-	private static List<CIDRAddress> parseList(String listStr) {
+	private static LinkedList<CIDRAddress> parseList(String listStr) {
 		String[] splitArray = listStr.split(",");
-		List<CIDRAddress> splitList = new LinkedList<CIDRAddress>();
+		LinkedList<CIDRAddress> splitList = new LinkedList<CIDRAddress>();
 		for (String listEl : splitArray) {
 			splitList.add(CIDRAddress.parse(listEl.trim()));
 		}
@@ -139,9 +147,51 @@ public class JabberIqRegister
 		}
 	}
 
+	public long getRegistrationsPerSecond() {
+		return tokenBucket.getDefaultRate();
+	}
+
+	public void setRegistrationsPerSecond(long registrationsPerSecond) {
+		tokenBucket.setDefaultRate(registrationsPerSecond);
+	}
+
+	public LinkedList<String> getRegistrationBlacklist() {
+		return registrationBlacklist.stream().map( cidr -> cidr.toString()).collect(Collectors.toCollection(LinkedList::new));
+	}
+
+	public void setRegistrationBlacklist(LinkedList<String> vals) {
+		if (vals == null) {
+			registrationBlacklist = new LinkedList<>();
+		} else {
+			registrationBlacklist = vals.stream().map(val -> CIDRAddress.parse(val)).collect(Collectors.toCollection(LinkedList::new));
+		}
+	}
+
+	public LinkedList<String> getRegistrationWhitelist() {
+		return registrationWhitelist.stream().map( cidr -> cidr.toString()).collect(Collectors.toCollection(LinkedList::new));
+	}
+
+	public void setRegistrationWhitelist(LinkedList<String> vals) {
+		if (vals == null) {
+			registrationWhitelist = new LinkedList<>();
+		} else {
+			registrationWhitelist = vals.stream().map(val -> CIDRAddress.parse(val)).collect(Collectors.toCollection(LinkedList::new));
+		}
+	}
+
 	@Override
 	public void beforeUnregister() {
 		eventBus.unregisterAll(this);
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+		kernel.registerBean("tokenBucketPool").asClass(TokenBucketPool.class).exec();
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 
 	protected void createAccount(XMPPResourceConnection session, String user_name, VHostItem domain, String password,
@@ -415,41 +465,6 @@ public class JabberIqRegister
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		this.oauthConsumerKey = (String) settings.get(OAUTH_CONSUMERKEY_PROP_KEY);
-		this.oauthConsumerSecret = (String) settings.get(OAUTH_CONSUMERSECRET_PROP_KEY);
-		Object verifyFormSignatureObj = settings.get(SIGNED_FORM_REQUIRED_PROP_KEY);
-		if (verifyFormSignatureObj != null && verifyFormSignatureObj instanceof Boolean) {
-			signedFormRequired = (Boolean) verifyFormSignatureObj;
-		} else if (verifyFormSignatureObj != null) {
-			signedFormRequired = Boolean.parseBoolean(verifyFormSignatureObj.toString());
-		}
-
-		String whitelistRegistrationOnlyStr = (String) settings.get(WHITELIST_REGISTRATION_ONLY_PROP_KEY);
-		if (whitelistRegistrationOnlyStr != null) {
-			whitelistRegistrationOnly = Boolean.parseBoolean(whitelistRegistrationOnlyStr);
-		}
-
-		String registrationWhitelistStr = (String) settings.get(REGISTRATION_WHITELIST_PROP_KEY);
-		if (registrationWhitelistStr != null) {
-			registrationWhitelist = parseList(registrationWhitelistStr);
-		}
-
-		String registrationBlacklistStr = (String) settings.get(REGISTRATION_BLACKLIST_PROP_KEY);
-		if (registrationBlacklistStr != null) {
-			registrationBlacklist = parseList(registrationBlacklistStr);
-		}
-
-		String registrationsPerSecond = (String) settings.get(REGISTRATION_PER_SECOND_PROP_KEY);
-		if (registrationsPerSecond != null) {
-			this.tokenBucket.setDefaultRate(Long.parseLong(registrationsPerSecond));
-			log.config("Accounts registration limit is set to " + this.tokenBucket.getDefaultRate() + " per " +
-							   this.tokenBucket.getDefaultPer() + " sec");
-		}
-
 	}
 
 	@Override
@@ -757,7 +772,7 @@ public class JabberIqRegister
 	 * http://commons.apache.org/proper/commons-net/jacoco/org.apache.commons
 	 * .net.util/SubnetUtils.java.html
 	 */
-	private static class CIDRAddress {
+	public static class CIDRAddress {
 
 		static final int NBITS = 32;
 
@@ -823,6 +838,30 @@ public class JabberIqRegister
 		boolean inRange(String address) {
 			int diff = toInteger(address) - low;
 			return diff >= 0 && (diff <= (high - low));
+		}
+
+		@Override
+		public String toString() {
+			int mask = 0;
+			boolean z = false;
+			for (int j=3; j>=0; j--) {
+				int shift = j * 8;
+				byte b = (byte) ((~(low >> shift & 0xff) ^ (high >> shift & 0xff)) & 0xff);
+				int m = 0x80;
+				for (int i=0; i<8; i++) {
+					if ((b & m) == 0) {
+						z = true;
+					} else {
+						mask++;
+					}
+					m >>>= 1;
+				}
+			}
+			return String.format("%d.%d.%d.%d/%d",
+						  (low >> 24 & 0xff),
+						  (low >> 16 & 0xff),
+						  (low >> 8 & 0xff),
+						  (low & 0xff), mask);
 		}
 	}
 

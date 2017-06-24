@@ -26,6 +26,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
@@ -75,7 +76,13 @@ public class JabberIqRoster
 	protected static final String ID = RosterAbstract.XMLNS;
 	/** variable holding setting regarding auto authorisation of items added to
 	 * user roset */
-	private static boolean autoAuthorize = false;
+	@ConfigField(desc = "Automatically authorize subscription requests", alias = AUTO_AUTHORIZE_PROP_KEY)
+	private boolean autoAuthorize = false;
+
+	@ConfigField(desc = "Allow empty names in roster", alias = "empty_name_enabled")
+	private boolean emptyNameAllowed = false;
+	@ConfigField(desc = "Max roster size", alias = "max_roster_size")
+	private int maxRosterSize = 0;
 	//~--- fields ---------------------------------------------------------------
 	/** instance of class implementing {@link RosterAbstract} */
 	protected RosterAbstract roster_util = getRosterUtil();
@@ -95,16 +102,20 @@ public class JabberIqRoster
 		return ID;
 	}
 
-	@Override
-	public void init( Map<String, Object> settings ) throws TigaseDBException {
-		autoAuthorize = Boolean.parseBoolean( (String) settings.get( AUTO_AUTHORIZE_PROP_KEY ) );
-		if ( autoAuthorize ){
-			log.config( "Automatic presence subscription of new roster items enabled,"
-									+ "results in less strict XMPP specs compatibility " );
-		}
-		if ( roster_util != null ){
-			roster_util.setProperties( settings );
-		}
+	public boolean isEmptyNameAllowed() {
+		return roster_util.isEmptyNameAllowed();
+	}
+
+	public void setEmptyNameAllowed(boolean emptyNameAllowed) {
+		roster_util.setEmptyNameAllowed(emptyNameAllowed);
+	}
+
+	public int getMaxRosterSize() {
+		return roster_util.getMaxRosterSize();
+	}
+
+	public void setMaxRosterSize(int maxRosterSize) {
+		roster_util.setMaxRosterSize(maxRosterSize);
 	}
 
 	/**

@@ -26,6 +26,7 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
 import tigase.server.xmppsession.SessionManager;
@@ -66,16 +67,8 @@ public class PresenceSubscription extends PresenceAbstract {
 	 * variable holding setting regarding auto authorisation of items added to
 	 * user roset
 	 */
+	@ConfigField(desc = "Automatically authorize subscription requests", alias = AUTO_AUTHORIZE_PROP_KEY)
 	private static boolean autoAuthorize = false;
-
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		autoAuthorize = Boolean.parseBoolean((String) settings.get(AUTO_AUTHORIZE_PROP_KEY));
-		if (autoAuthorize) {
-			log.config(
-					"Automatic presence autorization enabled, results in less strict XMPP specs compatibility ");
-		}
-	}
 	
 	@Override
 	public Set<StanzaType> supTypes() {
