@@ -24,6 +24,11 @@ package tigase.kernel.beans.config;
 import java.lang.annotation.*;
 
 /**
+ * Annotation to add additional aliases to the fields.
+ * <br/>
+ * Useful if field annotated with {@link tigase.kernel.beans.config.ConfigField} is inaccessible direcly,
+ * ie. is defined in extended class.
+ *
  * Created by andrzej on 05.08.2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -31,8 +36,16 @@ import java.lang.annotation.*;
 @Documented
 public @interface ConfigAlias {
 
+	/**
+	 * Name of the field
+	 * @return
+	 */
 	String field();
 
+	/**
+	 * Alias for the field
+	 * @return
+	 */
 	String alias();
 
 }

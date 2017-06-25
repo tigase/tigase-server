@@ -1,0 +1,255 @@
+[[tigasekernel]]
+= Tigase Kernel
+:version: v1.0
+:date: 2017-06-25 21:22
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Tigase Kernel is an implementation of https://en.wikipedia.org/wiki/Inversion_of_control[IoT] created for Tigase XMPP Server.
+It is responsible for maintaining objects lifecycle and provides mechanisms for dependency resolutions between beans.
+
+Additionally, as and optional feature, Tigase Kernel is capable of configuring beans using provided bean configurator.
+
+== Core
+Kernel is based on named beans - each bean must have assigned unique name within this kernel scope.
+Registration of a bean under name which under which other bean was already registered will result in removal of instance of old bean and injection of an instance of a new bean to all bean depending on it.
+
+Kernel core is responsible only for dependency resolution and maintaining lifecycle of beans. Other features, like proper configuration of beans are done by additional beans working inside the Kernel.
+
+TIP: Kernel initializes beans using lazy initialization, which means that if there will be registered bean which is not required by any other bean and was not retrieved from kernel manually, then instance of this bean will not be created.
+
+During registration of a bean, kernel checks if there is any bean which requires this newly registered bean and if so, then instance of a newly registered bean will be created and injected to fields which require it.
+
+=== Registration of a bean
+
+There are few way to register a bean.
+
+==== Using annotation
+If you want your bean +SomeDependencyBean+ to be registered when other bean +ParentBean+ is being registered, ie. due to the fact that it is required dependency, you may annotated your bean +SomeDependencyBean+ with following +@Bean+ annotation
+[source,java]
+----
+@Bean(name = "nameOfSomeDependencyBean", parent = ParentBean.class, active = true)
+public class SomeDependencyBean {
+    ...
+}
+----
+
+==== As a class
+For that you need to have an instance of a Tigase Kernel execute it's +registerBean()+ method passing your bean +Bean1+ class.
+[source,java]
+----
+kernel.registerBean(Bean1.class).exec();
+----
+
+NOTE: To be able to use this method you need to annotate +Bean1+ class with +@Bean+ annotation and provide a bean name which will be used for registration of the bean.
+
+==== As a factory
+For that you need to have an instance of a Tigase Kernel execute it's +registerBean()+ method passing your bean +Bean5+ class.
+[source,java]
+----
+kernel.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
+----
+
+==== As an instance
+For that you need to have an instance of a Tigase Kernel execute it's +registerBean()+ method passing your bean +Bean41+ class instance.
+[source,java]
+----
+Bean41 bean41 = new Bean41();
+kernel.registerBean("bean4_1").asInstance(bean41).exec();
+----
+
+WARNING: To bean registered as instance dependencies are not injected. As well this bean instances will not be configured by provided bean configurators.
+
+=== Defining dependencies
+All dependencies are defined with annotations:
+
+[source,java]
+----
+public class Bean1 {
+  @Inject
+  private Bean2 bean2;
+
+  @Inject(bean = "bean3")
+  private Bean3 bean3;
+
+  @Inject(type = Bean4.class)
+  private Bean4 bean4;
+
+  @Inject
+  private Special[] tableOfSpecial;
+
+  @Inject(type = Special.class)
+  private Set<Special> collectionOfSpecial;
+}
+----
+
+Kernel automatically determines type of a required beans based on field type. As a result, there is no need to specify type of a bean in case of +bean4+ field.
+
+In case in which there are or may be more than one bean instances matching required dependency fields type needs to be an array or collection.
+If kernel will not be able to resolve dependencies, it will throw an exception.
+To help kernel and select a single bean instance in case more that one bean will match field dependency you may set name of a required bean, as shown in anntation to field +bean3+.
+
+Dependencies are inserted using getters/setters if those method exists and directly to the fields in the other case. Thanks to usage of setters it is possible to detect change of dependency instance and react as required, ie. clear internal cache.
+
+=== Nested kernels and exported beans
+
+Tigase Kernel allows on a usage of nested kernels. This allows you to create even complex applications and maintain proper separation and visibility of beans in scopes as each module (subkernel) may work within its own scope.
+
+
+Subkernels may be created using one of two ways:
+
+==== Manual registration of new a new kernel
+You can create an instance of a new kernel and registers it as a bean within parent kernel.
+[source,java]
+----
+Kernel parent = new Kernel("parent");
+Kernel child = new Kernel("child");
+parent.registerBean(child.getName()).asInstance(child).exec();
+----
+
+==== Usage of RegistrarBean
+You may create a bean which implements +RegistrarBean+ interfaces.
+For all bean which are implementing this interface subkernels are created. You can access this new kernel within instance of +RegistrarBean+ class as +register(Kernel)+ and +unregister(Kernel)+ methods are called once +RegistrarBean+ instance is created or destroyed.
+
+==== Scope and visibility
+Bean which are registered within parent kernel are visible to beans which are registered within first level of child kernels. But beans registered within child kernels are not available to beans registered in parent kernel with exception that they are visible to bean which caused creation of this subkernel (an instance of +RegistrarBean+).
+
+As mentioned, beans are only visible to beans registered in first level of child kernels, but if some beans needs to be visible for second or next level of child kernels, it is possible to export them.
+To do so, you need to mark bean as exportable using annotations or by calling +exportable()+ method.
+
+.Using annotation
+[source,java]
+----
+@Bean(name = "bean1", exportable = true)
+public class Bean1 {
+}
+----
+
+.Calling +exportable()+
+[source,java]
+----
+kernel.registerBean(Bean1.class).exportable().exec();
+----
+
+=== Lifecycle
+Kernel provides you with two interfaces +Initializable+ and +UnregisterAware+ which methods will be called during bean initialization and during bean unregistration.
+
+=== Dependency graph
+Kernel allows you to create dependency graph. Following lines will generate it in format supported by http://www.graphviz.org[Graphviz].
+[source,java]
+----
+DependencyGrapher dg = new DependencyGrapher(krnl);
+String dot = dg.getDependencyGraph();
+----
+
+== Configuration
+Core of a kernel do not provide you any way to configure created beans. For that you need to use +DSLBeanConfigurator+ class by providing its instance with configuration and registration of this instances within kernel.
+
+.Example
+[source,java]
+----
+Kernel kernel = new Kernel("root");
+kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
+kernel.registerBean(DSLBeanConfigurator.class).exportable().exec();
+DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+Map<String, Object> cfg = new ConfigReader().read(file);
+configurator.setProperties(cfg);
+// and now register other beans...
+----
+
+=== DSL and kernel scopes
+DSL is a structure based format explained in http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#dslConfig[Tigase XMPP Server Administration Guide in DSL file format section].
+It is important to know that kernel and beans structure have impact on how configuration in DSL will look like.
+
+.Example kernel and beans classes
+[source,java]
+----
+@Bean(name = "bean1", parent = Kernel.class, active = true )
+public class Bean1 implements RegistrarBean {
+  @ConfigField(desc = "V1")
+  private String v1;
+
+  public void register(Kernel kernel) {
+    kernel.registerBean("bean1_1").asClass(Bean11.class).exec();
+  }
+
+  public void unregister(Kernel kernel) {}
+}
+
+public class Bean11 {
+  @ConfigField(desc = "V11")
+  private String v11;
+}
+
+@Bean(name = "bean1_2", parent = Bean1.class, active = true)
+public class Bean12 {
+  @ConfigField(desc = "V12")
+  private String v12;
+}
+
+@Bean(name = "bean2", active = true)
+public class Bean2 {
+  @ConfigField(desc = "V2")
+  private String v2;
+}
+
+public class Bean3 {
+  @ConfigField(desc = "V3")
+  private String v3;
+}
+
+public class Main {
+  public static void main(String[] args) {
+    Kernel kernel = new Kernel("root");
+    kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
+    kernel.registerBean(DSLBeanConfigurator.class).exportable().exec();
+    DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+    Map<String, Object> cfg = new ConfigReader().read(file);
+    configurator.setProperties(cfg);
+
+    configurator.registerBeans(null, null, config.getProperties());
+
+    kernel.registerBean("bean4").asClass(Bean2.class).exec();
+    kernel.registerBean("bean3").asClass(Bean3.class).exec();
+  }
+}
+----
+
+Following classes will produce following structure of beans:
+
+* "bean1" of class +Bean1+
+** "bean1_1" of class +Bean11+
+** "bean1_2" of class +Bean12+
+* "bean4" of class +Bean2+
+* "bean3" of class +Bean3+
+
+NOTE: This is simplified structure and actual structure is slightly more complex, but this simplified version makes it easier to explain structure of beans and impact on configuration file structure.
+
+WARNING: Even that +Bean2+ was annotated with name +bean2+ it was registered with name +bean4+ as this name was passed during registration of a bean in +main()+ method.
+
+TIP: +Bean12+ was registered under name +bean1_2+ as subbean of +Bean1+ as a result of annotation of +Bean12+
+
+As mentioned DSL file structure depends on structure of beans, a file to set a config field in each bean to bean name should look like that:
+[source,dsl]
+----
+'bean1' () {
+    'v1' = 'bean1'
+
+    'bean1_1' () {
+        'v11' = 'bean1_1'
+    }
+    'bean1_2' () {
+        'v12' = 'bean1_2'
+    }
+}
+'bean4' () {
+    'v2' = 'bean4'
+}
+'bean3' () {
+    'v3' = 'bean3'
+}
+----
+
+

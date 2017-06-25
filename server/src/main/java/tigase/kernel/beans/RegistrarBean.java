@@ -32,8 +32,18 @@ import tigase.kernel.core.Kernel;
  */
 public interface RegistrarBean {
 
+	/**
+	 * Method called when bean is being registered allowing developer to programatically register other beans.
+	 *
+	 * @param kernel - instance from local scope
+	 */
 	void register(Kernel kernel);
 
+	/**
+	 * Method called while bean is being unregistered.
+	 *
+	 * @param kernel - instance from local scope
+	 */
 	void unregister(Kernel kernel);
 
 }
