@@ -37,23 +37,50 @@ public interface Repository {
 
 	/**
 	 * Meta created to add possibility to retrieve informations about 
- implementation of repository (ie. supported database URI)
+	 * implementation of repository (ie. supported database URI)
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	public static @interface Meta {
+
+		/**
+		 * Is it default implementation for supported URIs?
+		 * @return true if yes
+		 */
 		boolean isDefault() default false;
+
+		/**
+		 * Method returns and array of strings with regexps matching URIs which are supported by annotated class.
+		 * @return string array of regular expressions
+		 */
 		String[] supportedUris();
 	}
 
+	/**
+	 * Annotation provides information about schema (ie. database schema) required by annotated class.
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	public static @interface SchemaId {
+
+		/**
+		 * Method returns identifiers of a schema (ie. database schema) required by annotated class.
+		 * @return id of a schema
+		 */
 		String id();
+
+		/**
+		 * Method returns name of a schema required by annotated class.
+		 * <br/>
+		 * Result of this method is intended to be displated to the user.
+		 * @return name of a schema
+		 */
 		String name();
 	}
 
 	/**
+	 * Method is deprecated and should not be user any more.
+	 *
 	 * The method is called to initialize the data repository. Depending on the implementation
 	 * all the initialization parameters can be passed either via <code>resource_uri</code>
 	 * parameter as the database connection string or via <code>params</code> map if

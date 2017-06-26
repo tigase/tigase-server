@@ -9,13 +9,7 @@ There are cases when you want to store some data permanently by your component. 
 
 In order to use it one needs to extend +tigase.db.comp.ConfigRepository+ abstract class.
 
-== Accessing other repositories
-In order to have more freedom while accessing repositories it's possible to use:
-
-* *AuthRepository*
-* *UserRepository*
-* custom repository implementation which implements *DataSourceAware* interface
-
+== Accessing UserRepository or AuthRepository
 To use *AuthRepository* or *UserRepository* you need only to declare fields properly and annotated them with *@Inject*. This fields must be part of a class managed by Tigase Kernel - class of a component or any class annotated with *@Bean* annotation.
 For that classes proper instances of repositories will be injected by dependency injection.
 
@@ -28,7 +22,12 @@ private AuthRepository authRepository;
 private UserRepository userRepository;
 ----
 
-As mentioned it is also possible to use custom repository class. For our example let's assume it will be class implementing *TestRepositoryIfc* and our implementation will be using JDBC.
+== Accessing other repositories
+In order to have more freedom while accessing repositories it's possible to create and use custom repository implementation which implements *DataSourceAware* interface.
+
+For our example let's assume it will be class implementing *TestRepositoryIfc* and our implementation will be using JDBC.
+To make it work, we need to define +TestRepositoryIfc+ as a generic interface extending +DataSourceAware+ interface.
++DataSourceAware+ interface will provide definition for methods required by Tigase XMPP Server internals to initialize custom repository classes based on +TestRepositoryIfc+.
 
 .TestRepositoryIfc
 [source,java]
@@ -41,6 +40,7 @@ public interface TestRepositoryIfc<DS extends DataSource> extends DataSourceAwar
 
 Next we need to prepare our actual implementation of repository - class responsible for execution of SQL statements. In this class we need to implement all of methods from our interface
 and method *void setDataSource(DataSource dataSource)* which comes from *DataSourceAware* interface. In this method we need to initialize data source, ie. create prepared statements.
+We should annotate our new class with +@Repository.Meta+ annotation which will allow Tigase XMPP Server to find this class whenever class implementing +TestRepositoryIfc+ and with support for data source with jdbc URI.
 
 [source,java]
 ----
@@ -76,7 +76,10 @@ public static class JDBCTestRepository implements TestRepositoryIfc<DataReposito
 }
 ----
 
+As you can see we defined type of a data source generic parameter for interface +TestRepositoryIfc+. With that we make sure that only instance implementing +DataRepository+ interface will be provided and thanks to that we do not need to cast provided instance of +DataSource+ to this interface before any access to data source.
+
 With that in place we need to create class which will take care of adding support for multi-database setup. In our case it will be *TestRepositoryMDBean*, which will take care of discovery of repository class, initialization and reinjection of data source.
+It is required to do so, as it was just mentioned our +TestRepositoryMDBean+ will be responsible for initialization of +JDBCTestRepository+ (actually this will be done by +MDRepositoryBean+ which is extended by +TestRepositoryMDBean+.
 
 [source,java]
 ----
@@ -115,6 +118,7 @@ public static class TestRepositoryMDBean extends MDRepositoryBeanWithStatistics<
 ----
 
 Most of this code will be the same in all implementations based on MDRepositoryBeanWithStatistics. In our case only custom method is *void addItem(...)* which uses *getRepository(String domain)* method to retrieve correct repository for a domain.
+This retrieval of actual repository instance for a domain will need to be done for every custom method of +TestRepositoryIfc+/
 
 While this is more difficult to implement than in previous version, it gives you support for multi database setup and provides you with statistics of database query times which may be used for diagnosis.
 

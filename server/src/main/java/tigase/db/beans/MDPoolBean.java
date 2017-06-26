@@ -27,6 +27,8 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 
 /**
+ * Abstract class providing base part for implementation of pool for multiple domains.
+ *
  * Created by andrzej on 08.03.2016.
  */
 public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements RegistrarBeanWithDefaultBeanClass {
@@ -65,14 +67,38 @@ public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements R
 		kernel.registerBean(domain).asClass(getConfigClass()).exec();
 	}
 
+	/**
+	 * Default alias used if for provided domain then is no repo instance.
+	 * @return default alias
+	 */
 	public String getDefaultAlias() {
 		return "default";
 	}
 
+	/**
+	 * Returns per domain configuration class
+	 * @return class
+	 */
 	protected abstract Class<? extends T> getConfigClass();
 
+	/**
+	 * Method called to add repo instance for domain
+	 * @param domain
+	 * @param repo
+	 */
 	protected abstract void addRepo(String domain, S repo);
+
+	/**
+	 * Method called to remove repo instance for domain
+	 * @param domain
+	 * @return removed instance of repo
+	 */
 	protected abstract S removeRepo(String domain);
+
+	/**
+	 * Method called to set default repo instance.
+	 * @param repo instance of repo
+	 */
 	protected abstract void setDefault(S repo);
 
 }

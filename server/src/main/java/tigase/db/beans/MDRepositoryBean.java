@@ -45,7 +45,7 @@ import static tigase.db.beans.MDPoolBean.REPO_CLASS;
 
 /**
  * Abstract class implementing bean to which should be used to create name aware repository pool.
- * This class is resposible for creation of correct repository instances for every DataSource configured.
+ * This class is responsible for creation of correct repository instances for every DataSource configured.
  *
  * Created by andrzej on 15.03.2016.
  */
@@ -74,20 +74,43 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	private final Map<String,T> repositories = new ConcurrentHashMap<>();
 	private Kernel kernel;
 
+	/**
+	 * Method returns class implementing repository which supports data source instance provided in parameter.
+	 * @param dataSource
+	 * @return repository class
+	 * @throws DBInitException
+	 */
 	protected abstract Class<? extends T> findClassForDataSource(DataSource dataSource) throws DBInitException;
 
+	/**
+	 * Provides access to all available repository instances
+	 * @return stream of repository instances
+	 */
 	protected Stream<T> repositoriesStream() {
 		return getRepositories().values().stream();
 	}
 
+	/**
+	 * Returns name of a bean
+	 * @return name of a bean
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Provides access to unmodifiable map domain to repository instance
+	 * @return map of domain to repository instance
+	 */
 	protected Map<String,T> getRepositories() {
 		return Collections.unmodifiableMap(repositories);
 	}
 
+	/**
+	 * Provides repository instance for passed domain name
+	 * @param domain
+	 * @return instance of repository
+	 */
 	protected T getRepository(String domain) {
 		T repo = repositories.get(aliases.getOrDefault(domain, domain));
 		if (repo == null) {
@@ -164,6 +187,13 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		this.kernel = null;
 	}
 
+	/**
+	 * Method called to initialized passed repository instance for passed domain.
+	 * <br/>
+	 * Should be empty if no custom initialization is required.
+	 * @param domain
+	 * @param repo
+	 */
 	protected void initializeRepository(String domain, T repo) {
 
 	}
@@ -177,7 +207,12 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		eventBus.unregisterAll(this);
 	}
 
-
+	/**
+	 * Method called when repository instance for domain changes.
+	 * @param domain name of domain
+	 * @param newRepo new instance of repository
+	 * @param oldRepo old instance of repository
+	 */
 	protected void updateDataSourceAware(String domain, T newRepo, T oldRepo) {
 		if (newRepo != null) {
 			this.repositories.put(domain, newRepo);
@@ -186,12 +221,28 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		}
 	}
 
+	/**
+	 * Determines behaviour of MDRepositoryBean.
+	 */
 	public static enum SelectorType {
+		/**
+		 * Repository instances will be created for default data source and for data sources listed in configuration.
+		 */
 		List,
+		/**
+		 * Repository instances will be created for every data source.
+		 */
 		EveryDataSource,
+		/**
+		 * Repository instances will be created for every data source for which user repository exists.
+		 */
 		EveryUserRepository,
 	}
 
+	/**
+	 * MDRepositoryConfigBean is bean responsible for basic management and initialization of repository for domain.
+	 * @param <A>
+	 */
 	public abstract static class MDRepositoryConfigBean<A extends DataSourceAware> implements Initializable, UnregisterAware, ConfigurationChangedAware, RegistrarBean {
 
 		@Inject
@@ -219,6 +270,13 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 
 		private DataSource dataSource;
 
+		/**
+		 * Method returns class for instance repository matching data source or returning class
+		 * specified in <code>cls</code> config field.
+		 * @return
+		 * @throws DBInitException
+		 * @throws ClassNotFoundException
+		 */
 		protected Class<?> getRepositoryClassName() throws DBInitException, ClassNotFoundException {
 			if (cls == null) {
 				return mdRepositoryBean.findClassForDataSource(dataSource);

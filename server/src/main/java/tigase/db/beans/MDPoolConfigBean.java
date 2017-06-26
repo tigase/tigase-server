@@ -42,6 +42,9 @@ import java.util.logging.Logger;
 import static tigase.db.beans.MDPoolBean.*;
 
 /**
+ * Base class for configuration beans of {@link tigase.db.beans.DataSourceBean},
+ * {@link tigase.db.beans.AuthRepositoryMDPoolBean} and {@link tigase.db.beans.UserRepositoryMDPoolBean}
+ *
  * Created by andrzej on 08.03.2016.
  */
 public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implements Initializable, ConfigurationChangedAware, RegistrarBean {
@@ -76,10 +79,31 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 
 	private boolean skipInitializationErrors = false;
 
+	/**
+	 * Get interface to which instances initialized by this config bean must conform to.
+	 * @return interface
+	 */
 	protected abstract Class<? extends A> getRepositoryIfc();
+
+	/**
+	 * Get name of a pool which should be used if any.
+	 * @return class name
+	 * @throws DBInitException
+	 */
 	protected abstract String getRepositoryPoolClassName() throws DBInitException;
+
+	/**
+	 * Method used to initialize provided instance
+	 * @param repo
+	 * @throws RepositoryException
+	 */
 	protected abstract void initRepository(A repo) throws RepositoryException;
 
+	/**
+	 * Get class name to initialize as repository
+	 * @return
+	 * @throws DBInitException
+	 */
 	protected String getRepositoryClassName() throws DBInitException {
 		if (cls != null)
 			return cls;

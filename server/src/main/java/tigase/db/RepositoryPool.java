@@ -22,10 +22,16 @@
 package tigase.db;
 
 /**
+ * Generic interface of repository pool implementations.
+ * 
  * Created by andrzej on 08.03.2016.
  */
 public interface RepositoryPool<T> extends Repository {
 
+	/**
+	 * Method called to add instance of a repository to the repository pool.
+	 * @param repo instance of a repository
+	 */
 	void addRepo(T repo);
 
 }

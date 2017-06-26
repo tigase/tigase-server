@@ -37,6 +37,13 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
+ * Pool for authentication repositories.
+ * <br/>
+ * This pool should be used if connection to authentication storage is blocking or synchronized,
+ * ie. implemented using single connection.<br/>
+ * If implementation of <code>AuthRepository</code> uses connection pool or non blocking, concurrent
+ * access to authentication storage (ie. <code>DataSourcePool</code>), then this pool is not need.
+ *
  * Created: Mar 27, 2010 11:31:17 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

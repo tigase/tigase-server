@@ -24,10 +24,22 @@ package tigase.db;
 import tigase.component.exceptions.RepositoryException;
 
 /**
+ * Interface providing a generic way to access data sources by classes implementing it.
+ *
+ * It is required to be implemented by classes requiring access to data sources
+ * and should be used with class extending {@link tigase.db.beans.MDRepositoryBean}
+ * for ease of use and to provide support for usage of different data source for
+ * different domains (vhosts).
+ *
  * Created by andrzej on 09.03.2016.
  */
 public interface DataSourceAware<T extends DataSource> {
 
+	/**
+	 * Method called to provide class with instance of a data source.
+	 * @param dataSource
+	 * @throws RepositoryException
+	 */
 	void setDataSource(T dataSource) throws RepositoryException;
 
 }

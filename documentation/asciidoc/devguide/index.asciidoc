@@ -40,6 +40,9 @@ include::text/Server_Compilation_-_v4.x_or_Later.asciidoc[]
 include::text/Tigase_Kernel.asciidoc[]
 
 :leveloffset: 1
+include::text/Data_Sources_And_Repositories.asciidoc[]
+
+:leveloffset: 1
 
 //components
 include::text/Component_Development.asciidoc[]

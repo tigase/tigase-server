@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Configuration bean for authentication repository per domain
  * Created by andrzej on 09.03.2016.
  */
 public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserRepositoryConfigBean<T,U>> extends MDPoolConfigBean<T,U> implements ConfigurationChangedAware, Initializable, UnregisterAware {
@@ -62,13 +63,18 @@ public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserReposito
 		return repositoryUri;
 	}
 
+	/**
+	 * Returns class name of a repository to initialize for domain
+	 * @return
+	 * @throws DBInitException
+	 */
 	@Override
 	protected String getRepositoryClassName() throws DBInitException {
 		if (cls != null)
 			return cls;
 		return RepositoryFactory.getRepoClassName(getRepositoryIfc(), repositoryUri);
 	}
-
+	
 	@Override
 	protected void initRepository(T repository) throws RepositoryException {
 		boolean initialized = false;
@@ -104,6 +110,10 @@ public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserReposito
 		super.beanConfigurationChanged(changedFields);
 	}
 
+	/**
+	 * Returns class name of repository pool for domain
+	 * @return
+	 */
 	@Override
 	protected String getRepositoryPoolClassName() {
 		return null;
