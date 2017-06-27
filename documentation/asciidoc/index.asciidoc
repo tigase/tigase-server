@@ -133,7 +133,7 @@ include::text/admin/4/Database_Management_-_A_-_Database_Preparation.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preperation_-_1_-_DbSchemaLoader.asciidoc[]
+include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_1_-_DbSchemaLoader.asciidoc[]
 
 include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_2_-_MySQL.asciidoc[]
 
@@ -143,7 +143,7 @@ include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_4_-_MSSQL
 
 include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_5_-_PostGRE.asciidoc[]
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preperation_-_6_-_MongoDB.asciidoc[]
+include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_6_-_MongoDB.asciidoc[]
 
 :leveloffset: 2
 
@@ -173,7 +173,7 @@ include::text/admin/4/Database_Management_-_F_-_Schema_Updates.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/4/Database_Managament_-_F_-_Schema_Updates_-_A_-_Tigase_Server_7.1.asciidoc[]
+include::text/admin/4/Database_Management_-_F_-_Schema_Updates_-_A_-_Tigase_Server_7.1.asciidoc[]
 
 :leveloffset: 1
 

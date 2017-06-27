@@ -15,7 +15,7 @@ Although REST uses HTTP to receive commands, REST itself is not intended for use
 == Setup & Configuration
 Tigase will by default start with the http servlet active and running.
 Tigase will try to start a standalone Jetty HTTP server at port 8080 and start up the default modules, including `RestModule` which will add context for REST API in the /rest path.
-`RestModule` will also load all groovy scripts located in `scripts/rest/*` directories and will bind them to proper actions for the `/rest/*` paths.
+`RestModule` will also load all groovy scripts located in `scripts/rest/&#42;` directories and will bind them to proper actions for the `/rest/&#42;` paths.
 
 *NOTE:* Scripts that handle HTTP requests are available in the component repository in `src/scriopts/groovy/tigase/rest/` directory.
 

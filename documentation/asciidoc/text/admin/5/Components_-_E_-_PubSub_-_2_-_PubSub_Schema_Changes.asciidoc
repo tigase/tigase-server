@@ -4,8 +4,6 @@
 :version: v1.0 September, 2015
 :date: 2015-30-09 17:28
 
-###### NOT DONE YET ######
-
 :toc:
 :numbered:
 :website: http://www.tigase.org
