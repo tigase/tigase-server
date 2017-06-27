@@ -27,8 +27,6 @@ This will:
 - Dump full stacktrace to a file
 - Run GC and clear from memory
 
-// Ad-hoc?
-
 [[shutDownStats]]
 == Shutdown statistics
 Upon shutdown, statistics for the server's runtime will be appended to the log file.  For a description of the statsitics and what they mean, refer to the xref:statsticsDescription[Statistics Description] portion of the documentation.
