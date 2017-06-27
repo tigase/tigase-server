@@ -4,11 +4,13 @@
 :version: v1.0 September, 2015
 :date: 2015-30-09 17:28
 
+###### NOT DONE YET ######
+
 :toc:
 :numbered:
 :website: http://www.tigase.org
 
-Tigase PubSub Component is currently version 3.2.0 which is introduced in Tigase server v7.1.0
+Tigase PubSub Component is currently version 3.3.0 which is introduced in Tigase server v7.2.0
 
 [[Pubsub3.2.0Changes]]
 == PubSub 3.2.0 Changes

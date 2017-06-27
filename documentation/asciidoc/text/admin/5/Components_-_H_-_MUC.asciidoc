@@ -1,110 +1,147 @@
 [[tigaseMUC]]
 = Tigase MUC Component
 :author: not known
-:version: v1.0 October 2015
+:version: v2.0 June 2017. Reformatted for v7.2.0.
 :date: 2015-10-01 15:00
 
 :toc:
 :numbered:
 :website: http://www.tigase.org
 
-Tigase MUC component is included in all Tigase distributions, to enable MUCs have the following lines in your +init.properties+ file:
+Tigase MUC component is included in all Tigase distributions, it is enabled by default, but you may customize the name of the component by calling it in the init.properties file.
 
+[source,dsl]
 -----
---comp-name-4 = muc
---comp-class-4 = tigase.muc.MUCComponent
+muc {}
 -----
 
 == Configuration Options
 - *room-log-directory* +
 Directory to store chat logs
+[source,dsl]
 -----
-muc/room-log-directory=/var/log/muc/
+muc {
+    'room-log-directory' = ' /var/log/muc/'
+}
 -----
 
 - *message-filter-enabled* +
-To disable filter and allow MUC transfer all subelements in <message/> set:
+Filter that controls subelements in <message/> set, by default is set to on and will send only <message/> element:
+[source,dsl]
 -----
-muc/message-filter-enabled[B]=false
+muc {
+    'message-filter-enabled' = false
+}
 -----
 
 For example, this allows users to send XHTML stanzas through MUC chatrooms on your server.
 
 - *presence-filter-enabled* +
 To disable filter and allow MUC transfer all subelements in <presence/> set:
+[source,dsl]
 -----
-muc/presence-filter-enabled[B]=false
+muc {
+    'presence-filter-enabled' = false
+}
 -----
 
 - *search-ghosts-every-minute* +
-To enable pinging occupants every minute
+This enables pinging of occupants once every minute:
+[source,dsl]
 -----
-muc/search-ghosts-every-minute[B]=true
+muc {
+    'search-ghosts-every-minute' = true
+}
 -----
 
 - *ghostbuster-enabled* +
-To disable active searching of ghosts in MUC Rooms:
+To disable active searching of ghosts in MUC Rooms.  Default is enabled.:
+[source,dsl]
 -----
-muc/ghostbuster-enabled[B]=false
+muc {
+    'ghostbuster-enabled' = false
+}
 -----
 
 - *muc-allow-chat-states* +
-To allow transfer of chat-states in MUC messages:
+Allows transfer of chat-states in MUC messages:
+[source,dsl]
 -----
-muc/muc-allow-chat-states[B]=true
+muc {
+    'muc-allow-chat-states' = true
+}
 -----
 
 - *muc-lock-new-room* +
 To turn off default locking newly created rooms:
+[source,dsl]
 -----
-muc/muc-lock-new-room[B]=false
+muc {
+    'muc-lock-new-room' = false
+}
 -----
-By default new room will be locked until owner submit room configuration.
+By default new room will be locked until owner submits a new room configuration.
 
 - *muc-multi-item-allowed*
-To disable joining from few resources to sinlge nickname:
+To disable joining from multiple resources to a sinlge nickname:
+[source,dsl]
 -----
-muc/muc-multi-item-allowed[B]=false
+muc {
+    'muc-multi-item-allowed' = false
+}
 -----
 
 === History Providers Parameters
 - *history-db* +
-Database type. By default the same what is used as User Repository in Server.
+Database type. By default the same what is used as User Repository in Server, setting both database type and uri you can have a seperate MUC database.
 Provided types: +derby+, +mysql+, +memory+, +pgsql+, +sqlserver+, +none+.
+[source,dsl]
 -----
-muc/history-db=none
+muc {
+    'history-db' = 'pgsql'
+}
 -----
 
 - *history-db-uri* +
-URI for database, if should be used different than default from Tigase Server:
+URI for database, if should be used if you want a seperate MUC database:
+[source,dsl]
 -----
-muc/history-db-uri=jdbc:derby:/database/tigasedbmuc
+muc {
+    'history-db-uri' = 'jdbc:derby:/database/tigasedbmuc'
+}
 -----
 
 === Public log
 - *muc-logger-class* +
-To set custom class for MUC logger:
+Used to set a custom class for MUC logger:
+[source,dsl]
 -----
-muc/muc-logger-class=com.example.CustomLogger
+muc {
+    'muc-logger-class' = 'com.example.CustomLogger'
+}
 -----
-Class must implment interface +tigase.muc.logger.MucLogger+.
+Class *must* implment interface `tigase.muc.logger.MucLogger`.
 
 === Modules
-Each module can be configured to use custom implementation by including it in the init.properties, the defaults are as follows:
-[source,properties]
+Each module can be configured to use a custom implementation by including it in the init.properties, the defaults are as follows:
+[source,dsl]
 -----
-muc/modules/jabber:iq:version[S]=tigase.component.modules.impl.JabberVersionModule
-muc/modules/owner[S]=tigase.muc.modules.RoomConfigurationModule
-muc/modules/presences[S]=tigase.muc.modules.PresenceModuleImpl
-muc/modules/groupchat[S]=tigase.muc.modules.GroupchatMessageModule
-muc/modules/invitations[S]=tigase.muc.modules.MediatedInvitationModule
-muc/modules/urn:xmpp:ping[S]=tigase.component.modules.impl.XmppPingModule
-muc/modules/unique[S]=tigase.muc.modules.UniqueRoomNameModule
-muc/modules/disco[S]=tigase.muc.modules.DiscoveryModule
-muc/modules/iqforwarder[S]=tigase.muc.modules.IqStanzaForwarderModule
-muc/modules/admin[S]=tigase.muc.modules.ModeratorModule
-muc/modules/privatemessages[S]=tigase.muc.modules.PrivateMessageModule
-muc/modules/commands[S]=tigase.component.modules.impl.AdHocCommandModule
+muc {
+    modules {
+        admin = 'tigase.muc.modules.ModeratorModule'
+        commands = 'tigase.component.modules.impl.AdHocCommandModule'
+        disco = 'tigase.muc.modules.DiscoveryModule'
+        groupchat = 'tigase.muc.modules.GroupchatMessageModule'
+        invitations = 'tigase.muc.modules.MediatedInvitationModule'
+        iqforwarder = 'tigase.muc.modules.IqStanzaForwarderModule'
+        jabber = 'iq:version[S]=tigase.component.modules.impl.JabberVersionModule'
+        owner = 'tigase.muc.modules.RoomConfigurationModule'
+        presences = 'tigase.muc.modules.PresenceModuleImpl'
+        privatemessages = 'tigase.muc.modules.PrivateMessageModule'
+        unique = 'tigase.muc.modules.UniqueRoomNameModule'
+        urn = 'xmpp:ping[S]=tigase.component.modules.impl.XmppPingModule'
+    }
+}
 -----
 
 [[mucRoomConfig]]
@@ -112,26 +149,36 @@ muc/modules/commands[S]=tigase.component.modules.impl.AdHocCommandModule
 In addition to the default Room configuration options defined in the MUC specification Tigase offers following as well:
 
 Tigase MUC Options::
-- tigase#presence_delivery_logic - allows configuring logic determining which presence should be used by occupant in the room while using multiple-resource connections under one nickname, following options are available:
+- `tigase#presence_delivery_logic` - allows configuring logic determining which presence should be used by occupant in the room while using multiple-resource connections under one nickname, following options are available:
   * PREFERE_PRIORITY
   * PREFERE_LAST
-- tigase#presence_filtering - (boolean) when enabled broadcasts presence only to selected affiliation groups
-- tigase#presence_filtered_affiliations - when enabled tigase#presence_filtering is enabled one can select affiliation which should receive presences, following are possible to select from:
+- `tigase#presence_filtering` - (boolean) when enabled broadcasts presence only to selected affiliation groups
+- `tigase#presence_filtered_affiliations` - when enabled `tigase#presence_filtering` is enabled one can select affiliation which should receive presences, following are possible to select from:
   * owner
   * admin
   * member
   * none
   * outcast
-- muc#roomconfig_maxusers - Allows configuring of maximum users of room.
+- `muc#roomconfig_maxusers` - Allows configuring of maximum users of room.
 
 
 Configuring default room configuration in init.properties::
+[source,dsl]
 -----
-muc/default_room_config/<option>=<value>
+muc {
+    'default_room_config' {
+        'Option' = 'value'
+    }
+}
 -----
 for example:
+[source,dsl]
 -----
-muc/default_room_config/tigase#presence_delivery_logic=PREFERE_LAST
+muc {
+    default_room_config {
+        'tigase#presence_delivery_logic' = 'PREFERE_LAST'
+    }
+}
 -----
 
 Configuration per-room::

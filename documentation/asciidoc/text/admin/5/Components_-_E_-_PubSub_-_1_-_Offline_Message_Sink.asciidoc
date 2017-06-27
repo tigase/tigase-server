@@ -33,7 +33,7 @@ Messages sent to offline users is published in PubSub node, from where that mess
 The PubSub node must be created and configured beforehand:
 
 === Create node
-[source.xml]
+[source,xml]
 -----
 <iq type='set'
     to='pubsub.coffeebean.local'
@@ -63,14 +63,16 @@ After that is done, you need to add SessionManager as a publisher:
 Finally, the AMP plugin must be configured as well
 
 === init.properties configuration
-[source,bash]
+[source,dsl]
 -----
-sess-man/plugins-conf/amp/msg-pubsub-jid=pubsub.coffeebean.local
-sess-man/plugins-conf/amp/msg-pubsub-node=message_sink
-sess-man/plugins-conf/amp/msg-pubsub-publisher=sess-man@coffeebean.local
+'sess-man' {
+    amp {
+        'msg-pubsub-jid' = 'pubsub.coffeebean.local'
+        'msg-pubsub-node' = 'message_sink'
+        'msg-pubsub-publisher' = 'sess-man@coffeebean.local'
+    }
+}
 -----
-
-Of course be sure that AMP plugin is in your +--sm-plugins+ line.
 
 == Usage
 Because these sinks use a standard PubSub component, administration of the sink node is identical to any other PubSub node. link:http://www.xmpp.org/extensions/xep-0060[XEP-0060] defines standard PubSub usage and management.

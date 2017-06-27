@@ -1,7 +1,7 @@
 [[PubSubComp]]
 = PubSub Component
 :author: many authors
-:version: v1.0, September 2015
+:version: v2.0, September 2015. Reformatted for v7.2.0.
 :date: 2015-09-30 17:25
 
 :toc:
@@ -12,14 +12,14 @@
 
 == Configuration
 Tigase's Publish Subscribe component is an link:http://www.xmpp.org/extensions/xep-0060.html[XEP-0060] compliant plugin handling all publish and subscribe activity within Tigase server.
-To enable the component the following should be in your init.properties file
+This is enabled as default with the pubsub name, however you may include the following line if you wish to customize it's configuration.
+[source,dsl]
 -----
---comp-name-2 = pubsub
---comp-class-2 = tigase.pubsub.PubSubComponent
+pubsub (class: tigase.pubsub.PubSubComponent) {}
 -----
 
 == Pubsub naming
-Within Tigase, all pubsub component address MUST be domain-based address and not a JID style address.  This was made to simplify communications structure. Tigase will automatically set component names to pubsub.domain, however any messages send to pubsub@domain will result in a +SERVICE_UNAVAILABLE+ error.
+Within Tigase, all pubsub component address MUST be domain-based address and not a JID style address.  This was made to simplify communications structure. Tigase will automatically set component names to pubsub.domain, however any messages send to pubsub@domain will result in a `SERVICE_UNAVAILABLE` error.
 
 Pubsub nodes within Tigase can be found as a combination of JID and node where nodes will be identified akin to service discovery.  For example, to address a friendly node, use the following structure:
 
@@ -32,26 +32,32 @@ Pubsub nodes within Tigase can be found as a combination of JID and node where n
 
 [[rosterLimit]]
 == Configure Roster Maxmimum size
-Starting with Tigase v7.1.0, administrators can configure the maximum allowable roster size per user via the init.properties file.
+Administrators can configure the maximum allowable roster size per user via the init.properties file.
+[source,dsl]
 -----
-sess-man/plugins-conf/jabber\:iqa\:roster/max_roster_size=100
+'sess-man' {
+    'jabber:iqa:roster' {
+        max_roster_size = '100'
+    }
+}
 -----
-This sets the roster limit to 100 entries per user.  It can be set to any integer, however by default no limit is set.
+
+This sets the roster limit to 100 entries per user.  It can be set to any integer, however by default no limit is set and no configuration is set in `init.properties` file.
 
 
 == AdHoc Commands
-Similar to the HTTP API, AdHoc commands based on groovy scripts can be sent to this component to do a number of tasks. All scripts for these Ad-hoc commands are found at +sec/main/groovy/tigase/admin+ in source distrubitions, or at link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/show/src/main/groovy/tigase/admin[this link]. To use them, the scripts need to be copied into the +scripts/admin/pubsub+ folder in the Tigase installation directory.
-For all examples, the component address will be +pubsub.example.com+.
+Similar to the HTTP API, AdHoc commands based on groovy scripts can be sent to this component to do a number of tasks. All scripts for these Ad-hoc commands are found at +sec/main/groovy/tigase/admin+ in source distrubitions, or at link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/show/src/main/groovy/tigase/admin[this link]. To use them, the scripts need to be copied into the `scripts/admin/pubsub` folder in the Tigase installation directory.
+For all examples, the component address will be `pubsub.example.com`.
 
 === Create a Node
-Ad-hoc command node: +create-node+
+Ad-hoc command node: `create-node`
 Required role: Service Administrator
 
 Command requires fields +node+ and +pubsub#node_type+ to be filled with proper values for execution.
-- +node+ Field containing id of node to create.
-- +pubsub#node_type+ Contains one of two possible values.
-  * +leaf-node+ Node that will be published.
-  * +collection+ Node that will contain other nodes.
+- `node` Field containing id of node to create.
+- `pubsub#node_type` Contains one of two possible values.
+  * `leaf-node` Node that will be published.
+  * `collection` Node that will contain other nodes.
 
 Other fields are optional fields that can be set to change configuration of newly create node to different configuration than default.
 
@@ -61,11 +67,11 @@ bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com create-n
 -----
 
 === Delete a Node
-Ad-hoc command node: +delete-node+
+Ad-hoc command node: `delete-node`
 Required role: Service Administrator
 
-Command requires +node+ field to be filled.
-- +node+ Field containing id of node to delete.
+Command requires `node` field to be filled.
+- `node` Field containing id of node to delete.
 
 Example call using TCLMT:
 -----
@@ -73,12 +79,12 @@ bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com delete-n
 -----
 
 === Subscribe to a Node
-Ad-hoc command node: +subscribe-node+
+Ad-hoc command node: `subscribe-node`
 Required role: Service Administrator
 
-Command requires +node+ and +jids+ nodes to be filled.
-- +node+ Field containing node to subscribe to.
-- +jids+ Field containing list of JIDs to subscribe to the node.
+Command requires `node` and `jids` nodes to be filled.
+- `node` Field containing node to subscribe to.
+- `jids` Field containing list of JIDs to subscribe to the node.
 
 Example call using TCLMT:
 -----
@@ -86,12 +92,12 @@ bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com subscrib
 -----
 
 === Unsubscribe to a Node
-Ad-hoc command node: +unsubscribe-node+
+Ad-hoc command node: `unsubscribe-node`
 Required role: Service Administrator
 
-Command requires +node+ and +jids+ nodes to be filled.
-- +node+ Field containing node to unsubscribe to.
-- +jids+ Field containing list of JIDs to unsubscribe to the node.
+Command requires `node` and `jids` nodes to be filled.
+- `node` Field containing node to unsubscribe to.
+- `jids` Field containing list of JIDs to unsubscribe to the node.
 
 Example call using TCLMT:
 -----
@@ -99,13 +105,13 @@ bin/tclmt.sh -u admin@example.com -p admin123 remote pubsub.example.com unsubscr
 -----
 
 === Publish an item to a Node
-Ad-hoc command node: +publish-item+
+Ad-hoc command node: `publish-item`
 Required role: Service Administrator
 
-Command requires fields +node+ and +entry+ to be filled.
-- +node+ Field containing id of node to publish to.
-- +item-id+ Field may contain id of entry to publish, can be empty.
-- +entry+ Field should contain multi-line entry content that should be valid XML values for items.
+Command requires fields `node` and `entry` to be filled.
+- `node` Field containing id of node to publish to.
+- `item-id` Field may contain id of entry to publish, can be empty.
+- `entry` Field should contain multi-line entry content that should be valid XML values for items.
 
 This command due to it's complexity cannot be easily executed by TCLMT using default remote script which provides support for basic adhoc commands.
 Example call using TCLMT:
@@ -241,7 +247,7 @@ Component will send events to all occupants as described:
 If component receives presence stanza with type unavailable without specified node, then component will log out user from all nodes he logged before and publish events.
 
 === Retrieving list of all Node Subscribers
-To retrieve list of node subscribers, node configuration option +tigase#allow_view_subscribers+ must be set to true:
+To retrieve list of node subscribers, node configuration option `tigase#allow_view_subscribers` must be set to true:
 [source,xml]
 -----
 <iq type='set'
@@ -292,15 +298,24 @@ In this example will be returned all subscriptions of users from domain "denmark
 
 [[storeFullXMLLastPresence]]
 == Store Full XML of Last Presence
-A new feature has been implemented in v7.1.0 that allows Tigase to store a more detailed <unavailable/> presence stanza to include timestamps and other information.
+Tigase can store a more detailed `<unavailable/>` presence stanza to include timestamps and other information.
 
 === Requirements
-Ensure that +presence-offline+ plugin is enabled in init.properties.  To do this, add *+presence-offline* to the *--sm-plugins* line.
-
-The following two lines configure options to broadcast probes to offline users.
+Ensure that `presence-offline` plugin is enabled in init.properties.  To do this, add be sure `presence-offline` is listed under `sess-man`
+[source,dsl]
 -----
-sess-man/plugins-conf/skip-offline=false
-sess-man/plugins-conf/skip-offline-sys=false
+'sess-man' {
+    'presence-offline' () {}
+}
+-----
+
+The following two lines in `sess-man` configure options to broadcast probes to offline users.
+[source,dsl]
+-----
+'sess-man' {
+    'skip-offline' = 'false'
+    'skip-offline-sys' = 'false'
+}
 -----
 Without these lines, Tigase will not send presence probes to users that the server knows to be offline.
 
@@ -312,13 +327,19 @@ The full XML presence is stored under the tig_pairs table with a pkey of +last-u
 <delay stamp="2015-12-29T16:51:50.748Z" xmlns="urn:xmpp:delay"/></presence>
 -----
 As you can see, the plugin has added a delay stamp which indicates the last time they were seen online. This may be suppressed by using the following line in your init.properties file.
+[source,dsl]
 -----
-sess-man/plugins-conf/delay-stamp=false
+'sess-man' {
+    'delay-stamp' = 'false'
+}
 -----
 
 You may also limit probe responses only to newly connected resources.
+[source,dsl]
 -----
-sess-man/plugins-conf/probe-full-jid=true
+'sess-man' {
+    'probe-full-jid' = 'true'
+}
 -----
 
 When a user logs on, they will receive the same full unavailable presence statements from contacts not logged in.  Also the repository entry containing their last unavailable presence will be removed.

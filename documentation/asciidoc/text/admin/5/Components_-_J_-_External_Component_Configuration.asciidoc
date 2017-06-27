@@ -9,13 +9,13 @@
 :numbered:
 :website: http://tigase.net
 
-In Tigase server version 4.4.x and later a new implementation for connecting external components has been introduced.
+Tigase can connect to external components, this guide will show you how this can be accomplished.
 
-It is much simpler to setup and follows the same configuration standards as all other components. It is also much more powerful as a single instance can control many TCP/IP ports and many external components on each port and even allows for multiple connections for the same component. It supports both XEP-0114 and XEP-0225 with protocol auto-detection mechanisms. Protocols are pluggable so in future more protocols can be supported or custom extensions to existing protocols can be added.
+Configuration follows the same standards as all other components. It is also much more powerful as a single Tigase instance can control many TCP/IP ports and many external components on each port and even allows for multiple connections for the same component. It supports both XEP-0114 and XEP-0225 with protocol auto-detection mechanisms. Protocols are pluggable so more protocols can be supported or custom extensions to existing protocols can be added.
 
 The implementation also supports a scripting API and new domains with passwords can be added at run-time using ad-hoc commands. New scripts can be loaded to even further control all connected external components.
 
-Even though it is much simpler to setup and to use it also offers a lot of new functionality and features. Pages in this guide describe in details all the administration aspects of setting up and managing external components.
+Pages in this guide describe in details all the administration aspects of setting up and managing external components.
 
 - xref:tigase4xbasicConfiguration[Basic Configuration Options] (External Component)
 - xref:tigase4xexternalComponent[Tigase as an External Component]

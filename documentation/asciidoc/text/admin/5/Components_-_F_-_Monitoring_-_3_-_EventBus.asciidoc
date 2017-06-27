@@ -1,14 +1,15 @@
 [[eventBus]]
 = Eventbus
 :author: Bartosz Malkowski
+:version: v2.0 September 2015. Reformatted for v7.2.0.
 :date: 2015-04-09 8:56
-:version: v1.0 September 2015
+
 
 :toc:
 :numbered:
 :website: http://www.tigase.org
 
-New for Tigase version 7.1.0, is an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know an event has occured!
+Tigase includes an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know an event has occured!
 Lets begin with setup and requirements.
 
 Eventbus is based on a limited http://www.xmpp.org/extensions/xep-0060.html[PubSub] specification. Events are delivered to subscribers as a normal PubSub notification.
@@ -16,7 +17,7 @@ Eventbus is based on a limited http://www.xmpp.org/extensions/xep-0060.html[PubS
 Each component or client may subscribe for specific types of events. Only components on cluster nodes are allowed to publish events.
 
 == Setup
-Eventbus is enabled by default on v7.1.0 b4001 and later, no setup needed!
+Eventbus is enabled by default on v7.1.0 b4001 and later, so no setup needed!
 
 == How it Works
 Events in Eventbus are identified by two elements: name of event and its namespace:
@@ -26,6 +27,7 @@ Events in Eventbus are identified by two elements: name of event and its namespa
   <sample_value>1</sample_value>
 </EventName>
 -------
+
 Where event name is `EventName` and namespace is `tigase:demo`.
 
 Listeners may subscribe for a specific event or for all events with specific a namespace. Because in pubsub, only one node name exists, so we have to add a way to convert the event name and namespace to a node name:
@@ -33,11 +35,12 @@ Listeners may subscribe for a specific event or for all events with specific a n
 -------
 nodename = eventname + "|" + namespace
 -------
-So for example, to subscribe to `<EventName xmlns="tigase:demo">`, node must be: `EventName|tigase:demo`. If you wish to subscribe to all events with a specific namespace, use an asterisk (`*`) instead of the event name: +*|tigase:demo+.
+
+So for example, to subscribe to `<EventName xmlns="tigase:demo">`, node must be: `EventName|tigase:demo`. If you wish to subscribe to all events with a specific namespace, use an asterisk (`*`) instead of the event name: `*|tigase:demo`.
 
 [NOTE]
 ===============================
-If client is subscribed to /*|tigase:demo node, then events will not be sent from node /*|tigase:demo, but from the *real* node (in this case: `EventName|tigase:demo`).
+If client is subscribed to `/*|tigase:demo node`, then events will not be sent from node `/*|tigase:demo`, but from the *real* node (in this case: `EventName|tigase:demo`).
 ===============================
 
 [[availableTasks]]
@@ -46,39 +49,39 @@ Eventbus monitoring has several pre-defined tasks that can be monitored and set 
 
 - *disk-task* - Used to check disk usage. +
 Available Options
-  . +enabled[B]+ - Enable or disable task, Boolean value.
-  . +period[I]+ - Period of running check, Integer value.
-  . +threshold+ - Percentage of used space on disk, Float value.
+  . `enabled` - Enable or disable task, Boolean value.
+  . `period` - Period of running check, Integer value.
+  . `threshold` - Percentage of used space on disk, Float value.
 
 - *cpu-temp-task* - Used to check CPU temperature. +
 Available Options
-  . +enabled[B]+ - Enable or disable task, Boolean value.
-  . +period[I]+ - Period of running check, Integer value.
-  . +cpuTempThreshold[I]+ - Temperature threshold of CPU in °C.
+  . `enabled` - Enable or disable task, Boolean value.
+  . `period` - Period of running check, Integer value.
+  . `cpuTempThreshold` - Temperature threshold of CPU in °C.
 
 - *load-checker-task* - Used to check system load. +
 Available Options
-. +enabled[B]+ - Enable or disable task, Boolean value.
-. +period[I]+ - Period of running check, Integer value.
-. +averageLoadThreshold[L]+ - Average percent load threshold, Long value.
+. `enabled` - Enable or disable task, Boolean value.
+. `period` - Period of running check, Integer value.
+. `averageLoadThreshold` - Average percent load threshold, Long value.
 
 - *memory-checker-task* - Used to check memory usage. +
 Available Options
-. +enabled[B]+ - Enable or disable task, Boolean value.
-. +period[I]+ - Period of running check, Integer value.
-. +maxHeapMemUsagePercentThreshold[I]+ - Alarm when percent of used Heap memory is larger than, Integer value.
-. +maxNonHeapMemUsagePercentThreshold[I]+ - Alarm when percent of used Non Heap memory is larger than, Integer value.
+. `enabled` - Enable or disable task, Boolean value.
+. `period` - Period of running check, Integer value.
+. `maxHeapMemUsagePercentThreshold` - Alarm when percent of used Heap memory is larger than, Integer value.
+. `maxNonHeapMemUsagePercentThreshold` - Alarm when percent of used Non Heap memory is larger than, Integer value.
 
 - *logger-task* - Used to transmit log entries depending on level entered. +
-. +enabled[B]+ - Enable or disable task, Boolean value.
-. +levelThreshold+ - Minimal log level that will be the threshold. Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, and ALL.
+. `enabled` - Enable or disable task, Boolean value.
+. `levelThreshold` - Minimal log level that will be the threshold. Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, and ALL.
 
 - *connections-task* - Used to check users disconnections. +
 *NOTE: The event will be generated only if both thresholds (amount and percentage) will be fulfilled.* +
-. +enabled[B]+ - Enable or disable task, Boolean value.
-. +period[I]+ - Period of running check in ms, Integer value.
-. +thresholdMinimal[I]+ - Minimal amount of disconnected users required to generate alarm.
-. +threshold[I]+ - Minimal percent of disconnected users required to generate alarm.
+. `enabled` - Enable or disable task, Boolean value.
+. `period` - Period of running check in ms, Integer value.
+. `thresholdMinimal` - Minimal amount of disconnected users required to generate alarm.
+. `threshold` - Minimal percent of disconnected users required to generate alarm.
 
 == Configuration
 Configuration of the eventbus monitor can be done one of two ways; either by lines in init.properties file, or by sending XMPP stanzas to the server.  You may also send XMPP stanzas VIA HTTP REST.
@@ -88,26 +91,43 @@ XMPP stanza configurations will override ones in init.properties, but they will 
 Tasks can be configured in the init.properties file. See xref:availableTasks[available tasks] for the tasks that can be setup.
 
 To enable a specific monitor task, use the following line:
+[source,dsl]
 -----
-monitor/$TASKNAME/enabled[B]=true
+monitor {
+    '$TASKNAME' {
+        setting = value
+    }
+}
 -----
-Where monitor is the component name for tigase.monitor.MonitorComponent, and $TASKNAME is one of the xref:availableTasks[available task names].
 
-This format will be the same for other settings for tasks.  For example:
+Where monitor is the component name for `MonitorComponent`, and `$TASKNAME` is one of the xref:availableTasks[available task names].
+
+This format will be the same for other settings for tasks, and it's best to group settings under one heading.  For example:
+[source,dsl]
 -----
-monitor/$TASKNAME/period[I]=1000
+monitor {
+    'connections-task' {
+        enabled = true
+        period = 1000
+    }
+}
 -----
-which sets the check period to 1000 milliseconds.
+
+sets the check period to 1000 milliseconds and enables `connections-task`.
 
 *NOTE* Once triggers have been activated, they will become dormant.  Think of these as one-shot settings.
 
 ==== Subscription Limitations
 To define list of JIDs allowed to subscribe for events:
-[source, bash]
+[source, dsl]
 -----
-eventbus/affiliations/allowedSubscribers=francisco@denmark.lit,bernardo@denmark.lit
+eventbus {
+    affiliations {
+        allowedSubscribers = 'francisco@denmark.lit,bernardo@denmark.lit'
+    }
+}
 -----
-If this is left blank, all users can subscribe.
+If this is not specified, all users can subscribe.
 
 === Configuration via XMPP
 We can also configure the eventbus monitor component using XMPP stanzas. This allows us to set and change configurations during server runtime. This is done using a series of +iq+ stanzas send to the monitor component.
@@ -166,8 +186,6 @@ To send new settings to the monitor component, we can send a similar stanza back
 
 To which a successful update will give you an XMPP success stanza to let you know everything is set correctly.
 
-(Include what the response will be from this setting!)
-
 Alternatively, you can update specific settings by editing a single field without adding anything else. For example, if we just wanted to turn the +disk-task+ on we could send the following stanza:
 
 [source,xml]
@@ -186,16 +204,16 @@ Alternatively, you can update specific settings by editing a single field withou
 To set any other values, do not forget that certain parts may need to be changed, specifically the
 *<field type="boolean" var=x-task#enabled">*  fields. +
 - Your field type will be defined by the type of variable specified in the xref:availableTasks [Available Tasks] section. +
-- +var=x task#+ will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section, minus the data type parameter.
+- `var=x task#` will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section.
 
 == Getting the Message
 Without a place to send messages to, eventbus will just trigger and shut down. There are two different methods that eventbus can deliver alarm messages and relevant data; XMPP messages and using the mailer extension.
 
 === XMPP notification
-In order to retrieve notifications, a subscription to the +eventbus@tigase.org+ user must be made.
+In order to retrieve notifications, a subscription to the `eventbus@tigase.org` user must be made.
 Keep in mind that subscriptions are not persistent across server restarts, or triggers. +
-The eventbus schema is very similar to most XMPP subscription requests but with a few tweaks to differentiate it if you wanted to subscribe to a certain task or all of them. Each task is considered a node, and each node has the following pattern: +eventName|eventXMLNS+. Since each monitoring task has the +tigase:monitor:event+ event XMLNS, we just need to pick the event name from the list of tasks.
-So like the above example, our event node for the disk task will be +disk-task|tigase:monitor:event+.
+The eventbus schema is very similar to most XMPP subscription requests but with a few tweaks to differentiate it if you wanted to subscribe to a certain task or all of them. Each task is considered a node, and each node has the following pattern: `eventName|eventXMLNS`. Since each monitoring task has the `tigase:monitor:event` event XMLNS, we just need to pick the event name from the list of tasks.
+So like the above example, our event node for the disk task will be `disk-task|tigase:monitor:event`.
 Applied to an XMPP stanza, it will look something like this:
 [source,xml]
 -----
@@ -207,14 +225,15 @@ Applied to an XMPP stanza, it will look something like this:
   </pubsub>
 </iq>
 -----
-Don't forget to replace $USER_JID with the bare JID of the user you want to receive those messages. You can even have them sent to a MUC or any component with a JID.
+
+Don't forget to replace `$USER_JID` with the bare JID of the user you want to receive those messages. You can even have them sent to a MUC or any component with a JID.
 Available events are as follows:
-- disk-taskEvent for +disk-task+
-- LoggerMonitorEvent for +logger-task+
-- HeapMemoryMonitorEvent for +memory-checker-task+
-- LoadAverageMonitorEvent for +load-checker-task+
-- CPUTempMonitorEvent for +cpu-temp-task+
-- UsersDisconnected for +connections-task+
+- disk-taskEvent for `disk-task`
+- LoggerMonitorEvent for `logger-task`
+- HeapMemoryMonitorEvent for `memory-checker-task`
+- LoadAverageMonitorEvent for `load-checker-task`
+- CPUTempMonitorEvent for `cpu-temp-task`
+- UsersDisconnected for `connections-task`
 
 Alternatively, you can also subscribe to all events within the eventbus by using a wildcard * in place of the event XMLNS like this example:
 [source,xml]
@@ -256,21 +275,29 @@ For versions older than 7.1.0 TSMME requires two files to operate:
 
 - javax.mail.jar file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the /jars directory.
 
-[source,properties]
+=== Configuration
+
+Tigase Mailer Extention may be configured via the init.properties file in the following manner:
+
+[source,dsl]
 -----
-monitor/mailer-smtp-host=mail.tigase.org
-monitor/mailer-smtp-port=587
-monitor/mailer-smtp-username=sender
-monitor/mailer-smtp-password=********
-monitor/mailer-from-address=sender@tigase.org
-monitor/mailer-to-addresses=receiver@tigase.org,admin@tigase.org
+monitor {
+    'mailer-from-address' = 'sender@tigase.org'
+    'mailer-smtp-host' = 'mail.tigase.org'
+    'mailer-smtp-password' = '********'
+    'mailer-smtp-port' = '587'
+    'mailer-smtp-username' = 'sender'
+    'mailer-to-addresses' = 'receiver@tigase.org,admin@tigase.org'
+}
 -----
 
-- +monitor/mailer-smtp-host+ - SMTP Server hostname.
-- +monitor/mailer-smtp-port+ - SMTP Server port.
-- +monitor/mailer-smtp-usernam+ - name of sender account.
-- +monitor/mailer-smtp-password+ - password of sender account.
-- +monitor/mailer-from-address+ - sender email address. It will be set in field from in email.
-- +monitor/mailer-to-addresses+ - comma separated notification receivers email addresses.
+Here is an explination of those variables.
+
+- `mailer-smtp-host` - SMTP Server hostname.
+- `mailer-smtp-port` - SMTP Server port.
+- `mailer-smtp-usernam` - name of sender account.
+- `mailer-smtp-password` - password of sender account.
+- `mailer-from-address` - sender email address. It will be set in field from in email.
+- `mailer-to-addresses` - comma separated notification receivers email addresses.
 
 It is recommended to create a specific e-mail address in your mail server for this purpose only, as the account settings are stored in plaintext without encryption.

@@ -1,7 +1,7 @@
 [[setUpRemoteMonitoring]]
 = Setting Up Remote Monitoring in the Server
 :author: unknown
-:version: v1.0
+:version: v2.0 Reformatted for v7.2.0.
 :date: 2010-04-06 21:18
 
 Tigase server can be remotely monitored over following protocols: *JMX/RMI*, *SNMP* and *HTTP*. Even though JMX offers the biggest control and visibility to the server states, all of the monitoring services give the same basic set of the server statistics:
@@ -18,7 +18,7 @@ The monitoring itself causes very low overhead in terms of the resources and CPU
 *Note.* _This works with the Tigase server from version_ *4.2.0* _or SVN revision_ *1418*.
 
 == What You Need
-Using v7.2.0 and later, statistics binaries are built-in dist-max and no extra files are needed.  If you have downloaded -dist file, you will need tigase-extras.
+Statistics binaries are built-in dist-max and no extra files are needed.  If you have downloaded -dist file, you will need tigase-extras.
 
 To ensure, one files is necessary to run monitoring:
 
@@ -31,7 +31,7 @@ File should be in the /jars directory.
 == Activation
 
 You can either run the Tigase installer and use the configuration wizard to activate the monitoring or edit etc/init.properties file and add following lines:
-
+[source,dsl]
 -----
 monitoring() {
   jmx() {
@@ -62,7 +62,7 @@ Both JMX and SNMP offer security protection to limit access to monitoring data. 
 == JMX
 After the server installation or in the SVN repository you can find 2 files in the *etc/* directory: *jmx.access* and *jmx.password*.
 
-- *jmx.access* is a user permission file. You can use it to specify whether the user can access the monitoring data for reading only 'readonly' or with read-write 'readwrite' access. There are example entries in the file already and the content may simply look like:
+- *jmx.access* is a user permission file. You can use it to specify whether the user can access the monitoring data for reading only `readonly` or with read-write `readwrite` access. There are example entries in the file already and the content may simply look like:
 +
 [source,bash]
 -----

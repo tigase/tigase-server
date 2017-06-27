@@ -8,19 +8,35 @@ Client to server communication is an integral part of XMPP communication.  C2S h
 C2S CAN be disabled, however doing so will only allow communication of internal components, and S2S communications.
 
 = Configuration
+To disable C2S, use the following lines in init.properties folder.
+
+[source,dsl]
+-----
+c2s (active: false) {}
+-----
+
+Otherwise, C2S component is activated by default.
 
 == Resumption timeout
 It is now possible to set a default stream resumption timeout that the server uses.  This allows control of how long a server will wait for a reconnection from a client.  This can be particularly helpful to manage mobile clients connecting to your server as they may not have complete coverage, and you do not want to close the stream right away.
 By default, Tigase sets this value to 60 seconds.
 
-[source,properties]
+[source,dsl]
 -----
-c2s/processors/urn\:xmpp\:sm\:3/resumption-timeout[I]=90
+c2s {
+    'urn:xmpp:sm:3' {
+        'resumption-timeout' = 90
+    }
+}
 -----
 This sets the default timeout to 90 seconds.  You may, if you choose, specify a maximum timout time, which will allow the server to wait between the default and maximum before a connection is closed.
-[source,properties]
+[source,dsl]
 -----
-c2s/processors/urn\:xmpp\:sm\:3/max-resumption-timeout[I]=900
+c2s {
+    'urn:xmpp:sm:3' {
+        'max-resumption-timeout' = 900
+    }
+}
 -----
 
 NOTE: If the max-resumption-timeout is not set, it will always equal the resumption-timeout number, or default is none is set.

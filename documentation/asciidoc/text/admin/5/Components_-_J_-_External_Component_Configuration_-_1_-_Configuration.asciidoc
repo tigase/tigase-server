@@ -17,8 +17,7 @@ Following 2 lines in the +init.properties+ will load the component during the se
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 -----
 
 While this would load the component, there are no additional configurations provided to the component would be practically useless. It is possible to add necessary parameters (external domains, passwords) during run-time via ad-hoc commands. It is generally a good practice to provide some initial parameters in the configuration file too.
@@ -36,8 +35,7 @@ For such a scenario we need 3 lines in the +init.properties+ file:
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = muc.devel.tigase.org:muc-secret:listen:5270
 -----
 
@@ -50,8 +48,7 @@ Let's say then that we want Tigase server accept two more domains with correspon
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = muc.devel.tigase.org:muc-secret:listen:5270, \
     pubsub.devel.tigase.org:pubsub_pass, \
     msn.devel.tigase.org:msn_pass
@@ -66,8 +63,7 @@ However, if for some reason you need Tigase to listen on more ports then this is
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = muc.devel.tigase.org:muc-secret:listen:5270, \
    pubsub.devel.tigase.org:pubsub_pass:listen:5271, \
    msn.devel.tigase.org:msn_pass:listen:5272
@@ -84,8 +80,7 @@ To make Tigase connect to an external component you have to change 'listen' para
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = devel.tigase.org:muc-secret:connect:5270:muc.devel.tigase.org
 -----
 
@@ -95,8 +90,7 @@ You can of course set as many as you need external components to which you want 
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = devel.tigase.org:mucsecret:connect:5270:muc.devel.tigase.org, \
   devel.tigase.org:pubsub_pass:connect:5271:pubsub.devel.tigase.org, \
   devel.tigase.org:msn_pass:connect:5272:msn.devel.tigase.org
@@ -120,8 +114,7 @@ An example configuration with protocol specified:
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = devel.tigase.org:mucsecret:connect:5270:muc.devel.tigase.org:accept, \
   devel.tigase.org:pubsub_pass:connect:5270:pubsub.devel.tigase.org:client
 -----
@@ -137,8 +130,7 @@ An example configuration with load balancer plugin specified:
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+ext (class: tigase.server.ext.ComponentProtocol) {}
 --external = muc.devel.tigase.org:mucsecret:listen:5270:devel.tigase.org:accept:ReceiverBareJidLB, \
   pubsub.devel.tigase.org:pubsub_pass:listen:5270:devel.tigase.org:accept:SenderBareJidLB
 -----
