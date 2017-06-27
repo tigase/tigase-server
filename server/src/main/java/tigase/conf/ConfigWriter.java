@@ -79,7 +79,12 @@ public class ConfigWriter {
 					beanDefinition.setClazzName((String) v);
 					break;
 				default:
-					map.put(key, v);
+					Object old = map.get(key);
+					if (old != null && old instanceof Map && v instanceof Map) {
+						((Map<String, Object>) old).putAll((Map<String, Object>) v);
+					} else {
+						map.put(key, v);
+					}
 					break;
 			}
 		});
