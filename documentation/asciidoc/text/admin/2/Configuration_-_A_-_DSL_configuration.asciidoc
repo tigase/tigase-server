@@ -208,6 +208,7 @@ WARNING: For properties which accepts lists it is not allowed to set value using
 `property = [ env('some-variable') + ',other-value' ]`. It needs to be set in following way `property = env('some-variable') + ',other-value'`.
 
 == Example configuration file in DSL
+[source,dsl]
 ----
 # Enable cluster mode
 --cluster-mode = true
@@ -286,7 +287,7 @@ sess-man {
 == Default configuration
 Tigase XMPP Server is packaged with a basic init.properties file that tells the server to start up in setup mode.
 
-[source,properties]
+[source,dsl]
 -----
 'config-type' = 'setup'
 

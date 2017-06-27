@@ -15,7 +15,7 @@ The main parameter is a maximum number of opened files allowed for the process t
 
 This limit is set on 2 levels - on the kernel level (*fs.file-max*) and on the system level (*nofile*).
 
-Another kernel property which can be important in certain configurations (like transports installations or when you use proxy for Bosh connections) is: *net.ipv4.ip_local_port_range*. This parameter can be set the same way as the +fs.file-max+ property.
+Another kernel property which can be important in certain configurations (like transports installations or when you use proxy for Bosh connections) is: *net.ipv4.ip_local_port_range*. This parameter can be set the same way as the `fs.file-max` property.
 
 == fs.file-max
 
@@ -88,11 +88,11 @@ Command:
 # sysctl -p
 -----
 
-Causes the +/etc/systcl.conf+ to be reloaded which is useful when you have added more parameters to the file and don't want to restart the server.
+Causes the `/etc/systcl.conf` to be reloaded which is useful when you have added more parameters to the file and don't want to restart the server.
 
 == nofile
 
-This is the property used by the system limits. For example running the command +ulimit -a+ shows you all limits set for the current user:
+This is the property used by the system limits. For example running the command `ulimit -a` shows you all limits set for the current user:
 
 [source,sh]
 -----
@@ -139,7 +139,7 @@ file locks                      (-x) unlimited
 
 The hard limits are usually bigger then the soft limits or sometimes the same.
 
-For us the most important parameter is: *open files*. You can change the property in file: +/etc/security/limits.conf+. You have to append 2 following lines to the end of the file:
+For us the most important parameter is: *open files*. You can change the property in file: `/etc/security/limits.conf`. You have to append 2 following lines to the end of the file:
 
 [source,sh]
 -----

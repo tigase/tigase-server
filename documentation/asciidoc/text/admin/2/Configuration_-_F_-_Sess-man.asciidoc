@@ -1,7 +1,7 @@
 [[sessMan]]
 = Session Manager
 :author: Daniel Wisnewski
-:version: v1.0 June 2016
+:version: v2.0 June 2017: Reformatted for v7.2
 :date: 24-06-2016 11:00
 
 Tigase Session Manager is where most of Tigase basic options can be configured, and where many operations are controlled from.
@@ -15,9 +15,15 @@ This employment is contained within the processor +ClientStateIndication+ and is
 However, this can be fine tuned by using mobile plugins from Tigase which can be used at the same time by adding the following line to the init.properties file:
 [source,properties]
 -----
-sess-man/plugins-conf/urn\:xmpp\:csi\:0/logic=tigase.xmpp.impl.MobileV1
+}
+'sess-man' {
+    'urn:xmpp:csi:0' {
+        logic = 'tigase.xmpp.impl.MobileV1'
+    }
+}
 -----
-Options are:
+
+Logic Options are:
 
 === MobileV1
 Keeps all presence stanzas in queue until client is active.
@@ -34,7 +40,10 @@ Keeps the same presence logic as MobileV2, but also queues Message Carbons.
 If you wish to not use the +ClientStateIndication+ processor, set the following in your init.properties file:
 [source,properties]
 -----
---sm-plugins=-urn:xmpp:csi:0
+}
+'sess-man' {
+    'urn:xmpp:csi:0' (active: false) {}
+}
 -----
 
 === A note about Mobile Plugins

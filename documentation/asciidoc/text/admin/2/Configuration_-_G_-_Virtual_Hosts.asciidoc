@@ -1,7 +1,7 @@
 [[tigase41virtualHosts]]
 = Virtual Hosts in Tigase Server
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:version: v2.1, June 2017: Reformatted for v7.2.
 :date: 2010-04-06 21:18
 :revision: v2.1
 
@@ -9,7 +9,7 @@
 :numbered:
 :website: http://tigase.net
 
-Tigase server supports multiple virtual hosts in a single server installation. This is supported via link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/vhosts/VHostManagerIfc.java[VHostManager] - the new Tigase server component added recently to the implementation. Virtual hosts can be added or removed, enabled or disabled during runtime without restarting the service or disrupting normal operation.
+Tigase server supports multiple virtual hosts in a single server installation.  Virtual hosts can be added or removed, enabled or disabled during runtime without restarting the service or disrupting normal operation.
 
 This document describes how virtual hosts work in Tigase server and how to get the most out of this feature in your installation.
 

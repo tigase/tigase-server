@@ -3,22 +3,15 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v1.0, April 2017
 :date: 2017-04-04 09:08
+:revision: v2.0 Reformatted for v7.2.0
 
 :toc:
 :numbered:
 :website: http://tigase.net
 
-Logging can be an important tool to monitor your server's health and performence. With the release of DSL configuration logging may be controlled and customized on a per-component basis.
+Logging can be an important tool to monitor your server's health and performence. Logging may be controlled and customized on a per-component basis.
 
-Logging configuration by pacage may still be used in the init.properties file as before:
-
-[source,config]
------
---debug=server
---debug-packages=tigase.conf
------
-
-However, with DSL, a `logging` bean has been implemented to allow more fine configuration of each component.
+A `logging` bean has been implemented to allow more fine configuration of each component.
 
 [source,config]
 -----
@@ -64,3 +57,10 @@ You only need to specify the settings you wish to customize, otherwise they will
 . *ConsoleHandler* - Determines the formatting for Tigase output to console.
 .. *level* - specifies the level of logs to be written, default is WARNING.
 .. *formatter* - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
+
+You can still use the old logging configuration as well.  However we only recommend using this on basic installations.
+[source,properties]
+-----
+--debug=server
+--debug-packages=tigase.conf
+-----
