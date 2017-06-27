@@ -27,11 +27,11 @@ x.x.x is the major version the builds are working towards, with yyyy being the s
 
 Just like the standard distributions, the builds are available with the following extensions:
 
-. -javadoc.jar - Java installer for javadoc only
-. -dist.zip - Compressed binaries with no dependencies.
-. -dist.tar.gz - tarball compressed binaries with no dependencies.
-. -dist-max.zip - Compressed binaries with all dependencies.
-. -dist-max.tar.gz - tarball compressed binaries with all dependencies.
+. javadoc.jar - Java installer for javadoc only
+. dist.zip - Compressed binaries with no dependencies.
+. dist.tar.gz - tarball compressed binaries with no dependencies.
+. dist-max.zip - Compressed binaries with all dependencies.
+. dist-max.tar.gz - tarball compressed binaries with all dependencies.
 
 We also provide automated testing of each of our nightly builds for each supported databases.  Tests are done with both functional and low memory parameters in mind, and are available link:http://build.xmpp-test.net/nightlies/tests/[at this link].  These tests can provide a quick examination of function before upgrading your current build.
 
