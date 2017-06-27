@@ -600,11 +600,13 @@ public class ConfigHolder {
 
 			String external = (String) props.remove("--external");
 			if (external != null) {
-				props.forEach((k, v) -> {
-					if (k.endsWith("/class") && v.equals(ComponentProtocol.class.getCanonicalName())) {
-						toAdd.put(k.replace("/class", "/repository/items"), v);
-					}
-				});
+				Optional<String> extCmpName = toAdd.entrySet()
+						.stream()
+						.filter(e -> e.getKey().endsWith("/class") &&
+								e.getValue().equals(ComponentProtocol.class.getCanonicalName()))
+						.map(e -> e.getKey().replace("/class", ""))
+						.findFirst();
+				extCmpName.ifPresent(cmpName -> toAdd.put(cmpName + "/repository/items", Arrays.asList(external.split(","))));
 			}
 
 			String admins = (String) props.remove("--admins");

@@ -23,6 +23,7 @@ package tigase.conf;
 import org.junit.Test;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.CmdAcl;
+import tigase.server.ext.ComponentProtocol;
 import tigase.xmpp.impl.roster.DynamicRosterTest;
 import tigase.xmpp.impl.roster.DynamicRosterTest123;
 
@@ -211,6 +212,27 @@ public class ConfigHolderTest {
 
 		Map<String, Object> result = ConfigWriter.buildTree(props);
 		assertEquals(10000, result.get("max-queue-size"));
+	}
+
+	@Test
+	public void testConversionOfExtComponentProperties() throws IOException {
+		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
+		Map<String, Object> props = reader.loadFromPropertyStrings(
+				Arrays.asList("--external=muc1.devel.tigase.org:passwd1,muc2.devel.tigase.org:passwd2",
+							  "--comp-name-1=ext", "--comp-class-1=" + ComponentProtocol.class.getCanonicalName()));
+
+		reader.convertFromOldFormat();
+
+		Map<String, Object> result = ConfigWriter.buildTree(props);
+		Map<String, Object> ext = (Map<String, Object>) result.get("ext");
+		assertNotNull(ext);
+		Map<String, Object> repo = (Map<String, Object>) ext.get("repository");
+		assertNotNull(repo);
+		List<String> items = (List<String>) repo.get("items");
+		assertNotNull(items);
+		assertEquals(2, items.size());
+		assertEquals("muc1.devel.tigase.org:passwd1", items.get(0));
+		assertEquals("muc2.devel.tigase.org:passwd2", items.get(1));
 	}
 
 }
