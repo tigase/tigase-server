@@ -15,7 +15,6 @@ This section keeps set of documents which apply to all the Tigase server version
 - xref:systemchecks[Basic System Checks]
 - xref:addManageDomain[Add and Manage Domains]
 - xref:presenceForwarding[Presence Forwarding]
-- xref:registerXMPP[Register Your Own XMPP Domain]
 - xref:Pymsn-t[Tigase and PyMSN Transport]
 - xref:multiplesessionmanagers[Multiple Session Managers]
 - xref:watchdog[Watchdog]

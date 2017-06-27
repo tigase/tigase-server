@@ -25,7 +25,7 @@ All basic components support clustering configuration, and some may be turned on
 To enable Clustering on Tigase servers, use the following line in your init.properties file:
 [source,properties]
 -----
---cluster-mode=true
+--cluster-mode = true
 -----
 
 That's it!
@@ -34,23 +34,33 @@ That's it!
 You can customize ports for the cluster component, just be sure that each clustered server also has the same settings so they can communicate.
 [source,properties]
 -----
---cl-comp-ports=4250,3540
+--cl-comp-ports = '4250,3540'
 -----
 You can fine tune each port configuration, however this is not typically needed.
 
 ==== Custom Port Configuration
 Each port has it's own details that can be manipulated VIA the following ports.  Again *THIS IS OPTIONAL*
-[source,properties]
+[source,dsl]
 -----
-cl-comp/connections/4250/type[S]=accept
-cl-comp/connections/4250/socket[S]=plain
-cl-comp/connections/4250/ifc[s]=*
-cl-comp/connections/4250/remote-host[S]=localhost
-cl-comp/connections/4250/connections/tls/required[B]=false
+'cl-comp' {
+    connections {
+        4250 {
+            ifc = [ '*' ]
+            'remote-host' = 'localhost'
+            socket = 'plain'
+            type = 'accept'
+            connections {
+                tls {
+                    required = false
+                }
+            }
+        }
+    }
+}
 -----
 
 === Multi-node configuration
-Each node should have +--cluster-mode=true+ enabled that you wish to connect to the cluster.  They will automatically discover other nodes to connect to VIA Server to Server traffic.
+Each node should have `--cluster-mode = true` enabled that you wish to connect to the cluster.  They will automatically discover other nodes to connect to VIA Server to Server traffic.
 Nodes that are added or removed will be periodically updated.
 
 === Traffic Control
@@ -60,7 +70,7 @@ You can customize the traffic going between clustered servers with a few options
 This setting will control the number of bytes sent over non-user connections.  Namely, Server to Server or S2S connections.
 [source,properties]
 -----
---cm-ht-traffic-throttling=xmpp:25k:0:disc,bin:200m:0:disc
+--cm-ht-traffic-throttling = 'xmpp:25k:0:disc,bin:200m:0:disc'
 -----
 The format is as follows: {traffic-type}:{maximum-traffic}:{max-lifespan-traffic}:{action}
 - *traffic-type* Specifies the type of traffic controlled.  This can either be *XMPP* or *bin*.  XMPP limits the number of packets transferred, whereas bin limits the number of bytes transferred.
@@ -69,7 +79,7 @@ The format is as follows: {traffic-type}:{maximum-traffic}:{max-lifespan-traffic
 - *action* Specifies the action to be taken which can be *disc* which disconnects the connection, or *drop* which will drop any data exceeding the thresholds.
 
 ==== cm-see-other-host
-This allows the specific use of a load balancing mechanism by selecting +SeeOtherHostIfc+ implementation.
+This allows the specific use of a load balancing mechanism by selecting `SeeOtherHostIfc` implementation.
 For more details, see xref:loadBalanding[Tigase Load Balancing] documentation.
 
 == Old configuration method
@@ -81,12 +91,12 @@ You can still use the old method of specifying every node on each server.
 Server 3 needs the following set
 [source,properties]
 -----
---cluster-nodes=serv1.xmpp-test.org,serv2.xmpp-test.org
+--cluster-nodes = 'serv1.xmpp-test.org,serv2.xmpp-test.org'
 -----
 Server 2 needs
 [source,properties]
 -----
---cluster-nodes=serv1.xmpp-test.org,serv3.xmpp-test.org
+--cluster-nodes = 'serv1.xmpp-test.org,serv3.xmpp-test.org'
 -----
 and so on...
 
@@ -94,7 +104,7 @@ and so on...
 You may specify a password and port to specific cluster servers if that is required.  To do so, you will need to add {password}:{port} to the domain, like this example:
 [source,properties]
 -----
---cluster-nodes=serv1.xmpp-test.org:domainpass:5600
+--cluster-nodes = 'serv1.xmpp-test.org:domainpass:5600'
 -----
 
 == Checking Cluster Connections

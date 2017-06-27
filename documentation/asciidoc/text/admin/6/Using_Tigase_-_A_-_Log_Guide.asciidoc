@@ -43,7 +43,6 @@ Lets take the value for admins, listing who is administrator for the server.
 basic-conf/admins[s]=admin@jabber.freehost.org, administrator@jabber.freehost.org, fJones@jabber.freehost.org
 -----
 The admin parameter which is an array of strings noted by the s, has 3 users listed.
-*NOTE* you can lookup the available Data types in the xref:initPropertiesGuide[init.properties guide].
 
 This file is re-written every time tigase starts.
 
@@ -66,10 +65,14 @@ tigase.log can get very large in size rather quickly reaching it's maximum size.
 
 By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of 10 files. You can edit these values by editing the init.properties guide and adding the following lines.
 
-[source,bash]
+[source,dsl]
 -----
-basic-conf/logging/java.util.logging.FileHandler.limit=20000000
-basic-conf/logging/java.util.logging.FileHandler.count=15
+logging {
+    java.util.logging.FileHandler {
+        count = '15'
+        limit = '20000000'
+    }
+}
 -----
 This code, if entered into the init.properties file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
 
@@ -102,10 +105,14 @@ This file can be handy if you are tracking issues in the server.
 tigase-console.log is appended during each run session of the server.
 
 == Log File Location
-You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following line in your init.properties file:
-[source,properties]
+You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following lines in your init.properties file:
+[source,dsl]
 -----
-basic-conf/logging/java.util.logging.FileHandler.pattern=/var/log/tigase/tigase.log
+logging {
+    java.util.logging.FileHandler {
+        pattern = '/var/log/tigase/tigase.log'
+    }
+}
 -----
 
 This setting changes the log file location to /var/log/tigase/ where all log files will be made.  Files in the original location will be left.

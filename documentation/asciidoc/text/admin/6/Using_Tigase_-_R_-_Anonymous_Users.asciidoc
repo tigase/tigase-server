@@ -17,11 +17,9 @@ This setting is false by default as SASL-ANONYMOUS may not be totally secure as 
 This is a *global* setting and will affect all vhosts unless they are set individually.  If you wish to allow only certain hosts to allow anonymous login, then use the --virt-hosts configuration like below:
 [source,properties]
 -----
---virt-hosts=domain1:-anon, domain2:c2s-ports-allowed=5032:-tls-required
+--virt-hosts = 'domain1:-anon, domain2:c2s-ports-allowed=5032:-tls-required'
 -----
 Where domain1 now has anonymous access allowed, and domain2 does not.
-
-
 
 == Anonymous User Features
 To connect to your server anonymously, you must use a client that supports anonymous authentication and users.  Connect to the server with the name of the server as the username, and no password.

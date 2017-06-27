@@ -159,7 +159,7 @@ TIGASE_OPTIONS="--gen-config-all --admins \"tus@test-d\"
 
 [source,sh]
 -----
-./bin/tigase.sh start etc/tigase.conf
+./scripts/tigase.sh start etc/tigase.conf
 -----
 
 == Tigase - expected output

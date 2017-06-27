@@ -31,7 +31,7 @@ To solve the problem a *routing* concept has been introduced. You can define pac
 
 As you can see this routing table forwards all packets to a single destination - the session manager located on the *tigase.org* server.
 
-Now let's say we have two session managers, each of them is responsible for a separate +domain.sm1@tigase.org+ handling requests for *tigase.org* and +sm2@tigase.net+ handling requests for domain *tigase.net*. The modifications to the configuration to properly spread the traffic between the two session managers would look like this:
+Now let's say we have two session managers, each of them is responsible for a separate `domain.sm1@tigase.org` handling requests for *tigase.org* and `sm2@tigase.net` handling requests for domain *tigase.net*. The modifications to the configuration to properly spread the traffic between the two session managers would look like this:
 
 [source,bash]
 -----

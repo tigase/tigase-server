@@ -16,43 +16,47 @@ No extra setup is necessary, Watchdog is already included with your build of Tig
 
 == Watchdog Configuration
 To configure watchdog, the following lines need to be present or edited in init.properties file:
-[source,bash]
+[source,dsl]
 -----
 --watchdog_timeout=70000
 --watchdog_delay=60000
 --watchdog_ping_type=xmpp
 -----
+
 The three settings are as follows:
-- +--watchdog_timeout=70000+ This setting sets the amount of time that watchdog will consider before it determines a connection may be stale. This setting sets the timeout at 70000ms or 70 seconds.
-- +--watchdog_delay=60000+ This setting sets how often the watchdog should conduct the check, current setting sets the delay at 60000ms or 60 seconds.
-- +--watchdog_ping_type=whitespace+ This setting determines the type of ping sent to components when watchdog is testing for activity.
+- `--watchdog_timeout=70000` This setting sets the amount of time that watchdog will consider before it determines a connection may be stale. This setting sets the timeout at 70000ms or 70 seconds.
+- `--watchdog_delay=60000` This setting sets how often the watchdog should conduct the check, current setting sets the delay at 60000ms or 60 seconds.
+- `--watchdog_ping_type=whitespace` This setting determines the type of ping sent to components when watchdog is testing for activity.
 
 You may, if you choose, to specify individual watchdog settings for specific components by adding them to the component settings, for example if we wanted to change the Client2Server settings to include watchdog, use the following lines in init.properties:
-[source,bash]
+[source,dsl]
 -----
-c2s/watchdog_timeout=3000
-c2s/watchdog_delay=1500
+c2s {
+    watchdog_delay = '1500'
+    watchdog_timeout = '3000'
+}
 -----
+
 If any settings are not set, the global or settings will be used.
-+watchdog_delay+ default is set to 10 min
-+watchdog_ping_type+ default is set to xmpp
+`watchdog_delay` default is set to 10 min
+`watchdog_ping_type` default is set to xmpp
 
 == Logic
 Watchdog compares it's own pings, and records the time it takes for a round trip to different components, clustered connections, and if one variable is larger than the other, watchdog will commence closing that stale connection.
 Here is a breakdown:
 
-. A check is performed of a connection(s) on every +watchdog_delay+ interval.
+. A check is performed of a connection(s) on every `watchdog_delay` interval.
 . During this check two things occur
-  * If the last transfer time exceeds +max-inactivity-time+ a stop service command is given to terminate and broadcast unavailable presence.
-  * If the last transfer time is lower than +max-inactivity-time+ but exceeds +watchdog_timeout+ watchdog will try to send a ping (of +watchdog_ping_type+).
+  * If the last transfer time exceeds `max-inactivity-time` a stop service command is given to terminate and broadcast unavailable presence.
+  * If the last transfer time is lower than `max-inactivity-time` but exceeds `watchdog_timeout` watchdog will try to send a ping (of `watchdog_ping_type`).
   This ping may be one of two varieties (set in init.properties)
-    - +whitespace+ ping which will yield the time of the last data transfer in any direction.
-    - +xmpp+ ping which will yield the time of the last received xmpp stanza.
+    - `whitespace` ping which will yield the time of the last data transfer in any direction.
+    - `xmpp` ping which will yield the time of the last received xmpp stanza.
 . If the 2nd option is true, the connection will remain open, and another check will begin after the +watchdog_delay+ time has expired.
 
 For example, lets draw this out and get a visual representation
 
-This line represents how often the check is performed. Each - is 10 seconds, so the check is done every 60 seconds (watchdog_delay=60000)
+This line represents how often the check is performed. Each - is 10 seconds, so the check is done every 60 seconds (`watchdog_delay=60000`)
 -----
 -----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+------
 
@@ -65,7 +69,15 @@ This line is client activity, here the client has sent a message at 20 seconds a
 -+------------------------------------------------------------------
 -----
 
-The following line represents the logic, with settings set at: +watchdog_timeout=120000 | +c2s/max-inactivity-time[L]=180000+ (timeout at 120 seconds and max inactivity timeout at 180 seconds)
+The following line represents the logic, with settings set at:
+[source,dsl]
+-----
+watchdog_timeout=120000
+c2s {
+    'max-inactivity-time' = '180000'
+}
+(timeout at 120 seconds and max inactivity timeout at 180 seconds)
+-----
 
 -----
  1   2     3     4     5     6
@@ -83,15 +95,26 @@ It is possible that the connection is broken, and could be detected during the s
 
 *NOTE: Global settings may not be ideal for every setup. Since each component has its own settings for +max-inactivity-time+ you may find it necessary to design custom watchdog settings, or edit the inactivity times to better suit your needs.  Below is a short list of components with thier default settings:*
 
+[source,dsl]
 -----
-bosh/max-inactivity-time[L]=600
-c2s/max-inactivity-time[L]=86400
-cl-comp/max-inactivity-time[L]=180
-s2s/max-inactivity-time[L]=900
-ws2s/max-inactivity-time[L]=86400
+bosh {
+    'max-inactivity-time' = 600L
+}
+c2s {
+    'max-inactivity-time' = 86400L
+}
+'cl-comp' {
+    'max-inactivity-time' = 180L
+}
+s2s {
+    'max-inactivity-time' = 900L
+}
+ws2s {
+    'max-inactivity-time' = 86400L
+}
 -----
 
-Again remember, for Watchdog to properly work, the +max-inactivity-time+ MUST be longer than the +watchdog_timeout+ setting
+Again remember, for Watchdog to properly work, the `max-inactivity-time` MUST be longer than the `watchdog_timeout` setting
 
 
 == Testing
