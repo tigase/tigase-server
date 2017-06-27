@@ -12,9 +12,12 @@ The articles here cover advanced security features built into to Tigase Server, 
 The simplest security feature, however, inside an XMPP server is the ability to block users and JIDS. link:http://xmpp.org/extensions/xep-0191[XEP-0191] specifies the parameters of simple blocking without using privacy lists. Below is a breakdown and some sample commands you may find helpful.
 To enable this feature, be sure the following is in your init.properties file:
 ----
---sm-plugins +urn:xmpp:blocking
+}
+'sess-man' {
+    'urn:xmpp:blocking' () {}
+}
 ----
-If you have other plugins running, then just add ++urn:blocking+ to the list to activate this feature.
+If you have other plugins running, then just add `'urn:xmpp:blocking' () {}` to the list to activate this feature.
 
 
 To confirm if your installation of Tigase supports this feature, a quick disco#info of your server should reveal the following feature:
