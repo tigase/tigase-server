@@ -31,53 +31,72 @@ Current list of features included in the integration:
 
 A few assumptions:
 
-. LibreSource data are kept in PostgreSQL database - +libresource+ and database user is demo.
-. For use in cases where Tigase data are stored in MySQL database name is tigase, database user is dbuser and database user password is +dbpass+
+. LibreSource data are kept in PostgreSQL database - `libresource` and database user is demo.
+. For use in cases where Tigase data are stored in MySQL database name is tigase, database user is dbuser and database user password is `dbpass`
 
 == How to set Tigase up
-Now we will focus on setting things up to have both services up and running together. Below is example of the most complex environment to run where LibreSource is using PostgreSQL database and Tigase is using a MySQL database. All basic user data needed for authentication is kept by LibreSource, so Tigase has to connect to PostgreSQL database also in order to authenticate users.
+Now we will focus on setting things up to have both services up and running together.
+Below is example of the most complex environment to run where LibreSource is using PostgreSQL database and Tigase is using a MySQL database. All basic user data needed for authentication is kept by LibreSource, so Tigase has to connect to PostgreSQL database also in order to authenticate users.
 
-. First you need LibreSource system up and running. Please refer to LS documentation for details.
+. First you need LibreSource system up and running. Please refer to link:http://dev.libresource.org/home/doc[LS documentation] for details.
 . Install Tigase server in the normal way including loading Tigase database schema. Database tables used by Tigase server use different naming convention so you can simply load Tigase DB schema to the same database as LibreSource data. It is also possible and recommended to keep Tigase data in separate database.
 . Using configuration wizards generate configuration for Tigase server to connect to LibreSource database. Here is the sample file with parameters for configuration wizard assuming following setup:
-  - LibreSource data are kept in PostgreSQL database: +libresource,+ user: +demo+
-  - Tigase data are kept in MySQL database: +tigase+, user: +dbuser+, password: +dbpass+
+  - LibreSource data are kept in PostgreSQL database: `libresource`,+ user: `demo`
+  - Tigase data are kept in MySQL database: `tigase`, user: `dbuser`, password: `dbpass`
   - No external components are connected to Tigase server
-  - Tigase works for domain: +domain.net+
-+
-[source,bash]
------
-ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
-DRV="-Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver"
+  - Tigase works for domain: `domain.net`
 
-JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
-TIGASE_CONFIG="etc/tigase-mysql-libresource.xml"
-TIGASE_OPTIONS="--gen-config-def \
-  --user-db mysql \
-  --user-db-uri jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass&autoCreateUser=true \
-  --auth-db libresource \
-  --auth-db-uri jdbc:postgresql://localhost/libresource?user=demo \
-  --virt-hosts domain.net,localhost "
+[source,DSL]
 -----
+--gen-config-def =
+--virt-hosts = 'domain.net,localhost'
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/tigase?user=dbuser&password=dbpass&autoCreateUser=true'
+        cls = 'com.mysql.jdbc.Driver:org.postgresql.Driver'
+    }
+    'default-auth' () {
+        uri = 'jdbc:postgresql://localhost/libresource?user=demo'
+        cls = 'com.mysql.jdbc.Driver:org.postgresql.Driver'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {
+        'data-source' = 'default-auth'
+    }
+}
+-----
+
 . A simpler example where all data (LibreSource and Tigase) are stored in the same database:
-  - LibreSource data are kept in PostgreSQL database: +libresource+, user: +demo+
-  - Tigase data are kept also in PostgreSQL database: +libresource+, user: +demo+
+  - LibreSource data are kept in PostgreSQL database: `libresource`, user: `demo`
+  - Tigase data is also kept in PostgreSQL database: `libresource`, user: `demo`
   - No external components are connected to Tigase server
-  - Tigase works for domain: +domain.net+
-+
-[source,bash]
------
-ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
-DRV="-Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver"
+  - Tigase works for domain: `domain.net`
 
-JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
-TIGASE_CONFIG="etc/tigase-mysql-libresource.xml"
-TIGASE_OPTIONS="--gen-config-def \
-  --user-db pgsql \
-  --user-db-uri jdbc:postgresql://localhost/libresource?user=demo&autoCreateUser=true \
-  --auth-db libresource \
-  --auth-db-uri jdbc:postgresql://localhost/libresource?user=demo \
-  --virt-hosts domain.net,localhost "
+[source,dsl]
+-----
+--gen-config-def =
+'-virt-hosts' = 'domain.net,localhost'
+dataSource {
+    default () {
+        uri = 'jdbc:postgresql://localhost/libresource?user=demo&autoCreateUser=true'
+    }
+    'default-auth' () {
+        uri = 'jdbc:postgresql://localhost/libresource?user=demo'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {
+        cls = 'tigase.db.jdbc.LibreSourceAuth'
+        'data-source' = 'default-auth'
+    }
+}
 -----
 
 Now, you can run Tigase as normal and it all works.

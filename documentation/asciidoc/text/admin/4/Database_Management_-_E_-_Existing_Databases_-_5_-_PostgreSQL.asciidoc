@@ -1,9 +1,8 @@
 [[postgresDB2]]
 = PostgreSQL Database Use
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:version: v2.1, June 2017: Reformatted for v7.2.0.
 :date: 2010-04-06 21:16
-:revision: v2.1
 
 :toc:
 :numbered:
@@ -42,11 +41,13 @@ Now you can load the database schema:
 Now the database is ready for Tigase server to use.
 
 == Server Configuration
-Server configuration is identical as MySQL database setup. The same jdbc module is used to connect to PostgreSQL database as for MySQL. The only difference is the connection string which usually looks like:
+Server configuration is almost identical to MySQL database setup. The only difference is the connection string which usually looks like:
 
-[source,bash]
+[source,dsl]
 -----
-jdbc:postgresql://localhost/tigasdb?user=tigase
+dataSource {
+    default () {
+        uri = 'postgresql://localhost/tigasdb?user=tigase'
+    }
+}
 -----
-
-So for more detailed guide how to change configuration refer to xref:mysql2database[MySQL database use guide] or if you look for a more automatic configuration file generation refer to xref:3xconfiguration[configuration wizards] page.

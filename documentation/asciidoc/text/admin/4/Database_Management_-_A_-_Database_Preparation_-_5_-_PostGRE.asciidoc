@@ -15,9 +15,9 @@ This guide describes how to prepare PostgreSQL database for connecting to Tigase
 
 The PostgreSQL database can be prepared in many ways. Below are presented two possible ways. The following assumptions apply to both methods:
 
-- +admin_db_user+ - database user with admin rights
-- +tigase_user+ - database user for Tigase
-- +tigasedb+ - database for Tigase
+- `admin_db_user` - database user with admin rights
+- `tigase_user` - database user for Tigase
+- `tigasedb` - database for Tigase
 
 === Configuring from PostgreSQL Command Line Tool
 

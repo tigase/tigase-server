@@ -1,9 +1,8 @@
 [[prepareMssql]]
 = Prepare the MS SQL Server Database for the Tigase Server
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:version: v2.1, June 2017: Reformatted for 7.2.0.
 :date: 2013-09-04 14:57
-:revision: v2.1
 
 :toc:
 :numbered:
@@ -100,18 +99,15 @@ If no parameters are provided then the following defaults are used:
 
 == Tigase configuration - init.properties
 
-Configuration of the MS SQL Server follows general database convention. For MS SQL Support --user-db needs to be set to sqlserver:
+Configuration of the MS SQL Server follows general database convention.
 
 [source,bash]
 -----
---user-db=sqlserver
------
-
-and the --user-db-uri needs to point to the configured database:
-
-[source,bash]
------
---user-db-uri=jdbc:[jtds:]sqlserver://db_hostname:port[;property=val]
+dataSource {
+    default () {
+        uri = 'jdbc:[jtds:]sqlserver://db_hostname:port[;property=val]'
+    }
+}
 -----
 
 where any number of additional parameters can (and should) consist of:
@@ -124,26 +120,38 @@ where any number of additional parameters can (and should) consist of:
 
 Example:
 
-[source,sh]
+[source,dsl]
 -----
---user-db-uri=jdbc:sqlserver://hostname:1433;databaseName=tigasedb;user=tigase;password=tigase12;schema=dbo;lastUpdateCount=false
+dataSource {
+    default () {
+        uri = 'jdbc:sqlserver://hostname:1433;databaseName=tigasedb;user=tigase;password=tigase12;schema=dbo;lastUpdateCount=false'
+    }
+}
 -----
 
 == JDBC: jTDS vs MS JDBC driver
 
 Tigase XMPP Server supports two JDBC drivers intended to be used with Microsoft SQL Server - one created and provided by Microsoft itself and the alternative implementation - jTDS. Tigase is shipped with the latter in the distribution packages. Starting with the version 7.1.0 we recommend using jDTS driver that is shipped with Tigase as JDBC driver created by Microsoft can cause problems with some components in cluster installations. MS driver can be downloaded form the website: link:http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774[JDBC Drivers 4.0, 4.1 for SQL Server] then unpack the archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to $\{tigase-server}/jars directory.
 
-Depending on the driver used --user-db-uri needs to be configured accordingly.
+Depending on the driver used `uri` needs to be configured accordingly.
 
 - Microsoft driver:
 +
-[source,bash]
+[source,dsl]
 -----
---user-db-uri=jdbc:sqlserver://...
+dataSource {
+    default () {
+        uri = 'jdbc:sqlserver://...'
+    }
+}
 -----
 - jDTS driver
 +
 [source,bash]
 -----
---user-db-uri=jdbc:jdts:sqlserver://...
+dataSource {
+    default () {
+        uri = 'jdbc:jdts://...'
+    }
+}
 -----

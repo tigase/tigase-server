@@ -1,9 +1,8 @@
 [[multidb]]
 = Tigase Server and Multiple Databases
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:version: v2.1, June 2017: Reformatted for v7.2.0.
 :date: 2012-10-02 04:23
-:revision: v2.1
 
 :toc:
 :numbered:
@@ -17,78 +16,210 @@ How can we do that then?
 
 This is very easy to do through the Tigase's configuration file.
 
-Typically the well known lines:
-
-[source,sh]
+[source,dsl]
 -----
---auth-db=tigase-custom
---auth-db-uri=jdbc:mysql://db1.tigase/dbname?user&password
---user-db=mysql
---user-db-uri=jdbc:mysql://db2.tigase/dbname?user&password
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://db2.tigase/dbname?user&password'
+    }
+    'default-auth' () {
+        uri = 'jdbc:mysql://db1.tigase/dbname?user&password'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {
+        cls = 'tigase.db.jdbc.TigaseCustomAuth'
+        'data-source' = 'default-auth'
+    }
+}
 -----
 
-Define just a default databases for both user repository and authentication repository. Default means it is used when there is no repository specified for a particular virtual domain. However, you can have a separate, both user and authentication repository for each virtual domain.
+This configuration defines just a default databases for both user repository and authentication repository. Default means it is used when there is no repository specified for a particular virtual domain. However, you can have a separate, both user and authentication repository for each virtual domain.
 
 Here is, how it works:
 
-[source,sh]
+First, let's define our default database for all VHosts
+[source,dsl]
 -----
-# First, let's define our default database for all VHosts
---auth-db=tigase-custom
---auth-db-uri=jdbc:mysql://db1.tigase/dbname?user&password
---user-db=mysql
---user-db-uri=jdbc:mysql://db2.tigase/dbname?user&password
-
-# Now, we have VHost: domain1.com
-# User authentication data for this VHost is stored in Drupal database
---auth-db[domain1.com]=drupal
---auth-db-uri[domain1.com]=jdbc:mysql://db7.tigase/dbname?user&password
-# All other user data is stored in Tigase's standard database in MySQL
---user-db[domain1.com]=mysql
---user-db-uri[domain1.com]=jdbc:mysql://db4.tigase/dbname?user&password
-
-# Next VHost: domain2.com
-# User authentication is in LDAP server
---auth-db[domain2.com]=tigase.db.ldap.LdapAuthProvider
-# Pretty standard Tigase's definition for the database (repository)
-#  connection string
---auth-db-uri[domain2.com]=ldap://ldap.domain2.com:389
-# Now is something new, we have a custom authentication repository
-# settings for a single domain.
-# Please note how we define the VHost for which we set custom parameters
-basic-conf/auth-repo-params/domain2.com/user-dn-pattern=cn=,ou=,dc=,dc=
-# All other user data is stored in the same as default repository
---user-db[domain2.com]=mysql
---user-db-uri[domain2.com]=jdbc:mysql://db2.tigase/dbname?user&password
-
-# Next VHost: domain3.com
-# Again user authentication is in LDAP server but pointing to
-# a different LDAP server with different access credentials
---auth-db[domain3.com]=tigase.db.ldap.LdapAuthProvider
-# Pretty standard Tigase's definition for the database
-# (repository) connection string
---auth-db-uri[domain3.com]=ldap://ldap.domain3.com:389
-# Now is something new, we have a custom authentication
-# repository settings for a single domain
-# Please note how we define the VHost for which we set custom parameters
-basic-conf/auth-repo-params/domain3.com/user-dn-pattern=cn=,ou=,dc=,dc=
-# All other user data is stored on the domain3 server in PostgreSQL database
---user-db[domain3.com]=pgsql
---user-db-uri[domain3.com]=jdbc:pgsql://db.domain3.com/dbname?user&password
-
-# For VHost: domain4.com all the data, both authentication and
-# user XMPP data are stored on a separate
-# MySQL server with custom stored procedures for both user
-# login and user logout processing.
---auth-db[domain4.com]=tigase-custom
---auth-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password
-basic-conf/auth-repo-params/domain4.com/user-login-query={ call UserLogin(?, ?) }
-basic-conf/auth-repo-params/domain4.com/user-logout-query={ call UserLogout(?) }
-basic-conf/auth-repo-params/domain4.com/sasl-mechs=PLAIN,DIGEST-MD5
---user-db[domain4.com]=mysql
---user-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://db2.tigase/dbname?user&password'
+    }
+    'default-auth' () {
+        uri = 'jdbc:mysql://db1.tigase/dbname?user&password'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {
+        cls = 'tigase.db.jdbc.TigaseCustomAuth'
+        'data-source' = 'default-auth'
+    }
+}
 -----
 
-As you can see, it requires some writing but flexibility is very extensive and you can setup as many separate databases as you need or want. If one database (recognized by the database connection string) is shared among different VHosts, Tigase still uses a single connection pool, so it won't create an excessive number of connections to the database.
+Now, we have VHost: domain1.com
+User authentication data for this VHost is stored in Drupal database
+[source,dsl]
+-----
+dataSource {
+  'domain1.com-auth' () {
+    uri = jdbc:mysql://db7.tigase/dbname?user&password'
+  }
+}
+authRepository {
+  domain1.com () {
+    cls = 'tigase/db/jdbc.TigaseCustomAuth'
+    'data-source' = 'domain1.com-auth'
+  }
+}
+-----
+All other user data is stored in Tigase's standard database in MySQL
+[source,dsl]
+-----
+dataSource {
+  'domain1.com' () {
+    uri = jdbc:mysql://db4.tigase/dbname?user&password'
+  }
+}
+userRepository {
+  domain1.com () {}
+}
+-----
 
-I hope this helps with more complex setups and configuration cases.
+Next VHost: domain2.com
+User authentication is in LDAP server
+[source,dsl]
+-----
+dataSource {
+    'domain2.com-auth' () {
+        uri = 'ldap://ldap.domain2.com:389'
+    }
+}
+authRepository {
+    domain2.com () {
+        cls = 'tigase.db.ldap.LdapAuthProvider'
+        'data-source' = 'domain2.com-auth'
+    }
+}
+-----
+
+Now is something new, we have a custom authentication repository and seperate user settings for a single domain.
+Please note how we define the VHost for which we set custom parameters
+[source,dsl]
+-----
+'basic-conf' {
+    'auth-repo-params' {
+        domain2.com {
+            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
+        }
+    }
+}
+-----
+
+All other user data is stored in the same as default repository
+[source,dsl]
+-----
+userRepository {
+    domain2.com () {}
+}
+dataSource {
+    domain2.com () {
+        uri = 'jdbc:mysql://db2.tigase/dbname?user&password'
+    }
+}
+-----
+When combined, the DSL oputput should look like this:
+
+[source,dsl]
+-----
+dataSource {
+    domain2.com () {
+        uri = 'jdbc:mysql://db2.tigase/dbname?user&password'
+    }
+    'domain2.com-auth' () {
+        uri = 'ldap://ldap.domain2.com:389'
+    }
+}
+userRepository {
+    domain2.com () {}
+}
+authRepository {
+    domain2.com () {
+        cls = 'tigase.db.ldap.LdapAuthProvider'
+        'data-source' = 'domain2.com-auth'
+    }
+}
+'basic-conf' {
+    'auth-repo-params' {
+        domain2.com {
+            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
+        }
+    }
+}
+-----
+
+Next VHost: domain3.com
+Again user authentication is in LDAP server but pointing to a different LDAP server with different access credentials and parameters.  User information is stored in a postgreSQL database.
+[source,dsl]
+-----
+dataSource {
+    domain3.com () {
+        uri = 'jdbc:pgsql://db.domain3.com/dbname?user&password'
+    }
+    'domain3.com-auth' () {
+        uri = 'ldap://ldap.domain3.com:389'
+    }
+}
+userRepository {
+    domain3.com () {}
+}
+authRepository {
+    domain3.com () {
+        cls = 'tigase.db.ldap.LdapAuthProvider'
+        'data-source' = 'domain3.com-auth'
+    }
+}
+'basic-conf' {
+    'auth-repo-params' {
+        domain3.com {
+            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
+        }
+    }
+}
+-----
+
+For VHost: domain4.com all the data, both authentication and user XMPP data are stored on a separate MySQL server with custom stored procedures for both user login and user logout processing.
+[source,dsl]
+-----
+dataSource {
+    domain4.com () {
+        uri = 'jdbc:mysql://db14.domain4.com/dbname?user&password'
+    }
+}
+userRepository {
+    domain4.com () {}
+}
+authRepository {
+    domain4.com () {
+        cls = 'tigase.db.jdbc.TigaseCustomAuth'
+    }
+}
+'basic-conf' {
+    'auth-repo-params' {
+        domain4.com {
+            'user-login-query' = '{ call UserLogin(?, ?) }'
+            'user-logout-query' = '{ call UserLogout(?) }'
+            'sasl-mechs' = 'PLAIN,DIGEST-MD5'
+        }
+    }
+}
+-----
+
+As you can see, it requires some writing but flexibility is very extensive and you can setup as many separate databases as you need or want.
+If one database (recognized by the database connection string) is shared among different VHosts, Tigase still uses a single connection pool, so it won't create an excessive number of connections to the database.
