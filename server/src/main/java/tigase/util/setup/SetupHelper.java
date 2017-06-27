@@ -29,6 +29,7 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.Kernel;
 import tigase.server.ServerComponent;
 import tigase.server.xmppsession.SessionManager;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPImplIfc;
 
 import java.util.*;
@@ -69,7 +70,7 @@ public class SetupHelper {
 
 	public static ConfigBuilder generateConfig(ConfigTypeEnum configType, String dbUri, boolean clusterMode, boolean acs,
 											   Optional<Set<String>> optionalComponentsOption, Optional<Set<String>> forceEnabledComponentsOptions, Optional<Set<String>> pluginsOption,
-											   String[] virtualDomains, Optional<String[]> admins,
+											   String[] virtualDomains, Optional<BareJID[]> admins,
 											   Optional<HttpSecurity> httpSecurity) {
 		ConfigBuilder builder = new ConfigBuilder().with("config-type", configType.id().toLowerCase());
 

@@ -399,6 +399,11 @@ public class SchemaManager {
 		config = new ConfigReader().read(reader);
 	}
 
+	public void setAdmins(List<BareJID> admins, String adminPass) {
+		this.admins = admins;
+		this.adminPass = adminPass;
+	}
+
 	public void setConfig(Map<String, Object> config) {
 		this.config = config;
 	}
