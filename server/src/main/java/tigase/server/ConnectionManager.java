@@ -211,7 +211,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description. */
-	@ConfigField(desc = "Interfaces to listen on")
+	@ConfigField(desc = "Interfaces to listen on", alias = PORT_IFC_PROP_KEY)
 	public String[]                         PORT_IFC_PROP_VAL = { "*" };
 	private long                            bytesReceived     = 0;
 	private long                            bytesSent         = 0;

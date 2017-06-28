@@ -22,6 +22,8 @@
 package tigase.conf;
 
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -265,12 +267,16 @@ public class ConfigWriter {
 			if (newLine != null)
 				writer.write(newLine);
 		} else {
-			writeString(writer, obj.toString());
+			if (obj instanceof JID || obj instanceof BareJID || obj instanceof Enum) {
+				writeString(writer, obj.toString());
+			} else {
+				writer.write(obj.toString());
+			}
 			if (obj instanceof Long) {
-				writeString(writer, "L");
+				writer.write("L");
 			}
 			if (obj instanceof Float) {
-				writeString(writer, "f");
+				writer.write("f");
 			}
 			if (newLine != null)
 				writer.write(newLine);
@@ -390,7 +396,7 @@ public class ConfigWriter {
 		}
 	}
 
-	private static final char[] RESTRICTED_CHARS = "=:,[]#+-*/".toCharArray();
+	private static final char[] RESTRICTED_CHARS = "=:,[]#+-*/@.".toCharArray();
 
 	public static boolean hasRestrictedChars(String str) {
 		for (char ch : RESTRICTED_CHARS) {

@@ -693,7 +693,7 @@ public class Kernel {
 		return false;
 	}
 
-	void injectIfRequired(final BeanConfig beanConfig) {
+	protected void injectIfRequired(final BeanConfig beanConfig) {
 		try {
 			if (!isThereSomethingWaitingFor(beanConfig)) {
 				// nothing is waiting for this bean. Skipping initialization.

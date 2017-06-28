@@ -23,10 +23,12 @@ package tigase.component;
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
+import tigase.osgi.ModulesManagerImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -190,46 +192,180 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 			BeanDefinition forBean = getBeanDefinitionFromDump(dump, bc.getBeanName());
 
 			if (forBean.getClazzName() == null) {
-				forBean.setClazzName(bc.getClazz().getCanonicalName());
+				forBean.setClazzName(bc.getClazz().getName());
 			}
 			forBean.setActive(bc.getState() != BeanConfig.State.inactive);
 			forBean.setExportable(bc.isExportable());
 
 			try {
-				Map<Field, Object> defaults = grabCurrentConfig(bc);
-				Map<String, Object> cfg = bc.getState() != BeanConfig.State.initialized ? getConfiguration(bc) : null;
-				if (defaults != null) {
-					defaults.forEach((field,v) -> {
-						ConfigField cf = field.getAnnotation(ConfigField.class);
+				if (forBean.isActive()) {
+					if (RegistrarBean.class.isAssignableFrom(bc.getClazz())) {
+						Kernel subkernel = bc.getKernel();
+						dumpConfiguration(forBean, subkernel);
+					}
+
+					Object bean = bc.getKernel().getInstanceIfExistsOr(bc.getBeanName(), bc1 -> {
+						try {
+							return bc1.getClazz().newInstance();
+						} catch (InstantiationException | IllegalAccessException e) {
+							log.log(Level.FINEST, "failed to instantiate class for retrieval of default configuration");
+						}
+						return null;
+					});
+
+					Map<Field, Object> defaults = grabCurrentConfig(bean, bc.getBeanName());
+					Map<String, Object> cfg = bc.getState() != BeanConfig.State.initialized ? getConfiguration(bc) : null;
+					Set<String> validProps = new HashSet<>();
+					if (defaults != null) {
+						defaults.forEach((field, v) -> {
+							ConfigField cf = field.getAnnotation(ConfigField.class);
 //						if (forBean.containsKey(field.getName()) || (cf != null && !cf.alias().isEmpty() && forBean.containsKey(cf.alias()))) {
 //							return;
 //						}
-						Object v1 = null;
-						if (cfg != null) {
-							v1 = cfg.get(field.getName());
-							if (v1 == null && cf != null && !cf.alias().isEmpty()) {
-								v1 = cfg.get(cf.alias());
+							Object v1 = null;
+							if (cfg != null) {
+								v1 = cfg.get(field.getName());
+								if (v1 == null && cf != null && !cf.alias().isEmpty()) {
+									v1 = cfg.get(cf.alias());
+								}
 							}
-						}
-						String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
-						forBean.put(prop, v1 == null ? v : v1);
-					});
+							String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
+							forBean.put(prop, v1 == null ? v : v1);
+							validProps.add(prop);
+						});
+					}
+					new ArrayList<Map.Entry>(forBean.entrySet()).stream()
+							.filter(e -> !validProps.contains(e.getKey()))
+							.filter(e -> !(e.getValue() instanceof BeanDefinition))
+							.map(e -> e.getKey())
+							.forEach(forBean::remove);
+					forBean.remove("name");
+				} else {
+					dumpConfigFromSubBeans(forBean, kernel);
 				}
 			} catch (Exception ex) {
 				log.log(Level.FINEST, "failed to retrieve default values for bean " + bc.getBeanName() + ", class = " + bc.getClazz(), ex);
 			}
 		}
 
-		List<BeanConfig> kernelBeans = kernel.getDependencyManager().getBeanConfigs().stream()
-				.filter(bc -> Kernel.class.isAssignableFrom(bc.getClazz()))
-				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
-				.collect(Collectors.toList());
-		for (BeanConfig bc : kernelBeans) {
-			Kernel subkernel = kernel.getInstance(bc.getBeanName());
-			if (subkernel == kernel)
-				continue;
-			BeanDefinition forKernel = getBeanDefinitionFromDump(dump, subkernel.getName());
-			dumpConfiguration(forKernel, subkernel);
+//		List<BeanConfig> kernelBeans = kernel.getDependencyManager().getBeanConfigs().stream()
+//				.filter(bc -> Kernel.class.isAssignableFrom(bc.getClazz()))
+//				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+//				.collect(Collectors.toList());
+//		for (BeanConfig bc : kernelBeans) {
+//			Kernel subkernel = kernel.getInstance(bc.getBeanName());
+//			if (subkernel == kernel)
+//				continue;
+//			----- here are added new entries!
+//			BeanDefinition forKernel = getBeanDefinitionFromDump(dump, subkernel.getName());
+//			----- and they are not removed here!
+//			dumpConfiguration(forKernel, subkernel);
+//		}
+	}
+
+	private void dumpConfigFromSubBeans(BeanDefinition beanDef, Kernel kernel) {
+		try {
+			Object bean = ModulesManagerImpl.getInstance().forName(beanDef.getClazzName()).newInstance();
+
+			Map<String, Object> cfg = new HashMap<>(beanDef);
+
+			Map<Field, Object> defaults = grabCurrentConfig(bean, beanDef.getBeanName());
+			if (defaults != null) {
+				Set<String> validProps = new HashSet<>();
+				defaults.forEach((field, v) -> {
+					ConfigField cf = field.getAnnotation(ConfigField.class);
+					Object v1 = beanDef.remove(field.getName());
+					if (v1 == null) {
+						v1 = beanDef.remove(cf.alias());
+					}
+					String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
+					beanDef.put(prop, v1 == null ? v : v1);
+					validProps.add(prop);
+				});
+				new ArrayList<Map.Entry>(beanDef.entrySet()).stream()
+						.filter(e -> !validProps.contains(e.getKey()))
+						.filter(e -> !(e.getValue() instanceof BeanDefinition))
+						.map(e -> e.getKey())
+						.forEach(beanDef::remove);
+			}
+
+			beanDef.remove("name");
+
+			if (RegistrarBean.class.isAssignableFrom(bean.getClass())) {
+				Kernel tmpKernel = new Kernel() {
+//					@Override
+//					protected BeanConfig registerBean(BeanConfig beanConfig, BeanConfig factoryBeanConfig,
+//													  Object beanInstance) {
+//						return null;
+//					}
+
+					@Override
+					public void registerLinks(String beanName) {
+					}
+
+					@Override
+					protected <T> T getInstance(Class<T> beanClass, boolean allowNonExportable) {
+						return null;
+					}
+
+					@Override
+					public <T> T getInstance(String beanName) {
+						return null;
+					}
+
+					@Override
+					protected void injectIfRequired(BeanConfig beanConfig) {
+					}
+				};
+				if (bean instanceof RegistrarBean) {
+					((RegistrarBean) bean).register(tmpKernel);
+				}
+
+				final Map<String, Class<?>> subbeans = new HashMap<>();
+				tmpKernel.getDependencyManager()
+						.getBeanConfigs()
+						.stream()
+						.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()))
+						.forEach(bc -> subbeans.put(bc.getBeanName(), bc.getClazz()));
+				subbeans.putAll(getBeanClassesFromAnnotations(kernel, bean.getClass()));
+				Map<String, BeanDefinition> beansFromConfig = mergeWithBeansPropertyValue(getBeanDefinitions(beanDef), beanDef);
+				subbeans.entrySet().stream().filter(e -> !beansFromConfig.containsKey(e.getKey())).map(e -> {
+					BeanDefinition def = new BeanDefinition();
+					def.setBeanName(e.getKey());
+					def.setClazzName(e.getValue().getName());
+
+					Bean b = e.getValue().getAnnotation(Bean.class);
+					if (b != null) {
+						def.setActive(b.active());
+					}
+					
+					Object tmp = beanDef.get(def.getBeanName());
+					cfg.entrySet()
+							.stream()
+							.filter(x -> !(x.getValue() instanceof BeanDefinition))
+							.forEach(x -> def.put(x.getKey(), x.getValue()));
+
+					if (tmp != null && tmp instanceof Map) {
+						def.putAll((Map<String, Object>) tmp);
+					}
+					beanDef.put(def.getBeanName(), def);
+					return def;
+				}).forEach(def -> {
+					dumpConfigFromSubBeans(def, kernel);
+				});
+				beansFromConfig.values().stream().map(def -> {
+					if (def.getClazzName() == null) {
+						Class x = subbeans.get(def.getBeanName());
+						if (x != null) {
+							def.setClazzName(x.getName());
+						}
+					}
+					return def;
+				}).forEach(def -> dumpConfigFromSubBeans(def, kernel));
+			}
+
+		} catch (Exception ex) {
+			log.log(Level.FINEST, "exception retrieving configuration of subbeans = " + beanDef.getBeanName(), ex);
 		}
 	}
 
@@ -239,9 +375,21 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		if (tmp == null || (!(tmp instanceof BeanDefinition))) {
 			BeanDefinition def = new BeanDefinition();
 			def.setBeanName(name);
+			dump.entrySet()
+					.stream()
+					.filter(e -> !(e.getValue() instanceof BeanDefinition))
+					.forEach(e -> def.putIfAbsent(e.getKey(), e.getValue()));
 			if (tmp != null && tmp instanceof Map) {
 				def.putAll((Map<String, Object>) tmp);
 			}
+			dump.put(name, def);
+			tmp = def;
+		} else {
+			BeanDefinition def = new BeanDefinition((BeanDefinition) tmp);
+			dump.entrySet()
+					.stream()
+					.filter(e -> !(e.getValue() instanceof BeanDefinition))
+					.forEach(e -> def.putIfAbsent(e.getKey(), e.getValue()));
 			dump.put(name, def);
 			tmp = def;
 		}

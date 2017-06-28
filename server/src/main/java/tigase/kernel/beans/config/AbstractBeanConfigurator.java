@@ -217,18 +217,11 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		}
 	}
 
-	protected Map<Field, Object> grabCurrentConfig(final BeanConfig beanConfig) {
+	protected Map<Field, Object> grabCurrentConfig(final Object bean, String beanName) {
 		Map<Field, Object> config = new HashMap<>();
 		try {
-			Object bean = beanConfig.getKernel().getInstanceIfExistsOr(beanConfig.getBeanName(), bc -> {
-				try {
-					bc.getClazz().newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					log.log(Level.FINEST, "failed to instantiate class for retrieval of default configuration");
-				}
-				return null;
-			});
-			final Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
+			final Field[] fields = DependencyManager.getAllFields(bean.getClass());
+
 			for (Field field : fields) {
 
 				ConfigField configField = field.getAnnotation(ConfigField.class);
@@ -243,7 +236,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				}
 			}
 		} catch (Exception ex) {
-			log.log(Level.FINEST, "retrieval of configuration for bean " + beanConfig.getBeanName() + " failed", ex);
+			log.log(Level.FINEST, "retrieval of configuration for bean " + beanName+ " failed", ex);
 		}
 		return config;
 	}
@@ -378,7 +371,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		toUnregister.forEach(beanName -> kernel.unregister(beanName));
 	}
 
-	private static Map<String, BeanDefinition> mergeWithBeansPropertyValue(Map<String, BeanDefinition> beanPropConfigMap, Map<String, Object> values) {
+	protected static Map<String, BeanDefinition> mergeWithBeansPropertyValue(Map<String, BeanDefinition> beanPropConfigMap, Map<String, Object> values) {
 		List<String> beansProp = null;
 		Object beansValue = values.get("beans");
 		if (beansValue instanceof String) {
@@ -643,6 +636,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		private boolean exportable = false;
 
 		public BeanDefinition() {
+		}
+
+		public BeanDefinition(BeanDefinition def) {
+			this.beanName = def.getBeanName();
+			this.clazzName = def.getClazzName();
+			this.active = def.isActive();
+			this.exportable = def.isExportable();
+			this.putAll(def);
 		}
 
 		public String getBeanName() {

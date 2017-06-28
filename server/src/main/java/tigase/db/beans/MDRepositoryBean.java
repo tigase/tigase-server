@@ -344,8 +344,10 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		@Override
 		public void register(Kernel kernel) {
 			this.kernel = kernel;
-			String rootBean = kernel.getParent().getName();
-			this.kernel.getParent().ln("service", kernel, rootBean);
+			if (kernel.getParent() != null) {
+				String rootBean = kernel.getParent().getName();
+				this.kernel.getParent().ln("service", kernel, rootBean);
+			}
 		}
 
 		@Override
