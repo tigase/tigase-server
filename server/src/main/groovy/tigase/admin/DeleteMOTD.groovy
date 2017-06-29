@@ -48,6 +48,11 @@ Packet process(Kernel kernel, SessionManager component, Iq p) {
 	}
 
 	def result = p.commandResult(Command.DataType.result)
+	if (kernel.getDependencyManager().getBeanConfigs(MotdProcessor.class, null, null, true).isEmpty()) {
+		Command.addTextField(result, "Error", "MotDProcessor is disabled");
+		return result
+	}
+
 	MotdProcessor motdProcessor = kernel.getInstance(MotdProcessor.class)
 	motdProcessor.setMotd(null)
 	return result;

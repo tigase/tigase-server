@@ -473,6 +473,8 @@ public class JabberIqRegister
 		try {
 			if (userRepository.userExists(smJid)) {
 				welcomeMessage = userRepository.getData(smJid, ID, "welcome-message");
+			} else {
+				userRepository.addUser(smJid);
 			}
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "failed to read current welcome message from user repository", ex);

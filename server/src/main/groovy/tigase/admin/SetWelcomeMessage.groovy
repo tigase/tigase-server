@@ -48,6 +48,12 @@ Packet process(Kernel kernel, SessionManager component, Iq p) {
 		return result
 	}
 
+	if (kernel.getDependencyManager().getBeanConfigs(JabberIqRegister.class, null, null, true).isEmpty()) {
+		def result = p.commandResult(Command.DataType.result)
+		Command.addTextField(result, "Error", "JabberIqRegister is disabled");
+		return result
+	}
+
 	def motd = Command.getFieldValues(p, MOTD)
 	if (!motd) {
 		def result = p.commandResult(Command.DataType.form)

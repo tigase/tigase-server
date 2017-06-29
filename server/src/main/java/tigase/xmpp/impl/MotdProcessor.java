@@ -2,6 +2,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
@@ -61,6 +62,13 @@ public class MotdProcessor
 			motd = userRepository.getData(smJid, ID, "message");
 			String stamp = userRepository.getData(smJid, ID, "timestamp");
 			motdTimestamp = stamp == null ? null : Long.parseLong(stamp);
+		} catch (UserNotFoundException ex) {
+			log.log(Level.FINEST, "MotD has never been set - nothing to load");
+			try {
+				userRepository.addUser(smJid);
+			} catch (TigaseDBException ex1) {
+				log.log(Level.WARNING, "failed to create user '" + smJid + "' for SessionManager", ex1);
+			}
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "failed to read current MOTD from user repository", ex);
 		}
