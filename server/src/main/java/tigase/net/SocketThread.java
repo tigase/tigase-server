@@ -581,7 +581,7 @@ public class SocketThread implements Runnable {
 						}    // end of else
 					}
 				} catch (ExecutionException e) {
-					log.log(Level.WARNING, "Protocol execution exception.", e);
+					log.log(Level.WARNING, "Protocol execution exception.", e.getCause());
 
 					// TODO: Do something with this
 				}        // end of catch

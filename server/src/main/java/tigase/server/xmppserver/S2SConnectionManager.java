@@ -694,7 +694,7 @@ public class S2SConnectionManager
 	@Override
 	public boolean isTlsRequired(String domain) {
 		VHostItem item = vHostManager.getVHostItemDomainOrComponent(domain);
-		return item.isTlsRequired();
+		return item != null && item.isTlsRequired();
 	}
 	
 	@Override
