@@ -51,3 +51,4 @@ distribution-packages
 server/logs
 server/etc/acs.licence
 server/etc/config-dump.properties
+server/etc/installation-id
