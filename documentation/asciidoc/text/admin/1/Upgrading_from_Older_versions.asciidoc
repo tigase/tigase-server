@@ -1,0 +1,119 @@
+= Upgrading to v7.2.0 from v7.1.0
+:author: Eric Dziewa & Daniel
+:date: 2017-06-15
+:version: v1.0 June 2017
+
+:toc:
+:website: http://www.tigase.net
+
+
+There have been a number of changes to the user and auth databases since v7.1.0.  As a result, if you are upgrading from older versions, you will need to follow this guide.
+
+NOTE: We recommend installing Tigase v7.2.0 in a seperate directory.
+
+== Backup your data
+As with any migration it is highly recommended that you backup your repository before conducting any upgrade operations.
+
+For MySQL databases:
+[source,bash]
+-----
+mysqldump [dbname] --routines -u [username] -p [password] > [filename].sql
+-----
+
+== Setup Tigase v7.2.0
+After downloading tigase v7.2.0 from our website, or using wget, extract the files to a seperate directory.
+
+Copy the `tigase.conf` and `init.properties` files from the old directory to v7.2.0 directory.
+
+[source,bash]
+-----
+cd tigase-server-7.2.0
+cp ../tigase-server/etc/tigase.conf etc/
+cp ../tigase-server/etc/init.properties etc/
+-----
+
+Import the database.
+[source,bash]
+-----
+mysql -h [host address] [dbname] -u [username] -p [password] < [filename].sql
+mysql -h 198.27.120.213 tigase_tpub -u USERNAME -p <../tpub.2017-05-30.sql
+Enter password:
+-----
+
+== Upgrade init.properties file
+Tigase XMPP Server has a utility that can be called using `upgrade-config` that will update your old init.properties file and create a new file using DSL.
+
+[source,bash]
+-----
+./scripts/tigase.sh upgrade-config etc/tigase.conf
+-----
+
+=============================================================================
+  Configuration file etc/init.properties was converted to DSL format.
+  Previous version of a configuration file was saved at etc/init.properties.old
+=============================================================================
+
+== Connect new database
+Edit your new init.dsl file to connect to the new database you created during the import step.
+[source,dsl]
+-----
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/tigase_tpub?user=tigase_user&password=mypass'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+-----
+
+== Upgrade Database schema
+Upgrading database schemas is now possible using the `upgrade-schema` option.  Do this now.
+[source,bash]
+-----
+./scripts/tigase.sh upgrade-schema etc/tigase.conf
+-----
+
+WARNING: Your database schema MUST be v7.2 or conversion will not occur properly!
+
+You will be asked the following prompts:
+[source,bash]
+-----
+Database root account username used to create tigase user and database at 198.27.120.213 :
+
+Database root account password used to create tigase user and database at 198.27.120.213 :
+-----
+
+Upon sucess, you should see the following:
+[source,bash]
+-----
+=============================================================================
+        Schema upgrade finished
+
+  Data source: default with uri
+jdbc:mysql://HOST/DATABASE?user=USERNAME&password=PASSWORD
+        Checking connection to database ok
+        Checking if database exists     ok
+        Loading schema: Tigase XMPP Server (Core), version: 7.2.0       ok
+        Loading schema: Tigase Message Archiving Component, version:
+1.3.0      ok
+        Loading schema: Tigase MUC Component, version: 2.5.0    ok
+        Loading schema: Tigase PubSub Component, version: 3.3.0 ok
+        Adding XMPP admin accounts      warning
+                Message: Error: No admin users entered
+        Post installation action        ok
+
+=============================================================================
+-----
+Start Tigase!
+
+== Help?
+Both `upgrade` commands also have a build in help function, they can be called if needed from the command line.
+You can also run these commands for help.
+-----
+scripts/tigase.sh upgrade-config etc/tigase.conf --help
+scripts/tigase.sh upgrade-schema etc/tigase.conf --help
+-----

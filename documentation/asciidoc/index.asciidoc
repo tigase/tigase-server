@@ -47,6 +47,8 @@ include::text/admin/1/Quick_Start_-_F_-_Script_Selection.asciidoc[]
 
 include::text/admin/1/Quick_Start_-_G_-_Shutting_Down.asciidoc[]
 
+include::text/admin/1/Upgrading_from_Older_versions.asciidoc[]
+
 :leveloffset: 1
 
 
