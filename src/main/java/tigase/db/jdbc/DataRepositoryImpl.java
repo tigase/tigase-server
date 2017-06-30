@@ -29,6 +29,7 @@ import tigase.stats.StatisticsProviderIfc;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.BareJID;
 
+import java.lang.reflect.Proxy;
 import java.sql.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
