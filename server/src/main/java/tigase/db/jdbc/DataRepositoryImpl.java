@@ -30,6 +30,7 @@ import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.xmpp.BareJID;
 
+import java.lang.reflect.Proxy;
 import java.sql.*;
 import java.time.Duration;
 import java.util.Map;
