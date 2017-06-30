@@ -53,6 +53,23 @@ Entries after `\#` are comments, to pass `#` you need to wrap whole part contain
 
 WARNING: If a string value assigned to a property contains any char from a following list `=:,[]#+-*/` it needs to be wrapped in a `''`.
 
+== Why DSL?
+DSL configuration format provides a number of advantages over the old system of configuration.
+. All configurations for components are related in a single block, so they are not spread out over several different lines.
+. No need for long property names, no longer have to invoke a long string of settings for multiple values.
+. Support is provided for environment variables.
+. No longer need to escape certain characters, making settings far more readable at a glance.
+. Values may be set using basic calculations, such as `100 * 200 * 2` rather than `40000`.
+. Parameter type values are no longer necessary, no more [i], [S], [B] etc..
+. Comma seperated values can now be simplified lists with seperate entries being able to be in multiple lines.
+
+Although the format may seem more complex, looking like a section of java code, the formatting is consistant and can be far more readable.
+After some experience with DSL format, you'll find it's far more intuiative and user friendly than it may appear.  Of course if there's any real confusion, Tigase can automatically convert old style properties files to the DSL format using the following command:
+[source,bash]
+-----
+./scripts/tigase.sh upgrade-config etc/tigase.conf
+-----
+
 === Setting property
 To set property you just write property name followed by `=` and value to set. This is always done in context of bean which configuration property you want to set.
 ----
