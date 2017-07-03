@@ -26,13 +26,12 @@ package tigase.io;
 
 import tigase.server.Lifecycle;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
 import java.util.Map;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -263,6 +262,9 @@ public interface SSLContextContainerIfc extends Lifecycle {
 	 */
 	KeyStore getTrustStore();
 
+	String[] getEnabledCiphers();
+
+	String[] getEnabledProtocols();
 }
 
 // ~ Formatted in Sun Code Convention

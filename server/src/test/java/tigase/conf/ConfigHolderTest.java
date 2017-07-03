@@ -101,7 +101,7 @@ public class ConfigHolderTest {
 	}
 
 	@Test
-	public void testConversionOfAuthRepositoryOptions() throws IOException {
+	public void testConversionOfAuthRepositoryOptions() throws IOException, ConfigReader.ConfigException {
 		StringBuilder w = new StringBuilder();
 		w.append("--auth-db[domain4.com]=tigase-custom")
 				.append("\n")
@@ -130,7 +130,7 @@ public class ConfigHolderTest {
 	}
 
 	@Test
-	public void testConversionOfAdHocCommandsACLs() throws IOException {
+	public void testConversionOfAdHocCommandsACLs() throws IOException, ConfigReader.ConfigException {
 		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
 		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(
 				new String[]{"sess-man/command/http\\://jabber.org/protocol/admin#add-user=LOCAL",
@@ -175,7 +175,7 @@ public class ConfigHolderTest {
 	}
 
 	@Test
-	public void testConversionOfDynamicRosterClasses() throws IOException {
+	public void testConversionOfDynamicRosterClasses() throws IOException, ConfigReader.ConfigException {
 		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
 		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(
 				new String[]{"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest,tigase.xmpp.impl.roster.DynamicRosterTest123"}));
@@ -204,7 +204,7 @@ public class ConfigHolderTest {
 	}
 
 	@Test
-	public void testConversionOfGlobalProperties() throws IOException {
+	public void testConversionOfGlobalProperties() throws IOException, ConfigReader.ConfigException {
 		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
 		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList("--max-queue-size=10000"));
 
@@ -215,7 +215,7 @@ public class ConfigHolderTest {
 	}
 
 	@Test
-	public void testConversionOfExtComponentProperties() throws IOException {
+	public void testConversionOfExtComponentProperties() throws IOException, ConfigReader.ConfigException {
 		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
 		Map<String, Object> props = reader.loadFromPropertyStrings(
 				Arrays.asList("--external=muc1.devel.tigase.org:passwd1,muc2.devel.tigase.org:passwd2",

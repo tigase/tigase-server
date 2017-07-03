@@ -416,7 +416,9 @@ public abstract class IOService<RefObject>
 		}
 
 		SSLContext sslContext = sslContextContainer.getSSLContext("SSL", tls_hostname, clientMode, x509TrustManagers);
-		TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
+		TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
+											needClientAuth, sslContextContainer.getEnabledCiphers(),
+											sslContextContainer.getEnabledProtocols());
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -468,7 +470,9 @@ public abstract class IOService<RefObject>
 			}
 
 			SSLContext sslContext = sslContextContainer.getSSLContext("TLS", tls_hostname, clientMode, x509TrustManagers);
-			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
+			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
+												needClientAuth, sslContextContainer.getEnabledCiphers(),
+												sslContextContainer.getEnabledProtocols());
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();

@@ -28,7 +28,6 @@ package tigase.server.amp.action;
 
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepositoryImpl;
-import tigase.db.RepositoryFactory;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
@@ -44,7 +43,6 @@ import tigase.xml.Element;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -140,25 +138,6 @@ public class Store
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-		String db_uri            = (String) params.get(AMP_MSG_REPO_URI_PARAM);
-		String db_cls			 = (String) params.get(AMP_MSG_REPO_CLASS_PARAM);
-
-		if (db_uri == null) {
-			db_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
-		}
-		if (db_uri != null) {
-			defs.put(AMP_MSG_REPO_URI_PROP_KEY, db_uri);
-		}
-		if (db_cls != null) {
-			defs.put(AMP_MSG_REPO_CLASS_PROP_KEY, db_cls);
-		}
-
-		return defs;
-	}
 
 	@Override
 	public String getName() {

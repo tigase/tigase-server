@@ -31,6 +31,9 @@ import tigase.db.DataSource;
 import tigase.db.Repository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.UserRepoRepository;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigAlias;
+import tigase.kernel.beans.config.ConfigAliases;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.DNSEntry;
 import tigase.util.DNSResolverFactory;
@@ -61,6 +64,9 @@ import java.util.logging.Logger;
  * @since Nov 29, 2008 2:32:48 PM
  */
 @Repository.Meta( supportedUris = { ".*" }, isDefault = true)
+@ConfigAliases({
+		@ConfigAlias(field = "items", alias = "virtual-hosts")
+})
 public class VHostJDBCRepository
 				extends UserRepoRepository<VHostItem>
 				implements ComponentRepositoryDataSourceAware<VHostItem,DataSource> {
@@ -75,6 +81,10 @@ public class VHostJDBCRepository
 	private String def_srv_address   = null;
 	@ConfigField(desc = "Max allowed number of domains per user", alias = "domains-per-user-limit")
 	private int max_domains_per_user = 25;
+	private String[] pendingItemsToSet = null;
+
+	@Inject
+	private VHostItemDefaults vhostDefaults;
 
 	public VHostJDBCRepository() {
 		DNSResolverIfc resolver = DNSResolverFactory.getInstance();
@@ -107,7 +117,9 @@ public class VHostJDBCRepository
 
 	@Override
 	public VHostItem getItemInstance() {
-		return VHostRepoDefaults.getItemInstance();
+		VHostItem item = VHostRepoDefaults.getItemInstance();
+		item.initializeFromDefaults(vhostDefaults);
+		return item;
 	}
 
 	@Override
@@ -130,7 +142,15 @@ public class VHostJDBCRepository
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do
 	}
-	
+
+	@Override
+	public void reload() {
+		if (vhostDefaults == null) {
+			return;
+		}
+		super.reload();
+	}
+
 	//~--- set methods ----------------------------------------------------------
 
 	public void setDef_srv_address(String address) {
@@ -164,8 +184,9 @@ public class VHostJDBCRepository
 		if (item.getS2sSecret() == null) {
 			return "S2S Secret is required";
 		}
-		
-		if (System.getProperty("vhost-disable-dns-check") != null) {
+
+
+		if (!vhostDefaults.isCheckDns()) {
 			return null;
 		}
 
@@ -217,6 +238,23 @@ public class VHostJDBCRepository
 		// this is needed as it is required by interface
 	}
 
+	@Override
+	public void setItems(String[] items_arr) {
+		if (vhostDefaults == null) {
+			this.pendingItemsToSet = items_arr;
+		} else {
+			super.setItems(items_arr);
+			super.reload();
+		}
+	}
+
+	public void setVhostDefaults(VHostItemDefaults vhostDefaults) {
+		this.vhostDefaults = vhostDefaults;
+		if (pendingItemsToSet != null) {
+			setItems(pendingItemsToSet);
+			pendingItemsToSet = null;
+		}
+	}
 }
 
 

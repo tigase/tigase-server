@@ -3,6 +3,7 @@ package tigase.server;
 import org.junit.Ignore;
 import org.junit.Test;
 import tigase.TestLogger;
+import tigase.conf.ConfigReader;
 import tigase.db.AuthRepositoryMDImpl;
 import tigase.db.UserRepositoryMDImpl;
 import tigase.kernel.core.Kernel;
@@ -31,21 +32,21 @@ public class BootstrapTest {
 	private Map<String, Object> props = new HashMap<>();
 
 	@Test
-	public void testNonCluster() throws InterruptedException {
-		props.put("--cluster-mode","false");
+	public void testNonCluster() throws InterruptedException, ConfigReader.ConfigException {
+		props.put("cluster-mode","false");
 		Bootstrap  bootstrap = executeTest();
 		Thread.sleep(10 * 60 * 1000);
 		bootstrap.stop();
 	}
 
 	@Test
-	public void testCluster() {
-		props.put("--cluster-mode","true");
+	public void testCluster() throws ConfigReader.ConfigException {
+		props.put("cluster-mode","true");
 		Bootstrap bootstrap = executeTest();
 		bootstrap.stop();
 	}
 
-	public Bootstrap executeTest() {
+	public Bootstrap executeTest() throws ConfigReader.ConfigException {
 		Bootstrap bootstrap = new Bootstrap();
 
 		bootstrap.setProperties(getProps());

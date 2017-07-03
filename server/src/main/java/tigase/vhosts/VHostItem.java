@@ -26,34 +26,23 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.lang.reflect.Array;
+import tigase.db.comp.RepositoryItemAbstract;
+import tigase.server.Command;
+import tigase.server.Packet;
+import tigase.server.xmppclient.ClientTrustManagerFactory;
+import tigase.util.DataTypes;
+import tigase.util.StringUtilities;
+import tigase.util.TigaseStringprepException;
 import tigase.vhosts.filter.DomainFilterPolicy;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.db.comp.RepositoryItemAbstract;
-import tigase.server.Command;
-import tigase.server.Packet;
-import tigase.server.XMPPServer;
-import tigase.server.xmppclient.ClientTrustManagerFactory;
-import tigase.util.DataTypes;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.JID;
-import tigase.util.StringUtilities;
-import tigase.xmpp.BareJID;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration
@@ -330,7 +319,7 @@ public class VHostItem
 
 	/** Field description */
 	protected static final Long VHOST_MAX_USERS_PROP_DEF = Long.valueOf(0l);
-
+	
 	/** Field description */
 	protected static final String VHOST_MESSAGE_FORWARD_PROP_DEF = null;
 
@@ -372,28 +361,9 @@ public class VHostItem
 
 	protected static final Map<String,DataType> dataTypes = new ConcurrentHashMap<String,DataType>();
 	
-	private static ConcurrentSkipListSet<String> GLOBAL_TRUSTED_JIDS = null;
-	
 	public static void registerData(List<DataType> types) {
 		for (DataType type : types) {
 			dataTypes.put(type.getKey(), type);
-		}
-	}
-	
-	protected static void initGlobalTrustedJids() {
-		String trustedJidsStr = System.getProperty("trusted");
-		if (trustedJidsStr == null || trustedJidsStr.isEmpty())
-			GLOBAL_TRUSTED_JIDS = null;
-		else {
-			ConcurrentSkipListSet<String> trusted = new ConcurrentSkipListSet<>();
-			for (String trustedStr : trustedJidsStr.split(",")) {
-				if (!trustedStr.contains("{"))
-					trusted.add(trustedStr);
-			}
-			if (trusted.isEmpty())
-				GLOBAL_TRUSTED_JIDS = null;
-			else
-				GLOBAL_TRUSTED_JIDS = trusted;
 		}
 	}
 	
@@ -405,8 +375,6 @@ public class VHostItem
 		types.add(new DataType(TRUSTED_JIDS_ATT, "Trusted JIDs", String[].class, 
 				ConcurrentSkipListSet.class, null, null));
 		VHostItem.registerData(types);
-		
-		initGlobalTrustedJids();
 	}
 
 	
@@ -415,29 +383,23 @@ public class VHostItem
 	private String[] comps = null;
 	private int[] c2sPortsAllowed = null;
 	private String[] saslAllowedMechanisms = null;
-	private long     maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY,
-			VHOST_MAX_USERS_PROP_DEF);
-	private JID messageForward = JID.jidInstanceNS(System.getProperty(
-			VHOST_MESSAGE_FORWARD_PROP_KEY, VHOST_MESSAGE_FORWARD_PROP_DEF));
+	private long     maxUsersNumber = VHOST_MAX_USERS_PROP_DEF;
+	private JID messageForward = JID.jidInstanceNS(VHOST_MESSAGE_FORWARD_PROP_DEF);
 	private String otherDomainParams = null;
-	private JID    presenceForward = JID.jidInstanceNS(System.getProperty(
-			VHOST_PRESENCE_FORWARD_PROP_KEY, VHOST_PRESENCE_FORWARD_PROP_DEF));
+	private JID    presenceForward = JID.jidInstanceNS(VHOST_PRESENCE_FORWARD_PROP_DEF);
 	private VHostItem unmodifiableItem = null;
 	private JID       vhost            = null;
-	private boolean   tlsRequired = DataTypes.getProperty(VHOST_TLS_REQUIRED_PROP_KEY,
-			VHOST_TLS_REQUIRED_PROP_DEF);
-	private String  s2sSecret = System.getProperty(S2S_SECRET_PROP_KEY,
-			S2S_SECRET_PROP_DEF);
-	private boolean registerEnabled = DataTypes.getProperty(
-			VHOST_REGISTER_ENABLED_PROP_KEY, VHOST_REGISTER_ENABLED_PROP_DEF);
+	private boolean   tlsRequired = VHOST_TLS_REQUIRED_PROP_DEF;
+	private String  s2sSecret = S2S_SECRET_PROP_DEF;
+	private boolean registerEnabled = VHOST_REGISTER_ENABLED_PROP_DEF;
 	private boolean            enabled = true;
-	private DomainFilterPolicy domainFilter = DomainFilterPolicy.valueof(System.getProperty(
-			DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+	private DomainFilterPolicy domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
 	private String[] domainFilterDomains = null;
-	private boolean anonymousEnabled = DataTypes.getProperty(
-			VHOST_ANONYMOUS_ENABLED_PROP_KEY, VHOST_ANONYMOUS_ENABLED_PROP_DEF);
+	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
 	private Map<String,Object> data = new ConcurrentHashMap<String,Object>();
-	
+
+	private VHostItemDefaults defaults;
+
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -449,9 +411,6 @@ public class VHostItem
 		// will always fail (needed mostly for newly added vhosts).
 		if (s2sSecret == null) {
 			s2sSecret = UUID.randomUUID().toString();
-		}
-		if (GLOBAL_TRUSTED_JIDS != null) {
-			data.put(TRUSTED_JIDS_ATT, GLOBAL_TRUSTED_JIDS);
 		}
 	}
 
@@ -682,6 +641,26 @@ public class VHostItem
 
 		log.log( Level.FINE, "Initialized from command: {0}", this);
 
+	}
+
+	protected void initializeFromDefaults(VHostItemDefaults vhostDefaults) {
+		if (vhostDefaults.getTrusted() != null) {
+			data.put(TRUSTED_JIDS_ATT, vhostDefaults.getTrusted());
+		}
+		maxUsersNumber = vhostDefaults.getMaxUsersNumber();
+		messageForward = vhostDefaults.getMessageForward();
+		presenceForward = vhostDefaults.getPresenceForward();
+		tlsRequired = vhostDefaults.isTlsRequired();
+		s2sSecret = vhostDefaults.getS2sSecret();
+		registerEnabled = vhostDefaults.isRegisterEnabled();
+		domainFilter = vhostDefaults.getDomainFilter();
+		anonymousEnabled = vhostDefaults.isAnonymousEnabled();
+
+		if (s2sSecret == null) {
+			s2sSecret = UUID.randomUUID().toString();
+		}
+
+		this.defaults = vhostDefaults;
 	}
 
 	@Override
@@ -1275,7 +1254,7 @@ public class VHostItem
 	 * @return a <code>boolean</code> value whether TLS is required for the vhost or not.
 	 */
 	public boolean isTlsRequired() {
-		return tlsRequired || XMPPServer.isHardenedModeEnabled();
+		return tlsRequired || defaults.isTlsRequired();
 	}
 	
 	public boolean isTrustedJID(JID jid) {
@@ -1562,6 +1541,12 @@ public class VHostItem
 					extends VHostItem {
 		@Override
 		public void initFromElement(Element elem) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
+
+		@Override
+		protected void initializeFromDefaults(VHostItemDefaults vhostDefaults) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}

@@ -59,21 +59,21 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
 	public ConfigRepository() {
-		String[] items = getDefaultPropetyItems();
 		String propKey = getPropertyKey();
 		if (propKey != null) {
 			if (propKey.startsWith("--"))
 				propKey = propKey.substring(2);
 
 			String value = System.getProperty(propKey);
+			String[] items = null;
 			if (value != null) {
 				items = value.split(",");
 				for (int i=0; i<items.length; i++) {
 					items[i] = items[i].trim();
 				}
 			}
+			this.setItems(items);
 		}
-		this.setItems(items);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -152,6 +152,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 *
 	 */
+	@Deprecated
 	public abstract String getPropertyKey();
 
 	//~--- methods --------------------------------------------------------------
@@ -335,6 +336,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	@Override
 	public void initialize() {
+		if (items.isEmpty()) {
+			setItems(getDefaultPropetyItems());
+		}
 		setAutoReloadInterval(autoReloadInterval);
 	}
 

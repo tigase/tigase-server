@@ -91,19 +91,6 @@ import java.util.zip.Deflater;
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
 				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
-	/** Field description */
-	public static final String CLCON_REPO_CLASS_PROP_KEY = "repository-class";
-
-	/** Field description */
-	public static final String CLCON_REPO_CLASS_PROP_VAL =
-			"tigase.cluster.repo.ClConSQLRepository";
-
-	/** Field description */
-	public static final String CLCON_REPO_CLASS_PROPERTY = "--cl-conn-repo-class";
-
-	/** Field description */
-	public static final String CLUSTER_CONNECTIONS_PER_NODE_PAR =
-			"--cluster-connections-per-node";
 
 	/** Field description */
 	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY =
@@ -112,11 +99,6 @@ public class ClusterConnectionManager
 	/** Field description */
 	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 5;
 
-	/** Field description */
-	public static final String CLUSTER_CONNECTIONS_SELECTOR_KEY = "connection-selector";
-	/** Field description */
-	public static final String DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL = ClusterConnectionSelector.class.getCanonicalName();
-	
 	/** Field description */
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
 
@@ -200,9 +182,9 @@ public class ClusterConnectionManager
 			IDENTITY_TYPE_VAL;
 	private Map<String, ClusterConnection> connectionsPool =
 			new ConcurrentSkipListMap<>();
-	@ConfigField(desc = "Connect to all nodes")
+	@ConfigField(desc = "Connect to all nodes", alias = CONNECT_ALL_PROP_KEY)
 	private boolean                              connect_all = CONNECT_ALL_PROP_VAL;
-	@ConfigField(desc = "Compress stream")
+	@ConfigField(desc = "Compress stream", alias = COMPRESS_STREAM_PROP_KEY)
 	private boolean                              compress_stream = COMPRESS_STREAM_PROP_VAL;
 	private long[]                               lastDay               = new long[24];
 	private int                                  lastDayIdx            = 0;
@@ -211,7 +193,7 @@ public class ClusterConnectionManager
 	private MaxDailyCounterQueue<Integer> maxNodes = new MaxDailyCounterQueue<>(31);
 	private int maxNodesWithinLastWeek = 0;
 	private int                                  nodesNo               = 0;
-	@ConfigField(desc = "Number of connections to open per node", alias = "cluster-connections-per-node")
+	@ConfigField(desc = "Number of connections to open per node", alias = "connections-per-node")
 	private int                                  per_node_conns =
 			CLUSTER_CONNECTIONS_PER_NODE_VAL;
 	@Inject

@@ -29,6 +29,7 @@ package tigase.server;
 import tigase.annotations.TODO;
 import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.*;
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.kernel.core.Kernel;
@@ -221,9 +222,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private long                            watchdogRuns      = 0;
 	private long                            watchdogStopped   = 0;
 	private long                            watchdogTests     = 0;
-	@ConfigField(desc = "Watchdog delay")
+	@ConfigField(desc = "Watchdog delay", alias = "watchdog-delay")
 	protected long                          watchdogDelay     = 10 * MINUTE; // 600 000
-	@ConfigField(desc = "Watchdog timeout")
+	@ConfigField(desc = "Watchdog timeout", alias = "watchdog-timeout")
 	protected long                          watchdogTimeout   = 29 * MINUTE; // 1 740 000
 	private boolean                         white_char_ack    = WHITE_CHAR_ACK_PROP_VAL;
 	private boolean                         xmpp_ack          = XMPP_ACK_PROP_VAL;
@@ -252,7 +253,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@ConfigField(desc = "Limit of bytes per minute for connection")
 	private long                      last_minute_bin_limit =
 			LAST_MINUTE_BIN_LIMIT_PROP_VAL;
-	@ConfigField(desc = "Limit of size for network buffer for connection")
+	@ConfigField(desc = "Limit of size for network buffer for connection", alias = "net-buffer-limit")
 	private int net_buffer_limit = 0;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean started = false;
@@ -264,6 +265,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private SSLContextContainerIfc    sslContextContainer;
 
 	/** Field description */
+	@ConfigField(desc = "Default size of a network buffer", alias = "net-buffer")
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 
 	/** Field description */
@@ -271,12 +273,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected long       connectionDelay = 2 * SECOND;
 	@ConfigField(desc = "Action taken if XMPP limit is exceeded")
 	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
-	@ConfigField(desc = "Watchdog ping type")
+	@ConfigField(desc = "Watchdog ping type", alias = "watchdog-ping-type")
 	protected WATCHDOG_PING_TYPE watchdogPingType = WATCHDOG_PING_TYPE.WHITESPACE;
     protected boolean delayPortListening = PORT_LISTENING_DELAY_DEF;
 
 	@ConfigField(desc = "Traffic throttling")
-	protected String trafficThrottling = ST_TRAFFIC_THROTTLING_PROP_VAL;
+	protected String trafficThrottling = null;
 	protected Kernel kernel;
 
 	//~--- constant enums -------------------------------------------------------
@@ -842,10 +844,40 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return new Watchdog();
 	}
 
+	public int getNet_buffer_limit() {
+		if (net_buffer_limit == 0) {
+			AbstractBeanConfigurator configurator = kernel.getInstance(AbstractBeanConfigurator.class);
+			if (isHighThroughput()) {
+				net_buffer_limit = (Integer) configurator.getProperties().getOrDefault("net-buffer-high-throughput", NET_BUFFER_HT_PROP_VAL);
+			} else {
+				net_buffer_limit = (Integer) configurator.getProperties().getOrDefault("net-buffer-standard", NET_BUFFER_ST_PROP_VAL);
+			}
+		}
+		return net_buffer_limit;
+	}
+
+	public void setNet_buffer_limit(int value) {
+		this.net_buffer_limit = value;
+	}
+
 	public void setProcessors(XMPPIOProcessor[] processors) {
 		if (processors == null)
 			processors = new XMPPIOProcessor[0];
 		this.processors = processors;
+	}
+
+	public String getTrafficThrottling() {
+		if (trafficThrottling == null) {
+			AbstractBeanConfigurator configurator = kernel.getInstance(AbstractBeanConfigurator.class);
+			String value = null;
+			if (isHighThroughput()) {
+				value = (String) configurator.getProperties().getOrDefault("cm-ht-traffic-throttling", HT_TRAFFIC_THROTTLING_PROP_VAL);
+			} else {
+				value = (String) configurator.getProperties().getOrDefault("cm-traffic-throttling", ST_TRAFFIC_THROTTLING_PROP_VAL);
+			}
+			setTrafficThrottling(value);
+		}
+		return trafficThrottling;
 	}
 
 	public void setTrafficThrottling(String trafficThrottling) {
@@ -858,11 +890,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			if (tmp_thr[0].equalsIgnoreCase("xmpp")) {
 				last_minute_packets_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
 						LAST_MINUTE_PACKETS_LIMIT_PROP_VAL);
-				log.warning(getName() + " last_minute_packets_limit = " +
+				log.finest(getName() + " last_minute_packets_limit = " +
 						last_minute_packets_limit);
 				total_packets_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
 						TOTAL_PACKETS_LIMIT_PROP_VAL);
-				log.warning(getName() + " total_packets_limit = " + total_packets_limit);
+				log.finest(getName() + " total_packets_limit = " + total_packets_limit);
 				if (tmp_thr[3].equalsIgnoreCase("disc")) {
 					xmppLimitAction = LIMIT_ACTION.DISCONNECT;
 				}
@@ -873,10 +905,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			if (tmp_thr[0].equalsIgnoreCase("bin")) {
 				last_minute_bin_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
 						LAST_MINUTE_BIN_LIMIT_PROP_VAL);
-				log.warning(getName() + " last_minute_bin_limit = " + last_minute_bin_limit);
+				log.finest(getName() + " last_minute_bin_limit = " + last_minute_bin_limit);
 				total_bin_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
 						TOTAL_BIN_LIMIT_PROP_VAL);
-				log.warning(getName() + " total_bin_limit = " + total_bin_limit);
+				log.finest(getName() + " total_bin_limit = " + total_bin_limit);
 			}
 		}
 	}

@@ -80,7 +80,7 @@ public class ServerBeanSelector implements BeanSelector {
 	}
 
 	public static boolean getClusterMode(Kernel kernel) {
-		Object val = getProperty(kernel, "--cluster-mode", false);
+		Object val = getProperty(kernel, "cluster-mode", false);
 		if (val instanceof Boolean) {
 			return (Boolean) val;
 		} else {

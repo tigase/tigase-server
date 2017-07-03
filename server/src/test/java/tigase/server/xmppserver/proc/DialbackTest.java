@@ -63,7 +63,7 @@ public class DialbackTest extends TestCase {
 		kernel.setName("s2s");
 		kernel.setForceAllowNull(true);
 		kernel.registerBean(DefaultTypesConverter.class).exec();
-		kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exec();
+		kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
 		kernel.getInstance(PropertiesBeanConfiguratorWithBackwardCompatibility.class).setProperties(props);
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean(ConnectionManager.PortsConfigBean.class).exec();
@@ -73,7 +73,12 @@ public class DialbackTest extends TestCase {
 		kernel.registerBean(CertificateContainer.class).exportable().exec();
 		kernel.registerBean("service").asClass(S2SConnectionHandlerImpl.class).setActive(true).exec();
 
-		handler = kernel.getInstance(S2SConnectionHandlerImpl.class);
+		try {
+			handler = kernel.getInstance(S2SConnectionHandlerImpl.class);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw ex;
+		}
 		dialback = kernel.getInstance(Dialback.class);
 	}
 

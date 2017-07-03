@@ -22,6 +22,7 @@
 package tigase.server.websocket;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Base64;
 
 import java.io.IOException;
@@ -64,7 +65,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	private static final String WS_KEY_KEY      = "Sec-WebSocket-Key";
 
 	private static final String CLOSE_CODE = "close-code";
-	private static final boolean ALLOW_UNMASKED_FROM_CLIENT = Boolean.getBoolean("ws-allow-unmasked-frames");
+	@ConfigField(desc = "Allow for unmasked frames send from client", alias = "ws-allow-unmasked-frames")
+	private boolean allowUnmaskedFromClient = false;
 	private static final int PROTOCOL_ERROR = 1003;
 
 	private static byte[] EMPTY = new byte[0];
@@ -142,7 +144,7 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 
 				// check if content is masked
 				masked = (b2 & 0x80) == 0x80;
-				if (!masked && !ALLOW_UNMASKED_FROM_CLIENT) {
+				if (!masked && !allowUnmaskedFromClient) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Socket: {0}, closing connection due to protocol error - unmasked frame sent by client {1}",
 								new Object[] { service, String.format("%02X ", type) });

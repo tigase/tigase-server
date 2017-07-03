@@ -65,6 +65,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 		final HashMap<Field, Object> valuesToSet = new HashMap<>();
 
+		// should we invert it? for every field get value, not for every value find field?
 		for (Map.Entry<String, Object> entry : values.entrySet()) {
 			final String property = entry.getKey();
 			final Object value = entry.getValue();

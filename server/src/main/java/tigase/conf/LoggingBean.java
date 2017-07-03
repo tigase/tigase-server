@@ -23,6 +23,7 @@ package tigase.conf;
 
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
+import tigase.server.monitor.MonitorRuntime;
 import tigase.util.LogFormatter;
 
 import java.io.ByteArrayInputStream;
@@ -30,15 +31,22 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.stream.Stream;
 
 /**
  * Created by andrzej on 02.04.2017.
  */
 public class LoggingBean implements ConfigurationChangedAware {
+
+	@ConfigField(desc = "Debug")
+	private String[] debug;
+	@ConfigField(desc = "Debug packages", alias = "debug-packages")
+	private String[] debugPackages;
 
 	@ConfigField(desc = "Loggers")
 	private HashMap<String, HashMap<String, Object>> loggers = new HashMap<>();
@@ -50,6 +58,9 @@ public class LoggingBean implements ConfigurationChangedAware {
 
 	@ConfigField(desc = "Root handlers")
 	private String[] rootHandlers = new String[0];
+
+	@ConfigField(desc = "Log thread dump on shutdown", alias = "shutdown-thread-dump")
+	private boolean shutdownThreadDump = true;
 
 	public LoggingBean() {
 		setLoggers(new HashMap<>());
@@ -69,26 +80,6 @@ public class LoggingBean implements ConfigurationChangedAware {
 			props.putIfAbsent("useParentHandlers", true);
 			return props;
 		});
-		String debug = System.getProperty("debug");
-		if (debug != null) {
-			for (String name : debug.split(",")) {
-				loggers.computeIfAbsent("tigase." + name, (k) -> {
-					HashMap<String, Object> logger = new HashMap<>();
-					logger.put("level", Level.ALL);
-					return logger;
-				});
-			}
-		}
-		String packages = System.getProperty("debug-packages");
-		if (packages != null) {
-			for (String name : packages.split(",")) {
-				loggers.computeIfAbsent(name, (k) -> {
-					HashMap<String, Object> logger = new HashMap<>();
-					logger.put("level", Level.ALL);
-					return logger;
-				});
-			}
-		}
 		this.loggers = loggers;
 	}
 
@@ -122,6 +113,17 @@ public class LoggingBean implements ConfigurationChangedAware {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(".level=").append(rootLevel.getName()).append("\n");
+
+		Optional.ofNullable(debug).ifPresent(names -> {
+			Stream.of(names).forEach(name -> {
+				sb.append("tigase.").append(name).append(".level=").append(Level.ALL).append("\n");
+			});
+		});
+		Optional.ofNullable(debugPackages).ifPresent(names -> {
+			Stream.of(names).forEach(name -> {
+				sb.append(name).append(".level=").append(Level.ALL).append("\n");
+			});
+		});
 
 		loggers.forEach((name, props) -> {
 			props.forEach((key, value) -> {
@@ -166,5 +168,12 @@ public class LoggingBean implements ConfigurationChangedAware {
 			throw new RuntimeException("Failed to load logging configuration", ex);
 		}
 	}
-	
+
+	public boolean isShutdownThreadDump() {
+		return MonitorRuntime.getMonitorRuntime().isShutdownThreadDump();
+	}
+
+	public void setShutdownThreadDump(boolean shutdownThreadDump) {
+		MonitorRuntime.getMonitorRuntime().setShutdownThreadDump(shutdownThreadDump);
+	}
 }

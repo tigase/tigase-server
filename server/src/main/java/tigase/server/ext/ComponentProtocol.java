@@ -113,7 +113,7 @@ public class ComponentProtocol
 	 */
 	private Map<String, CopyOnWriteArrayList<ComponentConnection>> connections =
 			new ConcurrentHashMap<String, CopyOnWriteArrayList<ComponentConnection>>();
-	@ConfigField(desc = "Hostnames to bind", alias = HOSTNAMES_PROP_KEY)
+	@ConfigField(desc = "Hostnames to bind", alias = EXTCOMP_BIND_HOSTNAMES_PROP_KEY)
 	private String[]                          hostnamesToBind           = new String[0];
 	@ConfigField(desc = "Max number of authentication attempts", alias = MAX_AUTH_ATTEMPTS_PROP_KEY)
 	private int                               maxAuthenticationAttempts = 1;

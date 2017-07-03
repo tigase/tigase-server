@@ -63,7 +63,7 @@ public class BoshConnectionClustered
     private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
 
 	public BoshConnectionClustered() {
-		delayPortListening = System.getProperty("client-" + PORT_LISTENING_DELAY_KEY) == null ? true : Boolean.getBoolean("client-" + PORT_LISTENING_DELAY_KEY);
+		delayPortListening = true;
 	}
 
 	@Override

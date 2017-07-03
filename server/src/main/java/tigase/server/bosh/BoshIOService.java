@@ -27,22 +27,18 @@ package tigase.server.bosh;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
+import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.UUID;
-import tigase.server.xmppclient.XMPPIOProcessor;
-import tigase.xmpp.StreamError;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class BoshIOService here.
@@ -55,29 +51,10 @@ import tigase.xmpp.StreamError;
  */
 public class BoshIOService
 				extends XMPPIOService<Object> {
-	/** Field description */
-	public static final String BOSH_CLOSE_CONNECTION_PROP_KEY = "bosh-close-connection";
-
-	/** Field description */
-	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
-
-	/** Field description */
-	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL =
-			"etc/bosh-extra-headers.txt";
-
-	/** Field description */
-	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_KEY =
-			"client-access-policy-file";
-
-	/** Field description */
-	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_VAL =
-			"etc/client-access-policy.xml";
-	private static String       client_access_policy = null;
 	private static final String CONNECTION           = "Connection: ";
 	private static final String CONTENT_TYPE_HEADER  = "Content-Type: ";
 	private static final String CONTENT_TYPE_LENGTH  = "Content-Length: ";
-	private static final String EOL                  = "\r\n";
-	private static String       extra_headers        = null;
+	public static final String EOL                  = "\r\n";
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -88,7 +65,6 @@ public class BoshIOService
 			.getImplementationVersion();
 	private static final char[] HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER =
 			"GET /clientaccesspolicy.xml".toCharArray();
-	private static Boolean closeConnections;
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -99,58 +75,17 @@ public class BoshIOService
 	private boolean  firstPassCORS               = true;
 	private boolean  firstPassClientAccessPolicy = true;
 
+	private final ConfigProvider configProvider;
+
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
 	 *
 	 */
-	public BoshIOService() {
+	public BoshIOService(ConfigProvider configProvider) {
 		super();
-		if (closeConnections == null) {
-			closeConnections = Boolean.parseBoolean(System.getProperty(
-					BOSH_CLOSE_CONNECTION_PROP_KEY, "false"));
-		}
-		if (extra_headers == null) {
-			String file_name = System.getProperty(BOSH_EXTRA_HEADERS_FILE_PROP_KEY,
-					BOSH_EXTRA_HEADERS_FILE_PROP_VAL);
-
-			try {
-				BufferedReader br   = new BufferedReader(new FileReader(file_name));
-				String         line = br.readLine();
-				StringBuilder  sb   = new StringBuilder();
-
-				while (line != null) {
-					sb.append(line).append(EOL);
-					line = br.readLine();
-				}
-				br.close();
-				extra_headers = sb.toString();
-			} catch (Exception ex) {
-				log.log(Level.WARNING, "Problem reading Bosh extra headers file: " + file_name,
-						ex);
-			}
-		}
-		if (client_access_policy == null) {
-			String file_name = System.getProperty(CLIENT_ACCESS_POLICY_FILE_PROP_KEY,
-					CLIENT_ACCESS_POLICY_FILE_PROP_VAL);
-
-			try {
-				BufferedReader br   = new BufferedReader(new FileReader(file_name));
-				String         line = br.readLine();
-				StringBuilder  sb   = new StringBuilder();
-
-				while (line != null) {
-					sb.append(line).append(EOL);
-					line = br.readLine();
-				}
-				br.close();
-				client_access_policy = sb.toString();
-			} catch (Exception ex) {
-				log.log(Level.WARNING, "Problem reading client access policy file: " + file_name,
-						ex);
-			}
-		}
+		this.configProvider = configProvider;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -234,6 +169,7 @@ public class BoshIOService
 		sb.append(errorMsg).append(EOL);
 		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
 		sb.append(CONTENT_TYPE_LENGTH).append(code.getBytes().length).append(EOL);
+		String extra_headers = configProvider.getExtraHeaders();
 		if (extra_headers != null) {
 			sb.append(extra_headers);
 		}
@@ -303,6 +239,7 @@ public class BoshIOService
 		else {
 			sb.append(CONTENT_TYPE_LENGTH).append("0").append(EOL);
 		}
+		String extra_headers = configProvider.getExtraHeaders();
 		if (extra_headers != null) {
 			sb.append(extra_headers);
 		}
@@ -325,7 +262,7 @@ public class BoshIOService
 		} else {
 			super.writeRawData(data);
 		}
-		if (closeConnections) {
+		if (configProvider.isCloseConnections()) {
 			stop();
 		}
 	}
@@ -361,6 +298,7 @@ public class BoshIOService
 					i++;
 				}
 				if (ok) {
+					String client_access_policy = configProvider.getClientAccessPolicy();
 					this.writeRawData(prepareHeaders(client_access_policy).toString() +
 							client_access_policy);
 
@@ -376,6 +314,16 @@ public class BoshIOService
 
 		// by default do nothing and return false
 		return false;
+	}
+
+	public interface ConfigProvider {
+
+		boolean isCloseConnections();
+
+		String getExtraHeaders();
+
+		String getClientAccessPolicy();
+
 	}
 }
 

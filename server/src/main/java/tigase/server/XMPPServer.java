@@ -63,13 +63,7 @@ public final class XMPPServer {
 	 * {@link tigase.conf.ConfiguratorAbstract} used in Tigase, which is
 	 * tigase.conf.Configurator. */
 	private static final String DEF_CONFIGURATOR = "tigase.conf.Configurator";
-	public static final String HARDENED_MODE_KEY = "hardened-mode";
-
-	public static boolean isHardenedModeEnabled() {
-		return System.getProperty( XMPPServer.HARDENED_MODE_KEY ) == null ? false
-					 : Boolean.getBoolean( XMPPServer.HARDENED_MODE_KEY );
-	}
-
+	
 	/** Field description */
 	public static final String NAME = "Tigase";
 	private static String serverName = "message-router";

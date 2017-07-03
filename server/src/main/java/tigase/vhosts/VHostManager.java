@@ -391,7 +391,7 @@ public class VHostManager
 			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
 			return (Class<ComponentRepositoryDataSourceAware<VHostItem, DataSource>>) cls;
 		}
-
+		
 	}
 }
 

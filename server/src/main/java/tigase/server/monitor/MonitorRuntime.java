@@ -54,6 +54,8 @@ public class MonitorRuntime extends TigaseRuntime {
 					new LinkedHashSet<ShutdownHook>();
 	private final LinkedList<OnlineJidsReporter> onlineJidsReporters =
 					new LinkedList<OnlineJidsReporter>();
+	
+	private boolean shutdownThreadDump = true;
 
 	private Thread mainShutdownThread;
 
@@ -166,6 +168,14 @@ public class MonitorRuntime extends TigaseRuntime {
 		shutdownHooks.remove(hook);
 	}
 
+	public boolean isShutdownThreadDump() {
+		return shutdownThreadDump;
+	}
+
+	public void setShutdownThreadDump(boolean shutdownThreadDump) {
+		this.shutdownThreadDump = shutdownThreadDump;
+	}
+
 	private class ShutdownHandlerThread extends Thread {
 
 		private ShutdownHook hook = null;
@@ -258,9 +268,7 @@ public class MonitorRuntime extends TigaseRuntime {
 			}
 
 
-			String SHUTDOWN_THREAD_DUMP = "shutdown-thread-dump";
-			if (System.getProperty(SHUTDOWN_THREAD_DUMP) == null ||
-					Boolean.TRUE.equals(Boolean.valueOf(System.getProperty(SHUTDOWN_THREAD_DUMP)))) {
+			if (shutdownThreadDump) {
 
 				try {
 					// we have to configure logger here
@@ -296,7 +304,6 @@ public class MonitorRuntime extends TigaseRuntime {
 					log.log(Level.WARNING, "Failed creating thread dumper logger");
 				}
 			}
-
 
 			System.out.println("ShutdownThread finished...");
 			log.warning("ShutdownThread finished...");

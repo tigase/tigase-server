@@ -44,6 +44,8 @@ import tigase.xml.Element;
 import tigase.xmpp.*;
 
 import javax.script.Bindings;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -66,14 +68,33 @@ import static tigase.server.bosh.Constants.*;
 @ClusterModeRequired(active = false)
 public class BoshConnectionManager
 				extends ClientConnectionManager
-				implements BoshSessionTaskHandler {
-	private static final int DEF_PORT_NO = 5280;
-
+				implements BoshSessionTaskHandler, BoshIOService.ConfigProvider {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(BoshConnectionManager.class
-			.getName());
+															   .getName());
+
+
+	private static final int DEF_PORT_NO = 5280;
+
+	/** Field description */
+	public static final String BOSH_CLOSE_CONNECTION_PROP_KEY = "bosh-close-connection";
+
+	/** Field description */
+	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
+
+	/** Field description */
+	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL =
+			"etc/bosh-extra-headers.txt";
+
+	/** Field description */
+	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_KEY =
+			"client-access-policy-file";
+
+	/** Field description */
+	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_VAL =
+			"etc/client-access-policy.xml";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -105,6 +126,16 @@ public class BoshConnectionManager
 	private boolean				   sendNodeHostname	   = SEND_NODE_HOSTNAME_VAL;
 	@ConfigField(desc = "SID logger level", alias = SID_LOGGER_KEY)
 	private String sidLoggerLevel = SID_LOGGER_VAL;
+
+	@ConfigField(desc = "Close BOSH connections", alias = BOSH_CLOSE_CONNECTION_PROP_KEY)
+	private boolean closeConnections = false;
+	@ConfigField(desc = "Extra headers file", alias = BOSH_EXTRA_HEADERS_FILE_PROP_KEY)
+	private String extraHeadersFile = BOSH_EXTRA_HEADERS_FILE_PROP_VAL;
+	private String extraHeaders = null;
+	@ConfigField(desc = "Client access policy file", alias = CLIENT_ACCESS_POLICY_FILE_PROP_KEY)
+	private String clientAccessPolicyFile = CLIENT_ACCESS_POLICY_FILE_PROP_VAL;
+	private String clientAccessPolicy = null;
+
 
 	protected enum BOSH_OPERATION_TYPE {
 
@@ -799,8 +830,72 @@ public class BoshConnectionManager
 	}
 
 	@Override
+	public void initialize() {
+		if (extraHeaders == null && extraHeadersFile != null) {
+			setExtraHeadersFile(extraHeadersFile);
+		}
+		if (clientAccessPolicy == null && clientAccessPolicyFile != null) {
+			setClientAccessPolicyFile(clientAccessPolicyFile);
+		}
+		super.initialize();
+	}
+
+	@Override
 	protected BoshIOService getXMPPIOServiceInstance() {
-		return new BoshIOService();
+		return new BoshIOService(this);
+	}
+
+	@Override
+	public boolean isCloseConnections() {
+		return closeConnections;
+	}
+
+	@Override
+	public String getClientAccessPolicy() {
+		return clientAccessPolicy;
+	}
+
+	public void setClientAccessPolicyFile(String clientAccessPolicyFile) {
+		this.clientAccessPolicyFile = clientAccessPolicyFile;
+		try {
+			BufferedReader br   = new BufferedReader(new FileReader(clientAccessPolicyFile));
+			String         line = br.readLine();
+			StringBuilder  sb   = new StringBuilder();
+
+			while (line != null) {
+				sb.append(line).append(BoshIOService.EOL);
+				line = br.readLine();
+			}
+			br.close();
+			clientAccessPolicy = sb.toString();
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "Problem reading client access policy file: " + clientAccessPolicyFile,
+					ex);
+		}
+	}
+
+	@Override
+	public String getExtraHeaders() {
+		return extraHeaders;
+	}
+
+	public void setExtraHeadersFile(String extraHeadersFile) {
+		this.extraHeadersFile = extraHeadersFile;
+		try {
+			BufferedReader br   = new BufferedReader(new FileReader(extraHeadersFile));
+			String         line = br.readLine();
+			StringBuilder  sb   = new StringBuilder();
+
+			while (line != null) {
+				sb.append(line).append(BoshIOService.EOL);
+				line = br.readLine();
+			}
+			br.close();
+			extraHeaders = sb.toString();
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "Problem reading Bosh extra headers file: " + extraHeadersFile,
+					ex);
+		}
 	}
 
 	// ~--- get methods ----------------------------------------------------------

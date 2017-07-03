@@ -32,6 +32,8 @@ import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigAlias;
+import tigase.kernel.beans.config.ConfigAliases;
 import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
@@ -67,7 +69,10 @@ import java.util.zip.Deflater;
 @Bean(name="c2s", parent=Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 @ClusterModeRequired(active = false)
-public class ClientConnectionManager
+@ConfigAliases({
+		@ConfigAlias(field = "delayPortListening", alias = "client-port-delay-listening")
+})
+public class ClientConnectionManager                                                                                      
 				extends ConnectionManager<XMPPIOService<Object>> {
 	/**
 	 * Variable <code>log</code> is a class logger.

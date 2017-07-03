@@ -33,6 +33,8 @@ import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigAlias;
+import tigase.kernel.beans.config.ConfigAliases;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
@@ -52,6 +54,9 @@ import java.util.logging.Logger;
  * @version        5.2.0, 13/03/09
  * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@ConfigAliases({
+	@ConfigAlias(field = "items", alias = "cluster-nodes")
+})
 public class ClConConfigRepository
 		extends ConfigRepository<ClusterRepoItem>
 		implements ShutdownHook, Initializable, UnregisterAware {

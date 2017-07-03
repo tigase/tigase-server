@@ -26,7 +26,9 @@ import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,7 +113,8 @@ public class VHostItemTest extends TestCase {
 
 	}
 
-	public void testInitFromPropertyString() throws TigaseStringprepException {
+	public void testInitFromPropertyString()
+			throws TigaseStringprepException, IllegalAccessException, NoSuchFieldException {
 		JID jid = JID.jidInstanceNS("comp1@example.com");
 		JID notTrusted = JID.jidInstanceNS("not-trusted@example.com");
 		
@@ -149,9 +152,15 @@ public class VHostItemTest extends TestCase {
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertTrue(item.isTrustedJID(notTrusted));	
 		
-		System.setProperty("trusted", "comp3@example.com,comp4@example.com");
-		VHostItem.initGlobalTrustedJids();
+		//System.setProperty("trusted", "comp3@example.com,comp4@example.com");
+		VHostItemDefaults defaults = new VHostItemDefaults();
+		Field f = VHostItemDefaults.class.getDeclaredField("trusted");
+		f.setAccessible(true);
+		f.set(defaults, new ConcurrentSkipListSet<String>());
+		defaults.getTrusted().add("comp3@example.com");
+		defaults.getTrusted().add("comp4@example.com");
 		item = new VHostItem();
+		item.initializeFromDefaults(defaults);
 		item.toString();
 		Assert.assertArrayEquals(new String[] { "comp3@example.com", "comp4@example.com" }, 
 				item.getTrustedJIDs().toArray(new String[0]));

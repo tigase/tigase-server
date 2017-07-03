@@ -28,11 +28,9 @@ import tigase.db.DataSourceHelper;
 import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.Initializable;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
@@ -47,7 +45,7 @@ import java.util.logging.Logger;
  *
  */
 public class SeeOtherHostDualIP
-		extends SeeOtherHostHashed implements Initializable, UnregisterAware {
+		extends SeeOtherHostHashed implements Initializable, RegistrarBean, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger( SeeOtherHostDualIP.class.getName() );
 
@@ -156,6 +154,16 @@ public class SeeOtherHostDualIP
 		return redirectsMap.get( defaultHost ) != null
 					 ? !redirectsMap.get( defaultHost ).equals( redirectionHost )
 					 : false;
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+		
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 
 	protected void reloadRedirection() {

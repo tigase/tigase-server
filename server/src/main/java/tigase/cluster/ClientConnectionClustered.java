@@ -80,7 +80,7 @@ public class ClientConnectionClustered
     private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
 
 	public ClientConnectionClustered() {
-		delayPortListening = System.getProperty("client-" + PORT_LISTENING_DELAY_KEY) == null ? true : Boolean.getBoolean("client-" + PORT_LISTENING_DELAY_KEY);
+		delayPortListening = true;
 	}
 
 	//~--- methods --------------------------------------------------------------

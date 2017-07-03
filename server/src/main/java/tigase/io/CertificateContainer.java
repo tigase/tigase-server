@@ -68,16 +68,16 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
 	private KeyStore trustKeyStore = null;
 
-	@ConfigField(desc = "Alias for default certificate")
+	@ConfigField(desc = "Alias for default certificate", alias = DEFAULT_DOMAIN_CERT_KEY)
 	private String def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;
 	private File[] certsDirs = null;
 	private char[] emptyPass = new char[0];
 
-	@ConfigField(desc = "Disable SNI support")
+	@ConfigField(desc = "Disable SNI support", alias = SNI_DISABLE_KEY)
 	private boolean sniDisable = false;
-	@ConfigField(desc = "Location of server SSL certificates")
+	@ConfigField(desc = "Location of server SSL certificates", alias = SERVER_CERTS_LOCATION_KEY)
 	private String[] sslCertsLocation = { SERVER_CERTS_LOCATION_VAL };
-	@ConfigField(desc = "Location of trusted certificates")
+	@ConfigField(desc = "Location of trusted certificates", alias = TRUSTED_CERTS_DIR_KEY)
 	private String[] trustedCertsDir = { TRUSTED_CERTS_DIR_VAL };
 
 	@ConfigField(desc = "Custom certificates")

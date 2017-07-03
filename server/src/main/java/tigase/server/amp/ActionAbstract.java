@@ -28,6 +28,8 @@ package tigase.server.amp;
 
 import tigase.db.UserRepository;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigAlias;
+import tigase.kernel.beans.config.ConfigAliases;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -52,12 +54,17 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@ConfigAliases({
+		@ConfigAlias(field = "security", alias = "amp-security-level")
+})
 public abstract class ActionAbstract
 				implements ActionIfc {
 	/** Field description */
+	@Deprecated
 	public static final String AMP_SECURITY_LEVEL = "--amp-security-level";
 
 	/** Field description */
+	@Deprecated
 	public static final String AMP_SECURITY_LEVEL_DEFAULT = "STRICT";
 
 	/** Field description */
@@ -81,26 +88,6 @@ public abstract class ActionAbstract
 
 		NONE, PERFORMANCE, STRICT
 	};
-
-	//~--- get methods ----------------------------------------------------------
-
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
-		String sec_str           = (String) params.get(AMP_SECURITY_LEVEL);
-
-		if (null == sec_str) {
-			sec_str = AMP_SECURITY_LEVEL_DEFAULT;
-		}
-		try {
-			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());
-
-			security = sec;
-		} catch (Exception e) {}
-		defs.put(SECURITY_PROP_KEY, security.name());
-
-		return defs;
-	}
 
 	//~--- set methods ----------------------------------------------------------
 

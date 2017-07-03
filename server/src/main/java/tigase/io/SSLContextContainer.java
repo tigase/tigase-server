@@ -28,12 +28,18 @@ import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -50,7 +56,74 @@ import java.util.logging.Logger;
 @Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true)
 public class SSLContextContainer extends SSLContextContainerAbstract {
 
+	// Workaround for TLS/SSL bug in new JDK used with new version of
+	// nss library see also:
+	// http://stackoverflow.com/q/10687200/427545
+	// http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
+	private static final String[] TLS_WORKAROUND_CIPHERS = new String[] { "SSL_RSA_WITH_RC4_128_MD5",
+																		  "SSL_RSA_WITH_RC4_128_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+																		  "TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
+																		  "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA",
+																		  "SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+																		  "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
+																		  "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" };
+
+	private static final String[] HARDENED_MODE_FORBIDDEN_CIPHERS = new String[] { "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
+																				   "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA",
+																				   "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
+																				   "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA", "TLS_ECDHE_RSA_WITH_RC4_128_SHA", "SSL_RSA_WITH_RC4_128_SHA",
+																				   "TLS_ECDH_ECDSA_WITH_RC4_128_SHA", "TLS_ECDH_RSA_WITH_RC4_128_SHA", "SSL_RSA_WITH_RC4_128_MD5",
+																				   "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "TLS_KRB5_WITH_RC4_128_SHA", "TLS_KRB5_WITH_RC4_128_MD5",
+																				   "TLS_KRB5_EXPORT_WITH_RC4_40_SHA", "TLS_KRB5_EXPORT_WITH_RC4_40_MD5" };
+	private static String[] HARDENED_MODE_CIPHERS;
+
+	private static final String[] HARDENED_MODE_PROTOCOLS = new String[] { "SSLv2Hello", "TLSv1", "TLSv1.1", "TLSv1.2" };
+
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
+
+	private static String markEnabled(String[] enabled, String[] supported) {
+		final List<String> en = enabled == null ? new ArrayList<String>() : Arrays.asList(enabled);
+		String result = "";
+
+		if (supported != null)
+			for (int i = 0; i < supported.length; i++) {
+				String t = supported[i];
+				result += (en.contains(t) ? "(+)" : "(-)");
+				result += t;
+				if (i + 1 < supported.length)
+					result += ",";
+			}
+
+		return result;
+	}
+
+	static {
+		String[] allEnabledCiphers = null;
+		try {
+			SSLEngine tmpE = SSLContext.getDefault().createSSLEngine();
+			allEnabledCiphers = tmpE.getEnabledCipherSuites();
+			log.config("Supported protocols: " + markEnabled(tmpE.getEnabledProtocols(), tmpE.getSupportedProtocols()));
+			log.config("Supported ciphers: " + markEnabled(allEnabledCiphers, tmpE.getSupportedCipherSuites()));
+
+			ArrayList<String> ciphers = new ArrayList<String>(Arrays.asList(allEnabledCiphers));
+			ciphers.removeAll(Arrays.asList(HARDENED_MODE_FORBIDDEN_CIPHERS));
+			HARDENED_MODE_CIPHERS = ciphers.toArray(new String[] {});
+		} catch (NoSuchAlgorithmException e) {
+			log.log(Level.WARNING, "Can't determine supported protocols", e);
+		}
+	}
+
+
+	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "enabled-ciphers")
+	private String[] enabledCiphers;
+	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "enabled-protocols")
+	private String[] enabledProtocols;
+
+	@ConfigField(desc = "TLS/SSL hardened mode", alias = "hardened-mode")
+	private boolean hardenedMode = false;
+
+	@ConfigField(desc = "TLS/SSL", alias = "tls-jdk-nss-bug-workaround-active")
+	private boolean tlsJdkNssBugWorkaround = false;
 
 	@Inject
 	protected EventBus eventBus = EventBusFactory.getInstance();
@@ -86,6 +159,59 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 	public SSLContextContainer(CertificateContainerIfc certContainer, SSLContextContainerIfc parent) {
 		super(certContainer);
 		this.parent = parent;
+	}
+
+	@Override
+	public String[] getEnabledCiphers() {
+		if (enabledCiphers != null && enabledCiphers.length != 0) {
+			return enabledCiphers;
+		} else if (hardenedMode) {
+			return HARDENED_MODE_CIPHERS;
+		} else if (tlsJdkNssBugWorkaround){
+			return TLS_WORKAROUND_CIPHERS;
+		}
+		return null;
+	}
+
+	public void setEnabledCiphers(String[] enabledCiphers) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("Enabled ciphers: " + (enabledCiphers == null ? "default" : Arrays.toString(enabledCiphers)));
+		}
+		this.enabledCiphers = enabledCiphers;
+	}
+
+	@Override
+	public String[] getEnabledProtocols() {
+		if (enabledProtocols != null && enabledProtocols.length != 0) {
+			return enabledProtocols;
+		} else if (hardenedMode) {
+			return HARDENED_MODE_PROTOCOLS;
+		}
+		return null;
+	}
+
+	public void setEnabledProtocols(String[] enabledProtocols) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("Enabled protocols: " + (enabledProtocols == null ? "default" : Arrays.toString(enabledProtocols)));
+		}
+		this.enabledProtocols = enabledProtocols;
+	}
+
+	public void setHardenedMode(boolean hardenedMode) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("Hardened mode is " + (hardenedMode ? "enabled" : "disabled"));
+		}
+		if (hardenedMode) {
+			System.setProperty("jdk.tls.ephemeralDHKeySize", "2048");
+		}
+		this.hardenedMode = hardenedMode;
+	}
+
+	public void setTlsJdkNssBugWorkaround(boolean value) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("Workaround for TLS/SSL bug is " + (value ? "enabled" : "disabled"));
+		}
+		this.tlsJdkNssBugWorkaround = value;
 	}
 
 	@Override

@@ -36,17 +36,16 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.xmpp.BareJID;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.conf.Configurable.*;
+import static tigase.conf.Configurable.GEN_DEBUG;
+import static tigase.conf.Configurable.GEN_DEBUG_PACKAGES;
 import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
 
 /**
@@ -54,7 +53,7 @@ import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
  *
  * Created by andrzej on 05.03.2016.
  */
-public class Bootstrap implements Lifecycle {
+public class Bootstrap {
 
 	private static final Logger log = Logger.getLogger(Bootstrap.class.getCanonicalName());
 
@@ -73,10 +72,25 @@ public class Bootstrap implements Lifecycle {
 	public void setProperties(Map<String,Object> props) {
 		this.config.setProperties(props);
 	}
+	
+	public void start() throws ConfigReader.ConfigException {
+		Object clusterMode = config.getProperties().getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", false));
+		if (clusterMode instanceof ConfigReader.Variable) {
+			clusterMode = ((ConfigReader.Variable) clusterMode).calculateValue();
+			if (clusterMode == null) {
+				clusterMode = false;
+			}
+		}
+		if (clusterMode instanceof String) {
+			clusterMode = Boolean.parseBoolean((String) clusterMode);
+		}
+		if ((Boolean) clusterMode) {
+			System.setProperty("tigase.cache", "false");
+		}
+		config.getProperties().put("cluster-mode", clusterMode);
 
+		Optional.ofNullable((String) config.getProperties().get("stringprep-processor")).ifPresent(val -> BareJID.useStringprepProcessor(val));
 
-	@Override
-	public void start() {
 		for (Map.Entry<String, Object> e : config.getProperties().entrySet()) {
 			if (e.getKey().startsWith("--")) {
 				String key = e.getKey().substring(2);
@@ -85,9 +99,6 @@ public class Bootstrap implements Lifecycle {
 					value = ((ConfigReader.Variable) value).calculateValue();
 				}
 				System.setProperty(key, value.toString());
-				if (CLUSTER_MODE.equals(e.getKey())) {
-					System.setProperty("tigase.cache", "false");
-				}					
 			}
 		}
 
@@ -160,8 +171,7 @@ public class Bootstrap implements Lifecycle {
 			log.log(Level.FINE, "failed to dump configuration to file etc/config-dump.properties");
 		}
 	}
-
-	@Override
+	
 	public void stop() {
 		MessageRouter mr = kernel.getInstance("message-router");
 		mr.stop();
@@ -216,11 +226,11 @@ public class Bootstrap implements Lifecycle {
 		Map<String, Object> defaults = new HashMap<>();
 		String              levelStr = ".level";
 
-		if ((Boolean) params.get(GEN_TEST)) {
-			defaults.put(LOGGING_KEY + levelStr, "WARNING");
-		} else {
-			defaults.put(LOGGING_KEY + levelStr, "CONFIG");
-		}
+//		if ((Boolean) params.get("test")) {
+//			defaults.put(LOGGING_KEY + levelStr, "WARNING");
+//		} else {
+		defaults.put(LOGGING_KEY + levelStr, "CONFIG");
+//		}
 		defaults.put(LOGGING_KEY + "handlers",
 				"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",

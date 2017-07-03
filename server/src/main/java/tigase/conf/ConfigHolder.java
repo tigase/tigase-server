@@ -20,8 +20,15 @@
  */
 package tigase.conf;
 
+import tigase.cluster.ClusterConnectionManager;
 import tigase.db.RepositoryFactory;
+import tigase.io.CertificateContainer;
+import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
+import tigase.server.ConnectionManager;
+import tigase.server.amp.ActionAbstract;
+import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.ext.ComponentProtocol;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.server.xmppsession.SessionManagerConfig;
@@ -41,6 +48,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -48,9 +57,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static tigase.conf.ConfigHolder.Format.dsl;
+import static tigase.conf.Configurable.CLUSTER_NODES_PROP_KEY;
 import static tigase.conf.Configurable.GEN_SM_PLUGINS;
+import static tigase.conf.Configurable.GEN_TEST;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
+import static tigase.io.SSLContextContainerIfc.ALLOW_INVALID_CERTS_KEY;
+import static tigase.io.SSLContextContainerIfc.ALLOW_SELF_SIGNED_CERTS_KEY;
 
 /**
  * Created by andrzej on 18.09.2016.
@@ -118,9 +131,26 @@ public class ConfigHolder {
 			switch (holder.format) {
 				case dsl:
 					holder.loadFromDSLFiles();
-					TigaseRuntime.getTigaseRuntime()
-							.shutdownTigase(new String[]{
-									"Configuration file " + configFile + " is in DSL format and is valid."});
+					if (upgradeDSL(holder.props)) {
+						try {
+							Path initPropsFile = holder.initPropertiesPath;
+							Path initPropsFileOld = backupOldConfigFile(initPropsFile);
+							holder.saveToDSLFile(initPropsFile.toFile());
+							TigaseRuntime.getTigaseRuntime()
+									.shutdownTigase(
+											new String[]{"Configuration file " + configFile + " was updated to match current configuration format.",
+														 "Previous version of a configuration file was saved at " +
+																 initPropsFileOld});
+						} catch (IOException ex) {
+							TigaseRuntime.getTigaseRuntime()
+									.shutdownTigase(new String[]{"Error! Failed to save upgraded configuration file",
+																 ex.getMessage()});
+						}
+					} else {
+						TigaseRuntime.getTigaseRuntime()
+								.shutdownTigase(new String[]{
+										"Configuration file " + configFile + " is in DSL format and is valid."});
+					}
 					break;
 				case properties:
 					holder.loadFromPropertiesFiles();
@@ -128,6 +158,7 @@ public class ConfigHolder {
 					Path initPropsFileOld = initPropsFile.resolveSibling(
 							holder.initPropertiesPath.getFileName() + ".old");
 					holder.props = ConfigWriter.buildTree(holder.props);
+					upgradeDSL(holder.props);
 					try {
 						Files.deleteIfExists(initPropsFileOld);
 						Files.move(initPropsFile, initPropsFileOld);
@@ -156,24 +187,52 @@ public class ConfigHolder {
 		}
 	}
 
+	private static Path backupOldConfigFile(Path initPropsFile) throws IOException {
+		Path initPropsFileOld = initPropsFile.resolveSibling(initPropsFile.getFileName() + ".old");
+		int i=0;
+		while (Files.exists(initPropsFileOld)) {
+			i++;
+			initPropsFileOld = initPropsFile.resolveSibling(initPropsFile.getFileName() + ".old." + i);
+		}
+
+		Files.deleteIfExists(initPropsFileOld);
+		Files.move(initPropsFile, initPropsFileOld);
+		return initPropsFileOld;
+	}
+
 	public void loadConfiguration(String[] args) throws IOException, ConfigReader.ConfigException {
 		List<String> settings = new LinkedList<>();
 		ConfiguratorAbstract.parseArgs(props, settings, args);
+		props.remove(GEN_TEST);
 
 		detectPathAndFormat();
 
 		switch (format) {
 			case dsl:
 				loadFromDSLFiles();
+				if (upgradeDSL(props)) {
+					try {
+						Path initPropsFile = initPropertiesPath;
+						Path initPropsFileOld = backupOldConfigFile(initPropsFile);
+						saveToDSLFile(initPropsFile.toFile());
+						log.log(Level.WARNING,
+								"Configuration file {0} was updated to match current format." +
+										" Previous version of configuration file was saved at {1}",
+								new Object[]{initPropsFile, initPropsFileOld});
+					} catch (IOException ex) {
+						log.log(Level.SEVERE, "could not replace configuration file with file in DSL format", ex);
+						throw new RuntimeException(ex);
+					}
+				}
 				break;
 			case properties:
 				loadFromPropertiesFiles();
-				Path initPropsFile = initPropertiesPath;
-				Path initPropsFileOld = initPropsFile.resolveSibling(initPropertiesPath.getFileName() + ".old");
+				upgradeDSL(props);
 				props = ConfigWriter.buildTree(props);
+				Path initPropsFile = initPropertiesPath;
+				Path initPropsFileOld = null;
 				try {
-					Files.deleteIfExists(initPropsFileOld);
-					Files.move(initPropsFile, initPropsFileOld);
+					initPropsFileOld = backupOldConfigFile(initPropsFile);
 					saveToDSLFile(initPropsFile.toFile());
 				} catch (IOException ex) {
 					log.log(Level.SEVERE, "could not replace configuration file with file in DSL format", ex);
@@ -260,8 +319,108 @@ public class ConfigHolder {
 		props.putAll(loaded);
 	}
 
-	private void loadFromPropertiesFiles() {
+	private void loadFromPropertiesFiles() throws ConfigReader.ConfigException {
 		props.putAll(new PropertiesConfigReader().read(initPropertiesPath));
+	}
+
+	private static void putIfAbsent(Map<String, Object> props, String newKey, Object value) {
+		Map<String, Object> parentProps = null;
+		String[] parts = newKey.split("/");
+		for (int i=0; i < parts.length-1; i++) {
+			parentProps = props;
+			props = (Map<String, Object>) props.computeIfAbsent(parts[i], (k) -> new HashMap<>());
+		}
+		String key = parts[parts.length-1];
+		if (key.equals("class")) {
+			if (!(props instanceof AbstractBeanConfigurator.BeanDefinition)) {
+				AbstractBeanConfigurator.BeanDefinition tmp  = new AbstractBeanConfigurator.BeanDefinition();
+				tmp.setBeanName(parts[parts.length-2]);
+				tmp.putAll(props);
+				props = tmp;
+				parentProps.put(tmp.getBeanName(), tmp);
+			}
+			((AbstractBeanConfigurator.BeanDefinition) props).setClazzName(value.toString());
+		} else {
+			props.put(key, value);
+		}
+	}
+
+	private static Optional renameIfExists(Map<String, Object> props, String oldKey, String newKey, Function<Object, Object> converter) {
+		Optional value = Optional.ofNullable(props.remove(oldKey));
+		value = value.map(converter);
+		if (value.isPresent()) {
+			putIfAbsent(props, newKey, value.get());
+		}
+		return value;
+	}
+
+	private static void removeIfExistsAnd(Map<String, Object> props, String oldKey, BiConsumer<BiConsumer<String, Object>, Object> consumer) {
+		Object value = props.remove(oldKey);
+		if (value != null) {
+			consumer.accept((k,v) -> {
+				putIfAbsent(props, k, v);
+			}, value);
+		}
+	}
+
+	private static boolean upgradeDSL(Map<String, Object> props) {
+		String before = props.toString();
+		renameIfExists(props, "--cluster-mode", "cluster-mode", Function.identity());
+		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, Configurable.GEN_DEBUG, "debug", value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, Configurable.GEN_DEBUG_PACKAGES, "debug-packages", value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, "--client-port-delay-listening", "client-port-delay-listening", Function.identity());
+		renameIfExists(props, "--shutdown-thread-dump", "shutdown-thread-dump", Function.identity());
+		renameIfExists(props, ActionAbstract.AMP_SECURITY_LEVEL, "amp-security-level", Function.identity());
+		removeIfExistsAnd(props, "--cm-see-other-host=", (setter, value) -> {
+			setter.accept("c2s/seeOtherHost/class", value);
+			setter.accept("bosh/seeOtherHost/class", value);
+			setter.accept("ws2s/seeOtherHost/class", value);
+		});
+		renameIfExists(props,"--watchdog_timeout","watchdog-timeout", Function.identity());
+		renameIfExists(props,"--watchdog_delay", "watchdog-timeout", Function.identity());
+		renameIfExists(props,"--watchdog_ping_type", "watchdog-ping-type", Function.identity());
+		renameIfExists(props, "--installation-id", "installation-id", Function.identity());
+		renameIfExists(props, ConnectionManager.NET_BUFFER_HT_PROP_KEY, ConnectionManager.NET_BUFFER_HT_PROP_KEY.substring(2), Function.identity());
+		renameIfExists(props, ConnectionManager.NET_BUFFER_ST_PROP_KEY, ConnectionManager.NET_BUFFER_ST_PROP_KEY.substring(2), Function.identity());
+		renameIfExists(props, ConnectionManager.HT_TRAFFIC_THROTTLING_PROP_KEY, ConnectionManager.HT_TRAFFIC_THROTTLING_PROP_KEY.substring(2), Function.identity());
+		renameIfExists(props, ConnectionManager.ST_TRAFFIC_THROTTLING_PROP_KEY, ConnectionManager.ST_TRAFFIC_THROTTLING_PROP_KEY.substring(2), Function.identity());
+		renameIfExists(props, "--ws-allow-unmasked-frames", "ws-allow-unmasked-frames", Function.identity());
+		renameIfExists(props, "--vhost-tls-required", "vhost-tls-required", Function.identity());
+		renameIfExists(props, "--vhost-register-enabled", "vhost-register-enabled", Function.identity());
+		renameIfExists(props, "--vhost-message-forward-jid", "vhost-message-forward-jid", Function.identity());
+		renameIfExists(props, "--vhost-presence-forward-jid", "vhost-presence-forward-jid", Function.identity());
+		renameIfExists(props, "--vhost-max-users", "vhost-max-users", Function.identity());
+		renameIfExists(props, "--vhost-anonymous-enabled", "vhost-anonymous-enabled", Function.identity());
+		renameIfExists(props, "--vhost-disable-dns-check", "vhost-disable-dns-check", Function.identity());
+		renameIfExists(props, "--test", "logging/rootLevel", value -> Boolean.TRUE.equals(value) ? Level.WARNING : Level.CONFIG);
+
+		renameIfExists(props, "--" + SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_KEY, "certificate-container/" + SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_KEY, Function.identity());
+		renameIfExists(props, "--" + CertificateContainer.SNI_DISABLE_KEY, "certificate-container/" + CertificateContainer.SNI_DISABLE_KEY, Function.identity());
+		renameIfExists(props, "--" + SSLContextContainerIfc.SERVER_CERTS_LOCATION_KEY, "certificate-container/" + SSLContextContainerIfc.SERVER_CERTS_LOCATION_KEY, Function.identity());
+		renameIfExists(props, "--" + SSLContextContainerIfc.TRUSTED_CERTS_DIR_KEY, "certificate-container/" + SSLContextContainerIfc.TRUSTED_CERTS_DIR_KEY, Function.identity());
+		renameIfExists(props, "--pem-privatekey-password", "certificate-container/pem-privatekey-password", Function.identity());
+		renameIfExists(props, "--tls-jdk-nss-bug-workaround-active", "tls-jdk-nss-bug-workaround-active", Function.identity());
+		renameIfExists(props, "--tls-enabled-protocols", "tls-enabled-protocols", value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, "--tls-enabled-ciphers", "tls-enabled-ciphers", value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, "--hardened-mode", "hardened-mode", Function.identity());
+
+		boolean allowInvalidCerts = Boolean.parseBoolean((String) props.remove(ALLOW_INVALID_CERTS_KEY));
+		boolean allowSelfSignedCerts = Boolean.parseBoolean((String) props.remove(ALLOW_SELF_SIGNED_CERTS_KEY));
+		if (allowInvalidCerts || allowSelfSignedCerts) {
+			props.put("certificate-container/ssl-trust-model", allowInvalidCerts ? "all" : (allowSelfSignedCerts ? "selfsigned" : "trusted"));
+		}
+
+		renameIfExists(props, "--" + BoshConnectionManager.BOSH_EXTRA_HEADERS_FILE_PROP_KEY, BoshConnectionManager.BOSH_EXTRA_HEADERS_FILE_PROP_KEY, Function.identity());
+		renameIfExists(props, "--" + BoshConnectionManager.BOSH_CLOSE_CONNECTION_PROP_KEY, BoshConnectionManager.BOSH_CLOSE_CONNECTION_PROP_KEY, Function.identity());
+		renameIfExists(props, "--" + BoshConnectionManager.CLIENT_ACCESS_POLICY_FILE_PROP_KEY, BoshConnectionManager.CLIENT_ACCESS_POLICY_FILE_PROP_KEY, Function.identity());
+		renameIfExists(props, "--stringprep-processor", "stringprep-processor", Function.identity());
+		renameIfExists(props, ClusterConnectionManager.CONNECT_ALL_PAR, "cl-comp/" + ClusterConnectionManager.CONNECT_ALL_PROP_KEY, Function.identity());
+		renameIfExists(props, "--cluster-connections-per-node", "cl-comp/connections-per-node", Function.identity());
+
+		String after = props.toString();
+		return !before.equals(after);
 	}
 
 	public static class PropertiesConfigReader {
@@ -272,7 +431,7 @@ public class ConfigHolder {
 			props = new LinkedHashMap<>();
 		}
 
-		public Map read(Path path) {
+		public Map read(Path path) throws ConfigReader.ConfigException {
 			LinkedList<String> settings = new LinkedList<>();
 			ConfiguratorAbstract.loadFromPropertiesFiles(path.toString(), props, settings);
 			loadFromPropertyStrings(settings);
@@ -304,7 +463,7 @@ public class ConfigHolder {
 			return props;
 		}
 
-		protected void convertFromOldFormat() {
+		protected void convertFromOldFormat() throws ConfigReader.ConfigException {
 			// converting old component configuration to new one
 			Map<String, Object> toAdd = new HashMap<>();
 			List<String> toRemove = new ArrayList<>();
@@ -314,6 +473,15 @@ public class ConfigHolder {
 
 			Pattern commandsPattern = Pattern.compile("^([^\\/]+)\\/command\\/(.+)$");
 			Pattern processorsPattern = Pattern.compile("^([^\\/]+)\\/processors\\/(.+)$");
+			
+			if (props.containsKey(RepositoryFactory.AUTH_DOMAIN_POOL_CLASS)) {
+				throw new ConfigReader.ConfigException(
+						"Cannot convert property " + RepositoryFactory.AUTH_DOMAIN_POOL_CLASS +
+								"!\nPlease check if provided class is compatible with Tigase XMPP Server data sources. If so, then please remove this property, convert the configuration file and then manually modify configuration.");
+			}
+			
+			Object defDataPoolSize = props.remove(RepositoryFactory.DATA_REPO_POOL_SIZE);
+			Object defAuthRepoPool = props.remove(RepositoryFactory.AUTH_REPO_POOL_SIZE);
 
 			props.forEach((k, v) -> {
 				if (k.equals("config-type")) {
@@ -530,6 +698,21 @@ public class ConfigHolder {
 						}
 					}
 				}
+				if (k.startsWith("basic-conf/user-repo-params/")) {
+					String[] tmp = k.replace("basic-conf/user-repo-params/", "").split("/");
+					String domain = "default";
+					String prop = null;
+					if (tmp.length == 1) {
+						prop = tmp[0];
+					} else {
+						domain = tmp[0];
+						prop = tmp[1];
+					}
+					Map<String, Object> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
+					Map<String, Object> authParams = (Map<String, Object>) ds.computeIfAbsent("user-params", (x) -> new HashMap<String, Object>());
+					authParams.put(prop, v.toString());
+					toRemove.add(k);
+				}
 				if (k.startsWith("basic-conf/auth-repo-params/")) {
 					String[] tmp = k.replace("basic-conf/auth-repo-params/", "").split("/");
 					String domain = "default";
@@ -557,10 +740,18 @@ public class ConfigHolder {
 				String ampUri = (String) cfg.get("amp-uri");
 				String ampType = (String) cfg.get("amp-type");
 				Map<String, Object> authParams = (Map<String, Object>) cfg.get("auth-params");
+				Map<String, Object> userParams = (Map<String, Object>) cfg.get("user-params");
+
+				String sourcePrefix = "dataSource/" + domain + "/";
+				String authPrefix = "authRepository/" + domain + "/";
+				String userPrefix = "userRepository/" + domain + "/";
 
 				if (userUri != null) {
 					props.put("dataSource/" + domain + "/uri", userUri);
 					props.put("dataSource/" + domain + "/active", "true");
+					if (defDataPoolSize != null) {
+						props.put(sourcePrefix + "pool-size", defDataPoolSize);
+					}
 					props.put("userRepository/" + domain + "/active", "true");
 					props.put("authRepository/" + domain + "/active", "true");
 				}
@@ -568,6 +759,9 @@ public class ConfigHolder {
 				if ((authUri != null) && (userUri == null || !userUri.contains(authUri))) {
 					props.put("dataSource/" + domain + "-auth/uri", authUri);
 					props.put("dataSource/" + domain + "-auth/active", "true");
+					if (defDataPoolSize != null) {
+						props.put("dataSource/" + domain + "-auth/pool-size", defDataPoolSize);
+					}
 					props.put("authRepository/" + domain + "/data-source", domain + "-auth");
 					props.put("authRepository/" + domain + "/active", "true");
 				}
@@ -593,8 +787,32 @@ public class ConfigHolder {
 				}
 				if (authParams != null) {
 					authParams.forEach((k,v) -> {
-						props.put("authRepository/" + domain + "/" + k, v);
+						if (k.equals(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY)) {
+							props.put(authPrefix + "/cls", v);
+						} else if (k.equals(RepositoryFactory.AUTH_REPO_POOL_CLASS_PROP_KEY)) {
+							props.put(authPrefix + "/pool-cls", v);
+						} else if (k.equals(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY)) {
+							props.put(authPrefix + "/pool-size", v);
+						} else {
+							props.put(authPrefix + k, v);
+						}
 					});
+				}
+				if (userParams != null) {
+					userParams.forEach((k,v) -> {
+						if (k.equals(RepositoryFactory.USER_REPO_CLASS_PROP_KEY)) {
+							props.put(userPrefix + "/cls", v);
+						} else if (k.equals(RepositoryFactory.USER_REPO_POOL_CLASS_PROP_KEY)) {
+							props.put(userPrefix + "/pool-cls", v);
+						} else if (k.equals(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY)) {
+							props.put(userPrefix + "/pool-size", v);
+						} else {
+							props.put(userPrefix + k, v);
+						}
+					});
+				}
+				if (defAuthRepoPool != null) {
+					props.putIfAbsent(authPrefix, defAuthRepoPool);
 				}
 			});
 
@@ -607,6 +825,9 @@ public class ConfigHolder {
 						.map(e -> e.getKey().replace("/class", ""))
 						.findFirst();
 				extCmpName.ifPresent(cmpName -> toAdd.put(cmpName + "/repository/items", Arrays.asList(external.split(","))));
+				renameIfExists(props, ComponentProtocol.EXTCOMP_BIND_HOSTNAMES,
+							   ComponentProtocol.EXTCOMP_BIND_HOSTNAMES_PROP_KEY,
+							   value -> Arrays.asList(((String) value).split(",")));
 			}
 
 			String admins = (String) props.remove("--admins");
@@ -757,7 +978,6 @@ public class ConfigHolder {
 					}
 				}
 			}
-
 		}
 	}
 
