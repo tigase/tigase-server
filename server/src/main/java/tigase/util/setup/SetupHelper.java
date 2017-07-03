@@ -75,11 +75,11 @@ public class SetupHelper {
 		ConfigBuilder builder = new ConfigBuilder().with("config-type", configType.id().toLowerCase());
 
 		if (clusterMode) {
-			builder.with("--cluster-mode", "true");
+			builder.with("cluster-mode", "true");
 		}
-		builder.with("--virt-hosts", Arrays.stream(virtualDomains).collect(Collectors.joining(",")))
+		builder.with("virtual-hosts", Arrays.asList(virtualDomains))
 				.with("admins", admins)
-				.with("--debug", "server");
+				.with("debug", Arrays.asList("server"));
 
 		builder.withBean(ds -> ds.name("dataSource").withBean(def -> def.name("default").with("uri", dbUri)));
 

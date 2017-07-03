@@ -114,9 +114,9 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 	}
 
 
-	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "enabled-ciphers")
+	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "tls-enabled-ciphers")
 	private String[] enabledCiphers;
-	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "enabled-protocols")
+	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "tls-enabled-protocols")
 	private String[] enabledProtocols;
 
 	@ConfigField(desc = "TLS/SSL hardened mode", alias = "hardened-mode")

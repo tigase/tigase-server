@@ -487,6 +487,7 @@ public class ConfigHolder {
 				if (k.equals("config-type")) {
 					switch ((String) v) {
 						case "--gen-config-all":
+						case "--gen-config-def":
 						case "--gen-config-default":
 							toAdd.put(k, "default");
 							break;
@@ -594,6 +595,7 @@ public class ConfigHolder {
 				}
 				if (k.startsWith("sess-man/plugins-conf/")) {
 					if (k.equals("sess-man/plugins-conf/dynamic-roster-classes")) {
+						
 						toAdd.put("sess-man/dynamic-rosters/active", "true");
 						for (String clazzName : v.toString().split(",")) {
 							String[] parts = clazzName.split("\\.");
@@ -899,6 +901,9 @@ public class ConfigHolder {
 
 			// converting list of sess-man processors from --sm-plugins to sess-man/beans
 			// and converting concurrency settings as well
+			if (!"connection-managers".equals(props.get("config-type")) && !"component".equals(props.get("config-type"))) {
+				props.put("sess-man/active", "true");
+			}
 			String plugins = (String) props.remove(GEN_SM_PLUGINS);
 			if (plugins != null) {
 				Set<XMPPProcessor> knownProcessors = ClassUtilBean.getInstance()
