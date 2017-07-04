@@ -306,7 +306,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 
 	private DataRepository data_repo = null;
 	@ConfigField(desc = "Database initialization query which is run after the server is started", alias = DEF_INITDB_KEY)
-	private String initdb_query = DEF_INITDB_QUERY;
+	private String initdb_query = null;
 	@ConfigField(desc = "Retrieves user password from the database for given user_id (JID)", alias = DEF_GETPASSWORD_KEY)
 	private String getpassword_query = DEF_GETPASSWORD_QUERY;
 	@ConfigField(desc = "Removes a user from the database", alias = DEF_DELUSER_KEY)
@@ -582,7 +582,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	@Deprecated
 	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
-			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
+			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, null);
 
 			adduser_query = getParamWithDef(params, DEF_ADDUSER_KEY, DEF_ADDUSER_QUERY);
 			
