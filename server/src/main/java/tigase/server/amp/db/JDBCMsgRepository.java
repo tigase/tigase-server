@@ -53,6 +53,8 @@ import java.util.logging.Logger;
 public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 	private static final Logger log = Logger.getLogger(JDBCMsgRepository.class.getName());
 
+	private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
 	@ConfigField(desc = "Query to add message", alias = "add-message-query")
 	private String MSGS_ADD_MESSAGE = "{ call Tig_OfflineMessages_AddMessage(?,?,?,?,?,?,?) }";
 	@ConfigField(desc = "Query to count messages", alias = "count-messages-query")
@@ -423,7 +425,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 				}
 
 				insert_msg_st.setInt(3, msg_type);
-				insert_msg_st.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+				insert_msg_st.setTimestamp(4, new Timestamp(System.currentTimeMillis()), UTC_CALENDAR);
 				insert_msg_st.setString(5, msg.toString());
 
 				if (expired == null) {
@@ -431,7 +433,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 				} else {
 					Timestamp time = new Timestamp(expired.getTime());
 
-					insert_msg_st.setTimestamp(6, time);
+					insert_msg_st.setTimestamp(6, time, UTC_CALENDAR);
 				}
 				insert_msg_st.setLong(7, msgs_store_limit);
 
@@ -523,7 +525,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 
 			synchronized (select_expired_before_st) {
 				try {
-					select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()));
+					select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()), UTC_CALENDAR);
 					rs = select_expired_before_st.executeQuery();
 
 					DomBuilderHandler domHandler = new DomBuilderHandler();
@@ -560,7 +562,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 							+ "XML elements: {0}", msg_str);
 			return null;
 		} else {
-			Timestamp ts = rs.getTimestamp(2);
+			Timestamp ts = rs.getTimestamp(2, UTC_CALENDAR);
 			return new MsgDBItem(rs.getLong(1), msg, ts);
 		}
 	}

@@ -27,6 +27,8 @@ import tigase.util.Algorithms;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +38,8 @@ import java.util.logging.Logger;
 public class MsgRepositoryStoredProcedures {
 
 	private static final Logger log = Logger.getLogger(StoredProcedures.class.getName());
+
+	private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -103,12 +107,12 @@ public class MsgRepositoryStoredProcedures {
 			stmt.setString(3, sender.toString());
 			stmt.setString(4, senderSha1);
 			stmt.setInt(5, type.intValue());
-			stmt.setTimestamp(6, ts);
+			stmt.setTimestamp(6, ts, UTC_CALENDAR);
 			stmt.setString(7, message);
 			if (expired == null) {
 				stmt.setNull(8, Types.TIMESTAMP);
 			} else {
-				stmt.setTimestamp(8, expired);
+				stmt.setTimestamp(8, expired, UTC_CALENDAR);
 			}
 
 			stmt.execute();
@@ -329,8 +333,8 @@ public class MsgRepositoryStoredProcedures {
 				stmt.setNull(1, Types.TIMESTAMP);
 				stmt.setNull(2, Types.TIMESTAMP);
 			} else {
-				stmt.setTimestamp(1, before);
-				stmt.setTimestamp(2, before);
+				stmt.setTimestamp(1, before, UTC_CALENDAR);
+				stmt.setTimestamp(2, before, UTC_CALENDAR);
 			}
 			data[0] = stmt.executeQuery();
 		} finally {

@@ -33,10 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +47,8 @@ import static tigase.server.amp.db.JDBCMsgRepository.Meta;
 public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,DataRepository> {
 
 	private static final Logger log = Logger.getLogger(JDBCMsgBroadcastRepository.class.getCanonicalName());
+
+	private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 	@ConfigField(desc = "Query to add message to broadcast messsages", alias = "add-message")
 	private String BROADCAST_ADD_MESSAGE = "{ call Tig_BroadcastMessages_AddMessage(?,?,?) }";
@@ -88,7 +87,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 				try {
 					Timestamp ts = new Timestamp(System.currentTimeMillis());
 					System.out.println("loading expiring after " + ts);
-					stmt.setTimestamp(1, ts);
+					stmt.setTimestamp(1, ts, UTC_CALENDAR);
 					rs = stmt.executeQuery();
 
 					DomBuilderHandler domHandler = new DomBuilderHandler();
@@ -99,7 +98,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 						if (broadcastMessages.containsKey(msgId))
 							continue;
 
-						Date expire = rs.getTimestamp(2);
+						Date expire = rs.getTimestamp(2, UTC_CALENDAR);
 						char[] msgChars = rs.getString(3).toCharArray();
 
 						parser.parse(domHandler, msgChars, 0, msgChars.length);
@@ -152,7 +151,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 			PreparedStatement stmt = data_repo.getPreparedStatement(recipient, BROADCAST_ADD_MESSAGE);
 			synchronized (stmt) {
 				stmt.setString(1, id);
-				stmt.setTimestamp(2, new Timestamp(expire.getTime()));
+				stmt.setTimestamp(2, new Timestamp(expire.getTime()), UTC_CALENDAR);
 				stmt.setString(3, msg.toString());
 				stmt.executeUpdate();
 			}

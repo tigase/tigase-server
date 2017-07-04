@@ -25,7 +25,7 @@
 
 -- QUERY START:
 -- It sets last_login time to the current timestamp
-create or replace function TigUpdateLoginTime(varchar(2049)) returns void as '
+create or replace function TigUpdateLoginTime(varchar(2049)) returns void as $$
 declare
   _user_id alias for $1;
 begin
@@ -34,13 +34,20 @@ begin
 		where lower(user_id) = lower(_user_id);
   return;
 end;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 -- QUERY END:
 
+-- QUERY START:
+-- Get list of all disabled user accounts
+create or replace function TigDisabledAccounts() returns table(user_id varchar(2049), last_login timestamp with time zone, last_logout timestamp with time zone, online_status int, failed_logins int, account_status int) as '
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status = 0;
+' LANGUAGE 'sql';
+-- QUERY END:
 
 -- ------------ Offline Messages
 -- QUERY START:
-create or replace function Tig_OfflineMessages_AddMessage(_to varchar(2049), _from varchar(2049), _type int, _ts timestamp, _message text, _expired timestamp, _limit bigint) returns bigint as $$
+create or replace function Tig_OfflineMessages_AddMessage(_to varchar(2049), _from varchar(2049), _type int, _ts timestamp with time zone, _message text, _expired timestamp with time zone, _limit bigint) returns bigint as $$
 declare
     _msg_count bigint;
     _msg_id bigint;
@@ -171,7 +178,7 @@ $$ LANGUAGE 'plpgsql';
 
 -- QUERY START:
 create or replace function Tig_OfflineMessages_GetExpiredMessages(_limit int) returns table(
-    "msg_id" bigint, "expired" timestamp, "message" text
+    "msg_id" bigint, "expired" timestamp with time zone, "message" text
 ) as $$
 begin
     return query select om.msg_id, om.expired, om.message
@@ -184,8 +191,8 @@ $$ LANGUAGE 'plpgsql';
 -- QUERY END:
 
 -- QUERY START:
-create or replace function  Tig_OfflineMessages_GetExpiredMessagesBefore(_expired timestamp) returns table(
-    "msg_id" bigint, "expired" timestamp, "message" text
+create or replace function  Tig_OfflineMessages_GetExpiredMessagesBefore(_expired timestamp with time zone) returns table(
+    "msg_id" bigint, "expired" timestamp with time zone, "message" text
 ) as $$
 begin
     return query select om.msg_id, om.expired, om.message
@@ -200,7 +207,7 @@ $$ LANGUAGE 'plpgsql';
 
 -- ------------ Broadcast Messages
 -- QUERY START:
-create or replace function Tig_BroadcastMessages_AddMessage(_msg_id varchar(128), _expired timestamp, _msg text) returns void
+create or replace function Tig_BroadcastMessages_AddMessage(_msg_id varchar(128), _expired timestamp with time zone, _msg text) returns void
 as $$
 begin
     begin
@@ -246,7 +253,7 @@ $$ LANGUAGE 'plpgsql';
 -- QUERY END:
 
 -- QUERY START:
-create or replace function  Tig_BroadcastMessages_GetMessages(_expired timestamp) returns table (
+create or replace function  Tig_BroadcastMessages_GetMessages(_expired timestamp with time zone) returns table (
     id varchar(128),
     expired timestamp,
     msg text

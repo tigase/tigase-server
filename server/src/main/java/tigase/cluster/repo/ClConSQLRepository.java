@@ -34,8 +34,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +57,8 @@ public class ClConSQLRepository
 	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger(ClConSQLRepository.class.getName());
+
+	private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 	//J-
 	/* @formatter:off */
 	private static final String GET_ITEM_QUERY =
@@ -199,7 +203,7 @@ public class ClConSQLRepository
 				updateItemSt.setString(1, item.getHostname());
 				updateItemSt.setString(2, item.getSecondaryHostname());
 				updateItemSt.setString(3, item.getPassword());
-				updateItemSt.setTimestamp(4, new Timestamp(date.getTime()));
+				updateItemSt.setTimestamp(4, new Timestamp(date.getTime()), UTC_CALENDAR);
 				updateItemSt.setInt(5, item.getPortNo());
 				updateItemSt.setFloat(6, item.getCpuUsage());
 				updateItemSt.setFloat(7, item.getMemUsage());
@@ -211,7 +215,7 @@ public class ClConSQLRepository
 				insertItemSt.setString(1, item.getHostname());
 				insertItemSt.setString(2, item.getSecondaryHostname());
 				insertItemSt.setString(3, item.getPassword());
-				insertItemSt.setTimestamp(4, new Timestamp(date.getTime()));
+				insertItemSt.setTimestamp(4, new Timestamp(date.getTime()), UTC_CALENDAR);
 				insertItemSt.setInt(5, item.getPortNo());
 				insertItemSt.setFloat(6, item.getCpuUsage());
 				insertItemSt.setFloat(7, item.getMemUsage());
@@ -254,7 +258,7 @@ public class ClConSQLRepository
 						item.setHostname(rs.getString(HOSTNAME_COLUMN));
 						item.setSecondaryHostname(rs.getString(SECONDARY_HOSTNAME_COLUMN));
 						item.setPassword(rs.getString(PASSWORD_COLUMN));
-						item.setLastUpdate(rs.getTimestamp(LASTUPDATE_COLUMN).getTime());
+						item.setLastUpdate(rs.getTimestamp(LASTUPDATE_COLUMN, UTC_CALENDAR).getTime());
 						item.setPort(rs.getInt(PORT_COLUMN));
 						item.setCpuUsage(rs.getFloat(CPU_USAGE_COLUMN));
 						item.setMemUsage(rs.getFloat(MEM_USAGE_COLUMN));

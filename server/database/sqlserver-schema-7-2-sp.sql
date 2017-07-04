@@ -37,7 +37,61 @@ create procedure dbo.TigUpdateLoginTime
 AS
 begin
 	update dbo.tig_users
-		set last_login = CURRENT_TIMESTAMP
+		set last_login = GETUTCDATE()
+		where user_id = @_user_id;
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserLogin')
+DROP PROCEDURE TigUserLogin
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Perforrm user login. It returns user_id uppon success and NULL
+-- on failure.
+-- If the login is successful it also increases online_status and sets
+-- last_login time to the current timestamp
+create procedure dbo.TigUserLogin
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
+AS
+begin
+	if exists(select 1 from dbo.tig_users
+		where (account_status > 0) AND (sha1_user_id = hashbytes('SHA1', lower(@_user_id)))
+			AND (user_pw = @_user_pw) AND (user_id = @_user_id))
+		begin
+		update dbo.tig_users
+			set online_status = online_status + 1, last_login = GETUTCDATE()
+				where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+			select @_user_id as user_id;
+		end
+	else
+		begin
+			update dbo.tig_users set failed_logins = failed_logins + 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+			select NULL as user_id;
+		end
+	end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserLogout')
+DROP PROCEDURE TigUserLogout
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- It decreases online_status and sets last_logout time to the current timestamp
+create procedure dbo.TigUserLogout
+	@_user_id nvarchar(2049)
+AS
+begin
+	update dbo.tig_users
+		set online_status = dbo.InlineMax(online_status - 1, 0),
+			last_logout = GETUTCDATE()
 		where user_id = @_user_id;
 end
 -- QUERY END:

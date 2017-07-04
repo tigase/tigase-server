@@ -30,8 +30,8 @@ begin
     else
         create table if not exists tig_offline_messages (
             msg_id bigserial,
-            ts timestamp default now(),
-            expired timestamp,
+            ts timestamp with time zone default now(),
+            expired timestamp with time zone,
             sender varchar(2049),
             receiver varchar(2049) not null,
             msg_type int not null default 0,
@@ -88,7 +88,7 @@ begin
     else
         create table if not exists tig_broadcast_messages (
             id varchar(128) not null,
-            expired timestamp not null,
+            expired timestamp with time zone not null,
 			msg text not null,
 			primary key (id)
 			);
@@ -159,10 +159,29 @@ create table if not exists tig_cluster_nodes (
     hostname varchar(512) not null,
 	secondary varchar(512),
     password varchar(255) not null,
-    last_update timestamp default current_timestamp,
+    last_update timestamp with time zone default current_timestamp,
     port int,
     cpu_usage double precision not null,
     mem_usage double precision not null,
     primary key (hostname)
 );
+-- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+    alter table tig_offline_messages
+        alter column ts type timestamp with time zone,
+        alter column expired type timestamp with time zone;
+    alter table tig_broadcast_messages
+        alter column expired type timestamp with time zone;
+
+    alter table tig_cluster_nodes
+        alter column last_update type timestamp with time zone;
+        
+    alter table tig_users
+        alter column acc_create_time type timestamp with time zone,
+        alter column last_login type timestamp with time zone,
+	    alter column last_logout type timestamp with time zone;
+end$$;
 -- QUERY END:

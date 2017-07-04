@@ -40,7 +40,7 @@ GO
 if object_id('dbo.tig_offline_messages') is null
     create table tig_offline_messages (
         msg_id [bigint] IDENTITY(1,1),
-        ts [datetime] DEFAULT getdate(),
+        ts [datetime] DEFAULT GETUTCDATE(),
         expired [datetime],
         sender nvarchar(2049),
         sender_sha1 varbinary(20),
@@ -229,7 +229,7 @@ if object_id('dbo.tig_cluster_nodes') is null
         hostname nvarchar(450) not null,
         secondary nvarchar(512),
         password nvarchar(255) not null,
-		last_update [datetime] default getdate(),
+		last_update [datetime] default getutcdate(),
 		port int,
 		cpu_usage double precision not null,
 		mem_usage double precision not null,
