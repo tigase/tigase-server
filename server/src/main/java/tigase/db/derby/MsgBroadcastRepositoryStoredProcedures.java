@@ -26,15 +26,11 @@ import tigase.util.Algorithms;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.util.Calendar;
-import java.util.TimeZone;
 
 /**
  * Created by andrzej on 24.03.2017.
  */
 public class MsgBroadcastRepositoryStoredProcedures {
-
-	private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 	public static void addMessage(String msgId, Timestamp expired, String msg)
 			throws SQLException {
@@ -55,7 +51,7 @@ public class MsgBroadcastRepositoryStoredProcedures {
 
 			stmt = conn.prepareStatement("insert into tig_broadcast_messages (id, expired, msg) values (?,?,?)");
 			stmt.setString(1, msgId);
-			stmt.setTimestamp(2, expired, UTC_CALENDAR);
+			stmt.setTimestamp(2, expired);
 			stmt.setString(3, msg);
 			stmt.executeUpdate();
 		} finally {
@@ -130,7 +126,7 @@ public class MsgBroadcastRepositoryStoredProcedures {
 		try {
 			PreparedStatement stmt = conn.prepareStatement(
 					"select id, expired, msg from tig_broadcast_messages where expired >= ?");
-			stmt.setTimestamp(1, expired, UTC_CALENDAR);
+			stmt.setTimestamp(1, expired);
 			data[0] = stmt.executeQuery();
 		} finally {
 			conn.close();
