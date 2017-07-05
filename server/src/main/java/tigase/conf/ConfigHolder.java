@@ -57,9 +57,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static tigase.conf.ConfigHolder.Format.dsl;
-import static tigase.conf.Configurable.CLUSTER_NODES_PROP_KEY;
-import static tigase.conf.Configurable.GEN_SM_PLUGINS;
-import static tigase.conf.Configurable.GEN_TEST;
+import static tigase.conf.Configurable.*;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
 import static tigase.io.SSLContextContainerIfc.ALLOW_INVALID_CERTS_KEY;
@@ -366,10 +364,34 @@ public class ConfigHolder {
 	private static boolean upgradeDSL(Map<String, Object> props) {
 		String before = props.toString();
 		renameIfExists(props, "--cluster-mode", "cluster-mode", Function.identity());
-		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", value -> Arrays.asList(((String) value).split(",")));
-		renameIfExists(props, Configurable.GEN_DEBUG, "debug", value -> Arrays.asList(((String) value).split(",")));
-		renameIfExists(props, Configurable.GEN_DEBUG_PACKAGES, "debug-packages", value -> Arrays.asList(((String) value).split(",")));
-		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
+		renameIfExists(props, Configurable.GEN_DEBUG, "debug", value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
+		renameIfExists(props, Configurable.GEN_DEBUG_PACKAGES, "debug-packages", value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
+		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
 		renameIfExists(props, "--client-port-delay-listening", "client-port-delay-listening", Function.identity());
 		renameIfExists(props, "--shutdown-thread-dump", "shutdown-thread-dump", Function.identity());
 		renameIfExists(props, ActionAbstract.AMP_SECURITY_LEVEL, "amp-security-level", Function.identity());
@@ -402,8 +424,20 @@ public class ConfigHolder {
 		renameIfExists(props, "--" + SSLContextContainerIfc.TRUSTED_CERTS_DIR_KEY, "certificate-container/" + SSLContextContainerIfc.TRUSTED_CERTS_DIR_KEY, Function.identity());
 		renameIfExists(props, "--pem-privatekey-password", "certificate-container/pem-privatekey-password", Function.identity());
 		renameIfExists(props, "--tls-jdk-nss-bug-workaround-active", "tls-jdk-nss-bug-workaround-active", Function.identity());
-		renameIfExists(props, "--tls-enabled-protocols", "tls-enabled-protocols", value -> Arrays.asList(((String) value).split(",")));
-		renameIfExists(props, "--tls-enabled-ciphers", "tls-enabled-ciphers", value -> Arrays.asList(((String) value).split(",")));
+		renameIfExists(props, "--tls-enabled-protocols", "tls-enabled-protocols", value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
+		renameIfExists(props, "--tls-enabled-ciphers", "tls-enabled-ciphers", value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
 		renameIfExists(props, "--hardened-mode", "hardened-mode", Function.identity());
 
 		boolean allowInvalidCerts = Boolean.parseBoolean((String) props.remove(ALLOW_INVALID_CERTS_KEY));
