@@ -405,14 +405,6 @@ end;
 -- QUERY END:
 
 -- QUERY START:
--- Get list of all disabled user accounts
-create or replace function TigDisabledAccounts() returns table(user_id varchar(2049), last_login timestamp, last_logout timestamp, online_status int, failed_logins int, account_status int) as '
-	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users where account_status = 0;
-' LANGUAGE 'sql';
--- QUERY END:
-
--- QUERY START:
 -- Helper procedure for adding a new node
 create or replace function TigAddNode(bigint, bigint, varchar(255))
   returns bigint as '
