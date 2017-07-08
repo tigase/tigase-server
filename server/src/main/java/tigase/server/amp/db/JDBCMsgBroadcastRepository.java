@@ -48,8 +48,6 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 
 	private static final Logger log = Logger.getLogger(JDBCMsgBroadcastRepository.class.getCanonicalName());
 
-	private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-
 	@ConfigField(desc = "Query to add message to broadcast messsages", alias = "add-message")
 	private String BROADCAST_ADD_MESSAGE = "{ call Tig_BroadcastMessages_AddMessage(?,?,?) }";
 	@ConfigField(desc = "Query to add message recipient to broadcast message", alias = "add-message-recipient")
@@ -87,7 +85,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 				try {
 					Timestamp ts = new Timestamp(System.currentTimeMillis());
 					System.out.println("loading expiring after " + ts);
-					stmt.setTimestamp(1, ts, UTC_CALENDAR);
+					data_repo.setTimestamp(stmt, 1, ts);
 					rs = stmt.executeQuery();
 
 					DomBuilderHandler domHandler = new DomBuilderHandler();
@@ -98,7 +96,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 						if (broadcastMessages.containsKey(msgId))
 							continue;
 
-						Date expire = rs.getTimestamp(2, UTC_CALENDAR);
+						Date expire = data_repo.getTimestamp(rs, 2);
 						char[] msgChars = rs.getString(3).toCharArray();
 
 						parser.parse(domHandler, msgChars, 0, msgChars.length);
@@ -151,7 +149,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 			PreparedStatement stmt = data_repo.getPreparedStatement(recipient, BROADCAST_ADD_MESSAGE);
 			synchronized (stmt) {
 				stmt.setString(1, id);
-				stmt.setTimestamp(2, new Timestamp(expire.getTime()), UTC_CALENDAR);
+				data_repo.setTimestamp(stmt,2, new Timestamp(expire.getTime()));
 				stmt.setString(3, msg.toString());
 				stmt.executeUpdate();
 			}

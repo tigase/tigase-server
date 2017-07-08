@@ -28,10 +28,9 @@ package tigase.db;
 
 import tigase.xmpp.BareJID;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -47,6 +46,9 @@ import java.sql.Statement;
  * @version $Rev$
  */
 public interface DataRepository extends DataSource {
+
+	Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+	
 	/**
 	 * Helper enumeration with types of supported databases.
 	 *
@@ -253,6 +255,69 @@ public interface DataRepository extends DataSource {
 	 *         string.
 	 */
 	String getResourceUri();
+
+	/**
+	 * Helper method to set timestamp into prepared statements. Provides proper
+	 * calendar when needed to adjust timestamps so that they are stored in
+	 * the database in proper time zone.
+	 *
+	 * @param stmt
+	 * @param pos
+	 * @param timestamp
+	 * @throws SQLException
+	 */
+	default void setTimestamp(PreparedStatement stmt, int pos, java.sql.Timestamp timestamp) throws SQLException {
+		switch (getDatabaseType()) {
+			case jtds:
+			case sqlserver:
+				stmt.setTimestamp(pos, timestamp, UTC_CALENDAR);
+				break;
+			default:
+				stmt.setTimestamp(pos, timestamp);
+				break;
+		}
+	}
+
+	/**
+	 * Helper method to get timestamp from result set. Provides proper
+	 * calendar when needed to adjust timestamps so that they are stored in
+	 * the database in proper time zone.
+	 * 
+	 * @param rs
+	 * @param pos
+	 * @return
+	 * @throws SQLException
+	 */
+	default Timestamp getTimestamp(ResultSet rs, int pos) throws SQLException {
+		switch (getDatabaseType()) {
+			case jtds:
+			case sqlserver:
+				return rs.getTimestamp(pos, UTC_CALENDAR);
+			default:
+				return rs.getTimestamp(pos);
+		}
+	}
+
+	/**
+	 * Helper method to get timestamp from result set. Provides proper
+	 * calendar when needed to adjust timestamps so that they are stored in
+	 * the database in proper time zone.
+	 *
+	 * @param rs
+	 * @param pos
+	 * @return
+	 * @throws SQLException
+	 */
+	default Timestamp getTimestamp(ResultSet rs, String field) throws SQLException {
+		switch (getDatabaseType()) {
+			case jtds:
+			case sqlserver:
+				return rs.getTimestamp(field, UTC_CALENDAR);
+			default:
+				return rs.getTimestamp(field);
+		}
+	}
+
 }
 
 

@@ -552,7 +552,7 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 		long failedReconnections = list.getValue(compName, reconnectionFailedCounter.getName(), 0L) + reconnectionFailedCounter.getValue();
 		list.add(compName, reconnectionFailedCounter.getName(),failedReconnections, Level.FINER);
 	}
-
+	
 	@Override
 	public int getPoolSize() {
 		return 1;
