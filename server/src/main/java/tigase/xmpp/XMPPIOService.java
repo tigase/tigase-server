@@ -834,8 +834,24 @@ public class XMPPIOService<RefObject>
 					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(),
 							response });
 				}
-				writeRawData(response);
-				processWaitingPackets();
+				if (response == null) {
+					if (writeInProgress.tryLock()) {
+						try {
+							writeRawData(response);
+							processWaitingPackets();
+						} finally {
+							writeInProgress.unlock();
+						}
+					}
+				} else {
+					writeInProgress.lock();
+					try {
+						writeRawData(response);
+						processWaitingPackets();
+					} finally {
+						writeInProgress.unlock();
+					}
+				}
 				if ((response != null) && response.endsWith("</stream:stream>")) {
 					stop();
 				}    // end of if (response.endsWith())
