@@ -19,6 +19,7 @@
 package tigase.db.util;
 
 import tigase.conf.ConfigBuilder;
+import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
 import tigase.osgi.util.ClassUtilBean;
 import tigase.util.ui.console.CommandlineParameter;
@@ -204,7 +205,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 			configStr = "Failure: " + ex.getMessage();
 		}
 		Logger.getLogger(this.getClass().getCanonicalName())
-				.log(Level.INFO, "\n\nDatabase init.properties configuration:\n{0}\n", new Object[]{configStr});
+				.log(Level.INFO, "\n\nDatabase " + ConfigHolder.TDSL_CONFIG_FILE_DEF + " configuration:\n{0}\n", new Object[]{configStr});
 		return Result.ok;
 	}
 

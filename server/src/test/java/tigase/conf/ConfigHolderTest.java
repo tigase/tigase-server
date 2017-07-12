@@ -34,6 +34,8 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
@@ -44,8 +46,8 @@ import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
 public class ConfigHolderTest {
 
 	@Test
-	public void testFormatDetection() throws IOException {
-		ConfigHolder holder = new ConfigHolder();
+	public void testFormatDetection() throws IOException, ConfigReader.ConfigException {
+		OldConfigHolder holder = new OldConfigHolder();
 
 		File tmp = File.createTempFile("test_", ".properties");
 		try (Writer w = new FileWriter(tmp)) {
@@ -65,13 +67,13 @@ public class ConfigHolderTest {
 					.append("\n");
 		}
 
-		holder.getProperties().put(PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath());
+		holder.getProperties().put(ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, tmp.getAbsolutePath());
 
-		ConfigHolder.Format format = holder.detectPathAndFormat();
+		OldConfigHolder.Format format = holder.detectPathAndFormat();
 
 		tmp.delete();
 		
-		assertEquals(ConfigHolder.Format.properties, format);
+		assertEquals(OldConfigHolder.Format.properties, format);
 
 		tmp = File.createTempFile("test_", ".properties");
 		try (Writer w = new FileWriter(tmp)) {
@@ -91,13 +93,13 @@ public class ConfigHolderTest {
 					.append("\n");
 		}
 
-		holder.getProperties().put(PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath());
+		holder.getProperties().put(ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, tmp.getAbsolutePath());
 
 		format = holder.detectPathAndFormat();
 
 		tmp.delete();
 
-		assertEquals(ConfigHolder.Format.dsl, format);
+		assertEquals(OldConfigHolder.Format.dsl, format);
 	}
 
 	@Test
@@ -117,23 +119,25 @@ public class ConfigHolderTest {
 				.append("\n")
 				.append("--user-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password")
 				.append("\n");
-		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
-		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(w.toString().split("\n")));
 
-		reader.convertFromOldFormat();
+		File tmp = File.createTempFile("test_", ".properties");
+		try (Writer writer = new FileWriter(tmp)) {
+			writer.write(w.toString());
+		}
 
-		Map<String, Object> result = ConfigWriter.buildTree(props);
+		OldConfigHolder holder = new OldConfigHolder();
+		holder.getProperties().put(ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, tmp.getAbsolutePath());
 
-		assertNotNull(result.get("authRepository"));
-		assertNotNull(((Map)result.get("authRepository")).get("domain4.com"));
-		assertEquals("{ call UserLogin(?, ?) }", ((Map) ((Map)result.get("authRepository")).get("domain4.com")).get("user-login-query"));
+		OldConfigHolder.Format format = holder.detectPathAndFormat();
+
+		tmp.delete();
+
+		assertEquals(OldConfigHolder.Format.properties, format);
 	}
 
 	@Test
 	public void testConversionOfAdHocCommandsACLs() throws IOException, ConfigReader.ConfigException {
-		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
-		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(
-				new String[]{"sess-man/command/http\\://jabber.org/protocol/admin#add-user=LOCAL",
+		String cfgStr = Stream.of("sess-man/command/http\\://jabber.org/protocol/admin#add-user=LOCAL",
 							 "sess-man/command/http\\://jabber.org/protocol/admin#delete-user=DOMAIN:test.com",
 							 "sess-man/command/http\\://jabber.org/protocol/admin#change-user-password=LOCAL",
 							 "sess-man/command/http\\://jabber.org/protocol/admin#get-user-roster=JID:ala1@test.com",
@@ -151,11 +155,21 @@ public class ConfigHolderTest {
 							 "basic-conf/command/user-domain-perm=LOCAL", "sess-man/command/connection-time=LOCAL",
 							 "s2s/command/roster-fixer=LOCAL", "sess-man/command/roster-fixer-cluster=LOCAL",
 							 "s2s/command/user-roster-management=LOCAL",
-							 "c2s/command/user-roster-management-ext=LOCAL"}));
+							 "c2s/command/user-roster-management-ext=LOCAL").collect(Collectors.joining("\n"));
 
-		reader.convertFromOldFormat();
+		File tmp = File.createTempFile("test_", ".properties");
+		try (Writer writer = new FileWriter(tmp)) {
+			writer.write(cfgStr);
+		}
 
-		Map<String, Object> result = ConfigWriter.buildTree(props);
+		File tdslFile = File.createTempFile("test_", ".tdsl");
+		tdslFile.delete();
+
+		OldConfigHolder holder = new OldConfigHolder();
+		holder.convert(new String[] { PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath() }, tdslFile.toPath());
+		
+		Map<String, Object> result = ConfigWriter.buildTree(holder.getProperties());
+		result.remove("config-type");
 		result.forEach((comp, properties) -> {
 			assertTrue(Map.class.isAssignableFrom(properties.getClass()));
 			Map<String, Object> map = (Map<String, Object>) properties;
@@ -176,11 +190,11 @@ public class ConfigHolderTest {
 
 	@Test
 	public void testConversionOfDynamicRosterClasses() throws IOException, ConfigReader.ConfigException {
-		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
-		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList(
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList(
 				new String[]{"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest,tigase.xmpp.impl.roster.DynamicRosterTest123"}));
 
-		reader.convertFromOldFormat();
+		holder.convertFromOldFormat();
 
 		Map<String, Object> result = ConfigWriter.buildTree(props);
 		Map<String, Object> sessMan = (Map<String, Object>) result.get("sess-man");
@@ -205,10 +219,10 @@ public class ConfigHolderTest {
 
 	@Test
 	public void testConversionOfGlobalProperties() throws IOException, ConfigReader.ConfigException {
-		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
-		Map<String, Object> props = reader.loadFromPropertyStrings(Arrays.asList("--max-queue-size=10000"));
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList("--max-queue-size=10000"));
 
-		reader.convertFromOldFormat();
+		holder.convertFromOldFormat();
 
 		Map<String, Object> result = ConfigWriter.buildTree(props);
 		assertEquals(10000, result.get("max-queue-size"));
@@ -216,12 +230,12 @@ public class ConfigHolderTest {
 
 	@Test
 	public void testConversionOfExtComponentProperties() throws IOException, ConfigReader.ConfigException {
-		ConfigHolder.PropertiesConfigReader reader = new ConfigHolder.PropertiesConfigReader();
-		Map<String, Object> props = reader.loadFromPropertyStrings(
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(
 				Arrays.asList("--external=muc1.devel.tigase.org:passwd1,muc2.devel.tigase.org:passwd2",
 							  "--comp-name-1=ext", "--comp-class-1=" + ComponentProtocol.class.getCanonicalName()));
 
-		reader.convertFromOldFormat();
+		holder.convertFromOldFormat();
 
 		Map<String, Object> result = ConfigWriter.buildTree(props);
 		Map<String, Object> ext = (Map<String, Object>) result.get("ext");

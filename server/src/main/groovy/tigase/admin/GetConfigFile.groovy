@@ -42,7 +42,7 @@ def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def CFGFILE_TYPE = "config-file";
-def CFGFILE_OPTIONS = ["init.properties", "tigase.conf"];
+def CFGFILE_OPTIONS = ["config.tdsl", "tigase.conf"];
 
 def cfgfile = Command.getFieldValue(p, CFGFILE_TYPE);
 
@@ -53,12 +53,12 @@ if (!isServiceAdmin) {
 }
 else if (cfgfile == null) {
 	def filesArray = CFGFILE_OPTIONS.toArray(new String[CFGFILE_OPTIONS.size()]);
-	Command.addFieldValue(result, CFGFILE_TYPE, "init.properties", "File", filesArray, filesArray);
+	Command.addFieldValue(result, CFGFILE_TYPE, "config.tdsl", "File", filesArray, filesArray);
 }
 else {
 	def filepath = []
 	switch (cfgfile) {
-		case "init.properties":
+		case "config.tdsl":
 			filepath = [((Kernel) kernel).getInstance(DSLBeanConfigurator).getConfigHolder().getConfigFilePath().toString()];
 			break;
 

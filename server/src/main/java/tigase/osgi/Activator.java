@@ -25,7 +25,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import tigase.conf.ConfiguratorAbstract;
 import tigase.server.XMPPServer;
 
 import javax.management.MBeanServer;
@@ -86,9 +85,7 @@ public class Activator implements BundleActivator {
 						ModulesManagerImpl.getInstance().setActive(true);
                         bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
 						
-                        XMPPServer.start(new String[]{
-                                ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY, "etc/init.properties"
-                        });
+                        XMPPServer.start(new String[0]);
                         
                         // if it is not too late
                         SLF4JBridgeHandler.install();

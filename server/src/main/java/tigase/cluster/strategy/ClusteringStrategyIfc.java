@@ -201,6 +201,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @return a <code>Map</code> with all the class default configuration
 	 *         parameters.
 	 */
+	@Deprecated // in 7.2.0
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	/**

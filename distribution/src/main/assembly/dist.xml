@@ -75,7 +75,7 @@
 				<include>bosh-extra-headers.txt</include>
 				<include>cross-domain-policy.xml</include>
 				<include>client-access-policy.xml</include>
-				<include>init.properties</include>
+				<include>config.tdsl</include>
 				<include>tigase.conf</include>
 				<include>jmx.access</include>
 				<include>jmx.password</include>

@@ -50,6 +50,7 @@ import tigase.util.DataTypes;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Deprecated
 public class ConfigSQLRepository extends ConfigurationCache {
 
 	/** Field description */

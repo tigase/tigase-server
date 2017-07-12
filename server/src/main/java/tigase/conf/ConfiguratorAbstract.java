@@ -76,9 +76,11 @@ public abstract class ConfiguratorAbstract
 			.AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
 
 	/** Field description */
+	@Deprecated
 	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--tigase-config-repo-class";
 
 	/** Field description */
+	@Deprecated
 	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
 
 	/** Field description */

@@ -51,7 +51,7 @@ import java.util.Map;
  * time as you need and all of them are called for each user roster request.
  * <br>
  * To load your implementations you have to specify them in the configuration
- * file. The simplest way is to use <code>init.properties</code> file. Have a look
+ * file. The simplest way is to use <code>config.tdsl</code> file. Have a look
  * at the example file available in the repository. Following line added to
  * the end of the file tell the server to load the dynamic roster implementation:
  * <pre>sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.AnonymousRoster</pre>

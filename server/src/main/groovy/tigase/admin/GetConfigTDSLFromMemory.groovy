@@ -22,20 +22,18 @@
 
 /*
 
-Get init.properties configuration from memory.
+Get config.tdsl configuration from memory.
 
-AS:Description: Get init.properties configuration
-AS:CommandId: get-init-properties
+AS:Description: Get config.tdsl configuration
+AS:CommandId: get-config-tdsl
 AS:Component: basic-conf
 */
 
 package tigase.admin
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
-import tigase.cert.*
-import tigase.io.*
+import tigase.db.comp.ComponentRepository
+import tigase.server.Command
+import tigase.server.Packet
 
 def repo = (ComponentRepository)comp_repo
 def p = (Packet)packet
@@ -54,7 +52,7 @@ else {
 		lines += key + "=" + value;
 	}
 
-	Command.addFieldMultiValue(result, "init.properties", lines);
+	Command.addFieldMultiValue(result, "config.tdsl", lines);
 }
 
 return result;

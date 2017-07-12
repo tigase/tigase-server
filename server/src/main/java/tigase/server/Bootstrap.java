@@ -23,10 +23,7 @@ package tigase.server;
 
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
-import tigase.conf.ConfigHolder;
-import tigase.conf.ConfigReader;
-import tigase.conf.ConfiguratorAbstract;
-import tigase.conf.LoggingBean;
+import tigase.conf.*;
 import tigase.db.beans.DataSourceBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;

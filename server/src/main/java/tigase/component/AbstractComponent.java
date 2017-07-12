@@ -93,7 +93,7 @@ public abstract class AbstractComponent extends AbstractMessageReceiver implemen
 	 * Returns default map of components. Keys in map are used as component
 	 * identifiers.<br>
 	 *
-	 * This map may be modified by <code>init.properties</code>:<br>
+	 * This map may be modified by <code>config.tdsl</code>:<br>
 	 * <code>&lt;component_name&gt;/modules/&lt;module_name&gt;[S]=&lt;module_class&gt;</code>
 	 *
 	 *

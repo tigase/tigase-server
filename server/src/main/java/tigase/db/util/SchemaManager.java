@@ -21,10 +21,7 @@ package tigase.db.util;
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.component.exceptions.RepositoryException;
-import tigase.conf.ConfigBuilder;
-import tigase.conf.ConfigReader;
-import tigase.conf.ConfigWriter;
-import tigase.conf.ConfiguratorAbstract;
+import tigase.conf.*;
 import tigase.db.*;
 import tigase.db.beans.*;
 import tigase.eventbus.EventBusFactory;
@@ -273,7 +270,7 @@ public class SchemaManager {
 
 		List<String> output = prepareOutput("Schema installation finished", results);
 		output.add("");
-		output.add("Example init.properties configuration file:");
+		output.add("Example " + ConfigHolder.TDSL_CONFIG_FILE_DEF + " configuration file:");
 		output.add("");
 		try (StringWriter writer = new StringWriter()) {
 			new ConfigWriter().write(writer, config);
