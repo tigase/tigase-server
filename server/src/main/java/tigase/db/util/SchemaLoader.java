@@ -73,6 +73,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 				.filter(instance -> instance.isSupported(type))
 				.findAny()
 				.get();
+		schemaLoader.setType(type);
 		return schemaLoader;
 	}
 
@@ -157,7 +158,17 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 		dbHelper.execute(params);
 	}
-	
+
+	private String type;
+
+	protected String getType() {
+		return type;
+	}
+
+	private void setType(String type) {
+		this.type = type;
+	}
+
 	public abstract P createParameters();
 
 	public abstract void execute(Parameters params);

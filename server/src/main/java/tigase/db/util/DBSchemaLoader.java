@@ -105,7 +105,9 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		ADMIN_JID("adminJID",null),
 		ADMIN_JID_PASS("adminJIDpass",null),
 		IGNORE_MISSING_FILES("ignoreMissingFiles", "false"),
-		DATABASE_OPTIONS("dbOptions", null);
+		DATABASE_OPTIONS("dbOptions", null),
+		USE_LEGACY_DATETIME_CODE("useLegacyDatetimeCode", "false"),
+		SERVER_TIMEZONE("serverTimezone", null);
 
 		private String name = null;
 		private String defaultValue = null;
@@ -780,7 +782,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				}
 				break;
 
-			default:
+			case "mysql":
 				db_uri += "//" + params.getDbHostname() + "/";
 				if ( includeDbName ){
 					db_uri += params.getDbName();
@@ -797,7 +799,15 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					// explicitly disable SSL to avoid a warning by the driver
 					db_uri += "&useSSL=false";
 				}
+				if (!params.isUseLegacyDatetimeCode()) {
+					db_uri += "&useLegacyDatetimeCode=" + params.isUseLegacyDatetimeCode();
+				}
+				if (params.getServerTimezone() != null) {
+					db_uri += "&serverTimezone=" + params.getServerTimezone();
+				}
 				break;
+			default:
+				throw new IllegalArgumentException("Unknown database type: " + database);
 		}
 		return db_uri;
 	}
@@ -890,6 +900,23 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 							.defaultValue(PARAMETERS_ENUM.USE_SSL.getDefaultValue())
 							.type(Boolean.class)
 							.build());
+		switch (this.getType()) {
+			case "mysql":
+				options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE.getName()).description(
+						"Use legacy datetime code for JDBC connection")
+									.requireArguments(true)
+									.defaultValue(PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE.getDefaultValue())
+									.type(Boolean.class)
+									.build());
+				options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.SERVER_TIMEZONE.getName()).description(
+						"Time zone of database server")
+									.defaultValue(PARAMETERS_ENUM.SERVER_TIMEZONE.getDefaultValue())
+									.requireArguments(true)
+									.build());
+				break;
+			default:
+				break;
+		}
 		return options;
 	}
 
@@ -1009,6 +1036,8 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		private String dbUser = null;
 		private String dbPass = null;
 		private Boolean useSSL = null;
+		private Boolean useLegacyDatetimeCode = false;
+		private String serverTimezone = null;
 
 		private String file;
 		private String query;
@@ -1067,6 +1096,14 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			return useSSL;
 		}
 
+		public Boolean isUseLegacyDatetimeCode() {
+			return useLegacyDatetimeCode;
+		}
+
+		public String getServerTimezone() {
+			return serverTimezone;
+		}
+
 		@Override
 		public void parseUri(String uri) {
 			int idx = uri.indexOf(":", 5);
@@ -1114,6 +1151,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					idx = rest.indexOf("?");
 					dbName = rest.substring(0, idx);
 					rest = rest.substring(idx + 1);
+					useLegacyDatetimeCode = true;
 					for (String x : rest.split("&")) {
 						String p[] = x.split("=");
 						if (p.length < 2)
@@ -1127,6 +1165,13 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 								break;
 							case "useSSL":
 								useSSL = Boolean.valueOf(p[1]);
+								break;
+							case "useLegacyDatetimeCode":
+								useLegacyDatetimeCode = Boolean.valueOf(p[1]);
+								break;
+							case "serverTimezone":
+								serverTimezone = p[1];
+								break;
 							default:
 								break;
 						}
@@ -1150,6 +1195,8 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			dbUser = getProperty(props, PARAMETERS_ENUM.TIGASE_USERNAME);
 			dbPass = getProperty(props, PARAMETERS_ENUM.TIGASE_PASSWORD);
 			useSSL = getProperty(props, PARAMETERS_ENUM.USE_SSL, tmp -> Boolean.parseBoolean(tmp));
+			useLegacyDatetimeCode = getProperty(props, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE, tmp -> Boolean.parseBoolean(tmp));
+			serverTimezone = getProperty(props, PARAMETERS_ENUM.SERVER_TIMEZONE);
 
 			dbRootUser = getProperty(props, PARAMETERS_ENUM.ROOT_USERNAME);
 			dbRootPass = getProperty(props, PARAMETERS_ENUM.ROOT_PASSWORD);
