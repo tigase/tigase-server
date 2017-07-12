@@ -275,17 +275,28 @@ public class PresenceSubscription extends PresenceAbstract {
 			if (curr_sub == null) {
 				roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
 			}    // end of if (curr_sub == null)
+			final boolean preApproved = roster_util.isPreApproved(session, packet.getStanzaFrom());
 			roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
 			if (!autoAuthorize) {
-				updatePresenceChange(packet, session, results);
+				// broadcast the subscription request only if it wasn't pre-approved
+				if (!preApproved) {
+					updatePresenceChange(packet, session, results);
+				} else {
+					// was pre-approved, update status and send probe
+					final Element buddyItem = roster_util.getBuddyItem(session,
+					                                                   packet.getStanzaFrom().copyWithoutResource());
+					roster_util.updateBuddyChange(session, results, buddyItem);
+					broadcastProbe(session, results, settings);
+					sendPresence(StanzaType.subscribed, session.getJID(), packet.getStanzaFrom(), results, null);
+				}
 			} else {
 				roster_util.setBuddySubscription(session, RosterAbstract.SubscriptionType.both, packet
 						.getStanzaFrom().copyWithoutResource());
 			}
 		}    // end of else
 		if (autoAuthorize) {
-			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session,
-					packet.getStanzaFrom().copyWithoutResource()));
+			final Element buddyItem = roster_util.getBuddyItem(session, packet.getStanzaFrom().copyWithoutResource());
+			roster_util.updateBuddyChange(session, results, buddyItem);
 			broadcastProbe(session, results, settings);
 			sendPresence(StanzaType.subscribed, session.getJID(), packet.getStanzaFrom(),
 					results, null);
@@ -588,21 +599,26 @@ public class PresenceSubscription extends PresenceAbstract {
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to re-synchronize
 		// subscriptions in case of synchronization loss
-		forwardPresence(results, packet, session.getJID().copyWithoutResource());
 
 		Element initial_presence = session.getPresence();
 		JID     buddy            = packet.getStanzaTo().copyWithoutResource();
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 				buddy);
 
+		final boolean isPreApproved = roster_util.isPreApproved(session, packet.getStanzaTo());
 		if (autoAuthorize && (pres_type == RosterAbstract.PresenceType.out_subscribed)) {
 			roster_util.setBuddySubscription(session, RosterAbstract.SubscriptionType.both, buddy
 					.copyWithoutResource());
 		}
+
+		// do not forward the subscribed if it's a pre-approval
+		if (!isPreApproved) {
+			forwardPresence(results, packet, session.getJID().copyWithoutResource());
+		}
+
 		if (subscr_changed) {
-			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session,
-					buddy));
-			if (initial_presence != null) {
+			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session, buddy));
+			if (initial_presence != null && !isPreApproved) {
 				if (pres_type == RosterAbstract.PresenceType.out_subscribed) {
 
 					// The contact's server MUST then also send current presence to the user

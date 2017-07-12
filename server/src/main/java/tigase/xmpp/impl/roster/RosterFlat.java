@@ -115,7 +115,7 @@ public class RosterFlat
 						break;
 					}
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can't load roster element: {0}", elem);
+					log.log(Level.WARNING, "Can't load roster element: " + elem, e);
 				}
 			}
 		}
