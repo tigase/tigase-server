@@ -185,6 +185,8 @@ include::text/admin/5/Components.asciidoc[]
 
 include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
 
+:leveloffset: 3
+
 include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]
 
 include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
@@ -204,7 +206,6 @@ include::text/admin/5/Components_-_B_-_Tigase_HTTP_API_-_3_-_Web_Client.asciidoc
 include::text/admin/5/Components_-_B_-_Tigase_HTTP_API_-_4_-_Pre-bind-Bosh.asciidoc[]
 
 
-
 :leveloffset: 2
 
 include::text/admin/5/Components_-_C_-_Message_Archiving.asciidoc[]
@@ -213,9 +214,24 @@ include::text/admin/5/Components_-_D_-_Advanced_Message_Processing_-_AMP_XEP-007
 
 include::text/admin/5/Components_-_E_-_PubSub.asciidoc[]
 
-include::text/components/pubsub/documentation/index.asciidoc[]
+:leveloffset: 3
+
+include::text/components/pubsub/documentation/text/Overview.asciidoc[]
+include::text/components/pubsub/documentation/text/Announcement.asciidoc[]
+include::text/components/pubsub/documentation/text/Database.asciidoc[]
+include::text/components/pubsub/documentation/text/Configuration.asciidoc[]
+include::text/components/pubsub/documentation/text/Features.asciidoc[]
+
+:leveloffset: 4
+
+include::text/components/pubsub/documentation/text/features/AdHocCommands.asciidoc[]
+include::text/components/pubsub/documentation/text/features/PubSub_Node_Presence_Protocol.asciidoc[]
+include::text/components/pubsub/documentation/text/features/OfflineMessagesSink.asciidoc[]
+include::text/components/pubsub/documentation/text/features/REST_API.asciidoc[]
 
 :leveloffset: 3
+
+include::text/components/pubsub/documentation/text/Limitations.asciidoc[]
 
 include::text/admin/5/Components_-_E_-_PubSub_-_1_-_Offline_Message_Sink.asciidoc[]
 
@@ -260,6 +276,16 @@ include::text/admin/5/Components_-_K_-_C2S.asciidoc[]
 include::text/admin/5/Components_-_L_-_Socks5.asciidoc[]
 
 include::text/admin/5/Components_-_M_-_External_Service_Discovery_Component.asciidoc[]
+
+:leveloffset: 2
+
+include::text/components/tigase-push/documentation/text/Overview.asciidoc[]
+
+:leveloffset: 3
+
+include::text/components/tigase-push/documentation/text/Configuration.asciidoc[]
+
+include::text/components/tigase-push/documentation/text/Usage.asciidoc[]
 
 :leveloffset: 1
 
@@ -336,15 +362,13 @@ include::text/admin/7/Statistics_Descriptions.asciidoc[]
 
 include::text/properties/admins.asciidoc[]
 
-include::text/properties/auth-db.asciidoc[]
-
-include::text/properties/auth-db-uri.asciidoc[]
-
 include::text/properties/auth-domain-repo-pool.asciidoc[]
 
 include::text/properties/auth-repo-pool.asciidoc[]
 
 include::text/properties/auth-repo-pool-size.asciidoc[]
+
+include::text/properties/authRepository.asciidoc[]
 
 include::text/properties/bind-ext-hostnames.asciidoc[]
 
@@ -380,6 +404,8 @@ include::text/properties/config-type.asciidoc[]
 
 include::text/properties/cross-domain-policy-file.asciidoc[]
 
+include::text/properties/dataSource.asciidoc[]
+
 include::text/properties/data-repo-pool-size.asciidoc[]
 
 include::text/properties/debug.asciidoc[]
@@ -410,6 +436,8 @@ include::text/properties/new-connections-throttling.asciidoc[]
 
 include::text/properties/nonpriority-queue.asciidoc[]
 
+include::text/properties/plugins.asciidoc[]
+
 include::text/properties/queue-implementation.asciidoc[]
 
 include::text/properties/roster-implementation.asciidoc[]
@@ -423,8 +451,6 @@ include::text/properties/s2s-skip-tls-hostnames.asciidoc[]
 include::text/properties/script-dir.asciidoc[]
 
 include::text/properties/sm-cluster-strategy-class.asciidoc[]
-
-include::text/properties/sm-plugins.asciidoc[]
 
 include::text/properties/sm-threads-pool.asciidoc[]
 
@@ -448,10 +474,6 @@ include::text/properties/tls-jdk-nss-bug-workaround-active.asciidoc[]
 
 include::text/properties/trusted.asciidoc[]
 
-include::text/properties/user-db.asciidoc[]
-
-include::text/properties/user-db-uri.asciidoc[]
-
 include::text/properties/user-domain-repo-pool.asciidoc[]
 
 include::text/properties/user-repo-pool.asciidoc[]
@@ -472,7 +494,7 @@ include::text/properties/vhost-register-enabled.asciidoc[]
 
 include::text/properties/vhost-tls-required.asciidoc[]
 
-include::text/properties/virt-hosts.asciidoc[]
+include::text/properties/virtual-hosts.asciidoc[]
 
 include::text/properties/watchdog_delay.asciidoc[]
 

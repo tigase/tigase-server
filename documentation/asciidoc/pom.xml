@@ -257,45 +257,56 @@
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
-                                <artifactItem>
-                                    <groupId>tigase</groupId>
-                                    <artifactId>tigase-muc</artifactId>
-                                    <version>2.5.0-SNAPSHOT</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>text/components/muc</outputDirectory>
-                                    <includes>**/*.asciidoc,**/*.css</includes>
-                                </artifactItem>
-
 								<artifactItem>
 									<groupId>tigase</groupId>
-									<artifactId>tigase-pubsub</artifactId>
-									<version>3.3.0-SNAPSHOT</version>
+									<artifactId>tigase-muc</artifactId>
+									<version>2.5.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>text/components/pubsub</outputDirectory>
+									<outputDirectory>text/components/muc</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
-		                        <artifactItem>
-                                    <groupId>tigase</groupId>
-                                    <artifactId>tigase-message-archiving</artifactId>
-                                    <version>1.3.0-SNAPSHOT</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>text/components/tigase-message-archiving</outputDirectory>
-                                    <includes>**/*.asciidoc,**/*.css</includes>
-                                </artifactItem>
+								<artifactItem>
+										<groupId>tigase</groupId>
+										<artifactId>tigase-pubsub</artifactId>
+										<version>3.3.0-SNAPSHOT</version>
+										<type>jar</type>
+										<overWrite>false</overWrite>
+										<outputDirectory>text/components/pubsub</outputDirectory>
+										<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
 
 								<artifactItem>
-                                    <groupId>tigase</groupId>
-                                    <artifactId>tigase-unified-archive</artifactId>
-                                    <version>1.1.0-SNAPSHOT</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>text/components/tigase-unified-archive</outputDirectory>
-                                    <includes>**/*.asciidoc,**/*.css</includes>
-                                </artifactItem>
+									<groupId>tigase</groupId>
+									<artifactId>tigase-message-archiving</artifactId>
+									<version>1.3.0-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>text/components/tigase-message-archiving</outputDirectory>
+									<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
+
+								<artifactItem>
+									<groupId>tigase</groupId>
+									<artifactId>tigase-unified-archive</artifactId>
+									<version>1.1.0-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>text/components/tigase-unified-archive</outputDirectory>
+									<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
+
+								<artifactItem>
+										<groupId>tigase</groupId>
+										<artifactId>tigase-push</artifactId>
+										<version>1.0.0-SNAPSHOT</version>
+										<type>jar</type>
+										<overWrite>false</overWrite>
+										<outputDirectory>text/components/tigase-push/</outputDirectory>
+										<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
+
 							</artifactItems>
 						</configuration>
 					</execution>
