@@ -61,12 +61,12 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
 		return new String[]{
-				SaslSCRAMPlus.NAME,
-				SaslSCRAM.NAME,
-				"PLAIN",
-				"EXTERNAL",
-				"ANONYMOUS",
-		};
+//				SaslSCRAMPlus.NAME,
+SaslSCRAM.NAME,
+"PLAIN",
+"EXTERNAL",
+"ANONYMOUS",
+};
 	}
 
 }

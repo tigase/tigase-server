@@ -358,10 +358,10 @@ public abstract class IOService<RefObject>
 					certCheckResult});
 		}
 		if (!wrapper.getTlsEngine().getUseClientMode()) {
-			this.tlsUniqueId = wrapper.getSessionId();
+			this.tlsUniqueId = wrapper.getTlsUniqueBindingData();
 			try {
 				Certificate[] certs = wrapper.getTlsEngine().getSession().getLocalCertificates();
-				this.localCertificate = certs == null || certs.length == 0 ? null : certs[certs.length - 1];
+				this.localCertificate = certs == null || certs.length == 0 ? null : certs[0];
 			} catch (Exception e) {
 				this.localCertificate = null;
 				log.log(Level.WARNING, "Cannot get local certificate", e);
