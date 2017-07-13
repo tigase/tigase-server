@@ -114,7 +114,7 @@ public class VHostItem
 			this.optionsNames = optionsNames;
 			
 			if (defValue != null && !cls.isAssignableFrom(defValue.getClass())) {
-				throw new IllegalArgumentException("default value paratemeter must of class " + cls.getCanonicalName());
+				throw new IllegalArgumentException("default value parameter must be of class " + cls.getCanonicalName());
 			}
 			
 			if (options != null) {
@@ -144,7 +144,30 @@ public class VHostItem
 		public DataType(String key, String name, Class cls, Object defValue) {
 			this(key, name, cls, null, defValue, null, null);
 		}
-		
+
+		public <E extends Enum<E>> DataType(String key, String name, Class<? extends Enum<E>> e, E defValue) {
+
+			String[] options = new String[defValue != null
+			                              ? e.getEnumConstants().length
+			                              : e.getEnumConstants().length + 1];
+			int idx = 0;
+
+			if (defValue == null) {
+				options[idx++] = null;
+			}
+			for (Enum<E> en : e.getEnumConstants()) {
+				options[idx++] = en.name();
+			}
+
+			this.key = key;
+			this.name = name;
+			this.cls = String.class;
+			this.collectionCls = null;
+			this.defValue = (defValue != null ? defValue.name() : null);
+			this.options = options;
+			this.optionsNames = null;
+		}
+
 		public String getName() {
 			return name;
 		}
@@ -171,6 +194,15 @@ public class VHostItem
 		
 		public String[] getOptionsNames() {
 			return optionsNames;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append(key).append(':');
+			sb.append(name).append(" @ ");
+			sb.append(cls);
+			return sb.toString();
 		}
 	}
 	
@@ -622,7 +654,7 @@ public class VHostItem
 
 		for (DataType type : dataTypes.values()) {
 			String valueStr = Command.getFieldValue(packet, type.getName());
-			char typeId = DataTypes.typesMap.get(type.cls.getName());
+			Character typeId = DataTypes.typesMap.get(type.cls.getName());
 			Object value = (valueStr == null || valueStr.isEmpty()) ? null :DataTypes.decodeValueType(typeId, valueStr);
 			if (value != null && type.getCollectionCls() != null) {
 				try {
@@ -732,7 +764,7 @@ public class VHostItem
 			if (items != null) {
 				for (Element item : items) {
 					DataType type = dataTypes.get(item.getName());
-					char typeChar = type != null ? DataTypes.typesMap.get(type.getCls().getName()) : item.getAttributeStaticStr("type").charAt(0);
+					Character typeChar = type != null ? DataTypes.typesMap.get(type.getCls().getName()) : item.getAttributeStaticStr("type").charAt(0);
 					Object value = DataTypes.decodeValueType(typeChar, item.getCData());
 					if (type != null && type.getCollectionCls() != null && value != null) {
 						try {

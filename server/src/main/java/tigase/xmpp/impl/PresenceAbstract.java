@@ -236,34 +236,6 @@ public abstract class PresenceAbstract
 		return super.concurrentQueuesNo() * 4;
 	}
 
-//	@Override
-	protected void initSettings(Map<String, Object> settings) throws TigaseDBException {
-
-		// Init plugin configuration
-		String tmp;
-
-		tmp            = (String) settings.get(PRESENCE_PROBE_FULL_JID_KEY);
-		probeFullJID    = (tmp != null)
-				? Boolean.parseBoolean(tmp)
-				: probeFullJID;
-			log.log( Level.CONFIG,
-							 "Sending probe from FullJID set to: {0}", probeFullJID );
-
-		tmp            = (String) settings.get(SKIP_OFFLINE_PROP_KEY);
-		skipOffline    = (tmp != null)
-				? Boolean.parseBoolean(tmp)
-				: skipOffline;
-		tmp            = (String) settings.get(SKIP_OFFLINE_SYS_PROP_KEY);
-		skipOfflineSys = (tmp != null)
-				? Boolean.parseBoolean(tmp)
-				: skipOfflineSys;
-		if (skipOffline || skipOfflineSys) {
-			log.log( Level.CONFIG,
-							 "Skipping sending presence to offline contacts enabled :: skipOffline: {0}, skipOfflineSys: {1}",
-							 new Object[] { skipOffline, skipOfflineSys } );
-		}
-	}
-
 	/**
 	 * Sends Presence stanza from provided parameters without returning created
 	 * result {@link Packet} object. In case of missing {@code  pres} parameter a

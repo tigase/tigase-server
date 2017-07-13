@@ -26,10 +26,13 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
 import tigase.server.xmppsession.SessionManager;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.Handle;
@@ -74,7 +77,41 @@ public class PresenceSubscription extends PresenceAbstract {
 	public Set<StanzaType> supTypes() {
 		return TYPES;
 	}
-	
+
+	@Inject(nullAllowed = true)
+	protected VHostManagerIfc vHostManager          = null;
+
+	enum AUTO_AUTHORIZE_MODE {
+		global,
+		on(true),
+		off(false);
+
+		private boolean enabled;
+		private static String[] names = null;
+
+		AUTO_AUTHORIZE_MODE() {
+			enabled = false;
+		}
+
+		AUTO_AUTHORIZE_MODE(boolean b) {
+			enabled = b;
+		}
+
+		protected boolean isEnabled() {
+			return enabled;
+		}
+	}
+
+	static {
+		List<VHostItem.DataType> types = new ArrayList<>();
+		types.add(new VHostItem.DataType(AUTO_AUTHORIZE_PROP_KEY,
+		                                 "Automatically authorize subscription requests",
+		                                 AUTO_AUTHORIZE_MODE.class,
+		                                 AUTO_AUTHORIZE_MODE.global));
+		VHostItem.registerData(types);
+
+	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -277,7 +314,7 @@ public class PresenceSubscription extends PresenceAbstract {
 			}    // end of if (curr_sub == null)
 			final boolean preApproved = roster_util.isPreApproved(session, packet.getStanzaFrom());
 			roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
-			if (!autoAuthorize) {
+			if (!isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 				// broadcast the subscription request only if it wasn't pre-approved
 				if (!preApproved) {
 					updatePresenceChange(packet, session, results);
@@ -294,7 +331,7 @@ public class PresenceSubscription extends PresenceAbstract {
 						.getStanzaFrom().copyWithoutResource());
 			}
 		}    // end of else
-		if (autoAuthorize) {
+		if (isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 			final Element buddyItem = roster_util.getBuddyItem(session, packet.getStanzaFrom().copyWithoutResource());
 			roster_util.updateBuddyChange(session, results, buddyItem);
 			broadcastProbe(session, results, settings);
@@ -333,7 +370,7 @@ public class PresenceSubscription extends PresenceAbstract {
 		RosterAbstract.SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
-		if (!autoAuthorize && (curr_sub == null)) {
+		if (!isAutoAuthorizeEnabled(session.getJID().getDomain()) && (curr_sub == null)) {
 			roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
 		}    // end of if (curr_sub == null)
 
@@ -345,7 +382,7 @@ public class PresenceSubscription extends PresenceAbstract {
 
 			forward_p.setPacketTo(session.getConnectionId());
 			results.offer(forward_p);
-			if (autoAuthorize) {
+			if (isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 				roster_util.setBuddySubscription(session, RosterAbstract.SubscriptionType.both, packet
 						.getStanzaFrom().copyWithoutResource());
 			}
@@ -397,7 +434,7 @@ public class PresenceSubscription extends PresenceAbstract {
 			// First forward the request to the client to make sure it stays in sync
 			// with the server. This should be done only in the case of actual change of the state
 			// and with auto-authorization disabled
-			if (!autoAuthorize) {
+			if (!isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 				Packet forward_p = packet.copyElementOnly();
 
 				forward_p.setPacketTo(session.getConnectionId());
@@ -415,7 +452,7 @@ public class PresenceSubscription extends PresenceAbstract {
 							packet.getStanzaFrom());
 				}
 			}
-			if (autoAuthorize) {
+			if (isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 				broadcastProbe(session, results, settings);
 			}
 		}
@@ -457,7 +494,7 @@ public class PresenceSubscription extends PresenceAbstract {
 
 			// First forward the request to the client to make sure it stays in sync
 			// with the server. This should be done only with auto-authorization disabled
-			if (!autoAuthorize) {
+			if (!isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 				Packet forward_p = packet.copyElementOnly();
 
 				forward_p.setPacketTo(session.getConnectionId());
@@ -481,7 +518,7 @@ public class PresenceSubscription extends PresenceAbstract {
 								packet.getStanzaFrom());
 					}
 				}
-				if (autoAuthorize) {
+				if (isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 					broadcastProbe(session, results, settings);
 				}
 			}
@@ -538,7 +575,7 @@ public class PresenceSubscription extends PresenceAbstract {
 			}    // end of if (current_subscription == null)
 			subscr_changed = roster_util.updateBuddySubscription(session, pres_type, packet
 					.getStanzaTo());
-			if (autoAuthorize) {
+			if (isAutoAuthorizeEnabled(session.getJID().getDomain())) {
 				roster_util.setBuddySubscription(session, RosterAbstract.SubscriptionType.both, packet
 						.getStanzaTo().copyWithoutResource());
 			}
@@ -606,7 +643,7 @@ public class PresenceSubscription extends PresenceAbstract {
 				buddy);
 
 		final boolean isPreApproved = roster_util.isPreApproved(session, packet.getStanzaTo());
-		if (autoAuthorize && (pres_type == RosterAbstract.PresenceType.out_subscribed)) {
+		if (isAutoAuthorizeEnabled(session.getJID().getDomain()) && (pres_type == RosterAbstract.PresenceType.out_subscribed)) {
 			roster_util.setBuddySubscription(session, RosterAbstract.SubscriptionType.both, buddy
 					.copyWithoutResource());
 		}
@@ -638,5 +675,22 @@ public class PresenceSubscription extends PresenceAbstract {
 			}    // end of if (subscr_changed)
 		}
 	}
-	
+
+	private boolean isAutoAuthorizeEnabled(String domain) {
+
+		final Object data = vHostManager.getVHostItem(domain).getData(AUTO_AUTHORIZE_PROP_KEY);
+
+		AUTO_AUTHORIZE_MODE mode =
+				vHostManager != null && vHostManager.getVHostItem(domain).getData(AUTO_AUTHORIZE_PROP_KEY) != null
+				? AUTO_AUTHORIZE_MODE.valueOf(vHostManager.getVHostItem(domain).getData(AUTO_AUTHORIZE_PROP_KEY))
+				: AUTO_AUTHORIZE_MODE.global;
+
+		if (AUTO_AUTHORIZE_MODE.global.equals(mode)) {
+			return autoAuthorize;
+		} else {
+			return mode.isEnabled();
+		}
+	}
+
+
 }
