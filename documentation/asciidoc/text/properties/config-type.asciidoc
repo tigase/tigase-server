@@ -1,16 +1,13 @@
 [[configType]]
 = -config-type
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 07:22
+:version: v2.0, June 2017: Reformatted for v7.2.0.
+
 
 :toc:
 :numbered:
 :website: http://tigase.net/
-
-*Default value:* `'config-type' = 'setup'`
-
-*Possible values:* `setup`|`default`|`connection-managers`|`session-manager`|`connection-managers`|`component`
 
 *Description:* This property sets the server type and determines what components are started up without needing to declare and configure all components. Possible values are listed below:
 
@@ -20,5 +17,9 @@
 - `connection-managers` - creates configuration for instance with components managing network connections. This is useful for distributed installation where you want to have session manager installed on separate machine and components managing network connections on different machines (one or more). Components included in configuration are: +c2s+, +s2s+, +ext2s+.
 - `component` - generating a configuration with only one component - component managing external components connection, either XEP-0114 or XEP-0225. This is used to deploy a Tigase instance as external component connecting to the main server. You have to add more components handled by this instance, usually these are MUC, PubSub or any other custom components. You have to refer to description for xref:compName[--comp-name] and xref:compClass[--comp-class] properties to learn how to add components to the Tigase instance. You also have to configure the external component connection, domain name, password, port, etc... Please look for a description for xref:external[--external] and xref:bindExtHostnames[--bind-ext-hostnames] properties.
 - ` ` - If none is setup, the server will be unable to run as no key is set for `null`.
+
+*Default value:* `'config-type' = 'setup'`
+
+*Possible values:* `setup`|`default`|`connection-managers`|`session-manager`|`connection-managers`|`component`
 
 *Available since:* 2.0.0

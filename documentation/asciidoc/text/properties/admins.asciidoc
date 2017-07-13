@@ -1,22 +1,20 @@
 [[admins]]
-= --admins
+= admins
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 07:42
-:revision: v2.1
+:version: v2.1, June 2017: Reformatted for v7.2.0.
+
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-*Default value:* none
+*Description:* Specifies a list of administrator accounts.
 
-*Example:* +--admins = admin@domain.com+
+*Default value:* the administration account created when the server is setup.  Typically it would be something like `admins = ['admin@server.com']`.
 
-*Possible values:* +user1@domain,user2@domain2+
+*Example:* `admins = [ 'admin@domain.com', 'user2@domain.com' ]`
 
-*Description:* 'Specifies a list of administrator accounts.'
-
-*Possible values:* list of admin accounts: +user1@domain,user2@domain2+
+*Possible values:* Comma seperated values of Bare JIDs.
 
 *Available since:* 2.0.0
