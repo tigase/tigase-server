@@ -29,6 +29,10 @@ import tigase.server.amp.ActionAbstract;
 import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
+import tigase.util.DNSResolverFactory;
+import tigase.util.DNSResolverIfc;
+import tigase.util.NonpriorityQueue;
+import tigase.util.PriorityQueueAbstract;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
@@ -272,6 +276,11 @@ public class ConfigHolder {
 				return value;
 			}
 		});
+		renameIfExists(props, "--packet.debug.full", "logging/packet-debug-full", Function.identity());
+		renameIfExists(props, "--" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, "priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, Function.identity());
+		if (Boolean.parseBoolean((String) props.get("--nonpriority-queue"))) {
+			props.putIfAbsent("priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, NonpriorityQueue.class.getCanonicalName());
+		}
 		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> {
 			if (value instanceof String) {
 				return Arrays.asList(((String) value).split(","));
@@ -339,6 +348,10 @@ public class ConfigHolder {
 		renameIfExists(props, "--stringprep-processor", "stringprep-processor", Function.identity());
 		renameIfExists(props, ClusterConnectionManager.CONNECT_ALL_PAR, "cl-comp/" + ClusterConnectionManager.CONNECT_ALL_PROP_KEY, Function.identity());
 		renameIfExists(props, "--cluster-connections-per-node", "cl-comp/connections-per-node", Function.identity());
+
+		renameIfExists(props,"--" + DNSResolverFactory.TIGASE_RESOLVER_CLASS, "dns-resolver/" + DNSResolverFactory.TIGASE_RESOLVER_CLASS, Function.identity());
+		renameIfExists(props, "--" + DNSResolverIfc.TIGASE_PRIMARY_ADDRESS, "dns-resolver/" + DNSResolverIfc.TIGASE_PRIMARY_ADDRESS, Function.identity());
+		renameIfExists(props, "--" + DNSResolverIfc.TIGASE_SECONDARY_ADDRESS, "dns-resolver/" + DNSResolverIfc.TIGASE_SECONDARY_ADDRESS, Function.identity());
 
 		String after = props.toString();
 		return !before.equals(after);

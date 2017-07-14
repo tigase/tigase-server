@@ -23,6 +23,7 @@ package tigase.conf;
 
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
+import tigase.server.Packet;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.util.LogFormatter;
 
@@ -52,6 +53,9 @@ public class LoggingBean implements ConfigurationChangedAware {
 	private HashMap<String, HashMap<String, Object>> loggers = new HashMap<>();
 	@ConfigField(desc = "Handlers")
 	private HashMap<String, HashMap<String, Object>> handlers = new HashMap<>();
+
+	@ConfigField(desc = "Packet full debug", alias = "packet-debug-full")
+	private boolean packetFullDebug = Packet.FULL_DEBUG;
 
 	@ConfigField(desc ="Root level")
 	private Level rootLevel = Level.CONFIG;
@@ -106,6 +110,15 @@ public class LoggingBean implements ConfigurationChangedAware {
 			return props;
 		});
 		this.handlers = handlers;
+	}
+
+	public boolean getPacketFullDebug() {
+		return Packet.FULL_DEBUG;
+	}
+
+	public void setPacketFullDebug(boolean packetFullDebug) {
+		this.packetFullDebug = packetFullDebug;
+		Packet.FULL_DEBUG = packetFullDebug;
 	}
 
 	@Override

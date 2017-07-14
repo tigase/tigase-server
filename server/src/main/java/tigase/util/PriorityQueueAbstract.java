@@ -24,6 +24,9 @@ package tigase.util;
 
 //~--- classes ----------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
+import tigase.sys.TigaseRuntime;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -140,28 +143,45 @@ public abstract class PriorityQueueAbstract<E> {
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated
+	@TigaseDeprecatedComponent
 	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {
-		PriorityQueueAbstract<E> result = null;
+		Class<? extends PriorityQueueAbstract> result = null;
 		String queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);
 
 		if ((queue_class == null) || queue_class.isEmpty()) {
 			if (Boolean.getBoolean(NONPRIORITY_QUEUE)) {
-				result = new NonpriorityQueue<E>(maxSize);
+				result = NonpriorityQueue.class;
 			} else {
-				result = new PriorityQueueRelaxed<E>(maxPriority, maxSize);
+				result = PriorityQueueRelaxed.class;
 			}
 		} else {
 			try {
-				result = (PriorityQueueAbstract<E>) Class.forName(queue_class).newInstance();
+				result = (Class<? extends PriorityQueueAbstract>) Class.forName(queue_class);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.exit(1);
+				TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+						"Error: Could not instantiate or initialize priority queue of class: " + queue_class,
+						"Got exception: " + e.getMessage()});
 			}
-
-			result.init(maxPriority, maxSize);
 		}
 
-		log.log(Level.CONFIG, "Initialized queue implementation: " + result.getClass().getName());
-		return result;
+		return getPriorityQueue(maxPriority, maxSize, result);
 	}
+
+	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize, Class<? extends PriorityQueueAbstract> queueClass) {
+		try {
+			PriorityQueueAbstract<E> result = queueClass.newInstance();
+			result.init(maxPriority, maxSize);
+			log.log(Level.CONFIG, "Initialized queue implementation: " + result.getClass().getName());
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+					"Error: Could not instantiate or initialize priority queue of class: " + queueClass,
+					"Got exception: " + e.getMessage()});
+		}
+		return null;
+	}
+
 }

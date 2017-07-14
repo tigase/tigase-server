@@ -36,6 +36,7 @@ import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
+import tigase.util.PriorityQueueRelaxed;
 import tigase.util.TigaseStringprepException;
 
 import java.util.*;
@@ -186,6 +187,8 @@ public abstract class AbstractMessageReceiver
 
 	// Array cache to speed processing up....
 	private final Priority[]                            pr_cache = Priority.values();
+	@ConfigField(desc = "Priority queue class", alias = "priority-queue-implementation")
+	private Class<? extends PriorityQueueAbstract> priorityQueueClass = PriorityQueueRelaxed.class;
 	@ConfigField(desc = "Outgoing filters", alias = OUTGOING_FILTERS_PROP_KEY)
 	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 			new CopyOnWriteArrayList<PacketFilterIfc>();
@@ -1002,6 +1005,13 @@ public abstract class AbstractMessageReceiver
 		outgoing_filters.addAll(filters);
 	}
 
+	public void setPriorityQueueClass(Class<? extends PriorityQueueAbstract> priorityQueueClass) {
+		if (!this.priorityQueueClass.equals(priorityQueueClass)) {
+			this.priorityQueueClass = priorityQueueClass;
+			this.setMaxQueueSize(maxQueueSize);
+		}
+	}
+
 	/**
 	 * Method description
 	 *
@@ -1010,7 +1020,7 @@ public abstract class AbstractMessageReceiver
 	 *
 	 */
 	public void setMaxQueueSize(int maxQueueSize) {
-		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
+		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0) || (!this.priorityQueueClass.equals(in_queues.get(0).getClass()) && this.threadsQueueIn == null)) {
 			this.maxQueueSize = maxQueueSize;
 			
 			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
@@ -1023,7 +1033,7 @@ public abstract class AbstractMessageReceiver
 			if (in_queues.size() == 0) {
 				for (int i = 0; i < in_queues_size; i++) {
 					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(
-							pr_cache.length, maxInQueueSize);
+							pr_cache.length, maxInQueueSize, priorityQueueClass);
 
 					in_queues.add(queue);
 				}
@@ -1035,7 +1045,7 @@ public abstract class AbstractMessageReceiver
 			if (out_queues.size() == 0) {
 				for (int i = 0; i < out_queues_size; i++) {
 					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(
-							pr_cache.length, maxOutQueueSize);
+							pr_cache.length, maxOutQueueSize, priorityQueueClass);
 
 					out_queues.add(queue);
 				}

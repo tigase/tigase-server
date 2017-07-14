@@ -23,7 +23,10 @@ package tigase.server;
 
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
-import tigase.conf.*;
+import tigase.conf.ConfigHolder;
+import tigase.conf.ConfigReader;
+import tigase.conf.ConfiguratorAbstract;
+import tigase.conf.LoggingBean;
 import tigase.db.beans.DataSourceBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
@@ -33,6 +36,9 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.util.DNSResolverDefault;
+import tigase.util.DNSResolverFactory;
+import tigase.util.DNSResolverIfc;
 import tigase.xmpp.BareJID;
 
 import java.io.File;
@@ -71,6 +77,7 @@ public class Bootstrap {
 	}
 	
 	public void start() throws ConfigReader.ConfigException {
+		initializeDnsResolver();
 		Object clusterMode = config.getProperties().getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", false));
 		if (clusterMode instanceof ConfigReader.Variable) {
 			clusterMode = ((ConfigReader.Variable) clusterMode).calculateValue();
@@ -217,6 +224,27 @@ public class Bootstrap {
 	private void configureLogManager() {
 		Map<String, Object> cfg = prepareLogManagerConfiguration(config.getProperties());
 		setupLogManager(cfg);
+	}
+
+	private void initializeDnsResolver() {
+		Map<String, Object> resolverConfig = (Map<String, Object>) config.getProperties().get("dns-resolver");
+		if (resolverConfig != null) {
+			String resolverClass = (String) resolverConfig.get(DNSResolverFactory.TIGASE_RESOLVER_CLASS);
+			if (resolverClass != null) {
+				DNSResolverFactory.setDnsResolverClassName(resolverClass);
+			}
+			DNSResolverIfc resolver = DNSResolverFactory.getInstance();
+			if (resolver instanceof DNSResolverDefault) {
+				String host = (String) resolverConfig.get(DNSResolverIfc.TIGASE_PRIMARY_ADDRESS);
+				if (host != null) {
+					((DNSResolverDefault) resolver).setPrimaryHost(host);
+				}
+				host = (String) resolverConfig.get(DNSResolverIfc.TIGASE_SECONDARY_ADDRESS);
+				if (host != null) {
+					((DNSResolverDefault) resolver).setSecondaryHost(host);
+				}
+			}
+		}
 	}
 
 	private Map<String, Object> prepareLogManagerConfiguration(Map<String, Object> params) {
