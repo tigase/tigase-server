@@ -150,17 +150,17 @@ public class SaslSCRAMTest
 		}
 	}
 
-	@Test
-	public void testServerFirstMessageFail_2() {
-		try {
-			SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
-			byte[] r = m.evaluateResponse("y,,n=bmalkow,r=SpiXKmhi57DBp5sdE5G3H3ms".getBytes());
-			fail();
-		} catch (SaslException e) {
-			Assert.assertEquals("Server supports PLUS. Please use 'p'", e.getMessage());
-
-		}
-	}
+//	@Test
+//	public void testServerFirstMessageFail_2() {
+//		try {
+//			SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
+//			byte[] r = m.evaluateResponse("y,,n=bmalkow,r=SpiXKmhi57DBp5sdE5G3H3ms".getBytes());
+//			fail();
+//		} catch (SaslException e) {
+//			Assert.assertEquals("Server supports PLUS. Please use 'p'", e.getMessage());
+//
+//		}
+//	}
 
 	@Test
 	public void testDataExchange01() throws Exception {

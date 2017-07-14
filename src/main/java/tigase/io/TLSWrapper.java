@@ -218,8 +218,9 @@ public class TLSWrapper {
 		return tlsEngineResult.bytesConsumed();
 	}
 
-	public byte[] getSessionId(){
-		return tlsEngine.getSession().getId();
+	public byte[] getTlsUniqueBindingData(){
+		// Because of Java API limitations it always returns null.
+		return null;
 	}
 
 	/**
