@@ -167,14 +167,17 @@ public class ConfigHolder {
 				Optional<Path> configFileOld = Optional.ofNullable(backupOldConfigFile(configFile));
 				saveToDSLFile(configFile.toFile());
 				log.log(Level.CONFIG, "Configuration file {0} was updated to match current format." +
-						configFileOld.map(path -> "Previous version of configuration file was saved as " + path).orElse(""),
+						configFileOld.map(path -> " Previous version of configuration file was saved as " + path).orElse(""),
 						new Object[]{configFile});
 
 				if (!oldConfigHolder.getOutput().isPresent()) {
-					output = Optional.of(new String[]{java.text.MessageFormat.format(
-							"Configuration file {0} was updated to match current format." + configFileOld.map(
-									path -> "Previous version of configuration file was saved as " + path).orElse(""),
-							configFile)});
+					output = Optional.of(Stream.of(java.text.MessageFormat.format(
+							"Configuration file {0} was updated to match current format.", configFile),
+												   configFileOld.map(
+														   path -> "Previous version of configuration file was saved as " +
+																   path).orElse(""))
+												 .filter(line -> !line.isEmpty())
+												 .toArray(x -> new String[x]));
 				}
 			} catch (IOException ex) {
 				log.log(Level.SEVERE, "could not replace configuration file with file in DSL format", ex);
@@ -254,6 +257,7 @@ public class ConfigHolder {
 
 	private static boolean upgradeDSL(Map<String, Object> props) {
 		String before = props.toString();
+		props.remove("--config-file");
 		renameIfExists(props, "--cluster-mode", "cluster-mode", Function.identity());
 		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", value -> {
 			if (value instanceof String) {
@@ -291,7 +295,7 @@ public class ConfigHolder {
 		renameIfExists(props, "--client-port-delay-listening", "client-port-delay-listening", Function.identity());
 		renameIfExists(props, "--shutdown-thread-dump", "shutdown-thread-dump", Function.identity());
 		renameIfExists(props, ActionAbstract.AMP_SECURITY_LEVEL, "amp-security-level", Function.identity());
-		removeIfExistsAnd(props, "--cm-see-other-host=", (setter, value) -> {
+		removeIfExistsAnd(props, "--cm-see-other-host", (setter, value) -> {
 			setter.accept("c2s/seeOtherHost/class", value);
 			setter.accept("bosh/seeOtherHost/class", value);
 			setter.accept("ws2s/seeOtherHost/class", value);
@@ -352,6 +356,25 @@ public class ConfigHolder {
 		renameIfExists(props,"--" + DNSResolverFactory.TIGASE_RESOLVER_CLASS, "dns-resolver/" + DNSResolverFactory.TIGASE_RESOLVER_CLASS, Function.identity());
 		renameIfExists(props, "--" + DNSResolverIfc.TIGASE_PRIMARY_ADDRESS, "dns-resolver/" + DNSResolverIfc.TIGASE_PRIMARY_ADDRESS, Function.identity());
 		renameIfExists(props, "--" + DNSResolverIfc.TIGASE_SECONDARY_ADDRESS, "dns-resolver/" + DNSResolverIfc.TIGASE_SECONDARY_ADDRESS, Function.identity());
+
+		renameIfExists(props, "--s2s-skip-tls-hostnames", "s2s/skip-tls-hostnames", value -> {
+			if (value instanceof String) {
+				return Arrays.asList(((String) value).split(","));
+			} else {
+				return value;
+			}
+		});
+
+		Stream.of("c2s", "bosh", "ws2s").forEach(cmp -> {
+			Map<String, Object> cmpCfg = (Map<String, Object>) props.get(cmp);
+			if (cmpCfg != null) {
+				Map<String, Object> oldCfg = (Map<String, Object>) cmpCfg.remove("cm-see-other-host");
+				Map<String, Object> newCfg = (Map<String, Object>) cmpCfg.computeIfAbsent("seeOtherHost", (x) -> new HashMap<String, Object>());
+				if (oldCfg != null) {
+					newCfg.putAll(oldCfg);
+				}
+			}
+		});
 
 		String after = props.toString();
 		return !before.equals(after);

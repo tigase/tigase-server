@@ -21,7 +21,10 @@ package tigase.db.util;
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.component.exceptions.RepositoryException;
-import tigase.conf.*;
+import tigase.conf.ConfigBuilder;
+import tigase.conf.ConfigHolder;
+import tigase.conf.ConfigReader;
+import tigase.conf.ConfigWriter;
 import tigase.db.*;
 import tigase.db.beans.*;
 import tigase.eventbus.EventBusFactory;
@@ -100,11 +103,16 @@ public class SchemaManager {
 			.secret()
 			.build();
 
-	private CommandlineParameter CONFIG_FILE = new CommandlineParameter.Builder(null, ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY.replace("--",""))
-			.defaultValue(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF)
-			.description("Path to configuration file")
+	private CommandlineParameter PROPERTY_CONFIG_FILE = new CommandlineParameter.Builder(null, ConfigHolder.PROPERTIES_CONFIG_FILE_KEY.replace("--", ""))
+			.defaultValue(ConfigHolder.PROPERTIES_CONFIG_FILE_DEF)
+			.description("Path to properties configuration file")
 			.requireArguments(true)
-			.required(true)
+			.build();
+
+	private CommandlineParameter TDSL_CONFIG_FILE = new CommandlineParameter.Builder(null, ConfigHolder.TDSL_CONFIG_FILE_KEY.replace("--", ""))
+			.defaultValue(ConfigHolder.TDSL_CONFIG_FILE_DEF)
+			.description("Path to DSL configuration file")
+			.requireArguments(true)
 			.build();
 
 	private CommandlineParameter COMPONENTS = new CommandlineParameter.Builder("C", "components").description(
@@ -167,7 +175,7 @@ public class SchemaManager {
 	                                                                                                                             
 	private List<CommandlineParameter> destroySchemaParametersSupplier() {
 		List<CommandlineParameter> options = new ArrayList<>();
-		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, CONFIG_FILE));
+		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE));
 		options.addAll(SchemaLoader.getMainCommandlineParameters(true));
 		return options;
 	}
@@ -176,6 +184,7 @@ public class SchemaManager {
 		fixShutdownThreadIssue();
 		String type = props.getProperty(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName());
 		Map<String, Object> config = null;
+		Optional<String[]> conversionMessages = Optional.empty();
 		if (type != null) {
 			SchemaLoader loader = SchemaLoader.newInstance(type);
 			SchemaLoader.Parameters params = loader.createParameters();
@@ -190,10 +199,11 @@ public class SchemaManager {
 
 			config = configBuilder.build();
 		} else {
-			Optional<String> configFile = getProperty(props, CONFIG_FILE);
-			try (FileReader reader = new FileReader(configFile.get())) {
-				 config = new ConfigReader().read(reader);
-			}
+			ConfigHolder holder = new ConfigHolder();
+			conversionMessages = holder.loadConfiguration(new String[] { ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, PROPERTY_CONFIG_FILE.getValue().get(),
+													ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
+
+			config = holder.getProperties();
 		}
 
 		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
@@ -208,7 +218,7 @@ public class SchemaManager {
 		log.info("found " + result.size() + " data sources to destroy...");
 		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
 		log.info("data sources  destruction finished!");
-		List<String> output = prepareOutput("Data source destruction finished", results);
+		List<String> output = prepareOutput("Data source destruction finished", results, conversionMessages);
 		boolean error = results.values()
 				.stream()
 				.flatMap(entries -> entries.stream())
@@ -268,7 +278,7 @@ public class SchemaManager {
 		Map<String, Object> config = configBuilder.build();
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
 
-		List<String> output = prepareOutput("Schema installation finished", results);
+		List<String> output = prepareOutput("Schema installation finished", results, Optional.empty());
 		output.add("");
 		output.add("Example " + ConfigHolder.TDSL_CONFIG_FILE_DEF + " configuration file:");
 		output.add("");
@@ -287,24 +297,25 @@ public class SchemaManager {
 	}
 
 	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
-		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, CONFIG_FILE);
+		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE);
 	}
 
 	public void upgradeSchema(Properties props) throws IOException, ConfigReader.ConfigException {
-		Optional<String> configFile = getProperty(props, CONFIG_FILE);
-		try (FileReader reader = new FileReader(configFile.get())) {
-			Map<String, Object> config = new ConfigReader().read(reader);
-			Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
-			List<String> output = prepareOutput("Schema upgrade finished", results);
-			boolean error = results.values()
-					.stream()
-					.flatMap(entries -> entries.stream())
-					.map(entry -> entry.result)
-					.filter(r -> r == SchemaLoader.Result.error)
-					.findAny()
-					.isPresent();
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
-		}
+		ConfigHolder holder = new ConfigHolder();
+		Optional<String[]> conversionMessages = holder.loadConfiguration(new String[] { ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, PROPERTY_CONFIG_FILE.getValue().get(),
+																	 ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
+
+		Map<String, Object> config = holder.getProperties();
+		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
+		List<String> output = prepareOutput("Schema upgrade finished", results, conversionMessages);
+		boolean error = results.values()
+				.stream()
+				.flatMap(entries -> entries.stream())
+				.map(entry -> entry.result)
+				.filter(r -> r == SchemaLoader.Result.error)
+				.findAny()
+				.isPresent();
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
 	}
 
 	private Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> loadSchemas(Map<String, Object> config, Properties props) throws IOException, ConfigReader.ConfigException {
@@ -325,8 +336,12 @@ public class SchemaManager {
 		return results;
 	}
 
-	private List<String> prepareOutput(String title, Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results) {
+	private List<String> prepareOutput(String title, Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results, Optional<String[]> conversionMessages) {
 		List<String> output = new ArrayList<>(Arrays.asList("\t" + title));
+		conversionMessages.ifPresent(msgs -> {
+			output.add("");
+			output.addAll(Arrays.asList(msgs));
+		});
 		results.forEach((k,v) -> {
 			output.add("");
 			output.add("Data source: " + k.getName() + " with uri " + k.getResourceUri());

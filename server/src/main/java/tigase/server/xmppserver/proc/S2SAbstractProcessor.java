@@ -26,6 +26,7 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.S2SIOService;
 import tigase.server.xmppserver.S2SProcessor;
@@ -60,6 +61,9 @@ public abstract class S2SAbstractProcessor
 	private static final Logger log                        =
 			Logger.getLogger(S2SAbstractProcessor.class.getName());
 
+	@ConfigField(desc = "Skip StartTLS for domains", alias = "skip-tls-hostnames")
+	private String[] skipTlsHosts;
+
 	//~--- methods --------------------------------------------------------------
 	
 	@Override
@@ -82,17 +86,12 @@ public abstract class S2SAbstractProcessor
 	 * 
 	 */
 	public boolean skipTLSForHost(String hostname) {
-
 		// TODO: this is slow, optimize it somehow!!!
 		// Workaround for buggy servers having problems with establishing TLS over s2s
 		// http://community.igniterealtime.org/thread/36206
 		// http://community.igniterealtime.org/thread/30578
-		String hostnames = System.getProperty("s2s-skip-tls-hostnames");
-
-		if (hostnames != null) {
-			String[] hosts = hostnames.split(",");
-
-			for (String host : hosts) {
+		if (skipTlsHosts != null) {
+			for (String host : skipTlsHosts) {
 				if (hostname.equalsIgnoreCase(host)) {
 					return true;
 				}

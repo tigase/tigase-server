@@ -112,6 +112,8 @@ public class OldConfigHolder {
 		convertFromOldFormat();
 
 		props = ConfigWriter.buildTree(props);
+		props.remove("--property-file");
+		props.remove("--config-file");
 
 		if (Files.exists(tdslPath)) {
 			Path backup = ConfigHolder.backupOldConfigFile(tdslPath);
