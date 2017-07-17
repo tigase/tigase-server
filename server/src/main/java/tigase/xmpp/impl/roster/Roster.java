@@ -21,6 +21,7 @@ package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
 
 import tigase.xmpp.JID;
@@ -44,6 +45,7 @@ import java.util.logging.Logger;
  *
  */
 @Deprecated
+@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 public class Roster extends RosterAbstract {
 
 	/**

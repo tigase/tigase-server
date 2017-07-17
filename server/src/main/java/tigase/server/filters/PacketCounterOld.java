@@ -26,6 +26,7 @@ package tigase.server.filters;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
@@ -50,6 +51,7 @@ import java.util.Map.Entry;
  *
  */
 @Deprecated
+@TigaseDeprecated(since = "7.1.0", removeIn = "7.2.0")
 public class PacketCounterOld
 		implements PacketFilterIfc {
 	private long                               clusterCounter = 0;

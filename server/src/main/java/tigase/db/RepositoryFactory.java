@@ -26,6 +26,7 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.ClassUtilBean;
 
@@ -50,6 +51,7 @@ import java.util.regex.Pattern;
  * @version $Rev$
  */
 @Deprecated
+@TigaseDeprecated(since = "7.2.0")
 public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";

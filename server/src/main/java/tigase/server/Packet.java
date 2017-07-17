@@ -22,6 +22,7 @@
 
 package tigase.server;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
@@ -432,6 +433,7 @@ public class Packet {
 	 * @deprecated Consider using {@link #getAttributeStaticStr(java.lang.String) } instead.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getAttribute(String key) {
 		return elem.getAttribute(key);
 	}
@@ -490,6 +492,7 @@ public class Packet {
 	 * instead, if possible, if not, contact us so we preserve the API.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getAttribute(String[] path, String key) {
 		return elem.getAttribute(path, key);
 	}
@@ -510,6 +513,7 @@ public class Packet {
 	 * instead, if possible, or {@link #getAttribute(java.lang.String[], java.lang.String)}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getAttribute(String path, String key) {
 		return elem.getAttribute(path, key);
 	}
@@ -567,6 +571,7 @@ public class Packet {
 	 * if possible, if not, contact us so we preserve the API.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getElemCData(String[] xmlPath) {
 		return elem.getCData(xmlPath);
 	}
@@ -587,6 +592,7 @@ public class Packet {
 	 * if possible, or {@link #getElemCData(java.lang.String[])}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getElemCData(String xmlPath) {
 		return elem.getCData(xmlPath);
 	}
@@ -648,6 +654,7 @@ public class Packet {
 	 * if possible, if not, contact us so we preserve the API.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public List<Element> getElemChildren(String[] xmlPath) {
 		return elem.getChildren(xmlPath);
 	}
@@ -669,6 +676,7 @@ public class Packet {
 	 * if possible, or {@link #getElemChildren(java.lang.String[]) }.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public List<Element> getElemChildren(String xmlPath) {
 		return elem.getChildren(xmlPath);
 	}
@@ -682,6 +690,7 @@ public class Packet {
 	 * @deprecated use getStanzaFrom() instead.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getElemFrom() {
 		return (stanzaFrom != null)
 					 ? stanzaFrom.toString()
@@ -711,6 +720,7 @@ public class Packet {
 	 * @deprecated use getStanzaTo() instead
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public String getElemTo() {
 		return (stanzaTo != null)
 					 ? stanzaTo.toString()
@@ -1103,6 +1113,7 @@ public class Packet {
 	 * if possible, if not contact us so we preserve the API.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public boolean isXMLNS(String[] elementPath, String xmlns) {
 		String this_xmlns = elem.getXMLNS(elementPath);
 
@@ -1124,6 +1135,7 @@ public class Packet {
 	 * if possible, or {@link #isXMLNS(String[], String)}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public boolean isXMLNS(String elementPath, String xmlns) {
 		String this_xmlns = elem.getXMLNS(elementPath);
 
@@ -1347,6 +1359,7 @@ public class Packet {
 	 * @deprecated Use <code>swapStanzaFromTo()</code> instead.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Packet swapElemFromTo() {
 		return swapStanzaFromTo();
 	}
@@ -1362,6 +1375,7 @@ public class Packet {
 	 * @deprecated Use <code>swapStanzaFromTo()</code> instead.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Packet swapElemFromTo(final StanzaType type) {
 		return swapStanzaFromTo(type);
 	}

@@ -24,12 +24,9 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.Packet;
-
-import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -37,6 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -51,6 +50,7 @@ import java.util.logging.Logger;
  * @deprecated was replaced by {@link S2SConnectionManager}, will be removed in 7.2.0
  */
 @Deprecated
+@TigaseDeprecated(since = "7.1.0", removeIn = "7.2.0")
 public class ServerConnections {
 
 	/**

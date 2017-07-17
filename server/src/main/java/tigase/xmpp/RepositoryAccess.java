@@ -26,6 +26,7 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
@@ -194,6 +195,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Authorization loginDigest(BareJID userId, String digest, String id, String alg)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -230,6 +232,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Authorization loginOther(Map<String, Object> props)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -277,6 +280,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Authorization loginPlain(BareJID userId, String password)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -316,6 +320,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Authorization loginToken(BareJID userId, String xmpp_sessionId, String token)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -401,6 +406,7 @@ public abstract class RepositoryAccess {
 	 * @deprecated
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Authorization register(String name_param, String pass_param, String email_param)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		Map<String, String> reg_params = null;
@@ -567,6 +573,7 @@ public abstract class RepositoryAccess {
 	 * @deprecated Replaced by code in {@link JabberIqRegister#doRegisterNewAccount(Packet, Element, XMPPResourceConnection, Queue)}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public Authorization register(String name_param, String pass_param, Map<String,
 			String> reg_params)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
@@ -1247,6 +1254,7 @@ public abstract BareJID getBareJID() throws NotAuthorizedException;
 	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, Queue)}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public Authorization unregister(String name_param)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		if (!isAuthorized()) {

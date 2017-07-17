@@ -26,6 +26,7 @@ package tigase.db.comp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.Repository;
 import tigase.db.TigaseDBException;
 
@@ -137,6 +138,8 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *          defaults, for example they can contain database connection URL or
 	 *          initial list of virtual domains.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	void getDefaults(Map<String, Object> defs, Map<String, Object> params);
 
 	/**
@@ -192,6 +195,8 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *          a <code>Map</code> with configuration settings. Content of this
 	 *          <code>Map</code> must not be modified. This read-only collection.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	void setProperties(Map<String, Object> properties);
 
 	//~--- methods --------------------------------------------------------------

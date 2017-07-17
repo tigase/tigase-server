@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
@@ -51,6 +53,7 @@ import tigase.util.DataTypes;
  * @version $Rev$
  */
 @Deprecated
+@TigaseDeprecated(since = "7.2.0")
 public class ConfigSQLRepository extends ConfigurationCache {
 
 	/** Field description */

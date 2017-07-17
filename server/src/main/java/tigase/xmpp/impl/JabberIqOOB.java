@@ -26,6 +26,7 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.Iq;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -47,6 +48,7 @@ import java.util.logging.Logger;
  * future releases.
  */
 @Deprecated
+@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
 public abstract class JabberIqOOB
 				extends SimpleForwarder {
 	private static final Logger     log      = Logger.getLogger(JabberIqOOB.class

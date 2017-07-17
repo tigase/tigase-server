@@ -22,6 +22,7 @@
 
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xmpp.BareJID;
 
 import java.util.List;
@@ -233,6 +234,7 @@ public interface UserRepository extends Repository {
 	 * @throws TigaseDBException if there is a problem with accessing user repository.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	long getUserUID(BareJID user) throws TigaseDBException;
 
 	/**

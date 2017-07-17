@@ -24,6 +24,7 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 
@@ -68,6 +69,7 @@ import java.util.logging.Logger;
  * @deprecated was replaced by {@link S2SConnectionManager}, will be removed in 7.2.0
  */
 @Deprecated
+@TigaseDeprecated(since = "7.1.0", removeIn = "7.2.0")
 public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Object>>
 		implements ConnectionHandlerIfc<XMPPIOService<Object>> {
 	private static final String DB_RESULT_EL_NAME = "db:result";

@@ -26,6 +26,7 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.UserRepository;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigAlias;
@@ -61,10 +62,12 @@ public abstract class ActionAbstract
 				implements ActionIfc {
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String AMP_SECURITY_LEVEL = "--amp-security-level";
 
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String AMP_SECURITY_LEVEL_DEFAULT = "STRICT";
 
 	/** Field description */

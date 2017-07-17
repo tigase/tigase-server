@@ -26,6 +26,7 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.ClusterConnectionManager;
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
@@ -121,6 +122,7 @@ public class ClConConfigRepository
 	//~--- methods --------------------------------------------------------------
 
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do

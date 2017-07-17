@@ -26,6 +26,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.JID;
@@ -180,10 +181,12 @@ public enum Command {
 
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	public static final String FIELD_EL = DataForm.FIELD_EL;
 
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	public static final String VALUE_EL = DataForm.VALUE_EL;
 
 	/** Field description */
@@ -191,6 +194,7 @@ public enum Command {
 
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	protected static final String[] FIELD_VALUE_PATH = DataForm.FIELD_VALUE_PATH;
 
 	/**

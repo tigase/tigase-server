@@ -24,6 +24,7 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.monitor.MonitorComponent;
 
 //~--- classes ----------------------------------------------------------------
@@ -36,5 +37,6 @@ import tigase.server.monitor.MonitorComponent;
  * @deprecated Use {@link tigase.monitor.MonitorComponent} instead.
  */
 @Deprecated
+@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 public class MonitorClustered extends MonitorComponent {
 }

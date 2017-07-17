@@ -26,6 +26,7 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
 import tigase.db.TigaseDBException;
@@ -271,6 +272,7 @@ public class XMPPResourceConnection
 	 * @throws TigaseStringprepException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public final Authorization loginDigest(String user, String digest, String id,
 			String alg)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException,
@@ -288,6 +290,7 @@ public class XMPPResourceConnection
 
 	@Override
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public final Authorization loginOther(Map<String, Object> props)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginOther(props);
@@ -321,6 +324,7 @@ public class XMPPResourceConnection
 	 * @throws TigaseStringprepException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public final Authorization loginPlain(String user, String password)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException,
 							TigaseStringprepException {
@@ -836,6 +840,7 @@ public class XMPPResourceConnection
 	 * @deprecated
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	public BareJID getUserId() throws NotAuthorizedException {
 		return this.getBareJID();
 	}
@@ -982,6 +987,7 @@ public class XMPPResourceConnection
 	 */
 	@Override
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public Authorization unregister(String name_param)
 			throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		Authorization auth_res = super.unregister(name_param);

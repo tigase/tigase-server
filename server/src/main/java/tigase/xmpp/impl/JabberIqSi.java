@@ -26,15 +26,14 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.Iq;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * XEP-0096: File Transfer
@@ -52,6 +51,7 @@ import java.util.logging.Logger;
  * future releases.
  */
 @Deprecated
+@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
 public abstract class JabberIqSi
 				extends SimpleForwarder {
 	private static final Logger     log = Logger.getLogger(JabberIqSi.class.getName());

@@ -26,6 +26,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.conf.Configurable;
@@ -599,6 +600,7 @@ public class BasicComponent
 	 * @return a value of {@code List<Element>}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
 	public List<Element> getDiscoFeatures() {
 		return null;
 	}
@@ -619,6 +621,7 @@ public class BasicComponent
 	 * @return a value of <code>Element</code>
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
 	public Element getDiscoInfo(String node, JID jid) {
 		return null;
 	}
@@ -655,6 +658,7 @@ public class BasicComponent
 	 * @return a value of {@code List<Element>}
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
 	public List<Element> getDiscoItems(String node, JID jid) {
 		return null;
 	}

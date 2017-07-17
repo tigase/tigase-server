@@ -26,6 +26,7 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
@@ -64,6 +65,7 @@ public abstract class ConfiguratorAbstract
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory
 			.AUTH_DOMAIN_POOL_CLASS_PROP_KEY;
 
@@ -72,15 +74,18 @@ public abstract class ConfiguratorAbstract
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory
 			.AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
 
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--tigase-config-repo-class";
 
 	/** Field description */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
 
 	/** Field description */
@@ -98,6 +103,7 @@ public abstract class ConfiguratorAbstract
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory
 			.USER_DOMAIN_POOL_CLASS_PROP_KEY;
 
@@ -106,6 +112,7 @@ public abstract class ConfiguratorAbstract
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory
 			.USER_DOMAIN_POOL_CLASS_PROP_VAL;
 	public static final String LOGGING_KEY = "logging/";

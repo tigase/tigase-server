@@ -24,6 +24,7 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Algorithms;
@@ -225,9 +226,11 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	public static final String DEF_LISTDISABLEDACCOUNTS_KEY= "users-list-disabled-accounts-query";
 
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String DEF_DISABLEACCOUNT_KEY = "user-disable-account-query";
 
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public static final String DEF_ENABLEACCOUNT_KEY = "user-enable-account-query";
 
 	public static final String DEF_UPDATEACCOUNTSTATUS_KEY = "user-update-account-status-query";

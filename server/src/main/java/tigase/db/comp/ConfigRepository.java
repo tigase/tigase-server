@@ -26,6 +26,7 @@ package tigase.db.comp;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
@@ -153,6 +154,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public abstract String getPropertyKey();
 
 	//~--- methods --------------------------------------------------------------

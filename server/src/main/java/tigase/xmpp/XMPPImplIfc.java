@@ -26,6 +26,7 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
 import tigase.server.ComponentInfo;
 import tigase.server.Packet;
@@ -100,6 +101,7 @@ public interface XMPPImplIfc
 	 * @return a value of <code>int</code>
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	int concurrentThreadsPerQueue();
 
 	/**
@@ -124,6 +126,7 @@ public interface XMPPImplIfc
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	void init(Map<String, Object> settings) throws TigaseDBException;
 
 	/**
@@ -163,6 +166,7 @@ public interface XMPPImplIfc
 	 * @see #supElementNamePaths
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	String[] supElements();
 
 	/**
@@ -225,6 +229,7 @@ public interface XMPPImplIfc
 	 * @return a <code>boolean</code> value
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	boolean isSupporting(String elem, String ns);
 }    // XMPPImplIfc
 

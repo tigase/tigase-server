@@ -30,6 +30,7 @@ package tigase.cluster.repo;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.Repository;
 
@@ -78,6 +79,7 @@ public class ClConDirRepository
 
 	@Override
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
 		// Nothing to do here
 		super.initRepository(conn_str, params);

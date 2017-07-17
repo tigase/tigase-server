@@ -26,6 +26,7 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
 import tigase.db.comp.RepositoryChangeListenerIfc;
@@ -202,7 +203,8 @@ public class ConfigurationCache
 		return this.hostname;
 	}
 
-	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		defs.put(CONFIG_DUMP_FILE_PROP_KEY, CONFIG_DUMP_FILE_PROP_DEF);
 	}
@@ -284,7 +286,8 @@ public class ConfigurationCache
 		}
 	}
 
-	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public Map<String, Object> getProperties(String compName)
 					throws ConfigurationException {
 
@@ -313,6 +316,7 @@ public class ConfigurationCache
 
 	@Override
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do..
 	}	
@@ -403,8 +407,9 @@ public class ConfigurationCache
 		this.hostname = hostname;
 	}
 
-	@Deprecated
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	public void setProperties(Map<String, Object> properties) {
 		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);
 	}

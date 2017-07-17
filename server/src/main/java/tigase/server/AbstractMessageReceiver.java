@@ -29,6 +29,7 @@ package tigase.server;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
@@ -479,6 +480,7 @@ public abstract class AbstractMessageReceiver
 	 * @deprecated
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	public void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
 	}
@@ -728,6 +730,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a value of <code>int</code>
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	public int processingThreads() {
 		return 1;
 	}
@@ -1217,6 +1220,7 @@ public abstract class AbstractMessageReceiver
 	 * @deprecated
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	protected void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		receiverTasks.schedule(task, unit.toMillis(delay));
 	}

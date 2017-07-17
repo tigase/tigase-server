@@ -26,6 +26,7 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xmpp.BareJID;
 
 import java.util.HashMap;
@@ -160,6 +161,7 @@ public interface AuthRepository extends Repository {
 	 * process.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "5.1.0", removeIn = "7.3.0")
 	boolean digestAuth(BareJID user, String digest, String id, String alg)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
@@ -220,6 +222,7 @@ public interface AuthRepository extends Repository {
 	 *
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	boolean otherAuth(Map<String, Object> authProps)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
@@ -244,6 +247,7 @@ public interface AuthRepository extends Repository {
 	 *             methods should use otherAuth(...) calls.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "5.1.0", removeIn = "7.3.0")
 	boolean plainAuth(BareJID user, String password)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
@@ -253,6 +257,7 @@ public interface AuthRepository extends Repository {
 	 * @param authProps a <code>Map</code> value with parameters for authentication.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	void queryAuth(Map<String, Object> authProps);
 
 	/**
@@ -315,10 +320,12 @@ public interface AuthRepository extends Repository {
 	void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException;
 
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	boolean isUserDisabled(BareJID user) 
 					throws UserNotFoundException, TigaseDBException;
 
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	void setUserDisabled(BareJID user, Boolean value) 
 					throws UserNotFoundException, TigaseDBException;
 	

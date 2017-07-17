@@ -155,6 +155,13 @@
                             <value>src/test/resources/logging.properties</value>
                         </property>
                     </systemProperties>
+					<environmentVariables>
+						<project.target>${project.build.outputDirectory}</project.target>
+						<project.version>${project.version}</project.version>
+					</environmentVariables>
+					<dependenciesToScan>
+						<dependency>tigase:tigase-utils</dependency>
+					</dependenciesToScan>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -195,6 +202,13 @@
 			<artifactId>tigase-utils</artifactId>
 			<version>3.6.0-SNAPSHOT</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-utils</artifactId>
+			<version>3.6.0-SNAPSHOT</version>
+			<scope>compile</scope>
+			<classifier>tests</classifier>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>

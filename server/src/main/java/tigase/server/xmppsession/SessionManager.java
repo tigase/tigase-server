@@ -26,6 +26,7 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.conf.Configurable;
@@ -177,6 +178,7 @@ public class SessionManager
 			new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
 	// This is not used any more as plugins settings are passed by annotation and configuration injection
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
 			Map<String, Object>>(20);
 	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,

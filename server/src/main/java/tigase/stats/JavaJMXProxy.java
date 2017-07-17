@@ -26,6 +26,8 @@ package tigase.stats;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
+
 import javax.management.*;
 import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
@@ -45,6 +47,7 @@ import java.util.logging.Logger;
  * class will be removed in the next version after 7.1.0
  */
 @Deprecated
+@TigaseDeprecated(since = "7.1.0", removeIn = "7.2.0")
 public class JavaJMXProxy
 				implements StatisticsProviderMBean, NotificationListener {
 	private static final Logger log = Logger.getLogger(JavaJMXProxy.class.getName());

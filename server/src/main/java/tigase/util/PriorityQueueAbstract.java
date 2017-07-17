@@ -24,7 +24,7 @@ package tigase.util;
 
 //~--- classes ----------------------------------------------------------------
 
-import tigase.annotations.TigaseDeprecatedComponent;
+import tigase.annotations.TigaseDeprecated;
 import tigase.sys.TigaseRuntime;
 
 import java.util.logging.Level;
@@ -144,7 +144,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Deprecated
-	@TigaseDeprecatedComponent
+	@TigaseDeprecated(since = "7.2.0")
 	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {
 		Class<? extends PriorityQueueAbstract> result = null;
 		String queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);

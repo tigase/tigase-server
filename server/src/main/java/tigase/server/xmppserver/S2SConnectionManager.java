@@ -26,6 +26,7 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -203,6 +204,7 @@ public class S2SConnectionManager
 
 	@Override
 	@Deprecated
+	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
 	public void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		super.addTimerTask(task, delay, unit);
 	}

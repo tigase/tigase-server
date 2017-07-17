@@ -26,6 +26,7 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Iq;
@@ -60,6 +61,7 @@ import java.util.Queue;
  * @version $Rev$
  */
 @Deprecated
+@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 public class RosterPresence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {

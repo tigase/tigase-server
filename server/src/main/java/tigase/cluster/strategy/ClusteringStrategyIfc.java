@@ -26,6 +26,7 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.server.Packet;
 import tigase.stats.StatisticHolder;
@@ -201,7 +202,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @return a <code>Map</code> with all the class default configuration
 	 *         parameters.
 	 */
-	@Deprecated // in 7.2.0
+	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	/**
@@ -217,6 +219,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @return an Object with content of an internal cache data.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
 	Object getInternalCacheData();
 
 	/**

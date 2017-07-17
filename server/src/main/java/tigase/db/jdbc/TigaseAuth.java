@@ -24,6 +24,7 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
@@ -52,6 +53,7 @@ import static tigase.db.AuthRepository.Meta;
 @Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 @Deprecated
+@TigaseDeprecated(since = "7.2.0")
 public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepository> {
 
 	/**

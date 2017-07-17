@@ -20,6 +20,8 @@
  */
 package tigase.xmpp;
 
+import tigase.annotations.TigaseDeprecated;
+
 /**
  * The XMPPResourceConnection Object can be put in special states
  * when all packets received to by this connection are threated in
@@ -39,6 +41,7 @@ package tigase.xmpp;
  * @version $Rev$
  */
 @Deprecated
+@TigaseDeprecated(since = "5.2.0", removeIn = "7.2.0")
 public enum ConnectionStatus {
 
 	INIT, ON_HOLD, REDIRECT, NORMAL,

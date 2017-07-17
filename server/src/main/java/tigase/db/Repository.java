@@ -21,6 +21,8 @@
  */
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -94,6 +96,7 @@ public interface Repository {
 	 * call.
 	 */
 	@Deprecated
+	@TigaseDeprecated(since = "7.2.0")
 	default void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		
 	}
