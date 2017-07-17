@@ -526,7 +526,7 @@ public class OldConfigHolder {
 			}
 
 			if (ampUri != null && (userUri == null || !userUri.equals(ampUri))) {
-				props.put("dataSource/" + domain + "-amp/uri", authUri);
+				props.put("dataSource/" + domain + "-amp/uri", ampUri);
 				props.put("dataSource/" + domain + "-amp/active", "true");
 				props.put("msgRepository/" + domain + "/data-source", domain + "-amp");
 				props.put("msgRepository/" + domain + "/active", "true");
