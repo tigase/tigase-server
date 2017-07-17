@@ -55,6 +55,14 @@ if object_id('dbo.tig_offline_messages') is null
 GO
 
 -- QUERY START:
+if not exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'msg_type')
+begin
+    alter table tig_offline_messages add msg_type int not null default 0;
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
 if not exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'receiver')
 begin
     alter table tig_offline_messages add receiver nvarchar(2049);

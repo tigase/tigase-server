@@ -57,6 +57,10 @@ begin
         ) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;        
     end if;
 
+    if not exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'msg_type') then
+        alter table tig_offline_messages add msg_type int not null default 0;
+    end if;
+
     if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'expired') then
         alter table tig_offline_messages modify expired timestamp(6) null default null;
     end if;

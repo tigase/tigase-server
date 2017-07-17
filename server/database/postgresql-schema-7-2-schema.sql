@@ -41,6 +41,11 @@ begin
         );
     end if;
 
+    if not exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'msg_type') then
+        alter table tig_offline_messages
+            add msg_type int not null default 0;
+    end if;
+
     if exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'message' and udt_name = 'varchar') then
         alter table tig_offline_messages alter message type text;
     end if;
