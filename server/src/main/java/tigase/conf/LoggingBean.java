@@ -44,7 +44,7 @@ import java.util.stream.Stream;
  */
 public class LoggingBean implements ConfigurationChangedAware {
 
-	@ConfigField(desc = "Debug")
+	@ConfigField(desc = "Debug", alias = "debug")
 	private String[] debug;
 	@ConfigField(desc = "Debug packages", alias = "debug-packages")
 	private String[] debugPackages;
