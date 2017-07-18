@@ -53,9 +53,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	protected final EventBus eventBus = EventBusFactory.getInstance();
 
-	@Inject(nullAllowed = true)
-	private Set<ScheduledTask> scheduledTasks;
-
 	@Inject
 	private StanzaProcessor stanzaProcessor;
 
@@ -85,12 +82,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	@Override
 	public void start() {
 		super.start();
-
-		if (scheduledTasks != null) {
-			for (ScheduledTask task : scheduledTasks) {
-				task.initialize();
-			}
-		}
 	}
 
 	/**

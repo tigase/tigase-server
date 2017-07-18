@@ -26,6 +26,7 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
+import tigase.server.AbstractMessageReceiver;
 import tigase.util.TimerTask;
 
 import java.time.Duration;
@@ -45,8 +46,14 @@ public abstract class ScheduledTask extends TimerTask implements ConfigurationCh
 	private Duration delay;
 
 	@Inject(bean = "service")
-	private AbstractKernelBasedComponent component;
+	protected AbstractMessageReceiver component;
 
+	/**
+	 * Default constructor allows providing default values
+	 *
+	 * @param delay default value of delay Duration
+	 * @param period default value of period Duration
+	 */
 	public ScheduledTask(Duration delay, Duration period) {
 		this.period = period;
 		this.delay = delay;

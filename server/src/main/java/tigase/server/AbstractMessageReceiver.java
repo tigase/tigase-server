@@ -30,6 +30,8 @@ package tigase.server;
 //~--- JDK imports ------------------------------------------------------------
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.component.ScheduledTask;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
@@ -39,6 +41,8 @@ import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
 import tigase.util.PriorityQueueRelaxed;
 import tigase.util.TigaseStringprepException;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -200,6 +204,9 @@ public abstract class AbstractMessageReceiver
 	@ConfigField(desc = "Incoming filters", alias = INCOMING_FILTERS_PROP_KEY)
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters = new CopyOnWriteArrayList<>();
 	private final List<PriorityQueueAbstract<Packet>> in_queues = new ArrayList<>(pr_cache.length);
+
+	@Inject(nullAllowed = true)
+	private Set<ScheduledTask> scheduledTasks;
 
 	/**
 	 * Variable <code>statAddedMessagesEr</code> keeps counter of unsuccessfuly
@@ -822,6 +829,12 @@ public abstract class AbstractMessageReceiver
 			log.log(Level.INFO, "{0}: starting queue management threads ...", getName());
 		}
 		startThreads();
+
+		if (scheduledTasks != null) {
+			for (ScheduledTask task : scheduledTasks) {
+				task.initialize();
+			}
+		}
 	}
 
 	/**
