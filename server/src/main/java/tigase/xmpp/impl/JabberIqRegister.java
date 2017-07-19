@@ -182,6 +182,7 @@ public class JabberIqRegister
 	@Override
 	public void beforeUnregister() {
 		eventBus.unregisterAll(this);
+		tokenBucket.beforeUnregister();
 	}
 
 	@Override
@@ -469,6 +470,7 @@ public class JabberIqRegister
 
 	@Override
 	public void initialize() {
+		tokenBucket.initialize();
 		eventBus.registerAll(this);
 		try {
 			if (userRepository.userExists(smJid)) {

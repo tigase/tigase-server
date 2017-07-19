@@ -1,5 +1,8 @@
 package tigase.xmpp.impl;
 
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.UnregisterAware;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
@@ -9,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TokenBucketPool {
+public class TokenBucketPool implements Initializable, UnregisterAware {
 
 	private final static Logger log = Logger.getLogger(TokenBucketPool.class.getName());
-	private final Timer timer = new Timer(true);
+	private Timer timer;
 	private final ConcurrentHashMap<String, TokenBucket> items = new ConcurrentHashMap<>();
 	private TimeUnit timeUnit = TimeUnit.SECONDS;
 	// unit: events
@@ -41,10 +44,6 @@ public class TokenBucketPool {
 	}
 
 	public TokenBucketPool() {
-		if (log.isLoggable(Level.FINE))
-			log.fine("TokenBucketPool Created. Auto purge task created.");
-
-		timer.schedule(purgerTask, TimeUnit.HOURS.toMillis(4));
 	}
 
 	public void setAutoPurgeEnabled(boolean enabled) {
@@ -97,6 +96,28 @@ public class TokenBucketPool {
 				iterator.remove();
 			}
 		}
+	}
+
+	@Override
+	public void beforeUnregister() {
+		if (timer == null) {
+			timer.cancel();
+		}
+		timer = null;
+	}
+
+	@Override
+	public void initialize() {
+		if (timer != null) {
+			beforeUnregister();
+		}
+		
+		if (log.isLoggable(Level.FINE))
+			log.fine("TokenBucketPool Created. Auto purge task created.");
+
+		timer = new Timer("TokenBuckerPoolTimerThread", true);
+
+		timer.schedule(purgerTask, TimeUnit.HOURS.toMillis(4));
 	}
 
 	private boolean consume(TokenBucket item) {
