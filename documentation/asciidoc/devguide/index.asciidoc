@@ -65,9 +65,15 @@ include::text/Component_Implementation_-_Lesson_7_-_Data_Repository.asciidoc[]
 
 include::text/Component_Implementation_-_Lesson_8_-_Startup_Time.asciidoc[]
 
+:leveloffset: 1
+
 include::text/components/http-api/documentation/text/REST_API.asciidoc[]
 
-include::text/HTTP_API_Scripting.asciidoc[]
+:leveloffset: 2
+
+include::text/components/http-api/documentation/text/HTTP_API_Scripting.asciidoc[]
+
+:leveloffset: 1
 
 include::text/Packet_Filtering_in_Component.asciidoc[]
 
