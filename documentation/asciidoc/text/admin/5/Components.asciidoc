@@ -1,5 +1,5 @@
 [[loadComponent]]
-= Configuring the Tigase Server to Load a Component
+= Components
 
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2017: Reformatted for v7.2.0.
@@ -9,11 +9,7 @@
 :numbered:
 :website: http://tigase.net
 
-A detailed description of all the configuration options is in the `init.properties` guide where you can also find information described below and much more. The purpose of this document is to give you a brief introduction on how to load a component into Tigase server without the need to dig through all the details.
-
-I will show how to load 2 components into Tigase server using a configuration in the init.properties file: link:https://projects.tigase.org/projects/tigase-muc[MUC] and link:https://projects.tigase.org/projects/tigase-pubsub[PubSub].
-
-The only step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the +init.properties+ file you use in your installation.
+The only step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the `config.tdsl` file you use in your installation.
 
 Let's say you want to just add PubSub for now. All you need to do is add the following to the properties file:
 
@@ -37,6 +33,7 @@ Normally, however we want to load few different components like PubSub, MUC, MSN
 [source,dsl]
 -----
 muc (class: tigase.muc.MUCComponent) {}
+pubsub (class: tigase.pubsub.PubSubComponent) {}
 -----
 
-Changes to the init.properties file will take effect upon server restart.
+Changes to the `config.tdsl` file will take effect upon server restart.

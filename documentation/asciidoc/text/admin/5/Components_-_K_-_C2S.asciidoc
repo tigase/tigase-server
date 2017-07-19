@@ -7,7 +7,7 @@
 Client to server communication is an integral part of XMPP communication.  C2S handles all client communication to the server, and is responsible for filtering and handling remote communications.
 C2S CAN be disabled, however doing so will only allow communication of internal components, and S2S communications.
 
-= Configuration
+== Configuration
 To disable C2S, use the following lines in init.properties folder.
 
 [source,dsl]

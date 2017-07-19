@@ -183,28 +183,23 @@ include::text/admin/5/Components.asciidoc[]
 
 :leveloffset: 2
 
-include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_Component_Configuration.asciidoc
 
-:leveloffset: 3
+include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
 
 include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]
 
-include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
-
 include::text/components/http-api/documentation/text/HTTP_File_Upload_Component.asciidoc[]
 
-include::text/admin/5/Components_-_B_-_Tigase_HTTP_API.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
 
-include::text/admin/5/Components_-_B_-_HTTP_API_-_HTTP_API_Usage_Examples.asciidoc[]
+include::text/components/http-api/documentation/text/HTTP_Pre_Bind_BOSH.asciidoc[]
 
-include::text/admin/5/Components_-_B_-_Tigase_HTTP_API_-_2_-_Admin_UI.asciidoc[]
+include::text/components/http-api/documentation/text/REST_API_Usage_Examples.asciidoc[]
 
-include::text/admin/5/Components_-_B_-_Tigase_HTTP_API_-_1_-_REST_API_Guide.asciidoc[]
+include::text/components/http-api/documentation/text/UI_Guide_Admin.asciidoc[]
 
-include::text/admin/5/Components_-_B_-_Tigase_HTTP_API_-_3_-_Web_Client.asciidoc[]
-
-include::text/admin/5/Components_-_B_-_Tigase_HTTP_API_-_4_-_Pre-bind-Bosh.asciidoc[]
-
+include::text/components/http-api/documentation/text/UI_Guide_Client.asciidoc[]
 
 :leveloffset: 2
 
