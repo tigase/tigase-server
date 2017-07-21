@@ -75,6 +75,11 @@ public class MAMItemHandler implements MAMRepository.ItemHandler {
 		Message packet = new Message(m, query.getComponentJID(), query.getQuestionerJID());
 		packet.setPriority(Priority.HIGH);
 
+		if (query.getRsm().getFirst() == null) {
+			query.getRsm().setFirst(item.getId());
+		}
+		query.getRsm().setLast(item.getId());
+
 		packetWriter.write(packet);
 	}
 
