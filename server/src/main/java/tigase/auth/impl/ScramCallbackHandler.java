@@ -174,7 +174,7 @@ public class ScramCallbackHandler
 			}
 		} catch (Exception e) {
 			callback.setSaltedPassword(null);
-			log.log(Level.WARNING, "Can't retrieve user password.", e);
+			log.log(Level.FINE, "Can't retrieve user password.", e);
 		}
 	}
 

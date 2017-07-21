@@ -164,7 +164,7 @@ public class ScramSPCallbackHandler
 		} catch (Exception e) {
 			this.salt = null;
 			this.saltedPassword = null;
-			log.log(Level.WARNING, "Can't retrieve users salted password.", e);
+			log.log(Level.FINE, "Can't retrieve users salted password.", e);
 		}
 	}
 
