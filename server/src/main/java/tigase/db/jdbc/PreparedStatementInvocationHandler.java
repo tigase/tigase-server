@@ -21,7 +21,9 @@
 package tigase.db.jdbc;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.sql.PreparedStatement;
 
 public class PreparedStatementInvocationHandler implements InvocationHandler {
@@ -34,6 +36,17 @@ public class PreparedStatementInvocationHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		return method.invoke(ps, args);
+		try {
+			return method.invoke(ps, args);
+		} catch (Throwable ex) {
+			if (ex instanceof UndeclaredThrowableException) {
+				ex = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
+			}
+			if (ex instanceof InvocationTargetException) {
+				throw ((InvocationTargetException) ex).getTargetException();
+			} else {
+				throw ex;
+			}
+		}
 	}
 }
