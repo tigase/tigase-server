@@ -364,6 +364,7 @@ public class ConfigHolder {
 				return value;
 			}
 		});
+		renameIfExists(props, "--" + Configurator.SCRIPTS_DIR_PROP_KEY, Configurator.SCRIPTS_DIR_PROP_KEY, Function.identity());
 
 		Stream.of("c2s", "bosh", "ws2s").forEach(cmp -> {
 			Map<String, Object> cmpCfg = (Map<String, Object>) props.get(cmp);

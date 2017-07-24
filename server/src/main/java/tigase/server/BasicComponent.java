@@ -116,7 +116,7 @@ public class BasicComponent
 	protected ConcurrentSkipListSet<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
 	protected ConcurrentSkipListSet<String>       trusted = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager     = null;
-	@ConfigField(desc = "Base directory for scripts")
+	@ConfigField(desc = "Base directory for scripts", alias = SCRIPTS_DIR_PROP_KEY)
 	private String              scriptsBaseDir          = SCRIPTS_DIR_PROP_DEF;
 	private String              scriptsCompDir          = null;
 	private ServiceEntity       serviceEntity           = null;
