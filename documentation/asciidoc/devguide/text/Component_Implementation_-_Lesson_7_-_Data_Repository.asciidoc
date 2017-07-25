@@ -118,7 +118,12 @@ public static class TestRepositoryMDBean extends MDRepositoryBeanWithStatistics<
 ----
 
 Most of this code will be the same in all implementations based on MDRepositoryBeanWithStatistics. In our case only custom method is *void addItem(...)* which uses *getRepository(String domain)* method to retrieve correct repository for a domain.
-This retrieval of actual repository instance for a domain will need to be done for every custom method of +TestRepositoryIfc+/
+This retrieval of actual repository instance for a domain will need to be done for every custom method of +TestRepositoryIfc+.
+
+TIP: It is also possible to extend +MDRepositoryBean+ or +SDRepositoryBean+ instead of +MDRepositoryBeanWithStatistics+. However, if you decide to extend abstract repository bean classes without +withStatistics+ suffix, then no statistics data related to usage of this repository will be gathered. The only change, will be that you will not need to pass interface class to constructor of a superclass as it is not needed.
+
+NOTE: As menitoned above, it is also possible to extend +SDRepostioryBean+ and +SDRepositoryBeanWithStatistics+. Methods which you would need to implement are the same is in case of extending +MDRepositoryBeanWithStatistics+, however internally +SDRepositoryBean+ will not have support for using different repository for different domain. In fact +SDRepositoryBeanWithStatistics+ has only one repository instance and uses only one data source for all domains.
+The same behaviour is presented by +MDRepositoryBeanWithStatistics+ if only single +default+ instance of repository is configured. However, +MDRepositoryBeanWithStatistics+ gives better flexibility and due to that usage of +SDRepositoryBean+ and +SDRepositoryBeanWithStatistics+ is discouraged.
 
 While this is more difficult to implement than in previous version, it gives you support for multi database setup and provides you with statistics of database query times which may be used for diagnosis.
 
@@ -132,3 +137,102 @@ private TestRepositoryIfc testRepository;
 
 TIP: In *testRepository* field instance of *TestRepositoryMDBean* will be injected.
 
+=== Configuration
+
+Our class +TestRepositoryMDBean+ is annotated with +@Bean+ which sets its name as +repository+ and sets parent as +TestComponent+. Instance of this component was configured by use under name of +test+ in Tigase XMPP Server configuration file.
+As a result, all configuration related to our repositories should be placed in +repository+ section placed inside +test+ section.
+
+.Example
+[source,dsl]
+----
+test(class: TestComponent) {
+    repository () {
+        // repository related configuration
+    }
+}
+----
+
+==== Defaults
+As mentioned above, if we use +MDRepositoryBeanWithStatistics+ as our base class for +TestRepositoryMDBean+, then we may have different data sources used for different domains.
+By default, if we will not configure it otherwise, +MDRepositoryBeanWithStatistics+ will create only single repository instance named +default+.
+It will be used for all domains and it will, by default, use data source named the same as repository instance - it will use data source named +default+.
+This defaults are equal to following configuration entered in the config file:
+[source,dsl]
+----
+test(class: TestComponent) {
+    repository () {
+        default () {
+            dataSourceName = 'default'
+        }
+    }
+}
+----
+
+==== Changing data source used by repository
+It is possible to make any repository use different data source than data source configured under the same name as repository instance.
+To do so, you need to set +dataSourceName+ property of repository instance to the name of data source which it should use.
+
+.Example setting repository +default+ to use data source named +test+
+[source,dsl]
+----
+test(class: TestComponent) {
+    repository () {
+        default () {
+            dataSourceName = 'test'
+        }
+    }
+}
+----
+
+==== Configuring separate repository for domain
+To configure repository instance to be used for particular domain, you need to define repository with the same name as domain for which it should be used.
+It will, by default, use data source with name equal domain name.
+
+.Separate repository for +example.com+ using data source named +example.com+
+[source,dsl]
+----
+dataSource () {
+    // configuration of data sources here is not complete
+    default () {
+        uri = "jdbc:derby:/database"
+    }
+    'example.com' () {
+        uri = "jdbc:derby/example"
+    }
+}
+
+test(class: TestComponent) {
+    repository () {
+        default () {
+        }
+        'example.com' () {
+        }
+    }
+}
+----
+
+.Separate repository for +example.com+ using data source named +test+
+[source,dsl]
+----
+dataSource () {
+    // configuration of data sources here is not complete
+    default () {
+        uri = "jdbc:derby:/database"
+    }
+    'test' () {
+        uri = "jdbc:derby/example"
+    }
+}
+
+test(class: TestComponent) {
+    repository () {
+        default () {
+        }
+        'example.com' () {
+            dataSourceName = 'test'
+        }
+    }
+}
+----
+
+NOTE: In both examples presented above, for domains other than +example.com+, repository instance named +default+ will be used and it will use data source named +default+.
