@@ -31,14 +31,14 @@ AS:Component: vhost-man
 
 package tigase.admin
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
-import tigase.cert.*
-import tigase.io.*
-import tigase.xmpp.JID
-import tigase.cluster.*
-import tigase.conf.ConfiguratorAbstract;
+import tigase.cert.CertificateEntry
+import tigase.cert.CertificateUtil
+import tigase.db.comp.ComponentRepository
+import tigase.io.CertificateContainerIfc
+import tigase.io.SSLContextContainerIfc
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.Permissions
 
 def MARKER = "command-marker"
 //def ITEMS = "item-list"
@@ -154,7 +154,8 @@ if (item == null) {
 				params.put(SSLContextContainerIfc.PEM_CERTIFICATE_KEY, pemCert)
 				params.put(SSLContextContainerIfc.CERT_ALIAS_KEY, itemKey)
 				params.put(SSLContextContainerIfc.CERT_SAVE_TO_DISK_KEY, saveToDisk.toString())
-				TLSUtil.addCertificate(params)
+				CertificateContainerIfc certContainer = kernel.getInstance(CertificateContainerIfc.class);
+				certContainer.addCertificates(params);
 				Command.addTextField(result, "Note", "SSL Certificate for domain: " + itemKey + " loaded successfully")
 			}
 		}

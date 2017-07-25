@@ -83,6 +83,7 @@ public class VHostManager
 	private String                       identity_type           = "generic";
 	private long                         isAnonymousEnabledCalls = 0;
 	private long                         isLocalDomainCalls      = 0;
+	private Kernel kernel;
 	private LinkedHashSet<VHostListener> localDomainsHandlers =
 			new LinkedHashSet<VHostListener>(10);
 	private LinkedHashSet<VHostListener> nonLocalDomainsHandlers =
@@ -134,6 +135,7 @@ public class VHostManager
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+		binds.put("kernel", kernel);
 	}
 
 	@Override
@@ -143,7 +145,7 @@ public class VHostManager
 
 	@Override
 	public void register(Kernel kernel) {
-
+		this.kernel = kernel;
 	}
 
 	@Override

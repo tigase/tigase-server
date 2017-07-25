@@ -848,9 +848,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if (net_buffer_limit == 0) {
 			AbstractBeanConfigurator configurator = kernel.getInstance(AbstractBeanConfigurator.class);
 			if (isHighThroughput()) {
-				net_buffer_limit = (Integer) configurator.getProperties().getOrDefault("net-buffer-high-throughput", NET_BUFFER_HT_PROP_VAL);
+				net_buffer_limit = (Integer) configurator.getProperties().getOrDefault("net-buffer-high-throughput", NET_BUFFER_LIMIT_HT_PROP_VAL);
 			} else {
-				net_buffer_limit = (Integer) configurator.getProperties().getOrDefault("net-buffer-standard", NET_BUFFER_ST_PROP_VAL);
+				net_buffer_limit = (Integer) configurator.getProperties().getOrDefault("net-buffer-standard", NET_BUFFER_LIMIT_ST_PROP_VAL);
 			}
 		}
 		return net_buffer_limit;
