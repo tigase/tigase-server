@@ -277,7 +277,7 @@ public class TLSIO implements IOInterface {
 						io.write(null);
 						
 						// it appears only during handshake so force break only in this case
-						if (tlsWrapper.getTlsEngine().getHandshakeStatus() == 
+						if (tlsWrapper.getHandshakeStatus() ==
 								SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING 
 								&& (buff == null || !buff.hasRemaining())) {
 							breakNow = true;

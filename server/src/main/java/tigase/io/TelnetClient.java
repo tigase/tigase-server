@@ -101,7 +101,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 
 		if (ssl) {
 			SSLContextContainerIfc sslContextContainer = TLSUtil.getRootSslContextContainer();
-			iosock = new TLSIO(iosock, new TLSWrapper(sslContextContainer.getSSLContext("SSL", null, true), null, null, 0, true, false), ByteOrder.BIG_ENDIAN);
+			iosock = new TLSIO(iosock, new JcaTLSWrapper(sslContextContainer.getSSLContext("SSL", null, true), null, null, 0, true, false), ByteOrder.BIG_ENDIAN);
 		}    // end of if (ssl)
 
 		reader.addIOInterface(iosock);

@@ -336,8 +336,7 @@ public abstract class IOService<RefObject>
 			// if reqCertDomain is set then verify if certificate got from server
 			// is allowed for reqCertDomain
 			try {
-				Certificate[] certs = wrapper.getTlsEngine().getSession()
-						.getPeerCertificates();
+				Certificate[] certs = wrapper.getPeerCertificates();
 				if (certs != null && certs.length > 0) {
 					Certificate peerCert = certs[0];
 					if (log.isLoggable(Level.FINEST)) {
@@ -357,20 +356,19 @@ public abstract class IOService<RefObject>
 			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[]{this,
 					certCheckResult});
 		}
-		if (!wrapper.getTlsEngine().getUseClientMode()) {
+		if (!wrapper.isClientMode()) {
 			this.tlsUniqueId = wrapper.getTlsUniqueBindingData();
 			try {
-				Certificate[] certs = wrapper.getTlsEngine().getSession().getLocalCertificates();
+				Certificate[] certs = wrapper.getLocalCertificates();
 				this.localCertificate = certs == null || certs.length == 0 ? null : certs[0];
 			} catch (Exception e) {
 				this.localCertificate = null;
 				log.log(Level.WARNING, "Cannot get local certificate", e);
 			}
 		}
-		if (!wrapper.getTlsEngine().getUseClientMode() && (wrapper.getTlsEngine().getWantClientAuth() || wrapper.getTlsEngine().getNeedClientAuth())) {
+		if (!wrapper.isClientMode() && (wrapper.wantClientAuth() || wrapper.isNeedClientAuth())) {
 			try {
-				Certificate[] certs = wrapper.getTlsEngine().getSession()
-						.getPeerCertificates();
+				Certificate[] certs = wrapper.getPeerCertificates();
 				this.peerCertificate = certs[certs.length - 1];
 
 			} catch (SSLPeerUnverifiedException e) {
@@ -416,9 +414,9 @@ public abstract class IOService<RefObject>
 		}
 
 		SSLContext sslContext = sslContextContainer.getSSLContext("SSL", tls_hostname, clientMode, x509TrustManagers);
-		TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
-											needClientAuth, sslContextContainer.getEnabledCiphers(),
-											sslContextContainer.getEnabledProtocols());
+		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
+											   needClientAuth, sslContextContainer.getEnabledCiphers(),
+											   sslContextContainer.getEnabledProtocols());
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -470,9 +468,9 @@ public abstract class IOService<RefObject>
 			}
 
 			SSLContext sslContext = sslContextContainer.getSSLContext("TLS", tls_hostname, clientMode, x509TrustManagers);
-			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
-												needClientAuth, sslContextContainer.getEnabledCiphers(),
-												sslContextContainer.getEnabledProtocols());
+			TLSWrapper wrapper = new JcaTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
+												   needClientAuth, sslContextContainer.getEnabledCiphers(),
+												   sslContextContainer.getEnabledProtocols());
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();
