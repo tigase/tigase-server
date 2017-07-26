@@ -414,11 +414,12 @@ public abstract class IOService<RefObject>
 		}
 
 		SSLContext sslContext = sslContextContainer.getSSLContext("SSL", tls_hostname, clientMode, x509TrustManagers);
-		TLSWrapper wrapper = new BcTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
+		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
 											   needClientAuth, sslContextContainer.getEnabledCiphers(),
 											   sslContextContainer.getEnabledProtocols());
 
-		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
+//		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
+		socketIO = new BcTLSIO(socketIO,tls_hostname, byteOrder());
 		setLastTransferTime();
 		encoder.reset();
 		decoder.reset();
@@ -468,11 +469,12 @@ public abstract class IOService<RefObject>
 			}
 
 			SSLContext sslContext = sslContextContainer.getSSLContext("TLS", tls_hostname, clientMode, x509TrustManagers);
-			TLSWrapper wrapper = new BcTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
+			TLSWrapper wrapper = new JcaTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
 												   needClientAuth, sslContextContainer.getEnabledCiphers(),
 												   sslContextContainer.getEnabledProtocols());
 
-			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
+//			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
+			socketIO = new BcTLSIO(socketIO, tls_hostname, byteOrder());
 			setLastTransferTime();
 			encoder.reset();
 			decoder.reset();
