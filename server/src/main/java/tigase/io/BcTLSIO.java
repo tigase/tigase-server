@@ -20,6 +20,7 @@ import org.bouncycastle.tls.crypto.TlsCryptoParameters;
 import org.bouncycastle.tls.crypto.impl.bc.BcDefaultTlsCredentialedDecryptor;
 import org.bouncycastle.tls.crypto.impl.bc.BcDefaultTlsCredentialedSigner;
 import org.bouncycastle.tls.crypto.impl.bc.BcTlsCrypto;
+import org.bouncycastle.util.encoders.Hex;
 import tigase.stats.StatisticsList;
 
 import javax.net.ssl.SSLException;
@@ -174,11 +175,11 @@ public class BcTLSIO
 	private byte[] getBytes(final ByteBuffer buff) {
 		byte[] tmp;
 		if (buff != null) {
-			buff.flip();
+//			buff.flip();
 			tmp = new byte[buff.remaining()];
 			buff.get(tmp);
 			buff.compact();
-			buff.flip();
+//			buff.flip();
 		} else {
 			tmp = null;
 		}
@@ -258,23 +259,24 @@ public class BcTLSIO
 			int dataLen = serverProtocol.readOutput(buff, 0, buff.length);
 			if (dataLen > 0) {
 				resOut += dataLen;
-				ByteBuffer bb = ByteBuffer.allocate(dataLen);
-				bb.put(buff);
-				System.err.println("S->C: " + dataLen);
+				ByteBuffer bb = ByteBuffer.wrap(buff, 0, dataLen);
+				System.out.println("S->C: " + resOut + " wrapped bytes: " + Hex.toHexString(bb.array()));
+				bb.flip();
 				io.write(bb);
 			}
 
 			// copy received data (C->S)
 			resIn = 0;
 			ByteBuffer bb = io.read(ByteBuffer.allocate(10240));
+
 			byte[] tmp = getBytes(bb);
 			if (tmp != null && tmp.length > 0) {
 				resIn += tmp.length;
+				System.out.println("C->S: " + resIn + " wrapped bytes: " + Hex.toHexString(tmp));
 				serverProtocol.offerInput(tmp);
-				System.err.println("C->S: " + dataLen);
 
 			}
-		} while (resIn > 0 && resOut > 0 || counter > 1000);
+		} while ((resIn > 0 || resOut > 0) && counter <= 1000);
 	}
 
 	@Override

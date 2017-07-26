@@ -196,14 +196,16 @@ public class Experiment {
 
 						int sentFromClient = clientProtocol.readOutput(buff, 0, buff.length);
 						if (sentFromClient > 0) {
-							System.out.println("C->S: " + sentFromClient + " wrapped bytes");
-							serverProtocol.offerInput(cp(buff, sentFromClient));
+							byte[] b = cp(buff, sentFromClient);
+							System.out.println("C->S: " + sentFromClient + " wrapped bytes: "+Hex.toHexString(b));
+							serverProtocol.offerInput(b);
 						}
 
 						int sentFromSeerver = serverProtocol.readOutput(buff, 0, buff.length);
 						if (sentFromSeerver > 0) {
-							System.out.println("S->C: " + sentFromSeerver + " wrapped bytes");
-							clientProtocol.offerInput(cp(buff, sentFromSeerver));
+							byte[] b = cp(buff, sentFromSeerver);
+							System.out.println("S->C: " + sentFromSeerver + " wrapped bytes: "+Hex.toHexString(b));
+							clientProtocol.offerInput(b);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
