@@ -28,158 +28,158 @@ include::text/admin/Licensing_and_Open_Source.asciidoc[]
 
 include::text/admin/Latest_and_Nightly_Builds.asciidoc[]
 
-include::text/admin/1/Quick_Start.asciidoc[]
+include::text/admin/Quick_Start/Intro.asciidoc[]
 
 
 :leveloffset: 2
 
-include::text/admin/1/Quick_Start_-_A_-_Installation_Using_Web_Installer.asciidoc[]
+include::text/admin/Quick_Start/Installation_Using_Web_Installer.asciidoc[]
 
-include::text/admin/1/Quick_Start_-_B_-_Installing_Using_Console_Installer.asciidoc[]
+include::text/admin/Quick_Start/Installing_Using_Console_Installer.asciidoc[]
 
-include::text/admin/1/Quick_Start_-_C_-_Manual_Installation_in_Console_Mode.asciidoc[]
+include::text/admin/Quick_Start/Manual_Installation_in_Console_Mode.asciidoc[]
 
-include::text/admin/1/Quick_Start_-_D_-_Windows_Installation.asciidoc[]
+include::text/admin/Quick_Start/Windows_Installation.asciidoc[]
 
-include::text/admin/1/Quick_Start_-_E_-_Setting_Up_Server.asciidoc[]
+include::text/admin/Quick_Start/Setting_Up_Server.asciidoc[]
 
-include::text/admin/1/Quick_Start_-_F_-_Script_Selection.asciidoc[]
+include::text/admin/Quick_Start/Script_Selection.asciidoc[]
 
-include::text/admin/1/Quick_Start_-_G_-_Shutting_Down.asciidoc[]
+include::text/admin/Quick_Start/Shutting_Down.asciidoc[]
 
-include::text/admin/1/Upgrading_from_Older_versions.asciidoc[]
+include::text/admin/Quick_Start/Upgrading_from_Older_versions.asciidoc[]
 
 :leveloffset: 1
 
 
 
-include::text/admin/2/Configuration.asciidoc[]
+include::text/admin/Configuration/Configuration.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/2/Configuration_-_A_-_DSL_configuration.asciidoc[]
+include::text/admin/Configuration/DSL_configuration.asciidoc[]
 
-include::text/admin/2/Configuration_-_A_-_Tigase_XMPP_Server_init.properties_Configuration.asciidoc[]
+include::text/admin/Configuration/init.properties_Configuration.asciidoc[]
 
-include::text/admin/2/Configuration_-_B_-_Startup_Files.asciidoc[]
+include::text/admin/Configuration/Startup_Files.asciidoc[]
 
-include::text/admin/2/Configuration_-_C_-_Settings_for_High_Load_Systems.asciidoc[]
+include::text/admin/Configuration/Settings_for_High_Load_Systems.asciidoc[]
 
-include::text/admin/2/Configuration_-_E_-_JVM_settings.asciidoc[]
+include::text/admin/Configuration/JVM_settings.asciidoc[]
 
-include::text/admin/2/Configuration_-_F_-_Sess-man.asciidoc[]
+include::text/admin/Configuration/Session_Manager.asciidoc[]
 
-include::text/admin/2/Configuration_-_G_-_Virtual_Hosts.asciidoc[]
+include::text/admin/Configuration/Vhosts.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/2/Configuration_-_G_-_Virtual_Hosts_-_1_-_Ad-hoc_Commands.asciidoc[]
+include::text/admin/Configuration/Vhosts_Ad-hoc_Commands.asciidoc[]
 
-include::text/admin/2/Configuration_-_G_-_Virtual_Hosts_-_2_-_Virtual_Components.asciidoc[]
+include::text/admin/Configuration/Vhosts_Virtual_Components.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/2/Configuration_-_H_-_Logging.asciidoc[]
+include::text/admin/Configuration/Logging.asciidoc[]
 
 :leveloffset: 1
 
-include::text/admin/3/Security.asciidoc[]
+include::text/admin/Security/Security.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/3/Security_-_A_-_Server_Certificates.asciidoc[]
+include::text/admin/Security/Server_Certificates/Server_Certificates.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/3/Security_-_A_-_Server_Certificates_-_1_-_PEM_Files.asciidoc[]
+include::text/admin/Security/Server_Certificates/PEM_Files.asciidoc[]
 
-include::text/admin/3/Security_-_A_-_Server_Certificates_-_2_-_LetsEncrypt.asciidoc[]
+include::text/admin/Security/Server_Certificates/LetsEncrypt.asciidoc[]
 
-//include::text/admin/3/Security_-_A_-_Server_Certificates_-_3_-_Keystore.asciidoc[]
+//include::text/admin/Security/Server_Certificates/Keystore.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/3/Security_-_B_-_Auth_Connectors.asciidoc[]
+include::text/admin/Security/Auth_Connectors/Auth_Connectors.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/3/Security_-_B_-_Auth_Connectors_-_1_-_Tigase_Auth_Connector.asciidoc[]
+include::text/admin/Security/Auth_Connectors/Tigase_Auth_Connector.asciidoc[]
 
-include::text/admin/3/Security_-_B_-_Auth_Connectors_-_2_-_Custom_Auth_Connector.asciidoc[]
+include::text/admin/Security/Auth_Connectors/Custom_Auth_Connector.asciidoc[]
 
-include::text/admin/3/Security_-_B_-_Auth_Connectors_-_3_-_Drupal_Auth.asciidoc[]
+include::text/admin/Security/Auth_Connectors/Drupal_Auth.asciidoc[]
 
-include::text/admin/3/Security_-_B_-_Auth_Connectors_-_4_-_LDAP_Auth.asciidoc[]
+include::text/admin/Security/Auth_Connectors/LDAP_Auth.asciidoc[]
 
-include::text/admin/3/Security_-_B_-_Auth_Connectors_-_5_-_SASL_EXTERNAL.asciidoc[]
+include::text/admin/Security/Auth_Connectors/SASL_EXTERNAL.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/3/Security_-_C_-_Packet_Filtering.asciidoc[]
+include::text/admin/Security/Packet_Filtering/Packet_Filtering.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/3/Security_-_C_-_Packet_Filtering_-_1_-_Domain_Based_Filtering.asciidoc[]
+include::text/admin/Security/Packet_Filtering/Domain_Based_Filtering.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/3/Security_-_D_-_Access_Control_List.asciidoc[]
+include::text/admin/Security/Access_Control_List.asciidoc[]
 
 :leveloffset: 1
 
-include::text/admin/4/Database_Management.asciidoc[]
+include::text/admin/Database_Manegement/Database_Manegement.asciidoc
 
 :leveloffset: 2
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/Database_Preparation.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_1_-_DbSchemaLoader.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/DbSchemaLoader.asciidoc[]
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_2_-_MySQL.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/MySQL.asciidoc[]
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_3_-_Derby.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/Derby.asciidoc[]
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_4_-_MSSQL.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/MSSQL.asciidoc[]
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_5_-_PostGRE.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/PostGRE.asciidoc[]
 
-include::text/admin/4/Database_Management_-_A_-_Database_Preparation_-_6_-_MongoDB.asciidoc[]
+include::text/admin/Database_Management/Database_Preparation/MongoDB.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/4/Database_Management_-_B_-_Hashed_User_Passwords_in_Database.asciidoc[]
+include::text/admin/Database_Management/Hashed_User_Passwords_in_Database.asciidoc[]
 
-include::text/admin/4/Database_Management_-_C_-_Tigase_Server_and_Multiple_Databases.asciidoc[]
+include::text/admin/Database_Management/Multiple_Databases.asciidoc[]
 
-include::text/admin/4/Database_Management_-_D_-_Importing_User_Data.asciidoc[]
+include::text/admin/Database_Management/Importing_User_Data.asciidoc[]
 
-include::text/admin/4/Database_Management_-_E_-_Existing_Databases.asciidoc[]
+include::text/admin/Database_Management/Existing_Databases/Existing_Databases.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/4/Database_Management_-_E_-_Existing_Databases_-_1_-_MySQL.asciidoc[]
+include::text/admin/Database_Management/Existing_Databases/MySQL.asciidoc[]
 
-include::text/admin/4/Database_Management_-_E_-_Existing_Databases_-_2_-_Drupal.asciidoc[]
+include::text/admin/Database_Management/Existing_Databases/Drupal.asciidoc[]
 
-include::text/admin/4/Database_Management_-_E_-_Existing_Databases_-_3_-_LibreSource.asciidoc[]
+include::text/admin/Database_Management/Existing_Databases/LibreSource.asciidoc[]
 
-include::text/admin/4/Database_Management_-_E_-_Existing_Databases_-_4_-_MySQL.asciidoc[]
-
-include::text/admin/4/Database_Management_-_E_-_Existing_Databases_-_5_-_PostgreSQL.asciidoc[]
+include::text/admin/Database_Management/Existing_Databases/PostgreSQL.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/4/Database_Management_-_F_-_Schema_Updates.asciidoc[]
+include::text/admin/Database_Management/Schema_Updates/Schema_Updates.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/4/Database_Management_-_F_-_Schema_Updates_-_A_-_Tigase_Server_7.1.asciidoc[]
+include::text/admin/Database_Management/Schema_Updates/Tigase_Server_7.1.asciidoc[]
+
+include::text/admin/Database_Management/Schema_Updates/Tigase_v5.x.asciidoc[]
 
 :leveloffset: 1
 
-include::text/admin/5/Components.asciidoc[]
+include::text/admin/Components/Components.asciidoc[]
 
 :leveloffset: 2
 
@@ -203,18 +203,18 @@ include::text/components/http-api/documentation/text/UI_Guide_Client.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/5/Components_-_C_-_Message_Archiving.asciidoc[]
+include::text/admin/Components/Message_Archiving.asciidoc[]
 
-include::text/admin/5/Components_-_D_-_Advanced_Message_Processing_-_AMP_XEP-0079.asciidoc[]
+include::text/admin/Components/Advanced_Message_Processing.asciidoc[]
 
-include::text/admin/5/Components_-_E_-_PubSub.asciidoc[]
+include::text/components/pubsub/documentation/text/Overview.asciidoc[]
 
 :leveloffset: 3
 
-include::text/components/pubsub/documentation/text/Overview.asciidoc[]
 include::text/components/pubsub/documentation/text/Announcement.asciidoc[]
 include::text/components/pubsub/documentation/text/Database.asciidoc[]
 include::text/components/pubsub/documentation/text/Configuration.asciidoc[]
+include::text/components/pubsub/documentation/text/Schema_Changes.asciidoc[]
 include::text/components/pubsub/documentation/text/Features.asciidoc[]
 
 :leveloffset: 4
@@ -228,49 +228,45 @@ include::text/components/pubsub/documentation/text/features/REST_API.asciidoc[]
 
 include::text/components/pubsub/documentation/text/Limitations.asciidoc[]
 
-include::text/admin/5/Components_-_E_-_PubSub_-_1_-_Offline_Message_Sink.asciidoc[]
-
-include::text/admin/5/Components_-_E_-_PubSub_-_2_-_PubSub_Schema_Changes.asciidoc[]
-
 :leveloffset: 2
 
-include::text/admin/5/Components_-_F_-_Monitoring.asciidoc[]
+include::text/admin/Components/Monitoring/Monitoring.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/5/Components_-_F_-_Monitoring_-_1_-_Setting_up.asciidoc[]
+include::text/admin/Components/Monitoring/Setting_up.asciidoc[]
 
-include::text/admin/5/Components_-_F_-_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
+include::text/admin/Components/Monitoring/Retrieving_statistics.asciidoc[]
 
-include::text/admin/5/Components_-_F_-_Monitoring_-_3_-_EventBus.asciidoc[]
+include::text/admin/Components/Monitoring/EventBus.asciidoc[]
 
-include::text/admin/5/Components_-_F_-_Monitoring_-_4_-_Statistics_Logger_Config.asciidoc[]
+include::text/admin/Components/Monitoring/Statistics_Logger_Config.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/5/Components_-_G_-_Server_to_Server_Protocol.asciidoc[]
+include::text/admin/Components/Server_to_Server_Protocol.asciidoc[]
 
-include::text/admin/5/Components_-_H_-_MUC.asciidoc[]
+include::text/admin/Components/MUC.asciidoc[]
 
-include::text/admin/5/Components_-_I_-_Tigase_Load_Balancing.asciidoc[]
+include::text/admin/Components/Load_Balancing.asciidoc[]
 
-include::text/admin/5/Components_-_J_-_External_Component_Configuration.asciidoc[]
+include::text/admin/Components/External_Component_Configuration/Intro.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/5/Components_-_J_-_External_Component_Configuration_-_1_-_Configuration.asciidoc[]
+include::text/admin/Components/External_Component_Configuration/Configuration.asciidoc[]
 
-include::text/admin/5/Components_-_J_-_External_Component_Configuration_-_2_-_Tigase_as_External.asciidoc[]
+include::text/admin/Components/External_Component_Configuration/Tigase_as_External.asciidoc[]
 
-include::text/admin/5/Components_-_J_-_External_Component_Configuration_-_3_-_Load_Balancing.asciidoc[]
+include::text/admin/Components/External_Component_Configuration/Load_Balancing.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/5/Components_-_K_-_C2S.asciidoc[]
+include::text/admin/Components/C2S.asciidoc[]
 
-include::text/admin/5/Components_-_L_-_Socks5.asciidoc[]
+include::text/admin/Components/Socks5.asciidoc[]
 
-include::text/admin/5/Components_-_M_-_External_Service_Discovery_Component.asciidoc[]
+include::text/admin/Components/External_Service_Discovery_Component.asciidoc[]
 
 :leveloffset: 2
 
@@ -284,69 +280,69 @@ include::text/components/tigase-push/documentation/text/Usage.asciidoc[]
 
 :leveloffset: 1
 
-include::text/admin/6/Using_Tigase.asciidoc[]
+include::text/admin/Using_Tigase/Intro.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/6/Using_Tigase_-_A_-_Log_Guide.asciidoc[]
+include::text/admin/Using_Tigase/Log_Guide.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_B_-_Debugging_Tigase.asciidoc[]
+include::text/admin/Using_Tigase/Debugging_Tigase.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_C_-_Basic_System_Checks.asciidoc[]
+include::text/admin/Using_Tigase/Basic_System_Checks.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_D_-_Add_and_Manage_Virtual_Domains.asciidoc[]
+include::text/admin/Using_Tigase/Virtual_Domains.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_E_-_Presence_Forwarding.asciidoc[]
+include::text/admin/Using_Tigase/Presence_Forwarding.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_G_-_Tigase_and_PyMSN-t_Transport.asciidoc[]
+include::text/admin/Using_Tigase/Tigase_and_PyMSN-t_Transport.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_H_-_Two_or_more_SessionManagers.asciidoc[]
+include::text/admin/Using_Tigase/Multiple_SessionManagers.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_I_-_Watchdog.asciidoc[]
+include::text/admin/Using_Tigase/Watchdog.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_J_-_Tips_and_Tricks.asciidoc[]
+include::text/admin/Using_Tigase/Tips_and_Tricks/Tips_and_Tricks.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/6/Using_Tigase_-_J_-_Tips_and_Tricks_-_1_-_Checking_Environment.asciidoc[]
+include::text/admin/Using_Tigase/Tips_and_Tricks/Checking_Environment.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_J_-_Tips_and_Tricks_-_3_-_Browser_Access.asciidoc[]
+include::text/admin/Using_Tigase/Tips_and_Tricks/Browser_Access.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/6/Using_Tigase_-_K_-_Command_Line_Tools.asciidoc[]
+include::text/admin/Using_Tigase/Command_Line_Tool/Command_Line_Tools.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/6/Using_Tigase_-_K_-_Command_Line_Tools_-_1_-_Configuration_Tool.asciidoc[]
+include::text/admin/Using_Tigase/Command_Line_Tool/Configuration_Tool.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/6/Using_Tigase_-_L_-_Scripting_Support.asciidoc[]
+include::text/admin/Using_Tigase/Scripting/Scripting_Support.asciidoc[]
 
 :leveloffset: 3
 
-include::text/admin/6/Using_Tigase_-_L_-_Scripting_Support_-_1_-_Introduction.asciidoc[]
+include::text/admin/Using_Tigase/Scripting/Introduction.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_L_-_Scripting_Support_-_2_-_v4.4.x_Update.asciidoc[]
+include::text/admin/Using_Tigase/Scripting/v4.4.x_Update.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_L_-_Scripting_Support_-_3_-_Python.asciidoc[]
+include::text/admin/Using_Tigase/Scripting/Python.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/6/Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
+include::text/admin/Using_Tigase/Offline_Messages.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_O_-_Licensing.asciidoc[]
+include::text/admin/Using_Tigase/Licensing.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_P_-_Advanced_Options.asciidoc[]
+include::text/admin/Using_Tigase/Advanced_Options.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_Q_-_Clustering.asciidoc[]
+include::text/admin/Using_Tigase/Clustering.asciidoc[]
 
-include::text/admin/6/Using_Tigase_-_R_-_Anonymous_Users.asciidoc[]
+include::text/admin/Using_Tigase/Anonymous_Users.asciidoc[]
 
 :leveloffset: 1
 
-include::text/admin/7/Statistics_Descriptions.asciidoc[]
+include::text/admin/Addendum/Statistics_Descriptions.asciidoc[]
 
 :leveloffset: 1
 
