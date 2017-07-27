@@ -1,4 +1,4 @@
-[[PubSubComp]]
+[[PubSubComp1]]
 = PubSub Component
 :author: many authors
 :version: v2.0, September 2015. Reformatted for v7.2.0.
@@ -30,7 +30,7 @@ Pubsub nodes within Tigase can be found as a combination of JID and node where n
 </iq>
 -----
 
-[[rosterLimit]]
+[[rosterLimit1]]
 == Configure Roster Maxmimum size
 Administrators can configure the maximum allowable roster size per user via the init.properties file.
 [source,dsl]
@@ -296,7 +296,7 @@ There is extension to filter returned list:
 -----
 In this example will be returned all subscriptions of users from domain "denmark.lit".
 
-[[storeFullXMLLastPresence]]
+[[storeFullXMLLastPresence1]]
 == Store Full XML of Last Presence
 Tigase can store a more detailed `<unavailable/>` presence stanza to include timestamps and other information.
 
