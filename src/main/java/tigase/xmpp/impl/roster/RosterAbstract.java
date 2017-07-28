@@ -528,7 +528,7 @@ public abstract class RosterAbstract {
 					presence });
 		}
 		if ((current_subscription == SubscriptionType.none_pending_in) && (presence ==
-				PresenceType.out_unsubscribed)) {
+				PresenceType.out_unsubscribed || presence == PresenceType.in_unsubscribe)) {
 			removeBuddy(session, jid);
 
 			return false;
