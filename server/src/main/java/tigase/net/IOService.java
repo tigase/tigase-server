@@ -419,7 +419,7 @@ public abstract class IOService<RefObject>
 											   sslContextContainer.getEnabledProtocols());
 
 //		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
-		socketIO = new BcTLSIO(socketIO,tls_hostname, byteOrder());
+		socketIO = new BcTLSIO(socketIO, tls_hostname, byteOrder());
 		setLastTransferTime();
 		encoder.reset();
 		decoder.reset();

@@ -34,6 +34,7 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +49,7 @@ public class BcTLSIO
 	private final DefaultTlsServer server;
 	private final TlsServerProtocol serverProtocol;
 	private Certificate bcCert;
+	private static final ConcurrentHashMap<String, CertificateEntry> certificateCache = new ConcurrentHashMap<>();
 	private IOInterface io = null;
 	private AsymmetricKeyParameter privateKey;
 	/**
@@ -56,14 +58,16 @@ public class BcTLSIO
 	private ByteBuffer tlsInput = null;
 	private byte[] tlsUnique;
 
+	private int bytesRead = 0;
+
 	public BcTLSIO(final IOInterface ioi, String hostname, final ByteOrder order) throws IOException {
 		this.random = new SecureRandom();
 		this.crypto = new BcTlsCrypto(random);
 		this.hostname = hostname;
 		io = ioi;
-		tlsInput = ByteBuffer.allocate(10240);
+		tlsInput = ByteBuffer.allocate(2048);
 		tlsInput.order(order);
-
+		
 		this.serverProtocol = new TlsServerProtocol();
 		this.server = new DefaultTlsServer(crypto) {
 			@Override
@@ -114,7 +118,7 @@ public class BcTLSIO
 
 		serverProtocol.accept(server);
 
-		pumpData();
+		//pumpData();
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "TLS Socket created: {0}", io.toString());
@@ -123,7 +127,7 @@ public class BcTLSIO
 
 	@Override
 	public int bytesRead() {
-		return io.bytesRead();
+		return bytesRead;
 	}
 
 	@Override
@@ -239,15 +243,24 @@ public class BcTLSIO
 	}
 
 	private void loadKeys() throws Exception {
-		KeyPairGenerator keypairGen = KeyPairGenerator.getInstance("RSA");
-		keypairGen.initialize(2048, random);
-		final KeyPair keypair = keypairGen.generateKeyPair();
-		this.privateKey = PrivateKeyFactory.createKey(keypair.getPrivate().getEncoded());
-		this.bcCert = gen(keypair);
+		CertificateEntry certEntry = certificateCache.computeIfAbsent(hostname, domain -> {
+			try {
+				KeyPairGenerator keypairGen = KeyPairGenerator.getInstance("RSA");
+				keypairGen.initialize(2048, random);
+				final KeyPair keypair = keypairGen.generateKeyPair();
+				AsymmetricKeyParameter privateKey = PrivateKeyFactory.createKey(keypair.getPrivate().getEncoded());
+				Certificate bcCert = gen(keypair);
+				return new CertificateEntry(privateKey, bcCert);
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		});
+
+		this.privateKey = certEntry.getPrivateKey();
+		this.bcCert = certEntry.getCertificate();
 	}
 
 	private void pumpData() throws IOException {
-		final byte buff[] = new byte[10240];
 		int counter = 0;
 		int resOut;
 		int resIn;
@@ -256,25 +269,31 @@ public class BcTLSIO
 			++counter;
 			resOut = 0;
 			// copy outgoing data (S->C)
-			int dataLen = serverProtocol.readOutput(buff, 0, buff.length);
-			if (dataLen > 0) {
-				resOut += dataLen;
-				ByteBuffer bb = ByteBuffer.wrap(buff, 0, dataLen);
-				System.out.println("S->C: " + resOut + " wrapped bytes: " + Hex.toHexString(bb.array()));
-				bb.flip();
-				io.write(bb);
+			int waiting = serverProtocol.getAvailableOutputBytes();
+			if (waiting > 0) {
+				ByteBuffer bb = ByteBuffer.allocate(waiting);
+				int dataLen = serverProtocol.readOutput(bb.array(), 0, bb.array().length);
+				if (dataLen > 0) {
+					resOut += dataLen;
+					System.out.println("S->C: " + resOut + " wrapped bytes: " + Hex.toHexString(bb.array()));
+					bb.position(resOut);
+					bb.flip();
+					io.write(bb);
+				}
 			}
 
 			// copy received data (C->S)
 			resIn = 0;
-			ByteBuffer bb = io.read(ByteBuffer.allocate(10240));
+			ByteBuffer bb = io.read(tlsInput);
 
-			byte[] tmp = getBytes(bb);
-			if (tmp != null && tmp.length > 0) {
-				resIn += tmp.length;
-				System.out.println("C->S: " + resIn + " wrapped bytes: " + Hex.toHexString(tmp));
-				serverProtocol.offerInput(tmp);
+			if (io.bytesRead() > 0) {
+				byte[] tmp = getBytes(bb);
+				if (tmp != null && tmp.length > 0) {
+					resIn += tmp.length;
+					System.out.println("C->S: " + resIn + " wrapped bytes: " + Hex.toHexString(tmp));
+					serverProtocol.offerInput(tmp);
 
+				}
 			}
 		} while ((resIn > 0 || resOut > 0) && counter <= 1000);
 	}
@@ -282,16 +301,14 @@ public class BcTLSIO
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {
 		pumpData();
-		ByteBuffer result = null;
-		byte[] byteBuff = new byte[10240];
-		int receivedFromClient = serverProtocol.readInput(byteBuff, 0, byteBuff.length);
-		if (receivedFromClient > 0) {
-			result = ByteBuffer.wrap(byteBuff, 0, receivedFromClient);
+		bytesRead = serverProtocol.readInput(buff.array(), buff.position(), buff.remaining());
+		if (bytesRead > 0) {
+			buff.position(buff.position() + bytesRead);
+			buff.flip();
 		}
-
 		pumpData();
 
-		return result == null ? ByteBuffer.allocate(0) : result;
+		return buff;
 	}
 
 	@Override
@@ -332,12 +349,14 @@ public class BcTLSIO
 
 		pumpData();
 
-		byte[] tmp = getBytes(buff);
+		if (buff == null) {
+			return io.write(null);
+		}
+
 		try {
-			if (tmp != null && tmp.length > 0) {
-				serverProtocol.writeApplicationData(tmp, 0, tmp.length);
-				result = tmp.length;
-			}
+			serverProtocol.writeApplicationData(buff.array(), buff.position(), buff.remaining());
+			result = buff.remaining();
+			buff.position(buff.position() + result);
 			serverProtocol.flush();
 
 			pumpData();
@@ -350,4 +369,22 @@ public class BcTLSIO
 		return result;
 	}
 
+	private static class CertificateEntry {
+
+		private final Certificate certificate;
+		private final AsymmetricKeyParameter privateKey;
+
+		public CertificateEntry(AsymmetricKeyParameter privateKey, Certificate certificate) {
+			this.privateKey = privateKey;
+			this.certificate = certificate;
+		}
+
+		public AsymmetricKeyParameter getPrivateKey() {
+			return privateKey;
+		}
+
+		public Certificate getCertificate() {
+			return certificate;
+		}
+	}
 }
