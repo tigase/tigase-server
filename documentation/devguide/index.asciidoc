@@ -45,25 +45,25 @@ include::text/Data_Sources_And_Repositories.asciidoc[]
 :leveloffset: 1
 
 //components
-include::text/Component_Development.asciidoc[]
+include::text/Component_Implementation/Intro.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Component_Implementation_-_Lesson_1_-_Basics.asciidoc[]
+include::text/Component_Implementation/Basics.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_2_-_Configuration.asciidoc[]
+include::text/Component_Implementation/Configuration.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_3_-_Multi-threading.asciidoc[]
+include::text/Component_Implementation/Multi-threading.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_4_-_Service_Discovery.asciidoc[]
+include::text/Component_Implementation/Service_Discovery.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_5_-_Statistics.asciidoc[]
+include::text/Component_Implementation/Statistics.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_6_-_Scripting_Support.asciidoc[]
+include::text/Component_Implementation/Scripting_Support.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_7_-_Data_Repository.asciidoc[]
+include::text/Component_Implementation/Data_Repository.asciidoc[]
 
-include::text/Component_Implementation_-_Lesson_8_-_Startup_Time.asciidoc[]
+include::text/Component_Implementation/Startup_Time.asciidoc[]
 
 :leveloffset: 1
 
@@ -84,70 +84,70 @@ include::text/Cluster_Map_Interface.asciidoc[]
 :leveloffset: 1
 
 //plugins
-include::text/Plugin_Development.asciidoc[]
+include::text/Plugin_Development/Intro.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Plugin_Development_-_Writing_Plugin_Code.asciidoc[]
+include::text/Plugin_Development/Writing_Plugin_Code.asciidoc[]
 
-include::text/Plugin_Development_-_Plugin_Configuration.asciidoc[]
+include::text/Plugin_Development/Configuration.asciidoc[]
 
-include::text/Plugin_Development_-_How_Packets_are_Processed_by_the_SM_and_Plugins.asciidoc[]
+include::text/Plugin_Development/Packet_Processing.asciidoc[]
 
-include::text/Plugin_Development_-_SASL_Custom_Mechanisms_and_Configuration.asciidoc[]
+include::text/Plugin_Development/SASL_Custom.asciidoc[]
 
 :leveloffset: 1
 
 //maven
 
-include::text/Using_Maven.asciidoc[]
+include::text/Using_Maven/Using_Maven.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Using_Maven_-_Setting_Up_Maven_In_Windows.asciidoc[]
+include::text/Using_Maven/Maven_In_Windows.asciidoc[]
 
-include::text/Using_Maven_-_A_Very_Short_Maven_Guide.asciidoc[]
+include::text/Using_Maven/A_Very_Short_Maven_Guide.asciidoc[]
 
-include::text/Using_Maven_-_Maven_2.x_Support.asciidoc[]
+include::text/Using_Maven/Maven_2.x_Support.asciidoc[]
 
 :leveloffset: 1
 
 //Tests
 
-include::text/Tests.asciidoc[]
+include::text/Tests/Tests.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Tests_-_Tigase_Test_Suite.asciidoc[]
+include::text/Tests/Tigase_Test_Suite.asciidoc[]
 
-include::text/Tests_-_Test_Suite_Scripting_Language.asciidoc[]
+include::text/Tests/Test_Suite_Scripting_Language.asciidoc[]
 
-include::text/Tests_-_Writing_Tests_for_Plugins.asciidoc[]
+include::text/Tests/Writing_Tests_for_Plugins.asciidoc[]
 
-include::text/Tests_-_Test_Case_Parameters_Description.asciidoc[]
+include::text/Tests/Test_Case_Parameters_Description.asciidoc[]
 
 :leveloffset: 1
 
 //experimental
-include::text/Experimental.asciidoc[]
+include::text/Experimental/Experimental.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Experimental_-_Dynamic_Rosters.asciidoc[]
+include::text/Experimental/Dynamic_Rosters.asciidoc[]
 
-include::text/Experimental_-_Mobile_Optimizations.asciidoc[]
+include::text/Experimental/Mobile_Optimizations.asciidoc[]
 
-include::text/Experimental_-_Bosh_Session_Cache.asciidoc[]
+include::text/Experimental/Bosh_Session_Cache.asciidoc[]
 //Old
 
 :leveloffset: 1
 
-include::text/Old_Stuff.asciidoc[]
+include::text/Old_Stuff/Old_Stuff.asciidoc[]
 
-include::text/Old_Stuff_-_Tigase_DB_Schema_Explained.asciidoc[]
+include::text/Old_Stuff/Tigase_DB_Schema_Explained.asciidoc[]
 
-include::text/Old_Stuff_-_Why_the_Most_Recent_JDK.asciidoc[]
+include::text/Old_Stuff/Why_the_Most_Recent_JDK.asciidoc[]
 
-include::text/Old_Stuff_-_Virtual_Domains_Management_API.asciidoc[]
+include::text/Old_Stuff/Virtual_Domains_Management_API.asciidoc[]
 
-include::text/Old_Stuff_-_Stanza_Limitations.asciidoc[]
+include::text/Old_Stuff/Stanza_Limitations.asciidoc[]
