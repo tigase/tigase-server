@@ -72,4 +72,4 @@ muc/incoming-filters=
 muc/outgoing-filters=
 -----
 
-The simplest way to apply the new configuration is via the init.properties file which is in details described in the _Admin Guide_.
+The simplest way to apply the new configuration is via the config.tdsl file which is in details described in the _Admin Guide_.

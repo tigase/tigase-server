@@ -30,7 +30,7 @@ private boolean secureLogging = false;
 
 And this is it. Tigase Kernel will take care of this fields and will update them when configuration will change.
 
-The syntax in +init.properties+ file is very simple and is described in details in the _Admin Guide_. To set the configuration for your component in +init.properties+ file you have to append following lines to the file inside test component configuration block:
+The syntax in +config.tdsl+ file is very simple and is described in details in the _Admin Guide_. To set the configuration for your component in +config.tdsl+ file you have to append following lines to the file inside test component configuration block:
 
 [source,dsl]
 -----

@@ -34,7 +34,7 @@ Properties list for SASL plugin _(sess-man/plugins-conf/urn\:ietf\:params\:xml\:
 
 [[mechconf]]
 === Mechanisms Configuration
-To add a new mechanism, a new factory for the mechanism has to be registered. It can be done with a new line in the +init.properties+ file like this one:
+To add a new mechanism, a new factory for the mechanism has to be registered. It can be done with a new line in the +config.tdsl+ file like this one:
 
 +sess-man/plugins-conf/urn\:ietf\:params\:xml\:ns\:xmpp-sasl/factory=com.example.OwnFactory+
 
@@ -46,7 +46,7 @@ The default factory that is available and registered by default is +tigase.auth.
 === CallbackHandler Configuration
 The +CallbackHandler+ is a helper class used for loading/retrieving authentication data from data repository and providing them to a mechanism.
 
-To register a new callback handler a new line in the +init.properties+ file like this one has to be added:
+To register a new callback handler a new line in the +config.tdsl+ file like this one has to be added:
 
 +sess-man/plugins-conf/urn\:ietf\:params\:xml\:ns\:xmpp-sasl/callbackhandler=com.example.DefaultCallbackHandler+
 
@@ -67,7 +67,7 @@ The +tigase.auth.MechanismSelector+ interface is used for selecting mechanisms a
 
 The default selector returns mechanisms from Tigase's default factory +(TigaseSaslServerFactory)+ only.
 
-It is possible to use a custom selector by specifying it's class int the +init.properties+ file:
+It is possible to use a custom selector by specifying it's class int the +config.tdsl+ file:
 
 +sess-man/plugins-conf/urn\:ietf\:params\:xml\:ns\:xmpp-sasl/mechanism-selector=com.example.OwnSelector+
 
@@ -116,7 +116,7 @@ Methods +auth+ in +Repository+ interfaces will be deprecated. These interfaces w
 
 === Known Problems
 
-Because +JabberIqAuth+ is initialized separately, we strongly recommend to use more general prefix in *+init.properties+*:
+Because +JabberIqAuth+ is initialized separately, we strongly recommend to use more general prefix in *+config.tdsl+*:
 
 [source,bash]
 sess-man/plugins-conf/${KEY}=${VALUE}

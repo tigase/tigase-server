@@ -55,4 +55,4 @@ cd server
 ./scripts/tigase.sh start etc/tigase.conf
 -----
 
-Please bear in mind, that you need to provide correct setup in etc/init.properties configuration files for the server to work correctly.
+Please bear in mind, that you need to provide correct setup in etc/config.tdsl configuration files for the server to work correctly.
