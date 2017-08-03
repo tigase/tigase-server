@@ -24,17 +24,7 @@ include::text/API_Changes_in_Tigase_Server_5.x.asciidoc[]
 
 :leveloffset: 1
 
-//compiling
 include::text/Server_Compilation.asciidoc[]
-
-:leveloffset: 2
-
-include::text/Server_Compilation_-_v5.2.0_and_Later.asciidoc[]
-
-include::text/Server_Compilation_-_v4.x_or_Later.asciidoc[]
-
-//removed is outdate?
-//include::text/Server_Compilation_-_Version_2.x_and_3.x.asciidoc[]
 
 :leveloffset: 1
 include::text/Tigase_Kernel.asciidoc[]
