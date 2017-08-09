@@ -90,13 +90,13 @@ And finally we have a very important method `void process(Packet packet)` which 
 But how we can send packet from a module? *AbstractModule* contains method *void write(Packet packet)* which you can use to send packets from a component.
 
 Before we go any further with the implementation let's configure the component in Tigase server so it is loaded next time the server starts.
-Assuming our *init.properties* file looks like this one:
+Assuming our *init.tdsl* file looks like this one:
 
 [source,java]
 -----
-config-type = --gen-config-def
---debug = server
---virt-hosts = devel.tigase.org
+'config-type' = 'default'
+'debug' = ['server']
+'virtual-hosts' = [ 'devel.tigase.org' ]
 admins = [ 'admin@devel.tigase.org' ]
 dataSource {
   default () {
@@ -107,7 +107,7 @@ muc() {}
 pubsub() {}
 -----
 
-We can see that it already is configured to load two other components: *MUC* and *PubSub*. Let's add a third - our new component to the configuration file by appending two following lines in the properties file:
+We can see that it already is configured to load two other components: *MUC* and *PubSub*. Let's add a third - our new component to the configuration file by appending the following line in the properties file:
 
 [source,java]
 -----

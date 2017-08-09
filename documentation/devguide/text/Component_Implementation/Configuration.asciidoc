@@ -30,7 +30,7 @@ private boolean secureLogging = false;
 
 And this is it. Tigase Kernel will take care of this fields and will update them when configuration will change.
 
-The syntax in +config.tdsl+ file is very simple and is described in details in the _Admin Guide_. To set the configuration for your component in +config.tdsl+ file you have to append following lines to the file inside test component configuration block:
+The syntax in `config.tdsl` file is very simple and is described in details in the _Admin Guide_. To set the configuration for your component in `config.tdsl` file you have to append following lines to the file inside test component configuration block:
 
 [source,dsl]
 -----
@@ -43,7 +43,7 @@ test-module {
 
 The square brackets are used to mark that we set a list consisting of a few elemente, have a look at the _Admin Guide_ documentation for more details.
 
-And this is the complete code of the new component module with a modified +process(...)+ method taking advantage of configuration settings:
+And this is the complete code of the new component module with a modified `process(...)` method taking advantage of configuration settings:
 
 [source,java]
 -----
@@ -82,6 +82,6 @@ public static class TestModule extends AbstractModule {
 }
 -----
 
-Of course we can do much more useful packet processing in the +process(...)+ method. This is just an example code.
+Of course we can do much more useful packet processing in the `process(...)` method. This is just an example code.
 
 TIP: Here we used a setter *setPacketType(String[] packetTypes)* which is a setter for field *packetTypes*. Tigase Kernel will use it instead of assigning value directly to a field which gives up opportunity to convert value to different type and update other field - in our case we updated *CRITERIA* field which will result in change of packet types which for which method *void process(...)* will be called.

@@ -13,7 +13,7 @@ Multi core and multi CPU machines very common nowadays, especially for an applic
 
 This is especially important if the packet processing is CPU expensive like, for example, SPAM checking. In such a case you could experience single Core/CPU usage at 100% while other Cores/CPUs are idling. Ideally, you want your component to use all available CPUs.
 
-Tigase API offers a very simple way to execute component's +processPacket(Packet packet)+ method in multiple threads. Methods +int processingOutThreads()+ and +int processingInThreads()+ returns number of threads assigned to the component. By default it returns just '1' as not all component implementations are prepared to process packets concurrently. By overwriting the method you can return any value you think is appropriate for the implementation. Please note, there are two methods, one is for a number of threads for incoming packets to the component and another for outgoing packets from the component. It used to be a single method but different components have different needs and the best performance can be achieved when the outgoing queues have a separate threads pool from incoming queues. Also some components only receive packets while other only send, therefore assigning an equal number of threads for both that could be a waste of resources.
+Tigase API offers a very simple way to execute component's `processPacket(Packet packet)` method in multiple threads. Methods `int processingOutThreads()` and `int processingInThreads()` returns number of threads assigned to the component. By default it returns just '1' as not all component implementations are prepared to process packets concurrently. By overwriting the method you can return any value you think is appropriate for the implementation. Please note, there are two methods, one is for a number of threads for incoming packets to the component and another for outgoing packets from the component. It used to be a single method but different components have different needs and the best performance can be achieved when the outgoing queues have a separate threads pool from incoming queues. Also some components only receive packets while other only send, therefore assigning an equal number of threads for both that could be a waste of resources.
 
 If the packet processing is CPU bound only, you normally want to have as many threads as there are CPUs available:
 
@@ -31,14 +31,16 @@ public int processingOutThreads() {
 
 If the processing is I/O bound (network or database) you probably want to have more threads to process requests. It is hard to guess the ideal number of threads right on the first try. Instead you should run a few tests to see how many threads is best for implementation of the component.
 
-Now you have many threads for processing your packets, but there is one slight problem with this. In many cases packet order is essential. If our +processPacket(...)+ method is executed concurrently by a few threads it is quite possible that a message sent to user can takeover the message sent earlier. Especially if the first message was large and the second was small. We can prevent this by adjusting the method responsible for packet distribution among threads.
+Now you have many threads for processing your packets, but there is one slight problem with this. In many cases packet order is essential. If our `processPacket(...)` method is executed concurrently by a few threads it is quite possible that a message sent to user can takeover the message sent earlier. Especially if the first message was large and the second was small. We can prevent this by adjusting the method responsible for packet distribution among threads.
 
 The algorithm for packets distribution among threads is very simple:
 
 [source,java]
+-----
 int thread_idx = hashCodeForPacket(packet) % threads_total;
+-----
 
-So the key here is using the +hashCodeForPacket(...)+ method. By overwriting it we can make sure that all packets addressed to the same user will always be processed by the same thread:
+So the key here is using the `hashCodeForPacket(...)` method. By overwriting it we can make sure that all packets addressed to the same user will always be processed by the same thread:
 
 [source,java]
 -----
@@ -90,9 +92,9 @@ public synchronized void everyMinute() {
 }
 -----
 
-This method sends every *notificationFrequency* minute a message to *abuseAddress* reporting how many spam messages have been detected during last period. Please note, you have to call +super.everyMinute()+ to make sure other actions are executed as well and you have to also remember to keep processing in this method to minimum, especially if you overwrite +everySecond()+ method.
+This method sends every *notificationFrequency* minute a message to *abuseAddress* reporting how many spam messages have been detected during last period. Please note, you have to call `super.everyMinute()` to make sure other actions are executed as well and you have to also remember to keep processing in this method to minimum, especially if you overwrite `everySecond()` method.
 
-There is also a method which allow you to schedule tasks executed at certain time, it is very similar to the +java.util.Timer+ API. The only difference is that we are using *ScheduledExecutorService* as a backend which is being reused among all levels of Class hierarchy. There is a separate +ScheduledExecutorService+ for each Class instance though, to avoid interferences between separate components:
+There is also a method which allow you to schedule tasks executed at certain time, it is very similar to the `java.util.Timer` API. The only difference is that we are using *ScheduledExecutorService* as a backend which is being reused among all levels of Class hierarchy. There is a separate `ScheduledExecutorService` for each Class instance though, to avoid interferences between separate components:
 
 [source,java]
 -----
@@ -159,7 +161,7 @@ public class TestComponent extends AbstractKernelBasedComponent {
   protected void registerModules(Kernel kernel) {
     // here we need to register modules responsible for processing packets
   }
-  
+
 }
 -----
 
