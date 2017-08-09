@@ -1683,8 +1683,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		@Override
 		public void register(Kernel kernel) {
 			this.kernel = kernel;
-			String connManagerBean = kernel.getParent().getName();
-			this.kernel.getParent().ln("service", kernel, connManagerBean);
+			if (kernel.getParent() != null) {
+				String connManagerBean = kernel.getParent().getName();
+				this.kernel.getParent().ln("service", kernel, connManagerBean);
+			}
 		}
 
 		@Override
