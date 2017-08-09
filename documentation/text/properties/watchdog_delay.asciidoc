@@ -1,38 +1,40 @@
 [[watchdogDelay]]
-= --watchdog_delay
+= watchdog_delay
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2014-02-07 18:07
-:revision: v2.1
+:version: v2.1, August 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-*Default value:* +600000+
+*Default value:* `600000`
 
-*Example:* +--watchdog_delay=30000+
+*Example:* `watchdog_delay = '30000'`
 
 *Possible values:* 'any integer.'
 
-*Description:* +--watchdog_delay+ configuration property allows configuring delay (in miliseconds) between subsequent checks that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to verify the connection. In addition to global configuration presented above a per component configuration is possible:
+*Description:* `watchdog_delay` configuration property allows configuring delay (in miliseconds) between subsequent checks that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to verify the connection. In addition to global configuration presented above a per component configuration is possible:
 
-[source,bash]
+[source,dsl]
 -----
-<ConnectionManager component>/watchdog_delay[L]=60000
+<ConnectionManager> {
+  watchdog_delay = 60000L
+}
 -----
 
 for example (for ClusterConnectionManager):
 
-[source,bash]
+[source,dsl]
 -----
-cl-comp/watchdog_delay[L]=150000
+'cl-comp' {
+    watchdog_delay = 150000L
+}
 -----
 
 All related configuration options:
 
-- --watchdog_ping_type
-- --watchdog_delay
-- --watchdog_timeout
+- xref:watchdog_ping_type[watchdog_Ping_Type]
+- watchdog_delay
+- xref:watchdog_Timeout[watchdog_timeout]
 
-*Available since:* 5.2.1
+*Available since:* 7.2.0

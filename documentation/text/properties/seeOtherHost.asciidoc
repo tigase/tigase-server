@@ -1,0 +1,26 @@
+[[SeeOtherHost]]
+= see-other-host
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.1, August 2017: Reformatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+--cmSeeOtherHost has been replaced with using `seeOtherHost` setting, and can be configured for each connection manager (c2s, s2s, etc..)
+
+*Default value:* `tigase.server.xmppclient.SeeOtherHostHashed`
+
+*Example:*
+[source,dsl]
+-----
+<connectionManager> {
+  seeOtherHost (class: value) { }
+}
+-----
+
+*Possible values:* 'none' 'or class implementing SeeOtherHostIfc.'
+
+*Description:* Allows you to specify a load balancing mechanism by specifying SeeOtherHostIfc implementation. More details about functionality and implementation details can be found in Tigase Load Balancing documentation.
+
+*Available since:* 7.2.0

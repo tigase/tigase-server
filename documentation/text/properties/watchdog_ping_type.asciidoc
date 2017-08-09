@@ -1,38 +1,40 @@
 [[watchdogPingType]]
-= --watchdog_ping_type
+= watchdog_ping_type
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2014-02-07 18:05
-:revision: v2.1
+:version: v2.1, August 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-*Default value:* +whitespace+
+*Default value:* `whitespace`
 
-*Example:* +--watchdog_ping_type=xmpp+
+*Example:* `watchdog_ping_type = 'xmpp'`
 
-*Possible values:* +whitespace,xmpp+
+*Possible values:* `whitespace`,`xmpp`
 
-*Description:* +watchdog_ping_type+ configuration property allows configuring the type of ping that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to check the connection. In addition to global configuration presented above a per component configuration is possible:
+*Description:* `watchdog_ping_type` configuration property allows configuring of the type of ping that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to check the connection. In addition to global configuration presented above a per component configuration is possible:
 
-[source,bash]
+[source,dsl]
 -----
-<ConnectionManager component>/watchdog_ping_type[S]=xmpp
+<ConnectionManager> {
+  watchdog_ping_type = 'xmpp'
+}
 -----
 
 for example (for ClusterConnectionManager):
 
-[source,bash]
+[source,dsl]
 -----
-cl-comp/watchdog_ping_type[S]=xmpp
+cl-comp {
+    watchdog_ping_type = 'whitespace'
+}
 -----
 
 All related configuration options:
 
-- --watchdog_ping_type
-- --watchdog_delay
-- --watchdog_timeout
+- watchdog_ping_type
+- xref:watchdog_delay[watchdog_Delay]
+- watchdog_timeout
 
-*Available since:* 5.2.1
+*Available since:* 7.2.0

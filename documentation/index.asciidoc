@@ -381,8 +381,6 @@ include::text/properties/cluster-nodes.asciidoc[]
 
 include::text/properties/cm-ht-traffic-throttling.asciidoc[]
 
-include::text/properties/cm-see-other-host.asciidoc[]
-
 include::text/properties/cm-traffic-throttling.asciidoc[]
 
 include::text/properties/cmpname-ports.asciidoc[]
@@ -441,6 +439,8 @@ include::text/properties/s2s-skip-tls-hostnames.asciidoc[]
 
 include::text/properties/script-dir.asciidoc[]
 
+include::text/properties/seeOtherHost.asciidoc[]
+
 include::text/properties/sm-cluster-strategy-class.asciidoc[]
 
 include::text/properties/sm-threads-pool.asciidoc[]
@@ -450,6 +450,8 @@ include::text/properties/ssl-certs-location.asciidoc[]
 include::text/properties/ssl-container-class.asciidoc[]
 
 include::text/properties/ssl-def-cert-domain.asciidoc[]
+
+include::text/properties/stats.asciidoc[]
 
 include::text/properties/stream-error-counter.asciidoc[]
 

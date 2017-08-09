@@ -1,20 +1,26 @@
 [[vhostDisableDnsCheck]]
-= --vhost-disable-dns-check
+= vhost-disable-dns-check
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:version: v1.0, October 2015
-:date: 2015-07-10
+:version: v2.1, August 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-*Default value:* +false+
+*Default value:* `false`
 
-*Example:* +--vhost-disable-dns-check = true+
+*Example:* `'vhost-disable-dns-check' = 'true'`
 
-*Possible values:* +true|false+
+*Possible values:* `true|false`
 
 *Description:* This property disables DNS validation when adding or editing vhosts in Tigase server. This also exempts administrative accounts from validation.
 With this property enabled, you will not benefit from seeing if proper SRV records are set so other people can connect to specific vhosts from outside your network.
 
-*Available since:* 7.1.0
+This is a global property which is overridden by settings for particular vhost.
+
+[source,dsl]
+-----
+'virtual-hosts' = [ 'domain4:vhost-disable-dns-check = true' ]
+-----
+
+*Available since:* 7.2.0
