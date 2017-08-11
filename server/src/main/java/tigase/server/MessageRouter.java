@@ -635,6 +635,8 @@ public class MessageRouter
 
 		NumberFormat format = NumberFormat.getNumberInstance();
 
+		list.add(getName(), "Version", XMPPServer.getImplementationVersion(), Level.INFO);
+
 		format.setMaximumFractionDigits(4);
 		list.add(getName(), "Load average", format.format(runtime.getLoadAverage()), Level
 				.FINE);
