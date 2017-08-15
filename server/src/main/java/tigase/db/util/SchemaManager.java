@@ -710,8 +710,15 @@ public class SchemaManager {
 				.filter(bc -> !Kernel.DelegatedBeanConfig.class.isAssignableFrom(bc.getClass()))
 				.forEach(bc -> {
 					try {
-						Object bean = bc.getClazz().newInstance();
-						if (RegistrarBean.class.isAssignableFrom(bc.getClazz())) {
+						Class<?> clazz = bc.getClazz();
+						if ("tigase.muc.cluster.MUCComponentClustered".equals(clazz.getName())) {
+							clazz = ModulesManagerImpl.getInstance().forName("tigase.muc.MUCComponent");
+						}
+						if ("tigase.pubsub.cluster.PubSubComponentClustered".equals(clazz.getName())) {
+							clazz = ModulesManagerImpl.getInstance().forName("tigase.pubsub.PubSubComponent");
+						}
+						Object bean = clazz.newInstance();
+						if (RegistrarBean.class.isAssignableFrom(clazz)) {
 							RegistrarKernel k = new RegistrarKernel();
 							k.setName(bc.getBeanName());
 							bc.getKernel().registerBean(bc.getBeanName() + "#KERNEL").asInstance(k).exec();
@@ -725,7 +732,7 @@ public class SchemaManager {
 							parent.ln(bc.getBeanName(), bc.getKernel(), "service");
 
 							((RegistrarBean) bean).register(bc.getKernel());
-							Map<String,Object> cfg = (Map<String, Object>) config.getOrDefault(bc.getBeanName(), new HashMap<>());
+							Map<String, Object> cfg = (Map<String, Object>) config.getOrDefault(bc.getBeanName(), new HashMap<>());
 							configurator.registerBeans(bc, bean, cfg);
 							results.addAll(crawlKernel(repositoryClasses, bc.getKernel(), configurator, cfg));
 						}
@@ -737,6 +744,8 @@ public class SchemaManager {
 							results.add(bc);
 						}
 
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
 					} catch (InstantiationException | IllegalAccessException e) {
 						e.printStackTrace();
 					} catch (NoSuchMethodException e) {
