@@ -26,13 +26,21 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
+import tigase.server.xmppsession.SessionManagerHandler;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -56,7 +64,7 @@ import static tigase.xmpp.impl.Privacy.*;
 @Bean(name = JabberIqPrivacy.ID, parent = SessionManager.class, active = true)
 public class JabberIqPrivacy
 				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
+				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, RegistrarBean {
 	protected static final String     ACTIVE_EL_NAME  = "active";
 	protected static final Element     BLOCKED_ELEM = new Element("blocked", new String[] { "xmlns" }, new String[] { "urn:xmpp:blocking:errors" });
 	protected static final String     DEFAULT_EL_NAME = "default";
@@ -92,6 +100,16 @@ public class JabberIqPrivacy
 		}
 	};
 
+	@Override
+	public void register(Kernel kernel) {
+		
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
+	}
+
 	//~--- constant enums -------------------------------------------------------
 
 	protected enum ITEM_ACTION { allow, deny }
@@ -103,6 +121,9 @@ public class JabberIqPrivacy
 	protected enum ITEM_TYPE {
 		jid, group, subscription, all
 	}
+
+	@Inject(nullAllowed = true)
+	protected DummySessionManagerHandler dummySessionManagerHandler;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -160,13 +181,25 @@ public class JabberIqPrivacy
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		if ((session == null) ||!session.isAuthorized() || packet.isXMLNSStaticStr(Iq
+		if (packet.isXMLNSStaticStr(Iq
 				.IQ_QUERY_PATH, XMLNS)) {
 			return false;
 		}    // end of if (session == null)
 
+		boolean sendError = true;
+		if (session == null || !session.isAuthorized()) {
+			if (dummySessionManagerHandler != null) {
+				session = dummySessionManagerHandler.createXMPPResourceConnection(packet);
+			}
+			if (session == null || !session.isAuthorized()) {
+				return false;
+			} else {
+				sendError = false;
+			}
+		}
+
 		boolean allowed = allowed(packet, session);
-		if (!allowed) {
+		if (!allowed && sendError) {
 			Packet error = prepareError(packet, session);
 			if (error != null)
 				results.offer(error);
@@ -229,7 +262,7 @@ public class JabberIqPrivacy
 			if (allowedByDefault(packet, session))
 				return true;
 
-			Element list = Privacy.getActiveList(session);
+			Element list = (session instanceof OfflineResourceConnection) ? null : Privacy.getActiveList(session);
 
 			if ((list == null) ) {
 				list = Privacy.getDefaultList( session );
@@ -736,6 +769,99 @@ public class JabberIqPrivacy
 		}
 
 		return result;
+	}
+
+	@Bean(name = "offlineSessionProvider", parent = JabberIqPrivacy.class, active = true)
+	public static class DummySessionManagerHandler implements SessionManagerHandler {
+
+		private JID compId = JID.jidInstanceNS("privacy-sessman", DNSResolverFactory.getInstance().getDefaultHost());
+
+		@Inject
+		private UserRepository userRepository;
+
+		@Inject
+		private AuthRepository authRepository;
+
+		@Override
+		public JID getComponentId() {
+			return compId;
+		}
+
+		@Override
+		public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
+		}
+
+		@Override
+		public void handleDomainChange(String domain, XMPPResourceConnection conn) {
+
+		}
+
+		@Override
+		public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
+
+		}
+
+		@Override
+		public void handlePresenceSet(XMPPResourceConnection conn) {
+
+		}
+
+		@Override
+		public void handleResourceBind(XMPPResourceConnection conn) {
+
+		}
+
+		@Override
+		public boolean isLocalDomain(String domain, boolean includeComponents) {
+			return false;
+		}
+
+		protected XMPPResourceConnection createXMPPResourceConnection(Packet packet) {
+			JID userJid = packet.getStanzaTo();
+			if (userJid == null) {
+				return null;
+			}
+			
+			try {
+				XMPPResourceConnection session = new OfflineResourceConnection(packet.getStanzaTo(), userRepository,
+																			authRepository, this);
+				VHostItem vhost = new VHostItem();
+				vhost.setVHost(userJid.getDomain());
+				session.setDomain(vhost);
+				session.authorizeJID(userJid.getBareJID(), false);
+				XMPPSession parentSession = new XMPPSession(userJid.getLocalpart());
+				session.setParentSession(parentSession);
+				return session;
+			} catch (TigaseStringprepException ex) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "creation of temporary session for offline user " + userJid + " failed", ex);
+				}
+				return null;
+			}
+		}
+
+	}
+
+	public static class OfflineResourceConnection
+			extends XMPPResourceConnection {
+
+		/**
+		 * Creates a new <code>XMPPResourceConnection</code> instance.
+		 *
+		 * @param connectionId
+		 * @param rep
+		 * @param authRepo
+		 * @param loginHandler
+		 */
+		public OfflineResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
+										 SessionManagerHandler loginHandler) {
+			super(connectionId, rep, authRepo, loginHandler);
+		}
+
+		@Override
+		public boolean isAuthorized() {
+			return true;
+		}
 	}
 }    // JabberIqPrivacy
 

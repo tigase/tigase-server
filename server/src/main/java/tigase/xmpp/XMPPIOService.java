@@ -27,6 +27,7 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.net.IOService;
+import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.util.TigaseStringprepException;
@@ -34,8 +35,6 @@ import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -87,8 +86,6 @@ public class XMPPIOService<RefObject>
 	public static final String REQ_NAME            = "req";
 
 	public static final String STREAM_CLOSING        = "stream-closing";
-
-	private static String      cross_domain_policy = null;
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -150,27 +147,6 @@ public class XMPPIOService<RefObject>
 		super();
 		domHandler = new XMPPDomBuilderHandler<>( this );
 		getSessionData().put( DOM_HANDLER, domHandler );
-		if (cross_domain_policy == null) {
-			String file_name = System.getProperty(CROSS_DOMAIN_POLICY_FILE_PROP_KEY,
-					CROSS_DOMAIN_POLICY_FILE_PROP_VAL);
-
-			try {
-				BufferedReader br   = new BufferedReader(new FileReader(file_name));
-				String         line = br.readLine();
-				StringBuilder  sb   = new StringBuilder();
-
-				while (line != null) {
-					sb.append(line);
-					line = br.readLine();
-				}
-				sb.append('\0');
-				br.close();
-				cross_domain_policy = sb.toString();
-			} catch (Exception ex) {
-				log.log(Level.WARNING, "Problem reading cross domain poicy file: " + file_name,
-						ex);
-			}
-		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -612,6 +588,7 @@ public class XMPPIOService<RefObject>
 		if (firstPacket) {
 			if ("policy-file-request" == packet.getElemName()) {
 				log.fine("Got flash cross-domain request" + packet);
+				String cross_domain_policy = (this.serviceListener instanceof ConnectionManager) ? ((ConnectionManager) serviceListener).getFlashCrossDomainPolicy() : null;
 				if (cross_domain_policy != null) {
 					try {
 						writeRawData(cross_domain_policy);

@@ -40,6 +40,7 @@ import tigase.util.DNSResolverDefault;
 import tigase.util.DNSResolverFactory;
 import tigase.util.DNSResolverIfc;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.impl.roster.RosterFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +93,7 @@ public class Bootstrap {
 			System.setProperty("tigase.cache", "false");
 		}
 		config.getProperties().put("cluster-mode", clusterMode);
+		RosterFactory.defaultRosterImplementation = (String) config.getProperties().getOrDefault(RosterFactory.ROSTER_IMPL_PROP_KEY, RosterFactory.ROSTER_IMPL_PROP_VAL);
 
 		Optional.ofNullable((String) config.getProperties().get("stringprep-processor")).ifPresent(val -> BareJID.useStringprepProcessor(val));
 

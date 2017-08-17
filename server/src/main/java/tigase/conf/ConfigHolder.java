@@ -21,6 +21,7 @@
 package tigase.conf;
 
 import tigase.cluster.ClusterConnectionManager;
+import tigase.db.RepositoryFactory;
 import tigase.io.CertificateContainer;
 import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
@@ -28,6 +29,7 @@ import tigase.server.ConnectionManager;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.monitor.MonitorRuntime;
+import tigase.server.xmppsession.SessionManagerConfig;
 import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
 import tigase.util.DNSResolverIfc;
@@ -36,6 +38,8 @@ import tigase.util.PriorityQueueAbstract;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
+import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.impl.roster.RosterFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,8 +57,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static tigase.conf.Configurable.CLUSTER_NODES_PROP_KEY;
-import static tigase.io.SSLContextContainerIfc.ALLOW_INVALID_CERTS_KEY;
-import static tigase.io.SSLContextContainerIfc.ALLOW_SELF_SIGNED_CERTS_KEY;
+import static tigase.io.SSLContextContainerIfc.*;
 
 /**
  * Created by andrzej on 18.09.2016.
@@ -282,7 +285,7 @@ public class ConfigHolder {
 		});
 		renameIfExists(props, "--packet.debug.full", "logging/packet-debug-full", Function.identity());
 		renameIfExists(props, "--" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, "priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, Function.identity());
-		if (Boolean.parseBoolean((String) props.get("--nonpriority-queue"))) {
+		if (Boolean.parseBoolean("" + props.get("--nonpriority-queue"))) {
 			props.putIfAbsent("priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, NonpriorityQueue.class.getCanonicalName());
 		}
 		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> {
@@ -316,6 +319,7 @@ public class ConfigHolder {
 		renameIfExists(props, "--vhost-max-users", "vhost-max-users", Function.identity());
 		renameIfExists(props, "--vhost-anonymous-enabled", "vhost-anonymous-enabled", Function.identity());
 		renameIfExists(props, "--vhost-disable-dns-check", "vhost-disable-dns-check", Function.identity());
+		renameIfExists(props, "--s2s-secret", "vhost-man/defaults/s2s-secret", Function.identity());
 		renameIfExists(props, "--test", "logging/rootLevel", value -> Boolean.TRUE.equals(value) ? Level.WARNING : Level.CONFIG);
 
 		renameIfExists(props, "--" + SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_KEY, "certificate-container/" + SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_KEY, Function.identity());
@@ -366,6 +370,93 @@ public class ConfigHolder {
 		});
 		renameIfExists(props, "--" + Configurator.SCRIPTS_DIR_PROP_KEY, Configurator.SCRIPTS_DIR_PROP_KEY, Function.identity());
 
+		renameIfExists(props, "--" + XMPPIOService.CROSS_DOMAIN_POLICY_FILE_PROP_KEY, XMPPIOService.CROSS_DOMAIN_POLICY_FILE_PROP_KEY, Function.identity());
+		renameIfExists(props, "--domain-filter-policy", "domain-filter-policy", Function.identity());
+		props.remove("--script-dir");
+		removeIfExistsAnd(props, "--new-connections-throttling", (setter, value) -> {
+			String[] all_ports_thr = ((String)value).split(",");
+
+			for (String port_thr : all_ports_thr) {
+				String[] port_thr_ar = port_thr.split(":");
+
+				if (port_thr_ar.length == 2) {
+					try {
+						int port_no = Integer.parseInt(port_thr_ar[0]);
+						long throttling = Long.parseLong(port_thr_ar[1]);
+						switch (port_no) {
+							case 5222:
+							case 5223:
+								setter.accept("c2s/connections/" + port_no + "/new-connections-throttling", throttling);
+								break;
+							case 5280:
+								setter.accept("bosh/connections/" + port_no + "/new-connections-throttling", throttling);
+								break;
+							case 5277:
+								setter.accept("c2s/connections/" + port_no + "/new-connections-throttling", throttling);
+								break;
+							case 5290:
+								setter.accept("ws2s/connections/" + port_no + "/new-connections-throttling", throttling);
+								break;
+							case 5269:
+								setter.accept("s2s/connections/" + port_no + "/new-connections-throttling", throttling);
+								break;
+							default:
+								Stream.of("c2s", "bosh", "ws2s", "s2s", "ext").forEach(cmp -> {
+									Map<String, Object> cmpCfg = (Map<String, Object>) props.get(cmp);
+									if (cmpCfg == null) {
+										return;
+									}
+									Map<String, Object> cmpConns = (Map<String, Object>) cmpCfg.get("connections");
+									if (cmpConns == null) {
+										return;
+									}
+
+									Map<String, Object> portSettings = (Map<String, Object>) cmpConns.get("" + port_no);
+									if (portSettings == null) {
+										return;
+									}
+
+									portSettings.putIfAbsent("new-connections-throttling", throttling);
+								});
+
+						}
+					} catch (Exception e) {
+
+						// bad configuration
+						log.log(Level.WARNING,
+								"Connections throttling configuration error, bad format, " +
+										"check the documentation for a correct syntax, " +
+										"port throttling config: {0}", port_thr);
+					}
+				} else {
+
+					// bad configuration
+					log.log(Level.WARNING,
+							"Connections throttling configuration error, bad format, " +
+									"check the documentation for a correct syntax, " +
+									"port throttling config: {0}", port_thr);
+				}
+			}
+
+		});
+		renameIfExists(props, "--" + RosterFactory.ROSTER_IMPL_PROP_KEY, RosterFactory.ROSTER_IMPL_PROP_KEY, Function.identity());
+		renameIfExists(props, "--s2s-ejabberd-bug-workaround-active", "s2s/dialback/ejabberd-bug-workaround", (v)-> Boolean.parseBoolean("" + v));
+		renameIfExists(props,"--" + SessionManagerConfig.SM_THREADS_POOL_PROP_KEY, "sess-man/" + SessionManagerConfig.SM_THREADS_POOL_PROP_KEY, Function.identity());
+
+		removeIfExistsAnd(props, "--" + SSL_CONTAINER_CLASS_KEY, (setter, value) -> {
+			Map<String, Object> cfg = (Map<String, Object>) props.getOrDefault("rootSslContextContainer", new HashMap<>());
+			if (cfg instanceof AbstractBeanConfigurator.BeanDefinition) {
+				((AbstractBeanConfigurator.BeanDefinition) cfg).setClazzName(value.toString());
+			} else {
+				AbstractBeanConfigurator.BeanDefinition.Builder builder = new AbstractBeanConfigurator.BeanDefinition.Builder()
+						.name("rootSslContextContainer")
+						.active(true)
+						.clazz(value.toString());
+				cfg.forEach(builder::property);
+				props.put("rootSslContextContainer", builder.build());
+			}
+		});
+
 		Stream.of("c2s", "bosh", "ws2s").forEach(cmp -> {
 			Map<String, Object> cmpCfg = (Map<String, Object>) props.get(cmp);
 			if (cmpCfg != null) {
@@ -375,6 +466,19 @@ public class ConfigHolder {
 					newCfg.putAll(oldCfg);
 				}
 			}
+		});
+
+		removeIfExistsAnd(props, RepositoryFactory.USER_REPO_POOL_CLASS, (setter, value) -> {
+			Map<String, Object> repos = ((Map<String, Object>) props.get("userRepository"));
+			(repos != null ? repos.keySet() : Collections.singleton("default")).forEach( name -> {
+				setter.accept("userRepository/" + name + "/pool-class", value);
+			});
+		});
+		removeIfExistsAnd(props, RepositoryFactory.USER_REPO_POOL_SIZE, (setter, value) -> {
+			Map<String, Object> repos = ((Map<String, Object>) props.get("userRepository"));
+			(repos != null ? repos.keySet() : Collections.singleton("default")).forEach( name -> {
+				setter.accept("userRepository/" + name + "/pool-size", value);
+			});
 		});
 
 		String after = props.toString();

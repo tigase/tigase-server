@@ -317,7 +317,7 @@ public class ConnectionOpenThread
 					throws IOException {
 		switch (al.getConnectionType()) {
 		case accept :
-			long port_throttling = getThrottlingForPort(isa.getPort());
+			long port_throttling = al.getNewConnectionsThrottling();
 
 			throttling.put(isa.getPort(), new PortThrottlingData(port_throttling));
 			if (log.isLoggable(Level.FINEST)) {
@@ -374,65 +374,6 @@ public class ConnectionOpenThread
 				addISA(new InetSocketAddress(ifc, al.getPort()), al);
 			}    // end of for ()
 		}      // end of if (ip == null || ip.equals("")) else
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	private long getThrottlingForPort(int port) {
-		long result = def_5222_throttling;
-
-		switch (port) {
-		case 5223 :
-			result = def_5223_throttling;
-
-			break;
-
-		case 5269 :
-			result = def_5269_throttling;
-
-			break;
-
-		case 5280 :
-			result = def_5280_throttling;
-
-			break;
-		}
-
-		String throttling_prop = System.getProperty("new-connections-throttling");
-
-		if (throttling_prop != null) {
-			String[] all_ports_thr = throttling_prop.split(",");
-
-			for (String port_thr : all_ports_thr) {
-				String[] port_thr_ar = port_thr.split(":");
-
-				if (port_thr_ar.length == 2) {
-					try {
-						int port_no = Integer.parseInt(port_thr_ar[0]);
-
-						if (port_no == port) {
-							return Long.parseLong(port_thr_ar[1]);
-						}
-					} catch (Exception e) {
-
-						// bad configuration
-						log.log(Level.WARNING,
-								"Connections throttling configuration error, bad format, " +
-								"check the documentation for a correct syntax, " +
-								"port throttling config: {0}", port_thr);
-					}
-				} else {
-
-					// bad configuration
-					log.log(Level.WARNING,
-							"Connections throttling configuration error, bad format, " +
-							"check the documentation for a correct syntax, " +
-							"port throttling config: {0}", port_thr);
-				}
-			}
-		}
-
-		return result;
 	}
 
 	//~--- inner classes --------------------------------------------------------
