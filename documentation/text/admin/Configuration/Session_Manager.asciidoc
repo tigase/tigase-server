@@ -38,10 +38,9 @@ Keeps the same presence logic as MobileV2, but also queues Message Carbons.
 
 === Disabling CSI
 If you wish to not use the +ClientStateIndication+ processor, set the following in your init.properties file:
-[source,properties]
+[source,dsl]
 -----
-}
-'sess-man' {
+'sess-man' () {
     'urn:xmpp:csi:0' (active: false) {}
 }
 -----
@@ -53,10 +52,50 @@ If you have used these in the past, it is recommended you change your system to 
 
 If you require v3 logic, or do not wish to use CSI, be sure to disable it using the above option.
 
-== Thread Pool Counts
-Session manager can control the number of available thread pools for each processor.  By adding the following line to the init.properties file, the global thread pool can be increased by a specified factor:
-[source,properties]
+[[smThreadsPool]]
+== threads-pool
+The `threadsNo` property allows you to fine-tune the SM plugin's (processors) thread pool. With the default settings every plugin gets his own thread pool. This guarantees the best performance and optimal resource usage. The downside of this setting is that packets can arrive out of order if they are processed within different thread pools.
+
+/// If you really need or want to preserve the order for packets processed by different plugins then the solution is to use the 'custom' thread pool. In this case packets processed by all plugins are handled within a single thread pool. This guarantees that the packets are processed and delivered in the exact order they arrive.
+
+We can even fine tune this packet processing. Let's say you want most of the plugins to be executed within a single thread pool to preserve packet ordering for them, but for some selected plugins that should execute within separate thread pools to improve performance.  Let's say, authentication packets and user registration can be actually executed in a separate thread pools as we do not worry about an order for them. Users cannot send or receive anything else before they authenticates anyway. The solution is to specify a number of threads for the selected plugin. For example, setting a common thread pool for all plugins but registration and authentication can be done with following configuration:
+
+[source,dsl]
 -----
-sess-man/sm-threads-factor[I]=3
+'sess-man' () {
+    'amp' () {
+        threadsNo = 30
+    }
+    'presence-state' () {
+        threadsNo = 27
+    }
+}
+-----
+
+This replaces the old `--sm-threads-pool` property, as well as specifying thread pools in `--sm-plugins`.
+
+== Thread Pool factor
+Session manager can control the number of available thread pools for each processor.  By adding the following line to the init.properties file, the global thread pool can be increased by a specified factor:
+[source,dsl]
+-----
+'sess-man' () {
+    'sm-threads-factor' = 3
+}
 -----
 In this case, the global thread pools is increased by a factor or 3.
+
+[[smClusterStrategyClass]]
+== Strategy
+The `Strategy` property allows users to specify Clustering Strategy class which should be used for handling clustering environment; by default `SMNonCachingAllNodes` is used.
+
+Any class implementing `tigase.cluster.strategy.ClusteringStrategyIfc` interface may be used for this setting.
+
+Example:
+[source,dsl]
+-----
+'sess-man' () {
+    strategy (class: tigase.cluster.strategy.SMCachingAllNodes)
+}
+-----
+
+This replaces the old `--sm-cluster-strategy-class` setting from v7.1.

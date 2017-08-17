@@ -1,0 +1,73 @@
+[[propComp]]
+= Component
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:date: 2017-06-29 07:50
+:version: v2.0, June 2017: Formatted for v7.2.0.
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Description:* Container specifying component configuration.  All components if they require configuration must be called in the conf.tdsl file in the following manner:
+[source,dsl]
+-----
+componentName (class: value) {
+    <configuration>
+}
+-----
+
+DSL allows for custom naming of the component, and specifying of the class in the same line.  This method replaces the old `comp-class` and `comp-name` style of configuration.
+
+For example, what used to be
+[source,properties]
+-----
+--comp-name-1 = socks5
+--comp-class-1 = tigase.socks5.Socks5Component
+--comp-name-2 = stun
+--comp-class-2 = tigase.stun.StunComponent
+-----
+
+is now
+[source,dsl]
+-----
+socks5 (class: tigase.socks5.Socks5Component) {}
+stun (class: tigase.stun.StunComponent) {}
+-----
+
+In fact, if you are using the default class & name for a component, you don't need to specify it either, so MUC in this is now called by
+[source,dsl]
+-----
+socks5 () {}
+-----
+
+*Default value:* By default, component configuration runs of default, and does not need to be specified.
+
+
+There are many many configuration options under each component, which are specified in xref:loadComponent[component documentation].
+
+== Ports
+The ports property is a subclass of connections, which is used to set a ports list for a connection manager. 'list of ports' is a comma separated list of ports numbers. For example for the server to server connection manager named s2s the property would like like the example below:
+[source,dsl]
+-----
+s2s {
+    connections {
+        ports = [ 5290, 5291 ]
+    }
+}
+-----
+
+Each port many be individually configured underneath ports
+[source,dsl]
+-----
+s2s {
+    connections {
+        ports = [ 5290, 5291 ]
+        5291 {
+            type = 'accept'
+        }
+    }
+}
+-----
+
+this replaces the `--cmpname-ports` property.
+
+*Available since:* 7.2.0

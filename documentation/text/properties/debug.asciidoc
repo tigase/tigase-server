@@ -9,6 +9,7 @@
 :website: http://tigase.net/
 
 *Description:* The `debug` property is used to turn on the debug log for the specified Tigase package. For example if you want to turn debug logs on for the `tigase.server` package, then you have to use the `server` parameter. If you have any problems with your server the best way to get help from the Tigase team is to generate configuration with this enabled at a minimum and run the server. Then from the `logs/tigase-console.log` log file I can provide the best information for us to provide assistance. More details about server logging and adjusting logging level is described in the Debugging Tigase article in the admin guide.
+If you wish to debug packages not compiled with Tigase, use the xref:debugPackages[debug-packages] setting.
 
 *Default value:* 'none'
 

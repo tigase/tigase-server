@@ -1,17 +1,15 @@
 [[boshExtraHeadersFile]]
-= --bosh-extra-headers-file
+= bosh-extra-headers-file
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2013-03-20 01:00
-:revision: v2.1
+:version: v2.0, August 2017: Formatted for v7.2.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-*Default value:* +etc/bosh-extra-headers.txt+
+*Default value:* `'etc/bosh-extra-headers.txt'`
 
-*Example:* +--bosh-extra-headers-file = /path/to/file.txt+
+*Example:* `'bosh-extra-headers-file' = ''/path/to/file.txt'`
 
 *Possible values:* 'path to a file on the filesystem.'
 
@@ -29,4 +27,4 @@ Access-Control-Max-Age: 86400
 
 This can be modified, removed or replaced with a different content on your installation.
 
-*Available since:* 5.1.0
+*Available since:* 7.2.0

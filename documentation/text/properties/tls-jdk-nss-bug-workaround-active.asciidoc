@@ -1,19 +1,17 @@
 [[tlsJdkNssBugWorkaroundActive]]
-= --tls-jdk-nss-bug-workaround-active
+= tls-jdk-nss-bug-workaround-active
 :author: Andrzej Wojcik <andrzejw@tigase.org>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2013-02-09 03:57
-:revision: v2.1
+:version: v2.1, August 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-*Default value:* +false+
+*Default value:* `false`
 
-*Example:* +--tls-jdk-nss-bug-workaround-active = true+
+*Example:* `'tls-jdk-nss-bug-workaround-active' = true`
 
-*Possible values:* +true|false+
+*Possible values:* `true|false`
 
 *Description:* This is a workaround for TLS/SSL bug in new JDK7 using the native library for keys generation and connection encryption used with new version of nss library.
 
@@ -22,4 +20,6 @@ This caused a number of problems with Tigase installed on systems with JDK7 and 
 - http://stackoverflow.com/q/10687200/427545
 - http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
 
-*Available since:* 5.2.0
+Note, while this setting is still supported, the issues mentioned above are fixed in v8 JDK.
+
+*Available since:* 7.2.0

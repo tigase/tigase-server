@@ -44,7 +44,7 @@ Typically if a bean is called, it is automatically active.  Session manager plug
 [source,dsl]
 -----
 'sess-man' () {
-    ':version' () {}
+    'version' () {}
     amp () {}
     'basic-filter' () {}
     'domain-filter' () {}

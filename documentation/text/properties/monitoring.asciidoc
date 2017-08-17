@@ -29,6 +29,8 @@ monitoring () {
 }
 -----
 
+WARNING: DO NOT CONFUSE monitoring with monitor component.
+
 *Possible values:* 'list of monitoring protocols with port numbers.'
 
 *Available since:* 7.2.0

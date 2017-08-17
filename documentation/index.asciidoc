@@ -353,12 +353,6 @@ include::text/admin/Addendum/Statistics_Descriptions.asciidoc[]
 
 include::text/properties/admins.asciidoc[]
 
-include::text/properties/auth-domain-repo-pool.asciidoc[]
-
-include::text/properties/auth-repo-pool.asciidoc[]
-
-include::text/properties/auth-repo-pool-size.asciidoc[]
-
 include::text/properties/authRepository.asciidoc[]
 
 include::text/properties/bind-ext-hostnames.asciidoc[]
@@ -367,13 +361,13 @@ include::text/properties/bosh-close-connection.asciidoc[]
 
 include::text/properties/bosh-extra-headers-file.asciidoc[]
 
-include::text/properties/cl-conn-repo-class.asciidoc[]
+include::text/properties/certificate-container.asciidoc[]
+
+include::text/properties/cl-comp.asciidoc[]
 
 include::text/properties/client-access-policy-file.asciidoc[]
 
 include::text/properties/client-port-delay-listening.asciidoc[]
-
-include::text/properties/cluster-connect-all.asciidoc[]
 
 include::text/properties/cluster-mode.asciidoc[]
 
@@ -383,19 +377,13 @@ include::text/properties/cm-ht-traffic-throttling.asciidoc[]
 
 include::text/properties/cm-traffic-throttling.asciidoc[]
 
-include::text/properties/cmpname-ports.asciidoc[]
-
-include::text/properties/comp-class.asciidoc[]
-
-include::text/properties/comp-name.asciidoc[]
+include::text/properties/component.asciidoc[]
 
 include::text/properties/config-type.asciidoc[]
 
 include::text/properties/cross-domain-policy-file.asciidoc[]
 
 include::text/properties/dataSource.asciidoc[]
-
-include::text/properties/data-repo-pool-size.asciidoc[]
 
 include::text/properties/debug.asciidoc[]
 
@@ -404,10 +392,6 @@ include::text/properties/debug-packages.asciidoc[]
 include::text/properties/domain-filter-policy.asciidoc[]
 
 include::text/properties/elements-number-list.asciidoc[]
-
-include::text/properties/ext-comp.asciidoc[]
-
-include::text/properties/extcomp-repo-class.asciidoc[]
 
 include::text/properties/external.asciidoc[]
 
@@ -435,21 +419,11 @@ include::text/properties/s2s-ejabberd-bug-workaround-active.asciidoc[]
 
 include::text/properties/s2s-secret.asciidoc[]
 
-include::text/properties/s2s-skip-tls-hostnames.asciidoc[]
-
 include::text/properties/script-dir.asciidoc[]
 
 include::text/properties/seeOtherHost.asciidoc[]
 
-include::text/properties/sm-cluster-strategy-class.asciidoc[]
-
-include::text/properties/sm-threads-pool.asciidoc[]
-
-include::text/properties/ssl-certs-location.asciidoc[]
-
 include::text/properties/ssl-container-class.asciidoc[]
-
-include::text/properties/ssl-def-cert-domain.asciidoc[]
 
 include::text/properties/stats.asciidoc[]
 
@@ -458,10 +432,6 @@ include::text/properties/stream-error-counter.asciidoc[]
 include::text/properties/stringprep-proecssor.asciidoc[]
 
 include::text/properties/test.asciidoc[]
-
-include::text/properties/tigase-config-repo-class.asciidoc[]
-
-include::text/properties/tigase-config-repo-uri.asciidoc[]
 
 include::text/properties/tls-jdk-nss-bug-workaround-active.asciidoc[]
 
