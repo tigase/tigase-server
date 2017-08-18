@@ -481,6 +481,18 @@ public class ConfigHolder {
 			});
 		});
 
+		Map<String, Object> sessManCfg = (Map<String, Object>) props.get("sess-man");
+		if (sessManCfg != null) {
+			Object saslMechanisms = (String) sessManCfg.remove("enabled-mechanisms");
+			if (saslMechanisms != null) {
+				if (saslMechanisms instanceof String) {
+					putIfAbsent(props, "sess-man/sasl-provider/allowed-mechanisms", Arrays.asList(((String) saslMechanisms).split(",")));
+				} else {
+					putIfAbsent(props, "sess-man/sasl-provider/allowed-mechanisms", saslMechanisms);
+				}
+			}
+		}
+
 		String after = props.toString();
 		return !before.equals(after);
 	}
