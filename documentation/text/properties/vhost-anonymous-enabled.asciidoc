@@ -1,0 +1,32 @@
+[[vhostAnonymousEnabled]]
+= vhost-anonymous-enabled
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.1, August 2017: Reformatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* `true`
+
+*Example:* `'vhost-anonymous-enabled' = 'false'`
+
+*Possible values:* `true|false`
+
+*Description:* The `vhost-anonymous-enabled` property specifies whether anonymous user logins are allowed for the installation for all vhosts.
+
+This is a global property which is overridden by settings for particular vhost.
+
+Default settings for all virtual hosts are used when this property is not defined. This settings is useful mostly for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It allows the configuration of default values for all of them, instead of having to provide individual configuration for each vhost.
+
+It is also applied as a default value for all new vhosts added at run-time.
+
+This is a global property which is overridden by settings for particular vhost.
+
+[source,dsl]
+-----
+'virtual-hosts' = [ 'domain4:vhost-anonymous-enabled = true' ]
+-----
+
+
+*Available since:* 7.2.0

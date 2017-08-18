@@ -1,0 +1,36 @@
+[[monitoring]]
+= monitoring
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:date: 2013-02-09 22:48
+:version: v2.0, June 2017: Reformatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Description:* This property activates monitoring interfaces through selected protocols on selected TCP/IP port numbers. For more details please refer to the xref:serverMonitoring[monitoring guide] in the user guide for details.
+Each monitoring protocol should be called in it's own child bean under `monitoring ()`.  If a protocol is not specified, monitoring under that will not be available.
+
+*Default value:* By default monitoring is disabled.
+
+*Example:*
+[source,dsl]
+-----
+monitoring () {
+    http () {
+        port = '9080'
+    }
+    jmx () {
+        port = '9050'
+    }
+    snmp () {
+        port = '9060'
+    }
+}
+-----
+
+WARNING: DO NOT CONFUSE monitoring with monitor component.
+
+*Possible values:* 'list of monitoring protocols with port numbers.'
+
+*Available since:* 7.2.0

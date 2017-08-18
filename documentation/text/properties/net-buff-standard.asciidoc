@@ -1,0 +1,18 @@
+[[netBuffStandard]]
+= net-buff-standard
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2017: Reformatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* `2k`
+
+*Example:* `'net-buff-standard' = '16k'`
+
+*Possible values:* network buffer size as integer.
+
+*Description:* This property sets the network buffer for standard (usually c2s) connections, default value is 2k and is optimal for most installations.
+
+*Available since:* 4.3.0

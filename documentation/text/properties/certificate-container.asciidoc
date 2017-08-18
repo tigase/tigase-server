@@ -1,0 +1,43 @@
+[[sslContainer]]
+= Certificate Container
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:date: 2017-06-29 07:50
+:version: v2.0, June 2017: Formatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+The certificate container houses all configuration related to SSL certificate configuration.  This container replaces a number of former -- properties.
+
+[[sslCertsLocation]]
+== ssl-certs-location
+This option allows you to specify the location where SSL certificates are stored. The meaning of this property depends on the SSL container xref:sslContainerClass[class implementation]. By default it just points to the directory where the server SSL certificates are stored in files in PEM format.
+
+Default location is `/certs` however it can be changed using the following setting:
+
+[source,dsl]
+-----
+}
+'certificate-container' {
+    'ssl-certs-location' = '/etc/vhost-certs'
+}
+-----
+
+This replaces the former `--ssl-certs-location` property.
+
+[[sslDefCertDomain]]
+== ssl-def-cert-domain
+This property allows you to specify a default alias/domain name for certificate. It is mostly used to load certificates for unknown domain names during the SSL negotiation. Unlike in TLS protocol where the domain name is known at the handshaking time, for SSL domain name is not known, therefore, the server does not know which certificate to use. Specifying a domain name in this property allows you to use a certificate for a specific domain in such case. This property value is also sometimes used if there is no certificate for one of virtual domains and the container does not automatically generate a self-signed certificate, then it can use a default one.
+
+This may be configured as follows:
+
+[source,dsl]
+-----
+}
+'certificate-container' {
+    'ssl-def-cert-domain' = 'some.domain.com'
+}
+-----
+
+This replaces the former `--ssl-def-cert-domain` property.

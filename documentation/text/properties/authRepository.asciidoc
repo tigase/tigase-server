@@ -1,0 +1,60 @@
+[[authRepository]]
+= authRepository
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:date: 2017-06-29 07:50
+:version: v1.0, June 2017: Formatted for v7.2.0.
+
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Description:* Container specifying authentication repository.  This container replaces the old `auth-db` property types, and may contain some other configuration values.
+
+*Default value:*
+[source,dsl]
+-----
+authRepository {
+  <configuration>
+}
+-----
+This is the basic setup for authRepository, where <configuration> settings are global for all authentication databases.
+However, you may configure multiple databases individually.
+
+*Example:*
+[source,dsl]
+-----
+authRepository {
+    'auth-repo-pool-size' = 50
+    domain1.com () {
+        cls = 'tigase.db.jdbc.JDBCRepository'
+        'data-source' = 'domain1'
+    }
+    domain2.com () {
+        cls = 'tigase.db.jdbc.JDBCRepository'
+        'data-source' = 'domain2'
+        'auth-repo-pool-size' = 30
+    }
+}
+-----
+
+== *Configuration Values:*
+Container has the following options
+
+=== *cls*
+Defines the class used for repository connection.  You can use this to specify specific drivers for different DB types. +
+cls replaces the `--auth-repo-pool` property.
+
+=== *data-source*
+If you are using a specific URI for a seperate authentication database, specify the name of the URI that is listed in the xref:dataSource[dataSource] container. +  If none is specified, it is assumed the basic user-db will also serve as auth-db.
+
+=== *auth-repo-pool-size*
+Sets the database connections pool size for the AuthRepository.  Default if not defined is 10 connections.
+
+NOTE: If this value is not specified, there are some cases where a default is defined. This depends on the repository implementation and the way it is initialized.
+
+
+
+
+
+*Available since:* 7.2.0
