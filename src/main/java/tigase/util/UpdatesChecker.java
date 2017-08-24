@@ -27,19 +27,14 @@ package tigase.util;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.net.URL;
 import java.net.URLConnection;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,7 +60,7 @@ public class UpdatesChecker extends Thread {
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
 	private static final String VERSION_URL =
-		"http://www.tigase.org/files/downloads/tigase-server/descript-redmine.ion";
+		"http://update.tigase.net/check/descript-redmine.ion";
 	private static final String FILE_START = "tigase-server-";
 
 	//~--- fields ---------------------------------------------------------------
@@ -133,6 +128,9 @@ public class UpdatesChecker extends Thread {
 
 				connection.setConnectTimeout(1000 * 60);
 				connection.setReadTimeout(1000 * 60);
+				if (null != version) {
+					connection.setRequestProperty("tigase-server-version", version);
+				}
 
 				BufferedReader buffr =
 					new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -172,18 +170,17 @@ public class UpdatesChecker extends Thread {
 					}
 				}
 
-				if ((major > major_ver) || ((major == major_ver) && (minor > minor_ver))
-						|| ((major == major_ver) && (minor == minor_ver) && (bugfix > bugfix_ver))) {
-					String os_name = System.getProperty("os.name");
-					String link = null;
+				String link = "http://tigase.net/downloads";
+				final String messageBody =
+						"You are currently using: '" + major_ver + "." + minor_ver + "." + bugfix_ver +
+								"' version of Tigase" +
+								" server. A new version of the server has been released: '" + major + "." + minor +
+								"." + bugfix + "' and it is available for" + " download at address: " + link +
+								"\n\n" + intro_msg;
+				log.info("Update found: " + messageBody);
 
-					if (os_name.toLowerCase().contains("windows")) {
-						link = "http://www.tigase.org/files/downloads/tigase-server/tigase-server-"
-								+ major + "." + minor + "." + bugfix + build + ".exe";
-					} else {
-						link = "http://www.tigase.org/files/downloads/tigase-server/tigase-server-"
-								+ major + "." + minor + "." + bugfix + build + ".tar.gz";
-					}
+				if (receiver != null && ((major > major_ver) || ((major == major_ver) && (minor > minor_ver))
+						|| ((major == major_ver) && (minor == minor_ver) && (bugfix > bugfix_ver)))) {
 
 					message = new Element("message", new String[] { "to", "from" },
 							new String[] { receiver.getDefHostName().getDomain(),
@@ -194,12 +191,7 @@ public class UpdatesChecker extends Thread {
 
 					message.addChild(subject);
 
-					Element body = new Element("body",
-						"You are currently using: '" + major_ver + "." + minor_ver + "." + bugfix_ver
-						+ "' version of Tigase"
-						+ " server. A new version of the server has been released: '" + major + "."
-						+ minor + "." + bugfix + "' and it is available for" + " download at address: "
-						+ link + "\n\n" + intro_msg);
+					Element body = new Element("body", messageBody);
 
 					message.addChild(body);
 					receiver.addPacket(Packet.packetInstance(message));
@@ -218,9 +210,3 @@ public class UpdatesChecker extends Thread {
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
