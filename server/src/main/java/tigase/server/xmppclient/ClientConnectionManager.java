@@ -34,6 +34,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigAlias;
 import tigase.kernel.beans.config.ConfigAliases;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
@@ -91,6 +92,12 @@ public class ClientConnectionManager
 	private static final boolean ROUTING_MODE_PROP_VAL            = true;
 	protected static final String FORCE_REDIRECT_TO_KEY = "force-redirect-to";
 
+	@ConfigField(desc = "CA for client certificate")
+	String clientCertCA;
+
+	@ConfigField(desc = "Is client certificate required")
+	boolean clientCertRequired = false;
+
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
@@ -118,12 +125,11 @@ public class ClientConnectionManager
 	 */
 	private IPMonitor                       ipMonitor = new IPMonitor();
 	private final ClientTrustManagerFactory clientTrustManagerFactory =
-			new ClientTrustManagerFactory();
+			new ClientTrustManagerFactory(this);
 	@Inject
 	protected EventBus eventBus;
 	@Inject(bean = RegistrationThrottling.ID, nullAllowed = true)
 	private RegistrationThrottling registrationThrottling;
-	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 
 	//~--- methods --------------------------------------------------------------

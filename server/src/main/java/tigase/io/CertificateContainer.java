@@ -63,6 +63,7 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	private String o = "Tigase.org";
 	private String ou = "XMPP Service";
 
+	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<String, CertificateEntry>();
 	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
 	private KeyManager[] kms = new KeyManager[] { new SniKeyManager() };
 	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
@@ -95,6 +96,7 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 
 		kmf.init(keys, emptyPass);
 		kmfs.put(alias, kmf);
+		cens.put(alias, entry);
 
 		if (store) {
 			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(), entry);
@@ -152,6 +154,15 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	@Override
 	public String getDefCertAlias() {
 		return def_cert_alias;
+	}
+
+	public CertificateEntry getCertificateEntry(String hostname){
+		String alias = hostname;
+		if (alias == null)
+			alias = getDefCertAlias();
+
+		CertificateEntry c = SSLContextContainerAbstract.find(cens, alias);
+		return c;
 	}
 
 	@Override
@@ -445,14 +456,10 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 
 		@Override
 		public boolean accept(File pathname) {
-			if (pathname.isFile()
-					&& (pathname.getName().endsWith(".pem") || pathname.getName().endsWith(".PEM")
-					|| pathname.getName().endsWith(".crt") || pathname.getName().endsWith(".CRT")
-					|| pathname.getName().endsWith(".cer") || pathname.getName().endsWith(".CER"))) {
-				return true;
-			}
+			return pathname.isFile() && (pathname.getName().endsWith(".pem") || pathname.getName().endsWith(".PEM") ||
+					pathname.getName().endsWith(".crt") || pathname.getName().endsWith(".CRT") ||
+					pathname.getName().endsWith(".cer") || pathname.getName().endsWith(".CER"));
 
-			return false;
 		}
 	}
 

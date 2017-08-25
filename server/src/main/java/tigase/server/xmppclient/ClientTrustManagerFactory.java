@@ -1,5 +1,13 @@
 package tigase.server.xmppclient;
 
+import tigase.cert.CertificateEntry;
+import tigase.cert.CertificateUtil;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.XMPPIOService;
+
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -7,19 +15,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-
-import tigase.cert.CertificateEntry;
-import tigase.cert.CertificateUtil;
-import tigase.vhosts.VHostItem;
-import tigase.xmpp.XMPPIOService;
 
 public class ClientTrustManagerFactory {
 
@@ -33,20 +31,16 @@ public class ClientTrustManagerFactory {
 
 	private final ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>();
 
-	private TrustManager[] defaultTrustManagers;
-
+	private final ClientConnectionManager clientConnectionManager;
 	private final TrustManager[] emptyTrustManager;
-
 	private final KeyStore keystore;
-
-	private boolean peerCertificateRequired = false;
-
+	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<>();
+	private TrustManager[] defaultTrustManagers;
 	private TrustManagerFactory tmf;
 
-	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<>();
-
-	public ClientTrustManagerFactory() {
-		this.emptyTrustManager = new TrustManager[] { new X509TrustManager() {
+	public ClientTrustManagerFactory(ClientConnectionManager clientConnectionManager) {
+		this.clientConnectionManager = clientConnectionManager;
+		this.emptyTrustManager = new TrustManager[]{new X509TrustManager() {
 
 			@Override
 			public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
@@ -60,7 +54,7 @@ public class ClientTrustManagerFactory {
 			public X509Certificate[] getAcceptedIssuers() {
 				return new X509Certificate[0];
 			}
-		} };
+		}};
 		try {
 			keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 			keystore.load(null, EMPTY_PASS);
@@ -77,31 +71,43 @@ public class ClientTrustManagerFactory {
 	}
 
 	protected X509Certificate[] getAcceptedIssuers() {
-		return acceptedIssuers.toArray(new X509Certificate[] {});
+		return acceptedIssuers.toArray(new X509Certificate[]{});
 	}
 
 	public TrustManager[] getManager(final VHostItem vHost) {
 		TrustManager[] result = trustManagers.get(vHost);
 
+		if (this.clientConnectionManager.clientCertCA == null) {
+			return null;
+		}
+
 		if (result == null) {
-			if (log.isLoggable(Level.FINEST))
+			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Creating new TrustManager for VHost " + vHost);
+			}
+
+			if (defaultTrustManagers == null) {
+				this.defaultTrustManagers = loadTrustedCert(this.clientConnectionManager.clientCertCA);
+			}
 
 			result = defaultTrustManagers;
 			String path = vHost.getData(CA_CERT_PATH);
-			if (log.isLoggable(Level.FINEST))
+			if (log.isLoggable(Level.FINEST)) {
 				log.finest("CA cert path=" + path + " for VHost " + vHost);
+			}
 			if (path != null) {
 				TrustManager[] tmp = loadTrustedCert(path);
 				if (tmp != null) {
-					if (log.isLoggable(Level.FINEST))
+					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Using custom TrustManager for VHost " + vHost);
+					}
 					result = tmp;
 					trustManagers.put(vHost, result);
 				}
 			}
-		} else if (log.isLoggable(Level.FINEST))
+		} else if (log.isLoggable(Level.FINEST)) {
 			log.finest("Found TrustManager for VHost " + vHost);
+		}
 
 		return result;
 	}
@@ -116,8 +122,9 @@ public class ClientTrustManagerFactory {
 
 	public boolean isTlsNeedClientAuthEnabled(final VHostItem vhost) {
 		Boolean result = vhost.getData(CERT_REQUIRED_KEY);
-		if (result == null)
-			result = peerCertificateRequired;
+		if (result == null) {
+			result = clientConnectionManager.clientCertRequired;
+		}
 		return result;
 	}
 
@@ -131,19 +138,22 @@ public class ClientTrustManagerFactory {
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(caCertFile);
 			Certificate[] chain = certEntry.getCertChain();
 
-			if (log.isLoggable(Level.FINEST))
+			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Loaded certificate from file " + caCertFile + " : " + certEntry);
+			}
 
 			if (chain != null) {
-				if (log.isLoggable(Level.FINEST))
+				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Loaded cert chain: " + Arrays.toString(chain));
+				}
 				for (Certificate cert : chain) {
 					if (cert instanceof X509Certificate) {
 						X509Certificate crt = (X509Certificate) cert;
 						String alias = crt.getSubjectX500Principal().getName();
 
-						if (log.isLoggable(Level.FINEST))
+						if (log.isLoggable(Level.FINEST)) {
 							log.finest("Adding certificate to keystore: alias=" + alias + "; cert=" + crt);
+						}
 
 						keystore.setCertificateEntry(alias, crt);
 						acceptedIssuers.add(crt);
@@ -156,15 +166,6 @@ public class ClientTrustManagerFactory {
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't create TrustManager with certificate from file.", e);
 			throw new RuntimeException(e);
-		}
-	}
-
-	public void setProperties(Map<String, Object> props) {
-		if (props.containsKey(CERT_REQUIRED_KEY)) {
-			this.peerCertificateRequired = (Boolean) props.get(CERT_REQUIRED_KEY);
-		}
-		if (props.containsKey(CA_CERT_PATH)) {
-			this.defaultTrustManagers = loadTrustedCert((String) props.get(CA_CERT_PATH));
 		}
 	}
 

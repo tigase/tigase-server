@@ -27,6 +27,7 @@ package tigase.server;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.annotations.TODO;
+import tigase.io.CertificateContainerIfc;
 import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
@@ -244,7 +245,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected int elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
 	private ConcurrentHashMap<String, IO> services = new ConcurrentHashMap<String, IO>();
 	private Set<ConnectionListenerImpl>   pending_open = Collections.synchronizedSet(
-			new HashSet<ConnectionListenerImpl>());;
+			new HashSet<ConnectionListenerImpl>());
 	@ConfigField(desc = "Maximal allowed time of inactivity of connection")
 	private long                      maxInactivityTime       = getMaxInactiveTime();
 	@ConfigField(desc = "Limit of packets per minute for connection")
@@ -263,6 +264,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected XMPPIOProcessor[]       processors              = new XMPPIOProcessor[0];
 	@Inject(bean = "sslContextContainer")
 	private SSLContextContainerIfc    sslContextContainer;
+	@Inject
+	private CertificateContainerIfc certificateContainer;
 
 	/** Field description */
 	@ConfigField(desc = "Default size of a network buffer", alias = "net-buffer")
@@ -287,10 +290,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Describe class <code>LIMIT_ACTION</code> here.
 	 *
 	 */
-	public static enum LIMIT_ACTION { DISCONNECT, DROP_PACKETS; }
+	public enum LIMIT_ACTION { DISCONNECT, DROP_PACKETS
+	}
 	/** Holds possible types of ping to be used in watchdog service for detection
 	 * of broken connections */
-	public static enum WATCHDOG_PING_TYPE { WHITESPACE, XMPP; }
+	public enum WATCHDOG_PING_TYPE { WHITESPACE, XMPP
+	}
 
 
 	//~--- methods --------------------------------------------------------------
@@ -1306,6 +1311,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			IO serv = getXMPPIOServiceInstance();
 			serv.setSslContextContainer(sslContextContainer);
 			serv.setBufferLimit( net_buffer_limit );
+			serv.setCertificateContainer(certificateContainer);
 
 			( (XMPPDomBuilderHandler) serv.getSessionData().get( DOM_HANDLER ) ).setElementsLimit( elements_number_limit );
 

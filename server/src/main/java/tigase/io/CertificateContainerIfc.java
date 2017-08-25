@@ -21,6 +21,8 @@
  */
 package tigase.io;
 
+import tigase.cert.CertificateEntry;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
@@ -76,6 +78,8 @@ public interface CertificateContainerIfc {
 	 * @return default alias
 	 */
 	String getDefCertAlias();
+
+	CertificateEntry getCertificateEntry(String hostname);
 
 	/**
 	 * Method returns array of <code>KeyManager</code> with certificate for domain
