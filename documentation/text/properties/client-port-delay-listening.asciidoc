@@ -1,6 +1,6 @@
 [[clusterPortDelayListening]]
 = client-port-delay-listening
-:date: 2016-10-05 10:30
+:author: Daniel Wisnewski
 :version: v2.0, June 2017, Reformatted for v7.2.0.
 
 :toc:

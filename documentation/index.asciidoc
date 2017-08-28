@@ -59,8 +59,6 @@ include::text/admin/Configuration/Configuration.asciidoc[]
 
 include::text/admin/Configuration/DSL_configuration.asciidoc[]
 
-include::text/admin/Configuration/init.properties_Configuration.asciidoc[]
-
 include::text/admin/Configuration/Startup_Files.asciidoc[]
 
 include::text/admin/Configuration/Settings_for_High_Load_Systems.asciidoc[]
@@ -405,8 +403,6 @@ include::text/properties/net-buff-high-throughput.asciidoc[]
 
 include::text/properties/net-buff-standard.asciidoc[]
 
-include::text/properties/new-connections-throttling.asciidoc[]
-
 include::text/properties/nonpriority-queue.asciidoc[]
 
 include::text/properties/plugins.asciidoc[]
@@ -414,8 +410,6 @@ include::text/properties/plugins.asciidoc[]
 include::text/properties/queue-implementation.asciidoc[]
 
 include::text/properties/roster-implementation.asciidoc[]
-
-include::text/properties/s2s-ejabberd-bug-workaround-active.asciidoc[]
 
 include::text/properties/s2s-secret.asciidoc[]
 
@@ -438,10 +432,6 @@ include::text/properties/tls-jdk-nss-bug-workaround-active.asciidoc[]
 include::text/properties/trusted.asciidoc[]
 
 include::text/properties/user-domain-repo-pool.asciidoc[]
-
-include::text/properties/user-repo-pool.asciidoc[]
-
-include::text/properties/user-repo-pool-size.asciidoc[]
 
 include::text/properties/vhost-anonymous-enabled.asciidoc[]
 

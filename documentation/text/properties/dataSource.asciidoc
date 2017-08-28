@@ -1,7 +1,6 @@
 [[dataSource]]
 = authRepository
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:date: 2017-06-29 07:50
 :version: v2.0, June 2017: Formatted for v7.2.0.
 
 

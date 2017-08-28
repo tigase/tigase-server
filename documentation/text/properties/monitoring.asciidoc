@@ -1,7 +1,6 @@
 [[monitoring]]
 = monitoring
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:date: 2013-02-09 22:48
 :version: v2.0, June 2017: Reformatted for v7.2.0.
 
 :toc:
