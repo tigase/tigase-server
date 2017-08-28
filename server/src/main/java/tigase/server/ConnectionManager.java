@@ -43,6 +43,8 @@ import tigase.xml.Element;
 import tigase.xmpp.*;
 
 import javax.script.Bindings;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -146,6 +148,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description */
 	protected static final String PORT_KEY = "port-no";
+
+	protected static final String PORT_NEW_CONNECTIONS_THROTTLING_KEY = "new-connections-throttling";
 
 	/** Field description */
 	protected static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
@@ -283,6 +287,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@ConfigField(desc = "Traffic throttling")
 	protected String trafficThrottling = null;
 	protected Kernel kernel;
+
+	@ConfigField(desc = "Flash cross domain policy file path", alias = XMPPIOService.CROSS_DOMAIN_POLICY_FILE_PROP_KEY)
+	private String flashCrossDomainPolicyFile= XMPPIOService.CROSS_DOMAIN_POLICY_FILE_PROP_VAL;
+	private String flassCrossDomainPolicy = null;
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -837,6 +845,31 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@Override
 	public void setName(String name) {
 		super.setName(name);
+	}
+
+	public String getFlashCrossDomainPolicy() {
+		return flassCrossDomainPolicy;
+	}
+
+	public void setFlashCrossDomainPolicyFile(String file) {
+		this.flashCrossDomainPolicyFile = file;
+		if (flashCrossDomainPolicyFile != null) {
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(flashCrossDomainPolicyFile));
+				String line = br.readLine();
+				StringBuilder sb = new StringBuilder();
+
+				while (line != null) {
+					sb.append(line);
+					line = br.readLine();
+				}
+				sb.append('\0');
+				br.close();
+				flassCrossDomainPolicy = sb.toString();
+			} catch (Exception ex) {
+				log.log(Level.WARNING, "Problem reading cross domain poicy file: " + flashCrossDomainPolicyFile, ex);
+			}
+		}
 	}
 
 	protected void setupWatchdogThread() {
@@ -1440,6 +1473,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				return DEF_TRAFFIC_CLASS;
 			}
 		}
+
+		@Override
+		public long getNewConnectionsThrottling() {
+			return (Long) port_props.getOrDefault(PORT_NEW_CONNECTIONS_THROTTLING_KEY, ConnectionOpenThread.def_5222_throttling);
+		}
 	}
 
 
@@ -1609,6 +1647,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		@ConfigField(desc = "Interface to listen on")
 		protected String[] ifc = null;
 
+		@ConfigField(desc = "New connections throttling", alias = "new-connections-throttling")
+		protected long newConnectionsThrottling = -1;
+
 		public PortConfigBean() {
 
 		}
@@ -1645,12 +1686,34 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			else
 				props.put(PORT_IFC_PROP_KEY, ifc);
 			props.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
+			props.put(PORT_NEW_CONNECTIONS_THROTTLING_KEY, newConnectionsThrottling);
 //			props.put(TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
 			return props;
 		}
 
 		@Override
 		public void initialize() {
+			if (newConnectionsThrottling == -1) {
+				switch (name) {
+					case 5223:
+						newConnectionsThrottling = ConnectionOpenThread.def_5223_throttling;
+
+						break;
+
+					case 5269:
+						newConnectionsThrottling = ConnectionOpenThread.def_5269_throttling;
+
+						break;
+
+					case 5280:
+						newConnectionsThrottling = ConnectionOpenThread.def_5280_throttling;
+
+						break;
+					default:
+						newConnectionsThrottling = ConnectionOpenThread.def_5222_throttling;
+				}
+			}
+
 			beanConfigurationChanged(Collections.emptyList());
 		}
 	}
@@ -1689,8 +1752,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		@Override
 		public void register(Kernel kernel) {
 			this.kernel = kernel;
-			String connManagerBean = kernel.getParent().getName();
-			this.kernel.getParent().ln("service", kernel, connManagerBean);
+			if (kernel.getParent() != null) {
+				String connManagerBean = kernel.getParent().getName();
+				this.kernel.getParent().ln("service", kernel, connManagerBean);
+			}
 		}
 
 		@Override

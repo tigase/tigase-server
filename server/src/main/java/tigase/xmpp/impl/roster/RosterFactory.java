@@ -40,6 +40,7 @@ public abstract class RosterFactory {
 	/** Holds shared implementation of {@link RosterAbstract} */
 	private static RosterAbstract shared = null;
 
+	public static String defaultRosterImplementation = ROSTER_IMPL_PROP_VAL;
 	//~--- get methods ----------------------------------------------------------
 	/**
 	 * Creates new instance of class implementing {@link RosterAbstract} - either
@@ -53,9 +54,7 @@ public abstract class RosterFactory {
 	 */
 	public static RosterAbstract getRosterImplementation( boolean shared_impl ) {
 		try {
-			String cls_name = System.getProperty( ROSTER_IMPL_PROP_KEY, ROSTER_IMPL_PROP_VAL );
-
-			return getRosterImplementation( cls_name, shared_impl );
+			return getRosterImplementation( defaultRosterImplementation, shared_impl );
 		} catch ( ClassNotFoundException | InstantiationException | IllegalAccessException e ) {
 			return null;
 		}

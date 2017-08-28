@@ -1,0 +1,468 @@
+= Tigase Administration Guide
+Tigase Team <team@tigase.com>
+:toc:
+:numbered:
+:website: http://tigase.net
+
+:leveloffset: 1
+:no title:
+:no author:
+
+include::text/Tigase_v7.2.0.asciidoc[]
+
+include::text/user/Jabber_XMPP_Introduction.asciidoc[]
+
+include::text/user/Installing_Minichat_on_your_Website.asciidoc[]
+
+include::text/user/How_to_use_Tigase_Service.asciidoc[]
+
+include::text/user/Psi_Initial_Configuration.asciidoc[]
+
+Welcome to the Tigase Administration Guide.
+
+:leveloffset: 1
+
+include::text/admin/About_Tigase_Jabber_XMPP_Server.asciidoc[]
+
+include::text/admin/Licensing_and_Open_Source.asciidoc[]
+
+include::text/admin/Latest_and_Nightly_Builds.asciidoc[]
+
+include::text/admin/Quick_Start/Intro.asciidoc[]
+
+
+:leveloffset: 2
+
+include::text/admin/Quick_Start/Installation_Using_Web_Installer.asciidoc[]
+
+include::text/admin/Quick_Start/Installing_Using_Console_Installer.asciidoc[]
+
+include::text/admin/Quick_Start/Manual_Installation_in_Console_Mode.asciidoc[]
+
+include::text/admin/Quick_Start/Windows_Installation.asciidoc[]
+
+include::text/admin/Quick_Start/Setting_Up_Server.asciidoc[]
+
+include::text/admin/Quick_Start/Script_Selection.asciidoc[]
+
+include::text/admin/Quick_Start/Shutting_Down.asciidoc[]
+
+include::text/admin/Quick_Start/Upgrading_from_Older_versions.asciidoc[]
+
+:leveloffset: 1
+
+
+
+include::text/admin/Configuration/Configuration.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Configuration/DSL_configuration.asciidoc[]
+
+include::text/admin/Configuration/init.properties_Configuration.asciidoc[]
+
+include::text/admin/Configuration/Startup_Files.asciidoc[]
+
+include::text/admin/Configuration/Settings_for_High_Load_Systems.asciidoc[]
+
+include::text/admin/Configuration/JVM_settings.asciidoc[]
+
+include::text/admin/Configuration/Session_Manager.asciidoc[]
+
+include::text/admin/Configuration/Vhosts.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Configuration/Vhosts_Ad-hoc_Commands.asciidoc[]
+
+include::text/admin/Configuration/Vhosts_Virtual_Components.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Configuration/Logging.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Security/Security.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Security/Server_Certificates/Server_Certificates.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Security/Server_Certificates/PEM_Files.asciidoc[]
+
+include::text/admin/Security/Server_Certificates/LetsEncrypt.asciidoc[]
+
+//include::text/admin/Security/Server_Certificates/Keystore.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Security/Auth_Connectors/Auth_Connectors.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Security/Auth_Connectors/Tigase_Auth_Connector.asciidoc[]
+
+include::text/admin/Security/Auth_Connectors/Custom_Auth_Connector.asciidoc[]
+
+include::text/admin/Security/Auth_Connectors/Drupal_Auth.asciidoc[]
+
+include::text/admin/Security/Auth_Connectors/LDAP_Auth.asciidoc[]
+
+include::text/admin/Security/Auth_Connectors/SASL_EXTERNAL.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Security/Packet_Filtering/Packet_Filtering.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Security/Packet_Filtering/Domain_Based_Filtering.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Security/Access_Control_List.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Database_Manegement/Database_Manegement.asciidoc
+
+:leveloffset: 2
+
+include::text/admin/Database_Management/Database_Preparation/Database_Preparation.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Database_Management/Database_Preparation/DbSchemaLoader.asciidoc[]
+
+include::text/admin/Database_Management/Database_Preparation/MySQL.asciidoc[]
+
+include::text/admin/Database_Management/Database_Preparation/Derby.asciidoc[]
+
+include::text/admin/Database_Management/Database_Preparation/MSSQL.asciidoc[]
+
+include::text/admin/Database_Management/Database_Preparation/PostGRE.asciidoc[]
+
+include::text/admin/Database_Management/Database_Preparation/MongoDB.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Database_Management/Hashed_User_Passwords_in_Database.asciidoc[]
+
+include::text/admin/Database_Management/Multiple_Databases.asciidoc[]
+
+include::text/admin/Database_Management/Importing_User_Data.asciidoc[]
+
+include::text/admin/Database_Management/Existing_Databases/Existing_Databases.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Database_Management/Existing_Databases/MySQL.asciidoc[]
+
+include::text/admin/Database_Management/Existing_Databases/Drupal.asciidoc[]
+
+include::text/admin/Database_Management/Existing_Databases/LibreSource.asciidoc[]
+
+include::text/admin/Database_Management/Existing_Databases/PostgreSQL.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Database_Management/Schema_Updates/Schema_Updates.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Database_Management/Schema_Updates/Tigase_Server_7.1.asciidoc[]
+
+include::text/admin/Database_Management/Schema_Updates/Tigase_v5.x.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Components/Components.asciidoc[]
+
+:leveloffset: 2
+
+include::text/components/http-api/documentation/text/HTTP_Component_Configuration.asciidoc
+
+include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
+
+include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]
+
+include::text/components/http-api/documentation/text/HTTP_File_Upload_Component.asciidoc[]
+
+include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
+
+include::text/components/http-api/documentation/text/HTTP_Pre_Bind_BOSH.asciidoc[]
+
+include::text/components/http-api/documentation/text/REST_API_Usage_Examples.asciidoc[]
+
+include::text/components/http-api/documentation/text/UI_Guide_Admin.asciidoc[]
+
+include::text/components/http-api/documentation/text/UI_Guide_Client.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Components/Message_Archiving.asciidoc[]
+
+include::text/admin/Components/Advanced_Message_Processing.asciidoc[]
+
+include::text/components/pubsub/documentation/text/Overview.asciidoc[]
+
+:leveloffset: 3
+
+include::text/components/pubsub/documentation/text/Announcement.asciidoc[]
+include::text/components/pubsub/documentation/text/Database.asciidoc[]
+include::text/components/pubsub/documentation/text/Configuration.asciidoc[]
+include::text/components/pubsub/documentation/text/Schema_Changes.asciidoc[]
+include::text/components/pubsub/documentation/text/Features.asciidoc[]
+
+:leveloffset: 4
+
+include::text/components/pubsub/documentation/text/features/AdHocCommands.asciidoc[]
+include::text/components/pubsub/documentation/text/features/PubSub_Node_Presence_Protocol.asciidoc[]
+include::text/components/pubsub/documentation/text/features/OfflineMessagesSink.asciidoc[]
+include::text/components/pubsub/documentation/text/features/REST_API.asciidoc[]
+
+:leveloffset: 3
+
+include::text/components/pubsub/documentation/text/Limitations.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Components/Monitoring/Monitoring.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Components/Monitoring/Setting_up.asciidoc[]
+
+include::text/admin/Components/Monitoring/Retrieving_statistics.asciidoc[]
+
+include::text/admin/Components/Monitoring/EventBus.asciidoc[]
+
+include::text/admin/Components/Monitoring/Statistics_Logger_Config.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Components/Server_to_Server_Protocol.asciidoc[]
+
+include::text/admin/Components/MUC.asciidoc[]
+
+include::text/admin/Components/Load_Balancing.asciidoc[]
+
+include::text/admin/Components/External_Component_Configuration/Intro.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Components/External_Component_Configuration/Configuration.asciidoc[]
+
+include::text/admin/Components/External_Component_Configuration/Tigase_as_External.asciidoc[]
+
+include::text/admin/Components/External_Component_Configuration/Load_Balancing.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Components/C2S.asciidoc[]
+
+include::text/admin/Components/Socks5.asciidoc[]
+
+include::text/admin/Components/External_Service_Discovery_Component.asciidoc[]
+
+:leveloffset: 2
+
+include::text/components/tigase-push/documentation/text/Overview.asciidoc[]
+
+:leveloffset: 3
+
+include::text/components/tigase-push/documentation/text/Configuration.asciidoc[]
+
+include::text/components/tigase-push/documentation/text/Usage.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Using_Tigase/Intro.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Using_Tigase/Log_Guide.asciidoc[]
+
+include::text/admin/Using_Tigase/Debugging_Tigase.asciidoc[]
+
+include::text/admin/Using_Tigase/Basic_System_Checks.asciidoc[]
+
+include::text/admin/Using_Tigase/Virtual_Domains.asciidoc[]
+
+include::text/admin/Using_Tigase/Presence_Forwarding.asciidoc[]
+
+include::text/admin/Using_Tigase/Tigase_and_PyMSN-t_Transport.asciidoc[]
+
+include::text/admin/Using_Tigase/Multiple_SessionManagers.asciidoc[]
+
+include::text/admin/Using_Tigase/Watchdog.asciidoc[]
+
+include::text/admin/Using_Tigase/Tips_and_Tricks/Tips_and_Tricks.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Using_Tigase/Tips_and_Tricks/Checking_Environment.asciidoc[]
+
+include::text/admin/Using_Tigase/Tips_and_Tricks/Browser_Access.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Using_Tigase/Command_Line_Tool/Command_Line_Tools.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Using_Tigase/Command_Line_Tool/Configuration_Tool.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Using_Tigase/Scripting/Scripting_Support.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Using_Tigase/Scripting/Introduction.asciidoc[]
+
+include::text/admin/Using_Tigase/Scripting/v4.4.x_Update.asciidoc[]
+
+include::text/admin/Using_Tigase/Scripting/Python.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Using_Tigase/Offline_Messages.asciidoc[]
+
+include::text/admin/Using_Tigase/Licensing.asciidoc[]
+
+include::text/admin/Using_Tigase/Advanced_Options.asciidoc[]
+
+include::text/admin/Using_Tigase/Clustering.asciidoc[]
+
+include::text/admin/Using_Tigase/Anonymous_Users.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Addendum/Statistics_Descriptions.asciidoc[]
+
+:leveloffset: 1
+
+
+= Appendix II - Properties Guide
+
+:leveloffset: 2
+
+include::text/properties/admins.asciidoc[]
+
+include::text/properties/authRepository.asciidoc[]
+
+include::text/properties/bind-ext-hostnames.asciidoc[]
+
+include::text/properties/bosh-close-connection.asciidoc[]
+
+include::text/properties/bosh-extra-headers-file.asciidoc[]
+
+include::text/properties/certificate-container.asciidoc[]
+
+include::text/properties/cl-comp.asciidoc[]
+
+include::text/properties/client-access-policy-file.asciidoc[]
+
+include::text/properties/client-port-delay-listening.asciidoc[]
+
+include::text/properties/cluster-mode.asciidoc[]
+
+include::text/properties/cluster-nodes.asciidoc[]
+
+include::text/properties/cm-ht-traffic-throttling.asciidoc[]
+
+include::text/properties/cm-traffic-throttling.asciidoc[]
+
+include::text/properties/component.asciidoc[]
+
+include::text/properties/config-type.asciidoc[]
+
+include::text/properties/cross-domain-policy-file.asciidoc[]
+
+include::text/properties/dataSource.asciidoc[]
+
+include::text/properties/debug.asciidoc[]
+
+include::text/properties/debug-packages.asciidoc[]
+
+include::text/properties/domain-filter-policy.asciidoc[]
+
+include::text/properties/elements-number-list.asciidoc[]
+
+include::text/properties/external.asciidoc[]
+
+include::text/properties/hardened-mode.asciidoc[]
+
+include::text/properties/max-queue-size.asciidoc[]
+
+include::text/properties/monitoring.asciidoc[]
+
+include::text/properties/net-buff-high-throughput.asciidoc[]
+
+include::text/properties/net-buff-standard.asciidoc[]
+
+include::text/properties/new-connections-throttling.asciidoc[]
+
+include::text/properties/nonpriority-queue.asciidoc[]
+
+include::text/properties/plugins.asciidoc[]
+
+include::text/properties/queue-implementation.asciidoc[]
+
+include::text/properties/roster-implementation.asciidoc[]
+
+include::text/properties/s2s-ejabberd-bug-workaround-active.asciidoc[]
+
+include::text/properties/s2s-secret.asciidoc[]
+
+include::text/properties/script-dir.asciidoc[]
+
+include::text/properties/seeOtherHost.asciidoc[]
+
+include::text/properties/ssl-container-class.asciidoc[]
+
+include::text/properties/stats.asciidoc[]
+
+include::text/properties/stream-error-counter.asciidoc[]
+
+include::text/properties/stringprep-proecssor.asciidoc[]
+
+include::text/properties/test.asciidoc[]
+
+include::text/properties/tls-jdk-nss-bug-workaround-active.asciidoc[]
+
+include::text/properties/trusted.asciidoc[]
+
+include::text/properties/user-domain-repo-pool.asciidoc[]
+
+include::text/properties/user-repo-pool.asciidoc[]
+
+include::text/properties/user-repo-pool-size.asciidoc[]
+
+include::text/properties/vhost-anonymous-enabled.asciidoc[]
+
+include::text/properties/vhost-disable-dns-check.asciidoc[]
+
+include::text/properties/vhost-max-users.asciidoc[]
+
+include::text/properties/vhost-message-forward-jid.asciidoc[]
+
+include::text/properties/vhost-presence-forward-jid.asciidoc[]
+
+include::text/properties/vhost-register-enabled.asciidoc[]
+
+include::text/properties/vhost-tls-required.asciidoc[]
+
+include::text/properties/virtual-hosts.asciidoc[]
+
+include::text/properties/watchdog_delay.asciidoc[]
+
+include::text/properties/watchdog_ping_type.asciidoc[]
+
+include::text/properties/watchdog-timeout.asciidoc[]
+
+include::text/properties/ws-allow-unmasked-frames.asciidoc[]

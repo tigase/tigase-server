@@ -601,8 +601,7 @@ public class VHostItem
 		try {
 			domainFilter = DomainFilterPolicy.valueof(tmp);
 			if (domainFilter == null) {
-				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
-						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+				domainFilter = defaults.getDomainFilter();
 			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST
 					|| domainFilter == DomainFilterPolicy.CUSTOM) {
 				tmp = Command.getFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL);
@@ -714,8 +713,7 @@ public class VHostItem
 			domainFilter = DomainFilterPolicy.valueof(elem.getAttributeStaticStr(
 					DOMAIN_FILTER_POLICY_ATT));
 			if (domainFilter == null) {
-				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
-						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+				domainFilter = defaults.getDomainFilter();
 			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST
 					|| domainFilter == DomainFilterPolicy.CUSTOM) {
 				String tmp = elem.getAttributeStaticStr(DOMAIN_FILTER_POLICY_DOMAINS_ATT);
@@ -837,8 +835,7 @@ public class VHostItem
 						}
 					}
 					if ( domainFilter == null ){
-						domainFilter = DomainFilterPolicy.valueof( System.getProperty(
-								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString() ) );
+						domainFilter = defaults.getDomainFilter();
 					}
 				} catch (Exception e) {
 					domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
@@ -1102,8 +1099,7 @@ public class VHostItem
 	 */
 	public DomainFilterPolicy getDomainFilter() {
 		if (domainFilter == null) {
-			domainFilter = DomainFilterPolicy.valueof(System.getProperty(
-					DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+			domainFilter = defaults.getDomainFilter();
 		}
 
 		return domainFilter;

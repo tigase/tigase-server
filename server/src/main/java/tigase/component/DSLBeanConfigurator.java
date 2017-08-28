@@ -201,7 +201,9 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 				if (forBean.isActive()) {
 					if (RegistrarBean.class.isAssignableFrom(bc.getClazz())) {
 						Kernel subkernel = bc.getKernel();
-						dumpConfiguration(forBean, subkernel);
+						if (subkernel != kernel) {
+							dumpConfiguration(forBean, subkernel);
+						}
 					}
 
 					Object bean = bc.getKernel().getInstanceIfExistsOr(bc.getBeanName(), bc1 -> {

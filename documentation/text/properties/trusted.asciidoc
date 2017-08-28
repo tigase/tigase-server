@@ -1,0 +1,18 @@
+[[trusted]]
+= trusted
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2017: Formatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* `none`
+
+*Example:* `trusted = [ 'user@domain.com' , 'user-2@domain2.com' ]`
+
+*Possible values:* comma separated list of user bare JIDs.
+
+*Description:* The `trusted` property allows users to specify a list of accounts which are considered as trusted, thus whom can perform some specific actions on the server. They can execute some commands, send a broadcast message, set MOTD and so on. The configuration is similar to xref:admins[`admins`] setting.
+
+*Available since:* 7.2.0

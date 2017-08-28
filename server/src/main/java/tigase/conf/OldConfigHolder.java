@@ -549,7 +549,7 @@ public class OldConfigHolder {
 					if (k.equals(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY)) {
 						props.put(authPrefix + "/cls", v);
 					} else if (k.equals(RepositoryFactory.AUTH_REPO_POOL_CLASS_PROP_KEY)) {
-						props.put(authPrefix + "/pool-cls", v);
+						props.put(authPrefix + "/pool-class", v);
 					} else if (k.equals(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY)) {
 						props.put(authPrefix + "/pool-size", v);
 					} else {
@@ -562,7 +562,7 @@ public class OldConfigHolder {
 					if (k.equals(RepositoryFactory.USER_REPO_CLASS_PROP_KEY)) {
 						props.put(userPrefix + "/cls", v);
 					} else if (k.equals(RepositoryFactory.USER_REPO_POOL_CLASS_PROP_KEY)) {
-						props.put(userPrefix + "/pool-cls", v);
+						props.put(userPrefix + "/pool-class", v);
 					} else if (k.equals(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY)) {
 						props.put(userPrefix + "/pool-size", v);
 					} else {
@@ -571,7 +571,7 @@ public class OldConfigHolder {
 				});
 			}
 			if (defAuthRepoPool != null) {
-				props.putIfAbsent(authPrefix, defAuthRepoPool);
+				props.putIfAbsent(authPrefix + "/pool-size", defAuthRepoPool);
 			}
 		});
 
@@ -587,6 +587,8 @@ public class OldConfigHolder {
 			renameIfExists(props, ComponentProtocol.EXTCOMP_BIND_HOSTNAMES,
 						   ComponentProtocol.EXTCOMP_BIND_HOSTNAMES_PROP_KEY,
 						   value -> Arrays.asList(((String) value).split(",")));
+		} else {
+			props.remove(ComponentProtocol.EXTCOMP_BIND_HOSTNAMES);
 		}
 
 		String admins = (String) props.remove("--admins");

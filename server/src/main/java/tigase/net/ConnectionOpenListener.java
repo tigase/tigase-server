@@ -145,6 +145,10 @@ public interface ConnectionOpenListener {
 	 * 
 	 */
 	int getTrafficClass();
+
+	default long getNewConnectionsThrottling() {
+		return ConnectionOpenThread.def_5222_throttling;
+	}
 }    // ConnectionOpenListener
 
 

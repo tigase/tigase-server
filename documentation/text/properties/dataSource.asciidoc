@@ -1,0 +1,64 @@
+[[dataSource]]
+= authRepository
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:date: 2017-06-29 07:50
+:version: v2.0, June 2017: Formatted for v7.2.0.
+
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Description:* Container specifying repository URIs.  This container replaces the old `auth-db-uri` and `user-db-uri` property types.
+
+*Default value:*
+[source,dsl]
+-----
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/tigasedb?user=tigase&password=tigase12'
+}
+-----
+Once your configuration is setup, you will see the uri of your user database here. If other databases need to be defined, they will be listed in the same dataSource bean.
+
+*Example:*
+[source,dsl]
+-----
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/tigasedb?user=tigase&password=tigase12'
+    }
+    'default-auth' () {
+        uri = 'jdbc:mysql://localhost/tigasedbath?user=tigase&password=tigase12'
+    }
+}
+-----
+
+*Possible values:* Broken down list of customized names for DB URIs.  Each name must have a defined uri property. DB name can be customized by the bean name.
+
+NOTE: URI name may be used as shorthand to define DB location URI in other containers, so be sure to name them uniquely.
+
+NOTE: default () URI setting replaces the `user-db-uri` as well as the `auth-repo-uri` property.
+
+[[dataRepoPoolSize]]
+== pool-size
+`DataSource` is an abstraction layer between any higher level data access repositories such as `userRepository` or `authRepository` and SQL database or JDBC driver to be more specific.
+Many implementations use `DataSource` for DB connections and in fact on many installations they also share the same DataRepository instance if they connect to the same DB. In this case it is desired to use a specific connection pool on this level to an avoid excessive number of connections to the database.
+
+To do so, specify the number of number of database connection as an interger:
+
+[source,dsl]
+-----
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/tigasedb?user=tigase&password=tigase12'
+        'pool-size' = '50'
+    }
+}
+-----
+
+By default, the number of connections is 10.
+
+
+
+*Available since:* 7.2.0

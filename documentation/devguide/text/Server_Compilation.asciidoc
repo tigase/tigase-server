@@ -1,0 +1,79 @@
+[[serverCompilation]]
+= Server Compilation
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-08-08 12:42
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Tigase XMPP Server Project uses Maven for compilation.  For details on Maven and it's use, please see the xref:usingMaven[Maven Guide.]
+
+== Distribution Packages
+Once Compiled, Tigase creates two separate distribution archives:
+
+- *-dist* is a minimal version containing only tigase-server, tigase-xmltools and tigase-utils, MUC, Pubsub, and HTTP.
+- *-dist-max* is a version containing all additional tigase components as well as dependencies required by those components.
+
+They will be available as both zip and tarball.
+
+== Building Server and Generating Packages
+After cloning tigase-server repository:
+
+[source,bash]
+-----
+git clone https://repository.tigase.org/git/tigase-server.git
+cd tigase-server
+-----
+
+You compile server with maven using project distribution profile (dist):
+
+[source,bash]
+-----
+mvn -Pdist clean install
+-----
+
+This will:
+
+- compile server binaries.
+- generate javadoc documentation in distribution-docs/javadoc directory.
+- grab all latest versions of all declared dependencies and put them in jars/ directory.
+- create both types of distribution packages (-dist and -dist-max) and place them in distribution-packages/ directory.
+
+However, in order for them to succeed you have to build the server first using maven as described earlier.
+
+== Shortcut for building
+If you wish to just build Tigase XMPP server to just a minimum standard just to make sure the server will compile, you may use the following command:
+[source,bash]
+-----
+mvn clean install
+-----
+
+This will:
+
+- Build Tigase XMPP tigase-server jar in tigase-server/jars.
+
+This will not incorporate dependencies or javadoc.
+
+== Documentation
+If you wish to build documentation as well as the distribution packages, you will need to run the following command:
+[source,bash]
+-----
+mvn -Pdoc clean install
+-----
+
+This will do the same as -Pdist command, but will also build documentation in the archive as well as distribution-docs/ in epub, html, html-chunk and PDF formats.
+
+
+== Running Server
+Afterwards you can run the server with the regular shell script from within `server` module:
+
+[source,bash]
+-----
+cd server
+./scripts/tigase.sh start etc/tigase.conf
+-----
+
+Please bear in mind, that you need to provide correct setup in etc/config.tdsl configuration files for the server to work correctly.

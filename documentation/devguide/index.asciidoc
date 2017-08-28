@@ -1,0 +1,143 @@
+= Tigase Development Guide
+Tigase Team <team@tigase.com>
+:toc:
+:numbered:
+:website: http://tigase.net
+
+:leveloffset: 1
+:no title:
+:no author:
+
+//Tigase Development Guide
+
+//intro
+include::text/Basic_Information.asciidoc[]
+
+include::text/CodeStyleGuide.asciidoc[]
+
+//writing for Tigase
+include::text/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
+
+:leveloffset: 2
+
+include::text/API_Changes_in_Tigase_Server_5.x.asciidoc[]
+
+:leveloffset: 1
+
+include::text/Server_Compilation.asciidoc[]
+
+:leveloffset: 1
+include::text/Tigase_Kernel.asciidoc[]
+
+:leveloffset: 1
+include::text/Data_Sources_And_Repositories.asciidoc[]
+
+:leveloffset: 1
+
+//components
+include::text/Component_Implementation/Intro.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Component_Implementation/Basics.asciidoc[]
+
+include::text/Component_Implementation/Configuration.asciidoc[]
+
+include::text/Component_Implementation/Multi-threading.asciidoc[]
+
+include::text/Component_Implementation/Service_Discovery.asciidoc[]
+
+include::text/Component_Implementation/Statistics.asciidoc[]
+
+include::text/Component_Implementation/Scripting_Support.asciidoc[]
+
+include::text/Component_Implementation/Data_Repository.asciidoc[]
+
+include::text/Component_Implementation/Startup_Time.asciidoc[]
+
+:leveloffset: 1
+
+include::text/components/http-api/documentation/text/REST_API.asciidoc[]
+
+:leveloffset: 2
+
+include::text/components/http-api/documentation/text/HTTP_API_Scripting.asciidoc[]
+
+:leveloffset: 1
+
+include::text/Packet_Filtering_in_Component.asciidoc[]
+
+include::text/EventBus_API.asciidoc[]
+
+include::text/Cluster_Map_Interface.asciidoc[]
+
+:leveloffset: 1
+
+//plugins
+include::text/Plugin_Development/Intro.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Plugin_Development/Writing_Plugin_Code.asciidoc[]
+
+include::text/Plugin_Development/Configuration.asciidoc[]
+
+include::text/Plugin_Development/Packet_Processing.asciidoc[]
+
+include::text/Plugin_Development/SASL_Custom.asciidoc[]
+
+:leveloffset: 1
+
+//maven
+
+include::text/Using_Maven/Using_Maven.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Using_Maven/Maven_In_Windows.asciidoc[]
+
+include::text/Using_Maven/A_Very_Short_Maven_Guide.asciidoc[]
+
+include::text/Using_Maven/Maven_2.x_Support.asciidoc[]
+
+:leveloffset: 1
+
+//Tests
+
+include::text/Tests/Tests.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Tests/Tigase_Test_Suite.asciidoc[]
+
+include::text/Tests/Test_Suite_Scripting_Language.asciidoc[]
+
+include::text/Tests/Writing_Tests_for_Plugins.asciidoc[]
+
+include::text/Tests/Test_Case_Parameters_Description.asciidoc[]
+
+:leveloffset: 1
+
+//experimental
+include::text/Experimental/Experimental.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Experimental/Dynamic_Rosters.asciidoc[]
+
+include::text/Experimental/Mobile_Optimizations.asciidoc[]
+
+include::text/Experimental/Bosh_Session_Cache.asciidoc[]
+//Old
+
+:leveloffset: 1
+
+include::text/Old_Stuff/Old_Stuff.asciidoc[]
+
+include::text/Old_Stuff/Tigase_DB_Schema_Explained.asciidoc[]
+
+include::text/Old_Stuff/Why_the_Most_Recent_JDK.asciidoc[]
+
+include::text/Old_Stuff/Virtual_Domains_Management_API.asciidoc[]
+
+include::text/Old_Stuff/Stanza_Limitations.asciidoc[]

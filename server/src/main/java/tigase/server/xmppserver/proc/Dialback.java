@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "Dialback", parent = S2SConnectionManager.class, active = true)
+@Bean(name = "dialback", parent = S2SConnectionManager.class, active = true)
 public class Dialback
 				extends S2SAbstractProcessor {
 	private static final Logger log                =
@@ -75,8 +75,8 @@ public class Dialback
 	private long authenticationTimeOut = 30;
 
 	// Ejabberd does not request dialback after TLS (at least some versions don't)
-	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd")
-	private boolean ejabberd_bug_workaround_active = false;
+	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd", alias = "ejabberd-bug-workaround")
+	private boolean ejabberd_bug_workaround_active = true;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -88,11 +88,6 @@ public class Dialback
 	 */
 	public Dialback() {
 		super();
-		if (System.getProperty("s2s-ejabberd-bug-workaround-active") == null) {
-			System.setProperty("s2s-ejabberd-bug-workaround-active", "true");
-		}
-		ejabberd_bug_workaround_active =
-			Boolean.getBoolean("s2s-ejabberd-bug-workaround-active");
 	}
 
 	//~--- methods --------------------------------------------------------------
