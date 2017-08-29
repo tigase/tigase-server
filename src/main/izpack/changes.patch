@@ -181,6 +181,15 @@ index 60e52dc..b29e756 100644
              </fileset>
          </jar>
      </target>
+@@ -1251,7 +1315,7 @@
+ 
+     <!-- Makes everything, from compilation, customer and javadoc to generating an installer. -->
+     <target name="dist"
+-            depends="src.tar.gz, all, create.docu, generate.installer"
++            depends="src.tar.gz, all, generate.installer"
+             description="makes a complete installer"/>
+ 
+     <!-- Makes everything, from Cleaning to generating both installers: normal and reg support. -->
 diff --git a/src/lib/com/izforge/izpack/installer/ConsoleHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
 new file mode 100644
 index 0000000..6a40663
