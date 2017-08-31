@@ -771,7 +771,7 @@ public class JabberIqPrivacy
 		return result;
 	}
 
-	@Bean(name = "offlineSessionProvider", parent = JabberIqPrivacy.class, active = true)
+	@Bean(name = "offlineSessionProvider", parent = JabberIqPrivacy.class, active = false)
 	public static class DummySessionManagerHandler implements SessionManagerHandler {
 
 		private JID compId = JID.jidInstanceNS("privacy-sessman", DNSResolverFactory.getInstance().getDefaultHost());
