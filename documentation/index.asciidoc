@@ -189,26 +189,7 @@ include::text/admin/Components/Message_Archiving.asciidoc[]
 
 include::text/admin/Components/Advanced_Message_Processing.asciidoc[]
 
-include::text/components/pubsub/documentation/text/Overview.asciidoc[]
-
-:leveloffset: 3
-
-include::text/components/pubsub/documentation/text/Announcement.asciidoc[]
-include::text/components/pubsub/documentation/text/Database.asciidoc[]
-include::text/components/pubsub/documentation/text/Configuration.asciidoc[]
-include::text/components/pubsub/documentation/text/Schema_Changes.asciidoc[]
-include::text/components/pubsub/documentation/text/Features.asciidoc[]
-
-:leveloffset: 4
-
-include::text/components/pubsub/documentation/text/features/AdHocCommands.asciidoc[]
-include::text/components/pubsub/documentation/text/features/PubSub_Node_Presence_Protocol.asciidoc[]
-include::text/components/pubsub/documentation/text/features/OfflineMessagesSink.asciidoc[]
-include::text/components/pubsub/documentation/text/features/REST_API.asciidoc[]
-
-:leveloffset: 3
-
-include::text/components/pubsub/documentation/text/Limitations.asciidoc[]
+include::text/components/pubsub/documentation/doclink.asciidoc[]
 
 :leveloffset: 2
 
