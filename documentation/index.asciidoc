@@ -398,8 +398,6 @@ include::text/properties/tls-jdk-nss-bug-workaround-active.asciidoc[]
 
 include::text/properties/trusted.asciidoc[]
 
-include::text/properties/user-domain-repo-pool.asciidoc[]
-
 include::text/properties/vhost-anonymous-enabled.asciidoc[]
 
 include::text/properties/vhost-disable-dns-check.asciidoc[]

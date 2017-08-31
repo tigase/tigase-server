@@ -35,6 +35,8 @@ userRepository {
 Unless specified, the pool class will use the one included with Tigase.  You may configure individual repositories in the same way.
 This replaces the former `--user-repo-pool` property.
 
+NOTE: File conversion will not remove and convert this property, it *MUST BE DONE MANUALLY*.
+
 [[userRepoPoolSize]]
 == pool-size
 This property sets the database connections pool size for the associated `UserRepository`.
