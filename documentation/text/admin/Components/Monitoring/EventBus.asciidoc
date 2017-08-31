@@ -2,8 +2,6 @@
 = Eventbus
 :author: Bartosz Malkowski
 :version: v2.0 September 2015. Reformatted for v7.2.0.
-:date: 2015-04-09 8:56
-
 
 :toc:
 :numbered:
@@ -84,11 +82,11 @@ Available Options
 . `threshold` - Minimal percent of disconnected users required to generate alarm.
 
 == Configuration
-Configuration of the eventbus monitor can be done one of two ways; either by lines in init.properties file, or by sending XMPP stanzas to the server.  You may also send XMPP stanzas VIA HTTP REST.
-XMPP stanza configurations will override ones in init.properties, but they will only last until the server restarts.
+Configuration of the eventbus monitor can be done one of two ways; either by lines in config.tdsl file, or by sending XMPP stanzas to the server.  You may also send XMPP stanzas VIA HTTP REST.
+XMPP stanza configurations will override ones in config.tdsl, but they will only last until the server restarts.
 
-=== init.properties
-Tasks can be configured in the init.properties file. See xref:availableTasks[available tasks] for the tasks that can be setup.
+=== config.tdsl
+Tasks can be configured in the config.tdsl file. See xref:availableTasks[available tasks] for the tasks that can be setup.
 
 To enable a specific monitor task, use the following line:
 [source,dsl]
@@ -277,7 +275,7 @@ For versions older than 7.1.0 TSMME requires two files to operate:
 
 === Configuration
 
-Tigase Mailer Extention may be configured via the init.properties file in the following manner:
+Tigase Mailer Extention may be configured via the config.tdsl file in the following manner:
 
 [source,dsl]
 -----

@@ -1,9 +1,7 @@
 [[customLogging]]
 = Settings for Custom Logging in Tigase
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:version: v1.0, April 2017
-:date: 2017-04-04 09:08
-:revision: v2.0 Reformatted for v7.2.0
+:version: v2.0 April 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -57,10 +55,3 @@ You only need to specify the settings you wish to customize, otherwise they will
 . *ConsoleHandler* - Determines the formatting for Tigase output to console.
 .. *level* - specifies the level of logs to be written, default is WARNING.
 .. *formatter* - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
-
-You can still use the old logging configuration as well.  However we only recommend using this on basic installations.
-[source,properties]
------
---debug=server
---debug-packages=tigase.conf
------

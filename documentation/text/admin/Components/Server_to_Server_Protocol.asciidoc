@@ -1,9 +1,7 @@
 [[v5xs2sps]]
 = Server to Server Protocol Settings
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-06-29 21:27
-:revision: v2.1
+:version: v2.0 August 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -29,7 +27,7 @@ Tigase server offers 2 different parameters to tweak the number of concurrent, s
 
 - `max-out-total-conns` - this property specifies the maximum outgoing connections the Tigase server opens to any remote XMPP server. This is a *per domain* limit, which means that this limit applies to each of the remote domains Tigase connects to. If it is set to `4` then Tigase opens a maximum of 4 connections to `jabber.org` plus maximum 4 connections to `muc.jabber.org` even if this is the same physical server behind the same IP address.
 +
-To adjust the limit you have to add following to the `init.properties` file:
+To adjust the limit you have to add following to the `config.tdsl` file:
 +
 [source,dsl]
 -----
@@ -40,7 +38,7 @@ s2s {
 
 - `max-out-per-ip-conns` - this property specifies the maximum outgoing connections Tigase server opens to any remote XMPP server to its single IP address. This too, is *per domain* limit, which means that this limit applies to each of the remote domains Tigase connects to. If it is set to `1`, and the above limit is set to `4`, and the remote server is visible behind 1 IP address, then Tigase opens a maximum of 1 connection to `jabber.org` plus a maximum of 1 connection to `muc.jabber.org` and other subdomains.
 +
-To adjust the limit you have to add following line to the init.properties file:
+To adjust the limit you have to add following line to the config.tdsl file:
 +
 [source,dsl]
 -----
@@ -80,7 +78,7 @@ s2s {
 == Custom Plugin: Selecting s2s Connection
 Sometimes for very large installations you may want to set larger number of s2s connections to remote servers, especially if they work in cluster of several nodes. In such a case you can also have a control over XMPP packets distribution among s2s connections to a single remote server.
 
-This piece of code is pluggable and you can write your own connection selector. It is enough to implement `S2SConnectionSelector` interface and set your class name in the configuration using following parameter in `init.properties` file:
+This piece of code is pluggable and you can write your own connection selector. It is enough to implement `S2SConnectionSelector` interface and set your class name in the configuration using following parameter in `config.tdsl` file:
 
 [source,dsl]
 -----
@@ -101,3 +99,18 @@ s2s {
     'skip-tls-hostnames' = [ 'domain1', 'domain2' ]
 }
 -----
+
+[[s2sEjabberdBugWorkaroundActive]]
+== ejabberd-bug-workaround
+This property activates a workaround for a bug in EJabberd in it's s2s implementation. EJabberd does not send dialback in stream features after TLS handshaking even if the dialback is expected/needed. This results in unusable connection as EJabberd does not accept any packets on this connection either. The workaround is enabled by default right now until the EJabberd version without the bug is popular enough. A disadvantage of the workaround is that dialback is always performed even if the SSL certificate is fully trusted and in theory this dialback could be avoided.  By default, this is not enabled.
+
+[source,dsl]
+-----
+s2s {
+    dialback () {
+        'ejabbered-bug-workaround' = true
+        }
+}
+-----
+
+This replaces the old `--s2s-ejabberd-bug-workaround-active` property.

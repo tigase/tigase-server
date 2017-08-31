@@ -1,9 +1,6 @@
 [[loadBalancingExternalComponent]]
 = Load Balancing External Components in Cluster Mode
-:author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2011-07-09 22:45
-:revision: v2.1
+:version: v2.0, August 2017: Reformatted for 7.2.0.
 
 :toc:
 :numbered:
@@ -33,34 +30,49 @@ We have a single machine running Tigase XMPP Server and 2 instances of the MUC c
 
 The server configuration
 
-[source,bash]
+[source,dsl]
 -----
-config-type = --gen-config-def
---user-db = mysql
---admins = admin@devel.tigase.org
---user-db-uri = jdbc:mysql://localhost/db?user=tigase&password=tigase
---virt-hosts = devel.tigase.org
-
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
---external = muc.devel.tigase.org:muc-secret:listen:\
-       5270:devel.tigase.org:accept:ReceiverBareJidLB
+admins = [ 'admin@devel.tigase.org' ]
+'config-type' = 'default'
+'virtual-hosts' = [ 'devel.tigase.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+ext (class: tigase.server.ext.ComponentProtocol) {
+    repository {
+        items = [ 'muc.devel.tigase.org:muc-secret:listen:5270:devel.tigase.org:accept:ReceiverBareJidLB' ]
+    }
+}
+'sess-man' () {}
 -----
 
 And configuration for both instances of the MUC component (identical for both of them):
 
-[source,bash]
+[source,dsl]
 -----
-config-type = --gen-config-comp
---user-db = mysql
---admins = admin@devel.tigase.org
---user-db-uri = jdbc:mysql://localhost/db?user=tigase&password=tigase
---virt-hosts = devel.tigase.org
-
---comp-name-1 = muc
---comp-class-1 = tigase.muc.MUCComponent
---external = muc.devel.tigase.org:muc-secret:connect:\
-       5270:devel.tigase.org:accept
+admins = [ 'admin@devel.tigase.org' ]
+'config-type' = 'component'
+'virtual-hosts' = [ 'devel.tigase.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+muc (class: tigase.muc.MUCComponent) {}
 -----
 
 For those familiar with Tigase's configuration, this should be pretty basic. The difference is one small element in the server configuration. At the end of the component connection we have *ReceiverBareJidLB*.
@@ -80,39 +92,58 @@ image:images/admin/ExternalCompClustering003_0.png[]
 
 We want to make it possible to connect the MUC component to all nodes, so here is configuration for the server (for each node is the same):
 
-[source,bash]
+[source,dsl]
 -----
-config-type=--gen-config-def
---admins=admin@xmpp-test.org
---virt-hosts = xmpp-test.org
-
---cluster-mode = true
---cluster-nodes=red.xmpp-test.org,green.xmpp-test.org,blue.xmpp-test.org
-
---auth-db=tigase-auth
---user-db=mysql
---user-db-uri=jdbc:mysql://localhost/db?user=tigase&password=tigase
-
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
---external = muc.xmpp-test.org:muc-secret:listen:5270:\
-       xmpp-test.org:accept:ReceiverBareJidLB
+admins = [ 'admin@xmpp-test.org' ]
+'cluster-mode' = true
+'cluster-nodes' = [ 'red.xmpp-test.org', 'green.xmpp-test.org', 'blue.xmpp-test.org' ]
+'config-type' = 'default'
+'virtual-hosts' = [ 'xmpp-test.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {
+        cls = 'tigase.db.jdbc.TigaseAuth'
+    }
+}
+ext (class: tigase.server.ext.ComponentProtocol) {
+    repository {
+        items = [ 'muc.xmpp-test.org:muc-secret:listen:5270:xmpp-test.org:accept:ReceiverBareJidLB' ]
+    }
+}
+'sess-man' () {}
 -----
 
 As you can see there is nothing special here. The most interesting part comes on the MUC side.
 
-[source,bash]
+[source,dsl]
 -----
-config-type = --gen-config-comp
---user-db = mysql
---admins = admin@xmpp-test.orgg
---user-db-uri = jdbc:mysql://localhost/db?user=tigase&password=tigase
-
---virt-hosts = xmpp-test.org
-
---comp-name-1 = muc
---comp-class-1 = tigase.muc.MUCComponent
---external = muc.xmpp-test.org:muc-secret:connect:5270:xmpp-test.org;blue.xmpp-test.org;green.xmpp-test.org,red.xmpp-test.org:accept
+admins = [ 'admin@xmpp-test.orgg' ]
+'config-type' = 'component'
+'virtual-hosts' = [ 'xmpp-test.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+ext (class: tigase.server.ext.ComponentProtocol) {
+    repository {
+        items = [ 'muc.xmpp-test.org:muc-secret:connect:5270:xmpp-test.org', 'blue.xmpp-test.org', 'green.xmpp-test.org', 'red.xmpp-test.org:accept' ]
+    }
+}
+muc (class: tigase.muc.MUCComponent) {}
 -----
 
 As you can see remote host name is not a simple domain but a character string with a few comma separated parts. The first part is our remote domain and the rest are addresses of the host to connect to. This can be a list of domain names or IP addresses.

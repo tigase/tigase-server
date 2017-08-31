@@ -1,8 +1,8 @@
 [[loadBalancing]]
 = Tigase Load Balancing
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.1, June 2017: Reformatted for 7.2.0.
-:date: 2013-06-10 15:49
+::::::::::::: incomplete
+:version: v2.1, August 2017: Reformatted for 7.2.0.
 
 :toc:
 :numbered:
@@ -15,16 +15,24 @@ Tigase implementation is, as usual, extensible and allows for different, pluggab
 
 Currently there are three strategies available:
 
-- `SeeOtherHost` - most basic implementation returning either single host configured in init.properties file or name of the current host;
-- `SeeOtherHostHashed` (default) - default implementation for cluster environment of SeeOtherHostIfc returning redirect host based on the hash value of the user's JID; list of the available nodes from which a selection would be made is by default composed and reflects all connected nodes, alternatively hosts list can be configured in the init.properties;
+- `SeeOtherHost` - most basic implementation returning either single host configured in config.tdsl file or name of the current host;
+- `SeeOtherHostHashed` (default) - default implementation for cluster environment of SeeOtherHostIfc returning redirect host based on the hash value of the user's JID; list of the available nodes from which a selection would be made is by default composed and reflects all connected nodes, alternatively hosts list can be configured in the config.tdsl;
 - `SeeOtherHostDB` - extended implementation of SeeOtherHost using redirect information from database in the form of pairs `user_id` and `node_id` to which given user should be redirected.
 
 == Configuration Options
-The most basic configuration is related to the choice of actual redirection implementation:
+The most basic configuration is related to the choice of actual redirection implementation by declaring class for each connector:
 
-[source,bash]
+[source,dsl]
 ----
---cm-see-other-host=
+bosh {
+    seeOtherHost (class: <value>) {}
+}
+c2s {
+    seeOtherHost (class: <value>) {}
+}
+ws2s {
+    seeOtherHost (class: <value>) {}
+}
 ----
 
 Possible values are:
@@ -35,20 +43,20 @@ Possible values are:
 - `tigase.server.xmppclient.SeeOtherHostDualIP`
 - `none` - disables redirection
 
-All the remaining options are configured on a per-connection-manager basis, thus all options need to be prefixed with the corresponding connection manager ID, i.e. c2s, bosh or ws; we will use c2s in the examples:
+All options are configured on a per-connection-manager basis, thus all options need to be prefixed with the corresponding connection manager ID, i.e. c2s, bosh or ws; we will use c2s in the examples:
 
 [source,dsl]
 -----
 c2s {
     'cm-see-other-host' {
         'default-host' = 'host1;host2;host3'
-        'active' = OPEN;LOGIN
+        'active' = LOGIN
     }
 }
 -----
 
 - `'default-host' = 'host1;host2;host3'` - a semicolon separated list of hosts to be used for redirection.
-- `'active' = 'OPEN;LOGIN'` - a semicolon separated list of phases in which redirection should be active, currently possible values are:
+- `'active' =`  - a semicolon separated list of phases in which redirection should be active, currently possible values are:
   * `OPEN` which enables redirection during opening of the XMPP stream;
   * `LOGIN` which enables redirection upon authenticating user session;
 
@@ -66,7 +74,7 @@ c2s {
 }
 -----
 
-- `db-url` - a JDBC connection URI which should be used to query redirect information; if not configured --user-db-uri will be used;
+- `db-url` - a JDBC connection URI which should be used to query redirect information; if not configured the default `dataSource` will be used;
 - `get-host-query` - a SQL query which should return redirection hostname;
 - `get-all-data-query` - a SQL helper query which should return all redirection data from database;
 - `get-all-query-timeout` - allows to set timeout for executed queries.
@@ -74,20 +82,21 @@ c2s {
 === SeeOtherHostDualIP
 This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `tig_cluster_nodes` table will be used (and appropriate repository implementation will be used).
 
-To enable this redirection mechanism following configuration / class should be used:
+To enable this redirection mechanism following configuration / class should be used.  Note that for global use, all connection managers must have the same class defined.  You can define each connection manager individually.
 
-[source,bash]
+[source,dsl]
 ----
---cm-see-other-host=tigase.server.xmppclient.SeeOtherHostDualIP
-----
-
-It's possible to configure it on per-connection-manager basis
-[source,bash]
-----
-connector {
-    'cm-see-other-host' = 'tigase.server.xmppclient.SeeOtherHostDualIP'
+bosh {
+    seeOtherHost (class: tigase.server.xmppclient.SeeOtherHostDualIP) {}
+}
+c2s {
+    seeOtherHost (class: tigase.server.xmppclient.SeeOtherHostDualIP) {}
+}
+ws2s {
+    seeOtherHost (class: tigase.server.xmppclient.SeeOtherHostDualIP) {}
 }
 ----
+
 
 It offers following configuration options:
 
@@ -191,7 +200,7 @@ INTERNAL_IP=" -Dtigase-primary-address=hostname.local "
 EXTERNAL_IP=" -Dtigase-secondary-address=hostname "
 ----
 
-or in the `etc/init.properties` (they will be converted to JVM properties):
+or in the `etc/config.tdsl` (they will be converted to JVM properties):
 [source,bash]
 ----
 --tigase-resolver-class=tigase.util.DNSResolverDefault

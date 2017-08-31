@@ -1,9 +1,7 @@
 [[virtualComponents]]
 = Virtual Components for the Cluster Mode
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2017: Reformatted for v7.2.
-:date: 2010-04-06 21:18
-:revision: v2.1
+:version: v2.0 August 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -19,13 +17,13 @@ Virtual component is a very lightweight ServerComponent implementation in Tigase
 
 Configuration is very simple and straightforward, in fact it is very similar to configuration of any Tigase component. You set a real component name as a name of the component and a virtual component class name to load. Let's say we want to deploy MUC component this way. The MUC component is visible as `muc.domain.oug` in the installation. Thus the name of the component is: `muc`
 
-[source,bash]
+[source,dsl]
 -----
 muc (class: tigase.cluster.VirtualComponent) {}
 -----
 This is pretty much all you need to load a virtual component. A few other options are needed to point to correct destination addresses for packets forwarding and to set correct service discovery parameters:
 
-[source,bash]
+[source,dsl]
 -----
 }
 muc (class: tigase.cluster.VirtualComponent) {

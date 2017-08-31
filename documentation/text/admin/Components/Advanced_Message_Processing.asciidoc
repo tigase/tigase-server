@@ -2,7 +2,6 @@
 = Advanced Message Processing - AMP XEP-0079
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2014: Reformatted for v7.2.0.
-:date: 2010-05-13 16:09
 
 :toc:
 :numbered:
@@ -64,7 +63,7 @@ There is also one parameter shared between the component and the plugin. Connect
 
 By default the same physical database as for `UserRepository` is used but you can change it and store messages in a completely separate location to reduce performance degradation of rest of the system. You can set a database connection string using following property:
 
-[source,bash]
+[source,dsl]
 -----
 dataSource {
     'default-amp' () {
@@ -77,9 +76,9 @@ The link:http://xmpp.org/extensions/xep-0079.html[XEP-0079] specification has a 
 
 Tigase's implementation offers 3 modes to handle `AMP` requests to prevent revealing user's status to non-authorized users:
 
-[source,bash]
+[source,dsl]
 -----
---amp-security-level=STRICT
+'amp-security-level' = 'STRICT'
 -----
 
 In this mode the server performs strict checking. The `AMP` specification is fully handled. This however involves roster loading for each offline user, hence it may impact the service performance. It may not be feasible or possible to run in this mode for services under a high load with lots of AMP messages.
@@ -88,9 +87,9 @@ In the XEP this mode is described in the following way:
 
 _Accept the relevant condition only if the sender is authorized to receive the receiver's presence, as a result of which the server MUST reply with a <not-acceptable/> error condition if the sender is not so authorized; this is the RECOMMENDED behavior. This is also the default in Tigase._
 
-[source,bash]
+[source,dsl]
 -----
---amp-security-level=PERFORMANCE
+'amp-security-level' = 'PERFORMANCE'
 -----
 
 Dummy checking is performed efficiently by just returning an error response every time there is a chance that the default action may reveal user status without looking into the user's roster. This does not affect performance but it does impact the `AMP` compliance.
@@ -101,7 +100,7 @@ _Accept the relevant condition only if the action is "drop", as a result of whic
 
 It does not do any checking. It acts like all users are authorized to receive notifications, even if it may reveal user status to unauthorized users. It does not impact the server performance and it offers full AMP compliance.
 
-[source,bash]
+[source,dsl]
 -----
---amp-security-level=NONE
+'amp-security-level' = 'NONE'
 -----
