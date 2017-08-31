@@ -181,23 +181,7 @@ include::text/admin/Components/Components.asciidoc[]
 
 :leveloffset: 2
 
-include::text/components/http-api/documentation/text/HTTP_Component_Configuration.asciidoc
-
-include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_File_Upload_Component.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_Pre_Bind_BOSH.asciidoc[]
-
-include::text/components/http-api/documentation/text/REST_API_Usage_Examples.asciidoc[]
-
-include::text/components/http-api/documentation/text/UI_Guide_Admin.asciidoc[]
-
-include::text/components/http-api/documentation/text/UI_Guide_Client.asciidoc[]
+include::text/components/http-api/documentation/doclink.asciidoc[]
 
 :leveloffset: 2
 
@@ -249,6 +233,8 @@ include::text/admin/Components/MUC.asciidoc[]
 include::text/admin/Components/Load_Balancing.asciidoc[]
 
 include::text/admin/Components/External_Component_Configuration/Intro.asciidoc[]
+
+// include::text/components/workgroup/documentation/text/doclink.asciidoc[]
 
 :leveloffset: 3
 
