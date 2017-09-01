@@ -1,8 +1,7 @@
 [[mongoDBSupport]]
 = Preparing Tigase for MongoDB
 :author: not known
-:version: v2.0 June, 2017. Reformatted for v7.2.0.
-:date: 2015-01-10 12:22
+:version: v2.0 August 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -12,13 +11,33 @@ Tigase now supports MongoDB for auth, settings, and storage repositories. If you
 
 == Dependencies
 
-To run Tigase MongoDB support library requires drivers for MongoDB for Java which can be downloaded from link:https://github.com/mongodb/mongo-java-driver/releases[here]. This driver needs to be placed in +/jars+ directory located in Tigase XMPP Server installation directory.
+To run Tigase MongoDB support library requires drivers for MongoDB for Java which can be downloaded from link:https://github.com/mongodb/mongo-java-driver/releases[here]. This driver needs to be placed in `/jars` directory located in Tigase XMPP Server installation directory.  If you are using a dist-max distrobution, it is already included.
 
 == Configuration
 
+Note that fresh installations of mondoDB do not come with users or databases installed.  Once you have setup mondoDB you will need to create a user to be used with Tigase.  To do this, bring up the mongo console by running mongo.exe in a cmd window for windows, or run mongo in linux.
+Once connected, enter then following:
+[source,bash]
+-----
+>use admin
+switched to admin
+>db.createUser (
+... {
+... user: "tigase"
+... pwd: "password"
+... roles: [ "root" ]
+... }
+... )
+-----
+
+Press shift + Enter to create new lines in the command and the shell will automatically add the three elipses.  Be sure to give this user a `root` role in order to properly write to the database.
+Once you receieve a `user sucessfully created` message, you are ready to install tigase on MongoDB.
+
+
+
 === Configuration of user repository for Tigase XMPP Server
 
-To configure Tigase XMPP Server to use MongoDB you need to set `dataSource` in etc/init.properties file to proper MongoDB URI pointing to which MongoDB database should be used (it will be created by MongoDB if it does not exist).
+To configure Tigase XMPP Server to use MongoDB you need to set `dataSource` in etc/config.tdsl file to proper MongoDB URI pointing to which MongoDB database should be used (it will be created by MongoDB if it does not exist).
 `userRepository` property should not be set to let Tigase XMPP Server autodetect proper implementation of `UserRepository`. Tigase XMPP Server will create proper collections in MongoDB if they do not exist so no schema files are necessary.
 
 Example configuration of XMPP Server pointing to MongoDB database `tigase_test` in a local instance:
@@ -26,7 +45,7 @@ Example configuration of XMPP Server pointing to MongoDB database `tigase_test` 
 -----
 dataSource {
     default () {
-        uri = 'mongodb://localhost/tigase_test'
+        uri = 'mongodb://user:pass@localhost/tigase_test'
     }
 }
 userRepository {
@@ -57,7 +76,7 @@ By default, MUC component will use MongoDB to store data if Tigase is configured
 [source,dsl]
 -----
 muc {
-    'history-db-uri' = 'mongodb://localhost/tigase_test'
+    'history-db-uri' = 'mongodb://user:pass@localhost/tigase_test'
 }
 -----
 If MUC components fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the `init.properties` file:
@@ -73,7 +92,7 @@ By default, PubSub component will use MongoDB to store data if Tigase is configu
 [source,dsl]
 -----
 pubsub {
-    'pubsub-repo-url' = 'mongodb://localhost/tigase_test'
+    'pubsub-repo-url' = 'mongodb://user:pass@localhost/tigase_test'
 }
 -----
 If the PubSub components fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the `init.properties` file:
@@ -89,7 +108,7 @@ By default, the Message Archiving component will use MongoDB to store data if Ti
 [source,dsl]
 -----
 'message-archive' {
-    'archive-repo-uri' = 'mongodb://localhost/tigase_test'
+    'archive-repo-uri' = 'mongodb://user:pass@localhost/tigase_test'
 }
 -----
 If Message Archiving component fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the `init.properties` file:
