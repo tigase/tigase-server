@@ -64,6 +64,7 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 	@Override
 	protected void registerBeans(Kernel kernel) {
 		super.registerBeans(kernel);
+		kernel.registerBean("userAuthRepository").asInstance(getRepository()).exportable().exec();
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean(JabberIqPrivacy.class).exec();
 		this.kernel = kernel;
