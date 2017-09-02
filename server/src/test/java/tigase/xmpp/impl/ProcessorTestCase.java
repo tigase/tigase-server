@@ -51,6 +51,7 @@ public abstract class ProcessorTestCase  {
 		String xmlRepositoryURI = "memory://xmlRepo?autoCreateUser=true";
 		repository = new XMLRepository();
 		repository.initRepository( xmlRepositoryURI, null );
+		kernel.registerBean("userAuthRepository").asInstance(repository).exportable().exec();
 		registerBeans(kernel);
 		loginHandler = new SessionManagerHandlerImpl();
 	}
@@ -66,6 +67,10 @@ public abstract class ProcessorTestCase  {
 
 	protected <T> T getInstance(String name) {
 		return kernel.getInstance(name);
+	}
+
+	protected XMLRepository getRepository() {
+		return repository;
 	}
 
 	protected void registerBeans(Kernel kernel) {

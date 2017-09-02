@@ -19,7 +19,9 @@
  */
 package tigase.xmpp.impl;
 
-import tigase.db.*;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
@@ -32,6 +34,7 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.sys.TigaseRuntime;
+import tigase.util.LRUConcurrentCache;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -420,49 +423,6 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 
 		public void setJids(BareJID[] jids) {
 			this.jids = jids;
-		}
-	}
-
-	private class LRUConcurrentCache<K, V> {
-
-		private final Map<K, V> cache;
-
-		public LRUConcurrentCache(final int maxEntries) {
-			this.cache = new LinkedHashMap<K, V>(maxEntries, 0.75F, true) {
-				private static final long serialVersionUID = -1236481390177598762L;
-
-				@Override
-				protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-					return size() > maxEntries;
-				}
-			};
-		}
-
-		public V get(K key) {
-			synchronized (cache) {
-				return cache.get(key);
-			}
-		}
-
-		public void put(K key, V value) {
-			synchronized (cache) {
-				cache.put(key, value);
-			}
-		}
-
-		public V remove(K key) {
-			synchronized (cache) {
-				return cache.remove(key);
-			}
-		}
-
-		public int size() {
-			return cache.size();
-		}
-
-		@Override
-		public String toString() {
-			return "LRUConcurrentCache{" + "cache=" + cache + '}';
 		}
 	}
 

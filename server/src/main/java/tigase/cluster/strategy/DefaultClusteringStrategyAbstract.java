@@ -30,6 +30,7 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
+import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Inject;
 import tigase.server.Iq;
 import tigase.server.Message;
@@ -107,6 +108,9 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	protected ClusterControllerIfc cluster = null;
 
 	// private ClusteringMetadataIfc<E> metadata = null;
+
+	@Inject
+	protected EventBus eventBus = null;
 
 	/** Field description */
 	@Inject
@@ -488,6 +492,10 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	
 	public SessionManagerClusteredIfc getSM() {
 		return this.sm;
+	}
+
+	public void fireEvent(Object event) {
+		eventBus.fire(event);
 	}
 }
 
