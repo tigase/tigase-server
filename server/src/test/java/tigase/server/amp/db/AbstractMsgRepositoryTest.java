@@ -93,7 +93,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 			SchemaLoader.Parameters params = loader.createParameters();
 			params.parseUri(uri);
 			params.setDbRootCredentials(null, null);
-			loader.init(params);
+			loader.init(params, Optional.empty());
 			loader.validateDBConnection();
 			loader.validateDBExists();
 			Assert.assertEquals(SchemaLoader.Result.ok, loader.loadSchema(Schema.SERVER_SCHEMA_ID, "7.2.0"));

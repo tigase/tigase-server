@@ -31,6 +31,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -173,7 +174,11 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	public abstract void execute(Parameters params);
 
-	public abstract void init(P props);
+	public abstract void init(P props, Optional<SchemaManager.RootCredentialsCache> rootCredentialsCache);
+
+	public void init(P props) {
+		init(props, Optional.empty());
+	}
 
 	public abstract List<String> getSupportedTypes();
 
