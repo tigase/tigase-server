@@ -36,6 +36,8 @@ import tigase.osgi.ModulesManagerImpl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -194,32 +196,45 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 		if (this.instances != null) {
 			toInitialize.removeAll(this.instances);
 		}
-		for (A repo :  toInitialize) {
-			try {
-				initRepository(repo);
-			} catch (RepositoryException ex) {
-				if (skipInitializationErrors) {
-					// maybe we should not ignore this error but delay initialization and await successful database initialization?
-					// or maybe we should unload this bean totally as it is not working as it should?
-					// Two things to consider:
-					// * initialization during bootstrap
-					// * initialization during reconfiguration of server
-					Logger.getLogger(this.getClass().getCanonicalName())
-							.log(Level.WARNING,
-								 "Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name +
-										 "'", ex);
-				} else {
-					throw new RuntimeException(
-							"Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name + "'",
-							ex);
+
+		if (!toInitialize.isEmpty()) {
+			Queue<ForkJoinTask<A>> tasks = new ArrayDeque<>();
+			final ForkJoinPool pool = new ForkJoinPool(Math.min(toInitialize.size(), 128));
+			for (A repo : toInitialize) {
+				tasks.offer(pool.submit(() -> {
+					try {
+						Thread.sleep(1000);
+						initRepository(repo);
+					} catch (RepositoryException ex) {
+						if (skipInitializationErrors) {
+							// maybe we should not ignore this error but delay initialization and await successful database initialization?
+							// or maybe we should unload this bean totally as it is not working as it should?
+							// Two things to consider:
+							// * initialization during bootstrap
+							// * initialization during reconfiguration of server
+							Logger.getLogger(this.getClass().getCanonicalName())
+									.log(Level.WARNING,
+										 "Could not initialize " + repo.getClass().getCanonicalName() + " for name '" +
+												 name + "'", ex);
+						} else {
+							throw new RuntimeException(
+									"Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name + "'",
+									ex);
+						}
+					}
+					return repo;
+				}));
+			}
+			ForkJoinTask<A> task;
+			while ((task = tasks.poll()) != null) {
+				A repo = task.join();
+				if (repository instanceof RepositoryPool && !(repo instanceof RepositoryPool)) {
+					((RepositoryPool<A>) repository).addRepo(repo);
 				}
 			}
-
-			if (repository instanceof RepositoryPool && !(repo instanceof RepositoryPool)) {
-				((RepositoryPool<A>) repository).addRepo(repo);
-			}
+			pool.shutdown();
 		}
-
+		
 		this.instances = instances;
 	}
 

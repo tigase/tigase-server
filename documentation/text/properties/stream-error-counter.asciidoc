@@ -1,7 +1,6 @@
 [[stream-error-counter]]
 = stream-error-counter
 :author: Daniel Wisnewski
-:date: 2017-05-12
 :version: v2.0, June 2017, Reformatted for v7.2.0.
 
 

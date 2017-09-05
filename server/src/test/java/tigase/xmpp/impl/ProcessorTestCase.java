@@ -68,6 +68,10 @@ public abstract class ProcessorTestCase  {
 		return kernel.getInstance(name);
 	}
 
+	protected XMLRepository getRepository() {
+		return repository;
+	}
+
 	protected void registerBeans(Kernel kernel) {
 		kernel.registerBean("repository").asInstance(repository).exec();
 	}

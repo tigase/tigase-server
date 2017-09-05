@@ -1,7 +1,6 @@
 [[clusterMode]]
 = cluster-mode
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:date: 2013-02-09 21:27
 :version: v2.1, June 2017: Reformatted for v7.2.0.
 
 :toc:

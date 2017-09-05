@@ -2,13 +2,12 @@
 = Tigase MUC Component
 :author: not known
 :version: v2.0 June 2017. Reformatted for v7.2.0.
-:date: 2015-10-01 15:00
 
 :toc:
 :numbered:
 :website: http://www.tigase.org
 
-Tigase MUC component is included in all Tigase distributions, it is enabled by default, but you may customize the name of the component by calling it in the init.properties file.
+Tigase MUC component is included in all Tigase distributions, it is enabled by default, but you may customize the name of the component by calling it in the config.tdsl file.
 
 [source,dsl]
 -----
@@ -123,7 +122,7 @@ muc {
 Class *must* implment interface `tigase.muc.logger.MucLogger`.
 
 === Modules
-Each module can be configured to use a custom implementation by including it in the init.properties, the defaults are as follows:
+Each module can be configured to use a custom implementation by including it in the config.tdsl, the defaults are as follows:
 [source,dsl]
 -----
 muc {
@@ -162,7 +161,7 @@ Tigase MUC Options::
 - `muc#roomconfig_maxusers` - Allows configuring of maximum users of room.
 
 
-Configuring default room configuration in init.properties::
+Configuring default room configuration in config.tdsl::
 [source,dsl]
 -----
 muc {

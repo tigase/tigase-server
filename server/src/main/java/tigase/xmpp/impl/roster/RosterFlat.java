@@ -473,7 +473,7 @@ public class RosterFlat
 		session.setData(null, ROSTER, sb.toString());
 	}
 
-	private Map<BareJID, RosterElement> loadUserRoster(XMPPResourceConnection session)
+	public Map<BareJID, RosterElement> loadUserRoster(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
 
 		// In most times we just read from this data structure

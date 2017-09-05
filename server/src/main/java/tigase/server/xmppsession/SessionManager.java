@@ -424,6 +424,7 @@ public class SessionManager
 
 				Command.addFieldValue(user_login_cmd, "user-jid", conn.getjid().toString());
 				addOutPacket(user_login_cmd);
+				eventBus.fire(new UserConnectedEvent(conn.getjid()));
 			} catch (NoConnectionIdException ex) {
 
 				// This actually should not happen... might be a bug:

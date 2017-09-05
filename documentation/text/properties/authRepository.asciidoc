@@ -1,7 +1,6 @@
 [[authRepository]]
 = authRepository
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:date: 2017-06-29 07:50
 :version: v1.0, June 2017: Formatted for v7.2.0.
 
 
@@ -41,17 +40,43 @@ authRepository {
 == *Configuration Values:*
 Container has the following options
 
+
+[[authRepoPoolSize]]
+=== pool-size
+This property sets the database connections pool size for the associated `UserRepository`.
+
+NOTE: in some cases instead of default for this property setting for xref:dataRepoPoolSize[`data-repo-pool-size`] is used if pool-size is not defined in `userRepository`. This depends on the repository implementation and the way it is initialized.
+
+[source,dsl]
+-----
+authRepository {
+    default ()
+      'pool-size' = 10
+}
+-----
+
+This is a global property that may be overridden by individual repository settings:
+
+[source,dsl]
+-----
+userRepository {
+    default () {
+      'pool-size' = 10
+    }
+    special-repo () {
+      'pool-size' = 30
+    }
+}
+-----
+
+[[authRepoPool]]
 === *cls*
 Defines the class used for repository connection.  You can use this to specify specific drivers for different DB types. +
-cls replaces the `--auth-repo-pool` property.
 
-=== *data-source*
-If you are using a specific URI for a seperate authentication database, specify the name of the URI that is listed in the xref:dataSource[dataSource] container. +  If none is specified, it is assumed the basic user-db will also serve as auth-db.
+Unless specified, the pool class will use the one included with Tigase.  You may configure individual repositories in the same way.
+This replaces the former `--auth-repo-pool` property.
 
-=== *auth-repo-pool-size*
-Sets the database connections pool size for the AuthRepository.  Default if not defined is 10 connections.
-
-NOTE: If this value is not specified, there are some cases where a default is defined. This depends on the repository implementation and the way it is initialized.
+NOTE: File conversion will not remove and convert this property, it *MUST BE DONE MANUALLY*.
 
 
 

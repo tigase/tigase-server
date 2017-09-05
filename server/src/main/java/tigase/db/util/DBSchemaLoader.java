@@ -131,8 +131,8 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 	}
 
 	@Override
-	public void init( Parameters params ) {
-		params.init();
+	public void init(Parameters params, Optional<SchemaManager.RootCredentialsCache> rootCredentialsCache) {
+		params.init(rootCredentialsCache);
 		for (PARAMETERS_ENUM p : PARAMETERS_ENUM.values()) {
 			String value = null;
 			switch (p) {
@@ -1205,20 +1205,31 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			query = getProperty(props, PARAMETERS_ENUM.QUERY);
 		}
 
-		protected void init() {
+		protected void init(Optional<SchemaManager.RootCredentialsCache> rootCredentialsCache) {
 			if (dbRootUser == null || dbRootPass == null) {
-				if (!"derby".equals(dbType)) {
-					SystemConsole console = new SystemConsole();
-					console.writeLine("");
-					if (dbRootUser == null) {
-						dbRootUser = console.readLine(
-								"Database root account username used to create tigase user and database at " +
-										dbHostname + " : ");
-					}
-					if (dbRootPass == null) {
-						dbRootPass = new String(console.readPassword(
-								"Database root account password used to create tigase user and database at " +
-										dbHostname + " : "));
+				SchemaManager.RootCredentials credentials = rootCredentialsCache.isPresent()
+															? rootCredentialsCache.get().get(dbHostname)
+															: null;
+				if (credentials != null) {
+					dbRootUser = credentials.user;
+					dbRootPass = credentials.password;
+				} else {
+					if (!"derby".equals(dbType)) {
+						SystemConsole console = new SystemConsole();
+						console.writeLine("");
+						if (dbRootUser == null) {
+							dbRootUser = console.readLine(
+									"Database root account username used to create tigase user and database at " +
+											dbHostname + " : ");
+						}
+						if (dbRootPass == null) {
+							dbRootPass = new String(console.readPassword(
+									"Database root account password used to create tigase user and database at " +
+											dbHostname + " : "));
+						}
+						rootCredentialsCache.ifPresent(cache -> cache.set(dbHostname,
+																		  new SchemaManager.RootCredentials(dbRootUser,
+																											dbRootPass)));
 					}
 				}
 			}

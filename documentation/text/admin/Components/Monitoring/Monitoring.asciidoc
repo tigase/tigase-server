@@ -1,9 +1,11 @@
 [[serverMonitoring]]
 = Server Monitoring
 :author: Unknown
-:version: v1.0
+:version: v2.0, August 2017: Reformatted for 7.2.0.
 
 All the documentation and resources related to the Tigase server monitoring.
 
 xref:setupRemoteMonitoring[Setting up Remote Monitoring in the Server]
+xref:statLoggerConfig[Statistics Logger Configuration]
 xref:retrievingStatisticsFromTheServer[Retrieving Statistics from the Server]
+xref:eventBus[Event Bus]

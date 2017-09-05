@@ -1,8 +1,7 @@
 [[jvm_settings]]
 = JVM settings and recommendations
 :author: Daniel Wisnewski <wojte@tigase.org>
-:version: v1.0, June 2016.
-:date: 2016-06-02
+:version: v2.0 August 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:

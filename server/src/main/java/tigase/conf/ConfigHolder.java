@@ -285,7 +285,7 @@ public class ConfigHolder {
 		});
 		renameIfExists(props, "--packet.debug.full", "logging/packet-debug-full", Function.identity());
 		renameIfExists(props, "--" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, "priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, Function.identity());
-		if (Boolean.parseBoolean("" + props.get("--nonpriority-queue"))) {
+		if (Boolean.parseBoolean("" + props.remove("--nonpriority-queue"))) {
 			props.putIfAbsent("priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, NonpriorityQueue.class.getCanonicalName());
 		}
 		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> {
@@ -492,6 +492,10 @@ public class ConfigHolder {
 				}
 			}
 		}
+
+		removeIfExistsAnd(props, "--api-keys", (setter, value) -> {
+			putIfAbsent(props,"http/api-keys", Arrays.asList(value.toString().split(",")));
+		});
 
 		String after = props.toString();
 		return !before.equals(after);

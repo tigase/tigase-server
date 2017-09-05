@@ -21,7 +21,10 @@
 package tigase.util.updater;
 
 import tigase.component.ScheduledTask;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.MessageRouter;
 import tigase.server.Packet;
@@ -58,12 +61,8 @@ import java.util.logging.Logger;
 public class UpdatesChecker
 		extends ScheduledTask {
 
-	@ConfigField(desc = "Enables sending XMPP notifications about new version")
-	private Boolean notificationsEnabled = true;
-
 	private static final Logger log = Logger.getLogger(UpdatesChecker.class.getName());
 	private static final String VERSION_URL = "http://update.tigase.net/check/";
-
 	private static Version serverVersion = null;
 
 	static {
@@ -75,7 +74,15 @@ public class UpdatesChecker
 	}
 
 	@ConfigField(desc = "List of receivers JIDs", alias = "admins")
-	protected ConcurrentSkipListSet<BareJID> receivers = new ConcurrentSkipListSet<BareJID>();
+	private ConcurrentSkipListSet<BareJID> receivers = new ConcurrentSkipListSet<BareJID>();
+
+	@Inject
+	private EventBus eventBus;
+
+	private Version latestCheckedVersion = null;
+
+	@ConfigField(desc = "Enables sending XMPP notifications about new version")
+	private Boolean notificationsEnabled = true;
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -96,6 +103,45 @@ public class UpdatesChecker
 		super(Duration.ofDays(7), Duration.ofDays(7));
 	}
 
+	private void fire(Object event) {
+		if (eventBus != null) {
+			eventBus.fire(event);
+		}
+	}
+
+	private Version getVersion(String version) {
+		try {
+			return Version.of(version);
+		} catch (IllegalArgumentException e) {
+			log.log(Level.FINE, "Error parsing version from server");
+			return null;
+		}
+	}
+
+	@Override
+	public void initialize() {
+		super.initialize();
+		if (eventBus != null) {
+			eventBus.registerAll(this);
+		}
+	}
+
+	private boolean isNewerVersion(Version ver) {
+		if (latestCheckedVersion == null || ver.compareTo(latestCheckedVersion) > 0) {
+			latestCheckedVersion = ver;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@HandleEvent
+	protected void onUpdatedVersionDiscovered(UpdatesChecker.UpdatedVersionDiscovered event) {
+		if ((event.getVersion() != null) && isNewerVersion(event.getVersion())) {
+			log.log(Level.CONFIG, "New version updated from cluster");
+		}
+	}
+
 	private Packet prepareMessage(Version v, BareJID jid) {
 		String link = "http://tigase.net/downloads";
 		final JID sender = JID.jidInstanceNS("updates.checker@" + jid.getDomain());
@@ -114,8 +160,8 @@ public class UpdatesChecker
 				"(setting both of them to 0 will disable the checking altogether), in addition you can disable sending XMPP notifications by setting 'notificationsEnabled' to 'false':\n" +
 				"'message-router' (class: tigase.server.MessageRouter) {\n" +
 				"\t'update-checker' (class: tigase.util.updater.UpdatesChecker) {\n" +
-				"\t\tdelay = PT5S\n" +
-				"\t\tperiod = PT30S\n" +
+				"\t\tdelay = PT5M\n" +
+				"\t\tperiod = P30D\n" +
 				"\t\tnotificationsEnabled = true\n" +
 				"\t\treceivers = ['admin_username@VHost']\n" +
 				"\t}\n" +
@@ -141,23 +187,23 @@ public class UpdatesChecker
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			final Optional<Version> version = br.lines()
 //					.filter(line -> line.startsWith(FILE_START))
-					.map(this::getVersion)
-					.filter(Objects::nonNull)
+					.map(this::getVersion).filter(Objects::nonNull)
 //					.filter(e -> !serverVersion.isZero() && e.compareTo(serverVersion) > 0)
-					.filter(e -> e.compareTo(serverVersion) > 0)
-					.findFirst();
-
-			version.ifPresent(v -> log.info("Update available: " + v + " (current version: " + serverVersion + ")"));
+					.filter(e -> e.compareTo(serverVersion) > 0).findFirst();
 
 			version.ifPresent(v -> {
-				if (notificationsEnabled) {
-					receivers
-							.stream()
+				log.log(Level.CONFIG, "Update available: " + v + " (current version: " + serverVersion + ")");
+
+				if (notificationsEnabled && isNewerVersion(v)) {
+					receivers.stream()
 							.filter(addr -> !addr.toString().contains("{clusternode}"))
-							.filter(addr -> !component.getNodesConnectedWithLocal().contains(JID.jidInstanceNS(addr.getDomain())))
+							.filter(addr -> !component.getNodesConnectedWithLocal()
+									.contains(JID.jidInstanceNS(addr.getDomain())))
 							.map(admin -> prepareMessage(v, admin))
 							.forEach(p -> component.addPacket(p));
 				}
+
+				fire(new UpdatedVersionDiscovered(v));
 			});
 
 		} catch (IOException e) {
@@ -167,12 +213,16 @@ public class UpdatesChecker
 		}
 	}
 
-	private Version getVersion(String version) {
-		try {
-			return Version.of(version);
-		} catch (IllegalArgumentException e) {
-			log.log(Level.FINE, "Error parsing version from server");
-			return null;
+	public static class UpdatedVersionDiscovered {
+
+		private final Version version;
+
+		UpdatedVersionDiscovered(Version version) {
+			this.version = version;
+		}
+
+		public Version getVersion() {
+			return version;
 		}
 	}
 }

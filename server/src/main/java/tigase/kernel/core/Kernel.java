@@ -1336,11 +1336,13 @@ public class Kernel {
 		private final ArrayDeque<DelayedDependenciesInjection> queue = new ArrayDeque<>();
 
 		public boolean offer(DelayedDependenciesInjection item) {
-			DelayedDependenciesInjection last = queue.peekLast();
-			if (last != null && last.equals(item)) {
-				return true;
+			synchronized (queue) {
+				DelayedDependenciesInjection last = queue.peekLast();
+				if (last != null && last.equals(item)) {
+					return true;
+				}
+				return queue.offer(item);
 			}
-			return queue.offer(item);
 		}
 
 		public Queue<DelayedDependenciesInjection> getQueue() {

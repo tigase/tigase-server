@@ -2,7 +2,6 @@
 = Message Archiving Component
 :author: Daniel Wisnewski
 :version: v2.0 June 2017. Reformatted for v7.2.0.
-:date: 2015-17-09 13:29
 
 :source: https://projects.tigase.org/projects/message-archiving/wiki/Wiki
 
@@ -12,7 +11,7 @@
 
 == Configuration
 
-To activate message archiving, place the following line in the init.properties file:
+To activate message archiving, place the following line in the config.tdsl file:
 [source,dsl]
 -----
 'message-archive' (class: tigase.archive.MessageArchiveComponent) {
@@ -34,16 +33,20 @@ The next line turns on the message archive plugin. While this is not always nece
 Finally, the last line specifies the name for the component, if left blank the component's JID will be message-archive@local-machine-name.
 
 *NOTE: Message tagging can take up considerable resources!*
-There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experience an increase in resource use with the archive turned on. It is recommended to drecrease the repository connection pool to help balance server load from this component using the following line in init.properties:
-[source,bash]
+There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experince an increase in resource use with the archive turned on. It is recommended to drecrease the repository connection pool to help balance server load from this component using the xref:dataRepoPoolSize[Pool Size] property:
+
+[source,dsl]
 -----
---data-repo-pool-size=5
+'message-archive' (class: tigase.archive.MessageArchiveComponent) {
+    'archive-repo-uri' = 'jdbc:mysql://localhost/messagearchivedb?user=test&password=test'
+    'pool-size' = 15
+}
 -----
 
 [[nonBodyStore]]
 === Saving Options
 
-By default, Tigase Message Archive will only store the message body with some metadata, this can exclude messages that are lacking a body.  If you decide you wish to save non-body elements within Message Archive, you can now can now configure this using the following line from init.properties:
+By default, Tigase Message Archive will only store the message body with some metadata, this can exclude messages that are lacking a body.  If you decide you wish to save non-body elements within Message Archive, you can now can now configure this using the following line from config.tdsl:
 [source,dsl]
 -----
 'sess-man' {
@@ -179,7 +182,7 @@ It is also important to note that MUC messages are archived to user messages arc
 
 === Configuration
 
-Enabling archiving of MUC messages is done by adding one more line to your init.properties file. Along with defining `comp-name` and `comp-class` add this line:
+Enabling archiving of MUC messages is done by adding one more line to your config.tdsl file. Along with defining `comp-name` and `comp-class` add this line:
 [source,dsl]
 -----
 'sess-man' {
@@ -264,7 +267,7 @@ This feature allows users to query and retrieve messages or collections from the
 
 === Activating Tagging
 
-To enable this feature, the following line must be in the init.properties file (or may be added with Admin or Web UI)
+To enable this feature, the following line must be in the config.tdsl file (or may be added with Admin or Web UI)
 [source,dsl]
 -----
 'message-archive' (class: tigase.archive.MessageArchiveComponent) {

@@ -1,8 +1,7 @@
 [[retrievingStatisticsFromTheServer]]
 = Retrieving statistics from the server
 :author: Daniel Wisnewski
-:version: v2.0
-:date: 2015-13-07 11:22
+:version: v2.0, April 2017: Reformatted for 7.2.0.
 
 :toc:
 :numbered:

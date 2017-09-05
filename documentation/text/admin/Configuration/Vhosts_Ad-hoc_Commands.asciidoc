@@ -1,9 +1,7 @@
 [[ad-hocCommands]]
 = Specification for ad-hoc Commands Used to Manage Virtual Domains
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-04-06 21:18
-:revision: v2.1
+:version: v2.0 August 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -17,7 +15,7 @@ There are 3 ad-hoc commands for virtual domains management in the Tigase server:
 
 Syntax of the commands follows the specification described in link:http://xmpp.org/extensions/xep-0050.html[XEP-0050]. Extra information required to complete the command is carried as data forms described in link:http://xmpp.org/extensions/xep-0004.html[XEP-0004].
 
-All commands are accepted by the server only when send by the installation administrator. If the command is sent from any other account +&lt;not-authorized /&gt;+ error is returned. To grant administrator rights to an account you have to set *--admins* property in the +init.Properties+ configuration file.
+All commands are accepted by the server only when send by the installation administrator. If the command is sent from any other account +&lt;not-authorized /&gt;+ error is returned. To grant administrator rights to an account you have to set `admins` property in the `config.tdsl` configuration file.
 
 Commands are sent to the 'vhost-man' server component and the 'to' attribute of the stanza must contain a full JID of the VHostManager on the server. The full *JID* consists of the component name: 'vhost-man' and the local domain, that is domain which is already on the list of virtual domains and is active. Assuming 'existing.domain.com' one of domains already activated for the server installation the *JID* is: 'vhost-man@existing.domain.com'.
 

@@ -1,7 +1,7 @@
 = userRepository
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:date: 2017-06-29 07:50
 :version: v2.0, June 2017: Formatted for v7.2.0.
+
 :toc:
 :numbered:
 :website: http://tigase.net/
@@ -18,3 +18,49 @@ userRepository {
 This default entry specifies that that userRepository should look for the `default` database that is specified under the xref:dataSource[`dataSource`] property with no special classes or configuration.
 
 This replaces the former `--user-db` property.
+
+[[userRepoPool]]
+== pool-class
+The `pool-class` property provides an ability to specify an implementation for the repository connection pool. This is used only if the implementation provided by a default Tigase server package is not sufficient in a particular deployment. The implementation provides a DB (UserRepository to be more specific) connection pool to improve the data access performance. The repository pool can offer data caching for improved performance or any other features necessary.
+
+You may specify the class in the following way:
+[source,dsl]
+-----
+userRepository {
+    default ()
+      'pool-class' = 'some.class.name'
+}
+-----
+
+Unless specified, the pool class will use the one included with Tigase.  You may configure individual repositories in the same way.
+This replaces the former `--user-repo-pool` property.
+
+NOTE: File conversion will not remove and convert this property, it *MUST BE DONE MANUALLY*.
+
+[[userRepoPoolSize]]
+== pool-size
+This property sets the database connections pool size for the associated `UserRepository`.
+
+NOTE: in some cases instead of default for this property setting for xref:dataRepoPoolSize[`data-repo-pool-size`] is used if pool-size is not defined in `userRepository`. This depends on the repository implementation and the way it is initialized.
+
+[source,dsl]
+-----
+userRepository {
+    default ()
+      'pool-size' = 10
+}
+-----
+
+This is a global property that may be overridden by individual repository settings:
+
+[source,dsl]
+-----
+userRepository {
+    default () {
+      'pool-size' = 10
+    }
+    special-repo () {
+      'pool-size' = 30
+    }
+}
+-----

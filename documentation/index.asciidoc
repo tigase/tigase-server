@@ -59,8 +59,6 @@ include::text/admin/Configuration/Configuration.asciidoc[]
 
 include::text/admin/Configuration/DSL_configuration.asciidoc[]
 
-include::text/admin/Configuration/init.properties_Configuration.asciidoc[]
-
 include::text/admin/Configuration/Startup_Files.asciidoc[]
 
 include::text/admin/Configuration/Settings_for_High_Load_Systems.asciidoc[]
@@ -183,23 +181,7 @@ include::text/admin/Components/Components.asciidoc[]
 
 :leveloffset: 2
 
-include::text/components/http-api/documentation/text/HTTP_Component_Configuration.asciidoc
-
-include::text/components/http-api/documentation/text/HTTP_API_Component.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_API_Component_modules.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_File_Upload_Component.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_Server.asciidoc[]
-
-include::text/components/http-api/documentation/text/HTTP_Pre_Bind_BOSH.asciidoc[]
-
-include::text/components/http-api/documentation/text/REST_API_Usage_Examples.asciidoc[]
-
-include::text/components/http-api/documentation/text/UI_Guide_Admin.asciidoc[]
-
-include::text/components/http-api/documentation/text/UI_Guide_Client.asciidoc[]
+include::text/components/http-api/documentation/doclink.asciidoc[]
 
 :leveloffset: 2
 
@@ -207,26 +189,7 @@ include::text/admin/Components/Message_Archiving.asciidoc[]
 
 include::text/admin/Components/Advanced_Message_Processing.asciidoc[]
 
-include::text/components/pubsub/documentation/text/Overview.asciidoc[]
-
-:leveloffset: 3
-
-include::text/components/pubsub/documentation/text/Announcement.asciidoc[]
-include::text/components/pubsub/documentation/text/Database.asciidoc[]
-include::text/components/pubsub/documentation/text/Configuration.asciidoc[]
-include::text/components/pubsub/documentation/text/Schema_Changes.asciidoc[]
-include::text/components/pubsub/documentation/text/Features.asciidoc[]
-
-:leveloffset: 4
-
-include::text/components/pubsub/documentation/text/features/AdHocCommands.asciidoc[]
-include::text/components/pubsub/documentation/text/features/PubSub_Node_Presence_Protocol.asciidoc[]
-include::text/components/pubsub/documentation/text/features/OfflineMessagesSink.asciidoc[]
-include::text/components/pubsub/documentation/text/features/REST_API.asciidoc[]
-
-:leveloffset: 3
-
-include::text/components/pubsub/documentation/text/Limitations.asciidoc[]
+include::text/components/pubsub/documentation/doclink.asciidoc[]
 
 :leveloffset: 2
 
@@ -251,6 +214,8 @@ include::text/admin/Components/MUC.asciidoc[]
 include::text/admin/Components/Load_Balancing.asciidoc[]
 
 include::text/admin/Components/External_Component_Configuration/Intro.asciidoc[]
+
+// include::text/components/workgroup/documentation/text/doclink.asciidoc[]
 
 :leveloffset: 3
 
@@ -405,8 +370,6 @@ include::text/properties/net-buff-high-throughput.asciidoc[]
 
 include::text/properties/net-buff-standard.asciidoc[]
 
-include::text/properties/new-connections-throttling.asciidoc[]
-
 include::text/properties/nonpriority-queue.asciidoc[]
 
 include::text/properties/plugins.asciidoc[]
@@ -414,8 +377,6 @@ include::text/properties/plugins.asciidoc[]
 include::text/properties/queue-implementation.asciidoc[]
 
 include::text/properties/roster-implementation.asciidoc[]
-
-include::text/properties/s2s-ejabberd-bug-workaround-active.asciidoc[]
 
 include::text/properties/s2s-secret.asciidoc[]
 
@@ -436,12 +397,6 @@ include::text/properties/test.asciidoc[]
 include::text/properties/tls-jdk-nss-bug-workaround-active.asciidoc[]
 
 include::text/properties/trusted.asciidoc[]
-
-include::text/properties/user-domain-repo-pool.asciidoc[]
-
-include::text/properties/user-repo-pool.asciidoc[]
-
-include::text/properties/user-repo-pool-size.asciidoc[]
 
 include::text/properties/vhost-anonymous-enabled.asciidoc[]
 

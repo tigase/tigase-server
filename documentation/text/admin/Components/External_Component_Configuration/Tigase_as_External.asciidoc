@@ -1,9 +1,7 @@
-[[tigase4xexternalComponent]]
+[[tigaseasExternal]]
 = Tigase as an External Component
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-04-06 21:18
-:revision: v2.1
+:version: v2.0, August 2017: Reformatted for 7.2.0.
 
 :toc:
 :numbered:
@@ -24,62 +22,64 @@ A few assumptions:
 
 There is a special configuration type for this case which simplifies setting needed to run Tigase as an external component:
 
-[source,bash]
+[source,dsl]
 -----
-config-type=--gen-config-comp.
------
-
-This generates a configuration for Tigase with only one component loaded by default - the component used for external component connection. If you use this configuration type, your init.properties file may look like this:
-
-[source,bash]
------
-config-type = --gen-config-comp
---debug = server
---user-db = derby
---admins = admin@devel.tigase.org
---user-db-uri = jdbc:derby:/tigasedb
---virt-hosts = devel.tigase.org
---comp-name-1 = muc
---comp-class-1 = tigase.muc.MUCComponent
---external = muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:accept
+'config-type' = 'component'
 -----
 
-Please note, you do not need lines:
+This generates a configuration for Tigase with only one component loaded by default - the component used for external component connection. If you use this configuration type, your config.tdsl file may look like this:
 
-[source,bash]
+[source,dsl]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
+admins = [ 'admin@devel.tigase.org' ]
+'config-type' = 'component'
+debug = [ 'server' ]
+'virtual-hosts' = [ 'devel.tigase.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:derby:/tigasedb'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+muc (class: tigase.muc.MUCComponent) {}
+ext () {
+    items = [ 'muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:accept' ]
+}
 -----
 
-as the
-
-[source,bash]
------
---gen-config-comp
------
-
-automatically includes them.
 
 == More Components
 Suppose you want to run more than one component as an external components within one Tigase instance. Let's add another - PubSub component to the configuration above and see how to set it up.
 
 The most straightforward way is just to add another component and another connection to the main server for the component domain:
 
-[source,bash]
+[source,dsl]
 -----
-config-type = --gen-config-comp
---debug = server
---user-db = derby
---admins = admin@devel.tigase.org
---user-db-uri = jdbc:derby:/tigasedb
---virt-hosts = devel.tigase.org
---comp-name-1 = muc
---comp-class-1 = tigase.muc.MUCComponent
---comp-name-2 = pubsub
---comp-class-2 = tigase.pubsub.PubSubComponent
---external = muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:accept, \
-  pubsub.devel.tigase.org:pubsub-pass:connect:5270:devel.tigase.org:accept
+admins = [ 'admin@devel.tigase.org' ]
+'config-type' = 'component'
+debug = [ 'server' ]
+'virtual-hosts' = [ 'devel.tigase.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:derby:/tigasedb'
+    }
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+muc (class: tigase.muc.MUCComponent) {}
+pubsub (class: tigase.pubsub.PubSubComponent) {}
+ext () {
+    items = [ 'muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:accept', 'pubsub.devel.tigase.org:pubsub-pass:connect:5270:devel.tigase.org:accept' ]
+}
 -----
 
 Please note however that we are opening two connections to the same server. This can waste resources and overcomplicate the system. For example, what if we want to run even more components? Opening a separate connection for each component is a tad overkill.
@@ -90,18 +90,27 @@ There is one catch however. Since you are reusing connections (hostname binding 
 
 Here is an example configuration with a single connection over the link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] protocol used by both external domains:
 
-[source,bash]
+[source,dsl]
 -----
-config-type = --gen-config-comp
---debug = server
---user-db = derby
---admins = admin@devel.tigase.org
---user-db-uri = jdbc:derby:/tigasedb
---virt-hosts = devel.tigase.org
---comp-name-1 = muc
---comp-class-1 = tigase.muc.MUCComponent
---comp-name-2 = pubsub
---comp-class-2 = tigase.pubsub.PubSubComponent
---external = muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:client
---bind-ext-hostnames=pubsub.devel.tigase.org
+admins = [ 'admin@devel.tigase.org' ]
+'bind-ext-hostnames' = [ 'pubsub.devel.tigase.org' ]
+'config-type' = 'component'
+debug = [ 'server' ]
+'virtual-hosts' = [ 'devel.tigase.org' ]
+dataSource {
+    default () {
+        uri = 'jdbc:derby:/tigasedb'
+    }
+}
+ext () {
+    items = [ 'muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:client' ]
+}
+userRepository {
+    default () {}
+}
+authRepository {
+    default () {}
+}
+muc (class: tigase.muc.MUCComponent) {}
+pubsub (class: tigase.pubsub.PubSubComponent) {}
 -----

@@ -1,8 +1,11 @@
 [[socks5]]
 = Socks 5 Component
 :author: Daniel Wisnewski
-:date: 2016-07-26 10:35
 :version: v2.0 July 2017. Reformatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://tigase.net
 
 
 Tigase SOCKS5 component allows for file transfers to be made over a SOCKS5 proxy in accordance with link:http://xmpp.org/extensions/xep-0065.html[XEP-0065 SOCKS5 Bytestreams].  This allows for some useful features such as:
@@ -11,7 +14,7 @@ Tigase SOCKS5 component allows for file transfers to be made over a SOCKS5 proxy
 - quotas and credits system implementation
 
 == Installation
-Tigase SOCKS5 component comes built into the dist-max archives for Tigase XMPP server, and requires the component to be listed in init.properties file:
+Tigase SOCKS5 component comes built into the dist-max archives for Tigase XMPP server, and requires the component to be listed in config.tdsl file:
 [source,dsl]
 -----
 proxy {}
@@ -63,7 +66,7 @@ One this process is complete, you may begin using SOCKS5 proxy component.
 === Create New Database
 
 If you want to create a new database for the proxy component and use it as a separate socks5 database, create the database using the appropriate schema file in the database folder.
-Once this is created, add the following line to your init.properties folder.
+Once this is created, add the following line to your config.tdsl folder.
 [source,dsl]
 -----
 proxy {}
@@ -158,7 +161,7 @@ proxy {
 Comma seperated list of IP addresses that will be accessible VIA the Socks5 Proxy.  This can be useful if you want to specify a specific router address to allow external traffic to transfer files using the proxy to users on an internal network.
 
 === Port settings
-If socks5 is being used as a proxy, you may configure a specific ports for the proxy using the following line in init.properties:
+If socks5 is being used as a proxy, you may configure a specific ports for the proxy using the following line in config.tdsl:
 [source,dsl]
 -----
 proxy {
@@ -197,8 +200,8 @@ A second database is setup tig_socks5_connections that records the connections a
 
 
 
-== Example init.properties block
-Combined, your init.properties should look like the below excerpt to run socks5 transfers using a separate database.
+== Example config.tdsl block
+Combined, your config.tdsl should look like the below excerpt to run socks5 transfers using a separate database.
 
 [source,dsl]
 -----

@@ -4,6 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.TestLogger;
+import tigase.db.TigaseDBException;
+import tigase.eventbus.EventBusFactory;
+import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
@@ -12,14 +15,6 @@ import tigase.xmpp.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.junit.Assert.*;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +31,9 @@ import static org.junit.Assert.*;
 public class JabberIqPrivacyTest extends ProcessorTestCase {
 
 	private static final Logger log = TestLogger.getLogger(JabberIqPrivacyTest.class);
-	
+
+	private Kernel kernel;
+
 	private JabberIqPrivacy privacyFilter;
 	private ArrayDeque<Packet> results;
 
@@ -44,9 +41,17 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		privacyFilter = new JabberIqPrivacy();
-		privacyFilter.init(new HashMap<String, Object>());
-		results = new ArrayDeque<Packet>();
+		try {
+			privacyFilter = getInstance(JabberIqPrivacy.class);
+			kernel.getDependencyManager()
+					.getBeanConfig("jabber:iq:privacy")
+					.getKernel()
+					.setBeanActive("privacyListOfflineCache", true);
+			results = new ArrayDeque<Packet>();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			assert(false);
+		}
 	}
 
 	@After
@@ -55,8 +60,17 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 		super.tearDown();
 		privacyFilter = null;
 	}
-	
-        @Test
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean("userAuthRepository").asInstance(getRepository()).exportable().exec();
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
+		kernel.registerBean(JabberIqPrivacy.class).exec();
+		this.kernel = kernel;
+	}
+
+	@Test
         public void testValidateListGood() {
              List<Element> items = new ArrayList<Element>();
              
@@ -170,7 +184,7 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 			list.addChild(new Element("item", new String[]{"action", "order"},
 					new String[]{"allow", "110"}));
 			
-			session.putSessionData("active-list", list);
+			session.putSessionData("active-list", PrivacyList.create(null, list));
 			
 			Packet presence = Packet.packetInstance(new Element("presence", 
 					new String[] { "from", "to" }, 
@@ -236,7 +250,7 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 		list.addChild(new Element("item", new String[]{"action", "order"},
 				new String[]{"allow", "110"}));
 
-		session.putSessionData("active-list", list);
+		session.putSessionData("active-list", PrivacyList.create(null, list));
 
 		Packet presence = Packet.packetInstance(new Element("presence",
 				new String[]{"from", "to"},
@@ -317,8 +331,56 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 
 	}
 
+	@Test
+	public void testPartialJidMatchingOffline() throws Exception {
+
+		XMPPResourceConnection session = null;
+
+		testList(session, "partial_blocked@test.domain.com/resource", "partial_blocked@test.domain.com/resource", false);
+		testList(session, "partial_blocked@test.domain.com/resource", "partial_blocked@test2.domain.com/resource", true);
+		testList(session, "partial_blocked@test.domain.com/resource", "partial_blocked@test.domain.com/resource2", true);
+		testList(session, "partial_blocked@test.domain.com/resource", "partial_blocked2@test.domain.com/resource", true);
+		testList(session, "partial_blocked@test.domain.com/resource", "partial_blocked@test.domain.com", true);
+		testList(session, "partial_blocked@test.domain.com/resource", "test.domain.com/true", true);
+		testList(session, "partial_blocked@test.domain.com/resource", "test.domain.com", true);
+
+
+		testList(session, "partial_blocked@test.domain.com", "partial_blocked@test.domain.com/resource", false);
+		testList(session, "partial_blocked@test.domain.com", "partial_blocked@test.domain.com", false);
+		testList(session, "partial_blocked@test.domain.com", "partial_blocked2@test.domain.com", true);
+		testList(session, "partial_blocked@test.domain.com", "partial_blocked@test2.domain.com", true);
+		testList(session, "partial_blocked@test.domain.com", "test.domain.com/true", true);
+		testList(session, "partial_blocked@test.domain.com", "test.domain.com", true);
+
+
+		testList(session, "test.domain.com/true", "partial_blocked@test.domain.com/resource", true);
+		testList(session, "test.domain.com/true", "partial_blocked@test.domain.com", true);
+		testList(session, "test.domain.com/true", "test.domain.com/true", false);
+		testList(session, "test.domain.com/true", "test.domain.com", true);
+		testList(session, "test.domain.com/true", "test.domain.com/true2", true);
+		testList(session, "test.domain.com/true", "test.2domain.com", true);
+
+		testList(session, "test.domain.com/true", "partial_blocked@test2.domain.com/resource", true);
+		testList(session, "test.domain.com/true", "partial_blocked@test2.domain.com", true);
+		testList(session, "test.domain.com/true", "test2.domain.com/true", true);
+		testList(session, "test.domain.com/true", "test.domain.com/true2", true);
+		testList(session, "test.domain.com/true", "test2.domain.com", true);
+
+
+		testList(session, "test.domain.com", "partial_blocked@test.domain.com/resource", false);
+		testList(session, "test.domain.com", "partial_blocked@test.domain.com", false);
+		testList(session, "test.domain.com", "test.domain.com/true", false);
+		testList(session, "test.domain.com", "test.domain.com", false);
+
+		testList(session, "test.domain.com", "partial_blocked@test2.domain.com/resource", true);
+		testList(session, "test.domain.com", "partial_blocked@test2.domain.com", true);
+		testList(session, "test.domain.com", "test2.domain.com/true", true);
+		testList(session, "test.domain.com", "test2.domain.com", true);
+
+	}
+
 	private void testList(XMPPResourceConnection session, String listJID, String testJID, boolean shouldBeAllowed)
-			throws TigaseStringprepException, NotAuthorizedException {
+			throws TigaseStringprepException, NotAuthorizedException, TigaseDBException {
 
 		JID jid = JID.jidInstance("test@example/res-1");
 		JID blockedJID = JID.jidInstance(listJID);
@@ -329,7 +391,13 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 		list.addChild(new Element("item", new String[]{"action", "order"},
 				new String[]{"allow", "110"}));
 
-		session.putSessionData("active-list", list);
+		if (session != null) {
+			session.putSessionData("active-list", PrivacyList.create(null, list));
+		} else {
+			this.getRepository().setData(jid.getBareJID(),"privacy", "default-list", "default");
+			this.getRepository().setData(jid.getBareJID(), "privacy/default", "privacy-list", list.toString());
+			this.privacyFilter.cache.clear();
+		}
 
 		Packet presence = Packet.packetInstance(new Element("presence",
 				new String[]{"from", "to"},

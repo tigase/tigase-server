@@ -34,6 +34,7 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Presence;
 import tigase.server.Priority;
+import tigase.server.xmppsession.UserConnectedEvent;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 
@@ -442,6 +443,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 						ex.printStackTrace();
 					}
 				}
+			}
+			else {
+				fireEvent(new UserConnectedEvent(rec.getUserJid()));
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("User connected jid: " + rec.getUserJid() + ", fromNode: " + fromNode);

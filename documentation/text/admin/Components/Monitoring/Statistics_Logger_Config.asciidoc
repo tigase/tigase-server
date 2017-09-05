@@ -1,4 +1,6 @@
+[[statLoggerConfig]]
 = Configuration of statistics loggers
+:version: v2.0, August 2017: Reformatted for 7.2.0.
 
 It is possible to enable and configure automatic storage of statistics information. To do that you need to configure any of following statistics loggers
 as a `StatisticsCollector` component subbeans:

@@ -237,6 +237,12 @@ public class OldConfigHolder {
 							"!\nPlease check if provided class is compatible with Tigase XMPP Server data sources. If so, then please remove this property, convert the configuration file and then manually modify configuration.");
 		}
 
+		if (props.containsKey(RepositoryFactory.USER_DOMAIN_POOL_CLASS)) {
+			throw new ConfigReader.ConfigException(
+					"Cannot convert property " + RepositoryFactory.USER_DOMAIN_POOL_CLASS +
+							"!\nPlease check if provided class is compatible with Tigase XMPP Server data sources. If so, then please remove this property, convert the configuration file and then manually modify configuration.");
+		}
+
 		Object defDataPoolSize = props.remove(RepositoryFactory.DATA_REPO_POOL_SIZE);
 		Object defAuthRepoPool = props.remove(RepositoryFactory.AUTH_REPO_POOL_SIZE);
 
@@ -315,7 +321,8 @@ public class OldConfigHolder {
 					});
 				}
 
-			} if (k.startsWith("--user-db") || k.startsWith("--auth-db") || k.startsWith("--amp-repo")) {
+			}
+			if (k.startsWith("--user-db") || k.startsWith("--auth-db") || k.startsWith("--amp-repo")) {
 				String domain = "default";
 				if (k.endsWith("]")) {
 					domain = k.substring(k.indexOf('[') + 1, k.length() - 1);

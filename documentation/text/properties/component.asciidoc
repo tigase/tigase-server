@@ -1,8 +1,8 @@
 [[propComp]]
 = Component
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:date: 2017-06-29 07:50
 :version: v2.0, June 2017: Formatted for v7.2.0.
+
 :toc:
 :numbered:
 :website: http://tigase.net/
@@ -44,6 +44,8 @@ socks5 () {}
 
 There are many many configuration options under each component, which are specified in xref:loadComponent[component documentation].
 
+
+[[cmpnamePorts]]
 == Ports
 The ports property is a subclass of connections, which is used to set a ports list for a connection manager. 'list of ports' is a comma separated list of ports numbers. For example for the server to server connection manager named s2s the property would like like the example below:
 [source,dsl]

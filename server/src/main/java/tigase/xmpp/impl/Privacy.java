@@ -26,24 +26,23 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import tigase.db.TigaseDBException;
-
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.roster.RosterFactory;
 
-//~--- JDK imports ------------------------------------------------------------
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Queue;
+import java.util.stream.Collectors;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class defining data structure for privacy lists.
@@ -176,9 +175,9 @@ public class Privacy {
 	 *
 	 * @throws NotAuthorizedException
 	 */
-	public static Element getActiveList(XMPPResourceConnection session)
+	public static PrivacyList getActiveList(XMPPResourceConnection session)
 					throws NotAuthorizedException {
-		return (Element) session.getSessionData(ACTIVE);
+		return (PrivacyList) session.getSessionData(ACTIVE);
 	}
 
 	/**
@@ -193,13 +192,26 @@ public class Privacy {
 	 */
 	public static String getActiveListName(XMPPResourceConnection session)
 					throws NotAuthorizedException {
-		Element list = getActiveList(session);
+		PrivacyList list = getActiveList(session);
 
 		if (list != null) {
-			return list.getAttributeStaticStr(NAME);
+			return list.getName();
 		} else {
 			return null;
 		}    // end of if (list != null) else
+	}
+
+	public static PrivacyList getDefaultList(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
+		PrivacyList sessionDefaultList = (PrivacyList) session.getCommonSessionData( DEFAULT );
+		if (session.getCommonSessionData(PRIVACY_LIST_LOADED) == null) {
+			sessionDefaultList = PrivacyList.create(session, RosterFactory.getRosterImplementation(true), getDefaultListElement(session));
+			if (null != sessionDefaultList) {
+				session.putCommonSessionData(DEFAULT, sessionDefaultList);
+			}
+			session.putCommonSessionData(PRIVACY_LIST_LOADED, PRIVACY_LIST_LOADED);
+		}
+		return sessionDefaultList;
 	}
 
 	/**
@@ -209,20 +221,12 @@ public class Privacy {
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
-	public static Element getDefaultList(XMPPResourceConnection session)
+	public static Element getDefaultListElement(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		Element sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
-		if (session.getCommonSessionData(PRIVACY_LIST_LOADED) == null) {
-			if ( sessionDefaultList == null ){
-				String defaultListName = getDefaultListName( session );
-				if ( defaultListName != null ){
-					sessionDefaultList = Privacy.getList( session, defaultListName);
-					if ( null != sessionDefaultList ){
-						session.putCommonSessionData( DEFAULT, sessionDefaultList );
-					}
-				}
-			}
-			session.putCommonSessionData(PRIVACY_LIST_LOADED, PRIVACY_LIST_LOADED);
+		Element sessionDefaultList = null;
+		String defaultListName = getDefaultListName(session);
+		if (defaultListName != null) {
+			sessionDefaultList = Privacy.getList(session, defaultListName);
 		}
 		return sessionDefaultList;
 	}
@@ -389,7 +393,8 @@ public class Privacy {
 		} else {
 
 			// User selects a different active list
-			Element list = getList(session, lName);
+			PrivacyList list = PrivacyList.create(session, RosterFactory.getRosterImplementation(true),
+												  getList(session, lName));
 
 			if (list != null) {
 				session.putSessionData(ACTIVE, list);
@@ -415,7 +420,8 @@ public class Privacy {
 					throws NotAuthorizedException, TigaseDBException {
 		if ((list != null) && (list.getAttributeStaticStr(NAME) != null)) {
 			session.setData(PRIVACY, DEFAULT, list.getAttributeStaticStr(NAME));
-			session.putCommonSessionData( DEFAULT, list);
+			session.putCommonSessionData(DEFAULT,
+										 PrivacyList.create(session, RosterFactory.getRosterImplementation(true), list));
 		} else {
 			session.removeData(PRIVACY, DEFAULT);
 			session.removeCommonSessionData( DEFAULT );
@@ -423,10 +429,10 @@ public class Privacy {
 	}
 
 	public static List<String> getBlocked(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
-		Element list = getDefaultList(session);
+		PrivacyList list = getDefaultList(session);
 		List<String> ulist = null;
 		if(list != null) {
-			ulist = list.mapChildren(item -> isBlockItem(item), item -> item.getAttributeStaticStr(VALUE));
+			ulist = list.getBlockedJids().map(jid -> jid.toString()).collect(Collectors.toList());
 		}
 		return ulist;				
 	}
@@ -512,11 +518,11 @@ public class Privacy {
 			session.putSessionData(ACTIVE, list_new);
 		}		
 	}
-	
+
 	private static boolean isBlockItem(Element item) {
 		return "jid".equals(item.getAttributeStaticStr(TYPE)) && "deny".equals(item.getAttributeStaticStr(ACTION)) && item.getChildren() == null;
 	}
-	
+
 }    // Privacy
 
 

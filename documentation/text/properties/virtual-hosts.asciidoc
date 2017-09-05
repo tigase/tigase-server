@@ -1,7 +1,6 @@
 [[virtHosts]]
 = virtual-hosts
 :author: not known
-:Date: 2013-02-10 01:53
 :version: v2.0 June 2017. Reformatted for v7.2.0.
 
 :toc:

@@ -54,6 +54,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -123,9 +124,8 @@ public class SchemaManager {
 
 	private final List<Class<?>> repositoryClasses;
 	private Map<String, Object> config;
-
-	private String rootUser;
-	private String rootPass;
+	
+	private RootCredentialsCache rootCredentialsCache = new RootCredentialsCache();
 
 	public static void main(String args[]) throws IOException, ConfigReader.ConfigException {
 		try {
@@ -189,7 +189,7 @@ public class SchemaManager {
 			SchemaLoader loader = SchemaLoader.newInstance(type);
 			SchemaLoader.Parameters params = loader.createParameters();
 			params.setProperties(props);
-			loader.init(params);
+			loader.init(params, Optional.ofNullable(rootCredentialsCache));
 			String dbUri = loader.getDBUri();
 
 			String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
@@ -243,7 +243,7 @@ public class SchemaManager {
 		SchemaLoader loader = SchemaLoader.newInstance(type);
 		SchemaLoader.Parameters params = loader.createParameters();
 		params.setProperties(props);
-		loader.init(params);
+		loader.init(params, Optional.ofNullable(rootCredentialsCache));
 		String dbUri = loader.getDBUri();
 
 		Map<String, Set<String>> changes = getProperty(props, COMPONENTS,
@@ -421,8 +421,7 @@ public class SchemaManager {
 	}
 
 	public void setDbRootCredentials(String user, String pass) {
-		rootUser = user;
-		rootPass = pass;
+		rootCredentialsCache.set(null, new RootCredentials(user, pass));
 	}
 
 	public Map<DataSourceInfo, List<SchemaInfo>> getDataSourcesAndSchemas() {
@@ -514,11 +513,8 @@ public class SchemaManager {
 
 		SchemaLoader.Parameters params = schemaLoader.createParameters();
 		params.parseUri(ds.getResourceUri());
-		if (rootUser != null || rootPass != null) {
-			params.setDbRootCredentials(rootUser, rootPass);
-		}
 		params.setAdmins(admins, adminPass);
-		schemaLoader.init(params);
+		schemaLoader.init(params, Optional.ofNullable(rootCredentialsCache));
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));
 
@@ -931,5 +927,38 @@ public class SchemaManager {
 
 	public interface SchemaLoaderExecutor {
 		List<ResultEntry> execute(SchemaLoader schemaLoader, SchemaManagerLogHandler handler);
+	}
+
+	public static class RootCredentialsCache {
+
+		private final Map<String, RootCredentials> cache = new ConcurrentHashMap<>();
+
+		public RootCredentials get(String server) {
+			return cache.getOrDefault(createKey(server), cache.get("default"));
+		}
+
+		public void set(String server, RootCredentials credentials) {
+			cache.put(createKey(server), credentials);
+		}
+
+		private String createKey(String server) {
+			if (server == null) {
+				return "default";
+			}
+			return server;
+		}
+
+	}
+
+	public static class RootCredentials {
+
+		public final String user;
+		public final String password;
+
+		public RootCredentials(String user, String password) {
+			this.user = user;
+			this.password = password;
+		}
+
 	}
 }

@@ -30,21 +30,27 @@ import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.RegistrarBean;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
+import tigase.kernel.beans.*;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.SessionManagerHandler;
+import tigase.server.xmppsession.UserConnectedEvent;
 import tigase.util.DNSResolverFactory;
+import tigase.util.LRUConcurrentCache;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFactory;
+import tigase.xmpp.impl.roster.RosterFlat;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -123,7 +129,7 @@ public class JabberIqPrivacy
 	}
 
 	@Inject(nullAllowed = true)
-	protected DummySessionManagerHandler dummySessionManagerHandler;
+	protected PrivacyListOfflineCache cache;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -186,17 +192,7 @@ public class JabberIqPrivacy
 			return false;
 		}    // end of if (session == null)
 
-		boolean sendError = true;
-		if (session == null || !session.isAuthorized()) {
-			if (dummySessionManagerHandler != null) {
-				session = dummySessionManagerHandler.createXMPPResourceConnection(packet);
-			}
-			if (session == null || !session.isAuthorized()) {
-				return false;
-			} else {
-				sendError = false;
-			}
-		}
+		boolean sendError = session != null && session.isAuthorized();
 
 		boolean allowed = allowed(packet, session);
 		if (!allowed && sendError) {
@@ -257,198 +253,100 @@ public class JabberIqPrivacy
 		return XMLNSS;
 	}
 
-	protected boolean allowed(Packet packet, XMPPResourceConnection session) {
-		try {
-			if (allowedByDefault(packet, session))
-				return true;
-
-			Element list = (session instanceof OfflineResourceConnection) ? null : Privacy.getActiveList(session);
-
-			if ((list == null) ) {
-				list = Privacy.getDefaultList( session );
-			}                  // end of if (lName == null)
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Using privcy list: {0}", list);
-			}
-			if (list != null) {
-				List<Element> items = list.getChildren();
-
-				if (items != null) {
-					BareJID sessionUserId = session.getBareJID();
-					JID jid = packet.getStanzaFrom();
-					boolean packetIn = true;
-
-					if ((jid == null) || sessionUserId.equals(jid.getBareJID())) {
-						jid = packet.getStanzaTo();
-						packetIn = false;
-					}
-
-					Collections.sort(items, compar);
-					for (Element item : items) {
-						final ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
-						boolean   type_matched = false;
-						boolean   elem_matched = false;
-						ITEM_TYPE type         = ITEM_TYPE.all;
-
-						if (item.getAttributeStaticStr(TYPE) != null) {
-							type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
-						}            // end of if (item.getAttribute(TYPE) != null)
-
-						String  value         = item.getAttributeStaticStr(VALUE);
-						if (jid != null) {
-							switch (type) {
-							case jid :
-								try {
-
-//									<user@domain/resource> (only that resource matches)
-//									<user@domain> (any resource matches)
-//									<domain/resource> (only that resource matches)
-//									<domain> (the domain itself matches, as does any user@domain or domain/resource)
-									JID jidFromList = JID.jidInstance(value);
-									if (jidFromList.getLocalpart() != null) {
-										if (jidFromList.getResource() != null ) {
-											type_matched = jid.equals(jidFromList);
-										} else if (jidFromList.getResource() == null ) {
-											type_matched = jid.getBareJID().equals(jidFromList.getBareJID());
-										}
-									} else {
-										if (jidFromList.getResource() != null ) {
-											type_matched = jid.equals(jidFromList);
-										} else if (jidFromList.getResource() == null ) {
-											type_matched = jid.getDomain().equals(jidFromList.getDomain());
-										}
-									}
-								} catch ( TigaseStringprepException ex ) {
-									log.log(Level.FINEST, "Exception while creating jid instance for value: " + value, ex);
-								}
-
-								break;
-
-							case group :
-								String[] groups = roster_util.getBuddyGroups(session, jid);
-
-								if (groups != null) {
-									for (String group : groups) {
-										if (type_matched = group.equals(value)) {
-											break;
-										}    // end of if (group.equals(value))
-									}      // end of for (String group: groups)
-								}
-
-								break;
-
-							case subscription :
-								ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
-
-								switch (subscr) {
-								case to :
-									type_matched = roster_util.isSubscribedTo(session, jid);
-
-									break;
-
-								case from :
-									type_matched = roster_util.isSubscribedFrom(session, jid);
-
-									break;
-
-								case none :
-									type_matched = (!roster_util.isSubscribedFrom(session, jid) &&
-											!roster_util.isSubscribedTo(session, jid));
-
-									break;
-
-								case both :
-									type_matched = (roster_util.isSubscribedFrom(session, jid) &&
-											roster_util.isSubscribedTo(session, jid));
-
-									break;
-
-								default :
-									break;
-								}    // end of switch (subscr)
-
-								break;
-
-							case all :
-							default :
-								type_matched = true;
-
-								break;
-							}      // end of switch (type)
-						} else {
-							if (type == ITEM_TYPE.all) {
-								type_matched = true;
-							}
-						}        // end of if (from != null) else
-						if (!type_matched) {
-							continue;
-						}        // end of if (!type_matched)
-
-						List<Element> elems = item.getChildren();
-
-						if ((elems == null) || (elems.size() == 0)) {
-							elem_matched = true;
-						} else {
-							for (Element elem : elems) {
-								if (matchToPrivacyListElement(packetIn, packet, elem, action)) {
-									elem_matched = true;
-									break;
-								}
-							}
-						} // end of else
-						if (!elem_matched) {
-							break;
-						}        // end of if (!elem_matched)
-
-						switch (action) {
-						case allow :
-							return true;
-
-						case deny :
-							return false;
-
-						default :
-							break;
-						}        // end of switch (action)
-					}          // end of for (Element item: items)
-				}            // end of if (items != null)
-			}              // end of if (lName != null)
-			// there is no active nor default list, as per XEP-0016 2.2 Business rules
-			// such stanza should be processed normally
-			else {
-				return true;
-			}
-		} catch (NoConnectionIdException e) {
-
-			// Always allow, this is server dummy session
-		} catch (NotAuthorizedException e) {
-
-//    results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-//        "You must authorize session first.", true));
-		} catch (TigaseDBException e) {
-			log.log(Level.WARNING, "Database problem, please notify the admin. {0}", e);
+	protected boolean allowed(Packet packet, JID connId, BareJID userJid, PrivacyList privacyList) {
+		if (allowedByDefault(packet, connId, userJid)) {
+			return true;
 		}
 
+		if (privacyList != null) {
+			JID jid = packet.getStanzaFrom();
+			boolean packetIn = true;
+
+			if ((jid == null) || userJid.equals(jid.getBareJID())) {
+				jid = packet.getStanzaTo();
+				packetIn = false;
+			}
+
+			PrivacyList.Item.Type type = null;
+			if (packetIn) {
+				switch (packet.getElemName()) {
+					case Presence.ELEM_NAME:
+						type = PrivacyList.Item.Type.presenceIn;
+						break;
+					case Message.ELEM_NAME:
+						type = PrivacyList.Item.Type.message;
+						break;
+					case Iq.ELEM_NAME:
+						type = PrivacyList.Item.Type.iq;
+						break;
+					default:
+						break;
+				}
+			} else {
+				if (packet.getElemName() == Presence.ELEM_NAME) {
+					type = PrivacyList.Item.Type.presenceOut;
+				}
+			}
+
+			if (type != null) {
+				return privacyList.isAllowed(jid, type);
+			}
+		}
+		
 		return true;
 	}
 	
-	protected boolean allowedByDefault(Packet packet, XMPPResourceConnection session) throws NoConnectionIdException, NotAuthorizedException {
+	protected boolean allowed(Packet packet, XMPPResourceConnection session) {
+		if (session != null && session.isAuthorized()) {
+			try {
+				PrivacyList list = Privacy.getActiveList(session);
+				if (list == null) {
+					list = Privacy.getDefaultList(session);
+				}
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Using privcy list: {0}", list);
+				}
+				if (list != null) {
+					return allowed(packet, session.getConnectionId(), session.getBareJID(), list);
+				}
+			} catch (NoConnectionIdException e) {
+
+				// Always allow, this is server dummy session
+			} catch (NotAuthorizedException e) {
+//    results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+//        "You must authorize session first.", true));
+			} catch (TigaseDBException e) {
+				log.log(Level.WARNING, "Database problem, please notify the admin. {0}", e);
+			}
+		} else if (cache != null) {
+			JID to = packet.getStanzaTo();
+			if (to != null) {
+				PrivacyList list = cache.getPrivacyList(to.getBareJID());
+				if (list != null) {
+					return allowed(packet, null, to.getBareJID(), list);
+				}
+			}
+		}
+		return true;
+	}
+
+	protected boolean allowedByDefault(Packet packet, JID connId, BareJID userJid) {
 		// If this is a preprocessing phase, always allow all packets to
 		// make it possible for the client to communicate with the server.
-		if (session.getConnectionId().equals(packet.getPacketFrom())) {
+		if (connId != null && connId.equals(packet.getPacketFrom())) {
 			return true;
 		}
 
 		// allow packets without from attribute and packets with from attribute same as domain name
 		if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart()
-				== null) && session.getBareJID().getDomain().equals(packet.getStanzaFrom()
+				== null) && userJid.getDomain().equals(packet.getStanzaFrom()
 						.getDomain()))) {
 			return true;
 		}
 
 		// allow packets without to attribute and packets with to attribute same as domain name
 		if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart()
-				== null) && session.getBareJID().getDomain().equals(packet.getStanzaTo()
+				== null) && userJid.getDomain().equals(packet.getStanzaTo()
 						.getDomain()))) {
 			return true;
 		}
@@ -461,7 +359,7 @@ public class JabberIqPrivacy
 			return true;
 		}
 		
-		if (packet.getType() == StanzaType.error && packet.getStanzaTo() != null && session.isUserId(packet.getStanzaTo().getBareJID())) {
+		if (packet.getType() == StanzaType.error && packet.getStanzaTo() != null && userJid.equals(packet.getStanzaTo().getBareJID())) {
 			// this may be error sent back to sender of blocked request
 			// or even to user who sent packet to blocked user
 			Element error = packet.getElement().findChild(e -> e.getName() == ERROR_EL_NAME);
@@ -470,18 +368,6 @@ public class JabberIqPrivacy
 				return true;
 		}
 
-		return false;
-	}
-	
-	protected boolean matchToPrivacyListElement(boolean packetIn, Packet packet, Element elem, ITEM_ACTION action) {
-		if ((packet.getElemName() == PRESENCE_EL_NAME)
-				&& ((packetIn && (elem.getName() == PRESENCE_IN_EL_NAME)) || (!packetIn && (elem.getName() == PRESENCE_OUT_EL_NAME)))
-				&& ((packet.getType() == null) || (packet.getType() == StanzaType.unavailable))) {
-			return true;
-		}
-		if (packetIn && (elem.getName() == packet.getElemName())) {
-			return true;
-		}
 		return false;
 	}
 	
@@ -771,16 +657,30 @@ public class JabberIqPrivacy
 		return result;
 	}
 
-	@Bean(name = "offlineSessionProvider", parent = JabberIqPrivacy.class, active = true)
-	public static class DummySessionManagerHandler implements SessionManagerHandler {
+	@Bean(name = "privacyListOfflineCache", parent = JabberIqPrivacy.class, active = false)
+	public static class PrivacyListOfflineCache
+			implements SessionManagerHandler, Initializable, UnregisterAware {
 
 		private JID compId = JID.jidInstanceNS("privacy-sessman", DNSResolverFactory.getInstance().getDefaultHost());
+		private JID offlineConnectionId = JID.jidInstanceNS("offline-connection", DNSResolverFactory.getInstance().getDefaultHost());
+
+		@ConfigField(desc = "Cache size", alias = "size")
+		private int cacheSize = 10000;
+
+		private LRUConcurrentCache<BareJID,PrivacyList> cache = new LRUConcurrentCache<>(cacheSize);
 
 		@Inject
 		private UserRepository userRepository;
 
 		@Inject
 		private AuthRepository authRepository;
+
+		@Inject
+		private EventBus eventBus;
+
+		public void clear() {
+			cache.clear();
+		}
 
 		@Override
 		public JID getComponentId() {
@@ -811,24 +711,67 @@ public class JabberIqPrivacy
 
 		}
 
+		@HandleEvent
+		protected void userConnected(UserConnectedEvent event) {
+			cache.remove(event.getUserJid().getBareJID());
+		}
+
 		@Override
 		public boolean isLocalDomain(String domain, boolean includeComponents) {
 			return false;
 		}
 
-		protected XMPPResourceConnection createXMPPResourceConnection(Packet packet) {
-			JID userJid = packet.getStanzaTo();
-			if (userJid == null) {
-				return null;
+		@Override
+		public void initialize() {
+			eventBus.registerAll(this);
+		}
+
+		@Override
+		public void beforeUnregister() {
+			eventBus.unregisterAll(this);
+		}
+
+		public void setCacheSize(int cacheSize) {
+			this.cacheSize = cacheSize;
+			if (cache.limit() != cacheSize) {
+				cache = new LRUConcurrentCache<>(cacheSize);
 			}
-			
+		}
+
+		protected PrivacyList getPrivacyList(BareJID userJID) {
+			if (!cache.containsKey(userJID)) {
+				try {
+					PrivacyList list = this.loadList(userJID);
+					cache.put(userJID, list);
+				} catch (NotAuthorizedException|TigaseDBException ex) {
+					return null;
+				}
+			}
+			return cache.get(userJID);
+		}
+
+		protected PrivacyList loadList(BareJID userJID) throws NotAuthorizedException, TigaseDBException {
+			XMPPResourceConnection session = createXMPPResourceConnection(userJID);
+			if (roster_util instanceof RosterFlat) {
+				Element listEl = Privacy.getDefaultListElement(session);
+				if (listEl == null) {
+					return PrivacyList.ALLOW_ALL;
+				}
+				final Map<BareJID, RosterElement> roster = ((RosterFlat) roster_util).loadUserRoster(session);
+				return PrivacyList.create(roster, listEl);
+			} else {
+				return Privacy.getDefaultList(session);
+			}
+		}
+
+		protected XMPPResourceConnection createXMPPResourceConnection(BareJID userJid) {
 			try {
-				XMPPResourceConnection session = new OfflineResourceConnection(packet.getStanzaTo(), userRepository,
+				XMPPResourceConnection session = new OfflineResourceConnection(offlineConnectionId, userRepository,
 																			authRepository, this);
 				VHostItem vhost = new VHostItem();
 				vhost.setVHost(userJid.getDomain());
 				session.setDomain(vhost);
-				session.authorizeJID(userJid.getBareJID(), false);
+				session.authorizeJID(userJid, false);
 				XMPPSession parentSession = new XMPPSession(userJid.getLocalpart());
 				session.setParentSession(parentSession);
 				return session;

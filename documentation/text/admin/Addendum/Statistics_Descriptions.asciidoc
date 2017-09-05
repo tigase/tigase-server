@@ -1,8 +1,7 @@
 [[statsticsDescription]]
 = Appendix I - Statistics description
 :author: Daniel Wisnewski (daniel@tigase.org)
-:date: 2016-04-22 10:40
-:version: v2.0 April 2017
+:version: v2.0, April 2017: Reformatted for 7.2.0.
 
 
 :toc:
@@ -300,7 +299,7 @@ Note that the processor arrray will only have as many threads as the component h
 |`{compname}/processing threads`
 
 |stream-error-counter
-|The number of errors counted during the operation of the server for this component.  Will only be available if xref:stream-error-counter[stream-error-counter] is enabled in init.properties, otherwise will be 0. |FINE |Integer |
+|The number of errors counted during the operation of the server for this component.  Will only be available if xref:stream-error-counter[stream-error-counter] is enabled in config.tdsl, otherwise will be 0. |FINE |Integer |
 |`{compname}/processors/stream-error-counter`
 
 |Socket overflow
@@ -337,7 +336,7 @@ Note that the processor arrray will only have as many threads as the component h
 |`{compname}/Watchdog runs`
 
 |Watchdog stopped
-|The number of times watchdog identified and closed a connection it has found to be stale according to the settings in init.properties or by the defaults defined xref:watchdog[in this section]. |FINER |Integer |
+|The number of times watchdog identified and closed a connection it has found to be stale according to the settings in config.tdsl or by the defaults defined xref:watchdog[in this section]. |FINER |Integer |
 |`{compname}/Watchdog stopped`
 
 |Watchdog tests

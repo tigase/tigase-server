@@ -1,9 +1,14 @@
 [[dslConfig]]
 = DSL file format
+:author: Andrzej Wójcik
+:version: v1.2 August 2017. Reformatted for v7.2.0.
 
-In previous Tigase XMPP Server releases configuration was stored in properties based configuration file. From Tigase XMPP Server 7.2.0 release it will be possible
-// recommended ??
-to use new DSL based configuration file format. This file format was inspired by Groovy language syntax and new core feature of Tigase XMPP Server - Tigase Kernel Framework.
+:toc:
+:numbered:
+:website: http://tigase.net
+
+In previous Tigase XMPP Server releases configuration was stored in properties based configuration file.
+From Tigase XMPP Server 7.2.0 release it will be required to use new DSL based configuration file format. This file format was inspired by Groovy language syntax and new core feature of Tigase XMPP Server - Tigase Kernel Framework.
 
 == Why new format?
 In properties configuration format each line contained key and value with optional definition of type of stored value:
@@ -302,7 +307,7 @@ sess-man {
 ----
 
 == Default configuration
-Tigase XMPP Server is packaged with a basic init.properties file that tells the server to start up in setup mode.
+Tigase XMPP Server is packaged with a basic config.tdsl file that tells the server to start up in setup mode.
 
 [source,dsl]
 -----
