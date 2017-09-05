@@ -37,6 +37,7 @@ import tigase.xmpp.XMPPResourceConnection;
 public class DynamicRosterTest123 implements DynamicRosterIfc {
 
 	private static final String[] buddy_names = { "test1", "test2", "test3" };
+	private static final String[] managers = { "manager1" };
 
 	@Override
 	public void setItemExtraData(Element item) {
@@ -71,6 +72,12 @@ public class DynamicRosterTest123 implements DynamicRosterIfc {
 				result.add(JID.jidInstanceNS(name, domain, null));
 			}
 		}
+		for (String name : managers) {
+			if (!name.equals(session.getUserName())) {
+				result.add(JID.jidInstanceNS(name, domain, null));
+			}
+		}
+
 		return result.toArray(new JID[result.size()]);
 	}
 
@@ -79,7 +86,11 @@ public class DynamicRosterTest123 implements DynamicRosterIfc {
 			throws NotAuthorizedException {
 		return new Element("item", new Element[] { new Element("group", "test group") },
 				new String[] { "jid", "name", "subscription" }, new String[] {
-						buddy.getBareJID().toString(), buddy.getLocalpart(), "both" });
+					buddy.getBareJID().toString(),
+					buddy.getLocalpart(),
+					( buddy.toString().contains("manager") ? "from" : "to" )
+		});
+
 	}
 
 	@Override

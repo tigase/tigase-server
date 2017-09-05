@@ -44,9 +44,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.xmpp.impl.roster.RosterAbstract.SUB_BOTH;
-import static tigase.xmpp.impl.roster.RosterAbstract.SUB_FROM;
-import static tigase.xmpp.impl.roster.RosterAbstract.SUB_TO;
+import static tigase.xmpp.impl.roster.RosterAbstract.*;
 
 /**
  * Class responsible for handling Presence packets
@@ -150,7 +148,7 @@ public abstract class PresenceAbstract
 		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
 
 		try {
-			buddies = DynamicRoster.addBuddies(session, settings, buddies);
+			buddies = DynamicRoster.addBuddies(session, settings, buddies, TO_SUBSCRIBED);
 		} catch (RosterRetrievingException | RepositoryAccessException ex) {
 
 			// Ignore, handled in the JabberIqRoster code
