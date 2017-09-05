@@ -163,7 +163,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	@Override
 	public void store() {
 		super.store();
-		if (repo != null) {
+		if (repo != null && isInitialized()) {
 			StringBuilder sb = new StringBuilder();
 
 			for (Item item : items.values()) {

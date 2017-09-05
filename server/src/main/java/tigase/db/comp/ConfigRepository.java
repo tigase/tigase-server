@@ -58,6 +58,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
+	private boolean initialized = false;
 
 	public ConfigRepository() {
 		String propKey = getPropertyKey();
@@ -289,18 +290,21 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	//~--- set methods ----------------------------------------------------------
 
 	public void setItems(String[] items_arr) {
-		items.clear();
-		if (items_arr != null) {
-			for (String it : items_arr) {
-				log.log(Level.CONFIG, "Loading config item: {0}", it);
+			if (items_arr != null) {
+				for (String it : items_arr) {
+					log.log(Level.CONFIG, "Loading config item: {0}", it);
 
-				Item item = getItemInstance();
+					Item item = getItemInstance();
 
-				item.initFromPropertyString(it);
-				addItem(item);
-				log.log(Level.CONFIG, "Loaded config item: {0}", item);
+					item.initFromPropertyString(it);
+					if (!items.containsKey(item.getKey())) {
+						addItem(item);
+						log.log(Level.CONFIG, "Loaded config item: {0}", item);
+					} else {
+						log.log(Level.CONFIG, "Config item already loaded, skipping: {0}", item);
+					}
+				}
 			}
-		}
 	}
 
 	@Deprecated
@@ -338,10 +342,16 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	@Override
 	public void initialize() {
+		this.initialized = true;
 		if (items.isEmpty()) {
 			setItems(getDefaultPropetyItems());
+		} else {
+			store();
 		}
 		setAutoReloadInterval(autoReloadInterval);
 	}
 
+	protected boolean isInitialized() {
+		return initialized;
+	}
 }
