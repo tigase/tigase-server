@@ -35,6 +35,8 @@ import tigase.server.ConnectionManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
+import java.io.IOException;
+import java.nio.ByteOrder;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -212,6 +214,23 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 			log.config("Workaround for TLS/SSL bug is " + (value ? "enabled" : "disabled"));
 		}
 		this.tlsJdkNssBugWorkaround = value;
+	}
+
+	@Override
+	public IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
+										 boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
+										 TrustManager[] x509TrustManagers, TLSEventHandler eventHandler, IOInterface socketIO,
+										 CertificateContainerIfc certificateContainer) throws IOException {
+		return new BcTLSIO(certificateContainer, eventHandler, socketIO, tls_hostname, byteOrder, wantClientAuth,
+							   needClientAuth, getEnabledCiphers(),
+							   getEnabledProtocols(),x509TrustManagers);
+
+
+
+//		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
+//		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
+//											   needClientAuth, getEnabledCiphers(), getEnabledProtocols());
+//		return new TLSIO(socketIO, wrapper, byteOrder);
 	}
 
 	@Override

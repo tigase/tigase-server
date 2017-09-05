@@ -29,6 +29,8 @@ import tigase.server.Lifecycle;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.File;
+import java.io.IOException;
+import java.nio.ByteOrder;
 import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
 import java.util.Map;
@@ -54,7 +56,7 @@ public interface SSLContextContainerIfc extends Lifecycle {
 	 * <code>false</code> in any real deployment and can be set ot
 	 * <code>true</code> in development invironment.
 	 */
-	public static final String ALLOW_INVALID_CERTS_KEY = "allow-invalid-certs";
+	String ALLOW_INVALID_CERTS_KEY = "allow-invalid-certs";
 
 	/**
 	 * Constant <code>ALLOW_INVALID_CERTS_VAL</code> is a default configuration
@@ -62,66 +64,66 @@ public interface SSLContextContainerIfc extends Lifecycle {
 	 * server.
 	 * 
 	 */
-	public static final String ALLOW_INVALID_CERTS_VAL = "false";
+	String ALLOW_INVALID_CERTS_VAL = "false";
 
 	/**
 	 * Constant <code>ALLOW_SELF_SIGNED_CERTS_KEY</code> is a key pointing to a
 	 * configuration parameter specifying if self-signed certificates are
 	 * acceptable for the server.
 	 */
-	public static final String ALLOW_SELF_SIGNED_CERTS_KEY = "allow-self-signed-certs";
+	String ALLOW_SELF_SIGNED_CERTS_KEY = "allow-self-signed-certs";
 
 	/**
 	 * Constant <code>ALLOW_SELF_SIGNED_CERTS_VAL</code> is a default
 	 * configuration value specifying if self-signed certificates are allowed by
 	 * the server.
 	 */
-	public static final String ALLOW_SELF_SIGNED_CERTS_VAL = "true";
+	String ALLOW_SELF_SIGNED_CERTS_VAL = "true";
 
 	/** Field description */
-	public static final String CERT_ALIAS_KEY = "cert-alias";
+	String CERT_ALIAS_KEY = "cert-alias";
 
 	/** Field description */
-	public static final String CERT_SAVE_TO_DISK_KEY = "cert-save-to-disk";
+	String CERT_SAVE_TO_DISK_KEY = "cert-save-to-disk";
 
 	/**
 	 * Constant <code>DEFAULT_DOMAIN_CERT_KEY</code> is a key pointing to the
 	 * domain with default certificate.
 	 */
-	public static final String DEFAULT_DOMAIN_CERT_KEY = "ssl-def-cert-domain";
+	String DEFAULT_DOMAIN_CERT_KEY = "ssl-def-cert-domain";
 
 	/**
 	 * Constant <code>DEFAULT_DOMAIN_CERT_VAL</code> keeps default value for a
 	 * domain with default certificate.
 	 */
-	public static final String DEFAULT_DOMAIN_CERT_VAL = "default";
+	String DEFAULT_DOMAIN_CERT_VAL = "default";
 
 	/**
 	 * Constant <code>JKS_KEYSTORE_FILE_KEY</code> is a key pointing to a JKS
 	 * keystore file.
 	 */
-	public static final String JKS_KEYSTORE_FILE_KEY = "keys-store";
+	String JKS_KEYSTORE_FILE_KEY = "keys-store";
 
 	/**
 	 * Constant <code>JKS_KEYSTORE_FILE_VAL</code> keeps default value for a JKS
 	 * keystore file.
 	 */
-	public static final String JKS_KEYSTORE_FILE_VAL = "certs" + File.separator + "rsa-keystore";
+	String JKS_KEYSTORE_FILE_VAL = "certs" + File.separator + "rsa-keystore";
 
 	/**
 	 * Constant <code>JKS_KEYSTORE_PWD_KEY</code> is a key pointing to a private
 	 * key password,
 	 */
-	public static final String JKS_KEYSTORE_PWD_KEY = "keys-store-password";
+	String JKS_KEYSTORE_PWD_KEY = "keys-store-password";
 
 	/**
 	 * Constant <code>JKS_KEYSTORE_PWD_VAL</code> is a default private key
 	 * password.
 	 */
-	public static final String JKS_KEYSTORE_PWD_VAL = "keystore";
+	String JKS_KEYSTORE_PWD_VAL = "keystore";
 
 	/** Field description */
-	public static final String PEM_CERTIFICATE_KEY = "pem-certificate";
+	String PEM_CERTIFICATE_KEY = "pem-certificate";
 
 	/**
 	 * Constant <code>SERVER_CERTS_DIR_KEY</code> is a key pointing to a
@@ -134,14 +136,14 @@ public interface SSLContextContainerIfc extends Lifecycle {
 	 * which is a default certificate for the server if certificate for specific
 	 * domain is missing.
 	 */
-	public static final String SERVER_CERTS_LOCATION_KEY = "ssl-certs-location";
+	String SERVER_CERTS_LOCATION_KEY = "ssl-certs-location";
 
 	/**
 	 * Constant <code>SERVER_CERTS_DIR_VAL</code> is a default directory name
 	 * where all certificate files are stored.
 	 * 
 	 */
-	public static final String SERVER_CERTS_LOCATION_VAL = "certs/";
+	String SERVER_CERTS_LOCATION_VAL = "certs/";
 
 	/**
 	 * Constant <code>SSL_CONTAINER_CLASS_KEY</code> is a key pointing to a
@@ -150,49 +152,49 @@ public interface SSLContextContainerIfc extends Lifecycle {
 	 * implementations may accept different parameters set. Please refer to the
 	 * implementation for more details.
 	 */
-	public static final String SSL_CONTAINER_CLASS_KEY = "ssl-container-class";
+	String SSL_CONTAINER_CLASS_KEY = "ssl-container-class";
 
 	/**
 	 * Constant <code>SSL_CONTAINER_CLASS_VAL</code> keeps default container
 	 * implementation class loaded if none is specified in configuration file.
 	 */
-	public static final String SSL_CONTAINER_CLASS_VAL = SSLContextContainer.class.getName();
+	String SSL_CONTAINER_CLASS_VAL = SSLContextContainer.class.getName();
 
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_KEY</code> is a key pointing to a
 	 * configuration parameter where all trusted certificates are stored. This
 	 * can be a comma separated list of directories.
 	 */
-	public static final String TRUSTED_CERTS_DIR_KEY = "trusted-certs-dir";
+	String TRUSTED_CERTS_DIR_KEY = "trusted-certs-dir";
 
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_VAL</code> is a default directory name
 	 * where all trusted certificates are stored.
 	 */
-	public static final String TRUSTED_CERTS_DIR_VAL = "/etc/ssl/certs";
+	String TRUSTED_CERTS_DIR_VAL = "/etc/ssl/certs";
 
 	/**
 	 * Constant <code>TRUSTSTORE_FILE_KEY</code> is a key pointing to a trust
 	 * store file.
 	 */
-	public static final String TRUSTSTORE_FILE_KEY = "trusts-store";
+	String TRUSTSTORE_FILE_KEY = "trusts-store";
 
 	/**
 	 * Constant <code>TRUSTSTORE_FILE_VAL</code> is a default truststore file.
 	 */
-	public static final String TRUSTSTORE_FILE_VAL = "certs" + File.separator + "truststore";
+	String TRUSTSTORE_FILE_VAL = "certs" + File.separator + "truststore";
 
 	/**
 	 * Constant <code>TRUSTSTORE_PWD_KEY</code> is a key pointing to a trustore
 	 * file password.
 	 */
-	public static final String TRUSTSTORE_PWD_KEY = "trusts-store-password";
+	String TRUSTSTORE_PWD_KEY = "trusts-store-password";
 
 	/**
 	 * Constant <code>TRUSTSTORE_PWD_VAL</code> is a default password for
 	 * truststore file.
 	 */
-	public static final String TRUSTSTORE_PWD_VAL = "truststore";
+	String TRUSTSTORE_PWD_VAL = "truststore";
 
 	// ~--- methods
 	// --------------------------------------------------------------
@@ -210,6 +212,10 @@ public interface SSLContextContainerIfc extends Lifecycle {
 	 * @throws CertificateParsingException
 	 */
 	void addCertificates(Map<String, String> params) throws CertificateParsingException;
+
+	IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
+								  boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder, TrustManager[] x509TrustManagers,
+								  TLSEventHandler eventHandler, IOInterface ioi, CertificateContainerIfc certificateContainer) throws IOException;
 
 	// ~--- get methods
 	// ----------------------------------------------------------
