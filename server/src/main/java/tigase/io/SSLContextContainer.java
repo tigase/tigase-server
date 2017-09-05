@@ -221,16 +221,10 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 										 boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
 										 TrustManager[] x509TrustManagers, TLSEventHandler eventHandler, IOInterface socketIO,
 										 CertificateContainerIfc certificateContainer) throws IOException {
-		return new BcTLSIO(certificateContainer, eventHandler, socketIO, tls_hostname, byteOrder, wantClientAuth,
-							   needClientAuth, getEnabledCiphers(),
-							   getEnabledProtocols(),x509TrustManagers);
-
-
-
-//		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
-//		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
-//											   needClientAuth, getEnabledCiphers(), getEnabledProtocols());
-//		return new TLSIO(socketIO, wrapper, byteOrder);
+		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
+		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
+											   needClientAuth, getEnabledCiphers(), getEnabledProtocols());
+		return new TLSIO(socketIO, wrapper, byteOrder);
 	}
 
 	@Override
