@@ -27,18 +27,17 @@ package tigase.xmpp.impl.roster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+
+import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class DynamicRoster here.
@@ -52,6 +51,8 @@ import java.util.Map;
 public abstract class DynamicRoster {
 	private static final String DYNAMIC_ROSTERS         = "dynamic-rosters";
 	private static final String DYNAMIC_ROSTERS_CLASSES = "dynamic-roster-classes";
+
+	private static final EnumSet<SubscriptionType> subs = EnumSet.noneOf(SubscriptionType.class);
 
 	/**
 	 * Private logger for class instances.
@@ -80,15 +81,39 @@ public abstract class DynamicRoster {
 			Object> settings, JID[] buddies)
 					throws NotAuthorizedException, RosterRetrievingException,
 							RepositoryAccessException {
+		return addBuddies(session,settings,buddies, subs);
+	}
+
+	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String,
+			Object> settings, JID[] buddies, final EnumSet<RosterAbstract.SubscriptionType> subscrs)
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException {
 		List<JID> result = getBuddiesList(session, settings);
+
+		if (result != null && subscrs != null && !subscrs.isEmpty()) {
+			final Iterator<JID> iterator = result.iterator();
+			while (iterator.hasNext()) {
+				final JID jid = iterator.next();
+				Element buddy = getBuddyItem(session, settings, jid);
+				String sub = null;
+				if (buddy != null && ((sub = buddy.getAttributeStaticStr("subscription")) != null)) {
+					try {
+						final SubscriptionType subType = SubscriptionType.valueOf(sub.toLowerCase());
+						if (!subscrs.contains(subType)) {
+							iterator.remove();
+						}
+					} catch (IllegalArgumentException e) {
+						log.log(Level.FINEST, "Illegal dynamic roster element, skipping");
+					}
+				}
+			}
+		}
 
 		if (buddies != null) {
 			if (result == null) {
 				result = new ArrayList<JID>();
 			}
 			addBuddiesToList(result, buddies);
-
-			// result.addAll(Arrays.asList(buddies));
 		}
 		if ((result != null) && (result.size() > 0)) {
 			return result.toArray(new JID[result.size()]);
