@@ -154,9 +154,17 @@ public class ConfigHolder {
 	}
 
 	public Optional<String[]> loadConfiguration(String[] args) throws IOException, ConfigReader.ConfigException {
+		boolean hasCustomConfigFile = false;
 		for (int i=0; i<args.length; i++) {
 			if (TDSL_CONFIG_FILE_KEY.equals(args[i]) && (i+1) < args.length) {
 				configFile = Paths.get(args[++i]);
+				hasCustomConfigFile = true;
+			}
+			if (PROPERTIES_CONFIG_FILE_KEY.equals(args[i]) && (i+1) < args.length) {
+				if (!hasCustomConfigFile) {
+					Path propsFilePath = Paths.get(args[++i]);
+					configFile = propsFilePath.getParent().resolveSibling(configFile.getFileName());
+				}
 			}
 		}
 
