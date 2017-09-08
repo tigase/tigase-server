@@ -14,10 +14,10 @@ As mentioned in each of the quick start sections, each distribution of Tigase XM
 [options="header""]
 |===========================
 |Operating system| init.d file path| Types of Operating Systems
-|Debian|`tigase-server/scripts/debian/tigase.init.d`|Knoppix, Ubuntu, Raspbian or Duvian
-|Gentoo|`tigase-server/scripts/gentoo/init.d/tigase`|CoreOS, Tin Hat Linux or other *too based systems
+|Debian|`tigase-server/scripts/debian/tigase.init.d`|Knoppix, Ubuntu (before v15.04), Raspbian or Duvian
+|Gentoo|`tigase-server/scripts/gentoo/init.d/tigase`|CoreOS (before v94.0.0), Tin Hat Linux or other *too based systems
 |Mandriva|`tigase-server/scripts/mandriva/init.d/tigase`|Specific init.d file for Mandriva Linux
-|Redhat|`tigase-server/scripts/redhat/init.d/tigase`|Redhat and other RPM based linux derivatives like CentOS, openSUSE
+|Redhat|`tigase-server/scripts/redhat/init.d/tigase`|RedHat (before v7.0) and other RPM based linux derivatives like CentOS (before v.7.14), openSUSE (before v12.2)
 |===========================
 
 == Configuration: For All Linux Distributions
