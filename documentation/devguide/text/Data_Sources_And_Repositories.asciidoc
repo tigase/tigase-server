@@ -1,4 +1,10 @@
 = Data Source and Repositories
+:author: Tigase Team
+:version: v2.0 August 2017. Reformatted for v7.2.0.
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
 
 In Tigase XMPP Server 7.2.0 new concept of data sources was introduced.
 It was introduced to create distinction between classes responsible for maintaining connection to actual data source and classes operating on this data source.
@@ -59,6 +65,3 @@ Implementations should be annotated with +@Repository.Meta+ implementation to ma
 It is required to create a class extending +MDRepositoryBean+ implementing same custom interface as the custom repository.
 This class will be a multi domain pool, allowing you to have separate implementation of custom repository for each domain.
 Moreover, it will be responsible for creation and initialization of your custom repository instances.
-
-
-

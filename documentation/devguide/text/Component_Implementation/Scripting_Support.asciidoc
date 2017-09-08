@@ -1,9 +1,7 @@
 [[cil6]]
 = Component Implementation - Lesson 6 - Scripting Support
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-01-06 20:22
-:revision: v2.1
+:version: v2.1, June 2014: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -28,7 +26,7 @@ public void initBindings(Bindings binds) {
 }
 -----
 
-This way you expose two the component variables: +badWords+ and +whiteList+ to scripts under names the same names - two defined constants. You could use different names of course but it is always a good idea to keep things straightforward, hence we use the same variable names in the component and in the script.
+This way you expose two the component variables: `badWords` and `whiteList` to scripts under names the same names - two defined constants. You could use different names of course but it is always a good idea to keep things straightforward, hence we use the same variable names in the component and in the script.
 
 Almost done, almost... In our old implementation these two variables are Java arrays of `String`. Therefore we can only change their elements but we can not add or remove elements from these structures inside the script. This is not very practical and it puts some serious limits on the script's code. To overcome this problem I have changed the test component code to keep bad words and whitelist in `java.util.Set` collection. This gives us enough flexibility to manipulate data.
 

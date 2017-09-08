@@ -1,8 +1,7 @@
 [[dynamicRosters]]
 = Dynamic Rosters
 :author: not known
-:version: v1.0 initial release
-:date: 2015-07-27 18:10
+:version: v2.0, August 2017: Reformatted for v7.2.0.
 
 
 == Problem Description
@@ -119,17 +118,29 @@ Client responds to the server:
 
 == Configuration
 DynamicRoster implementation class should be configured in the *config.tdsl* file. As it's an extension to the *PresenceState*, *PresenceSubscription* and *Roster* plugins classes should be configured either for each plugin:
-[source,bash]
+[source,dsl]
 -----
-sess-man/plugins-conf/jabber\:iq\:roster/dynamic-roster-classes=<class list>
-sess-man/plugins-conf/presence-state/dynamic-roster-classes=<classes list>
-sess-man/plugins-conf/presence-subscription/dynamic-roster-classes=<classes list>
+'sess-man' () {
+    'jabber:iq:roster' () {
+        'dynamic-roster-classes' = 'class1.tigase.com,class2.tigase.com'
+    }
+    'presence-state' () {
+        'dynamic-roster-classes' = 'classList.rosterImplementation.tigase'
+    }
+    'presence-subscription' () {
+        'dynamic-roster-classes' = 'class2.custom.roster,another.class.dynamicRoster'
+    }
+}
 -----
 or globally:
 
-[source,bash]
+[source,dsl]
 -----
-sess-man/plugins-conf/dynamic-roster-classes=<classes list>
+'sess-man' () {
+    'dynamic-rosters' () {
+        class (class: custom.dynamicRoster.class) {}
+    }
+}
 -----
 
 *<classes list>* is a comma separated list of classes.

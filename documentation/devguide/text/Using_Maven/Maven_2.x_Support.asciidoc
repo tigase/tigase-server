@@ -1,9 +1,7 @@
 [[maven2support]]
 = Maven 2.x Support
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-04-06 21:22
-:revision: v2.1
+:version: v2.1 September 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -30,7 +28,7 @@ cd tigase-server
 
 [source,bash]
 -----
-mvn assembly:assembly
+mvn clean install
 -----
 . After maven finished his work there should be new subdirectory created: target. Go to this directory now:
 
@@ -55,7 +53,7 @@ dir
 +
 [source,bash]
 -----
-tigase-server-2.4.0-SNAPSHOT-prodenv.tar.gz
+tigase-server-x.x.x-SNAPSHOT-prodenv.tar.gz
 tigase-server-2.4.0-SNAPSHOT-prodenv.zip
 -----
 . Unpack one of these files whichever you like:

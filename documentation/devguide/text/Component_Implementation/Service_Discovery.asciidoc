@@ -1,9 +1,7 @@
 [[cil4]]
 = Component Implementation - Lesson 4 - Service Discovery
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-01-06 20:22
-:revision: v2.1
+:version: v2.1, June 2014: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -34,9 +32,9 @@ After you have added the two above methods and restarted the server with updated
 
 image:images/spam-filtering-disco-small.png[]
 
-Now let's add method which will allow our module +TestModule+ to return supported features. This way our component will automatically report features supported by all it's modules.
+Now let's add method which will allow our module `TestModule` to return supported features. This way our component will automatically report features supported by all it's modules.
 To do so we need to implement a method *String[] getFeatures()* which returns array of `String` items. This items are used to generate a list of features supported by component.
-List of features supported by all modules are retrieved during service discovery of a component by +DiscoveryModule+.
+List of features supported by all modules are retrieved during service discovery of a component by `DiscoveryModule`.
 
 Although this was easy, this particular change doesn't affect anything apart from just a visual appearance. Let's get then to more advanced and more useful changes.
 
@@ -51,7 +49,7 @@ updateServiceDiscoveryItem(getName(), null,
   (++messagesCounter) + "]", true);
 -----
 
-_A small performance note, in some cases calling +updateServiceDiscoveryItem(...)+ might be an expensive operation so probably a better idea would be to call the method not every time we receive a message but maybe every 100 times or so._
+_A small performance note, in some cases calling `updateServiceDiscoveryItem(...)` might be an expensive operation so probably a better idea would be to call the method not every time we receive a message but maybe every 100 times or so._
 
 The first parameter is the component JID presented on the service discovery list. However, Tigase server may work for many virtual hosts so the hostname part is added by the lower level functions and we only provide the component name here. The second parameter is the service discovery node which is usually '*null*' for top level disco elements. Third is the item description (which is actually called 'name' in the disco specification). The last parameter specifies if the element is visible to administrators only.
 
@@ -75,9 +73,9 @@ updateServiceDiscoveryItem(getName(), "spam", "Spam caught: [" +
 
 Again, have a look at the full method body below for a complete code example. Now if we send a few messages to the component and some of them are spam (contain words recognized as spam) we can browse the service discovery of the server. Your service discovery should show a list similar to the one presented on the screenshot on the left.
 
-Of course depending on the implementation, initially there might be no sub-nodes under our component element if we call the +updateServiceDiscoveryItem(...)+ method only when a message is processed. To make sure that sub-nodes of our component show from the very beginning you can call them in +setProperties(...)+ for the first time to populate the service discovery with initial sub-nodes.
+Of course depending on the implementation, initially there might be no sub-nodes under our component element if we call the `updateServiceDiscoveryItem(...)` method only when a message is processed. To make sure that sub-nodes of our component show from the very beginning you can call them in `setProperties(...)` for the first time to populate the service discovery with initial sub-nodes.
 
-Please note, the +updateServiceDiscoveryItem(...)+ method is used for adding a new item and updating existing one. There is a separate method though to remove the item:
+Please note, the `updateServiceDiscoveryItem(...)` method is used for adding a new item and updating existing one. There is a separate method though to remove the item:
 
 [source,java]
 -----
@@ -89,7 +87,7 @@ Actually only two first parameters are important: the *jid* and the *node* which
 
 There are two additional variants of the _update_ method which give you more control over the service discovery item created. Items can be of different categories and types and can also present a set of features.
 
-The simpler is a variant which sets a set of features for the updated service discovery item. There is a link:http://xmpp.org/registrar/disco-features.html[document] describing existing, registered features. We are creating an example which is going to be a spam filter and there is no predefined feature for spam filtering but for purpose of this guide we can invent two feature identification strings and set it for our component. Let's call +update+ method with following parameters:
+The simpler is a variant which sets a set of features for the updated service discovery item. There is a link:http://xmpp.org/registrar/disco-features.html[document] describing existing, registered features. We are creating an example which is going to be a spam filter and there is no predefined feature for spam filtering but for purpose of this guide we can invent two feature identification strings and set it for our component. Let's call `update` method with following parameters:
 
 [source,java]
 -----
@@ -97,7 +95,7 @@ updateServiceDiscoveryItem(getName(), null, getDiscoDescription(),
   true, "tigase:x:spam-filter", "tigase:x:spam-reporting");
 -----
 
-The best place to call this method is the +setProperties(...)+ method so our component gets a proper service discovery settings at startup time. We have set two features for the component disco: _tigase:x:spam-filter_ and _tigase:x:spam-reporting_. This method accepts a variable set of arguments so we can pass to it as many features as we need or following Java spec we can just pass an array of *Strings*.
+The best place to call this method is the `setProperties(...)` method so our component gets a proper service discovery settings at startup time. We have set two features for the component disco: _tigase:x:spam-filter_ and _tigase:x:spam-reporting_. This method accepts a variable set of arguments so we can pass to it as many features as we need or following Java spec we can just pass an array of *Strings*.
 
 Update your code with call presented above, and restart the server. Have a look at the service discovery for the component now.
 

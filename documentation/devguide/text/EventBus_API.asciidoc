@@ -1,9 +1,7 @@
 [[eventBusAPI]]
 = EventBus API in Tigase
 :author: Bartosz Małkowski <bmalkowski@tigase.pl>
-:version: v1.0, December 2015.
-:date: 2015-12-29
-:revision: v1.0
+:version: v1.0 August 2015. Reformatted for v7.2.0.
 
 :toc:
 :numbered:

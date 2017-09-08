@@ -2,8 +2,6 @@
 = API changes in the Tigase Server 5.x
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-01-06 20:22
-:revision: v2.1
 
 :toc:
 :numbered:
@@ -37,9 +35,9 @@ String getElemFrom();
 String getElemTo();
 -----
 
-Please refer to the JavaDoc documentation for the link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/server/Packet.html[+Packet+] class and methods to learn all the details of these methods and difference between them.
+Please refer to the JavaDoc documentation for the link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/server/Packet.html[`Packet`] class and methods to learn all the details of these methods and difference between them.
 
-Another difference is that you can no longer create the +Packet+ instance using a constructor. Instead there are a few factory methods available:
+Another difference is that you can no longer create the `Packet` instance using a constructor. Instead there are a few factory methods available:
 
 [source,java]
 -----
@@ -48,7 +46,7 @@ static Packet packetInstance(Element elem,
     JID stanzaFrom, JID stanzaTo);
 -----
 
-Again, please refer to the JavaDoc documentation for all the details. The main point of using these methods is that they actually return an instance of one of the following classes instead of the +Packet+ class: +Iq+, +Presence+ or +Message+.
+Again, please refer to the JavaDoc documentation for all the details. The main point of using these methods is that they actually return an instance of one of the following classes instead of the `Packet` class: `Iq`, `Presence` or `Message`.
 
 There is also a number of utility methods helping with creating a copy of the Packet instance preserving as much pre-parsed data as possible:
 
@@ -63,7 +61,7 @@ Packet swapStanzaFromTo();
 
 We try to keep the link:http://docs.tigase.org/tigase-server/snapshot/javadoc/[JavaDoc] documentation as complete as possible. Please contact us if you find missing or incorrect information.
 
-The main point is to reuse +JID+ or +BareJID+ instances in your code as much as possible. You never know, your code may run in highly loaded systems with throughput of 100k XMPP packets per second.
+The main point is to reuse `JID` or `BareJID` instances in your code as much as possible. You never know, your code may run in highly loaded systems with throughput of 100k XMPP packets per second.
 
 Another change. This one a bit risky as it is very difficult to find all places where this could be used. There are several utility classes and methods which accept source and destination address of a stanza and produce something.  There was a great confusion with them, as in some of them the first was the source address and in others the destination address. All the code has been re-factored to keep the parameter order the same in all places. Right now the policy is: *source address first*.  Therefore in all places where there was a method:
 

@@ -1,8 +1,6 @@
 = Test Case Parameters Description
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-04-06 21:22
-:revision: v2.1
+:version: v2.1, June 2014: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -14,7 +12,7 @@ There is long list of parameters which can be applied to any test case. Here is 
 There are test report parameters which must be set in the main script file in order to generate HTML report from the test. These parameters have no effect is they are set inside the test case description.
 
 . *-version = 2.0.0* sets the test script version. This is used to easily detect incompatibility issues when the test suite loads a script created for more recent version of the suite and may not work properly for this version.
-. *-output-format = (html | html-content)* sets the output format for the test report. There is actually only one format possible right now - HTML. The only difference between these 2 options is that the *html* format creates full HTML page with HTML header and body. The *html-content* format on the other hand creates only what is inside +<body/>+ element. And is used to embed test result inside other HTML content.
+. *-output-format = (html | html-content)* sets the output format for the test report. There is actually only one format possible right now - HTML. The only difference between these 2 options is that the *html* format creates full HTML page with HTML header and body. The *html-content* format on the other hand creates only what is inside `<body/>` element. And is used to embed test result inside other HTML content.
 . *-output-file = "report-file.html"* sets the file name for the test report.
 . *-output-history = (yes | no)* sets logging of the all protocol data sent between test suite and the XMPP server. Normally for functional tests it is recommended to set it to *yes* but for all other tests like performance or load tests it should be set to *no*.
 . *-history-format = separate-file* sets protocol data logging to a separate file. Currently this is the only possible option.
@@ -26,7 +24,7 @@ There are test report parameters which must be set in the main script file in or
 7: "Test name", "Result", "Total time", "OK", "Average", "Description" [, "History" ]
 -----
 
-. *-title* = "The title of the report page" This parameter sets the test report title which is placed in the HTML page in the +<title/>+ element as well as in the first page header.
+. *-title* = "The title of the report page" This parameter sets the test report title which is placed in the HTML page in the `<title/>` element as well as in the first page header.
 
 == Basic Test Parameters
 These parameters can be set on per-test case basis but usually they are set in the main script file to apply them to all test cases.
@@ -68,4 +66,4 @@ Test parameters which are normally set on per-test case basis and apply only to 
 . *-repeat-script = 100* and *-repeat-wait = 10* are 2 parameters are specific to the common test cases. (The test cases which reads the test input/output data from the pseudo-xml text file. The first parameter is another variation of test looping. It sets how many times the test has to be repeated. It works very much like the *-on-one-socket* parameter. The only difference is that the common test can preserve some internal states between runs and therefore it has more control over the data. The second parameter sets the timeout in milliseconds to wait/delay between each individual test run and it is a very similar parameter to the *-delay* one but it sets a timeout inside the common test instead.
 . *-source-file = "dir/path/to/file.cot"* is a parameter to set the "common test" script file. The common test is a test cases which depends on the authentication test case and can read data to send and responses to expect from the text file. The "cot" file is a pseudo-xml file with stanzas to send and stanzas to expect. The the test cases compares the received packets with those in the text file and reports the test result. This is usually a more convenient way to write a new test cases than coding them in Java.
 . *-time-out-ok* is set for a test case when we expect socket timeout as a correct result from the test case. Normally the timeout means that the test failed and there was no response from the server at all or the response was incorrect. For some tests however (like sending a message to the user who is blocking messages through privacy lists) the timeout is the desired correct test result.
-. *-to-jid = "user_name@host.name"* sets the destination address for packets sending packets somewhere. As an example is the test case sending <message                     /> packet. You can set the destination address for the packet. Mind, normally every test expects some response for the data sent so make sure the destination end-point will send back the data expected by the test case.
+. *-to-jid = "user_name@host.name"* sets the destination address for packets sending packets somewhere. As an example is the test case sending `<message/>` packet. You can set the destination address for the packet. Mind, normally every test expects some response for the data sent so make sure the destination end-point will send back the data expected by the test case.

@@ -1,12 +1,10 @@
 = Tigase Code Style
-Author Tigase Team
-:doctype: article
-:encoding: utf-8
-:lang: en
-:toc: left
-:numbered:
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.1 August 2014. Reformatted for v7.2.0.
 
-// toc::[]
+:toc:
+:numbered:
+:website: http://www.tigase.net
 
 [[introduction]]
 == Introduction

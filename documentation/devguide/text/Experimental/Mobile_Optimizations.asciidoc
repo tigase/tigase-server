@@ -1,9 +1,7 @@
 [[mobileoptimizations]]
 = Mobile Optimizations
 :author: Andrzej Wojcik <andrzejw@tigase.org>
-:version: v2.1, January 2015: Added info about MobileV3
-:oldversion: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2012-05-22 17:57
+:version: v2.2, August 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -56,8 +54,15 @@ If you wish to activate you Mobile v1 plugin you need to send presented above wi
 If you wish to activate you Mobile v2 plugin you need to send presented above with xmlns attribute value replaced with _http://tigase.org/protocol/mobile#v2_
 
 == Configuration
-Mentioned plugins are not activated by default thus additional entries in the config.tdsl are required:
+Mobile plugins are not activated by default thus additional entry in the config.tdsl is required:
 
-+--sm-plugins=+mobile_v1,+mobile_v2,+mobile_v3
+[source,dsl]
+-----
+'sess-man' () {
+    mobile_v1 () {}
+}
+-----
 
-*Only one of these plugins should be enabled*
+You may substitute `mobile_v1` with `mobile_v2` or `mobile_v3` depending on which algorithim you wish to use.
+
+NOTE: USE ONLY ONE PLUGIN AT A TIME!

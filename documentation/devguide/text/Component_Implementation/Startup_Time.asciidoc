@@ -2,9 +2,7 @@
 = Component Implementation - Lesson 8 - Lifecycle of a component
 :author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2017-03-08 18:11
-:revision: v2.1
+:version: v2.1, March 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -26,7 +24,7 @@ There are a few methods which are called at startup time of a component in the f
 . *void initialized()* _(optional)_ - called if component implements `Initializable` interface to notify it that configuration is set and dependencies are injected.
 . *void start()* - during this call component starts it's internal jobs or worker threads or whatever it needs for future activity. Component's queues and threads are initialized at this point. *_(after this method returns the component is ready)_*
 
-Therefore, the +start()+ hook is the best point if you want to be sure that component is fully loaded, initialized and functional.
+Therefore, the `start()` hook is the best point if you want to be sure that component is fully loaded, initialized and functional.
 
 TIP: Component instance may be started and stopped only once, however new instances of the same component with the same name may be created during Tigase XMPP Server uptime, ie. as a result of a server reconfiguration.
 

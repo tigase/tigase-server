@@ -1,7 +1,6 @@
 [[tigasekernel]]
 = Tigase Kernel
-:version: v1.0
-:date: 2017-06-25 21:22
+:version: v1.0 June 2016. Reformatted for v7.2.0.
 
 :toc:
 :numbered:

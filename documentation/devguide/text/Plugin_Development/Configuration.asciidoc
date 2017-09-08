@@ -1,19 +1,19 @@
 [[pluginconf]]
 = Plugin Configuration
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-04-06 21:22
-:revision: v2.1
+:version: v2.1 September 2017. Reformatted for v7.2.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-Plugin configuration is not very straightforward at the moment but we are going to change it soon.
+Plugin configuration is straightforward.
 
-For now,  the best and the simplest way to tell the Tigase server to load or not to load the plugin is via +config.tdsl+ file. The +--sm-plugins+ property takes a comma separated list of plugin *IDs* to active at the runtime. Please refer to the documentation for a more complete description.
+Tell the Tigase server to load or not to load the plugins via the `config.tdsl` file.
+Plugins fall within the `'sess-man'` container.  To activate a plugin, simply list it among the sess-man plugins.
 
-Obviously you have to know the list of standard plugin IDs to add your to the set. There are 2 ways to find out the list. One is the log file: logs/tigase-console.log. If you look inside you can find following output:
+If you do not wish to use this method to find out what plugins are running, there are two ways you can identify if a plugin is running.
+One is the log file: logs/tigase-console.log. If you look inside you can find following output:
 
 [source,bash]
 -----
@@ -49,38 +49,44 @@ private static final String[] PLUGINS_FULL_PROP_VAL =
 -----
 
 
-In you wish to load a plugin outside these defaults, you have to edit the list and add your plugin IDs as a value to the plugin list property. Let's say our plugin ID is *message* as in our all examples:
+In you wish to load a plugin outside these defaults, you have to edit the list and add your plugin IDs as a value to the plugin list under 'sess-man'. Let's say our plugin ID is *message* as in our all examples:
 
 [source,bash]
 -----
- --sm-plugins=jabber:iq:register,jabber:iq:auth,......,message
+'sess-man' () {
+    'jabber:iq:register' () {}
+    'jabber:iq:auth' () {}
+    message () {}
+}
 -----
 
-Assuming your plugin class is in the classpath it will be loaded and used at the runtime.
+Assuming your plugin class is in the classpath it will be loaded and used at the runtime.  You may specify class by adding `class: class.implementing.plugin` within the parenthesis of the plugin.
+
+NOTE: If your plugin name has any special characters (-,:\|/.) it needs to be encapsulated in single quotation marks.
 
 There is another part of the plugin configuration though. If you looked at the xref:writePluginCode[Writing Plugin Code] guide you can remember the *Map settings* processing parameter. This is a map of properties you can set in the configuration file and these setting will be passed to the plugin at the processing time.
 
-Again *config.tdsl* is the place to put the stuff. These kind of properties start with a string: *sess-man/plugins-conf/*, then you add your *plugin ID* and at the end and follow it with key and value pair for your setting:
+Again *config.tdsl* is the place to put the stuff. These kind of properties start under your *plugin ID* and each key and value will be a child underneath:
 
-[source,bash]
+[source,dsl]
 -----
-sess-man/plugins-conf/pluginID/key1=val1
-sess-man/plugins-conf/pluginID/key2=val2
-sess-man/plugins-conf/pluginID/key3=val3
+'sess-man' () {
+    pluginID {
+      key1 = 'val1'
+      key2 = 'val2'
+      key3 = 'val3'
+    }
+}
 -----
 
-It is possible to provide settings for a few plugins within one configuration string by specifying *multiple pluginIDs* separated with a comma like below:
-
-[source,bash]
------
-sess-man/plugins-conf/plugin1,plugin2,plugin3/key1=val1
------
-This will make key/pair setting available only to listed plugins, in above case plugin1, plugin2 and plugin3.
+NOTE: From v7.2.0 you will no longer be able to specify one value for multiple keys, you must individually set each one.
 
 Last but not least - in case you have *omitted plugin ID*:
 
 [source,bash]
 -----
-sess-man/plugins-conf/key1=val1
+'sess-man' () {
+    key1 = 'val1'
+}
 -----
 then the configured key-value pair will be a global/common plugin setting available to all loaded plugins.

@@ -2,9 +2,7 @@
 = Component Implementation - Lesson 2 - Configuration
 :author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2017-03-09 13:16
-:revision: v2.1
+:version: v2.2, March 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

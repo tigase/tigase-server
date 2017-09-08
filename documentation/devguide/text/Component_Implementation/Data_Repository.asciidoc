@@ -1,8 +1,7 @@
 [[cil7]]
 = Component Implementation - Lesson 7 - Data Repository
 :author: not known
-:version: v1.0 initial release
-:date: 2015-07-27 16:19
+:version: v2.0, July 2015: Reformatted for v7.2.0.
 
 == ConfigRepository
 There are cases when you want to store some data permanently by your component. You can of course use the component configuration to provide some database connection settings, implement your own database connector and store records you need. There is, however, a very simple and useful framework which allows you to read and store some data transparently in either a database or a disk file. The framework also supports ad-hoc command interface straight away so you can manipulate your component data using an XMPP client.

@@ -1,9 +1,7 @@
 [[writingTests]]
 = Writing Tests for Plugins
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-04-06 21:22
-:revision: v2.1
+:version: v2.1, September 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -17,7 +15,7 @@ How it works:
 
 Let's take link:http://www.xmpp.org/extensions/xep-0049.html[XEP-0049] Private XML Storage. Looking into the spec we can see the first example:
 
-Example 1. Client Stores Private Data
+== Example: Client Stores Private Data
 
 *CLIENT:*
 
@@ -35,9 +33,11 @@ Example 1. Client Stores Private Data
 *SERVER:*
 
 [source,xml]
+-----
 <iq type="result" id="1001"/>
+-----
 
-This is enough for the first simple test. I have to create text file +JabberIqPrivate.test+ looking like this:
+This is enough for the first simple test. I have to create text file `JabberIqPrivate.test` looking like this:
 
 [source,java]
 -----
