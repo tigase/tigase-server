@@ -21,6 +21,8 @@
  */
 package tigase.xmpp.impl.annotation;
 
+import tigase.xml.Element;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -34,4 +36,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface StreamFeature {
 	String elem();
 	String xmlns();
+	String[] children() default {};
 }

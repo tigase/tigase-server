@@ -23,8 +23,11 @@ package tigase.xmpp.impl.annotation;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.SessionBind;
 
 /**
@@ -62,7 +65,7 @@ public class AnnotatedXMPPProcessorTest {
 	}
 
 	@Test
-	public void testSessionBind() {
+	public void testSessionBind() throws NotAuthorizedException, TigaseStringprepException {
 		SessionBind sessionBind = new SessionBind();
 		Assert.assertEquals("Wrong processor id", "urn:ietf:params:xml:ns:xmpp-session", sessionBind.id());
 		for (String[] path : sessionBind.supElementNamePaths()) {
@@ -73,9 +76,26 @@ public class AnnotatedXMPPProcessorTest {
 		Assert.assertArrayEquals("Wrong disco features", new Element[] { 
 			new Element("feature", new String[] { "var" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
 		}, sessionBind.supDiscoFeatures(null));
-//		Assert.assertArrayEquals("Wrong stream features", new Element[] {
-//			new Element("session", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
-//		}, sessionBind.supStreamFeatures(null));		
+
+		final XMPPResourceConnection session = getSession();
+
+		Element xmppSession = new Element("session");
+		xmppSession.setXMLNS("urn:ietf:params:xml:ns:xmpp-session");
+		xmppSession.addChild(new Element("optional"));
+
+		Assert.assertArrayEquals("Lack optional child", new Element[]{xmppSession},
+		                         sessionBind.supStreamFeatures(session));
+		session.putSessionData("Session-Set", "true");
+		Assert.assertArrayEquals("Lack optional child", null, sessionBind.supStreamFeatures(session));
 	}
 
+	private XMPPResourceConnection getSession() throws NotAuthorizedException, TigaseStringprepException {
+		XMPPResourceConnection conn = new XMPPResourceConnection(null, null, null, null) {
+			@Override
+			public boolean isAuthorized() {
+				return true;
+			}
+		};
+		return conn;
+	}
 }

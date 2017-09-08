@@ -54,7 +54,7 @@ import static tigase.xmpp.impl.SessionBind.XMLNS;
 @Id(XMLNS)
 @Handle(path={ Iq.ELEM_NAME, "session" }, xmlns=XMLNS)
 @StreamFeatures(
-	@StreamFeature(elem="session", xmlns=XMLNS)
+	@StreamFeature(elem="session", xmlns=XMLNS, children = {"optional"})
 )
 @DiscoFeatures({ XMLNS })
 @Bean(name = SessionBind.XMLNS, parent = SessionManager.class, active = true)

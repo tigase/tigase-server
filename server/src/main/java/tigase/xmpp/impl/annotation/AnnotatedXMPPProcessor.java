@@ -144,7 +144,13 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 		if (streamFeatures != null) {
 			List<Element> values = new ArrayList<Element>();
 			for (StreamFeature feature : streamFeatures.value()) {
-				values.add(new Element(feature.elem(), new String[] { "xmlns" }, new String[] { feature.xmlns() }));
+				final Element featureElement = new Element(feature.elem(), new String[]{"xmlns"}, new String[]{feature.xmlns()});
+				if (feature.children().length > 0) {
+					for (String child : feature.children()) {
+						featureElement.addChild(new Element(child));
+					}
+				}
+				values.add(featureElement);
 			}
 			STREAM_FEATURES = values.toArray(new Element[values.size()]);
 		}		
