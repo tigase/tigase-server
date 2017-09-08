@@ -530,8 +530,13 @@ public class SchemaManager {
 				.filter(v -> v instanceof AbstractBeanConfigurator.BeanDefinition)
 				.map(v -> (AbstractBeanConfigurator.BeanDefinition) v)
 				.filter(def -> def.isActive())
-				.map(def -> new DataSourceInfo(def.getBeanName(),
-											   (String) def.getOrDefault("uri", def.get("repo-uri"))))
+				.map(def -> {
+					Object v = def.getOrDefault("uri", def.get("repo-uri"));
+					return new DataSourceInfo(def.getBeanName(), v instanceof ConfigReader.Variable
+					                                             ? ((ConfigReader.Variable) v).calculateValue()
+							                                             .toString()
+					                                             : v.toString());
+				})
 				.collect(Collectors.toMap(DataSourceInfo::getName, Function.identity()));
 		return dataSources;
 	}
