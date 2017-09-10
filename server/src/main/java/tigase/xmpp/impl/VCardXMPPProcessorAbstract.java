@@ -117,7 +117,7 @@ public abstract class VCardXMPPProcessorAbstract extends XMPPProcessorAbstract i
 					if (extVal != null) {
 						r.addChild(new Element("uri", extVal.getCData()));
 					} else {
-						r.addChild(new Element("uri", "data:" + c.getChildCData((Element c1) -> c1.getName() == "TYPE")  + ";base64," + c.getChildCData((Element c1) -> c1.getName() == "BINVAL")));
+						r.addChild(new Element("uri", "data:" + c.getChildCData((Element c1) -> c1.getName() == "TYPE")  + ";base64," + c.getChildCData((Element c1) -> c1.getName() == "BINVAL").replace("\n", "").replace("\r", "")));
 					}
 					break;
 				case "BDAY":
