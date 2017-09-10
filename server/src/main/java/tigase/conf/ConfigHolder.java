@@ -163,7 +163,7 @@ public class ConfigHolder {
 			if (PROPERTIES_CONFIG_FILE_KEY.equals(args[i]) && (i+1) < args.length) {
 				if (!hasCustomConfigFile) {
 					Path propsFilePath = Paths.get(args[++i]);
-					configFile = propsFilePath.getParent().resolveSibling(configFile.getFileName());
+					configFile = propsFilePath.resolveSibling(configFile.getFileName());
 				}
 			}
 		}
