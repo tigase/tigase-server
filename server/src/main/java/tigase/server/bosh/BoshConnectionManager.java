@@ -288,6 +288,7 @@ public class BoshConnectionManager
 			Element el = new Element( "body" );
 			el.setAttributes( attr );
 			p = Packet.packetInstance( el );
+			p.setPacketTo(getComponentId().copyWithResource(sid.toString()));
 		} catch ( TigaseStringprepException ex ) {
 			Logger.getLogger( BoshConnectionManager.class.getName() ).log( Level.SEVERE, null, ex );
 		}
@@ -543,10 +544,12 @@ public class BoshConnectionManager
 		}
 
 		XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
-		Integer redirect_port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+		Integer redirect_port = xmppioService != null
+		                        ? (Integer) xmppioService.getSessionData().getOrDefault(FORCE_REDIRECT_TO_KEY, -1)
+		                        : -1;
 
 		return ( ( see_other_host != null )
-						 && ( redirect_port != null
+						 && ( redirect_port > 0
 									|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) )
 					 ? see_other_host
 					 : null;
