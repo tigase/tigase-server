@@ -307,6 +307,9 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 					@Override
 					protected <T> T getInstance(Class<T> beanClass, boolean allowNonExportable) {
+						if (AbstractBeanConfigurator.class.isAssignableFrom(beanClass)) {
+							return (T) DSLBeanConfigurator.this;
+						}
 						return null;
 					}
 
@@ -319,6 +322,10 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 					protected void injectIfRequired(BeanConfig beanConfig) {
 					}
 				};
+				tmpKernel.registerBean(AbstractBeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
+						.asInstance(this)
+						.exportable()
+						.exec();
 				if (bean instanceof RegistrarBean) {
 					((RegistrarBean) bean).register(tmpKernel);
 				}
