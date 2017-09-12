@@ -66,13 +66,13 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return addEntry(comp, description, recordLevel, new StatRecord(comp, description, value, recordLevel));
 	}
 
-	public <E> boolean add(String comp, String description, Collection<E> value, Level recordLevel) {
+	public <E extends Number> boolean add(String comp, String description, Collection<E> value, Level recordLevel) {
 		return addEntry(comp, description, recordLevel, new StatRecord(comp, description, value, recordLevel));
 	}
 
 	private boolean addEntry(String comp, String description, Level recordLevel, StatRecord statRecord) {
 		description = description.intern();
-		if (checkLevel(recordLevel)) {
+		if (checkLevel(recordLevel, statRecord)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 
 			if (compStats == null) {
@@ -100,27 +100,17 @@ public class StatisticsList implements Iterable<StatRecord> {
 	}
 
 	public boolean checkLevel(Level recordLevel, long value) {
-		if (checkLevel(recordLevel)) {
-			if (value == 0) {
-				return checkLevel(Level.FINEST);
-			} else {
-				return true;
-			}
-		}
+		return checkLevel(recordLevel) && (value != 0 || checkLevel(Level.FINEST));
 
-		return false;
+	}
+
+	public boolean checkLevel(Level recordLevel, StatRecord record) {
+		return checkLevel(recordLevel) && (record.isNonZero() || checkLevel(Level.FINEST));
 	}
 
 	public boolean checkLevel(Level recordLevel, int value) {
-		if (checkLevel(recordLevel)) {
-			if (value == 0) {
-				return checkLevel(Level.FINEST);
-			} else {
-				return true;
-			}
-		}
+		return checkLevel(recordLevel) && (value != 0 || checkLevel(Level.FINEST));
 
-		return false;
 	}
 
 	// ~--- get methods ----------------------------------------------------------
@@ -365,28 +355,4 @@ public class StatisticsList implements Iterable<StatRecord> {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 	}
-
-	public static void main(String[] args) {
-		final StatisticsList statRecords = new StatisticsList(Level.ALL);
-		statRecords.add("comp", "long", 1L, Level.ALL);
-		statRecords.add("comp", "int", 2, Level.ALL);
-		statRecords.add("comp", "string", "string", Level.ALL);
-		statRecords.add("comp", "float", 3.4F, Level.ALL);
-		ArrayList<Integer> ar = new ArrayList<>();
-		ar.add(1);
-		ar.add(2);
-		ar.add(3);
-		ar.add(4);
-		statRecords.add("comp", "collection", ar, Level.ALL);
-
-
-		System.out.println(statRecords);
-
-		final Collection<Integer> value = (Collection<Integer>)statRecords.getValue("comp/collection[C]");
-		System.out.println(value);
-
-		final Collection<Integer> value2 = statRecords.getCollectionValue("comp/collection[C]");
-		System.out.println(value2);
-	}
-
 }
