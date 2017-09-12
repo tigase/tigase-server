@@ -230,6 +230,7 @@ public class ClusterConnectionManager
 
 	public ClusterConnectionManager() {
 		super();
+		elements_number_limit = ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL;
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
 					"ERROR! Tigase is running in Clustered Mode yet the hostname",
