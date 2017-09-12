@@ -33,14 +33,15 @@ import java.util.logging.Level;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StatRecord {
+public class StatRecord<E extends Number> {
 
 	private StatisticType type = StatisticType.OTHER;
 	private Level level = Level.INFO;
 	private long longValue = -1;
  	private int intValue = -1;
 	private float floatValue = -1f;
-	private Collection collection = null;
+	private Collection<E> collection = null;
+	private boolean nonZero = false;
 
 	private String description = null;
 	private String value = null;
@@ -50,6 +51,7 @@ public class StatRecord {
 		this.description = description.intern();
 		if (value != null) {
 			this.value = value.intern();
+			this.nonZero = !value.isEmpty();
 		}
 		this.level = level;
 		this.component = comp.intern();
@@ -59,34 +61,40 @@ public class StatRecord {
 		Level level) {
 		this(comp, description, "" + value, level);
 		this.intValue = value;
+		this.nonZero = (value > 0);
 	}
 
 	public StatRecord(String comp, StatisticType type, long value, Level level) {
 		this(comp, type.getDescription(), "" + value, level);
 		this.type = type;
 		this.longValue = value;
+		this.nonZero = (value > 0);
 	}
 
 	public StatRecord(String comp, StatisticType type, int value, Level level) {
 		this(comp, type.getDescription(), "" + value, level);
 		this.type = type;
 		this.intValue = value;
+		this.nonZero = (value > 0);
 	}
 
 	public StatRecord(String comp, String description, long value,
 		Level level) {
 		this(comp, description, "" + value, level);
 		this.longValue = value;
+		this.nonZero = (value > 0);
 	}
 
 	StatRecord(String comp, String description, float value, Level level) {
 		this(comp, description, "" + value, level);
 		this.floatValue = value;
+		this.nonZero = (value > 0f);
 	}
 
-	StatRecord(String comp, String description, Collection value, Level level) {
+	StatRecord(String comp, String description, Collection<E> value, Level level) {
 		this(comp, description, (value != null ? value.toString() : ""), level);
 		this.collection = value;
+		this.nonZero = isCollectionNonZero(collection);
 	}
 
 	public String getDescription() {
@@ -117,7 +125,20 @@ public class StatRecord {
 		return this.intValue;
 	}
 
-	public <E> Collection<E> getCollection() { return this.collection; };
+	public Collection<E> getCollection() { return this.collection; };
+
+	boolean isNonZero() {
+		return nonZero;
+	}
+
+	private boolean isCollectionNonZero(Collection<E> collection) {
+		for (E e : collection) {
+			if (e.byteValue() > 0)
+				return true;
+		}
+		return false;
+	}
+
 
 	@Override
 	public String toString() {
