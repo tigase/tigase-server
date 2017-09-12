@@ -12,10 +12,13 @@ import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.impl.roster.RosterElement;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -198,6 +201,43 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 			
 			assertTrue(privacyFilter.allowed(presence, session));
 		}
+
+	@Test
+	public void testGroupSubscriptionTypeFiltering() throws Exception {
+		JID jid = JID.jidInstance("test@example/res-1");
+		JID connId = JID.jidInstance("c2s@example.com/asdasd");
+		XMPPResourceConnection session = getSession(connId, jid);
+		session.putCommonSessionData("roster", new ConcurrentHashMap<BareJID, RosterElement>());
+
+		//List<Element> items = new ArrayList<Element>();
+		Element list = new Element("list", new String[] { "name" }, new String[] { "default" });
+		Element item = new Element("item", new String[]{"type", "value", "action", "order"},
+								   new String[]{"subscription", "none", "deny", "100"});
+		item.addChild(new Element("presence-out"));
+		item.addChild(new Element("presence-in"));
+		item.addChild(new Element("message"));
+		list.addChild(item);
+		list.addChild(new Element("item", new String[]{"action", "order"},
+								  new String[]{"allow", "110"}));
+
+		session.putSessionData("active-list", PrivacyList.create(
+				(Map<BareJID, RosterElement>) session.getCommonSessionData("roster"), list));
+
+		Packet presence = Packet.packetInstance(new Element("presence",
+															new String[] { "from", "to" },
+															new String[] { "test@example/res-1", "test1.example.com" }));
+
+		assertFalse(privacyFilter.allowed(presence, session));
+
+		Packet message = Packet.packetInstance(new Element("message", new String[]{"from", "to"},
+														   new String[]{"test1.example.com",
+																		"test@example.com/res-1"}));
+		assertFalse(privacyFilter.allowed(message, session));
+
+		Packet iq = Packet.packetInstance(new Element("iq", new String[]{"from", "to"},
+													  new String[]{"test1.example.com", "test@example.com/res-1"}));
+		assertTrue(privacyFilter.allowed(iq, session));
+	}
 
 	@Test
 	public void testStanzaType() throws Exception {

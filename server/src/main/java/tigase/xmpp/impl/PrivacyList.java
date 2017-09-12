@@ -277,6 +277,10 @@ public class PrivacyList {
 
 		@Override
 		public boolean matches(JID jid, Type type) {
+			if (!types.contains(type)) {
+				return false;
+			}
+			
 			String[] groups = getRosterGroupsForJid(jid);
 			if (groups != null) {
 				for (String group : groups) {
@@ -300,6 +304,10 @@ public class PrivacyList {
 
 		@Override
 		public boolean matches(JID jid, Type type) {
+			if (!types.contains(type)) {
+				return false;
+			}
+
 			RosterAbstract.SubscriptionType subscription = getSubscriptionForJID(jid);
 			switch (this.subscription) {
 				case none:
