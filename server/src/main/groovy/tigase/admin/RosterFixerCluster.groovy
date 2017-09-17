@@ -40,16 +40,20 @@ AS:Component: sess-man
 
 package tigase.admin
 
-import java.util.Set;
-
-import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.xmpp.impl.roster.*
-import tigase.xml.*
-import tigase.vhosts.*
-import tigase.cluster.strategy.*
+import tigase.cluster.strategy.ClusteringStrategyIfc
+import tigase.cluster.strategy.ConnectionRecord
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostManagerIfc
+import tigase.xml.Element
+import tigase.xmpp.BareJID
+import tigase.xmpp.JID
+import tigase.xmpp.StanzaType
+import tigase.xmpp.XMPPSession
+import tigase.xmpp.impl.roster.RosterAbstract
+import tigase.xmpp.impl.roster.RosterElement
+import tigase.xmpp.impl.roster.RosterFlat
 
 def ROSTER_OWNER_JID = "roster-owner-jid"
 
@@ -186,7 +190,7 @@ def updateRoster = { sess, online, jid, i_jid, i_name, i_subscr ->
 		res_report += "Buddy: "+ i_jid + " removed"
 	} else {
 		if (roster.get(i_jid.getBareJID()) == null) {
-			RosterElement rel = new RosterElement(i_jid, i_name, null, null)
+			RosterElement rel = new RosterElement(i_jid, i_name, null)
 			rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
 			roster.put(i_jid, rel)
 			res_report += "Buddy: "+ i_jid + " added to the roster"

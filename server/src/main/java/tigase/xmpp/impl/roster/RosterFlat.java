@@ -105,7 +105,7 @@ public class RosterFlat
 		if ((elems != null) && (elems.size() > 0)) {
 			for (Element elem : elems) {
 				try {
-					RosterElement relem = new RosterElement(elem, session);
+					RosterElement relem = new RosterElement(elem);
 
 					result |= relem.isModified();
 					if (!addBuddy(relem, roster)) {
@@ -298,7 +298,7 @@ public class RosterFlat
 
 	public RosterElement getRosterElementInstance(JID buddy, String name, String[] groups,
 					XMPPResourceConnection session) {
-		return new RosterElement(buddy.copyWithoutResource(), name, groups, session);
+		return new RosterElement(buddy.copyWithoutResource(), name, groups);
 	}
 
 	@Override
@@ -598,7 +598,7 @@ public class RosterFlat
 
 		RosterElement element = roster.get(event.getJid().getBareJID());
 		if (element == null) {
-			element = new RosterElement(event.getJid(), event.getName(), event.getGroups(), session);
+			element = new RosterElement(event.getJid(), event.getName(), event.getGroups());
 			element.setSubscription(event.getSubscription());
 			addBuddy(element, getUserRoster(session));
 		} else {

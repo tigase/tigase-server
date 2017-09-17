@@ -191,7 +191,7 @@ class RosterChangesControler {
 				RosterElement userToAdd = roster.get(jidToAdd)
 				if (userToAdd == null) {
 					userToAdd = new RosterElement(
-						jidToAddJID, jidToAdd, groups, null)
+						jidToAddJID, jidToAdd, groups)
 				}
 				userToAdd.setSubscription(subscription(subscriptionType))
 				userToAdd.setGroups(groups)

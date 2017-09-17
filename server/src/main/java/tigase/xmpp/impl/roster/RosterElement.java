@@ -22,14 +22,12 @@
 
 package tigase.xmpp.impl.roster;
 
-import tigase.xmpp.JID;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
-
 import tigase.util.TigaseStringprepException;
 import tigase.util.XMPPStringPrepFactory;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.JID;
+import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -70,7 +68,6 @@ public class RosterElement {
 	private String otherData               = null;
 	private long lastSeen                  = INITIAL_LAST_SEEN_VAL;
 	private double activity                = INITIAL_ACTIVITY_VAL;
-	private XMPPResourceConnection session = null;
 	private String stringpreped            = null;
 	private SubscriptionType subscription  = null;
 	private double weight                  = INITIAL_WEIGHT_VAL;
@@ -84,9 +81,8 @@ public class RosterElement {
 
 	//~--- constructors ---------------------------------------------------------
 
-	public RosterElement(Element roster_el, XMPPResourceConnection session)
+	public RosterElement(Element roster_el)
 					throws TigaseStringprepException {
-		this.session = session;
 		if (roster_el.getName() == ELEM_NAME) {
 			this.stringpreped = roster_el.getAttributeStaticStr(STRINGPREP_ATT);
 			setJid(roster_el.getAttributeStaticStr(JID_ATT));
@@ -145,10 +141,8 @@ public class RosterElement {
 		}
 	}
 
-	public RosterElement(JID jid, String name, String[] groups,
-											 XMPPResourceConnection session) {
+	public RosterElement(JID jid, String name, String[] groups) {
 		this.stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
-		this.session      = session;
 		setJid(jid);
 		setName(name);
 		setGroups(groups);

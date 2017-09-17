@@ -1,16 +1,15 @@
 package tigase.xmpp.impl.roster;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-
 import tigase.xmpp.JID;
+
+import static org.junit.Assert.*;
 
 public class RosterElementTest {
 
 	@Test
 	public void testSetName() {
-		RosterElement e = new RosterElement(JID.jidInstanceNS("a@b.c"), null, new String[] {}, null);
+		RosterElement e = new RosterElement(JID.jidInstanceNS("a@b.c"), null, new String[] {});
 		assertNull(e.getName());
 		assertTrue(e.isModified());
 

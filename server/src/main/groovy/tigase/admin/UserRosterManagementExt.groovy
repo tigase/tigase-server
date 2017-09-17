@@ -33,16 +33,20 @@ AS:Component: sess-man
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.xmpp.impl.roster.*
-import tigase.xml.*
-import tigase.vhosts.*
-import tigase.cluster.*;
-import tigase.cluster.api.*;
-import tigase.cluster.strategy.*;
+import tigase.cluster.strategy.ClusteringStrategyIfc
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.Permissions
+import tigase.vhosts.VHostManagerIfc
+import tigase.xml.Element
+import tigase.xmpp.BareJID
+import tigase.xmpp.JID
+import tigase.xmpp.XMPPSession
+import tigase.xmpp.impl.roster.RosterAbstract
+import tigase.xmpp.impl.roster.RosterElement
+import tigase.xmpp.impl.roster.RosterFactory
+import tigase.xmpp.impl.roster.RosterFlat;
 
 
 try {
@@ -156,7 +160,7 @@ try {
 				if (remove_item) {
 					roster.remove(i_jid.getBareJID())
 				} else {
-					RosterElement rel = new RosterElement(i_jid, i_name, i_groups ? i_groups.split(",") : null, null)
+					RosterElement rel = new RosterElement(i_jid, i_name, i_groups ? i_groups.split(",") : null)
 					rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
 					rel.setPersistent(true);
 					roster.put(i_jid, rel)
