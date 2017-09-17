@@ -46,6 +46,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserSessionEvent;
+import tigase.server.xmppsession.UserSessionEventWithProcessorResultWriter;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
@@ -404,6 +405,12 @@ public class SessionManagerClustered
 	@Override
 	public boolean hasXMPPResourceConnectionForConnectionJid(JID connJid) {
 		return this.connectionsByFrom.containsKey(connJid);
+	}
+
+	@FillRoutedEvent
+	protected boolean fillRoutedUserSessionWithProcessorResultWriter(UserSessionEventWithProcessorResultWriter event) {
+		event.setPacketWriter(this::addOutPackets);
+		return true;
 	}
 	
 	@FillRoutedEvent

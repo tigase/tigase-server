@@ -18,27 +18,24 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.List;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.db.TigaseDBException;
+import tigase.eventbus.EventBusFactory;
+import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
+
+import java.util.ArrayDeque;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -49,25 +46,36 @@ public class BlockingCommandTest extends ProcessorTestCase {
 	private BlockingCommand blockingCommand;
 	private JabberIqPrivacy privacy;
 	private ArrayDeque<Packet> results;
+	private RosterAbstract roster_util;
 	
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		blockingCommand = new BlockingCommand();
-		blockingCommand.init(new HashMap<String, Object>());
-		privacy = new JabberIqPrivacy();
-		privacy.init(new HashMap<String, Object>());
-		results = new ArrayDeque<Packet>();
+		getInstance(RosterFactory.Bean.class);
+		blockingCommand = getInstance(BlockingCommand.class);
+		privacy = getInstance(JabberIqPrivacy.class);
+		roster_util = RosterFactory.getRosterImplementation(true);
+		results = new ArrayDeque<>();
 	}
 
 	@After
 	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
+		roster_util.setEventBus(null);
 		blockingCommand = null;
 	}
-	
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exec();
+		kernel.registerBean(RosterFactory.Bean.class).setActive(true).exec();
+		kernel.registerBean(JabberIqPrivacy.class).setActive(true).exec();
+		kernel.registerBean(BlockingCommand.class).setActive(true).exec();
+	}
+
 	@Test
 	public void testBlockUnblock() throws Exception {
 		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
@@ -175,7 +183,6 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		XMPPResourceConnection sess = getSession(connJid, userJid);
 		
 		String blockJid = "block-1@example.com";
-		RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 		roster_util.addBuddy(sess, JID.jidInstance(blockJid), "Block-1", null, null);
 		roster_util.setBuddySubscription(sess, RosterAbstract.SubscriptionType.both, JID.jidInstance(blockJid));
 		

@@ -21,6 +21,12 @@
  */
 package tigase.xmpp.impl.roster;
 
+import tigase.eventbus.EventBus;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
+
 /**
  * {@link RosterFactory} is an factory that is responsible for creation
  * appropriate instance of {@link RosterAbstract} class
@@ -54,38 +60,78 @@ public abstract class RosterFactory {
 	 */
 	public static RosterAbstract getRosterImplementation( boolean shared_impl ) {
 		try {
-			return getRosterImplementation( defaultRosterImplementation, shared_impl );
+			if (shared_impl) {
+				return shared;
+			}
+			return newRosterInstance(defaultRosterImplementation);
 		} catch ( ClassNotFoundException | InstantiationException | IllegalAccessException e ) {
 			return null;
 		}
 	}
 
-	/**
-	 * Creates new instance of class implementing {@link RosterAbstract} from
-	 * provided
-	 * <code>class_name</code>
-	 *
-	 * @param class_name  full qualified name of the class
-	 * @param shared_impl determines whether to returns shared or non shared
-	 *                    implementation
-	 *
-	 * @return new instance of class implementing {@link RosterAbstract}
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
-	public static RosterAbstract getRosterImplementation( String class_name,
-																												boolean shared_impl )
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		if ( shared_impl ){
-			if ( shared == null ){
-				shared = (RosterAbstract) Class.forName( class_name ).newInstance();
-			}
-			return shared;
+	public static RosterAbstract newRosterInstance(String class_name)
+			throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+		return (RosterAbstract) Class.forName( class_name ).newInstance();
+	}
+
+	@tigase.kernel.beans.Bean(name = "rosterFactory", exportable = true, active = true)
+	public static class Bean implements Initializable, UnregisterAware {
+
+		@ConfigField(desc = "Roster implementation class", alias = ROSTER_IMPL_PROP_KEY)
+		private String defaultRosterImplementation = ROSTER_IMPL_PROP_VAL;
+
+		@Inject
+		private EventBus eventBus;
+
+		public Bean() {
+
 		}
 
-		return (RosterAbstract) Class.forName( class_name ).newInstance();
+		public void setDefaultRosterImplementation(String defaultRosterImplementation) {
+			this.defaultRosterImplementation = defaultRosterImplementation;
+			RosterFactory.defaultRosterImplementation = defaultRosterImplementation;
+			try {
+				RosterFactory.shared = newRosterInstance(defaultRosterImplementation);
+			} catch (ClassNotFoundException|IllegalAccessException|InstantiationException ex) {
+				throw new RuntimeException(ex);
+			}
+			if (eventBus != null && shared != null) {
+				synchronized (RosterFactory.class) {
+					shared.setEventBus(eventBus);
+				}
+			}
+		}
+
+		public void setEventBus(EventBus eventBus) {
+			this.eventBus = eventBus;
+			synchronized (RosterFactory.class) {
+				if (shared != null) {
+					shared.setEventBus(eventBus);
+				}
+			}
+		}
+
+		@Override
+		public void beforeUnregister() {
+			if (shared != null) {
+				shared.setEventBus(null);
+			}
+		}
+
+		public void initialize() {
+			if (shared == null) {
+				try {
+					RosterFactory.shared = newRosterInstance(defaultRosterImplementation);
+				} catch (ClassNotFoundException|IllegalAccessException|InstantiationException ex) {
+					throw new RuntimeException(ex);
+				}
+				if (eventBus != null && shared != null) {
+					synchronized (RosterFactory.class) {
+						shared.setEventBus(eventBus);
+					}
+				}
+			}
+		}
 	}
 }
 

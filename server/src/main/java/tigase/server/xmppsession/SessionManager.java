@@ -2804,4 +2804,10 @@ public class SessionManager
 			// handleLogout(userId, conn);
 		}
 	}
+
+	public interface ProcessorResultWriter {
+
+		void write(Packet packet, XMPPResourceConnection session, Queue<Packet> results);
+
+	}
 }

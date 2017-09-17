@@ -79,21 +79,20 @@ public class Bootstrap {
 	
 	public void start() throws ConfigReader.ConfigException {
 		initializeDnsResolver();
-		Object clusterMode = config.getProperties().getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", false));
+		Object clusterMode = config.getProperties().getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", Boolean.FALSE));
 		if (clusterMode instanceof ConfigReader.Variable) {
 			clusterMode = ((ConfigReader.Variable) clusterMode).calculateValue();
 			if (clusterMode == null) {
-				clusterMode = false;
+				clusterMode = Boolean.FALSE;
 			}
 		}
 		if (clusterMode instanceof String) {
-			clusterMode = Boolean.parseBoolean((String) clusterMode);
+			clusterMode = (Boolean) Boolean.parseBoolean((String) clusterMode);
 		}
 		if ((Boolean) clusterMode) {
 			System.setProperty("tigase.cache", "false");
 		}
 		config.getProperties().put("cluster-mode", clusterMode);
-		RosterFactory.defaultRosterImplementation = (String) config.getProperties().getOrDefault(RosterFactory.ROSTER_IMPL_PROP_KEY, RosterFactory.ROSTER_IMPL_PROP_VAL);
 
 		Optional.ofNullable((String) config.getProperties().get("stringprep-processor")).ifPresent(val -> BareJID.useStringprepProcessor(val));
 
@@ -131,6 +130,9 @@ public class Bootstrap {
 		kernel.getInstance("logging");
 
 		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
+		
+		kernel.registerBean(RosterFactory.Bean.class).setPinned(true).exec();
+		kernel.getInstance(RosterFactory.Bean.class);
 
 		// if null then we register global subbeans
 		configurator.registerBeans(null, null, config.getProperties());

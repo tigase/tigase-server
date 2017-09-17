@@ -120,6 +120,18 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 					return;
 				}
 
+				if (packet.getType() != null) {
+					switch (packet.getType()) {
+						case subscribe:
+						case subscribed:
+						case unsubscribe:
+						case unsubscribed:
+							return;
+						default:
+							break;
+					}
+				}
+
 				boolean             initPresence = conn.getSessionData(INITIAL_PRESENCE_KEY) ==
 						null;
 				Map<String, String> params = prepareConnectionParams(conn);

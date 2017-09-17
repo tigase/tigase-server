@@ -27,26 +27,23 @@ package tigase.xmpp.impl.roster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.TigaseDBException;
-
 import tigase.server.PolicyViolationException;
-
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class RosterFlat here.
@@ -154,6 +151,7 @@ public class RosterFlat
 			}
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
+				// notify that roster element was changed!
 			} else {
 				throw new PolicyViolationException("Too many elements in the user roster. Limit: " + maxRosterSize);
 			}
@@ -185,6 +183,7 @@ public class RosterFlat
 			// }
 			relem.setPersistent( true );
 			saveUserRoster(session);
+			// notify that roster element was changed!
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Updated buddy in roster: {0}", buddy);
 			}
@@ -363,6 +362,7 @@ public class RosterFlat
 														 roster });
 		}
 		saveUserRoster(session);
+		// notify that roster element was changed!
 
 		return true;
 	}
@@ -389,6 +389,8 @@ public class RosterFlat
 				relem.setName(name);
 			}
 			saveUserRoster(session);
+			// notify that roster element was changed!
+
 		} else {
 			log.log(Level.WARNING, "Setting buddy name for non-existen contact: {0}", buddy);
 		}
@@ -403,6 +405,8 @@ public class RosterFlat
 		if (relem != null) {
 			relem.setSubscription(subscription);
 			saveUserRoster(session);
+			// notify that roster element was changed!
+
 		} else {
 			log.log(Level.WARNING, "Missing roster contact for subscription set: {0}", buddy);
 		}
@@ -465,12 +469,17 @@ public class RosterFlat
 			if (relem.isPersistent()) {
 				sb.append(relem.getRosterElement().toString());
 			}
+			// here we could detect changed records, but is removed record changed??
+			// no - item removed is gone!!!
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0} | Saving user roster: {1}",
 														new String [] {session.getBareJID().toString(), sb.toString()});
 		}
 		session.setData(null, ROSTER, sb.toString());
+
+		// here we should record changes? but how to detect that change was made and what was changed?
+		//
 	}
 
 	public Map<BareJID, RosterElement> loadUserRoster(XMPPResourceConnection session)
@@ -496,6 +505,7 @@ public class RosterFlat
 
 			if (modified) {
 				saveUserRoster(session);
+				// notify that roster element was changed!
 			}
 		} else {
 
@@ -518,6 +528,7 @@ public class RosterFlat
 					}
 				}
 				saveUserRoster(session);
+				// notify that roster element was changed!
 			}
 		}
 
@@ -547,6 +558,7 @@ public class RosterFlat
 		try {
 			if (session.isAuthorized() && isModified(session)) {
 				saveUserRoster(session);
+				// notify that roster element was changed!
 			}
 		} catch (NotAuthorizedException ex) {
 
@@ -571,6 +583,31 @@ public class RosterFlat
 		}
 
 		return result;
+	}
+
+	@Override
+	protected void updateRosterItem(XMPPResourceConnection session, RosterModifiedEvent event)
+			throws NotAuthorizedException, TigaseDBException {
+		// apply changes got from notification item
+
+		Map<BareJID, RosterElement> roster = getUserRoster(session);
+		if (event.getSubscription() == SubscriptionType.remove) {
+			roster.remove(event.getJid().getBareJID());
+			return;
+		}
+
+		RosterElement element = roster.get(event.getJid().getBareJID());
+		if (element == null) {
+			element = new RosterElement(event.getJid(), event.getName(), event.getGroups(), session);
+			element.setSubscription(event.getSubscription());
+			addBuddy(element, getUserRoster(session));
+		} else {
+			element.setName(event.getName());
+			element.setGroups(event.getGroups());
+			element.setSubscription(event.getSubscription());
+		}
+
+		super.updateRosterItem(session, event);
 	}
 
 	private class RosterElemComparator

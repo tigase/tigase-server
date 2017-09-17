@@ -28,16 +28,22 @@ package tigase.xmpp.impl.roster;
 
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
+import tigase.server.xmppsession.SessionManager;
+import tigase.server.xmppsession.UserSessionEventWithProcessorResultWriter;
 import tigase.util.Algorithms;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * Describe class RosterAbstract here.
@@ -442,6 +448,8 @@ public abstract class RosterAbstract {
 		}
 	}
 
+	private EventBus eventBus;
+
 	public enum SubscriptionType {
 		none("none"),
 		none_pending_out("none", "subscribe"),
@@ -482,8 +490,22 @@ public abstract class RosterAbstract {
 		}
 	}
 
+	public EventBus getEventBus() {
+		return eventBus;
+	}
+
+	public void setEventBus(EventBus eventBus) {
+		if (this.eventBus != null && this.eventBus != eventBus) {
+			this.eventBus.unregisterAll(this);
+		}
+		this.eventBus = eventBus;
+		if (this.eventBus != null) {
+			this.eventBus.registerAll(this);
+		}
+	}
+
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name,
-			String[] groups, String otherData)
+								  String[] groups, String otherData)
 					throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
 
 	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy,
@@ -510,30 +532,19 @@ public abstract class RosterAbstract {
 	public void updateBuddyChange(final XMPPResourceConnection session,
 			final Queue<Packet> results, final Element item)
 					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
-		Element update = new Element("iq");
 
-		update.setXMLNS(CLIENT_XMLNS);
-		update.setAttribute("type", StanzaType.set.toString());
-
-		Element query = new Element("query");
-
-		query.setXMLNS(ROSTER_XMLNS);
-		query.addAttribute(VER_ATT, getBuddiesHash(session));
-		query.addChild(item);
-		update.addChild(query);
-		for (XMPPResourceConnection conn : session.getActiveSessions()) {
-			Element conn_update = update.clone();
-
-			conn_update.setAttribute("to", conn.getBareJID().toString());
-			conn_update.setAttribute("id", "rst" + session.nextStanzaId());
-
-			Packet pack_update = Packet.packetInstance(conn_update, null, conn.getJID());
-
-			pack_update.setPacketTo(conn.getConnectionId());
-
-			// pack_update.setPacketFrom(session.getJID());
-			results.offer(pack_update);
-		}    // end of for (XMPPResourceConnection conn: sessions)
+		broadcastRosterChange(session.getParentSession(), item, results::offer);
+		if (eventBus != null) {
+			JID jid = JID.jidInstanceNS(item.getAttributeStaticStr("jid"));
+			RosterElement rosterElement = getRosterElement(session, jid);
+			if (rosterElement != null) {
+				eventBus.fire(new RosterModifiedEvent(session.getJID().copyWithoutResource(), session.getJID().copyWithoutResource(),
+													  session.getParentSession(), rosterElement));
+			} else {
+				eventBus.fire(new RosterModifiedEvent(session.getJID().copyWithoutResource(), session.getJID().copyWithoutResource(),
+													  session.getParentSession(), jid, SubscriptionType.remove));
+			}
+		}
 	}
 
 	public boolean updateBuddySubscription(final XMPPResourceConnection session,
@@ -625,6 +636,11 @@ public abstract class RosterAbstract {
 		return ((hash != null)
 				? hash
 				: "");
+	}
+
+	public String getBuddiesHash(final XMPPSession session) {
+		String hash = (String) session.getCommonSessionData(ROSTERHASH);
+		return hash != null ? hash : "";
 	}
 
 	public abstract String[] getBuddyGroups(final XMPPResourceConnection session, JID buddy)
@@ -869,5 +885,158 @@ public abstract class RosterAbstract {
 			}
 		}
 		log.log( Level.CONFIG, "Setting maximum number of roster items as: " + maxRosterSize );
+	}
+
+	@HandleEvent
+	public void handleRosterModified(RosterModifiedEvent event) {
+		SessionManager.ProcessorResultWriter writer = event.getPacketWriter();
+		if (writer != null) {
+			event.getSession()
+					.getActiveResources()
+					.stream()
+					.filter(conn -> conn.isAuthorized())
+					.findFirst()
+					.ifPresent(conn -> {
+						try {
+							synchronized (event.getSession()) {
+								updateRosterItem(conn, event);
+							}
+
+							// prepare broadcast notification
+							Element item = new Element("item");
+							item.setAttributes(event.getSubscription().getSubscriptionAttr());
+							item.setAttribute("jid", event.getJid().toString());
+							if (event.getName() != null) {
+								item.setAttribute("name", XMLUtils.escape(event.getName()));
+							}
+							if (event.getGroups() != null) {
+								Arrays.stream(event.getGroups())
+										.map(XMLUtils::escape)
+										.map(group -> new Element("group", group))
+										.forEach(item::addChild);
+							}
+
+							Queue<Packet> results = new ArrayDeque<>();
+							broadcastRosterChange(event.getSession(), item, results::offer);
+							preparePresencePackets(event.getSession(), event.getJid(), event.getSubscription(), results::offer);
+
+							writer.write(results.peek(), conn, results);
+						} catch (NotAuthorizedException | NoConnectionIdException | TigaseDBException ex) {
+							log.log(Level.FINEST, "Failed to update roster with changes from the other cluster node");
+						}
+					});
+		}
+	}
+
+	private void preparePresencePackets(XMPPSession session, JID jid, SubscriptionType subscription,
+										Consumer<Packet> consumer) {
+		Stream<XMPPResourceConnection> sessions = session.getActiveResources()
+				.stream()
+				.filter(conn -> conn.isAuthorized())
+				.filter(conn -> conn.getPresence() != null);
+
+		switch (subscription) {
+			case from:
+			case from_pending_out:
+			case both:
+				sessions.map(conn -> conn.getPresence())
+						.filter(presence -> presence != null)
+						.map(elem -> Packet.packetInstance(elem, JID.jidInstanceNS(elem.getAttributeStaticStr("from")),
+														   jid))
+						.forEach(consumer);
+				break;
+
+			case to:
+			case none:
+				sessions.map(conn -> Packet.packetInstance(
+						new Element("presence", new String[]{"type", "xmlns"},
+									new String[]{"unavailable", Packet.CLIENT_XMLNS }), conn.getjid(), jid))
+						.forEach(consumer);
+		}
+	}
+	
+	protected void updateRosterItem(XMPPResourceConnection conn, RosterModifiedEvent event)
+			throws NotAuthorizedException, TigaseDBException {
+		List<Element> items = getRosterItems(conn);
+		if (items != null) {
+			StringBuilder sb = new StringBuilder(4096);
+			for (Element item : items) {
+				item.toString(sb);
+			}
+			updateRosterHash(sb.toString(), conn);
+		}
+	}
+
+	private void broadcastRosterChange(XMPPSession session, Element item, Consumer<Packet> consumer)
+			throws NotAuthorizedException, NoConnectionIdException {
+		Element update = new Element("iq");
+
+		update.setXMLNS(CLIENT_XMLNS);
+		update.setAttribute("type", StanzaType.set.toString());
+
+		Element query = new Element("query");
+
+		query.setXMLNS(ROSTER_XMLNS);
+		query.addAttribute(VER_ATT, getBuddiesHash(session));
+		query.addChild(item);
+		update.addChild(query);
+
+		for (XMPPResourceConnection conn : session.getActiveResources()) {
+			
+			Element conn_update = update.clone();
+
+			conn_update.setAttribute("to", conn.getBareJID().toString());
+			conn_update.setAttribute("id", "rst" + conn.nextStanzaId());
+
+			Packet pack_update = Packet.packetInstance(conn_update, null, conn.getJID());
+
+			pack_update.setPacketTo(conn.getConnectionId());
+
+			// pack_update.setPacketFrom(session.getJID());
+			consumer.accept(pack_update);
+		}    // end of for (XMPPResourceConnection conn: sessions)
+	}
+
+	public static class RosterModifiedEvent extends UserSessionEventWithProcessorResultWriter {
+
+		private JID jid;
+		private String name;
+		private SubscriptionType subscription;
+		private String[] groups;
+
+		public RosterModifiedEvent() {}
+
+		public RosterModifiedEvent(JID sender, JID userJid, XMPPSession session, RosterElement rosterElement) {
+			super(sender, userJid, session, null);
+			this.jid = rosterElement.getJid();
+			this.name = rosterElement.getName();
+			this.subscription = rosterElement.getSubscription();
+			this.groups = rosterElement.getGroups();
+		}
+
+		public RosterModifiedEvent(JID sender, JID userJid, XMPPSession session, JID jid, SubscriptionType subscription) {
+			super(sender, userJid, session, null);
+			this.jid = jid;
+			this.name = null;
+			this.subscription = subscription;
+			this.groups = null;
+		}
+
+		public JID getJid() {
+			return jid;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public SubscriptionType getSubscription() {
+			return subscription;
+		}
+
+		public String[] getGroups() {
+			return groups;
+		}
+
 	}
 }

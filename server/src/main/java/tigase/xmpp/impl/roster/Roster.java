@@ -23,13 +23,11 @@ package tigase.xmpp.impl.roster;
 
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
-
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 
 import java.util.logging.Logger;
 
