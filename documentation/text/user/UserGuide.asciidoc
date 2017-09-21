@@ -13,7 +13,7 @@ This is very much like sending e-mail but the difference between Jabber and e-ma
 
 All messages sent through Jabber are sent instantly and you also receive responses instantly. More over you can see whether your mate is online and available for talking or not.
 
-There exists similar technologies to Jabber like Yahoo, MSN, and ICQ. There are, however, quite a few differences.
+There exists similar technologies to Jabber like AIM, Yahoo, and ICQ; although there are, quite a few differences.
 
 Jabber is an open standard which means everybody can know how it works, everybody can implement their own software connecting to the network both client and server side.
 

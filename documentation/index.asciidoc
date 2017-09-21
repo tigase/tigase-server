@@ -243,6 +243,10 @@ include::text/components/tigase-push/documentation/text/Configuration.asciidoc[]
 
 include::text/components/tigase-push/documentation/text/Usage.asciidoc[]
 
+:leveloffset: 2
+
+include::text/components/tigase-stun/documentation/doclink.asciidoc[]
+
 :leveloffset: 1
 
 include::text/admin/Using_Tigase/Intro.asciidoc[]
