@@ -48,7 +48,7 @@ public abstract class TimerTask implements Runnable {
 	}
 
 	public void cancel(boolean mayInterruptIfRunning) {
-		if (log.isLoggable(Level.FINEST)) {
+		if (future != null && log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Cancelling tigase task, mayInterruptIfRunning: {0}, done: {1}, cancelled: {2}, future: {3}",
 					new Object[] {mayInterruptIfRunning, future.isDone(), future.isCancelled(), future});
 		}

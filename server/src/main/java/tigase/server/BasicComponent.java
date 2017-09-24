@@ -47,6 +47,7 @@ import tigase.server.script.RemoveScriptCommand;
 import tigase.stats.ComponentStatisticsProvider;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolverFactory;
+import tigase.util.DependencyChecker;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
@@ -133,6 +134,8 @@ public class BasicComponent
 	private final List<JID> connectedNodesWithLocal_ro = Collections.unmodifiableList(connectedNodesWithLocal);
 
 	public BasicComponent() {
+		DependencyChecker.checkDependencies(getClass());
+
 		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
 		defHostname = BareJID.bareJIDInstanceNS( DEF_HOSTNAME_PROP_VAL );
 	}

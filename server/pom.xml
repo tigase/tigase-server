@@ -75,7 +75,7 @@
 						<Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Build>
 						<Tigase-Version>${project.version}-b${gitVersion}</Tigase-Version>
 						<Bundle-Activator>tigase.osgi.Activator</Bundle-Activator>
-						<Export-Package>gnu.inet.encoding.*;version=${packet.version},tigase.*;version=${packet.version};-split-package:=merge-first</Export-Package>
+						<Export-Package>gnu.inet.encoding.*;version=${project.version},tigase.*;version=${project.version};-split-package:=merge-first</Export-Package>
 						<Import-Package>!junit.*,!sun.*,!com.sun.*,*</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 						<inlinedArtifacts>

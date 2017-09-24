@@ -33,6 +33,7 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.BeanConfig;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtil;
+import tigase.util.Version;
 import tigase.xml.XMLUtils;
 
 import java.text.SimpleDateFormat;
@@ -88,6 +89,10 @@ public final class XMPPServer {
 	public static String getImplementationVersion() {
 		String version = ComponentInfo.getImplementationVersion( XMPPServer.class );
 		return ( version.isEmpty() ? "0.0.0-0" : version );
+	}
+
+	public static Version getVersion() {
+		return Version.of(getImplementationVersion());
 	}
 
 	//~--- methods --------------------------------------------------------------

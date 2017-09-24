@@ -3,7 +3,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <slf4j.version>1.7.5</slf4j.version>
-    <packet.version>7.1.0</packet.version>
     <packaging.type>bundle</packaging.type>
     <dist-dir>${myproject.basedir}/distribution-packages/</dist-dir>
     <maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
