@@ -2,6 +2,8 @@ package tigase.server.xmppclient;
 
 import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.vhosts.VHostItem;
 import tigase.xmpp.XMPPIOService;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Bean(name = "client-trust-manager-factory", parent = ClientConnectionManager.class, active = true)
 public class ClientTrustManagerFactory {
 
 	public static final String CA_CERT_PATH = "clientCertCA";
@@ -31,15 +34,20 @@ public class ClientTrustManagerFactory {
 
 	private final ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>();
 
-	private final ClientConnectionManager clientConnectionManager;
 	private final TrustManager[] emptyTrustManager;
 	private final KeyStore keystore;
 	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<>();
 	private TrustManager[] defaultTrustManagers;
 	private TrustManagerFactory tmf;
 
-	public ClientTrustManagerFactory(ClientConnectionManager clientConnectionManager) {
-		this.clientConnectionManager = clientConnectionManager;
+	@ConfigField(desc = "CA for client certificate", alias = "clientCertCA")
+	private String clientCertCA;
+
+	@ConfigField(desc = "Is client certificate required")
+	private boolean clientCertRequired = false;
+
+
+	public ClientTrustManagerFactory() {
 		this.emptyTrustManager = new TrustManager[]{new X509TrustManager() {
 
 			@Override
@@ -70,6 +78,15 @@ public class ClientTrustManagerFactory {
 
 	}
 
+	public void setClientCertCA(String clientCertCA) {
+		this.clientCertCA = clientCertCA;
+		if (clientCertCA != null) {
+			defaultTrustManagers = loadTrustedCert(clientCertCA);
+		} else {
+			defaultTrustManagers = null;
+		}
+	}
+	
 	protected X509Certificate[] getAcceptedIssuers() {
 		return acceptedIssuers.toArray(new X509Certificate[]{});
 	}
@@ -77,17 +94,9 @@ public class ClientTrustManagerFactory {
 	public TrustManager[] getManager(final VHostItem vHost) {
 		TrustManager[] result = trustManagers.get(vHost);
 
-		if (this.clientConnectionManager.clientCertCA == null) {
-			return null;
-		}
-
 		if (result == null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Creating new TrustManager for VHost " + vHost);
-			}
-
-			if (defaultTrustManagers == null) {
-				this.defaultTrustManagers = loadTrustedCert(this.clientConnectionManager.clientCertCA);
 			}
 
 			result = defaultTrustManagers;
@@ -123,7 +132,7 @@ public class ClientTrustManagerFactory {
 	public boolean isTlsNeedClientAuthEnabled(final VHostItem vhost) {
 		Boolean result = vhost.getData(CERT_REQUIRED_KEY);
 		if (result == null) {
-			result = clientConnectionManager.clientCertRequired;
+			result = clientCertRequired;
 		}
 		return result;
 	}
