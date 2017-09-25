@@ -67,6 +67,10 @@ public class DependencyChecker {
 											.shutdownTigase(new String[]{"Required package " + name +
 																				 " is inaccessible. Make sure that all required jars are available in your classpath."});
 								}
+								if (p.getImplementationVersion() == null) {
+									log.log(Level.FINE, "could not check " + name + " dependency version as package version is not set");
+									continue;
+								}
 
 								if (log.isLoggable(Level.FINEST)) {
 									log.log(Level.FINEST, "looking for " + name + " in version " + version + " and found " + p.getImplementationVersion());
