@@ -570,6 +570,9 @@ public class OfflineMessages
 				}    // end of try-catch
 			}      // end of if (priority != null)
 			if ( priority >= 0 ){
+				if (conn.getPresence() == null) {
+					conn.setPriority(priority);
+				}
 				conn.putSessionData( ID, ID );
 
 				return true;

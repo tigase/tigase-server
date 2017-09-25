@@ -39,6 +39,7 @@ import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,6 +63,8 @@ import static tigase.xmpp.impl.Message.XMLNS;
 public class Message
 				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
+
+	public static Predicate<XMPPResourceConnection> VIABLE_FOR_MESSAGE_DELIVERY = (conn) -> conn.getPriority() >= 0;
 
 	protected static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
 
@@ -306,7 +309,7 @@ public class Message
 	public List<XMPPResourceConnection> getConnectionsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
 		List<XMPPResourceConnection> conns = new ArrayList<XMPPResourceConnection>();
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
-			if (conn.getPresence() != null &&  conn.getPriority() >= 0)
+			if (VIABLE_FOR_MESSAGE_DELIVERY.test(conn))
 				conns.add(conn);
 		}
 		if (log.isLoggable(Level.FINEST)) {
@@ -328,7 +331,7 @@ public class Message
 	public Set<JID> getJIDsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
 		Set<JID> jids = new HashSet<JID>();
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
-			if (conn.getPresence() != null &&  conn.getPriority() >= 0)
+			if (VIABLE_FOR_MESSAGE_DELIVERY.test(conn))
 				jids.add(conn.getJID());
 		}
 		return jids;
@@ -344,7 +347,7 @@ public class Message
 	public boolean hasConnectionForMessageDelivery(XMPPResourceConnection session) {
 		try {
 			for (XMPPResourceConnection conn : session.getActiveSessions()) {
-				if (conn.getPresence() != null && conn.getPriority() >= 0)
+				if (VIABLE_FOR_MESSAGE_DELIVERY.test(conn))
 					return true;
 			}
 		} catch (NotAuthorizedException ex) {

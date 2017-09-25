@@ -131,8 +131,13 @@ public class MotdProcessor
 
 	public void setMotd(String motd) throws TigaseDBException {
 		Long timestamp = motd == null ? null : System.currentTimeMillis();
-		userRepository.setData(smJid, ID, "message", motd);
-		userRepository.setData(smJid, ID, "timestamp", timestamp == null ? null : String.valueOf(timestamp));
+		if (motd != null) {
+			userRepository.setData(smJid, ID, "message", motd);
+			userRepository.setData(smJid, ID, "timestamp", String.valueOf(timestamp));
+		} else {
+			userRepository.removeData(smJid, ID, "message");
+			userRepository.removeData(smJid, ID, "timestamp");
+		}
 		eventBus.fire(new MotdUpdatedEvent(motd, timestamp));
 	}
 

@@ -34,7 +34,6 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static tigase.db.RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY;
 
 /**
  *
@@ -95,7 +94,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();	
 		

@@ -112,7 +112,7 @@ public class XMPPResourceConnection
 	private SessionManagerHandler loginHandler    = null;
 	private long                  packets_counter = 0;
 	private XMPPSession           parentSession   = null;
-	private int                   priority        = 0;
+	private int                   priority        = -1;
 
 	/**
 	 * Session resource - part of user's JID for this session
@@ -533,6 +533,7 @@ public class XMPPResourceConnection
 			}
 			setPriority(pr);
 		} else {
+			setPriority(0);
 			// workaround for case when presence update came before presence was broadcasted due to
 			// loading of roster data in roster processing thread
 			if (getPriority() != 0 && !"unavailable".equals(packet.getAttributeStaticStr("type"))) {

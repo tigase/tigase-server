@@ -723,7 +723,11 @@ public class JabberIqRegister
 	}
 
 	public void setWelcomeMessage(String message) throws TigaseDBException {
-		userRepository.setData(smJid, ID, "welcome-message", message);
+		if (message != null) {
+			userRepository.setData(smJid, ID, "welcome-message", message);
+		} else {
+			userRepository.removeData(smJid, ID, "welcome-message");
+		}
 		eventBus.fire(new WelcomeMessageChangedEvent(message));
 	}
 
