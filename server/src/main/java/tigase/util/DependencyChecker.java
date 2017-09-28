@@ -24,8 +24,6 @@ import tigase.sys.TigaseRuntime;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
@@ -60,35 +58,33 @@ public class DependencyChecker {
 							String name = parts[0];
 							Version version = Version.of(parts[1]);
 
-							try {
-								Package p = getPackageFromClassLoader(clazz.getClassLoader(), name);
-								if (p == null) {
-									TigaseRuntime.getTigaseRuntime()
-											.shutdownTigase(new String[]{"Required package " + name +
-																				 " is inaccessible. Make sure that all required jars are available in your classpath."});
-								}
-								if (p.getImplementationVersion() == null) {
-									log.log(Level.FINE, "could not check " + name + " dependency version as package version is not set");
-									continue;
-								}
+							Package p = Package.getPackage(name);
+							if (p == null) {
+								TigaseRuntime.getTigaseRuntime()
+										.shutdownTigase(new String[]{"Required package " + name +
+																			 " is inaccessible. Make sure that all required jars are available in your classpath."});
+							}
+							if (p.getImplementationVersion() == null) {
+								log.log(Level.FINE, "could not check " + name +
+										" dependency version as package version is not set");
+								continue;
+							}
 
-								if (log.isLoggable(Level.FINEST)) {
-									log.log(Level.FINEST, "looking for " + name + " in version " + version + " and found " + p.getImplementationVersion());
-								}
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "looking for " + name + " in version " + version + " and found " +
+										p.getImplementationVersion());
+							}
 
-								//check support for more than one requirement!
-								// should be only >
-								if (version.compareTo(Version.of(p.getImplementationVersion())) > 0) {
-									TigaseRuntime.getTigaseRuntime()
-											.shutdownTigase(new String[]{
-													p.getImplementationTitle() + " is available in version " +
-															p.getImplementationVersion() + " while " +
-															clazz.getPackage().getImplementationTitle() + " " +
-															clazz.getPackage().getImplementationVersion() +
-															" requires version >= " + version});
-								}
-							} catch (NoSuchMethodException|IllegalAccessException|InvocationTargetException ex) {
-								log.log(Level.WARNING, "Exception while checking dependency versions for " + dependency, ex);
+							//check support for more than one requirement!
+							// should be only >
+							if (version.compareTo(Version.of(p.getImplementationVersion())) > 0) {
+								TigaseRuntime.getTigaseRuntime()
+										.shutdownTigase(new String[]{
+												p.getImplementationTitle() + " is available in version " +
+														p.getImplementationVersion() + " while " +
+														clazz.getPackage().getImplementationTitle() + " " +
+														clazz.getPackage().getImplementationVersion() +
+														" requires version >= " + version});
 							}
 						}
 					}
@@ -99,11 +95,5 @@ public class DependencyChecker {
 			throw new RuntimeException("Failed to read " + JarFile.MANIFEST_NAME, ex);
 		}
 	}
-
-	private static Package getPackageFromClassLoader(ClassLoader classLoader, String name)
-			throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		Method m = ClassLoader.class.getDeclaredMethod("getPackage", String.class);
-		m.setAccessible(true);
-		return (Package) m.invoke(classLoader, name);
-	}
+	
 }
