@@ -27,7 +27,6 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.nio.ch.DirectBuffer;
 
 /**
  *
@@ -111,14 +110,17 @@ public class IOUtil {
 				count = 1;
 				buffer.rewind();
 			}
-			else {
-				freeBuffer(buffer);
-			}
+			// API no longer accessible on JDK9 (it may be removed very soon!)
+//			else {
+//				freeBuffer(buffer);
+//			}
 		}
-				
-		private void freeBuffer(ByteBuffer buf) {
-			((DirectBuffer) buf).cleaner().clean();
-		}
+
+		// API no longer accessible on JDK9 (it may be removed very soon!)
+//		private void freeBuffer(ByteBuffer buf) {
+//			java.lang.ref.Cleaner
+//			((DirectBuffer) buf).cleaner().clean();
+//		}
 		
 	}
 	

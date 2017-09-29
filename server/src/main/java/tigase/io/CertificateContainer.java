@@ -141,13 +141,8 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	private KeyManagerFactory createCertificateKmf(String alias)
 			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
 			       NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
-		KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
-		X509Certificate cert = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
-		                                                                   keyPair);
-		CertificateEntry entry = new CertificateEntry();
-
-		entry.setPrivateKey(keyPair.getPrivate());
-		entry.setCertChain(new Certificate[]{cert});
+		CertificateEntry entry = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
+																		   () -> CertificateUtil.createKeyPair(1024, "secret"));
 		return addCertificateEntry(entry, alias, true);
 	}
 
@@ -365,10 +360,9 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		try {
 			if (!trustKeyStore.aliases().hasMoreElements()) {
 				log.log(Level.CONFIG, "No Trusted Anchors!!! Creating temporary trusted CA cert!");
-				KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
-				X509Certificate cert = CertificateUtil.createSelfSignedCertificate("fake_local@tigase", "fake one", "none",
-						"none", "none", "none", "US", keyPair);
-				trustKeyStore.setCertificateEntry("generated fake CA", cert);
+				CertificateEntry entry = CertificateUtil.createSelfSignedCertificate("fake_local@tigase", "fake one", "none",
+						"none", "none", "none", "US", () -> CertificateUtil.createKeyPair(1024, "secret"));
+				trustKeyStore.setCertificateEntry("generated fake CA", entry.getCertChain()[0]);
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't generate fake trusted CA certificate", e);
