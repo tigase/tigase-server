@@ -28,7 +28,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>../server/database</directory>
+			<directory>../server/src/main/database</directory>
 			<outputDirectory>database</outputDirectory>
 			<includes>
 				<include>*</include>
