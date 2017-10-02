@@ -139,7 +139,7 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *          initial list of virtual domains.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void getDefaults(Map<String, Object> defs, Map<String, Object> params);
 
 	/**
@@ -196,7 +196,7 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *          <code>Map</code> must not be modified. This read-only collection.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void setProperties(Map<String, Object> properties);
 
 	//~--- methods --------------------------------------------------------------

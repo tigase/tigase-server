@@ -132,14 +132,7 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
 		}
 	}
-
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		throw new AuthorizationException("Not supported.");
-	}
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -309,17 +302,14 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 			}
 			String digest = (String) props.get(DIGEST_KEY);
 			if (digest != null) {
-				String digest_id = (String) props.get(DIGEST_ID_KEY);
-				return digestAuth(user_id, digest, digest_id, "SHA");
+				throw new AuthorizationException("Not supported");
 			}
 		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
 
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
 
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, final String password)
+	private boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		try {
 			if ( !isActive(user)) {

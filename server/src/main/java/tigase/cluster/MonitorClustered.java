@@ -37,6 +37,6 @@ import tigase.server.monitor.MonitorComponent;
  * @deprecated Use {@link tigase.monitor.MonitorComponent} instead.
  */
 @Deprecated
-@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
+@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 public class MonitorClustered extends MonitorComponent {
 }

@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 public class JDBCRepository
 				implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
 	/** Field description */
-	public static final String CURRENT_DB_SCHEMA_VER = "7.2";
+	public static final String CURRENT_DB_SCHEMA_VER = "8.0";
 
 	/** Field description */
 	public static final String DEF_MAXIDS_TBL = "tig_max_ids";
@@ -87,7 +87,7 @@ public class JDBCRepository
 
 	/** Field description */
 	public static final String SCHEMA_UPGRADE_LINK =
-		"Administration Guide > Tigase Server Schema v7.2 Updates (available locally in docs directory and online http://docs.tigase.org)";
+		"Administration Guide > Tigase Server Schema v8.0 Updates (available locally in docs directory and online http://docs.tigase.org)";
 	private static final String ADD_NODE_QUERY          = "{ call TigAddNode(?, ?, ?) }";
 	private static final String ADD_USER_PLAIN_PW_QUERY =
 		"{ call TigAddUserPlainPw(?, ?) }";
@@ -220,15 +220,7 @@ public class JDBCRepository
 					throws UserExistsException, TigaseDBException {
 		auth.addUser(user, password);
 	}
-
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, final String digest, final String id,
-														final String alg)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		return auth.digestAuth(user, digest, id, alg);
-	}
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -621,14 +613,7 @@ public class JDBCRepository
 	}
 
 	// Implementation of tigase.db.AuthRepository
-
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, final String password)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		return auth.plainAuth(user, password);
-	}
-
+	
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		auth.queryAuth(authProps);

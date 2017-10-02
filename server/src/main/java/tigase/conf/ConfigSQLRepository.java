@@ -53,7 +53,7 @@ import tigase.util.DataTypes;
  * @version $Rev$
  */
 @Deprecated
-@TigaseDeprecated(since = "7.2.0")
+@TigaseDeprecated(since = "8.0.0")
 public class ConfigSQLRepository extends ConfigurationCache {
 
 	/** Field description */

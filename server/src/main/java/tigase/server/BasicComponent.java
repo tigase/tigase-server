@@ -26,7 +26,6 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.conf.Configurable;
@@ -594,16 +593,7 @@ public class BasicComponent
 	public String getDiscoDescription() {
 		return "Undefined description";
 	}
-
-	/**
-	 * Exists for backward compatibility with the old API.
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
+	
 	public List<Element> getDiscoFeatures() {
 		return null;
 	}
@@ -613,33 +603,8 @@ public class BasicComponent
 		return getDiscoFeatures();
 	}
 
-	/**
-	 * Exists for backward compatibility with the old API.
-	 *
-	 * @param node
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>Element</code>
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
-	public Element getDiscoInfo(String node, JID jid) {
-		return null;
-	}
-
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
-
-		// This is only to support the old depreciated API.
-		Element result = getDiscoInfo(node, jid);
-
-		if (result != null) {
-			return result;
-		}
-
-		// OLD API support end
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() +
 				".")) {
 			return serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
@@ -648,35 +613,9 @@ public class BasicComponent
 		return null;
 	}
 
-	/**
-	 * Exists for backward compatibility with the old API.
-	 *
-	 * @deprecated
-	 *
-	 * @param node
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "5.2.0", removeIn = "7.3.0")
-	public List<Element> getDiscoItems(String node, JID jid) {
-		return null;
-	}
-
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
-
-		// This is only to support the old depreciated API.
-		List<Element> result = getDiscoItems(node, jid);
-
-		if (result != null) {
-			return result;
-		}
-
-		// OLD API support end
+		List<Element> result = null;
 		boolean isAdminFrom = isAdmin(from);
 
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() +

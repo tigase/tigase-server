@@ -96,9 +96,7 @@ public class AuthRepositoryImpl
 		log.info("Password updated: " + user + ":" + password);
 	}
 
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, final String digest, final String id,
+	private boolean digestAuth(BareJID user, final String digest, final String id,
 			final String alg)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		final String db_password = getPassword(user);
@@ -173,9 +171,7 @@ public class AuthRepositoryImpl
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, final String password)
+	private boolean plainAuth(BareJID user, final String password)
 					throws UserNotFoundException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "plainAuth: {0}:{1}", new Object[] { user, password });

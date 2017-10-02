@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  *             worked before migration to Kernel Based TCF.
  */
 @Deprecated
-@TigaseDeprecated(since = "7.2.0")
+@TigaseDeprecated(since = "8.0.0")
 public abstract class AbstractComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
 
 	protected static final String COMPONENT = "component";

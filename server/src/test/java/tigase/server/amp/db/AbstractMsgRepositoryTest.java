@@ -96,7 +96,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 			loader.init(params, Optional.empty());
 			loader.validateDBConnection();
 			loader.validateDBExists();
-			Assert.assertEquals(SchemaLoader.Result.ok, loader.loadSchema(Schema.SERVER_SCHEMA_ID, "7.2.0"));
+			Assert.assertEquals(SchemaLoader.Result.ok, loader.loadSchema(Schema.SERVER_SCHEMA_ID, "8.0.0"));
 			loader.postInstallation();
 			loader.shutdown();
 		}

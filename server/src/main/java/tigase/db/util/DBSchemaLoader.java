@@ -89,7 +89,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 	public enum PARAMETERS_ENUM {
 		DATABASE_TYPE("dbType","mysql"),
-		SCHEMA_VERSION("schemaVersion","7-2"),
+		SCHEMA_VERSION("schemaVersion","8-0"),
 //		COMPONENTS("components","message-archiving,pubsub,muc,sock5"),
 		DATABASE_NAME("dbName","tigasedb"),
 		DATABASE_HOSTNAME("dbHostname","localhost"),
@@ -198,6 +198,9 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		switch (schemaId) {
 			case "":
 				String[] parts = version.split("\\.");
+				if ("0".equals(parts[1])) {
+					return path + dbType + "-schema-" + parts[0] + ".sql";
+				}
 				return path + dbType + "-schema-" + parts[0] + "-" + parts[1] + ".sql";
 			default:
 				return path + dbType + "-" + schemaId + "-schema-" + version + ".sql";

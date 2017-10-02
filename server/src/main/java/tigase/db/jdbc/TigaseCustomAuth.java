@@ -226,11 +226,11 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	public static final String DEF_LISTDISABLEDACCOUNTS_KEY= "users-list-disabled-accounts-query";
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_DISABLEACCOUNT_KEY = "user-disable-account-query";
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_ENABLEACCOUNT_KEY = "user-enable-account-query";
 
 	public static final String DEF_UPDATEACCOUNTSTATUS_KEY = "user-update-account-status-query";
@@ -388,9 +388,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		}
 	}
 
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, final String digest, final String id,
+	private boolean digestAuth(BareJID user, final String digest, final String id,
 			final String alg) throws UserNotFoundException, TigaseDBException,
 			AuthorizationException {
 		if (userlogin_active) {
@@ -697,9 +695,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, final String password)
+	private boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		if (userlogin_active) {
 			return userLoginAuth(user, password);

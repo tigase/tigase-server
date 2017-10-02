@@ -234,7 +234,7 @@ public interface UserRepository extends Repository {
 	 * @throws TigaseDBException if there is a problem with accessing user repository.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	long getUserUID(BareJID user) throws TigaseDBException;
 
 	/**

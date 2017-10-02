@@ -122,7 +122,7 @@ public class ClConConfigRepository
 	//~--- methods --------------------------------------------------------------
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do

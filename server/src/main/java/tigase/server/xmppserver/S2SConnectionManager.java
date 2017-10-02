@@ -204,7 +204,7 @@ public class S2SConnectionManager
 
 	@Override
 	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	public void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		super.addTimerTask(task, delay, unit);
 	}

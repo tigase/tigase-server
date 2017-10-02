@@ -203,7 +203,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 *         parameters.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	/**
@@ -219,7 +219,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @return an Object with content of an internal cache data.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	Object getInternalCacheData();
 
 	/**

@@ -96,7 +96,7 @@ public interface Repository {
 	 * call.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	default void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		
 	}

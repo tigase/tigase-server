@@ -144,7 +144,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {
 		Class<? extends PriorityQueueAbstract> result = null;
 		String queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);

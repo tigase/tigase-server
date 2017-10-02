@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.db.AuthRepository.*;
 import static tigase.db.NonAuthUserRepository.OFFLINE_DATA_NODE;
 import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
 
@@ -195,26 +196,16 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginDigest(BareJID userId, String digest, String id, String alg)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		isLoginAllowed();
-		try {
-			if (authRepo.digestAuth(userId, digest, id, alg)) {
-				authState = Authorization.AUTHORIZED;
-				login();
-			}    // end of if (authRepo.loginPlain())auth.login();
+		Map<String, Object> props = new HashMap<>();
+		props.put(PROTOCOL_KEY, PROTOCOL_VAL_NONSASL);
+		props.put(USER_ID_KEY, userId);
+		props.put(DIGEST_KEY, digest);
+		props.put(DIGEST_ID_KEY, id);
 
-			return authState;
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
-
-			throw new NotAuthorizedException("Authorization failed", e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-			// throw new NotAuthorizedException("Authorization failed", e);
-		}      // end of try-catch
+		return loginOther(props);
 	}
 
 	/**
@@ -232,7 +223,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginOther(Map<String, Object> props)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -280,26 +271,15 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginPlain(BareJID userId, String password)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		isLoginAllowed();
-		try {
-			if (authRepo.plainAuth(userId, password)) {
-				authState = Authorization.AUTHORIZED;
-				login();
-			}    // end of if (authRepo.loginPlain())auth.login();
+		Map<String, Object> props = new HashMap<>();
+		props.put(PROTOCOL_KEY, PROTOCOL_VAL_NONSASL);
+		props.put(USER_ID_KEY, userId);
+		props.put(PASSWORD_KEY, password);
 
-			return authState;
-		} catch (UserNotFoundException e) {
-			log.info("User not found, authorization failed: " + userId);
-
-			throw new NotAuthorizedException("Authorization failed", e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-			// throw new NotAuthorizedException("Authorization failed", e);
-		}      // end of try-catch
+		return loginOther(props);
 	}
 
 	/**
@@ -320,7 +300,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginToken(BareJID userId, String xmpp_sessionId, String token)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -372,7 +352,7 @@ public abstract class RepositoryAccess {
 		}
 		authProps.put(AuthRepository.SERVER_NAME_KEY, getDomain().getVhost().getDomain());
 		authRepo.queryAuth(authProps);
-		if (domain.isAnonymousEnabled() && (authProps.get(AuthRepository.PROTOCOL_KEY) ==
+		if (domain.isAnonymousEnabled() && (authProps.get(PROTOCOL_KEY) ==
 				AuthRepository.PROTOCOL_VAL_SASL)) {
 			String[] auth_mechs = (String[]) authProps.get(AuthRepository.RESULT_KEY);
 
@@ -406,7 +386,7 @@ public abstract class RepositoryAccess {
 	 * @deprecated
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization register(String name_param, String pass_param, String email_param)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		Map<String, String> reg_params = null;
@@ -573,7 +553,7 @@ public abstract class RepositoryAccess {
 	 * @deprecated Replaced by code in {@link JabberIqRegister#doRegisterNewAccount(Packet, Element, XMPPResourceConnection, Queue)}
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization register(String name_param, String pass_param, Map<String,
 			String> reg_params)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
@@ -1254,7 +1234,7 @@ public abstract BareJID getBareJID() throws NotAuthorizedException;
 	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, Queue)}
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	public Authorization unregister(String name_param)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		if (!isAuthorized()) {

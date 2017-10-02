@@ -33,19 +33,19 @@ public interface ModulesManager {
 	void unregisterClass(Class<?> cls);
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void registerPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void unregisterPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void registerServerComponentClass(Class<? extends Configurable> compCls);
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void unregisterServerComponentClass(Class<? extends Configurable> compCls);
 
 	void update();

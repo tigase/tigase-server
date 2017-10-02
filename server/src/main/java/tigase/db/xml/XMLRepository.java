@@ -112,15 +112,7 @@ public class XMLRepository
 			throws UserExistsException, TigaseDBException {
 		auth.addUser(user, password);
 	}
-
-	@Override
-	@Deprecated
-	public synchronized boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		return auth.digestAuth(user, digest, id, alg);
-	}
-
+	
 	@Override
 	public synchronized String getData(BareJID user, final String subnode, final String key,
 			final String def)
@@ -311,13 +303,6 @@ public class XMLRepository
 	}
 
 	// Implementation of tigase.db.AuthRepository
-
-	@Override
-	@Deprecated
-	public synchronized boolean plainAuth(BareJID user, final String password)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		return auth.plainAuth(user, password);
-	}
 
 	@Override
 	public synchronized void queryAuth(Map<String, Object> authProps) {

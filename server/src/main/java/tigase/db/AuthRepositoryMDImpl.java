@@ -59,8 +59,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void addUser(BareJID user, String password)
- throws TigaseDBException {
+	public void addUser(BareJID user, String password) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
@@ -70,23 +69,6 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 					"Couldn't obtain user repository for domain: " + user.getDomain()
 						+ ", not even default one!");
 		}
-	}
-
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, String digest, String id, String alg)
-			throws TigaseDBException, AuthorizationException {
-		AuthRepository repo = getRepo(user.getDomain());
-
-		if (repo != null) {
-			return repo.digestAuth(user, digest, id, alg);
-		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
-		}
-
-		return false;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -185,23 +167,6 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 					"Couldn't obtain user repository for domain: "
  + authProps.get(SERVER_NAME_KEY)
 					+ ", not even default one!");
-		}
-
-		return false;
-	}
-
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, String password)
- throws TigaseDBException, AuthorizationException {
-		AuthRepository repo = getRepo(user.getDomain());
-
-		if (repo != null) {
-			return repo.plainAuth(user, password);
-		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
 		}
 
 		return false;

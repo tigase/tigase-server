@@ -59,14 +59,7 @@ public class DummyRepository implements Repository, DataSource, UserRepository, 
 	@Override
 	public void addUser(BareJID user, String password)
 			throws UserExistsException, TigaseDBException {}
-
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, String digest, String id, String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		return false;
-	}
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	// Implementation of tigase.db.UserRepository
@@ -179,14 +172,7 @@ public class DummyRepository implements Repository, DataSource, UserRepository, 
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return false;
 	}
-
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		return false;
-	}
-
+	
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {}
 

@@ -79,7 +79,7 @@ public class ClConDirRepository
 
 	@Override
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
 		// Nothing to do here
 		super.initRepository(conn_str, params);

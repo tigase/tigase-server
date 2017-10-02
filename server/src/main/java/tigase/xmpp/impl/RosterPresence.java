@@ -61,7 +61,7 @@ import java.util.Queue;
  * @version $Rev$
  */
 @Deprecated
-@TigaseDeprecated(since = "7.0.0", removeIn = "7.3.0")
+@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 public class RosterPresence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {

@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  * @version $Rev$
  */
 @Deprecated
-@TigaseDeprecated(since = "7.2.0")
+@TigaseDeprecated(since = "8.0.0")
 public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";

@@ -121,7 +121,7 @@ public class ClConSQLRepository
 	//~--- get methods ----------------------------------------------------------
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
@@ -154,7 +154,7 @@ public class ClConSQLRepository
 	}
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	@Override
 	public void initRepository(String conn_str, Map<String, String> params)
 					throws DBInitException {
@@ -276,7 +276,7 @@ public class ClConSQLRepository
 	//~--- set methods ----------------------------------------------------------
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);

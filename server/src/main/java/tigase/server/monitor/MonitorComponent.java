@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * @deprecated Use {@link  tigase.monitor.MonitorComponent} instead.
  */
 @Deprecated
-@TigaseDeprecated(since = "7.2.0")
+@TigaseDeprecated(since = "8.0.0")
 public class MonitorComponent extends AbstractMessageReceiver {
 	private static final Logger log = Logger.getLogger(MonitorComponent.class.getName());
 

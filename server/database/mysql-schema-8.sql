@@ -1,6 +1,6 @@
 --
 --  Tigase Jabber/XMPP Server
---  Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+--  Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
 --
 --  This program is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,14 @@
 --
 --
 
-run 'database/derby-schema-7-2-schema.sql';
+source database/mysql-schema-8-schema.sql;
 
-run 'database/derby-schema-7-2-sp.sql';
+source database/mysql-schema-8-sp.sql;
 
-run 'database/derby-schema-7-2-props.sql';
+source database/mysql-schema-8-props.sql;
 
--- LOAD FILE: database/derby-schema-7-2-schema.sql
+-- LOAD FILE: database/mysql-schema-8-schema.sql;
 
--- LOAD FILE: database/derby-schema-7-2-sp.sql
+-- LOAD FILE: database/mysql-schema-8-sp.sql;
 
--- LOAD FILE: database/derby-schema-7-2-props.sql
+-- LOAD FILE: database/mysql-schema-8-props.sql;

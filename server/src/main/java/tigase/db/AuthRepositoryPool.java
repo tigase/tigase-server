@@ -84,26 +84,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
 	}
-
-	@Override
-	@Deprecated
-	public boolean digestAuth(BareJID user, String digest, String id, String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.digestAuth(user, digest, id, alg);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-
-		return false;
-	}
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -202,25 +183,6 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 		if (repo != null) {
 			try {
 				return repo.otherAuth(authProps);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-
-		return false;
-	}
-
-	@Override
-	@Deprecated
-	public boolean plainAuth(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.plainAuth(user, password);
 			} finally {
 				addRepo(repo);
 			}

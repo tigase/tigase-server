@@ -155,7 +155,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	public abstract String getPropertyKey();
 
 	//~--- methods --------------------------------------------------------------

@@ -41,8 +41,6 @@ import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
 import tigase.util.PriorityQueueRelaxed;
 import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -487,7 +485,7 @@ public abstract class AbstractMessageReceiver
 	 * @deprecated
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	public void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
 	}
@@ -737,7 +735,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a value of <code>int</code>
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	public int processingThreads() {
 		return 1;
 	}
@@ -1233,7 +1231,7 @@ public abstract class AbstractMessageReceiver
 	 * @deprecated
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "7.3.0")
+	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	protected void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		receiverTasks.schedule(task, unit.toMillis(delay));
 	}

@@ -1,6 +1,6 @@
 --
 --  Tigase Jabber/XMPP Server
---  Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+--  Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
 --
 --  This program is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,16 @@
 --
 --
 
-source database/mysql-schema-7-2-schema.sql;
+-- QUERY START:
+-- This is a dummy user who keeps all the database-properties
+call TigExecuteIfNot(
+    (select count(1) from tig_users where user_id = 'db-properties'),
+    "call TigAddUserPlainPw('db-properties', NULL)"
+);
+-- QUERY END:
 
-source database/mysql-schema-7-2-sp.sql;
+select NOW(), ' - Setting schema version to 8.0';
 
-source database/mysql-schema-7-2-props.sql;
-
--- LOAD FILE: database/mysql-schema-7-2-schema.sql;
-
--- LOAD FILE: database/mysql-schema-7-2-sp.sql;
-
--- LOAD FILE: database/mysql-schema-7-2-props.sql;
+-- QUERY START:
+call TigPutDBProperty('schema-version', '8.0');
+-- QUERY END:

@@ -138,33 +138,6 @@ public interface AuthRepository extends Repository {
 	void addUser(BareJID user, String password)
 					throws UserExistsException, TigaseDBException;
 
-	/**
-	 * <code>digestAuth</code> method performs non-sasl, digest authentication
-	 * as described in non-sasl authentication
-	 * <a href="http://www.xmpp.org/extensions/xep-0078.html">XEP-0078</a>
-	 * For now it is empty and always returns <code>false</code> as I don't
-	 * have description for database with passwords.
-	 *
-	 * @param user a <code>BareJID</code> value of user name
-	 * @param digest a <code>String</code> value password digest sum
-	 * @param id a <code>String</code> value session ID used for digest sum
-	 * calculation.
-	 * @param alg a <code>String</code> value of algorithm ID used for digest sum
-	 * calculation.
-	 * @return a <code>boolean</code> value <code>true</code> on successful
-	 * authentication, <code>false</code> on authentication failure.
-	 * @exception UserNotFoundException if an given user name is not found in
-	 * the authentication repository.
-	 * @exception TigaseDBException if an error occurs during during accessing
-	 * database;
-	 * @exception AuthorizationException if an error occurs during authentication
-	 * process.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "5.1.0", removeIn = "7.3.0")
-	boolean digestAuth(BareJID user, String digest, String id, String alg)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException;
-
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -222,33 +195,8 @@ public interface AuthRepository extends Repository {
 	 *
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	boolean otherAuth(Map<String, Object> authProps)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException;
-
-	/**
-	 * <code>plainAuth</code> method performs non-sasl, plain authentication
-	 * as described in non-sasl authentication
-	 * <a href="http://www.xmpp.org/extensions/xep-0078.html">XEP-0078</a>.
-	 *
-	 * @param user a <code>BareJID</code> value of user name
-	 * @param password a <code>String</code> value of plain user password.
-	 * @return a <code>boolean</code> value <code>true</code> on successful
-	 * authentication, <code>false</code> on authentication failure.
-	 * @exception UserNotFoundException if an given user name is not found in
-	 * the authentication repository.
-	 * @exception TigaseDBException if an error occurs during during accessing
-	 * database;
-	 * @exception AuthorizationException if an error occurs during authentication
-	 * process.
-	 * @deprecated use method
-	 *             {@linkplain AuthRepository#otherAuth(Map)}
-	 *             because this method is preferred. In a long term plans all authentication
-	 *             methods should use otherAuth(...) calls.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "5.1.0", removeIn = "7.3.0")
-	boolean plainAuth(BareJID user, String password)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	/**
@@ -257,7 +205,7 @@ public interface AuthRepository extends Repository {
 	 * @param authProps a <code>Map</code> value with parameters for authentication.
 	 */
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void queryAuth(Map<String, Object> authProps);
 
 	/**
@@ -320,12 +268,12 @@ public interface AuthRepository extends Repository {
 	void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException;
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	boolean isUserDisabled(BareJID user) 
 					throws UserNotFoundException, TigaseDBException;
 
 	@Deprecated
-	@TigaseDeprecated(since = "7.2.0")
+	@TigaseDeprecated(since = "8.0.0")
 	void setUserDisabled(BareJID user, Boolean value) 
 					throws UserNotFoundException, TigaseDBException;
 	
