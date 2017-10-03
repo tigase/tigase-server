@@ -195,12 +195,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 	public String getSchemaFileName(String schemaId, String version) {
 		String path = "database/";
 		String dbType = params.getDbType();
-		switch (schemaId) {
-			case "":
-				return path + dbType + "-schema-" + version + ".sql";
-			default:
-				return path + dbType + "-" + schemaId + "-schema-" + version + ".sql";
-		}
+		return path + dbType + "-" + schemaId + "-schema-" + version + ".sql";
 	}
 
 	/**

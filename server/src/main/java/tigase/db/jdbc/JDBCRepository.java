@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 public class JDBCRepository
 				implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
 	/** Field description */
-	public static final String CURRENT_DB_SCHEMA_VER = "8.0";
+	public static final String CURRENT_DB_SCHEMA_VER = "8.0.0";
 
 	/** Field description */
 	public static final String DEF_MAXIDS_TBL = "tig_max_ids";

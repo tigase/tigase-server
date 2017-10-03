@@ -23,7 +23,7 @@ package tigase.db;
  */
 public class Schema {
 
-	public static final String SERVER_SCHEMA_ID = "";
+	public static final String SERVER_SCHEMA_ID = "server";
 	public static final String SERVER_SCHEMA_NAME = "Tigase XMPP Server (Core)";
 
 }
