@@ -257,14 +257,19 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			throws IOException {
 		log.log(Level.FINER, "Loading queries, resource: {0}", new Object[]{resource});
 		ArrayList<String> results = new ArrayList<>();
-		final Path p = Paths.get(resource);
+		Path p = Paths.get(resource);
 
 		if (!Files.exists(p)) {
-			if (params.isIgnoreMissingFiles()) {
-				log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
-				return results;
+			Path srcPath = Paths.get("src/main/" + resource);
+			if (!Files.exists(srcPath)) {
+				if (params.isIgnoreMissingFiles()) {
+					log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
+					return results;
+				} else {
+					throw new IOException("Required file at " + p.toString() + " doesn't exist!");
+				}
 			} else {
-				throw new IOException("Required file at " + p.toString() + " doesn't exist!");
+				p = srcPath;
 			}
 		}
 
