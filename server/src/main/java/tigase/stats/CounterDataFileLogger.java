@@ -21,7 +21,7 @@
  */
 package tigase.stats;
 
-//~--- non-JDK imports --------------------------------------------------------
+import tigase.collections.CircularFifoQueue;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
@@ -29,17 +29,20 @@ import tigase.kernel.beans.config.ConfigurationChangedAware;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Class responsible for dumping server statistics to a file
@@ -52,74 +55,106 @@ public class CounterDataFileLogger
 	/* logger instance */
 	private static final Logger log = Logger.getLogger( CounterDataFileLogger.class.getName() );
 
-	/* Field denoting directory configuration */
-	private static final String DIRECTORY_KEY = "stats-directory";
-	/* Field denoting file prefix configuration */
-	private static final String FILENAME_KEY = "stats-filename";
-	/* Field denoting whether include or not unixtime into filename configuration */
-	private static final String UNIXTIME_KEY = "stats-unixtime";
-	/* Field denoting whether include or not datetime timestamp into filename configuration */
-	private static final String DATETIME_KEY = "stats-datetime";
-	/* Field denoting datetime format configuration */
-	private static final String DATETIME_FORMAT_KEY = "stats-datetime-format";
-	/* Field denoting level of the statistics configuration */
-	private static final String STATISTICS_LEVE_KEY = "stats-level";
-
 	/* Field holding directory path configuration */
-	@ConfigField(desc = "Directory path", alias = DIRECTORY_KEY)
-	private static String directory = "logs/stats";
+	@ConfigField(desc = "Directory path", alias = "stats-directory")
+	private String directory = "logs/stats";
 	/* Field holding file prefix configuration */
-	@ConfigField(desc = "Name of a file", alias = FILENAME_KEY)
-	private static String filename = "stats";
+	@ConfigField(desc = "Name of a file", alias = "stats-filename")
+	private String filename = "stats";
 	/* Field holding configuration whether include or not unixtime into filename */
-	@ConfigField(desc = "Should include unix time", alias = UNIXTIME_KEY)
-	private static boolean includeUnixTime = true;
+	@ConfigField(desc = "Should include unix time", alias = "stats-unixtime")
+	private boolean includeUnixTime = true;
 	/* Field holding configuration whether include or not datetime timestamp into filename */
-	@ConfigField(desc = "Should include date time", alias = DATETIME_KEY)
-	private static boolean includeDateTime = true;
+	@ConfigField(desc = "Should include date time", alias = "stats-datetime")
+	private boolean includeDateTime = true;
 
 	/* Field holding datetime format configuration */
-	@ConfigField(desc = "Format of a date time", alias = DATETIME_FORMAT_KEY)
-	private static String dateTimeFormat = "yyyy-MM-dd_HH:mm:ss";
+	@ConfigField(desc = "Format of a date time", alias = "stats-datetime-format")
+	private String dateTimeFormat = "yyyy-MM-dd_HH:mm:ss";
 
 	/* Field holding level of the statistics configuration */
-	@ConfigField(desc = "Statistics detail level", alias = STATISTICS_LEVE_KEY)
-	private static Level statsLevel = Level.ALL;
+	@ConfigField(desc = "Statistics detail level", alias = "stats-level")
+	private Level statsLevel = Level.ALL;
 
 	@ConfigField(desc = "Frequency")
 	private long frequency = -1;
 
-	/* Variable for SimpleDateFormat */
-	private static SimpleDateFormat sdf;
+	private final static ExecutorService service = Executors.newSingleThreadScheduledExecutor();
+
+	private final AtomicBoolean collectionReady = new AtomicBoolean(false);
+
+	private DateTimeFormatter dateTimeFormatter;
+
+	@ConfigField(desc = "Whether old entries should be pruned automatically", alias = "automatically-prune-old")
+	private boolean pruneOldEntries = true;
+
+	@ConfigField(desc = "Whether old entries should be pruned automatically", alias = "automatically-prune-limit")
+	private int limit = 60 * 60 * 24;
+
+	@ConfigField(desc = "Remaining space in MB resulting in shrinking the collection", alias = "automatically-prune-resize-mb")
+	private int freeSpaceMB = 100;
+
+	@ConfigField(desc = "Remaining space in % resulting in shrinking the collection", alias = "automatically-prune-resize-percent")
+	private int freeSpacePerCent = 5;
+
+	@ConfigField(desc = "Factor by which collection will be shrunk", alias = "automatically-prune-resize-factor")
+	private double shrinkFactor = 0.75;
+
+	private CircularFifoQueue<Path> pathsQueue = null;
+
+	private Charset charset = StandardCharsets.UTF_8;
+
 
 	@Override
 	public void execute( StatisticsProvider sp ) {
 
-		Date currTime = new Date();
-		String path = directory + "/"
-									+ filename
-									+ ( includeUnixTime ? "_" + currTime.getTime() : "" )
-									+ ( includeDateTime ? "_" + sdf.format( currTime ) : "" )
-									+ ".txt";
-
-		log.log( Level.FINEST, "Dumping server statistics to: {0}", path );
-		Path p = Paths.get( path);
-		
-		Map<String, String> stats = sp.getAllStats( statsLevel.intValue() );
-
-		try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8)) {
-			StringBuilder sb = new StringBuilder();
-			for (Map.Entry<String, String> entry : stats.entrySet()) {
-				sb.append(entry.getKey()).append("\t");
-				sb.append(entry.getValue()).append("\n");
-			}
-			sb.append("Statistics time: ").append(sdf.format(currTime)).append("\n");
-			sb.append("Statistics time (linux): ").append(currTime.getTime()).append("\n");
-
-			writer.write(sb.toString());
-		} catch ( IOException ex ) {
-			log.log( Level.SEVERE, "Error dumping server statistics to file", ex );
+		if (pruneOldEntries && !collectionReady.get()) {
+			return;
 		}
+
+		final ZonedDateTime time = ZonedDateTime.now();
+
+		Path path = Paths.get(getPath(time));
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Dumping server statistics to: {0}", path);
+		}
+
+		Map<String, String> stats = sp.getAllStats(statsLevel.intValue());
+		stats.put("Statistics time", dateTimeFormatter.format(time));
+		stats.put("Statistics time (linux)", Long.toString(time.toInstant().toEpochMilli()));
+
+		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+			String result = stats.entrySet()
+					.stream()
+					.map((e) -> e.getKey() + "\t" + e.getValue())
+					.collect(Collectors.joining("'n"));
+			writer.write(result);
+		} catch (IOException ex) {
+			log.log(Level.SEVERE, "Error dumping server statistics to file", ex);
+		}
+
+		if (pruneOldEntries) {
+			pathsQueue.offer(path);
+
+			final File file = path.toFile();
+			if (pathsQueue.limit() > 0 && (file.getUsableSpace() / 1024 / 1024 < freeSpaceMB ||
+					((file.getUsableSpace() * 100) / file.getTotalSpace() < freeSpacePerCent))) {
+				int newLimit = (int) (pathsQueue.limit() * shrinkFactor);
+
+				log.log(Level.FINEST,
+				        "Shrinking stats file history from {0} to {1} (usable space: {2}, total space: {3}",
+				        new Object[]{limit, newLimit, file.getUsableSpace(), file.getTotalSpace()});
+				limit = newLimit;
+				pathsQueue.setLimit(limit);
+			}
+		}
+	}
+
+	private String getPath(ZonedDateTime time) {
+		return directory + "/" + filename +
+				(includeUnixTime ? "_" + time.toInstant().toEpochMilli() : "") +
+				(includeDateTime ? "_" + dateTimeFormatter.format(time) : "") + ".txt";
 	}
 
 	@Override
@@ -129,8 +164,50 @@ public class CounterDataFileLogger
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
-		new File( directory ).mkdirs();
-		sdf = new SimpleDateFormat( dateTimeFormat );
+		Paths.get(directory).toFile().mkdirs();
+		dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+
+		if (pruneOldEntries) {
+			if (pathsQueue == null) {
+				pathsQueue = new CircularFifoQueue<>(limit, CounterDataFileLogger::deleteFile);
+
+				final Thread thread = new Thread(() -> {
+					final long start = System.currentTimeMillis();
+					log.log(Level.FINE, "Started collecting existing statistics files");
+					try {
+						final File[] files = Paths.get(directory).toFile().listFiles();
+						if (files != null && files.length > 0) {
+							final List<Path> existingFilesPaths = Arrays.stream(files)
+									.sorted(Comparator.comparing(File::lastModified))
+									.map(File::toPath)
+									.collect(Collectors.toList());
+							pathsQueue.addAll(existingFilesPaths);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					log.log(Level.CONFIG, "Statistics files collection finished in: {0}s ",
+					        new Object[]{(System.currentTimeMillis() - start) / 1000});
+
+					collectionReady.set(true);
+				});
+				thread.setName("stats-files-reader");
+				thread.start();
+
+			} else {
+				pathsQueue.setLimit(limit);
+			}
+		}
+	}
+
+	private static void deleteFile(Path file) {
+		try {
+			if (Files.exists(file)) {
+				Files.delete(file);
+			}
+		} catch (IOException e) {
+			log.log(Level.FINEST, "Error deleting file " + file, e);
+		}
 	}
 
 	@Override

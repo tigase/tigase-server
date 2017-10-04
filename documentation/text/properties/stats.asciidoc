@@ -84,7 +84,7 @@ stats-file-logger may also be controlled using frequency, which is the time inte
 [source,dsl]
 -----
 stats {
-    'stats-file-logger' (class: tigase.stats.CounterDataLogger) {
+    'stats-file-logger' (class: tigase.stats.CounterDataFileLogger) {
         frequency = '60'
     }
 }
