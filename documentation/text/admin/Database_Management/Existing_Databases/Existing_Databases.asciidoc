@@ -1,7 +1,6 @@
 [[existingData]]
 = Importing Existing Data
 :author: Daniel Wisnewski
-:version: v1.0 October, 2015
-:date: 2015-05-10 13:35
+:version: v1.0, October 2015: Reformatted for v7.2.0.
 
 Information about importing user data from other databases.

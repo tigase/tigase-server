@@ -1,8 +1,7 @@
 [[shuttingDown]]
 = Shutting Down Tigase
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:version: v1.0 November, 2016
-:date: 22-11-2016 11:30
+:version: v2.0, November 2016: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

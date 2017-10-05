@@ -1,8 +1,7 @@
 [[watchdog]]
 = Watchdog
 :author: Wojciech Kapcia
-:date: 2015-10-15 10:50
-:version: v1.0 October, 2015
+:version: v1.2, October 2015: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

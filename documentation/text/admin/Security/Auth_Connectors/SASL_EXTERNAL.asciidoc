@@ -2,7 +2,6 @@
 = Configuration of SASL EXTERNAL
 :author: Bartosz Malkowski <bmalkowski@tigase.pl>
 :version: v2.1, June 2017: Reformatted for v7.2.0.
-:date: 2013-11-27 13:34
 
 :toc:
 :numbered:

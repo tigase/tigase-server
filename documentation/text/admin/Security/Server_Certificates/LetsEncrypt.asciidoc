@@ -1,8 +1,7 @@
 [[LetsEncryptCertificate]]
 = Installing LetsEncrypt Certificates in Your Linux System
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:version: v1.0 November, 2016
-:date: 2016-11-01 12:35
+:version: v2.0, November 2016: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

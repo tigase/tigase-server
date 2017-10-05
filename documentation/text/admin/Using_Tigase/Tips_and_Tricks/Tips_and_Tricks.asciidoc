@@ -1,8 +1,7 @@
 [[tipsAndTricks]]
 = Tips and Tricks
 :author: Daniel Wisnewski
-:version: v1.0
-:date: 2015-13-07 11:32
+:version: v2.0, June 2014: Reformatted for v7.2.0.
 
 :toc:
 

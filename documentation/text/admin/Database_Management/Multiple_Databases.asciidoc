@@ -2,7 +2,6 @@
 = Tigase Server and Multiple Databases
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2017: Reformatted for v7.2.0.
-:date: 2012-10-02 04:23
 
 :toc:
 :numbered:

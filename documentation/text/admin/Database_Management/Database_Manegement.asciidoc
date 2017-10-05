@@ -1,8 +1,7 @@
 [[databasemgnt]]
 = Database Management
 :author: daniel wisnewski
-:version: v1.0 July 2015
-:date: 2015-07-16 12:49
+:version: v2.0 July 2015. Reformatted for v7.2.0.
 
 :website: http://tigase.net
 

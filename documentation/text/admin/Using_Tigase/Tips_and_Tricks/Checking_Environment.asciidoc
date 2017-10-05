@@ -2,7 +2,6 @@
 = Tigase Tip: Checking the Runtime Environment
 :author:  not known
 :version: v1.0 inital ver
-:date: not known
 
 
 :toc:

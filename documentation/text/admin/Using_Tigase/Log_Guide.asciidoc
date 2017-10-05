@@ -1,8 +1,7 @@
 [[logs]]
 = Tigase Log Guide
 :author: Daniel Wisnewski
-:version: v1.0 August 2015
-:date: 2015-10-08 12:13
+:version: v1.0, August 2015: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

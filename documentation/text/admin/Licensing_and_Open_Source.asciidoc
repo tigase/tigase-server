@@ -1,7 +1,6 @@
 [[licensing]]
 = Licensing and Open Source
 :author: Daniel Wisnewski
-:date: 2015-11-01 11:24
 :version: v2.0 August 2017. Reformatted for v7.2.0.
 
 :toc:

@@ -1,7 +1,6 @@
 = Upgrading to v7.2.0 from v7.1.0
-:author: Eric Dziewa & Daniel
-:date: 2017-06-15
-:version: v1.0 June 2017
+:author: Eric Dziewa & Daniel Wisnewski
+:version: v1.0 June 2017: Reformatted for v7.2.0.
 
 :toc:
 :website: http://www.tigase.net

@@ -2,7 +2,6 @@
 = Prepare the MS SQL Server Database for the Tigase Server
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.1, June 2017: Reformatted for 7.2.0.
-:date: 2013-09-04 14:57
 
 :toc:
 :numbered:

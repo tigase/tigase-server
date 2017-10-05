@@ -2,7 +2,6 @@
 = Tigase Server Schema v7.2 Updates
 :author: Daniel Wisnewski
 :version: v1.0 October 2015
-:Date: 2015-10-12 15:36
 
 :numbered:
 :website: http://www.tigase.org

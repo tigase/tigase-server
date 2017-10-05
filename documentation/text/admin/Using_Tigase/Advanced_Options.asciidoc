@@ -1,7 +1,6 @@
 [[tigaseAdvancedOptions]]
 = Tigase Advanced Options
 :author: Daniel Wisnewski
-:date: 2016-03-28 14:55
 :version: v2.0 June 2017. Reformatted for v7.2.0.
 
 :toc:

@@ -2,7 +2,6 @@
 = Offline Messages
 :author: Daniel Wisnewski
 :version: v2.0, June 2017. Reformatted for v7.2.0.
-:date: 2016-03-07 07:54
 
 :toc:
 :numbered:

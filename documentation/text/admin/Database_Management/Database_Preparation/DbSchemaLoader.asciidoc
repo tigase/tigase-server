@@ -1,8 +1,7 @@
 [[dbSchemaLoader]]
 = +dbSchemaLoader+ Utility
 :author: Daniel Wisnewski
-:author: v1.0, March 2016: Reformatted for AsciiDoc.
-:date: 2016-03-14 14:30
+:author: v1.0, March 2016: Reformatted for v7.2.0.
 
 :numbered:
 :toc:

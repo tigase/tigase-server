@@ -1,8 +1,7 @@
 [[domainBasedPacketFiltering]]
 = Domain Based Packet Filtering
 :author: not known
-:version: v1.0 initial release
-:date: 2015-07-13 16:43
+:version: v2.0 October 2017: Reformatted for v7.2.0.
 
 Domain based packet filtering is a simple filter allowing to restrict user communication based on the source/destination domain name. This is especially useful if we want to limit user communication within a single - own domain only or a list of domains.
 

@@ -1,9 +1,7 @@
 [[systemchecks]]
 = Basic System Checks
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2010-03-06 20:18
-:revision: v2.1
+:version: v2.0, June 2014: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

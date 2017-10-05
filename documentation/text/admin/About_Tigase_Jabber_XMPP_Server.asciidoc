@@ -1,6 +1,5 @@
 [[about]]
 = About Tigase XMPP Server
-
 :Author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0 August 2017. Reformatted for v7.2.0.
 

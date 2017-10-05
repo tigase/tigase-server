@@ -1,9 +1,7 @@
 [[databasePreperation]]
 = Database Preparation
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:author: v2.0, June 2014: Reformatted for AsciiDoc.
-:date: 2012-07-15 06:42
-:revision: v2.1
+:author: v2.2, June 2014: Reformatted for v7.2.0.
 
 :toc:
 :numbered:

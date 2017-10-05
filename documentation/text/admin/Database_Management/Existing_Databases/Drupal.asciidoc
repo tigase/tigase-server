@@ -2,7 +2,6 @@
 = Integrating Tigase Server with Drupal
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2017: Reformatted for v7.2.0.
-:date: 2010-04-06 21:16
 
 :toc:
 :numbered:
