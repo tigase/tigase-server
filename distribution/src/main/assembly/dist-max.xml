@@ -205,6 +205,11 @@
 				<include>com.sun.mail:javax.mail</include>
 				<include>com.sun.mail:smtp</include>
 
+				<!--BouncyCastle extension-->
+                <include>org.bouncycastle:bctls-jdk15on</include>
+                <include>org.bouncycastle:bcprov-jdk15on</include>
+                <include>org.bouncycastle:bcpkix-jdk15on</include>
+
 				<!-- Tigase Push - APNs-->
 				<include>com.notnoop.apns:apns</include>
 				<include>commons-httpclient:commons-httpclient:</include>
