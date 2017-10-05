@@ -45,7 +45,7 @@ import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
 import tigase.server.QueueType;
 import tigase.server.filters.PacketCounter;
-import tigase.server.filters.PacketCounterOld;
+//import tigase.server.filters.PacketCounterOld;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -106,10 +106,10 @@ public class MyBenchmark {
 
 	}
 
-	@Benchmark
-	public void benchmarkOld(BenchmarkState state, Blackhole bh) {
-		process(state, bh, state.pcOld);
-	}
+//	@Benchmark
+//	public void benchmarkOld(BenchmarkState state, Blackhole bh) {
+//		process(state, bh, state.pcOld);
+//	}
 
 	private void process(BenchmarkState state, Blackhole bh, PacketFilterIfc pcOld) {
 		Packet p;
@@ -144,7 +144,7 @@ public class MyBenchmark {
 		Queue<Packet> packets = new ArrayDeque<>((int) limit);
 		PacketCounter pcNewDetailedOn = new PacketCounter(true);
 		PacketCounter pcNewDetailedOff = new PacketCounter(false);
-		PacketFilterIfc pcOld = new PacketCounterOld();
+//		PacketFilterIfc pcOld = new PacketCounterOld();
 
 
 
@@ -172,8 +172,8 @@ public class MyBenchmark {
 			pcNewDetailedOn.getStatistics(sl);
 			pcNewDetailedOff.init("counter-new-detailed-off", QueueType.IN_QUEUE);
 			pcNewDetailedOff.getStatistics(sl);
-			pcOld.init("counter-old", QueueType.IN_QUEUE);
-			pcOld.getStatistics(sl);
+//			pcOld.init("counter-old", QueueType.IN_QUEUE);
+//			pcOld.getStatistics(sl);
 			sl.forEach(System.out::println);
 
 			System.out.println();
