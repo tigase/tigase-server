@@ -1,9 +1,28 @@
-[[tigase711]]
-= Tigase v7.1.1
+[[tigase712]]
+= Tigase v7.1.2
 :author: Daniel Wisnewski
-:date: 2017-07-26
 
-Welcome to Tigase v7.1.1!  This is a maintenance release for Tigase v7.1.0 with a number of fixes and updates.  Although this guide will forego changenotes for v7.1.0, we are including major changes and new features list from that version since there are some customers who will be upgrading from older versions directly to v7.1.1.
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+Welcome to Tigase v7.1.2!  This is a maintenance release for Tigase v7.1.1 with a number of fixes and updates.  Although this guide will forego changenotes for v7.1.0 and v7.1.1, we are including major changes and new features list from that version since there are some customers who will be upgrading from older versions directly to v7.1.2.
+
+== New Minor Features & Behavior Changes
+
+=== Input Buffer algorithim changed
+The algorhithm charged with resizing the input buffer size has been reworked.  The new algorhithm now takes less steps to shrink the input buffer to an appropiate size.  This has improved memory usage under operation, and leaves Tigase XMPP Server with a smaller footprint when idle.
+
+=== TLS Buffer size reduced
+As the input buffer has gotten smaller, so has the TLS buffer.  We are now able to utilized 2k per connection instead of an allocated 16k (and 2k therafter).  This significantly reduces the amount of memory needed to run Tigase, and will benefit both high and low activity servers.
+
+== Fixes
+- link:https://projects.tigase.org/issues/5750[#5750] Statistics reterieved over XMPP now adhere to level rules.
+- link:https://projects.tigase.org/issues/5864[#5864] Fixed NPE on pre-bind Bosh session script.
+- link:https://projects.tigase.org/issues/6000[#6000] Fixed issue with dynamic rosters not being recognised while broadcasting presence.
+
+[[tigase711]]
+== Tigase v7.1.1
 
 == AMP plugin has had some updates
 Offline message retrieval has been slightly changed to use different methods.  If you are using the below configuration:
@@ -19,30 +38,6 @@ Replace it with these settings to use proper retrieval method.
 sess-man/plugins-conf/http\://jabber.org/protocol/offline/amp-repo-class=tigase.archive.unified.db.JDBCFlexibleOfflineMessageRetrievalRepositoryWithRecents
 sess-man/plugins-conf/amp/amp-repo-class=tigase.archive.unified.db.JDBCFlexibleOfflineMessageRetrievalRepositoryWithRecents
 -----
-
-== New Minor Features & Behavior Changes
-- link:https://projects.tigase.org/issues/1986[#1968] Implemented a proxy method to synchronize database access on MySQL and prevent desync deadlocks.
-- link:https://projects.tigase.org/issues/5057[#5057] Tigase and all dependency binaries are now signed.
-- Reduced SCRAM CallbackHandler log level from `WARNING` to `FINE`.
-
-== Fixes
-- link:https://projects.tigase.org/issues/4878[#4878] Improved Tigase `tig_users` table to be compatible with MySQL v5.7.
-- link:https://projects.tigase.org/issues/4908[#4908] `MonitorComponent` is no longer visable or accessible to non-admin users.
-- link:https://projects.tigase.org/issues/4973[#4973] Linited number of items queried when loading expired messages to a user-defined value.
-- #5098 Added StackTrace output to `SEVERE` errors on `SessionManager`.
-- #5118 Fixed NPE when sending certain `iq` stanzas, resulted in loss of `<type>` in processing.
-- #5338 Fixed NPE retriving presence requests from offline repository.
-- #5418 Fixed potential race condition when identical stanzas are sent during stream negioation.
-- #5604 Mofidied MA and UA to enable retrieval of stored private chatroom messages.
-- #5705 Fixed NPE resulting from failed S2S connection.
-- link:https://projects.tigase.org/issues/5859[#5859] Fixed exceptions being thrown when calling methods using reflection in `PreparedStatementInvocationHandler`.
-- #5885 Fixed handling of Subscription request when subscriber cancles request before approval.  Rosters are no longer improperly updated.
-- `db-create` scripts now include new pubsub schemas.
-- `XMPPServer.getConfigurator()` has been marked as depreciated.
-- Tigase MUC has been bumped to v2.4.1
-- Tigase PubSub has been bumped to v3.2.1
-- Message Archive has been bumped to v1.2.1
-- Unified Archive has been bumped to v1.0.1
 
 [[tigase710]]
 == Tigase v7.1.0
