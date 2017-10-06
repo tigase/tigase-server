@@ -10,14 +10,14 @@ Welcome to Tigase v7.1.2!  This is a maintenance release for Tigase v7.1.1 with 
 
 == New Minor Features & Behavior Changes
 
-=== Input Buffer algorithim changed
-The algorhithm charged with resizing the input buffer size has been reworked.  The new algorhithm now takes less steps to shrink the input buffer to an appropiate size.  This has improved memory usage under operation, and leaves Tigase XMPP Server with a smaller footprint when idle.
+=== Input Buffer algorithm changed
+The algorithm charged with resizing the input buffer size has been reworked.  The new algorithm now takes less steps to shrink the input buffer to an appropriate size.  This has improved memory usage under operation, and leaves Tigase XMPP Server with a smaller footprint when idle.
 
 === TLS Buffer size reduced
-As the input buffer has gotten smaller, so has the TLS buffer.  We are now able to utilized 2k per connection instead of an allocated 16k (and 2k therafter).  This significantly reduces the amount of memory needed to run Tigase, and will benefit both high and low activity servers.
+As the input buffer has gotten smaller, so has the TLS buffer.  We are now able to utilized 2k per connection instead of an allocated 16k (and 2k thereafter).  This significantly reduces the amount of memory needed to run Tigase, and will benefit both high and low activity servers.
 
 == Fixes
-- link:https://projects.tigase.org/issues/5750[#5750] Statistics reterieved over XMPP now adhere to level rules.
+- link:https://projects.tigase.org/issues/5750[#5750] Statistics retrieved over XMPP now adhere to level rules.
 - link:https://projects.tigase.org/issues/5864[#5864] Fixed NPE on pre-bind Bosh session script.
 - link:https://projects.tigase.org/issues/6000[#6000] Fixed issue with dynamic rosters not being recognised while broadcasting presence.
 
@@ -56,10 +56,10 @@ tigase.http.HttpMessageReceiver
 -----
 
 ==== New JDK v8 required
-As Oracle has dropped support for version 7 of it's Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
+As Oracle has dropped support for version 7 of its Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
 
 ==== Changes to Database Schemas
-Tigase has undergone a number or database schema changes, the current versions being main database schema v7.1 and pubsub schema v3.2.0.  If you are upgrading to v7.1.0 from a previous version of tigase, it is recomended you visit xref:v710notice[this section] in the documentation to prepare your new installation.
+Tigase has undergone a number or database schema changes, the current versions being main database schema v7.1 and pubsub schema v3.2.0.  If you are upgrading to v7.1.0 from a previous version of Tigase, it is recommended you visit xref:v710notice[this section] in the documentation to prepare your new installation.
 
 ==== Presence Plugin Split
 The plugin handling all presence processing has been split from one plugin (Presence.java) into separate plugins:
@@ -143,7 +143,7 @@ Blocking Command support has been added to Tigase, all functions of link:http://
 
 ==== Stream management now has new settings available for stream timeout
 
-Maximum stream timeout and default stream timtout times can now be set in init.properties. Details of these two settings can be found xref:streamResumptiontimeout[here].
+Maximum stream timeout and default stream timeout times can now be set in init.properties. Details of these two settings can be found xref:streamResumptiontimeout[here].
 
 ==== JVM Default configuration updated
 
@@ -201,7 +201,7 @@ New Configuration options come with this change.  The first being able to change
 -----
 cl-comp/cluster-sys-connections-per-node[I]=2
 -----
-Also a new class which implements the a new connection selection interface, but uses the old mechanism where any connection can send any command.
+Also a new class which implements the new connection selection interface, but uses the old mechanism where any connection can send any command.
 -----
 cl-comp/connection-selector=tigase.cluster.ClusterConnectionSelectorOld
 -----
@@ -265,7 +265,7 @@ Tigase supports enabling automatic presence subscriptions and roster authorizati
 Tigase will now dump the stacktrace upon shutdown by default.  For more information, check xref:shutDownStackTrace[this description].
 
 ==== New logic handling re-delivery of packets
-Previously, Tigase would retry deliverying command packets that failed to send after a brief delay of 60 seconds.  This new method can provide relief in sutations where command packet queues can get full.
+Previously, Tigase would retry delivering command packets that failed to send after a brief delay of 60 seconds.  This new method can provide relief in situations where command packet queues can get full.
 The new logic works like this:
 The delay for retries, after the first delay of 60 seconds will increase by a factor of 1.5, so the 2nd retry will then be 90 seconds, and then 135 and so on, until the retry limit has been reached (default is 15).
 Included in this is a new setting for setting the retry count, available xref:PacketRedelivery[here].
