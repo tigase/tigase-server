@@ -148,7 +148,7 @@ public abstract class PresenceAbstract
 		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
 
 		try {
-			buddies = DynamicRoster.addBuddies(session, settings, buddies, TO_SUBSCRIBED);
+			buddies = DynamicRoster.addBuddies(session, settings, buddies, SUB_BOTH);
 		} catch (RosterRetrievingException | RepositoryAccessException ex) {
 
 			// Ignore, handled in the JabberIqRoster code
@@ -178,6 +178,12 @@ public abstract class PresenceAbstract
 
 		JID[] buddies_to = roster_util.getBuddies(session, SUB_TO);
 
+		try {
+			buddies_to = DynamicRoster.addBuddies(session, settings, buddies_to, SUB_TO);
+		} catch (RosterRetrievingException | RepositoryAccessException ex) {
+			// Ignore, handled in the JabberIqRoster code
+		}
+
 		if (buddies_to != null) {
 			for (JID buddy : buddies_to) {
 				if (requiresPresenceSending(roster_util, buddy, session, true)) {
@@ -197,6 +203,12 @@ public abstract class PresenceAbstract
 		// TODO: It might be a marginal number of cases here but just make it clear
 		// we send a presence here regardless
 		JID[] buddies_from = roster_util.getBuddies(session, SUB_FROM);
+
+		try {
+			buddies_from = DynamicRoster.addBuddies(session, settings, buddies_to, SUB_FROM);
+		} catch (RosterRetrievingException | RepositoryAccessException ex) {
+			// Ignore, handled in the JabberIqRoster code
+		}
 
 		if (buddies_from != null) {
 			for (JID buddy : buddies_from) {

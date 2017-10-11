@@ -764,10 +764,11 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 
 						// Resend pending in subscription requests
 						resendPendingInRequests(session, results);
+					} else {
+						// Broadcast initial presence to 'from' or 'both' contacts
+						sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results, presenceEl,
+						                      settings, roster_util);
 					}
-					// Broadcast initial presence to 'from' or 'both' contacts
-					sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED,
-														 results, presenceEl, settings, roster_util);
 
 					// Broadcast initial presence to other available user resources
 					updateUserResources(presenceEl, session, results, first);

@@ -357,6 +357,81 @@ public class StoredProcedures {
 		}
 	}
 
+	public static String tigGetComponentVersion(final String component) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			String result = null;
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Getting version of the component: " + component);
+			}
+
+			PreparedStatement ps =
+					conn.prepareStatement("select version from tig_versions where (component = ?)");
+			ResultSet rs;
+
+			ps.setString(1, component.toLowerCase());
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				result = rs.getString(1);
+			}
+
+			return result;
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static void tigSetComponentVersion(final String name, final String version) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Setting component: {0} version to: {1}", new Object[]{name, version});
+			}
+
+			int result;
+
+			if (tigGetComponentVersion(name) != null) {
+				final String updateSql = "update tig_versions set version = ? where (component_name = ?)";
+				PreparedStatement ps = conn.prepareStatement(updateSql);
+
+				ps.setString(1, version);
+				ps.setString(2, name);
+				result = ps.executeUpdate();
+			} else {
+				final String insertSql = "insert into tig_versions (component, version, last_update) VALUES ?, ?, current timestamp ";
+				PreparedStatement ps = conn.prepareStatement(insertSql);
+
+				ps.setString(1, name);
+				ps.setString( 2, version);
+				result = ps.executeUpdate();
+			}
+
+			if (result != 1) {
+				log.severe("Error on Setting version");
+			}
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
 	/**
 	 * Method description
 	 *
