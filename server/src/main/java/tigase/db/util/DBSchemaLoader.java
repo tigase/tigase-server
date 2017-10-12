@@ -24,6 +24,7 @@ import tigase.db.Schema;
 import tigase.db.TigaseDBException;
 import tigase.server.XMPPServer;
 import tigase.util.LogFormatter;
+import tigase.util.Version;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.SystemConsole;
 import tigase.xmpp.BareJID;
@@ -195,7 +196,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 	public String getSchemaFileName(String schemaId, String version) {
 		String path = "database/";
 		String dbType = params.getDbType();
-		return path + dbType + "-" + schemaId + "-schema-" + version + ".sql";
+		return path + dbType + "-" + schemaId + "-schema" + (version != null ? "-" + version : "") + ".sql";
 	}
 
 	/**
@@ -337,7 +338,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				while ( drivers.hasMoreElements() ) {
 					availableDrivers.add( drivers.nextElement().toString() );
 				}
-				log.log( Level.CONFIG, "DriverManager (available drivers): " +  availableDrivers );
+				log.log( Level.FINE, "DriverManager (available drivers): " +  availableDrivers );
 				conn.close();
 				connection_ok = true;
 				log.log( Level.INFO, "Connection OK" );
@@ -353,27 +354,38 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		return withConnection(db_conn, cmd, null);
 	}
 
-	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd, ExceptionHandler<Exception, Result> exceptionHandler) {
-		Result result = null;
+	private <R> Optional<R> withConnectionGeneric(String db_conn, SQLCommand<Connection, R> cmd,
+	                                              ExceptionHandler<Exception, R> exceptionHandler) {
+		R result = null;
 		try ( Connection conn = DriverManager.getConnection( db_conn ) ) {
 			Enumeration<Driver> drivers = DriverManager.getDrivers();
 			ArrayList<String> availableDrivers = new ArrayList<>();
 			while ( drivers.hasMoreElements() ) {
 				availableDrivers.add( drivers.nextElement().toString() );
 			}
-			log.log( Level.CONFIG, "DriverManager (available drivers): " +  availableDrivers ) ;
+			log.log( Level.FINE, "DriverManager (available drivers): " +  availableDrivers ) ;
 			result = cmd.execute(conn);
 			conn.close();
 		} catch (SQLException | IOException e) {
 			if (exceptionHandler != null) {
-				return exceptionHandler.handleException(e);
+				return Optional.of(exceptionHandler.handleException(e));
 			} else {
 				log.log( Level.SEVERE, "\n\n\n=====\nFailure: " + e.getMessage() + "\n=====\n\n" );
-				return Result.error;
+				if (log.isLoggable(Level.FINEST)) {
+
+					log.log( Level.SEVERE, "Failure: " + e.getMessage(), e );
+				}
+				return Optional.empty();
 			}
 		}
-		return result;
+		return Optional.of(result);
 	}
+
+	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd, ExceptionHandler<Exception, Result> exceptionHandler) {
+		final Optional<Result> result = withConnectionGeneric(db_conn, cmd, exceptionHandler);
+		return result.orElse(Result.error);
+	}
+
 
 	private Result withStatement(String dbConn, SQLCommand<Statement, Result> cmd) {
 		return withConnection(dbConn, conn -> {
@@ -572,6 +584,79 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		} catch ( TigaseDBException | ClassNotFoundException | InstantiationException | IllegalAccessException e ) {
 			log.log( Level.WARNING, "Error initializing DB" + e );
 			return Result.error;
+		}
+	}
+
+	@Override
+	public Result setComponentVersion(String component, String version) {
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			log.log(Level.INFO, "Connection not validated");
+			return Result.error;
+		}
+
+		if (component == null) {
+			log.log(Level.WARNING, "Invalid component");
+			return Result.error;
+		}
+
+		if (version == null) {
+			log.log(Level.WARNING, "Invalid version");
+			return Result.error;
+		}
+
+		String db_conn = getDBUri( true, true );
+		log.log(Level.INFO, "Setting version of the component: {0} to: {1} for connection: {2}",
+		        new Object[]{component, version, db_conn});
+
+		if (db_conn == null) {
+			log.log(Level.WARNING, "Missing DB connection URL");
+			return Result.error;
+		} else {
+			return withConnection(db_conn, cmd -> {
+				String procedure = "call TigSetComponentVersion(?,?)";
+				try (PreparedStatement ps = cmd.prepareStatement(procedure)) {
+					ps.setString(1, component);
+					ps.setString(2, version);
+					ps.executeUpdate();
+					ps.close();
+					return Result.ok;
+				} catch (SQLException ex) {
+					log.log(Level.WARNING, "Setting version failed: " + procedure + ", " + ex.getMessage());
+					return Result.warning;
+				}
+			});
+		}
+	}
+
+	@Override
+	public Version getComponentVersionFromDb(String component) {
+		if (component == null || component.trim().isEmpty()) {
+			log.log(Level.WARNING, "Missing DB connection URL");
+			throw new IllegalArgumentException("Wrong component name");
+		} else {
+			String db_conn = getDBUri( true, true );
+			final SQLCommand<Connection, Version> versionCommand = cmd -> {
+
+				String procedure = "call TigGetComponentVersion(?)";
+				try (PreparedStatement ps = cmd.prepareStatement(procedure)) {
+					ps.setString(1, component);
+					final ResultSet rs = ps.executeQuery();
+					if (rs.next()) {
+						final String versionString = rs.getString(1);
+						if (versionString != null) {
+							return Version.of(versionString);
+						}
+					}
+					ps.close();
+				} catch (SQLException ex) {
+					log.log(Level.WARNING, "Setting version failed: " + procedure + ", " + ex.getMessage());
+				}
+				return Version.ZERO;
+			};
+
+			final Optional<Version> r = withConnectionGeneric(db_conn, versionCommand, null);
+			return r.orElse(Version.ZERO);
 		}
 	}
 
@@ -831,7 +916,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 //				                 .defaultValue(PARAMETERS_ENUM.COMPONENTS.getDefaultValue())
 //				                 .build());
 
-		getSetupOptions().stream().forEach(options::add);
+		options.addAll(getSetupOptions());
 
 		options.add(new CommandlineParameter.Builder("F", PARAMETERS_ENUM.FILE.getName()).description(
 				"Comma separated list of SQL files that will be processed").build());
@@ -1181,7 +1266,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 		@Override
 		public void setProperties(Properties props) {
-			logLevel = getProperty(props, PARAMETERS_ENUM.LOG_LEVEL, val -> Level.parse(val));
+			logLevel = getProperty(props, PARAMETERS_ENUM.LOG_LEVEL, Level::parse);
 			ingoreMissingFiles = getProperty(props, PARAMETERS_ENUM.IGNORE_MISSING_FILES, val -> Boolean.valueOf(val));
 			admins = getProperty(props, PARAMETERS_ENUM.ADMIN_JID, tmp -> Arrays.stream(tmp.split(","))
 					.map(str -> BareJID.bareJIDInstanceNS(str))
@@ -1260,6 +1345,16 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				this.dbRootUser = this.dbUser;
 				this.dbRootPass = this.dbPass;
 			}
+		}
+
+		@Override
+		public Level getLogLevel() {
+			return this.logLevel;
+		}
+
+		@Override
+		public void setLogLevel(Level level) {
+			this.logLevel = level;
 		}
 
 		public Boolean getIngoreMissingFiles() {

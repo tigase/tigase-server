@@ -30,6 +30,8 @@ public class StoredProcedures {
 
 	private static final String DEFAULT_USERNAME_SHA1 = sha1(Credentials.DEFAULT_USERNAME);
 
+	private static final String GET_VERSION = "select version from tig_schema_versions where (component = ?)";
+
 	//~--- methods --------------------------------------------------------------
 
 	private static String encodePassword(String encMethod, String userId, String userPw) {
@@ -381,7 +383,7 @@ public class StoredProcedures {
 		}
 	}
 
-	public static String tigGetComponentVersion(final String component) throws SQLException {
+	public static void tigGetComponentVersion(final String component, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
@@ -393,18 +395,12 @@ public class StoredProcedures {
 				log.log(Level.FINEST, "Getting version of the component: " + component);
 			}
 
-			PreparedStatement ps =
-					conn.prepareStatement("select version from tig_versions where (component = ?)");
-			ResultSet rs;
+
+			PreparedStatement ps = conn.prepareStatement(GET_VERSION);
 
 			ps.setString(1, component.toLowerCase());
-			rs = ps.executeQuery();
+			data[0] = ps.executeQuery();
 
-			if (rs.next()) {
-				result = rs.getString(1);
-			}
-
-			return result;
 		} catch (SQLException e) {
 
 			// e.printStackTrace();
@@ -427,15 +423,20 @@ public class StoredProcedures {
 
 			int result;
 
-			if (tigGetComponentVersion(name) != null) {
-				final String updateSql = "update tig_versions set version = ? where (component_name = ?)";
+			PreparedStatement psComp = conn.prepareStatement(GET_VERSION);
+			psComp.setString(1, name.toLowerCase());
+
+			ResultSet rs = psComp.executeQuery();
+
+			if (rs.next()) {
+				final String updateSql = "update tig_schema_versions set version = ? where (component = ?)";
 				PreparedStatement ps = conn.prepareStatement(updateSql);
 
 				ps.setString(1, version);
 				ps.setString(2, name);
 				result = ps.executeUpdate();
 			} else {
-				final String insertSql = "insert into tig_versions (component, version, last_update) VALUES ?, ?, current timestamp ";
+				final String insertSql = "insert into tig_schema_versions (component, version, last_update) VALUES (?, ?, current timestamp) ";
 				PreparedStatement ps = conn.prepareStatement(insertSql);
 
 				ps.setString(1, name);
@@ -448,8 +449,8 @@ public class StoredProcedures {
 			}
 		} catch (SQLException e) {
 
-			// e.printStackTrace();
-			// log.log(Level.SEVERE, "SP error", e);
+//			 e.printStackTrace();
+//			 log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();

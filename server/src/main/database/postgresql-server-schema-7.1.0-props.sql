@@ -35,3 +35,6 @@ select now(), ' - Setting schema version to 7.1';
 select TigPutDBProperty('schema-version', '7.1');
 -- QUERY END:
 
+-- QUERY START:
+select TigSetComponentVersion('server', '7.1');
+-- QUERY END:

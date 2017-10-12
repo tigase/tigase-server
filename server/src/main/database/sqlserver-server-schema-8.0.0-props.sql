@@ -35,3 +35,8 @@ select GETDATE(), ' - Setting schema version to 8.0.0';
 exec dbo.TigPutDBProperty 'schema-version', '8.0.0';
 -- QUERY END:
 GO
+
+-- QUERY START:
+exec TigSetComponentVersion('server', '8.0.0');
+-- QUERY END:
+GO

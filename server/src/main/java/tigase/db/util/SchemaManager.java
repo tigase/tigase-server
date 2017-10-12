@@ -43,6 +43,8 @@ import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtilBean;
 import tigase.util.DNSResolverFactory;
+import tigase.util.Version;
+import tigase.util.setup.BeanDefinition;
 import tigase.util.setup.SetupHelper;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
@@ -59,6 +61,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -81,18 +84,19 @@ public class SchemaManager {
 	};
 	private String adminPass = null;
 	private List<BareJID> admins = null;
+	private Level logLevel = Level.CONFIG;
 
 	private static Stream<String> getNonCoreComponentNames() {
 		return SetupHelper.getAvailableComponents().stream()
 				.filter(def -> !def.isCoreComponent())
-				.map(bean -> bean.getName());
+				.map(BeanDefinition::getName);
 	}
 	
 	private static Stream<String> getActiveNonCoreComponentNames() {
 		return SetupHelper.getAvailableComponents().stream()
-				.filter(def -> def.isActive())
+				.filter(BeanDefinition::isActive)
 				.filter(def -> !def.isCoreComponent())
-				.map(bean -> bean.getName());
+				.map(BeanDefinition::getName);
 	}
 
 	private CommandlineParameter ROOT_USERNAME = new CommandlineParameter.Builder("R", DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME.getName())
@@ -119,7 +123,7 @@ public class SchemaManager {
 	private CommandlineParameter COMPONENTS = new CommandlineParameter.Builder("C", "components").description(
 			"List of enabled components identifiers (+/-)")
 			.defaultValue(getActiveNonCoreComponentNames().sorted().collect(Collectors.joining(",")))
-			.options(getNonCoreComponentNames().sorted().toArray(x -> new String[x]))
+			.options(getNonCoreComponentNames().sorted().toArray(String[]::new))
 			.build();
 
 	private final List<Class<?>> repositoryClasses;
@@ -219,15 +223,10 @@ public class SchemaManager {
 		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
 		log.info("data sources  destruction finished!");
 		List<String> output = prepareOutput("Data source destruction finished", results, conversionMessages);
-		boolean error = results.values()
-				.stream()
-				.flatMap(entries -> entries.stream())
-				.map(entry -> entry.result)
-				.filter(r -> r == SchemaLoader.Result.error)
-				.findAny()
-				.isPresent();
-		TigaseRuntime.getTigaseRuntime()
-				.shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
+
+		final int exitCode = isErrorPresent(results) ? 1 : 0;
+		final String[] message = output.toArray(new String[output.size()]);
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(message, exitCode);
 	}
 
 	private List<CommandlineParameter> installSchemaParametersSupplier() {
@@ -246,12 +245,19 @@ public class SchemaManager {
 		loader.init(params, Optional.ofNullable(rootCredentialsCache));
 		String dbUri = loader.getDBUri();
 
-		Map<String, Set<String>> changes = getProperty(props, COMPONENTS,
-													   (listStr) -> Arrays.asList(listStr.split(","))).orElse(
-				Collections.emptyList())
+		// split list of components and group them according to enable/disable sign (and none translates to "+"
+		final Function<String, List<String>> stringToListFunction = (listStr) -> Arrays.asList(listStr.split(","));
+
+		final Function<String, String> signRemovingFunction = (v) -> (v.startsWith("-") || v.startsWith("+"))
+		                                                             ? v.substring(1)
+		                                                             : v;
+		Map<String, Set<String>> changes = getProperty(props, COMPONENTS, stringToListFunction).orElse(Collections.emptyList())
 				.stream()
-				.collect(Collectors.groupingBy((v) -> v.startsWith("-") ? "-" : "+", Collectors.mapping(
-						(v) -> (v.startsWith("-") || v.startsWith("+")) ? v.substring(1) : v, Collectors.toSet())));
+				.collect(Collectors.groupingBy((v) -> v.startsWith("-") ? "-" : "+",
+				                               Collectors.mapping(signRemovingFunction, Collectors.toSet())));
+
+
+
 
 		Set<String> components = getActiveNonCoreComponentNames().collect(Collectors.toSet());
 
@@ -274,6 +280,7 @@ public class SchemaManager {
 
 		admins = params.getAdmins();
 		adminPass = params.getAdminPassword();
+		logLevel = params.getLogLevel();
 
 		Map<String, Object> config = configBuilder.build();
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
@@ -286,14 +293,10 @@ public class SchemaManager {
 			new ConfigWriter().write(writer, config);
 			output.addAll(Arrays.stream(writer.toString().split("\n")).collect(Collectors.toList()));
 		}
-		boolean error = results.values()
-				.stream()
-				.flatMap(entries -> entries.stream())
-				.map(entry -> entry.result)
-				.filter(r -> r == SchemaLoader.Result.error)
-				.findAny()
-				.isPresent();
-		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
+		final int exitCode = isErrorPresent(results) ? 1 : 0;
+		final String[] message = output.toArray(new String[output.size()]);
+
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(message, exitCode);
 	}
 
 	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
@@ -308,14 +311,20 @@ public class SchemaManager {
 		Map<String, Object> config = holder.getProperties();
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
 		List<String> output = prepareOutput("Schema upgrade finished", results, conversionMessages);
-		boolean error = results.values()
-				.stream()
-				.flatMap(entries -> entries.stream())
-				.map(entry -> entry.result)
-				.filter(r -> r == SchemaLoader.Result.error)
-				.findAny()
-				.isPresent();
-		TigaseRuntime.getTigaseRuntime().shutdownTigase(output.toArray(new String[output.size()]), error ? 1 : 0);
+
+		final int exitCode = isErrorPresent(results) ? 1 : 0;
+		final String[] message = output.toArray(new String[output.size()]);
+
+		TigaseRuntime.getTigaseRuntime().shutdownTigase(message, exitCode);
+
+	}
+
+	private boolean isErrorPresent(Map<DataSourceInfo, List<ResultEntry>> results) {
+		return results.values()
+					.stream()
+					.flatMap(Collection::stream)
+					.map(entry -> entry.result)
+					.anyMatch(r -> r == SchemaLoader.Result.error);
 	}
 
 	private Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> loadSchemas(Map<String, Object> config, Properties props) throws IOException, ConfigReader.ConfigException {
@@ -327,10 +336,7 @@ public class SchemaManager {
 			setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
 
-		Map<SchemaManager.DataSourceInfo, List<SchemaManager.SchemaInfo>> result = getDataSourcesAndSchemas();
-		log.info("found " + result.size() + " data sources to upgrade...");
-
-		log.info("begining upgrade...");
+		log.info("beginning upgrade...");
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
 		log.info("schema upgrade finished!");
 		return results;
@@ -384,9 +390,7 @@ public class SchemaManager {
 				.getAllClasses()
 				.stream()
 				.filter(clazz -> Arrays.stream(SUPPORTED_CLASSES)
-						.filter(supClazz -> supClazz.isAssignableFrom(clazz))
-						.findAny()
-						.isPresent())
+						.anyMatch(supClazz -> supClazz.isAssignableFrom(clazz)))
 				.filter(clazz -> {
 					Bean bean = clazz.getAnnotation(Bean.class);
 					return bean != null && (bean.parent() != Object.class || bean.parents().length > 0);
@@ -428,14 +432,12 @@ public class SchemaManager {
 		Kernel kernel = prepareKernel();
 		List<BeanConfig> repoBeans = getRepositoryBeans(kernel);
 		List<RepoInfo> repositories = getRepositories(kernel, repoBeans);
-		Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource = groupRepositoriesByDataSource(repositories);
+		Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource = repositories
+				.stream()
+				.collect(Collectors.groupingBy(RepoInfo::getDataSource, Collectors.toList()));
 
 		return collectSchemasByDataSource(repositoriesByDataSource);
 	}
-
-//	public String getSchemaFileName(SchemaInfo schemaInfo, DataSource ds) {
-//		return getSchemaFileName(schemaInfo, ds.getResourceUri());
-//	}
 
 	public Map<DataSourceInfo, List<ResultEntry>> destroySchemas(Collection<DataSourceInfo> dataSources) {
 		return dataSources.stream().map(e -> new Pair<>(e, destroySchemas(e))).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
@@ -458,19 +460,12 @@ public class SchemaManager {
 				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 	}
 
-	public Map<DataSourceInfo, List<ResultEntry>> loadSchemas(String uri) {
-		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas();
-		return dataSourceSchemas.entrySet()
-				.stream()
-				.filter(e -> uri.equals(e.getKey().getResourceUri()))
-				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(), loadSchemas(e.getKey(), e.getValue())))
-				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-	}
-
 	public List<ResultEntry> loadSchemas(DataSource ds, List<SchemaInfo> schemas) {
-		if (!schemas.stream().filter(SchemaInfo::isValid).findAny().isPresent()) {
+		final List<SchemaInfo> validSchemas = schemas.stream().filter(SchemaInfo::isValid).collect(Collectors.toList());
+
+		if (validSchemas.isEmpty()) {
 			log.log(Level.FINER, "no known schemas for data source " + ds + ", skipping schema loading...");
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 
 		return executeWithSchemaLoader(ds, (schemaLoader, handler) -> {
@@ -478,14 +473,30 @@ public class SchemaManager {
 			results.add(new ResultEntry("Checking if database exists", schemaLoader.validateDBExists(), handler));
 			log.log(Level.FINER, "loading schemas for data source " + ds);
 			schemas.sort(SCHEMA_INFO_COMPARATOR);
-			results.addAll(schemas.stream().filter(schema -> schema.isValid()).map(schema -> {
-				log.log(Level.FINER, "loading schema with id ='" + schema + "'");
-				return new ResultEntry(
-						"Loading schema: " + schema.getName() + ", version: " + schema.getVersion(),
-						schemaLoader.loadSchema(schema.getId(), schema.getVersion()), handler);
-			}).collect(Collectors.toList()));
 
-			if (schemas.stream().filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId())).findAny().isPresent()) {
+			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema("common", null), handler));
+
+			for (SchemaInfo schema : validSchemas) {
+				Version version = schema.getVersion().get();
+				Version versionInDb = schemaLoader.getComponentVersionFromDb(schema.getId());
+
+				ResultEntry schemaLoadResultEntry;
+				if (!Version.TYPE.FINAL.equals(version.getVersionType())
+						|| (!versionInDb.getBaseVersion().equals(version.getBaseVersion()))) {
+					log.log(Level.FINER, "loading schema with id ='" + schema + "'");
+					schemaLoadResultEntry = new ResultEntry(
+							"Loading schema: " + schema.getName() + ", version: " + version + " (had database schema: " + versionInDb + ")",
+							schemaLoader.loadSchema(schema.getId(), version.getBaseVersion().toString()), handler);
+				} else {
+					log.log(Level.FINER, "Skipped loading schema with id ='" + schema + "'");
+					schemaLoadResultEntry = new ResultEntry(
+							"Skipping schema: " + schema.getName() + ", version: " + version + " (had database schema: " + versionInDb + ")",
+							SchemaLoader.Result.skipped, handler);
+				}
+				results.add(schemaLoadResultEntry);
+			}
+
+			if (schemas.stream().anyMatch(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId()))) {
 				results.add(new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(), handler));
 			}
 
@@ -514,6 +525,7 @@ public class SchemaManager {
 		SchemaLoader.Parameters params = schemaLoader.createParameters();
 		params.parseUri(ds.getResourceUri());
 		params.setAdmins(admins, adminPass);
+		params.setLogLevel(logLevel);
 		schemaLoader.init(params, Optional.ofNullable(rootCredentialsCache));
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));
@@ -529,16 +541,18 @@ public class SchemaManager {
 				.stream()
 				.filter(v -> v instanceof AbstractBeanConfigurator.BeanDefinition)
 				.map(v -> (AbstractBeanConfigurator.BeanDefinition) v)
-				.filter(def -> def.isActive())
-				.map(def -> {
-					Object v = def.getOrDefault("uri", def.get("repo-uri"));
-					return new DataSourceInfo(def.getBeanName(), v instanceof ConfigReader.Variable
-					                                             ? ((ConfigReader.Variable) v).calculateValue()
-							                                             .toString()
-					                                             : v.toString());
-				})
+				.filter(AbstractBeanConfigurator.BeanDefinition::isActive)
+				.map(this::createDataSourceInfo)
 				.collect(Collectors.toMap(DataSourceInfo::getName, Function.identity()));
 		return dataSources;
+	}
+
+	private DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def) {
+		Object v = def.getOrDefault("uri", def.get("repo-uri"));
+		return new DataSourceInfo(def.getBeanName(), v instanceof ConfigReader.Variable
+		                                             ? ((ConfigReader.Variable) v).calculateValue()
+				                                             .toString()
+		                                             : v.toString());
 	}
 
 	private List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans) {
@@ -575,7 +589,7 @@ public class SchemaManager {
 				ex.printStackTrace();
 				return Stream.empty();
 			}
-		}).filter(repo -> repo != null).collect(Collectors.toList());
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	private Map<DataSourceInfo, List<SchemaInfo>> collectSchemasByDataSource(Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource) {
@@ -584,26 +598,24 @@ public class SchemaManager {
 
 			List<SchemaInfo> schemas = entry.getValue()
 					.stream()
-					.collect(Collectors.groupingBy(repoInfo -> getSchemaId(repoInfo), Collectors.toList()))
+					.collect(Collectors.groupingBy(this::getSchemaId, Collectors.toList()))
 					.entrySet()
 					.stream()
-					.map(e -> new SchemaInfo(e.getValue().iterator().next().getImplementation().getAnnotation(Repository.SchemaId.class), e.getValue()))
+					.map(e -> {
+						final Repository.SchemaId annotation = e.getValue()
+								     .iterator()
+								     .next()
+								     .getImplementation()
+								     .getAnnotation(Repository.SchemaId.class);
+						     return new SchemaInfo(annotation, e.getValue());
+					     }
+					)
 					.collect(Collectors.toList());
 
 			dataSourceSchemas.put(entry.getKey(), schemas);
 		}
 
 		return dataSourceSchemas;
-	}
-
-	private Map<DataSourceInfo, List<RepoInfo>> groupRepositoriesByDataSource(List<RepoInfo> repos) {
-		return repos.stream()
-				.collect(Collectors.toMap(repo -> repo.getDataSource(),
-										  repo -> new ArrayList(Arrays.asList(repo)),
-										  (prev, repo) -> {
-											  prev.addAll(repo);
-											  return prev;
-										  }));
 	}
 
 	private String getSchemaId(RepoInfo repoInfo) {
@@ -738,21 +750,12 @@ public class SchemaManager {
 							results.addAll(crawlKernel(repositoryClasses, bc.getKernel(), configurator, cfg));
 						}
 
-						if (repositoryClasses.stream()
-								.filter(repoClazz -> repoClazz.isAssignableFrom(bc.getClazz()))
-								.findAny()
-								.isPresent()) {
+						if (repositoryClasses.stream().anyMatch(repoClazz -> repoClazz.isAssignableFrom(bc.getClazz()))) {
 							results.add(bc);
 						}
 
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					} catch (InstantiationException | IllegalAccessException e) {
-						e.printStackTrace();
-					} catch (NoSuchMethodException e) {
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
+					} catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
+						log.log(Level.SEVERE, "Exception while crawling kernel", ex);
 					} catch (StackOverflowError ex) {
 						ex.printStackTrace();
 						Kernel k = bc.getKernel();
@@ -760,7 +763,7 @@ public class SchemaManager {
 						do {
 							list.add(k.getName());
 						} while ((k = k.getParent()) != null);
-						System.out.println("exception in path " + list);
+						log.log(Level.SEVERE, "exception in path " + list);
 					}
 				});
 		return results;
@@ -832,11 +835,11 @@ public class SchemaManager {
 	public static class SchemaInfo {
 
 		private final Repository.SchemaId schema;
-		private final RepoInfo[] repositories;
+		private final List<RepoInfo> repositories;
 
 		public SchemaInfo(Repository.SchemaId schema, List<RepoInfo> repositories) {
 			this.schema = schema;
-			this.repositories = repositories.toArray(new RepoInfo[repositories.size()]);
+			this.repositories = repositories;
 		}
 
 		public String getId() {
@@ -847,37 +850,27 @@ public class SchemaManager {
 			return (schema != null ? schema.name() : "");
 		}
 
-		public RepoInfo[] getRepositories() {
+		public List<RepoInfo> getRepositories() {
 			return repositories;
 		}
 
-		public String getVersion() {
-			try {
-				Map<String, String> map = Arrays.asList(repositories)
-						.stream()
-						.map(repo -> repo.getImplementation().getPackage())
-						.collect(Collectors.toMap(p -> p.getImplementationTitle(),
-												  p -> Optional.ofNullable(p.getImplementationVersion())
-														  .orElse("0.0.0")
-														  .split("-")[0], (v1, v2) -> v1));
-
-				if (map.size() > 1) {
-					throw new RuntimeException("Could not detect schema version = " + map);
-				}
-
-				return map.values().iterator().next();
-			} catch (Exception ex) {
-				return null;
-			}
+		public Optional<Version> getVersion() {
+			return repositories.stream()
+					.map(RepoInfo::getImplementation)
+					.map(Class::getPackage)
+					.map(Package::getImplementationVersion)
+					.filter(Objects::nonNull)
+					.map(Version::of)
+					.findAny();
 		}
 		
 		public boolean isValid() {
-			return schema != null && getVersion() != null;
+			return schema != null && getVersion().isPresent();
 		}                          
 
 		@Override
 		public String toString() {
-			return "SchemaInfo[id=" + (schema == null ? "<unknown>" : schema.id()) + ", repositories=" + Arrays.asList(repositories) + "]";
+			return "SchemaInfo[id=" + (schema == null ? "<unknown>" : schema.id()) + ", repositories=" + repositories + "]";
 		}
 	}
 
@@ -964,6 +957,5 @@ public class SchemaManager {
 			this.user = user;
 			this.password = password;
 		}
-
 	}
 }

@@ -1,6 +1,6 @@
 --
 --  Tigase Jabber/XMPP Server
---  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+--  Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
 --
 --  This program is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU Affero General Public License as published by
@@ -15,31 +15,37 @@
 --  along with this program. Look for COPYING file in the top folder.
 --  If not, see http://www.gnu.org/licenses/.
 --
---  $Rev: $
---  Last modified by $Author: $
---  $Date: $
---
+
 
 -- QUERY START:
-SET QUOTED_IDENTIFIER ON
+create table tig_schema_versions (
+	-- Component Name
+	component varchar(100) NOT NULL,
+	-- Version of loaded schema
+	version varchar(100) NOT NULL,
+	-- Time when schema was loaded last time
+	last_update timestamp NOT NULL
+);
 -- QUERY END:
-GO
 
 -- QUERY START:
--- This is a dummy user who keeps all the database-properties
-if not exists (select 1 from tig_users where user_id = 'db-properties')
-exec dbo.TigAddUserPlainPw 'db-properties', NULL;
+create unique index component on tig_schema_versions ( component );
 -- QUERY END:
-GO
 
-select GETDATE(), ' - Setting schema version to 5.1';
 
 -- QUERY START:
-exec dbo.TigPutDBProperty 'schema-version', '5.1';
+CREATE procedure TigGetComponentVersion(component varchar(100))
+  PARAMETER STYLE JAVA
+  LANGUAGE JAVA
+  MODIFIES SQL DATA
+  DYNAMIC RESULT SETS 1
+  EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigGetComponentVersion';
 -- QUERY END:
-GO
 
 -- QUERY START:
-exec TigSetComponentVersion('server', '5.1');
+CREATE procedure TigSetComponentVersion(component varchar(100), version varchar(100))
+  PARAMETER STYLE JAVA
+  LANGUAGE JAVA
+  MODIFIES SQL DATA
+  EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigSetComponentVersion';
 -- QUERY END:
-GO

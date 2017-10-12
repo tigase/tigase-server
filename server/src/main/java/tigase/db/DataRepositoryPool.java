@@ -112,6 +112,30 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 	}
 
 	@Override
+	public void checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource) {
+		DataRepository repo = takeRepo(null);
+
+		if (repo != null) {
+			repo.checkSchemaVersion(datasource);
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+	}
+
+	@Override
+	public boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer) throws SQLException {
+		DataRepository repo = takeRepo(null);
+
+		if (repo != null) {
+			return repo.checkSchemaVersion(datasource, true);
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean checkTable(String tableName) throws SQLException {
 		DataRepository repo = takeRepo(null);
 

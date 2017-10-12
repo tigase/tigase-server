@@ -38,7 +38,7 @@ import java.util.Map;
 public interface Repository {
 
 	/**
-	 * Meta created to add possibility to retrieve informations about 
+	 * Meta created to add possibility to retrieve information about
 	 * implementation of repository (ie. supported database URI)
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
@@ -74,7 +74,7 @@ public interface Repository {
 		/**
 		 * Method returns name of a schema required by annotated class.
 		 * <br/>
-		 * Result of this method is intended to be displated to the user.
+		 * Result of this method is intended to be displayed to the user.
 		 * @return name of a schema
 		 */
 		String name();

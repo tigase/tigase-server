@@ -22,6 +22,7 @@ import tigase.conf.ConfigBuilder;
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
 import tigase.osgi.util.ClassUtilBean;
+import tigase.util.Version;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.BareJID;
@@ -29,10 +30,7 @@ import tigase.xmpp.BareJID;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -64,6 +62,9 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 		void setDbRootCredentials(String username, String password);
 
+		Level getLogLevel();
+
+		void setLogLevel(Level level);
 	}
 
 	public static SchemaLoader newInstance(String type) {
@@ -104,7 +105,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 				e.printStackTrace();
 			}
 			return loader;
-		}).filter(instance -> instance != null);
+		}).filter(Objects::nonNull);
 	}
 
 	public static List<CommandlineParameter> getMainCommandlineParameters(boolean forceNotRequired) {
@@ -112,7 +113,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 				loader -> loader.getSupportedTypes().stream())
 				.map(x -> (String) x)
 				.sorted()
-				.toArray(x -> new String[x]);
+				.toArray(String[]::new);
 		return Arrays.asList(
 				new CommandlineParameter.Builder("T", DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
 						"Database server type")
@@ -230,6 +231,17 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	 * {@code AuthRepository}.
 	 */
 	public abstract Result addXmppAdminAccount();
+
+	/**
+	 * Methods attempt to write to database loaded schema version for particular component
+	 *
+	 * @param component name of the component for which version should be set
+	 * @param version value which should be associated with the component
+	 *
+	 * @return a {@link Result} object indicating whether the call was successful
+	 */
+	public abstract Result setComponentVersion(String component, String version);
+	public abstract Version getComponentVersionFromDb(String component);
 
 	/**
 	 * Method checks whether the connection to the database is possible and that
