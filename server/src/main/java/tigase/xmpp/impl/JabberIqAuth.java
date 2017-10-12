@@ -155,7 +155,7 @@ public class JabberIqAuth
 					final Collection<String> auth_mechs = saslProvider.filterMechanisms(Sasl
 							.getSaslServerFactories(), session);
 
-					if (auth_mechs.contains("PLAIN") || auth_mechs.contains("DIGEST-MD5")) {
+					if (auth_mechs.contains("PLAIN")) {
 						response.append("<password/>");
 					}
 

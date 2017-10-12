@@ -150,6 +150,11 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 		return -1;
 	}
 
+	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return PasswordForm.encoded;
+	}
+
 	//~--- methods --------------------------------------------------------------
 	@Override
 	public void setDataSource(DataRepository dataSource) throws DBInitException {

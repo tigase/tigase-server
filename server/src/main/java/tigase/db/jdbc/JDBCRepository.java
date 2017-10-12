@@ -387,6 +387,11 @@ public class JDBCRepository
 	}
 
 	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return auth.getPasswordForm(domain);
+	}
+
+	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
 	}

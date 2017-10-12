@@ -276,6 +276,16 @@ public interface AuthRepository extends Repository {
 	@TigaseDeprecated(since = "8.0.0")
 	void setUserDisabled(BareJID user, Boolean value) 
 					throws UserNotFoundException, TigaseDBException;
+
+	default PasswordForm getPasswordForm(String domain) {
+		return PasswordForm.plain;
+	}
+
+	enum PasswordForm {
+		plain,
+		encoded,
+		unknown
+	}
 	
 }    // AuthRepository
 

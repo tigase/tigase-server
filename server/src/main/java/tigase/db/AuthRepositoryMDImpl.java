@@ -87,6 +87,17 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 	}
 
 	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		AuthRepository repo = getRepo(domain);
+		if (repo != null) {
+			return repo.getPasswordForm(domain);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain +", not even default one!");
+			return PasswordForm.unknown;
+		}
+	}
+
+	@Override
 	public String getResourceUri() {
 		return getDefaultRepository().getResourceUri();
 	}

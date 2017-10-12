@@ -115,6 +115,11 @@ public class AuthRepositoryImpl
 	}
 
 	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return PasswordForm.plain;
+	}
+
+	@Override
 	public String getResourceUri() {
 		return repo.getResourceUri();
 	}

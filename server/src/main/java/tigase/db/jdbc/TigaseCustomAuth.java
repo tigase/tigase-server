@@ -36,10 +36,7 @@ import javax.security.auth.callback.*;
 import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -346,6 +343,8 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	@ConfigField(desc = "Comma separated list of NON-SASL authentication mechanisms", alias = DEF_NONSASL_MECHS_KEY)
 	private String[] nonsasl_mechs = DEF_NONSASL_MECHS.split(",");
 
+	private PasswordForm passwordForm = PasswordForm.unknown;
+
 	// ~--- methods --------------------------------------------------------------
 
 	@Override
@@ -412,6 +411,11 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	}
 
 	// ~--- get methods ----------------------------------------------------------
+
+	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return passwordForm;
+	}
 
 	@Override
 	public String getResourceUri() {
@@ -537,6 +541,42 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			}
 			if (accountstatus_query != null) {
 				data_repo.initPreparedStatement(accountstatus_query, accountstatus_query);
+			}
+
+			try (Statement stmt = data_repo.createStatement(null)) {
+				String query = "select TigGetDBProperty('password-encoding')";
+				switch (data_repo.getDatabaseType()) {
+					case jtds:
+					case sqlserver:
+						query = "select dbo.TigGetDBProperty('password-encoding')";
+						break;
+					case derby:
+						query = "values TigGetDBProperty('password-encoding')";
+						break;
+					default:
+						break;
+				}
+
+				passwordForm = PasswordForm.plain;
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					if (rs.next()) {
+						String form = rs.getString(1);
+						if (form == null) {
+							form = "";
+						}
+
+						switch (form) {
+							case "MD5-PASSWORD":
+							case "MD5-USERID-PASSWORD":
+							case "MD5-USERNAME-PASSWORD":
+								passwordForm = PasswordForm.encoded;
+								break;
+							default:
+								passwordForm = PasswordForm.plain;
+								break;
+						}
+					}
+				}
 			}
 
 			this.data_repo = data_repo;

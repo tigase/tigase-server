@@ -202,6 +202,11 @@ public class XMLRepository
 	}
 
 	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return PasswordForm.plain;
+	}
+
+	@Override
 	public String getResourceUri() {
 		return xmldb.getDBFileName();
 	}

@@ -182,7 +182,12 @@ public class LdapAuthProvider implements AuthRepository {
 	public long getUsersCount(String domain) {
 		return -1;
 	}
-	
+
+	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return PasswordForm.encoded;
+	}
+
 	@Override
 	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {

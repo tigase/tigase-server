@@ -116,6 +116,11 @@ public class DummyRepository implements Repository, DataSource, UserRepository, 
 	}
 
 	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		return PasswordForm.plain;
+	}
+
+	@Override
 	public String getResourceUri() {
 		return null;
 	}

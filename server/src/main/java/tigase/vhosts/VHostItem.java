@@ -1617,6 +1617,10 @@ public class VHostItem
 			return VHostItem.this.getDomainFilterDomains();
 		}
 
+		@Override
+		public String getKey() {
+			return VHostItem.this.getKey();
+		}
 
 		@Override
 		public long getMaxUsersNumber() {

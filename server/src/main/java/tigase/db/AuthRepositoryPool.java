@@ -88,6 +88,23 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
+	public PasswordForm getPasswordForm(String domain) {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getPasswordForm(domain);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+
+		return PasswordForm.unknown;
+	}
+
+	@Override
 	public String getResourceUri() {
 		AuthRepository repo = takeRepo();
 
