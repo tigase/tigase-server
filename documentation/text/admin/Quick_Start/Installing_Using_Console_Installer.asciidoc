@@ -10,16 +10,13 @@
 
 == Installation Using the text-mode Installer
 
-When you install Tigase server on a desktop machine or a server having a graphical user interface - you can use the xref:guiinstall[GUI Installer]. However servers are often administered using *SSH* text-mode connection because of low bandwidth requirements or user preferences. Due to popular demand, the Tigase development team has decided to implement a console installer for the server.
-
-*Note! The console installer is only available for Tigase server version 4.1.5 and later*.
+When you install Tigase server on a desktop machine or a server having a graphical user interface - we recommend using the xref:webinstall[Web Installer]. However servers are often administered using *SSH* text-mode connection because of low bandwidth requirements or user preferences. Due to popular demand, the Tigase development team has decided to implement a console installer for the server.
 
 === Requirements and Important Notice
 
 Before trying the installer please keep in mind:
 
-- This is first - alpha rate version of the text-mode installation - meant to install the server and do some basic configuration. We will be very happy to see bug reports and overall feedback about this feature. Please send your remarks to mailto:artur.hefczyc@tigase.net[Artur Hefczyc] or Mateusz Fiolka.
-- You will still need to perform some additional steps before running the installer. The main requirement is to download and install *Java JDK v1.6 or newer*. This guide is aimed at advanced users - thus downloading and configuring JDK is left to the reader. You can find more info at the link:http://java.sun.com/javase/downloads/index.jsp[Java downloads site].
+- You will still need to perform some additional steps before running the installer. The main requirement is to download and install *Java JDK v8 or newer*. This guide is aimed at advanced users - thus downloading and configuring JDK is left to the reader. You can find more info at the link:http://java.sun.com/javase/downloads/index.jsp[Java downloads site].
 
 == Download the Installer
 

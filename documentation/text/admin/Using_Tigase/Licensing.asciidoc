@@ -48,10 +48,10 @@ The next page will provide you with an installation ID like the following:
 
 +1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR+
 
-Edit your init.properties file and add your installation-id
-[source,properties]
+Edit your config.tdsl file and add your installation-id
+[source,dsl]
 -----
---installation-id=1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR
+'installation-id' = '1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR'
 -----
 
 Note that the `installation-id` file will be made automatically once the license file is installed and verified by the server.
@@ -235,10 +235,16 @@ NOTE: The text below has been better formatted for readability, but does not ref
 
 
 == Unauthorized use
-If Tigase XMPP server does not have a valid license file, cannot contact the licensing server to obtain installation id and attached licences, or is unable to sent statistics the server will initiate retries.
+Tigase will consider itself unauthorized if the following conditions are met:
+- If Tigase XMPP server does not have a valid license file and cannot contact the licensing server to obtain installation id and attached licences.
+
+Then the program will then attempt to send statistics.
+
+. If unable to sent statistics the server after a random number of retries.
+
 If these retries are not successful after a random amount of time and 10 tries, the server will then shutdown.
 
-If you are experiencing this in error, please contact Tigase.
+If you are experiencing this condition, please contact Tigase.
 
 == Manual mode
 If you cannot open communication to stats.tigase.net or license.tigase.net over the required ports, you may request to use manual mode.  Manual mode requires Tigase to create a license file to be used on your machine locally.  This must be placed in the same folder as the above information, and the license check system will not seek communication unless the license is invalid or expired.

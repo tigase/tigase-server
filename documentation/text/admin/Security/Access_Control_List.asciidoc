@@ -92,4 +92,4 @@ _Allowing users from a specific domain to execute +query-dns+ command and some o
 }
 -----
 
-To be able to set a correct ACL property you need to know component names and command IDs. Component IDs can be found in the service discovery information on running server or in the server logs during startup. A command ID can be found in the command script source code. Each script contains a list of metadata at the very beginning of it's code. One of them is +AS:CommandId+ which is what you have to use for the ACL setting.
+To be able to set a correct ACL property you need to know component names and command IDs. Component IDs can be found in the service discovery information on running server or in the server logs during startup. A command ID can be found in the command script source code. Each script contains a list of metadata at the very beginning of it's code. One of them is *AS:CommandId* which is what you have to use for the ACL setting.

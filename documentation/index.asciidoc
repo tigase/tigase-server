@@ -35,8 +35,6 @@ include::text/admin/Quick_Start/Intro.asciidoc[]
 
 include::text/admin/Quick_Start/Installation_Using_Web_Installer.asciidoc[]
 
-include::text/admin/Quick_Start/Installing_Using_Console_Installer.asciidoc[]
-
 include::text/admin/Quick_Start/Manual_Installation_in_Console_Mode.asciidoc[]
 
 include::text/admin/Quick_Start/Windows_Installation.asciidoc[]
@@ -78,6 +76,8 @@ include::text/admin/Configuration/Vhosts_Virtual_Components.asciidoc[]
 :leveloffset: 2
 
 include::text/admin/Configuration/Logging.asciidoc[]
+
+include::text/admin/Using_Tigase/Advanced_Options.asciidoc[]
 
 :leveloffset: 1
 
@@ -287,6 +287,16 @@ include::text/admin/Using_Tigase/Command_Line_Tool/Configuration_Tool.asciidoc[]
 
 :leveloffset: 2
 
+include::text/admin/Using_Tigase/Offline_Messages.asciidoc[]
+
+include::text/admin/Using_Tigase/Licensing.asciidoc[]
+
+include::text/admin/Using_Tigase/Clustering.asciidoc[]
+
+include::text/admin/Using_Tigase/Anonymous_Users.asciidoc[]
+
+:leveloffset: 2
+
 include::text/admin/Using_Tigase/Scripting/Scripting_Support.asciidoc[]
 
 :leveloffset: 3
@@ -296,18 +306,6 @@ include::text/admin/Using_Tigase/Scripting/Introduction.asciidoc[]
 include::text/admin/Using_Tigase/Scripting/v4.4.x_Update.asciidoc[]
 
 include::text/admin/Using_Tigase/Scripting/Python.asciidoc[]
-
-:leveloffset: 2
-
-include::text/admin/Using_Tigase/Offline_Messages.asciidoc[]
-
-include::text/admin/Using_Tigase/Licensing.asciidoc[]
-
-include::text/admin/Using_Tigase/Advanced_Options.asciidoc[]
-
-include::text/admin/Using_Tigase/Clustering.asciidoc[]
-
-include::text/admin/Using_Tigase/Anonymous_Users.asciidoc[]
 
 :leveloffset: 1
 

@@ -1,7 +1,7 @@
 [[watchdog]]
 = Watchdog
 :author: Wojciech Kapcia
-:version: v1.2, October 2015: Reformatted for v7.2.0.
+:version: v2.0, October 2017: Reformatted for v7.2.0.
 
 :toc:
 :numbered:
@@ -17,15 +17,15 @@ No extra setup is necessary, Watchdog is already included with your build of Tig
 To configure watchdog, the following lines need to be present or edited in init.properties file:
 [source,dsl]
 -----
---watchdog_timeout=70000
---watchdog_delay=60000
---watchdog_ping_type=xmpp
+'watchdog_timeout' = 70000
+'watchdog_delay' = 60000
+'watchdog_ping_type' = 'xmpp'
 -----
 
 The three settings are as follows:
-- `--watchdog_timeout=70000` This setting sets the amount of time that watchdog will consider before it determines a connection may be stale. This setting sets the timeout at 70000ms or 70 seconds.
-- `--watchdog_delay=60000` This setting sets how often the watchdog should conduct the check, current setting sets the delay at 60000ms or 60 seconds.
-- `--watchdog_ping_type=whitespace` This setting determines the type of ping sent to components when watchdog is testing for activity.
+- `'watchdog_timeout'= 70000` This setting sets the amount of time that watchdog will consider before it determines a connection may be stale. This setting sets the timeout at 70000ms or 70 seconds.
+- `'watchdog_delay' = 60000` This setting sets how often the watchdog should conduct the check, the default delay at 60000ms or 60 seconds.
+- `'watchdog_ping_type'` This setting determines the type of ping sent to components when watchdog is testing for activity.
 
 You may, if you choose, to specify individual watchdog settings for specific components by adding them to the component settings, for example if we wanted to change the Client2Server settings to include watchdog, use the following lines in init.properties:
 [source,dsl]
@@ -55,7 +55,7 @@ Here is a breakdown:
 
 For example, lets draw this out and get a visual representation
 
-This line represents how often the check is performed. Each - is 10 seconds, so the check is done every 60 seconds (`watchdog_delay=60000`)
+This line represents how often the check is performed. Each - is 10 seconds, so the check is done every 60 seconds (`'watchdog_delay' = 60000`)
 -----
 -----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+------
 
@@ -71,7 +71,7 @@ This line is client activity, here the client has sent a message at 20 seconds a
 The following line represents the logic, with settings set at:
 [source,dsl]
 -----
-watchdog_timeout=120000
+'watchdog_timeout' = 120000
 c2s {
     'max-inactivity-time' = '180000'
 }
@@ -117,9 +117,9 @@ Again remember, for Watchdog to properly work, the `max-inactivity-time` MUST be
 
 
 == Testing
-The tigase.log.0 file can reveal some information about watchdog and how it is working (or how it might be fighting your settings). To do so, enter the following line into your init.properties file:
+The tigase.log.0 file can reveal some information about watchdog and how it is working (or how it might be fighting your settings). To do so, enter the following line into your config.tdsl file:
 -----
---debug=server,xmpp.init
+debug = [ 'server', 'xmpp.init' ]
 -----
 
 This will set debug mode for your log, and enable some more information about what Tigase is doing.  These logs are truncated for simplicity. Lets look at the above scenario in terms of the logs:

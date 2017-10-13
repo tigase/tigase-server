@@ -3,6 +3,8 @@
 :author: daniel wisnewski
 :version: v2.0 July 2015. Reformatted for v7.2.0.
 
+:toc:
+:numbered:
 :website: http://tigase.net
 
 Tigase is coded to perform with multiple database types and numbers.

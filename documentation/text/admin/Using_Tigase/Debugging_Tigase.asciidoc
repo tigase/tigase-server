@@ -1,7 +1,7 @@
 [[debuggingTigase]]
 = Debuging Tigase
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2017: Reformatted for 7.2.0.
+:version: v3.0, October 2017: Reformatted for 7.2.0.
 
 :toc:
 :numbered:
@@ -21,14 +21,14 @@ However, people want to see what is going on the network level. That is what has
 
 [source,dsl]
 -----
---debug = 'xmpp.XMPPIOService'
+debug = [ 'xmpp.XMPPIOService' ]
 -----
 
 You can also have debugging switched on for many packages/classes at the same time:
 
 [source,dsl]
 -----
---debug = 'cluster,xmpp.XMPPIOService'
+debug = [ 'cluster' , 'xmpp.XMPPIOService' ]
 -----
 
 Other packages you might be interested in are:
@@ -44,5 +44,5 @@ To enable logging for your own packages from those different than Tigase, you ha
 
 [source,bash]
 -----
---debug-packages = your.com.package
+debug-packages = [ your.com.package ]
 -----

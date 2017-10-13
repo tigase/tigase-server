@@ -112,7 +112,6 @@ This accepts file transfers VIA SOCKS5 proxy from any user and does not check li
 proxy {
     'socks5-repo-cls' = '$REPOCLASS'
 }
-proxy/socks5-repo-cls=
 -----
 
 Specifies implementation of repository used to store usage statistics.  Two options are available for this setting:

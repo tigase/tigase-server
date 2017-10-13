@@ -1,21 +1,20 @@
 [[anonymousUsers]]
 = Anonymous Users & Authentication
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:version: v2.0, October 2016: Reformatted for v7.2.0.
+:version: v3.0, October 2017: Reformatted for v7.2.0.
 
-:toc:
 :numbered:
 :website: http://tigase.net
 
 To support anonymous users, you must first enable anonymous authentication on your server.
 
 == Anonymous Authentication
-Tigase Sevrer can support anonymous logins VIA SASL-ANONYMOUS in certain scenarios.  This can be enabled by using the following setting in init.properties file: _--vhost-anonymous-enabled=true_
+Tigase Sevrer can support anonymous logins VIA SASL-ANONYMOUS in certain scenarios.  This can be enabled by using the following setting in config.tdsl file: _'vhost-anonymous-enabled' = true_
 This setting is false by default as SASL-ANONYMOUS may not be totally secure as users can connect without prior permission (username and password).
-This is a *global* setting and will affect all vhosts unless they are set individually.  If you wish to allow only certain hosts to allow anonymous login, then use the --virt-hosts configuration like below:
-[source,properties]
+This is a *global* setting and will affect all vhosts unless they are set individually.  If you wish to allow only certain hosts to allow anonymous login, then use the virtual-hosts configuration like below:
+[source,dsl]
 -----
---virt-hosts = 'domain1:-anon, domain2:c2s-ports-allowed=5032:-tls-required'
+'virtual-hosts' = [ 'domain1:-anon' , 'domain2:c2s-ports-allowed=5032:-tls-required' ]
 -----
 Where domain1 now has anonymous access allowed, and domain2 does not.
 

@@ -37,9 +37,9 @@ To aid with troubleshooting purposes, the full stacktrace will be dumped to a se
 Stacktrace logs will follow the same log file numbering scheme described in xref:logs[Log file description].
 
 This feature is enabled by default, however you may disable this by adding the following to your init.properties file:
-[source,properties]
+[source,dsl]
 -----
---shutdown-thread-dump=false
+'shutdown-thread-dump' = false
 -----
 
 [[clusterNodeShutdown]]

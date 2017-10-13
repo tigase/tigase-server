@@ -24,7 +24,7 @@ Here is a first, brief overview of the AMP configuration and later detailed expl
     message (active: false) {}
     msgoffline (active: false) {}
 }
---amp-security-level=STRICT
+'amp-security-level' = 'STRICT'
 -----
 
 

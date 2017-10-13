@@ -39,6 +39,32 @@ NOTE: URI name may be used as shorthand to define DB location URI in other conta
 
 NOTE: default () URI setting replaces the `user-db-uri` as well as the `auth-repo-uri` property.
 
+=== MSSQL
+MSSql support works out of the box, however Tigase provides an open source driver for the database.  We recommend using Microsoft's own driver for better functionality.
+[source,dsl]
+-----
+dataSource () {
+    default () {
+        uri = 'jdbc:jtds:sqlserver://localhost;databaseName=tigasedb;user=tigase_user;password=tigase_pass;schema=dbo;lastUpdateCount=false;cacheMetaData=false'
+    }
+}
+-----
+Where the uri is divided as follows:
+jdbc:<driver>:sqlserver://<server address>;databaseName=<database name>;user=<username for db>;password=<password for db>;schema=dbo;lastUpdateCount=false;cacheMetaData=false
+We do not recommend modification of schema and onward unless you are explicit in your changes.
+
+
+=== MongoDb
+For using mongoDB as the repository, the setting will look slightly different:
+[source,dsl]
+-----
+dataSource () {
+    default () {
+        uri = 'mongodb://username:password@localhost/dbname'
+    }
+}
+-----
+
 [[dataRepoPoolSize]]
 == pool-size
 `DataSource` is an abstraction layer between any higher level data access repositories such as `userRepository` or `authRepository` and SQL database or JDBC driver to be more specific.

@@ -7,18 +7,20 @@
 :numbered:
 :website: http://tigase.net
 
-When Tigase XMPP Server starts up, it looks for the default configuration file: *etc/init.properties*. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
+When Tigase XMPP Server starts up, it looks for the default configuration file: *etc/config.tdsl*. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
 If you are installing Tigase in a Windows environment, please see the xref:winWebInstall[Windows Installation] section.
 
 == Download and Extract
 
 First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.xmpp-test.net/nightlies/dists/[nightly builds].
 
+You may also use wget:
+
 [source,bash]
 -----
-$ wget http://build.xmpp-test.net/nightlies/dists/2015-01-12/tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
-$ tar -xf tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
-$ cd tigase-server-7.0.0-SNAPSHOT-b3752
+$ wget http://build.xmpp-test.net/nightlies/stable/tigase-server-8.0.0-dist-max.tar.gz
+$ tar -xf tigase-server-8.0.0-dist-max.tar.gz
+$ cd tigase-server-8.0.0
 -----
 
 TIP: Do not run as root user!
@@ -57,8 +59,8 @@ Password: tigase
 
 This combination will only be valid once as it will be removed from init.properties file on compleation of setup process.  After this point the setup page will only be accessable using the following:
 
-. JID accounts listed as administrators in --admins line in init.properties
-. Username and password combinations added to init.properties file manually, or at the last page in this process.
+. JID accounts listed as administrators in admins line in config.tdsl file.
+. Username and password combinations added to config.tdsl file manually, or at the last page in this process.
 
 Point your browser to *http://localhost:8080/setup/* unless you are working remotely. Then you can use the domain name, or IP address. I used http://tpub.xmpp-test.net:8080/setup/ for this guide.
 
@@ -74,43 +76,44 @@ Read it and then click "Next"
 
 image:images/admin/web-install-02.png[]
 
-Here is some information about our commercial products and licensing. Please read though the agreement, type your name or company and click "Next".
+Here is some information about our commercial products and licensing. Please read though the agreement, type in your name or company and click "Next".
+
+image:images/admin/web-install-03.png[]
+
+This page will look over your basic configuration settings, these include the server type, domains you wish to use, and gives you a chance to specify an administrator for the domain.  Also, you will be selecting what type of database Tigase server will be using (configuration comes later).
+If you do not specify an administrator and password, one is made for you, which will be admin@yourdomain and password is tigase.  If you wish to configure your server beyond the basics, check Advanced configuration options.
 
 image:images/admin/web-install-04.png[]
 
-This page will look over your default configuration settings, these include the type, Domains you wish to use, and gives you a chance to specify an administrator for the domain.  Also, you will be selecting what type of database Tigase server will be using.
+The Advanced configuration page. Select what components and configurations you need.  Some may be hilighted red to indicate conflicts or unmet requirements.
 
 image:images/admin/web-install-05.png[]
 
-The Advanced configuration page. Select what components and configurations you need.
+Plugins which will be loaded by the server, most plugins are enabled by default.  Some may be highlighted red to indicate conflicts or unmet requirements.
 
 image:images/admin/web-install-06.png[]
 
-Plugins which will be loaded by the server, most plugins are enabled by default.
+This is where the database is setup.  The type of database selected in step 3 will influence available options. *BE SURE TO SPECIFY DATABASE ROOT USER ACCOUNT AND PASSWORD*
 
 image:images/admin/web-install-07.png[]
 
-This is where the database schema is installed. *BE SURE TO SPECIFY SUPER USER ACCOUNT AND PASSWORD*
+You should see a page like this after a successful database setup.  This page will reveal any issues with your database setup such as invalid URIs, passwords, and schemas.  You may hit Back on your browser to check credentials and settings and try again.
 
 image:images/admin/web-install-08.png[]
 
-You should see a page like this after a successful database setup.  This page will reveal any issues with your database setup such as invalid URIs, passwords, and schemas.
+Next a page asking if you'd like to provide an API Access Key to access HTTP REST commands.  It is highly recommended that you either specify an API key or block access.  Open API keys allow any REST command to be interpreted by the server.
 
 image:images/admin/web-install-09.png[]
 
-Next a page asking if you'd like to provide an API Access Key to access HTTP REST commands.  It is highly recommended that you either specify an API key or block access.  Open API keys allow any REST command to be interpreted by the server.
+The Setup Access Page will be locked from the admin/tigase user as specified above.  This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later.  If left blank, only JIDs listed in admin will be allowed to access.
 
 image:images/admin/web-install-10.png[]
 
-The Setup Access Page will be locked from the admin/tigase user as specified above.  This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later.  If left blank, only JIDs listed in admin will be allowed to access.
-
-image:images/admin/web-install-11.png[]
-
-The installation is complete and this is what the *init.properties* file will look like.
+The installation is complete and this is what the *config.tdsl* file will look like.
 If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current init.properties file.
 Click "Save" to write the file to disk.
 
-image:images/admin/web-install-12.png[]
+image:images/admin/web-install-11.png[]
 
 You have now finished the installation, proceed to the next step to restart the server.
 

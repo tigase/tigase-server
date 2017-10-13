@@ -7,7 +7,7 @@
 :toc:
 :website: http://www.tigase.net
 
-Included with Tigase is the +dbSchemaLoader+ Utility, which can be used to apply schema files to databases. It is able to operate with Derby, MySQL, SQLServer, and PostgreSQL databases.
+Included with Tigase is the *dbSchemaLoader* Utility, which can be used to apply schema files to databases. It is able to operate with Derby, MySQL, SQLServer, and PostgreSQL databases.
 In order to use this utility with any of the databases, you will need to first have the database environment up and running, and have established user credentials. You may use root or an account with administrator write privileges.
 
 IMPORTANT: All commands in this guide are required to be running from the Tigase installation directory.

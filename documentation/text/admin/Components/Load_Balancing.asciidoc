@@ -1,7 +1,7 @@
 [[loadBalancing]]
 = Tigase Load Balancing
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-::::::::::::: incomplete
+//incomplete
 :version: v2.1, August 2017: Reformatted for 7.2.0.
 
 :toc:
@@ -107,19 +107,8 @@ It offers following configuration options:
 - `fallback-redirection-host` - if there is no redirection information present (i.e. secondary hostname is not configured for the particular node) redirection won't be generated; with this it's possible to configure fallback redirection address.
 
 
-All options can be configured either globally (without providing type parameter)
-[source,dsl]
-----
---cm-see-other-host {
-    'data-source' = '<class implementing tigase.server.xmppclient.SeeOtherHostDualIP.DualIPRepository>'
-    'db-url' = 'jdbc:<database>://<uri>'
-    'fallback-redirection-host' = '<hostname>'
-    'get-all-data-query' = 'select * from tig_cluster_nodes'
-    'get-all-query-timeout' = '10'
-}
-----
+All options are configured or on per-component basis:
 
-or on per-component basis
 [source,dsl]
 ----
 <connector> {
@@ -134,25 +123,12 @@ or on per-component basis
 ----
 
 ==== EventBus as a source of information
-It's possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that `eventbus` should be used as a value of `data-source` configuration option. In addition, EventBus events needs to be enabled in ClusterConnectionManager. Example configuration:
-
-[source,dsl]
-----
---cm-see-other-host {
-    'data-source' = 'eventbus'
-}
-'cl-comp' {
-    'eventbus-repository-notifications' = true
-}
-----
-
-or on per-component basis:
+It's possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that `eventbus` should be used as a value of `data-source` configuration option. In addition, EventBus events needs to be enabled in ClusterConnectionManager or on per-component basis:
 
 [source,dsl]
 ----
 <connector> {
-    'cm-see-other-host' {
-        'data-source' = 'eventbus'
+    seeOtherHost (class: {data-source=eventbus}) {}
     }
 }
 'cl-comp' {
@@ -201,9 +177,11 @@ EXTERNAL_IP=" -Dtigase-secondary-address=hostname "
 ----
 
 or in the `etc/config.tdsl` (they will be converted to JVM properties):
-[source,bash]
+[source,dsl]
 ----
---tigase-resolver-class=tigase.util.DNSResolverDefault
---tigase-primary-address=hostname.local
---tigase-secondary-address=hostname
+'dns-resolver' {
+    'tigase-primary-address' = 'hostname.local'
+    'tigase-resolver-class' = 'tigase.util.DNSResolverDefault'
+    'tigase-secondary-address' = 'hostname'
+}
 ----
