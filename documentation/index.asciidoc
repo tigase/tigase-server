@@ -125,7 +125,7 @@ include::text/admin/Security/Access_Control_List.asciidoc[]
 
 :leveloffset: 1
 
-include::text/admin/Database_Manegement/Database_Manegement.asciidoc
+include::text/admin/Database_Management/Database_Management.asciidoc[]
 
 :leveloffset: 2
 

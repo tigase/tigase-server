@@ -39,7 +39,7 @@ NOTE: URI name may be used as shorthand to define DB location URI in other conta
 
 NOTE: default () URI setting replaces the `user-db-uri` as well as the `auth-repo-uri` property.
 
-=== MSSQL
+== MSSQL
 MSSql support works out of the box, however Tigase provides an open source driver for the database.  We recommend using Microsoft's own driver for better functionality.
 [source,dsl]
 -----
@@ -54,7 +54,7 @@ jdbc:<driver>:sqlserver://<server address>;databaseName=<database name>;user=<us
 We do not recommend modification of schema and onward unless you are explicit in your changes.
 
 
-=== MongoDb
+== MongoDb
 For using mongoDB as the repository, the setting will look slightly different:
 [source,dsl]
 -----
