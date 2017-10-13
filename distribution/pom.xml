@@ -23,7 +23,6 @@
 			<activation>
 				<os>
 					<family>!windows</family>
-					<family>!windows</family>
 				</os>
 			</activation>
 			<build>
