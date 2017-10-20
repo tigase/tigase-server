@@ -317,5 +317,204 @@ end //
 
 delimiter ;
 
+-- ------------- Credentials support
+
+-- QUERY START:
+drop procedure if exists TigUserCredential_Update;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserCredentials_Get;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserCredential_Remove;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserLoginPlainPw;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigAddUserPlainPw;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigGetPassword;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUpdatePasswordPlainPw;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigRemoveUser;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigUserCredential_Update(_user_id varchar(2049) CHARSET utf8, _username varchar(2049) CHARSET utf8, _mechanism varchar(128) CHARSET utf8, _value mediumtext CHARSET utf8)
+begin
+    declare _uid bigint;
+    declare _user_id_sha1 char(128);
+    declare _username_sha1 char(128);
+
+    select sha1(lower(_user_id)), sha1(_username) into _user_id_sha1, _username_sha1;
+
+    select uid into _uid from tig_users where sha1_user_id = _user_id_sha1;
+
+    if _uid is not null then
+        start transaction;
+            insert into tig_user_credentials (uid, username, username_sha1, mechanism, value)
+                values (_uid, _username, _username_sha1, _mechanism, _value)
+                on duplicate key update value = _value;
+        commit;
+    end if;
+end //
+-- QUERY END:
+
+-- QUERY START:
+create procedure TigUserCredentials_Get(_user_id varchar(2049) CHARSET utf8, _username varchar(2049) CHARSET utf8)
+begin
+    declare _user_id_sha1 char(128);
+    declare _username_sha1 char(128);
+
+    select sha1(lower(_user_id)), sha1(_username) into _user_id_sha1, _username_sha1;
+
+    select mechanism, value, account_status
+    from tig_users u
+    inner join tig_user_credentials c on u.uid = c.uid
+    where
+        u.sha1_user_id = _user_id_sha1
+        and c.username_sha1 = _username_sha1;
+end //
+-- QUERY END:
+
+-- QUERY START:
+create procedure TigUserCredential_Remove(_user_id varchar(2049) CHARSET utf8, _username varchar(2049) CHARSET utf8)
+begin
+    declare _uid bigint;
+    declare _user_id_sha1 char(128);
+    declare _username_sha1 char(128);
+
+    select sha1(lower(_user_id)), sha1(_username) into _user_id_sha1, _username_sha1;
+
+    select uid into _uid from tig_users where sha1_user_id = _user_id_sha1;
+
+    if _uid is not null then
+        start transaction;
+            delete from tig_user_credentials where uid = _uid and username_sha1 = _username_sha1;
+        commit;
+    end if;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Takes plain text user password and converts it to internal representation
+-- and creates a new user account.
+create procedure TigAddUserPlainPw(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
+begin
+	declare res_uid bigint unsigned;
+
+	insert into tig_users (user_id, sha1_user_id)
+		values (_user_id, sha1(lower(_user_id)));
+
+	select LAST_INSERT_ID() into res_uid;
+
+	insert into tig_nodes (parent_nid, uid, node)
+		values (NULL, res_uid, 'root');
+
+	if _user_pw is NULL then
+		update tig_users set account_status = -1 where uid = res_uid;
+    else
+        call TigUpdatePasswordPlainPw(_user_id, _user_pw);
+   	end if;
+
+	select res_uid as uid;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Returns user's password from the database
+create procedure TigGetPassword(_user_id varchar(2049) CHARSET utf8)
+begin
+	select c.value
+	from tig_users u
+	inner join tig_user_credentials c on c.uid = u.uid
+	where
+	    u.sha1_user_id = sha1(lower(_user_id))
+	    and c.mechanism = 'PLAIN'
+	    and c.username_sha1 = sha1('default');
+end //
+-- QUERY END:
+
+-- QUERY START:
+create procedure TigUpdatePasswordPlainPw(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
+begin
+    declare _passwordEncoding varchar(128) CHARSET utf8;
+    declare _encodedPassword varchar(255) CHARSET utf8;
+
+    select IFNULL(TigGetDBProperty('password-encoding'), 'PLAIN') into _passwordEncoding;
+    select case _passwordEncoding
+		when 'MD5-PASSWORD' then
+			MD5(_user_pw)
+		when 'MD5-USERID-PASSWORD' then
+			MD5(CONCAT(_user_id, _user_pw))
+		when 'MD5-USERNAME-PASSWORD' then
+			MD5(CONCAT(substring_index(_user_id, '@', 1), _user_pw))
+		else
+			_user_pw
+		end into _encodedPassword;
+
+    call TigUserCredential_Update(_user_id, 'default', _passwordEncoding, _encodedPassword);
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Performs user login for a plain text password, converting it to an internal
+-- representation if necessary
+create procedure TigUserLoginPlainPw(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
+begin
+    declare _passwordEncoding varchar(128) CHARSET utf8;
+    declare _encodedPassword varchar(255) CHARSET utf8;
+
+    select IFNULL(TigGetDBProperty('password-encoding'), 'PLAIN') into _passwordEncoding;
+    select case _passwordEncoding
+		when 'MD5-PASSWORD' then
+			MD5(_user_pw)
+		when 'MD5-USERID-PASSWORD' then
+			MD5(CONCAT(_user_id, _user_pw))
+		when 'MD5-USERNAME-PASSWORD' then
+			MD5(CONCAT(substring_index(_user_id, '@', 1), _user_pw))
+		else
+			_user_pw
+		end into _encodedPassword;
+
+	if exists(select 1 from tig_users u
+	    inner join tig_user_credentials c on c.uid = u.uid
+	    where (u.account_status > 0) AND (u.sha1_user_id = sha1(lower(_user_id))) AND (u.user_id = _user_id)
+	        AND (c.username_sha1 = sha1('default'))
+	        AND (c.mechanism = _passwordEncoding) AND (c.value = _encodedPassword))
+	then
+		update tig_users
+			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
+			where sha1_user_id = sha1(lower(_user_id));
+		select _user_id as user_id;
+	else
+		update tig_users set failed_logins = failed_logins + 1 where sha1_user_id = sha1(lower(_user_id));
+		select NULL as user_id;
+    end if;
+end //
+-- QUERY END:
 
 
+-- Removes a user from the database
+-- QUERY START:
+create procedure TigRemoveUser(_user_id varchar(2049) CHARSET utf8)
+begin
+	declare res_uid bigint unsigned;
+
+	select uid into res_uid from tig_users where sha1_user_id = sha1(lower(_user_id));
+
+    delete from tig_user_credentials where uid = res_uid;
+	delete from tig_pairs where uid = res_uid;
+	delete from tig_nodes where uid = res_uid;
+	delete from tig_users where uid = res_uid;
+end //
+-- QUERY END:
+
+delimiter ;

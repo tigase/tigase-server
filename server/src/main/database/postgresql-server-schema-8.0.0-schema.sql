@@ -190,3 +190,28 @@ begin
 	    alter column last_logout type timestamp with time zone;
 end$$;
 -- QUERY END:
+
+-- ------------- Credentials support
+-- QUERY START:
+create table if not exists tig_user_credentials (
+    uid bigint not null references tig_users(uid),
+    username varchar(2049) not null,
+    mechanism varchar(128) not null,
+    value text not null,
+
+    primary key (uid, username, mechanism)
+);
+-- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+    if not exists (select 1 from tig_user_credentials) and exists( select 1 from pg_proc where proname = lower('TigGetDBProperty')) then
+        insert into tig_user_credentials (uid, username, mechanism, value)
+            select uid, 'default', COALESCE(TigGetDBProperty('password-encoding'), 'PLAIN'), user_pw
+            from tig_users where user_pw is not null;
+            
+        update tig_users set user_pw = null where user_pw is not null;
+    end if;
+end$$;
+-- QUERY END:

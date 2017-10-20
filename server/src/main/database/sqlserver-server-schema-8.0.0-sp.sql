@@ -479,3 +479,262 @@ AS
     END
 -- QUERY END:
 GO
+
+-- ------------- Credentials support
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserCredential_Update')
+DROP PROCEDURE TigUserCredential_Update
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- It sets last_login time to the current timestamp
+create procedure dbo.TigUserCredential_Update
+	@_user_id nvarchar(2049),
+	@_username nvarchar(2049),
+	@_mechanism nvarchar(128),
+	@_value nvarchar(max)
+AS
+begin
+    declare @_uid bigint;
+    declare @_username_sha1 varbinary(32);
+
+    select @_uid = uid, @_username_sha1 = HASHBYTES('SHA1', @_username) from tig_users where sha1_user_id = HASHBYTES('SHA1', @_user_id);
+    if @_uid is not null
+    begin
+        update tig_user_credentials set value = @_value where uid = @_uid and username_sha1 = @_username_sha1 and mechanism = @_mechanism;
+        if @@ROWCOUNT = 0
+        begin
+            begin try
+                insert into tig_user_credentials (uid, username, username_sha1, mechanism, value)
+                    select @_uid, @_username, @_username_sha1, @_mechanism, @_value
+                    where not exists (
+                        select 1 from tig_user_credentials
+                        where
+                            uid = @_uid
+                            and username_sha1 = @_username_sha1
+                            and mechanism = @_mechanism
+                    );
+            end try
+            begin catch
+            	IF ERROR_NUMBER() <> 2627
+                declare @ErrorMessage nvarchar(max), @ErrorSeverity int, @ErrorState int;
+                select @ErrorMessage = ERROR_MESSAGE() + ' Line ' + cast(ERROR_LINE() as nvarchar(5)), @ErrorSeverity = ERROR_SEVERITY(), @ErrorState = ERROR_STATE();
+				raiserror (@ErrorMessage, @ErrorSeverity, @ErrorState);
+            end catch
+        end
+    end
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserCredentials_Get')
+DROP PROCEDURE TigUserCredentials_Get
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- It sets last_login time to the current timestamp
+create procedure dbo.TigUserCredentials_Get
+	@_user_id nvarchar(2049),
+	@_username nvarchar(2049)
+AS
+begin
+    select c.mechanism, c.value, u.account_status
+    from tig_users u
+    inner join tig_user_credentials c on c.uid = u.uid
+    where
+        u.sha1_user_id = HASHBYTES('SHA1', @_user_id)
+        and c.username_sha1 = HASHBYTES('SHA1', @_username);
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserCredential_Remove')
+DROP PROCEDURE TigUserCredential_Remove
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- It sets last_login time to the current timestamp
+create procedure dbo.TigUserCredential_Remove
+	@_user_id nvarchar(2049),
+	@_username nvarchar(2049)
+AS
+begin
+    declare @_uid bigint;
+    declare @_username_sha1 varbinary(32);
+
+    select @_uid = uid, @_username_sha1 = HASHBYTES('SHA1', @_username) from tig_users where sha1_user_id = HASHBYTES('SHA1', @_user_id);
+
+    delete from tig_user_credentials
+    where
+        uid = @_uid
+        and username_sha1 = @_username_sha1;
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigAddUserPlainPw')
+DROP PROCEDURE TigAddUserPlainPw
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Add a new user to the database assuming the user password is already
+-- encoded properly according to the database settings.
+-- If password is not encoded TigAddUserPlainPw should be used instead.
+create procedure dbo.TigAddUserPlainPw
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
+AS
+	begin
+		SET NOCOUNT ON;
+
+		declare @res_uid bigint;
+
+		insert into dbo.tig_users (user_id, sha1_user_id)
+			values (@_user_id, HASHBYTES('SHA1', LOWER(@_user_id)));
+
+		set  @res_uid = (select SCOPE_IDENTITY());
+
+		if (@res_uid is not NULL)
+			insert into dbo.tig_nodes (parent_nid, uid, node)
+				values (NULL, @res_uid, N'root');
+
+		if (@_user_pw is NULL)
+			update dbo.tig_users set account_status = -1 where uid = @res_uid;
+		else
+		    exec TigUpdatePasswordPlainPw @_user_id, @_user_pw
+
+		select @res_uid as uid;
+	end;
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigGetPassword')
+DROP PROCEDURE TigGetPassword
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Returns user's password from the database
+create procedure dbo.TigGetPassword
+	@_user_id nvarchar(2049)
+AS
+begin
+    select c.value
+    from tig_users u
+    inner join tig_user_credentials c on c.uid = u.uid
+    where
+        u.sha1_user_id = hashbytes('SHA1', lower(@_user_id))
+        and c.username_sha1 = hashbytes('SHA1', N'default')
+        and c.mechanism = N'PLAIN';
+end
+-- QUERY END:
+GO
+
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUpdatePasswordPlainPw')
+DROP PROCEDURE TigUpdatePasswordPlainPw
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Takes plain text user password and converts it to internal representation
+create procedure dbo.TigUpdatePasswordPlainPw
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
+AS
+begin
+	declare @_encoding nvarchar(512)
+	declare @_encoded nvarchar(max)
+	set @_encoding = coalesce(dbo.TigGetDBProperty(N'password-encoding'), N'PLAIN')
+
+	set @_encoded = case @_encoding
+	    when N'MD5-PASSWORD' then HASHBYTES('MD5', @_user_pw)
+	    when N'MD5-USERID-PASSWORD' then HASHBYTES('MD5', @_user_id + @_user_pw)
+	    when N'MD5-USERNAME-PASSWORD' then HASHBYTES('MD5', (LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)) + @_user_pw)
+	    else @_user_pw
+	    end;
+
+	exec TigUserCredential_Update @_user_id, N'default', @_encoding, @_encoded
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserLoginPlainPw')
+DROP PROCEDURE TigUserLoginPlainPw
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Performs user login for a plain text password, converting it to an internal
+-- representation if necessary
+create procedure dbo.TigUserLoginPlainPw
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
+AS
+begin
+	declare @_encoding nvarchar(512)
+	declare @_encoded nvarchar(max)
+	set @_encoding = coalesce(dbo.TigGetDBProperty(N'password-encoding'), N'PLAIN')
+
+	set @_encoded = case @_encoding
+	    when N'MD5-PASSWORD' then HASHBYTES('MD5', @_user_pw)
+	    when N'MD5-USERID-PASSWORD' then HASHBYTES('MD5', @_user_id + @_user_pw)
+	    when N'MD5-USERNAME-PASSWORD' then HASHBYTES('MD5', (LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)) + @_user_pw)
+	    else @_user_pw
+	    end;
+
+    if exists (select 1 from dbo.tig_users u
+        inner join tig_user_credentials c on c.uid = u.uid
+		where u.sha1_user_id = hashbytes('SHA1', lower(@_user_id))
+		    and u.account_status > 0
+		    and c.username_sha1 = hashbytes('SHA1', N'default')
+		    and c.mechanism = @_encoding
+			and c.value = @_encoded)
+		begin
+		update dbo.tig_users
+			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
+				where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+			select @_user_id as user_id;
+		end
+	else
+		begin
+			update dbo.tig_users set failed_logins = failed_logins + 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+			select NULL as user_id;
+		end
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigRemoveUser')
+DROP PROCEDURE TigRemoveUser
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- Removes a user from the database
+create procedure dbo.TigRemoveUser
+	@_user_id nvarchar(2049)
+AS
+begin
+	declare @res_uid bigint;
+
+	set @res_uid = (select uid from dbo.tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id)));
+
+    delete from dbo.tig_user_credentials where uid = @res_uid;
+	delete from dbo.tig_pairs where uid = @res_uid;
+	delete from dbo.tig_nodes where uid = @res_uid;
+	delete from dbo.tig_users where uid = @res_uid;
+end
+-- QUERY END:
+GO

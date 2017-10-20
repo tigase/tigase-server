@@ -1,8 +1,29 @@
+/*
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 package tigase.auth;
 
 import tigase.auth.callbacks.CallbackHandlerFactoryIfc;
-import tigase.auth.impl.AuthRepoPlainCallbackHandler;
+import tigase.auth.impl.PlainCallbackHandler;
 import tigase.auth.impl.ScramCallbackHandler;
+import tigase.auth.mechanisms.SaslSCRAM;
+import tigase.auth.mechanisms.SaslSCRAMPlus;
+import tigase.auth.mechanisms.SaslSCRAMSha256;
+import tigase.auth.mechanisms.SaslSCRAMSha256Plus;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.xmpp.XMPPResourceConnection;
@@ -25,7 +46,7 @@ public class CallbackHandlerFactory
 			Map<String, Object> settings) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		String handlerClassName = getHandlerClassname(mechanismName, session, repo, settings);
 		if (handlerClassName == null)
-			handlerClassName = AuthRepoPlainCallbackHandler.class.getName();
+			handlerClassName = PlainCallbackHandler.class.getName();
 		@SuppressWarnings("unchecked")
 		Class<CallbackHandler> handlerClass = (Class<CallbackHandler>) Class.forName(handlerClassName);
 
@@ -51,6 +72,10 @@ public class CallbackHandlerFactory
             ((PluginSettingsAware) handler).setPluginSettings(settings);
         }
 
+        if (handler instanceof MechanismNameAware) {
+			((MechanismNameAware) handler).setMechanismName(mechanismName);
+		}
+
 		return handler;
 	}
 
@@ -60,12 +85,16 @@ public class CallbackHandlerFactory
 			return (String) settings.get(CALLBACK_HANDLER_KEY + "-" + mechanismName);
 		} else if (settings != null && settings.containsKey(CALLBACK_HANDLER_KEY)) {
 			return (String) settings.get(CALLBACK_HANDLER_KEY);
-		} else if (mechanismName.equals("SCRAM-SHA-1")) {
-			return ScramCallbackHandler.class.getName();
-		} else if (mechanismName.equals("SCRAM-SHA-1-PLUS")) {
-			return ScramCallbackHandler.class.getName();
 		} else {
-			return null;
+			switch (mechanismName) {
+				case SaslSCRAM.NAME:
+				case SaslSCRAMPlus.NAME:
+				case SaslSCRAMSha256.NAME:
+				case SaslSCRAMSha256Plus.NAME:
+					return ScramCallbackHandler.class.getName();
+				default:
+					return null;
+			}
 		}
 	}
 

@@ -114,12 +114,7 @@ public class DummyRepository implements Repository, DataSource, UserRepository, 
 	public String[] getKeys(BareJID user) {
 		return null;
 	}
-
-	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return PasswordForm.plain;
-	}
-
+	
 	@Override
 	public String getResourceUri() {
 		return null;

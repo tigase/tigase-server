@@ -247,3 +247,32 @@ if object_id('dbo.tig_cluster_nodes') is null
     );
 -- QUERY END:
 GO
+
+-- ------------- Credentials support
+-- QUERY START:
+if object_id('dbo.tig_user_credentials') is null
+    create table tig_user_credentials (
+        uid bigint not null references tig_users(uid),
+        username nvarchar(2049) not null,
+        username_sha1 varbinary(32) not null,
+        mechanism nvarchar(128) not null,
+        value nvarchar(max) not null,
+
+        primary key (uid, username_sha1, mechanism)
+    );
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from tig_user_credentials) and exists (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigGetDBProperty')
+begin
+    execute('insert into tig_user_credentials (uid, username, username_sha1, mechanism, value)
+        select uid, ''default'', HASHBYTES(''SHA1'', ''default''), coalesce(TigGetDBProperty(''password-encoding''), ''PLAIN''), user_pw
+        from tig_users
+        where
+            user_pw is not null;
+
+    update tig_users set user_pw = null where user_pw is not null;');
+end
+-- QUERY END:
+GO

@@ -1,13 +1,10 @@
 /*
- * AuthRepoPlainCallbackHandler.java
- *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * the Free Software Foundation, either version 3 of the License.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,11 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-
 package tigase.auth.impl;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
 import tigase.auth.callbacks.VerifyPasswordCallback;
@@ -51,6 +47,8 @@ import java.util.logging.Logger;
  * {@linkplain AuthRepository#plainAuth(BareJID, String)} to password
  * verification.
  */
+@Deprecated
+@TigaseDeprecated(since = "8.0.0")
 public class PlainSPCallbackHandler
 		implements CallbackHandler, AuthRepositoryAware, DomainAware {
 

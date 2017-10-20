@@ -385,12 +385,7 @@ public class JDBCRepository
 					throws UserNotFoundException, TigaseDBException {
 		return getKeys(user_id, null);
 	}
-
-	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return auth.getPasswordForm(domain);
-	}
-
+	
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
@@ -586,6 +581,11 @@ public class JDBCRepository
 			data_repo = null;
 			throw new DBInitException("Could not initialize repository", ex);
 		}
+	}
+
+	@Override
+	public boolean isMechanismSupported(String domain, String mechanism) {
+		return auth.isMechanismSupported(domain, mechanism);
 	}
 
 	@Override

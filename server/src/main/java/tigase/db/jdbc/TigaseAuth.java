@@ -78,7 +78,6 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 	//~--- fields ---------------------------------------------------------------
 
 	private DataRepository data_repo = null;
-	private PasswordForm passwordForm = PasswordForm.unknown;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -108,11 +107,6 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 	}
 	
 	//~--- get methods ----------------------------------------------------------
-
-	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return passwordForm;
-	}
 
 	@Override
 	public String getResourceUri() {
@@ -205,42 +199,6 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 			data_repo.initPreparedStatement(DEF_UPDATELOGINTIME_QUERY, DEF_UPDATELOGINTIME_QUERY);
 
 			data_repo.getPreparedStatement(null, INIT_DB_QUERY).executeQuery();
-
-			try (Statement stmt = data_repo.createStatement(null)) {
-				String query = "select TigGetDBProperty('password-encoding')";
-				switch (data_repo.getDatabaseType()) {
-					case jtds:
-					case sqlserver:
-						query = "select dbo.TigGetDBProperty('password-encoding')";
-						break;
-					case derby:
-						query = "values TigGetDBProperty('password-encoding')";
-						break;
-					default:
-						break;
-				}
-
-				passwordForm = PasswordForm.plain;
-				try (ResultSet rs = stmt.executeQuery(query)) {
-					if (rs.next()) {
-						String form = rs.getString(1);
-						if (form == null) {
-							form = "";
-						}
-
-						switch (form) {
-							case "MD5-PASSWORD":
-							case "MD5-USERID-PASSWORD":
-							case "MD5-USERNAME-PASSWORD":
-								passwordForm = PasswordForm.encoded;
-								break;
-							default:
-								passwordForm = PasswordForm.plain;
-								break;
-						}
-					}
-				}
-			}
 		} catch (Exception ex) {
 			throw new DBInitException("Failed to initialize repository " + this.getClass().getCanonicalName(), ex);
 		}

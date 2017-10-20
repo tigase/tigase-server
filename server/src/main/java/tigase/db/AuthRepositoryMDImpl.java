@@ -23,6 +23,7 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.auth.credentials.Credentials;
 import tigase.db.beans.AuthRepositoryMDPoolBean;
 import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.eventbus.EventBus;
@@ -74,6 +75,19 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
+	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.getCredentials(user, username);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+			return null;
+		}
+	}
+
+	@Override
 	public String getPassword(BareJID user) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
@@ -83,17 +97,6 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 			return null;
-		}
-	}
-
-	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		AuthRepository repo = getRepo(domain);
-		if (repo != null) {
-			return repo.getPasswordForm(domain);
-		} else {
-			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain +", not even default one!");
-			return PasswordForm.unknown;
 		}
 	}
 
@@ -126,6 +129,17 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 			throws DBInitException {
 		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: "
 				+ params);
+	}
+
+	@Override
+	public boolean isMechanismSupported(String domain, String mechanism) {
+		AuthRepository repo = getRepo(domain);
+		if (repo != null) {
+			return repo.isMechanismSupported(domain, mechanism);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain +", not even default one!");
+			return false;
+		}
 	}
 
 	@Override
@@ -201,6 +215,19 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 	// --------------------------------------------------------------
 
 	@Override
+	public void removeCredential(BareJID user, String username) throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.removeCredential(user, username);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain()
+							+ ", not even default one!");
+		}
+	}
+
+	@Override
 	public void removeUser(BareJID user) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
@@ -256,6 +283,19 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 
 		if (repo != null) {
 			repo.updatePassword(user, password);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+		}
+	}
+
+	@Override
+	public void updateCredential(BareJID user, String username, String password)
+			throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.updateCredential(user, username, password);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");

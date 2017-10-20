@@ -98,3 +98,31 @@ create table tig_cluster_nodes (
     primary key (hostname)
 );
 -- QUERY END:
+
+-- ------------- Credentials support
+-- QUERY START:
+create table tig_user_credentials (
+    uid bigint not null references tig_users(uid),
+    username varchar(2049) not null,
+    mechanism varchar(128) not null,
+    value varchar(32672) not null,
+
+    primary key (uid, username, mechanism)
+);
+-- QUERY END:
+
+-- QUERY START:
+CREATE procedure TigMigrateCredentials()
+	PARAMETER STYLE JAVA
+	LANGUAGE JAVA
+	MODIFIES SQL DATA
+	EXTERNAL NAME 'tigase.db.derby.StoredProcedures.migrateCredentials';
+-- QUERY END:
+
+-- QUERY START:
+call TigMigrateCredentials();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure TigMigrateCredentials;
+-- QUERY END:

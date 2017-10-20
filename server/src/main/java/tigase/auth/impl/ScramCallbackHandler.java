@@ -1,13 +1,33 @@
+/*
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 package tigase.auth.impl;
 
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
+import tigase.auth.MechanismNameAware;
 import tigase.auth.SessionAware;
 import tigase.auth.callbacks.*;
+import tigase.auth.credentials.Credentials;
+import tigase.auth.credentials.entries.PlainCredentialsEntry;
+import tigase.auth.credentials.entries.ScramCredentialsEntry;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
-import tigase.db.TigaseDBException;
 import tigase.util.Base64;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPResourceConnection;
@@ -19,26 +39,32 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ScramCallbackHandler
-		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware {
+import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 
-	private final SecureRandom random = new SecureRandom();
-	private final byte[] salt;
-	protected BareJID jid = null;
-	protected Logger log = Logger.getLogger(this.getClass().getName());
+/**
+ * Implementation of CallbackHandler to support authentication using SASL SCRAM-* authentication mechanism.
+ */
+public class ScramCallbackHandler
+		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware, MechanismNameAware {
+
+	private static final Logger log = Logger.getLogger(ScramCallbackHandler.class.getCanonicalName());
+	private boolean credentialsFetched;
+
+	private BareJID jid = null;
+	private String mechanismName;
+	private String username = null;
 	private String domain;
-	private int pbkd2Iterations = 4096;
 	private AuthRepository repo;
 	private XMPPResourceConnection session;
 
+	private ScramCredentialsEntry credentialsEntry;
+	private boolean accountDisabled = false;
+
 	public ScramCallbackHandler() {
-		this.salt = new byte[10];
-		random.nextBytes(salt);
 	}
 
 	@Override
@@ -51,6 +77,11 @@ public class ScramCallbackHandler
 		}
 	}
 
+	@Override                                                                
+	public void setMechanismName(String mechanismName) {
+		this.mechanismName = mechanismName;
+	}
+
 	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
 		String authenId = authCallback.getAuthenticationID();
 
@@ -58,18 +89,14 @@ public class ScramCallbackHandler
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
 		}
 
-		try {
-			if (repo.isUserDisabled(jid)) {
-				authCallback.setAuthorized(false);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "User {0} is disabled", jid);
-				}
-				return;
-			}
-		} catch (TigaseDBException e) {
+
+		fetchCredentials();
+		if (accountDisabled) {
+			authCallback.setAuthorized(false);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Cannot check if user " + jid + " is enabled", e);
+				log.log(Level.FINEST, "User {0} is disabled", jid);
 			}
+			return;
 		}
 
 		String authorId = authCallback.getAuthorizationID();
@@ -77,9 +104,7 @@ public class ScramCallbackHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (AbstractSasl.isAuthzIDIgnored() || authenId.equals(authorId)) {
-			authCallback.setAuthorized(true);
-		}
+		authCallback.setAuthorized(true);
 	}
 
 	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
@@ -93,12 +118,27 @@ public class ScramCallbackHandler
 			handleSaltedPasswordCallbackCallback((SaltedPasswordCallback) callback);
 		} else if (callback instanceof NameCallback) {
 			handleNameCallback((NameCallback) callback);
+		} else if (callback instanceof AuthorizationIdCallback) {
+			handleAuthorizationIdCallback((AuthorizationIdCallback) callback);
 		} else if (callback instanceof SaltCallback) {
 			handleSaltCallback((SaltCallback) callback);
 		} else if (callback instanceof AuthorizeCallback) {
 			handleAuthorizeCallback((AuthorizeCallback) callback);
 		} else {
 			throw new UnsupportedCallbackException(callback, "Unrecognized Callback " + callback);
+		}
+	}
+
+	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
+		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null && !callback.getAuthzId().equals(jid.toString())) {
+			try {
+				jid = BareJID.bareJIDInstance(callback.getAuthzId());
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		} else {
+			username = DEFAULT_USERNAME;
+			callback.setAuthzId(jid.toString());
 		}
 	}
 
@@ -132,11 +172,11 @@ public class ScramCallbackHandler
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
-		String user_name = nc.getDefaultName();
-		jid = BareJID.bareJIDInstanceNS(user_name, domain);
+		username = nc.getDefaultName();
+		jid = BareJID.bareJIDInstanceNS(username, domain);
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "NameCallback: {0}", user_name);
+			log.log(Level.FINEST, "NameCallback: {0}", username);
 		}
 	}
 
@@ -144,7 +184,10 @@ public class ScramCallbackHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "PBKDIterationsCallback: {0}", jid);
 		}
-		callback.setInterations(pbkd2Iterations);
+		fetchCredentials();
+		if (credentialsEntry != null) {
+			callback.setInterations(credentialsEntry.getIterations());
+		}
 	}
 
 	protected void handleSaltCallback(SaltCallback callback) {
@@ -152,7 +195,12 @@ public class ScramCallbackHandler
 			log.log(Level.FINEST, "SaltCallback: {0}", jid);
 		}
 
-		callback.setSalt(salt);
+		fetchCredentials();
+		if (credentialsEntry != null) {
+			callback.setSalt(credentialsEntry.getSalt());
+		} else {
+			callback.setSalt(null);
+		}
 	}
 
 	protected void handleSaltedPasswordCallbackCallback(SaltedPasswordCallback callback) {
@@ -160,21 +208,11 @@ public class ScramCallbackHandler
 			log.log(Level.FINEST, "PasswordCallback: {0}", jid);
 		}
 
-		try {
-			String pwd = repo.getPassword(jid);
-
-			if (pwd == null) {
-				callback.setSaltedPassword(new byte[]{});
-			} else {
-
-				byte[] saltedPassword = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(pwd), salt,
-															 pbkd2Iterations);
-
-				callback.setSaltedPassword(saltedPassword);
-			}
-		} catch (Exception e) {
+		fetchCredentials();
+		if (credentialsEntry != null) {
+			callback.setSaltedPassword(credentialsEntry.getSaltedPassword());
+		} else {
 			callback.setSaltedPassword(null);
-			log.log(Level.FINE, "Can't retrieve user password.", e);
 		}
 	}
 
@@ -192,4 +230,37 @@ public class ScramCallbackHandler
 	public void setSession(XMPPResourceConnection session) {
 		this.session = session;
 	}
+
+	private void fetchCredentials() {
+		if (credentialsFetched) {
+			return;
+		}
+
+		try {
+			Credentials credentials = repo.getCredentials(jid, username);
+
+			if (credentials == null) {
+				accountDisabled = true;
+			} else {
+				String mech = mechanismName.endsWith("-PLUS") ? mechanismName.substring(0, mechanismName.length() -
+						"-PLUS".length()) : mechanismName;
+
+				Credentials.Entry entry = credentials.getEntryForMechanism(mech);
+				if (entry == null) {
+					entry = credentials.getEntryForMechanism("PLAIN");
+				}
+				if (entry instanceof ScramCredentialsEntry) {
+					credentialsEntry = (ScramCredentialsEntry) entry;
+				} else if (entry instanceof PlainCredentialsEntry) {
+					credentialsEntry = new 	ScramCredentialsEntry(mech.replace("SCRAM-", ""), (PlainCredentialsEntry) entry);
+				}
+
+				accountDisabled = credentials.isAccountDisabled();
+			}
+		} catch (Exception ex) {
+			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with username " + username, ex);
+		}
+		credentialsFetched = true;
+	}
+
 }

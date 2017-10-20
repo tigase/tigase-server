@@ -39,6 +39,8 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
+
 //~--- JDK imports ------------------------------------------------------------
 
 /**
@@ -92,7 +94,7 @@ public class AuthRepositoryImpl
 					throws UserExistsException, TigaseDBException {
 		repo.addUser(user);
 		log.info("Repo user added: " + user);
-		updatePassword(user, password);
+		updateCredential(user, DEFAULT_USERNAME, password);
 		log.info("Password updated: " + user + ":" + password);
 	}
 
@@ -115,8 +117,12 @@ public class AuthRepositoryImpl
 	}
 
 	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return PasswordForm.plain;
+	public boolean isMechanismSupported(String domain, String mechanism) {
+		if ("PLAIN".equals(mechanism)) {
+			return true;
+		}
+
+		return true;
 	}
 
 	@Override

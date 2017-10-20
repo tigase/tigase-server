@@ -1,5 +1,6 @@
 package tigase.db.ldap;
 
+import tigase.auth.credentials.Credentials;
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Base64;
@@ -131,8 +132,30 @@ public class LdapAuthProvider implements AuthRepository {
 		throw new TigaseDBException("Not available");
 	}
 
+	@Override
+	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+		Credentials.Entry entry = new Credentials.Entry() {
+			@Override
+			public String getMechanism() {
+				return "PLAIN";
+			}
+
+			@Override
+			public boolean verifyPlainPassword(String plain) {
+				try {
+					return LdapAuthProvider.this.doBindAuthentication(user, plain);
+				} catch (Exception ex) {
+					log.log(Level.WARNING, "Can't authenticate user", ex);
+				}
+				return false;
+			}
+		};
+
+		return new SingleCredential(user, getAccountStatus(user), entry);
+	}
+
 	private boolean doBindAuthentication(BareJID userId, final String password) throws UserNotFoundException,
-			TigaseDBException, AuthorizationException {
+																					   TigaseDBException, AuthorizationException {
 		try {
 			Hashtable<Object, Object> env = new Hashtable<Object, Object>();
 			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -181,11 +204,6 @@ public class LdapAuthProvider implements AuthRepository {
 	@Override
 	public long getUsersCount(String domain) {
 		return -1;
-	}
-
-	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return PasswordForm.encoded;
 	}
 
 	@Override

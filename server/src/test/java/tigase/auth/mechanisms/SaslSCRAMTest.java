@@ -272,6 +272,8 @@ public class SaslSCRAMTest
 					}
 				} else if (callback instanceof NameCallback) {
 					((NameCallback) callback).setName(name);
+				} else if (callback instanceof AuthorizationIdCallback) {
+					// nothing to do..
 				} else if (callback instanceof SaltCallback) {
 					((SaltCallback) callback).setSalt(Base64.decode(salt));
 				} else if (callback instanceof AuthorizeCallback) {

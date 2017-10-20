@@ -200,12 +200,7 @@ public class XMLRepository
 	public String[] getKeys(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return getKeys(user, null);
 	}
-
-	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return PasswordForm.plain;
-	}
-
+	
 	@Override
 	public String getResourceUri() {
 		return xmldb.getDBFileName();

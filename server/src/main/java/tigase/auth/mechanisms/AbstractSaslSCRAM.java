@@ -1,11 +1,25 @@
+/*
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 package tigase.auth.mechanisms;
 
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
-import tigase.auth.callbacks.ChannelBindingCallback;
-import tigase.auth.callbacks.PBKDIterationsCallback;
-import tigase.auth.callbacks.SaltCallback;
-import tigase.auth.callbacks.SaltedPasswordCallback;
+import tigase.auth.callbacks.*;
 import tigase.util.Base64;
 
 import javax.crypto.Mac;
@@ -63,6 +77,7 @@ public abstract class AbstractSaslSCRAM
 		tls_server_end_point
 	}
 	private final String algorithm;
+	private final String hmacAlgorithm;
 	private final byte[] clientKeyData;
 	private final String mechanismName;
 	private final byte[] serverKeyData;
@@ -84,6 +99,9 @@ public abstract class AbstractSaslSCRAM
 
 	public static byte[] hi(String algorithm, byte[] password, final byte[] salt, final int iterations)
 			throws InvalidKeyException, NoSuchAlgorithmException {
+		if (algorithm.startsWith("SHA-")) {
+			algorithm = algorithm.replace("SHA-", "SHA");
+		}
 		final SecretKeySpec k = new SecretKeySpec(password, "Hmac" + algorithm);
 
 		byte[] z = new byte[salt.length + 4];
@@ -121,6 +139,7 @@ public abstract class AbstractSaslSCRAM
 		super(props, callbackHandler);
 		this.mechanismName = mechanismName;
 		this.algorithm = algorithm;
+		this.hmacAlgorithm = "Hmac" + (algorithm.startsWith("SHA-") ? algorithm.replace("SHA-", "SHA") : algorithm);
 		this.clientKeyData = clientKey;
 		this.serverKeyData = serverKey;
 		serverNonce = randomString();
@@ -131,6 +150,7 @@ public abstract class AbstractSaslSCRAM
 		super(props, callbackHandler);
 		this.mechanismName = mechanismName;
 		this.algorithm = algorithm;
+		this.hmacAlgorithm = "Hmac" + (algorithm.startsWith("SHA-") ? algorithm.replace("SHA-", "SHA") : algorithm);
 		this.clientKeyData = clientKey;
 		this.serverKeyData = serverKey;
 		this.serverNonce = serverOnce;
@@ -204,7 +224,7 @@ public abstract class AbstractSaslSCRAM
 	}
 
 	protected SecretKey key(final byte[] key) {
-		return new SecretKeySpec(key, "Hmac" + algorithm);
+		return new SecretKeySpec(key, hmacAlgorithm);
 	}
 
 	protected byte[] processClientFirstMessage(byte[] data)
@@ -222,20 +242,17 @@ public abstract class AbstractSaslSCRAM
 		final String cfmMext = r.group("mext");
 		this.cfmUsername = r.group("username");
 		final String cfmNonce = r.group("nonce");
-
-		if (this.cfmAuthzid == null) {
-			this.cfmAuthzid = this.cfmUsername;
-		}
-
+		
 		checkRequestedBindType(requestedBindType);
 
 		final ChannelBindingCallback cc = new ChannelBindingCallback("Channel binding data", this.requestedBindType);
 		final NameCallback nc = new NameCallback("Authentication identity", cfmUsername);
+		final AuthorizationIdCallback ai = new AuthorizationIdCallback("Authorization identity", this.cfmAuthzid);
 		final PBKDIterationsCallback ic = new PBKDIterationsCallback("PBKD2 iterations");
 		final SaltCallback sc = new SaltCallback("Salt");
 		final SaltedPasswordCallback pc = new SaltedPasswordCallback("Salted password");
 
-		handleCallbacks(nc, ic, sc, pc, cc);
+		handleCallbacks(nc, ai, ic, sc, pc, cc);
 
 		if (pc.getSaltedPassword() == null) {
 			throw new SaslException("Unknown user");
@@ -246,6 +263,11 @@ public abstract class AbstractSaslSCRAM
 				log.log(Level.WARNING, "User {0} exists, but his password is empty.", cfmUsername);
 			}
 			throw new SaslException("Unknown user");
+		}
+
+		this.cfmAuthzid = ai.getAuthzId();
+		if (this.cfmAuthzid == null) {
+			this.cfmAuthzid = nc.getName();
 		}
 
 		validateBindingsData(requestedBindType, cc.getBindingData());

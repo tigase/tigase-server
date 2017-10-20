@@ -21,16 +21,17 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import java.util.Map;
 
-public class SaslSCRAM extends AbstractSaslSCRAM {
+public class SaslSCRAMSha256
+		extends AbstractSaslSCRAM {
 
-	public final static String NAME = "SCRAM-SHA-1";
-	protected final static String ALGO = "SHA1";
+	public final static String NAME = "SCRAM-SHA-256";
+	protected final static String ALGO = "SHA-256";
 
-	public SaslSCRAM(Map<? super String, ?> props, CallbackHandler callbackHandler) {
+	public SaslSCRAMSha256(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler);
 	}
 
-	SaslSCRAM(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
+	SaslSCRAMSha256(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
 		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler, once);
 	}
 

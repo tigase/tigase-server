@@ -202,3 +202,50 @@ create table if not exists tig_cluster_nodes (
 ) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 -- QUERY END:
 
+
+-- ------------- Credentials support
+-- QUERY START:
+create table if not exists tig_user_credentials (
+    uid bigint unsigned not null,
+    username varchar(2049) not null,
+    username_sha1 char(128) not null,
+    mechanism varchar(128) not null,
+    value mediumtext not null,
+
+    primary key (uid, username_sha1, mechanism),
+    constraint tig_credentials_uid foreign key (uid) references tig_users (uid)
+) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigUpgradeCredentials;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigUpgradeCredentials()
+begin
+    if not exists (select 1 from tig_user_credentials)
+        and exists (select 1 from information_schema.ROUTINES where routine_type = 'FUNCTION' and routine_schema = lower(database()) and routine_name = 'TigGetDBProperty') then
+        insert into tig_user_credentials (uid, username, username_sha1, mechanism, value)
+            select uid, 'default', sha1('default'), IFNULL(TigGetDBProperty('password-encoding'), 'PLAIN'), user_pw
+            from tig_users
+            where
+                user_pw is not null;
+        update tig_users set user_pw = null where user_pw is not null;
+    end if;
+end //
+-- QUERY END:
+
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigUpgradeCredentials();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigUpgradeCredentials;
+-- QUERY END:

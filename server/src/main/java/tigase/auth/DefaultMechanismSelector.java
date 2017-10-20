@@ -1,3 +1,20 @@
+/*
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 package tigase.auth;
 
 import tigase.auth.mechanisms.SaslEXTERNAL;
@@ -79,17 +96,17 @@ public class DefaultMechanismSelector implements MechanismSelector {
 		if (session.isTlsRequired() && !session.isEncrypted())
 			return false;
 		if (factory instanceof TigaseSaslServerFactory) {
-			if (!session.getDomain().isAnonymousEnabled() && "ANONYMOUS".equals(mechanismName))
-				return false;
-			if (authRepository.getPasswordForm(session.getDomain().getKey()) != AuthRepository.PasswordForm.plain &&
-					!allowedMechanismsWithNonPlainPasswordInRepository.contains(mechanismName)) {
-				return false;
+			switch (mechanismName) {
+				case "EXTERNAL":
+					return isJIDInCertificate(session);
+				case "ANONYMOUS":
+					return session.getDomain().isAnonymousEnabled();
+				default:
+					if (mechanismName.startsWith("SCRAM-") && mechanismName.endsWith("-PLUS") && !SaslSCRAMPlus.isAvailable(session))
+						return false;
+
+					return authRepository.isMechanismSupported(session.getDomain().getKey(), mechanismName);
 			}
-			if ("EXTERNAL".equals(mechanismName) && !isJIDInCertificate(session))
-				return false;
-			if (SaslSCRAMPlus.NAME.equals(mechanismName) && !SaslSCRAMPlus.isAvailable(session))
-				return false;
-			return true;
 		}
 		return false;
 	}

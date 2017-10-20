@@ -21,9 +21,13 @@
  */
 package tigase.db.beans;
 
+import tigase.auth.CredentialsDecoderBean;
+import tigase.auth.CredentialsEncoderBean;
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.AuthRepository;
 import tigase.db.AuthRepositoryMDImpl;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
@@ -63,6 +67,11 @@ public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
 
 	public static class AuthRepositoryConfigBean extends AuthUserRepositoryConfigBean<AuthRepository,AuthRepositoryConfigBean> {
 
+		@Inject
+		private CredentialsEncoderBean credentialsEncoderBean;
+		@Inject
+		private CredentialsDecoderBean credentialsDecoderBean;
+
 		@Override
 		protected Class<AuthRepository> getRepositoryIfc() {
 			return AuthRepository.class;
@@ -73,5 +82,10 @@ public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
 			return null;
 		}
 
+		@Override
+		protected void initRepository(AuthRepository repository) throws RepositoryException {
+			super.initRepository(repository);
+			repository.setCredentialsCodecs(credentialsEncoderBean, credentialsDecoderBean);
+		}
 	}
 }

@@ -357,3 +357,187 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 -- QUERY END:
+
+-- ------------- Credentials support
+-- QUERY START:
+create or replace function TigUserCredential_Update(_user_id varchar(2049), _username varchar(2049), _mechanism varchar(128), _value text) returns void
+as $$
+declare _uid bigint;
+begin
+    select uid into _uid from tig_users where lower(user_id) = lower(_user_id);
+    if _uid is not null then
+        update tig_user_credentials set value = _value  where uid = _uid and username = _username and mechanism = _mechanism;
+        insert into tig_user_credentials (uid, username, mechanism, value)
+            select _uid, _username, _mechanism, _value 
+            where not exists (select 1 from tig_user_credentials where uid = _uid and username = _username and mechanism = _mechanism);
+    end if;
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+create or replace function TigUserCredentials_Get(_user_id varchar(2049), _username varchar(2049)) returns table (
+    mechanism varchar(128),
+    value text,
+    account_status int
+) as $$
+begin
+    return query select c.mechanism, c.value, u.account_status
+        from tig_users u
+        inner join tig_user_credentials c on c.uid = u.uid
+        where
+            lower(u.user_id) = lower(_user_id)
+            and c.username = _username;
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+create or replace function TigUserCredential_Remove(_user_id varchar(2049), _username varchar(2049)) returns void
+as $$
+declare _uid bigint;
+begin
+    select uid into _uid from tig_users where lower(user_id) = lower(_user_id);
+    if _uid is not null then
+        delete from tig_user_credentials where uid = _uid and username = _username;
+    end if;
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+-- _user_id character varying, _user_pw character varying
+-- Add a new user to the database assuming the user password is already
+-- encoded properly according to the database settings.
+-- If password is not encoded TigAddUserPlainPw should be used instead.
+create or replace function TigAddUserPlainPw(_user_id varchar(2049), _user_pw varchar(255))
+  returns bigint as $$
+declare
+  _res_uid bigint;
+begin
+	insert into tig_users (user_id)
+		values (_user_id);
+	select currval('tig_users_uid_seq') into _res_uid;
+
+	insert into tig_nodes (parent_nid, uid, node)
+		values (NULL, _res_uid, 'root');
+
+    if _user_pw is null then
+        update tig_users set account_status = -1 where lower(user_id) = lower(_user_id);
+    else
+        perform TigUpdatePasswordPlainPw(_user_id, _user_pw);
+    end if;
+
+	return _res_uid as uid;
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+if exists( select 1 from pg_proc where proname = lower('TigGetPassword') and pg_get_function_result(oid) = 'character varying') then
+    drop function TigGetPassword(character varying);
+end if;
+end$$;
+-- QUERY END:
+
+-- QUERY START:
+-- Returns user's password from the database
+create or replace function TigGetPassword(_user_id varchar(2049)) returns text as $$
+declare
+  res_pw text;
+begin
+    select c.value into res_pw
+    from tig_users u
+    inner join tig_user_credentials c on c.uid = u.uid
+    where
+        lower(u.user_id) = lower(_user_id)
+        and c.username = 'default'
+        and c.mechanism = 'PLAIN';
+    return res_pw;
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+-- Takes plain text user password and converts it to internal representation
+create or replace function TigUpdatePasswordPlainPw(_user_id varchar(2049), _user_pw varchar(255))
+  returns void as $$
+declare
+    _passwordEncoding text;
+    _encodedPassword text;
+begin
+	select coalesce(TigGetDBProperty('password-encoding'), 'PLAIN') into _passwordEncoding;
+	
+    select
+        case _passwordEncoding
+		    when 'MD5-PASSWORD' then MD5(_user_pw)
+		    when 'MD5-USERID-PASSWORD' then MD5(_user_id || _user_pw)
+	        when 'MD5-USERNAME-PASSWORD' then MD5(split_part(_user_id, '@', 1) || _user_pw)
+		    else _user_pw
+		end into _encodedPassword;
+
+	perform TigUserCredential_Update(_user_id, 'default', _passwordEncoding, _encodedPassword);
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+-- Performs user login for a plain text password, converting it to an internal
+-- representation if necessary
+create or replace function TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255))
+returns varchar(2049) as $$
+declare
+    _res_user_id varchar(2049);
+    _passwordEncoding text;
+    _encodedPassword text;
+begin
+	select coalesce(TigGetDBProperty('password-encoding'), 'PLAIN') into _passwordEncoding;
+
+    select
+        case _passwordEncoding
+		    when 'MD5-PASSWORD' then MD5(_user_pw)
+		    when 'MD5-USERID-PASSWORD' then MD5(_user_id || _user_pw)
+	        when 'MD5-USERNAME-PASSWORD' then MD5(split_part(_user_id, '@', 1) || _user_pw)
+		    else _user_pw
+		end into _encodedPassword;
+
+	select u.user_id into _res_user_id
+	from tig_users u
+	inner join tig_user_credentials c on c.uid = u.uid
+	where
+	    lower(u.user_id) = lower(_user_id)
+	    and c.username = 'default'
+	    and c.mechanism = _passwordEncoding
+	    and c.value = _encodedPassword
+	    and u.account_status > 0;
+
+    if _res_user_id is not null then
+		update tig_users
+			set online_status = online_status + 1, last_login = now()
+			where lower(user_id) = lower(_user_id);
+	else
+		update tig_users set failed_logins = failed_logins + 1 where lower(user_id) = lower(_user_id);
+    end if;
+
+    return _res_user_id;
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
+-- Removes a user from the database
+create or replace function TigRemoveUser(_user_id varchar(2049)) returns void as $$
+declare
+  res_uid bigint;
+begin
+	select uid into res_uid from tig_users where lower(user_id) = lower(_user_id);
+
+    delete from tig_user_credentials where uid = res_uid;
+	delete from tig_pairs where uid = res_uid;
+	delete from tig_nodes where uid = res_uid;
+	delete from tig_users where uid = res_uid;
+end;
+$$ language 'plpgsql';
+-- QUERY END:

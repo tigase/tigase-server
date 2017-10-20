@@ -25,6 +25,10 @@ package tigase.db.jdbc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.auth.CredentialsDecoderBean;
+import tigase.auth.CredentialsEncoderBean;
+import tigase.auth.credentials.Credentials;
+import tigase.auth.credentials.entries.PlainCredentialsEntry;
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Algorithms;
@@ -37,6 +41,8 @@ import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -307,16 +313,12 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	private DataRepository data_repo = null;
 	@ConfigField(desc = "Database initialization query which is run after the server is started", alias = DEF_INITDB_KEY)
 	private String initdb_query = null;
-	@ConfigField(desc = "Retrieves user password from the database for given user_id (JID)", alias = DEF_GETPASSWORD_KEY)
-	private String getpassword_query = DEF_GETPASSWORD_QUERY;
 	@ConfigField(desc = "Removes a user from the database", alias = DEF_DELUSER_KEY)
 	private String deluser_query = DEF_DELUSER_QUERY;
 	@ConfigField(desc = "Query adding a new user to the database", alias = DEF_ADDUSER_KEY)
 	private String adduser_query = DEF_ADDUSER_QUERY;
-	@ConfigField(desc = "Updates (changes) password for a given user_id (JID)", alias = DEF_UPDATEPASSWORD_KEY)
-	private String updatepassword_query = DEF_UPDATEPASSWORD_QUERY;
 	@ConfigField(desc = "Performs user login", alias = DEF_USERLOGIN_KEY)
-	private String userlogin_query = DEF_USERLOGIN_QUERY;
+	private String userlogin_query = null;
 	@ConfigField(desc = "Count users for domain", alias = DEF_USERS_DOMAIN_COUNT_KEY)
 	private String userdomaincount_query = DEF_USERS_DOMAIN_COUNT_QUERY;
 	@ConfigField(desc = "Lists disabled accounts", alias = DEF_LISTDISABLEDACCOUNTS_KEY)
@@ -343,7 +345,16 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	@ConfigField(desc = "Comma separated list of NON-SASL authentication mechanisms", alias = DEF_NONSASL_MECHS_KEY)
 	private String[] nonsasl_mechs = DEF_NONSASL_MECHS.split(",");
 
-	private PasswordForm passwordForm = PasswordForm.unknown;
+	// credentials queries
+	@ConfigField(desc = "Select list of credentials for account and username", alias = "get-account-credentials-query")
+	private String getaccountcredentials_query = "{ call TigUserCredentials_Get(?,?) }";
+	@ConfigField(desc = "Remove credential for account and username", alias = "remove-account-credential-query")
+	private String removeaccountcredential_query = "{ call TigUserCredential_Remove(?,?) }";
+	@ConfigField(desc = "Update credential for account and username", alias = "update-account-credential-query")
+	private String updateaccountcredential_query = "{ call TigUserCredential_Update(?,?,?,?) }";
+
+	private CredentialsDecoderBean credentialsDecoder;
+	private CredentialsEncoderBean credentialsEncoder;
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -372,6 +383,8 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 					data_repo.release(null, rs);
 				}
 			}
+
+			updateCredential(user, Credentials.DEFAULT_USERNAME, password);
 		} catch (SQLIntegrityConstraintViolationException e) {
 			throw new UserExistsException(
 					"Error while adding user to repository, user possibly exists: " + user, e);
@@ -413,10 +426,19 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	// ~--- get methods ----------------------------------------------------------
 
 	@Override
-	public PasswordForm getPasswordForm(String domain) {
-		return passwordForm;
+	public boolean isMechanismSupported(String domain, String mechanism) {
+		if ("PLAIN".equals(mechanism)) {
+			return true;
+		}
+		if (userlogin_active) {
+			return false;
+		}
+		if (mechanism.endsWith("-PLUS")) {
+			mechanism = mechanism.substring(0, mechanism.length() - "-PLUS".length());
+		}
+		return credentialsDecoder.getSupportedMechanisms().contains(mechanism);
 	}
-
+	
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
@@ -499,6 +521,13 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	}
 
 	// ~--- methods --------------------------------------------------------------
+
+	@Override
+	public void setCredentialsCodecs(CredentialsEncoderBean encoder, CredentialsDecoderBean decoder) {
+		this.credentialsEncoder = encoder;
+		this.credentialsDecoder = decoder;
+	}
+	
 	@Override
 	public void setDataSource(DataRepository data_repo) throws DBInitException {
 		try {
@@ -510,12 +539,6 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			}
 			if ((deluser_query != null)) {
 				data_repo.initPreparedStatement(deluser_query, deluser_query);
-			}
-			if ((getpassword_query != null)) {
-				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
-			}
-			if ((updatepassword_query != null)) {
-				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
 			}
 			if (userlogin_query != null) {
 				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
@@ -542,41 +565,14 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			if (accountstatus_query != null) {
 				data_repo.initPreparedStatement(accountstatus_query, accountstatus_query);
 			}
-
-			try (Statement stmt = data_repo.createStatement(null)) {
-				String query = "select TigGetDBProperty('password-encoding')";
-				switch (data_repo.getDatabaseType()) {
-					case jtds:
-					case sqlserver:
-						query = "select dbo.TigGetDBProperty('password-encoding')";
-						break;
-					case derby:
-						query = "values TigGetDBProperty('password-encoding')";
-						break;
-					default:
-						break;
-				}
-
-				passwordForm = PasswordForm.plain;
-				try (ResultSet rs = stmt.executeQuery(query)) {
-					if (rs.next()) {
-						String form = rs.getString(1);
-						if (form == null) {
-							form = "";
-						}
-
-						switch (form) {
-							case "MD5-PASSWORD":
-							case "MD5-USERID-PASSWORD":
-							case "MD5-USERNAME-PASSWORD":
-								passwordForm = PasswordForm.encoded;
-								break;
-							default:
-								passwordForm = PasswordForm.plain;
-								break;
-						}
-					}
-				}
+			if (getaccountcredentials_query != null) {
+				data_repo.initPreparedStatement(getaccountcredentials_query, getaccountcredentials_query);
+			}
+			if (removeaccountcredential_query != null) {
+				data_repo.initPreparedStatement(removeaccountcredential_query, removeaccountcredential_query);
+			}
+			if (updateaccountcredential_query != null) {
+				data_repo.initPreparedStatement(updateaccountcredential_query, updateaccountcredential_query);
 			}
 
 			this.data_repo = data_repo;
@@ -587,6 +583,57 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		} catch (SQLException ex) {
 			data_repo = null;
 			throw new DBInitException("Could not initialize TigaseCustomAuth instance", ex);
+		}
+	}
+
+	@Override
+	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+		if (userlogin_active) {
+			return new SingleCredential(user, getAccountStatus(user), new Credentials.Entry() {
+				@Override
+				public String getMechanism() {
+					return "STORED-PROCEDURE";
+				}
+
+				@Override
+				public boolean verifyPlainPassword(String password) {
+					try {
+						return userLoginAuth(user, password);
+					} catch (TigaseDBException|AuthorizationException e) {
+						log.log(Level.FINEST, "authorization failed with an error", e);
+					}
+					return false;
+				}
+			});
+		}
+		try {
+			PreparedStatement get_credentials = data_repo.getPreparedStatement(user, getaccountcredentials_query);
+
+			List<DefaultCredentials.RawEntry> entries = new ArrayList<>();
+			AccountStatus accountStatus = null;
+			synchronized (get_credentials) {
+				ResultSet rs = null;
+				try {
+					get_credentials.setString(1, user.toString());
+					get_credentials.setString(2, username);
+					rs = get_credentials.executeQuery();
+
+					while (rs.next()) {
+						String mechanism = rs.getString(1);
+						String value = rs.getString(2);
+						accountStatus = AccountStatus.byValue(rs.getInt(3));
+
+						entries.add(new DefaultCredentials.RawEntry(mechanism, value));
+					}
+
+				} finally {
+					data_repo.release(null, rs);
+				}
+			}
+			return new DefaultCredentials(user, accountStatus, entries, credentialsDecoder);
+		} catch (SQLException e) {
+			throw new TigaseDBException(
+					"Problem with retrieving credentials for account " + user + " and username " + username, e);
 		}
 	}
 
@@ -629,11 +676,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			
 			deluser_query = getParamWithDef(params, DEF_DELUSER_KEY, DEF_DELUSER_QUERY);
 			
-			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, DEF_GETPASSWORD_QUERY);
-
-			updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY, DEF_UPDATEPASSWORD_QUERY);
-
-			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
+			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, null);
 
 			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_QUERY);
 
@@ -782,21 +825,43 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	@Override
 	public void updatePassword(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException {
-		if (updatepassword_query == null) {
-			return;
-		}
+		updateCredential(user, "default", password);
+	}
 
+	@Override
+	public void removeCredential(BareJID user, String username) throws UserNotFoundException, TigaseDBException {
 		try {
-			PreparedStatement update_pass =
-					data_repo.getPreparedStatement(user, updatepassword_query);
-
-			synchronized (update_pass) {
-				update_pass.setString(1, password);
-				update_pass.setString(2, user.toString());
-				update_pass.execute();
+			PreparedStatement removeCredential_stmt = data_repo.getPreparedStatement(user, removeaccountcredential_query);
+			synchronized (removeCredential_stmt) {
+				removeCredential_stmt.setString(1, user.toString());
+				removeCredential_stmt.setString(2, username);
+				removeCredential_stmt.execute();
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
+		}
+	}
+
+	@Override
+	public void updateCredential(BareJID user, String username, String password) throws UserNotFoundException, TigaseDBException {
+		List<String[]> entries = credentialsEncoder.encodeForAllMechanisms(user, password);
+		try {
+			removeCredential(user, username);
+
+			PreparedStatement updateCredential_stmt = data_repo.getPreparedStatement(user, updateaccountcredential_query);
+			synchronized (updateCredential_stmt) {
+				for (String[] entry : entries) {
+					updateCredential_stmt.setString(1, user.toString());
+					updateCredential_stmt.setString(2, username);
+					updateCredential_stmt.setString(3, entry[0]);
+					updateCredential_stmt.setString(4, entry[1]);
+
+					updateCredential_stmt.addBatch();
+				}
+				updateCredential_stmt.executeBatch();
+			}
+		} catch (SQLException ex) {
+			throw new TigaseDBException("Problem accessing repository.", ex);
 		}
 	}
 
@@ -831,32 +896,18 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 
 	@Override
 	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException  {
-		if (getpassword_query == null) {
-			return null;
-		}
-
-		try {
-			ResultSet rs = null;
-			PreparedStatement get_pass =
-					data_repo.getPreparedStatement(user, getpassword_query);
-
-			synchronized (get_pass) {
-				try {
-					get_pass.setString(1, user.toString());
-					rs = get_pass.executeQuery();
-
-					if (rs.next()) {
-						return rs.getString(1);
-					} else {
-						throw new UserNotFoundException("User does not exist: " + user);
-					} // end of if (isnext) else
-				} finally {
-					data_repo.release(null, rs);
+		Credentials credentials = getCredentials(user, Credentials.DEFAULT_USERNAME);
+		if (credentials != null) {
+			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");
+			if (entry != null && entry instanceof PlainCredentialsEntry) {
+				return ((PlainCredentialsEntry) entry).getPassword();
+			} else {
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "No password in plaintext stored for user {0}, returning null...", user);
 				}
 			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem with retrieving user password.", e);
 		}
+		return null;
 	}
 
 	@Override
@@ -1065,6 +1116,8 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 
 	// ~--- inner classes --------------------------------------------------------
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
 	private class SaslCallbackHandler implements CallbackHandler {
 		private Map<String, Object> options = null;
 

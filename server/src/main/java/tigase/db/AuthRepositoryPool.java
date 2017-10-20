@@ -24,6 +24,7 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.auth.credentials.Credentials;
 import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -88,20 +89,19 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public PasswordForm getPasswordForm(String domain) {
+	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
-				return repo.getPasswordForm(domain);
+				return repo.getCredentials(user, username);
 			} finally {
 				addRepo(repo);
 			}
 		} else {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
-
-		return PasswordForm.unknown;
+		return null;
 	}
 
 	@Override
@@ -156,6 +156,22 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	@Override
+	public boolean isMechanismSupported(String domain, String mechanism) {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.isMechanismSupported(domain, mechanism);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			return false;
+		}
+	}
 
 	@Override
 	@Deprecated
@@ -226,6 +242,21 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	}
 
 	@Override
+	public void removeCredential(BareJID user, String username) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.removeCredential(user, username);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}
+
+	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
 
@@ -254,6 +285,22 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 		}
 
 		return null;
+	}
+
+	@Override
+	public void updateCredential(BareJID user, String username, String password)
+			throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.updateCredential(user, username, password);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
 	}
 
 	@Override

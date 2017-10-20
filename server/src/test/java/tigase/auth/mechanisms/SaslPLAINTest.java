@@ -1,8 +1,11 @@
 package tigase.auth.mechanisms;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import tigase.auth.XmppSaslException;
+import tigase.auth.callbacks.AuthorizationIdCallback;
+import tigase.auth.callbacks.VerifyPasswordCallback;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -10,14 +13,9 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
-
-import junit.framework.TestCase;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import tigase.auth.XmppSaslException;
-import tigase.auth.callbacks.VerifyPasswordCallback;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SaslPLAINTest extends TestCase {
 
@@ -38,8 +36,10 @@ public class SaslPLAINTest extends TestCase {
 						username = ((NameCallback) callback).getDefaultName() + "@domain.com";
 						((NameCallback) callback).setName(username);
 					} else if (callback instanceof VerifyPasswordCallback) {
-						((VerifyPasswordCallback) callback).setVerified("juliet@domain.com:xsecret".equals(username + ":"
-								+ ((VerifyPasswordCallback) callback).getPassword()));
+						((VerifyPasswordCallback) callback).setVerified("juliet@domain.com:xsecret".equals(
+								username + ":" + ((VerifyPasswordCallback) callback).getPassword()));
+					} else if (callback instanceof AuthorizationIdCallback) {
+						// there is nothing to do..
 					} else if (callback instanceof AuthorizeCallback) {
 						boolean a = ((AuthorizeCallback) callback).getAuthorizationID().equals(
 								((AuthorizeCallback) callback).getAuthenticationID());
@@ -245,8 +245,10 @@ public class SaslPLAINTest extends TestCase {
 					if (callback instanceof NameCallback) {
 						username = ((NameCallback) callback).getDefaultName();
 					} else if (callback instanceof VerifyPasswordCallback) {
-						((VerifyPasswordCallback) callback).setVerified("secondwitch:shakespeare".equals(username + ":"
-								+ ((VerifyPasswordCallback) callback).getPassword()));
+						((VerifyPasswordCallback) callback).setVerified("secondwitch:shakespeare".equals(
+								username + ":" + ((VerifyPasswordCallback) callback).getPassword()));
+					} else if (callback instanceof AuthorizationIdCallback) {
+						// nothing to do..
 					} else if (callback instanceof AuthorizeCallback) {
 						boolean a = ((AuthorizeCallback) callback).getAuthorizationID().equals("romeo@example.net");
 						a = a && username.equals("secondwitch");

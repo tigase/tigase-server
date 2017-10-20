@@ -17,13 +17,13 @@
  */
 package tigase.auth.impl;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
+import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.VerifyPasswordCallback;
+import tigase.auth.credentials.Credentials;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
-import tigase.db.TigaseDBException;
 import tigase.xmpp.BareJID;
 
 import javax.security.auth.callback.Callback;
@@ -33,28 +33,22 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * This is implementation of {@linkplain CallbackHandler} to use with old
- * {@linkplain AuthRepository AuthRepositories}. Callback
- * {@linkplain VerifyPasswordCallback} uses method
- * {@linkplain AuthRepository#plainAuth(BareJID, String)} to password
- * verification.
- */
-@Deprecated
-@TigaseDeprecated(since = "8.0.0")
-public class AuthRepoPlainCallbackHandler
-		implements CallbackHandler, AuthRepositoryAware, DomainAware {
+import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 
+/**
+ * Implementation of CallbackHandler for authentication with SASL PLAIN or using plaintext password.
+ */
+public class PlainCallbackHandler implements CallbackHandler, AuthRepositoryAware, DomainAware {
 	protected String domain;
 
 	protected BareJID jid = null;
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 	protected AuthRepository repo;
+	private String username;
+	private boolean accountDisabled = false;
 
 	@Override
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -66,7 +60,6 @@ public class AuthRepoPlainCallbackHandler
 		}
 	}
 
-	@SuppressWarnings("unused")
 	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
 		String authenId = authCallback.getAuthenticationID();
 
@@ -74,18 +67,12 @@ public class AuthRepoPlainCallbackHandler
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
 		}
 
-		try {
-			if (repo.isUserDisabled(jid)) {
-				authCallback.setAuthorized(false);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "User {0} is disabled", jid);
-				}
-				return;
-			}
-		} catch (TigaseDBException e) {
+		if (accountDisabled) {
+			authCallback.setAuthorized(false);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Cannot check if user " + jid + " is enabled", e);
+				log.log(Level.FINEST, "User {0} is disabled", jid);
 			}
+			return;
 		}
 
 		String authorId = authCallback.getAuthorizationID();
@@ -93,9 +80,8 @@ public class AuthRepoPlainCallbackHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (AbstractSasl.isAuthzIDIgnored() || authenId.equals(authorId)) {
-			authCallback.setAuthorized(true);
-		}
+
+		authCallback.setAuthorized(true);
 	}
 
 	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
@@ -103,6 +89,8 @@ public class AuthRepoPlainCallbackHandler
 			handleRealmCallback((RealmCallback) callback);
 		} else if (callback instanceof NameCallback) {
 			handleNameCallback((NameCallback) callback);
+		} else if (callback instanceof AuthorizationIdCallback) {
+			handleAuthorizationIdCallback((AuthorizationIdCallback) callback);
 		} else if (callback instanceof VerifyPasswordCallback) {
 			handleVerifyPasswordCallback((VerifyPasswordCallback) callback);
 		} else if (callback instanceof AuthorizeCallback) {
@@ -112,13 +100,26 @@ public class AuthRepoPlainCallbackHandler
 		}
 
 	}
-
+	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
+		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null && !callback.getAuthzId().equals(jid.toString())) {
+			try {
+				jid = BareJID.bareJIDInstance(callback.getAuthzId());
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		} else {
+			username = DEFAULT_USERNAME;
+			callback.setAuthzId(jid.toString());
+		}
+	}
+	
 	protected void handleNameCallback(NameCallback nc) throws IOException {
-		String user_name = nc.getDefaultName();
-		jid = BareJID.bareJIDInstanceNS(user_name, domain);
+		username = nc.getDefaultName();
+
+		jid = BareJID.bareJIDInstanceNS(username, domain);
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "NameCallback: {0}", user_name);
+			log.log(Level.FINEST, "NameCallback: {0}", username);
 		}
 	}
 
@@ -134,23 +135,20 @@ public class AuthRepoPlainCallbackHandler
 	}
 
 	protected void handleVerifyPasswordCallback(VerifyPasswordCallback pc) throws IOException {
-		String passwd = pc.getPassword();
-
+		final String password = pc.getPassword();
 		try {
-			Map<String, Object> map = new HashMap<String, Object>();
+			Credentials credentials = repo.getCredentials(jid, username);
 
-			map.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-			map.put(AuthRepository.USER_ID_KEY, jid);
-			map.put(AuthRepository.PASSWORD_KEY, passwd);
-			map.put(AuthRepository.REALM_KEY, jid.getDomain());
-			map.put(AuthRepository.SERVER_NAME_KEY, jid.getDomain());
-			pc.setVerified(repo.otherAuth(map));
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "VerifyPasswordCallback: {0}", "******");
+			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");
+			if (entry == null) {
+				entry = credentials.getFirst();
 			}
+
+			accountDisabled = credentials.isAccountDisabled();
+
+			pc.setVerified(entry.verifyPlainPassword(password));
 		} catch (Exception e) {
 			pc.setVerified(false);
-
 			throw new IOException("Password verification problem.", e);
 		}
 	}
@@ -164,4 +162,5 @@ public class AuthRepoPlainCallbackHandler
 	public void setDomain(String domain) {
 		this.domain = domain;
 	}
+
 }

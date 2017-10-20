@@ -27,10 +27,18 @@ package tigase.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.auth.CredentialsDecoderBean;
+import tigase.auth.CredentialsEncoderBean;
+import tigase.auth.credentials.Credentials;
+import tigase.auth.credentials.entries.PlainCredentialsEntry;
 import tigase.xmpp.BareJID;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -217,10 +225,12 @@ public interface AuthRepository extends Repository {
 	 */
 	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
 
-	 String getPassword(BareJID user)
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	String getPassword(BareJID user)
 			throws UserNotFoundException, TigaseDBException ;
 
-	
+
 	/**
 	 * Describe <code>updatePassword</code> method here.
 	 *
@@ -229,8 +239,137 @@ public interface AuthRepository extends Repository {
 	 * @throws UserNotFoundException
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
 	void updatePassword(BareJID user, String password)
 					throws UserNotFoundException, TigaseDBException;
+
+	default Credentials getCredentials(BareJID user, String username) throws UserNotFoundException, TigaseDBException {
+		String password = getPassword(user);
+		if (password != null) {
+			return new SingleCredential(user, getAccountStatus(user), new PlainCredentialsEntry(password));
+		}
+		return null;
+	}
+
+	default void removeCredential(BareJID user, String username) throws UserNotFoundException, TigaseDBException {
+		
+	}
+
+	default void updateCredential(BareJID user, String username, String password)
+			throws UserNotFoundException, TigaseDBException {
+		updatePassword(user, password);
+	}
+
+	default void setCredentialsCodecs(CredentialsEncoderBean encoder, CredentialsDecoderBean decoder) {
+
+	}
+
+	class SingleCredential implements Credentials {
+
+		private final AccountStatus accountStatus;
+		private final BareJID user;
+		private final Credentials.Entry entry;
+
+		public SingleCredential(BareJID user, AccountStatus accountStatus, Credentials.Entry entry) {
+			this.user = user;
+			this.entry = entry;
+			this.accountStatus = accountStatus;
+		}
+
+		@Override
+		public BareJID getUser() {
+			return user;
+		}
+
+		@Override
+		public boolean isAccountDisabled() {
+			return accountStatus == AccountStatus.disabled;
+		}
+
+		@Override
+		public Entry getEntryForMechanism(String mechanism) {
+			if (mechanism.equals(entry.getMechanism())) {
+				return entry;
+			}
+			return null;
+		}
+
+		@Override
+		public Entry getFirst() {
+			return entry;
+		}
+	}
+
+	class DefaultCredentials implements Credentials {
+
+		private static final Logger log = Logger.getLogger(DefaultCredentials.class.getCanonicalName());
+
+		private final BareJID user;
+		private final AccountStatus accountStatus;
+		private final List<RawEntry> entries;
+		private final CredentialsDecoderBean decoder;
+
+		public DefaultCredentials(BareJID user, AccountStatus accountStatus, List<RawEntry> entries, CredentialsDecoderBean decoderBean) {
+			this.accountStatus = accountStatus;
+			this.user = user;
+			this.entries = entries;
+			this.decoder = decoderBean;
+		}
+		
+		@Override
+		public BareJID getUser() {
+			return user;
+		}
+
+		public boolean isAccountDisabled() {
+			return accountStatus == AccountStatus.disabled;
+		}
+
+		@Override
+		public Credentials.Entry getEntryForMechanism(String mechanism) {
+			for (RawEntry entry : entries) {
+				if (entry.isForMechanism(mechanism)) {
+					try {
+						return decoder.decode(user, mechanism, entry.getValue());
+					} catch (NoSuchAlgorithmException ex) {
+						log.log(Level.WARNING, "Could not decode credentials for " + mechanism, ex);
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public Credentials.Entry getFirst() {
+			RawEntry entry = entries.get(0);
+			try {
+				return decoder.decode(user, entry.getMechanism(), entry.getValue());
+			} catch (NoSuchAlgorithmException ex) {
+				log.log(Level.WARNING, "Could not decode credentials for " + entry.getMechanism(), ex);
+				return null;
+			}
+		}
+
+		public static class RawEntry implements Credentials.RawEntry {
+			private final String mechanism;
+			private final String value;
+
+			public RawEntry(String mechanism, String value) {
+				this.mechanism = mechanism;
+				this.value = value;
+			}
+
+			public String getMechanism() {
+				return mechanism;
+			}
+			
+			public String getValue() {
+				return value;
+			}
+
+		}
+	}
 
 	enum AccountStatus {
 		active(1),
@@ -277,14 +416,8 @@ public interface AuthRepository extends Repository {
 	void setUserDisabled(BareJID user, Boolean value) 
 					throws UserNotFoundException, TigaseDBException;
 
-	default PasswordForm getPasswordForm(String domain) {
-		return PasswordForm.plain;
-	}
-
-	enum PasswordForm {
-		plain,
-		encoded,
-		unknown
+	default boolean isMechanismSupported(String domain, String mechanism) {
+		return "PLAIN".equals(mechanism);
 	}
 	
 }    // AuthRepository

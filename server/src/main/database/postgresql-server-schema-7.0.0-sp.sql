@@ -132,11 +132,9 @@ end;
 -- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 -- and creates a new user account.
-create or replace function TigAddUserPlainPw(varchar(2049), varchar(255))
+create or replace function TigAddUserPlainPw(_user_id varchar(2049), _user_pw varchar(255))
   returns bigint as '
 declare
-  _user_id alias for $1;
-  _user_pw alias for $2;
   _enc text;
   _res_uid bigint;
 begin
@@ -170,9 +168,8 @@ end;
 
 -- QUERY START:
 -- Removes a user from the database
-create or replace function TigRemoveUser(varchar(2049)) returns void as '
+create or replace function TigRemoveUser(_user_id varchar(2049)) returns void as '
 declare
-  _user_id alias for $1;
   res_uid bigint;
 begin
 	select uid into res_uid from tig_users where lower(user_id) = lower(_user_id);
@@ -186,10 +183,17 @@ end;
 -- QUERY END:
 
 -- QUERY START:
+do $$
+begin
+if exists( select 1 from pg_proc where proname = lower('TigGetPassword') and pg_get_function_result(oid) = 'text') then
+    drop function TigGetPassword(character varying);
+end if;
+end$$;
+-- QUERY END:
+-- QUERY START:
 -- Returns user's password from the database
-create or replace function TigGetPassword(varchar(2049)) returns varchar(255) as '
+create or replace function TigGetPassword(_user_id varchar(2049)) returns varchar(255) as '
 declare
-  _user_id alias for $1;
   res_pw varchar(255);
 begin
 	select user_pw into res_pw from tig_users where lower(user_id) = lower(_user_id);
@@ -200,11 +204,9 @@ end;
 
 -- QUERY START:
 -- Takes plain text user password and converts it to internal representation
-create or replace function TigUpdatePasswordPlainPw(varchar(2049), varchar(255))
+create or replace function TigUpdatePasswordPlainPw(_user_id varchar(2049), _user_pw varchar(255))
   returns void as '
 declare
-  _user_id alias for $1;
-  _user_pw alias for $2;
   _enc text;
 begin
 	select TigGetDBProperty(''password-encoding'') into _enc;
@@ -303,11 +305,9 @@ end;
 -- QUERY START:
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
-create or replace function TigUserLoginPlainPw(varchar(2049), varchar(255))
+create or replace function TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255))
 			 					  returns varchar(2049) as '
 declare
-  _user_id alias for $1;
-  _user_pw alias for $2;
   res_user_id varchar(2049);
   _enc text;
 begin

@@ -27,6 +27,7 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.auth.credentials.Credentials;
 import tigase.db.*;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
@@ -1189,8 +1190,8 @@ public abstract BareJID getBareJID() throws NotAuthorizedException;
 								final Map<String, String> registr_params)
 					throws TigaseDBException, TigaseStringprepException {
 		try {
-			authRepo.updatePassword(BareJID.bareJIDInstance(name_param, getDomain().getVhost()
-					.getDomain()), pass_param);
+			authRepo.updateCredential(BareJID.bareJIDInstance(name_param, getDomain().getVhost()
+					.getDomain()), Credentials.DEFAULT_USERNAME, pass_param);
 			if (registr_params != null) {
 				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
 					repo.setData(BareJID.bareJIDInstance(name_param, getDomain().getVhost()

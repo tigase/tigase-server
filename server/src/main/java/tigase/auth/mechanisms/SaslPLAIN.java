@@ -1,16 +1,33 @@
+/*
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 package tigase.auth.mechanisms;
 
-import java.util.Map;
+import tigase.auth.XmppSaslException;
+import tigase.auth.XmppSaslException.SaslError;
+import tigase.auth.callbacks.AuthorizationIdCallback;
+import tigase.auth.callbacks.VerifyPasswordCallback;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
-
-import tigase.auth.XmppSaslException;
-import tigase.auth.XmppSaslException.SaslError;
-import tigase.auth.callbacks.VerifyPasswordCallback;
+import java.util.Map;
 
 /**
  * SASL-PLAIN mechanism.
@@ -55,15 +72,16 @@ public class SaslPLAIN extends AbstractSasl {
 			throw new XmppSaslException(SaslError.malformed_request, "Password string is too long");
 
 		final NameCallback nc = new NameCallback("Authentication identity", authcid);
+		final AuthorizationIdCallback ai = new AuthorizationIdCallback("Authorization identity", isEmpty(authzid) ? null : authzid);
 		final VerifyPasswordCallback vpc = new VerifyPasswordCallback(passwd);
 
-		handleCallbacks(nc, vpc);
+		handleCallbacks(nc, ai, vpc);
 
 		if (vpc.isVerified() == false) {
 			throw new XmppSaslException(SaslError.not_authorized, "Password not verified");
 		}
 
-		final String authorizationJID = isEmpty(authzid) ? nc.getName() : authzid;
+		final String authorizationJID = ai.getAuthzId() == null ? nc.getName() : ai.getAuthzId();
 
 		final AuthorizeCallback ac = new AuthorizeCallback(nc.getName(), authorizationJID);
 		handleCallbacks(ac);

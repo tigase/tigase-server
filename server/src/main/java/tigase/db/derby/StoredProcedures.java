@@ -2,11 +2,13 @@ package tigase.db.derby;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.auth.credentials.Credentials;
 import tigase.util.Algorithms;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.sql.*;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +28,8 @@ public class StoredProcedures {
 
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
+	private static final String DEFAULT_USERNAME_SHA1 = sha1(Credentials.DEFAULT_USERNAME);
+
 	//~--- methods --------------------------------------------------------------
 
 	private static String encodePassword(String encMethod, String userId, String userPw) {
@@ -44,6 +48,22 @@ public class StoredProcedures {
 	private static String md5(String data) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			if (data != null) {
+				md.update(data.getBytes(UTF8));
+			}
+
+			byte[] digest = md.digest();
+
+			return Algorithms.bytesToHex(digest);
+		} catch (Exception e) {
+			throw new RuntimeException("Error on encoding password", e);
+		}
+	}
+
+	private static String sha1(String data) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA1");
 
 			if (data != null) {
 				md.update(data.getBytes(UTF8));
@@ -158,11 +178,10 @@ public class StoredProcedures {
 				return;
 			}
 			PreparedStatement ps =
-				conn.prepareStatement("insert into tig_users (user_id, user_pw) values (?, ?)",
+				conn.prepareStatement("insert into tig_users (user_id) values (?)",
 					Statement.RETURN_GENERATED_KEYS);
 
 			ps.setString(1, userId);
-			ps.setString(2, userPw);
 			ps.executeUpdate();
 
 			ResultSet rs = ps.getGeneratedKeys();
@@ -170,6 +189,11 @@ public class StoredProcedures {
 			rs.next();
 
 			long generatedKey = rs.getLong(1);
+
+			if (userPw != null) {
+				tigUpdatePasswordPlainPw(userId, userPw);
+			}
+
 			PreparedStatement ps3 = conn.prepareStatement("select uid from tig_users where uid=?");
 
 			ps3.setLong(1, generatedKey);
@@ -475,7 +499,7 @@ public class StoredProcedures {
 			conn.close();
 		}
 	}
-
+	
 	/**
 	 * Method description
 	 *
@@ -492,7 +516,12 @@ public class StoredProcedures {
 
 		try {
 			PreparedStatement ps =
-				conn.prepareStatement("select user_pw from tig_users where lower(user_id) = ?");
+				conn.prepareStatement("select c.value from tig_users u " +
+									  " inner join tig_user_credentials c on c.uid = u.uid " +
+									  " where " +
+									  " u.user_id = ? " +
+									  " and c.mechanism = 'PLAIN' " +
+									  " and c.username = 'default'");
 
 			ps.setString(1, userId.toLowerCase());
 			data[0] = ps.executeQuery();
@@ -704,6 +733,10 @@ public class StoredProcedures {
 			ps2.setLong(1, uid);
 			ps2.executeUpdate();
 
+			PreparedStatement ps4 = conn.prepareStatement("delete from tig_user_credentials where uid = ?");
+			ps4.setLong(1, uid);
+			ps4.executeUpdate();
+
 			PreparedStatement ps = conn.prepareStatement("delete from tig_users where uid = ?");
 
 			ps.setLong(1, uid);
@@ -811,42 +844,10 @@ public class StoredProcedures {
 	 *
 	 * @throws SQLException
 	 */
-	public static void tigUpdatePassword(String userId, String userPw) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");
-
-		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-		try {
-			PreparedStatement ps =
-				conn.prepareStatement("update tig_users set user_pw = ? where lower(user_id) = ?");
-
-			ps.setString(1, userPw);
-			ps.setString(2, userId.toLowerCase());
-			ps.executeUpdate();
-		} catch (SQLException e) {
-
-			// e.printStackTrace();
-			// log.log(Level.SEVERE, "SP error", e);
-			throw e;
-		} finally {
-			conn.close();
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param userPw
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigUpdatePasswordPlainPw(String userId, String userPw) throws SQLException {
-		String encMethod = tigGetDBProperty("password-encoding");
-		String encp = encodePassword(encMethod, userId, userPw);
-
-		tigUpdatePassword(userId, encp);
+		String passwordEncoding = Optional.ofNullable(tigGetDBProperty("password-encoding")).orElse("PLAIN");
+		String encodedPassword = encodePassword(passwordEncoding, userId, userPw);
+		tigUserCredentialUpdate(userId, Credentials.DEFAULT_USERNAME, passwordEncoding, encodedPassword);
 	}
 
 	/**
@@ -872,18 +873,22 @@ public class StoredProcedures {
 	 *
 	 * @throws SQLException
 	 */
-	public static void tigUserLogin(String userId, String userPw, ResultSet[] data)
+	public static void tigUserLoginPlainPw(String userId, String userPw, ResultSet[] data)
 			throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
 		try {
+			String passwordEncoding = Optional.ofNullable(tigGetDBProperty("password-encoding")).orElse("PLAIN");
+			String encodedPassword = encodePassword(passwordEncoding, userId, userPw);
 			PreparedStatement ps =
-				conn.prepareStatement("select user_id from tig_users where (account_status > 0) AND ( lower(user_id) = ?) AND (user_pw = ?)");
+					conn.prepareStatement("select u.user_id from tig_users u inner join tig_user_credentials c on c.uid = u.uid where (u.account_status > 0) AND ( lower(u.user_id) = ?) " +
+												  " AND c.username = '"+ Credentials.DEFAULT_USERNAME + "' AND c.mechanism = ? AND c.value = ?");
 
 			ps.setString(1, userId.toLowerCase());
-			ps.setString(2, userPw);
+			ps.setString(2, passwordEncoding);
+			ps.setString(3, userPw);
 
 			ResultSet rs = ps.executeQuery();
 
@@ -893,7 +898,7 @@ public class StoredProcedures {
 				data[0] = x.executeQuery();
 
 				PreparedStatement flps =
-					conn.prepareStatement("update tig_users set online_status = online_status + 1, last_login = current timestamp where lower(user_id) =  ?");
+						conn.prepareStatement("update tig_users set online_status = online_status + 1, last_login = current timestamp where lower(user_id) =  ?");
 
 				flps.setString(1, userId.toLowerCase());
 				flps.executeUpdate();
@@ -903,7 +908,7 @@ public class StoredProcedures {
 				data[0] = x.executeQuery();
 
 				PreparedStatement flps =
-					conn.prepareStatement("update tig_users set failed_logins = failed_logins + 1 where lower(user_id) = ?");
+						conn.prepareStatement("update tig_users set failed_logins = failed_logins + 1 where lower(user_id) = ?");
 
 				flps.setString(1, userId.toLowerCase());
 				flps.executeUpdate();
@@ -916,24 +921,6 @@ public class StoredProcedures {
 		} finally {
 			conn.close();
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param userPw
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
-	public static void tigUserLoginPlainPw(String userId, String userPw, ResultSet[] data)
-			throws SQLException {
-		String encMethod = tigGetDBProperty("password-encoding");
-		String encp = encodePassword(encMethod, userId, userPw);
-
-		tigUserLogin(userId, encp, data);
 	}
 
 	/**
@@ -960,6 +947,134 @@ public class StoredProcedures {
 			// e.printStackTrace();
 			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static void tigUserCredentialUpdate(String userId, String username, String mechanism, String value) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps =
+					conn.prepareStatement("select uid from tig_users where lower(user_id) =  ?");
+
+			ps.setString(1, userId.toLowerCase());
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				long uid = rs.getLong(1);
+
+				ps = conn.prepareStatement("select 1 from tig_user_credentials where uid = ? and username = ? and mechanism = ?");
+				ps.setLong(1, uid);
+				ps.setString(2, username);
+				ps.setString(3, mechanism);
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					ps = conn.prepareStatement("update tig_user_credentials set value = ? where uid = ? and username = ? and mechanism = ?");
+					ps.setString(1, value);
+					ps.setLong(2, uid);
+					ps.setString(3, username);
+					ps.setString(4, mechanism);
+					ps.executeUpdate();
+				} else {
+					ps = conn.prepareStatement("insert into tig_user_credentials (uid, username, mechanism, value) values (?,?,?,?)");
+					ps.setLong(1, uid);
+					ps.setString(2, username);
+					ps.setString(3, mechanism);
+					ps.setString(4, value);
+					ps.execute();
+				}
+			}
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static void tigUserCredentialsGet(String userId, String username, ResultSet[] data) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps =
+					conn.prepareStatement("select c.mechanism, c.value, u.account_status from tig_users u " +
+												  " inner join tig_user_credentials c on c.uid = u.uid " +
+												  " where lower(u.user_id) = ? and c.username = ?");
+			ps.setString(1, userId);
+			ps.setString(2, username);
+
+			data[0] = ps.executeQuery();
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static void tigUserCredentialRemove(String userId, String username) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps = conn.prepareStatement("select uid from tig_users where lower(user_id) =  ?");
+
+			ps.setString(1, userId.toLowerCase());
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				long uid = rs.getLong(1);
+
+				ps = conn.prepareStatement("delete from tig_user_credentials where uid = ? and username = ?");
+				ps.setLong(1, uid);
+				ps.setString(2, username);
+				ps.execute();
+			}
+		} finally {
+			conn.close();
+		}
+	}
+
+
+	public static void migrateCredentials() throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("select 1 from tig_user_credentials");
+			boolean migrated = rs.next();
+			rs.close();
+
+			if (migrated)
+				return;
+
+			rs = stmt.executeQuery("select uid, user_pw from tig_users where user_pw is not null");
+
+			String encoding = Optional.ofNullable(tigGetDBProperty("password-encoding")).orElse("PLAIN");
+
+			PreparedStatement ps = conn.prepareStatement("insert into tig_user_credentials (uid, username, mechanism, value) values (?, ?, ?, ?)");
+			while (rs.next()) {
+				ps.setLong(1, rs.getLong(1));
+				ps.setString(2, "default");
+				ps.setString(3, encoding);
+				ps.setString(4, rs.getString(2));
+				ps.execute();
+			}
+
+			stmt.execute("update tig_users set user_pw = null where user_pw is not null");
+		} catch (SQLException e) {
+			log.log(Level.WARNING, "Migration of data failed", e);
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			//throw e;
 		} finally {
 			conn.close();
 		}
