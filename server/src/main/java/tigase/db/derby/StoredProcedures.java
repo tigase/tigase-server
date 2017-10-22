@@ -1008,7 +1008,7 @@ public class StoredProcedures {
 					conn.prepareStatement("select c.mechanism, c.value, u.account_status from tig_users u " +
 												  " inner join tig_user_credentials c on c.uid = u.uid " +
 												  " where lower(u.user_id) = ? and c.username = ?");
-			ps.setString(1, userId);
+			ps.setString(1, userId.toLowerCase());
 			ps.setString(2, username);
 
 			data[0] = ps.executeQuery();

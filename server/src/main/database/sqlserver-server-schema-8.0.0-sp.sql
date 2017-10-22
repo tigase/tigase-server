@@ -499,7 +499,7 @@ begin
     declare @_uid bigint;
     declare @_username_sha1 varbinary(32);
 
-    select @_uid = uid, @_username_sha1 = HASHBYTES('SHA1', @_username) from tig_users where sha1_user_id = HASHBYTES('SHA1', @_user_id);
+    select @_uid = uid, @_username_sha1 = HASHBYTES('SHA1', @_username) from tig_users where sha1_user_id = HASHBYTES('SHA1', lower(@_user_id));
     if @_uid is not null
     begin
         update tig_user_credentials set value = @_value where uid = @_uid and username_sha1 = @_username_sha1 and mechanism = @_mechanism;
@@ -545,7 +545,7 @@ begin
     from tig_users u
     inner join tig_user_credentials c on c.uid = u.uid
     where
-        u.sha1_user_id = HASHBYTES('SHA1', @_user_id)
+        u.sha1_user_id = HASHBYTES('SHA1', lower(@_user_id))
         and c.username_sha1 = HASHBYTES('SHA1', @_username);
 end
 -- QUERY END:
@@ -567,7 +567,7 @@ begin
     declare @_uid bigint;
     declare @_username_sha1 varbinary(32);
 
-    select @_uid = uid, @_username_sha1 = HASHBYTES('SHA1', @_username) from tig_users where sha1_user_id = HASHBYTES('SHA1', @_user_id);
+    select @_uid = uid, @_username_sha1 = HASHBYTES('SHA1', @_username) from tig_users where sha1_user_id = HASHBYTES('SHA1', lower(@_user_id));
 
     delete from tig_user_credentials
     where
