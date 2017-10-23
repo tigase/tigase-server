@@ -60,7 +60,7 @@ public class AuthRepositoryImpl
 
 	/** Field description */
 	protected static final String DISABLED_KEY   = "disabled";
-	protected static final String ACCOUNT_STATUS_KEY = "account_status";
+	public static final String ACCOUNT_STATUS_KEY = "account_status";
 	protected static final String PASSWORD_KEY   = "password";
 	private static final String[] non_sasl_mechs = { "password", "digest" };
 	private static final String[] sasl_mechs     = { "PLAIN", "DIGEST-MD5", "CRAM-MD5" };

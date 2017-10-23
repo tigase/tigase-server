@@ -408,13 +408,21 @@ public interface AuthRepository extends Repository {
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
-	boolean isUserDisabled(BareJID user) 
-					throws UserNotFoundException, TigaseDBException;
+	default boolean isUserDisabled(BareJID user)
+					throws UserNotFoundException, TigaseDBException {
+		AccountStatus s = getAccountStatus(user);
+		return s == AccountStatus.disabled;
+	}
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
-	void setUserDisabled(BareJID user, Boolean value) 
-					throws UserNotFoundException, TigaseDBException;
+	default void setUserDisabled(BareJID user, Boolean value)
+					throws UserNotFoundException, TigaseDBException {
+		AccountStatus status = getAccountStatus(user);
+		if (status == AccountStatus.active || status == AccountStatus.disabled) {
+			setAccountStatus(user, value ? AccountStatus.disabled : AccountStatus.active);
+		}
+	}
 
 	default boolean isMechanismSupported(String domain, String mechanism) {
 		return "PLAIN".equals(mechanism);

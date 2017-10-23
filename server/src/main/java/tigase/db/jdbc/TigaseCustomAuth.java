@@ -25,10 +25,7 @@ package tigase.db.jdbc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.annotations.TigaseDeprecated;
-import tigase.auth.CredentialsDecoderBean;
-import tigase.auth.CredentialsEncoderBean;
 import tigase.auth.credentials.Credentials;
-import tigase.auth.credentials.entries.PlainCredentialsEntry;
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Algorithms;
@@ -40,7 +37,10 @@ import javax.security.auth.callback.*;
 import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +95,7 @@ import static tigase.db.AuthRepository.Meta;
  */
 @Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
-public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRepository> {
+public class TigaseCustomAuth extends AbstractAuthRepositoryWithCredentials implements DataSourceAware<DataRepository> {
 
 	/**
 	 * Private logger for class instances.
@@ -353,9 +353,6 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	@ConfigField(desc = "Update credential for account and username", alias = "update-account-credential-query")
 	private String updateaccountcredential_query = "{ call TigUserCredential_Update(?,?,?,?) }";
 
-	private CredentialsDecoderBean credentialsDecoder;
-	private CredentialsEncoderBean credentialsEncoder;
-
 	// ~--- methods --------------------------------------------------------------
 
 	@Override
@@ -433,12 +430,9 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		if (userlogin_active) {
 			return false;
 		}
-		if (mechanism.endsWith("-PLUS")) {
-			mechanism = mechanism.substring(0, mechanism.length() - "-PLUS".length());
-		}
-		return credentialsDecoder.getSupportedMechanisms().contains(mechanism);
+		return super.isMechanismSupported(domain, mechanism);
 	}
-	
+
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
@@ -521,12 +515,6 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	}
 
 	// ~--- methods --------------------------------------------------------------
-
-	@Override
-	public void setCredentialsCodecs(CredentialsEncoderBean encoder, CredentialsDecoderBean decoder) {
-		this.credentialsEncoder = encoder;
-		this.credentialsDecoder = decoder;
-	}
 	
 	@Override
 	public void setDataSource(DataRepository data_repo) throws DBInitException {
@@ -630,7 +618,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 					data_repo.release(null, rs);
 				}
 			}
-			return new DefaultCredentials(user, accountStatus, entries, credentialsDecoder);
+			return new DefaultCredentials(user, accountStatus, entries, getCredentialsDecoder());
 		} catch (SQLException e) {
 			throw new TigaseDBException(
 					"Problem with retrieving credentials for account " + user + " and username " + username, e);
@@ -711,13 +699,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 	}
-
-	@Override
-	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		AccountStatus s = getAccountStatus(user);
-		return s == AccountStatus.disabled;
-	}
-
+	
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		if (userlogout_query == null) {
@@ -844,7 +826,7 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 
 	@Override
 	public void updateCredential(BareJID user, String username, String password) throws UserNotFoundException, TigaseDBException {
-		List<String[]> entries = credentialsEncoder.encodeForAllMechanisms(user, password);
+		List<String[]> entries = getCredentialsEncoder().encodeForAllMechanisms(user, password);
 		try {
 			removeCredential(user, username);
 
@@ -895,22 +877,6 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 	}
 
 	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException  {
-		Credentials credentials = getCredentials(user, Credentials.DEFAULT_USERNAME);
-		if (credentials != null) {
-			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");
-			if (entry != null && entry instanceof PlainCredentialsEntry) {
-				return ((PlainCredentialsEntry) entry).getPassword();
-			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "No password in plaintext stored for user {0}, returning null...", user);
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public void loggedIn(BareJID user) throws TigaseDBException {
 		if (updatelastlogin_query == null) {
 			return;
@@ -945,14 +911,6 @@ public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRep
 		}
 	}
 
-	@Override
-	public void setUserDisabled(BareJID user, Boolean value) 
-					throws UserNotFoundException, TigaseDBException {
-		AccountStatus status = getAccountStatus(user);
-		if (status == AccountStatus.active || status == AccountStatus.disabled) {
-			setAccountStatus(user, value ? AccountStatus.disabled : AccountStatus.active);
-		}
-	}
 	// ~--- methods --------------------------------------------------------------
 
 	private void initDb() throws SQLException {
