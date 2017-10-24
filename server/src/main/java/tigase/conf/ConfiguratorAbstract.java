@@ -442,6 +442,7 @@ public abstract class ConfiguratorAbstract
 				if (CLUSTER_MODE.equals(entry.getKey())) {
 					if ("true".equalsIgnoreCase(entry.getValue().toString())) {
 						System.setProperty("tigase.cache", "false");
+						log.log(Level.WARNING, "Tigase cache turned off");
 					}
 				}
 			}

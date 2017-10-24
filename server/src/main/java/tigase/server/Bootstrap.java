@@ -91,6 +91,7 @@ public class Bootstrap {
 		}
 		if ((Boolean) clusterMode) {
 			System.setProperty("tigase.cache", "false");
+			log.log(Level.WARNING, "Tigase cache turned off");
 		}
 		config.getProperties().put("cluster-mode", clusterMode);
 
