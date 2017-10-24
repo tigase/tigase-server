@@ -1,0 +1,184 @@
+= For Tigase XMPP Server
+!!!THIS PART IS FOR DOCUMENTATION OF TIGASE XMPP SERVER!!!
+
+In version 8.0.0 of Tigase XMPP Server we decided to improve authentication and security provided by Tigase XMPP Server.
+Due to that we changed implementation of repository and database schemas to allow us to achieve this goal.
+
+== Reasons
+Before version 8.0.0, by default password was stored in plaintext in a +user_pw+ database field in +tig_users+ table.
+It was also possible to enable storage of MD5 hash of a password instead, but this limited authentication mechanism only to PLAIN.
+We do not consider MD5 hash of a password to be secure any more as it is possible to revert this mechanism using rainbow tables.
+
+Due to following, we decided to change this and store by default only encrypted versions of a password in PBKDF2 form
+which can be easily used for +SCRAM-SHA-1+ authentication mechanism or +SCRAM-SHA-256+. It may be also used by PLAIN sasl
+mechanism without storage of plaintext password in a database.
+
+== Summary of changes
+
+=== Added support for storage of encrypted password
+Passwords are not stored in plaintext any more.
+
+=== Using same salt for any subsequent authentications
+This allows clients to reuse calculated credentials and keep them instead of storing plaintext passwords.
+
+=== Disabled usage of stored procedure for authentication
+In previous versions, Tigase used stored procedures +TigUserLoginPlainPw+ and +TigUserLogin+ for SASL PLAIN authentication.
+From version 8.0.0, those procedures are no longer used, but they are updated to use passwords stored in +tig_user_credentials+ table.
+You can still use this procedures for authentication, but to do that you need add:
+[source,tdsl]
+----
+'user-login-query' = '{ call TigUserLoginPlainPw(?, ?) }'
+----
+to configuration block of every authentication repository.
+To enable this for default repository, whole +authRepository+ will look like that:
+[source,tdsl]
+----
+authRepository () {
+    default () {
+        'user-login-query' = '{ call TigUserLoginPlainPw(?, ?) }'
+    }
+}
+----
+
+=== Deprecated API
+Some methods of +AuthRepository+ API were deprecated and should not be used. Most of them were used for authentication
+using stored procedures, retrieval of password in plaintext or for password change.
+
+For most of this methods, new versions based on +tig_user_credentials+ table and user credentials storage are provided if possible.
+
+=== Deprecated storage procedures
+Stored procedures for authentication and password manipulation were updated to new form, so that it is possible to use them by older version of Tigase XMPP Server during rolling update of a cluster.
+However, this procedures will not be used any more and will be removed in future versions of Tigase XMPP Server.
+
+=== Usage of MD5 hashes of passwords
+If in previous versions of Tigase XMPP Server you have changed +password-encoding+ database property, then you will need to modify your configuration to keep it working.
+If you wish only to allow access using old password and to store changed passwords in the new form then you need to enabled credentials decoder for correct authentication repository.
+In this example we will provided changes required for +MD5-PASSWORD+ value of +password-encoding+ database property. If you used different one then just replace +MD5-PASSWORD+ with +MD5-USERNAME-PASSWORD+ or +MD5-USERID-PASSWORD+.
+
+.Usage of MD5 decoder
+[source,tdsl]
+----
+authRepository () {
+    default () {
+        credentialsDecoders () {
+            'MD5-PASSWORD' () {}
+        }
+    }
+}
+----
+
+If you wish to store changes password also in MD5 form then use following entries in your configuration file:
+
+.Usage of MD5 encoder
+[source,tdsl]
+----
+authRepository () {
+    default () {
+        credentialsEncoders () {
+            'MD5-PASSWORD' () {}
+        }
+    }
+}
+----
+
+=== Enabling and disabling credentials encoders/decoders
+You may enable encoders and decoders which are used on your installation.
+By enabling encoders/decoders you decide in what forms password is stored in the database.
+Those changes may impact SASL mechanism which maybe allowed to use on your installation.
+
+.Enabling PLAIN decoder
+[source,tdsl]
+----
+authRepository () {
+    default () {
+        credentialsDecoders () {
+            'PLAIN' () {}
+        }
+    }
+}
+----
+
+.Disabling SCRAM-SHA-1 encoder
+[source,tdsl]
+----
+authRepository () {
+    default () {
+        credentialsEncoders () {
+            'SCRAM-SHA-1' (active: false) {}
+        }
+    }
+}
+----
+
+WARNING: It is strongly recommended not to disable encoders if you have enabled decoder of the same type as it may lead to the authentication issues, if client will try to use mechanism which is not available for him.
+
+
+=== Schema changes
+This change resulted in a creation of new table +tig_user_credentials+ with following fields:
+
+uid:: id of a user row in +tig_users+.
+username:: username used for authentication (if +authzid+ is not provided or +authzid+ localpart is equal to +authcid+ then row with `default` value will be used.
+mechanism:: name of mechanism for which this credentials will be used, ie. +SCRAM-SHA-1+ or +PLAIN+
+value:: serialized value required for mechanism to confirm that credentials match.
+
+WARNING: During execution of +upgrade-schema+ task, passwords will be removed from +tig_users+ table from +user_pw+ field and moved to +tig_user_credentials+ table.
+
+
+=== Added password reset mechanism
+As a part of Tigase HTTP API component and Tigase Extras, we developed a mechanism which allows user to reset their password.
+To use this mechanism HTTP API component and its REST module needs to be enabled on Tigase XMPP Server installation.
+
+NOTE: Additionally this mechanism need to be enabled in the configuration file. For more information about configuration of this mechanism please check Tigase HTTP API component documentation.
+
+Assuming that HTTP API component is configured to run on port 8080 _(default)_, then after accessing address http://localhost:8080/rest/user/resetPassword in the web browser it will present a web form.
+By filling and submitting this form user will initiate a password reset process. During this process, Tigase XMPP Server will send an email to the user's email address with a link to the password change form.
+
+
+= For HTTP API
+!!!IN THIS PART ARE THINGS RELATED TO HTTP API, MAYBE THEY SHOULD BE PLACES IN HTTP API DOCUMENTATION?!!!
+
+== Enabling password reset mechanism
+It is possible to provide users with a mechanism for a password change in case if they forgot their password to the XMPP account.
+To do that you need to have +tigase-extras.jar+ in your classpath (it is part of +-dist-max+ distribution package), enable +mailer+ and +account-email-password-resetter+.
+
+.Example configuration
+[source,tdsl]
+----
+account-email-password-resetter () {}
+mailer (class: tigase.extras.mailer.Mailer) {
+    'mailer-from-address' = 'email-address@to-send-emails-from'
+    'mailer-smtp-host' = 'smtp.email.server.com'
+    'mailer-smtp-password' = 'password-for-email-account'
+    'mailer-smtp-port' = '587' # Email server SMTP port
+    'mailer-smtp-username' = 'username-for-email-account'
+}
+----
+
+NOTE: You need to replace example configuration parameters with correct ones.
+
+With this configuration in place and after restart of Tigase XMPP Server at url http://localhost:8080/rest/user/resetPassword will be available web form which may be used for password reset.
+
+NOTE: This mechanism will only work if user provided real email address during account registration and if user still remembers and has access to email address used during registration.
+
+= For MongoDB
+!!!IN THIS PART ARE THINGS RELATED TO MONGODB and schema.!!!
+
+Due to changes in authentication and credentials storage in AuthRepository, we moved +password+ field from +tig_users+ collection to newly created +tig_user_credentials+ collection.
+This new collection has following fields:
+[width="50%",options="header"]
+|=====================================================================
+|Name	    |Description
+|_id	    |id of document automatically generated by MongoDB
+|uid        |SHA256 hash of a user for which credentails are stored
+|username   |username provided during authentication (or +default+)
+|account_status |name of an account state (copy of value stored in user document from +tig_users+
+|=====================================================================
+
+Additionally for each mechanism we store separate field in this object, so for:
+
+* +PLAIN+ we have +PLAIN+ field with value for this mechanism
+* +SCRAM-SHA-1+ we have +SCRAM-SHA-1+ field with value for this mechanism
+* etc...
+
+Upgrade will not be done in one step, and in fact it will be done once particular user will log in.
+During authentication if there will be no data in +tig_user_credentials+, Tigase XMPP Server will check if +password+ field in +tig_user+ exists is filled and if so will migrate credentials to new collection.
