@@ -47,7 +47,7 @@ public class PlainCredentialsEntry
 		return password == plain || password.equals(plain);
 	}
 
-	@Bean(name = "PLAIN", parent = CredentialsEncoderBean.class, active = true)
+	@Bean(name = "PLAIN", parent = CredentialsEncoderBean.class, active = false)
 	public static class Encoder implements Credentials.Encoder {
 
 		@ConfigField(desc = "Mechanism name")
