@@ -136,7 +136,7 @@ Basic schema for UserRespository and AuthRepository consists of two collections:
 |_id	      |id of user which is SHA256 hash of users jid (raw byte array).
 |user_id	  |contains full user jid.
 |domain	    |domain to which user belongs for easier lookup of users by domain.
-|password   |password of user (or hash of password).
+|password   |password of user (will be removed after upgrade to 8.0.0).
 |=====================================================================
 
 `tig_nodes` collection contains the following fields
@@ -167,6 +167,7 @@ Tigase XMPP Server also uses additional collections for storage of Offline Messa
 |expire-at	|timestamp of expiration of message (if message contains AMP expire-at set).
 |=====================================================================
 
+[mongodb-schema-changes-8.0.0]
 ==== Additions for v8.0 Schema
 Due to changes in authentication and credentials storage in AuthRepository, we moved `password` field from `tig_users` collection to a newly created collection called `tig_user_credentials`.
 
