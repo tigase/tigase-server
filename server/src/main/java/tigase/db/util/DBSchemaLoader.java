@@ -44,6 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static tigase.db.jdbc.DataRepositoryImpl.JDBC_SCHEMA_VERSION_QUERY;
+
 /**
  * Simple utility class allowing various Database operations, including
  * executing simple queries, loading specific schema files or performing
@@ -638,8 +640,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			String db_conn = getDBUri( true, true );
 			final SQLCommand<Connection, Version> versionCommand = cmd -> {
 
-				String procedure = "call TigGetComponentVersion(?)";
-				try (PreparedStatement ps = cmd.prepareStatement(procedure)) {
+				try (PreparedStatement ps = cmd.prepareCall(JDBC_SCHEMA_VERSION_QUERY)) {
 					ps.setString(1, component);
 					final ResultSet rs = ps.executeQuery();
 					if (rs.next()) {
@@ -650,7 +651,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					}
 					ps.close();
 				} catch (SQLException ex) {
-					log.log(Level.WARNING, "Setting version failed: " + procedure + ", " + ex.getMessage());
+					log.log(Level.WARNING, "Getting version failed: " + JDBC_SCHEMA_VERSION_QUERY + ", " + ex.getMessage());
 				}
 				return Version.ZERO;
 			};
