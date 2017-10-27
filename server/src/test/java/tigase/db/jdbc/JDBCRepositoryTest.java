@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import tigase.TestLogger;
 import tigase.db.*;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.time.LocalDateTime;
 import java.util.Date;

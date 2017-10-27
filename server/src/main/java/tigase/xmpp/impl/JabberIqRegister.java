@@ -33,11 +33,13 @@ import tigase.server.*;
 import tigase.server.Message;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.Serializable;
 import java.util.*;

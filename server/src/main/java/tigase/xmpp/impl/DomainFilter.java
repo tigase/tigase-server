@@ -24,7 +24,7 @@ import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.util.StringUtilities;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.filter.CustomDomainFilter;

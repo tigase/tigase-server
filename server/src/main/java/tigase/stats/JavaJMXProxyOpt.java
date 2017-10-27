@@ -26,7 +26,7 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.DataTypes;
+import tigase.util.repository.DataTypes;
 
 import javax.management.*;
 import javax.management.remote.JMXConnectionNotification;

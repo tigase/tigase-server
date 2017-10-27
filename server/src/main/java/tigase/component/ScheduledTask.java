@@ -27,7 +27,7 @@ import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.server.AbstractMessageReceiver;
-import tigase.util.TimerTask;
+import tigase.util.common.TimerTask;
 
 import java.time.Duration;
 import java.util.Collection;

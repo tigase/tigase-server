@@ -30,10 +30,12 @@ import tigase.annotations.TigaseDeprecated;
 import tigase.auth.credentials.Credentials;
 import tigase.db.*;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.impl.JabberIqRegister;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;

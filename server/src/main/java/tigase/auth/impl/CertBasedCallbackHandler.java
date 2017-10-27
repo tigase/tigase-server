@@ -21,8 +21,8 @@ import tigase.auth.SessionAware;
 import tigase.auth.callbacks.ValidateCertificateData;
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.cert.CertificateUtil;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.XMPPResourceConnection;
 
 import javax.security.auth.callback.Callback;

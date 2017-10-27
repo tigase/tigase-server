@@ -2,7 +2,7 @@ package tigase.component.responses;
 
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Logger;

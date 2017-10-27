@@ -21,9 +21,9 @@ import tigase.component.adhoc.AdHocResponse.State;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
-import tigase.util.SimpleCache;
+import tigase.util.cache.SimpleCache;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -35,10 +35,10 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigAlias;
 import tigase.kernel.beans.config.ConfigAliases;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolverFactory;
-import tigase.util.DNSResolverIfc;
-import tigase.xmpp.BareJID;
+import tigase.util.dns.DNSEntry;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.dns.DNSResolverIfc;
+import tigase.xmpp.jid.BareJID;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;

@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
+import tigase.xmpp.jid.JID;
 
 /**
  * Utility abstract class detecting what kind of packet is processed. Releases developers from

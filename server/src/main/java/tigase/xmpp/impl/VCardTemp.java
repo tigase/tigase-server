@@ -42,6 +42,7 @@ import tigase.xmpp.impl.annotation.DiscoFeatures;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
+import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;
@@ -89,8 +90,8 @@ public class VCardTemp
 	private static final SimpleParser parser   = SingletonFactory.getParserInstance();
 	
 	public void processFromUserOutPacket(JID connectionId, Packet packet,
-			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings)
+										 XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+										 Map<String, Object> settings)
 					throws PacketErrorTypeException {
 		if (session.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 

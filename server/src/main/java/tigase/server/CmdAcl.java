@@ -2,7 +2,7 @@ package tigase.server;
 
 //~--- enums ------------------------------------------------------------------
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Objects;
 

@@ -20,7 +20,7 @@ package tigase.component.modules;
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 
 /**
  * Basic interface to implement component module. Single module should implement

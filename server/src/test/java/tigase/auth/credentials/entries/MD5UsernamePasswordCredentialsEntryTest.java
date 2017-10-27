@@ -18,7 +18,7 @@
 package tigase.auth.credentials.entries;
 
 import org.junit.Test;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import static org.junit.Assert.assertTrue;
 

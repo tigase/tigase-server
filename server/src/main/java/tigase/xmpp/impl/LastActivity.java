@@ -35,8 +35,8 @@ import tigase.server.Presence;
 
 import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPException;

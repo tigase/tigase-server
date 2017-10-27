@@ -43,9 +43,9 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
-import tigase.util.ReflectionHelper;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.util.reflection.ReflectionHelper;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.lang.reflect.Type;

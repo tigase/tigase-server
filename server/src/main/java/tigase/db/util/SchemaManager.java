@@ -41,15 +41,15 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
-import tigase.util.ClassUtilBean;
-import tigase.util.DNSResolverFactory;
+import tigase.util.reflection.ClassUtilBean;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.util.Version;
 import tigase.util.setup.BeanDefinition;
 import tigase.util.setup.SetupHelper;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -61,7 +61,6 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -670,7 +669,7 @@ public class SchemaManager {
 						.exec();
 			} else {
 				kernel.registerBean("classUtilBean")
-						.asInstance(Class.forName("tigase.util.ClassUtilBean").newInstance())
+						.asInstance(Class.forName("tigase.util.reflection.ClassUtilBean").newInstance())
 						.exportable()
 						.exec();
 			}

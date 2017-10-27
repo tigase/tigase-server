@@ -25,7 +25,7 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;

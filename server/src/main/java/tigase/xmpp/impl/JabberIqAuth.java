@@ -38,6 +38,7 @@ import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.*;
 import javax.security.sasl.Sasl;

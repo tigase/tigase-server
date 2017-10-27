@@ -28,7 +28,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;

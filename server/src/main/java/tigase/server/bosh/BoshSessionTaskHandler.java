@@ -23,8 +23,8 @@ package tigase.server.bosh;
 import tigase.server.Packet;
 import tigase.server.xmppclient.SeeOtherHostIfc;
 
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import tigase.xml.Element;
 

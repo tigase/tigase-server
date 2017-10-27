@@ -21,7 +21,7 @@ import tigase.auth.credentials.Credentials;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Base64;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

@@ -11,7 +11,7 @@ import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.DateTimeFormatter;
+import tigase.util.datetime.DateTimeFormatter;
 import tigase.xml.Element;
 
 import java.util.Date;

@@ -36,10 +36,10 @@ import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 

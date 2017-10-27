@@ -37,6 +37,8 @@ import tigase.server.Priority;
 import tigase.server.xmppsession.UserConnectedEvent;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;

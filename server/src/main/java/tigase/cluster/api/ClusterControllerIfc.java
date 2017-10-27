@@ -28,7 +28,7 @@ package tigase.cluster.api;
 
 import tigase.xml.Element;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 

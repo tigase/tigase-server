@@ -25,7 +25,7 @@ package tigase.db;
 
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

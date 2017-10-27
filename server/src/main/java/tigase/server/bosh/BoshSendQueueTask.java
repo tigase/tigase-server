@@ -20,7 +20,7 @@
  */
 package tigase.server.bosh;
 
-import tigase.util.TimerTask;
+import tigase.util.common.TimerTask;
 
 /**
  *

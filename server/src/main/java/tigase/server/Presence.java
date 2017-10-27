@@ -25,11 +25,11 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 
 import tigase.xml.Element;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 /**
  * Created: Dec 31, 2009 8:42:05 PM

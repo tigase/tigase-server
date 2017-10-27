@@ -40,7 +40,7 @@ import tigase.util.Base64;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;

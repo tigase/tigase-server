@@ -48,10 +48,12 @@ import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserSessionEvent;
 import tigase.server.xmppsession.UserSessionEventWithProcessorResultWriter;
 import tigase.stats.StatisticsList;
-import tigase.util.DNSResolverFactory;
-import tigase.util.TigaseStringprepException;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.util.*;
@@ -105,7 +107,7 @@ public class SessionManagerClustered
 	private ClusterControllerIfc  clusterController = null;
 	private ComponentInfo         cmpInfo           = null;
 	@ConfigField(desc = "Component own internal JID")
-	private JID                   my_address;
+	private JID my_address;
 	@ConfigField(desc = "Server domain name")
 	private JID                   my_hostname;
 	private int                   nodesNo           = 0;

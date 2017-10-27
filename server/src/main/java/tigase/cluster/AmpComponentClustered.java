@@ -33,9 +33,9 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.amp.AmpComponent;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;

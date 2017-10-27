@@ -14,7 +14,7 @@ import tigase.monitor.MonitorTask;
 import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.Collection;
 

@@ -10,7 +10,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.util.DateTimeFormatter;
+import tigase.util.datetime.DateTimeFormatter;
 import tigase.xml.Element;
 
 import java.util.Date;

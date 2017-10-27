@@ -40,7 +40,7 @@ import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayList;
 import java.util.HashMap;

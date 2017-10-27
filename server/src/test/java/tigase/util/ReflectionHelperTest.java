@@ -7,6 +7,7 @@ import tigase.cluster.repo.ClConSQLRepository;
 import tigase.cluster.repo.ClusterRepoItem;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryItem;
+import tigase.util.reflection.ReflectionHelper;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostJDBCRepository;
 

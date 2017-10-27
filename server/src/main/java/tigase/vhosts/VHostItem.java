@@ -30,12 +30,12 @@ import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.xmppclient.ClientTrustManagerFactory;
-import tigase.util.DataTypes;
+import tigase.util.repository.DataTypes;
 import tigase.util.StringUtilities;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Array;
 import java.util.*;

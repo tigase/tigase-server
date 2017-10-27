@@ -41,6 +41,7 @@ import tigase.xmpp.impl.annotation.Id;
 import tigase.xmpp.impl.roster.*;
 import tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -98,7 +99,7 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 	@ConfigField(desc = "Send last seen infomations for matching clients", alias = OFFLINE_ROSTER_LAST_SEEN_PROP_KEY)
 	private String[]         offlineRosterLastSeen = null;
 	@ConfigField(desc = "Forward all presences to following JID", alias = PRESENCE_GLOBAL_FORWARD)
-	private JID              presenceGLobalForward = null;
+	private JID presenceGLobalForward = null;
 	@ConfigField(desc = "Enable roster lazy loading", alias = ENABLE_ROSTER_LAZY_LOADING_KEY)
 	private boolean	 rosterLazyLoading       = true;
 	private long             usersStatusChanges    = 0;

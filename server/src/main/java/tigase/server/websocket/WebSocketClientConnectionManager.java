@@ -35,7 +35,7 @@ import tigase.kernel.core.Kernel;
 import tigase.net.SocketType;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 

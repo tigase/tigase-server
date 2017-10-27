@@ -36,7 +36,7 @@ import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import javax.script.ScriptEngineManager;
 import java.util.logging.Level;

@@ -24,7 +24,7 @@ import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;

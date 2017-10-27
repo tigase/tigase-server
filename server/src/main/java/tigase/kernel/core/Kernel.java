@@ -29,7 +29,7 @@ import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ExceptionUtilities;
-import tigase.util.ReflectionHelper;
+import tigase.util.reflection.ReflectionHelper;
 
 import java.lang.reflect.*;
 import java.util.*;

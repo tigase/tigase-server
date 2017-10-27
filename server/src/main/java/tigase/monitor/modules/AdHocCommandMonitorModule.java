@@ -14,7 +14,7 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 @Bean(name = AdHocCommandModule.ID, parent = MonitorComponent.class, active = true)
 public class AdHocCommandMonitorModule extends AdHocCommandModule implements Initializable {

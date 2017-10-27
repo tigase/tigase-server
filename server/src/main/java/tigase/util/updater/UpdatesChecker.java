@@ -31,8 +31,8 @@ import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.util.Version;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.BufferedReader;
 import java.io.IOException;

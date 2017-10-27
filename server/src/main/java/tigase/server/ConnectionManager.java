@@ -38,9 +38,11 @@ import tigase.net.*;
 import tigase.server.script.CommandIfc;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.stats.StatisticsList;
-import tigase.util.DataTypes;
+import tigase.util.common.TimerTask;
+import tigase.util.repository.DataTypes;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.io.BufferedReader;
@@ -1267,7 +1269,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}, props: {3}",
 					new Object[] { getName(), delay / 1000, cid, port_props });
 		}
-		addTimerTask(new tigase.util.TimerTask() {
+		addTimerTask(new TimerTask() {
 			@Override
 			public void run() {
 				String host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);

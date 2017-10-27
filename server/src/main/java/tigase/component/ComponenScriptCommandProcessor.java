@@ -6,7 +6,7 @@ import tigase.kernel.beans.Inject;
 import tigase.server.BasicComponent;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Queue;

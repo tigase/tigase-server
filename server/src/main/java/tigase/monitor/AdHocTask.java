@@ -3,7 +3,7 @@ package tigase.monitor;
 import java.util.Collection;
 
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public interface AdHocTask extends MonitorTask {
 

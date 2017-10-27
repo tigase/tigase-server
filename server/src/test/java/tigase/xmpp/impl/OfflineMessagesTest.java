@@ -27,8 +27,8 @@ import tigase.db.UserNotFoundException;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.*;

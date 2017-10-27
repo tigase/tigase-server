@@ -30,7 +30,7 @@ import tigase.TestLogger;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppclient.StreamManagementIOProcessor.OutQueue;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
 /**

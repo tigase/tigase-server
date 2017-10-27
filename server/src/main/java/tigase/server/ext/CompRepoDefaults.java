@@ -24,7 +24,7 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 //~--- classes ----------------------------------------------------------------
 

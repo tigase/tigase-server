@@ -34,13 +34,13 @@ import tigase.server.bosh.Constants.CacheAction;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 
 import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
-import tigase.util.TigaseStringprepException;
-import tigase.util.TimerTask;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.util.common.TimerTask;
 import tigase.xml.Element;
 
 import java.util.Collections;

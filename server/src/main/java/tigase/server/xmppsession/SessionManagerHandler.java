@@ -22,8 +22,8 @@
 
 package tigase.server.xmppsession;
 
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**

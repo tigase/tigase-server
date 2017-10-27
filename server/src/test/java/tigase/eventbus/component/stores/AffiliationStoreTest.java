@@ -24,7 +24,7 @@ package tigase.eventbus.component.stores;
 import org.junit.Assert;
 import org.junit.Test;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public class AffiliationStoreTest {
 

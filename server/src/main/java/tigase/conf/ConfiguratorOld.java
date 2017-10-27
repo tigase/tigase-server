@@ -45,8 +45,8 @@ import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 
 import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 

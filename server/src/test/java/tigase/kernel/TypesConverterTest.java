@@ -24,8 +24,8 @@ package tigase.kernel;
 import org.junit.Assert;
 import org.junit.Test;
 import tigase.conf.ConfigReader;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.File;
 import java.util.EnumSet;

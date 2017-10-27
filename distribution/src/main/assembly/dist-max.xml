@@ -107,6 +107,8 @@
 			<outputDirectory>jars</outputDirectory>
 			<includes>
                 <include>**/tigase-server*</include>
+				<include>**/tigase-utils*</include>
+				<include>**/tigase-xmltools*</include>
                 <include>**/tigase-acs*</include>
                 <include>**/tigase-acs-muc*</include>
                 <include>**/tigase-acs-pubsub*</include>

@@ -54,12 +54,18 @@ import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Base64;
-import tigase.util.*;
+import tigase.util.common.TimerTask;
+import tigase.util.processing.ProcessingThreads;
+import tigase.util.processing.QueueItem;
+import tigase.util.processing.WorkerThread;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
@@ -1255,7 +1261,7 @@ public class SessionManager
 					}
 					pt.addItem(sessionCloseProc, iqc, connection);
 				} else {
-					tigase.util.TimerTask task = new SessionCloseTimer(iqc.getFrom(), connection.getSessionId());
+					TimerTask task = new SessionCloseTimer(iqc.getFrom(), connection.getSessionId());
 					addTimerTask(task, 10, TimeUnit.SECONDS);
 					connection.putSessionData(SESSION_CLOSE_TIMER_KEY, task);
 				}
@@ -1339,7 +1345,7 @@ public class SessionManager
 							: " is null") });
 				}
 				if (connection != null) {
-					tigase.util.TimerTask task = (tigase.util.TimerTask) connection.getSessionData(SESSION_CLOSE_TIMER_KEY);
+					TimerTask task = (TimerTask) connection.getSessionData(SESSION_CLOSE_TIMER_KEY);
 					if (task != null) {
 						// cancel existing timer task as it will not be needed
 						task.cancel();
@@ -2354,7 +2360,7 @@ public class SessionManager
 	//~--- inner classes --------------------------------------------------------
 
 	private static class AuthenticationTimer
-			extends tigase.util.TimerTask {
+			extends TimerTask {
 		private final SessionManager sm;
 		private JID connId = null;
 
@@ -2448,7 +2454,7 @@ public class SessionManager
 		}
 	}
 
-	private class NodeShutdownTask extends tigase.util.TimerTask {
+	private class NodeShutdownTask extends TimerTask {
 
 		@Override
 		public void run() {
@@ -2604,7 +2610,7 @@ public class SessionManager
 	 * Class implements timer which will be scheduled on STREAM_CLOSED to ensure
 	 * that session is properly closed, even if STREAM_FINISHED would not be received
 	 */
-	private class SessionCloseTimer extends tigase.util.TimerTask {
+	private class SessionCloseTimer extends TimerTask {
 		private JID connId = null;
 		private String sessId = null;
 
@@ -2634,7 +2640,7 @@ public class SessionManager
 	}
 
 	private class StaleConnectionCloser
-			extends tigase.util.TimerTask {
+			extends TimerTask {
 		/** Field description */
 		public static final int DEF_QUEUE_SIZE = 1000;
 

@@ -17,7 +17,7 @@
  */
 package tigase.component.adhoc;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public interface AdHocCommand {
 

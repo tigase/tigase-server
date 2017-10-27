@@ -22,6 +22,8 @@
             <outputDirectory>jars</outputDirectory>
             <includes>
                 <include>**/tigase-server*</include>
+				<include>**/tigase-utils*</include>
+				<include>**/tigase-xmltools*</include>
                 <include>**/tigase-http-api*</include>
                 <include>**/tigase-web-ui*</include>
             </includes>

@@ -25,7 +25,7 @@ import tigase.db.*;
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.ArrayList;
 import java.util.Arrays;

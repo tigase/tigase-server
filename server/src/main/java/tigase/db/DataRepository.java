@@ -26,7 +26,7 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.sql.*;
 import java.util.Calendar;

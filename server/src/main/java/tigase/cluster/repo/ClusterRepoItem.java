@@ -26,7 +26,7 @@ import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import tigase.util.Algorithms;
 import tigase.xml.Element;

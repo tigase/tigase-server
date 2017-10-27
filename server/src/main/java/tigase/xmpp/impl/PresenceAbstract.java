@@ -37,8 +37,10 @@ import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.roster.*;
 
 import tigase.sys.TigaseRuntime;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -265,7 +267,7 @@ public abstract class PresenceAbstract
 	 *                be sent.
 	 */
 	public static void sendPresence(StanzaType t, BareJID from, BareJID to,
-			Queue<Packet> results, Element pres) {
+									Queue<Packet> results, Element pres) {
 		sendPresence(t, JID.jidInstance(from), JID.jidInstance(to), results, pres);
 	}
 

@@ -1,8 +1,10 @@
 package tigase.monitor;
 
+import tigase.util.common.TimerTask;
+
 public interface TimerTaskService {
 
-	void addTimerTask(tigase.util.TimerTask task, long delay);
+	void addTimerTask(TimerTask task, long delay);
 
-	void addTimerTask(tigase.util.TimerTask task, long initialDelay, long period);
+	void addTimerTask(TimerTask task, long initialDelay, long period);
 }

@@ -41,7 +41,7 @@ import tigase.server.amp.cond.Deliver;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayList;
 import java.util.List;

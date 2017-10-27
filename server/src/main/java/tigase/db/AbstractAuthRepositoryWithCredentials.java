@@ -22,7 +22,7 @@ import tigase.auth.CredentialsDecoderBean;
 import tigase.auth.CredentialsEncoderBean;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.credentials.entries.PlainCredentialsEntry;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

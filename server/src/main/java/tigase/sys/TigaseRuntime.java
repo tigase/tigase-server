@@ -26,8 +26,8 @@ package tigase.sys;
 
 import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.lang.management.*;
 import java.util.Arrays;

@@ -19,16 +19,15 @@
 package tigase.xmpp.impl;
 
 import tigase.TestLogger;
-import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Packet;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
 import java.util.ArrayDeque;

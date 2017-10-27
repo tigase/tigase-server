@@ -21,7 +21,7 @@
  */
 package tigase.db;
 
-import tigase.util.ClassUtilBean;
+import tigase.util.reflection.ClassUtilBean;
 
 import java.util.HashSet;
 import java.util.Set;

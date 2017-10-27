@@ -36,7 +36,8 @@ import tigase.server.Packet;
 import tigase.server.ext.handlers.*;
 import tigase.server.ext.lb.LoadBalancerIfc;
 import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
+import tigase.util.common.TimerTask;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
@@ -851,7 +852,7 @@ public class ComponentProtocol
 	//~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimerTask
-					extends tigase.util.TimerTask {
+			extends TimerTask {
 		private ComponentIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------

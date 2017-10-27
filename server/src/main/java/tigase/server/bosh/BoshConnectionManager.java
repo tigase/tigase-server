@@ -39,9 +39,11 @@ import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.io.BufferedReader;
@@ -256,10 +258,10 @@ public class BoshConnectionManager
 
 		Queue<Packet> out_results = new ArrayDeque<Packet>( 2 );
 
-		BoshSession bs = new BoshSession( getDefVHostItem().getDomain(),
-				JID.jidInstanceNS( routings.computeRouting( hostname ) ), 
-				this, sendNodeHostname ? getDefHostName().getDomain() : null,
-				maxSessionWaitingPackets);
+		BoshSession bs = new BoshSession(getDefVHostItem().getDomain(),
+										 JID.jidInstanceNS(routings.computeRouting(hostname ) ),
+										 this, sendNodeHostname ? getDefHostName().getDomain() : null,
+										 maxSessionWaitingPackets);
 
 		String jid = attr.get( FROM_ATTR );
 		String uuid = UUID.randomUUID().toString();

@@ -30,8 +30,8 @@ import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.*;
 import javax.security.sasl.*;

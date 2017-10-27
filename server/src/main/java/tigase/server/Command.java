@@ -29,7 +29,7 @@ package tigase.server;
 import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import java.util.List;

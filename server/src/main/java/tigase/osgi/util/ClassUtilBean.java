@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Created by andrzej on 08.09.2016.
  */
-public class ClassUtilBean extends tigase.util.ClassUtilBean {
+public class ClassUtilBean extends tigase.util.reflection.ClassUtilBean {
 
 	public ClassUtilBean() {
 		classes.addAll(ClassUtil.getClassesFromBundle(Activator.getBundle()));

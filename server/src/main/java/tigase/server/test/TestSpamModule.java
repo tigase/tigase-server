@@ -10,8 +10,8 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Message;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.JID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import javax.script.Bindings;

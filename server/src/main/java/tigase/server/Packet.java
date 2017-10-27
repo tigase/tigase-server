@@ -23,9 +23,9 @@
 package tigase.server;
 
 import tigase.annotations.TigaseDeprecated;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import java.util.LinkedHashSet;

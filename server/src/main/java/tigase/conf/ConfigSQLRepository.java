@@ -42,7 +42,7 @@ import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.util.DataTypes;
+import tigase.util.repository.DataTypes;
 
 //~--- classes ----------------------------------------------------------------
 

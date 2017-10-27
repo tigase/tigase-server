@@ -11,6 +11,7 @@ import tigase.xmpp.impl.annotation.DiscoFeatures;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
+import tigase.xmpp.jid.JID;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,7 +59,7 @@ public class EntityTime extends XMPPProcessorAbstract {
 
 	@Override
 	public void processFromUserOutPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
+										 NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
 		super.processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
 	}
 

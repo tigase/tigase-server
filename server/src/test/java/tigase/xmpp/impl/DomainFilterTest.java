@@ -22,20 +22,17 @@ import org.junit.*;
 import tigase.TestLogger;
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
-import tigase.util.LogFormatter;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.filter.DomainFilterPolicy;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

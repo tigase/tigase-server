@@ -31,12 +31,11 @@ import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Version;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.lang.reflect.Proxy;
 import java.sql.*;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;

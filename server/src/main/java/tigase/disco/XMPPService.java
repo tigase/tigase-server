@@ -25,7 +25,7 @@ package tigase.disco;
 import java.util.List;
 import tigase.xml.Element;
 import tigase.server.ServerComponent;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 /**
  * Interface XMPPService

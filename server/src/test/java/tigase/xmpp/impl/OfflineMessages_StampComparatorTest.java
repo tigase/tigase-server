@@ -24,7 +24,7 @@ package tigase.xmpp.impl;
 
 import org.junit.Test;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
 import static org.junit.Assert.assertTrue;

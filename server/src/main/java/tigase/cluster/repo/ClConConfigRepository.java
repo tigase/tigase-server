@@ -39,7 +39,7 @@ import tigase.kernel.beans.config.ConfigAliases;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 
 import java.util.Date;
 import java.util.Iterator;

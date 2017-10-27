@@ -22,7 +22,7 @@ package tigase.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.Date;

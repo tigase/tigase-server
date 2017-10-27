@@ -28,10 +28,10 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.BasicComponent;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.HashSet;
 import java.util.List;

@@ -25,8 +25,9 @@ package tigase.server.xmppserver;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
+import tigase.util.common.TimerTask;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.XMPPIOService;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	boolean addOutPacket(Packet packet);
 
-	void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit);
+	void addTimerTask(TimerTask task, long delay, TimeUnit unit);
 
 	//~--- get methods ----------------------------------------------------------
 

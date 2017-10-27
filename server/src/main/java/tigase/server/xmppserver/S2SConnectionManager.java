@@ -41,7 +41,7 @@ import tigase.stats.StatisticsList;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
@@ -198,7 +198,7 @@ public class S2SConnectionManager
 	}
 
 	@Override
-	public void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
+	public void addTimerTask(tigase.util.common.TimerTask task, long delay, TimeUnit unit) {
 		super.addTimerTask(task, delay, unit);
 	}
 

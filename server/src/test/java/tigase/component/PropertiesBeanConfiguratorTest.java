@@ -25,7 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.Kernel;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.HashMap;
 import java.util.Map;

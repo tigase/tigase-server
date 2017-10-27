@@ -37,7 +37,7 @@ import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.AmpComponent;
 import tigase.server.amp.cond.ExpireAt;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
 import java.text.SimpleDateFormat;

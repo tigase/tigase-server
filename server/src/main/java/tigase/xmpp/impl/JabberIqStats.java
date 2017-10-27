@@ -27,33 +27,22 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.ElementUtils;
-
 import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * XEP-0039: Statistics Gathering.
@@ -116,15 +105,12 @@ public class JabberIqStats
 					}
 
 					// Send it back to user.
-					Element iq = ElementUtils.createIqQuery(session.getDomainAsJID(), session
-							.getJID(), StanzaType.result, packet.getStanzaId(), XMLNS);
-					Element query = iq.getChild("query");
+					Element query = new Element("query", XMLNS);
 					Element stats = Command.getData(packet, "statistics", null);
 
 					query.addChildren(stats.getChildren());
 
-					Packet result = Packet.packetInstance(iq, session.getSMComponentId(), session
-							.getJID());
+					Packet result = packet.okResult(query, 0);
 
 					result.setPacketTo(conId);
 					results.offer(result);

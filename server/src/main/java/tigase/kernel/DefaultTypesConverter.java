@@ -26,10 +26,10 @@ import tigase.kernel.beans.Bean;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.CmdAcl;
 import tigase.util.Base64;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.XMLUtils;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.File;
 import java.lang.reflect.Array;

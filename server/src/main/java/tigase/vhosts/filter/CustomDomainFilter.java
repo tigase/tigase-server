@@ -18,8 +18,7 @@
  */
 package tigase.vhosts.filter;
 
-import tigase.xmpp.JID;
-import tigase.xmpp.impl.DomainFilter;
+import tigase.xmpp.jid.JID;
 
 import tigase.vhosts.filter.Rule.RuleType;
 

@@ -31,7 +31,7 @@ import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
 
-import tigase.util.DataTypes;
+import tigase.util.repository.DataTypes;
 
 import tigase.xml.Element;
 

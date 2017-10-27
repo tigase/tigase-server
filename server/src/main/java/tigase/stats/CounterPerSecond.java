@@ -22,13 +22,12 @@
 package tigase.stats;
 
 import java.util.logging.Level;
-import tigase.util.EverySecond;
 
 /**
  *
  * @author andrzej
  */
-public class CounterPerSecond extends CounterValue implements EverySecond {
+public class CounterPerSecond extends CounterValue {
 		
 	private long last_second_counter = 0;
 	
@@ -38,7 +37,6 @@ public class CounterPerSecond extends CounterValue implements EverySecond {
 		super(name, level);
 	}
 		
-	@Override
 	public synchronized void everySecond() {
 		per_second = counter - last_second_counter;
 		last_second_counter = counter;

@@ -32,8 +32,9 @@ import tigase.net.ConnectionType;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
 import tigase.util.Algorithms;
+import tigase.util.common.TimerTask;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import java.util.List;
@@ -476,7 +477,7 @@ public class Dialback
 	//~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer
-					extends tigase.util.TimerTask {
+			extends TimerTask {
 		private S2SIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------

@@ -43,13 +43,15 @@ import tigase.net.SocketThread;
 import tigase.net.SocketType;
 import tigase.server.*;
 import tigase.util.Base64;
-import tigase.util.RoutingsContainer;
-import tigase.util.TigaseStringprepException;
-import tigase.util.TimerTask;
+import tigase.util.routing.RoutingsContainer;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.util.common.TimerTask;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
@@ -459,7 +461,7 @@ public class ClientConnectionManager
 		String       lang     = attribs.get("xml:lang");
 		final String hostname = attribs.get("to");
 		final String from     = attribs.get("from");
-		BareJID      fromJID  = null;
+		BareJID fromJID  = null;
 
 		if (from != null) {
 			try {

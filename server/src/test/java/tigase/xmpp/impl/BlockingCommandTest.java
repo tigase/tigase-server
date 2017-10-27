@@ -26,11 +26,12 @@ import tigase.eventbus.EventBusFactory;
 import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.List;

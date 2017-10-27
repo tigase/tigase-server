@@ -20,6 +20,7 @@ package tigase.util;
 
 import org.junit.Test;
 import tigase.TestLogger;
+import tigase.util.repository.DataTypes;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +38,7 @@ public class DataTypesTest {
 	@Test
 	public void testParseNum() {
 
-		assertEquals( new Long( 262144L ), Long.valueOf( Integer.class.cast( DataTypes.parseNum( "256k", Integer.class, 1 ) ) ) );
+		assertEquals( new Long( 262144L ), Long.valueOf( Integer.class.cast(DataTypes.parseNum("256k", Integer.class, 1 ) ) ) );
 		assertEquals( new Long( 262144L ), Long.class.cast( DataTypes.parseNum( "256k", Long.class, 1L ) ) );
 		assertEquals( new Double( 670720.0D ), Double.class.cast( DataTypes.parseNum( "655k", Double.class, 1D ) ) );
 		assertEquals( new Double( 262144F ), Double.valueOf( Float.class.cast( DataTypes.parseNum( "256k", Float.class, 1F ) ) ) );

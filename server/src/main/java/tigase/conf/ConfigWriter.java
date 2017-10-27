@@ -22,8 +22,8 @@
 package tigase.conf;
 
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.File;
 import java.io.FileWriter;

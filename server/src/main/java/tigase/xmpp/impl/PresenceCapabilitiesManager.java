@@ -40,11 +40,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.conf.Configurable;
+
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 /**

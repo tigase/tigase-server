@@ -6,7 +6,7 @@ import tigase.component.responses.ResponseManager;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
 

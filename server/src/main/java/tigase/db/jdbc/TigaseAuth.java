@@ -27,8 +27,8 @@ package tigase.db.jdbc;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.util.Base64;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.BareJID;
 
 import java.sql.*;
 import java.util.Map;

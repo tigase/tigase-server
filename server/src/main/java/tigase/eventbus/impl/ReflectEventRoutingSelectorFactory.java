@@ -21,8 +21,8 @@
 
 package tigase.eventbus.impl;
 
-import static tigase.util.ReflectionHelper.Handler;
-import static tigase.util.ReflectionHelper.collectAnnotatedMethods;
+import static tigase.util.reflection.ReflectionHelper.Handler;
+import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

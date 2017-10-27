@@ -37,6 +37,8 @@ import tigase.xmpp.impl.roster.*
 import tigase.xml.*
 import tigase.db.UserRepository
 import tigase.vhosts.*
+import tigase.xmpp.jid.BareJID
+import tigase.xmpp.jid.JID
 
 class Field { String name; String label; String type; String defVal = ""}
 

@@ -35,6 +35,7 @@ import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.*;
+import tigase.xmpp.jid.JID;
 
 import java.text.SimpleDateFormat;
 import java.util.*;

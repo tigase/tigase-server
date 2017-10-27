@@ -20,7 +20,7 @@ package tigase.vhosts;
 
 import junit.framework.TestCase;
 import org.junit.Test;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 
 public class VHostJDBCRepositoryTest extends TestCase {
 

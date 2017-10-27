@@ -26,7 +26,7 @@ import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.util.Base64;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;

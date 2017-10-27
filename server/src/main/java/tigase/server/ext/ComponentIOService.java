@@ -22,9 +22,9 @@
 package tigase.server.ext;
 
 import tigase.net.ConnectionType;
-import tigase.util.SizedCache;
+import tigase.util.cache.SizedCache;
 import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 

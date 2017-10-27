@@ -18,16 +18,12 @@
  */
 package tigase.server;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import tigase.xml.Element;
 
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

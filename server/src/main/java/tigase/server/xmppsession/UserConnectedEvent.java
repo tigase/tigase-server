@@ -22,7 +22,7 @@
 
 package tigase.server.xmppsession;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public class UserConnectedEvent {
 

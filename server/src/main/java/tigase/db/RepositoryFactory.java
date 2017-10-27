@@ -28,7 +28,7 @@ package tigase.db;
 
 import tigase.annotations.TigaseDeprecated;
 import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtilBean;
+import tigase.util.reflection.ClassUtilBean;
 
 import java.sql.SQLException;
 import java.util.HashSet;

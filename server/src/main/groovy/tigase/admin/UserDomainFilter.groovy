@@ -30,7 +30,6 @@ package tigase.admin
 
 import tigase.server.*
 import tigase.util.*
-import tigase.xmpp.*
 import tigase.xmpp.impl.DomainFilter
 import tigase.vhosts.filter.CustomDomainFilter
 import tigase.vhosts.filter.DomainFilterPolicy
@@ -38,6 +37,7 @@ import tigase.db.UserRepository
 import tigase.db.UserNotFoundException
 
 import tigase.vhosts.*
+import tigase.xmpp.jid.BareJID
 
 def vhost_man = (VHostManagerIfc)vhostMan
 

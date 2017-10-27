@@ -26,10 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.PresenceAbstract;
 import tigase.xmpp.impl.PresenceState;
 //import tigase.xmpp.impl.Roster;
 //import tigase.xmpp.impl.Presence;

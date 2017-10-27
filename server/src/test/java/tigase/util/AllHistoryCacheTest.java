@@ -2,6 +2,7 @@ package tigase.util;
 
 import org.junit.Test;
 import tigase.stats.StatisticsList;
+import tigase.util.historyCache.AllHistoryCache;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

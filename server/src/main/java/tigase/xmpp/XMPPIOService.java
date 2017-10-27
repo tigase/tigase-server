@@ -30,7 +30,7 @@ import tigase.net.IOService;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.xmppclient.XMPPIOProcessor;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;

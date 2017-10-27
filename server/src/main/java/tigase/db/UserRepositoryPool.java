@@ -24,9 +24,9 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.SimpleCache;
+import tigase.util.cache.SimpleCache;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 

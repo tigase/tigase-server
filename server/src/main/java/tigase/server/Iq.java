@@ -28,12 +28,12 @@ package tigase.server;
 
 import tigase.disco.XMPPService;
 
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.impl.roster.RosterAbstract;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------

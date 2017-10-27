@@ -23,7 +23,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.core.Kernel;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;

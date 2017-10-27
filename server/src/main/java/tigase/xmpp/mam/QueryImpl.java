@@ -21,8 +21,8 @@
  */
 package tigase.xmpp.mam;
 
-import tigase.xmpp.JID;
-import tigase.xmpp.RSM;
+import tigase.xmpp.jid.JID;
+import tigase.xmpp.rsm.RSM;
 
 import java.util.Date;
 

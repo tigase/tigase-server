@@ -336,7 +336,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 					}
 				}
 
-				if (!tigase.util.ClassUtilBean.getInstance().getAllClasses().contains(clazz))
+				if (!tigase.util.reflection.ClassUtilBean.getInstance().getAllClasses().contains(clazz))
 					continue;
 
 				toUnregister.remove(cfg.getBeanName());
@@ -554,7 +554,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 	}
 
 	protected void refreshConfiguration_removeUndefinedBeans(Kernel kernel) {
-		Set<Class<?>> classes = tigase.util.ClassUtilBean.getInstance().getAllClasses();
+		Set<Class<?>> classes = tigase.util.reflection.ClassUtilBean.getInstance().getAllClasses();
 		Set<BeanConfig> toRemove = kernel.getDependencyManager().getBeanConfigs().stream()
 				.filter(bc -> !classes.contains(bc.getClazz()))
 				.filter(bc -> {

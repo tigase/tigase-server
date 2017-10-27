@@ -24,11 +24,11 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

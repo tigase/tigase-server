@@ -33,12 +33,12 @@ AS:Component: sess-man
 package tigase.admin
 
 import tigase.server.*
-import tigase.util.*
 import tigase.xmpp.*
 import tigase.db.*
 import tigase.xml.*
 import tigase.vhosts.*
 import tigase.xmpp.impl.roster.*
+import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
 def SHOW_AS_TABLE = "Present roster in table (required for UI)";

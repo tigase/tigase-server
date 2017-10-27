@@ -30,7 +30,7 @@ import tigase.kernel.beans.*;
 import tigase.kernel.core.Kernel;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;

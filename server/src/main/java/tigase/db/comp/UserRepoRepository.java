@@ -34,7 +34,7 @@ import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Queue;
 import java.util.logging.Level;

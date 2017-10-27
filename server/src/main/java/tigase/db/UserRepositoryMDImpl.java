@@ -28,7 +28,7 @@ import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.db.beans.UserRepositoryMDPoolBean;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Inject;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
 import java.util.Map;

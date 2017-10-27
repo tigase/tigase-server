@@ -2,7 +2,7 @@ package tigase.auth.callbacks;
 
 import javax.security.auth.callback.Callback;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 public class ValidateCertificateData implements Callback {
 

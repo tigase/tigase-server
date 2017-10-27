@@ -26,8 +26,8 @@ import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 

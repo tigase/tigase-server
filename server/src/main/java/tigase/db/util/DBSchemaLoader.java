@@ -23,11 +23,11 @@ import tigase.db.RepositoryFactory;
 import tigase.db.Schema;
 import tigase.db.TigaseDBException;
 import tigase.server.XMPPServer;
-import tigase.util.LogFormatter;
+import tigase.util.log.LogFormatter;
 import tigase.util.Version;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.SystemConsole;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.io.IOException;
 import java.io.InputStream;

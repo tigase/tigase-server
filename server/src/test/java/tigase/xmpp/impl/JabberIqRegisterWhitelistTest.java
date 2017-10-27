@@ -6,7 +6,7 @@ import tigase.db.TigaseDBException;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.DependencyManager;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

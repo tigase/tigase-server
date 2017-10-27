@@ -23,7 +23,7 @@
 package tigase.stats;
 
 import tigase.server.QueueType;
-import tigase.util.DataTypes;
+import tigase.util.repository.DataTypes;
 
 import java.util.*;
 import java.util.logging.Level;

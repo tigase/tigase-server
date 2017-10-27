@@ -25,7 +25,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.server.Packet;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.util.LogFormatter;
+import tigase.util.log.LogFormatter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

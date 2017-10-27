@@ -29,11 +29,9 @@
 package tigase.admin
 
 import tigase.server.*
-import tigase.util.*
 import tigase.xmpp.*
-import tigase.db.*
-import tigase.xml.*
 import tigase.vhosts.*
+import tigase.xmpp.jid.JID
 
 def JIDS = "accountjids"
 

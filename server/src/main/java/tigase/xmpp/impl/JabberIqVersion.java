@@ -33,7 +33,7 @@ import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;

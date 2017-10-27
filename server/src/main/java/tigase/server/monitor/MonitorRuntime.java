@@ -23,8 +23,8 @@
 package tigase.server.monitor;
 
 import tigase.sys.*;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;

@@ -37,9 +37,11 @@ import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.util.Algorithms;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -266,7 +268,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
 			return Arrays.asList(serviceEntity.getDiscoItem(null,
-					BareJID.toString(getName(), jid.toString())));
+															BareJID.toString(getName(), jid.toString())));
 		}
 	}
 

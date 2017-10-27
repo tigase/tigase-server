@@ -10,7 +10,7 @@ import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.modules.*;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.util.TimerTask;
+import tigase.util.common.TimerTask;
 
 import javax.script.ScriptEngineManager;
 import java.util.ArrayList;

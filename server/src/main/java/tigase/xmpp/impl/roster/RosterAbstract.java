@@ -38,6 +38,8 @@ import tigase.util.Algorithms;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -705,7 +707,7 @@ public abstract class RosterAbstract {
 	public PresenceType getPresenceType(final XMPPResourceConnection session,
 			final Packet packet)
 					throws NotAuthorizedException {
-		BareJID    to   = (packet.getStanzaTo() != null)
+		BareJID to   = (packet.getStanzaTo() != null)
 				? packet.getStanzaTo().getBareJID()
 				: null;
 		StanzaType type = packet.getType();

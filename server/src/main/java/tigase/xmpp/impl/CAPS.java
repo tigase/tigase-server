@@ -46,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
+import tigase.xmpp.jid.JID;
 
 /**
  *
@@ -91,7 +92,7 @@ public class CAPS
 		if ((session != null) && session.isAuthorized()) {
 			try {
 				if (packet.getElemName() == Presence.ELEM_NAME) {
-					JID                to = packet.getStanzaTo();
+					JID to = packet.getStanzaTo();
 					Map<JID, String[]> resources = (Map<JID, String[]>) session
 							.getCommonSessionData(ID);
 

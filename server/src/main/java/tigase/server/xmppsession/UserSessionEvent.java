@@ -22,7 +22,7 @@
 package tigase.server.xmppsession;
 
 import java.io.Serializable;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPSession;
 
 /**

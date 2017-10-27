@@ -29,9 +29,10 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -106,7 +107,7 @@ public class FlexibleOfflineMessageRetrieval
 	}
 
 	@Override
-	public void processFromUserToServerPacket( JID connectionId, Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings ) throws PacketErrorTypeException {
+	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings ) throws PacketErrorTypeException {
 		Element query = packet.getElement().findChildStaticStr( Iq.IQ_QUERY_PATH );
 		Element offlineElement = packet.getElement().findChildStaticStr( IQ_OFFLINE );
 

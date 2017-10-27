@@ -25,8 +25,8 @@ package tigase.server.amp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 /**
  * Generic utility class to allow storage of any value for particular JID (including resource).

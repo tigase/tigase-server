@@ -28,6 +28,7 @@ import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import java.io.IOException;
 import java.util.Arrays;

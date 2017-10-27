@@ -28,8 +28,8 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostManagerIfc;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;

@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public class EventBusSerializerTest {
 

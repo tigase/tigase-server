@@ -19,9 +19,9 @@
 package tigase.vhosts.filter;
 
 import tigase.TestLogger;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.filter.Rule.RuleType;
 
 import java.text.ParseException;

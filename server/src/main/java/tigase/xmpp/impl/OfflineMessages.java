@@ -34,13 +34,14 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.DNSResolverFactory;
-import tigase.util.TigaseStringprepException;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -684,7 +685,7 @@ public class OfflineMessages
 		}
 
 		@Override
-		public boolean storeMessage( JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo )
+		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo )
 				throws UserNotFoundException {
 			repo.addOfflineDataList( to.getBareJID(), ID, "messages",
 															 new String[] { msg.toString() } );

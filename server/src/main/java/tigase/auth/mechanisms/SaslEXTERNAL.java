@@ -20,8 +20,8 @@ package tigase.auth.mechanisms;
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.callbacks.ValidateCertificateData;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;

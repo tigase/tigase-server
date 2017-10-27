@@ -30,11 +30,10 @@
  */
 package tigase.admin
 import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
 import tigase.db.*
-import tigase.xml.*
 import tigase.vhosts.*
+import tigase.xmpp.jid.BareJID
+
 def SECOND = 1000;
 def MINUTE = 60 * SECOND;
 def JID = "domainjid"

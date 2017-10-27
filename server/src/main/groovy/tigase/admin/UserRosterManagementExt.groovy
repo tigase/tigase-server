@@ -40,8 +40,8 @@ import tigase.server.Packet
 import tigase.server.Permissions
 import tigase.vhosts.VHostManagerIfc
 import tigase.xml.Element
-import tigase.xmpp.BareJID
-import tigase.xmpp.JID
+import tigase.xmpp.jid.BareJID
+import tigase.xmpp.jid.JID
 import tigase.xmpp.XMPPSession
 import tigase.xmpp.impl.roster.RosterAbstract
 import tigase.xmpp.impl.roster.RosterElement

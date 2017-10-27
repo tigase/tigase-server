@@ -24,7 +24,7 @@ package tigase.db.jdbc;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.*;
 import tigase.util.Base64;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

@@ -28,7 +28,7 @@ import tigase.db.*;
 import tigase.db.Repository.Meta;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.*;
 import javax.security.sasl.*;

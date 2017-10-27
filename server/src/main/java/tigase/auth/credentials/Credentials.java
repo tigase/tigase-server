@@ -17,7 +17,7 @@
  */
 package tigase.auth.credentials;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 /**
  * Interface implemented by classes handling user login credentials.

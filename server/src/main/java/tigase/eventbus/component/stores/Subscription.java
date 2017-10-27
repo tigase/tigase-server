@@ -21,7 +21,7 @@
 
 package tigase.eventbus.component.stores;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public class Subscription {
 

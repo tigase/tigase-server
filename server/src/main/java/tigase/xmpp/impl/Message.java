@@ -37,6 +37,8 @@ import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.function.Predicate;

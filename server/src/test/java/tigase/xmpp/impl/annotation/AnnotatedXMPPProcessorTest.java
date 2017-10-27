@@ -23,7 +23,7 @@ package tigase.xmpp.impl.annotation;
 
 import org.junit.Assert;
 import org.junit.Test;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;

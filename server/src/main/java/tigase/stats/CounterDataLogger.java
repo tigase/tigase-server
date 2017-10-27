@@ -25,7 +25,7 @@ import tigase.db.RepositoryFactory;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

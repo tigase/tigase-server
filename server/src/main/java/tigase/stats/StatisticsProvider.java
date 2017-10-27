@@ -28,10 +28,10 @@ package tigase.stats;
 
 import tigase.server.QueueType;
 import tigase.sys.TigaseRuntime;
-import tigase.util.AllHistoryCache;
-import tigase.util.FloatHistoryCache;
-import tigase.util.IntHistoryCache;
-import tigase.util.LongHistoryCache;
+import tigase.util.historyCache.AllHistoryCache;
+import tigase.util.historyCache.FloatHistoryCache;
+import tigase.util.historyCache.IntHistoryCache;
+import tigase.util.historyCache.LongHistoryCache;
 
 import javax.management.*;
 import java.util.*;

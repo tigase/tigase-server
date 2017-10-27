@@ -31,8 +31,8 @@ import tigase.server.xmppserver.CID;
 import tigase.server.xmppserver.S2SConnectionHandlerIfc;
 import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSEntry;
+import tigase.util.dns.DNSResolverFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;

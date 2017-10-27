@@ -27,7 +27,7 @@ import tigase.db.Schema;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

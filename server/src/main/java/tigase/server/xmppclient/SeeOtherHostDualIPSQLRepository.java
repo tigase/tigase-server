@@ -21,8 +21,8 @@ package tigase.server.xmppclient;
 import tigase.db.DataRepository;
 import tigase.db.Repository;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.BareJID;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

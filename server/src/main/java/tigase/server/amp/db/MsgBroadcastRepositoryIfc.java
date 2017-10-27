@@ -24,7 +24,7 @@ package tigase.server.amp.db;
 import tigase.db.DataSource;
 import tigase.db.DataSourceAware;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Collection;
 import java.util.Date;

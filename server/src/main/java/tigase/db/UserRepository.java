@@ -23,7 +23,7 @@
 package tigase.db;
 
 import tigase.annotations.TigaseDeprecated;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
 

@@ -24,9 +24,11 @@ import tigase.db.UserRepository;
 import tigase.db.xml.XMLRepository;
 import tigase.kernel.core.Kernel;
 import tigase.server.xmppsession.SessionManagerHandler;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +78,7 @@ public abstract class ProcessorTestCase  {
 		kernel.registerBean("repository").asInstance(repository).exec();
 	}
 	
-	protected XMPPResourceConnection getSession( JID connId, JID userJid) throws NotAuthorizedException, TigaseStringprepException {
+	protected XMPPResourceConnection getSession(JID connId, JID userJid) throws NotAuthorizedException, TigaseStringprepException {
 		XMPPResourceConnection conn = new XMPPResourceConnection( connId, (UserRepository) repository, (AuthRepository) repository, loginHandler );
 		VHostItem vhost = new VHostItem();
 		vhost.setVHost( userJid.getDomain() );

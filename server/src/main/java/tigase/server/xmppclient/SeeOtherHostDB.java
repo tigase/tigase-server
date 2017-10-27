@@ -31,8 +31,8 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.BareJID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 

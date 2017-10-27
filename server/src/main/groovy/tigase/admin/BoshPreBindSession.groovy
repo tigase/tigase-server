@@ -27,12 +27,8 @@ AS:Component: bosh
 package tigase.admin
 
 import tigase.server.*
-import tigase.server.bosh.*
-import tigase.util.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.xml.*
 import tigase.vhosts.*
+import tigase.xmpp.jid.BareJID
 
 try {
 

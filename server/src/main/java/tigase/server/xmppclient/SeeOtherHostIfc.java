@@ -26,8 +26,8 @@ package tigase.server.xmppclient;
 import tigase.server.Lifecycle;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 

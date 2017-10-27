@@ -31,9 +31,8 @@
 package tigase.admin
 
 import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
-
+import tigase.util.dns.DNSEntry
+import tigase.util.dns.DNSResolverFactory
 
 def DOMAIN = "domain-name"
 

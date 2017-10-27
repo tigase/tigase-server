@@ -30,8 +30,8 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import java.util.*;

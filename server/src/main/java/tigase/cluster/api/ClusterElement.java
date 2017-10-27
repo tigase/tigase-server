@@ -30,7 +30,7 @@ import tigase.server.Packet;
 
 import tigase.xml.Element;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------

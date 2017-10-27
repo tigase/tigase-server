@@ -29,14 +29,13 @@ package tigase.server.amp.cond;
 import tigase.server.amp.ConditionIfc;
 import tigase.server.Packet;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.logging.Logger;
-import java.util.Map;
 
 /**
  * Created: Apr 27, 2010 5:36:54 PM

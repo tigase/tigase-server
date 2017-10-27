@@ -22,9 +22,9 @@
 
 package tigase.vhosts;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 
 import static tigase.conf.Configurable.GEN_VIRT_HOSTS;
 import static tigase.conf.Configurable.HOSTNAMES_PROP_KEY;

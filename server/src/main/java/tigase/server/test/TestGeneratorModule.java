@@ -28,8 +28,8 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Message;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.JID;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import java.util.logging.Logger;

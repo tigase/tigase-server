@@ -39,12 +39,11 @@ import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
-import tigase.util.ElementUtils;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
@@ -203,10 +202,7 @@ public class StatisticsCollector
 		switch (iqc.getCommand()) {
 		case GETSTATS : {
 
-			// Element statistics = new Element("statistics");
-			Element iq = ElementUtils.createIqQuery(iqc.getStanzaTo(), iqc.getStanzaFrom(),
-					StanzaType.result, iqc.getStanzaId(), STATS_XMLNS);
-			Element        query = iq.getChild("query");
+			Element        query = new Element("query", STATS_XMLNS);
 			StatisticsList stats = getAllStats();
 
 			if (stats != null) {
@@ -220,7 +216,7 @@ public class StatisticsCollector
 				}    // end of for ()
 			}      // end of if (stats != null && stats.count() > 0)
 
-			Packet result = Packet.packetInstance(iq, iqc.getStanzaTo(), iqc.getStanzaFrom());
+			Packet result = iqc.okResult(query, 0);
 
 			// Command.setData(result, statistics);
 			results.offer(result);

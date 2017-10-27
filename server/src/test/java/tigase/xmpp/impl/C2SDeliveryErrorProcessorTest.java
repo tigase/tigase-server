@@ -23,7 +23,6 @@ package tigase.xmpp.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.Queue;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -32,9 +31,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**

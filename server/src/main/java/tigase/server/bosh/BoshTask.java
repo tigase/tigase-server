@@ -22,7 +22,7 @@ package tigase.server.bosh;
 
 import tigase.server.Packet;
 
-import tigase.util.TimerTask;
+import tigase.util.common.TimerTask;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

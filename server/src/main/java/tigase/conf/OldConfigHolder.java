@@ -25,8 +25,8 @@ import tigase.db.RepositoryFactory;
 import tigase.kernel.beans.Bean;
 import tigase.server.ext.ComponentProtocol;
 import tigase.server.xmppsession.SessionManagerConfig;
-import tigase.util.ClassUtilBean;
-import tigase.util.DataTypes;
+import tigase.util.reflection.ClassUtilBean;
+import tigase.util.repository.DataTypes;
 import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 

@@ -18,7 +18,7 @@
 package tigase.auth;
 
 import tigase.component.exceptions.RepositoryException;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 public interface PasswordResetterIfc {
 

@@ -36,9 +36,9 @@ import tigase.kernel.core.Kernel;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
-import tigase.util.TimerTask;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.util.common.TimerTask;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPIOService;
 
 import java.util.List;

@@ -38,7 +38,7 @@ import tigase.server.Command
 import tigase.server.Iq
 import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
-import tigase.xmpp.BareJID
+import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
 def EMAIL = "email"

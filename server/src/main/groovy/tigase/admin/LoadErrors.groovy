@@ -31,8 +31,7 @@ AS:Component: monitor
 package tigase.admin
 
 import tigase.server.*
-import tigase.xmpp.*
-import tigase.util.*
+import tigase.util.log.LogFormatter
 
 def p = (Packet)packet
 def admins = (Set)adminsSet

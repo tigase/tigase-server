@@ -28,8 +28,8 @@ package tigase.vhosts;
 
 import tigase.server.ServerComponent;
 
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 

@@ -31,7 +31,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 
 import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;

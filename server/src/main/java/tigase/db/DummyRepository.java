@@ -25,7 +25,7 @@ package tigase.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.component.exceptions.RepositoryException;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 

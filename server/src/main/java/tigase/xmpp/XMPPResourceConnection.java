@@ -34,10 +34,12 @@ import tigase.db.UserRepository;
 import tigase.server.Packet;
 import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManagerHandler;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.impl.JabberIqRegister;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Map;
@@ -98,7 +100,7 @@ public class XMPPResourceConnection
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
-	private JID    connectionId    = null;
+	private JID connectionId    = null;
 	private String connectionState = null;
 	private long   creationTime    = 0;
 	private String defLang         = "en";

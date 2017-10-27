@@ -1,7 +1,7 @@
 package tigase.xmpp.impl.roster;
 
 import org.junit.Test;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import static org.junit.Assert.*;
 

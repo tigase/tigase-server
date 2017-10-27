@@ -8,8 +8,8 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
-import tigase.util.DateTimeFormatter;
-import tigase.util.OSUtils;
+import tigase.util.datetime.DateTimeFormatter;
+import tigase.util.common.OSUtils;
 import tigase.xml.Element;
 
 import java.io.BufferedReader;

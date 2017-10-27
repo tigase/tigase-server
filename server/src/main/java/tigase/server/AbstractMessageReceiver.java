@@ -37,10 +37,10 @@ import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
-import tigase.util.PatternComparator;
-import tigase.util.PriorityQueueAbstract;
-import tigase.util.PriorityQueueRelaxed;
-import tigase.util.TigaseStringprepException;
+import tigase.util.routing.PatternComparator;
+import tigase.util.workqueue.PriorityQueueAbstract;
+import tigase.util.workqueue.PriorityQueueRelaxed;
+import tigase.util.stringprep.TigaseStringprepException;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -465,14 +465,14 @@ public abstract class AbstractMessageReceiver
 	 * @param task
 	 * @param delay
 	 */
-	public void addTimerTask(tigase.util.TimerTask task, long delay) {
+	public void addTimerTask(tigase.util.common.TimerTask task, long delay) {
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit
 				.MILLISECONDS);
 		
 		task.setScheduledFuture(future);
 	}
 	
-	public void addTimerTask(tigase.util.TimerTask task, long initialDelay, long period) {
+	public void addTimerTask(tigase.util.common.TimerTask task, long initialDelay, long period) {
 		ScheduledFuture<?> future = receiverScheduler.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
 		task.setScheduledFuture(future);
 	}
@@ -495,12 +495,12 @@ public abstract class AbstractMessageReceiver
 	 * which allows using more than one thread for executing tasks. It allows to set
 	 * a timeout to cancel long running tasks
 	 *
-	 * @param task a task implementing {@link tigase.util.TimerTask}
+	 * @param task a task implementing {@link tigase.util.common.TimerTask}
 	 * @param delay in milliseconds delay after which task will be started
 	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
 	 */
-	public void addTimerTaskWithTimeout( final tigase.util.TimerTask task, long delay, long timeout ) {
-		receiverScheduler.schedule( new tigase.util.TimerTask() {
+	public void addTimerTaskWithTimeout(final tigase.util.common.TimerTask task, long delay, long timeout ) {
+		receiverScheduler.schedule( new tigase.util.common.TimerTask() {
 			@Override
 			public void run() {
 				if ( log.isLoggable( Level.FINEST ) ){
@@ -518,15 +518,15 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently
 	 * with the given period; please refer to {@link ScheduledExecutorService#scheduleAtFixedRate} javadoc for details.
-	 * It utilizes Tigase {@link tigase.util.TimerTask} and allows setting a timeout to cancel long running tasks
+	 * It utilizes Tigase {@link tigase.util.common.TimerTask} and allows setting a timeout to cancel long running tasks
 	 *
-	 * @param task a task implementing {@link tigase.util.TimerTask}
+	 * @param task a task implementing {@link tigase.util.common.TimerTask}
 	 * @param delay in milliseconds, the time to delay first execution
 	 * @param period in milliseconds, the period between successive executions
 	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
 	 */
-	public void addTimerTaskWithTimeout( final tigase.util.TimerTask task, long delay, long period, long timeout ) {
-		receiverScheduler.schedule( new tigase.util.TimerTask() {
+	public void addTimerTaskWithTimeout(final tigase.util.common.TimerTask task, long delay, long period, long timeout ) {
+		receiverScheduler.schedule( new tigase.util.common.TimerTask() {
 			@Override
 			public void run() {
 				if ( log.isLoggable( Level.FINEST ) ){
@@ -1212,7 +1212,7 @@ public abstract class AbstractMessageReceiver
 	 * @param delay
 	 * @param unit
 	 */
-	protected void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
+	protected void addTimerTask(tigase.util.common.TimerTask task, long delay, TimeUnit unit) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "adding timer, task: {0}, delay: {1}, TimeUnit: {2}, receiverScheduler: {3}",
 			        new Object[]{task, delay, unit, receiverScheduler});
@@ -1365,7 +1365,7 @@ public abstract class AbstractMessageReceiver
 	//~--- inner classes --------------------------------------------------------
 
 	private class PacketReceiverTask
-					extends tigase.util.TimerTask {
+			extends tigase.util.common.TimerTask {
 		private ReceiverTimeoutHandler handler = null;
 		private String                 id      = null;
 		private int                    retryCount = packetDeliveryRetryCount;

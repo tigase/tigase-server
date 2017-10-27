@@ -26,7 +26,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 

@@ -24,7 +24,7 @@ package tigase.db;
 
 //~--- classes ----------------------------------------------------------------
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 
 /**

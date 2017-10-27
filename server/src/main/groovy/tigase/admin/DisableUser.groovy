@@ -36,7 +36,7 @@ import tigase.server.Packet
 import tigase.server.Permissions
 import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
-import tigase.xmpp.BareJID
+import tigase.xmpp.jid.BareJID
 import tigase.xmpp.StanzaType
 
 def JIDS = "accountjids"

@@ -18,7 +18,7 @@
  */
 package tigase.vhosts.filter;
 
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.Objects;
 

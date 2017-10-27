@@ -11,7 +11,7 @@ import tigase.kernel.core.Kernel;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import static tigase.monitor.modules.InfoTaskCommand.NODE;
 

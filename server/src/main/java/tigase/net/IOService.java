@@ -31,7 +31,7 @@ import tigase.cert.CertificateUtil;
 import tigase.io.*;
 import tigase.stats.StatisticsList;
 import tigase.util.IOListener;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;

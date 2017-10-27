@@ -36,9 +36,10 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;
@@ -79,7 +80,7 @@ public class MessageAmp
 	//~--- fields ---------------------------------------------------------------
 
 	@ConfigField(desc = "AMP component JID", alias = AMP_JID_PROP_KEY)
-	private JID             ampJID           = JID.jidInstanceNS("amp@" + defHost);
+	private JID ampJID           = JID.jidInstanceNS("amp@" + defHost);
 	@Inject
 	private MsgRepositoryIfc   msg_repo         = null;
 	@Inject(nullAllowed = true)

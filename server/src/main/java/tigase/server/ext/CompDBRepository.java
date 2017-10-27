@@ -27,7 +27,7 @@ package tigase.server.ext;
 import tigase.db.DBInitException;
 import tigase.db.comp.UserRepoRepository;
 import tigase.kernel.beans.Bean;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Map;
 

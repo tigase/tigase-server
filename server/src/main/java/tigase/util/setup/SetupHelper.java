@@ -29,7 +29,7 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.Kernel;
 import tigase.server.ServerComponent;
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.XMPPImplIfc;
 
 import java.util.*;

@@ -24,9 +24,9 @@
 
 package tigase.cluster.repo;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSResolverFactory;
 
 /**
  * Class description

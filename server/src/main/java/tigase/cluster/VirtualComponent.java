@@ -30,15 +30,15 @@ import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import tigase.conf.Configurable;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
-import tigase.util.DNSResolverFactory;
-import tigase.util.TigaseStringprepException;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;

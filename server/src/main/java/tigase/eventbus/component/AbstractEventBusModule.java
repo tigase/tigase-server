@@ -23,7 +23,7 @@ package tigase.eventbus.component;
 
 import tigase.component.modules.AbstractModule;
 import tigase.kernel.beans.Inject;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public abstract class AbstractEventBusModule extends AbstractModule {
 

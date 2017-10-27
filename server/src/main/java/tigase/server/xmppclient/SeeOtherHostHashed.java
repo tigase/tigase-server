@@ -27,8 +27,8 @@ package tigase.server.xmppclient;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.selector.ClusterModeRequired;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayList;
 import java.util.Collections;

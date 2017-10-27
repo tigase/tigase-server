@@ -35,9 +35,9 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
-import tigase.util.DNSResolverFactory;
-import tigase.util.DataTypes;
-import tigase.xmpp.BareJID;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.repository.DataTypes;
+import tigase.xmpp.jid.BareJID;
 
 import javax.script.Bindings;
 import java.io.*;

@@ -29,8 +29,8 @@
 package tigase.admin
 
 import tigase.server.*
-import tigase.xmpp.*
-import tigase.util.*
+import tigase.util.log.LogUserFilter
+
 import java.util.logging.*
 
 def JID = "accountjid"

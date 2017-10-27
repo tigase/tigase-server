@@ -23,7 +23,7 @@ package tigase.eventbus.impl;
 
 import java.util.HashSet;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 public class Event1 {
 

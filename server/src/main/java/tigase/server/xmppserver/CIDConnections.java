@@ -35,8 +35,8 @@ import tigase.xmpp.PacketErrorTypeException;
 
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolverFactory;
+import tigase.util.dns.DNSEntry;
+import tigase.util.dns.DNSResolverFactory;
 
 import java.net.UnknownHostException;
 import java.util.Map;

@@ -24,7 +24,7 @@ package tigase.eventbus.component.stores;
 import tigase.eventbus.component.EventBusComponent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

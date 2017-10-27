@@ -56,10 +56,13 @@ import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 import tigase.util.*;
-import tigase.util.TimerTask;
+import tigase.util.common.TimerTask;
+import tigase.util.datetime.TimeUtils;
+import tigase.util.reflection.ReflectionHelper;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
 
@@ -1171,7 +1174,7 @@ public class ClusterConnectionManager
 
 
 	private class ServiceConnectedTimerTask
-					extends tigase.util.TimerTask {
+			extends TimerTask {
 		private XMPPIOService<Object> serv = null;
 
 		//~--- constructors -------------------------------------------------------
@@ -1219,7 +1222,7 @@ public class ClusterConnectionManager
 		private ComponentRepository<ClusterRepoItem> repo = null;
 
 		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
-				return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] { ClusterRepoItem.class, DataSource.class });
+				return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] {ClusterRepoItem.class, DataSource.class });
 		};
 
 		@Override

@@ -22,7 +22,7 @@
 package tigase.db;
 
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Map;

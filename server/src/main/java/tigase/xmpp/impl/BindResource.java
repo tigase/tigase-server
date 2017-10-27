@@ -30,10 +30,11 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.DNSResolverFactory;
-import tigase.util.TigaseStringprepException;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;

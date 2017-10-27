@@ -22,11 +22,11 @@
 
 package tigase.xmpp.impl.roster;
 
-import tigase.util.TigaseStringprepException;
-import tigase.util.XMPPStringPrepFactory;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.util.stringprep.XMPPStringPrepFactory;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 import java.util.HashSet;

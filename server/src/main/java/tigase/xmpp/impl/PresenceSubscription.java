@@ -39,6 +39,7 @@ import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Id;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -638,7 +639,7 @@ public class PresenceSubscription extends PresenceAbstract {
 		// subscriptions in case of synchronization loss
 
 		Element initial_presence = session.getPresence();
-		JID     buddy            = packet.getStanzaTo().copyWithoutResource();
+		JID buddy            = packet.getStanzaTo().copyWithoutResource();
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 				buddy);
 

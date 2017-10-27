@@ -34,13 +34,9 @@ AS:Group: Notifications
 package tigase.admin
 
 import tigase.server.*
-import tigase.util.*
 import tigase.xmpp.*
-import tigase.db.*
-import tigase.xml.*
-import tigase.cluster.*;
-import tigase.cluster.api.*;
-import tigase.cluster.strategy.*;
+import tigase.cluster.strategy.*
+import tigase.xmpp.jid.JID;
 
 
 def FROM_JID = "from-jid"

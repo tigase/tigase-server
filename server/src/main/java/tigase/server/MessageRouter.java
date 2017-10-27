@@ -37,11 +37,11 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
-import tigase.util.*;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.updater.UpdatesChecker;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
@@ -55,7 +55,6 @@ import java.util.*;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

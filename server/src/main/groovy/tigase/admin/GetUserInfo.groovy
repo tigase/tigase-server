@@ -31,15 +31,11 @@
 package tigase.admin
 
 import tigase.server.*
-import tigase.util.*
-import tigase.xml.*
 import tigase.xmpp.*
-import tigase.db.*
 import tigase.xml.*
 import tigase.vhosts.*
-import tigase.cluster.*;
-import tigase.cluster.api.*;
-import tigase.cluster.strategy.*;
+import tigase.cluster.strategy.*
+import tigase.xmpp.jid.BareJID;
 
 
 def JID = "accountjid"
@@ -132,10 +128,10 @@ if (isServiceAdmin ||
 
 		def sessionManager = component;
 		def offlineMsgsRepo = sessionManager.processors.values().find { it.hasProperty("msg_repo") }?.msg_repo;
-		if (offlineMsgsRepo && offlineMsgsRepo.metaClass.respondsTo(offlineMsgsRepo, "getMessagesCount", [tigase.xmpp.JID] as Object[])) {
+		if (offlineMsgsRepo && offlineMsgsRepo.metaClass.respondsTo(offlineMsgsRepo, "getMessagesCount", [ tigase.xmpp.jid.JID] as Object[])) {
 			def offlineStats = 0;
 			try {
-				offlineStats = offlineMsgsRepo.getMessagesCount(tigase.xmpp.JID.jidInstance(bareJID));
+				offlineStats = offlineMsgsRepo.getMessagesCount(tigase.xmpp.jid.JID.jidInstance(bareJID));
 			} catch (tigase.db.UserNotFoundException ex) {
 				// ignoring this error for now as it is not important
 			}

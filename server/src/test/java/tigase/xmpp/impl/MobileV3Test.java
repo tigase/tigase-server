@@ -24,30 +24,22 @@ package tigase.xmpp.impl;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import junit.framework.TestCase;
 import org.junit.After;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
-import tigase.util.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
 
 /**
  *

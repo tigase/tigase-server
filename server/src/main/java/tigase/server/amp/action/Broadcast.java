@@ -32,9 +32,9 @@ import tigase.server.amp.AmpComponent;
 import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.db.MsgBroadcastRepository;
 import tigase.server.amp.db.MsgBroadcastRepositoryIfc;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 
 import java.text.ParseException;

@@ -6,7 +6,7 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.TimerTaskService;
-import tigase.util.TimerTask;
+import tigase.util.common.TimerTask;
 
 public abstract class AbstractConfigurableTimerTask extends AbstractConfigurableTask implements UnregisterAware {
 

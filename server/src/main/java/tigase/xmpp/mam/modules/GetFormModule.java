@@ -28,7 +28,7 @@ import tigase.criteria.Criteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.mam.Query;

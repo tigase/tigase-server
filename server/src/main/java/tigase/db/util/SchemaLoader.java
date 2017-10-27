@@ -25,7 +25,7 @@ import tigase.osgi.util.ClassUtilBean;
 import tigase.util.Version;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import java.io.IOException;
 import java.io.StringWriter;

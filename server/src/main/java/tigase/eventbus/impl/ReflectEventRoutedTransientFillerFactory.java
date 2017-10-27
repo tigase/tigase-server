@@ -21,7 +21,7 @@
 
 package tigase.eventbus.impl;
 
-import static tigase.util.ReflectionHelper.collectAnnotatedMethods;
+import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -29,7 +29,7 @@ import java.util.Collection;
 import tigase.eventbus.EventRoutedTransientFiller;
 import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.RegistrationException;
-import tigase.util.ReflectionHelper.Handler;
+import tigase.util.reflection.ReflectionHelper.Handler;
 
 /**
  * Class responsible for creation of <code>ReflectEventRoutedTransientFiller</code> instances

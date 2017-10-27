@@ -25,7 +25,7 @@ package tigase.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.auth.credentials.Credentials;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 

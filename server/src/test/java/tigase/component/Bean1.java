@@ -2,7 +2,7 @@ package tigase.component;
 
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 /**
  * Created by bmalkow on 19.10.2015.

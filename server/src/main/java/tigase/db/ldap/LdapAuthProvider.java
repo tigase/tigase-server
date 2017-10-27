@@ -4,7 +4,7 @@ import tigase.auth.credentials.Credentials;
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Base64;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.jid.BareJID;
 
 import javax.naming.Context;
 import javax.naming.directory.DirContext;

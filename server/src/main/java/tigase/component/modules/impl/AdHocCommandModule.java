@@ -30,7 +30,7 @@ import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

@@ -23,7 +23,7 @@ package tigase.kernel.core;
 
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig.State;
-import tigase.util.ReflectionHelper;
+import tigase.util.reflection.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

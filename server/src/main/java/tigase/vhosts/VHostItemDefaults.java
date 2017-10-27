@@ -25,7 +25,7 @@ package tigase.vhosts;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.vhosts.filter.DomainFilterPolicy;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.util.concurrent.ConcurrentSkipListSet;
 

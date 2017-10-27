@@ -21,10 +21,10 @@ package tigase.vhosts;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import tigase.TestLogger;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

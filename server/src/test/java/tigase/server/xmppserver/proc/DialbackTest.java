@@ -31,7 +31,7 @@ import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 

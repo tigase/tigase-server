@@ -32,14 +32,8 @@ package tigase.cluster.api;
 
 import tigase.stats.StatisticsList;
 
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-
-import static tigase.cluster.strategy.ClusteringStrategyIfc.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
 import tigase.server.Priority;
 
 /**
