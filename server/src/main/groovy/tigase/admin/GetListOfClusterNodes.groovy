@@ -1,6 +1,8 @@
 /*
+ * GetListOfClusterNodes.groovy
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -14,14 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
-/*
- Get list of all connected cluster nodes
-
- AS:Description: Get list of all connected cluster nodes
- AS:CommandId: cluster-nodes-list
- AS:Component: cl-comp
- AS:Group: Configuration
  */
 package tigase.admin
 

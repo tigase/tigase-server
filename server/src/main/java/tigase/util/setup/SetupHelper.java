@@ -1,4 +1,6 @@
 /*
+ * SetupHelper.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
@@ -14,10 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 package tigase.util.setup;
 

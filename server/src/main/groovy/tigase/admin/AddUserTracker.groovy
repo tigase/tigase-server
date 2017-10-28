@@ -1,6 +1,8 @@
 /*
+ * AddUserTracker.groovy
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -14,11 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
- * $Rev: 2411 $
- * Last modified by $Author: kobit $
- * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- *
  */
 /*
  Activate on the server user tracking mechanisms to aid in problem resolution.
