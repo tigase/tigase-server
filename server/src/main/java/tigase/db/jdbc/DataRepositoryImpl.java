@@ -118,7 +118,8 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 	public boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer) {
 		boolean result = false;
 
-		try (PreparedStatement ps = getPreparedStatement(null, JDBC_SCHEMA_VERSION_QUERY)) {
+		try {
+			PreparedStatement ps = getPreparedStatement(null, JDBC_SCHEMA_VERSION_QUERY);
 			final Class<? extends DataSourceAware> datasourceClass = datasource.getClass();
 			if (datasourceClass.isAnnotationPresent(SchemaId.class)) {
 				final String dataSourceID = datasourceClass.getAnnotation(SchemaId.class).id();
