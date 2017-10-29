@@ -34,9 +34,8 @@ public class MD5UserIdPasswordCredentialsEntry
 		implements Credentials.Entry {
 
 	private static final Logger log = Logger.getLogger(MD5UserIdPasswordCredentialsEntry.class.getCanonicalName());
-
-	private final BareJID user;
 	private final String passwordHash;
+	private final BareJID user;
 
 	public MD5UserIdPasswordCredentialsEntry(BareJID user, String passwordHash) {
 		this.user = user;
@@ -59,8 +58,24 @@ public class MD5UserIdPasswordCredentialsEntry
 		return false;
 	}
 
+	@Bean(name = "MD5-USERID-PASSWORD", parent = CredentialsDecoderBean.class, active = false)
+	public static class Decoder
+			implements Credentials.Decoder {
+
+		@Override
+		public String getName() {
+			return "MD5-USERID-PASSWORD";
+		}
+
+		@Override
+		public Credentials.Entry decode(BareJID user, String value) {
+			return new MD5UserIdPasswordCredentialsEntry(user, value);
+		}
+	}
+
 	@Bean(name = "MD5-USERID-PASSWORD", parent = CredentialsEncoderBean.class, active = false)
-	public static class Encoder implements Credentials.Encoder {
+	public static class Encoder
+			implements Credentials.Encoder {
 
 		@Override
 		public String getName() {
@@ -75,20 +90,6 @@ public class MD5UserIdPasswordCredentialsEntry
 			} catch (Exception ex) {
 				throw new RuntimeException("failed to generate password hash", ex);
 			}
-		}
-	}
-
-	@Bean(name = "MD5-USERID-PASSWORD", parent = CredentialsDecoderBean.class, active = false)
-	public static class Decoder implements Credentials.Decoder {
-
-		@Override
-		public String getName() {
-			return "MD5-USERID-PASSWORD";
-		}
-
-		@Override
-		public Credentials.Entry decode(BareJID user, String value) {
-			return new MD5UserIdPasswordCredentialsEntry(user, value);
 		}
 	}
 }

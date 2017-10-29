@@ -38,13 +38,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author kobit
  */
-@Repository.Meta( supportedUris = { "file://.*" } )
+@Repository.Meta(supportedUris = {"file://.*"})
 public class ClConDirRepository
-				extends ClConConfigRepository
-				implements ClusterRepoConstants {
+		extends ClConConfigRepository
+		implements ClusterRepoConstants {
+
 	/** Field description */
 	public static final String REPO_FILE_EXTENSION = ".rep";
 
@@ -57,16 +57,15 @@ public class ClConDirRepository
 	private static final Logger log = Logger.getLogger(ClConDirRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private File      repo_dir  = new File(REPO_URI_DB_DEF_VAL);
 	private DirFilter dirFilter = new DirFilter();
+	private File repo_dir = new File(REPO_URI_DB_DEF_VAL);
 
 	@Override
 	public void destroy() {
 		// Nothing to do here
 		super.destroy();
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -82,7 +81,7 @@ public class ClConDirRepository
 		// Nothing to do here
 		super.initRepository(conn_str, params);
 	}
-	
+
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
@@ -96,8 +95,8 @@ public class ClConDirRepository
 	@Override
 	public void storeItem(ClusterRepoItem item) {
 		try {
-			File           file = new File(repo_dir, item.getHostname() + REPO_FILE_EXTENSION);
-			BufferedWriter bw   = new BufferedWriter(new FileWriter(file, false));
+			File file = new File(repo_dir, item.getHostname() + REPO_FILE_EXTENSION);
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file, false));
 
 			bw.write(item.toPropertyString());
 			bw.newLine();
@@ -114,8 +113,8 @@ public class ClConDirRepository
 			File[] files = repo_dir.listFiles(dirFilter);
 
 			for (File file : files) {
-				BufferedReader br   = new BufferedReader(new FileReader(file));
-				String         data = br.readLine();
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				String data = br.readLine();
 
 				br.close();
 
@@ -132,14 +131,12 @@ public class ClConDirRepository
 	//~--- inner classes --------------------------------------------------------
 
 	private class DirFilter
-					implements FileFilter {
+			implements FileFilter {
+
 		/**
 		 * Method description
 		 *
-		 *
 		 * @param file
-		 *
-		 * 
 		 */
 		@Override
 		public boolean accept(File file) {
@@ -147,6 +144,5 @@ public class ClConDirRepository
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/11

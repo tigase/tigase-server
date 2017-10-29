@@ -20,29 +20,28 @@
 package tigase.db;
 
 /**
- * The <code>DataOverwriteException</code> exception is thrown when application
- * tries to ovrewrite data in repository but does not have permission to do so.
- * <br>
- * Created: Wed Oct 27 14:17:44 2004
- * <br>
+ * The <code>DataOverwriteException</code> exception is thrown when application tries to ovrewrite data in repository
+ * but does not have permission to do so. <br> Created: Wed Oct 27 14:17:44 2004 <br>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-public class DataOverwriteException extends TigaseDBException {
+public class DataOverwriteException
+		extends TigaseDBException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  /**
-   * Creates a new <code>DataOverwriteException</code> instance.
-   *
-   */
-  public DataOverwriteException(String message) { super(message); }
+	/**
+	 * Creates a new <code>DataOverwriteException</code> instance.
+	 */
+	public DataOverwriteException(String message) {
+		super(message);
+	}
 
-  /**
-   * Creates a new <code>DataOverwriteException</code> instance.
-   *
-   */
-  public DataOverwriteException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	/**
+	 * Creates a new <code>DataOverwriteException</code> instance.
+	 */
+	public DataOverwriteException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 } // DataOverwriteException

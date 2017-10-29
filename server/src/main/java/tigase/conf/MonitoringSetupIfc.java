@@ -27,9 +27,13 @@ package tigase.conf;
  * @version $Rev$
  */
 public interface MonitoringSetupIfc {
-	
-	public enum MONITOR { jmx, http, snmp; }
-	
+
+	public enum MONITOR {
+		jmx,
+		http,
+		snmp;
+	}
+
 	void initMonitoring(String settings, String configDir);
 
 	void initializationCompleted();

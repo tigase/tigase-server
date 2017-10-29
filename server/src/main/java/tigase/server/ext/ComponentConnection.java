@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.ext;
 
 /**
@@ -29,10 +27,11 @@ package tigase.server.ext;
  * @version $Rev$
  */
 public class ComponentConnection
-				implements Comparable<ComponentConnection> {
+		implements Comparable<ComponentConnection> {
+
 	private String domain = null;
 
-//private List<String> resources     = new ArrayList<String>();
+	//private List<String> resources     = new ArrayList<String>();
 	private ComponentIOService service = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -40,12 +39,11 @@ public class ComponentConnection
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param domain
 	 * @param service
 	 */
 	public ComponentConnection(String domain, ComponentIOService service) {
-		this.domain  = domain;
+		this.domain = domain;
 		this.service = service;
 	}
 
@@ -66,9 +64,6 @@ public class ComponentConnection
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getDomain() {
 		return domain;
@@ -76,14 +71,10 @@ public class ComponentConnection
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public ComponentIOService getService() {
 		return service;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/16

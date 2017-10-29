@@ -42,15 +42,14 @@ import java.util.TimeZone;
 import static tigase.xmpp.impl.EntityTime.ID;
 
 /**
- * This supports the implementation of
- * <a href='http://xmpp.org/extensions/xep-0202.html'>XEP-0202</a>: Entity Time.
- *
+ * This supports the implementation of <a href='http://xmpp.org/extensions/xep-0202.html'>XEP-0202</a>: Entity Time.
  */
 @Id(EntityTime.XMLNS)
-@Handles({ @Handle(path = { Iq.ELEM_NAME, EntityTime.TIME }, xmlns = EntityTime.XMLNS) })
-@DiscoFeatures({ EntityTime.XMLNS })
+@Handles({@Handle(path = {Iq.ELEM_NAME, EntityTime.TIME}, xmlns = EntityTime.XMLNS)})
+@DiscoFeatures({EntityTime.XMLNS})
 @Bean(name = ID, parent = SessionManager.class, active = true)
-public class EntityTime extends XMPPProcessorAbstract {
+public class EntityTime
+		extends XMPPProcessorAbstract {
 
 	protected static final String XMLNS = "urn:xmpp:time";
 
@@ -79,48 +78,54 @@ public class EntityTime extends XMPPProcessorAbstract {
 
 	@Override
 	public void processFromUserOutPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
-										 NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
+										 NonAuthUserRepository repo, Queue<Packet> results,
+										 Map<String, Object> settings) throws PacketErrorTypeException {
 		super.processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
 	}
 
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
-		if (packet.getStanzaTo() != null && packet.getStanzaFrom() != null
-				&& packet.getStanzaTo().equals(packet.getStanzaFrom())) {
+											  NonAuthUserRepository repo, Queue<Packet> results,
+											  Map<String, Object> settings) throws PacketErrorTypeException {
+		if (packet.getStanzaTo() != null && packet.getStanzaFrom() != null &&
+				packet.getStanzaTo().equals(packet.getStanzaFrom())) {
 			processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
 		} else if (packet.getType() == StanzaType.get) {
 			sendTimeResult(packet, results);
-		} else
+		} else {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", true));
+		}
 	}
 
 	@Override
 	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings) throws PacketErrorTypeException {
+										 Map<String, Object> settings) throws PacketErrorTypeException {
 		if (packet.getType() == StanzaType.get) {
 			sendTimeResult(packet, results);
-		} else if (packet.getType() == StanzaType.set)
+		} else if (packet.getType() == StanzaType.set) {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", true));
-		else
+		} else {
 			super.processNullSessionPacket(packet, repo, results, settings);
+		}
 	}
 
 	@Override
 	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
+										   Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
 	}
 
 	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
+									Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
 		super.processToUserPacket(packet, session, repo, results, settings);
 	}
 
 	private void sendTimeResult(Packet packet, Queue<Packet> results) {
 		Packet resp = packet.okResult((Element) null, 0);
 
-		Element time = new Element("time", new String[] { "xmlns" }, new String[] { XMLNS });
+		Element time = new Element("time", new String[]{"xmlns"}, new String[]{XMLNS});
 
 		Element tzo = new Element("tzo");
 		tzo.setCData(getUtcOffset());

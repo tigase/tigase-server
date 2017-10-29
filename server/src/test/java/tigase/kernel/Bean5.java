@@ -27,7 +27,8 @@ import tigase.kernel.beans.config.ConfigField;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Bean5 implements UnregisterAware {
+public class Bean5
+		implements UnregisterAware {
 
 	private static final Logger log = TestLogger.getLogger(Bean5.class);
 

@@ -1,4 +1,3 @@
-
 /*
  * StreamFeatures.java
  *
@@ -46,7 +45,9 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "streamFeatures", parent = S2SConnectionManager.class, active = true)
-public class StreamFeatures extends S2SAbstractProcessor {
+public class StreamFeatures
+		extends S2SAbstractProcessor {
+
 	private static final Logger log = Logger.getLogger(StreamFeatures.class.getName());
 
 	//~--- methods --------------------------------------------------------------
@@ -55,12 +56,12 @@ public class StreamFeatures extends S2SAbstractProcessor {
 	public int order() {
 		return Order.StreamFeatures.ordinal();
 	}
-	
+
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[] { serv, p });
+				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[]{serv, p});
 			}
 
 			return true;
@@ -91,8 +92,7 @@ public class StreamFeatures extends S2SAbstractProcessor {
 				}
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending stream features: {1}", new Object[] { serv,
-							featuresElement });
+					log.log(Level.FINEST, "{0}, Sending stream features: {1}", new Object[]{serv, featuresElement});
 				}
 
 				serv.addPacketToSend(Packet.packetInstance(featuresElement, null, null));
@@ -103,8 +103,6 @@ public class StreamFeatures extends S2SAbstractProcessor {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

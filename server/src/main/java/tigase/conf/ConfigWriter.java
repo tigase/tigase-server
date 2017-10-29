@@ -35,11 +35,9 @@ import java.util.*;
  */
 public class ConfigWriter {
 
+	private static final char[] RESTRICTED_CHARS = "=:,[]#+-*/@.".toCharArray();
 	private int indent = 0;
-
 	private boolean resolveVariables = false;
-
-	public ConfigWriter() {}
 
 	public static Map<String, Object> buildTree(Map<String, Object> props) {
 		Map<String, Object> result = new LinkedHashMap<>();
@@ -47,11 +45,13 @@ public class ConfigWriter {
 			String[] parts = k.split("/");
 			Map<String, Object> map = result;
 			Map<String, Object> parent = null;
-			for (int i=0; i<parts.length-1; i++) {
+			for (int i = 0; i < parts.length - 1; i++) {
 				parent = map;
-				map = (Map<String, Object>) map.computeIfAbsent(parts[i], (String key) -> { return new HashMap<String, Object>(); });
+				map = (Map<String, Object>) map.computeIfAbsent(parts[i], (String key) -> {
+					return new HashMap<String, Object>();
+				});
 			}
-			String key = parts[parts.length-1];
+			String key = parts[parts.length - 1];
 			AbstractBeanConfigurator.BeanDefinition beanDefinition;
 			switch (key) {
 				case "active":
@@ -59,7 +59,7 @@ public class ConfigWriter {
 						beanDefinition = (AbstractBeanConfigurator.BeanDefinition) map;
 					} else {
 						beanDefinition = new AbstractBeanConfigurator.BeanDefinition();
-						beanDefinition.setBeanName(parts[parts.length-2]);
+						beanDefinition.setBeanName(parts[parts.length - 2]);
 						beanDefinition.putAll(map);
 						parent.put(beanDefinition.getBeanName(), beanDefinition);
 					}
@@ -71,7 +71,7 @@ public class ConfigWriter {
 						beanDefinition = (AbstractBeanConfigurator.BeanDefinition) map;
 					} else {
 						beanDefinition = new AbstractBeanConfigurator.BeanDefinition();
-						beanDefinition.setBeanName(parts[parts.length-2]);
+						beanDefinition.setBeanName(parts[parts.length - 2]);
 						beanDefinition.putAll(map);
 						parent.put(beanDefinition.getBeanName(), beanDefinition);
 					}
@@ -90,6 +90,18 @@ public class ConfigWriter {
 		});
 
 		return result;
+	}
+
+	public static boolean hasRestrictedChars(String str) {
+		for (char ch : RESTRICTED_CHARS) {
+			if (str.indexOf(ch) > -1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public ConfigWriter() {
 	}
 
 	public ConfigWriter resolveVariables() {
@@ -114,8 +126,9 @@ public class ConfigWriter {
 	private void writeObject(Writer writer, Object obj, String newLine) throws IOException {
 		if (obj == null) {
 			writer.write("null");
-			if (newLine != null)
+			if (newLine != null) {
 				writer.write(newLine);
+			}
 			return;
 		}
 
@@ -190,8 +203,8 @@ public class ConfigWriter {
 				ConfigReader.CompositeVariable variable = (ConfigReader.CompositeVariable) obj;
 				List<Object> arguments = variable.getArguments();
 				List<ConfigReader.CompositeVariable.Operation> operations = variable.getOperations();
-				writeObject(writer,arguments.get(0), null);
-				for (int i=0; i<operations.size(); i++) {
+				writeObject(writer, arguments.get(0), null);
+				for (int i = 0; i < operations.size(); i++) {
 					ConfigReader.CompositeVariable.Operation o = operations.get(i);
 					switch (o) {
 						case multiply:
@@ -207,7 +220,7 @@ public class ConfigWriter {
 							writer.write(" - ");
 							break;
 					}
-					writeObject(writer,arguments.get(i + 1), null);
+					writeObject(writer, arguments.get(i + 1), null);
 				}
 				if (newLine != null) {
 					writer.write(newLine);
@@ -252,9 +265,9 @@ public class ConfigWriter {
 					writer.write(newLine);
 				}
 			}
-		} else if ( obj.getClass().isArray() ) {
+		} else if (obj.getClass().isArray()) {
 			List tmp = new ArrayList();
-			for (int i = 0; i< Array.getLength(obj); i++) {
+			for (int i = 0; i < Array.getLength(obj); i++) {
 				tmp.add(Array.get(obj, i));
 			}
 			writeObject(writer, tmp);
@@ -262,8 +275,9 @@ public class ConfigWriter {
 			writer.write('\'');
 			writer.write((String) obj);
 			writer.write("\'");
-			if (newLine != null)
+			if (newLine != null) {
 				writer.write(newLine);
+			}
 		} else {
 			if (obj instanceof JID || obj instanceof BareJID || obj instanceof Enum) {
 				writeString(writer, obj.toString());
@@ -276,15 +290,16 @@ public class ConfigWriter {
 			if (obj instanceof Float) {
 				writer.write("f");
 			}
-			if (newLine != null)
+			if (newLine != null) {
 				writer.write(newLine);
+			}
 		}
 	}
 
 	private void writeMap(Writer writer, Map<String, Object> map) throws IOException {
 		List<Map.Entry<String, Object>> items = new ArrayList<>(map.entrySet());
 
-		items.sort((a,b) -> {
+		items.sort((a, b) -> {
 			boolean a_ = a.getKey().startsWith("--");
 			boolean b_ = b.getKey().startsWith("--");
 
@@ -348,7 +363,7 @@ public class ConfigWriter {
 	}
 
 	private void writeIndent(Writer writer) throws IOException {
-		for (int i=0; i<indent; i++) {
+		for (int i = 0; i < indent; i++) {
 			writer.write("    ");
 		}
 	}
@@ -382,8 +397,9 @@ public class ConfigWriter {
 	}
 
 	private void writeString(Writer writer, String str) throws IOException {
-		if (str == null)
+		if (str == null) {
 			return;
+		}
 
 		if (hasRestrictedChars(str)) {
 			writer.append('\'');
@@ -392,17 +408,6 @@ public class ConfigWriter {
 		} else {
 			writer.write(str);
 		}
-	}
-
-	private static final char[] RESTRICTED_CHARS = "=:,[]#+-*/@.".toCharArray();
-
-	public static boolean hasRestrictedChars(String str) {
-		for (char ch : RESTRICTED_CHARS) {
-			if (str.indexOf(ch) > -1) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 }

@@ -33,5 +33,5 @@ public class UserConnectedEvent {
 	public JID getUserJid() {
 		return userJid;
 	}
-	
+
 }

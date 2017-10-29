@@ -18,42 +18,32 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
+import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-
 /**
  * Describe class JabberIqCommand here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Jan 22 22:41:17 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -61,37 +51,34 @@ import java.util.Queue;
  */
 @Bean(name = JabberIqCommand.ID, parent = SessionManager.class, active = true)
 public class JabberIqCommand
-				extends XMPPProcessor
-				implements XMPPProcessorIfc {
-	private static final String[][] ELEMENTS = {
-		Iq.IQ_COMMAND_PATH
-	};
-	private static final Logger     log = Logger.getLogger(JabberIqCommand.class.getName());
-	private static final String[]   XMLNSS   = { Command.XMLNS };
-	private static final String     XMLNS    = Command.XMLNS;
-	protected static final String     ID       = XMLNS;
-	private static final Element[]  DISCO_FEATURES = { new Element("feature",
-			new String[] { "var" }, new String[] { XMLNS }) };
+		extends XMPPProcessor
+		implements XMPPProcessorIfc {
+
+	private static final String[][] ELEMENTS = {Iq.IQ_COMMAND_PATH};
+	private static final Logger log = Logger.getLogger(JabberIqCommand.class.getName());
+	private static final String[] XMLNSS = {Command.XMLNS};
+	private static final String XMLNS = Command.XMLNS;
+	protected static final String ID = XMLNS;
+	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
-		if (conn == null)
+		if (conn == null) {
 			return null;
+		}
 		return super.canHandle(packet, conn);
 	}
-	
+
 	@Override
 	public String id() {
 		return ID;
 	}
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
-			Object> settings)
-					throws XMPPException {
+	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+						final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		}
@@ -139,7 +126,7 @@ public class JabberIqCommand
 
 				// Yes this is message to 'this' client
 				Packet result = packet.copyElementOnly();
-				JID    conId  = session.getConnectionId(packet.getStanzaTo());
+				JID conId = session.getConnectionId(packet.getStanzaTo());
 
 				if (conId != null) {
 					result.setPacketTo(conId);
@@ -147,7 +134,8 @@ public class JabberIqCommand
 					results.offer(result);
 				} else {
 					result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-							"The recipient is no longer available.", true);
+																					"The recipient is no longer available.",
+																					true);
 					result.setPacketFrom(null);
 					result.setPacketTo(null);
 					results.offer(result);
@@ -161,8 +149,8 @@ public class JabberIqCommand
 			}    // end of else
 		} catch (NotAuthorizedException e) {
 			log.log(Level.WARNING, "NotAuthorizedException for packet: {0}", packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			results.offer(
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		}    // end of try-catch
 	}
 

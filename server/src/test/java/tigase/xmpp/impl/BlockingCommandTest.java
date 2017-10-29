@@ -29,7 +29,10 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.JID;
@@ -40,16 +43,16 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author andrzej
  */
-public class BlockingCommandTest extends ProcessorTestCase {
-	
+public class BlockingCommandTest
+		extends ProcessorTestCase {
+
 	private BlockingCommand blockingCommand;
 	private JabberIqPrivacy privacy;
 	private ArrayDeque<Packet> results;
 	private RosterAbstract roster_util;
-	
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
@@ -69,31 +72,22 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		blockingCommand = null;
 	}
 
-	@Override
-	protected void registerBeans(Kernel kernel) {
-		super.registerBeans(kernel);
-		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exec();
-		kernel.registerBean(RosterFactory.Bean.class).setActive(true).exec();
-		kernel.registerBean(JabberIqPrivacy.class).setActive(true).exec();
-		kernel.registerBean(BlockingCommand.class).setActive(true).exec();
-	}
-
 	@Test
 	public void testBlockUnblock() throws Exception {
 		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
 		JID userJid = JID.jidInstanceNS("user-1@example.com/res-1");
 		XMPPResourceConnection sess = getSession(connJid, userJid);
-		
+
 		String blockJid = "block-1@example.com";
-		
+
 		checkPrivacyJidBlocked(sess, blockJid, false);
 		List<String> blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
-		
+
 		block(sess, blockJid);
 		assertEquals(2, results.size());
-		privacy.filter(null, sess, null, results);		
-		
+		privacy.filter(null, sess, null, results);
+
 		assertEquals(2, results.size());
 		Packet result = results.poll();
 		assertNotNull(result);
@@ -103,14 +97,14 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		assertNotNull(result);
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
 		assertEquals(StanzaType.set, result.getType());
-		
+
 		checkPrivacyJidBlocked(sess, blockJid, true);
 		blocked = getBlocked(sess);
 		assertTrue(blocked.contains(blockJid));
-		
+
 		unblock(sess, blockJid);
 		assertEquals(2, results.size());
-		privacy.filter(null, sess, null, results);		
+		privacy.filter(null, sess, null, results);
 
 		assertEquals(2, results.size());
 		result = results.poll();
@@ -121,29 +115,28 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		assertNotNull(result);
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
 		assertEquals(StanzaType.set, result.getType());
-		
-	
+
 		checkPrivacyJidBlocked(sess, blockJid, false);
 		blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
 	}
-	
+
 	@Test
 	public void testBlockUnblockAll() throws Exception {
 		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
 		JID userJid = JID.jidInstanceNS("user-1@example.com/res-1");
 		XMPPResourceConnection sess = getSession(connJid, userJid);
-		
+
 		String blockJid = "block-1@example.com";
-		
+
 		checkPrivacyJidBlocked(sess, blockJid, false);
 		List<String> blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
-		
+
 		block(sess, blockJid);
 		assertEquals(2, results.size());
-		privacy.filter(null, sess, null, results);		
-		
+		privacy.filter(null, sess, null, results);
+
 		assertEquals(2, results.size());
 		Packet result = results.poll();
 		assertNotNull(result);
@@ -153,12 +146,11 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		assertNotNull(result);
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
 		assertEquals(StanzaType.set, result.getType());
-		
-		
+
 		checkPrivacyJidBlocked(sess, blockJid, true);
 		blocked = getBlocked(sess);
 		assertTrue(blocked.contains(blockJid));
-		
+
 		unblock(sess, blockJid);
 		assertEquals(2, results.size());
 		privacy.filter(null, sess, null, results);
@@ -172,30 +164,30 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		assertNotNull(result);
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
 		assertEquals(StanzaType.set, result.getType());
-	
+
 		checkPrivacyJidBlocked(sess, blockJid, false);
 		blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
-	}	
-	
+	}
+
 	@Test
 	public void testBlockUnblockWithPresence() throws Exception {
 		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
 		JID userJid = JID.jidInstanceNS("user-1@example.com/res-1");
 		XMPPResourceConnection sess = getSession(connJid, userJid);
-		
+
 		String blockJid = "block-1@example.com";
 		roster_util.addBuddy(sess, JID.jidInstance(blockJid), "Block-1", null, null);
 		roster_util.setBuddySubscription(sess, RosterAbstract.SubscriptionType.both, JID.jidInstance(blockJid));
-		
+
 		checkPrivacyJidBlocked(sess, blockJid, false);
 		List<String> blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
-		
+
 		block(sess, blockJid);
 		assertEquals(3, results.size());
 		privacy.filter(null, sess, null, results);
-		
+
 		assertEquals(3, results.size());
 		Packet result = results.poll();
 		assertNotNull(result);
@@ -209,12 +201,11 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		assertNotNull(result);
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
 		assertEquals(StanzaType.set, result.getType());
-		
-		
+
 		checkPrivacyJidBlocked(sess, blockJid, true);
 		blocked = getBlocked(sess);
 		assertTrue(blocked.contains(blockJid));
-		
+
 		unblock(sess, blockJid);
 		assertEquals(3, results.size());
 		privacy.filter(null, sess, null, results);
@@ -232,41 +223,51 @@ public class BlockingCommandTest extends ProcessorTestCase {
 		assertNotNull(result);
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
 		assertEquals(StanzaType.set, result.getType());
-		
-	
+
 		checkPrivacyJidBlocked(sess, blockJid, false);
 		blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
-	}	
-	
+	}
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exec();
+		kernel.registerBean(RosterFactory.Bean.class).setActive(true).exec();
+		kernel.registerBean(JabberIqPrivacy.class).setActive(true).exec();
+		kernel.registerBean(BlockingCommand.class).setActive(true).exec();
+	}
+
 	private void block(XMPPResourceConnection sess, String jid) throws Exception {
-		Element iq = new Element("iq", new String[] { "type" }, new String[] { "set" });
-		Element block = new Element("block", new String[] { "xmlns" }, new String[] { BlockingCommand.XMLNS });
-		Element item = new Element("item", new String[] { "jid" }, new String[] { jid });
+		Element iq = new Element("iq", new String[]{"type"}, new String[]{"set"});
+		Element block = new Element("block", new String[]{"xmlns"}, new String[]{BlockingCommand.XMLNS});
+		Element item = new Element("item", new String[]{"jid"}, new String[]{jid});
 		block.addChild(item);
 		iq.addChild(block);
 		Packet p = Packet.packetInstance(iq);
 		blockingCommand.process(p, sess, null, results, null);
 	}
-	
+
 	private void unblock(XMPPResourceConnection sess, String jid) throws Exception {
-		Element iq = new Element("iq", new String[] { "type" }, new String[] { "set" });
-		Element block = new Element("unblock", new String[] { "xmlns" }, new String[] { BlockingCommand.XMLNS });
-		Element item = new Element("item", new String[] { "jid" }, new String[] { jid });
+		Element iq = new Element("iq", new String[]{"type"}, new String[]{"set"});
+		Element block = new Element("unblock", new String[]{"xmlns"}, new String[]{BlockingCommand.XMLNS});
+		Element item = new Element("item", new String[]{"jid"}, new String[]{jid});
 		block.addChild(item);
 		iq.addChild(block);
 		Packet p = Packet.packetInstance(iq);
-		blockingCommand.process(p, sess, null, results, null);		
+		blockingCommand.process(p, sess, null, results, null);
 	}
-	
+
 	private void unblockAll(XMPPResourceConnection sess) throws Exception {
-		Element iq = new Element("iq", new String[] { "type" }, new String[] { "set" });
-		Element block = new Element("unblock", new String[] { "xmlns" }, new String[] { BlockingCommand.XMLNS });
+		Element iq = new Element("iq", new String[]{"type"}, new String[]{"set"});
+		Element block = new Element("unblock", new String[]{"xmlns"}, new String[]{BlockingCommand.XMLNS});
 		iq.addChild(block);
 		Packet p = Packet.packetInstance(iq);
-		blockingCommand.process(p, sess, null, results, null);		
+		blockingCommand.process(p, sess, null, results, null);
 	}
-	private void checkPrivacyJidBlocked(XMPPResourceConnection sess, String jid, boolean value) throws NotAuthorizedException, TigaseDBException {
+
+	private void checkPrivacyJidBlocked(XMPPResourceConnection sess, String jid, boolean value)
+			throws NotAuthorizedException, TigaseDBException {
 		List<String> blocked = Privacy.getBlocked(sess);
 		if (value) {
 			assertTrue(blocked != null && blocked.contains(jid));
@@ -274,17 +275,19 @@ public class BlockingCommandTest extends ProcessorTestCase {
 			assertTrue(blocked == null || !blocked.contains(jid));
 		}
 	}
-	
+
 	private List<String> getBlocked(XMPPResourceConnection sess) throws XMPPException, TigaseStringprepException {
-		Element iq = new Element("iq", new String[] { "type" }, new String[] { "get" });
-		Element blocklist = new Element("blocklist", new String[] { "xmlns" }, new String[] { BlockingCommand.XMLNS });
+		Element iq = new Element("iq", new String[]{"type"}, new String[]{"get"});
+		Element blocklist = new Element("blocklist", new String[]{"xmlns"}, new String[]{BlockingCommand.XMLNS});
 		iq.addChild(blocklist);
-		
+
 		Packet p = Packet.packetInstance(iq);
 		blockingCommand.process(p, sess, null, results, null);
 		assertEquals(1, results.size());
 		Packet result = results.poll();
 		assertEquals(Iq.ELEM_NAME, result.getElemName());
-		return result.getElement().getChild("blocklist").mapChildren(c -> c.getName() == "item", c -> c.getAttributeStaticStr("jid"));
+		return result.getElement()
+				.getChild("blocklist")
+				.mapChildren(c -> c.getName() == "item", c -> c.getAttributeStaticStr("jid"));
 	}
 }

@@ -20,24 +20,33 @@
 package tigase.xmpp;
 
 /**
- * Base exception type used for other eceptions defined for <em>XMPP</em>
- * protocol. This type and all descendants are thrown by this package runtime.
- *
+ * Base exception type used for other eceptions defined for <em>XMPP</em> protocol. This type and all descendants are
+ * thrown by this package runtime.
  * <p>
- * Created: Sat Oct 30 08:38:18 2004
- * </p>
+ * <p> Created: Sat Oct 30 08:38:18 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPException extends Exception {
+public class XMPPException
+		extends Exception {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  public XMPPException() { super(); }
-  public XMPPException(String message) { super(message); }
-  public XMPPException(String message, Throwable cause) {
-    super(message, cause);
-  }
-  public XMPPException(Throwable cause) { super(cause); }
+	public XMPPException() {
+		super();
+	}
+
+	public XMPPException(String message) {
+		super(message);
+	}
+
+	public XMPPException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public XMPPException(Throwable cause) {
+		super(cause);
+	}
 
 } // XMPPException

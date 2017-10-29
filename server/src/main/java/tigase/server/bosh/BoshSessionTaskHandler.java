@@ -21,17 +21,14 @@ package tigase.server.bosh;
 
 import tigase.server.Packet;
 import tigase.server.xmppclient.SeeOtherHostIfc;
-
+import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
-import tigase.xml.Element;
-
-
 /**
  * Describe interface BoshSessionTaskHandler here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Aug  4 10:39:21 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -40,26 +37,26 @@ import tigase.xml.Element;
 public interface BoshSessionTaskHandler {
 
 	JID getJidForBoshSession(BoshSession bs);
-	
-	BoshTask scheduleTask( BoshSession bs, long delay );
 
-	BoshSendQueueTask scheduleSendQueueTask( BoshSession tt, long delay );
+	BoshTask scheduleTask(BoshSession bs, long delay);
 
-	void cancelTask( BoshTask bs );
+	BoshSendQueueTask scheduleSendQueueTask(BoshSession tt, long delay);
 
-	void cancelSendQueueTask( BoshSendQueueTask bt );
+	void cancelTask(BoshTask bs);
 
-	void writeRawData( BoshIOService ios, String data );
+	void cancelSendQueueTask(BoshSendQueueTask bt);
 
-	boolean addOutStreamOpen( Packet packet, BoshSession bs );
+	void writeRawData(BoshIOService ios, String data);
 
-	boolean addOutStreamClosed( Packet packet, BoshSession bs, boolean withTimeout );
+	boolean addOutStreamOpen(Packet packet, BoshSession bs);
+
+	boolean addOutStreamClosed(Packet packet, BoshSession bs, boolean withTimeout);
 
 	BareJID getDefHostName();
-	
-	BareJID getSeeOtherHostForJID( Packet packet, BareJID userId, SeeOtherHostIfc.Phase ph );
 
-	Element getSeeOtherHostError( Packet packet, BareJID destination);
+	BareJID getSeeOtherHostForJID(Packet packet, BareJID userId, SeeOtherHostIfc.Phase ph);
+
+	Element getSeeOtherHostError(Packet packet, BareJID destination);
 
 	boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage);
 }

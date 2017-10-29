@@ -73,6 +73,60 @@ public class CpuTempTask
 		setPeriod(1000 * 10);
 	}
 
+	public int getCpuTempThreshold() {
+		return cpuTempThreshold;
+	}
+
+	public void setCpuTempThreshold(Integer cpuTempThreshold) {
+		this.cpuTempThreshold = cpuTempThreshold;
+	}
+
+	@Override
+	public Form getCurrentConfiguration() {
+		Form x = super.getCurrentConfiguration();
+		x.addField(Field.fieldTextSingle("cpuTempThreshold", "" + cpuTempThreshold, "CPU Temp threshold"));
+		// x.addField(Field.fieldTextSingle("N270#cpuTemp", "" +
+		// cpuTempThreshold, "CPU Temp threshold"));
+		return x;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(CPU_TEMP_MONITOR_EVENT_NAME, "Fired when CPU temperature is too high", false);
+	}
+
+	@Override
+	public void setNewConfiguration(Form form) {
+		Field cpuTempField = form.get("cpuTempThreshold");
+		if (cpuTempField != null) {
+			this.cpuTempThreshold = Integer.parseInt(cpuTempField.getValue());
+		}
+
+		super.setNewConfiguration(form);
+	}
+
+	@Override
+	protected void run() {
+		checkCPUTemperature();
+		// checkCPUFrequency();
+		// checkCPUThrottling();
+
+		if (cpu_temp >= cpuTempThreshold) {
+			Element event = new Element(CPU_TEMP_MONITOR_EVENT_NAME);
+			event.addChild(new Element("hostname", component.getDefHostName().toString()));
+			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("cpuTemp", "" + cpu_temp));
+
+			if (!triggeredEvents.contains(event.getName())) {
+				eventBus.fire(event);
+				triggeredEvents.add(event.getName());
+			}
+
+		} else {
+			triggeredEvents.remove(CPU_TEMP_MONITOR_EVENT_NAME);
+		}
+	}
+
 	private void checkCPUFrequency() {
 		try {
 			int cpu = 0;
@@ -128,59 +182,5 @@ public class CpuTempTask
 				log.log(Level.WARNING, "Can't read file: " + THROTT_DIR + i + THROTT_FILE, ex);
 			}
 		}
-	}
-
-	public int getCpuTempThreshold() {
-		return cpuTempThreshold;
-	}
-
-	public void setCpuTempThreshold(Integer cpuTempThreshold) {
-		this.cpuTempThreshold = cpuTempThreshold;
-	}
-
-	@Override
-	public Form getCurrentConfiguration() {
-		Form x = super.getCurrentConfiguration();
-		x.addField(Field.fieldTextSingle("cpuTempThreshold", "" + cpuTempThreshold, "CPU Temp threshold"));
-		// x.addField(Field.fieldTextSingle("N270#cpuTemp", "" +
-		// cpuTempThreshold, "CPU Temp threshold"));
-		return x;
-	}
-
-	@Override
-	public void initialize() {
-		eventBus.registerEvent(CPU_TEMP_MONITOR_EVENT_NAME, "Fired when CPU temperature is too high", false);
-	}
-
-	@Override
-	protected void run() {
-		checkCPUTemperature();
-		// checkCPUFrequency();
-		// checkCPUThrottling();
-
-		if (cpu_temp >= cpuTempThreshold) {
-			Element event = new Element(CPU_TEMP_MONITOR_EVENT_NAME);
-			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
-			event.addChild(new Element("cpuTemp", "" + cpu_temp));
-
-			if (!triggeredEvents.contains(event.getName())) {
-				eventBus.fire(event);
-				triggeredEvents.add(event.getName());
-			}
-
-		} else {
-			triggeredEvents.remove(CPU_TEMP_MONITOR_EVENT_NAME);
-		}
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field cpuTempField = form.get("cpuTempThreshold");
-		if (cpuTempField != null) {
-			this.cpuTempThreshold = Integer.parseInt(cpuTempField.getValue());
-		}
-
-		super.setNewConfiguration(form);
 	}
 }

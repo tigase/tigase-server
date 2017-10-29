@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -27,32 +25,26 @@ package tigase.server.bosh;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
-
 import tigase.xml.Element;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-
 /**
  * Describe class BoshSessionCache here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Feb 25 23:54:57 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class BoshSessionCache {
+
 	/** Field description */
 	public static final String DEF_ID = "";
 
@@ -64,29 +56,25 @@ public class BoshSessionCache {
 
 	/** Field description */
 	public static final String ROSTER_ID = "bosh-roster";
-	private static final Logger log      =
-		Logger.getLogger("tigase.server.bosh.BoshSessionCache");
-	private static final SimpleDateFormat sdf =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshSessionCache");
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- fields ---------------------------------------------------------------
 
 	/**
-	 * Cached time of the first message to/from some jid
-	 * to speedup message caching processing
+	 * Cached time of the first message to/from some jid to speedup message caching processing
 	 */
 	protected Map<String, Long> jid_msg_start = null;
 
 	/**
-	 * Cache elements stored by the Bosh client. The cache elements are grouped
-	 * by IDs. There can be any number of Elements under each ID.
+	 * Cache elements stored by the Bosh client. The cache elements are grouped by IDs. There can be any number of
+	 * Elements under each ID.
 	 */
 	private Map<String, List<Element>> id_cache = null;
 
 	/**
-	 * Cached presence elements automaticaly stored by the Bosh component.
-	 * There is only 1 presence element stored for each JID which means the
-	 * cache stores the last presence element for each JID.
+	 * Cached presence elements automaticaly stored by the Bosh component. There is only 1 presence element stored for
+	 * each JID which means the cache stores the last presence element for each JID.
 	 */
 	private Map<String, Element> jid_presence = null;
 
@@ -94,11 +82,10 @@ public class BoshSessionCache {
 
 	/**
 	 * Creates a new <code>BoshSessionCache</code> instance.
-	 *
 	 */
 	public BoshSessionCache() {
-		id_cache      = new LinkedHashMap<String, List<Element>>();
-		jid_presence  = new LinkedHashMap<String, Element>();
+		id_cache = new LinkedHashMap<String, List<Element>>();
+		jid_presence = new LinkedHashMap<String, Element>();
 		jid_msg_start = new LinkedHashMap<String, Long>();
 	}
 
@@ -106,7 +93,6 @@ public class BoshSessionCache {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param id
 	 * @param data
@@ -131,7 +117,6 @@ public class BoshSessionCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param message
 	 */
 	public void addFromMessage(Element message) {
@@ -149,7 +134,6 @@ public class BoshSessionCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param presence
 	 */
 	public void addPresence(Element presence) {
@@ -163,7 +147,6 @@ public class BoshSessionCache {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param roster
 	 */
@@ -181,7 +164,6 @@ public class BoshSessionCache {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param message
 	 */
@@ -202,10 +184,7 @@ public class BoshSessionCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param id
-	 *
-	 * 
 	 */
 	public List<Element> get(String id) {
 		if (id == null) {
@@ -223,9 +202,6 @@ public class BoshSessionCache {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public List<Element> getAll() {
 		List<Element> result = new ArrayList<Element>();
@@ -243,9 +219,6 @@ public class BoshSessionCache {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public List<Element> getAllPresences() {
 		return new ArrayList<Element>(jid_presence.values());
@@ -254,10 +227,7 @@ public class BoshSessionCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param from
-	 *
-	 * 
 	 */
 	public List<Element> getPresence(String... from) {
 		List<Element> result = new ArrayList<Element>();
@@ -278,10 +248,7 @@ public class BoshSessionCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param id
-	 *
-	 * 
 	 */
 	public List<Element> remove(String id) {
 		if (id == null) {
@@ -301,7 +268,6 @@ public class BoshSessionCache {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param id
 	 * @param data
@@ -323,9 +289,9 @@ public class BoshSessionCache {
 	//~--- methods --------------------------------------------------------------
 
 	private void addMsgBody(String jid, String direction, Element body) {
-		long start_time             = getMsgStartTime(jid);
+		long start_time = getMsgStartTime(jid);
 		List<Element> msg_history_l = id_cache.get(MESSAGE_ID + jid);
-		Element msg_history         = null;
+		Element msg_history = null;
 
 		if (msg_history_l == null) {
 			msg_history = createMessageHistory(jid);
@@ -336,9 +302,9 @@ public class BoshSessionCache {
 
 		long current_secs = (System.currentTimeMillis() / 1000) - start_time;
 
-		msg_history.findChildStaticStr(Iq.IQ_CHAT_PATH).addChild(new Element(direction,
-						new Element[] { body }, new String[] { "secs" },
-						new String[] { "" + current_secs }));
+		msg_history.findChildStaticStr(Iq.IQ_CHAT_PATH)
+				.addChild(new Element(direction, new Element[]{body}, new String[]{"secs"},
+									  new String[]{"" + current_secs}));
 	}
 
 	private Element createMessageHistory(String jid) {
@@ -348,10 +314,9 @@ public class BoshSessionCache {
 			sdf_string = sdf.format(new Date());
 		}
 
-		return new Element("iq", new Element[] { new Element("chat", new String[] { "xmlns",
-						"with", "start" }, new String[] { "urn:xmpp:tmp:archive", jid,
-						sdf_string }) }, new String[] { "type",
-						"id" }, new String[] { "set", "" + System.currentTimeMillis() });
+		return new Element("iq", new Element[]{new Element("chat", new String[]{"xmlns", "with", "start"},
+														   new String[]{"urn:xmpp:tmp:archive", jid, sdf_string})},
+						   new String[]{"type", "id"}, new String[]{"set", "" + System.currentTimeMillis()});
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -367,6 +332,5 @@ public class BoshSessionCache {
 		return start_time;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/20

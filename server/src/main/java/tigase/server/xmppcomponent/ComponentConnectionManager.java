@@ -37,7 +37,9 @@ import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -50,7 +52,7 @@ import java.util.logging.Logger;
 
 /**
  * Class ComponentConnectionManager
- *
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -58,7 +60,8 @@ import java.util.logging.Logger;
  */
 @Bean(name = "ext-comp", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.ComponentMode})
-public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<Object>>
+public class ComponentConnectionManager
+		extends ConnectionManager<XMPPIOService<Object>>
 		implements XMPPService {
 
 	/** Field description */
@@ -88,36 +91,27 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	private static final Logger log = Logger.getLogger(ComponentConnectionManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	/** Field description */
-	public int[] PORTS = { 5555 };
-
-	/** Field description */
-	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
-
-	/** Field description */
-	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
-
-	/** Field description */
-	public ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
-
-	/** Field description */
-	public SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
-
-	/** Field description */
-	public String SECRET_PROP_VAL = "someSecret";
-
-	/** Field description */
-	public String[] PORT_ROUTING_TABLE_PROP_VAL = { PORT_REMOTE_HOST_PROP_VAL,
-			".*@" + PORT_REMOTE_HOST_PROP_VAL, ".*\\." + PORT_REMOTE_HOST_PROP_VAL };
-
 	/** Field description */
 	public boolean PACK_ROUTED_VAL = false;
-	private ServiceEntity serviceEntity = null;
-	private boolean pack_routed = PACK_ROUTED_VAL;
-
+	/** Field description */
+	public int[] PORTS = {5555};
+	/** Field description */
+	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
+	/** Field description */
+	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
+	/** Field description */
+	public String[] PORT_ROUTING_TABLE_PROP_VAL = {PORT_REMOTE_HOST_PROP_VAL, ".*@" + PORT_REMOTE_HOST_PROP_VAL,
+												   ".*\\." + PORT_REMOTE_HOST_PROP_VAL};
+	/** Field description */
+	public SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
+	/** Field description */
+	public ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
+	/** Field description */
+	public String SECRET_PROP_VAL = "someSecret";
 	// private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
+	private boolean pack_routed = PACK_ROUTED_VAL;
+	private ServiceEntity serviceEntity = null;
 	private String service_id = "it doesn't matter";
 
 	//~--- get methods ----------------------------------------------------------
@@ -134,7 +128,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		if (config_type.equals(GEN_CONFIG_CS)) {
 			PACK_ROUTED_VAL = true;
 			PORT_TYPE_PROP_VAL = ConnectionType.connect;
-			PORT_IFC_PROP_VAL = new String[] { "localhost" };
+			PORT_IFC_PROP_VAL = new String[]{"localhost"};
 		}
 
 		boolean def_found = false;
@@ -164,10 +158,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 					if (comp_params.length >= idx + 1) {
 						PORT_REMOTE_HOST_PROP_VAL = comp_params[idx++];
 						log.config("Setting PORT_REMOTE_HOST_PROP_VAL to " + PORT_REMOTE_HOST_PROP_VAL);
-						PORT_ROUTING_TABLE_PROP_VAL = new String[] { PORT_REMOTE_HOST_PROP_VAL };
+						PORT_ROUTING_TABLE_PROP_VAL = new String[]{PORT_REMOTE_HOST_PROP_VAL};
 
 						if (config_type.equals(GEN_CONFIG_CS)) {
-							PORT_IFC_PROP_VAL = new String[] { PORT_REMOTE_HOST_PROP_VAL };
+							PORT_IFC_PROP_VAL = new String[]{PORT_REMOTE_HOST_PROP_VAL};
 						}
 					}
 
@@ -206,19 +200,19 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 					}
 
 					if (comp_params.length >= idx + 1) {
-						PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
+						PORT_ROUTING_TABLE_PROP_VAL = new String[]{comp_params[idx++]};
 					} else {
 						if (config_type.equals(GEN_CONFIG_COMP)) {
 
 							// This is specialized configuration for a single
 							// external component so all traffic should go through
 							// the external component (it acts as like s2s component)
-							PORT_ROUTING_TABLE_PROP_VAL = new String[] { ".*" };
+							PORT_ROUTING_TABLE_PROP_VAL = new String[]{".*"};
 						} else {
 							String regex_host = PORT_REMOTE_HOST_PROP_VAL.replace(".", "\\.");
 
-							PORT_ROUTING_TABLE_PROP_VAL = new String[] { regex_host, ".*@" + regex_host,
-									".*\\." + regex_host };
+							PORT_ROUTING_TABLE_PROP_VAL = new String[]{regex_host, ".*@" + regex_host,
+																	   ".*\\." + regex_host};
 						}
 					}
 
@@ -227,14 +221,13 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 			}
 		}
 
-		if ( !def_found) {
+		if (!def_found) {
 			PORT_LOCAL_HOST_PROP_VAL = "localhost";
 			PORT_REMOTE_HOST_PROP_VAL = getName() + ".localhost";
 
 			String regex_host = PORT_REMOTE_HOST_PROP_VAL.replace(".", "\\.");
 
-			PORT_ROUTING_TABLE_PROP_VAL = new String[] { regex_host, ".*@" + regex_host,
-					".*\\." + regex_host };
+			PORT_ROUTING_TABLE_PROP_VAL = new String[]{regex_host, ".*@" + regex_host, ".*\\." + regex_host};
 		}    // end of if (!def_found)
 
 		Map<String, Object> props = super.getDefaults(params);
@@ -265,8 +258,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		if (getName().equals(jid.getLocalpart())) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
-			return Arrays.asList(serviceEntity.getDiscoItem(null,
-															BareJID.toString(getName(), jid.toString())));
+			return Arrays.asList(serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString())));
 		}
 	}
 
@@ -284,8 +276,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 		if ((packet.getStanzaTo() != null) && packet.getStanzaTo().equals(getComponentId())) {
 			try {
-				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Not implemented", true));
+				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, "Not implemented", true));
 			} catch (PacketErrorTypeException e) {
 				log.warning("Packet processing exception: " + e);
 			}
@@ -334,14 +325,14 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 		return null;
 	}
-	
+
 	@Override
 	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
 		// readd packet - this may be good as we would retry to send packet 
 		// which delivery failed due to IO error
 		addPacket(packet);
 		return true;
-	}	
+	}
 
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
@@ -354,8 +345,8 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		super.serviceStarted(serv);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("c2c connection opened: " + serv.getRemoteAddress() + ", type: "
-					+ serv.connectionType().toString() + ", id=" + serv.getUniqueId());
+			log.finest("c2c connection opened: " + serv.getRemoteAddress() + ", type: " +
+							   serv.connectionType().toString() + ", id=" + serv.getUniqueId());
 		}
 
 //  String addr =
@@ -363,13 +354,13 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 //  addRouting(addr);
 		// addRouting(serv.getRemoteHost());
 		switch (serv.connectionType()) {
-			case connect :
+			case connect:
 
 				// Send init xmpp stream here
 				// XMPPIOService serv = (XMPPIOService)service;
 				String compName = (String) serv.getSessionData().get(PORT_LOCAL_HOST_PROP_KEY);
-				String data = "<stream:stream" + " xmlns='jabber:component:accept'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " to='" + compName + "'" + ">";
+				String data = "<stream:stream" + " xmlns='jabber:component:accept'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" + " to='" + compName + "'" + ">";
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " + data);
@@ -379,7 +370,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 				break;
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
@@ -431,14 +422,14 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 		// serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
 		serviceEntity = new ServiceEntity("XEP-0114 " + getName(), null, "XEP-0114");
-		serviceEntity.addIdentities(new ServiceIdentity("component", identity_type,
-				"XEP-0114 " + getName()));
+		serviceEntity.addIdentities(new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {
+	}
 
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
@@ -454,7 +445,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		}
 
 		switch (service.connectionType()) {
-			case connect : {
+			case connect: {
 				String id = attribs.get("id");
 
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
@@ -465,8 +456,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 					String digest = Algorithms.hexDigest(id, secret, "SHA");
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest="
-								+ digest);
+						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest=" + digest);
 					}
 
 					return "<handshake>" + digest + "</handshake>";
@@ -477,7 +467,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				}
 			}
 
-			case accept : {
+			case accept: {
 				String hostname = attribs.get("to");
 
 				service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
@@ -486,12 +476,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
-				return "<stream:stream" + " xmlns='jabber:component:accept'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
-							+ " id='" + id + "'" + ">";
+				return "<stream:stream" + " xmlns='jabber:component:accept'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'" + " id='" + id +
+						"'" + ">";
 			}
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
@@ -509,11 +499,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * <p>
 	 * <br><br>
-	 * 
-	 * We should not really close external component connection at all, so let's
-	 * say something like: 1000 days...
+	 * <p>
+	 * We should not really close external component connection at all, so let's say something like: 1000 days...
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
@@ -557,7 +546,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
-			case connect : {
+			case connect: {
 				String data = p.getElemCData();
 
 				if (data == null) {
@@ -581,7 +570,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				break;
 			}
 
-			case accept : {
+			case accept: {
 				String digest = p.getElemCData();
 				String id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 				String secret = (String) serv.getSessionData().get(SECRET_PROP_KEY);
@@ -590,8 +579,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 					String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest="
-								+ loc_digest);
+						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest=" + loc_digest);
 					}
 
 					if ((digest != null) && digest.equals(loc_digest)) {
@@ -623,7 +611,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				break;
 			}
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
@@ -666,8 +654,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

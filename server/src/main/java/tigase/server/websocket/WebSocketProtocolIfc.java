@@ -25,71 +25,74 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 /**
- * Interface which needs to be implemented by any implemention of version of
- * WebSocket protocol. 
- * 
- * Currently we have stable version but there were older not compatible with 
- * current so it may be that new will come in future - also not compatible.
- * 
+ * Interface which needs to be implemented by any implemention of version of WebSocket protocol.
+ * <p>
+ * Currently we have stable version but there were older not compatible with current so it may be that new will come in
+ * future - also not compatible.
+ *
  * @author andrzej
  */
 public interface WebSocketProtocolIfc {
-	
+
 	/**
-	 * HTTP header used by WebSocket to pass used version of WebSocket protocol
-	 * from client to server
+	 * HTTP header used by WebSocket to pass used version of WebSocket protocol from client to server
 	 */
-    public static final String WS_VERSION_KEY  = "Sec-WebSocket-Version";
+	public static final String WS_VERSION_KEY = "Sec-WebSocket-Version";
+
 	/**
-	 * HTTP header which contains name of subprotocol which should be used over
-	 * established WebSocket connection
+	 * HTTP header which contains name of subprotocol which should be used over established WebSocket connection
 	 */
 	static final String WS_PROTOCOL_KEY = "Sec-WebSocket-Protocol";
-	
+
 	/**
 	 * Method to retrieve string identifier of implementation of protcol version
-	 * 
-	 * @return 
+	 *
+	 * @return
 	 */
 	String getId();
-	
+
 	/**
-	 * Method responsible for handshaking of WebSocket using proper version of
-	 * protocol.
-	 * 
+	 * Method responsible for handshaking of WebSocket using proper version of protocol.
+	 *
 	 * @param service
 	 * @param headers
 	 * @param buf
-	 * @return false - if implementation is not able to handshake using this
-	 *					version of protocol, in other case return true
+	 *
+	 * @return false - if implementation is not able to handshake using this version of protocol, in other case return
+	 * true
+	 *
 	 * @throws NoSuchAlgorithmException
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	boolean handshake(WebSocketXMPPIOService service, Map<String,String> headers, byte[] buf) throws NoSuchAlgorithmException, IOException;
-	
+	boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
+			throws NoSuchAlgorithmException, IOException;
+
 	/**
-	 * Method responsible for decoding data received from socket and returning 
-	 * data after extracting it from WebSocket frame.
-	 * 
+	 * Method responsible for decoding data received from socket and returning data after extracting it from WebSocket
+	 * frame.
+	 *
 	 * @param service
 	 * @param buf
+	 *
 	 * @return decoded data or null if not full frame is available in input buffer
 	 */
 	ByteBuffer decodeFrame(WebSocketXMPPIOService service, ByteBuffer buf);
-	
+
 	/**
 	 * Method encodes data into WebSocket frame and writes it to passed service
-	 * 
+	 *
 	 * @param service
 	 * @param buf
+	 *
 	 * @throws IOException
 	 */
 	void encodeFrameAndWrite(WebSocketXMPPIOService service, ByteBuffer buf) throws IOException;
-	
+
 	/**
 	 * Method closes connection by sending close frame
+	 *
 	 * @param service
 	 */
 	void closeConnection(WebSocketXMPPIOService service);
-	
+
 }

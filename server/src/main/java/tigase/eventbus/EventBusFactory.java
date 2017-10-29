@@ -27,15 +27,15 @@ public class EventBusFactory {
 
 	private final static EventBusImplementation eventBus = new EventBusImplementation();
 
-	private EventBusFactory() {
-	}
-
 	public static EventBus getInstance() {
 		return eventBus;
 	}
 
 	public static EventsRegistrar getRegistrar() {
 		return eventBus.getRegistrar();
+	}
+
+	private EventBusFactory() {
 	}
 
 }

@@ -32,8 +32,6 @@ def feeder = new jabberd2(source)
 //def feeder = new OpenFire(source)
 /* Configure here ^^^ */
 
-
-
 /* you definitely not need to change anything below */
 //import tigase.server.*
 //import tigase.util.*

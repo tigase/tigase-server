@@ -19,20 +19,17 @@
  */
 package tigase.admin
 
-import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.db.comp.ComponentRepository
-import tigase.xml.*
+import tigase.server.Command
+import tigase.server.Packet
 
-def p = (Packet)packet
+def p = (Packet) packet
 def result = p.commandResult(Command.DataType.result)
 try {
 	def nodes = component.getNodesConnectedWithLocal().collect { return it.getDomain() }
 	Command.addFieldMultiValue(result, "Cluster nodes:", nodes);
 } catch (Exception ex) {
-	Command.addTextField(result, "Note", "Problem with retrieving list of all connected cluster nodes: " + ex.getMessage());
+	Command.addTextField(result, "Note",
+						 "Problem with retrieving list of all connected cluster nodes: " + ex.getMessage());
 }
 return result
 

@@ -29,5 +29,5 @@ public interface PasswordResetterIfc {
 	void validateToken(String encodedToken) throws RepositoryException, RuntimeException;
 
 	void sendToken(BareJID bareJID, String url) throws RepositoryException, Exception;
-	
+
 }

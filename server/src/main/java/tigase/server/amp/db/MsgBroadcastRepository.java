@@ -40,16 +40,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by andrzej on 15.03.2016.
  */
-public abstract class MsgBroadcastRepository<T,S extends DataSource> implements DataSourceAware<S> {
+public abstract class MsgBroadcastRepository<T, S extends DataSource>
+		implements DataSourceAware<S> {
 
+	protected Map<String, BroadcastMsg> broadcastMessages = new ConcurrentHashMap<String, BroadcastMsg>();
+	protected long broadcastMessagesLastCleanup = 0;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 
-	protected long broadcastMessagesLastCleanup = 0;
-	protected Map<String,BroadcastMsg> broadcastMessages = new ConcurrentHashMap<String,BroadcastMsg>();
-
 	public abstract void loadMessagesToBroadcast();
-	protected abstract void ensureBroadcastMessageRecipient(String id, BareJID recipient);
-	protected abstract void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
 
 	public BroadcastMsg getBroadcastMsg(String id) {
 		return broadcastMessages.get(id);
@@ -58,10 +56,11 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 	public String dumpBroadcastMessageKeys() {
 		StringBuilder sb = new StringBuilder();
 		for (String key : broadcastMessages.keySet()) {
-			if (sb.length() == 0)
+			if (sb.length() == 0) {
 				sb.append("[");
-			else
+			} else {
 				sb.append(",");
+			}
 			sb.append(key);
 		}
 		return sb.append("]").toString();
@@ -72,13 +71,14 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 		if (now - broadcastMessagesLastCleanup > 60 * 1000) {
 			broadcastMessagesLastCleanup = now;
 			List<String> toRemove = new ArrayList<String>();
-			for (Map.Entry<String,BroadcastMsg> e : broadcastMessages.entrySet()) {
+			for (Map.Entry<String, BroadcastMsg> e : broadcastMessages.entrySet()) {
 				if (e.getValue().getDelay(TimeUnit.MILLISECONDS) < 0) {
 					toRemove.add(e.getKey());
 				}
 			}
-			for (String key : toRemove)
+			for (String key : toRemove) {
 				broadcastMessages.remove(key);
+			}
 		}
 		return Collections.unmodifiableCollection(broadcastMessages.values());
 	}
@@ -100,34 +100,13 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 		}
 	}
 
-	public class BroadcastMsg<T> extends MsgRepository.MsgDBItem<T> {
+	protected abstract void ensureBroadcastMessageRecipient(String id, BareJID recipient);
 
-		private JidResourceMap<Boolean> recipients = new JidResourceMap<Boolean>();
-
-		public BroadcastMsg(T db_id, Element msg, Date expired) {
-			super(db_id, msg, expired);
-		}
-
-		protected boolean addRecipient(BareJID jid) {
-			if (recipients.containsKey(jid))
-				return false;
-			recipients.put(JID.jidInstance(jid), Boolean.TRUE);
-			return true;
-		}
-
-		public boolean needToSend(JID jid) {
-			return recipients.containsKey(jid.getBareJID())
-					&& (jid.getResource() == null || !recipients.containsKey(jid));
-		}
-
-		public void markAsSent(JID jid) {
-			recipients.put(jid, Boolean.TRUE);
-		}
-
-	}
+	protected abstract void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
 
 	@Bean(name = "msgBroadcastRepository", parent = AmpComponent.class, active = true)
-	public static class MsgBroadcastRepositoryBean extends MDRepositoryBeanWithStatistics<MsgBroadcastRepository>
+	public static class MsgBroadcastRepositoryBean
+			extends MDRepositoryBeanWithStatistics<MsgBroadcastRepository>
 			implements MsgBroadcastRepositoryIfc {
 
 		public MsgBroadcastRepositoryBean() {
@@ -137,11 +116,6 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 		@Override
 		public void setDataSource(DataSource dataSource) {
 			// Nothing to do
-		}
-
-		@Override
-		protected Class<? extends MsgBroadcastRepository> findClassForDataSource(DataSource dataSource) throws DBInitException {
-			return DataSourceHelper.getDefaultClass(MsgBroadcastRepository.class, dataSource.getResourceUri());
 		}
 
 		@Override
@@ -174,9 +148,44 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 			return MsgBroadcastRepositoryConfigBean.class;
 		}
 
-		public static class MsgBroadcastRepositoryConfigBean extends MDRepositoryConfigBean<MsgBroadcastRepository> {
+		@Override
+		protected Class<? extends MsgBroadcastRepository> findClassForDataSource(DataSource dataSource)
+				throws DBInitException {
+			return DataSourceHelper.getDefaultClass(MsgBroadcastRepository.class, dataSource.getResourceUri());
+		}
+
+		public static class MsgBroadcastRepositoryConfigBean
+				extends MDRepositoryConfigBean<MsgBroadcastRepository> {
 
 		}
+	}
+
+	public class BroadcastMsg<T>
+			extends MsgRepository.MsgDBItem<T> {
+
+		private JidResourceMap<Boolean> recipients = new JidResourceMap<Boolean>();
+
+		public BroadcastMsg(T db_id, Element msg, Date expired) {
+			super(db_id, msg, expired);
+		}
+
+		public boolean needToSend(JID jid) {
+			return recipients.containsKey(jid.getBareJID()) &&
+					(jid.getResource() == null || !recipients.containsKey(jid));
+		}
+
+		public void markAsSent(JID jid) {
+			recipients.put(jid, Boolean.TRUE);
+		}
+
+		protected boolean addRecipient(BareJID jid) {
+			if (recipients.containsKey(jid)) {
+				return false;
+			}
+			recipients.put(JID.jidInstance(jid), Boolean.TRUE);
+			return true;
+		}
+
 	}
 
 }

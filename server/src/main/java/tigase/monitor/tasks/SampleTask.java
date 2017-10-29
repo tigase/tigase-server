@@ -41,6 +41,30 @@ public class SampleTask
 	private String message = "<->";
 
 	@Override
+	public Form getCurrentConfiguration() {
+		Form x = super.getCurrentConfiguration();
+		x.addField(Field.fieldTextSingle("message", "", "Event message"));
+		return x;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent("tigase.monitor.tasks.SampleTaskEnabled", "Sample task", false);
+	}
+
+	@Override
+	public void setNewConfiguration(Form form) {
+		Field m = form.get("message");
+		if (m == null) {
+			this.message = "<not found>";
+		} else {
+			this.message = m.getValue();
+		}
+
+		super.setNewConfiguration(form);
+	}
+
+	@Override
 	protected void enable() {
 		super.enable();
 
@@ -54,30 +78,6 @@ public class SampleTask
 	}
 
 	@Override
-	public Form getCurrentConfiguration() {
-		Form x = super.getCurrentConfiguration();
-		x.addField(Field.fieldTextSingle("message", "", "Event message"));
-		return x;
-	}
-
-	@Override
-	public void initialize() {
-		eventBus.registerEvent("tigase.monitor.tasks.SampleTaskEnabled", "Sample task", false);
-	}
-
-	@Override
 	protected void run() {
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field m = form.get("message");
-		if (m == null) {
-			this.message = "<not found>";
-		} else {
-			this.message = m.getValue();
-		}
-
-		super.setNewConfiguration(form);
 	}
 }

@@ -22,20 +22,20 @@ package tigase.cluster.api;
 import tigase.server.Packet;
 
 /**
- * ClusterConnectionHandler interface used by ClusterConnectionSelectorIfc
- * implementations to separate implementation from ClusterConnectionManager
- * 
+ * ClusterConnectionHandler interface used by ClusterConnectionSelectorIfc implementations to separate implementation
+ * from ClusterConnectionManager
+ *
  * @author andrzej
  */
 public interface ClusterConnectionHandler {
 
 	/**
-	 * Generates hashCode for particular packet used to spread processing between
-	 * thread or connections
-	 * 
+	 * Generates hashCode for particular packet used to spread processing between thread or connections
+	 *
 	 * @param packet
-	 * @return 
+	 *
+	 * @return
 	 */
 	int hashCodeForPacket(Packet packet);
-	
+
 }

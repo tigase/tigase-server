@@ -22,14 +22,14 @@ package tigase.server.bosh;
 import tigase.util.common.TimerTask;
 
 /**
- *
  * @author andrzej
  */
-public class BoshSendQueueTask extends TimerTask {
+public class BoshSendQueueTask
+		extends TimerTask {
 
 	private final BoshSession bs;
 
-	public BoshSendQueueTask( BoshSession bs ) {
+	public BoshSendQueueTask(BoshSession bs) {
 		this.bs = bs;
 	}
 

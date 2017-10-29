@@ -23,11 +23,11 @@ package tigase.auth.callbacks;
 import javax.security.auth.callback.Callback;
 
 /**
- * Class for validate password. Called by SASL mechanisms. If given password is
- * valid then {@linkplain VerifyPasswordCallback#setVerified(boolean)
- * setVerified(true)} must be called.
+ * Class for validate password. Called by SASL mechanisms. If given password is valid then {@linkplain
+ * VerifyPasswordCallback#setVerified(boolean) setVerified(true)} must be called.
  */
-public class VerifyPasswordCallback implements Callback {
+public class VerifyPasswordCallback
+		implements Callback {
 
 	private final String password;
 

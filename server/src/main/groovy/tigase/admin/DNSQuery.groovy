@@ -28,13 +28,14 @@
 
 package tigase.admin
 
-import tigase.server.*
+import tigase.server.Command
+import tigase.server.Packet
 import tigase.util.dns.DNSEntry
 import tigase.util.dns.DNSResolverFactory
 
 def DOMAIN = "domain-name"
 
-def p = (Packet)packet
+def p = (Packet) packet
 
 def domain = Command.getFieldValue(packet, DOMAIN)
 
@@ -45,13 +46,13 @@ if (domain == null) {
 	Command.addInstructions(result, "Fill out this form to query DNS for domain.")
 
 	Command.addFieldValue(result, DOMAIN, domain ?: "", "text-single",
-			"Domain name to query DNS")
+						  "Domain name to query DNS")
 
 	return result
 }
 
 def result = p.commandResult(Command.DataType.result)
-def response_data = []
+def response_data = [ ]
 try {
 	response_data += "IP: " + DNSResolverFactory.getInstance().getHostIP(domain)
 } catch (Exception ex) {
@@ -72,7 +73,7 @@ try {
 	Command.addTextField(result, "Note", "Problem querying DNS for domain: " + domain);
 	// There is a new API to pass exception, for now we have to do it manually
 	//Command.addFieldMultiValue(result, "Exception: ", ex)
-	def stes = []
+	def stes = [ ]
 	stes += ex.toString()
 	ex.getStackTrace().each {
 		stes += it.toString()

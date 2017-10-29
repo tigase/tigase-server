@@ -18,26 +18,21 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.amp.cond;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.amp.ConditionIfc;
 import tigase.server.Packet;
-
+import tigase.server.amp.ConditionIfc;
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
-import java.util.logging.Logger;
-import java.util.Map;
 import java.util.TimeZone;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:36:39 PM
@@ -46,7 +41,8 @@ import java.util.TimeZone;
  * @version $Rev$
  */
 public class ExpireAt
-				implements ConditionIfc {
+		implements ConditionIfc {
+
 	/** Field description */
 	public static final String NAME = "expire-at";
 
@@ -59,11 +55,12 @@ public class ExpireAt
 
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
+
 	{
-		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
-		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-		formatter2 = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
-		formatter2.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+		formatter2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		formatter2.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	//~--- get methods ----------------------------------------------------------
 
@@ -103,6 +100,5 @@ public class ExpireAt
 		return false;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/20

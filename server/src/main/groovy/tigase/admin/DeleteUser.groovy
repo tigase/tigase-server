@@ -29,27 +29,33 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.vhosts.*
+import tigase.db.AuthRepository
+import tigase.db.TigaseDBException
+import tigase.db.UserNotFoundException
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.Permissions
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
+import tigase.xmpp.StanzaType
 import tigase.xmpp.jid.BareJID
 
 def JIDS = "accountjids"
 
-def p = (Packet)packet
-def auth_repo = (AuthRepository)authRepository
-def user_repo = (UserRepository)userRepository
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 def NOTIFY_CLUSTER = "notify-cluster"
-boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.toString()));
 def notifyClusterStr = Command.getFieldValue(packet, NOTIFY_CLUSTER);
-boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf( notifyClusterStr ) : true;
+boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf(notifyClusterStr) : true;
 
-def user_sessions = (Map)userSessions;
+def user_sessions = (Map) userSessions;
 
 def userJids = Command.getFieldValues(packet, JIDS)
 
@@ -60,10 +66,10 @@ if (userJids == null) {
 	Command.addInstructions(result, "Fill out this form to delete a user.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, JIDS, userJids ?: "", "jid-multi",
-			"The Jabber ID(s) to delete")
-	if 	( clusterMode  ) {
+						  "The Jabber ID(s) to delete")
+	if (clusterMode) {
 		Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
 	}
 
@@ -82,7 +88,7 @@ def closeUserSessions = { userJid ->
 				def res = sess.getResourceForConnectionId(conn);
 				if (res != null) {
 					def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
-							StanzaType.set, res.nextStanzaId());
+															   StanzaType.set, res.nextStanzaId());
 					results.offer(commandClose);
 				}
 			}
@@ -104,14 +110,14 @@ if (clusterMode) {
 
 def result = p.commandResult(Command.DataType.result)
 results.offer(result);
-def msgs = [];
-def errors = [];
+def msgs = [ ];
+def errors = [ ];
 for (userJid in userJids) {
 	try {
 		def bareJID = BareJID.bareJIDInstance(userJid)
 		VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-		if (isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		if (isServiceAdmin || (vhost != null &&
+				(vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 			if (user_repo.userExists(bareJID)) {
 				auth_repo.removeUser(bareJID)
 				try {
@@ -122,41 +128,42 @@ for (userJid in userJids) {
 					// then the second call to user_repo may throw the exception which is fine.
 				}
 				if (clusterMode && notifyCluster) {
-					def nodes = (List)clusterStrategy.getNodesConnected();
-					if (nodes && nodes.size() > 0 ) {
+					def nodes = (List) clusterStrategy.getNodesConnected();
+					if (nodes && nodes.size() > 0) {
 						nodes.each { node ->
 							def forward = p.copyElementOnly();
 							Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 							Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-							forward.setPacketTo( node );
-							forward.setPermissions( Permissions.ADMIN );
-							
+							forward.setPacketTo(node);
+							forward.setPermissions(Permissions.ADMIN);
+
 							results.offer(forward)
 						}
-					}	
-				} 
+					}
+				}
 				closeUserSessions(userJid);
 
-				msgs.add("Operation successful for user "+userJid);
-			}
-			else {
-				errors.add("User "+userJid+" not found, can't be deleted.");
+				msgs.add("Operation successful for user " + userJid);
+			} else {
+				errors.add("User " + userJid + " not found, can't be deleted.");
 			}
 		} else {
-			errors.add("You do not have enough permissions to delete accounts for domain "+bareJID.getDomain()+".");
+			errors.add("You do not have enough permissions to delete accounts for domain " + bareJID.getDomain() + ".");
 		}
 	} catch (UserNotFoundException ex) {
-		errors.add("User "+userJid+" not exists, can't be deleted.");
+		errors.add("User " + userJid + " not exists, can't be deleted.");
 	} catch (TigaseDBException ex) {
-		errors.add("Problem accessing database, user "+userJid+" not deleted.");
+		errors.add("Problem accessing database, user " + userJid + " not deleted.");
 	}
 }
 
-if (!msgs.isEmpty())
-	Command.addFieldMultiValue(result, "Notes", msgs);
+if (!msgs.isEmpty()) {
+	Command.addFieldMultiValue(result, "Notes", msgs)
+};
 
-if (!errors.isEmpty())
-	Command.addFieldMultiValue(result, "Errors", errors);
+if (!errors.isEmpty()) {
+	Command.addFieldMultiValue(result, "Errors", errors)
+};
 return results
 
 

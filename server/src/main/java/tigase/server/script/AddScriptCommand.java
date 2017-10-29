@@ -43,14 +43,15 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AddScriptCommand extends AbstractScriptCommand {
+public class AddScriptCommand
+		extends AbstractScriptCommand {
+
 	private static final Logger log = Logger.getLogger(AddScriptCommand.class.getName());
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param cmdId
 	 * @param cmdDescr
@@ -60,14 +61,11 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	 * @param ext
 	 * @param binds
 	 *
-	 * 
-	 *
 	 * @throws ScriptException
 	 */
-	@SuppressWarnings({ "unchecked" })
-	public Script addAdminScript(String cmdId, String cmdDescr, String cmdGroup, String script, String lang,
-			String ext, Bindings binds)
-			throws ScriptException {
+	@SuppressWarnings({"unchecked"})
+	public Script addAdminScript(String cmdId, String cmdDescr, String cmdGroup, String script, String lang, String ext,
+								 Bindings binds) throws ScriptException {
 		Script as = new Script();
 
 		as.init(cmdId, cmdDescr, cmdGroup, script, lang, ext, binds);
@@ -76,8 +74,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 
 		adminCommands.put(as.getCommandId(), as);
 
-		Map<String, Set<CmdAcl>> commandsACL = (Map<String,
-			Set<CmdAcl>>) binds.get(COMMANDS_ACL);
+		Map<String, Set<CmdAcl>> commandsACL = (Map<String, Set<CmdAcl>>) binds.get(COMMANDS_ACL);
 		Set<CmdAcl> acl = commandsACL.get(as.getCommandId());
 
 		if (acl != null) {
@@ -103,7 +100,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
 		String language = Command.getFieldValue(packet, LANGUAGE);
 		String commandId = Command.getFieldValue(packet, COMMAND_ID);
@@ -130,7 +127,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 					if (component != null) {
 						group = group.replace("${componentName}", component.getDiscoDescription());
 					}
-				}			
+				}
 				Script s = addAdminScript(commandId, description, group, sb.toString(), language, null, binds);
 				Packet result = packet.commandResult(Command.DataType.result);
 
@@ -201,25 +198,21 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	}
 
 	private void saveCommandToDisk(String commandId, String description, String group, StringBuilder sb,
-			String fileExtension, Bindings binds)
-			throws IOException {
+								   String fileExtension, Bindings binds) throws IOException {
 		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." + fileExtension);
 
 		File parentDirectory = fileName.getParentFile();
 
-		if ( ( parentDirectory != null ) && !parentDirectory.exists() ){
-			log.log( Level.CONFIG, "Admin scripts directory is missing: {0}, creating...",
-							 parentDirectory );
+		if ((parentDirectory != null) && !parentDirectory.exists()) {
+			log.log(Level.CONFIG, "Admin scripts directory is missing: {0}, creating...", parentDirectory);
 			try {
 				parentDirectory.mkdirs();
-			} catch ( Exception e ) {
-				log.log( Level.WARNING,
-								 "Can't create scripts directory , read-only filesystem: " + parentDirectory, e );
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Can't create scripts directory , read-only filesystem: " + parentDirectory, e);
 			}
 		}
 
-		log.log(Level.INFO, "Saving command: {0} to disk file: {1}", new Object[] { commandId,
-				fileName.toString() });
+		log.log(Level.INFO, "Saving command: {0} to disk file: {1}", new Object[]{commandId, fileName.toString()});
 
 		FileWriter fw = new FileWriter(fileName, false);
 		String comment = lineCommentStart.get(fileExtension);
@@ -239,8 +232,6 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

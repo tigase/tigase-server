@@ -18,24 +18,19 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.comp.RepositoryItemAbstract;
-
 import tigase.server.Command;
 import tigase.server.Packet;
-
 import tigase.util.repository.DataTypes;
-
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2009 2:40:26 PM
@@ -44,7 +39,8 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class ConfigItem
-				extends RepositoryItemAbstract {
+		extends RepositoryItemAbstract {
+
 	/** Field description */
 	public static final String CLUSTER_NODE_ATTR = "cluster-node";
 
@@ -90,21 +86,23 @@ public class ConfigItem
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String clusterNode        = null;
-	private String compName           = null;
-	private String keyName            = null;
-	private long lastModificationTime = -1;
-	private String nodeName           = null;
-	private Object value              = null;
-	private FLAGS flag                = FLAGS.DEFAULT;
-
-	//~--- constant enums -------------------------------------------------------
-
 	/**
 	 * Enum description
-	 *
 	 */
-	public enum FLAGS { INITIAL, DEFAULT, UPDATED; }
+	public enum FLAGS {
+		INITIAL,
+		DEFAULT,
+		UPDATED;
+	}
+	private String clusterNode = null;
+	private String compName = null;
+	private FLAGS flag = FLAGS.DEFAULT;
+	private String keyName = null;
+	private long lastModificationTime = -1;
+	private String nodeName = null;
+
+	//~--- constant enums -------------------------------------------------------
+	private Object value = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -119,16 +117,14 @@ public class ConfigItem
 		if (nodeName != null) {
 			Command.addTextField(packet, NODE_NAME_LABEL, nodeName);
 		}
-		Command.addTextField(packet, KEY_NAME_LABEL, ((keyName != null)
-						? keyName
-						: ""));
+		Command.addTextField(packet, KEY_NAME_LABEL, ((keyName != null) ? keyName : ""));
 		Command.addTextField(packet, "    ", "    ");
 
 		String value_label = VALUE_LABEL;
-		String value_str   = "";
+		String value_str = "";
 
 		if (value != null) {
-			value_str   = DataTypes.valueToString(value);
+			value_str = DataTypes.valueToString(value);
 			value_label += " [" + DataTypes.getTypeId(value) + "]";
 		}
 		Command.addFieldValue(packet, value_label, value_str);
@@ -139,9 +135,6 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getClusterNode() {
 		return clusterNode;
@@ -149,32 +142,21 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getCompName() {
 		return compName;
 	}
 
 	/**
-	 * Returns a configuration property key which is constructed in a following
-	 * way: <code>
-	 * nodeName + "/" + keyName
+	 * Returns a configuration property key which is constructed in a following way: <code> nodeName + "/" + keyName
 	 * </code>
-	 *
-	 * 
 	 */
 	public String getConfigKey() {
-		return ((nodeName != null)
-						? nodeName + "/"
-						: "") + keyName;
+		return ((nodeName != null) ? nodeName + "/" : "") + keyName;
 	}
 
 	/**
 	 * Returns a configuration property value.
-	 *
-	 * 
 	 */
 	public Object getConfigVal() {
 		return value;
@@ -182,14 +164,9 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getConfigValToString() {
-		return (value == null)
-					 ? null
-					 : DataTypes.valueToString(value);
+		return (value == null) ? null : DataTypes.valueToString(value);
 	}
 
 	@Override
@@ -203,25 +180,19 @@ public class ConfigItem
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * <p>
 	 * <br><br>
-	 *
-	 * Returns ConfigItem key which is constructed in a following way:
-	 * {@code compName + "/" + nodeName + "/" + keyName}
-	 * 
+	 * <p>
+	 * Returns ConfigItem key which is constructed in a following way: {@code compName + "/" + nodeName + "/" +
+	 * keyName}
 	 */
 	@Override
 	public String getKey() {
-		return ((compName != null)
-						? compName + "/"
-						: "") + ((nodeName != null)
-										 ? nodeName + "/"
-										 : "") + keyName;
+		return ((compName != null) ? compName + "/" : "") + ((nodeName != null) ? nodeName + "/" : "") + keyName;
 	}
 
 	/**
-	 * Returns a property key which is constructed in a following way:
-	 * {@code keyName}
+	 * Returns a property key which is constructed in a following way: {@code keyName}
 	 */
 	public String getKeyName() {
 		return keyName;
@@ -229,9 +200,6 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getNodeName() {
 		return nodeName;
@@ -245,30 +213,29 @@ public class ConfigItem
 
 		String tmp = Command.getFieldValue(packet, COMPONENT_NAME_LABEL);
 
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			compName = tmp;
 		}
 		tmp = Command.getFieldValue(packet, NODE_NAME_LABEL);
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			nodeName = tmp;
 		}
 		tmp = Command.getFieldValue(packet, KEY_NAME_LABEL);
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			keyName = tmp;
 		}
 
 		String value_label = Command.getFieldKeyStartingWith(packet, VALUE_LABEL);
-		char t             = DataTypes.decodeTypeIdFromName(value_label);
+		char t = DataTypes.decodeTypeIdFromName(value_label);
 
 		tmp = Command.getFieldValue(packet, value_label);
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			value = DataTypes.decodeValueType(t, tmp);
 		}
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param elem
 	 */
@@ -280,18 +247,17 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param propString
 	 */
 	@Override
 	public void initFromPropertyString(String propString) {
-		int idx_eq    = propString.indexOf('=');
-	
+		int idx_eq = propString.indexOf('=');
+
 		// String key = prop[0].trim();
 		// Object val = prop[1];
 		String key = propString.substring(0, idx_eq);
 		Object val = propString.substring(idx_eq + 1);
-		String[] prop = idx_eq == -1 ? new String[] { propString } : new String[] { key, (String) val };
+		String[] prop = idx_eq == -1 ? new String[]{propString} : new String[]{key, (String) val};
 
 		if (key.matches(".*\\[[FLISBlisb]\\]$")) {
 			char c = key.charAt(key.length() - 2);
@@ -304,17 +270,17 @@ public class ConfigItem
 
 		if (idx1 > 0) {
 			String compNameMeth = key.substring(0, idx1);
-			int idx2            = key.lastIndexOf("/");
+			int idx2 = key.lastIndexOf("/");
 			String nodeNameMeth = null;
-			String keyNameMeth  = key.substring(idx2 + 1);
+			String keyNameMeth = key.substring(idx2 + 1);
 
 			if (idx1 != idx2) {
 				nodeNameMeth = key.substring(idx1 + 1, idx2);
 			}
 			set(compNameMeth, nodeNameMeth, keyNameMeth, val);
 		} else {
-			throw new IllegalArgumentException("You have to provide a key with at least" +
-																				 " 'component_name/key_name': " + key);
+			throw new IllegalArgumentException(
+					"You have to provide a key with at least" + " 'component_name/key_name': " + key);
 		}
 	}
 
@@ -323,12 +289,9 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param comp
 	 * @param node
 	 * @param key
-	 *
-	 * 
 	 */
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
@@ -339,10 +302,7 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param o
-	 *
-	 * 
 	 */
 	@Override
 	public boolean equals(Object o) {
@@ -355,9 +315,6 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	@Override
 	public int hashCode() {
@@ -370,13 +327,10 @@ public class ConfigItem
 	 * Checks if the given component name is equal to this item compName.
 	 *
 	 * @param comp
-	 * 
 	 */
 	public boolean isComponent(String comp) {
 		if (compName != comp) {
-			return (compName != null)
-						 ? compName.equals(comp)
-						 : false;
+			return (compName != null) ? compName.equals(comp) : false;
 		}
 
 		return true;
@@ -386,13 +340,10 @@ public class ConfigItem
 	 * Checks if the given key is equal to this item keyName.
 	 *
 	 * @param key
-	 * 
 	 */
 	public boolean isKey(String key) {
 		if (keyName != key) {
-			return (keyName != null)
-						 ? keyName.equals(key)
-						 : false;
+			return (keyName != null) ? keyName.equals(key) : false;
 		}
 
 		return true;
@@ -402,29 +353,23 @@ public class ConfigItem
 	 * Checks if the given node is equal to this item nodeName
 	 *
 	 * @param node
-	 * 
 	 */
 	public boolean isNode(String node) {
 		if (nodeName != node) {
 
 			// At least one is not null
-			return (nodeName != null)
-						 ? nodeName.equals(node)
-						 : false;
+			return (nodeName != null) ? nodeName.equals(node) : false;
 		}
 
 		return true;
 	}
 
 	/**
-	 * Checks if the given node and key are equal to this item nodeName and
-	 * keyName. This method call works the same way as following statement: {@code
-	 * isNode(node) && isKey(key)
-	 * }
+	 * Checks if the given node and key are equal to this item nodeName and keyName. This method call works the same way
+	 * as following statement: {@code isNode(node) && isKey(key) }
 	 *
 	 * @param node
 	 * @param key
-	 * 
 	 */
 	public boolean isNodeKey(String node, String key) {
 		return isNode(node) && isKey(key);
@@ -435,7 +380,6 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param clusterNode_m
 	 * @param compName_m
 	 * @param nodeName_m
@@ -444,10 +388,10 @@ public class ConfigItem
 	 * @param val_type_m
 	 * @param flag_str_m
 	 */
-	public void set(String clusterNode_m, String compName_m, String nodeName_m,
-									String key_m, String value_str_m, char val_type_m, String flag_str_m) {
+	public void set(String clusterNode_m, String compName_m, String nodeName_m, String key_m, String value_str_m,
+					char val_type_m, String flag_str_m) {
 		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
-		FLAGS flag_m   = FLAGS.DEFAULT;
+		FLAGS flag_m = FLAGS.DEFAULT;
 
 		try {
 			flag_m = FLAGS.valueOf(flag_str_m);
@@ -461,7 +405,6 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param clusterNode_m
 	 * @param compName_m
 	 * @param nodeName_m
@@ -469,8 +412,8 @@ public class ConfigItem
 	 * @param value_m
 	 * @param flag_m
 	 */
-	public void set(String clusterNode_m, String compName_m, String nodeName_m,
-									String key_m, Object value_m, FLAGS flag_m) {
+	public void set(String clusterNode_m, String compName_m, String nodeName_m, String key_m, Object value_m,
+					FLAGS flag_m) {
 		if (clusterNode_m != null) {
 			this.clusterNode = clusterNode_m;
 		}
@@ -495,7 +438,6 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param compName_m
 	 * @param nodeName_m
 	 * @param key_m
@@ -503,14 +445,13 @@ public class ConfigItem
 	 * @param val_type_m
 	 * @param flag_str_m
 	 */
-	public void set(String compName_m, String nodeName_m, String key_m, String value_str_m,
-									char val_type_m, String flag_str_m) {
+	public void set(String compName_m, String nodeName_m, String key_m, String value_str_m, char val_type_m,
+					String flag_str_m) {
 		set(null, compName_m, nodeName_m, key_m, value_str_m, val_type_m, flag_str_m);
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param compName
 	 * @param nodeName
@@ -524,35 +465,31 @@ public class ConfigItem
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param clusterNode
 	 * @param compName
 	 * @param nodeName
 	 * @param key
 	 * @param value
 	 */
-	public void set(String clusterNode, String compName, String nodeName, String key,
-									Object value) {
+	public void set(String clusterNode, String compName, String nodeName, String key, Object value) {
 		set(clusterNode, compName, nodeName, key, value, null);
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param clusterNode
 	 * @param compName
 	 * @param nodeKey
 	 * @param value
 	 */
-	public void setNodeKey(String clusterNode, String compName, String nodeKey,
-												 Object value) {
-		int key_idx        = nodeKey.lastIndexOf("/");
-		String method_key  = nodeKey;
+	public void setNodeKey(String clusterNode, String compName, String nodeKey, Object value) {
+		int key_idx = nodeKey.lastIndexOf("/");
+		String method_key = nodeKey;
 		String method_node = null;
 
 		if (key_idx >= 0) {
-			method_key  = nodeKey.substring(key_idx + 1);
+			method_key = nodeKey.substring(key_idx + 1);
 			method_node = nodeKey.substring(0, key_idx);
 		}
 		set(clusterNode, compName, method_node, method_key, value);
@@ -578,9 +515,6 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	@Override
 	public Element toElement() {
@@ -603,15 +537,12 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	@Override
 	public String toPropertyString() {
-		char t        = DataTypes.getTypeId(value);
+		char t = DataTypes.getTypeId(value);
 		String result = getKey() + "[" + t + "]=";
-		String varr   = DataTypes.valueToString(value);
+		String varr = DataTypes.valueToString(value);
 
 		result += varr;
 
@@ -620,15 +551,11 @@ public class ConfigItem
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	@Override
 	public String toString() {
 		return getKey() + "=" + value;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/25

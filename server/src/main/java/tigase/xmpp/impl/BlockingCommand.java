@@ -44,39 +44,38 @@ import java.util.logging.Logger;
 /**
  * XEP-0191: Blocking Command. Based on privacy lists.
  *
- * @author Andrzej Wójcik 
- * 
+ * @author Andrzej Wójcik
+ * <p>
  * Originally submitted by:
  * @author Daniele Ricci
  * @author Behnam Hatami
  */
 @Id(BlockingCommand.ID)
 @DiscoFeatures({BlockingCommand.XMLNS})
-@Handles({
-	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.BLOCKLIST}, xmlns = BlockingCommand.XMLNS),
-	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.BLOCK}, xmlns = BlockingCommand.XMLNS),
-	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.UNBLOCK}, xmlns = BlockingCommand.XMLNS)})
+@Handles({@Handle(path = {Iq.ELEM_NAME, BlockingCommand.BLOCKLIST}, xmlns = BlockingCommand.XMLNS),
+		  @Handle(path = {Iq.ELEM_NAME, BlockingCommand.BLOCK}, xmlns = BlockingCommand.XMLNS),
+		  @Handle(path = {Iq.ELEM_NAME, BlockingCommand.UNBLOCK}, xmlns = BlockingCommand.XMLNS)})
 @HandleStanzaTypes({StanzaType.set, StanzaType.get})
 @Bean(name = BlockingCommand.ID, parent = SessionManager.class, active = true)
-public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProcessorIfc {
+public class BlockingCommand
+		extends XMPPProcessorAbstract
+		implements XMPPProcessorIfc {
 
-	private static final Logger log = Logger.getLogger(BlockingCommand.class.getName());
 	protected static final String XMLNS = "urn:xmpp:blocking";
 	protected static final String XMLNS_ERRORS = XMLNS + ":errors";
 	protected static final String ID = XMLNS;
-
 	protected static final String BLOCKLIST = "blocklist";
 	protected static final String BLOCK = "block";
 	protected static final String UNBLOCK = "unblock";
+	private static final Logger log = Logger.getLogger(BlockingCommand.class.getName());
 	private static final String ITEM = "item";
 	private static final String _JID = "jid";
-	
+
 	private final RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings) throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 		if (session == null || packet.getElemName() != Iq.ELEM_NAME) {
 			return;
 		}
@@ -98,7 +97,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 								processSetUnblock(packet, e, session, results);
 								break;
 							default:
-								results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, null, true));
+								results.offer(
+										Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, null, true));
 						}
 					}
 					break;
@@ -112,7 +112,20 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		}
 	}
 
-	private void processGet(Packet packet, XMPPResourceConnection session, Queue<Packet> results) throws XMPPException, NotAuthorizedException, TigaseDBException {
+	@Override
+	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+											  NonAuthUserRepository repo, Queue<Packet> results,
+											  Map<String, Object> settings) throws PacketErrorTypeException {
+	}
+
+	@Override
+	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+										   Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
+	}
+
+	private void processGet(Packet packet, XMPPResourceConnection session, Queue<Packet> results)
+			throws XMPPException, NotAuthorizedException, TigaseDBException {
 		if (packet.getElement().getChild(BLOCKLIST, XMLNS) != null) {
 			Element list = new Element(BLOCKLIST);
 			list.setXMLNS(XMLNS);
@@ -129,7 +142,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		}
 	}
 
-	private void processSetBlock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
+	private void processSetBlock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results)
+			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
 		List<JID> jids = collectJids(e);
 		if (jids != null && !jids.isEmpty()) {
 			for (JID jid : jids) {
@@ -143,7 +157,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		}
 	}
 
-	private void processSetUnblock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
+	private void processSetUnblock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results)
+			throws NotAuthorizedException, TigaseDBException {
 		List<JID> jids = collectJids(e);
 		if (jids == null || jids.isEmpty()) {
 			List<String> jidsStr = Privacy.getBlocked(session);
@@ -153,8 +168,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 					jids.add(JID.jidInstanceNS(jidStr));
 				}
 			}
-		}	
-		
+		}
+
 		if (jids != null) {
 			for (JID jid : jids) {
 				Privacy.unblock(session, jid.toString());
@@ -164,7 +179,7 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		results.offer(packet.okResult((Element) null, 0));
 		sendPush(session.getParentSession(), packet, results);
 	}
-	
+
 	private List<JID> collectJids(Element el) {
 		return el.mapChildren(item -> {
 			String jid = item.getAttributeStaticStr(_JID);
@@ -176,7 +191,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		});
 	}
 
-	private void sendUnblockPresences(XMPPResourceConnection session, JID jid, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
+	private void sendUnblockPresences(XMPPResourceConnection session, JID jid, Queue<Packet> results)
+			throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType stype = roster_util.getBuddySubscription(session, jid);
 		if (stype == SubscriptionType.both || stype == SubscriptionType.from) {
 			PresenceAbstract.sendPresence(StanzaType.probe, JID.jidInstance(session.getBareJID()), jid, results, null);
@@ -194,7 +210,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		}
 	}
 
-	private void sendBlockPresences(XMPPResourceConnection session, JID jid, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
+	private void sendBlockPresences(XMPPResourceConnection session, JID jid, Queue<Packet> results)
+			throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType stype = roster_util.getBuddySubscription(session, jid);
 		JID[] froms = session.getAllResourcesJIDs();
 		if (stype == SubscriptionType.both || stype == SubscriptionType.to) {
@@ -222,20 +239,13 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 			}
 		}
 	}
-	
-	@Override
-	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
-	}
 
-	@Override
-	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
-	}
-	
-	private static class TigaseStringprepRuntimeException extends RuntimeException {
+	private static class TigaseStringprepRuntimeException
+			extends RuntimeException {
 
 		public TigaseStringprepRuntimeException(String message, Throwable cause) {
 			super(message, cause);
 		}
-		
+
 	}
 }

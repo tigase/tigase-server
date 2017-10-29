@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 
 /**
- *
  * @author Wojtek
  */
 public class DomainFilterPolicyTest {
@@ -39,31 +38,29 @@ public class DomainFilterPolicyTest {
 	public DomainFilterPolicyTest() {
 	}
 
-
 	@Test
 	public void testValuePoliciesWithDomainListStr() {
-		log.log(Level.FINE, "valuePoliciesWithDomainListStr" );
+		log.log(Level.FINE, "valuePoliciesWithDomainListStr");
 		HashSet<String> result = DomainFilterPolicy.valuePoliciesWithDomainListStr();
-		assertEquals( true, result.contains( DomainFilterPolicy.CUSTOM.name()) );
-		assertEquals( true, result.contains( DomainFilterPolicy.LIST.name()) );
-		assertEquals( true, result.contains( DomainFilterPolicy.BLACKLIST.name()) );
-		assertEquals( false, result.contains( DomainFilterPolicy.ALL.name()) );
-		assertEquals( false, result.contains( DomainFilterPolicy.BLOCK.name()) );
-		assertEquals( false, result.contains( DomainFilterPolicy.LOCAL.name()) );
-		assertEquals( false, result.contains( DomainFilterPolicy.OWN.name()) );
+		assertEquals(true, result.contains(DomainFilterPolicy.CUSTOM.name()));
+		assertEquals(true, result.contains(DomainFilterPolicy.LIST.name()));
+		assertEquals(true, result.contains(DomainFilterPolicy.BLACKLIST.name()));
+		assertEquals(false, result.contains(DomainFilterPolicy.ALL.name()));
+		assertEquals(false, result.contains(DomainFilterPolicy.BLOCK.name()));
+		assertEquals(false, result.contains(DomainFilterPolicy.LOCAL.name()));
+		assertEquals(false, result.contains(DomainFilterPolicy.OWN.name()));
 	}
 
 	@Test
 	public void testIsDomainListRequired() {
-		log.log(Level.FINE,  "isDomainListRequired" );
-		assertEquals( false, DomainFilterPolicy.ALL.isDomainListRequired() );
-		assertEquals( true, DomainFilterPolicy.BLACKLIST.isDomainListRequired() );
-		assertEquals( false, DomainFilterPolicy.BLOCK.isDomainListRequired() );
-		assertEquals( true, DomainFilterPolicy.CUSTOM.isDomainListRequired() );
-		assertEquals( true, DomainFilterPolicy.LIST.isDomainListRequired() );
-		assertEquals( false, DomainFilterPolicy.LOCAL.isDomainListRequired() );
-		assertEquals( false, DomainFilterPolicy.OWN.isDomainListRequired() );
-
+		log.log(Level.FINE, "isDomainListRequired");
+		assertEquals(false, DomainFilterPolicy.ALL.isDomainListRequired());
+		assertEquals(true, DomainFilterPolicy.BLACKLIST.isDomainListRequired());
+		assertEquals(false, DomainFilterPolicy.BLOCK.isDomainListRequired());
+		assertEquals(true, DomainFilterPolicy.CUSTOM.isDomainListRequired());
+		assertEquals(true, DomainFilterPolicy.LIST.isDomainListRequired());
+		assertEquals(false, DomainFilterPolicy.LOCAL.isDomainListRequired());
+		assertEquals(false, DomainFilterPolicy.OWN.isDomainListRequired());
 
 	}
 

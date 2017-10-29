@@ -30,7 +30,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
-public class EventBusSerializer implements Serializer {
+public class EventBusSerializer
+		implements Serializer {
 
 	private TypesConverter typesConverter = new DefaultTypesConverter();
 
@@ -41,26 +42,32 @@ public class EventBusSerializer implements Serializer {
 
 			Field[] fields = BeanUtils.getAllFields(cls);
 			for (final Field f : fields) {
-				if (Modifier.isTransient(f.getModifiers()))
+				if (Modifier.isTransient(f.getModifiers())) {
 					continue;
-				if (Modifier.isFinal(f.getModifiers()))
+				}
+				if (Modifier.isFinal(f.getModifiers())) {
 					continue;
-				if (Modifier.isStatic(f.getModifiers()))
+				}
+				if (Modifier.isStatic(f.getModifiers())) {
 					continue;
+				}
 
 				try {
 					Object value;
 					Element v = element.getChild(f.getName());
-					if (v == null)
+					if (v == null) {
 						continue;
+					}
 
 					if (Element.class.isAssignableFrom(f.getType())) {
 						if (v.getChildren().size() > 0) {
 							value = v.getChildren().get(0);
-						} else
+						} else {
 							value = null;
+						}
 					} else {
-						value = typesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType(), f.getGenericType());
+						value = typesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType(),
+													   f.getGenericType());
 					}
 					BeanUtils.setValue(result, f, value);
 				} catch (IllegalAccessException | InvocationTargetException caught) {
@@ -80,18 +87,22 @@ public class EventBusSerializer implements Serializer {
 
 		Field[] fields = BeanUtils.getAllFields(cls);
 		for (final Field f : fields) {
-			if (Modifier.isTransient(f.getModifiers()))
+			if (Modifier.isTransient(f.getModifiers())) {
 				continue;
-			if (Modifier.isFinal(f.getModifiers()))
+			}
+			if (Modifier.isFinal(f.getModifiers())) {
 				continue;
-			if (Modifier.isStatic(f.getModifiers()))
+			}
+			if (Modifier.isStatic(f.getModifiers())) {
 				continue;
+			}
 
 			try {
 				final Object value = BeanUtils.getValue(object, f);
 
-				if (value == null)
+				if (value == null) {
 					continue;
+				}
 
 				Element v = new Element(f.getName());
 				if (Element.class.isAssignableFrom(f.getType())) {

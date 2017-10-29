@@ -28,16 +28,11 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.TimerTaskService;
 import tigase.util.common.TimerTask;
 
-public abstract class AbstractConfigurableTimerTask extends AbstractConfigurableTask implements UnregisterAware {
+public abstract class AbstractConfigurableTimerTask
+		extends AbstractConfigurableTask
+		implements UnregisterAware {
 
 	private final static String PERIOD_VAR = "x-task#period";
-
-	@ConfigField(desc = "Task execute period [ms]")
-	private long period = 1000l;
-
-	@Inject(bean = "timerTaskService")
-	private TimerTaskService timerTaskService;
-
 	private final TimerTask worker = new TimerTask() {
 
 		@Override
@@ -45,22 +40,14 @@ public abstract class AbstractConfigurableTimerTask extends AbstractConfigurable
 			AbstractConfigurableTimerTask.this.run();
 		}
 	};
+	@ConfigField(desc = "Task execute period [ms]")
+	private long period = 1000l;
+	@Inject(bean = "timerTaskService")
+	private TimerTaskService timerTaskService;
 
 	@Override
 	public void beforeUnregister() {
 		setEnabled(false);
-	}
-
-	@Override
-	protected void disable() {
-		super.disable();
-		worker.cancel();
-	}
-
-	@Override
-	protected void enable() {
-		super.enable();
-		timerTaskService.addTimerTask(worker, 1000l, period);
 	}
 
 	@Override
@@ -76,11 +63,23 @@ public abstract class AbstractConfigurableTimerTask extends AbstractConfigurable
 		return period;
 	}
 
+	public void setPeriod(long value) {
+		if (this.period != value) {
+			this.period = value;
+			if (isEnabled()) {
+				worker.cancel();
+				timerTaskService.addTimerTask(worker, 1000l, period);
+			}
+		}
+	}
+
 	public TimerTaskService getTimerTaskService() {
 		return timerTaskService;
 	}
 
-	protected abstract void run();
+	public void setTimerTaskService(TimerTaskService timerTaskService) {
+		this.timerTaskService = timerTaskService;
+	}
 
 	@Override
 	public void setNewConfiguration(Form form) {
@@ -93,18 +92,18 @@ public abstract class AbstractConfigurableTimerTask extends AbstractConfigurable
 		super.setNewConfiguration(form);
 	}
 
-	public void setPeriod(long value) {
-		if (this.period != value) {
-			this.period = value;
-			if (isEnabled()) {
-				worker.cancel();
-				timerTaskService.addTimerTask(worker, 1000l, period);
-			}
-		}
+	@Override
+	protected void disable() {
+		super.disable();
+		worker.cancel();
 	}
 
-	public void setTimerTaskService(TimerTaskService timerTaskService) {
-		this.timerTaskService = timerTaskService;
+	@Override
+	protected void enable() {
+		super.enable();
+		timerTaskService.addTimerTask(worker, 1000l, period);
 	}
+
+	protected abstract void run();
 
 }

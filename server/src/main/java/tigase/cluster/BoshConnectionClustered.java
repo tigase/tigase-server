@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -35,44 +33,33 @@ import tigase.server.ServiceChecker;
 import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
 import tigase.util.common.TimerTask;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author andrzej
  */
-@Bean(name="bosh", parent=Kernel.class, active = true)
+@Bean(name = "bosh", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 @ClusterModeRequired(active = true)
 public class BoshConnectionClustered
-				extends BoshConnectionManager
-				implements ClusteredComponentIfc {
+		extends BoshConnectionManager
+		implements ClusteredComponentIfc {
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(BoshConnectionClustered.class
-			.getName());
+	private static final Logger log = Logger.getLogger(BoshConnectionClustered.class.getName());
 
-    private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
+	private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
 
 	public BoshConnectionClustered() {
 		delayPortListening = true;
 	}
-
-	@Override
-	protected void onNodeConnected(JID jid) {
-		super.onNodeConnected(jid);
-		
-		List<JID> connectedNodes = getNodesConnectedWithLocal();
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.setNodes(connectedNodes);
-		}
-	}	
 
 	@Override
 	public void onNodeDisconnected(JID jid) {
@@ -111,8 +98,7 @@ public class BoshConnectionClustered
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Configuring see_other_host clustered strategy for: " +
-					see_other_host_class);
+			log.finest("Configuring see_other_host clustered strategy for: " + see_other_host_class);
 		}
 		if (see_other_host_class == null) {
 			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
@@ -126,36 +112,48 @@ public class BoshConnectionClustered
 		return see_other_host_strategy;
 	}
 
-    @Override
-    public void start() {
-        super.start();
+	@Override
+	public void start() {
+		super.start();
 
-        if (clusterEventHandler == null) {
-            clusterEventHandler = (ClusterConnectionManager.ClusterInitializedEvent event) -> {
+		if (clusterEventHandler == null) {
+			clusterEventHandler = (ClusterConnectionManager.ClusterInitializedEvent event) -> {
 				BoshConnectionClustered.this.connectWaitingTasks();
-				log.log(Level.WARNING, "Starting listening on ports of component: {0}", BoshConnectionClustered.this.getName());
+				log.log(Level.WARNING, "Starting listening on ports of component: {0}",
+						BoshConnectionClustered.this.getName());
 				eventBus.removeListener(clusterEventHandler);
-            };
-        }
+			};
+		}
 
-       	eventBus.addListener(ClusterConnectionManager.ClusterInitializedEvent.class, clusterEventHandler);
+		eventBus.addListener(ClusterConnectionManager.ClusterInitializedEvent.class, clusterEventHandler);
 
 		if (delayPortListening) {
 			addTimerTask(new TimerTask() {
 				@Override
 				public void run() {
-					log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
+					log.log(Level.FINE,
+							"Cluster synchronization timed-out, starting pending connections for " + getName());
 					BoshConnectionClustered.this.connectWaitingTasks();
 				}
 			}, connectionDelay * 30);
 		}
-    }
+	}
 
-    @Override
-    public void stop() {
-        super.stop();
-        eventBus.removeListener(clusterEventHandler);
-        clusterEventHandler = null;
-    }
+	@Override
+	public void stop() {
+		super.stop();
+		eventBus.removeListener(clusterEventHandler);
+		clusterEventHandler = null;
+	}
+
+	@Override
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
+
+		List<JID> connectedNodes = getNodesConnectedWithLocal();
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.setNodes(connectedNodes);
+		}
+	}
 
 }

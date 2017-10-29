@@ -22,8 +22,9 @@ package tigase.kernel.core;
 
 import tigase.kernel.beans.UnregisterAware;
 
-public class RegistrarKernel extends Kernel implements UnregisterAware {
-
+public class RegistrarKernel
+		extends Kernel
+		implements UnregisterAware {
 
 	@Override
 	public void beforeUnregister() {

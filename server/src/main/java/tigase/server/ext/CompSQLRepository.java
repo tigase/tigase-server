@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -53,54 +51,53 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class CompSQLRepository
-				implements ComponentRepository<CompRepoItem>, DataSourceAware<DataRepository>, Initializable, UnregisterAware {
+		implements ComponentRepository<CompRepoItem>, DataSourceAware<DataRepository>, Initializable, UnregisterAware {
+
 	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 
 	/** Field description */
-	public static final String  TABLE_NAME             = "external_component";
+	public static final String TABLE_NAME = "external_component";
 	private static final String CONNECTION_TYPE_COLUMN = "connection_type";
-	private static final String DOMAIN_COLUMN          = "domain";
+	private static final String DOMAIN_COLUMN = "domain";
 
 	/**
 	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger(CompSQLRepository.class.getName());
-	private static final String OTHER_DATA_COLUMN    = "other_data";
-	private static final String PASSWORD_COLUMN      = "password";
-	private static final String PORT_COLUMN          = "port";
-	private static final String PROTOCOL_COLUMN      = "protocol";
+	private static final String OTHER_DATA_COLUMN = "other_data";
+	private static final String PASSWORD_COLUMN = "password";
+	private static final String PORT_COLUMN = "port";
+	private static final String PROTOCOL_COLUMN = "protocol";
 	private static final String REMOTE_DOMAIN_COLUMN = "remote_domain";
-	private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME +
-			" where " + DOMAIN_COLUMN + " = ?";
+	private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME + " where " + DOMAIN_COLUMN + " = ?";
 	private static final String GET_ALL_ITEMS_QUERY = "select * from " + TABLE_NAME;
-	private static final String DELETE_ITEM_QUERY = "delete from " + TABLE_NAME +
-			" where (" + DOMAIN_COLUMN + " = ?)";
-	private static final String CREATE_TABLE_QUERY = "create table " + TABLE_NAME + " (" +
-			"  " + DOMAIN_COLUMN + " varchar(255) NOT NULL," + "  " + PASSWORD_COLUMN +
-			" varchar(255) NOT NULL," + "  " + CONNECTION_TYPE_COLUMN + " varchar(127)," +
-			"  " + PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(255)," +
-			"  " + PROTOCOL_COLUMN + " varchar(127)," + "  " + OTHER_DATA_COLUMN +
-			" TEXT," + "  primary key(" + DOMAIN_COLUMN + "))";
+	private static final String DELETE_ITEM_QUERY = "delete from " + TABLE_NAME + " where (" + DOMAIN_COLUMN + " = ?)";
+	private static final String CREATE_TABLE_QUERY =
+			"create table " + TABLE_NAME + " (" + "  " + DOMAIN_COLUMN + " varchar(255) NOT NULL," + "  " +
+					PASSWORD_COLUMN + " varchar(255) NOT NULL," + "  " + CONNECTION_TYPE_COLUMN + " varchar(127)," +
+					"  " + PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(255)," + "  " +
+					PROTOCOL_COLUMN + " varchar(127)," + "  " + OTHER_DATA_COLUMN + " TEXT," + "  primary key(" +
+					DOMAIN_COLUMN + "))";
 	private static final String CHECK_TABLE_QUERY = "select count(*) from " + TABLE_NAME;
-	private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " (" +
-			DOMAIN_COLUMN + ", " + PASSWORD_COLUMN + ", " + CONNECTION_TYPE_COLUMN + ", " +
-			PORT_COLUMN + ", " + REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN + ", " +
+	private static final String ADD_ITEM_QUERY =
+			"insert into " + TABLE_NAME + " (" + DOMAIN_COLUMN + ", " + PASSWORD_COLUMN + ", " +
+					CONNECTION_TYPE_COLUMN + ", " + PORT_COLUMN + ", " + REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN +
+					", " +
 //			OTHER_DATA_COLUMN + ") " + " values (?, ?, ?, ?, ?, ?, ?)";
-			OTHER_DATA_COLUMN + ") " + " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME + " where " + DOMAIN_COLUMN + " = ? HAVING count(*)=0) ";
+					OTHER_DATA_COLUMN + ") " + " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME + " where " +
+					DOMAIN_COLUMN + " = ? HAVING count(*)=0) ";
 
 	//~--- fields ---------------------------------------------------------------
-
-	@ConfigField(desc = "Name of data source to use")
-	private String dataSourceName = "default";
+	private CompConfigRepository configRepo = new CompConfigRepository();
 	@Inject
 	private DataSourceBean dataSourceBean;
+	@ConfigField(desc = "Name of data source to use")
+	private String dataSourceName = "default";
 	private DataRepository data_repo = null;
 	@Inject
 	private EventBus eventBus;
-
-	private String               tableName  = TABLE_NAME;
-	private CompConfigRepository configRepo = new CompConfigRepository();
+	private String tableName = TABLE_NAME;
 
 	public void setDataSourceBean(DataSourceBean dataSourceBean) {
 		this.dataSourceBean = dataSourceBean;
@@ -123,8 +120,9 @@ public class CompSQLRepository
 	}
 
 	public void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
-		if (!event.isCorrectSender(dataSourceBean))
+		if (!event.isCorrectSender(dataSourceBean)) {
 			return;
+		}
 
 		DataSource ds = event.getNewDataSource();
 		if (ds != null && ds instanceof DataRepository) {
@@ -137,14 +135,12 @@ public class CompSQLRepository
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void addRepoChangeListener(
-			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+	public void addRepoChangeListener(RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
 		configRepo.addRepoChangeListener(repoChangeListener);
 	}
 
 	@Override
-	public void removeRepoChangeListener(
-			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+	public void removeRepoChangeListener(RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
 		configRepo.removeRepoChangeListener(repoChangeListener);
 	}
 
@@ -159,7 +155,7 @@ public class CompSQLRepository
 			PreparedStatement addItemSt = data_repo.getPreparedStatement(null, ADD_ITEM_QUERY);
 
 			synchronized (addItemSt) {
-				if ((item.getDomain() != null) &&!item.getDomain().isEmpty()) {
+				if ((item.getDomain() != null) && !item.getDomain().isEmpty()) {
 					addItemSt.setString(1, item.getDomain());
 					addItemSt.setString(8, item.getDomain());
 				} else {
@@ -180,7 +176,7 @@ public class CompSQLRepository
 				} else {
 					addItemSt.setNull(4, Types.INTEGER);
 				}
-				if ((item.getRemoteHost() != null) &&!item.getRemoteHost().isEmpty()) {
+				if ((item.getRemoteHost() != null) && !item.getRemoteHost().isEmpty()) {
 					addItemSt.setString(5, item.getRemoteHost());
 				} else {
 					addItemSt.setNull(5, Types.VARCHAR);
@@ -213,8 +209,7 @@ public class CompSQLRepository
 
 		try {
 			ResultSet rs = null;
-			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
-					GET_ALL_ITEMS_QUERY);
+			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
 
 			synchronized (getAllItemsSt) {
 				try {
@@ -246,7 +241,7 @@ public class CompSQLRepository
 		// pool to database which is cached by RepositoryFactory and maybe be used
 		// in other places, so we can not destroy it.
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Deprecated
@@ -269,8 +264,7 @@ public class CompSQLRepository
 		if (result == null) {
 			try {
 				ResultSet rs = null;
-				PreparedStatement getItemSt = data_repo.getPreparedStatement(null,
-						GET_ITEM_QUERY);
+				PreparedStatement getItemSt = data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
 					try {
@@ -313,8 +307,7 @@ public class CompSQLRepository
 
 	@Deprecated
 	@Override
-	public void initRepository(String conn_str, Map<String, String> params)
-					throws DBInitException {
+	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 			setDataSource(data_repo);
@@ -341,8 +334,7 @@ public class CompSQLRepository
 	public void removeItem(String key) {
 		configRepo.removeItem(key);
 		try {
-			PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null,
-					DELETE_ITEM_QUERY);
+			PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
 
 			synchronized (deleteItemSt) {
 				deleteItemSt.setString(1, key);
@@ -389,13 +381,17 @@ public class CompSQLRepository
 		return null;
 	}
 
+	@Override
+	public void setAutoloadTimer(long delay) {
+	}
+
 	/**
 	 * Performs database check, creates missing schema if necessary
 	 *
 	 * @throws SQLException
 	 */
 	private void checkDB() throws SQLException {
-		data_repo.checkTable( tableName, CREATE_TABLE_QUERY );
+		data_repo.checkTable(tableName, CREATE_TABLE_QUERY);
 	}
 
 	private CompRepoItem createItemFromRS(ResultSet rs) throws SQLException {
@@ -405,7 +401,7 @@ public class CompSQLRepository
 		// overwrite fields initialized from other parametrs
 		String other = rs.getString(OTHER_DATA_COLUMN);
 
-		if ((other != null) &&!other.isEmpty()) {
+		if ((other != null) && !other.isEmpty()) {
 			Element elem_item = parseElement(other);
 
 			if (elem_item != null) {
@@ -415,13 +411,13 @@ public class CompSQLRepository
 
 		String domain = rs.getString(DOMAIN_COLUMN);
 
-		if ((domain != null) &&!domain.isEmpty()) {
+		if ((domain != null) && !domain.isEmpty()) {
 			result.setDomain(domain);
 		}
 
 		String password = rs.getString(PASSWORD_COLUMN);
 
-		if ((password != null) &&!password.isEmpty()) {
+		if ((password != null) && !password.isEmpty()) {
 			result.setPassword(password);
 		}
 
@@ -433,28 +429,30 @@ public class CompSQLRepository
 
 		String remote_domain = rs.getString(REMOTE_DOMAIN_COLUMN);
 
-		if ((remote_domain != null) &&!remote_domain.isEmpty()) {
+		if ((remote_domain != null) && !remote_domain.isEmpty()) {
 			result.setRemoteDomain(remote_domain);
 		}
 
 		String protocol = rs.getString(PROTOCOL_COLUMN);
 
-		if ((protocol != null) &&!protocol.isEmpty()) {
+		if ((protocol != null) && !protocol.isEmpty()) {
 			result.setProtocol(protocol);
 		}
 
 		String connection_type = rs.getString(CONNECTION_TYPE_COLUMN);
 
-		if ((connection_type != null) &&!connection_type.isEmpty()) {
+		if ((connection_type != null) && !connection_type.isEmpty()) {
 			result.setConnectionType(connection_type);
 		}
 
 		return result;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	private Element parseElement(String data) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
-		SimpleParser      parser     = SingletonFactory.getParserInstance();
+		SimpleParser parser = SingletonFactory.getParserInstance();
 
 		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 
@@ -466,9 +464,4 @@ public class CompSQLRepository
 
 		return null;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	@Override
-	public void setAutoloadTimer(long delay) {}
 }

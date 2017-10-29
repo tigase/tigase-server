@@ -30,12 +30,13 @@ import java.util.logging.LogRecord;
 /**
  * @author kobit Created Dec 20, 2011
  */
-public class LogUserFilter implements Filter {
+public class LogUserFilter
+		implements Filter {
 
-	private XMPPSession tracker = null;
 	Map<BareJID, XMPPSession> sessionsByNodeId = null;
-	private BareJID jid = null;
 	private LogFormatter format = new LogFormatter();
+	private BareJID jid = null;
+	private XMPPSession tracker = null;
 
 	public LogUserFilter(BareJID jid, Map<BareJID, XMPPSession> sessionsByNodeId) {
 		this.jid = jid;

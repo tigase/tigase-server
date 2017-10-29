@@ -279,7 +279,9 @@ public class DefaultTypesConverter
 						Map result = (Map) expectedType.newInstance();
 						for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
 							Object k = convert(unescape(e.getKey()), actualTypes[0]);
-							Object v = e.getValue() instanceof String ? convert(unescape((String) e.getValue()), actualTypes[1]) : convert(e.getValue(), actualTypes[1]);
+							Object v = e.getValue() instanceof String
+									   ? convert(unescape((String) e.getValue()), actualTypes[1])
+									   : convert(e.getValue(), actualTypes[1]);
 							result.put(k, v);
 						}
 						return (T) result;
@@ -307,10 +309,6 @@ public class DefaultTypesConverter
 		} catch (TigaseStringprepException e) {
 			throw new IllegalArgumentException(e);
 		}
-	}
-
-	protected <T> T customConversion(final Object value, final Class<T> expectedType, Type genericType) {
-		return null;
 	}
 
 	/**
@@ -355,6 +353,10 @@ public class DefaultTypesConverter
 		} else {
 			return value.toString();
 		}
+	}
+
+	protected <T> T customConversion(final Object value, final Class<T> expectedType, Type genericType) {
+		return null;
 	}
 
 }

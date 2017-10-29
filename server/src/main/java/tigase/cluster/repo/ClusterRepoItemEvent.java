@@ -25,18 +25,17 @@ import tigase.cluster.ClusterConnectionManager.REPO_ITEM_UPDATE_TYPE;
 import java.io.Serializable;
 
 /**
- *
  * @author andrzej
  */
-public class ClusterRepoItemEvent implements Serializable {
+public class ClusterRepoItemEvent
+		implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private final ClusterRepoItem item;
 	private final REPO_ITEM_UPDATE_TYPE action;
-	
+	private final ClusterRepoItem item;
+
 //	public ClusterRepoItemEvent() {}
-	
+
 	public ClusterRepoItemEvent(ClusterRepoItem item, REPO_ITEM_UPDATE_TYPE action) {
 		this.item = item;
 		this.action = action;

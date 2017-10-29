@@ -38,12 +38,12 @@ public class ScramCredentialsEntry
 	private static final Logger log = Logger.getLogger(ScramCredentialsEntry.class.getCanonicalName());
 
 	private final String algorithm;
+	private final int iterations = 4096;
 	private final byte[] salt;
 	private final byte[] saltedPassword;
-	private final int iterations = 4096;
 
-	public ScramCredentialsEntry(String algorithm, PlainCredentialsEntry entry) throws NoSuchAlgorithmException,
-																					   InvalidKeyException {
+	public ScramCredentialsEntry(String algorithm, PlainCredentialsEntry entry)
+			throws NoSuchAlgorithmException, InvalidKeyException {
 		final SecureRandom random = new SecureRandom();
 		this.algorithm = algorithm;
 		this.salt = new byte[10];
@@ -57,7 +57,7 @@ public class ScramCredentialsEntry
 		this.salt = salt;
 		this.saltedPassword = saltedPassword;
 	}
-	
+
 	public byte[] getSalt() {
 		return salt;
 	}
@@ -79,63 +79,21 @@ public class ScramCredentialsEntry
 	public boolean verifyPlainPassword(String password) {
 		try {
 			byte[] expSaltedPassword = AbstractSaslSCRAM.hi(algorithm, AbstractSaslSCRAM.normalize(password), salt,
-														 iterations);
+															iterations);
 			return Arrays.equals(this.saltedPassword, expSaltedPassword);
-		} catch (InvalidKeyException|NoSuchAlgorithmException ex) {
+		} catch (InvalidKeyException | NoSuchAlgorithmException ex) {
 			log.log(Level.FINE, "Password comparison failed", ex);
 		}
 		return false;
 	}
 
-	public static class Encoder implements Credentials.Encoder {
-
-		@ConfigField(desc = "Mechanism name")
-		private String name;
+	public static class Decoder
+			implements Credentials.Decoder {
 
 		@ConfigField(desc = "Hash algorithm")
 		private String algorithm;
-
-		@ConfigField(desc = "Number of iterations")
-		private int iterations = 4096;
-
-		private final SecureRandom random = new SecureRandom();
-
-		public Encoder() {
-
-		}
-
-		protected Encoder(String algorithm) {
-			this.algorithm = algorithm;
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public String encode(BareJID user, String password) {
-			byte[] salt = new byte[10];
-			random.nextBytes(salt);
-			byte[] saltedPassword = new byte[0];
-			try {
-				saltedPassword = AbstractSaslSCRAM.hi(algorithm, AbstractSaslSCRAM.normalize(password), salt,
-													  iterations);
-			} catch (InvalidKeyException|NoSuchAlgorithmException e) {
-				throw new RuntimeException("Could not encode password", e);
-			}
-
-			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",p=" + tigase.util.Base64.encode(saltedPassword);
-		}
-	}
-	
-	public static class Decoder implements Credentials.Decoder {
-
 		@ConfigField(desc = "Mechanism name")
 		private String name;
-
-		@ConfigField(desc = "Hash algorithm")
-		private String algorithm;
 
 		public Decoder() {
 
@@ -186,6 +144,48 @@ public class ScramCredentialsEntry
 
 		protected Credentials.Entry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
 			return new ScramCredentialsEntry(algorithm, salt, iterations, saltedPassword);
+		}
+	}
+
+	public static class Encoder
+			implements Credentials.Encoder {
+
+		private final SecureRandom random = new SecureRandom();
+		@ConfigField(desc = "Hash algorithm")
+		private String algorithm;
+
+		@ConfigField(desc = "Number of iterations")
+		private int iterations = 4096;
+		@ConfigField(desc = "Mechanism name")
+		private String name;
+
+		public Encoder() {
+
+		}
+
+		protected Encoder(String algorithm) {
+			this.algorithm = algorithm;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String encode(BareJID user, String password) {
+			byte[] salt = new byte[10];
+			random.nextBytes(salt);
+			byte[] saltedPassword = new byte[0];
+			try {
+				saltedPassword = AbstractSaslSCRAM.hi(algorithm, AbstractSaslSCRAM.normalize(password), salt,
+													  iterations);
+			} catch (InvalidKeyException | NoSuchAlgorithmException e) {
+				throw new RuntimeException("Could not encode password", e);
+			}
+
+			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",p=" +
+					tigase.util.Base64.encode(saltedPassword);
 		}
 	}
 

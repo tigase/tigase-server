@@ -33,18 +33,17 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class IPMonitor extends Thread {
+public class IPMonitor
+		extends Thread {
 
-  private static final Logger log =
-    Logger.getLogger(IPMonitor.class.getName());
-
-	private boolean stopped = false;
+	private static final Logger log = Logger.getLogger(IPMonitor.class.getName());
 	private static final int MAX_SIZE = 50;
 	private static final long CLEANUP_RATE = 10000;
 	private static final long DISC_THRESHOLD = 200;
 	private long[] ip_cnts = new long[MAX_SIZE];
 	private LinkedHashSet<String> ips = new LinkedHashSet<String>();
 	private LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+	private boolean stopped = false;
 	private Timer timer = new Timer("IPMonitor Timer");
 
 	public IPMonitor() {

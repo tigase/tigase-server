@@ -31,38 +31,38 @@ import java.util.List;
 /**
  * @author Wojtek
  */
-public interface SeeOtherHostIfc extends Lifecycle {
+public interface SeeOtherHostIfc
+		extends Lifecycle {
+
 	public static final String CM_SEE_OTHER_HOST_CLASS_PROPERTY = "--cm-see-other-host";
 
 	public static final String CM_SEE_OTHER_HOST_CLASS_PROP_KEY = "cm-see-other-host";
 
-	public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL =
-			"tigase.server.xmppclient.SeeOtherHost";
-	public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER =
-			"tigase.server.xmppclient.SeeOtherHostHashed";
+	public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL = "tigase.server.xmppclient.SeeOtherHost";
+
+	public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER = "tigase.server.xmppclient.SeeOtherHostHashed";
 
 	// default properties
-	public static final String CM_SEE_OTHER_HOST_DEFAULT_HOST =
-			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "default-host";
-	public static final String CM_SEE_OTHER_HOST_DEFAULT_PORT =
-			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "default-port";
-	public static final String CM_SEE_OTHER_HOST_ACTIVE =
-			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "active";
+	public static final String CM_SEE_OTHER_HOST_DEFAULT_HOST = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "default-host";
+
+	public static final String CM_SEE_OTHER_HOST_DEFAULT_PORT = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "default-port";
+
+	public static final String CM_SEE_OTHER_HOST_ACTIVE = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "active";
 
 	public static enum Phase {
-		OPEN, LOGIN, OTHER
+		OPEN,
+		LOGIN,
+		OTHER
 	}
 
-
 	// ~--- methods -------------------------------------------------------------
+
 	/**
 	 * Finds an appropriate host for a given JID
 	 *
-	 * @param jid
-	 *          is a user JID extracted from the stream open attributes
-	 * @param host
-	 *          is "this" host to which the user is now connected and which calls
-	 *          the method
+	 * @param jid is a user JID extracted from the stream open attributes
+	 * @param host is "this" host to which the user is now connected and which calls the method
+	 *
 	 * @return BareJID of possible host to which the user should connect or NULL
 	 */
 	BareJID findHostForJID(BareJID jid, BareJID host);
@@ -81,41 +81,40 @@ public interface SeeOtherHostIfc extends Lifecycle {
 	 *
 	 * @param xmlns xml namespace of the element
 	 * @param destination BareJID address of the redirect destination
+	 *
 	 * @return element containing stream:error message
 	 */
-	default Element getStreamError( String xmlns, BareJID destination, Integer port ) {
-		Element error = new Element( "stream:error" );
-		Element seeOtherHost = new Element( "see-other-host", destination.toString() + (port != null ? ":"+port : "") );
+	default Element getStreamError(String xmlns, BareJID destination, Integer port) {
+		Element error = new Element("stream:error");
+		Element seeOtherHost = new Element("see-other-host", destination.toString() + (port != null ? ":" + port : ""));
 
-		seeOtherHost.setXMLNS( xmlns );
-		error.addChild( seeOtherHost );
+		seeOtherHost.setXMLNS(xmlns);
+		error.addChild(seeOtherHost);
 
 		return error;
 	}
 
 	/**
-	 * Performs check whether redirect is enabled in the given phase
-	 * by default see-other-host redirect is only active in stream:open phase
+	 * Performs check whether redirect is enabled in the given phase by default see-other-host redirect is only active
+	 * in stream:open phase
 	 *
 	 * @param vHost vHost for which redirection should be performed
 	 * @param ph phase for which the check should be performed
-	 * @return boolean value indicating whether to perform or not redirect for
-	 * the phase passed as argument
+	 *
+	 * @return boolean value indicating whether to perform or not redirect for the phase passed as argument
 	 */
 	boolean isEnabled(VHostItem vHost, Phase ph);
 
 	/**
-	 * Method validates whether a redirection for a particular hostname and
-	 * resulting redirection hastname is required
+	 * Method validates whether a redirection for a particular hostname and resulting redirection hastname is required
 	 *
-	 * @param defaultHost     default hostname of the particular machine
+	 * @param defaultHost default hostname of the particular machine
 	 * @param redirectionHost destination hostname
 	 *
-	 * @return {@code true} if the redirection is required, otherwise
-	 *         {@code false}
+	 * @return {@code true} if the redirection is required, otherwise {@code false}
 	 */
-	default boolean isRedirectionRequired( BareJID defaultHost, BareJID redirectionHost ) {
-		return !defaultHost.equals( redirectionHost );
+	default boolean isRedirectionRequired(BareJID defaultHost, BareJID redirectionHost) {
+		return !defaultHost.equals(redirectionHost);
 	}
 
 }

@@ -18,36 +18,34 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.util.log;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Calendar;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
-import java.util.Map;
 
 /**
  * Describe class LogFormatter here.
- *
- *
+ * <p>
+ * <p>
  * Created: Thu Jan  5 22:58:02 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class LogFormatter
-				extends Formatter {
+		extends Formatter {
+
 	/** Field description */
-	public static final Map<Integer, LogWithStackTraceEntry> errors =
-			new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
+	public static final Map<Integer, LogWithStackTraceEntry> errors = new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
 	private static int DATE_TIME_LEN = 24;
-	private static int LEVEL_OFFSET  = 12;
-	private static int MED_LEN       = 40;
-	private static int TH_NAME_LEN   = 17;
+	private static int LEVEL_OFFSET = 12;
+	private static int MED_LEN = 40;
+	private static int TH_NAME_LEN = 17;
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -57,9 +55,9 @@ public class LogFormatter
 
 	/**
 	 * Creates a new <code>LogFormatter</code> instance.
-	 *
 	 */
-	public LogFormatter() {}
+	public LogFormatter() {
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -78,7 +76,7 @@ public class LogFormatter
 		}    // end of while (sb.length() < MEDIUM_LEN)
 		if (record.getSourceClassName() != null) {
 			String clsName = record.getSourceClassName();
-			int    idx     = clsName.lastIndexOf('.');
+			int idx = clsName.lastIndexOf('.');
 
 			if (idx >= 0) {
 				clsName = clsName.substring(idx + 1);
@@ -110,7 +108,7 @@ public class LogFormatter
 	}
 
 	private void addError(Throwable thrown, String stack, String log_msg) {
-		Integer                code  = stack.hashCode();
+		Integer code = stack.hashCode();
 		LogWithStackTraceEntry entry = errors.get(code);
 
 		if (entry == null) {
@@ -147,6 +145,5 @@ public class LogFormatter
 		}
 	}
 }    // LogFormatter
-
 
 //~ Formatted in Tigase Code Convention on 13/05/27

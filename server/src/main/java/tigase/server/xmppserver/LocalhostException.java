@@ -1,4 +1,3 @@
-
 /*
  * LocalhostException.java
  *
@@ -32,14 +31,15 @@ import tigase.xmpp.XMPPException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class LocalhostException extends XMPPException {
+public class LocalhostException
+		extends XMPPException {
+
 	private static final long serialVersionUID = 1L;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public LocalhostException() {
 		super();
@@ -47,7 +47,6 @@ public class LocalhostException extends XMPPException {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param msg
 	 */
@@ -58,7 +57,6 @@ public class LocalhostException extends XMPPException {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param cause
 	 */
 	public LocalhostException(Throwable cause) {
@@ -68,7 +66,6 @@ public class LocalhostException extends XMPPException {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param msg
 	 * @param cause
 	 */
@@ -77,8 +74,6 @@ public class LocalhostException extends XMPPException {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

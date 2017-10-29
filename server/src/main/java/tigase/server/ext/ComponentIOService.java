@@ -28,30 +28,42 @@ import java.util.List;
 
 /**
  * Created: Jun 14, 2010 12:05:41 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentIOService extends XMPPIOService<List<ComponentConnection>> {
+public class ComponentIOService
+		extends XMPPIOService<List<ComponentConnection>> {
+
 	private static final int MAX_RECENT_JIDS = 10000;
 	private static final long MAX_CACHE_TIME = 100000;
 
 	private boolean authenticated = false;
-	private String routings = null;
 	private SizedCache<JID, JID> recentJIDs = new SizedCache<JID, JID>(MAX_RECENT_JIDS);
+	private String routings = null;
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * 
 	 */
 	public boolean isAuthenticated() {
 		return authenticated;
 	}
 
+	/**
+	 * Method description
+	 *
+	 * @param authenticated
+	 */
+	public void setAuthenticated(boolean authenticated) {
+		this.authenticated = authenticated;
+	}
+
 	public String getRoutings() {
 		return routings;
+	}
+
+	public void setRoutings(String r) {
+		routings = r;
 	}
 
 	public void addRecentJID(JID jid) {
@@ -63,20 +75,6 @@ public class ComponentIOService extends XMPPIOService<List<ComponentConnection>>
 
 	public boolean isRecentJID(JID jid) {
 		return jid != null && recentJIDs.get(jid) != null;
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param authenticated
-	 */
-	public void setAuthenticated(boolean authenticated) {
-		this.authenticated = authenticated;
-	}
-
-	public void setRoutings(String r) {
-		routings = r;
 	}
 
 }

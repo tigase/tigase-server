@@ -33,19 +33,19 @@ import tigase.xmpp.mam.Query;
 import tigase.xmpp.mam.QueryParser;
 
 /**
- * Implementation of module responsible for handling request to retrive
- * form used in XEP-0313: Message Archive Management
- *
+ * Implementation of module responsible for handling request to retrive form used in XEP-0313: Message Archive
+ * Management
+ * <p>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamGetFormModule", active = true)
-public class GetFormModule implements Module {
-
-	@Inject(bean = "mamQueryParser")
-	private QueryParser<Query> queryParser;
+public class GetFormModule
+		implements Module {
 
 	@Inject
 	private PacketWriter packetWriter;
+	@Inject(bean = "mamQueryParser")
+	private QueryParser<Query> queryParser;
 
 	@Override
 	public String[] getFeatures() {
@@ -59,7 +59,8 @@ public class GetFormModule implements Module {
 
 	@Override
 	public boolean canHandle(Packet packet) {
-		return packet.getElement().getChildStaticStr("query", "urn:xmpp:mam:1") != null && packet.getType() == StanzaType.get;
+		return packet.getElement().getChildStaticStr("query", "urn:xmpp:mam:1") != null &&
+				packet.getType() == StanzaType.get;
 	}
 
 	@Override

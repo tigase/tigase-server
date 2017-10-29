@@ -23,14 +23,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor}
- * can define path and XMLNSS supported by implemented processor
- * 
+ * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor} can
+ * define path and XMLNSS supported by implemented processor
+ *
  * @author andrzej
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Handle {
+
 	String[] path() default {};
+
 	String pathStr() default "";
+
 	String xmlns();
 }

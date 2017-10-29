@@ -25,19 +25,19 @@ import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
 /**
- *
  * @author Wojciech Kapcia
  */
 
-public class BoshSidLoggerFilter implements Filter {
+public class BoshSidLoggerFilter
+		implements Filter {
 
 	@Override
-	public boolean isLoggable( LogRecord record ) {
+	public boolean isLoggable(LogRecord record) {
 		boolean matchTracker = false;
 
 		Object[] parameters = record.getParameters();
-		if ( parameters != null && parameters.length > 0 && parameters[0] != null
-				 && BOSH_OPERATION_TYPE.forName( parameters[0].toString()) != null ){
+		if (parameters != null && parameters.length > 0 && parameters[0] != null &&
+				BOSH_OPERATION_TYPE.forName(parameters[0].toString()) != null) {
 			matchTracker = true;
 		}
 		return matchTracker;

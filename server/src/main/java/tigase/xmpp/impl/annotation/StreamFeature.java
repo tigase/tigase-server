@@ -19,20 +19,21 @@
  */
 package tigase.xmpp.impl.annotation;
 
-import tigase.xml.Element;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor}
- * can define supported stream features provided by processor
+ * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor} can
+ * define supported stream features provided by processor
  *
  * @author andrzej
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StreamFeature {
+
 	String elem();
+
 	String xmlns();
+
 	String[] children() default {};
 }

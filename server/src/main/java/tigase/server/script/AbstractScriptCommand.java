@@ -22,9 +22,10 @@ package tigase.server.script;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.stats.StatisticHolderImpl;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-import tigase.stats.StatisticHolderImpl;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -34,7 +35,9 @@ import tigase.stats.StatisticHolderImpl;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class AbstractScriptCommand extends StatisticHolderImpl implements CommandIfc {
+public abstract class AbstractScriptCommand
+		extends StatisticHolderImpl
+		implements CommandIfc {
 
 	/** Field description */
 	public static final Map<String, String> lineCommentStart = new LinkedHashMap<String, String>(20);
@@ -62,10 +65,10 @@ public abstract class AbstractScriptCommand extends StatisticHolderImpl implemen
 
 	//~--- fields ---------------------------------------------------------------
 
+	private boolean adminOnly = true;
 	private String commandId = null;
 	private String description = null;
 	private String group = null;
-	private boolean adminOnly = true;
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -83,7 +86,7 @@ public abstract class AbstractScriptCommand extends StatisticHolderImpl implemen
 	public String getGroup() {
 		return this.group;
 	}
-	
+
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -113,5 +116,5 @@ public abstract class AbstractScriptCommand extends StatisticHolderImpl implemen
 
 	protected boolean isEmpty(String val) {
 		return (val == null) || val.isEmpty();
-	}	
+	}
 }

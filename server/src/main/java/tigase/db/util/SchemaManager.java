@@ -42,9 +42,9 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
-import tigase.util.reflection.ClassUtilBean;
-import tigase.util.dns.DNSResolverFactory;
 import tigase.util.Version;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.reflection.ClassUtilBean;
 import tigase.util.setup.BeanDefinition;
 import tigase.util.setup.SetupHelper;
 import tigase.util.ui.console.CommandlineParameter;
@@ -70,66 +70,85 @@ import java.util.stream.Stream;
  */
 public class SchemaManager {
 
-	private static final Logger log = Logger.getLogger(SchemaManager.class.getCanonicalName());
-
 	protected static final Class[] SUPPORTED_CLASSES = {MDPoolBean.class, MDRepositoryBean.class,
 														SDRepositoryBean.class};
-
+	private static final Logger log = Logger.getLogger(SchemaManager.class.getCanonicalName());
 	private static final Comparator<SchemaInfo> SCHEMA_INFO_COMPARATOR = (o1, o2) -> {
-		if (o1.getId().equals("<unknown>") || o2.getId().equals(Schema.SERVER_SCHEMA_ID))
+		if (o1.getId().equals("<unknown>") || o2.getId().equals(Schema.SERVER_SCHEMA_ID)) {
 			return 1;
-		if (o2.getId().equals("<unknown>") || o1.getId().equals(Schema.SERVER_SCHEMA_ID))
+		}
+		if (o2.getId().equals("<unknown>") || o1.getId().equals(Schema.SERVER_SCHEMA_ID)) {
 			return -1;
+		}
 		return o1.getId().compareTo(o2.getId());
 	};
-	private String adminPass = null;
-	private List<BareJID> admins = null;
-	private Level logLevel = Level.CONFIG;
-
-	private static Stream<String> getNonCoreComponentNames() {
-		return SetupHelper.getAvailableComponents().stream()
-				.filter(def -> !def.isCoreComponent())
-				.map(BeanDefinition::getName);
-	}
-	
-	private static Stream<String> getActiveNonCoreComponentNames() {
-		return SetupHelper.getAvailableComponents().stream()
-				.filter(BeanDefinition::isActive)
-				.filter(def -> !def.isCoreComponent())
-				.map(BeanDefinition::getName);
-	}
-
-	private CommandlineParameter ROOT_USERNAME = new CommandlineParameter.Builder("R", DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME.getName())
-			.description("Database root account username used to create/remove tigase user and database")
-			.build();
-
-	private CommandlineParameter ROOT_PASSWORD = new CommandlineParameter.Builder("A", DBSchemaLoader.PARAMETERS_ENUM.ROOT_PASSWORD.getName())
-			.description("Database root account password used to create/remove tigase user and database")
-			.secret()
-			.build();
-
-	private CommandlineParameter PROPERTY_CONFIG_FILE = new CommandlineParameter.Builder(null, ConfigHolder.PROPERTIES_CONFIG_FILE_KEY.replace("--", ""))
-			.defaultValue(ConfigHolder.PROPERTIES_CONFIG_FILE_DEF)
-			.description("Path to properties configuration file")
-			.requireArguments(true)
-			.build();
-
-	private CommandlineParameter TDSL_CONFIG_FILE = new CommandlineParameter.Builder(null, ConfigHolder.TDSL_CONFIG_FILE_KEY.replace("--", ""))
-			.defaultValue(ConfigHolder.TDSL_CONFIG_FILE_DEF)
-			.description("Path to DSL configuration file")
-			.requireArguments(true)
-			.build();
-
+	private final List<Class<?>> repositoryClasses;
 	private CommandlineParameter COMPONENTS = new CommandlineParameter.Builder("C", "components").description(
 			"List of enabled components identifiers (+/-)")
 			.defaultValue(getActiveNonCoreComponentNames().sorted().collect(Collectors.joining(",")))
 			.options(getNonCoreComponentNames().sorted().toArray(String[]::new))
 			.build();
-
-	private final List<Class<?>> repositoryClasses;
+	private CommandlineParameter PROPERTY_CONFIG_FILE = new CommandlineParameter.Builder(null,
+																						 ConfigHolder.PROPERTIES_CONFIG_FILE_KEY
+																								 .replace("--",
+																										  "")).defaultValue(
+			ConfigHolder.PROPERTIES_CONFIG_FILE_DEF)
+			.description("Path to properties configuration file")
+			.requireArguments(true)
+			.build();
+	private CommandlineParameter ROOT_PASSWORD = new CommandlineParameter.Builder("A",
+																				  DBSchemaLoader.PARAMETERS_ENUM.ROOT_PASSWORD
+																						  .getName()).description(
+			"Database root account password used to create/remove tigase user and database").secret().build();
+	private CommandlineParameter ROOT_USERNAME = new CommandlineParameter.Builder("R",
+																				  DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME
+																						  .getName()).description(
+			"Database root account username used to create/remove tigase user and database").build();
+	private CommandlineParameter TDSL_CONFIG_FILE = new CommandlineParameter.Builder(null,
+																					 ConfigHolder.TDSL_CONFIG_FILE_KEY.replace(
+																							 "--", "")).defaultValue(
+			ConfigHolder.TDSL_CONFIG_FILE_DEF)
+			.description("Path to DSL configuration file")
+			.requireArguments(true)
+			.build();
+	private String adminPass = null;
+	private List<BareJID> admins = null;
 	private Map<String, Object> config;
-	
+	private Level logLevel = Level.CONFIG;
 	private RootCredentialsCache rootCredentialsCache = new RootCredentialsCache();
+
+	private static Stream<String> getActiveNonCoreComponentNames() {
+		return SetupHelper.getAvailableComponents()
+				.stream()
+				.filter(BeanDefinition::isActive)
+				.filter(def -> !def.isCoreComponent())
+				.map(BeanDefinition::getName);
+	}
+
+	private static Stream<String> getNonCoreComponentNames() {
+		return SetupHelper.getAvailableComponents()
+				.stream()
+				.filter(def -> !def.isCoreComponent())
+				.map(BeanDefinition::getName);
+	}
+
+	public static Optional<String> getProperty(Properties props, CommandlineParameter parameter) {
+		Optional<String> value = Optional.ofNullable(props.getProperty(parameter.getFullName(false).get()));
+		if (!value.isPresent()) {
+			return parameter.getDefaultValue();
+		}
+		return value;
+	}
+
+	public static <T> Optional<T> getProperty(Properties props, CommandlineParameter parameter,
+											  Function<String, T> converter) {
+		Optional<String> value = getProperty(props, parameter);
+		if (!value.isPresent()) {
+			return Optional.empty();
+		}
+		T result = converter.apply(value.get());
+		return Optional.ofNullable(result);
+	}
 
 	public static void main(String args[]) throws IOException, ConfigReader.ConfigException {
 		try {
@@ -142,23 +161,40 @@ public class SchemaManager {
 		}
 	}
 
+	public SchemaManager() {
+		repositoryClasses = ClassUtilBean.getInstance()
+				.getAllClasses()
+				.stream()
+				.filter(clazz -> Arrays.stream(SUPPORTED_CLASSES)
+						.anyMatch(supClazz -> supClazz.isAssignableFrom(clazz)))
+				.filter(clazz -> {
+					Bean bean = clazz.getAnnotation(Bean.class);
+					return bean != null && (bean.parent() != Object.class || bean.parents().length > 0);
+				})
+				.filter(clazz -> !DataSourceBean.class.isAssignableFrom(clazz))
+				.collect(Collectors.toList());
+
+		log.log(Level.FINE, "found following data source related classes: {0}", repositoryClasses);
+	}
+
 	public void execute(String args[]) throws Exception {
 		String scriptName = System.getProperty("scriptName");
 		ParameterParser parser = new ParameterParser(true);
 
-		parser.setTasks(new Task[] {
-				new Task.Builder().name("upgrade-schema")
-						.description("Upgrade schema of databases specified in your config file - it's not possible to specify parameters")
-						.additionalParameterSupplier(this::upgradeSchemaParametersSupplier)
-						.function(this::upgradeSchema).build(),
-				new Task.Builder().name("install-schema")
-						.description("Install schema to database - it requires specifying database parameters where schema will be installed (config file will be ignored)")
-						.additionalParameterSupplier(this::installSchemaParametersSupplier)
-						.function(this::installSchema).build(),
-				new Task.Builder().name("destroy-schema")
-						.description("Destroy database and schemas (DANGEROUS)")
-						.additionalParameterSupplier(this::destroySchemaParametersSupplier)
-						.function(this::destroySchema).build()
+		parser.setTasks(new Task[]{new Task.Builder().name("upgrade-schema")
+										   .description(
+												   "Upgrade schema of databases specified in your config file - it's not possible to specify parameters")
+										   .additionalParameterSupplier(this::upgradeSchemaParametersSupplier)
+										   .function(this::upgradeSchema).build(),
+								   new Task.Builder().name("install-schema")
+										   .description(
+												   "Install schema to database - it requires specifying database parameters where schema will be installed (config file will be ignored)")
+										   .additionalParameterSupplier(this::installSchemaParametersSupplier)
+										   .function(this::installSchema).build(),
+								   new Task.Builder().name("destroy-schema")
+										   .description("Destroy database and schemas (DANGEROUS)")
+										   .additionalParameterSupplier(this::destroySchemaParametersSupplier)
+										   .function(this::destroySchema).build()
 
 		});
 
@@ -176,13 +212,6 @@ public class SchemaManager {
 			System.out.println(parser.getHelp(executionCommand));
 		}
 	}
-	                                                                                                                             
-	private List<CommandlineParameter> destroySchemaParametersSupplier() {
-		List<CommandlineParameter> options = new ArrayList<>();
-		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE));
-		options.addAll(SchemaLoader.getMainCommandlineParameters(true));
-		return options;
-	}
 
 	public void destroySchema(Properties props) throws IOException, ConfigReader.ConfigException {
 		fixShutdownThreadIssue();
@@ -198,21 +227,23 @@ public class SchemaManager {
 
 			String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 			ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
-																	 Optional.empty(), Optional.empty(), Optional.empty(), vhosts,
-																	 Optional.empty(), Optional.empty());
+																	 Optional.empty(), Optional.empty(),
+																	 Optional.empty(), vhosts, Optional.empty(),
+																	 Optional.empty());
 
 			config = configBuilder.build();
 		} else {
 			ConfigHolder holder = new ConfigHolder();
-			conversionMessages = holder.loadConfiguration(new String[] { ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, PROPERTY_CONFIG_FILE.getValue().get(),
-													ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
+			conversionMessages = holder.loadConfiguration(
+					new String[]{ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, PROPERTY_CONFIG_FILE.getValue().get(),
+								 ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
 
 			config = holder.getProperties();
 		}
 
 		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
 		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
-		
+
 		setConfig(config);
 		if (rootUser.isPresent() && rootPass.isPresent()) {
 			setDbRootCredentials(rootUser.get(), rootPass.get());
@@ -229,14 +260,6 @@ public class SchemaManager {
 		TigaseRuntime.getTigaseRuntime().shutdownTigase(message, exitCode);
 	}
 
-	private List<CommandlineParameter> installSchemaParametersSupplier() {
-
-		List<CommandlineParameter> options = new ArrayList<>();
-		options.add(COMPONENTS);
-		options.addAll(SchemaLoader.getMainCommandlineParameters(false));
-		return options;
-	}
-
 	public void installSchema(Properties props) throws IOException, ConfigReader.ConfigException {
 		String type = props.getProperty(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName());
 		SchemaLoader loader = SchemaLoader.newInstance(type);
@@ -249,19 +272,17 @@ public class SchemaManager {
 		final Function<String, List<String>> stringToListFunction = (listStr) -> Arrays.asList(listStr.split(","));
 
 		final Function<String, String> signRemovingFunction = (v) -> (v.startsWith("-") || v.startsWith("+"))
-		                                                             ? v.substring(1)
-		                                                             : v;
-		Map<String, Set<String>> changes = getProperty(props, COMPONENTS, stringToListFunction).orElse(Collections.emptyList())
+																	 ? v.substring(1)
+																	 : v;
+		Map<String, Set<String>> changes = getProperty(props, COMPONENTS, stringToListFunction).orElse(
+				Collections.emptyList())
 				.stream()
 				.collect(Collectors.groupingBy((v) -> v.startsWith("-") ? "-" : "+",
-				                               Collectors.mapping(signRemovingFunction, Collectors.toSet())));
-
-
-
+											   Collectors.mapping(signRemovingFunction, Collectors.toSet())));
 
 		Set<String> components = getActiveNonCoreComponentNames().collect(Collectors.toSet());
 
-		changes.forEach((k,v) -> {
+		changes.forEach((k, v) -> {
 			switch (k) {
 				case "+":
 					components.addAll(v);
@@ -272,11 +293,12 @@ public class SchemaManager {
 			}
 		});
 
-		
 		String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
-																 Optional.ofNullable(components), Optional.ofNullable(changes.get("+")), Optional.empty(), vhosts,
-																 Optional.empty(), Optional.empty());
+																 Optional.ofNullable(components),
+																 Optional.ofNullable(changes.get("+")),
+																 Optional.empty(), vhosts, Optional.empty(),
+																 Optional.empty());
 
 		admins = params.getAdmins();
 		adminPass = params.getAdminPassword();
@@ -299,14 +321,11 @@ public class SchemaManager {
 		TigaseRuntime.getTigaseRuntime().shutdownTigase(message, exitCode);
 	}
 
-	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
-		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE);
-	}
-
 	public void upgradeSchema(Properties props) throws IOException, ConfigReader.ConfigException {
 		ConfigHolder holder = new ConfigHolder();
-		Optional<String[]> conversionMessages = holder.loadConfiguration(new String[] { ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, PROPERTY_CONFIG_FILE.getValue().get(),
-																	 ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
+		Optional<String[]> conversionMessages = holder.loadConfiguration(
+				new String[]{ConfigHolder.PROPERTIES_CONFIG_FILE_KEY, PROPERTY_CONFIG_FILE.getValue().get(),
+							 ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
 
 		Map<String, Object> config = holder.getProperties();
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
@@ -317,88 +336,6 @@ public class SchemaManager {
 
 		TigaseRuntime.getTigaseRuntime().shutdownTigase(message, exitCode);
 
-	}
-
-	private boolean isErrorPresent(Map<DataSourceInfo, List<ResultEntry>> results) {
-		return results.values()
-					.stream()
-					.flatMap(Collection::stream)
-					.map(entry -> entry.result)
-					.anyMatch(r -> r == SchemaLoader.Result.error);
-	}
-
-	private Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> loadSchemas(Map<String, Object> config, Properties props) throws IOException, ConfigReader.ConfigException {
-		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
-		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
-
-		setConfig(config);
-		if (rootUser.isPresent() && rootPass.isPresent()) {
-			setDbRootCredentials(rootUser.get(), rootPass.get());
-		}
-
-		log.info("beginning upgrade...");
-		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
-		log.info("schema upgrade finished!");
-		return results;
-	}
-
-	private List<String> prepareOutput(String title, Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results, Optional<String[]> conversionMessages) {
-		List<String> output = new ArrayList<>(Arrays.asList("\t" + title));
-		conversionMessages.ifPresent(msgs -> {
-			output.add("");
-			output.addAll(Arrays.asList(msgs));
-		});
-		results.forEach((k,v) -> {
-			output.add("");
-			output.add("Data source: " + k.getName() + " with uri " + k.getResourceUri());
-			v.forEach(r -> {
-				output.add("\t" + r.name + "\t" + r.result);
-				if (r.result != SchemaLoader.Result.ok && r.message != null) {
-					String[] lines = r.message.split("\n");
-					for (int i=0; i<lines.length; i++) {
-						if (i == 0) {
-							output.add("\t\tMessage: " + lines[0]);
-						} else {
-							output.add("\t\t         " + lines[i]);
-						}
-					}
-				}
-			});
-		});
-		return output;
-	}
-
-	public static Optional<String> getProperty(Properties props, CommandlineParameter parameter) {
-		Optional<String> value = Optional.ofNullable(props.getProperty(parameter.getFullName(false).get()));
-		if (!value.isPresent()) {
-			return parameter.getDefaultValue();
-		}
-		return value;
-	}
-
-	public static <T> Optional<T> getProperty(Properties props, CommandlineParameter parameter, Function<String, T> converter) {
-		Optional<String> value = getProperty(props, parameter);
-		if (!value.isPresent()) {
-			return Optional.empty();
-		}
-		T result = converter.apply(value.get());
-		return Optional.ofNullable(result);
-	}
-
-	public SchemaManager() {
-		repositoryClasses = ClassUtilBean.getInstance()
-				.getAllClasses()
-				.stream()
-				.filter(clazz -> Arrays.stream(SUPPORTED_CLASSES)
-						.anyMatch(supClazz -> supClazz.isAssignableFrom(clazz)))
-				.filter(clazz -> {
-					Bean bean = clazz.getAnnotation(Bean.class);
-					return bean != null && (bean.parent() != Object.class || bean.parents().length > 0);
-				})
-				.filter(clazz -> !DataSourceBean.class.isAssignableFrom(clazz))
-				.collect(Collectors.toList());
-
-		log.log(Level.FINE, "found following data source related classes: {0}", repositoryClasses);
 	}
 
 	public void readConfig(File file) throws IOException, ConfigReader.ConfigException {
@@ -432,15 +369,16 @@ public class SchemaManager {
 		Kernel kernel = prepareKernel();
 		List<BeanConfig> repoBeans = getRepositoryBeans(kernel);
 		List<RepoInfo> repositories = getRepositories(kernel, repoBeans);
-		Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource = repositories
-				.stream()
+		Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource = repositories.stream()
 				.collect(Collectors.groupingBy(RepoInfo::getDataSource, Collectors.toList()));
 
 		return collectSchemasByDataSource(repositoriesByDataSource);
 	}
 
 	public Map<DataSourceInfo, List<ResultEntry>> destroySchemas(Collection<DataSourceInfo> dataSources) {
-		return dataSources.stream().map(e -> new Pair<>(e, destroySchemas(e))).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+		return dataSources.stream()
+				.map(e -> new Pair<>(e, destroySchemas(e)))
+				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 	}
 
 	public List<ResultEntry> destroySchemas(DataSource ds) {
@@ -456,7 +394,8 @@ public class SchemaManager {
 		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas();
 		return dataSourceSchemas.entrySet()
 				.stream()
-				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(), loadSchemas(e.getKey(), e.getValue())))
+				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(),
+																	  loadSchemas(e.getKey(), e.getValue())))
 				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 	}
 
@@ -474,24 +413,27 @@ public class SchemaManager {
 			log.log(Level.FINER, "loading schemas for data source " + ds);
 			schemas.sort(SCHEMA_INFO_COMPARATOR);
 
-			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema("common", null), handler));
+			results.add(
+					new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema("common", null), handler));
 
 			for (SchemaInfo schema : validSchemas) {
 				Version version = schema.getVersion().get();
 				Version versionInDb = schemaLoader.getComponentVersionFromDb(schema.getId());
 
 				ResultEntry schemaLoadResultEntry;
-				if (!Version.TYPE.FINAL.equals(version.getVersionType())
-						|| (!versionInDb.getBaseVersion().equals(version.getBaseVersion()))) {
+				if (!Version.TYPE.FINAL.equals(version.getVersionType()) ||
+						(!versionInDb.getBaseVersion().equals(version.getBaseVersion()))) {
 					log.log(Level.FINER, "loading schema with id ='" + schema + "'");
 					schemaLoadResultEntry = new ResultEntry(
-							"Loading schema: " + schema.getName() + ", version: " + version + " (had database schema: " + versionInDb + ")",
+							"Loading schema: " + schema.getName() + ", version: " + version +
+									" (had database schema: " + versionInDb + ")",
 							schemaLoader.loadSchema(schema.getId(), version.getBaseVersion().toString()), handler);
 				} else {
 					log.log(Level.FINER, "Skipped loading schema with id ='" + schema + "'");
 					schemaLoadResultEntry = new ResultEntry(
-							"Skipping schema: " + schema.getName() + ", version: " + version + " (had database schema: " + versionInDb + ")",
-							SchemaLoader.Result.skipped, handler);
+							"Skipping schema: " + schema.getName() + ", version: " + version +
+									" (had database schema: " + versionInDb + ")", SchemaLoader.Result.skipped,
+							handler);
 				}
 				results.add(schemaLoadResultEntry);
 			}
@@ -503,6 +445,77 @@ public class SchemaManager {
 			results.add(new ResultEntry("Post installation action", schemaLoader.postInstallation(), handler));
 			return results;
 		});
+	}
+
+	private List<CommandlineParameter> destroySchemaParametersSupplier() {
+		List<CommandlineParameter> options = new ArrayList<>();
+		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE));
+		options.addAll(SchemaLoader.getMainCommandlineParameters(true));
+		return options;
+	}
+
+	private List<CommandlineParameter> installSchemaParametersSupplier() {
+
+		List<CommandlineParameter> options = new ArrayList<>();
+		options.add(COMPONENTS);
+		options.addAll(SchemaLoader.getMainCommandlineParameters(false));
+		return options;
+	}
+
+	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
+		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE);
+	}
+
+	private boolean isErrorPresent(Map<DataSourceInfo, List<ResultEntry>> results) {
+		return results.values()
+				.stream()
+				.flatMap(Collection::stream)
+				.map(entry -> entry.result)
+				.anyMatch(r -> r == SchemaLoader.Result.error);
+	}
+
+	private Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> loadSchemas(Map<String, Object> config,
+																						   Properties props)
+			throws IOException, ConfigReader.ConfigException {
+		Optional<String> rootUser = getProperty(props, ROOT_USERNAME);
+		Optional<String> rootPass = getProperty(props, ROOT_PASSWORD);
+
+		setConfig(config);
+		if (rootUser.isPresent() && rootPass.isPresent()) {
+			setDbRootCredentials(rootUser.get(), rootPass.get());
+		}
+
+		log.info("beginning upgrade...");
+		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
+		log.info("schema upgrade finished!");
+		return results;
+	}
+
+	private List<String> prepareOutput(String title, Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results,
+									   Optional<String[]> conversionMessages) {
+		List<String> output = new ArrayList<>(Arrays.asList("\t" + title));
+		conversionMessages.ifPresent(msgs -> {
+			output.add("");
+			output.addAll(Arrays.asList(msgs));
+		});
+		results.forEach((k, v) -> {
+			output.add("");
+			output.add("Data source: " + k.getName() + " with uri " + k.getResourceUri());
+			v.forEach(r -> {
+				output.add("\t" + r.name + "\t" + r.result);
+				if (r.result != SchemaLoader.Result.ok && r.message != null) {
+					String[] lines = r.message.split("\n");
+					for (int i = 0; i < lines.length; i++) {
+						if (i == 0) {
+							output.add("\t\tMessage: " + lines[0]);
+						} else {
+							output.add("\t\t         " + lines[i]);
+						}
+					}
+				}
+			});
+		});
+		return output;
 	}
 
 	private List<ResultEntry> executeWithSchemaLoader(DataSource ds, SchemaLoaderExecutor function) {
@@ -549,10 +562,9 @@ public class SchemaManager {
 
 	private DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def) {
 		Object v = def.getOrDefault("uri", def.get("repo-uri"));
-		return new DataSourceInfo(def.getBeanName(), v instanceof ConfigReader.Variable
-		                                             ? ((ConfigReader.Variable) v).calculateValue()
-				                                             .toString()
-		                                             : v.toString());
+		return new DataSourceInfo(def.getBeanName(),
+								  v instanceof ConfigReader.Variable ? ((ConfigReader.Variable) v).calculateValue()
+										  .toString() : v.toString());
 	}
 
 	private List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans) {
@@ -592,9 +604,10 @@ public class SchemaManager {
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	private Map<DataSourceInfo, List<SchemaInfo>> collectSchemasByDataSource(Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource) {
+	private Map<DataSourceInfo, List<SchemaInfo>> collectSchemasByDataSource(
+			Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource) {
 		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = new HashMap<>();
-		for (Map.Entry<DataSourceInfo,List<RepoInfo>> entry : repositoriesByDataSource.entrySet()) {
+		for (Map.Entry<DataSourceInfo, List<RepoInfo>> entry : repositoriesByDataSource.entrySet()) {
 
 			List<SchemaInfo> schemas = entry.getValue()
 					.stream()
@@ -603,13 +616,12 @@ public class SchemaManager {
 					.stream()
 					.map(e -> {
 						final Repository.SchemaId annotation = e.getValue()
-								     .iterator()
-								     .next()
-								     .getImplementation()
-								     .getAnnotation(Repository.SchemaId.class);
-						     return new SchemaInfo(annotation, e.getValue());
-					     }
-					)
+								.iterator()
+								.next()
+								.getImplementation()
+								.getAnnotation(Repository.SchemaId.class);
+						return new SchemaInfo(annotation, e.getValue());
+					})
 					.collect(Collectors.toList());
 
 			dataSourceSchemas.put(entry.getKey(), schemas);
@@ -745,12 +757,14 @@ public class SchemaManager {
 							parent.ln(bc.getBeanName(), bc.getKernel(), "service");
 
 							((RegistrarBean) bean).register(bc.getKernel());
-							Map<String, Object> cfg = (Map<String, Object>) config.getOrDefault(bc.getBeanName(), new HashMap<>());
+							Map<String, Object> cfg = (Map<String, Object>) config.getOrDefault(bc.getBeanName(),
+																								new HashMap<>());
 							configurator.registerBeans(bc, bean, cfg);
 							results.addAll(crawlKernel(repositoryClasses, bc.getKernel(), configurator, cfg));
 						}
 
-						if (repositoryClasses.stream().anyMatch(repoClazz -> repoClazz.isAssignableFrom(bc.getClazz()))) {
+						if (repositoryClasses.stream()
+								.anyMatch(repoClazz -> repoClazz.isAssignableFrom(bc.getClazz()))) {
 							results.add(bc);
 						}
 
@@ -767,6 +781,11 @@ public class SchemaManager {
 					}
 				});
 		return results;
+	}
+
+	public interface SchemaLoaderExecutor {
+
+		List<ResultEntry> execute(SchemaLoader schemaLoader, SchemaManagerLogHandler handler);
 	}
 
 	public static class DataSourceInfo
@@ -806,6 +825,25 @@ public class SchemaManager {
 		}
 	}
 
+	public static class Pair<K, V> {
+
+		private final K key;
+		private final V value;
+
+		public Pair(K key, V value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		public K getKey() {
+			return key;
+		}
+
+		public V getValue() {
+			return value;
+		}
+	}
+
 	public static class RepoInfo {
 
 		private final BeanConfig beanConfig;
@@ -832,10 +870,72 @@ public class SchemaManager {
 		}
 	}
 
+	public static class ResultEntry {
+
+		public final String message;
+		public final String name;
+		public final SchemaLoader.Result result;
+
+		private ResultEntry(String name, SchemaLoader.Result result, SchemaManagerLogHandler logHandler) {
+			this.name = name;
+			this.result = result;
+			LogRecord rec;
+			StringBuilder sb = null;
+			while ((rec = logHandler.poll()) != null) {
+				if (rec.getLevel().intValue() <= Level.FINE.intValue()) {
+					continue;
+				}
+				if (rec.getMessage() == null) {
+					continue;
+				}
+				if (sb == null) {
+					sb = new StringBuilder();
+				} else {
+					sb.append("\n");
+				}
+				sb.append(String.format(rec.getMessage(), rec.getParameters()));
+			}
+			this.message = sb == null ? null : sb.toString();
+		}
+
+	}
+
+	public static class RootCredentials {
+
+		public final String password;
+		public final String user;
+
+		public RootCredentials(String user, String password) {
+			this.user = user;
+			this.password = password;
+		}
+	}
+
+	public static class RootCredentialsCache {
+
+		private final Map<String, RootCredentials> cache = new ConcurrentHashMap<>();
+
+		public RootCredentials get(String server) {
+			return cache.getOrDefault(createKey(server), cache.get("default"));
+		}
+
+		public void set(String server, RootCredentials credentials) {
+			cache.put(createKey(server), credentials);
+		}
+
+		private String createKey(String server) {
+			if (server == null) {
+				return "default";
+			}
+			return server;
+		}
+
+	}
+
 	public static class SchemaInfo {
 
-		private final Repository.SchemaId schema;
 		private final List<RepoInfo> repositories;
+		private final Repository.SchemaId schema;
 
 		public SchemaInfo(Repository.SchemaId schema, List<RepoInfo> repositories) {
 			this.schema = schema;
@@ -863,99 +963,15 @@ public class SchemaManager {
 					.map(Version::of)
 					.findAny();
 		}
-		
+
 		public boolean isValid() {
 			return schema != null && getVersion().isPresent();
-		}                          
+		}
 
 		@Override
 		public String toString() {
-			return "SchemaInfo[id=" + (schema == null ? "<unknown>" : schema.id()) + ", repositories=" + repositories + "]";
-		}
-	}
-
-	public static class ResultEntry {
-
-		public final String name;
-		public final SchemaLoader.Result result;
-		public final String message;
-
-		private ResultEntry(String name, SchemaLoader.Result result, SchemaManagerLogHandler logHandler) {
-			this.name = name;
-			this.result = result;
-			LogRecord rec;
-			StringBuilder sb = null;
-			while ((rec = logHandler.poll()) != null) {
-				if (rec.getLevel().intValue() <= Level.FINE.intValue()) {
-					continue;
-				}
-				if (rec.getMessage() == null) {
-					continue;
-				}
-				if (sb == null) {
-					sb = new StringBuilder();
-				} else {
-					sb.append("\n");
-				}
-				sb.append(String.format(rec.getMessage(), rec.getParameters()));
-			}
-			this.message = sb == null ? null : sb.toString();
-		}
-
-	}
-
-	public static class Pair<K,V> {
-
-		private final K key;
-		private final V value;
-
-		public Pair(K key, V value) {
-			this.key = key;
-			this.value = value;
-		}
-
-		public K getKey() {
-			return key;
-		}
-
-		public V getValue() {
-			return value;
-		}
-	}
-
-	public interface SchemaLoaderExecutor {
-		List<ResultEntry> execute(SchemaLoader schemaLoader, SchemaManagerLogHandler handler);
-	}
-
-	public static class RootCredentialsCache {
-
-		private final Map<String, RootCredentials> cache = new ConcurrentHashMap<>();
-
-		public RootCredentials get(String server) {
-			return cache.getOrDefault(createKey(server), cache.get("default"));
-		}
-
-		public void set(String server, RootCredentials credentials) {
-			cache.put(createKey(server), credentials);
-		}
-
-		private String createKey(String server) {
-			if (server == null) {
-				return "default";
-			}
-			return server;
-		}
-
-	}
-
-	public static class RootCredentials {
-
-		public final String user;
-		public final String password;
-
-		public RootCredentials(String user, String password) {
-			this.user = user;
-			this.password = password;
+			return "SchemaInfo[id=" + (schema == null ? "<unknown>" : schema.id()) + ", repositories=" + repositories +
+					"]";
 		}
 	}
 }

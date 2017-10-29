@@ -29,26 +29,30 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
-import tigase.vhosts.*
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.Permissions
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
+import tigase.xmpp.StanzaType
+import tigase.xmpp.XMPPResourceConnection
 import tigase.xmpp.jid.JID
 
 def JIDS = "accountjids"
 
-def p = (Packet)packet
+def p = (Packet) packet
 //def auth_repo =/**/ (AuthRepository)authRepository
 //def user_repo = (UserRepository)userRepository
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 def NOTIFY_CLUSTER = "notify-cluster"
-boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.toString()));
 def notifyClusterStr = Command.getFieldValue(packet, NOTIFY_CLUSTER);
-boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf( notifyClusterStr ) : true;
+boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf(notifyClusterStr) : true;
 
-def user_sessions = (Map)userSessions;
+def user_sessions = (Map) userSessions;
 
 def userJids = Command.getFieldValues(packet, JIDS)
 
@@ -56,13 +60,14 @@ if (userJids == null) {
 	def result = p.commandResult(Command.DataType.form);
 
 	Command.addTitle(result, "Ending session for the users")
-	Command.addInstructions(result, "Fill out this form to end user(s) session(s). BareJID - will end all user sessions, FullJID - only particular session.")
+	Command.addInstructions(result,
+							"Fill out this form to end user(s) session(s). BareJID - will end all user sessions, FullJID - only particular session.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, JIDS, userJids ?: "", "jid-multi",
-			"The Jabber ID(s) for which end session")
-	if 	( clusterMode  ) {
+						  "The Jabber ID(s) for which end session")
+	if (clusterMode) {
 		Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
 	}
 
@@ -73,14 +78,14 @@ def results = new LinkedList<Packet>();
 
 
 if (clusterMode && notifyCluster) {
-	def nodes = (List)clusterStrategy.getNodesConnected();
-	if (nodes && nodes.size() > 0 ) {
+	def nodes = (List) clusterStrategy.getNodesConnected();
+	if (nodes && nodes.size() > 0) {
 		nodes.each { node ->
 			def forward = p.copyElementOnly();
 			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-			forward.setPacketTo( node );
-			forward.setPermissions( Permissions.ADMIN );
+			forward.setPacketTo(node);
+			forward.setPermissions(Permissions.ADMIN);
 
 			println "forwarding: " + forward
 
@@ -91,31 +96,33 @@ if (clusterMode && notifyCluster) {
 
 def result = p.commandResult(Command.DataType.result)
 results.offer(result);
-def msgs = [];
-def errors = [];
+def msgs = [ ];
+def errors = [ ];
 for (userJid in userJids) {
 	try {
 
 		JID userFullJID = JID.jidInstance(userJid)
 		def sess = user_sessions.get(userFullJID.getBareJID());
 		VHostItem vhost = vhost_man.getVHostItem(userFullJID.getDomain())
-		if (isServiceAdmin ||
-				(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		if (isServiceAdmin || (vhost != null &&
+				(vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 
 			if (sess != null) {
 				def conns = sess.getConnectionIds();
 				for (conn in conns) {
 					XMPPResourceConnection res = sess.getResourceForConnectionId(conn);
-					if (res != null && userFullJID.getResource() == null || (userFullJID.getResource() == res.getResource())) {
+					if (res != null && userFullJID.getResource() == null ||
+							(userFullJID.getResource() == res.getResource())) {
 						def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
-								StanzaType.set, res.nextStanzaId());
+																   StanzaType.set, res.nextStanzaId());
 						results.offer(commandClose);
-						msgs.add("Operation successful for user "+res.getjid());
+						msgs.add("Operation successful for user " + res.getjid());
 					}
 				}
 			}
 		} else {
-			errors.add("You do not have enough permissions to end sessions for accounts for domain "+bareJID.getDomain()+".");
+			errors.add("You do not have enough permissions to end sessions for accounts for domain " +
+							   bareJID.getDomain() + ".");
 		}
 
 	} catch (Exception ex) {
@@ -123,11 +130,13 @@ for (userJid in userJids) {
 	}
 }
 
-if (!msgs.isEmpty())
-	Command.addFieldMultiValue(result, "Notes", msgs);
+if (!msgs.isEmpty()) {
+	Command.addFieldMultiValue(result, "Notes", msgs)
+};
 
-if (!errors.isEmpty())
-	Command.addFieldMultiValue(result, "Errors", errors);
+if (!errors.isEmpty()) {
+	Command.addFieldMultiValue(result, "Errors", errors)
+};
 return results
 
 

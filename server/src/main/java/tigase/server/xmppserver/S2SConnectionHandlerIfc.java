@@ -1,4 +1,3 @@
-
 /*
  * S2SConnectionHandlerIfc.java
  *
@@ -25,8 +24,8 @@ package tigase.server.xmppserver;
 import tigase.server.Packet;
 import tigase.util.common.TimerTask;
 import tigase.xml.Element;
-import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
 import java.util.Map;
@@ -38,17 +37,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created: Dec 9, 2010 11:40:28 PM
  *
+ * @param <IO>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
- *
- * @param <IO>
  */
 public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	/**
 	 * Method description
-	 *
-	 *
 	 *
 	 * @param serv {@link S2SIOService} for which stream features should be retrieved
 	 *
@@ -64,8 +61,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	//~--- get methods ----------------------------------------------------------
 
-	CIDConnections getCIDConnections(CID cid, boolean createNew)
-			throws NotLocalhostException, LocalhostException;
+	CIDConnections getCIDConnections(CID cid, boolean createNew) throws NotLocalhostException, LocalhostException;
 
 	CIDConnections.CIDConnectionsOpenerService getConnectionOpenerService();
 
@@ -75,13 +71,14 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	 * Returns secret used for particular domain
 	 *
 	 * @param domain for which secret should be returned
-	 * 
+	 *
 	 * @return for particular domain
+	 *
 	 * @throws NotLocalhostException if the domain is not local
 	 */
-	String getSecretForDomain( String domain ) throws NotLocalhostException;
+	String getSecretForDomain(String domain) throws NotLocalhostException;
 
-	String getServerNameForDomain( String domain );
+	String getServerNameForDomain(String domain);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -95,16 +92,16 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	 * @return boolean indicating whether TLS is required
 	 */
 	boolean isTlsRequired(String domain);
-        
-	boolean isTlsWantClientAuthEnabled();
-	
-	boolean isTlsNeedClientAuthEnabled();
-	
-	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
-			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly);
 
-	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
-			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem);
+	boolean isTlsWantClientAuthEnabled();
+
+	boolean isTlsNeedClientAuthEnabled();
+
+	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid, String key_sessionId,
+							 String serv_sessionId, String cdata, boolean handshakingOnly);
+
+	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid, String key_sessionId,
+							 String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem);
 
 	boolean writePacketToSocket(IO serv, Packet packet);
 
@@ -114,8 +111,6 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

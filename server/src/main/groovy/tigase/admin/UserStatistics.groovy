@@ -29,17 +29,20 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
-import tigase.vhosts.*
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
+import tigase.xmpp.XMPPResourceConnection
+import tigase.xmpp.XMPPSession
 import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
 
-def p = (Packet)packet
-def sessions = (Map<BareJID, XMPPSession>)userSessions
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def sessions = (Map<BareJID, XMPPSession>) userSessions
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -52,7 +55,7 @@ if (userJid == null) {
 	Command.addInstructions(result, "Fill out this form to gather user statistics.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
-	Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for statistics")
+	Command.addFieldValue(result, JID, userJid ?: "", "jid-single", "The Jabber ID for statistics")
 
 	return result
 }
@@ -62,7 +65,7 @@ VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def result = p.commandResult(Command.DataType.result)
 
 if (isServiceAdmin ||
-(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 	XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
 
 	if (session == null) {
@@ -70,13 +73,15 @@ if (isServiceAdmin ||
 	} else {
 		List<XMPPResourceConnection> conns = session.getActiveResources()
 		String conns_str = "Connections: "
-		for (XMPPResourceConnection con: conns)
+		for (XMPPResourceConnection con : conns) {
 			conns_str += con.toString() + "###\n"
+		}
 		return "There is ${conns?.size()} active user's ${userJid} sessions, packets: ${session.getPacketsCounter()}\n" +
-		"user connections:\n" + conns_str
+				"user connections:\n" + conns_str
 	}
 } else {
-	Command.addTextField(result, "Error", "You do not have enough permissions to obtain statistics for user in this domain.");
+	Command.addTextField(result, "Error",
+						 "You do not have enough permissions to obtain statistics for user in this domain.");
 }
 
 return result

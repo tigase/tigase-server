@@ -22,17 +22,15 @@
 
 package tigase.admin
 
-import tigase.server. { Command, Packet }
-
-val num1 = Command getFieldValue(packet, "num1")
-val num2 = Command getFieldValue(packet, "num2")
+val num1 = Command getFieldValue (packet, "num1")
+val num2 = Command getFieldValue (packet, "num2")
 
 scriptResult = if (num1 == null || num2 == null) {
-	val cmd = Packet.commandResultForm(packet)
-	Command.addTextField(cmd, "Note", "This is a Scala script!")
-	Command.addFieldValue(cmd, "num1", "")
-	Command.addFieldValue(cmd, "num2", "")
-	cmd
+  val cmd = Packet.commandResultForm (packet)
+  Command.addTextField (cmd, "Note", "This is a Scala script!")
+  Command.addFieldValue (cmd, "num1", "")
+  Command.addFieldValue (cmd, "num2", "")
+  cmd
 } else {
-	num1 + num2
+  num1 + num2
 }

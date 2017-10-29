@@ -39,34 +39,26 @@ import tigase.server.Packet;
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import java.util.Collection;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco, RegistrarBean {
+public abstract class AbstractKernelBasedComponent
+		extends AbstractMessageReceiver
+		implements XMPPService, DisableDisco, RegistrarBean {
 
-	protected Kernel kernel = null;
+	protected final EventBus eventBus = EventBusFactory.getInstance();
 	/**
 	 * Logger
 	 */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
-	protected final EventBus eventBus = EventBusFactory.getInstance();
-
+	protected Kernel kernel = null;
 	@Inject
 	private StanzaProcessor stanzaProcessor;
-
-	@Override
-	protected ScriptEngineManager createScriptEngineManager() {
-		ScriptEngineManager result = super.createScriptEngineManager();
-		result.setBindings(new BindingsKernel(kernel));
-		return result;
-	}
 
 	public String getComponentVersion() {
 		String version = this.getClass().getPackage().getImplementationVersion();
 		return version == null ? "0.0.0" : version;
 	}
-
 
 	public Kernel getKernel() {
 		return this.kernel;
@@ -84,8 +76,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	}
 
 	/**
-	 * Is this component discoverable by disco#items for domain by non admin
-	 * users.
+	 * Is this component discoverable by disco#items for domain by non admin users.
 	 *
 	 * @return <code>true</code> - if yes
 	 */
@@ -95,8 +86,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	public void processPacket(Packet packet) {
 		stanzaProcessor.processPacket(packet);
 	}
-
-	protected abstract void registerModules(Kernel kernel);
 
 	@Override
 	public void register(Kernel kernel) {
@@ -125,8 +114,18 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		this.updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), !isDiscoNonAdmin());
 	}
 
+	@Override
+	protected ScriptEngineManager createScriptEngineManager() {
+		ScriptEngineManager result = super.createScriptEngineManager();
+		result.setBindings(new BindingsKernel(kernel));
+		return result;
+	}
+
+	protected abstract void registerModules(Kernel kernel);
+
 	@Bean(name = "writer", active = true)
-	public static final class DefaultPacketWriter implements PacketWriter {
+	public static final class DefaultPacketWriter
+			implements PacketWriter {
 
 		protected final Logger log = Logger.getLogger(this.getClass().getName());
 		@Inject(nullAllowed = false)

@@ -18,40 +18,29 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
+import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-
 /**
- * Message forwarder class. Forwards <code>Message</code> packet to it's
- * destination address.
- *
+ * Message forwarder class. Forwards <code>Message</code> packet to it's destination address.
+ * <p>
  * Created: Tue Feb 21 15:49:08 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -59,25 +48,19 @@ import java.util.Queue;
  */
 @Bean(name = MessageForwarding.ID, parent = SessionManager.class, active = false)
 public class MessageForwarding
-				extends XMPPProcessor
-				implements XMPPProcessorIfc {
-	private static final String FORWARD_EL    = "forward";
-	private static final String FORWARD_XMLNS = "http://tigase.org/protocol/forward#v1";
-	protected static final String ID            = "message-vhost-forward";
+		extends XMPPProcessor
+		implements XMPPProcessorIfc {
 
+	protected static final String ID = "message-vhost-forward";
+	private static final String FORWARD_EL = "forward";
+	private static final String FORWARD_XMLNS = "http://tigase.org/protocol/forward#v1";
 	/** Class logger */
-	private static final Logger     log = Logger.getLogger(MessageForwarding.class
-			.getName());
-	private static final String     XMLNS    = "jabber:client";
-	private static final String[][] ELEMENTS = {
-		{ tigase.server.Message.ELEM_NAME }
-	};
-	private static final String[]   XMLNSS   = { XMLNS };
-	private static final String[]   MESSAGE_FORWARD_PATH = { tigase.server.Message
-			.ELEM_NAME,
-			FORWARD_EL };
-	private static final Element forw_el = new Element(FORWARD_EL, new String[] {
-			"xmlns" }, new String[] { FORWARD_XMLNS });
+	private static final Logger log = Logger.getLogger(MessageForwarding.class.getName());
+	private static final String XMLNS = "jabber:client";
+	private static final String[][] ELEMENTS = {{tigase.server.Message.ELEM_NAME}};
+	private static final String[] XMLNSS = {XMLNS};
+	private static final String[] MESSAGE_FORWARD_PATH = {tigase.server.Message.ELEM_NAME, FORWARD_EL};
+	private static final Element forw_el = new Element(FORWARD_EL, new String[]{"xmlns"}, new String[]{FORWARD_XMLNS});
 
 	//~--- methods --------------------------------------------------------------
 
@@ -87,9 +70,8 @@ public class MessageForwarding
 	}
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-					throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 
 		// For performance reasons it is better to do the check
 		// before calling logging method.
@@ -128,9 +110,7 @@ public class MessageForwarding
 			JID user = null;
 
 			// Remember to cut the resource part off before comparing JIDs
-			BareJID id = (packet.getStanzaTo() != null)
-					? packet.getStanzaTo().getBareJID()
-					: null;
+			BareJID id = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
 
 			// Checking if this is a packet TO the owner of the session
 			if (session.isUserId(id)) {
@@ -140,9 +120,7 @@ public class MessageForwarding
 			} else {
 
 				// Remember to cut the resource part off before comparing JIDs
-				id = (packet.getStanzaFrom() != null)
-						? packet.getStanzaFrom().getBareJID()
-						: null;
+				id = (packet.getStanzaFrom() != null) ? packet.getStanzaFrom().getBareJID() : null;
 
 				// Checking if this is maybe packet FROM the client
 				if (session.isUserId(id)) {
@@ -172,8 +150,8 @@ public class MessageForwarding
 			results.offer(result);
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			results.offer(
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		}    // end of try-catch
 	}
 

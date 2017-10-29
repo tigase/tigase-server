@@ -20,19 +20,19 @@
 
 package tigase.eventbus.impl;
 
-import static tigase.util.reflection.ReflectionHelper.Handler;
-import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.RegistrationException;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import tigase.eventbus.HandleEvent;
-import tigase.eventbus.RegistrationException;
+import static tigase.util.reflection.ReflectionHelper.Handler;
+import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
 
 public class ReflectEventListenerHandlerFactory {
 
-	private static final Handler<HandleEvent,AbstractHandler> HANDLER = (Object consumer, Method method, HandleEvent annotation) -> {
+	private static final Handler<HandleEvent, AbstractHandler> HANDLER = (Object consumer, Method method, HandleEvent annotation) -> {
 		if (method.getParameterCount() < 1) {
 			throw new RegistrationException("Handler method must have parameter to receive event!");
 		}
@@ -44,13 +44,16 @@ public class ReflectEventListenerHandlerFactory {
 		ReflectEventListenerHandler handler;
 		switch (method.getParameterCount()) {
 			case 1:
-				handler = new ReflectEventListenerHandler(annotation.filter(), packageName, eventName, consumer, method);
+				handler = new ReflectEventListenerHandler(annotation.filter(), packageName, eventName, consumer,
+														  method);
 				break;
 			case 2:
 				final Class sourPar = method.getParameters()[1].getType();
 				if (!sourPar.equals(Object.class)) {
 					throw new RegistrationException("Second parameter (event source) must be Object type.");
-				}	handler = new ReflectEventSourceListenerHandler(annotation.filter(), packageName, eventName, consumer, method);
+				}
+				handler = new ReflectEventSourceListenerHandler(annotation.filter(), packageName, eventName, consumer,
+																method);
 				break;
 			default:
 				throw new RegistrationException("Handler method must have exactly one parameter!");
@@ -65,5 +68,5 @@ public class ReflectEventListenerHandlerFactory {
 	public Collection<AbstractHandler> create(final Object consumer) throws RegistrationException {
 		return collectAnnotatedMethods(consumer, HandleEvent.class, HANDLER);
 	}
-	
+
 }

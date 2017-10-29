@@ -18,18 +18,14 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.util.stringprep.TigaseStringprepException;
-
 import tigase.xml.Element;
-
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 /**
  * Created: Dec 31, 2009 8:38:38 PM
@@ -38,76 +34,42 @@ import tigase.xmpp.StanzaType;
  * @version $Rev$
  */
 public class Message
-				extends Packet {
+		extends Packet {
+
 	/** Field description */
 	public static final String ELEM_NAME = "message";
 
 	/** Field description */
-	public static final String[] MESSAGE_BODY_PATH = { ELEM_NAME, "body" };
+	public static final String[] MESSAGE_BODY_PATH = {ELEM_NAME, "body"};
 
 	/** Field description */
-	public static final String[] MESSAGE_SUBJECT_PATH = { ELEM_NAME, "subject" };
+	public static final String[] MESSAGE_SUBJECT_PATH = {ELEM_NAME, "subject"};
 
 	/** Field description */
-	public static final String[] MESSAGE_ERROR_PATH = { ELEM_NAME, "error" };
+	public static final String[] MESSAGE_ERROR_PATH = {ELEM_NAME, "error"};
 
 	/** Field description */
-	public static final String[] MESSAGE_DELAY_PATH = { ELEM_NAME, "delay" };
+	public static final String[] MESSAGE_DELAY_PATH = {ELEM_NAME, "delay"};
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param elem
-	 *
-	 * @throws TigaseStringprepException
-	 */
-	public Message(Element elem) throws TigaseStringprepException {
-		super(elem);
-	}
-
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param elem
-	 * @param stanzaFrom
-	 * @param stanzaTo
-	 */
-	public Message(Element elem, JID stanzaFrom, JID stanzaTo) {
-		super(elem, stanzaFrom, stanzaTo);
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
 	 * Creates a packet with message stanza.
 	 *
+	 * @param from is a <code>JID</code> instance with message source address.
+	 * @param to is a <code>JID</code> instance with message destination address.
+	 * @param type is a <code>StanzaType</code> object with the message type.
+	 * @param body is a <code>String</code> object with message body content.
+	 * @param subject is a <code>String</code> object with message subject.
+	 * @param thread is a <code>String</code> object with message thread.
+	 * @param id is a <code>String</code> object with packet id value. Normally we do not set packet IDs for messages
+	 * but in some cases this might be useful.
 	 *
-	 * @param from
-	 *          is a <code>JID</code> instance with message source address.
-	 * @param to
-	 *          is a <code>JID</code> instance with message destination address.
-	 * @param type
-	 *          is a <code>StanzaType</code> object with the message type.
-	 * @param body
-	 *          is a <code>String</code> object with message body content.
-	 * @param subject
-	 *          is a <code>String</code> object with message subject.
-	 * @param thread
-	 *          is a <code>String</code> object with message thread.
-	 * @param id
-	 *          is a <code>String</code> object with packet id value. Normally we
-	 *          do not set packet IDs for messages but in some cases this might be
-	 *          useful.
-	 *
-	 * @return a new <code>Packet</code> instance (more specifically
-	 *         <code>Message</code> instance) with the message stanza.
+	 * @return a new <code>Packet</code> instance (more specifically <code>Message</code> instance) with the message
+	 * stanza.
 	 */
-	public static Packet getMessage(JID from, JID to, StanzaType type, String body,
-			String subject, String thread, String id) {
+	public static Packet getMessage(JID from, JID to, StanzaType type, String body, String subject, String thread,
+									String id) {
 		Element message = new Element("message", null, null);
 
 		message.setXMLNS(CLIENT_XMLNS);
@@ -134,6 +96,30 @@ public class Message
 		}
 
 		return packetInstance(message, from, to);
+	}
+
+	/**
+	 * Constructs ...
+	 *
+	 * @param elem
+	 *
+	 * @throws TigaseStringprepException
+	 */
+	public Message(Element elem) throws TigaseStringprepException {
+		super(elem);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 *
+	 * @param elem
+	 * @param stanzaFrom
+	 * @param stanzaTo
+	 */
+	public Message(Element elem, JID stanzaFrom, JID stanzaTo) {
+		super(elem, stanzaFrom, stanzaTo);
 	}
 
 	@Override

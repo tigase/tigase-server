@@ -41,54 +41,43 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Extended implementation of SeeOtherHost using redirect information from
- * database based on cluster_nodes table.
- *
+ * Extended implementation of SeeOtherHost using redirect information from database based on cluster_nodes table.
  */
 public class SeeOtherHostDualIP
-		extends SeeOtherHostHashed implements Initializable, RegistrarBean, UnregisterAware {
+		extends SeeOtherHostHashed
+		implements Initializable, RegistrarBean, UnregisterAware {
 
-	private static final Logger log = Logger.getLogger( SeeOtherHostDualIP.class.getName() );
-
-	public static final String SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "fallback-redirection-host";
-
-	public static final String SEE_OTHER_HOST_DATA_SOURCE_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "data-source";
-	public static final String SEE_OTHER_HOST_DATA_SOURCE_VALUE
-														 = SeeOtherHostDualIPSQLRepository.class.getName();
-
-	public static final String SEE_OTHER_HOST_DB_URL_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "db-url";
-
-	@ConfigField(desc = "Failback host", alias = "failbackHost")
-	private BareJID fallback_host = null;
-
+	public static final String SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY =
+			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "fallback-redirection-host";
+	public static final String SEE_OTHER_HOST_DATA_SOURCE_KEY = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "data-source";
+	public static final String SEE_OTHER_HOST_DATA_SOURCE_VALUE = SeeOtherHostDualIPSQLRepository.class.getName();
+	public static final String SEE_OTHER_HOST_DB_URL_KEY = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "db-url";
+	private static final Logger log = Logger.getLogger(SeeOtherHostDualIP.class.getName());
+	private final Map<BareJID, BareJID> redirectsMap = Collections.synchronizedMap(new HashMap());
 	@Inject
 	private EventBus eventBus;
-
+	@ConfigField(desc = "Failback host", alias = "failbackHost")
+	private BareJID fallback_host = null;
 	@Inject(bean = "dualIPRepository")
 	private DualIPRepository repo = null;
 
-	private final Map<BareJID, BareJID> redirectsMap = Collections.synchronizedMap(new HashMap());
-
 	@Override
-	public BareJID findHostForJID( BareJID jid, BareJID host ) {
+	public BareJID findHostForJID(BareJID jid, BareJID host) {
 
 		// get default host identification
-		BareJID see_other_host = super.findHostForJID( jid, host );
+		BareJID see_other_host = super.findHostForJID(jid, host);
 
 		// lookup resolution in redirection map
 		BareJID redirection;
-		redirection = redirectsMap.get( see_other_host );
+		redirection = redirectsMap.get(see_other_host);
 
-		if ( redirection == null ){
+		if (redirection == null) {
 			// let's try querying the table again
 			reloadRedirection();
-			redirection = redirectsMap.get( see_other_host );
+			redirection = redirectsMap.get(see_other_host);
 		}
 
-		if ( redirection == null && fallback_host != null ){
+		if (redirection == null && fallback_host != null) {
 			// let's use default fallback redirection if present
 			redirection = fallback_host;
 		}
@@ -97,10 +86,10 @@ public class SeeOtherHostDualIP
 	}
 
 	@HandleEvent
-	public void clusterRepoItemEvent( ClusterRepoItemEvent event ) {
+	public void clusterRepoItemEvent(ClusterRepoItemEvent event) {
 
-		if ( log.isLoggable( Level.FINE ) ){
-			log.log( Level.FINE, "Procesing ClusterRepoItemEvent: {0}", new Object[] { event } );
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "Procesing ClusterRepoItemEvent: {0}", new Object[]{event});
 		}
 
 		REPO_ITEM_UPDATE_TYPE action = event.getAction();
@@ -109,81 +98,63 @@ public class SeeOtherHostDualIP
 
 		BareJID hostname;
 		String hostnameStr = item.getHostname();
-		if ( null != hostnameStr ){
-			hostname = BareJID.bareJIDInstanceNS( hostnameStr );
+		if (null != hostnameStr) {
+			hostname = BareJID.bareJIDInstanceNS(hostnameStr);
 		} else {
 			return;
 		}
 
 		BareJID secondary = null;
 		String secondaryStr = item.getSecondaryHostname();
-		if ( null != secondaryStr && !secondaryStr.trim().isEmpty() ){
-			secondary = BareJID.bareJIDInstanceNS( secondaryStr );
+		if (null != secondaryStr && !secondaryStr.trim().isEmpty()) {
+			secondary = BareJID.bareJIDInstanceNS(secondaryStr);
 		}
 
 		BareJID oldItem;
-		switch ( action ) {
+		switch (action) {
 			case ADDED:
 			case UPDATED:
-				oldItem = redirectsMap.put( hostname, secondary );
-				if ( log.isLoggable( Level.FINE ) ){
-					log.log( Level.FINE, "Redirection item :: hostname: {0}, secondary: {1}, added/updated! Replaced: {2}",
-									 new Object[] { hostname, secondary, oldItem } );
+				oldItem = redirectsMap.put(hostname, secondary);
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,
+							"Redirection item :: hostname: {0}, secondary: {1}, added/updated! Replaced: {2}",
+							new Object[]{hostname, secondary, oldItem});
 				}
 
 				break;
 
 			case REMOVED:
-				oldItem = redirectsMap.remove( hostname );
-				if ( log.isLoggable( Level.FINE ) ){
-					log.log( Level.FINE, "Redirection item :: hostname: {0}, {1}",
-									 new Object[] { hostname, ( oldItem != null ? "removed" : "was not present in redirection map" ) } );
+				oldItem = redirectsMap.remove(hostname);
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Redirection item :: hostname: {0}, {1}", new Object[]{hostname,
+																							   (oldItem != null
+																								? "removed"
+																								: "was not present in redirection map")});
 				}
 				break;
 		}
 	}
 
 	@Override
-	public void setNodes( List<JID> connectedNodes ) {
-		super.setNodes( connectedNodes );
+	public void setNodes(List<JID> connectedNodes) {
+		super.setNodes(connectedNodes);
 
 		reloadRedirection();
 	}
 
 	@Override
-	public boolean isRedirectionRequired( BareJID defaultHost, BareJID redirectionHost ) {
-		return redirectsMap.get( defaultHost ) != null
-					 ? !redirectsMap.get( defaultHost ).equals( redirectionHost )
-					 : false;
+	public boolean isRedirectionRequired(BareJID defaultHost, BareJID redirectionHost) {
+		return redirectsMap.get(defaultHost) != null ? !redirectsMap.get(defaultHost).equals(redirectionHost) : false;
 	}
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override
 	public void unregister(Kernel kernel) {
 
-	}
-
-	protected void reloadRedirection() {
-		// reload redirections from
-		if ( null == repo ){
-			return;
-		}
-		try {
-			final Map<BareJID, BareJID> queryAllDB = repo.queryAllDB();
-			if ( null != queryAllDB ){
-				redirectsMap.clear();
-				redirectsMap.putAll( queryAllDB );
-				if ( log.isLoggable( Level.FINE ) ){
-					log.log( Level.FINE, "Reloaded redirection items: " + Arrays.asList( redirectsMap ) );
-				}
-			}
-		} catch ( Exception ex ) {
-			log.log( Level.SEVERE, "Reloading redirection items failed: ", ex );
-		}
 	}
 
 	@Override
@@ -200,9 +171,30 @@ public class SeeOtherHostDualIP
 		eventBus.unregisterAll(this);
 	}
 
-	public interface DualIPRepository<T extends DataSource> extends DataSourceAware<T> {
+	protected void reloadRedirection() {
+		// reload redirections from
+		if (null == repo) {
+			return;
+		}
+		try {
+			final Map<BareJID, BareJID> queryAllDB = repo.queryAllDB();
+			if (null != queryAllDB) {
+				redirectsMap.clear();
+				redirectsMap.putAll(queryAllDB);
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Reloaded redirection items: " + Arrays.asList(redirectsMap));
+				}
+			}
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Reloading redirection items failed: ", ex);
+		}
+	}
+
+	public interface DualIPRepository<T extends DataSource>
+			extends DataSourceAware<T> {
 
 		public static final String HOSTNAME_ID = "hostname";
+
 		public static final String SECONDARY_HOSTNAME_ID = "secondary";
 
 		Map<BareJID, BareJID> queryAllDB() throws SQLException;
@@ -210,7 +202,8 @@ public class SeeOtherHostDualIP
 	}
 
 	@Bean(name = "dualIPRepository", parent = SeeOtherHostDualIP.class, active = true)
-	public static class DualIPRepositoryWrapper extends MDRepositoryBeanWithStatistics<DualIPRepository>
+	public static class DualIPRepositoryWrapper
+			extends MDRepositoryBeanWithStatistics<DualIPRepository>
 			implements DualIPRepository<DataSource> {
 
 		public DualIPRepositoryWrapper() {
@@ -219,11 +212,6 @@ public class SeeOtherHostDualIP
 
 		public Map<BareJID, BareJID> queryAllDB() throws SQLException {
 			return getRepository("").queryAllDB();
-		}
-
-		@Override
-		protected Class<? extends DualIPRepository> findClassForDataSource(DataSource dataSource) throws DBInitException {
-			return DataSourceHelper.getDefaultClass(DualIPRepository.class, dataSource.getResourceUri());
 		}
 
 		@Override
@@ -236,7 +224,14 @@ public class SeeOtherHostDualIP
 			return DualIPRepositoryWrapperConfigBean.class;
 		}
 
-		public static class DualIPRepositoryWrapperConfigBean extends MDRepositoryConfigBean<DualIPRepository> {
+		@Override
+		protected Class<? extends DualIPRepository> findClassForDataSource(DataSource dataSource)
+				throws DBInitException {
+			return DataSourceHelper.getDefaultClass(DualIPRepository.class, dataSource.getResourceUri());
+		}
+
+		public static class DualIPRepositoryWrapperConfigBean
+				extends MDRepositoryConfigBean<DualIPRepository> {
 
 		}
 	}

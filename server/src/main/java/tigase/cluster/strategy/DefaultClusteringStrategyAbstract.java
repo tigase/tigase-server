@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -36,10 +34,10 @@ import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.Element;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -51,25 +49,47 @@ import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 /**
  * Created: May 13, 2009 9:53:44 AM
  *
+ * @param <E>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
- *
- * @param <E>
  */
 public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
-				implements ClusteringStrategyIfc<E> {
+		implements ClusteringStrategyIfc<E> {
+
 	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(
-			DefaultClusteringStrategyAbstract.class.getName());
+	private static final Logger log = Logger.getLogger(DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
+	/** Field description */
+	@Inject
+	protected ClusterControllerIfc cluster = null;
 	protected String comp = "sess-man";
-	protected String prefix = "strategy/" + this.getClass().getSimpleName() + "/";
 
 	//~--- fields ---------------------------------------------------------------
+	@Inject
+	protected EventBus eventBus = null;
+	protected String prefix = "strategy/" + this.getClass().getSimpleName() + "/";
+	/** Field description */
+	@Inject
+	protected SessionManagerClusteredIfc sm = null;
+	private JID ampJID = JID.jidInstanceNS("amp", DNSResolverFactory.getInstance().getDefaultHost());
+	/** Field description */
+	private Set<CommandListener> commands = new CopyOnWriteArraySet<CommandListener>();
+	private ErrorForwarding errorForwarding = ErrorForwarding.drop;
+
+	/**
+	 * Constructs ...
+	 */
+	public DefaultClusteringStrategyAbstract() {
+		super();
+		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));
+	}
+
+	// private ClusteringMetadataIfc<E> metadata = null;
 
 	@Override
 	public void statisticExecutedIn(long executionTime) {
@@ -96,57 +116,25 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 	}
 
+	//~--- constant enums -------------------------------------------------------
+
 	@Override
 	public void setStatisticsPrefix(String prefix) {
 		this.prefix = prefix;
 	}
 
-	/** Field description */
-	@Inject
-	protected ClusterControllerIfc cluster = null;
-
-	// private ClusteringMetadataIfc<E> metadata = null;
-
-	@Inject
-	protected EventBus eventBus = null;
-
-	/** Field description */
-	@Inject
-	protected SessionManagerClusteredIfc sm = null;
-
-	private JID ampJID = JID.jidInstanceNS("amp", DNSResolverFactory.getInstance().getDefaultHost());
-
-	/** Field description */
-	private Set<CommandListener>        commands =
-			new CopyOnWriteArraySet<CommandListener>();
-	private ErrorForwarding             errorForwarding = ErrorForwarding.drop;
-
-	//~--- constant enums -------------------------------------------------------
-
-	private static enum ErrorForwarding { forward, drop }
-
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Constructs ...
-	 *
-	 */
-	public DefaultClusteringStrategyAbstract() {
-		super();
-		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
 	 * Method description
-	 *
 	 *
 	 * @param cmd
 	 */
 	public final void addCommandListener(CommandListener cmd) {
 		commands.add(cmd);
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -157,13 +145,15 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	public boolean containsJidLocally(BareJID jid) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean containsJidLocally(JID jid) {
 		return false;
 	}
+
 	@Override
-	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {}
+	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
+	}
 
 	@Override
 	public void handleLocalPresenceSet(XMPPResourceConnection conn) {
@@ -174,7 +164,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	public void handleLocalResourceBind(XMPPResourceConnection conn) {
 		// Do nothing
 	}
-	
+
 	@Override
 	public void handleLocalUserLogin(BareJID userId, XMPPResourceConnection conn) {
 
@@ -188,37 +178,37 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	}
 
 	@Override
-	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId,
+											 JID newConnId) {
 		// Do nothing
 	}
 
 	@Override
 	public boolean processPacket(Packet packet, XMPPResourceConnection conn) {
 		List<JID> toNodes = getNodesForPacketForward(sm.getComponentId(), null, packet);
-		boolean   result  = (toNodes != null) && (toNodes.size() > 0);
+		boolean result = (toNodes != null) && (toNodes.size() > 0);
 
 		if (result) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Forwarding packet {0} to nodes: {1}", new Object[] {
-						packet,
-						toNodes });
+				log.log(Level.FINEST, "Forwarding packet {0} to nodes: {1}", new Object[]{packet, toNodes});
 			}
 
 			Map<String, String> data = null;
 
 			if (conn != null || packet.getPacketFrom() != null) {
 				data = new LinkedHashMap<String, String>();
-				if (conn != null)
+				if (conn != null) {
 					data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
-				if (packet.getPacketFrom() != null)
+				}
+				if (packet.getPacketFrom() != null) {
 					data.put(PacketForwardCmd.PACKET_FROM_KEY, packet.getPacketFrom().toString());
+				}
 			}
-			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), sm
-					.getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
+			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), sm.getComponentId(), null,
+								toNodes.toArray(new JID[toNodes.size()]));
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "No cluster nodes found for packet forward: {0}",
-						new Object[] { packet });
+				log.log(Level.FINEST, "No cluster nodes found for packet forward: {0}", new Object[]{packet});
 			}
 		}
 
@@ -226,37 +216,30 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	}
 
 	/**
-	 * Method attempts to send the packet to the next cluster node. Returns true
-	 * on successful attempt and false on failure. The true result does not mean
-	 * that the packet has been delivered though. Only that it was sent. The send
-	 * attempt may fail if there is no more cluster nodes to send the packet or if
-	 * the clustering strategy logic decided that the packet does not have to be
-	 * sent.
-	 *
+	 * Method attempts to send the packet to the next cluster node. Returns true on successful attempt and false on
+	 * failure. The true result does not mean that the packet has been delivered though. Only that it was sent. The send
+	 * attempt may fail if there is no more cluster nodes to send the packet or if the clustering strategy logic decided
+	 * that the packet does not have to be sent.
 	 *
 	 * @param fromNode
 	 * @param data
-	 * @param packet
-	 *          to be sent to a next cluster node
-	 * @param visitedNodes
-	 *          a list of nodes already visited by the packet.
-	 * @return true if the packet was sent to next cluster node and false
-	 *         otherwise.
+	 * @param packet to be sent to a next cluster node
+	 * @param visitedNodes a list of nodes already visited by the packet.
+	 *
+	 * @return true if the packet was sent to next cluster node and false otherwise.
 	 */
-	public boolean sendToNextNode(JID fromNode, Set<JID> visitedNodes, Map<String,
-			String> data, Packet packet) {
-		boolean   result    = false;
+	public boolean sendToNextNode(JID fromNode, Set<JID> visitedNodes, Map<String, String> data, Packet packet) {
+		boolean result = false;
 		List<JID> nextNodes = getNodesForPacketForward(fromNode, visitedNodes, packet);
 
 		if ((nextNodes != null) && (nextNodes.size() > 0)) {
-			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), fromNode,
-					visitedNodes, nextNodes.toArray(new JID[nextNodes.size()]));
+			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), fromNode, visitedNodes,
+								nextNodes.toArray(new JID[nextNodes.size()]));
 			result = true;
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Called for packet: {0}, visitedNodes: {1}, result: {2}",
-					new Object[] { packet,
-					visitedNodes, result });
+					new Object[]{packet, visitedNodes, result});
 		}
 
 		return result;
@@ -267,12 +250,12 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		return getInfo();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public List<JID> getNodesConnected() {
 		return sm.getNodesConnected();
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -317,17 +300,13 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param fromNode
 	 * @param visitedNodes
 	 * @param packet
 	 *
-	 *
-	 *
 	 * @return a value of {@code List<JID>}
 	 */
-	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
-			Packet packet) {
+	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 
 		// If visited nodes is not null then we return null as this strategy never
 		// sends packets in ring, the first node decides where to send a packet
@@ -348,14 +327,11 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 			// nodes = metadata.getNodesForJid(jidLookup);
 			nodes = getNodesConnected();
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Selected nodes: {0}, for packet: {1}", new Object[] {
-						nodes,
-						packet });
+				log.log(Level.FINEST, "Selected nodes: {0}, for packet: {1}", new Object[]{nodes, packet});
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Packet not suitable for forwarding: {0}", new Object[] {
-						packet });
+				log.log(Level.FINEST, "Packet not suitable for forwarding: {0}", new Object[]{packet});
 			}
 		}
 
@@ -367,15 +343,13 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		for (CommandListener cmd : commands) {
 			cmd.getStatistics(list);
 		}
-		getStatistics("sess-man/",list);
+		getStatistics("sess-man/", list);
 	}
 
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return false;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setClusterController(ClusterControllerIfc clComp) {
@@ -385,6 +359,8 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 			cluster.setCommandListener(cmd);
 		}
 	}
+
+	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setProperties(Map<String, Object> props) {
@@ -406,36 +382,41 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		}
 	}
 
+	public SessionManagerClusteredIfc getSM() {
+		return this.sm;
+	}
+
 	//~--- get methods ----------------------------------------------------------
+
+	public void fireEvent(Object event) {
+		eventBus.fire(event);
+	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
-	 *
-	 *
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
 		switch (errorForwarding) {
-		case forward :
-			break;
+			case forward:
+				break;
 
-		default :
+			default:
 
-			// Do not forward any error packets by default
-			if (packet.getType() == StanzaType.error) {
-				return false;
-			}
+				// Do not forward any error packets by default
+				if (packet.getType() == StanzaType.error) {
+					return false;
+				}
 
-			break;
+				break;
 		}
 
 		// Artur: Moved it to the front of the method for performance reasons.
 		// TODO: make sure it does not affect logic.
-		// Andrzej: this blocks sending responses from other components if 
+		// Andrzej: this blocks sending responses from other components if
 		// packet was processed on other node that node of user session, ie.
 		// when new PubSub clustered component is used
 //		if ((packet.getPacketFrom() != null) &&!sm.getComponentId().equals(packet
@@ -444,25 +425,23 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 //		}
 		// Andrzej: Added in place of condition which was checked above as due to
 		// lack of this condition messages sent from client with "from" attribute
-		// set are duplicated	
+		// set are duplicated
 		if (packet.getPacketFrom() != null && sm.hasXMPPResourceConnectionForConnectionJid(packet.getPacketFrom())) {
 			return false;
 		}
-		
+
 		// This is for packet forwarding logic.
 		// Some packets are for certain not forwarded like packets without to
 		// attribute set.
-		if ((packet.getStanzaTo() == null) || sm.isLocalDomain(packet.getStanzaTo()
-				.toString(), false) || sm.getComponentId().getBareJID().equals((packet
-				.getStanzaTo().getBareJID()))) {
+		if ((packet.getStanzaTo() == null) || sm.isLocalDomain(packet.getStanzaTo().toString(), false) ||
+				sm.getComponentId().getBareJID().equals((packet.getStanzaTo().getBareJID()))) {
 			return false;
 		}
 
 		// Also packets sent from the server to user are not being forwarded like
 		// service discovery perhaps?
-		if ((packet.getStanzaFrom() == null) || sm.isLocalDomain(packet.getStanzaFrom()
-				.toString(), false) || sm.getComponentId().getBareJID().equals((packet
-				.getStanzaFrom().getBareJID()))) {
+		if ((packet.getStanzaFrom() == null) || sm.isLocalDomain(packet.getStanzaFrom().toString(), false) ||
+				sm.getComponentId().getBareJID().equals((packet.getStanzaFrom().getBareJID()))) {
 			return false;
 		}
 
@@ -472,30 +451,29 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 			return false;
 		}
-		
+
 		// server needs to respond on Iq stanzas sent to bare jid, but there is
 		// no need to forward it to cluster node with users session
-		if (packet.getElemName() == Iq.ELEM_NAME && packet.getStanzaTo() != null 
-				&& packet.getStanzaTo().getResource() == null)
+		if (packet.getElemName() == Iq.ELEM_NAME && packet.getStanzaTo() != null &&
+				packet.getStanzaTo().getResource() == null) {
 			return false;
+		}
 
-		if (packet.getElemName() == Message.ELEM_NAME && packet.getType() != StanzaType.error && ampJID.equals(packet.getPacketFrom())) {
+		if (packet.getElemName() == Message.ELEM_NAME && packet.getType() != StanzaType.error &&
+				ampJID.equals(packet.getPacketFrom())) {
 			Element amp = packet.getElement().getChild("amp", "http://jabber.org/protocol/amp");
-			if (amp != null && amp.getAttributeStaticStr("status") == null)
+			if (amp != null && amp.getAttributeStaticStr("status") == null) {
 				return false;
+			}
 		}
 
 		return true;
 	}
-	
-	public SessionManagerClusteredIfc getSM() {
-		return this.sm;
-	}
 
-	public void fireEvent(Object event) {
-		eventBus.fire(event);
+	private static enum ErrorForwarding {
+		forward,
+		drop
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

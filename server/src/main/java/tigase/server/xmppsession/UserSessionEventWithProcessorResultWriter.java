@@ -20,17 +20,19 @@
 
 package tigase.server.xmppsession;
 
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPSession;
+import tigase.xmpp.jid.JID;
 
 public class UserSessionEventWithProcessorResultWriter
 		extends UserSessionEvent {
 
 	private transient SessionManager.ProcessorResultWriter packetWriter;
 
-	public UserSessionEventWithProcessorResultWriter() { }
+	public UserSessionEventWithProcessorResultWriter() {
+	}
 
-	public UserSessionEventWithProcessorResultWriter(JID sender, JID userJid, XMPPSession session, SessionManager.ProcessorResultWriter writer) {
+	public UserSessionEventWithProcessorResultWriter(JID sender, JID userJid, XMPPSession session,
+													 SessionManager.ProcessorResultWriter writer) {
 		super(sender, userJid, session);
 		packetWriter = writer;
 	}

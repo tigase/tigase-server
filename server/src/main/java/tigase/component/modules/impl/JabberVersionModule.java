@@ -31,17 +31,14 @@ import tigase.xml.Element;
 
 /**
  * Class description
- *
- *
  */
 @Bean(name = JabberVersionModule.ID, active = true)
-public class JabberVersionModule extends AbstractModule {
-
-	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get").add(
-			ElementCriteria.name("query", "jabber:iq:version"));
+public class JabberVersionModule
+		extends AbstractModule {
 
 	public final static String ID = "jabber:iq:version";
-
+	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get")
+			.add(ElementCriteria.name("query", "jabber:iq:version"));
 	@Inject(bean = "service")
 	private AbstractKernelBasedComponent component;
 
@@ -50,7 +47,7 @@ public class JabberVersionModule extends AbstractModule {
 
 	@Override
 	public String[] getFeatures() {
-		return new String[] { "jabber:iq:version" };
+		return new String[]{"jabber:iq:version"};
 	}
 
 	@Override
@@ -60,14 +57,13 @@ public class JabberVersionModule extends AbstractModule {
 
 	@Override
 	public void process(Packet packet) throws ComponentException {
-		Element query = new Element("query", new String[] { "xmlns" }, new String[] { "jabber:iq:version" });
+		Element query = new Element("query", new String[]{"xmlns"}, new String[]{"jabber:iq:version"});
 
 		query.addChild(new Element("name", component.getDiscoDescription()));
 		query.addChild(new Element("version", component.getComponentVersion()));
-		query.addChild(new Element("os",
-				System.getProperty("os.name") + "-" + System.getProperty("os.arch") + "-" + System.getProperty("os.version")
-						+ ", " + System.getProperty("java.vm.name") + "-" + System.getProperty("java.version") + " "
-						+ System.getProperty("java.vm.vendor")));
+		query.addChild(new Element("os", System.getProperty("os.name") + "-" + System.getProperty("os.arch") + "-" +
+				System.getProperty("os.version") + ", " + System.getProperty("java.vm.name") + "-" +
+				System.getProperty("java.version") + " " + System.getProperty("java.vm.vendor")));
 
 		write(packet.okResult(query, 0));
 	}

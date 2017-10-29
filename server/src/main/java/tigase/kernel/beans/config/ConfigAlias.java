@@ -19,14 +19,15 @@
  */
 package tigase.kernel.beans.config;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to add additional aliases to the fields.
- * <br/>
- * Useful if field annotated with {@link tigase.kernel.beans.config.ConfigField} is inaccessible direcly,
- * ie. is defined in extended class.
- *
+ * Annotation to add additional aliases to the fields. <br/> Useful if field annotated with {@link
+ * tigase.kernel.beans.config.ConfigField} is inaccessible direcly, ie. is defined in extended class.
+ * <p>
  * Created by andrzej on 05.08.2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -36,12 +37,14 @@ public @interface ConfigAlias {
 
 	/**
 	 * Name of the field
+	 *
 	 * @return
 	 */
 	String field();
 
 	/**
 	 * Alias for the field
+	 *
 	 * @return
 	 */
 	String alias();

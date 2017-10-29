@@ -24,30 +24,29 @@ import tigase.conf.ConfigurationException;
 
 /**
  * Interface ComponentRegistrator
- *
+ * <p>
  * Collects information about all ServerComponents connected to MessageRouter
- *
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ComponentRegistrator extends ServerComponent {
+public interface ComponentRegistrator
+		extends ServerComponent {
 
-  /**
-   *
-   * @param component
-   * @return a <code>boolean</code> value indicating whehether component has
-   * been successfuly added or not.
-   */
+	/**
+	 * @param component
+	 *
+	 * @return a <code>boolean</code> value indicating whehether component has been successfuly added or not.
+	 */
 	boolean addComponent(ServerComponent component) throws ConfigurationException;
 
-  /**
-   *
-	 * @param component 
-	 * @return a <code>boolean</code> value indicating whehether component has
-   * been successfuly removed or not.
-   */
+	/**
+	 * @param component
+	 *
+	 * @return a <code>boolean</code> value indicating whehether component has been successfuly removed or not.
+	 */
 	boolean deleteComponent(ServerComponent component);
 
 }

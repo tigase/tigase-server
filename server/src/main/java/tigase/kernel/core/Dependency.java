@@ -33,18 +33,14 @@ public class Dependency {
 	private String beanName;
 
 	private Field field;
-
-	private boolean nullAllowed;
-
-	private Class<?> type;
-
 	private Type genericType;
+	private boolean nullAllowed;
+	private Class<?> type;
 
 	/**
 	 * Creates instance of class.
-	 * 
-	 * @param beanConfig
-	 *            definition of bean.
+	 *
+	 * @param beanConfig definition of bean.
 	 */
 	public Dependency(BeanConfig beanConfig) {
 		this.beanConfig = beanConfig;
@@ -52,7 +48,7 @@ public class Dependency {
 
 	/**
 	 * Returns definition of bean.
-	 * 
+	 *
 	 * @return definition of bean.
 	 */
 	public BeanConfig getBeanConfig() {
@@ -61,70 +57,71 @@ public class Dependency {
 
 	/**
 	 * Returns name of dependent bean.
-	 * 
-	 * @return name of dependent bean, or <code>null</code> if name is not
-	 *         specified.
-	 * 
+	 *
+	 * @return name of dependent bean, or <code>null</code> if name is not specified.
 	 */
 	public String getBeanName() {
 		return beanName;
-	}
-
-	/**
-	 * Returns field to be filled by dependency.
-	 * 
-	 * @return field.
-	 */
-	public Field getField() {
-		return field;
-	}
-
-	public Type getGenericType() {
-		return genericType;
-	}
-
-	/**
-	 * Returns type of wanted bean.
-	 * 
-	 * @return type of bean.
-	 */
-	public Class<?> getType() {
-		return type;
-	}
-
-	/**
-	 * Checks if empty value may be injected.
-	 * 
-	 * @return <code>true</code> if dependency is optional.
-	 */
-	public boolean isNullAllowed() {
-		return nullAllowed;
 	}
 
 	public void setBeanName(String beanId) {
 		this.beanName = beanId;
 	}
 
+	/**
+	 * Returns field to be filled by dependency.
+	 *
+	 * @return field.
+	 */
+	public Field getField() {
+		return field;
+	}
+
 	public void setField(Field field) {
 		this.field = field;
+	}
+
+	public Type getGenericType() {
+		return genericType;
+	}
+
+	public void setGenericType(Type genericType) {
+		this.genericType = genericType;
+	}
+
+	/**
+	 * Returns type of wanted bean.
+	 *
+	 * @return type of bean.
+	 */
+	public Class<?> getType() {
+		return type;
+	}
+
+	public void setType(Class<?> type) {
+		this.type = type;
+	}
+
+	/**
+	 * Checks if empty value may be injected.
+	 *
+	 * @return <code>true</code> if dependency is optional.
+	 */
+	public boolean isNullAllowed() {
+		return nullAllowed;
 	}
 
 	public void setNullAllowed(boolean nullAllowed) {
 		this.nullAllowed = nullAllowed;
 	}
 
-	public void setGenericType(Type genericType) { this.genericType = genericType; }
-
-	public void setType(Class<?> type) {
-		this.type = type;
-	}
-
 	@Override
 	public String toString() {
-		if (beanName != null)
+		if (beanName != null) {
 			return "bean:" + beanName;
-		else
+		} else {
 			return "type:" + type.getName();
+		}
 	}
 
 }

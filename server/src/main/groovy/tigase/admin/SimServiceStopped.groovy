@@ -30,16 +30,13 @@ AS:Component: cl-comp
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.util.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.xml.*
-import tigase.net.*
-import tigase.cluster.*
+import tigase.cluster.ClusterConnectionManager
+import tigase.net.IOService
+import tigase.server.Command
+import tigase.server.Packet
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -55,21 +52,21 @@ def key = Command.getFieldValue(packet, KEY)
 
 if (key == null) {
 	def result = p.commandResult(Command.DataType.form);
-  Command.addTitle(result, "Simulate serviceStopped method call")
+	Command.addTitle(result, "Simulate serviceStopped method call")
 	Command.addInstructions(result, "Provide a key for IOService you wish to test.")
-	Command.addFieldValue(result, KEY, key ?: "", "text-single",  "Key")
+	Command.addFieldValue(result, KEY, key ?: "", "text-single", "Key")
 
 	return result
 }
 
-Map services = (Map)servicesMap
+Map services = (Map) servicesMap
 
 IOService serv = services.get(key)
 
 if (serv == null) {
 	return "IOService for key: ${key} not found!"
 } else {
-  ClusterConnectionManager clCM = (ClusterConnectionManager)clusterCM
+	ClusterConnectionManager clCM = (ClusterConnectionManager) clusterCM
 	clCM.serviceStopped(serv)
 	return "serviceStopped called for IOService for key: ${key}."
 }

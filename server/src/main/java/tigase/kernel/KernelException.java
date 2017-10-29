@@ -20,7 +20,8 @@
 
 package tigase.kernel;
 
-public class KernelException extends RuntimeException {
+public class KernelException
+		extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

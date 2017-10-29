@@ -32,8 +32,8 @@ package tigase.admin
 import tigase.server.Command
 import tigase.server.Packet
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -45,23 +45,18 @@ def result = p.commandResult(filepath ? Command.DataType.result : Command.DataTy
 
 if (!isServiceAdmin) {
 	Command.addTextField(result, "Error", "You are not service administrator");
-}
-
-else if (filepath == null) {
+} else if (filepath == null) {
 	Command.addFieldValue(result, FILE_PATH, "", "text-single", "File");
-}
-else {
+} else {
 	if (filepath == null) {
 		Command.addTextField(result, "Error", "File not specified");
-	}
-	else {
+	} else {
 		def file = new File(filepath);
 		if (file.exists()) {
-			def lines = [];
+			def lines = [ ];
 			file.eachLine { line -> lines += line; };
 			Command.addFieldMultiValue(result, "Content", lines);
-		}
-		else {
+		} else {
 			Command.addTextField(result, "Error", "File not found");
 		}
 	}

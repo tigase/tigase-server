@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -40,42 +38,39 @@ import java.util.logging.Logger;
 import static tigase.xmpp.impl.SessionBind.XMLNS;
 
 //~--- JDK imports ------------------------------------------------------------
+
 /**
  * Describe class SessionBind here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Feb 20 22:43:59 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 @Id(XMLNS)
-@Handle(path={ Iq.ELEM_NAME, "session" }, xmlns=XMLNS)
-@StreamFeatures(
-	@StreamFeature(elem="session", xmlns=XMLNS, children = {"optional"})
-)
-@DiscoFeatures({ XMLNS })
+@Handle(path = {Iq.ELEM_NAME, "session"}, xmlns = XMLNS)
+@StreamFeatures(@StreamFeature(elem = "session", xmlns = XMLNS, children = {"optional"}))
+@DiscoFeatures({XMLNS})
 @Bean(name = SessionBind.XMLNS, parent = SessionManager.class, active = true)
 public class SessionBind
-				extends AnnotatedXMPPProcessor
-				implements XMPPProcessorIfc {
-	private static final String     SESSION_KEY = "Session-Set";
-	protected static final String     XMLNS       = "urn:ietf:params:xml:ns:xmpp-session";
-	private static final Logger     log = Logger.getLogger(SessionBind.class.getName());
+		extends AnnotatedXMPPProcessor
+		implements XMPPProcessorIfc {
+
+	protected static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-session";
+	private static final String SESSION_KEY = "Session-Set";
+	private static final Logger log = Logger.getLogger(SessionBind.class.getName());
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
-			Object> settings)
-					throws XMPPException {
+	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+						final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
 		if (!session.isAuthorized()) {
-			results.offer(session.getAuthState().getResponseMessage(packet,
-					"Session is not yet authorized.", false));
+			results.offer(session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
 
 			return;
 		}    // end of if (!session.isAuthorized())
@@ -84,24 +79,22 @@ public class SessionBind
 		StanzaType type = packet.getType();
 
 		switch (type) {
-		case set :
-			session.putSessionData(SESSION_KEY, "true");
-			results.offer(packet.okResult((String) null, 0));
+			case set:
+				session.putSessionData(SESSION_KEY, "true");
+				results.offer(packet.okResult((String) null, 0));
 
-			break;
+				break;
 
-		default :
-			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-					"Session type is incorrect", false));
+			default:
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Session type is incorrect", false));
 
-			break;
+				break;
 		}    // end of switch (type)
 	}
 
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		if ((session != null) && (session.getSessionData(SESSION_KEY) == null) && session
-				.isAuthorized()) {
+		if ((session != null) && (session.getSessionData(SESSION_KEY) == null) && session.isAuthorized()) {
 			return super.supStreamFeatures(session);
 		} else {
 			return null;

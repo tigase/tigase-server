@@ -33,10 +33,10 @@ import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.Date;
 import java.util.List;
@@ -52,52 +52,75 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author andrzej
  */
-public abstract class MsgRepository<T,S extends DataSource> implements MsgRepositoryIfc<S> {
+public abstract class MsgRepository<T, S extends DataSource>
+		implements MsgRepositoryIfc<S> {
 
 	public static final String OFFLINE_MSGS_KEY = "offline-msgs";
-	private static final long MSGS_STORE_LIMIT_VAL = 100;
 	public static final String MSGS_STORE_LIMIT_KEY = "store-limit";
+	protected static final int MAX_QUEUE_SIZE = 1000;
+	private static final long MSGS_STORE_LIMIT_VAL = 100;
 	private static final String MSGS_USER_STORE_LIMIT_ENABLE_KEY = "user-store-limit-enable";
 	private static final String NULL_STR = "NULL";
-	
-	protected static final int MAX_QUEUE_SIZE = 1000;
-	
-	private static final Map<String, MsgRepositoryIfc> repos =
-			new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
-	private ReentrantLock expiredMessagesLock;
-	private Condition expiredMessagesCondition;
+	private static final Map<String, MsgRepositoryIfc> repos = new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
+	public enum MSG_TYPES {
+		none(0),
+		message(1),
+		presence(2);
 
-	@Inject
-	private UserRepository userRepository;
+		private final int numVal;
 
-	public enum MSG_TYPES { none(0), message(1), presence(2);
-
-    private final int numVal;
-
-    MSG_TYPES(int numVal) {
-        this.numVal = numVal;
-    }
-
-    public int getNumVal() {
-        return numVal;
-    }
-
-    public static MSG_TYPES getFromInt(int type) {
-        switch (type) {
-        case 1:
-            return message;
-        case 2:
-            return presence;
-        case 0:
+		public static MSG_TYPES getFromInt(int type) {
+			switch (type) {
+				case 1:
+					return message;
+				case 2:
+					return presence;
+				case 0:
 				default:
-            return none;
-        }
+					return none;
+			}
 		}
 
+		MSG_TYPES(int numVal) {
+			this.numVal = numVal;
+		}
+
+		public int getNumVal() {
+			return numVal;
+		}
+
+	}
+	protected long earliestOffline = Long.MAX_VALUE;
+	protected SimpleParser parser = SingletonFactory.getParserInstance();
+	private Condition expiredMessagesCondition;
+
+	;
+	private ReentrantLock expiredMessagesLock;
+	protected DelayQueue<MsgDBItem<T>> expiredQueue = new DelayQueue<MsgDBItem<T>>() {
+		@Override
+		public boolean offer(MsgDBItem msgDBItem) {
+			expiredMessagesLock.lock();
+			boolean result = false;
+			;
+			try {
+				result = super.offer(msgDBItem);
+				if (result && expiredMessagesCondition != null) {
+					expiredMessagesCondition.signal();
+				}
+			} finally {
+				expiredMessagesLock.unlock();
+			}
+			return result;
+		}
 	};
+	@ConfigField(desc = "Limit of offline messages", alias = "store-limit")
+	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
+	@ConfigField(desc = "Support limits of offline messages set by users", alias = "user-store-limit-enable")
+	private boolean msgs_user_store_limit = false;
+	@Inject
+	private UserRepository userRepository;
 
 	public static MsgRepositoryIfc getInstance(String cls, String id_string) throws TigaseDBException {
 		try {
@@ -118,74 +141,29 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 	}
 
-	protected SimpleParser parser = SingletonFactory.getParserInstance();	
-	protected long earliestOffline = Long.MAX_VALUE;
-	protected DelayQueue<MsgDBItem<T>> expiredQueue = new DelayQueue<MsgDBItem<T>>() {
-		@Override
-		public boolean offer(MsgDBItem msgDBItem) {
-			expiredMessagesLock.lock();
-			boolean result = false;;
-			try {
-				result =  super.offer(msgDBItem);
-				if (result && expiredMessagesCondition != null)
-					expiredMessagesCondition.signal();
-			} finally {
-				expiredMessagesLock.unlock();
-			}
-			return result;
-		}
-	};
+	public abstract Queue<Element> loadMessagesToJID(List<String> db_ids, XMPPResourceConnection session,
+													 boolean delete, OfflineMessagesProcessor proc)
+			throws UserNotFoundException;
 
-	@ConfigField(desc = "Limit of offline messages", alias = "store-limit")
-	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
-	@ConfigField(desc = "Support limits of offline messages set by users", alias = "user-store-limit-enable")
-	private boolean msgs_user_store_limit = false;
-	
-	protected abstract void loadExpiredQueue(int max);
-	protected abstract void loadExpiredQueue(Date expired);
-	protected abstract void deleteMessage(T db_id);
-
-	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids,  XMPPResourceConnection session, boolean delete,
-																		OfflineMessagesProcessor proc ) throws UserNotFoundException;
-	public abstract	int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session) throws UserNotFoundException;
+	public abstract int deleteMessagesToJID(List<String> db_ids, XMPPResourceConnection session)
+			throws UserNotFoundException;
 
 	@Override
 	@Deprecated
-	public void initRepository(String conn_str, Map<String, String> map)
-			throws DBInitException {
-		
+	public void initRepository(String conn_str, Map<String, String> map) throws DBInitException {
+
 		if (map != null) {
 			String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
-			
+
 			if (msgs_store_limit_str != null) {
 				msgs_store_limit = Long.parseLong(msgs_store_limit_str);
 			}
-			
+
 			String msgs_user_store_limit_enable = map.get(MSGS_USER_STORE_LIMIT_ENABLE_KEY);
 			if (msgs_user_store_limit_enable != null) {
 				msgs_user_store_limit = Boolean.parseBoolean(msgs_user_store_limit_enable);
-			}			
-		}
-	}	
-
-	protected long getMsgsStoreLimit(BareJID userJid, NonAuthUserRepository userRepo) throws UserNotFoundException {
-		if (msgs_user_store_limit) {
-			String limitStr = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, NULL_STR);
-			if (limitStr == null) {
-				throw new UserNotFoundException("User " + userJid + " not found in user repository");
 			}
-			if (NULL_STR != limitStr) {
-				long limit = Long.parseLong(limitStr);
-				// in case of 0 we need to disable offline storage - not to save all as in case of store-limit
-				if (limit == 0) {
-					limit = -1;
-				}
-				return limit;
-			}
-		} else if (!userRepository.userExists(userJid)) {
-			throw new UserNotFoundException("User " + userJid + " not found in user repository");
 		}
-		return msgs_store_limit;
 	}
 
 	@Override
@@ -231,9 +209,42 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		this.expiredMessagesCondition = condition;
 	}
 
+	protected abstract void loadExpiredQueue(int max);
+
+	protected abstract void loadExpiredQueue(Date expired);
+
+	protected abstract void deleteMessage(T db_id);
+
+	protected long getMsgsStoreLimit(BareJID userJid, NonAuthUserRepository userRepo) throws UserNotFoundException {
+		if (msgs_user_store_limit) {
+			String limitStr = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, NULL_STR);
+			if (limitStr == null) {
+				throw new UserNotFoundException("User " + userJid + " not found in user repository");
+			}
+			if (NULL_STR != limitStr) {
+				long limit = Long.parseLong(limitStr);
+				// in case of 0 we need to disable offline storage - not to save all as in case of store-limit
+				if (limit == 0) {
+					limit = -1;
+				}
+				return limit;
+			}
+		} else if (!userRepository.userExists(userJid)) {
+			throw new UserNotFoundException("User " + userJid + " not found in user repository");
+		}
+		return msgs_store_limit;
+	}
+
 	// ~--- inner classes --------------------------------------------------------
 
-	public static class MsgDBItem<T> implements Delayed {
+	public interface OfflineMessagesProcessor {
+
+		public void stamp(Element msg, String msgID);
+	}
+
+	public static class MsgDBItem<T>
+			implements Delayed {
+
 		public final T db_id;
 		public final Date expired;
 		public final Element msg;
@@ -257,21 +268,18 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 
 		@Override
 		public long getDelay(TimeUnit unit) {
-			return unit.convert(expired.getTime() - System.currentTimeMillis(),
-					TimeUnit.MILLISECONDS);
+			return unit.convert(expired.getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 		}
-	}	
-
-	public interface OfflineMessagesProcessor {
-		public void stamp(Element msg, String msgID);
 	}
 
 	/**
 	 * Bean used to provide MsgRepository implementations
 	 */
 	@Bean(name = "msgRepository", parent = Kernel.class, active = true, exportable = true)
-	@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
-	public static class MsgRepositoryMDBean extends MDRepositoryBeanWithStatistics<MsgRepositoryIfc>
+	@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+				 ConfigTypeEnum.ComponentMode})
+	public static class MsgRepositoryMDBean
+			extends MDRepositoryBeanWithStatistics<MsgRepositoryIfc>
 			implements MsgRepositoryIfc {
 
 		private static final Logger log = Logger.getLogger(MsgRepositoryMDBean.class.getCanonicalName());
@@ -280,7 +288,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
 		public MsgRepositoryMDBean() {
-			super(MsgRepositoryIfc.class,OfflineMsgRepositoryIfc.class);
+			super(MsgRepositoryIfc.class, OfflineMsgRepositoryIfc.class);
 		}
 
 		@Override
@@ -289,18 +297,14 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 
 		@Override
-		protected Class<? extends MsgRepositoryIfc> findClassForDataSource(DataSource dataSource) throws DBInitException {
-			return DataSourceHelper.getDefaultClass(MsgRepository.class, dataSource.getResourceUri());
-		}
-
-		@Override
 		public Element getMessageExpired(long time, boolean delete) {
 			lock.lock();
 			try {
 				for (MsgRepositoryIfc repo : getRepositories().values()) {
 					Element el = repo.getMessageExpired(time, delete);
-					if (el != null)
+					if (el != null) {
 						return el;
+					}
 				}
 				expiredMessagesCondition.await();
 			} catch (InterruptedException e) {
@@ -313,7 +317,8 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 
 		@Override
-		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException {
+		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete)
+				throws UserNotFoundException {
 			Queue<Element> result = null;
 			try {
 				MsgRepositoryIfc repo = getRepository(session.getBareJID().getDomain());
@@ -325,22 +330,10 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 
 		@Override
-		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo) throws UserNotFoundException {
+		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
+				throws UserNotFoundException {
 			MsgRepositoryIfc repo = getRepository(to.getDomain());
 			return repo.storeMessage(from, to, expired, msg, userRepo);
-		}
-
-		@Override
-		protected void initializeRepository(String domain, MsgRepositoryIfc repo) {
-			super.initializeRepository(domain, repo);
-			repo.setCondition(lock, expiredMessagesCondition);
-		}
-
-		protected <T> T getValueForDomain(Map<String,T> map, String domain) {
-			T value = map.get(domain);
-			if (value == null)
-				value = map.get("default");
-			return value;
 		}
 
 		@Override
@@ -374,7 +367,28 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 			return MsgRepositoryConfigBean.class;
 		}
 
-		public static class MsgRepositoryConfigBean extends MDRepositoryConfigBean<MsgRepositoryIfc> {
+		@Override
+		protected Class<? extends MsgRepositoryIfc> findClassForDataSource(DataSource dataSource)
+				throws DBInitException {
+			return DataSourceHelper.getDefaultClass(MsgRepository.class, dataSource.getResourceUri());
+		}
+
+		@Override
+		protected void initializeRepository(String domain, MsgRepositoryIfc repo) {
+			super.initializeRepository(domain, repo);
+			repo.setCondition(lock, expiredMessagesCondition);
+		}
+
+		protected <T> T getValueForDomain(Map<String, T> map, String domain) {
+			T value = map.get(domain);
+			if (value == null) {
+				value = map.get("default");
+			}
+			return value;
+		}
+
+		public static class MsgRepositoryConfigBean
+				extends MDRepositoryConfigBean<MsgRepositoryIfc> {
 
 		}
 	}

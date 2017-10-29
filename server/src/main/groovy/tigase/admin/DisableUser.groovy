@@ -37,8 +37,8 @@ import tigase.server.Packet
 import tigase.server.Permissions
 import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
-import tigase.xmpp.jid.BareJID
 import tigase.xmpp.StanzaType
+import tigase.xmpp.jid.BareJID
 
 def JIDS = "accountjids"
 
@@ -53,7 +53,7 @@ boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.t
 def notifyClusterStr = Command.getFieldValue(packet, NOTIFY_CLUSTER)
 boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf(notifyClusterStr) : true
 
-def user_sessions = (Map)userSessions
+def user_sessions = (Map) userSessions
 
 def userJids = Command.getFieldValues(packet, JIDS)
 
@@ -76,7 +76,7 @@ if (userJids == null) {
 
 def results = new LinkedList<Packet>()
 
-def closeUserSessions = {userJid ->
+def closeUserSessions = { userJid ->
 	try {
 		def bareJID = BareJID.bareJIDInstance(userJid)
 		def sess = user_sessions.get(bareJID)
@@ -108,7 +108,7 @@ if (clusterMode) {
 if (clusterMode && notifyCluster) {
 	def nodes = (List) clusterStrategy.getNodesConnected()
 	if (nodes && nodes.size() > 0) {
-		nodes.each {node ->
+		nodes.each { node ->
 			def forward = p.copyElementOnly()
 			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
@@ -121,8 +121,8 @@ if (clusterMode && notifyCluster) {
 }
 
 def result = p.commandResult(Command.DataType.result)
-def msgs = []
-def errors = []
+def msgs = [ ]
+def errors = [ ]
 for (userJid in userJids) {
 	try {
 		def bareJID = BareJID.bareJIDInstance(userJid)

@@ -21,25 +21,27 @@ package tigase.xmpp;
 
 /**
  * Describe class XMPPParserException here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPParserException extends RuntimeException {
+public class XMPPParserException
+		extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  /**
-   * Creates a new <code>XMPPParserException</code> instance.
-   *
-   */
-  public XMPPParserException(String message) { super(message); }
+	/**
+	 * Creates a new <code>XMPPParserException</code> instance.
+	 */
+	public XMPPParserException(String message) {
+		super(message);
+	}
 
-  public XMPPParserException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	public XMPPParserException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

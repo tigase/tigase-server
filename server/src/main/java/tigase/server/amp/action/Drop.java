@@ -1,4 +1,3 @@
-
 /*
  * Drop.java
  *
@@ -37,7 +36,9 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 @Bean(name = "drop", parent = AmpComponent.class, active = true)
-public class Drop extends ActionAbstract {
+public class Drop
+		extends ActionAbstract {
+
 	private static final String name = "drop";
 
 	//~--- methods --------------------------------------------------------------

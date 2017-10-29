@@ -24,17 +24,16 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 /**
- *
  * @author andrzej
  */
 public class SchemaManagerLogHandler
 		extends Handler {
 
 	private final ArrayDeque<LogRecord> queue = new ArrayDeque<LogRecord>();
-	
+
 	public SchemaManagerLogHandler() {
 	}
-	
+
 	@Override
 	public void publish(LogRecord record) {
 		queue.offer(record);
@@ -49,9 +48,9 @@ public class SchemaManagerLogHandler
 	public void close() throws SecurityException {
 		flush();
 	}
-	
+
 	public LogRecord poll() {
 		return queue.poll();
 	}
-	
+
 }

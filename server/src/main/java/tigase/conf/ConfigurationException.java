@@ -23,25 +23,25 @@ package tigase.conf;
 import java.io.IOException;
 
 /**
- *
  * @author kobit
  */
-public class ConfigurationException extends IOException {
+public class ConfigurationException
+		extends IOException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	/**
-     * Creates a new instance of <code>ConfigurationException</code> without detail message.
+	 * Creates a new instance of <code>ConfigurationException</code> without detail message.
 	 */
 	public ConfigurationException() {
 		super();
 	}
 
-
 	/**
-     * Constructs an instance of <code>ConfigurationException</code> with the specified detail message.
-     * @param msg the detail message.
-     */
+	 * Constructs an instance of <code>ConfigurationException</code> with the specified detail message.
+	 *
+	 * @param msg the detail message.
+	 */
 	public ConfigurationException(String msg) {
 		super(msg);
 	}

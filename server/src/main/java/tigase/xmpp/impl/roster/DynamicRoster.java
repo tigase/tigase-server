@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -28,10 +26,10 @@ import tigase.kernel.beans.*;
 import tigase.kernel.core.Kernel;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -41,8 +39,8 @@ import java.util.logging.Logger;
 
 /**
  * Describe class DynamicRoster here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Nov 6 11:28:10 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -51,47 +49,39 @@ import java.util.logging.Logger;
 @Bean(name = "dynamic-rosters", parent = SessionManager.class, active = false)
 public class DynamicRoster
 		implements RegistrarBean, Initializable, UnregisterAware {
+
+	private static final EnumSet<SubscriptionType> subs = EnumSet.noneOf(SubscriptionType.class);
+	private static DynamicRoster instance;
 	/**
 	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRoster");
-
-	private static final EnumSet<SubscriptionType> subs = EnumSet.noneOf(SubscriptionType.class);
-
-
 	@Inject(nullAllowed = true)
 	private DynamicRosterIfc[] dynamicRosters;
-
-	private static DynamicRoster instance;
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 * @param buddies
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of <code>JID[]</code>
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException
 	 */
-	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String,
-			Object> settings, JID[] buddies)
-					throws NotAuthorizedException, RosterRetrievingException,
-							RepositoryAccessException {
-		return addBuddies(session,settings,buddies, subs);
+	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String, Object> settings,
+								   JID[] buddies)
+			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
+		return addBuddies(session, settings, buddies, subs);
 	}
 
-	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String,
-			Object> settings, JID[] buddies, final EnumSet<SubscriptionType> subscrs)
-					throws NotAuthorizedException, RosterRetrievingException,
-							RepositoryAccessException {
+	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String, Object> settings,
+								   JID[] buddies, final EnumSet<SubscriptionType> subscrs)
+			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		List<JID> result = getBuddiesList(session, settings);
 
 		if (result != null && subscrs != null && !subscrs.isEmpty()) {
@@ -129,7 +119,6 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param list
 	 * @param buddies
 	 */
@@ -140,28 +129,23 @@ public class DynamicRoster
 			}
 		}
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of <code>JID[]</code>
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException
 	 */
-	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String,
-			Object> settings)
-					throws NotAuthorizedException, RosterRetrievingException,
-							RepositoryAccessException {
+	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String, Object> settings)
+			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		List<JID> result = getBuddiesList(session, settings);
 
 		if ((result != null) && (result.size() > 0)) {
@@ -174,22 +158,17 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of {@code List<JID>}
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException
 	 */
-	public static List<JID> getBuddiesList(final XMPPResourceConnection session,
-			final Map<String, Object> settings)
-					throws NotAuthorizedException, RosterRetrievingException,
-							RepositoryAccessException {
+	public static List<JID> getBuddiesList(final XMPPResourceConnection session, final Map<String, Object> settings)
+			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -215,23 +194,19 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 * @param buddy
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of <code>Element</code>
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException
 	 */
-	public static Element getBuddyItem(final XMPPResourceConnection session,
-			final Map<String, Object> settings, JID buddy)
-					throws NotAuthorizedException, RosterRetrievingException,
-							RepositoryAccessException {
+	public static Element getBuddyItem(final XMPPResourceConnection session, final Map<String, Object> settings,
+									   JID buddy)
+			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -250,10 +225,7 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param settings
-	 *
-	 *
 	 *
 	 * @return a value of <code>DynamicRosterIfc[]</code>
 	 */
@@ -264,17 +236,13 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 * @param item
 	 *
-	 *
-	 *
 	 * @return a value of <code>Element</code>
 	 */
-	public static Element getItemExtraData(XMPPResourceConnection session, Map<String,
-			Object> settings, Element item) {
+	public static Element getItemExtraData(XMPPResourceConnection session, Map<String, Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -295,22 +263,17 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of {@code List<Element>}
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException
 	 */
-	public static List<Element> getRosterItems(final XMPPResourceConnection session,
-			final Map<String, Object> settings)
-					throws NotAuthorizedException, RosterRetrievingException,
-							RepositoryAccessException {
+	public static List<Element> getRosterItems(final XMPPResourceConnection session, final Map<String, Object> settings)
+			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -336,13 +299,11 @@ public class DynamicRoster
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param session
 	 * @param settings
 	 * @param item
 	 */
-	public static void setItemExtraData(XMPPResourceConnection session, Map<String,
-			Object> settings, Element item) {
+	public static void setItemExtraData(XMPPResourceConnection session, Map<String, Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -354,7 +315,7 @@ public class DynamicRoster
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override
@@ -374,6 +335,5 @@ public class DynamicRoster
 		instance = this;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

@@ -57,8 +57,7 @@ public class ConnectionsTask
 	private int thresholdMinimal = 10;
 
 	/**
-	 * Creates alarm event if required. Event will be created only if both
-	 * conditions will met.
+	 * Creates alarm event if required. Event will be created only if both conditions will met.
 	 *
 	 * @param currentOnlineUsers current amount of online users.
 	 * @param lastOnlineUsers previous amount of online users.
@@ -94,7 +93,8 @@ public class ConnectionsTask
 		}
 	}
 
-	public ConnectionsTask() {}
+	public ConnectionsTask() {
+	}
 
 	@Override
 	public Form getCurrentConfiguration() {
@@ -135,6 +135,21 @@ public class ConnectionsTask
 	}
 
 	@Override
+	public void setNewConfiguration(Form form) {
+		Field thresholdPercent = form.get("threshold");
+		if (thresholdPercent != null) {
+			this.threshold = Integer.parseInt(thresholdPercent.getValue());
+		}
+
+		Field thresholdNetto = form.get("thresholdMinimal");
+		if (thresholdNetto != null) {
+			this.thresholdMinimal = Integer.parseInt(thresholdNetto.getValue());
+		}
+
+		super.setNewConfiguration(form);
+	}
+
+	@Override
 	protected void run() {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Running task...");
@@ -151,20 +166,5 @@ public class ConnectionsTask
 		}
 
 		this.lastOnlineUsers = currentOnlineUsers;
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field thresholdPercent = form.get("threshold");
-		if (thresholdPercent != null) {
-			this.threshold = Integer.parseInt(thresholdPercent.getValue());
-		}
-
-		Field thresholdNetto = form.get("thresholdMinimal");
-		if (thresholdNetto != null) {
-			this.thresholdMinimal = Integer.parseInt(thresholdNetto.getValue());
-		}
-
-		super.setNewConfiguration(form);
 	}
 }

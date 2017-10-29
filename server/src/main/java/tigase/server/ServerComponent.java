@@ -18,43 +18,39 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xmpp.jid.JID;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface ServerComponent
- *
- * Object of this type can be managed by MessageRouter. All classes which are
- * loaded by MessageRouter must inherit this interface.
- *
+ * <p>
+ * Object of this type can be managed by MessageRouter. All classes which are loaded by MessageRouter must inherit this
+ * interface.
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public interface ServerComponent {
+
 	/**
-	 * Method is called by <code>MessageRouter</code> when all the startup components of
-	 * the server have been loaded and configured through setProperties(...) call.
-	 * At this point the whole server should be loaded and functional, except
-	 * initializations taking place in this routine.
-	 *
+	 * Method is called by <code>MessageRouter</code> when all the startup components of the server have been loaded and
+	 * configured through setProperties(...) call. At this point the whole server should be loaded and functional,
+	 * except initializations taking place in this routine.
 	 */
 	void initializationCompleted();
 
 	/**
-	 * <code>processPacket</code> is a blocking processing method implemented
-	 * by all components. This method processes packet and returns results
-	 * instantly without waiting for any resources.
+	 * <code>processPacket</code> is a blocking processing method implemented by all components. This method processes
+	 * packet and returns results instantly without waiting for any resources.
 	 *
 	 * @param packet a <code>Packet</code> value
 	 * @param results
@@ -63,7 +59,6 @@ public interface ServerComponent {
 
 	/**
 	 * Method description
-	 *
 	 */
 	void release();
 
@@ -71,9 +66,6 @@ public interface ServerComponent {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	JID getComponentId();
 
@@ -86,30 +78,25 @@ public interface ServerComponent {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	String getName();
 
 	/**
-	 * Method returns information about whether the initialization process
-	 * (initializationCompleted()) method has been called.
-	 * @return <code>true</code> if initialization of the object has been completed
-	 * <code>false</code> otherwise
-	 */
-	boolean isInitializationComplete();
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
 	 * Method description
-	 *
 	 *
 	 * @param name
 	 */
 	void setName(String name);
-}
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method returns information about whether the initialization process (initializationCompleted()) method has been
+	 * called.
+	 *
+	 * @return <code>true</code> if initialization of the object has been completed <code>false</code> otherwise
+	 */
+	boolean isInitializationComplete();
+}
 
 //~ Formatted in Tigase Code Convention on 13/06/08

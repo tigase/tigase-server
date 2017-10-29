@@ -32,12 +32,16 @@ public enum ConfigTypeEnum {
 	ComponentMode("component"),
 	SetupMode("setup");
 
-	private final String id;
-
-	private static final ConcurrentHashMap<String,ConfigTypeEnum> values = new ConcurrentHashMap();
+	private static final ConcurrentHashMap<String, ConfigTypeEnum> values = new ConcurrentHashMap();
 
 	static {
 		Arrays.asList(values()).forEach(val -> values.put(val.id(), val));
+	}
+
+	private final String id;
+
+	public static ConfigTypeEnum valueForId(String id) {
+		return values.get(id);
 	}
 
 	ConfigTypeEnum(String id) {
@@ -46,10 +50,6 @@ public enum ConfigTypeEnum {
 
 	public String id() {
 		return id;
-	}
-
-	public static ConfigTypeEnum valueForId(String id) {
-		return values.get(id);
 	}
 
 }

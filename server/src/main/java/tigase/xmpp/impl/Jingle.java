@@ -18,39 +18,30 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.Authorization;
+import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-
 /**
  * Describe class Jingle here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Feb 21 23:05:34 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -58,18 +49,17 @@ import java.util.Queue;
  */
 @Bean(name = Jingle.ID, parent = SessionManager.class, active = false)
 public class Jingle
-				extends XMPPProcessor
-				implements XMPPProcessorIfc {
-	protected static final String     ID          = "http://jabber.org/protocol/jingle";
-	private static final Logger     log         = Logger.getLogger(Jingle.class.getName());
-	private static final String[]   JINGLE_PATH = { Iq.ELEM_NAME, "jingle" };
-	private static final String[][] ELEMENTS    = {
-		JINGLE_PATH, JINGLE_PATH, JINGLE_PATH, { Iq.ELEM_NAME, "session" }
-	};
-	private static final String[]   XMLNSS = { "http://jabber.org/protocol/jingle",
-			"http://www.xmpp.org/extensions/xep-0166.html#ns",
-			"http://www.xmpp.org/extensions/xep-0167.html#ns",
-					"http://www.google.com/session" };
+		extends XMPPProcessor
+		implements XMPPProcessorIfc {
+
+	protected static final String ID = "http://jabber.org/protocol/jingle";
+	private static final Logger log = Logger.getLogger(Jingle.class.getName());
+	private static final String[] JINGLE_PATH = {Iq.ELEM_NAME, "jingle"};
+	private static final String[][] ELEMENTS = {JINGLE_PATH, JINGLE_PATH, JINGLE_PATH, {Iq.ELEM_NAME, "session"}};
+	private static final String[] XMLNSS = {"http://jabber.org/protocol/jingle",
+											"http://www.xmpp.org/extensions/xep-0166.html#ns",
+											"http://www.xmpp.org/extensions/xep-0167.html#ns",
+											"http://www.google.com/session"};
 
 	//~--- methods --------------------------------------------------------------
 
@@ -80,9 +70,8 @@ public class Jingle
 
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection conn,
-			final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results,
-			final Map<String, Object> settings)
-					throws XMPPException {
+						final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results,
+						final Map<String, Object> settings) throws XMPPException {
 		if (conn == null) {
 			return;
 		}
@@ -106,7 +95,7 @@ public class Jingle
 				// Make sure we send it to right client connection - the connection
 				// which supports jingle - this Yate specific code....
 				List<XMPPResourceConnection> res = conn.getParentSession().getActiveResources();
-				XMPPResourceConnection       session = conn;
+				XMPPResourceConnection session = conn;
 
 				if ((res != null) && (res.size() > 1)) {
 
@@ -133,8 +122,8 @@ public class Jingle
 			}    // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			results.offer(
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		}    // end of try-catch
 	}
 

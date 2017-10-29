@@ -24,15 +24,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * TimerTask class is basic implementation of java.util.TimerTask class which
- * is used with ScheduledExecutorService in AbstractMessageRecevier.
+ * TimerTask class is basic implementation of java.util.TimerTask class which is used with ScheduledExecutorService in
+ * AbstractMessageRecevier.
  */
-public abstract class TimerTask implements Runnable {
-
-	private ScheduledFuture<?> future = null;
+public abstract class TimerTask
+		implements Runnable {
 
 	private static final Logger log = Logger.getLogger(TimerTask.class.getName());
-
+	private ScheduledFuture<?> future = null;
 
 	public void setScheduledFuture(ScheduledFuture<?> future) {
 		this.future = future;
@@ -41,15 +40,16 @@ public abstract class TimerTask implements Runnable {
 	public boolean isScheduled() {
 		return future != null && !future.isCancelled() && !future.isDone();
 	}
-	
+
 	public void cancel() {
 		cancel(false);
 	}
 
 	public void cancel(boolean mayInterruptIfRunning) {
 		if (future != null && log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Cancelling tigase task, mayInterruptIfRunning: {0}, done: {1}, cancelled: {2}, future: {3}",
-					new Object[] {mayInterruptIfRunning, future.isDone(), future.isCancelled(), future});
+			log.log(Level.FINEST,
+					"Cancelling tigase task, mayInterruptIfRunning: {0}, done: {1}, cancelled: {2}, future: {3}",
+					new Object[]{mayInterruptIfRunning, future.isDone(), future.isCancelled(), future});
 		}
 
 		if (future != null && !future.isDone()) {

@@ -23,25 +23,27 @@ import tigase.component.exceptions.RepositoryException;
 
 /**
  * Describe class TigaseDBException here.
- *
- *
+ * <p>
+ * <p>
  * Created: Thu Oct 26 12:15:36 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TigaseDBException extends RepositoryException {
+public class TigaseDBException
+		extends RepositoryException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates a new <code>TigaseDBException</code> instance.
-	 *
 	 */
-	public TigaseDBException(String message) { super(message); }
+	public TigaseDBException(String message) {
+		super(message);
+	}
 
-  public TigaseDBException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	public TigaseDBException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 } // TigaseDBException

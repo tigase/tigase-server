@@ -30,9 +30,14 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.db.*
-import tigase.vhosts.*
+import tigase.db.AuthRepository
+import tigase.db.TigaseDBException
+import tigase.db.UserExistsException
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
@@ -40,11 +45,11 @@ def PASSWORD = "password"
 def PASSWORD_VERIFY = "password-verify"
 def EMAIL = "email"
 
-def p = (Packet)packet
-def auth_repo = (AuthRepository)authRepository
-def user_repo = (UserRepository)userRepository
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -60,15 +65,15 @@ if (userJid == null || userPass == null || userPassVer == null || userEmail == n
 	Command.addInstructions(result, "Fill out this form to add a user.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
-			"The Jabber ID for the account to be added")
+						  "The Jabber ID for the account to be added")
 	Command.addFieldValue(result, PASSWORD, userPass ?: "", "text-private",
-			"The password for this account")
+						  "The password for this account")
 	Command.addFieldValue(result, PASSWORD_VERIFY, userPassVer ?: "", "text-private",
-			"Retype password")
+						  "Retype password")
 	Command.addFieldValue(result, EMAIL, userEmail ?: "", "text-single",
-			"Email address")
+						  "Email address")
 
 	return result
 }
@@ -78,7 +83,7 @@ try {
 	bareJID = BareJID.bareJIDInstance(userJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 		auth_repo.addUser(bareJID, userPass)
 		user_repo.setData(bareJID, "email", userEmail);
 		Command.addTextField(result, "Note", "Operation successful");

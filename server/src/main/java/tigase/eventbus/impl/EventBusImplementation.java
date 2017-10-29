@@ -31,17 +31,18 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class EventBusImplementation implements EventBus {
+public class EventBusImplementation
+		implements EventBus {
 
 	private static final Logger log = Logger.getLogger(EventBusImplementation.class.getName());
-	private final EventsRegistrar registrar = new EventsRegistrar();
 	private final EventsNameMap<AbstractHandler> listeners = new EventsNameMap<>();
-	private final Map<Class<?>, EventRoutingSelector> routingSelectors = new ConcurrentHashMap<>();
-	private final Map<Class<?>, Set<EventRoutedTransientFiller>> routedTransientFillers = new ConcurrentHashMap<>();
-	private final Serializer serializer = new EventBusSerializer();
 	private final ReflectEventListenerHandlerFactory reflectEventListenerFactory = new ReflectEventListenerHandlerFactory();
 	private final ReflectEventRoutedTransientFillerFactory reflectEventRoutedTransientFillerFactory = new ReflectEventRoutedTransientFillerFactory();
 	private final ReflectEventRoutingSelectorFactory reflectEventRoutingSelectorFactory = new ReflectEventRoutingSelectorFactory();
+	private final EventsRegistrar registrar = new EventsRegistrar();
+	private final Map<Class<?>, Set<EventRoutedTransientFiller>> routedTransientFillers = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventRoutingSelector> routingSelectors = new ConcurrentHashMap<>();
+	private final Serializer serializer = new EventBusSerializer();
 	private boolean acceptOnlyRegisteredEvents = false;
 	private Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
 
@@ -80,56 +81,6 @@ public class EventBusImplementation implements EventBus {
 		fireListenerAddedEvent(packageName, eventName);
 	}
 
-	private void checkIfEventIsRegistered(final String eventName) throws EventBusException {
-		if (!registrar.isRegistered(eventName)) {
-			if (this.acceptOnlyRegisteredEvents) {
-				throw new EventBusException("Event " + eventName + " is not registered.");
-			} else {
-				log.log(Level.FINEST, "Event " + eventName + " in not registered.");
-			}
-		}
-	}
-
-	protected void doFireThreadPerHandler(final Object event, final Object source, boolean remotelyGeneratedEvent,
-			HashSet<AbstractHandler> handlers) {
-		Element eventConverted = null;
-		for (AbstractHandler listenerHandler : handlers) {
-			Object eventObject;
-
-			if (listenerHandler.getRequiredEventType() == AbstractListenerHandler.Type.asIs) {
-				eventObject = event;
-			} else if (listenerHandler.getRequiredEventType() == AbstractListenerHandler.Type.element
-					&& !(event instanceof Element)) {
-				if (eventConverted == null)
-					eventConverted = serializer.serialize(event);
-				eventObject = eventConverted;
-			} else if (listenerHandler.getRequiredEventType() != AbstractListenerHandler.Type.element
-					&& event instanceof Element) {
-				continue;
-			} else {
-				eventObject = event;
-			}
-
-			Runnable task = () -> {
-				try {
-					listenerHandler.dispatch(eventObject, source, remotelyGeneratedEvent);
-				} catch (Throwable e) {
-					log.log(Level.WARNING, "Exception during execution of event: " + event.getClass().getCanonicalName(), e);
-				}
-			};
-
-			executor.execute(task);
-		}
-	}
-
-	private void fillListenersForEvent(HashSet<AbstractHandler> result, Class<?> cls) {
-		final String packageName = cls.getPackage().getName();
-		final String eventName = cls.getSimpleName();
-
-		result.addAll(listeners.get(packageName, eventName));
-		result.addAll(listeners.get(packageName, null));
-	}
-
 	public void fire(Object event) {
 		fire(event, null, false);
 	}
@@ -159,14 +110,6 @@ public class EventBusImplementation implements EventBus {
 		}
 	}
 
-	private void fireListenerAddedEvent(String packageName, String eventName) {
-		ListenerAddedEvent event = new ListenerAddedEvent();
-		event.setEventName(eventName);
-		event.setPackageName(packageName);
-
-		fire(event);
-	}
-
 	public Collection<AbstractHandler> getAllHandlers() {
 		return listeners.getAllData();
 	}
@@ -175,24 +118,14 @@ public class EventBusImplementation implements EventBus {
 		return listeners.getAllListenedEvents();
 	}
 
-	List<tigase.eventbus.EventListener> getEventListeners(final String packageName, final String eventName) {
-		ArrayList<tigase.eventbus.EventListener> result = new ArrayList<>();
-		Collection ls = listeners.get(packageName, eventName);
-		result.addAll(ls);
-
-		ls = listeners.get(null, eventName);
-		result.addAll(ls);
-
-		return result;
-	}
-
 	public Collection<EventRoutedTransientFiller> getEventRoutedTransientFillers(Class<?> eventClass) {
 		final HashSet<EventRoutedTransientFiller> result = new HashSet<>();
 		Class<?> tmp = eventClass;
 		do {
 			Collection<EventRoutedTransientFiller> fillers = routedTransientFillers.get(tmp);
-			if (fillers != null)
+			if (fillers != null) {
 				result.addAll(fillers);
+			}
 			tmp = tmp.getSuperclass();
 		} while (!tmp.equals(Object.class));
 
@@ -204,8 +137,9 @@ public class EventBusImplementation implements EventBus {
 		EventRoutingSelector handler = null;
 		do {
 			handler = routingSelectors.get(tmp);
-			if (handler != null)
+			if (handler != null) {
 				break;
+			}
 			tmp = tmp.getSuperclass();
 		} while (!tmp.equals(Object.class));
 
@@ -218,6 +152,99 @@ public class EventBusImplementation implements EventBus {
 
 	public void setExecutor(Executor executor) {
 		this.executor = executor;
+	}
+
+	public EventsRegistrar getRegistrar() {
+		return registrar;
+	}
+
+	public Serializer getSerializer() {
+		return serializer;
+	}
+
+	public boolean isAcceptOnlyRegisteredEvents() {
+		return acceptOnlyRegisteredEvents;
+	}
+
+	public void setAcceptOnlyRegisteredEvents(boolean acceptOnlyRegisteredEvents) {
+		this.acceptOnlyRegisteredEvents = acceptOnlyRegisteredEvents;
+	}
+
+	public boolean isListened(String eventPackage, String eventName) {
+		return listeners.hasData(eventPackage, eventName);
+	}
+
+	public void registerAll(Object consumer) {
+		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
+		for (AbstractHandler l : listeners) {
+			addHandler(l);
+		}
+		Collection<EventRoutedTransientFiller> fillers = this.reflectEventRoutedTransientFillerFactory.create(consumer);
+		for (EventRoutedTransientFiller f : fillers) {
+			Set<EventRoutedTransientFiller> eventFillers = routedTransientFillers.computeIfAbsent(f.getEventClass(),
+																								  (Class<?> c) -> {
+																									  return new CopyOnWriteArraySet<>();
+																								  });
+			eventFillers.add(f);
+		}
+		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
+		for (EventRoutingSelector s : selectors) {
+			routingSelectors.put(s.getEventClass(), s);
+		}
+	}
+
+	public void registerEvent(String event, String description, boolean privateEvent) {
+		registrar.register(event, description, privateEvent);
+	}
+
+	public void registerEvent(Class<?> event, String description, boolean privateEvent) {
+		registrar.register(event.getName(), description, privateEvent);
+	}
+
+	public void removeHandler(AbstractHandler listenerHandler) {
+		listeners.delete(listenerHandler);
+	}
+
+	public <T> void removeListener(EventSourceListener<T> listener) {
+		AbstractListenerHandler handler = new ObjectEventsSourceListenerHandler(null, null, listener);
+		removeHandler(handler);
+	}
+
+	public <T> void removeListener(tigase.eventbus.EventListener<T> listener) {
+		if (listener == null) {
+			return;
+		}
+		AbstractListenerHandler handler = new ObjectEventsListenerHandler(null, null, listener);
+		removeHandler(handler);
+	}
+
+	public void unregisterAll(Object consumer) {
+		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
+		for (AbstractHandler l : listeners) {
+			removeHandler(l);
+		}
+		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
+		for (EventRoutingSelector s : selectors) {
+			routingSelectors.remove(s.getEventClass(), s);
+		}
+		Collection<EventRoutedTransientFiller> fillers = this.reflectEventRoutedTransientFillerFactory.create(consumer);
+		for (EventRoutedTransientFiller f : fillers) {
+			Set<EventRoutedTransientFiller> eventFillers = routedTransientFillers.get(f.getEventClass());
+			if (eventFillers != null) {
+				eventFillers.remove(f);
+			}
+		}
+	}
+
+	List<tigase.eventbus.EventListener> getEventListeners(final String packageName, final String eventName) {
+		ArrayList<tigase.eventbus.EventListener> result = new ArrayList<>();
+		Collection ls = listeners.get(packageName, eventName);
+		result.addAll(ls);
+
+		ls = listeners.get(null, eventName);
+		result.addAll(ls);
+
+		return result;
 	}
 
 	HashSet<AbstractHandler> getListenersForEvent(final Class<?> eventClass) {
@@ -249,93 +276,75 @@ public class EventBusImplementation implements EventBus {
 		return result;
 	}
 
-	public EventsRegistrar getRegistrar() {
-		return registrar;
-	}
+	protected void doFireThreadPerHandler(final Object event, final Object source, boolean remotelyGeneratedEvent,
+										  HashSet<AbstractHandler> handlers) {
+		Element eventConverted = null;
+		for (AbstractHandler listenerHandler : handlers) {
+			Object eventObject;
 
-	public Serializer getSerializer() {
-		return serializer;
-	}
+			if (listenerHandler.getRequiredEventType() == AbstractListenerHandler.Type.asIs) {
+				eventObject = event;
+			} else if (listenerHandler.getRequiredEventType() == AbstractListenerHandler.Type.element &&
+					!(event instanceof Element)) {
+				if (eventConverted == null) {
+					eventConverted = serializer.serialize(event);
+				}
+				eventObject = eventConverted;
+			} else if (listenerHandler.getRequiredEventType() != AbstractListenerHandler.Type.element &&
+					event instanceof Element) {
+				continue;
+			} else {
+				eventObject = event;
+			}
 
-	public boolean isAcceptOnlyRegisteredEvents() {
-		return acceptOnlyRegisteredEvents;
-	}
+			Runnable task = () -> {
+				try {
+					listenerHandler.dispatch(eventObject, source, remotelyGeneratedEvent);
+				} catch (Throwable e) {
+					log.log(Level.WARNING,
+							"Exception during execution of event: " + event.getClass().getCanonicalName(), e);
+				}
+			};
 
-	public void setAcceptOnlyRegisteredEvents(boolean acceptOnlyRegisteredEvents) {
-		this.acceptOnlyRegisteredEvents = acceptOnlyRegisteredEvents;
-	}
-
-	public boolean isListened(String eventPackage, String eventName) {
-		return listeners.hasData(eventPackage, eventName);
-	}
-
-	public void registerAll(Object consumer) {
-		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
-		for (AbstractHandler l : listeners) {
-			addHandler(l);
-		}
-		Collection<EventRoutedTransientFiller> fillers = this.reflectEventRoutedTransientFillerFactory.create(consumer);
-		for (EventRoutedTransientFiller f : fillers) {
-			Set<EventRoutedTransientFiller> eventFillers = routedTransientFillers.computeIfAbsent(f.getEventClass(),
-					(Class<?> c) -> {
-						return new CopyOnWriteArraySet<>();
-					});
-			eventFillers.add(f);
-		}
-		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
-		for (EventRoutingSelector s : selectors) {
-			routingSelectors.put(s.getEventClass(), s);
+			executor.execute(task);
 		}
 	}
 
-	public void registerEvent(String event, String description, boolean privateEvent) {
-		registrar.register(event, description, privateEvent);
-	}
-
-	public void registerEvent(Class<?> event, String description, boolean privateEvent) {
-		registrar.register(event.getName(), description, privateEvent);
-	}
-
-	public void removeHandler(AbstractHandler listenerHandler) {
-		listeners.delete(listenerHandler);
-	}
-
-	public <T> void removeListener(EventSourceListener<T> listener) {
-		AbstractListenerHandler handler = new ObjectEventsSourceListenerHandler(null, null, listener);
-		removeHandler(handler);
-	}
-
-	public <T> void removeListener(tigase.eventbus.EventListener<T> listener) {
-		if (listener == null)
-			return;
-		AbstractListenerHandler handler = new ObjectEventsListenerHandler(null, null, listener);
-		removeHandler(handler);
-	}
-
-	public void unregisterAll(Object consumer) {
-		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
-		for (AbstractHandler l : listeners) {
-			removeHandler(l);
-		}
-		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
-		for (EventRoutingSelector s : selectors) {
-			routingSelectors.remove(s.getEventClass(), s);
-		}
-		Collection<EventRoutedTransientFiller> fillers = this.reflectEventRoutedTransientFillerFactory.create(consumer);
-		for (EventRoutedTransientFiller f : fillers) {
-			Set<EventRoutedTransientFiller> eventFillers = routedTransientFillers.get(f.getEventClass());
-			if (eventFillers != null) {
-				eventFillers.remove(f);
+	private void checkIfEventIsRegistered(final String eventName) throws EventBusException {
+		if (!registrar.isRegistered(eventName)) {
+			if (this.acceptOnlyRegisteredEvents) {
+				throw new EventBusException("Event " + eventName + " is not registered.");
+			} else {
+				log.log(Level.FINEST, "Event " + eventName + " in not registered.");
 			}
 		}
 	}
 
-	public interface InternalEventbusEvent {
+	private void fillListenersForEvent(HashSet<AbstractHandler> result, Class<?> cls) {
+		final String packageName = cls.getPackage().getName();
+		final String eventName = cls.getSimpleName();
+
+		result.addAll(listeners.get(packageName, eventName));
+		result.addAll(listeners.get(packageName, null));
 	}
 
-	public static class ListenerAddedEvent implements InternalEventbusEvent {
-		private String packageName;
+	private void fireListenerAddedEvent(String packageName, String eventName) {
+		ListenerAddedEvent event = new ListenerAddedEvent();
+		event.setEventName(eventName);
+		event.setPackageName(packageName);
+
+		fire(event);
+	}
+
+	public interface InternalEventbusEvent {
+
+	}
+
+	public static class ListenerAddedEvent
+			implements InternalEventbusEvent {
+
 		private String eventName;
+		private String packageName;
 
 		public String getEventName() {
 			return eventName;
@@ -354,9 +363,11 @@ public class EventBusImplementation implements EventBus {
 		}
 	}
 
-	public static class ListenerRemovedEvent implements InternalEventbusEvent {
-		private String packageName;
+	public static class ListenerRemovedEvent
+			implements InternalEventbusEvent {
+
 		private String eventName;
+		private String packageName;
 
 		public String getEventName() {
 			return eventName;

@@ -26,13 +26,11 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.modular.Component;
 
 @Bean(name = "Component2", active = true)
-public class Component2 implements Component {
-
+public class Component2
+		implements Component {
 
 	@Inject
-	private
-	PropertiesBeanConfigurator propertiesBeanConfigurator;
-
+	private PropertiesBeanConfigurator propertiesBeanConfigurator;
 
 	@Override
 	public String execute(String request) {

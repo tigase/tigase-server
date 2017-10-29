@@ -25,8 +25,8 @@ import java.util.Map;
 public class MapCreatedEvent {
 
 	private final Map map;
-	private final String type;
 	private final String[] parameters;
+	private final String type;
 
 	public MapCreatedEvent(Map map, String type, String... parameters) {
 		this.map = map;

@@ -41,11 +41,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This is implementation of {@linkplain CallbackHandler} to use with old
- * {@linkplain AuthRepository AuthRepositories}. Callback
- * {@linkplain VerifyPasswordCallback} uses method
- * {@linkplain AuthRepository#plainAuth(BareJID, String)} to password
- * verification.
+ * This is implementation of {@linkplain CallbackHandler} to use with old {@linkplain AuthRepository AuthRepositories}.
+ * Callback {@linkplain VerifyPasswordCallback} uses method {@linkplain AuthRepository#plainAuth(BareJID, String)} to
+ * password verification.
  */
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
@@ -66,6 +64,16 @@ public class AuthRepoPlainCallbackHandler
 			}
 			handleCallback(callbacks[i]);
 		}
+	}
+
+	@Override
+	public void setAuthRepository(AuthRepository repo) {
+		this.repo = repo;
+	}
+
+	@Override
+	public void setDomain(String domain) {
+		this.domain = domain;
 	}
 
 	@SuppressWarnings("unused")
@@ -155,15 +163,5 @@ public class AuthRepoPlainCallbackHandler
 
 			throw new IOException("Password verification problem.", e);
 		}
-	}
-
-	@Override
-	public void setAuthRepository(AuthRepository repo) {
-		this.repo = repo;
-	}
-
-	@Override
-	public void setDomain(String domain) {
-		this.domain = domain;
 	}
 }

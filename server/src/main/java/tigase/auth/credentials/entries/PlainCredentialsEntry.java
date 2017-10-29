@@ -34,7 +34,7 @@ public class PlainCredentialsEntry
 	public PlainCredentialsEntry(String password) {
 		this.password = password;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
@@ -49,25 +49,9 @@ public class PlainCredentialsEntry
 		return password == plain || password.equals(plain);
 	}
 
-	@Bean(name = "PLAIN", parent = CredentialsEncoderBean.class, active = false)
-	public static class Encoder implements Credentials.Encoder {
-
-		@ConfigField(desc = "Mechanism name")
-		private String name;
-
-		@Override
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public String encode(BareJID user, String password) {
-			return password;
-		}
-	}
-
 	@Bean(name = "PLAIN", parent = CredentialsDecoderBean.class, active = true)
-	public static class Decoder implements Credentials.Decoder {
+	public static class Decoder
+			implements Credentials.Decoder {
 
 		@ConfigField(desc = "Mechanism name")
 		private String name;
@@ -80,6 +64,24 @@ public class PlainCredentialsEntry
 		@Override
 		public Credentials.Entry decode(BareJID user, String value) {
 			return new PlainCredentialsEntry(value);
+		}
+	}
+
+	@Bean(name = "PLAIN", parent = CredentialsEncoderBean.class, active = false)
+	public static class Encoder
+			implements Credentials.Encoder {
+
+		@ConfigField(desc = "Mechanism name")
+		private String name;
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String encode(BareJID user, String password) {
+			return password;
 		}
 	}
 }

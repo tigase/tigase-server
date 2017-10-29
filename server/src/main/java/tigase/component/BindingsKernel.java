@@ -20,11 +20,12 @@
 
 package tigase.component;
 
-import javax.script.SimpleBindings;
-
 import tigase.kernel.core.Kernel;
 
-public class BindingsKernel extends SimpleBindings {
+import javax.script.SimpleBindings;
+
+public class BindingsKernel
+		extends SimpleBindings {
 
 	private Kernel kernel;
 

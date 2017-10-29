@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -33,8 +31,8 @@ import tigase.server.xmppserver.*;
 import tigase.util.Algorithms;
 import tigase.util.common.TimerTask;
 import tigase.xml.Element;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Map;
@@ -55,18 +53,15 @@ import java.util.logging.Logger;
  */
 @Bean(name = "dialback", parent = S2SConnectionManager.class, active = true)
 public class Dialback
-				extends S2SAbstractProcessor {
-	private static final Logger log                =
-		Logger.getLogger(Dialback.class.getName());
-	private static final Element features_required =
-		new Element("dialback", new Element[] { new Element("required") },
-								new String[] { "xmlns" }, new String[] { "urn:xmpp:features:dialback" });
-	private static final Element features = new Element("dialback",
-																						new String[] { "xmlns" },
-																						new String[] {
-																							"urn:xmpp:features:dialback" });
-	private static final String REQUESTED_RESULT_DOMAINS_KEY =
-		"requested-result-domains-key";
+		extends S2SAbstractProcessor {
+
+	private static final Logger log = Logger.getLogger(Dialback.class.getName());
+	private static final Element features_required = new Element("dialback", new Element[]{new Element("required")},
+																 new String[]{"xmlns"},
+																 new String[]{"urn:xmpp:features:dialback"});
+	private static final Element features = new Element("dialback", new String[]{"xmlns"},
+														new String[]{"urn:xmpp:features:dialback"});
+	private static final String REQUESTED_RESULT_DOMAINS_KEY = "requested-result-domains-key";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -84,7 +79,6 @@ public class Dialback
 
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public Dialback() {
 		super();
@@ -96,19 +90,16 @@ public class Dialback
 	public int order() {
 		return Order.Dialback.ordinal();
 	}
-	
+
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
-		CID cid         = (CID) serv.getSessionData().get("cid");
-		boolean skipTLS = (cid == null)
-											? false
-											: skipTLSForHost(cid.getRemoteHost());
+		CID cid = (CID) serv.getSessionData().get("cid");
+		boolean skipTLS = (cid == null) ? false : skipTLSForHost(cid.getRemoteHost());
 
 		// If this is a dialback packet, process it accordingly
 		if (p.getXMLNS() == XMLNS_DB_VAL) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Processing dialback packet: {1}", new Object[] { serv,
-								p });
+				log.log(Level.FINEST, "{0}, Processing dialback packet: {1}", new Object[]{serv, p});
 			}
 			processDialback(p, serv);
 
@@ -118,30 +109,24 @@ public class Dialback
 		// If this is stream features, then it depends....
 		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received packet: {1}",
-								new Object[] { serv,
-															 p });
+				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
 			}
 
-			CertCheckResult certCheckResult =
-				(CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
+			CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData()
+					.get(S2SIOService.CERT_CHECK_RESULT);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, TLS Certificate check: {1}, packet: {2}",
-								new Object[] { serv,
-															 certCheckResult, p });
+						new Object[]{serv, certCheckResult, p});
 			}
 
 			// If TLS is not yet started (announced in stream features) then it is not
 			// the right time for dialback yet
 			// Some servers send starttls in stream features, even if TLS is already
 			// initialized....
-			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) &&
-					(certCheckResult == null) &&!skipTLS) {
+			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && (certCheckResult == null) && !skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}",
-									new Object[] { serv,
-																 p });
+					log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}", new Object[]{serv, p});
 				}
 
 				return true;
@@ -156,19 +141,14 @@ public class Dialback
 					!(p.isXMLNSStaticStr(FEATURES_DIALBACK_PATH, DIALBACK_NS))) {
 				if (ejabberd_bug_workaround_active) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(
-								Level.FINEST,
+						log.log(Level.FINEST,
 								"{0}, Ejabberd bug workaround active, proceeding to dialback anyway, packet: {1}",
-								new Object[] { serv,
-															 p });
+								new Object[]{serv, p});
 					}
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(
-								Level.FINEST,
-								"{0}, TLS trusted peer, no dialback needed or requested, packet: {1}",
-								new Object[] { serv,
-															 p });
+						log.log(Level.FINEST, "{0}, TLS trusted peer, no dialback needed or requested, packet: {1}",
+								new Object[]{serv, p});
 					}
 
 					CIDConnections cid_conns;
@@ -179,16 +159,12 @@ public class Dialback
 					} catch (NotLocalhostException ex) {
 
 						// Should not happen....
-						log.log(Level.INFO, "{0}, Incorrect local hostname, packet: {1}",
-										new Object[] { serv,
-																	 p });
+						log.log(Level.INFO, "{0}, Incorrect local hostname, packet: {1}", new Object[]{serv, p});
 						serv.forceStop();
 					} catch (LocalhostException ex) {
 
 						// Should not happen....
-						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}",
-										new Object[] { serv,
-																	 p });
+						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}", new Object[]{serv, p});
 						serv.stop();
 					}
 
@@ -197,20 +173,18 @@ public class Dialback
 			}
 
 			// we need to check if TLS is required
-			if (!skipTLS && cid != null && !serv.getSessionData().containsKey("TLS") 
-					&& handler.isTlsRequired(cid.getLocalHost())) {
-				log.log(Level.FINER, "{0}, TLS is required for domain {1} but STARTTLS was not "
-						+ "offered by {2} - policy-violation", new Object[] { serv, 
-							cid.getLocalHost(), cid.getRemoteHost() });
+			if (!skipTLS && cid != null && !serv.getSessionData().containsKey("TLS") &&
+					handler.isTlsRequired(cid.getLocalHost())) {
+				log.log(Level.FINER, "{0}, TLS is required for domain {1} but STARTTLS was not " +
+								"offered by {2} - policy-violation",
+						new Object[]{serv, cid.getLocalHost(), cid.getRemoteHost()});
 				serv.forceStop();
 				return true;
 			}
-			
+
 			// Nothing else can be done right now except the dialback
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Initializing dialback, packet: {1}",
-								new Object[] { serv,
-															 p });
+				log.log(Level.FINEST, "{0}, Initializing dialback, packet: {1}", new Object[]{serv, p});
 			}
 			initDialback(serv, serv.getSessionId());
 		}
@@ -220,14 +194,12 @@ public class Dialback
 
 	@Override
 	public void serviceStarted(S2SIOService serv) {
-		handler.addTimerTask(new AuthenticationTimer(serv), authenticationTimeOut,
-												 TimeUnit.SECONDS);
+		handler.addTimerTask(new AuthenticationTimer(serv), authenticationTimeOut, TimeUnit.SECONDS);
 	}
 
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
-		CertCheckResult certCheckResult =
-			(CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
+		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
 
 		if (certCheckResult == CertCheckResult.trusted) {
 			results.add(features);
@@ -244,35 +216,61 @@ public class Dialback
 			return null;
 		}
 		switch (serv.connectionType()) {
-		case connect :
-			initDialback(serv, attribs.get("id"));
+			case connect:
+				initDialback(serv, attribs.get("id"));
 
-			break;
+				break;
 
-		default :
+			default:
 
-		// Ignore
+				// Ignore
 		}
 
 		return null;
 	}
 
+	/**
+	 * Checks if result request for received domain was sent by service
+	 *
+	 * @param serv
+	 * @param domain
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean wasResultRequested(S2SIOService serv, String domain) {
+		Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
+
+		return (requested != null) && requested.contains(domain);
+	}
+
+	/**
+	 * Checks if verify request for received domain was sent by service
+	 *
+	 * @param serv
+	 * @param domain
+	 *
+	 * @see CIDConnections#sendHandshakingOnly
+	 */
+	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
+		String requested = (String) serv.getSessionData().get(S2SIOService.HANDSHAKING_DOMAIN_KEY);
+
+		return (requested != null) && requested.contains(domain);
+	}
+
 	private void initDialback(S2SIOService serv, String remote_id) {
 		try {
-			CID cid                  = (CID) serv.getSessionData().get("cid");
+			CID cid = (CID) serv.getSessionData().get("cid");
 
 			String secret = handler.getSecretForDomain(cid.getLocalHost());
-			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), 
-                                        secret, remote_id);
+			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), secret, remote_id);
 
 			if (!serv.isHandshakingOnly()) {
-				Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { XMLNS_DB_ATT },
-																	 new String[] { XMLNS_DB_VAL });
+				Element elem = new Element(DB_RESULT_EL_NAME, key, new String[]{XMLNS_DB_ATT},
+										   new String[]{XMLNS_DB_VAL});
 
 				addToResultRequested(serv, cid.getRemoteHost());
-				serv.getS2SConnection().addControlPacket(Packet.packetInstance(elem,
-								JID.jidInstanceNS(cid.getLocalHost()),
-								JID.jidInstanceNS(cid.getRemoteHost())));
+				serv.getS2SConnection()
+						.addControlPacket(Packet.packetInstance(elem, JID.jidInstanceNS(cid.getLocalHost()),
+																JID.jidInstanceNS(cid.getRemoteHost())));
 			}
 			serv.getS2SConnection().sendAllControlPackets();
 		} catch (NotLocalhostException ex) {
@@ -285,13 +283,11 @@ public class Dialback
 		// Get the cid for which the connection has been created, the cid calculated
 		// from the packet may be different though if the remote server tries to
 		// multiplexing
-		CID cid_main   = (CID) serv.getSessionData().get("cid");
+		CID cid_main = (CID) serv.getSessionData().get("cid");
 		CID cid_packet = new CID(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID_packet: {2}",
-							new Object[] { serv,
-														 p, cid_packet });
+			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID_packet: {2}", new Object[]{serv, p, cid_packet});
 		}
 
 		CIDConnections cid_conns = null;
@@ -314,13 +310,12 @@ public class Dialback
 		try {
 			cid_conns = handler.getCIDConnections(cid_main, true);
 		} catch (NotLocalhostException ex) {
-			log.log(Level.FINER, "{0} Incorrect local hostname: {1}", new Object[] { serv, p });
+			log.log(Level.FINER, "{0} Incorrect local hostname: {1}", new Object[]{serv, p});
 			generateStreamError(false, "host-unknown", serv);
 
 			return;
 		} catch (LocalhostException ex) {
-			log.log(Level.FINER, "{0} Incorrect remote hostname: {1}",
-							new Object[] { serv, p });
+			log.log(Level.FINER, "{0} Incorrect remote hostname: {1}", new Object[]{serv, p});
 			generateStreamError(false, "invalid-from", serv);
 
 			return;
@@ -336,19 +331,20 @@ public class Dialback
 			if (p.getType() == null) {
 				CID cid = (CID) serv.getSessionData().get("cid");
 				boolean skipTls = this.skipTLSForHost(cid.getRemoteHost());
-				if (!skipTls && !serv.getSessionData().containsKey("TLS") && handler.isTlsRequired(cid.getLocalHost())) {
-					log.log(Level.FINER, "{0}, rejecting S2S connection from {1} to {2} due to policy violation - STARTTLS is required",
-							new Object[] { serv, cid.getRemoteHost(), cid.getLocalHost() });
-					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet, false, null, serv.getSessionId(), 
-							null, false, new Element("error", new Element[] {
-								new Element("policy-violation", new String[] { "xmlns" },
-										new String[] { "urn:ietf:params:xml:ns:xmpp-stanzas" } )},
-									new String[] { "type" }, new String[] { "cancel" } ));
-				}
-				else {
+				if (!skipTls && !serv.getSessionData().containsKey("TLS") &&
+						handler.isTlsRequired(cid.getLocalHost())) {
+					log.log(Level.FINER,
+							"{0}, rejecting S2S connection from {1} to {2} due to policy violation - STARTTLS is required",
+							new Object[]{serv, cid.getRemoteHost(), cid.getLocalHost()});
+					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet, false, null, serv.getSessionId(),
+											 null, false, new Element("error", new Element[]{
+									new Element("policy-violation", new String[]{"xmlns"},
+												new String[]{"urn:ietf:params:xml:ns:xmpp-stanzas"})},
+																	  new String[]{"type"}, new String[]{"cancel"}));
+				} else {
 					String conn_sessionId = serv.getSessionId();
-					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, null,
-																 conn_sessionId, null, p.getElemCData(), true);
+					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, null, conn_sessionId, null,
+											 p.getElemCData(), true);
 				}
 			} else {
 				if (p.getType() == StanzaType.valid) {
@@ -358,58 +354,53 @@ public class Dialback
 						// p.getStanzaFrom().getDomain()));
 						cid_conns.connectionAuthenticated(serv, cid_packet);
 					} else if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE,
-										"Received result with type valid for {0} but it was not requested!",
-										p.getStanzaFrom());
+						log.log(Level.FINE, "Received result with type valid for {0} but it was not requested!",
+								p.getStanzaFrom());
 					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(
-								Level.FINE,
-								"Invalid result for DB authentication: {0}, stopping connection: {1}",
-								new Object[] { cid_packet,
-															 serv });
+						log.log(Level.FINE, "Invalid result for DB authentication: {0}, stopping connection: {1}",
+								new Object[]{cid_packet, serv});
 					}
 					serv.stop();
 				}
 			}
 		}
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (p.getType() == null) {                          
+			if (p.getType() == null) {
 				boolean result;
 				try {
-					String secret = handler.getSecretForDomain(cid_packet.getLocalHost());                                
-					String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(), 
-                                                cid_packet.getRemoteHost(), secret, p.getStanzaId());
+					String secret = handler.getSecretForDomain(cid_packet.getLocalHost());
+					String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(),
+																	  cid_packet.getRemoteHost(), secret,
+																	  p.getStanzaId());
 
 					if (local_key == null) {
 						if (log.isLoggable(Level.FINER)) {
-							log.log(Level.FINER, "The key is not available for connection CID: {0}, "
-									+ "or the packet CID: {1} ", new Object[] { cid_main, cid_packet });
+							log.log(Level.FINER,
+									"The key is not available for connection CID: {0}, " + "or the packet CID: {1} ",
+									new Object[]{cid_main, cid_packet});
 						}
 					}
 					result = local_key != null && local_key.equals(remote_key);
-				}
-				catch (NotLocalhostException ex) {
+				} catch (NotLocalhostException ex) {
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "Could not retreive secret for " + cid_packet.getLocalHost(), ex);
 					}
 					result = false;
 				}
-				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
-						result , p.getStanzaId(), serv.getSessionId(), null, false);
+				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, result, p.getStanzaId(),
+										 serv.getSessionId(), null, false);
 			} else {
 				if (wasVerifyRequested(serv, p.getStanzaFrom().toString())) {
-					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,
-																	 (p.getType() == StanzaType.valid), null,
-																	 p.getStanzaId(), null, false);
+					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet, (p.getType() == StanzaType.valid),
+											 null, p.getStanzaId(), null, false);
 					if (p.getType() == StanzaType.valid) {
 						cid_conns.connectionAuthenticated(p.getStanzaId(), cid_packet);
 					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "received verify for {0} but it was not requested!",
-										p.getStanzaFrom());
+						log.log(Level.FINE, "received verify for {0} but it was not requested!", p.getStanzaFrom());
 					}
 				}
 				if (serv.isHandshakingOnly()) {
@@ -427,15 +418,12 @@ public class Dialback
 	 */
 	@SuppressWarnings("unchecked")
 	private void addToResultRequested(S2SIOService serv, String domain) {
-		Set<String> requested =
-			(Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
+		Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
 
 		if (requested == null) {
 			Set<String> requested_tmp = new CopyOnWriteArraySet<String>();
 
-			requested =
-				(Set<String>) serv.getSessionData().putIfAbsent(REQUESTED_RESULT_DOMAINS_KEY,
-					requested_tmp);
+			requested = (Set<String>) serv.getSessionData().putIfAbsent(REQUESTED_RESULT_DOMAINS_KEY, requested_tmp);
 			if (requested == null) {
 				requested = requested_tmp;
 			}
@@ -443,40 +431,11 @@ public class Dialback
 		requested.add(domain);
 	}
 
-	/**
-	 * Checks if result request for received domain was sent by service
-	 *
-	 * @param serv
-	 * @param domain
-	 * 
-	 */
-	@SuppressWarnings("unchecked")
-	protected boolean wasResultRequested(S2SIOService serv, String domain) {
-		Set<String> requested =
-			(Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
-
-		return (requested != null) && requested.contains(domain);
-	}
-
-	/**
-	 * Checks if verify request for received domain was sent by service
-	 *
-	 * @see CIDConnections#sendHandshakingOnly
-	 * @param serv
-	 * @param domain
-	 * 
-	 */
-	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
-		String requested =
-			(String) serv.getSessionData().get(S2SIOService.HANDSHAKING_DOMAIN_KEY);
-
-		return (requested != null) && requested.contains(domain);
-	}
-
 	//~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer
 			extends TimerTask {
+
 		private S2SIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------
@@ -491,8 +450,7 @@ public class Dialback
 		public void run() {
 			if (!serv.isAuthenticated() && serv.isConnected()) {
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE,
-									"Connection not authenticated within timeout, stopping: {0}", serv);
+					log.log(Level.FINE, "Connection not authenticated within timeout, stopping: {0}", serv);
 				}
 				serv.stop();
 			}

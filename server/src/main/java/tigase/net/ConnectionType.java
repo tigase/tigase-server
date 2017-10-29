@@ -21,8 +21,8 @@ package tigase.net;
 
 /**
  * Describe class ConnectionType here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sun Feb  5 09:26:44 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -30,6 +30,7 @@ package tigase.net;
  */
 public enum ConnectionType {
 
-	accept, connect;
+	accept,
+	connect;
 
 } // ConnectionType

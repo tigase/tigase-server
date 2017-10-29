@@ -31,8 +31,6 @@ import tigase.kernel.core.Kernel;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.jid.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -41,32 +39,28 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//~--- JDK imports ------------------------------------------------------------
+
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Extended implementation of SeeOtherHost using redirect information from
- * database
- * 
+ * Extended implementation of SeeOtherHost using redirect information from database
  */
-public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean {
-
-	private static final Logger log = Logger.getLogger(SeeOtherHostDB.class.getName());
+public class SeeOtherHostDB
+		extends SeeOtherHostHashed
+		implements RegistrarBean {
 
 	public static final String SEE_OTHER_HOST_TABLE = "tig_see_other_hosts";
-	public static final String SEE_OTHER_HOST_DB_URL_KEY = CM_SEE_OTHER_HOST_CLASS_PROP_KEY
-			+ "/" + "db-url";
-	public static final String SEE_OTHER_HOST_DB_QUERY_KEY =
-			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-host-query";
+	public static final String SEE_OTHER_HOST_DB_URL_KEY = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "db-url";
+	public static final String SEE_OTHER_HOST_DB_QUERY_KEY = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-host-query";
 	public static final String DB_GET_ALL_DATA_DB_QUERY_KEY =
 			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-data-query";
 	public static final String GET_ALL_QUERY_TIMEOUT_QUERY_KEY =
-		CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-query-timeout";
-
-	
+			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-query-timeout";
 	public static final String SERIAL_ID = "sid";
 	public static final String USER_ID = "uid";
 	public static final String NODE_ID = "node_id";
-	
+	private static final Logger log = Logger.getLogger(SeeOtherHostDB.class.getName());
 	@Inject
 	private SeeOtherHostRepository repo;
 
@@ -88,9 +82,10 @@ public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean 
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "DB lookup failed, fallback to SeeOtherHostHashed: ", ex);
 		}
-		
+
 		if (see_other_host == null || isNodeShutdown(see_other_host)) {
-			log.log(Level.FINE, "DB lookup failed or selected node is being stopped, fallback to SeeOtherHostHashed for {0}", jid);
+			log.log(Level.FINE,
+					"DB lookup failed or selected node is being stopped, fallback to SeeOtherHostHashed for {0}", jid);
 			see_other_host = super.findHostForJID(jid, host);
 		}
 
@@ -106,7 +101,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean 
 	public void unregister(Kernel kernel) {
 
 	}
-	
+
 	/**
 	 * Performs database check, creates missing schema if necessary
 	 *
@@ -116,7 +111,8 @@ public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean 
 
 	}
 
-	public interface SeeOtherHostRepository<DS extends DataSource> extends DataSourceAware<DS> {
+	public interface SeeOtherHostRepository<DS extends DataSource>
+			extends DataSourceAware<DS> {
 
 		BareJID getHostFor(BareJID jid);
 
@@ -124,55 +120,44 @@ public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean 
 
 	}
 
-	public static class SeeOtherHostDBSDRepositoryBean extends SDRepositoryBean<SeeOtherHostRepository> {
-
-		@Override
-		protected Class<?> findClassForDataSource(DataSource dataSource) throws DBInitException {
-			return DataSourceHelper.getDefaultClass(SeeOtherHostRepository.class, dataSource.getResourceUri());
-		}
-	}
-
 	@Repository.Meta(supportedUris = {"jdbc:[^:]+:.*"})
-	public static class JDBCSeeOtherHostRepository implements SeeOtherHostRepository<DataRepository> {
+	public static class JDBCSeeOtherHostRepository
+			implements SeeOtherHostRepository<DataRepository> {
 
-		public static final String DEF_DB_GET_HOST_QUERY = " select * from tig_users, "
-				+ SEE_OTHER_HOST_TABLE + " where tig_users.uid = " + SEE_OTHER_HOST_TABLE + "."
-				+ USER_ID + " and user_id = ?";
+		public static final String DEF_DB_GET_HOST_QUERY =
+				" select * from tig_users, " + SEE_OTHER_HOST_TABLE + " where tig_users.uid = " + SEE_OTHER_HOST_TABLE +
+						"." + USER_ID + " and user_id = ?";
 
 		private static final String DEF_DB_GET_ALL_DATA_QUERY =
-				"select user_id, node_id from tig_users, " + SEE_OTHER_HOST_TABLE
-						+ " where tig_users.uid = " + SEE_OTHER_HOST_TABLE + "." + USER_ID;
+				"select user_id, node_id from tig_users, " + SEE_OTHER_HOST_TABLE + " where tig_users.uid = " +
+						SEE_OTHER_HOST_TABLE + "." + USER_ID;
 
-		private static final String CREATE_STATS_TABLE = "create table " + SEE_OTHER_HOST_TABLE
-				+ " ( " + SERIAL_ID + " serial," + USER_ID + " bigint unsigned NOT NULL, "
-				+ NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
-				+ " constraint tig_see_other_host_constr foreign key (" + USER_ID
-				+ ") references tig_users (" + USER_ID + ")" + ")";
+		private static final String CREATE_STATS_TABLE =
+				"create table " + SEE_OTHER_HOST_TABLE + " ( " + SERIAL_ID + " serial," + USER_ID +
+						" bigint unsigned NOT NULL, " + NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" +
+						SERIAL_ID + "), " + " constraint tig_see_other_host_constr foreign key (" + USER_ID +
+						") references tig_users (" + USER_ID + ")" + ")";
 
-		private static final String DERBY_CREATE_STATS_TABLE = "create table " + SEE_OTHER_HOST_TABLE
-				+ " ( " + SERIAL_ID + " bigint generated by default as identity not null," + USER_ID + " bigint  NOT NULL, "
-				+ NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
-				+ " constraint tig_see_other_host_constr foreign key (" + USER_ID
-				+ ") references tig_users (" + USER_ID + ")" + ")";
+		private static final String DERBY_CREATE_STATS_TABLE =
+				"create table " + SEE_OTHER_HOST_TABLE + " ( " + SERIAL_ID +
+						" bigint generated by default as identity not null," + USER_ID + " bigint  NOT NULL, " +
+						NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), " +
+						" constraint tig_see_other_host_constr foreign key (" + USER_ID + ") references tig_users (" +
+						USER_ID + ")" + ")";
 
-		private static final String SQLSERVER_CREATE_STATS_TABLE = "create table " + SEE_OTHER_HOST_TABLE
-				+ " ( " + SERIAL_ID + " [bigint] IDENTITY(1,1)," + USER_ID + " bigint NOT NULL, "
-				+ NODE_ID + " nvarchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
-				+ " constraint tig_see_other_host_constr foreign key (" + USER_ID
-				+ ") references tig_users (" + USER_ID + ")" + ")";
-
+		private static final String SQLSERVER_CREATE_STATS_TABLE =
+				"create table " + SEE_OTHER_HOST_TABLE + " ( " + SERIAL_ID + " [bigint] IDENTITY(1,1)," + USER_ID +
+						" bigint NOT NULL, " + NODE_ID + " nvarchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID +
+						"), " + " constraint tig_see_other_host_constr foreign key (" + USER_ID +
+						") references tig_users (" + USER_ID + ")" + ")";
 
 		private static final int DEF_QUERY_TIME_OUT = 0;
-
-		@ConfigField(desc = "Query to find host for JID", alias = "get-host-query")
-		private String get_host_query = DEF_DB_GET_HOST_QUERY;
+		private DataRepository data_repo;
 		@ConfigField(desc = "Query to load mapping data", alias = "get-all-data-query")
 		private String get_all_data_query = DEF_DB_GET_ALL_DATA_QUERY;
-
-		private DataRepository data_repo;
-
-		private Map<BareJID, BareJID> redirectsMap =
-				new ConcurrentSkipListMap<BareJID, BareJID>();
+		@ConfigField(desc = "Query to find host for JID", alias = "get-host-query")
+		private String get_host_query = DEF_DB_GET_HOST_QUERY;
+		private Map<BareJID, BareJID> redirectsMap = new ConcurrentSkipListMap<BareJID, BareJID>();
 
 		@Override
 		public BareJID getHostFor(BareJID jid) {
@@ -180,8 +165,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean 
 		}
 
 		@Override
-		public BareJID queryDBFor(BareJID user) throws UserNotFoundException, SQLException,
-													 TigaseStringprepException {
+		public BareJID queryDBFor(BareJID user) throws UserNotFoundException, SQLException, TigaseStringprepException {
 
 			PreparedStatement get_host = data_repo.getPreparedStatement(user, get_host_query);
 
@@ -260,6 +244,15 @@ public class SeeOtherHostDB extends SeeOtherHostHashed implements RegistrarBean 
 			}
 
 			log.info("Loaded " + redirectsMap.size() + " redirect definitions from database.");
+		}
+	}
+
+	public static class SeeOtherHostDBSDRepositoryBean
+			extends SDRepositoryBean<SeeOtherHostRepository> {
+
+		@Override
+		protected Class<?> findClassForDataSource(DataSource dataSource) throws DBInitException {
+			return DataSourceHelper.getDefaultClass(SeeOtherHostRepository.class, dataSource.getResourceUri());
 		}
 	}
 }

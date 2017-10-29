@@ -30,42 +30,43 @@ AS:Group: Configuration
 
 package tigase.admin
 
-import tigase.conf.*
-import tigase.server.*
+import tigase.conf.ConfigRepositoryIfc
+import tigase.server.Command
+import tigase.server.Iq
 
 def COMP_NAME = "comp-name"
 def PARAMS_SET = "params-set"
 
-def conf_repo = (ConfigRepositoryIfc)comp_repo
-def p = (Iq)packet
+def conf_repo = (ConfigRepositoryIfc) comp_repo
+def p = (Iq) packet
 def comp_name = Command.getFieldValue(p, COMP_NAME)
 
-def admins = (Set)adminsSet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
 try {
 
 	if (!isServiceAdmin) {
-			def result = p.commandResult(Command.DataType.result)
-			Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
-			return result
+		def result = p.commandResult(Command.DataType.result)
+		Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
+		return result
 	}
 
 	if (comp_name == null) {
-		def res = (Iq)p.commandResult(Command.DataType.form)
-		def compNames = []
+		def res = (Iq) p.commandResult(Command.DataType.form)
+		def compNames = [ ]
 		conf_repo.getCompNames().each { compNames += it }
 		Command.addFieldValue(res, COMP_NAME, comp_name ?: compNames[0], "Components",
-			(String[])compNames, (String[])compNames)
+							  (String[]) compNames, (String[]) compNames)
 		return res
 	}
 
 	def params_set = Command.getFieldValue(p, PARAMS_SET)
 
 	if (params_set == null) {
-		def res = (Iq)p.commandResult(Command.DataType.result)
-		def compNames = []
+		def res = (Iq) p.commandResult(Command.DataType.result)
+		def compNames = [ ]
 		conf_repo.getCompNames().each { compNames += it }
 		Command.addTextField(res, COMP_NAME, comp_name ?: compNames[0])
 		Command.addHiddenField(res, PARAMS_SET, PARAMS_SET)

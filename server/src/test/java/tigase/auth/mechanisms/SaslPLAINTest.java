@@ -37,7 +37,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SaslPLAINTest extends TestCase {
+public class SaslPLAINTest
+		extends TestCase {
 
 	private SaslPLAIN sasl;
 
@@ -61,13 +62,16 @@ public class SaslPLAINTest extends TestCase {
 					} else if (callback instanceof AuthorizationIdCallback) {
 						// there is nothing to do..
 					} else if (callback instanceof AuthorizeCallback) {
-						boolean a = ((AuthorizeCallback) callback).getAuthorizationID().equals(
-								((AuthorizeCallback) callback).getAuthenticationID());
+						boolean a = ((AuthorizeCallback) callback).getAuthorizationID()
+								.equals(((AuthorizeCallback) callback).getAuthenticationID());
 						((AuthorizeCallback) callback).setAuthorized(a);
-						if (a)
-							((AuthorizeCallback) callback).setAuthorizedID(((AuthorizeCallback) callback).getAuthorizationID());
-					} else
+						if (a) {
+							((AuthorizeCallback) callback).setAuthorizedID(
+									((AuthorizeCallback) callback).getAuthorizationID());
+						}
+					} else {
 						throw new UnsupportedCallbackException(callback);
+					}
 				}
 			}
 		};
@@ -273,10 +277,13 @@ public class SaslPLAINTest extends TestCase {
 						boolean a = ((AuthorizeCallback) callback).getAuthorizationID().equals("romeo@example.net");
 						a = a && username.equals("secondwitch");
 						((AuthorizeCallback) callback).setAuthorized(a);
-						if (a)
-							((AuthorizeCallback) callback).setAuthorizedID(((AuthorizeCallback) callback).getAuthorizationID());
-					} else
+						if (a) {
+							((AuthorizeCallback) callback).setAuthorizedID(
+									((AuthorizeCallback) callback).getAuthorizationID());
+						}
+					} else {
 						throw new UnsupportedCallbackException(callback);
+					}
 				}
 			}
 		};

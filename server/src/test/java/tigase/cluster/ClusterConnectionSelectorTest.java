@@ -19,25 +19,23 @@
  */
 package tigase.cluster;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import junit.framework.TestCase;
 import org.junit.Test;
-import static tigase.cluster.ClusterConnectionSelector.CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY;
 import tigase.cluster.api.ClusterConnectionHandler;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
+import java.util.*;
+
+import static tigase.cluster.ClusterConnectionSelector.CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY;
+
 /**
- *
  * @author andrzej
  */
-public class ClusterConnectionSelectorTest extends TestCase {
+public class ClusterConnectionSelectorTest
+		extends TestCase {
 
 	@Test
 	public void testSelectConnection() throws Exception {
@@ -51,18 +49,18 @@ public class ClusterConnectionSelectorTest extends TestCase {
 			}
 		});
 
-		Map<String,Object> props = new HashMap<>();
+		Map<String, Object> props = new HashMap<>();
 		props.put(CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY, 1);
 		selector.setProperties(props);
-		
-		Element el = new Element("iq", new String[] { "from" }, new String[] { "test1" });
+
+		Element el = new Element("iq", new String[]{"from"}, new String[]{"test1"});
 		Packet p = Packet.packetInstance(el);
 		assertNull(selector.selectConnection(p, conn));
-		
+
 		XMPPIOService<Object> serv1 = new XMPPIOService<Object>();
 		conn.addConn(serv1);
 		assertEquals(serv1, selector.selectConnection(p, conn));
-		
+
 		p.setPriority(Priority.SYSTEM);
 		assertEquals(serv1, selector.selectConnection(p, conn));
 
@@ -71,7 +69,7 @@ public class ClusterConnectionSelectorTest extends TestCase {
 		conn.addConn(serv2);
 		assertEquals(2, conn.size());
 		assertEquals(serv2, selector.selectConnection(p, conn));
-		
+
 		p.setPriority(Priority.SYSTEM);
 		assertEquals(serv1, selector.selectConnection(p, conn));
 
@@ -80,26 +78,26 @@ public class ClusterConnectionSelectorTest extends TestCase {
 		conn.addConn(serv3);
 		assertEquals(3, conn.size());
 		assertNotSame(serv1, selector.selectConnection(p, conn));
-		
+
 		p.setPriority(Priority.SYSTEM);
 		assertEquals(serv1, selector.selectConnection(p, conn));
-		
-		el = new Element("iq", new String[] { "from" }, new String[] { "test2" });
+
+		el = new Element("iq", new String[]{"from"}, new String[]{"test2"});
 		p = Packet.packetInstance(el);
 		assertEquals(3, conn.size());
 		assertNotSame(serv1, selector.selectConnection(p, conn));
 
-		el = new Element("iq", new String[] { "from" }, new String[] { "test3" });
+		el = new Element("iq", new String[]{"from"}, new String[]{"test3"});
 		p = Packet.packetInstance(el);
 		assertEquals(3, conn.size());
 		assertNotSame(serv1, selector.selectConnection(p, conn));
 
-		el = new Element("iq", new String[] { "from" }, new String[] { "test4" });
+		el = new Element("iq", new String[]{"from"}, new String[]{"test4"});
 		p = Packet.packetInstance(el);
 		assertEquals(3, conn.size());
-		assertNotSame(serv1, selector.selectConnection(p, conn));		
+		assertNotSame(serv1, selector.selectConnection(p, conn));
 	}
-	
+
 	@Test
 	public void testSelectConnectionFor2() throws Exception {
 		ClusterConnection conn = new ClusterConnection("test");
@@ -111,18 +109,18 @@ public class ClusterConnectionSelectorTest extends TestCase {
 				return packet.getStanzaFrom().hashCode();
 			}
 		});
-		Map<String,Object> props = new HashMap<>();
+		Map<String, Object> props = new HashMap<>();
 		props.put(CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY, 2);
 		selector.setProperties(props);
-		
-		Element el = new Element("iq", new String[] { "from" }, new String[] { "test1" });
+
+		Element el = new Element("iq", new String[]{"from"}, new String[]{"test1"});
 		Packet p = Packet.packetInstance(el);
 		assertNull(selector.selectConnection(p, conn));
-		
+
 		XMPPIOService<Object> serv1 = new XMPPIOService<Object>();
 		conn.addConn(serv1);
 		assertEquals(serv1, selector.selectConnection(p, conn));
-		
+
 		p.setPriority(Priority.SYSTEM);
 		assertEquals(serv1, selector.selectConnection(p, conn));
 
@@ -132,7 +130,7 @@ public class ClusterConnectionSelectorTest extends TestCase {
 		Set<XMPPIOService<Object>> sysServs = new HashSet<>(Arrays.asList(serv1, serv2));
 		assertEquals(2, conn.size());
 		assertTrue(sysServs.contains(selector.selectConnection(p, conn)));
-		
+
 		p.setPriority(Priority.SYSTEM);
 		assertTrue(sysServs.contains(selector.selectConnection(p, conn)));
 
@@ -141,21 +139,21 @@ public class ClusterConnectionSelectorTest extends TestCase {
 		conn.addConn(serv3);
 		assertEquals(3, conn.size());
 		assertSame(serv3, selector.selectConnection(p, conn));
-		
+
 		p.setPriority(Priority.SYSTEM);
 		assertTrue(sysServs.contains(selector.selectConnection(p, conn)));
-		
-		el = new Element("iq", new String[] { "from" }, new String[] { "test2" });
+
+		el = new Element("iq", new String[]{"from"}, new String[]{"test2"});
 		p = Packet.packetInstance(el);
 		assertEquals(3, conn.size());
 		assertSame(serv3, selector.selectConnection(p, conn));
 
-		el = new Element("iq", new String[] { "from" }, new String[] { "test3" });
+		el = new Element("iq", new String[]{"from"}, new String[]{"test3"});
 		p = Packet.packetInstance(el);
 		assertEquals(3, conn.size());
 		assertSame(serv3, selector.selectConnection(p, conn));
 
-		el = new Element("iq", new String[] { "from" }, new String[] { "test4" });
+		el = new Element("iq", new String[]{"from"}, new String[]{"test4"});
 		p = Packet.packetInstance(el);
 		assertEquals(3, conn.size());
 		assertSame(serv3, selector.selectConnection(p, conn));

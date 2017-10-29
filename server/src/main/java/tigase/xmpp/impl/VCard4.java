@@ -46,37 +46,28 @@ import java.util.logging.Logger;
 import static tigase.xmpp.impl.VCard4.*;
 
 /**
- *
  * @author andrzej
  */
 @Id(ID)
-@Handles({
-	@Handle(path={ Iq.ELEM_NAME, VCARD_EL },xmlns=XMLNS)
-})
-@DiscoFeatures({
-	XMLNS
-})
+@Handles({@Handle(path = {Iq.ELEM_NAME, VCARD_EL}, xmlns = XMLNS)})
+@DiscoFeatures({XMLNS})
 @Bean(name = VCard4.ID, parent = SessionManager.class, active = true)
-public class VCard4 extends VCardXMPPProcessorAbstract {
-	
-	private static final Logger log = Logger.getLogger(VCard4.class.getCanonicalName());
-	
-	// private varibles reused in public variables
-	static final String ID = "vcard-xep-0292";
+public class VCard4
+		extends VCardXMPPProcessorAbstract {
+
 	protected static final String VCARD_EL = "vcard";
 	protected static final String XMLNS = "urn:ietf:params:xml:ns:vcard-4.0";
-	
+	// private varibles reused in public variables
+	static final String ID = "vcard-xep-0292";
 	// public variables used in other places which depends on private variables above
 	public static final String REPO_NODE = ID;
-	
 	// private variables used only by this processor
 	static final String VCARD_KEY = ID;
-		
-	private static final SimpleParser parser   = SingletonFactory.getParserInstance();
+	private static final Logger log = Logger.getLogger(VCard4.class.getCanonicalName());
+	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param connectionId
 	 * @param packet
@@ -88,16 +79,14 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processFromUserOutPacket(JID connectionId, Packet packet,
-										 XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-										 Map<String, Object> settings)
-					throws PacketErrorTypeException {
+	public void processFromUserOutPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+										 NonAuthUserRepository repo, Queue<Packet> results,
+										 Map<String, Object> settings) throws PacketErrorTypeException {
 		if (session.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 
 			// This is a local user so we can quickly get his vCard from the database
 			try {
-				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID,
-						VCARD_KEY, null);
+				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, VCARD_KEY, null);
 				Packet result = null;
 
 				if (strvCard != null) {
@@ -108,8 +97,7 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 				result.setPacketTo(connectionId);
 				results.offer(result);
 			} catch (UserNotFoundException e) {
-				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-						"User not found", true));
+				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "User not found", true));
 			}    // end of try-catch
 		} else {
 
@@ -121,7 +109,6 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param connectionId
 	 * @param packet
 	 * @param session
@@ -132,37 +119,36 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processFromUserToServerPacket(JID connectionId, Packet packet,
-			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings)
-					throws PacketErrorTypeException {
+	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+											  NonAuthUserRepository repo, Queue<Packet> results,
+											  Map<String, Object> settings) throws PacketErrorTypeException {
 		if (packet.getType() != null) {
 			try {
 				Packet result = null;
 
 				switch (packet.getType()) {
-				case get :
-					String strvCard = session.getPublicData(ID, VCARD_KEY, null);
+					case get:
+						String strvCard = session.getPublicData(ID, VCARD_KEY, null);
 
-					if (strvCard != null) {
-						result = parseXMLData(strvCard, packet);
-					} else {
-						result = packet.okResult((String) null, 1);
-					}    // end of if (vcard != null) else
+						if (strvCard != null) {
+							result = parseXMLData(strvCard, packet);
+						} else {
+							result = packet.okResult((String) null, 1);
+						}    // end of if (vcard != null) else
 
-					break;
+						break;
 
-				case set :
-					Element elvCard = packet.getElement().getChild(VCARD_EL, XMLNS);
+					case set:
+						Element elvCard = packet.getElement().getChild(VCARD_EL, XMLNS);
 
-					setVCard(session, elvCard);
-					result = packet.okResult((String) null, 0);
+						setVCard(session, elvCard);
+						result = packet.okResult((String) null, 0);
 
-					break;
+						break;
 
-				default :
+					default:
 
-				// Ignore all others...
+						// Ignore all others...
 				}
 				if (result != null) {
 					result.setPacketTo(session.getConnectionId());
@@ -173,16 +159,17 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 				// This should not happen unless somebody sends a result vcard packet
 				// to the server itself
 				log.warning("This should not happen, unless this is a vcard result packet " +
-						"sent to the server, which should not happen: " + packet);
+									"sent to the server, which should not happen: " + packet);
 			} catch (NotAuthorizedException ex) {
-				log.warning("Received vCard request but user session is not authorized yet: " +
-						packet);
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You must authorize session first.", true));
+				log.warning("Received vCard request but user session is not authorized yet: " + packet);
+				results.offer(
+						Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.",
+																		true));
 			} catch (TigaseDBException ex) {
 				log.log(Level.WARNING, "Database problem, please contact admin: " + ex, ex);
 				results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-						"Database access problem, please contact administrator.", true));
+																					 "Database access problem, please contact administrator.",
+																					 true));
 			}
 		} else {
 
@@ -197,7 +184,6 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param repo
 	 * @param results
@@ -206,13 +192,11 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings)
-					throws PacketErrorTypeException {
+	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results,
+										 Map<String, Object> settings) throws PacketErrorTypeException {
 		if (packet.getType() == StanzaType.get) {
 			try {
-				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID,
-						VCARD_KEY, null);
+				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, VCARD_KEY, null);
 
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
@@ -220,8 +204,7 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 					results.offer(packet.okResult((String) null, 1));
 				}    // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
-				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-						"User not found", true));
+				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "User not found", true));
 			}    // end of try-catch
 		} else {
 
@@ -234,7 +217,6 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
@@ -242,15 +224,14 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	 * @param settings
 	 */
 	@Override
-	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+										   Queue<Packet> results, Map<String, Object> settings) {
 
 		// TODO: Hm, the server vCard should be sent here, not yet implemented....
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param packet
 	 * @param session
@@ -261,12 +242,11 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processToUserPacket(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-					throws PacketErrorTypeException {
+	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+									Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
 		processNullSessionPacket(packet, repo, results, settings);
-		if ((session != null) && session.isAuthorized() && (packet.getType() != StanzaType
-				.get)) {
+		if ((session != null) && session.isAuthorized() && (packet.getType() != StanzaType.get)) {
 			try {
 				JID conId = session.getConnectionId(packet.getStanzaTo());
 
@@ -285,7 +265,7 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 				// This should not happen unless somebody sends a result vcard packet
 				// to the server itself
 				log.warning("This should not happen, unless this is a vcard result packet " +
-						"sent to the server, which should not happen: " + packet);
+									"sent to the server, which should not happen: " + packet);
 			}
 		}
 	}
@@ -293,10 +273,11 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	@Override
 	protected String getVCardXMLNS() {
 		return XMLNS;
-	}	
-	
+	}
+
 	@Override
-	protected void storeVCard(XMPPResourceConnection session, Element elvCard) throws TigaseDBException, NotAuthorizedException {
+	protected void storeVCard(XMPPResourceConnection session, Element elvCard)
+			throws TigaseDBException, NotAuthorizedException {
 		if (elvCard != null && elvCard.getChildren() != null) {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("Adding vCard: " + elvCard);
@@ -308,15 +289,15 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 			}
 			session.removePublicData(ID, VCARD_KEY);
 		}    // end of else		
-	}	
-	
+	}
+
 	private Packet parseXMLData(String data, Packet packet) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
 
 		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 
-		Queue<Element> elems  = domHandler.getParsedElements();
-		Packet         result = packet.okResult((Element) null, 0);
+		Queue<Element> elems = domHandler.getParsedElements();
+		Packet result = packet.okResult((Element) null, 0);
 
 		result.setPacketFrom(null);
 		result.setPacketTo(null);
@@ -326,5 +307,5 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 
 		return result;
 	}
-	
+
 }

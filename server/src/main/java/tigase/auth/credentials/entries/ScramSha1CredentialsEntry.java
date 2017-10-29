@@ -27,12 +27,12 @@ import tigase.kernel.beans.Bean;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-public class ScramSha1CredentialsEntry extends ScramCredentialsEntry {
+public class ScramSha1CredentialsEntry
+		extends ScramCredentialsEntry {
 
 	private static final String ALGORITHM = "SHA1";
 
-	public ScramSha1CredentialsEntry(PlainCredentialsEntry entry)
-			throws NoSuchAlgorithmException, InvalidKeyException {
+	public ScramSha1CredentialsEntry(PlainCredentialsEntry entry) throws NoSuchAlgorithmException, InvalidKeyException {
 		super("SHA-1", entry);
 	}
 
@@ -40,17 +40,9 @@ public class ScramSha1CredentialsEntry extends ScramCredentialsEntry {
 		super("SHA-1", salt, iterations, saltedPassword);
 	}
 
-	@Bean(name = "SCRAM-SHA-1", parent = CredentialsEncoderBean.class, active = true)
-	public static class Encoder extends ScramCredentialsEntry.Encoder {
-
-		public Encoder() {
-			super(ALGORITHM);
-		}
-
-	}
-
 	@Bean(name = "SCRAM-SHA-1", parent = CredentialsDecoderBean.class, active = true)
-	public static class Decoder extends ScramCredentialsEntry.Decoder {
+	public static class Decoder
+			extends ScramCredentialsEntry.Decoder {
 
 		public Decoder() {
 			super(ALGORITHM);
@@ -60,5 +52,15 @@ public class ScramSha1CredentialsEntry extends ScramCredentialsEntry {
 		protected Credentials.Entry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
 			return new ScramSha1CredentialsEntry(salt, iterations, saltedPassword);
 		}
+	}
+
+	@Bean(name = "SCRAM-SHA-1", parent = CredentialsEncoderBean.class, active = true)
+	public static class Encoder
+			extends ScramCredentialsEntry.Encoder {
+
+		public Encoder() {
+			super(ALGORITHM);
+		}
+
 	}
 }

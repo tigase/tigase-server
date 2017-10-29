@@ -29,18 +29,22 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * Common activator which should be extended by any OSGi module which will be
- * used by Tigase XMPP Server in OSGi mode.
- *
+ * Common activator which should be extended by any OSGi module which will be used by Tigase XMPP Server in OSGi mode.
+ * <p>
  * Created by andrzej on 08.09.2016.
  */
-public abstract class AbstractActivator implements BundleActivator, ServiceListener {
+public abstract class AbstractActivator
+		implements BundleActivator, ServiceListener {
 
 	private static final Logger log = Logger.getLogger(Activator.class.getCanonicalName());
+	private static Predicate<Class> PUBLIC_AND_NOT_ABSTRACT = (cls -> {
+		int mod = cls.getModifiers();
+		return !Modifier.isAbstract(mod) && Modifier.isPublic(mod);
+	});
 	protected Set<Class<?>> classesToExport = null;
 	private BundleContext context = null;
-	private ServiceReference serviceReference = null;
 	private ModulesManager serviceManager = null;
+	private ServiceReference serviceReference = null;
 
 	@Override
 	public void start(BundleContext bc) throws Exception {
@@ -75,8 +79,7 @@ public abstract class AbstractActivator implements BundleActivator, ServiceListe
 				serviceManager = (ModulesManager) context.getService(serviceReference);
 				registerAddons();
 			}
-		}
-		else if (event.getType() == ServiceEvent.UNREGISTERING) {
+		} else if (event.getType() == ServiceEvent.UNREGISTERING) {
 			if (serviceReference == event.getServiceReference()) {
 				unregisterAddons();
 				context.ungetService(serviceReference);
@@ -89,9 +92,12 @@ public abstract class AbstractActivator implements BundleActivator, ServiceListe
 	private void registerAddons() {
 		if (serviceManager != null) {
 			if (classesToExport == null) {
-				classesToExport = ClassUtil.getClassesFromBundle(context.getBundle()).stream().filter(PUBLIC_AND_NOT_ABSTRACT).collect(Collectors.toSet());
+				classesToExport = ClassUtil.getClassesFromBundle(context.getBundle())
+						.stream()
+						.filter(PUBLIC_AND_NOT_ABSTRACT)
+						.collect(Collectors.toSet());
 			}
-			classesToExport.forEach( cls -> serviceManager.registerClass(cls) );
+			classesToExport.forEach(cls -> serviceManager.registerClass(cls));
 			serviceManager.update();
 		}
 	}
@@ -99,14 +105,9 @@ public abstract class AbstractActivator implements BundleActivator, ServiceListe
 	private void unregisterAddons() {
 		if (serviceManager != null) {
 			if (classesToExport != null) {
-				classesToExport.forEach( cls -> serviceManager.unregisterClass(cls) );
+				classesToExport.forEach(cls -> serviceManager.unregisterClass(cls));
 			}
 			serviceManager.update();
 		}
 	}
-
-	private static Predicate<Class> PUBLIC_AND_NOT_ABSTRACT =  (cls -> {
-			int mod = cls.getModifiers();
-			return !Modifier.isAbstract(mod) && Modifier.isPublic(mod);
-	});
 }

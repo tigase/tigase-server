@@ -24,8 +24,8 @@ import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.DataForm;
 import tigase.server.Packet;
-import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.datetime.TimestampHelper;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
@@ -34,11 +34,12 @@ import java.text.ParseException;
 
 /**
  * Implementation of parser for XEP-0313: Message Archive Management
- *
+ * <p>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamQueryParser", active = true)
-public class MAMQueryParser<Query extends tigase.xmpp.mam.Query> implements QueryParser<Query> {
+public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
+		implements QueryParser<Query> {
 
 	protected static final String MAM_XMLNS = "urn:xmpp:mam:1";
 
@@ -53,8 +54,9 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query> implements Quer
 
 		query.setId(queryEl.getAttributeStaticStr("queryid"));
 
-		if (queryEl.getChild("x", "jabber:x:data") == null)
+		if (queryEl.getChild("x", "jabber:x:data") == null) {
 			return query;
+		}
 
 		if (!MAM_XMLNS.equals(DataForm.getFieldValue(queryEl, "FORM_TYPE"))) {
 			throw new ComponentException(Authorization.BAD_REQUEST, "Invalid form type");
@@ -101,7 +103,7 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query> implements Quer
 	}
 
 	protected void addField(Element x, String var, String type, String label) {
-		Element field = new Element("field", new String[] { "type", "var" }, new String[] { type, var });
+		Element field = new Element("field", new String[]{"type", "var"}, new String[]{type, var});
 		if (label != null) {
 			field.setAttribute("label", label);
 		}

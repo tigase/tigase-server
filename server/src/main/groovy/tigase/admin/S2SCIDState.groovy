@@ -27,11 +27,13 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.server.xmppserver.*
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.xmppserver.CID
+import tigase.server.xmppserver.CIDConnections
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -53,15 +55,15 @@ if (cid == null) {
 	Command.addInstructions(result, "Fill out this form to get S2S connection state")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, CID_KEY, cid ?: "", "text-single",
-			"S2S connection CID")
+						  "S2S connection CID")
 
 	return result
 }
 
-def conns = []
-def cidConns = (Map)cidConnections
+def conns = [ ]
+def cidConns = (Map) cidConnections
 
 CID c = new CID(cid)
 CIDConnections con = cidConns.get(c)

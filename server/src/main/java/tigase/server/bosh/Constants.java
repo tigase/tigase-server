@@ -18,22 +18,21 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.bosh;
 
 import java.util.logging.Level;
 
 /**
  * Describe class Constants here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Jun  5 22:22:09 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class Constants {
+
 	/** Field description */
 	public static final String BOSH_VERSION = "1.6";
 
@@ -56,14 +55,13 @@ public abstract class Constants {
 	protected static final String BODY_EL_NAME = "body";
 
 	/** Field description */
-	protected static final String[] BODY_EL_PATH = { "body" };
+	protected static final String[] BODY_EL_PATH = {"body"};
 
 	/** Field description */
 	protected static final long BOSH_SESSION_CLOSE_DELAY_DEF_VAL = 0;
 
 	/** Field description */
-	protected static final String BOSH_SESSION_CLOSE_DELAY_PROP_KEY =
-		"bosh-session-close-delay";
+	protected static final String BOSH_SESSION_CLOSE_DELAY_PROP_KEY = "bosh-session-close-delay";
 
 	/** Field description */
 	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
@@ -101,10 +99,11 @@ public abstract class Constants {
 	/** Field description */
 	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
 
-	/** Name of custom attribute to pass name of host to which 
-	 * BOSH connection is established */
+	/**
+	 * Name of custom attribute to pass name of host to which BOSH connection is established
+	 */
 	protected static final String HOST_ATTR = "host";
-	
+
 	/** Field description */
 	protected static final String INACTIVITY_ATTR = "inactivity";
 
@@ -132,9 +131,9 @@ public abstract class Constants {
 
 	/** Field description */
 	protected static final long MAX_PAUSE_PROP_VAL = 10;
-	
+
 	protected static final String MAX_SESSION_WAITING_PACKETS_KEY = "max-session-waiting-packets";
-	
+
 	protected static final int MAX_SESSION_WAITING_PACKETS_VAL = 100;
 
 	/** Field description */
@@ -169,10 +168,10 @@ public abstract class Constants {
 
 	/** Field description */
 	protected static final String SECURE_ATTR = "secure";
-	
-	/**	Field description */
+
+	/** Field description */
 	protected static final String SEND_NODE_HOSTNAME_KEY = "send-node-hostname";
-	
+
 	/** Field description */
 	protected static final boolean SEND_NODE_HOSTNAME_VAL = true;
 
@@ -197,15 +196,19 @@ public abstract class Constants {
 	protected static final String SID_LOGGER_KEY = "sid-logger-level";
 	protected static final String SID_LOGGER_VAL = Level.OFF.toString();
 
-
 	//~--- constant enums -------------------------------------------------------
 
 	/**
 	 * Enum description
-	 *
 	 */
 	protected enum CacheAction {
-		on, off, set, add, get, get_all, remove;
+		on,
+		off,
+		set,
+		add,
+		get,
+		get_all,
+		remove;
 	}
 
 //protected static final String CACHE_ON = "on";
@@ -216,6 +219,5 @@ public abstract class Constants {
 //protected static final String CACHE_GET_ALL = "get-all";
 //protected static final String CACHE_REMOVE = "remove";
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/16

@@ -16,42 +16,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- */package tigase.stats;
+ */
+package tigase.stats;
 
 import java.util.logging.Level;
- 
+
 /**
- *
  * @author andrzej
  */
 public class CounterValue {
 
-	protected String name;
 	protected final Level level;
-	
 	protected long counter = 0;
+	protected String name;
 
 	public CounterValue(String name, Level level) {
 		this.name = name;
 		this.level = level;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public void inc() {
 		++counter;
 	}
-	
+
 	public Level getLevel() {
 		return level;
 	}
-	
+
 	public long getValue() {
 		return counter;
 	}

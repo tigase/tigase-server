@@ -23,19 +23,20 @@ import tigase.kernel.core.Kernel;
 
 /**
  * Interface used by bean configurators to detect is additional beans should be registered
- *
+ * <p>
  * Created by andrzej on 10.03.2016.
  */
 public interface BeanSelector {
 
 	/**
-	 * Method needs to return true if bean in which annotation class implementing this interface is specified
-	 * and this bean should be registered
+	 * Method needs to return true if bean in which annotation class implementing this interface is specified and this
+	 * bean should be registered
 	 *
 	 * @param clazz
 	 * @param kernel
+	 *
 	 * @return
 	 */
 	boolean shouldRegister(Class clazz, Kernel kernel);
-	
+
 }

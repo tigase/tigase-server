@@ -27,5 +27,6 @@ package tigase.server;
  * @version $Rev$
  */
 public enum QueueType {
-	IN_QUEUE, OUT_QUEUE;
+	IN_QUEUE,
+	OUT_QUEUE;
 }

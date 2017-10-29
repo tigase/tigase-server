@@ -33,8 +33,34 @@ public class CmdAcl {
 
 	public static final CmdAcl ADMIN = new CmdAcl(Type.ADMIN.name());
 
-	private final Type type;
+	public enum Type {
+		/**
+		 * Everybody can execute the command, even users from a different servers.
+		 */
+		ALL,
+		/**
+		 * Only local server administrators can execute command.
+		 */
+		ADMIN,
+		/**
+		 * Only users who have accounts on this local server can execute the command.
+		 */
+		LOCAL,
+		/**
+		 * Only users who have an account within the given domain can execute the command.
+		 */
+		DOMAIN,
+		/**
+		 * Comma separated list of JIDs of users who can execute the command.
+		 */
+		JID,
+		/**
+		 * No one is allowed to execute the command, even server administrators!
+		 */
+		NONE;
+	}
 	private final BareJID jid;
+	private final Type type;
 
 	public CmdAcl(String value) {
 		switch (value) {
@@ -99,37 +125,8 @@ public class CmdAcl {
 		}
 	}
 
-	public enum Type {
-		/**
-		 * Everybody can execute the command, even users from a different servers.
-		 */
-		ALL,
-		/**
-		 * Only local server administrators can execute command.
-		 */
-		ADMIN,
-		/**
-		 * Only users who have accounts on this local server can execute the command.
-		 */
-		LOCAL,
-		/**
-		 * Only users who have an account within the given domain can execute the command.
-		 */
-		DOMAIN,
-		/**
-		 * Comma separated list of JIDs of users who can execute the command.
-		 */
-		JID,
-		/**
-		 * No one is allowed to execute the command, even server administrators!
-		 */
-		NONE;
-	}
-
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

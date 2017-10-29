@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -43,9 +41,8 @@ import java.util.logging.Logger;
 //~--- JDK imports ------------------------------------------------------------
 
 /**
- * XEP-0039: Statistics Gathering.
- * http://www.xmpp.org/extensions/xep-0039.html
- *
+ * XEP-0039: Statistics Gathering. http://www.xmpp.org/extensions/xep-0039.html
+ * <p>
  * Created: Sat Mar 25 06:45:00 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -53,37 +50,34 @@ import java.util.logging.Logger;
  */
 @Bean(name = JabberIqStats.ID, parent = SessionManager.class, active = true)
 public class JabberIqStats
-				extends XMPPProcessor
-				implements XMPPProcessorIfc {
-	private static final String[][] ELEMENTS = {
-		Iq.IQ_QUERY_PATH, Iq.IQ_COMMAND_PATH
-	};
-	private static final Logger     log = Logger.getLogger(JabberIqStats.class.getName());
-	private static final String     XMLNS    = "http://jabber.org/protocol/stats";
-	protected static final String     ID       = XMLNS;
-	private static final String[]   XMLNSS   = { XMLNS, Command.XMLNS };
-	private static final Element[]  DISCO_FEATURES = { new Element("feature",
-			new String[] { "var" }, new String[] { XMLNS }) };
+		extends XMPPProcessor
+		implements XMPPProcessorIfc {
+
+	private static final String[][] ELEMENTS = {Iq.IQ_QUERY_PATH, Iq.IQ_COMMAND_PATH};
+	private static final Logger log = Logger.getLogger(JabberIqStats.class.getName());
+	private static final String XMLNS = "http://jabber.org/protocol/stats";
+	protected static final String ID = XMLNS;
+	private static final String[] XMLNSS = {XMLNS, Command.XMLNS};
+	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
-		if (conn == null)
+		if (conn == null) {
 			return null;
+		}
 		return super.canHandle(packet, conn);
 	}
-	
+
 	@Override
 	public String id() {
 		return ID;
 	}
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
-			Object> settings)
-					throws XMPPException {
+	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+						final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		}
@@ -92,8 +86,7 @@ public class JabberIqStats
 				log.log(Level.FINEST, "Received packet: {0}", packet);
 			}
 			if (packet.isCommand()) {
-				if ((packet.getCommand() == Command.GETSTATS) && (packet.getType() == StanzaType
-						.result)) {
+				if ((packet.getCommand() == Command.GETSTATS) && (packet.getType() == StanzaType.result)) {
 					JID conId = session.getConnectionId(packet.getStanzaTo());
 
 					if (conId == null) {
@@ -123,16 +116,14 @@ public class JabberIqStats
 			}    // end of if (packet.isCommand()
 
 			// Maybe it is message to admininstrator:
-			BareJID id = (packet.getStanzaTo() != null)
-					? packet.getStanzaTo().getBareJID()
-					: null;
+			BareJID id = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
 
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin
 			if ((id == null) || session.isLocalDomain(id.toString(), false)) {
 				String oldto = packet.getAttributeStaticStr("oldto");
-				Packet result = Command.GETSTATS.getPacket(packet.getStanzaFrom(), session
-						.getDomainAsJID(), StanzaType.get, packet.getStanzaId());
+				Packet result = Command.GETSTATS.getPacket(packet.getStanzaFrom(), session.getDomainAsJID(),
+														   StanzaType.get, packet.getStanzaId());
 
 				if (oldto != null) {
 					result.getElement().setAttribute("oldto", oldto);
@@ -173,10 +164,9 @@ public class JabberIqStats
 				}
 			}    // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("Received stats request but user session is not authorized yet: " +
-					packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			log.warning("Received stats request but user session is not authorized yet: " + packet);
+			results.offer(
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		}    // end of try-catch
 	}
 

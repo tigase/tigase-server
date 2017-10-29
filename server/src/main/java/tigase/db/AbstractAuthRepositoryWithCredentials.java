@@ -29,7 +29,8 @@ import tigase.xmpp.jid.BareJID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class AbstractAuthRepositoryWithCredentials implements AuthRepository {
+public abstract class AbstractAuthRepositoryWithCredentials
+		implements AuthRepository {
 
 	private static final Logger log = Logger.getLogger(AbstractAuthRepositoryWithCredentials.class.getCanonicalName());
 
@@ -37,7 +38,7 @@ public abstract class AbstractAuthRepositoryWithCredentials implements AuthRepos
 	private CredentialsEncoderBean credentialsEncoder;
 
 	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException  {
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
 		Credentials credentials = getCredentials(user, Credentials.DEFAULT_USERNAME);
 		if (credentials != null) {
 			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");

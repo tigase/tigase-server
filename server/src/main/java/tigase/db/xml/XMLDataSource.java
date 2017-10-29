@@ -34,8 +34,9 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 04.04.2017.
  */
-@Repository.Meta( supportedUris = {"memory://.*" } )
-public class XMLDataSource implements DataSource {
+@Repository.Meta(supportedUris = {"memory://.*"})
+public class XMLDataSource
+		implements DataSource {
 
 	private static final Logger log = Logger.getLogger(XMLDataSource.class.getCanonicalName());
 
@@ -58,8 +59,7 @@ public class XMLDataSource implements DataSource {
 		this.resource_uri = file;
 		String file_name = file;
 
-		log.log(Level.FINEST, "Initializing repository, file: {0}, params: {1}",
-				new Object[] { file, params } );
+		log.log(Level.FINEST, "Initializing repository, file: {0}, params: {1}", new Object[]{file, params});
 
 		try {
 			int idx = file.indexOf("?");

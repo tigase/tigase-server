@@ -25,22 +25,21 @@ import tigase.xmpp.rsm.RSM;
 import java.util.Date;
 
 /**
- * Class implements Query interface and is base implementation of query holder
- * used by implementation of XEP-0313: Message Archive Management
- *
+ * Class implements Query interface and is base implementation of query holder used by implementation of XEP-0313:
+ * Message Archive Management
+ * <p>
  * Created by andrzej on 21.07.2016.
  */
-public class QueryImpl implements Query {
-
-	private JID questionerJID;
-	private JID componentJID;
-
-	private String id;
-	private Date start;
-	private Date end;
-	private JID with;
+public class QueryImpl
+		implements Query {
 
 	private final RSM rsm = new RSM();
+	private JID componentJID;
+	private Date end;
+	private String id;
+	private JID questionerJID;
+	private Date start;
+	private JID with;
 
 	public QueryImpl() {
 

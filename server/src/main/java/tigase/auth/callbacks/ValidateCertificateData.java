@@ -20,11 +20,12 @@
 
 package tigase.auth.callbacks;
 
-import javax.security.auth.callback.Callback;
-
 import tigase.xmpp.jid.BareJID;
 
-public class ValidateCertificateData implements Callback {
+import javax.security.auth.callback.Callback;
+
+public class ValidateCertificateData
+		implements Callback {
 
 	private boolean authorized;
 
@@ -43,8 +44,16 @@ public class ValidateCertificateData implements Callback {
 		return authorizedID;
 	}
 
+	public void setAuthorizedID(String authorizedID) {
+		this.authorizedID = authorizedID;
+	}
+
 	public BareJID getDefaultAuthzid() {
 		return defaultAuthzid;
+	}
+
+	public void setDefaultAuthzid(BareJID defaultAuthzid) {
+		this.defaultAuthzid = defaultAuthzid;
 	}
 
 	public boolean isAuthorized() {
@@ -53,14 +62,6 @@ public class ValidateCertificateData implements Callback {
 
 	public void setAuthorized(boolean authorized) {
 		this.authorized = authorized;
-	}
-
-	public void setAuthorizedID(String authorizedID) {
-		this.authorizedID = authorizedID;
-	}
-
-	public void setDefaultAuthzid(BareJID defaultAuthzid) {
-		this.defaultAuthzid = defaultAuthzid;
 	}
 
 }

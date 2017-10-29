@@ -24,13 +24,12 @@ package tigase.server.script;
 
 import tigase.server.Iq;
 import tigase.server.Packet;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Queue;
+import tigase.stats.StatisticHolder;
 
 import javax.script.Bindings;
-import tigase.stats.StatisticHolder;
+import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -40,7 +39,8 @@ import tigase.stats.StatisticHolder;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface CommandIfc extends StatisticHolder {
+public interface CommandIfc
+		extends StatisticHolder {
 
 	/** Field description */
 	public static final String VHOST_MANAGER = "vhostMan";
@@ -80,15 +80,16 @@ public interface CommandIfc extends StatisticHolder {
 
 	/** Field description */
 	public static final String COMPONENT_NAME = "componentName";
-	
+
 	/** Field description */
 	public static final String COMPONENT = "component";
 
 	public static final String CONNECTED_NODES = "connectedNodes";
+
 	public static final String CONNECTED_NODES_WITH_LOCAL = "connectedNodesWithLocal";
-	
+
 	public static final String EVENTBUS = "eventBus";
-	
+
 	/** Field description */
 	public static final String SERVICES_MAP = "servicesMap";
 
@@ -106,7 +107,7 @@ public interface CommandIfc extends StatisticHolder {
 
 	/** Field description */
 	public static final String SCRIPT_GROUP = "AS:Group:";
-	
+
 	/** Field description */
 	public static final String LANGUAGE = "Language";
 
@@ -124,7 +125,7 @@ public interface CommandIfc extends StatisticHolder {
 
 	/** Field description */
 	public static final String GROUP = "Group";
-	
+
 	/** Field description */
 	public static final String SAVE_TO_DISK = "Save to disk";
 
@@ -139,21 +140,18 @@ public interface CommandIfc extends StatisticHolder {
 
 	/** Field description */
 	public static final String DEL_SCRIPT_CMD = "del-script";
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public Bindings getBindings();
 
 	String getCommandId();
 
 	String getDescription();
-	
+
 	String getGroup();
 
 	//~--- methods --------------------------------------------------------------
@@ -166,15 +164,13 @@ public interface CommandIfc extends StatisticHolder {
 
 	//~--- methods --------------------------------------------------------------
 
-	void runCommand(Iq packet, Bindings binds, Queue<Packet> results);
+	void setAdminOnly(boolean adminOnly);
 
 	//~--- set methods ----------------------------------------------------------
 
-	void setAdminOnly(boolean adminOnly);
+	void runCommand(Iq packet, Bindings binds, Queue<Packet> results);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

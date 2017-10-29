@@ -37,11 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Bean(name = "monitor", parent = Kernel.class, active = true)
-@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
-public class MonitorComponent extends AbstractKernelBasedComponent {
-
-	@Inject(nullAllowed = true)
-	private List<MonitorExtension> extensions = new ArrayList<>();
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
+public class MonitorComponent
+		extends AbstractKernelBasedComponent {
 
 	private final TimerTaskService timerTaskService = new TimerTaskService() {
 
@@ -55,6 +54,8 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 			MonitorComponent.this.addTimerTask(task, initialDelay, period);
 		}
 	};
+	@Inject(nullAllowed = true)
+	private List<MonitorExtension> extensions = new ArrayList<>();
 
 	@Override
 	public String getDiscoCategory() {
@@ -77,6 +78,12 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 	}
 
 	@Override
+	public void start() {
+		super.start();
+		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();
+	}
+
+	@Override
 	protected void registerModules(Kernel kernel) {
 		kernel.registerBean("runtime").asInstance(MonitorRuntime.getMonitorRuntime()).exec();
 		kernel.registerBean(TasksScriptRegistrar.class).exec();
@@ -95,11 +102,5 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 		kernel.registerBean("bindings").asInstance(scriptEngineManager.getBindings()).exec();
 
 		kernel.registerBean("timerTaskService").asInstance(timerTaskService).exec();
-	}
-	
-	@Override
-	public void start() {
-		super.start();
-		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();
 	}
 }

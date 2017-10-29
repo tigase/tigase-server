@@ -28,17 +28,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author andrzej
  */
-public class S2SConnectionManagerDomainServerNameMapperTest extends TestCase {
+public class S2SConnectionManagerDomainServerNameMapperTest
+		extends TestCase {
 
 	private static final Logger log = TestLogger.getLogger(S2SConnectionManagerDomainServerNameMapperTest.class);
 
 	@Test
 	public void testSortingOfMappings() {
 		DomainServerNameMapper mapper = new DomainServerNameMapper();
-		
+
 		// adding mapping entries
 		mapper.addEntry("*", "test1");
 		mapper.addEntry("*.local", "test2");
@@ -48,9 +48,9 @@ public class S2SConnectionManagerDomainServerNameMapperTest extends TestCase {
 		mapper.addEntry("local", "test6");
 		mapper.addEntry("test1.test", "test7");
 		mapper.addEntry("test1.test.local", "test8");
-		
+
 		log.log(Level.FINE, mapper.toString());
-		
+
 		// checking assertions to make sure that due to sorting of mappings
 		// mappings are used in proper order
 		assertEquals("test1", mapper.getServerNameForDomain("tigase.org"));
@@ -63,5 +63,5 @@ public class S2SConnectionManagerDomainServerNameMapperTest extends TestCase {
 		assertEquals("test7", mapper.getServerNameForDomain("test1.test"));
 		assertEquals("test8", mapper.getServerNameForDomain("test1.test.local"));
 	}
-	
+
 }

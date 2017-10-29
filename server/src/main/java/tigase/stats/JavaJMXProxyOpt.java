@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -42,47 +40,46 @@ import java.util.logging.Logger;
  * @author Artur Hefczyc Created Jun 3, 2011
  */
 public class JavaJMXProxyOpt
-				implements NotificationListener {
+		implements NotificationListener {
+
 	private static final Logger log = Logger.getLogger(JavaJMXProxyOpt.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private int                             cpuNo              = 0;
-	private long                            delay              = -1;
-	private Map<String, LinkedList<Object>> history            = null;
-	private String                          hostname           = null;
-	private String                          id                 = null;
-	private long                            interval           = -1;
-	private JMXConnector                    jmxc               = null;
-	private JMXServiceURL                   jmxUrl             = null;
-	private Date                            lastDisconnectTime = null;
-	private String                          password           = null;
-	private int                             port               = -1;
-	private MBeanServerConnection           server             = null;
-	private String                          sysDetails         = "No data yet...";
-	private StatisticsProviderMBean         tigBean            = null;
-	private StatisticsUpdater               updater            = null;
-	private String                          urlPath            = null;
-	private String                          userName           = null;
-	private Set<String>                     metrics            =
-			new LinkedHashSet<String>();
-	private boolean                         loadHistory        = false;
-	private List<JMXProxyListenerOpt>       listeners =
-			new LinkedList<JMXProxyListenerOpt>();
-	private boolean                         initialized        = false;
+	private int cpuNo = 0;
+	private long delay = -1;
+	private Map<String, LinkedList<Object>> history = null;
+	private String hostname = null;
+	private String id = null;
+	private boolean initialized = false;
+	private long interval = -1;
+	private JMXServiceURL jmxUrl = null;
+	private JMXConnector jmxc = null;
+	private Date lastDisconnectTime = null;
+	private List<JMXProxyListenerOpt> listeners = new LinkedList<JMXProxyListenerOpt>();
+	private boolean loadHistory = false;
+	private Set<String> metrics = new LinkedHashSet<String>();
+	private String password = null;
+	private int port = -1;
+	private MBeanServerConnection server = null;
+	private String sysDetails = "No data yet...";
+	private StatisticsProviderMBean tigBean = null;
+	private StatisticsUpdater updater = null;
+	private String urlPath = null;
+	private String userName = null;
 
 	//~--- constructors ---------------------------------------------------------
 
-	public JavaJMXProxyOpt(String id, String hostname, int port, String userName,
-			String password, long delay, long interval, boolean loadHistory) {
-		this.id          = id;
-		this.hostname    = hostname;
-		this.port        = port;
-		this.userName    = userName;
-		this.password    = password;
-		this.delay       = delay;
-		this.interval    = interval;
-		this.urlPath     = "/jndi/rmi://" + this.hostname + ":" + this.port + "/jmxrmi";
+	public JavaJMXProxyOpt(String id, String hostname, int port, String userName, String password, long delay,
+						   long interval, boolean loadHistory) {
+		this.id = id;
+		this.hostname = hostname;
+		this.port = port;
+		this.userName = userName;
+		this.password = password;
+		this.delay = delay;
+		this.interval = interval;
+		this.urlPath = "/jndi/rmi://" + this.hostname + ":" + this.port + "/jmxrmi";
 		this.loadHistory = loadHistory;
 		System.out.println("Created: " + id + ":" + hostname + ":" + port);
 	}
@@ -104,8 +101,8 @@ public class JavaJMXProxyOpt
 	public void connect() throws Exception {
 		this.jmxUrl = new JMXServiceURL("rmi", "", 0, this.urlPath);
 
-		String[]                userCred = new String[] { userName, password };
-		HashMap<String, Object> env      = new HashMap<String, Object>();
+		String[] userCred = new String[]{userName, password};
+		HashMap<String, Object> env = new HashMap<String, Object>();
 
 		env.put(JMXConnector.CREDENTIALS, userCred);
 		jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
@@ -122,17 +119,17 @@ public class JavaJMXProxyOpt
 
 				ObjectName obn = new ObjectName(StatisticsCollector.STATISTICS_MBEAN_NAME);
 
-				tigBean = MBeanServerInvocationHandler.newProxyInstance(server, obn,
-						StatisticsProviderMBean.class, false);
+				tigBean = MBeanServerInvocationHandler.newProxyInstance(server, obn, StatisticsProviderMBean.class,
+																		false);
 				if (history == null) {
 					if (loadHistory) {
 						String[] metrics_arr = metrics.toArray(new String[metrics.size()]);
 
 						history = tigBean.getStatsHistory(metrics_arr);
-						System.out.println(hostname + " loaded history, size: " + (((history !=
-								null) && (history.get(metrics_arr[0]) != null))
-								? history.get(metrics_arr[0]).size()
-								: "null"));
+						System.out.println(hostname + " loaded history, size: " +
+												   (((history != null) && (history.get(metrics_arr[0]) != null))
+													? history.get(metrics_arr[0]).size()
+													: "null"));
 					} else {
 						System.out.println(hostname + " loading history switched off.");
 					}
@@ -158,8 +155,8 @@ public class JavaJMXProxyOpt
 			return;
 		}
 		if (notification.getType().equals(JMXConnectionNotification.CLOSED)) {
-			server             = null;
-			tigBean            = null;
+			server = null;
+			tigBean = null;
 			lastDisconnectTime = new Date();
 			for (JMXProxyListenerOpt jMXProxyListener : listeners) {
 				jMXProxyListener.disconnected(id);
@@ -190,8 +187,7 @@ public class JavaJMXProxyOpt
 				cpuNo = tigBean.getCPUsNumber();
 			}
 
-			Map<String, Object> curMetrics = tigBean.getCurStats(metrics.toArray(
-					new String[metrics.size()]));
+			Map<String, Object> curMetrics = tigBean.getCurStats(metrics.toArray(new String[metrics.size()]));
 
 			if (null == history) {
 				return;
@@ -206,7 +202,7 @@ public class JavaJMXProxyOpt
 					}
 				}
 			}
-			sysDetails  = tigBean.getSystemDetails();
+			sysDetails = tigBean.getSystemDetails();
 			initialized = true;
 		}
 	}
@@ -266,20 +262,20 @@ public class JavaJMXProxyOpt
 
 		if (result != null) {
 			switch (DataTypes.decodeTypeIdFromName(key)) {
-			case 'I' :
-				return result.toArray(new Integer[result.size()]);
+				case 'I':
+					return result.toArray(new Integer[result.size()]);
 
-			case 'L' :
-				return result.toArray(new Long[result.size()]);
+				case 'L':
+					return result.toArray(new Long[result.size()]);
 
-			case 'F' :
-				return result.toArray(new Float[result.size()]);
+				case 'F':
+					return result.toArray(new Float[result.size()]);
 
-			case 'D' :
-				return result.toArray(new Double[result.size()]);
+				case 'D':
+					return result.toArray(new Double[result.size()]);
 
-			default :
-				return result.toArray(new String[result.size()]);
+				default:
+					return result.toArray(new String[result.size()]);
 			}
 		}
 
@@ -301,6 +297,7 @@ public class JavaJMXProxyOpt
 	//~--- inner classes --------------------------------------------------------
 
 	private class StatisticsUpdater {
+
 		private Timer updateTimer = null;
 
 		//~--- constructors -------------------------------------------------------
@@ -329,15 +326,14 @@ public class JavaJMXProxyOpt
 						String disconnected = "";
 
 						if (lastDisconnectTime != null) {
-							long disconnectedInterval = (System.currentTimeMillis() - lastDisconnectTime
-									.getTime()) / (1000 * 60);
+							long disconnectedInterval =
+									(System.currentTimeMillis() - lastDisconnectTime.getTime()) / (1000 * 60);
 
-							disconnected = ", disconnected: " + lastDisconnectTime + ", " +
-									disconnectedInterval + " minutes ago.";
+							disconnected = ", disconnected: " + lastDisconnectTime + ", " + disconnectedInterval +
+									" minutes ago.";
 						}
-						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds{3}", new Object[] {
-								cause.getMessage(),
-								hostname, interval / 1000, disconnected });
+						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds{3}",
+								new Object[]{cause.getMessage(), hostname, interval / 1000, disconnected});
 
 						// log.log(Level.FINEST, e.getMessage(), e);
 					} catch (Exception e) {
@@ -348,6 +344,5 @@ public class JavaJMXProxyOpt
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/09/21

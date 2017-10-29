@@ -22,12 +22,13 @@ package tigase.stats;
 import java.util.logging.Level;
 
 /**
- *
  * @author andrzej
  */
-public class StatisticHolderImpl extends Counter implements StatisticHolder {
-	
-//	private String prefix = null;
+public class StatisticHolderImpl
+		extends Counter
+		implements StatisticHolder {
+
+	//	private String prefix = null;
 //	
 //	private long last_hour_packets = 0;
 //	private long last_minute_packets = 0;
@@ -36,32 +37,31 @@ public class StatisticHolderImpl extends Counter implements StatisticHolder {
 //	private long packets_per_minute = 0;
 //	private long packets_per_second = 0;
 //	private long requestsOk = 0;
-	private long avgProcessingTime = 0;		
-	
+	private long avgProcessingTime = 0;
+
 	public StatisticHolderImpl() {
 		super("NULL", Level.FINEST);
 	}
-	
+
 	public StatisticHolderImpl(String name) {
 		super(name, Level.FINEST);
-	}	
+	}
 
 	@Override
 	public void statisticExecutedIn(long executionTime) {
 		avgProcessingTime = (avgProcessingTime + executionTime) / 2;
 		inc();
 	}
-	
+
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
 		super.getStatistics(compName, list);
-		list.add(compName, getName() +"/Average processing time", avgProcessingTime, Level.FINE);
-	}	
-	
+		list.add(compName, getName() + "/Average processing time", avgProcessingTime, Level.FINE);
+	}
+
 	@Override
 	public void setStatisticsPrefix(String prefix) {
 		setName(prefix);
 	}
-	
-	
+
 }

@@ -22,9 +22,11 @@ package tigase.eventbus.impl;
 
 import tigase.eventbus.EventSourceListener;
 
-public class ObjectEventsSourceListenerHandler extends AbstractListenerHandler<EventSourceListener> {
+public class ObjectEventsSourceListenerHandler
+		extends AbstractListenerHandler<EventSourceListener> {
 
-	public ObjectEventsSourceListenerHandler(final String packageName, final String eventName, EventSourceListener listener) {
+	public ObjectEventsSourceListenerHandler(final String packageName, final String eventName,
+											 EventSourceListener listener) {
 		super(packageName, eventName, listener);
 	}
 

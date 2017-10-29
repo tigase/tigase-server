@@ -29,13 +29,13 @@ AS:Component: cl-comp
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.server.xmppserver.*
+import tigase.server.Command
+import tigase.server.Packet
 
-Map services = (Map)servicesMap
+Map services = (Map) servicesMap
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 

@@ -27,7 +27,9 @@ import tigase.kernel.core.Kernel;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
-import tigase.xmpp.*;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -37,27 +39,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author andrzej
  */
-public abstract class ProcessorTestCase  {
+public abstract class ProcessorTestCase {
 
 	private static final Logger log = TestLogger.getLogger(ProcessorTestCase.class);
-	
-	private SessionManagerHandler loginHandler;
 	private Kernel kernel;
+	private SessionManagerHandler loginHandler;
 	private XMLRepository repository;
-	
+
 	//@Override
 	public void setUp() throws Exception {
 		kernel = new Kernel();
 		String xmlRepositoryURI = "memory://xmlRepo?autoCreateUser=true";
 		repository = new XMLRepository();
-		repository.initRepository( xmlRepositoryURI, null );
+		repository.initRepository(xmlRepositoryURI, null);
 		registerBeans(kernel);
 		loginHandler = new SessionManagerHandlerImpl();
 	}
-	
+
 	//@Override
 	public void tearDown() throws Exception {
 		loginHandler = null;
@@ -78,70 +78,74 @@ public abstract class ProcessorTestCase  {
 	protected void registerBeans(Kernel kernel) {
 		kernel.registerBean("repository").asInstance(repository).exec();
 	}
-	
-	protected XMPPResourceConnection getSession(JID connId, JID userJid) throws NotAuthorizedException, TigaseStringprepException {
-		XMPPResourceConnection conn = new XMPPResourceConnection( connId, (UserRepository) repository, (AuthRepository) repository, loginHandler );
+
+	protected XMPPResourceConnection getSession(JID connId, JID userJid)
+			throws NotAuthorizedException, TigaseStringprepException {
+		XMPPResourceConnection conn = new XMPPResourceConnection(connId, (UserRepository) repository,
+																 (AuthRepository) repository, loginHandler);
 		VHostItem vhost = new VHostItem();
-		vhost.setVHost( userJid.getDomain() );
-		conn.setDomain( vhost );
-		conn.authorizeJID( userJid.getBareJID(), false );
-		conn.setResource( userJid.getResource() );
+		vhost.setVHost(userJid.getDomain());
+		conn.setDomain(vhost);
+		conn.authorizeJID(userJid.getBareJID(), false);
+		conn.setResource(userJid.getResource());
 
 		return conn;
-	}	
+	}
 
-	private class SessionManagerHandlerImpl implements SessionManagerHandler {
+	private class SessionManagerHandlerImpl
+			implements SessionManagerHandler {
+
+		Map<BareJID, XMPPSession> sessions = new HashMap<BareJID, XMPPSession>();
 
 		public SessionManagerHandlerImpl() {
 		}
-		Map<BareJID, XMPPSession> sessions = new HashMap<BareJID, XMPPSession>();
 
 		@Override
 		public JID getComponentId() {
-			return JID.jidInstanceNS( "sess-man@localhost" );
+			return JID.jidInstanceNS("sess-man@localhost");
 		}
 
 		@Override
-		public void handleLogin( BareJID userId, XMPPResourceConnection conn ) {
-			XMPPSession session = sessions.get( userId );
-			if ( session == null ){
-				session = new XMPPSession( userId.getLocalpart() );
-				sessions.put( userId, session );
+		public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
+			XMPPSession session = sessions.get(userId);
+			if (session == null) {
+				session = new XMPPSession(userId.getLocalpart());
+				sessions.put(userId, session);
 			}
 			try {
-				session.addResourceConnection( conn );
-			} catch ( TigaseStringprepException ex ) {
-				log.log( Level.SEVERE, null, ex );
+				session.addResourceConnection(conn);
+			} catch (TigaseStringprepException ex) {
+				log.log(Level.SEVERE, null, ex);
 			}
 		}
 
 		@Override
-		public void handleLogout( BareJID userId, XMPPResourceConnection conn ) {
-			XMPPSession session = sessions.get( conn );
-			if ( session != null ){
-				session.removeResourceConnection( conn );
-				if ( session.getActiveResourcesSize() == 0 ){
-					sessions.remove( userId );
+		public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
+			XMPPSession session = sessions.get(conn);
+			if (session != null) {
+				session.removeResourceConnection(conn);
+				if (session.getActiveResourcesSize() == 0) {
+					sessions.remove(userId);
 				}
 			}
 		}
 
 		@Override
-		public void handlePresenceSet( XMPPResourceConnection conn ) {
+		public void handlePresenceSet(XMPPResourceConnection conn) {
 		}
 
 		@Override
-		public void handleResourceBind( XMPPResourceConnection conn ) {
+		public void handleResourceBind(XMPPResourceConnection conn) {
 		}
 
 		@Override
-		public boolean isLocalDomain( String domain, boolean includeComponents ) {
-			return !domain.contains( "-ext" );
+		public boolean isLocalDomain(String domain, boolean includeComponents) {
+			return !domain.contains("-ext");
 		}
 
 		@Override
 		public void handleDomainChange(String domain, XMPPResourceConnection conn) {
 		}
 	}
-	
+
 }

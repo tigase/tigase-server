@@ -42,88 +42,46 @@ import java.util.logging.Logger;
 import static tigase.db.beans.MDPoolBean.*;
 
 /**
- * Base class for configuration beans of {@link tigase.db.beans.DataSourceBean},
- * {@link tigase.db.beans.AuthRepositoryMDPoolBean} and {@link tigase.db.beans.UserRepositoryMDPoolBean}
- *
+ * Base class for configuration beans of {@link tigase.db.beans.DataSourceBean}, {@link
+ * tigase.db.beans.AuthRepositoryMDPoolBean} and {@link tigase.db.beans.UserRepositoryMDPoolBean}
+ * <p>
  * Created by andrzej on 08.03.2016.
  */
-public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implements Initializable, ConfigurationChangedAware, RegistrarBean {
+public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
+		implements Initializable, ConfigurationChangedAware, RegistrarBean {
 
 	private static final Logger log = Logger.getLogger(MDPoolConfigBean.class.getCanonicalName());
-
-	@Inject
-	protected MDPoolBean<A,B> mdPool;
-
-	@Inject(bean = "instance", nullAllowed = true)
-	private A repository;
-
-	@Inject(nullAllowed = true)
-	private Set<A> instances;
-
-	private Kernel kernel;
-
-	@ConfigField(desc = "Name (ie. domain)")
-	protected String name;
-
-	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
-	protected String uri;
-
 	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
 	protected String cls;
-
-	@ConfigField(alias = POOL_SIZE, desc = "Pool size", allowAliasFromParent = false)
-	protected int poolSize = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
-
+	@Inject
+	protected MDPoolBean<A, B> mdPool;
+	@ConfigField(desc = "Name (ie. domain)")
+	protected String name;
 	@ConfigField(alias = POOL_CLASS, desc = "Class implementing repository pool", allowAliasFromParent = false)
 	protected String poolCls;
-
+	@ConfigField(alias = POOL_SIZE, desc = "Pool size", allowAliasFromParent = false)
+	protected int poolSize = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
+	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
+	protected String uri;
+	@Inject(nullAllowed = true)
+	private Set<A> instances;
+	private Kernel kernel;
+	@Inject(bean = "instance", nullAllowed = true)
+	private A repository;
 	private boolean skipInitializationErrors = false;
-
-	/**
-	 * Get interface to which instances initialized by this config bean must conform to.
-	 * @return interface
-	 */
-	protected abstract Class<? extends A> getRepositoryIfc();
-
-	/**
-	 * Get name of a pool which should be used if any.
-	 * @return class name
-	 * @throws DBInitException
-	 */
-	protected abstract String getRepositoryPoolClassName() throws DBInitException;
-
-	/**
-	 * Method used to initialize provided instance
-	 * @param repo
-	 * @throws RepositoryException
-	 */
-	protected abstract void initRepository(A repo) throws RepositoryException;
-
-	/**
-	 * Get class name to initialize as repository
-	 * @return
-	 * @throws DBInitException
-	 */
-	protected String getRepositoryClassName() throws DBInitException {
-		if (cls != null)
-			return cls;
-		return RepositoryFactory.getRepoClassName(getRepositoryIfc(), uri);
-	}
-
-	protected String getUri() {
-		return uri;
-	}
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		// name not set yet - skip initialization
-		if (name == null || getUri() == null || kernel == null)
+		if (name == null || getUri() == null || kernel == null) {
 			return;
+		}
 
 		try {
 			String cls = getRepositoryClassName();
-			if (cls == null)
+			if (cls == null) {
 				return;
+			}
 
 			Class<?> repoClass = ModulesManagerImpl.getInstance().forName(cls);
 			String poolCls = getRepositoryPoolClassName();
@@ -131,8 +89,9 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 			Kernel.DelayedDependencyInjectionQueue queue = kernel.beginDependencyDelayedInjection();
 
 			if (poolCls == null) {
-				if (repository == null || changedFields.contains("poolCls"))
+				if (repository == null || changedFields.contains("poolCls")) {
 					kernel.registerBean("instance").asClass(repoClass).exec();
+				}
 			} else {
 				if (repository == null || changedFields.contains("poolCls") || changedFields.contains("poolSize")) {
 					Class<?> poolClass = ModulesManagerImpl.getInstance().forName(poolCls);
@@ -146,8 +105,9 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 			}
 			kernel.finishDependecyDelayedInjection(queue);
 			unloadOldBeans();
-		} catch (DBInitException|ClassNotFoundException|InstantiationException|InvocationTargetException|IllegalAccessException ex) {
-			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for name '" + name + "'", ex);
+		} catch (DBInitException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException ex) {
+			throw new RuntimeException(
+					"Could not initialize " + getRepositoryIfc().getCanonicalName() + " for name '" + name + "'", ex);
 		}
 	}
 
@@ -160,7 +120,7 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 					if (getRepositoryPoolClassName() == null || pos >= poolSize) {
 						kernel.unregister(bc.getBeanName());
 					}
-				} catch (NumberFormatException|DBInitException ex) {
+				} catch (NumberFormatException | DBInitException ex) {
 					// this is not instance create by us, ignoring
 				}
 			}
@@ -186,8 +146,9 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 		if (instances != null) {
 			for (Iterator<A> iter = instances.iterator(); iter.hasNext(); ) {
 				A it = iter.next();
-				if (it instanceof MDPoolBean)
+				if (it instanceof MDPoolBean) {
 					iter.remove();
+				}
 			}
 		}
 		HashSet<A> toInitialize = new HashSet<A>(instances);
@@ -216,8 +177,8 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 												 name + "'", ex);
 						} else {
 							throw new RuntimeException(
-									"Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name + "'",
-									ex);
+									"Could not initialize " + repo.getClass().getCanonicalName() + " for name '" +
+											name + "'", ex);
 						}
 					}
 					return repo;
@@ -232,8 +193,61 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 			}
 			pool.shutdown();
 		}
-		
+
 		this.instances = instances;
+	}
+
+	public void setMdPool(MDPoolBean<A, B> mdPool) {
+		if (mdPool != null && this.repository != null) {
+			mdPool.addRepo(name, this.repository);
+			if ("default".equals(name)) {
+				mdPool.setDefault(this.repository);
+			}
+		}
+		this.mdPool = mdPool;
+	}
+
+	/**
+	 * Get interface to which instances initialized by this config bean must conform to.
+	 *
+	 * @return interface
+	 */
+	protected abstract Class<? extends A> getRepositoryIfc();
+
+	/**
+	 * Get name of a pool which should be used if any.
+	 *
+	 * @return class name
+	 *
+	 * @throws DBInitException
+	 */
+	protected abstract String getRepositoryPoolClassName() throws DBInitException;
+
+	/**
+	 * Method used to initialize provided instance
+	 *
+	 * @param repo
+	 *
+	 * @throws RepositoryException
+	 */
+	protected abstract void initRepository(A repo) throws RepositoryException;
+
+	/**
+	 * Get class name to initialize as repository
+	 *
+	 * @return
+	 *
+	 * @throws DBInitException
+	 */
+	protected String getRepositoryClassName() throws DBInitException {
+		if (cls != null) {
+			return cls;
+		}
+		return RepositoryFactory.getRepoClassName(getRepositoryIfc(), uri);
+	}
+
+	protected String getUri() {
+		return uri;
 	}
 
 	protected A getRepository() {
@@ -262,15 +276,5 @@ public abstract class MDPoolConfigBean<A,B extends MDPoolConfigBean<A,B>> implem
 				mdPool.setDefault(repo);
 			}
 		}
-	}
-
-	public void setMdPool(MDPoolBean<A,B> mdPool) {
-		if (mdPool != null && this.repository != null) {
-			mdPool.addRepo(name, this.repository);
-			if ("default".equals(name)) {
-				mdPool.setDefault(this.repository);
-			}
-		}
-		this.mdPool = mdPool;
 	}
 }

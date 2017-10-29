@@ -34,9 +34,16 @@ public class MD5UsernamePasswordCredentialsEntry
 		implements Credentials.Entry {
 
 	private static final Logger log = Logger.getLogger(MD5UsernamePasswordCredentialsEntry.class.getCanonicalName());
-
-	private final BareJID user;
 	private final String passwordHash;
+	private final BareJID user;
+
+	protected static String getUsername(BareJID user) {
+		if (user.getLocalpart() == null) {
+			return user.getDomain();
+		} else {
+			return user.getLocalpart();
+		}
+	}
 
 	public MD5UsernamePasswordCredentialsEntry(BareJID user, String passwordHash) {
 		this.user = user;
@@ -59,8 +66,24 @@ public class MD5UsernamePasswordCredentialsEntry
 		return false;
 	}
 
+	@Bean(name = "MD5-USERNAME-PASSWORD", parent = CredentialsDecoderBean.class, active = false)
+	public static class Decoder
+			implements Credentials.Decoder {
+
+		@Override
+		public String getName() {
+			return "MD5-USERNAME-PASSWORD";
+		}
+
+		@Override
+		public Credentials.Entry decode(BareJID user, String value) {
+			return new MD5UsernamePasswordCredentialsEntry(user, value);
+		}
+	}
+
 	@Bean(name = "MD5-USERNAME-PASSWORD", parent = CredentialsEncoderBean.class, active = false)
-	public static class Encoder implements Credentials.Encoder {
+	public static class Encoder
+			implements Credentials.Encoder {
 
 		@Override
 		public String getName() {
@@ -75,28 +98,6 @@ public class MD5UsernamePasswordCredentialsEntry
 			} catch (Exception ex) {
 				throw new RuntimeException("failed to generate password hash", ex);
 			}
-		}
-	}
-
-	@Bean(name = "MD5-USERNAME-PASSWORD", parent = CredentialsDecoderBean.class, active = false)
-	public static class Decoder implements Credentials.Decoder {
-
-		@Override
-		public String getName() {
-			return "MD5-USERNAME-PASSWORD";
-		}
-
-		@Override
-		public Credentials.Entry decode(BareJID user, String value) {
-			return new MD5UsernamePasswordCredentialsEntry(user, value);
-		}
-	}
-
-	protected static String getUsername(BareJID user) {
-		if (user.getLocalpart() == null) {
-			return user.getDomain();
-		} else {
-			return user.getLocalpart();
 		}
 	}
 }

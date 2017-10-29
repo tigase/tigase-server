@@ -1,4 +1,3 @@
-
 /*
  * AuthRepositoryPool.java
  *
@@ -25,42 +24,39 @@ package tigase.db;
 import tigase.auth.credentials.Credentials;
 import tigase.xmpp.jid.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
-
-
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//~--- JDK imports ------------------------------------------------------------
+
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Pool for authentication repositories.
- * <br/>
- * This pool should be used if connection to authentication storage is blocking or synchronized,
- * ie. implemented using single connection.<br/>
- * If implementation of <code>AuthRepository</code> uses connection pool or non blocking, concurrent
- * access to authentication storage (ie. <code>DataSourcePool</code>), then this pool is not need.
- *
+ * Pool for authentication repositories. <br/> This pool should be used if connection to authentication storage is
+ * blocking or synchronized, ie. implemented using single connection.<br/> If implementation of
+ * <code>AuthRepository</code> uses connection pool or non blocking, concurrent access to authentication storage (ie.
+ * <code>DataSourcePool</code>), then this pool is not need.
+ * <p>
  * Created: Mar 27, 2010 11:31:17 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRepository> {
+public class AuthRepositoryPool
+		implements AuthRepository, RepositoryPool<AuthRepository> {
+
 	private static final Logger log = Logger.getLogger(AuthRepositoryPool.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private LinkedBlockingQueue<AuthRepository> repoPool =
-		new LinkedBlockingQueue<AuthRepository>();
+	private LinkedBlockingQueue<AuthRepository> repoPool = new LinkedBlockingQueue<AuthRepository>();
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param repo
 	 */
@@ -69,8 +65,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	}
 
 	@Override
-	public void addUser(BareJID user, String password)
-			throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -83,7 +78,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -173,8 +168,8 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 
 	@Override
 	@Deprecated
-	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {}
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+	}
 
 	@Override
 	public void loggedIn(BareJID user) throws TigaseDBException {
@@ -271,9 +266,6 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public AuthRepository takeRepo() {
 		try {
@@ -286,8 +278,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	}
 
 	@Override
-	public void updateCredential(BareJID user, String username, String password)
-			throws TigaseDBException {
+	public void updateCredential(BareJID user, String username, String password) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -302,8 +293,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 	}
 
 	@Override
-	public void updatePassword(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException {
+	public void updatePassword(BareJID user, String password) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -332,7 +322,7 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 			return null;
 		}
 	}
-	
+
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
@@ -393,5 +383,5 @@ public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRe
 		} else {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
-	}		
+	}
 }

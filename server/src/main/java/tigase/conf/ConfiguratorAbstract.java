@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -56,25 +54,26 @@ import static tigase.io.SSLContextContainerIfc.*;
  * @version $Rev$
  */
 public abstract class ConfiguratorAbstract
-				extends AbstractComponentRegistrator<Configurable>
-				implements RepositoryChangeListenerIfc<ConfigItem>, StatisticsContainer {
-	/**
-	 * Field description
-	 * @deprecated moved to RepositoryFactory
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
-	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory
-			.AUTH_DOMAIN_POOL_CLASS_PROP_KEY;
+		extends AbstractComponentRegistrator<Configurable>
+		implements RepositoryChangeListenerIfc<ConfigItem>, StatisticsContainer {
 
 	/**
 	 * Field description
+	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
-	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory
-			.AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_KEY;
+
+	/**
+	 * Field description
+	 *
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
 
 	/** Field description */
 	@Deprecated
@@ -88,68 +87,214 @@ public abstract class ConfiguratorAbstract
 
 	/** Field description */
 	public static final String INIT_PROPERTIES_MAP_BIND = "initProperties";
-
-	/** Field description */
-	public static String logManagerConfiguration = null;
-
 	/** Field description */
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
 	public static final String PROPERTY_FILENAME_PROP_DEF = "etc/init.properties";
-
 	/**
 	 * Field description
+	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
-	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory
-			.USER_DOMAIN_POOL_CLASS_PROP_KEY;
-
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory.USER_DOMAIN_POOL_CLASS_PROP_KEY;
 	/**
 	 * Field description
+	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
-	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory
-			.USER_DOMAIN_POOL_CLASS_PROP_VAL;
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory.USER_DOMAIN_POOL_CLASS_PROP_VAL;
 	public static final String LOGGING_KEY = "logging/";
-	private static final Logger log = Logger.getLogger(ConfiguratorAbstract.class
-			.getName());
+	private static final Logger log = Logger.getLogger(ConfiguratorAbstract.class.getName());
+	/** Field description */
+	public static String logManagerConfiguration = null;
 	private static MonitoringSetupIfc monitoring = null;
 
 	//~--- fields ---------------------------------------------------------------
 
-	private AuthRepositoryMDImpl auth_repo_impl   = null;
-	private Map<String, String>  auth_repo_params = null;
-	private AuthRepository       auth_repository  = null;
-	private UserRepositoryMDImpl user_repo_impl   = null;
-	private Map<String, String>  user_repo_params = null;
-
-	// Default user repository instance which can be shared among components
-	private UserRepository user_repository   = null;
-	private boolean        setup_in_progress = false;
-
-	/**
-	 * Configuration settings read from the initRepository.properties file or any other
-	 * source which provides startup configuration.
-	 */
-	private List<String> initSettings = new LinkedList<String>();
-
-	/**
-	 * Properties from the command line parameters and initRepository.properties file or any
-	 * other source which are used to generate default configuration. All the
-	 * settings starting with '--'
-	 */
-	private Map<String, Object> initProperties = new LinkedHashMap<String, Object>(100);
-
+	private AuthRepositoryMDImpl auth_repo_impl = null;
+	private Map<String, String> auth_repo_params = null;
+	private AuthRepository auth_repository = null;
 	// Default user auth repository instance which can be shared among components
 	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
-
+	/**
+	 * Properties from the command line parameters and initRepository.properties file or any other source which are used
+	 * to generate default configuration. All the settings starting with '--'
+	 */
+	private Map<String, Object> initProperties = new LinkedHashMap<String, Object>(100);
+	/**
+	 * Configuration settings read from the initRepository.properties file or any other source which provides startup
+	 * configuration.
+	 */
+	private List<String> initSettings = new LinkedList<String>();
 	// Common logging setup
 	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
+	private boolean setup_in_progress = false;
+	private UserRepositoryMDImpl user_repo_impl = null;
+	private Map<String, String> user_repo_params = null;
+	// Default user repository instance which can be shared among components
+	private UserRepository user_repository = null;
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param objName
+	 */
+	public static Object getMXBean(String objName) {
+		if (monitoring != null) {
+			return monitoring.getMXBean(objName);
+		} else {
+			return null;
+		}
+	}
+
+	public static void loadFromPropertiesFiles(String property_filenames, Map<String, Object> initProperties,
+											   List<String> initSettings) {
+		if (property_filenames != null) {
+			String[] prop_files = property_filenames.split(",");
+
+			if (prop_files.length == 1) {
+				File f = new File(prop_files[0]);
+				if (!f.exists()) {
+					log.log(Level.WARNING, "Provided property file {0} does NOT EXISTS! Using default one {1}",
+							new String[]{f.getAbsolutePath(), PROPERTY_FILENAME_PROP_DEF});
+					prop_files[0] = PROPERTY_FILENAME_PROP_DEF;
+				}
+			}
+
+			for (String property_filename : prop_files) {
+				log.log(Level.CONFIG, "Loading initial properties from property file: {0}", property_filename);
+				try (FileReader fileReader = new FileReader(property_filename)) {
+					Properties defProps = new Properties();
+
+					defProps.load(fileReader);
+
+					Set<String> prop_keys = defProps.stringPropertyNames();
+
+					for (String key : prop_keys) {
+						String value = defProps.getProperty(key).trim();
+
+						if (key.startsWith("-") || key.equals("config-type")) {
+							if (GEN_TEST.equalsIgnoreCase(key)) {
+								initProperties.put(key.trim().substring(2), DataTypes.parseBool(value));
+								initProperties.put(key.trim(), DataTypes.parseBool(value));
+							} else {
+								initProperties.put(key.trim(), value);
+							}
+
+							// defProperties.remove(key);
+							log.log(Level.CONFIG, "Added default config parameter: ({0}={1})",
+									new Object[]{key, value});
+						} else {
+							initSettings.add(key + "=" + value);
+						}
+					}
+				} catch (FileNotFoundException e) {
+					log.log(Level.WARNING, "Given property file was not found: {0}", property_filename);
+				} catch (IOException e) {
+					log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
+				}
+			}
+		}
+
+		// Set all parameters starting with '--' as a system properties with removed
+		// the starting '-' characters.
+		for (Map.Entry<String, Object> entry : initProperties.entrySet()) {
+			if (entry.getKey().startsWith("--")) {
+				System.setProperty(entry.getKey().substring(2),
+								   ((entry.getValue() == null) ? null : entry.getValue().toString()));
+
+				// In cluster mode we switch DB cache off as this does not play well.
+				if (CLUSTER_MODE.equals(entry.getKey())) {
+					if ("true".equalsIgnoreCase(entry.getValue().toString())) {
+						System.setProperty("tigase.cache", "false");
+						log.log(Level.WARNING, "Tigase cache turned off");
+					}
+				}
+			}
+		}
+	}
+
+	public static void loadFromPropertiesFiles(Map<String, Object> initProperties, List<String> initSettings) {
+		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
+
+		// if no property file was specified then use default one.
+		if (property_filenames == null) {
+			property_filenames = PROPERTY_FILENAME_PROP_DEF;
+			log.log(Level.WARNING, "No property file not specified! Using default one {0}", property_filenames);
+		}
+
+		loadFromPropertiesFiles(property_filenames, initProperties, initSettings);
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param config
+	 */
+	public static void loadLogManagerConfig(String config) {
+		logManagerConfiguration = config;
+		try {
+			final ByteArrayInputStream bis = new ByteArrayInputStream(config.getBytes());
+
+			LogManager.getLogManager().readConfiguration(bis);
+			bis.close();
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "Can not configure logManager", e);
+		}    // end of try-catch
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param args
+	 */
+	public static void parseArgs(Map<String, Object> initProperties, List<String> initSettings, String[] args) {
+		initProperties.put(GEN_TEST, Boolean.FALSE);
+		initProperties.put("config-type", GEN_CONFIG_DEF);
+		if ((args != null) && (args.length > 0)) {
+			for (int i = 0; i < args.length; i++) {
+				String key = null;
+				Object val = null;
+
+				if (args[i].startsWith(GEN_CONFIG)) {
+					key = "config-type";
+					val = args[i];
+				}
+				if (args[i].startsWith(GEN_TEST)) {
+					key = args[i];
+					val = Boolean.TRUE;
+				}
+				if ((key == null) && args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG)) {
+					key = args[i];
+					val = args[++i];
+				}
+				if ((key != null) && (val != null)) {
+					initProperties.put(key, val);
+
+					// System.out.println("Setting defaults: " + key + "=" +
+					// val.toString());
+					log.log(Level.CONFIG, "Setting defaults: {0} = {1}", new Object[]{key, val.toString()});
+				}    // end of if (key != null)
+			}      // end of for (int i = 0; i < args.length; i++)
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param objName
+	 * @param bean
+	 */
+	public static void putMXBean(String objName, Object bean) {
+		if (monitoring != null) {
+			monitoring.putMXBean(objName, bean);
+		}
+	}
 
 	@Override
 	public void componentAdded(Configurable component) throws ConfigurationException {
@@ -160,11 +305,11 @@ public abstract class ConfiguratorAbstract
 	}
 
 	@Override
-	public void componentRemoved(Configurable component) {}
+	public void componentRemoved(Configurable component) {
+	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param args
 	 *
@@ -200,7 +345,9 @@ public abstract class ConfiguratorAbstract
 			}
 		}
 		configRepo.addRepoChangeListener(this);
-		String host = getDefHostName() != null ? getDefHostName().getDomain() : DNSResolverFactory.getInstance().getDefaultHost();
+		String host = getDefHostName() != null
+					  ? getDefHostName().getDomain()
+					  : DNSResolverFactory.getInstance().getDefaultHost();
 		configRepo.setDefHostname(host);
 		try {
 			// loss of generic types is intentional to make parameter match API
@@ -233,8 +380,7 @@ public abstract class ConfiguratorAbstract
 		if (property_filenames != null) {
 			String[] prop_files = property_filenames.split(",");
 
-			initMonitoring((String) initProperties.get(MONITORING), new File(prop_files[0])
-					.getParent());
+			initMonitoring((String) initProperties.get(MONITORING), new File(prop_files[0]).getParent());
 		}
 	}
 
@@ -264,7 +410,8 @@ public abstract class ConfiguratorAbstract
 			log.log(Level.WARNING, "Cannot store configuration.", ex);
 		}
 
-		System.out.println("== " + new Date() + " Server finished starting up and (if there wasn't any error) is ready to use\n");
+		System.out.println(
+				"== " + new Date() + " Server finished starting up and (if there wasn't any error) is ready to use\n");
 
 	}
 
@@ -296,31 +443,12 @@ public abstract class ConfiguratorAbstract
 
 			try {
 				component.setProperties(prop);
-			}
-			catch (ConfigurationException ex) {
+			} catch (ConfigurationException ex) {
 				log.log(Level.SEVERE, "Component reconfiguration failed: " + ex.getMessage(), ex);
 			}
 		} else {
 			log.log(Level.WARNING, "Cannot find component for configuration item: {0}", item);
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param config
-	 */
-	public static void loadLogManagerConfig(String config) {
-		logManagerConfiguration = config;
-		try {
-			final ByteArrayInputStream bis = new ByteArrayInputStream(config.getBytes());
-
-			LogManager.getLogManager().readConfiguration(bis);
-			bis.close();
-		} catch (IOException e) {
-			log.log(Level.SEVERE, "Can not configure logManager", e);
-		}    // end of try-catch
 	}
 
 	public void parseArgs(final String[] args) {
@@ -330,153 +458,19 @@ public abstract class ConfiguratorAbstract
 	/**
 	 * Method description
 	 *
-	 *
-	 * @param args
-	 */
-	public static void parseArgs(Map<String, Object> initProperties, List<String> initSettings, String[] args) {
-		initProperties.put(GEN_TEST, Boolean.FALSE);
-		initProperties.put("config-type", GEN_CONFIG_DEF);
-		if ((args != null) && (args.length > 0)) {
-			for (int i = 0; i < args.length; i++) {
-				String key = null;
-				Object val = null;
-
-				if (args[i].startsWith(GEN_CONFIG)) {
-					key = "config-type";
-					val = args[i];
-				}
-				if (args[i].startsWith(GEN_TEST)) {
-					key = args[i];
-					val = Boolean.TRUE;
-				}
-				if ((key == null) && args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG)) {
-					key = args[i];
-					val = args[++i];
-				}
-				if ((key != null) && (val != null)) {
-					initProperties.put(key, val);
-
-					// System.out.println("Setting defaults: " + key + "=" +
-					// val.toString());
-					log.log(Level.CONFIG, "Setting defaults: {0} = {1}", new Object[]{key,
-							val.toString()});
-				}    // end of if (key != null)
-			}      // end of for (int i = 0; i < args.length; i++)
-		}
-	}
-
-	public static void loadFromPropertiesFiles(Map<String, Object> initProperties, List<String> initSettings) {
-		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
-
-		// if no property file was specified then use default one.
-		if (property_filenames == null) {
-			property_filenames = PROPERTY_FILENAME_PROP_DEF;
-			log.log(Level.WARNING, "No property file not specified! Using default one {0}", property_filenames);
-		}
-
-		loadFromPropertiesFiles(property_filenames, initProperties, initSettings);
-	}
-
-	public static void loadFromPropertiesFiles(String property_filenames, Map<String, Object> initProperties, List<String> initSettings) {
-		if (property_filenames != null) {
-			String[] prop_files = property_filenames.split(",");
-
-			if ( prop_files.length == 1 ){
-				File f = new File( prop_files[0] );
-				if ( !f.exists() ){
-					log.log( Level.WARNING, "Provided property file {0} does NOT EXISTS! Using default one {1}",
-									 new String[] { f.getAbsolutePath(), PROPERTY_FILENAME_PROP_DEF } );
-					prop_files[0] = PROPERTY_FILENAME_PROP_DEF;
-				}
-			}
-
-			for (String property_filename : prop_files) {
-				log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
-						property_filename);
-				try (FileReader fileReader = new FileReader(property_filename)) {
-					Properties defProps = new Properties();
-
-					defProps.load(fileReader);
-
-					Set<String> prop_keys = defProps.stringPropertyNames();
-
-					for (String key : prop_keys) {
-						String value = defProps.getProperty(key).trim();
-
-						if (key.startsWith("-") || key.equals("config-type")) {
-							if (GEN_TEST.equalsIgnoreCase(key)) {
-								initProperties.put(key.trim().substring(2), DataTypes.parseBool(value));
-								initProperties.put(key.trim(), DataTypes.parseBool(value));
-							} else {
-								initProperties.put(key.trim(), value);
-							}
-
-							// defProperties.remove(key);
-							log.log(Level.CONFIG, "Added default config parameter: ({0}={1})",
-									new Object[] { key,
-									value });
-						} else {
-							initSettings.add(key + "=" + value);
-						}
-					}
-				} catch (FileNotFoundException e) {
-					log.log(Level.WARNING, "Given property file was not found: {0}",
-							property_filename);
-				} catch (IOException e) {
-					log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
-				}
-			}
-		}
-
-		// Set all parameters starting with '--' as a system properties with removed
-		// the starting '-' characters.
-		for (Map.Entry<String, Object> entry : initProperties.entrySet()) {
-			if (entry.getKey().startsWith("--")) {
-				System.setProperty(entry.getKey().substring(2), ((entry.getValue() == null)
-						? null
-						: entry.getValue().toString()));
-
-				// In cluster mode we switch DB cache off as this does not play well.
-				if (CLUSTER_MODE.equals(entry.getKey())) {
-					if ("true".equalsIgnoreCase(entry.getValue().toString())) {
-						System.setProperty("tigase.cache", "false");
-						log.log(Level.WARNING, "Tigase cache turned off");
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param objName
-	 * @param bean
-	 */
-	public static void putMXBean(String objName, Object bean) {
-		if (monitoring != null) {
-			monitoring.putMXBean(objName, bean);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param compId
 	 * @param props
 	 *
 	 * @throws ConfigurationException
 	 */
-	public void putProperties(String compId, Map<String, Object> props)
-					throws ConfigurationException {
+	public void putProperties(String compId, Map<String, Object> props) throws ConfigurationException {
 		configRepo.putProperties(compId, props);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param component
 	 */
@@ -500,18 +494,17 @@ public abstract class ConfiguratorAbstract
 		try {
 			prop = configRepo.getProperties(compId);
 		} catch (ConfigurationException ex) {
-			log.log(Level.WARNING,
-					"Propblem retrieving configuration properties for component: " + compId, ex);
+			log.log(Level.WARNING, "Propblem retrieving configuration properties for component: " + compId, ex);
 
 			return;
 		}
 
 		Map<String, Object> defs = component.getDefaults(getDefConfigParams());
 
-		log.log(Level.CONFIG, "Component {0} defaults: {1}", new Object[] { compId, defs });
+		log.log(Level.CONFIG, "Component {0} defaults: {1}", new Object[]{compId, defs});
 
 		Set<Map.Entry<String, Object>> defs_entries = defs.entrySet();
-		boolean                        modified     = false;
+		boolean modified = false;
 
 		for (Map.Entry<String, Object> entry : defs_entries) {
 			if (!prop.containsKey(entry.getKey())) {
@@ -521,12 +514,10 @@ public abstract class ConfiguratorAbstract
 		}      // end of for ()
 		if (modified) {
 			try {
-				log.log(Level.CONFIG, "Component {0} configuration: {1}", new Object[] { compId,
-						prop });
+				log.log(Level.CONFIG, "Component {0} configuration: {1}", new Object[]{compId, prop});
 				configRepo.putProperties(compId, prop);
 			} catch (ConfigurationException ex) {
-				log.log(Level.WARNING,
-						"Propblem with saving configuration properties for component: " + compId, ex);
+				log.log(Level.WARNING, "Propblem with saving configuration properties for component: " + compId, ex);
 			}
 		}    // end of if (modified)
 		prop.put(RepositoryFactory.SHARED_USER_REPO_PROP_KEY, user_repo_impl);
@@ -539,30 +530,24 @@ public abstract class ConfiguratorAbstract
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = super.getDefaults(params);
-		String              levelStr = ".level";
+		String levelStr = ".level";
 
 		if ((Boolean) params.get(GEN_TEST)) {
 			defaults.put(LOGGING_KEY + levelStr, "WARNING");
 		} else {
 			defaults.put(LOGGING_KEY + levelStr, "CONFIG");
 		}
-		defaults.put(LOGGING_KEY + "handlers",
-				"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
-				"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", "tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
-				"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", "tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
-				"logs/tigase.log");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 		if (params.get(GEN_DEBUG) != null) {
@@ -594,9 +579,9 @@ public abstract class ConfiguratorAbstract
 		defaults.put(RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
 
 		String user_repo_class = null;//RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
-		String user_repo_url   = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
+		String user_repo_url = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 		String auth_repo_class = null;//RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
-		String auth_repo_url   = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
+		String auth_repo_url = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 
 		if (params.get(RepositoryFactory.GEN_USER_DB) != null) {
 			user_repo_class = (String) params.get(RepositoryFactory.GEN_USER_DB);
@@ -613,40 +598,42 @@ public abstract class ConfiguratorAbstract
 			auth_repo_url = (String) params.get(RepositoryFactory.GEN_AUTH_DB_URI);
 		}
 		if (params.get(RepositoryFactory.USER_REPO_POOL_SIZE) != null) {
-			defaults.put(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY, params.get(
-					RepositoryFactory.USER_REPO_POOL_SIZE));
+			defaults.put(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY,
+						 params.get(RepositoryFactory.USER_REPO_POOL_SIZE));
 		} else {
-			defaults.put(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY, RepositoryFactory
-					.USER_REPO_POOL_SIZE_PROP_VAL);
+			defaults.put(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY,
+						 RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL);
 		}
 		if (params.get(RepositoryFactory.DATA_REPO_POOL_SIZE) != null) {
-			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, params.get(
-					RepositoryFactory.DATA_REPO_POOL_SIZE));
+			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY,
+						 params.get(RepositoryFactory.DATA_REPO_POOL_SIZE));
 		} else if (params.get(RepositoryFactory.USER_REPO_POOL_SIZE) != null) {
-			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, params.get(
-					RepositoryFactory.USER_REPO_POOL_SIZE));
+			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY,
+						 params.get(RepositoryFactory.USER_REPO_POOL_SIZE));
 		} else {
-			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, RepositoryFactory
-					.DATA_REPO_POOL_SIZE_PROP_VAL);
+			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY,
+						 RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_VAL);
 		}
 		if (params.get(RepositoryFactory.AUTH_REPO_POOL_SIZE) != null) {
-			defaults.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY, params.get(
-					RepositoryFactory.AUTH_REPO_POOL_SIZE));
+			defaults.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY,
+						 params.get(RepositoryFactory.AUTH_REPO_POOL_SIZE));
 		} else if (params.get(RepositoryFactory.DATA_REPO_POOL_SIZE) != null) {
-			defaults.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY, params.get(
-					RepositoryFactory.DATA_REPO_POOL_SIZE));
+			defaults.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY,
+						 params.get(RepositoryFactory.DATA_REPO_POOL_SIZE));
 		} else if (params.get(RepositoryFactory.USER_REPO_POOL_SIZE) != null) {
-			defaults.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY, params.get(
-					RepositoryFactory.USER_REPO_POOL_SIZE));
+			defaults.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY,
+						 params.get(RepositoryFactory.USER_REPO_POOL_SIZE));
 		} else {
-			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, RepositoryFactory
-					.AUTH_REPO_POOL_SIZE_PROP_VAL);
+			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY,
+						 RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_VAL);
 		}
-		if (user_repo_class != null)
+		if (user_repo_class != null) {
 			defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY, user_repo_class);
+		}
 		defaults.put(RepositoryFactory.USER_REPO_URL_PROP_KEY, user_repo_url);
-		if (auth_repo_class != null)
+		if (auth_repo_class != null) {
 			defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
+		}
 		defaults.put(RepositoryFactory.AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
 		List<String> user_repo_domains = new ArrayList<String>(10);
@@ -669,30 +656,27 @@ public abstract class ConfiguratorAbstract
 			}
 		}
 		if (user_repo_domains.size() > 0) {
-			defaults.put(RepositoryFactory.USER_REPO_DOMAINS_PROP_KEY, user_repo_domains
-					.toArray(new String[user_repo_domains.size()]));
+			defaults.put(RepositoryFactory.USER_REPO_DOMAINS_PROP_KEY,
+						 user_repo_domains.toArray(new String[user_repo_domains.size()]));
 		}
 		if (auth_repo_domains.size() > 0) {
-			defaults.put(RepositoryFactory.AUTH_REPO_DOMAINS_PROP_KEY, auth_repo_domains
-					.toArray(new String[auth_repo_domains.size()]));
+			defaults.put(RepositoryFactory.AUTH_REPO_DOMAINS_PROP_KEY,
+						 auth_repo_domains.toArray(new String[auth_repo_domains.size()]));
 		}
 
 		// TLS/SSL configuration
 		if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
-			defaults.put(SSL_CONTAINER_CLASS_KEY, (String) params.get("--" +
-					SSL_CONTAINER_CLASS_KEY));
+			defaults.put(SSL_CONTAINER_CLASS_KEY, (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
 		} else {
 			defaults.put(SSL_CONTAINER_CLASS_KEY, SSL_CONTAINER_CLASS_VAL);
 		}
 		if (params.get("--" + SERVER_CERTS_LOCATION_KEY) != null) {
-			defaults.put(SERVER_CERTS_LOCATION_KEY, (String) params.get("--" +
-					SERVER_CERTS_LOCATION_KEY));
+			defaults.put(SERVER_CERTS_LOCATION_KEY, (String) params.get("--" + SERVER_CERTS_LOCATION_KEY));
 		} else {
 			defaults.put(SERVER_CERTS_LOCATION_KEY, SERVER_CERTS_LOCATION_VAL);
 		}
 		if (params.get("--" + DEFAULT_DOMAIN_CERT_KEY) != null) {
-			defaults.put(DEFAULT_DOMAIN_CERT_KEY, (String) params.get("--" +
-					DEFAULT_DOMAIN_CERT_KEY));
+			defaults.put(DEFAULT_DOMAIN_CERT_KEY, (String) params.get("--" + DEFAULT_DOMAIN_CERT_KEY));
 		} else {
 			defaults.put(DEFAULT_DOMAIN_CERT_KEY, DEFAULT_DOMAIN_CERT_VAL);
 		}
@@ -703,9 +687,6 @@ public abstract class ConfiguratorAbstract
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public Map<String, Object> getDefConfigParams() {
 		return initProperties;
@@ -713,9 +694,6 @@ public abstract class ConfiguratorAbstract
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getMessageRouterClassName() {
 		return "tigase.server.MessageRouter";
@@ -724,26 +702,7 @@ public abstract class ConfiguratorAbstract
 	/**
 	 * Method description
 	 *
-	 *
-	 * @param objName
-	 *
-	 * 
-	 */
-	public static Object getMXBean(String objName) {
-		if (monitoring != null) {
-			return monitoring.getMXBean(objName);
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param nodeId
-	 *
-	 * 
 	 *
 	 * @throws ConfigurationException
 	 */
@@ -772,45 +731,36 @@ public abstract class ConfiguratorAbstract
 			return;
 		} else {
 			log.log(Level.INFO, "Propeties size is {0}, and here are all propeties: {1}",
-					new Object[] { props.size(),
-					props });
+					new Object[]{props.size(), props});
 		}
 		setupLogManager(props);
 		super.setProperties(props);
 		if (props.size() == 1) {
 			log.log(Level.INFO, "Propeties size is {0}, and here are all propeties: {1}",
-					new Object[] { props.size(),
-					props });
+					new Object[]{props.size(), props});
 
 			return;
 		}
 		configRepo.setProperties(props);
 		TLSUtil.configureSSLContext(props);
 
-
-		String[] user_repo_domains = (String[]) props.get(RepositoryFactory
-				.USER_REPO_DOMAINS_PROP_KEY);
-		String[] auth_repo_domains = (String[]) props.get(RepositoryFactory
-				.AUTH_REPO_DOMAINS_PROP_KEY);
-		String authRepoMDImpl = (String) props.get(RepositoryFactory
-				.AUTH_DOMAIN_POOL_CLASS_PROP_KEY);
-		String userRepoMDImpl = (String) props.get(RepositoryFactory
-				.USER_DOMAIN_POOL_CLASS_PROP_KEY);
+		String[] user_repo_domains = (String[]) props.get(RepositoryFactory.USER_REPO_DOMAINS_PROP_KEY);
+		String[] auth_repo_domains = (String[]) props.get(RepositoryFactory.AUTH_REPO_DOMAINS_PROP_KEY);
+		String authRepoMDImpl = (String) props.get(RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_KEY);
+		String userRepoMDImpl = (String) props.get(RepositoryFactory.USER_DOMAIN_POOL_CLASS_PROP_KEY);
 
 		try {
 
 			// Authentication multi-domain repository pool initialization
-			Map<String, String> params = getRepoParams(props, RepositoryFactory
-					.AUTH_REPO_PARAMS_NODE, null);
+			Map<String, String> params = getRepoParams(props, RepositoryFactory.AUTH_REPO_PARAMS_NODE, null);
 			String conn_url = (String) props.get(RepositoryFactory.AUTH_REPO_URL_PROP_KEY);
 
 			auth_repo_impl = (AuthRepositoryMDImpl) Class.forName(authRepoMDImpl).newInstance();
 			auth_repo_impl.initRepository(conn_url, params);
 
 			// User multi-domain repository pool initialization
-			params         = getRepoParams(props, RepositoryFactory.USER_REPO_PARAMS_NODE,
-					null);
-			conn_url       = (String) props.get(RepositoryFactory.USER_REPO_URL_PROP_KEY);
+			params = getRepoParams(props, RepositoryFactory.USER_REPO_PARAMS_NODE, null);
+			conn_url = (String) props.get(RepositoryFactory.USER_REPO_URL_PROP_KEY);
 			user_repo_impl = (UserRepositoryMDImpl) Class.forName(userRepoMDImpl).newInstance();
 			user_repo_impl.initRepository(conn_url, params);
 		} catch (Exception ex) {
@@ -823,8 +773,7 @@ public abstract class ConfiguratorAbstract
 				try {
 					addUserRepo(props, domain);
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain,
-							e);
+					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
 				}
 			}
 		}
@@ -840,8 +789,7 @@ public abstract class ConfiguratorAbstract
 				try {
 					addAuthRepo(props, domain);
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain,
-							e);
+					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
 				}
 			}
 		}
@@ -857,18 +805,12 @@ public abstract class ConfiguratorAbstract
 	//~--- methods --------------------------------------------------------------
 
 	private void addAuthRepo(Map<String, Object> props, String domain)
-					throws DBInitException, ClassNotFoundException, InstantiationException,
-							IllegalAccessException {
-		Map<String, String> params = getRepoParams(props, RepositoryFactory
-				.AUTH_REPO_PARAMS_NODE, domain);
-		String cls_name = (String) props.get(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY +
-				((domain == null)
-				 ? ""
-				 : "/" + domain));
-		String conn_url = (String) props.get(RepositoryFactory.AUTH_REPO_URL_PROP_KEY +
-				((domain == null)
-				 ? ""
-				 : "/" + domain));
+			throws DBInitException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		Map<String, String> params = getRepoParams(props, RepositoryFactory.AUTH_REPO_PARAMS_NODE, domain);
+		String cls_name = (String) props.get(
+				RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + ((domain == null) ? "" : "/" + domain));
+		String conn_url = (String) props.get(
+				RepositoryFactory.AUTH_REPO_URL_PROP_KEY + ((domain == null) ? "" : "/" + domain));
 
 		AuthRepository repo = RepositoryFactory.getAuthRepository(cls_name, conn_url, params);
 
@@ -879,27 +821,17 @@ public abstract class ConfiguratorAbstract
 		} else {
 			auth_repo_impl.addRepo(domain, repo);
 		}
-		log.log(Level.INFO,
-				"[{0}] Initialized {1} as user auth repository pool, url: {3}",
-				new Object[] { ((domain != null)
-				? domain
-				: "DEFAULT"), cls_name, conn_url });
+		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository pool, url: {3}",
+				new Object[]{((domain != null) ? domain : "DEFAULT"), cls_name, conn_url});
 	}
 
 	private void addUserRepo(Map<String, Object> props, String domain)
-					throws DBInitException, ClassNotFoundException, InstantiationException,
-							IllegalAccessException {
-		Map<String, String> params = getRepoParams(props, RepositoryFactory
-				.USER_REPO_PARAMS_NODE, domain);
-		String cls_name = (String) props.get(RepositoryFactory.USER_REPO_CLASS_PROP_KEY +
-				((domain == null)
-				 ? ""
-				 : "/" + domain));
-		String conn_url = (String) props.get(RepositoryFactory.USER_REPO_URL_PROP_KEY +
-				((domain == null)
-				 ? ""
-				 : "/" + domain));
-
+			throws DBInitException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		Map<String, String> params = getRepoParams(props, RepositoryFactory.USER_REPO_PARAMS_NODE, domain);
+		String cls_name = (String) props.get(
+				RepositoryFactory.USER_REPO_CLASS_PROP_KEY + ((domain == null) ? "" : "/" + domain));
+		String conn_url = (String) props.get(
+				RepositoryFactory.USER_REPO_URL_PROP_KEY + ((domain == null) ? "" : "/" + domain));
 
 		UserRepository repo = RepositoryFactory.getUserRepository(cls_name, conn_url, params);
 
@@ -911,9 +843,7 @@ public abstract class ConfiguratorAbstract
 			user_repo_impl.addRepo(domain, repo);
 		}
 		log.log(Level.INFO, "[{0}] Initialized {1} as user repository pool, url: {2}",
-				new Object[] { ((domain != null)
-				? domain
-				: "DEFAULT"), cls_name, conn_url });
+				new Object[]{((domain != null) ? domain : "DEFAULT"), cls_name, conn_url});
 	}
 
 	private void initMonitoring(String settings, String configDir) {
@@ -929,11 +859,11 @@ public abstract class ConfiguratorAbstract
 		}
 	}
 
-	private String[] parseAuthRepoParams(Entry<String, Object> entry, Map<String,
-			Object> params, String auth_repo_class, Map<String, Object> defaults) {
-		String key      = entry.getKey();
-		int    br_open  = key.indexOf('[');
-		int    br_close = key.indexOf(']');
+	private String[] parseAuthRepoParams(Entry<String, Object> entry, Map<String, Object> params,
+										 String auth_repo_class, Map<String, Object> defaults) {
+		String key = entry.getKey();
+		int br_open = key.indexOf('[');
+		int br_close = key.indexOf(']');
 
 		if ((br_open < 0) || (br_close < 0)) {
 
@@ -941,9 +871,9 @@ public abstract class ConfiguratorAbstract
 			return null;
 		}
 
-		String   repo_class = auth_repo_class;
-		String   options    = key.substring(br_open + 1, br_close);
-		String[] domains    = options.split(",");
+		String repo_class = auth_repo_class;
+		String options = key.substring(br_open + 1, br_close);
+		String[] domains = options.split(",");
 
 		log.log(Level.INFO, "Found DB domain: {0}", Arrays.toString(domains));
 
@@ -954,24 +884,21 @@ public abstract class ConfiguratorAbstract
 		}
 		for (String domain : domains) {
 			defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-			log.log(Level.CONFIG, "Setting defaults: {0}/{1}={2}", new Object[] {
-					RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY,
-					domain, repo_class });
-			defaults.put(RepositoryFactory.AUTH_REPO_URL_PROP_KEY + "/" + domain, entry
-					.getValue());
-			log.log(Level.CONFIG, "Setting defaults: {0}{1}={2}", new Object[] {
-					RepositoryFactory.AUTH_REPO_URL_PROP_KEY,
-					domain, entry.getValue() });
+			log.log(Level.CONFIG, "Setting defaults: {0}/{1}={2}",
+					new Object[]{RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY, domain, repo_class});
+			defaults.put(RepositoryFactory.AUTH_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
+			log.log(Level.CONFIG, "Setting defaults: {0}{1}={2}",
+					new Object[]{RepositoryFactory.AUTH_REPO_URL_PROP_KEY, domain, entry.getValue()});
 		}
 
 		return domains;
 	}
 
-	private String[] parseUserRepoParams(Entry<String, Object> entry, Map<String,
-			Object> params, String user_repo_class, Map<String, Object> defaults) {
-		String key      = entry.getKey();
-		int    br_open  = key.indexOf('[');
-		int    br_close = key.indexOf(']');
+	private String[] parseUserRepoParams(Entry<String, Object> entry, Map<String, Object> params,
+										 String user_repo_class, Map<String, Object> defaults) {
+		String key = entry.getKey();
+		int br_open = key.indexOf('[');
+		int br_close = key.indexOf(']');
 
 		if ((br_open < 0) || (br_close < 0)) {
 
@@ -979,9 +906,9 @@ public abstract class ConfiguratorAbstract
 			return null;
 		}
 
-		String   repo_class = user_repo_class;
-		String   options    = key.substring(br_open + 1, br_close);
-		String[] domains    = options.split(",");
+		String repo_class = user_repo_class;
+		String options = key.substring(br_open + 1, br_close);
+		String[] domains = options.split(",");
 
 		log.log(Level.INFO, "Found DB domain: {0}", Arrays.toString(domains));
 
@@ -992,36 +919,33 @@ public abstract class ConfiguratorAbstract
 		}
 		for (String domain : domains) {
 			defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-			log.log(Level.CONFIG, "Setting defaults: {0}{1}={2}", new Object[] {
-					RepositoryFactory.USER_REPO_CLASS_PROP_KEY,
-					domain, repo_class });
-			defaults.put(RepositoryFactory.USER_REPO_URL_PROP_KEY + "/" + domain, entry
-					.getValue());
-			log.log(Level.CONFIG, "Setting defaults: {0}{1}={2}", new Object[] {
-					RepositoryFactory.USER_REPO_URL_PROP_KEY,
-					domain, entry.getValue() });
+			log.log(Level.CONFIG, "Setting defaults: {0}{1}={2}",
+					new Object[]{RepositoryFactory.USER_REPO_CLASS_PROP_KEY, domain, repo_class});
+			defaults.put(RepositoryFactory.USER_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
+			log.log(Level.CONFIG, "Setting defaults: {0}{1}={2}",
+					new Object[]{RepositoryFactory.USER_REPO_URL_PROP_KEY, domain, entry.getValue()});
 		}
 
 		return domains;
 	}
 
-	private void setupLogManager( Map<String, Object> properties ) {
+	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
-		StringBuilder buff = new StringBuilder( 200 );
+		StringBuilder buff = new StringBuilder(200);
 
-		for ( Map.Entry<String, Object> entry : entries ) {
-			if ( entry.getKey().startsWith( LOGGING_KEY ) ){
-				String key = entry.getKey().substring( LOGGING_KEY.length() );
-				loggingSetup.put( key, entry.getValue().toString() );
+		for (Map.Entry<String, Object> entry : entries) {
+			if (entry.getKey().startsWith(LOGGING_KEY)) {
+				String key = entry.getKey().substring(LOGGING_KEY.length());
+				loggingSetup.put(key, entry.getValue().toString());
 			}
 		}
 
-		for ( String key : loggingSetup.keySet() ) {
-			String entry = loggingSetup.get( key );
-			buff.append( key ).append( "=" ).append( entry ).append( "\n" );
-			if ( key.equals( "java.util.logging.FileHandler.pattern" ) ){
-				File log_path = new File( entry ).getParentFile();
-				if ( !log_path.exists() ){
+		for (String key : loggingSetup.keySet()) {
+			String entry = loggingSetup.get(key);
+			buff.append(key).append("=").append(entry).append("\n");
+			if (key.equals("java.util.logging.FileHandler.pattern")) {
+				File log_path = new File(entry).getParentFile();
+				if (!log_path.exists()) {
 					log_path.mkdirs();
 				}
 			}    // end of if (key.equals())
@@ -1034,12 +958,9 @@ public abstract class ConfiguratorAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type,
-			String domain) {
-		Map<String, String> result     = new LinkedHashMap<String, String>(10);
-		String              prop_start = repo_type + ((domain == null)
-				? ""
-				: "/" + domain);
+	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type, String domain) {
+		Map<String, String> result = new LinkedHashMap<String, String>(10);
+		String prop_start = repo_type + ((domain == null) ? "" : "/" + domain);
 
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(prop_start)) {
@@ -1050,8 +971,7 @@ public abstract class ConfiguratorAbstract
 				// The plugin ID part may contain many IDs separated with comma ','
 				// We have to make sure that the default repository does not pick up
 				// properties set for a specific domain
-				if (((domain == null) && (nodes.length == 2)) || ((domain != null) && (nodes
-						.length == 3))) {
+				if (((domain == null) && (nodes.length == 2)) || ((domain != null) && (nodes.length == 3))) {
 
 					// if (nodes.length > 1) {
 					result.put(nodes[nodes.length - 1], entry.getValue().toString());
@@ -1062,6 +982,5 @@ public abstract class ConfiguratorAbstract
 		return result;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/06/08

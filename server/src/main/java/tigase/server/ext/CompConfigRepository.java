@@ -31,13 +31,14 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
+public class CompConfigRepository
+		extends ConfigRepository<CompRepoItem> {
 
 	@Override
 	public void destroy() {
 		// Nothing to do
 	}
-	
+
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return CompRepoDefaults.getDefaultPropetyItems();

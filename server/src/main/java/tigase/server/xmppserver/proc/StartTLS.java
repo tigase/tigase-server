@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -47,34 +45,30 @@ import java.util.logging.Logger;
  */
 @Bean(name = "startTLS", parent = S2SConnectionManager.class, active = true)
 public class StartTLS
-				extends S2SAbstractProcessor {
-	private static final Logger log       = Logger.getLogger(StartTLS.class.getName());
-	private static final Element features = new Element(START_TLS_EL,
-																						new String[] { "xmlns" },
-																						new String[] { START_TLS_NS });
-	private static final Element features_required = new Element(START_TLS_EL, new Element[] { new Element( "required" ) },
-																						new String[] { "xmlns" },
-																						new String[] { START_TLS_NS });
-	private static final Element starttls_el = new Element(START_TLS_EL,
-																							 new String[] { "xmlns" },
-																							 new String[] { START_TLS_NS });
-	private static final Element proceed_el = new Element(PROCEED_TLS_EL,
-																							new String[] { "xmlns" },
-																							new String[] { START_TLS_NS });
+		extends S2SAbstractProcessor {
+
+	private static final Logger log = Logger.getLogger(StartTLS.class.getName());
+	private static final Element features = new Element(START_TLS_EL, new String[]{"xmlns"},
+														new String[]{START_TLS_NS});
+	private static final Element features_required = new Element(START_TLS_EL, new Element[]{new Element("required")},
+																 new String[]{"xmlns"}, new String[]{START_TLS_NS});
+	private static final Element starttls_el = new Element(START_TLS_EL, new String[]{"xmlns"},
+														   new String[]{START_TLS_NS});
+	private static final Element proceed_el = new Element(PROCEED_TLS_EL, new String[]{"xmlns"},
+														  new String[]{START_TLS_NS});
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {
 		return Order.StartTLS.ordinal();
-	}	
-	
+	}
+
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.isElement(START_TLS_EL, START_TLS_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { serv,
-								proceed_el });
+				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[]{serv, proceed_el});
 			}
 			handler.writeRawData(serv, proceed_el.toString());
 			try {
@@ -107,19 +101,15 @@ public class StartTLS
 		}
 		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[] { serv,
-								p });
+				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[]{serv, p});
 			}
 
-			CID cid         = (CID) serv.getSessionData().get("cid");
-			boolean skipTLS = (cid == null)
-												? false
-												: skipTLSForHost(cid.getRemoteHost());
+			CID cid = (CID) serv.getSessionData().get("cid");
+			boolean skipTLS = (cid == null) ? false : skipTLSForHost(cid.getRemoteHost());
 
-			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) &&!skipTLS) {
+			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && !skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { serv,
-									starttls_el });
+					log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[]{serv, starttls_el});
 				}
 				handler.writeRawData(serv, starttls_el.toString());
 
@@ -134,11 +124,9 @@ public class StartTLS
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		if (!serv.getSessionData().containsKey("TLS")) {
 			CID cid = (CID) serv.getSessionData().get("cid");
-			if (cid != null && !skipTLSForHost(cid.getRemoteHost()) 
-					&& handler.isTlsRequired(cid.getLocalHost())) {
+			if (cid != null && !skipTLSForHost(cid.getRemoteHost()) && handler.isTlsRequired(cid.getLocalHost())) {
 				results.add(features_required);
-			}
-			else {
+			} else {
 				results.add(features);
 			}
 		}

@@ -30,135 +30,144 @@ AS:Group: Configuration
 
 package tigase.admin
 
-import tigase.conf.ConfigRepositoryIfc
-import tigase.conf.Configurable;
-import tigase.conf.Configurator;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.server.*
+import tigase.conf.Configurable
+import tigase.conf.Configurator
+import tigase.osgi.ModulesManagerImpl
+import tigase.server.Command
+import tigase.server.Iq
+import tigase.server.XMPPServer
 
-class DelayedReloadTaskPlugMan extends Thread {
+class DelayedReloadTaskPlugMan
+		extends Thread {
+
 	void run() {
 		Thread.sleep(5000);
-	    ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+		((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
 	}
 }
 
 try {
 
-def SUBMIT = "exec";
-        
-def p = (Iq)packet
+	def SUBMIT = "exec";
+
+	def p = (Iq) packet
 
 // check permission
-def admins = (Set)adminsSet
-def stanzaFromBare = p.getStanzaFrom().getBareJID()
-def isServiceAdmin = admins.contains(stanzaFromBare)
+	def admins = (Set) adminsSet
+	def stanzaFromBare = p.getStanzaFrom().getBareJID()
+	def isServiceAdmin = admins.contains(stanzaFromBare)
 
-if (!isServiceAdmin) {
-        def result = p.commandResult(Command.DataType.result)
-        Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
-        return result
-}
+	if (!isServiceAdmin) {
+		def result = p.commandResult(Command.DataType.result)
+		Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
+		return result
+	}
 
-        
 //def submit = Command.getFieldValue(p, SUBMIT);
-def submit = p.getElement().findChild(["iq","command","x"] as String[])?.getAttribute("type");
+	def submit = p.getElement().findChild([ "iq", "command", "x" ] as String[])?.getAttribute("type");
 
-if (!submit) {
-        def res = (Iq)p.commandResult(Command.DataType.form)
-                
-        def pluginsAll = [];
+	if (!submit) {
+		def res = (Iq) p.commandResult(Command.DataType.form)
+
+		def pluginsAll = [ ];
 		if (XMPPServer.isOSGi()) {
 			pluginsAll.addAll(ModulesManagerImpl.getInstance().plugins.keySet());
-		}
-		else {
+		} else {
 			pluginsAll.addAll(tigase.xmpp.ProcessorFactory.processors.keySet());
 		}
-        def conf = XMPPServer.getConfigurator();
-        def pluginsEnabled = [];
-        pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
-        
-        def pluginsStr = conf.getDefConfigParams().get(Configurable.GEN_SM_PLUGINS);
-        if (pluginsStr) {
-                pluginsStr.split(",").each { tmp ->
-                        def id = tmp;
-                        switch (tmp.charAt(0)) {
-                                case '+':
-                                        id = tmp.substring(1);
-                                        if (!pluginsAll.contains(id)) {
-                                                pluginsAll.add(id);
-                                        }
-                                        if (!pluginsEnabled.contains(id)) {
-                                                pluginsEnabled.add(id);
-                                        }
-                                        break;
-                                case '-':
-                                        id = tmp.substring(1);
-                                        if (!pluginsAll.contains(id)) {
-                                                pluginsAll.add(id);
-                                        }
-                                        pluginsEnabled.remove(id);
-                                        break;
-                                default:
-                                        pluginsEnabled.add(id);
-                                        break;
-                        }
-                }
-        }
-        
-        Command.addHiddenField(res, SUBMIT, SUBMIT);
-                
-        pluginsAll.sort();
-        pluginsAll.each { id ->
-                Command.addCheckBoxField(res, id, pluginsEnabled.contains(id));
-        }
-        
-        return res;
-}
-else {
-        def pluginsEnabled = [];
-        pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
-        
-        def str = "";
-                
-        def data = Command.getData(p, "x", "jabber:x:data");
-        data.getChildren().each { child ->
-                if (child.getName() != 'field') return;
-                if (child.getAttribute("value") == SUBMIT) return;
-                def id = tigase.xml.XMLUtils.escape(child.getAttribute("var"));
-                def enable = Command.getCheckBoxFieldValue(p, id);
-                if (enable && pluginsEnabled.contains(id)) return;
-                if (!enable && !pluginsEnabled.contains(id)) return;
-                if (enable && !pluginsEnabled.contains(id)) {
-                        if (!str.isEmpty()) str += ",";
-                        str += "+" + id;
-                        pluginsEnabled.add(id);
-                }
-                else if (!enable && pluginsEnabled.contains(id)) {
-                        if (!str.isEmpty()) str += ",";
-                        str += "-" + id;
+		def conf = XMPPServer.getConfigurator();
+		def pluginsEnabled = [ ];
+		pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
+
+		def pluginsStr = conf.getDefConfigParams().get(Configurable.GEN_SM_PLUGINS);
+		if (pluginsStr) {
+			pluginsStr.split(",").each { tmp ->
+				def id = tmp;
+				switch (tmp.charAt(0)) {
+					case '+':
+						id = tmp.substring(1);
+						if (!pluginsAll.contains(id)) {
+							pluginsAll.add(id);
+						}
+						if (!pluginsEnabled.contains(id)) {
+							pluginsEnabled.add(id);
+						}
+						break;
+					case '-':
+						id = tmp.substring(1);
+						if (!pluginsAll.contains(id)) {
+							pluginsAll.add(id);
+						}
 						pluginsEnabled.remove(id);
-                }
-        }
+						break;
+					default:
+						pluginsEnabled.add(id);
+						break;
+				}
+			}
+		}
 
-        def conf = XMPPServer.getConfigurator();
-        conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str.isEmpty() ? null : str);
-	
-        def props = [:];
-        props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
-        conf.putProperties("sess-man", props);
-                
+		Command.addHiddenField(res, SUBMIT, SUBMIT);
+
+		pluginsAll.sort();
+		pluginsAll.each { id -> Command.addCheckBoxField(res, id, pluginsEnabled.contains(id));
+		}
+
+		return res;
+	} else {
+		def pluginsEnabled = [ ];
+		pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
+
+		def str = "";
+
+		def data = Command.getData(p, "x", "jabber:x:data");
+		data.getChildren().each { child ->
+			if (child.getName() != 'field') {
+				return
+			};
+			if (child.getAttribute("value") == SUBMIT) {
+				return
+			};
+			def id = tigase.xml.XMLUtils.escape(child.getAttribute("var"));
+			def enable = Command.getCheckBoxFieldValue(p, id);
+			if (enable && pluginsEnabled.contains(id)) {
+				return
+			};
+			if (!enable && !pluginsEnabled.contains(id)) {
+				return
+			};
+			if (enable && !pluginsEnabled.contains(id)) {
+				if (!str.isEmpty()) {
+					str += ","
+				};
+				str += "+" + id;
+				pluginsEnabled.add(id);
+			} else if (!enable && pluginsEnabled.contains(id)) {
+				if (!str.isEmpty()) {
+					str += ","
+				};
+				str += "-" + id;
+				pluginsEnabled.remove(id);
+			}
+		}
+
+		def conf = XMPPServer.getConfigurator();
+		conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str.isEmpty() ? null : str);
+
+		def props = [ : ];
+		props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
+		conf.putProperties("sess-man", props);
+
 		new DelayedReloadTaskPlugMan().start();
-		
-        def res = (Iq)p.commandResult(Command.DataType.result)
 
-        Command.addTextField(res, "Note", "Operation successful.");
-                
-        return res;
-}        
+		def res = (Iq) p.commandResult(Command.DataType.result)
 
-}
-catch (Exception ex) {
-        ex.printStackTrace();
-        throw ex;
+		Command.addTextField(res, "Note", "Operation successful.");
+
+		return res;
+	}
+
+} catch (Exception ex) {
+	ex.printStackTrace();
+	throw ex;
 }

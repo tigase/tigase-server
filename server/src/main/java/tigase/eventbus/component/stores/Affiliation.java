@@ -30,8 +30,7 @@ public enum Affiliation {
 	 */
 	outcast(0, false, false, false, false, false, false, false),
 	/**
-	 * The manager of a node, of which there may be more than one; often but not
-	 * necessarily the node creator.
+	 * The manager of a node, of which there may be more than one; often but not necessarily the node creator.
 	 */
 	owner(4, true, true, true, true, true, true, true),
 	/** An entity that is allowed to publish items to a node. */
@@ -54,7 +53,7 @@ public enum Affiliation {
 	private final int weight;
 
 	Affiliation(int weight, boolean subscribe, boolean retrieveItem, boolean publishItem, boolean deleteItem,
-			boolean configureNode, boolean deleteNode, boolean purgeNode) {
+				boolean configureNode, boolean deleteNode, boolean purgeNode) {
 		this.subscribe = subscribe;
 		this.weight = weight;
 		this.retrieveItem = retrieveItem;

@@ -18,15 +18,12 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.db.comp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Command;
 import tigase.server.Packet;
-
 import tigase.xml.Element;
 
 /**
@@ -36,7 +33,8 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public abstract class RepositoryItemAbstract
-				implements RepositoryItem {
+		implements RepositoryItem {
+
 	/** Field description */
 	public static final String ADMINS_ATT = "admins";
 
@@ -52,15 +50,12 @@ public abstract class RepositoryItemAbstract
 	//~--- fields ---------------------------------------------------------------
 
 	private String[] admins = null;
-	private String owner    = null;
+	private String owner = null;
 
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public abstract String getElemName();
 
@@ -68,9 +63,8 @@ public abstract class RepositoryItemAbstract
 
 	@Override
 	public void addCommandFields(Packet packet) {
-		Command.addFieldValue(packet, OWNER_LABEL, (owner != null)
-						? owner
-						: packet.getStanzaTo().getBareJID().toString());
+		Command.addFieldValue(packet, OWNER_LABEL,
+							  (owner != null) ? owner : packet.getStanzaTo().getBareJID().toString());
 		Command.addFieldValue(packet, ADMINS_LABEL, adminsToString(admins));
 	}
 
@@ -82,11 +76,23 @@ public abstract class RepositoryItemAbstract
 	}
 
 	@Override
+	public void setAdmins(String[] admins) {
+		this.admins = admins;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	@Override
 	public String getOwner() {
 		return owner;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	@Override
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public void initFromCommand(Packet packet) {
@@ -99,11 +105,11 @@ public abstract class RepositoryItemAbstract
 
 	@Override
 	public void initFromElement(Element elem) {
-		owner  = elem.getAttributeStaticStr(OWNER_ATT);
+		owner = elem.getAttributeStaticStr(OWNER_ATT);
 		admins = adminsFromString(elem.getAttributeStaticStr(ADMINS_ATT));
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public boolean isAdmin(String id) {
@@ -121,21 +127,7 @@ public abstract class RepositoryItemAbstract
 
 	@Override
 	public boolean isOwner(String id) {
-		return ((owner == null)
-						? false
-						: owner.equals(id));
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	@Override
-	public void setAdmins(String[] admins) {
-		this.admins = admins;
-	}
-
-	@Override
-	public void setOwner(String owner) {
-		this.owner = owner;
+		return ((owner == null) ? false : owner.equals(id));
 	}
 
 	//~--- methods --------------------------------------------------------------

@@ -18,200 +18,107 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.RepositoryFactory;
-
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
-
-import tigase.server.Command;
-import tigase.server.ConnectionManager;
-import tigase.server.Iq;
-import tigase.server.MessageReceiver;
-import tigase.server.Packet;
-import tigase.server.Permissions;
-
+import tigase.server.*;
 import tigase.util.ClassUtil;
-
-import tigase.xml.db.Types.DataType;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-
+import tigase.xml.db.Types.DataType;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class ConfiguratorOld
- *
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ConfiguratorOld
-				extends ConfiguratorAbstract {
-	private static String             key        = null;
-	private static final Logger       log = Logger.getLogger("tigase.conf.Configurator");
+		extends ConfiguratorAbstract {
+
+	private static final Logger log = Logger.getLogger("tigase.conf.Configurator");
+	private static boolean add = false;
+	private static boolean force = true;
+	private static String key = null;
 	private static MonitoringSetupIfc monitoring = null;
-	private static String             value      = null;
-	private static boolean            set        = false;
-	private static boolean            print      = false;
-	private static boolean            force      = true;
-	private static boolean            add        = false;
+	private static boolean print = false;
+	private static boolean set = false;
+	private static String value = null;
 
 	//~--- fields ---------------------------------------------------------------
-
-	private String              config_file_name = null;
-	private ServiceEntity       config_list      = null;
-	private ServiceEntity       config_set       = null;
-	private ConfigXMLRepository repository       = null;
-	private Map<String, Object> defProperties    = new LinkedHashMap<String, Object>();
-	private Map<String, Object> defConfigParams  = new LinkedHashMap<String, Object>();
-
+	private String config_file_name = null;
+	private ServiceEntity config_list = null;
+	private ServiceEntity config_set = null;
+	private Map<String, Object> defConfigParams = new LinkedHashMap<String, Object>();
+	private Map<String, Object> defProperties = new LinkedHashMap<String, Object>();
+	private boolean demoMode = false;
+	private ConfigXMLRepository repository = null;
 	/**
-	 * This variable is used only for configuration at run-time to add new
-	 * components....
+	 * This variable is used only for configuration at run-time to add new components....
 	 */
-	private String        routerCompName = null;
-	private ServiceEntity serviceEntity  = null;
-	private boolean       demoMode       = false;
+	private String routerCompName = null;
+	private ServiceEntity serviceEntity = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Constructs ...
+	 * Method description
 	 *
+	 * @param objName
 	 */
-	public ConfiguratorOld() {}
+	public static Object getMXBean(String objName) {
+		if (monitoring != null) {
+			return monitoring.getMXBean(objName);
+		} else {
+			return null;
+		}
+	}
 
 	//~--- methods --------------------------------------------------------------
 
-	@Override
-	public void componentAdded(Configurable component) throws ConfigurationException {
-		super.componentAdded(component);
-		if (log.isLoggable(Level.CONFIG)) {
-			log.config(" component: " + component.getName());
-		}
-
-		ServiceEntity item = config_list.findNode(component.getName());
-
-		if (item == null) {
-			item = new ServiceEntity(getName(), component.getName(), "Component: " + component
-					.getName());
-			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity[] { new ServiceIdentity("automation",
-					"command-node", "Component: " + component.getName()) });
-			config_list.addItems(new ServiceEntity[] { item });
-		}
-		if (config_set.findNode(component.getName()) == null) {
-			config_set.addItems(new ServiceEntity[] { item });
-		}
-		if (component.getClass().getName().equals(ROUTER_COMP_CLASS_NAME)) {
-			routerCompName = component.getName();
-		}    // end of if (component.getClass().getName().equals())
-	}
-
-	@Override
-	public void init(String[] args) throws ConfigurationException {
-
-		// String fileName, String[] args) throws XMLDBException {
-		// System.out.println("configurator init...");
-		parseArgs(args);
-
-		// System.out.println("configurator after parse args, reading config from file: " + fileName);
-		try {
-			repository = ConfigXMLRepository.getConfigRepository(config_file_name);
-		} catch (Exception e) {
-			throw new ConfigurationException("Problem reading configuration repository", e);
-		}
-
-		// System.out.println("configurator after config repository load");
-		defConfigParams.putAll(getAllProperties(null));
-
-		// System.out.println("configurator after defparams.putall all properties");
-		Set<String> prop_keys = defProperties.keySet();
-
-		// System.out.println("configurator starting loop....");
-		for (String key : prop_keys) {
-
-			// System.out.println("Analyzing key: " + key);
-			int idx1 = key.indexOf("/");
-
-			if (idx1 > 0) {
-				String root     = key.substring(0, idx1);
-				String node     = key.substring(idx1 + 1);
-				String prop_key = null;
-				int    idx2     = node.lastIndexOf("/");
-
-				if (idx2 > 0) {
-					prop_key = node.substring(idx2 + 1);
-					node     = node.substring(0, idx2);
-				} else {
-					prop_key = node;
-					node     = null;
-				}
-				repository.set(root, node, prop_key, defProperties.get(key));
-				log.config("Added default config property: (" + key + "=" + defProperties.get(
-						key) + "), classname: " + defProperties.get(key).getClass().getName());
-
-				// System.out.println("Added default config property: ("
-				// + key + "=" + defProperties.getProperty(key) + ")");
-			} else {
-				log.warning("Ignoring default property, component part is missing: " + key);
-			}
-		}
-
-		// Not sure if this is the correct pleace to initialize monitoring
-		// maybe it should be initialized init initializationCompleted but
-		// Then some stuff might be missing. Let's try to do it here for now
-		// and maybe change it later.
-		initMonitoring((String) defConfigParams.get(MONITORING), new File(config_file_name)
-				.getParent());
-	}
-
-	@Override
-	public void initializationCompleted() {
-		if (isInitializationComplete()) {
-
-			// Do we really need to do this again?
-			return;
-		}
-		super.initializationCompleted();
-		if (monitoring != null) {
-			monitoring.initializationCompleted();
-		}
+	private static String help() {
+		return "\n" + "Parameters:\n" + " -h             this help message\n" + " -c file        configuration file\n" +
+				" -key key       node/key for the value to set\n" +
+				" -value value   value to set in configuration file\n" +
+				" -set           set given value for given key\n" +
+				" -add           add given value to the values list for given key\n" +
+				" -print         print content of all configuration settings or of given node/key\n" +
+				" -f             force creation of the new property - dangerous option...\n" + "Samples:\n" +
+				" Setting admin account - overwriting any previous value(s)\n" +
+				" $ ./scripts/config.sh -c tigase-config.xml -print -set -key " + DEF_SM_NAME +
+				"/admins -value admin1@localhost\n" + " Adding next admin account leaving old value(s)\n" +
+				" $ ./scripts/config.sh -c tigase-config.xml -print -add -key " + DEF_SM_NAME +
+				"/admins -value admin2@localhost\n" + "\n" +
+				"Note: adding -print option is useful always, even with -set or -add\n" +
+				"      option as it prints set value afterwards.\n";
 	}
 
 	/**
 	 * Describe <code>main</code> method here.
 	 *
 	 * @param args a <code>String[]</code> value
+	 *
 	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {
@@ -258,6 +165,204 @@ public class ConfiguratorOld
 		}      // end of if (print)
 	}
 
+	private static String objectToString(Object value) {
+		String val_str = null;
+		DataType type = DataType.valueof(value.getClass().getSimpleName());
+
+		try {
+			StringBuilder sb = new StringBuilder();
+
+			switch (type) {
+				case STRING_ARR:
+					for (String s : (String[]) value) {
+						if (sb.length() == 0) {
+							sb.append(s);
+						} else {
+							sb.append(", ").append(s);
+						}    // end of else
+					}      // end of for (String s: (String[])value)
+					val_str = sb.toString();
+
+					break;
+
+				case INTEGER_ARR:
+					for (int s : (int[]) value) {
+						if (sb.length() == 0) {
+							sb.append(s);
+						} else {
+							sb.append(", ").append(s);
+						}    // end of else
+					}      // end of for (String s: (String[])value)
+					val_str = sb.toString();
+
+					break;
+
+				case LONG_ARR:
+					for (long s : (long[]) value) {
+						if (sb.length() == 0) {
+							sb.append(s);
+						} else {
+							sb.append(", ").append(s);
+						}    // end of else
+					}      // end of for (String s: (String[])value)
+					val_str = sb.toString();
+
+					break;
+
+				case DOUBLE_ARR:
+					for (double s : (double[]) value) {
+						if (sb.length() == 0) {
+							sb.append(s);
+						} else {
+							sb.append(", ").append(s);
+						}    // end of else
+					}      // end of for (String s: (String[])value)
+					val_str = sb.toString();
+
+					break;
+
+				case BOOLEAN_ARR:
+					for (boolean s : (boolean[]) value) {
+						if (sb.length() == 0) {
+							sb.append(s);
+						} else {
+							sb.append(", ").append(s);
+						}    // end of else
+					}      // end of for (String s: (String[])value)
+					val_str = sb.toString();
+
+					break;
+
+				default:
+					val_str = value.toString();
+
+					break;
+			}        // end of switch (type)
+		} catch (ClassCastException e) {
+			log.warning("ERROR! Problem with type casting for property: " + key);
+		}          // end of try-catch
+
+		return val_str;
+	}
+
+	private static void print(String key, Object value) {
+		System.out.println(key + " = " + objectToString(value));
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param objName
+	 * @param bean
+	 */
+	public static void putMXBean(String objName, Object bean) {
+		if (monitoring != null) {
+			monitoring.putMXBean(objName, bean);
+		}
+	}
+
+	/**
+	 * Constructs ...
+	 */
+	public ConfiguratorOld() {
+	}
+
+	@Override
+	public void componentAdded(Configurable component) throws ConfigurationException {
+		super.componentAdded(component);
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config(" component: " + component.getName());
+		}
+
+		ServiceEntity item = config_list.findNode(component.getName());
+
+		if (item == null) {
+			item = new ServiceEntity(getName(), component.getName(), "Component: " + component.getName());
+			item.addFeatures(CMD_FEATURES);
+			item.addIdentities(new ServiceIdentity[]{
+					new ServiceIdentity("automation", "command-node", "Component: " + component.getName())});
+			config_list.addItems(new ServiceEntity[]{item});
+		}
+		if (config_set.findNode(component.getName()) == null) {
+			config_set.addItems(new ServiceEntity[]{item});
+		}
+		if (component.getClass().getName().equals(ROUTER_COMP_CLASS_NAME)) {
+			routerCompName = component.getName();
+		}    // end of if (component.getClass().getName().equals())
+	}
+
+	@Override
+	public void init(String[] args) throws ConfigurationException {
+
+		// String fileName, String[] args) throws XMLDBException {
+		// System.out.println("configurator init...");
+		parseArgs(args);
+
+		// System.out.println("configurator after parse args, reading config from file: " + fileName);
+		try {
+			repository = ConfigXMLRepository.getConfigRepository(config_file_name);
+		} catch (Exception e) {
+			throw new ConfigurationException("Problem reading configuration repository", e);
+		}
+
+		// System.out.println("configurator after config repository load");
+		defConfigParams.putAll(getAllProperties(null));
+
+		// System.out.println("configurator after defparams.putall all properties");
+		Set<String> prop_keys = defProperties.keySet();
+
+		// System.out.println("configurator starting loop....");
+		for (String key : prop_keys) {
+
+			// System.out.println("Analyzing key: " + key);
+			int idx1 = key.indexOf("/");
+
+			if (idx1 > 0) {
+				String root = key.substring(0, idx1);
+				String node = key.substring(idx1 + 1);
+				String prop_key = null;
+				int idx2 = node.lastIndexOf("/");
+
+				if (idx2 > 0) {
+					prop_key = node.substring(idx2 + 1);
+					node = node.substring(0, idx2);
+				} else {
+					prop_key = node;
+					node = null;
+				}
+				repository.set(root, node, prop_key, defProperties.get(key));
+				log.config("Added default config property: (" + key + "=" + defProperties.get(key) + "), classname: " +
+								   defProperties.get(key).getClass().getName());
+
+				// System.out.println("Added default config property: ("
+				// + key + "=" + defProperties.getProperty(key) + ")");
+			} else {
+				log.warning("Ignoring default property, component part is missing: " + key);
+			}
+		}
+
+		// Not sure if this is the correct pleace to initialize monitoring
+		// maybe it should be initialized init initializationCompleted but
+		// Then some stuff might be missing. Let's try to do it here for now
+		// and maybe change it later.
+		initMonitoring((String) defConfigParams.get(MONITORING), new File(config_file_name).getParent());
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	@Override
+	public void initializationCompleted() {
+		if (isInitializationComplete()) {
+
+			// Do we really need to do this again?
+			return;
+		}
+		super.initializationCompleted();
+		if (monitoring != null) {
+			monitoring.initializationCompleted();
+		}
+	}
+
 	@Override
 	public void parseArgs(final String[] args) {
 		defConfigParams.put(GEN_TEST, Boolean.FALSE);
@@ -272,7 +377,7 @@ public class ConfiguratorOld
 						System.out.print(help());
 						System.exit(1);
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						config_file_name = args[++i];
 
 						continue;
@@ -286,14 +391,14 @@ public class ConfiguratorOld
 					key = args[i];
 					val = Boolean.TRUE;
 				}
-				if (args[i].equals(RepositoryFactory.GEN_USER_DB) || args[i].equals(
-						RepositoryFactory.GEN_USER_DB_URI) || args[i].equals(RepositoryFactory
-						.GEN_AUTH_DB) || args[i].equals(RepositoryFactory.GEN_AUTH_DB_URI) || args[i]
-						.startsWith(GEN_COMP_NAME) || args[i].startsWith(GEN_COMP_CLASS) || args[i]
-						.startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS) || args[i].equals(
-						GEN_ADMINS) || args[i].equals(GEN_DEBUG) || (args[i].startsWith(GEN_CONF) &&
-						!args[i].startsWith(GEN_CONFIG)) || args[i].equals(
-						PROPERTY_FILENAME_PROP_KEY) || args[i].equals(CLUSTER_MODE)) {
+				if (args[i].equals(RepositoryFactory.GEN_USER_DB) ||
+						args[i].equals(RepositoryFactory.GEN_USER_DB_URI) ||
+						args[i].equals(RepositoryFactory.GEN_AUTH_DB) ||
+						args[i].equals(RepositoryFactory.GEN_AUTH_DB_URI) || args[i].startsWith(GEN_COMP_NAME) ||
+						args[i].startsWith(GEN_COMP_CLASS) || args[i].startsWith(GEN_EXT_COMP) ||
+						args[i].equals(GEN_VIRT_HOSTS) || args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG) ||
+						(args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG)) ||
+						args[i].equals(PROPERTY_FILENAME_PROP_KEY) || args[i].equals(CLUSTER_MODE)) {
 					key = args[i];
 					val = args[++i];
 				}
@@ -334,75 +439,75 @@ public class ConfiguratorOld
 							key = key.substring(0, key.length() - 3);
 							try {
 								switch (c) {
-								case 'L' :
+									case 'L':
 
-									// Long value
-									val = Long.decode(value);
+										// Long value
+										val = Long.decode(value);
 
-									break;
+										break;
 
-								case 'I' :
+									case 'I':
 
-									// Integer value
-									val = Integer.decode(value);
+										// Integer value
+										val = Integer.decode(value);
 
-									break;
+										break;
 
-								case 'B' :
+									case 'B':
 
-									// Boolean value
-									val = Boolean.valueOf(Boolean.parseBoolean(value));
-									log.config("Found Boolean property: " + val.toString());
+										// Boolean value
+										val = Boolean.valueOf(Boolean.parseBoolean(value));
+										log.config("Found Boolean property: " + val.toString());
 
-									break;
+										break;
 
-								case 's' :
+									case 's':
 
-									// Comma separated, Strings array
-									val = value.split(",");
+										// Comma separated, Strings array
+										val = value.split(",");
 
-									break;
+										break;
 
-								case 'i' :
+									case 'i':
 
-									// Comma separated, int array
-									String[] ints_str = value.split(",");
-									int[]    ints     = new int[ints_str.length];
-									int      k        = 0;
+										// Comma separated, int array
+										String[] ints_str = value.split(",");
+										int[] ints = new int[ints_str.length];
+										int k = 0;
 
-									for (String i : ints_str) {
-										try {
-											ints[k++] = Integer.parseInt(i);
-										} catch (Exception e) {
-											log.warning("Incorrect int array settins: " + i);
+										for (String i : ints_str) {
+											try {
+												ints[k++] = Integer.parseInt(i);
+											} catch (Exception e) {
+												log.warning("Incorrect int array settins: " + i);
+											}
 										}
-									}
-									val = ints;
+										val = ints;
 
-									break;
+										break;
 
-								case 'l' :
+									case 'l':
 
-									// Comma separated, long array
-									String[] longs_str = value.split(",");
-									long[]   longs     = new long[longs_str.length];
-									int      j         = 0;
+										// Comma separated, long array
+										String[] longs_str = value.split(",");
+										long[] longs = new long[longs_str.length];
+										int j = 0;
 
-									for (String i : longs_str) {
-										try {
-											longs[j++] = Long.parseLong(i);
-										} catch (Exception e) {
-											log.warning("Incorrect long array settins: " + i);
+										for (String i : longs_str) {
+											try {
+												longs[j++] = Long.parseLong(i);
+											} catch (Exception e) {
+												log.warning("Incorrect long array settins: " + i);
+											}
 										}
-									}
-									val = longs;
+										val = longs;
 
-									break;
+										break;
 
-								default :
+									default:
 
-									// Do nothing, default to String
-									break;
+										// Do nothing, default to String
+										break;
 								}
 							} catch (Exception e) {
 								log.log(Level.CONFIG, "Incorrect parameter modifier", e);
@@ -435,7 +540,7 @@ public class ConfiguratorOld
 
 		String nick = iqc.getTo().getLocalpart();
 
-		if ((nick == null) ||!getName().equals(nick)) {
+		if ((nick == null) || !getName().equals(nick)) {
 			return;
 		}
 
@@ -446,14 +551,13 @@ public class ConfiguratorOld
 		if (iqc.getPermissions() != Permissions.ADMIN) {
 			if (demoMode) {
 				admin = false;
-				msg = "You are not admin. You can safely play with the settings as" +
-						" you can not change anything.";
+				msg = "You are not admin. You can safely play with the settings as" + " you can not change anything.";
 				if ((iqc.getStrCommand() != null) && iqc.getStrCommand().endsWith(DEF_SM_NAME)) {
 					Packet result = iqc.commandResult(Command.DataType.result);
 
 					Command.addFieldValue(result, "Note", msg, "fixed");
-					Command.addFieldValue(result, "Note",
-							"Restricted area, only admin can see these settings.", "fixed");
+					Command.addFieldValue(result, "Note", "Restricted area, only admin can see these settings.",
+										  "fixed");
 					results.offer(result);
 
 					return;
@@ -461,7 +565,8 @@ public class ConfiguratorOld
 			} else {
 				try {
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You are not authorized for this action.", true));
+																				  "You are not authorized for this action.",
+																				  true));
 				} catch (PacketErrorTypeException e) {
 					log.warning("Packet processing exception: " + e);
 				}
@@ -483,70 +588,57 @@ public class ConfiguratorOld
 			return;
 		}
 		switch (iqc.getCommand()) {
-		case OTHER :
-			if (iqc.getStrCommand() != null) {
-				if (iqc.getStrCommand().startsWith("config/list/")) {
-					try {
-						String[] spl    = iqc.getStrCommand().split("/");
-						Packet   result = iqc.commandResult(Command.DataType.result);
+			case OTHER:
+				if (iqc.getStrCommand() != null) {
+					if (iqc.getStrCommand().startsWith("config/list/")) {
+						try {
+							String[] spl = iqc.getStrCommand().split("/");
+							Packet result = iqc.commandResult(Command.DataType.result);
 
-						Command.addFieldValue(result, "Note", msg, "fixed");
+							Command.addFieldValue(result, "Note", msg, "fixed");
 
-						Map<String, Object> allprop = getAllProperties(spl[2]);
+							Map<String, Object> allprop = getAllProperties(spl[2]);
 
-						for (Map.Entry<String, Object> entry : allprop.entrySet()) {
-							Command.addFieldValue(result, XMLUtils.escape(entry.getKey()), XMLUtils
-									.escape(objectToString(entry.getValue())));
-						}    // end of for (Map.Entry entry: prop.entrySet())
-						results.offer(result);
-					} catch (ConfigurationException ex) {
-						Logger.getLogger(ConfiguratorOld.class.getName()).log(Level.SEVERE, null, ex);
-					}
-				}
-				if (iqc.getStrCommand().startsWith("config/set/")) {
-					try {
-						String[] spl    = iqc.getStrCommand().split("/");
-						Packet   result = iqc.commandResult(Command.DataType.result);
-
-						Command.addFieldValue(result, "Note", msg, "fixed");
-						if (Command.getData(packet) == null) {
-							prepareConfigData(result, spl[2]);
+							for (Map.Entry<String, Object> entry : allprop.entrySet()) {
+								Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+													  XMLUtils.escape(objectToString(entry.getValue())));
+							}    // end of for (Map.Entry entry: prop.entrySet())
 							results.offer(result);
-						} else {
-							updateConfigChanges(packet, result, spl[2], admin);
-							results.offer(result);
+						} catch (ConfigurationException ex) {
+							Logger.getLogger(ConfiguratorOld.class.getName()).log(Level.SEVERE, null, ex);
 						}
-					} catch (ConfigurationException ex) {
-						Logger.getLogger(ConfiguratorOld.class.getName()).log(Level.SEVERE, null, ex);
+					}
+					if (iqc.getStrCommand().startsWith("config/set/")) {
+						try {
+							String[] spl = iqc.getStrCommand().split("/");
+							Packet result = iqc.commandResult(Command.DataType.result);
+
+							Command.addFieldValue(result, "Note", msg, "fixed");
+							if (Command.getData(packet) == null) {
+								prepareConfigData(result, spl[2]);
+								results.offer(result);
+							} else {
+								updateConfigChanges(packet, result, spl[2], admin);
+								results.offer(result);
+							}
+						} catch (ConfigurationException ex) {
+							Logger.getLogger(ConfiguratorOld.class.getName()).log(Level.SEVERE, null, ex);
+						}
 					}
 				}
-			}
 
-			break;
+				break;
 
-		default :
-			break;
+			default:
+				break;
 		}
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param objName
-	 * @param bean
-	 */
-	public static void putMXBean(String objName, Object bean) {
-		if (monitoring != null) {
-			monitoring.putMXBean(objName, bean);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
 	 *
 	 * @param name
+	 *
 	 * @throws tigase.conf.ConfigurationException
 	 */
 	public void setup(String name) throws ConfigurationException {
@@ -555,21 +647,16 @@ public class ConfiguratorOld
 		setup(component);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param key
-	 *
-	 * 
 	 *
 	 * @throws ConfigurationException
 	 */
 	public Map<String, Object> getAllProperties(String key) throws ConfigurationException {
 		Map<String, Object> result = new LinkedHashMap<String, Object>();
-		String[]            comps  = getComponents();
+		String[] comps = getComponents();
 
 		if (comps != null) {
 			for (String comp : comps) {
@@ -594,9 +681,6 @@ public class ConfiguratorOld
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String[] getComponents() {
 		return repository.getCompNames();
@@ -615,6 +699,8 @@ public class ConfiguratorOld
 	public Map<String, Object> getDefConfigParams() {
 		return defConfigParams;
 	}
+
+	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -637,8 +723,7 @@ public class ConfiguratorOld
 				return serviceEntity.getDiscoItems(node, jid.toString());
 			} else {
 				if (node == null) {
-					return Arrays.asList(serviceEntity.getDiscoItem(null, BareJID.toString(
-							getName(), jid.toString())));
+					return Arrays.asList(serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString())));
 				} else {
 					return null;
 				}
@@ -648,48 +733,31 @@ public class ConfiguratorOld
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param objName
-	 *
-	 * 
-	 */
-	public static Object getMXBean(String objName) {
-		if (monitoring != null) {
-			return monitoring.getMXBean(objName);
-		} else {
-			return null;
-		}
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "config", "Server configuration");
-		serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("automation",
-				"command-list", "Configuration commands") });
+		serviceEntity.addIdentities(
+				new ServiceIdentity[]{new ServiceIdentity("automation", "command-list", "Configuration commands")});
 		serviceEntity.addFeatures(DEF_FEATURES);
 		config_list = new ServiceEntity(name, "list", "List");
-		config_list.addIdentities(new ServiceIdentity[] { new ServiceIdentity("automation",
-				"command-list", "Config listings") });
+		config_list.addIdentities(
+				new ServiceIdentity[]{new ServiceIdentity("automation", "command-list", "Config listings")});
 		config_list.addFeatures(DEF_FEATURES);
 		config_set = new ServiceEntity(name, "set", "Set");
-		config_set.addIdentities(new ServiceIdentity[] { new ServiceIdentity("automation",
-				"command-list", "Config settings") });
+		config_set.addIdentities(
+				new ServiceIdentity[]{new ServiceIdentity("automation", "command-list", "Config settings")});
 		config_set.addFeatures(DEF_FEATURES);
 
 		ServiceEntity item = new ServiceEntity(getName(), "--none--", "Add new component...");
 
 		item.addFeatures(CMD_FEATURES);
-		item.addIdentities(new ServiceIdentity("automation", "command-node",
-				"Add new component..."));
+		item.addIdentities(new ServiceIdentity("automation", "command-node", "Add new component..."));
 		config_set.addItems(item);
 		serviceEntity.addItems(config_list, config_set);
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void setProperties(final Map<String, Object> props) throws ConfigurationException {
@@ -702,16 +770,12 @@ public class ConfiguratorOld
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param key
 	 * @param val
 	 * @param result_pack
 	 * @param admin
-	 *
-	 * 
 	 */
-	public Object setPropertyValue(String key, String val, Packet result_pack,
-			boolean admin) {
+	public Object setPropertyValue(String key, String val, Packet result_pack, boolean admin) {
 		Object result = null;
 
 		try {
@@ -722,8 +786,8 @@ public class ConfiguratorOld
 				Command.addFieldValue(result_pack, XMLUtils.escape(key), XMLUtils.escape(val));
 			} else {
 				Command.addFieldValue(result_pack, "Note",
-						"You can not set new properties yet, you can just modify existing ones.",
-						"fixed");
+									  "You can not set new properties yet, you can just modify existing ones.",
+									  "fixed");
 			}
 		} catch (Exception e) {
 			Command.addFieldValue(result_pack, "Note", "Error setting property: " + e, "fixed");
@@ -735,29 +799,21 @@ public class ConfiguratorOld
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param node_key
 	 * @param value
 	 * @param add
 	 * @param feedback
 	 * @param orig
 	 *
-	 * 
-	 *
 	 * @throws Exception
 	 */
-	public Object setValue(String node_key, String value, boolean add, boolean feedback,
-			Map<String, Object> orig)
-					throws Exception {
-		int    root_idx = node_key.indexOf('/');
-		String root     = (root_idx > 0)
-				? node_key.substring(0, root_idx)
-				: "";
-		int    key_idx  = node_key.lastIndexOf('/');
-		String key      = (key_idx > 0)
-				? node_key.substring(key_idx + 1)
-				: node_key;
-		String subnode  = null;
+	public Object setValue(String node_key, String value, boolean add, boolean feedback, Map<String, Object> orig)
+			throws Exception {
+		int root_idx = node_key.indexOf('/');
+		String root = (root_idx > 0) ? node_key.substring(0, root_idx) : "";
+		int key_idx = node_key.lastIndexOf('/');
+		String key = (key_idx > 0) ? node_key.substring(key_idx + 1) : node_key;
+		String subnode = null;
 
 		if (root_idx != key_idx) {
 			subnode = node_key.substring(root_idx + 1, key_idx);
@@ -771,125 +827,124 @@ public class ConfiguratorOld
 			old_val = orig.get(node_key);
 		}    // end of if (orig == null) else
 		if (old_val != null) {
-			Object   new_val = null;
-			DataType type    = DataType.valueof(old_val.getClass().getSimpleName());
+			Object new_val = null;
+			DataType type = DataType.valueof(old_val.getClass().getSimpleName());
 
 			switch (type) {
-			case INTEGER :
-				new_val = Integer.decode(value);
+				case INTEGER:
+					new_val = Integer.decode(value);
 
-				break;
+					break;
 
-			case INTEGER_ARR :
-				if (add) {
-					int old_len = ((int[]) old_val).length;
+				case INTEGER_ARR:
+					if (add) {
+						int old_len = ((int[]) old_val).length;
 
-					new_val                    = Arrays.copyOf((int[]) old_val, old_len + 1);
-					((int[]) new_val)[old_len] = Integer.decode(value);
-				} else {
-					String[] spl = value.split(",");
+						new_val = Arrays.copyOf((int[]) old_val, old_len + 1);
+						((int[]) new_val)[old_len] = Integer.decode(value);
+					} else {
+						String[] spl = value.split(",");
 
-					new_val = new int[spl.length];
-					for (int i = 0; i < spl.length; i++) {
-						((int[]) new_val)[i] = Integer.decode(spl[i].trim());
+						new_val = new int[spl.length];
+						for (int i = 0; i < spl.length; i++) {
+							((int[]) new_val)[i] = Integer.decode(spl[i].trim());
+						}
+					}    // end of if (add) else
+
+					break;
+
+				case LONG:
+					new_val = Long.decode(value);
+
+					break;
+
+				case LONG_ARR:
+					if (add) {
+						int old_len = ((long[]) old_val).length;
+
+						new_val = Arrays.copyOf((long[]) old_val, old_len + 1);
+						((long[]) new_val)[old_len] = Long.decode(value);
+					} else {
+						String[] spl = value.split(",");
+
+						new_val = new long[spl.length];
+						for (int i = 0; i < spl.length; i++) {
+							((long[]) new_val)[i] = Long.decode(spl[i].trim());
+						}
+					}    // end of if (add) else
+
+					break;
+
+				case STRING:
+					new_val = value;
+
+					break;
+
+				case STRING_ARR:
+					if (add) {
+						int old_len = ((String[]) old_val).length;
+
+						new_val = Arrays.copyOf((String[]) old_val, old_len + 1);
+						((String[]) new_val)[old_len] = value;
+					} else {
+						String[] spl = value.split(",");
+
+						new_val = new String[spl.length];
+						for (int i = 0; i < spl.length; i++) {
+							((String[]) new_val)[i] = spl[i].trim();
+						}
+					}    // end of if (add) else
+
+					break;
+
+				case DOUBLE:
+					new_val = new Double(Double.parseDouble(value));
+
+					break;
+
+				case DOUBLE_ARR:
+					if (add) {
+						int old_len = ((double[]) old_val).length;
+
+						new_val = Arrays.copyOf((double[]) old_val, old_len + 1);
+						((double[]) new_val)[old_len] = Double.parseDouble(value);
+					} else {
+						String[] spl = value.split(",");
+
+						new_val = new double[spl.length];
+						for (int i = 0; i < spl.length; i++) {
+							((double[]) new_val)[i] = Double.parseDouble(spl[i].trim());
+						}
 					}
-				}    // end of if (add) else
 
-				break;
+					break;
 
-			case LONG :
-				new_val = Long.decode(value);
+				case BOOLEAN:
+					new_val = Boolean.valueOf(parseBoolean(value));
 
-				break;
+					break;
 
-			case LONG_ARR :
-				if (add) {
-					int old_len = ((long[]) old_val).length;
+				case BOOLEAN_ARR:
+					if (add) {
+						int old_len = ((boolean[]) old_val).length;
 
-					new_val                     = Arrays.copyOf((long[]) old_val, old_len + 1);
-					((long[]) new_val)[old_len] = Long.decode(value);
-				} else {
-					String[] spl = value.split(",");
+						new_val = Arrays.copyOf((boolean[]) old_val, old_len + 1);
+						((boolean[]) new_val)[old_len] = parseBoolean(value);
+					} else {
+						String[] spl = value.split(",");
 
-					new_val = new long[spl.length];
-					for (int i = 0; i < spl.length; i++) {
-						((long[]) new_val)[i] = Long.decode(spl[i].trim());
+						new_val = new boolean[spl.length];
+						for (int i = 0; i < spl.length; i++) {
+							((boolean[]) new_val)[i] = parseBoolean(spl[i].trim());
+						}
 					}
-				}    // end of if (add) else
 
-				break;
+					break;
 
-			case STRING :
-				new_val = value;
+				default:
+					new_val = value;
 
-				break;
-
-			case STRING_ARR :
-				if (add) {
-					int old_len = ((String[]) old_val).length;
-
-					new_val                       = Arrays.copyOf((String[]) old_val, old_len + 1);
-					((String[]) new_val)[old_len] = value;
-				} else {
-					String[] spl = value.split(",");
-
-					new_val = new String[spl.length];
-					for (int i = 0; i < spl.length; i++) {
-						((String[]) new_val)[i] = spl[i].trim();
-					}
-				}    // end of if (add) else
-
-				break;
-
-			case DOUBLE :
-				new_val = new Double(Double.parseDouble(value));
-
-				break;
-
-			case DOUBLE_ARR :
-				if (add) {
-					int old_len = ((double[]) old_val).length;
-
-					new_val                       = Arrays.copyOf((double[]) old_val, old_len + 1);
-					((double[]) new_val)[old_len] = Double.parseDouble(value);
-				} else {
-					String[] spl = value.split(",");
-
-					new_val = new double[spl.length];
-					for (int i = 0; i < spl.length; i++) {
-						((double[]) new_val)[i] = Double.parseDouble(spl[i].trim());
-					}
-				}
-
-				break;
-
-			case BOOLEAN :
-				new_val = Boolean.valueOf(parseBoolean(value));
-
-				break;
-
-			case BOOLEAN_ARR :
-				if (add) {
-					int old_len = ((boolean[]) old_val).length;
-
-					new_val                        = Arrays.copyOf((boolean[]) old_val, old_len +
-							1);
-					((boolean[]) new_val)[old_len] = parseBoolean(value);
-				} else {
-					String[] spl = value.split(",");
-
-					new_val = new boolean[spl.length];
-					for (int i = 0; i < spl.length; i++) {
-						((boolean[]) new_val)[i] = parseBoolean(spl[i].trim());
-					}
-				}
-
-				break;
-
-			default :
-				new_val = value;
-
-				break;
+					break;
 			}      // end of switch (type)
 			if (orig == null) {
 				repository.set(root, subnode, key, new_val);
@@ -924,9 +979,7 @@ public class ConfiguratorOld
 		}        // end of else
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-//private boolean isValidCompName(String name) {
+	//private boolean isValidCompName(String name) {
 //  return !(name.contains(" ")
 //    || name.contains("\t")
 //    || name.contains("@")
@@ -936,8 +989,7 @@ public class ConfiguratorOld
 		String msg = name;
 
 		if (msg != null) {
-			Command.addFieldValue(result, "Info", "Note!! " + msg +
-					", please provide valid component name.", "fixed");
+			Command.addFieldValue(result, "Info", "Note!! " + msg + ", please provide valid component name.", "fixed");
 			newComponentCommand(result);
 
 			return false;
@@ -947,10 +999,8 @@ public class ConfiguratorOld
 
 		for (String comp_name : comp_names) {
 			if (comp_name.equals(name)) {
-				Command.addFieldValue(result, "Info",
-						"Note!! Component with provided name already exists.", "fixed");
-				Command.addFieldValue(result, "Info", "Please provide different component name.",
-						"fixed");
+				Command.addFieldValue(result, "Info", "Note!! Component with provided name already exists.", "fixed");
+				Command.addFieldValue(result, "Info", "Please provide different component name.", "fixed");
 				newComponentCommand(result);
 
 				return false;
@@ -961,7 +1011,7 @@ public class ConfiguratorOld
 	}
 
 	private void createNewComponent(Packet packet, Packet result, boolean admin) {
-		String new_comp_name  = Command.getFieldValue(packet, "Component name");
+		String new_comp_name = Command.getFieldValue(packet, "Component name");
 		String new_comp_class = Command.getFieldValue(packet, "Component class");
 
 		try {
@@ -987,72 +1037,48 @@ public class ConfiguratorOld
 
 					// Now we can save all properties to config repository:
 					for (Map.Entry<String, Object> entry : new_params.entrySet()) {
-						String key     = entry.getKey();
+						String key = entry.getKey();
 						String subnode = null;
-						int    key_idx = entry.getKey().lastIndexOf('/');
+						int key_idx = entry.getKey().lastIndexOf('/');
 
 						if (key_idx > 0) {
-							key     = entry.getKey().substring(key_idx + 1);
+							key = entry.getKey().substring(key_idx + 1);
 							subnode = entry.getKey().substring(0, key_idx);
 						}
-						log.info("Saving property to repository: " + "root=" + new_comp_name +
-								", subnode=" + subnode + ", key=" + key + ", value=" + entry.getValue());
+						log.info("Saving property to repository: " + "root=" + new_comp_name + ", subnode=" + subnode +
+										 ", key=" + key + ", value=" + entry.getValue());
 						repository.set(new_comp_name, subnode, key, entry.getValue());
 					}    // end of for (Map.Entry entry: prop.entrySet())
 
 					// And load the component itself.....
 					// Set class name for the component
-					repository.set(routerCompName, "/components/msg-receivers", new_comp_name +
-							".class", new_comp_class);
+					repository.set(routerCompName, "/components/msg-receivers", new_comp_name + ".class",
+								   new_comp_class);
 
 					// Activate the component
-					repository.set(routerCompName, "/components/msg-receivers", new_comp_name +
-							".active", true);
+					repository.set(routerCompName, "/components/msg-receivers", new_comp_name + ".active", true);
 
 					// Add to the list of automaticaly loaded components
-					setValue(routerCompName + "/components/msg-receivers/id-names", new_comp_name,
-							true, false, null);
+					setValue(routerCompName + "/components/msg-receivers/id-names", new_comp_name, true, false, null);
 
 					// repository.sync();
 					setup(routerCompName);
 				}    // end of if (admin)
 			}
 			Command.addNote(result, "New component created: " + new_comp_name);
-			Command.addFieldValue(result, "Note", "New component created: " + new_comp_name,
-					"fixed");
+			Command.addFieldValue(result, "Note", "New component created: " + new_comp_name, "fixed");
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Problem instantiating component:", e);
 			Command.addFieldValue(result, "Component class",
-					"ERROR!! Problem instantiating component, " +
-					"look in log file for details...", "text-single", "Component class");
+								  "ERROR!! Problem instantiating component, " + "look in log file for details...",
+								  "text-single", "Component class");
 		}    // end of try-catch
-	}
-
-	private static String help() {
-		return "\n" + "Parameters:\n" + " -h             this help message\n" +
-				" -c file        configuration file\n" +
-				" -key key       node/key for the value to set\n" +
-				" -value value   value to set in configuration file\n" +
-				" -set           set given value for given key\n" +
-				" -add           add given value to the values list for given key\n" +
-				" -print         print content of all configuration settings or of given node/key\n" +
-				" -f             force creation of the new property - dangerous option...\n" +
-				"Samples:\n" + " Setting admin account - overwriting any previous value(s)\n" +
-				" $ ./scripts/config.sh -c tigase-config.xml -print -set -key " + DEF_SM_NAME +
-				"/admins -value admin1@localhost\n" +
-				" Adding next admin account leaving old value(s)\n" +
-				" $ ./scripts/config.sh -c tigase-config.xml -print -add -key " + DEF_SM_NAME +
-				"/admins -value admin2@localhost\n" + "\n" +
-				"Note: adding -print option is useful always, even with -set or -add\n" +
-				"      option as it prints set value afterwards.\n"
-		;
 	}
 
 	private void initMonitoring(String settings, String configDir) {
 		if ((monitoring == null) && (settings != null)) {
 			try {
-				monitoring = (MonitoringSetupIfc) Class.forName(
-						"tigase.management.MonitoringSetup").newInstance();
+				monitoring = (MonitoringSetupIfc) Class.forName("tigase.management.MonitoringSetup").newInstance();
 				monitoring.initMonitoring(settings, configDir);
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not initialize monitoring: ", e);
@@ -1062,33 +1088,31 @@ public class ConfiguratorOld
 
 	private void newComponentCommand(Packet result) {
 		Command.addFieldValue(result, "Info", "Press:", "fixed");
-		Command.addFieldValue(result, "Info",
-				"'Next' to set all parameters for the new component.", "fixed");
+		Command.addFieldValue(result, "Info", "'Next' to set all parameters for the new component.", "fixed");
 		Command.setStatus(result, Command.Status.executing);
 		Command.addAction(result, Command.Action.next);
 		Command.addFieldValue(result, "Component name", "", "text-single", "Component name");
 		try {
-			Set<Class<MessageReceiver>> receiv_cls = ClassUtil.getClassesImplementing(
-					MessageReceiver.class);
+			Set<Class<MessageReceiver>> receiv_cls = ClassUtil.getClassesImplementing(MessageReceiver.class);
 
 			// All message receivers except MessageRouter
-			String[] receiv_cls_names  = new String[receiv_cls.size() - 1];
+			String[] receiv_cls_names = new String[receiv_cls.size() - 1];
 			String[] receiv_cls_simple = new String[receiv_cls.size() - 1];
-			int      idx               = 0;
+			int idx = 0;
 
 			for (Class<MessageReceiver> reciv : receiv_cls) {
 				if (!reciv.getName().equals(ROUTER_COMP_CLASS_NAME)) {
-					receiv_cls_names[idx]    = reciv.getName();
+					receiv_cls_names[idx] = reciv.getName();
 					receiv_cls_simple[idx++] = reciv.getSimpleName();
 				}    // end of if (!reciv.getName().equals(ROUTER_COMP_CLASS_NAME))
 			}      // end of for (MessageReceiver.class reciv: receiv_cls)
-			Command.addFieldValue(result, "Component class", EXT_COMP_CLASS_NAME,
-					"Component class", receiv_cls_simple, receiv_cls_names);
+			Command.addFieldValue(result, "Component class", EXT_COMP_CLASS_NAME, "Component class", receiv_cls_simple,
+								  receiv_cls_names);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Problem loading MessageReceiver implementations", e);
 			Command.addFieldValue(result, "Component class",
-					"ERROR!! Problem loading MessageReceiver implementations, " +
-					"look in log file for details...", "text-single", "Component class");
+								  "ERROR!! Problem loading MessageReceiver implementations, " +
+										  "look in log file for details...", "text-single", "Component class");
 		}    // end of try-catch
 	}
 
@@ -1106,7 +1130,7 @@ public class ConfiguratorOld
 			return;
 		}    // end of if (params_set != null)
 
-		String new_comp_name  = Command.getFieldValue(packet, "Component name");
+		String new_comp_name = Command.getFieldValue(packet, "Component name");
 		String new_comp_class = Command.getFieldValue(packet, "Component class");
 
 		if (!checkComponentName(result, new_comp_name)) {
@@ -1119,26 +1143,26 @@ public class ConfiguratorOld
 		try {
 			MessageReceiver mr = (MessageReceiver) Class.forName(new_comp_class).newInstance();
 
-			Command.addFieldValue(result, "Info4", "Component name: " + new_comp_name +
-					", class: " + mr.getClass().getSimpleName(), "fixed");
+			Command.addFieldValue(result, "Info4",
+								  "Component name: " + new_comp_name + ", class: " + mr.getClass().getSimpleName(),
+								  "fixed");
 			if (mr instanceof ConnectionManager) {
 				String ports = Command.getFieldValue(packet, "TCP/IP ports");
 
 				if (ports == null) {
-					Command.addFieldValue(result, "Info2",
-							"1. 'Next' to set more component parameters.", "fixed");
-					Command.addFieldValue(result, "Info3",
-							"2. 'Previous' to go back and select different component.", "fixed");
+					Command.addFieldValue(result, "Info2", "1. 'Next' to set more component parameters.", "fixed");
+					Command.addFieldValue(result, "Info3", "2. 'Previous' to go back and select different component.",
+										  "fixed");
 					Command.addAction(result, Command.Action.next);
 					Command.addAction(result, Command.Action.prev);
 					Command.addFieldValue(result, "Info4",
-							"This component uses TCP/IP ports, please provide port numbers:", "fixed");
+										  "This component uses TCP/IP ports, please provide port numbers:", "fixed");
 					Command.addFieldValue(result, "TCP/IP ports", "5557");
 
 					return;
 				} else {
 					String[] ports_arr = ports.split(",");
-					int[]    ports_i   = new int[ports_arr.length];
+					int[] ports_i = new int[ports_arr.length];
 
 					try {
 						for (int i = 0; i < ports_arr.length; i++) {
@@ -1146,138 +1170,52 @@ public class ConfiguratorOld
 						}    // end of for (int i = 0; i < ports_arr.length; i++)
 						defConfigParams.put(new_comp_name + "/connections/ports", ports_i);
 					} catch (Exception e) {
-						Command.addFieldValue(result, "Info2",
-								"1. 'Next' to set more component parameters.", "fixed");
+						Command.addFieldValue(result, "Info2", "1. 'Next' to set more component parameters.", "fixed");
 						Command.addFieldValue(result, "Info3",
-								"2. 'Previous' to go back and select different component.", "fixed");
+											  "2. 'Previous' to go back and select different component.", "fixed");
 						Command.addAction(result, Command.Action.next);
 						Command.addAction(result, Command.Action.prev);
 						Command.addFieldValue(result, "Info4",
-								"Incorrect TCP/IP ports provided, please provide port numbers:", "fixed");
+											  "Incorrect TCP/IP ports provided, please provide port numbers:", "fixed");
 						Command.addFieldValue(result, "TCP/IP ports", ports);
 
 						return;
 					}    // end of try-catch
 				}      // end of else
 			}
-			Command.addFieldValue(result, "Info2",
-					"1. 'Finish' to create component with this parameters.", "fixed");
-			Command.addFieldValue(result, "Info3",
-					"2. 'Previous' to go back and select different component.", "fixed");
+			Command.addFieldValue(result, "Info2", "1. 'Finish' to create component with this parameters.", "fixed");
+			Command.addFieldValue(result, "Info3", "2. 'Previous' to go back and select different component.", "fixed");
 			Command.addAction(result, Command.Action.complete);
 			Command.addAction(result, Command.Action.prev);
 			mr.setName(new_comp_name);
 			if (mr instanceof Configurable) {
 
 				// Load defaults into sorted Map:
-				Map<String, Object> comp_props = new TreeMap<String, Object>(((Configurable) mr)
-						.getDefaults(defConfigParams));
+				Map<String, Object> comp_props = new TreeMap<String, Object>(
+						((Configurable) mr).getDefaults(defConfigParams));
 
 				for (Map.Entry<String, Object> entry : comp_props.entrySet()) {
-					Command.addFieldValue(result, XMLUtils.escape(entry.getKey()), XMLUtils.escape(
-							objectToString(entry.getValue())));
+					Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+										  XMLUtils.escape(objectToString(entry.getValue())));
 				}    // end of for (Map.Entry entry: prop.entrySet())
 			} else {
-				Command.addFieldValue(result, "Info6",
-						"Component is not configurable, do you want to create it?", "fixed");
+				Command.addFieldValue(result, "Info6", "Component is not configurable, do you want to create it?",
+									  "fixed");
 			}    // end of else
 			Command.addFieldValue(result, "Params set", "true", "hidden");
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Problem instantiating component:", e);
 			Command.addFieldValue(result, "Component class",
-					"ERROR!! Problem instantiating component, " +
-					"look in log file for details...", "text-single", "Component class");
+								  "ERROR!! Problem instantiating component, " + "look in log file for details...",
+								  "text-single", "Component class");
 		}    // end of try-catch
 	}
 
-	private static String objectToString(Object value) {
-		String   val_str = null;
-		DataType type    = DataType.valueof(value.getClass().getSimpleName());
-
-		try {
-			StringBuilder sb = new StringBuilder();
-
-			switch (type) {
-			case STRING_ARR :
-				for (String s : (String[]) value) {
-					if (sb.length() == 0) {
-						sb.append(s);
-					} else {
-						sb.append(", ").append(s);
-					}    // end of else
-				}      // end of for (String s: (String[])value)
-				val_str = sb.toString();
-
-				break;
-
-			case INTEGER_ARR :
-				for (int s : (int[]) value) {
-					if (sb.length() == 0) {
-						sb.append(s);
-					} else {
-						sb.append(", ").append(s);
-					}    // end of else
-				}      // end of for (String s: (String[])value)
-				val_str = sb.toString();
-
-				break;
-
-			case LONG_ARR :
-				for (long s : (long[]) value) {
-					if (sb.length() == 0) {
-						sb.append(s);
-					} else {
-						sb.append(", ").append(s);
-					}    // end of else
-				}      // end of for (String s: (String[])value)
-				val_str = sb.toString();
-
-				break;
-
-			case DOUBLE_ARR :
-				for (double s : (double[]) value) {
-					if (sb.length() == 0) {
-						sb.append(s);
-					} else {
-						sb.append(", ").append(s);
-					}    // end of else
-				}      // end of for (String s: (String[])value)
-				val_str = sb.toString();
-
-				break;
-
-			case BOOLEAN_ARR :
-				for (boolean s : (boolean[]) value) {
-					if (sb.length() == 0) {
-						sb.append(s);
-					} else {
-						sb.append(", ").append(s);
-					}    // end of else
-				}      // end of for (String s: (String[])value)
-				val_str = sb.toString();
-
-				break;
-
-			default :
-				val_str = value.toString();
-
-				break;
-			}        // end of switch (type)
-		} catch (ClassCastException e) {
-			log.warning("ERROR! Problem with type casting for property: " + key);
-		}          // end of try-catch
-
-		return val_str;
-	}
-
 	private boolean parseBoolean(String val) {
-		return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("yes") || val
-				.equalsIgnoreCase("on")
-		;
+		return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("on");
 	}
 
-	private void prepareConfigData(Packet result, String comp_name)
-					throws ConfigurationException {
+	private void prepareConfigData(Packet result, String comp_name) throws ConfigurationException {
 		if (comp_name.equals("--none--")) {
 			newComponentCommand(result);
 
@@ -1288,26 +1226,19 @@ public class ConfiguratorOld
 
 		// Let's try to sort them to make it easier to find options on
 		// configuration page.
-		Map<String, Object> allprop = new TreeMap<String, Object>(getAllProperties(
-				comp_name));
+		Map<String, Object> allprop = new TreeMap<String, Object>(getAllProperties(comp_name));
 
 		for (Map.Entry<String, Object> entry : allprop.entrySet()) {
-			Command.addFieldValue(result, XMLUtils.escape(entry.getKey()), XMLUtils.escape(
-					objectToString(entry.getValue())));
+			Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+								  XMLUtils.escape(objectToString(entry.getValue())));
 		}    // end of for (Map.Entry entry: prop.entrySet())
-		Command.addFieldValue(result, XMLUtils.escape("new-prop-name"), XMLUtils.escape(
-				comp_name + "/"), "text-single", "New property name");
-		Command.addFieldValue(result, XMLUtils.escape("new-prop-value"), "", "text-single",
-				"New property value");
+		Command.addFieldValue(result, XMLUtils.escape("new-prop-name"), XMLUtils.escape(comp_name + "/"), "text-single",
+							  "New property name");
+		Command.addFieldValue(result, XMLUtils.escape("new-prop-value"), "", "text-single", "New property value");
 	}
 
-	private static void print(String key, Object value) {
-		System.out.println(key + " = " + objectToString(value));
-	}
-
-	private void updateConfigChanges(Packet packet, Packet result, String comp_name,
-			boolean admin)
-					throws ConfigurationException {
+	private void updateConfigChanges(Packet packet, Packet result, String comp_name, boolean admin)
+			throws ConfigurationException {
 		if (comp_name.equals("--none--")) {
 			newComponentCommand(packet, result, admin);
 
@@ -1317,7 +1248,7 @@ public class ConfiguratorOld
 		Command.addFieldValue(result, "Note", "You changed following settings:", "fixed");
 
 		Map<String, Object> allprop = getAllProperties(comp_name);
-		boolean             changed = false;
+		boolean changed = false;
 
 		for (Map.Entry<String, Object> entry : allprop.entrySet()) {
 			String tmp_val = Command.getFieldValue(packet, XMLUtils.escape(entry.getKey()));
@@ -1327,9 +1258,8 @@ public class ConfiguratorOld
 			if (tmp_val != null) {
 				new_val = XMLUtils.unescape(tmp_val);
 			}
-			if ((new_val != null) && (old_val != null) &&!new_val.equals(old_val)) {
-				defConfigParams.put(entry.getKey(), setPropertyValue(entry.getKey(), new_val,
-						result, admin));
+			if ((new_val != null) && (old_val != null) && !new_val.equals(old_val)) {
+				defConfigParams.put(entry.getKey(), setPropertyValue(entry.getKey(), new_val, result, admin));
 				changed = true;
 			}
 		}    // end of for (Map.Entry entry: prop.entrySet())
@@ -1338,7 +1268,7 @@ public class ConfiguratorOld
 
 		if ((prop_value != null) && (prop_value.trim().length() > 0)) {
 			setPropertyValue(XMLUtils.unescape(Command.getFieldValue(packet, "new-prop-name")),
-					XMLUtils.unescape(prop_value), result, admin);
+							 XMLUtils.unescape(prop_value), result, admin);
 			changed = true;
 		}
 		if (changed && admin) {
@@ -1346,6 +1276,5 @@ public class ConfiguratorOld
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/06/08

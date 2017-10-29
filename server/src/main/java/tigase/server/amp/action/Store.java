@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -53,26 +51,27 @@ import java.util.logging.Logger;
  */
 @Bean(name = "store", parent = AmpComponent.class, active = true)
 public class Store
-				extends ActionAbstract implements Initializable, UnregisterAware {
-	private static final Logger log  = Logger.getLogger(Store.class.getName());
+		extends ActionAbstract
+		implements Initializable, UnregisterAware {
+
+	private static final Logger log = Logger.getLogger(Store.class.getName());
 	private static final String name = "store";
 
 	//~--- fields ---------------------------------------------------------------
-
-	// ~--- fields ---------------------------------------------------------------
-	private Thread expiredProcessor          = null;
-	@Inject
-	private MsgRepositoryIfc repo               = null;
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
+	// ~--- fields ---------------------------------------------------------------
+	private Thread expiredProcessor = null;
 	@Inject
 	private NonAuthUserRepositoryImpl nonAuthUserRepo;
+	@Inject
+	private MsgRepositoryIfc repo = null;
 
 	{
-		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
-		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-		formatter2 = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
-		formatter2.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+		formatter2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		formatter2.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -106,9 +105,7 @@ public class Store
 						}
 					}
 				} catch (Exception e) {
-					log.log(Level.INFO,
-									"Incorrect expire-at value: " + rule.getAttributeStaticStr("value"),
-									e);
+					log.log(Level.INFO, "Incorrect expire-at value: " + rule.getAttributeStaticStr("value"), e);
 					expired = null;
 				}
 			}
@@ -120,9 +117,8 @@ public class Store
 				Element elem = packet.getElement();
 
 				if (elem.getChild("delay", "urn:xmpp:delay") == null) {
-					Element x = new Element("delay", "Offline Storage", new String[] { "from",
-									"stamp", "xmlns" }, new String[] { packet.getStanzaTo().getDomain(),
-									stamp, "urn:xmpp:delay" });
+					Element x = new Element("delay", "Offline Storage", new String[]{"from", "stamp", "xmlns"},
+											new String[]{packet.getStanzaTo().getDomain(), stamp, "urn:xmpp:delay"});
 
 					elem.addChild(x);
 				}
@@ -140,51 +136,6 @@ public class Store
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	// ~--- get methods ----------------------------------------------------------
-	private Element getExpireAtRule(Packet packet) {
-		Element amp         = packet.getElement().getChild("amp", AMP_XMLNS);
-		List<Element> rules = amp.getChildren();
-		Element rule        = null;
-
-		if ((rules != null) && (rules.size() > 0)) {
-			for (Element r : rules) {
-				String cond = r.getAttributeStaticStr(CONDITION_ATT);
-
-				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
-					rule = r;
-
-					break;
-				}
-			}
-		}
-
-		return rule;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-	private void removeExpireAtRule(Packet packet) {
-		Element amp         = packet.getElement().getChild("amp", AMP_XMLNS);
-		List<Element> rules = amp.getChildren();
-
-		if ((rules != null) && (rules.size() > 0)) {
-			for (Element r : rules) {
-				String cond = r.getAttributeStaticStr(CONDITION_ATT);
-
-				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
-					amp.removeChild(r);
-
-					break;
-				}
-			}
-		}
-		rules = amp.getChildren();
-		if ((rules == null) || (rules.size() == 0)) {
-			packet.getElement().removeChild(amp);
-		}
 	}
 
 	@Override
@@ -224,18 +175,61 @@ public class Store
 
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	@Override
 	public void beforeUnregister() {
-		if (expiredProcessor != null)
+		if (expiredProcessor != null) {
 			expiredProcessor.interrupt();
+		}
+	}
+
+	// ~--- get methods ----------------------------------------------------------
+	private Element getExpireAtRule(Packet packet) {
+		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
+		List<Element> rules = amp.getChildren();
+		Element rule = null;
+
+		if ((rules != null) && (rules.size() > 0)) {
+			for (Element r : rules) {
+				String cond = r.getAttributeStaticStr(CONDITION_ATT);
+
+				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
+					rule = r;
+
+					break;
+				}
+			}
+		}
+
+		return rule;
+	}
+
+	// ~--- methods --------------------------------------------------------------
+	private void removeExpireAtRule(Packet packet) {
+		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
+		List<Element> rules = amp.getChildren();
+
+		if ((rules != null) && (rules.size() > 0)) {
+			for (Element r : rules) {
+				String cond = r.getAttributeStaticStr(CONDITION_ATT);
+
+				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
+					amp.removeChild(r);
+
+					break;
+				}
+			}
+		}
+		rules = amp.getChildren();
+		if ((rules == null) || (rules.size() == 0)) {
+			packet.getElement().removeChild(amp);
+		}
 	}
 }
-
-
 
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
-
 
 //~ Formatted in Tigase Code Convention on 13/02/20

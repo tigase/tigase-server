@@ -24,23 +24,20 @@ package tigase.server.ext.handlers;
 
 import tigase.server.Packet;
 import tigase.server.ext.CompRepoItem;
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.ExtProcessor;
-
 import tigase.util.Base64;
-
 import tigase.xml.Element;
-
-import static tigase.server.ext.ComponentProtocolHandler.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
+
+import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -50,7 +47,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SASLProcessor implements ExtProcessor {
+public class SASLProcessor
+		implements ExtProcessor {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -58,9 +56,9 @@ public class SASLProcessor implements ExtProcessor {
 	private static final Logger log = Logger.getLogger(SASLProcessor.class.getName());
 	private static final String ID = "sasl";
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
-	private static final Element FEATURES = new Element("mechanisms",
-		new Element[] { new Element("mechanism", "PLAIN") }, new String[] { "xmlns" },
-		new String[] { "urn:ietf:params:xml:ns:xmpp-sasl" });
+	private static final Element FEATURES = new Element("mechanisms", new Element[]{new Element("mechanism", "PLAIN")},
+														new String[]{"xmlns"},
+														new String[]{"urn:ietf:params:xml:ns:xmpp-sasl"});
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -70,8 +68,7 @@ public class SASLProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(ComponentIOService serv,
-			ComponentProtocolHandler handler) {
+	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		if (serv.getSessionData().get(ID) != null) {
 			return null;
 		} else {
@@ -82,8 +79,7 @@ public class SASLProcessor implements ExtProcessor {
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results) {
+	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
 		if (p.isElement("auth", XMLNS)) {
 			String cdata = p.getElemCData();
 			String[] credentials = decodeMessage(cdata);
@@ -102,15 +98,13 @@ public class SASLProcessor implements ExtProcessor {
 			}
 
 			if (auth_ok) {
-				Element success = new Element("success", new String[] { "xmlns" },
-					new String[] { XMLNS });
+				Element success = new Element("success", new String[]{"xmlns"}, new String[]{XMLNS});
 
 				results.offer(Packet.packetInstance(success, null, null));
 				handler.authenticated(serv);
 			} else {
-				Element failure = new Element("failure",
-					new Element[] { new Element("not-authorized") }, new String[] { "xmlns" },
-					new String[] { XMLNS });
+				Element failure = new Element("failure", new Element[]{new Element("not-authorized")},
+											  new String[]{"xmlns"}, new String[]{XMLNS});
 
 				handler.authenticationFailed(serv, Packet.packetInstance(failure, null, null));
 			}
@@ -143,8 +137,8 @@ public class SASLProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public void startProcessing(Packet p, ComponentIOService serv,
-			ComponentProtocolHandler handler, Queue<Packet> results) {
+	public void startProcessing(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
+								Queue<Packet> results) {
 		CompRepoItem comp_item = (CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY);
 		String domain = comp_item.getDomain();
 		String secret = comp_item.getAuthPasswd();
@@ -152,9 +146,7 @@ public class SASLProcessor implements ExtProcessor {
 
 //  <auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl'
 //       mechanism='PLAIN'>AGp1bGlldAByMG0zMG15cjBtMzA=</auth>
-		Element auth = new Element("auth", challenge, new String[] { "xmlns", "mechanism" },
-			new String[] { XMLNS,
-				"PLAIN" });
+		Element auth = new Element("auth", challenge, new String[]{"xmlns", "mechanism"}, new String[]{XMLNS, "PLAIN"});
 
 		results.offer(Packet.packetInstance(auth, null, null));
 	}
@@ -215,16 +207,13 @@ public class SASLProcessor implements ExtProcessor {
 		result[authoriz_size + 1 + user_id_size] = 0;
 
 		if ((password != null) && (password_size > 0)) {
-			System.arraycopy(password.getBytes(), 0, result, authoriz_size + 1 + user_id_size + 1,
-					password_size);
+			System.arraycopy(password.getBytes(), 0, result, authoriz_size + 1 + user_id_size + 1, password_size);
 		}
 
 		return Base64.encode(result);
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

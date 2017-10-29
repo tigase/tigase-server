@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.db.comp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -44,40 +42,35 @@ import java.util.logging.Logger;
  * Created: Oct 3, 2009 3:55:27 PM
  *
  * @param <Item>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class UserRepoRepository<Item extends RepositoryItem>
-				extends ConfigRepository<Item> {
+		extends ConfigRepository<Item> {
+
 	/** Field description */
 	public static final String REPO_CLASS_PROP_KEY = "repo-class";
 
 	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
-	private static final Logger log              =
-		Logger.getLogger(UserRepoRepository.class.getName());
+	private static final Logger log = Logger.getLogger(UserRepoRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	private String items_list_pkey = "items-lists";
 	@Inject
-	private UserRepository repo    = null;
+	private UserRepository repo = null;
 
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public abstract BareJID getRepoUser();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public String getItemsListPKey() {
 		return items_list_pkey;
@@ -87,7 +80,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 	/**
 	 * Method description
-	 *
 	 */
 	@Override
 	public void reload() {
@@ -102,26 +94,26 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			}
 			String items_list = repo.getData(getRepoUser(), getItemsListPKey());
 
-			if ( items_list != null ){
+			if (items_list != null) {
 				hashCode = items_list.hashCode();
 
-				if ( !items_list.isEmpty() && hashCode != itemsHash ){
+				if (!items_list.isEmpty() && hashCode != itemsHash) {
 					DomBuilderHandler domHandler = new DomBuilderHandler();
 					SimpleParser parser = SingletonFactory.getParserInstance();
 
-					parser.parse( domHandler, items_list.toCharArray(), 0, items_list.length() );
+					parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
 
 					Queue<Element> elems = domHandler.getParsedElements();
 
-					if ( ( elems != null ) && ( elems.size() > 0 ) ){
-						for ( Element elem : elems ) {
+					if ((elems != null) && (elems.size() > 0)) {
+						for (Element elem : elems) {
 							Item item = getItemInstance();
 
-							item.initFromElement( elem );
-							addItemNoStore( item );
+							item.initFromElement(elem);
+							addItemNoStore(item);
 						}
 					}
-					log.log( Level.CONFIG, "All loaded items: {0}", items );
+					log.log(Level.CONFIG, "All loaded items: {0}", items);
 					itemsHash = hashCode;
 				}
 			}
@@ -145,8 +137,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		} catch (Exception e) {
 
 			// This is not expected so let's signal an error:
-			log.log(Level.SEVERE,
-					"Problem with adding '" + getRepoUser() + "' user to the database", e);
+			log.log(Level.SEVERE, "Problem with adding '" + getRepoUser() + "' user to the database", e);
 		}
 
 		reload();
@@ -156,7 +147,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 	/**
 	 * Method description
-	 *
 	 */
 	@Override
 	public void store() {
@@ -175,6 +165,5 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/09

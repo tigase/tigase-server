@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -45,25 +43,22 @@ import java.util.logging.Logger;
 /**
  * Class InvisibleCommand implements XEP-0186 Invisible Command support
  *
- * @see <a href="http://xmpp.org/extensions/xep-0186.html">XEP-0186</a>
- *
  * @author andrzej
+ * @see <a href="http://xmpp.org/extensions/xep-0186.html">XEP-0186</a>
  */
 @Bean(name = InvisibleCommand.ID, parent = SessionManager.class, active = false)
 public class InvisibleCommand
-				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPreprocessorIfc {
+		extends XMPPProcessor
+		implements XMPPProcessorIfc, XMPPPreprocessorIfc {
+
 	protected static final String ID = "invisible-command";
-	private static final Logger log = Logger.getLogger(InvisibleCommand.class
-			.getCanonicalName());
-	private static final String     XMLNS          = "urn:xmpp:invisible:0";
-	private static final String[]   VISIBLE_PATH   = { Iq.ELEM_NAME, "visible" };
-	private static final String[]   INVISIBLE_PATH = { Iq.ELEM_NAME, "invisible" };
-	private static final String[][] ELEMENT_PATHS  = {
-		INVISIBLE_PATH, VISIBLE_PATH
-	};
-	private static final String[]   XMLNSS         = { XMLNS, XMLNS };
-	private static final String     ACTIVE_KEY     = ID + "-active";
+	private static final Logger log = Logger.getLogger(InvisibleCommand.class.getCanonicalName());
+	private static final String XMLNS = "urn:xmpp:invisible:0";
+	private static final String[] VISIBLE_PATH = {Iq.ELEM_NAME, "visible"};
+	private static final String[] INVISIBLE_PATH = {Iq.ELEM_NAME, "invisible"};
+	private static final String[][] ELEMENT_PATHS = {INVISIBLE_PATH, VISIBLE_PATH};
+	private static final String[] XMLNSS = {XMLNS, XMLNS};
+	private static final String ACTIVE_KEY = ID + "-active";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -78,12 +73,12 @@ public class InvisibleCommand
 	}
 
 	@Override
-	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+							  Queue<Packet> results, Map<String, Object> settings) {
 
 		// stop presence broadcast if invisibility is activated - only offline should be allowed to broadcast it to buddies with direct stanza sent
-		if ((packet.getElemName() == "presence") && (packet.getStanzaTo() == null) && (packet
-				.getType() != StanzaType.unavailable)) {
+		if ((packet.getElemName() == "presence") && (packet.getStanzaTo() == null) &&
+				(packet.getType() != StanzaType.unavailable)) {
 			Boolean active = (Boolean) session.getSessionData(ACTIVE_KEY);
 
 			active = (active != null) && active;
@@ -98,19 +93,17 @@ public class InvisibleCommand
 	}
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
-			Object> settings) {
+	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+						final Queue<Packet> results, final Map<String, Object> settings) {
 		if (session == null) {
 			return;
 		}
 		if (!session.isAuthorized()) {
 			try {
-				results.offer(session.getAuthState().getResponseMessage(packet,
-						"Session is not yet authorized.", false));
+				results.offer(
+						session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
 			} catch (PacketErrorTypeException ex) {
-				log.log(Level.FINEST,
-						"ignoring packet from not authorized session which is already of type error");
+				log.log(Level.FINEST, "ignoring packet from not authorized session which is already of type error");
 			}
 
 			return;
@@ -120,45 +113,44 @@ public class InvisibleCommand
 				StanzaType type = packet.getType();
 
 				switch (type) {
-				case set :
+					case set:
 
-					// @todo: need to implement handing
-					if (packet.getElement().findChildStaticStr(INVISIBLE_PATH) != null) {
+						// @todo: need to implement handing
+						if (packet.getElement().findChildStaticStr(INVISIBLE_PATH) != null) {
 
-						// invisibility started - set flag
-						session.putSessionData(ACTIVE_KEY, Boolean.TRUE);
+							// invisibility started - set flag
+							session.putSessionData(ACTIVE_KEY, Boolean.TRUE);
 
-						// send offline presence
-						Element presence = new Element("presence", new String[] { "from", "type" },
-								new String[] { session.getJID().toString(),
-								"unavailable" });
+							// send offline presence
+							Element presence = new Element("presence", new String[]{"from", "type"},
+														   new String[]{session.getJID().toString(), "unavailable"});
 
-						session.putSessionData(XMPPResourceConnection.PRESENCE_KEY, presence);
-						PresenceState.broadcastOffline(session, results, settings, roster_util);
-						session.removeSessionData(PresenceState.OFFLINE_BUD_SENT);
+							session.putSessionData(XMPPResourceConnection.PRESENCE_KEY, presence);
+							PresenceState.broadcastOffline(session, results, settings, roster_util);
+							session.removeSessionData(PresenceState.OFFLINE_BUD_SENT);
 
-						// session.removeSessionData(XMPPResourceConnection.PRESENCE_KEY);
-					} else if (packet.getElement().findChildStaticStr(VISIBLE_PATH) != null) {
+							// session.removeSessionData(XMPPResourceConnection.PRESENCE_KEY);
+						} else if (packet.getElement().findChildStaticStr(VISIBLE_PATH) != null) {
 
-						// invisibility left - clear flag
-						session.removeSessionData(ACTIVE_KEY);
-					}
+							// invisibility left - clear flag
+							session.removeSessionData(ACTIVE_KEY);
+						}
 
-					// sending result
-					results.offer(packet.okResult((Element) null, 0));
+						// sending result
+						results.offer(packet.okResult((Element) null, 0));
 
-					break;
+						break;
 
-				default :
-					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"InvisibleCommand processing type is incorrect", false));
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+																				   "InvisibleCommand processing type is incorrect",
+																				   false));
 				}
 			} catch (NotAuthorizedException ex) {
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"Not authorized", false));
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "Not authorized", false));
 			} catch (TigaseDBException ex) {
-				results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-						"Error accessing database", false));
+				results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, "Error accessing database",
+																					 false));
 			}
 		} catch (PacketErrorTypeException ex) {
 			log.log(Level.SEVERE, "packet error type exception", ex);
@@ -180,15 +172,11 @@ public class InvisibleCommand
 	/**
 	 * Method description
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of <code>RosterAbstract</code>
 	 */
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/09/21

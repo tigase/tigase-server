@@ -29,8 +29,8 @@ import tigase.kernel.beans.Inject;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import java.util.logging.Logger;
 
@@ -50,6 +50,19 @@ public class TestGeneratorModule
 		return CRITERIA;
 	}
 
+	@Override
+	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
+		if (isPostCommand(packet)) {
+			runCommand(packet);
+		} else {
+			String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+
+			write(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
+									 "This is response to your message: [" + body + "]", "Response", null,
+									 packet.getStanzaId()));
+		}
+	}
+
 	private boolean isPostCommand(Packet packet) {
 		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
@@ -62,19 +75,6 @@ public class TestGeneratorModule
 		}
 
 		return false;
-	}
-
-	@Override
-	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		if (isPostCommand(packet)) {
-			runCommand(packet);
-		} else {
-			String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
-
-			write(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
-			                         "This is response to your message: [" + body + "]", "Response", null,
-			                         packet.getStanzaId()));
-		}
 	}
 
 	private void runCommand(Packet packet) {
@@ -90,16 +90,16 @@ public class TestGeneratorModule
 
 					for (int i = 0; i < number; i++) {
 						write(Message.getMessage(packet.getStanzaTo(), JID.jidInstance("nonename_" + i + "@" + domain),
-						                         StanzaType.normal, "Traffic generattion: " + number,
-						                         "Internal load test", null, packet.getStanzaId()));
+												 StanzaType.normal, "Traffic generattion: " + number,
+												 "Internal load test", null, packet.getStanzaId()));
 					}
 					write(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
-					                         "Completed " + number, "Response", null, packet.getStanzaId()));
+											 "Completed " + number, "Response", null, packet.getStanzaId()));
 				} catch (Exception e) {
 					write(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
-					                         "Incorrect command parameter: " +
-							                         ((body_split.length > 1) ? body_split[1] : null) +
-							                         ", expecting Integer.", "Response", null, packet.getStanzaId()));
+											 "Incorrect command parameter: " +
+													 ((body_split.length > 1) ? body_split[1] : null) +
+													 ", expecting Integer.", "Response", null, packet.getStanzaId()));
 				}
 
 				break;

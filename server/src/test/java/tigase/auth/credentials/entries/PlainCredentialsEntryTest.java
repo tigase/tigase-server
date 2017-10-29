@@ -51,5 +51,5 @@ public class PlainCredentialsEntryTest {
 
 		assertTrue(entry.verifyPlainPassword(testPassword));
 	}
-	
+
 }

@@ -20,9 +20,9 @@
 package tigase.xmpp.impl.annotation;
 
 /**
- *
  * @author andrzej
  */
-class TestAnnotatedXMPPProcessor2 extends TestAnnotatedXMPPProcessor {
-	
+class TestAnnotatedXMPPProcessor2
+		extends TestAnnotatedXMPPProcessor {
+
 }

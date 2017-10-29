@@ -35,13 +35,14 @@ import tigase.stats.StatisticsList;
 
 /**
  * Class implements bean for multi domain pool for authentication repositories.
- * 
+ * <p>
  * Created by andrzej on 08.03.2016.
  */
-@Bean(name="authRepository", parent = Kernel.class, exportable = true, active = true)
+@Bean(name = "authRepository", parent = Kernel.class, exportable = true, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})
-public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
+public class AuthRepositoryMDPoolBean
+		extends AuthRepositoryMDImpl {
 
 	@Override
 	public boolean belongsTo(Class<? extends BasicComponent> component) {
@@ -63,12 +64,13 @@ public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
 		return AuthRepositoryConfigBean.class;
 	}
 
-	public static class AuthRepositoryConfigBean extends AuthUserRepositoryConfigBean<AuthRepository,AuthRepositoryConfigBean> {
+	public static class AuthRepositoryConfigBean
+			extends AuthUserRepositoryConfigBean<AuthRepository, AuthRepositoryConfigBean> {
 
 		@Inject
-		private CredentialsEncoderBean credentialsEncoderBean;
-		@Inject
 		private CredentialsDecoderBean credentialsDecoderBean;
+		@Inject
+		private CredentialsEncoderBean credentialsEncoderBean;
 
 		@Override
 		protected Class<AuthRepository> getRepositoryIfc() {

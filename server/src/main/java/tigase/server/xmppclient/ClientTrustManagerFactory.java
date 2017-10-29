@@ -57,15 +57,12 @@ public class ClientTrustManagerFactory {
 	private final TrustManager[] emptyTrustManager;
 	private final KeyStore keystore;
 	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<>();
-	private TrustManager[] defaultTrustManagers;
-	private TrustManagerFactory tmf;
-
 	@ConfigField(desc = "CA for client certificate", alias = "clientCertCA")
 	private String clientCertCA;
-
 	@ConfigField(desc = "Is client certificate required")
 	private boolean clientCertRequired = false;
-
+	private TrustManager[] defaultTrustManagers;
+	private TrustManagerFactory tmf;
 
 	public ClientTrustManagerFactory() {
 		this.emptyTrustManager = new TrustManager[]{new X509TrustManager() {
@@ -105,10 +102,6 @@ public class ClientTrustManagerFactory {
 		} else {
 			defaultTrustManagers = null;
 		}
-	}
-	
-	protected X509Certificate[] getAcceptedIssuers() {
-		return acceptedIssuers.toArray(new X509Certificate[]{});
 	}
 
 	public TrustManager[] getManager(final VHostItem vHost) {
@@ -160,6 +153,10 @@ public class ClientTrustManagerFactory {
 	public boolean isTlsWantClientAuthEnabled(final VHostItem vhost) {
 		TrustManager[] tmp = getManager(vhost);
 		return tmp != null && tmp.length > 0;
+	}
+
+	protected X509Certificate[] getAcceptedIssuers() {
+		return acceptedIssuers.toArray(new X509Certificate[]{});
 	}
 
 	protected TrustManager[] loadTrustedCert(String caCertFile) {

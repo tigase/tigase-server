@@ -29,9 +29,6 @@ import tigase.kernel.modular.c1.Component1Registrar;
 import tigase.kernel.modular.c2.Component2Registrar;
 
 import java.util.Collection;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ApplicationTest {

@@ -26,7 +26,8 @@ import java.util.function.Consumer;
 /**
  * Created by bmalkow on 04.12.2015.
  */
-class IteratorWrapper<E> implements Iterator<E> {
+class IteratorWrapper<E>
+		implements Iterator<E> {
 
 	private final Iterator<E> iterator;
 

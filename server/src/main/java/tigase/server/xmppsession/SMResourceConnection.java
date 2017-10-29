@@ -1,4 +1,3 @@
-
 /*
  * SMResourceConnection.java
  *
@@ -24,19 +23,16 @@ package tigase.server.xmppsession;
 
 import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
-
 import tigase.util.stringprep.TigaseStringprepException;
-
 import tigase.vhosts.VHostItem;
-
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -46,19 +42,19 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SMResourceConnection extends XMPPResourceConnection {
+public class SMResourceConnection
+		extends XMPPResourceConnection {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param connectionId
 	 * @param rep
 	 * @param authRepo
 	 * @param loginHandler
 	 */
-	public SMResourceConnection(JID connectionId, UserRepository rep,
-			AuthRepository authRepo, SessionManagerHandler loginHandler) {
+	public SMResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
+								SessionManagerHandler loginHandler) {
 		super(connectionId, rep, authRepo, loginHandler);
 
 		try {

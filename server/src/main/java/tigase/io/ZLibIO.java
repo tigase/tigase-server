@@ -22,20 +22,17 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.IOListener;
 import tigase.stats.StatisticsList;
-
+import tigase.util.IOListener;
 import tigase.util.ZLibWrapper;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -45,7 +42,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ZLibIO implements IOInterface {
+public class ZLibIO
+		implements IOInterface {
 
 	/** Field description */
 	public static final String ZLIB_CAPS = "zlib-caps";
@@ -64,7 +62,6 @@ public class ZLibIO implements IOInterface {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param ioi
 	 * @param level
@@ -215,9 +212,9 @@ public class ZLibIO implements IOInterface {
 	public void setLogId(String logId) {
 		io.setLogId(logId);
 	}
-	
+
 	public void setIOListener(IOListener listener) {
 		zlib.setIOListener(listener);
-	}	
+	}
 }
 

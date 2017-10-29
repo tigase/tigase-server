@@ -20,12 +20,12 @@
 
 package tigase.eventbus.impl;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
-import org.hamcrest.CoreMatchers;
-import org.junit.Test;
 
 /**
  * Created by bmalkow on 17.11.2015.

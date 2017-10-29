@@ -85,58 +85,47 @@ public class S2SAbstract {
 	protected static final String XMLNS_SERVER_VAL = "jabber:server";
 
 	/** Field description */
-	protected static final String[] FEATURES_STARTTLS_PATH = { FEATURES_EL, START_TLS_EL };
+	protected static final String[] FEATURES_STARTTLS_PATH = {FEATURES_EL, START_TLS_EL};
 
 	/** Field description */
-	protected static final String[] FEATURES_DIALBACK_PATH = { FEATURES_EL, DIALBACK_EL };
-
+	protected static final String[] FEATURES_DIALBACK_PATH = {FEATURES_EL, DIALBACK_EL};
+	private static final Logger log = Logger.getLogger(S2SAbstract.class.getName());
 	/** Field description */
 	public static boolean FORCE_VERSION = false;
 
-	private static final Logger log                        =
-			Logger.getLogger(S2SAbstract.class.getName());
-
-
 	//~--- fields ---------------------------------------------------------------
-
 	/** Field description */
 	@Inject(nullAllowed = true)
 	protected S2SConnectionHandlerIfc<S2SIOService> handler = null;
 
-	public void init(S2SConnectionHandlerIfc<S2SIOService> handler,
-					 Map<String, Object> props) {
+	public void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props) {
 		this.handler = handler;
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param initStream
 	 * @param error_el
 	 * @param serv
 	 */
-	public void generateStreamError(boolean initStream, String error_el,
-									S2SIOService serv) {
+	public void generateStreamError(boolean initStream, String error_el, S2SIOService serv) {
 		String strError = "";
 
 		if (initStream) {
-			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL +
-					"'" + " xmlns:stream='http://etherx.jabber.org/streams'" +
-					" id='tigase-server-error'" + " from='" + handler.getDefHostName() +
-					"'" + " xml:lang='en'>";
+			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL + "'" +
+					" xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-server-error'" + " from='" +
+					handler.getDefHostName() + "'" + " xml:lang='en'>";
 		}
-		strError += "<stream:error>" + "<" + error_el +
-				" xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" +
-				"</stream:stream>";
+		strError += "<stream:error>" + "<" + error_el + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+				"</stream:error>" + "</stream:stream>";
 		try {
 			if (log.isLoggable(Level.FINEST)) {
 				Throwable thr = new Throwable();
 
 				thr.fillInStackTrace();
 				log.log(Level.FINEST, "Called from: ", thr);
-				log.log(Level.FINEST, "{0}, Sending stream error: {1}", new Object[] { serv,
-																					   strError });
+				log.log(Level.FINEST, "{0}, Sending stream error: {1}", new Object[]{serv, strError});
 			}
 			handler.writeRawData(serv, strError);
 			serv.stop();

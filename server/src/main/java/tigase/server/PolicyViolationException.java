@@ -19,7 +19,8 @@
  */
 package tigase.server;
 
-public class PolicyViolationException extends Exception {
+public class PolicyViolationException
+		extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,16 +28,16 @@ public class PolicyViolationException extends Exception {
 		super();
 	}
 
-	public PolicyViolationException( String message ) {
-		super( message );
+	public PolicyViolationException(String message) {
+		super(message);
 	}
 
-	public PolicyViolationException( String message, Throwable cause ) {
-		super( message, cause );
+	public PolicyViolationException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public PolicyViolationException( Throwable cause ) {
-		super( cause );
+	public PolicyViolationException(Throwable cause) {
+		super(cause);
 	}
 
 }

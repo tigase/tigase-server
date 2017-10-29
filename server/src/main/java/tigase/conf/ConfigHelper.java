@@ -58,7 +58,7 @@ public class ConfigHelper {
 					}
 				} else if (currVal instanceof Map && value instanceof Map) {
 					mergeConfigs((Map<String, Object>) currVal, (Map<String, Object>) value);
-				} else  {
+				} else {
 					result.put(key, value);
 				}
 			}

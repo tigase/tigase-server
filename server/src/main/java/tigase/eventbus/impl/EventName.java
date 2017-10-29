@@ -26,6 +26,27 @@ public class EventName {
 
 	private final String eventPackage;
 
+	public final static String toString(final String eventPackage, final String eventName) {
+		String result = "";
+		if (eventPackage == null) {
+			result += "*";
+		} else {
+			result += eventPackage;
+		}
+
+		if (!result.isEmpty()) {
+			result += ".";
+		}
+
+		if (eventName == null) {
+			result += "*";
+		} else {
+			result += eventName;
+		}
+
+		return result;
+	}
+
 	public EventName(String eventName) {
 		int i = eventName.lastIndexOf(".");
 		String tmp = i >= 0 ? eventName.substring(0, i) : "";
@@ -41,43 +62,32 @@ public class EventName {
 		this.eventPackage = eventPackage;
 	}
 
-	public final static String toString(final String eventPackage, final String eventName) {
-		String result = "";
-		if (eventPackage == null)
-			result += "*";
-		else
-			result += eventPackage;
-
-		if (!result.isEmpty())
-			result += ".";
-
-		if (eventName == null)
-			result += "*";
-		else
-			result += eventName;
-
-		return result;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		EventName other = (EventName) obj;
 		if (eventName == null) {
-			if (other.eventName != null)
+			if (other.eventName != null) {
 				return false;
-		} else if (!eventName.equals(other.eventName))
+			}
+		} else if (!eventName.equals(other.eventName)) {
 			return false;
+		}
 		if (eventPackage == null) {
-			if (other.eventPackage != null)
+			if (other.eventPackage != null) {
 				return false;
-		} else if (!eventPackage.equals(other.eventPackage))
+			}
+		} else if (!eventPackage.equals(other.eventPackage)) {
 			return false;
+		}
 		return true;
 	}
 

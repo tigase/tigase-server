@@ -38,7 +38,7 @@ import static org.junit.Assert.assertNull;
 public class ConfigReaderTest {
 
 	private static final Logger log = TestLogger.getLogger(ConfigReaderTest.class);
-	
+
 	@Test
 	public void test1() throws Exception {
 
@@ -46,7 +46,7 @@ public class ConfigReaderTest {
 		Map<String, Object> root = new HashMap<>();
 		root.put("test123", "2313");
 		root.put("tes22", "223");
-		root.put("x-gy+=x",123);
+		root.put("x-gy+=x", 123);
 		root.put("env-1", new ConfigReader.EnvironmentVariable("PATH", null));
 		root.put("env-2", new ConfigReader.EnvironmentVariable("test-1", null));
 		root.put("env-3", new ConfigReader.EnvironmentVariable("test-2", "test"));
@@ -160,7 +160,8 @@ public class ConfigReaderTest {
 
 		assertEquals(System.getenv("PATH"), ((ConfigReader.Variable) root.get("env-1")).calculateValue());
 		assertEquals(System.getenv("test-1"), ((ConfigReader.Variable) root.get("env-2")).calculateValue());
-		assertEquals(Optional.ofNullable(System.getenv("test-2")).orElse("test"), ((ConfigReader.Variable) root.get("env-3")).calculateValue());
+		assertEquals(Optional.ofNullable(System.getenv("test-2")).orElse("test"),
+					 ((ConfigReader.Variable) root.get("env-3")).calculateValue());
 	}
 
 	@Test
@@ -168,10 +169,12 @@ public class ConfigReaderTest {
 
 		// equals is not working when type is different - ie. bool true vs string "true"
 		Map<String, Object> props = new HashMap<>();
-		props.put("--cluster-mode",true);
-		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
+		props.put("--cluster-mode", true);
+		props.put("dataSource/repo-uri",
+				  "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
 		props.put("sess-man/commands/ala-ma-kota", "DOMAIN");
-		props.put("c2s/incoming-filters", Arrays.asList("tigase.server.filters.PacketCounter", "tigase.server.filters.PacketCounter"));
+		props.put("c2s/incoming-filters",
+				  Arrays.asList("tigase.server.filters.PacketCounter", "tigase.server.filters.PacketCounter"));
 		props.put("http/active", "true");
 		Map<String, Object> root = ConfigWriter.buildTree(props);
 
@@ -218,7 +221,8 @@ public class ConfigReaderTest {
 		List paths = (List<String>) data.get("paths");
 		assertEquals(2, paths.size());
 		assertEquals("admin@localhost", paths.get(0).toString());
-		assertEquals("" + System.getenv("USER") + "@localhost", ((ConfigReader.Variable) paths.get(1)).calculateValue());
+		assertEquals("" + System.getenv("USER") + "@localhost",
+					 ((ConfigReader.Variable) paths.get(1)).calculateValue());
 	}
 
 	private void displayFile(File f) throws IOException {
@@ -230,7 +234,7 @@ public class ConfigReaderTest {
 		}
 	}
 
-	private void assertMapEquals(Map<String,Object> expected, Map actual, String prefix) {
+	private void assertMapEquals(Map<String, Object> expected, Map actual, String prefix) {
 		for (Map.Entry e : expected.entrySet()) {
 			Object value = actual.get(e.getKey());
 			log.log(Level.FINE, "checking key = " + prefix + e.getKey());
@@ -249,7 +253,7 @@ public class ConfigReaderTest {
 			}
 			if (value instanceof Map) {
 				assertMapEquals((Map<String, Object>) e.getValue(), (Map) value, prefix + e.getKey() + "/");
-			} else if(value instanceof List) {
+			} else if (value instanceof List) {
 				assertListEquals((List) e.getValue(), (List) value);
 			} else {
 				assertEquals(e.getValue(), value);
@@ -260,7 +264,7 @@ public class ConfigReaderTest {
 	private void assertListEquals(List expected, List actual) {
 		assertEquals(expected.size(), actual.size());
 
-		for (int i=0; i<expected.size(); i++) {
+		for (int i = 0; i < expected.size(); i++) {
 			assertEquals(expected.get(i), actual.get(i));
 		}
 	}

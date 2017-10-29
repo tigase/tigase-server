@@ -33,7 +33,7 @@ package tigase.admin
 import tigase.server.Command
 import tigase.server.Packet
 
-Packet p = (Packet)packet
+Packet p = (Packet) packet
 num1 = Command.getFieldValue(p, "num1")
 num2 = Command.getFieldValue(p, "num2")
 

@@ -19,39 +19,45 @@
  */
 package tigase.xmpp;
 
-import java.util.Map;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import tigase.xml.Element;
 
+import java.util.Map;
+
+import static org.junit.Assert.*;
+
 /**
- *
  * @author andrzej
  */
 public class XMPPDomBuilderHandlerTest {
-	
+
 	@Test
 	public void testPrefixesAndNamespacesHandling() {
 		XMPPIOService ioserv = new XMPPIOService() {
 			@Override
 			protected void xmppStreamOpened(Map attribs) {
 			}
-			
+
 		};
 		boolean error = false;
 		XMPPDomBuilderHandler<Element> handler = new XMPPDomBuilderHandler<>(ioserv);
 		handler.setElementsLimit(10);
-		handler.startElement(new StringBuilder("stream:stream"), new StringBuilder[] { new StringBuilder("xmlns"), new StringBuilder("xmlns:stream"), new StringBuilder("xmlns:db") }, 
-				new StringBuilder[] { new StringBuilder("jabber:server"), new StringBuilder("http://etherx.jabber.org/streams"), new StringBuilder("jabber:server:dialback") });
-		
-		handler.startElement(new StringBuilder("db:result"), new StringBuilder[] { new StringBuilder("to") }, new StringBuilder[] { new StringBuilder("example.com") });
+		handler.startElement(new StringBuilder("stream:stream"),
+							 new StringBuilder[]{new StringBuilder("xmlns"), new StringBuilder("xmlns:stream"),
+												 new StringBuilder("xmlns:db")},
+							 new StringBuilder[]{new StringBuilder("jabber:server"),
+												 new StringBuilder("http://etherx.jabber.org/streams"),
+												 new StringBuilder("jabber:server:dialback")});
+
+		handler.startElement(new StringBuilder("db:result"), new StringBuilder[]{new StringBuilder("to")},
+							 new StringBuilder[]{new StringBuilder("example.com")});
 		handler.elementCData(new StringBuilder("CAESBxCXyf6RqCoaEGPHnXDLTIeKBNx9ZJ1SmzM="));
 		error = !handler.endElement(new StringBuilder("db:result"));
-		
+
 		assertFalse(handler.parseError() || error);
 		assertEquals("result", handler.getParsedElements().peek().getName());
 		assertEquals("jabber:server:dialback", handler.getParsedElements().peek().getXMLNS());
-		
+
 		handler.getParsedElements().clear();
 		handler.startElement(new StringBuilder("test:message"), null, null);
 		error = !handler.endElement(new StringBuilder("test:message"));
@@ -78,5 +84,5 @@ public class XMPPDomBuilderHandlerTest {
 		assertTrue(handler.parseError() || error);
 
 	}
-	
+
 }

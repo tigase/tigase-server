@@ -22,7 +22,8 @@ package tigase.kernel;
 
 import tigase.kernel.beans.Inject;
 
-public class Bean3 implements Special {
+public class Bean3
+		implements Special {
 
 	@Inject(bean = "bean4")
 	private Bean4 bean4;

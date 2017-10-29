@@ -96,5 +96,5 @@ public class DependencyChecker {
 			throw new RuntimeException("Failed to read " + JarFile.MANIFEST_NAME, ex);
 		}
 	}
-	
+
 }

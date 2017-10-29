@@ -30,29 +30,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author andrzej
  */
-public class WebSocketHixie76Test extends TestCase {
-	
-	private WebSocketHixie76 impl;
-	
-	@Override
-	protected void setUp() throws Exception {
-		impl = new WebSocketHixie76();
-	}
+public class WebSocketHixie76Test
+		extends TestCase {
 
-	@Override
-	protected void tearDown() throws Exception {
-		impl = null;
-	}
-	
+	private WebSocketHixie76 impl;
+
 	@Test
 	public void testFrameEncodingDecoding() throws IOException {
 		String input = "<test-data><subdata/></test-data>";
 		ByteBuffer buf = ByteBuffer.wrap(input.getBytes());
 		final ByteBuffer tmp = ByteBuffer.allocate(1024);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHixie76() }) {
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHixie76()}) {
 
 			@Override
 			protected void writeBytes(ByteBuffer data) {
@@ -63,26 +54,28 @@ public class WebSocketHixie76Test extends TestCase {
 		impl.encodeFrameAndWrite(io, buf);
 		tmp.flip();
 		ByteBuffer decoded = impl.decodeFrame(io, tmp);
-		Assert.assertArrayEquals("Data before encoding do not match data after decoding", input.getBytes(), decoded.array());
+		Assert.assertArrayEquals("Data before encoding do not match data after decoding", input.getBytes(),
+								 decoded.array());
 	}
-	
+
 	@Test
 	public void testHandshakeOK() throws NoSuchAlgorithmException, IOException {
 		final ByteBuffer tmp = ByteBuffer.allocate(2048);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHixie76() }) {
-
-			@Override
-			protected void writeBytes(ByteBuffer data) {
-				tmp.put(data);
-			}
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHixie76()}) {
 
 			@Override
 			public int getLocalPort() {
 				return 80;
 			}
 
-		};		
-		Map<String,String> params = new HashMap<String,String>();
+			@Override
+			protected void writeBytes(ByteBuffer data) {
+				tmp.put(data);
+			}
+
+		};
+		Map<String, String> params = new HashMap<String, String>();
 		params.put("Sec-WebSocket-Key1", "1C2J899_05  6  !  M 9    ^4");
 		params.put("Sec-WebSocket-Key2", "23 2ff0M_E0#.454X23");
 		params.put("Sec-WebSocket-Protocol", "xmpp");
@@ -91,29 +84,40 @@ public class WebSocketHixie76Test extends TestCase {
 		bytes[1] = '\n';
 		Assert.assertTrue("Handshake failed", impl.handshake(io, params, bytes));
 	}
-	
+
 	@Test
 	public void testHandshakeFail() throws NoSuchAlgorithmException, IOException {
 		final ByteBuffer tmp = ByteBuffer.allocate(2048);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHixie76() }) {
-
-			@Override
-			protected void writeBytes(ByteBuffer data) {
-				tmp.put(data);
-			}
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHixie76()}) {
 
 			@Override
 			public int getLocalPort() {
 				return 80;
 			}
 
-		};		
-		Map<String,String> params = new HashMap<String,String>();
+			@Override
+			protected void writeBytes(ByteBuffer data) {
+				tmp.put(data);
+			}
+
+		};
+		Map<String, String> params = new HashMap<String, String>();
 		params.put("Sec-WebSocket-Version", "13");
-		params.put("Sec-WebSocket-Protocol", "xmpp");		
+		params.put("Sec-WebSocket-Protocol", "xmpp");
 		byte[] bytes = new byte[10];
 		bytes[0] = '\r';
 		bytes[1] = '\n';
 		Assert.assertFalse("Handshake succeeded", impl.handshake(io, params, bytes));
+	}
+
+	@Override
+	protected void setUp() throws Exception {
+		impl = new WebSocketHixie76();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		impl = null;
 	}
 }

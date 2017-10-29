@@ -31,17 +31,17 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
- *
  * @author andrzej
  */
 @Bean(name = StreamErrorCounterIOProcessor.ID, parent = ClientConnectionManager.class, active = false)
-public class StreamErrorCounterIOProcessor implements XMPPIOProcessor {
+public class StreamErrorCounterIOProcessor
+		implements XMPPIOProcessor {
 
 	public static final String ID = "stream-error-counter";
-	
+
 	private String compName;
-	private ErrorStatisticsHolder holder = new ErrorStatisticsHolder(); 
-	
+	private ErrorStatisticsHolder holder = new ErrorStatisticsHolder();
+
 	@Override
 	public String getId() {
 		return ID;
@@ -82,21 +82,22 @@ public class StreamErrorCounterIOProcessor implements XMPPIOProcessor {
 
 	@Override
 	public void streamError(XMPPIOService service, StreamError streamError) {
-		if (streamError == null)
+		if (streamError == null) {
 			streamError = StreamError.UndefinedCondition;
-		
+		}
+
 		holder.count(streamError);
 	}
-	
+
 	public static class ErrorStatisticsHolder {
-		
+
 		private static final String[] ERROR_NAMES;
-		
+
 		static {
 			int count = StreamError.values().length;
 			ERROR_NAMES = new String[count];
 			StreamError[] vals = StreamError.values();
-			for (int i=0; i<vals.length; i++) {
+			for (int i = 0; i < vals.length; i++) {
 				String name = vals[i].getCondition();
 				StringBuilder sb = new StringBuilder();
 				for (String part : name.split("-")) {
@@ -106,30 +107,28 @@ public class StreamErrorCounterIOProcessor implements XMPPIOProcessor {
 				ERROR_NAMES[i] = sb.toString();
 			}
 		}
-		
+
+		private final CounterValue[] counters;
+
 		public static String[] getErrorNames() {
 			return ERROR_NAMES;
 		}
 
-		
-		private final CounterValue[] counters;
-		
 		public ErrorStatisticsHolder() {
 			counters = new CounterValue[ERROR_NAMES.length];
-			for (int i=0; i<counters.length; i++) {
+			for (int i = 0; i < counters.length; i++) {
 				counters[i] = new CounterValue(ERROR_NAMES[i], Level.FINER);
 			}
 		}
-		
+
 		public void count(StreamError val) {
 			counters[val.ordinal()].inc();
 		}
 
-	
 		public void getStatistics(String compName, StatisticsList list) {
 			for (CounterValue c : counters) {
 				list.add(compName, "StreamErrorStats/" + c.getName() + "ErrorsNumber", c.getValue(), c.getLevel());
 			}
-		}		
+		}
 	}
 }

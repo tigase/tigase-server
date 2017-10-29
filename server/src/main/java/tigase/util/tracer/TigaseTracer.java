@@ -20,6 +20,8 @@
 
 package tigase.util.tracer;
 
+import tigase.server.Packet;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,7 +31,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.server.Packet;
 
 /**
  * Created: Jun 30, 2009 5:18:10 PM
@@ -39,34 +40,37 @@ import tigase.server.Packet;
  */
 public class TigaseTracer {
 
-	private static final Logger log =
-					Logger.getLogger(TigaseTracer.class.getName());
-
 	public static final String TRACER_IPS_PROP_KEY = "--tracer-ips";
 	public static final String TRACER_JIDS_PROP_KEY = "--tracer-jids";
 	public static final String TRACER_CIDS_PROP_KEY = "--tracer-cids";
-	
+	private static final Logger log = Logger.getLogger(TigaseTracer.class.getName());
 	private static final String DEF_DIR = "logs";
 	private static final long DEF_MAX_FILE_SIZE = 10000000;
 	private static final int DEF_FILES_COUNT = 5;
 	private static final String DEF_FILE_NAME = "packet-tracing.log";
-
+	private static ConcurrentSkipListSet<String> cids = new ConcurrentSkipListSet<String>();
 	private static TigaseTracer instance = null;
-	private static ConcurrentSkipListSet<String> ips =
-					new ConcurrentSkipListSet<String>();
-	private static ConcurrentSkipListSet<String> jids =
-					new ConcurrentSkipListSet<String>();
-	private static ConcurrentSkipListSet<String> cids =
-					new ConcurrentSkipListSet<String>();
-
-	private ArrayBlockingQueue<String> waiting =
-					new ArrayBlockingQueue<String>(10000, true);
-	private Runnable worker = null;
-	private File files[] = null;
-	private long maxFileSize = DEF_MAX_FILE_SIZE;
-	private int filesCount = DEF_FILES_COUNT;
+	private static ConcurrentSkipListSet<String> ips = new ConcurrentSkipListSet<String>();
+	private static ConcurrentSkipListSet<String> jids = new ConcurrentSkipListSet<String>();
 	private String dir = DEF_DIR;
 	private String fileName = DEF_FILE_NAME;
+	private File files[] = null;
+	private int filesCount = DEF_FILES_COUNT;
+	private long maxFileSize = DEF_MAX_FILE_SIZE;
+	private ArrayBlockingQueue<String> waiting = new ArrayBlockingQueue<String>(10000, true);
+	private Runnable worker = null;
+
+	public static void addCid(String cid) {
+		cids.add(cid);
+	}
+
+	public static void addIP(String ip) {
+		ips.add(ip);
+	}
+
+	public static void addJid(String jid) {
+		jids.add(jid);
+	}
 
 	public static TigaseTracer getTracer(String name) {
 		if (instance == null) {
@@ -79,48 +83,24 @@ public class TigaseTracer {
 		return instance;
 	}
 
-	public static void addIP(String ip) {
-		ips.add(ip);
+	public static void removeCid(String cid) {
+		cids.remove(cid);
 	}
 
 	public static void removeIP(String ip) {
 		ips.remove(ip);
 	}
 
-	public static void addJid(String jid) {
-		jids.add(jid);
-	}
-
 	public static void removeJid(String jid) {
 		jids.remove(jid);
-	}
-
-	public static void addCid(String cid) {
-		cids.add(cid);
-	}
-
-	public static void removeCid(String cid) {
-		cids.remove(cid);
 	}
 
 	private TigaseTracer() throws IOException {
 		init();
 	}
 
-	private void init() throws IOException {
-		files = new File[filesCount];
-		for (int i = 0; i < files.length; i++) {
-			files[i] = new File(dir, fileName + "." + i);
-		}
-		worker = new TracingWorker(new FileWriter(files[0], true), files[0].length());
-		Thread thr = new Thread(worker);
-		thr.setName("tracing-worker");
-		thr.setDaemon(true);
-		thr.start();
-	}
-
-	public boolean trace(String ip, String to_jid, String from_jid, String cid,
-					String id, String point, String msg, Packet packet) {
+	public boolean trace(String ip, String to_jid, String from_jid, String cid, String id, String point, String msg,
+						 Packet packet) {
 		if (ip != null && ips.contains(ip)) {
 			return waiting.offer(format(ip, id, point, msg, packet));
 		}
@@ -136,12 +116,40 @@ public class TigaseTracer {
 		return false;
 	}
 
+	public boolean tracegByIP(String ip, String point, String msg, Packet packet) {
+		return trace(ip, null, null, null, null, point, msg, packet);
+	}
+
+	public boolean traceByToJid(String jid, String point, String msg, Packet packet) {
+		return trace(null, jid, null, null, null, point, msg, packet);
+	}
+
+	public boolean traceByFromJid(String jid, String point, String msg, Packet packet) {
+		return trace(null, null, jid, null, null, point, msg, packet);
+	}
+
+	public boolean traceByCid(String cid, String point, String msg, Packet packet) {
+		return trace(null, null, null, cid, null, point, msg, packet);
+	}
+
+	private void init() throws IOException {
+		files = new File[filesCount];
+		for (int i = 0; i < files.length; i++) {
+			files[i] = new File(dir, fileName + "." + i);
+		}
+		worker = new TracingWorker(new FileWriter(files[0], true), files[0].length());
+		Thread thr = new Thread(worker);
+		thr.setName("tracing-worker");
+		thr.setDaemon(true);
+		thr.start();
+	}
+
 	private String format(String filter, String id, String point, String msg, Packet packet) {
 		StringBuilder sb = new StringBuilder();
 		Calendar cal = Calendar.getInstance();
 		sb.append(cal.get(Calendar.YEAR));
 		sb.append("-");
-		sb.append(cal.get(Calendar.MONTH)+1);
+		sb.append(cal.get(Calendar.MONTH) + 1);
 		sb.append("-");
 		sb.append(cal.get(Calendar.DAY_OF_MONTH));
 		sb.append(" ");
@@ -168,27 +176,12 @@ public class TigaseTracer {
 		sb.append('\n');
 		return sb.toString();
 	}
-	
-	public boolean tracegByIP(String ip, String point, String msg, Packet packet) {
-		return trace(ip, null, null, null, null, point, msg, packet);
-	}
-	
-	public boolean traceByToJid(String jid, String point, String msg, Packet packet) {
-		return trace(null, jid, null, null, null, point, msg, packet);
-	}
-	
-	public boolean traceByFromJid(String jid, String point, String msg, Packet packet) {
-		return trace(null, null, jid, null, null, point, msg, packet);
-	}
-	public boolean traceByCid(String cid, String point, String msg, Packet packet) {
-		return trace(null, null, null, cid, null, point, msg, packet);
-	}
 
 	private Writer rotateFiles(Writer writer) throws IOException {
 		writer.close();
-		for (int i = files.length-2; i >= 0; --i) {
+		for (int i = files.length - 2; i >= 0; --i) {
 			File file1 = files[i];
-			File file2 = files[i+1];
+			File file2 = files[i + 1];
 			if (file1.exists()) {
 				if (file2.exists()) {
 					file2.delete();
@@ -199,13 +192,14 @@ public class TigaseTracer {
 		return new FileWriter(files[0], false);
 	}
 
-	private class TracingWorker implements Runnable {
+	private class TracingWorker
+			implements Runnable {
 
+		private long size = 0;
 		private boolean stopped = false;
 		private Writer writer = null;
-		private long size = 0;
 
-    protected TracingWorker(Writer writer, long initSize) {
+		protected TracingWorker(Writer writer, long initSize) {
 			this.writer = writer;
 			this.size = initSize;
 		}
@@ -229,7 +223,8 @@ public class TigaseTracer {
 							log.log(Level.WARNING, "Can not write to trace file: ", ex);
 						}
 					}
-				} catch (InterruptedException ex) {	}
+				} catch (InterruptedException ex) {
+				}
 			}
 		}
 

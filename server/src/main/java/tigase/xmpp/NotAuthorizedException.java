@@ -20,28 +20,28 @@
 package tigase.xmpp;
 
 /**
- * This exception is usually trown when there is kind of access violation error.
- * If some code try to access data to which it doesn't have permission to or if
- * try to access data before successful authorization process.
- *
+ * This exception is usually trown when there is kind of access violation error. If some code try to access data to
+ * which it doesn't have permission to or if try to access data before successful authorization process.
  * <p>
- * Created: Sat Oct 30 08:44:37 2004
- * </p>
+ * <p> Created: Sat Oct 30 08:44:37 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class NotAuthorizedException extends XMPPException {
+public class NotAuthorizedException
+		extends XMPPException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  /**
-   * Creates a new <code>NotAuthorizedException</code> instance.
-   *
-   */
-  public NotAuthorizedException(String message) { super(message); }
+	/**
+	 * Creates a new <code>NotAuthorizedException</code> instance.
+	 */
+	public NotAuthorizedException(String message) {
+		super(message);
+	}
 
-  public NotAuthorizedException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	public NotAuthorizedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 } // NotAuthorizedException

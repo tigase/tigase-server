@@ -57,13 +57,13 @@ public class AllHistoryCacheTest {
 			}
 		};
 
-		for (int i=0; i<limit + 5; i++) {
+		for (int i = 0; i < limit + 5; i++) {
 			StatisticsList stats = new StatisticsList(Level.FINE);
 			cache.addItem(stats);
 		}
 
 		assertEquals(20, cache.getCurrentHistory().length);
-		for (int i=0; i<5; i++) {
+		for (int i = 0; i < 5; i++) {
 			entries.remove(0);
 		}
 		assertArrayEquals(entries.toArray(new StatisticsList[entries.size()]), cache.getCurrentHistory());
@@ -99,10 +99,11 @@ public class AllHistoryCacheTest {
 		Field f = AllHistoryCache.class.getDeclaredField("buffer");
 		f.setAccessible(true);
 		Object arr = f.get(cache);
-		int count =0;
-		for (int i=0; i<limit; i++) {
-			if (Array.get(arr, i) != null)
+		int count = 0;
+		for (int i = 0; i < limit; i++) {
+			if (Array.get(arr, i) != null) {
 				count++;
+			}
 		}
 		assertEquals(5, count);
 

@@ -23,40 +23,36 @@ import tigase.server.Packet;
 import tigase.xmpp.XMPPSession;
 
 /**
- * UserPresenceChangeEvent is local event (called on local node), which is fired
- * when user changes presence.
- * 
- * This event is local only as SessionManagerClustered will forward information
- * to other cluster nodes that presence is changed and on that nodes this event
- * also will be called locally, if and only if on that node is at least one
+ * UserPresenceChangeEvent is local event (called on local node), which is fired when user changes presence.
+ * <p>
+ * This event is local only as SessionManagerClustered will forward information to other cluster nodes that presence is
+ * changed and on that nodes this event also will be called locally, if and only if on that node is at least one
  * XMPPResouceConnection for same bare jid as client which changed presence.
- * 
+ *
  * @author andrzej
  */
 public class UserPresenceChangedEvent {
-	
+
 	/**
-	 * Packet containing new presence with "from" attribute set to full jid of
-	 * connection which changed presence.
+	 * Packet containing new presence with "from" attribute set to full jid of connection which changed presence.
 	 */
 	private final Packet presence;
 	/**
-	 * Instance of XMPPSesssion for client which bare jid is same as bare jid of
-	 * from attribute of changed presence.
+	 * Instance of XMPPSesssion for client which bare jid is same as bare jid of from attribute of changed presence.
 	 */
 	private final XMPPSession session;
-	
+
 	public UserPresenceChangedEvent(XMPPSession session, Packet presence) {
 		this.session = session;
 		this.presence = presence;
 	}
-	
+
 	public Packet getPresence() {
 		return presence;
 	}
-	
+
 	public XMPPSession getSession() {
 		return session;
 	}
-	
+
 }

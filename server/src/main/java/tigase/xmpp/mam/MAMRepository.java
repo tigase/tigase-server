@@ -26,10 +26,9 @@ import tigase.xml.Element;
 import java.util.Date;
 
 /**
- * Base interface which is required to be implemented by class which should be
- * used as repository implementation for quering using XEP-0313: Message
- * Archive Management
- *
+ * Base interface which is required to be implemented by class which should be used as repository implementation for
+ * quering using XEP-0313: Message Archive Management
+ * <p>
  * Created by andrzej on 19.07.2016.
  */
 public interface MAMRepository<Q extends Query, I extends MAMRepository.Item> {
@@ -41,8 +40,11 @@ public interface MAMRepository<Q extends Query, I extends MAMRepository.Item> {
 	Q newQuery();
 
 	interface Item {
+
 		String getId();
+
 		Element getMessage();
+
 		Date getTimestamp();
 	}
 

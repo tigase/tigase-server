@@ -20,37 +20,39 @@
 
 package tigase.server.amp;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Generic utility class to allow storage of any value for particular JID (including resource).
- * 
- * @author andrzej
+ *
  * @param <T>
+ *
+ * @author andrzej
  */
 public class JidResourceMap<T> {
-	
-	private final ConcurrentHashMap<BareJID,Map<String,T>> usersMap = new ConcurrentHashMap<BareJID,Map<String,T>>();
-	
+
+	private final ConcurrentHashMap<BareJID, Map<String, T>> usersMap = new ConcurrentHashMap<BareJID, Map<String, T>>();
+
 	public JidResourceMap() {
-		
+
 	}
-	
+
 	public boolean containsKey(BareJID jid) {
 		return usersMap.containsKey(jid);
 	}
-	
+
 	public boolean containsKey(JID jid) {
-		Map<String,T> resources = usersMap.get(jid.getBareJID());
+		Map<String, T> resources = usersMap.get(jid.getBareJID());
 		return resources != null && resources.containsKey(jid.getResource());
 	}
-	
+
 	public T get(JID jid) {
-		Map<String,T> resources = usersMap.get(jid.getBareJID());
+		Map<String, T> resources = usersMap.get(jid.getBareJID());
 		if (resources == null) {
 			return null;
 		} else {
@@ -59,19 +61,19 @@ public class JidResourceMap<T> {
 			}
 		}
 	}
-	
+
 	public T put(JID jid, T value) {
 		if (value == null) {
 			return remove(jid);
 		}
-		
-		Map<String,T> resources = usersMap.get(jid.getBareJID());
-		
+
+		Map<String, T> resources = usersMap.get(jid.getBareJID());
+
 		if (resources == null) {
-			resources = new HashMap<String,T>();
-			
-			Map<String,T> oldResources = usersMap.putIfAbsent(jid.getBareJID(), resources);
-			
+			resources = new HashMap<String, T>();
+
+			Map<String, T> oldResources = usersMap.putIfAbsent(jid.getBareJID(), resources);
+
 			if (oldResources != null) {
 				resources = oldResources;
 			}
@@ -83,13 +85,14 @@ public class JidResourceMap<T> {
 		}
 		return null;
 	}
-	
+
 	public T remove(JID jid) {
-		Map<String,T> resources = usersMap.get(jid.getBareJID());
-		
-		if (resources == null) 
+		Map<String, T> resources = usersMap.get(jid.getBareJID());
+
+		if (resources == null) {
 			return null;
-		
+		}
+
 		synchronized (resources) {
 			return resources.remove(jid.getResource());
 		}

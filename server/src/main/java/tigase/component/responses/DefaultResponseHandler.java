@@ -23,7 +23,8 @@ package tigase.component.responses;
 import tigase.component.responses.ResponseManager.Entry;
 import tigase.server.Packet;
 
-public class DefaultResponseHandler implements Runnable {
+public class DefaultResponseHandler
+		implements Runnable {
 
 	private final Entry entry;
 

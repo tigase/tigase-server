@@ -18,42 +18,34 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.net;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
-
-import java.net.*;
-
-import java.nio.channels.SelectableChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.net.InetSocketAddress;
+import java.nio.channels.*;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Describe class ConnectionOpenThread here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Jan 25 23:51:28 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ConnectionOpenThread
-				implements Runnable {
+		implements Runnable {
+
 	/**
 	 *
 	 */
@@ -66,30 +58,51 @@ public class ConnectionOpenThread
 	public static final long def_5269_throttling = 100;
 
 	/** Field description */
-	public static final long            def_5280_throttling = 1000;
-	private static ConnectionOpenThread acceptThread        = null;
-	private static final Logger         log = Logger.getLogger(ConnectionOpenThread.class
-			.getName());
-
+	public static final long def_5280_throttling = 1000;
+	private static final Logger log = Logger.getLogger(ConnectionOpenThread.class.getName());
 	/** Field description */
-	public static Map<Integer, PortThrottlingData> throttling =
-			new ConcurrentHashMap<Integer, PortThrottlingData>(10);
+	public static Map<Integer, PortThrottlingData> throttling = new ConcurrentHashMap<Integer, PortThrottlingData>(10);
+	private static ConnectionOpenThread acceptThread = null;
 
 	//~--- fields ---------------------------------------------------------------
-
 	/** Field description */
-	protected long                                        accept_counter = 0;
-	private Selector                                      selector       = null;
-	private boolean                                       stopping       = false;
-	private Timer                                         timer          = null;
-	private ConcurrentLinkedQueue<ConnectionOpenListener> waiting =
-			new ConcurrentLinkedQueue<ConnectionOpenListener>();
+	protected long accept_counter = 0;
+	private Selector selector = null;
+	private boolean stopping = false;
+	private Timer timer = null;
+	private ConcurrentLinkedQueue<ConnectionOpenListener> waiting = new ConcurrentLinkedQueue<ConnectionOpenListener>();
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
+	 * Method description
+	 */
+	public static ConnectionOpenThread getInstance() {
+
+		// Long new_throttling = Long.getLong("new-connections-throttling");
+//  if (new_throttling != null) {
+//    throttling = new_throttling;
+//    log.log(Level.WARNING, "New connections throttling set to: {0}", throttling);
+//  }
+		if (acceptThread == null) {
+			acceptThread = new ConnectionOpenThread();
+
+			Thread thrd = new Thread(acceptThread);
+
+			thrd.setName("ConnectionOpenThread");
+			thrd.start();
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("ConnectionOpenThread started.");
+			}
+		}    // end of if (acceptThread == null)
+
+		return acceptThread;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
 	 * Creates a new <code>ConnectionOpenThread</code> instance.
-	 *
 	 */
 	private ConnectionOpenThread() {
 		timer = new Timer("Connections open timer", true);
@@ -109,11 +122,8 @@ public class ConnectionOpenThread
 		}    // end of try-catch
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param al
 	 */
@@ -124,7 +134,6 @@ public class ConnectionOpenThread
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param al
 	 */
@@ -152,8 +161,8 @@ public class ConnectionOpenThread
 			try {
 				int select = selector.select();
 
-				if ( log.isLoggable( Level.FINEST ) ){
-					log.log( Level.FINEST, "Selected: " + select + " from selector: " + selector );
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Selected: " + select + " from selector: " + selector);
 				}
 
 				for (Iterator i = selector.selectedKeys().iterator(); i.hasNext(); ) {
@@ -161,15 +170,15 @@ public class ConnectionOpenThread
 
 					i.remove();
 
-					SocketChannel sc        = null;
-					boolean       throttled = false;
-					int           port_no   = 0;
+					SocketChannel sc = null;
+					boolean throttled = false;
+					int port_no = 0;
 
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel) sk.channel();
 
 						port_no = nextReady.socket().getLocalPort();
-						sc      = nextReady.accept();
+						sc = nextReady.accept();
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("OP_ACCEPT");
 						}
@@ -180,11 +189,11 @@ public class ConnectionOpenThread
 							++port_throttling.lastSecondConnections;
 							if (port_throttling.lastSecondConnections > port_throttling.throttling) {
 								if (log.isLoggable(Level.INFO)) {
-									log.log(Level.INFO,
-											"New connections throttling level {0} exceeded, closing: {0}", new Object[] {port_throttling.lastSecondConnections, sc});
+									log.log(Level.INFO, "New connections throttling level {0} exceeded, closing: {0}",
+											new Object[]{port_throttling.lastSecondConnections, sc});
 								}
 								sc.close();
-								sc        = null;
+								sc = null;
 								throttled = true;
 							}
 						} else {
@@ -228,7 +237,7 @@ public class ConnectionOpenThread
 					} else {
 						log.log(Level.INFO,
 								"Can not obtain socket channel from selection key, throttling activated = {0}, for port: {1}",
-								new Object[] { throttled, port_no });
+								new Object[]{throttled, port_no});
 					}    // end of if (sc != null) else
 					++accept_counter;
 				}
@@ -238,7 +247,7 @@ public class ConnectionOpenThread
 
 				// stopping = true;
 			}        // end of catch
-					catch (Exception e) {
+			catch (Exception e) {
 				log.log(Level.SEVERE, "Other service exception.", e);
 
 				// stopping = true;
@@ -248,7 +257,6 @@ public class ConnectionOpenThread
 
 	/**
 	 * Method description
-	 *
 	 */
 	public void start() {
 		Thread t = new Thread(this);
@@ -257,43 +265,14 @@ public class ConnectionOpenThread
 		t.start();
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
-	public void stop() {
-		stopping = true;
-		selector.wakeup();
-	}
-
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
-	public static ConnectionOpenThread getInstance() {
-
-		// Long new_throttling = Long.getLong("new-connections-throttling");
-//  if (new_throttling != null) {
-//    throttling = new_throttling;
-//    log.log(Level.WARNING, "New connections throttling set to: {0}", throttling);
-//  }
-		if (acceptThread == null) {
-			acceptThread = new ConnectionOpenThread();
-
-			Thread thrd = new Thread(acceptThread);
-
-			thrd.setName("ConnectionOpenThread");
-			thrd.start();
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("ConnectionOpenThread started.");
-			}
-		}    // end of if (acceptThread == null)
-
-		return acceptThread;
+	public void stop() {
+		stopping = true;
+		selector.wakeup();
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -311,61 +290,58 @@ public class ConnectionOpenThread
 		}      // end of for ()
 	}
 
-	private void addISA(InetSocketAddress isa, ConnectionOpenListener al)
-					throws IOException {
+	private void addISA(InetSocketAddress isa, ConnectionOpenListener al) throws IOException {
 		switch (al.getConnectionType()) {
-		case accept :
-			long port_throttling = al.getNewConnectionsThrottling();
+			case accept:
+				long port_throttling = al.getNewConnectionsThrottling();
 
-			throttling.put(isa.getPort(), new PortThrottlingData(port_throttling));
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Setting up throttling for the port {0} to {1} connections per second. isa: {2}",
-						new Object[] { isa.getPort(), port_throttling, isa });
-			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting up 'accept' channel...");
-			}
+				throttling.put(isa.getPort(), new PortThrottlingData(port_throttling));
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Setting up throttling for the port {0} to {1} connections per second. isa: {2}",
+							new Object[]{isa.getPort(), port_throttling, isa});
+				}
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Setting up 'accept' channel...");
+				}
 
-			ServerSocketChannel ssc = ServerSocketChannel.open();
+				ServerSocketChannel ssc = ServerSocketChannel.open();
 
-			ssc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
-			ssc.configureBlocking(false);
-			ssc.socket().bind(isa, (int) (port_throttling));
-			ssc.register(selector, SelectionKey.OP_ACCEPT, al);
+				ssc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
+				ssc.configureBlocking(false);
+				ssc.socket().bind(isa, (int) (port_throttling));
+				ssc.register(selector, SelectionKey.OP_ACCEPT, al);
 
-			break;
+				break;
 
-		case connect :
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Setting up ''connect'' channel for: {0}/{1}",
-						new Object[] { isa.getAddress(),
-						isa.getPort() });
-			}
+			case connect:
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Setting up ''connect'' channel for: {0}/{1}",
+							new Object[]{isa.getAddress(), isa.getPort()});
+				}
 
-			SocketChannel sc = SocketChannel.open();
+				SocketChannel sc = SocketChannel.open();
 
-			sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
-			sc.socket().setTrafficClass(al.getTrafficClass());
-			sc.configureBlocking(false);
-			sc.connect(isa);
-			sc.register(selector, SelectionKey.OP_CONNECT, al);
+				sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
+				sc.socket().setTrafficClass(al.getTrafficClass());
+				sc.configureBlocking(false);
+				sc.connect(isa);
+				sc.register(selector, SelectionKey.OP_CONNECT, al);
 
-			break;
+				break;
 
-		default :
-			log.log(Level.WARNING, "Unknown connection type: {0}", al.getConnectionType());
+			default:
+				log.log(Level.WARNING, "Unknown connection type: {0}", al.getConnectionType());
 
-			break;
+				break;
 		}    // end of switch (al.getConnectionType())
 	}
 
 	private void addPort(ConnectionOpenListener al) throws IOException {
-		if ((al.getConnectionType() == ConnectionType.connect) && (al.getRemoteAddress() !=
-				null)) {
+		if ((al.getConnectionType() == ConnectionType.connect) && (al.getRemoteAddress() != null)) {
 			addISA(al.getRemoteAddress(), al);
-		} else if ((al.getIfcs() == null) || (al.getIfcs().length == 0) || al.getIfcs()[0]
-				.equals("ifc") || al.getIfcs()[0].equals("*")) {
+		} else if ((al.getIfcs() == null) || (al.getIfcs().length == 0) || al.getIfcs()[0].equals("ifc") ||
+				al.getIfcs()[0].equals("*")) {
 			addISA(new InetSocketAddress(al.getPort()), al);
 		} else {
 			for (String ifc : al.getIfcs()) {
@@ -377,6 +353,7 @@ public class ConnectionOpenThread
 	//~--- inner classes --------------------------------------------------------
 
 	private class PortThrottlingData {
+
 		/** Field description */
 		protected long lastSecondConnections = 0;
 
@@ -388,7 +365,6 @@ public class ConnectionOpenThread
 		/**
 		 * Constructs ...
 		 *
-		 *
 		 * @param throttling_prop
 		 */
 		private PortThrottlingData(long throttling_prop) {
@@ -396,6 +372,5 @@ public class ConnectionOpenThread
 		}
 	}
 }    // ConnectionOpenThread
-
 
 //~ Formatted in Tigase Code Convention on 13/07/06

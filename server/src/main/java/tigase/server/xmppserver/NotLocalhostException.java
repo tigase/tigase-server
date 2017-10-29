@@ -1,4 +1,3 @@
-
 /*
  * NotLocalhostException.java
  *
@@ -32,14 +31,15 @@ import tigase.xmpp.XMPPException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class NotLocalhostException extends XMPPException {
+public class NotLocalhostException
+		extends XMPPException {
+
 	private static final long serialVersionUID = 1L;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public NotLocalhostException() {
 		super();
@@ -47,7 +47,6 @@ public class NotLocalhostException extends XMPPException {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param msg
 	 */
@@ -58,7 +57,6 @@ public class NotLocalhostException extends XMPPException {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param cause
 	 */
 	public NotLocalhostException(Throwable cause) {
@@ -68,7 +66,6 @@ public class NotLocalhostException extends XMPPException {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param msg
 	 * @param cause
 	 */
@@ -77,8 +74,6 @@ public class NotLocalhostException extends XMPPException {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

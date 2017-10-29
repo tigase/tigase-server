@@ -35,7 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by andrzej on 19.11.2016.
  */
 @Bean(name = RegistrationThrottling.ID, parent = Kernel.class, active = false, exportable = true)
-public class RegistrationThrottling implements UnregisterAware {
+public class RegistrationThrottling
+		implements UnregisterAware {
 
 	public static final String ID = "registration-throttling";
 	@ConfigField(desc = "Limit of allowed account registrations for IP in specified period")

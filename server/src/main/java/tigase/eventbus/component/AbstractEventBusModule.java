@@ -24,7 +24,8 @@ import tigase.component.modules.AbstractModule;
 import tigase.kernel.beans.Inject;
 import tigase.xmpp.jid.JID;
 
-public abstract class AbstractEventBusModule extends AbstractModule {
+public abstract class AbstractEventBusModule
+		extends AbstractModule {
 
 	private static long id = 0;
 

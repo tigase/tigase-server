@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -52,22 +50,22 @@ import java.util.logging.Logger;
 
 /**
  * Class StatisticsCollector
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 @Bean(name = "stats", parent = Kernel.class, active = true)
-@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 public class StatisticsCollector
-				extends AbstractComponentRegistrator<StatisticsContainer>
-				implements ShutdownHook, RegistrarBean {
-	public static final String ERRORS_STATISTICS_MBEAN_NAME =
-			"tigase.stats:type=ErrorStatistics";
-	public static final String STATISTICS_MBEAN_NAME =
-			"tigase.stats:type=StatisticsProvider";
+		extends AbstractComponentRegistrator<StatisticsContainer>
+		implements ShutdownHook, RegistrarBean {
+
+	public static final String ERRORS_STATISTICS_MBEAN_NAME = "tigase.stats:type=ErrorStatistics";
+	public static final String STATISTICS_MBEAN_NAME = "tigase.stats:type=StatisticsProvider";
 
 	public static final String STATS_HISTORY_SIZE_PROP_KEY = "stats-history-size";
 
@@ -82,27 +80,25 @@ public class StatisticsCollector
 	private static final Logger log = Logger.getLogger(StatisticsCollector.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	@ConfigField(desc = "History size", alias = STATS_HISTORY_SIZE_PROP_KEY)
-	private int                                  historySize                 = 0;
-	private TimerTask                            initializationCompletedTask = null;
-	private ServiceEntity                        serviceEntity               = null;
-	private StatisticsProvider                   sp                          = null;
-	private ErrorsStatisticsProvider			 esp						 = null;
+	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
+	private final Timer everyX = new Timer("stats-timer", true);
+	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
+	private Map<StatisticsArchivizerIfc, TimerTask> archiverTasks = new ConcurrentHashMap<>();
 	@Inject(nullAllowed = true)
 	private StatisticsArchivizerIfc[] archivizers = new StatisticsArchivizerIfc[0];
-	private Map<StatisticsArchivizerIfc, TimerTask> archiverTasks = new ConcurrentHashMap<>();
-	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
-
-	// private ServiceEntity stats_modules = null;
-	private Level statsLevel       = Level.INFO;
-	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
-	private final Timer everyX = new Timer("stats-timer", true);
-	@ConfigField(desc = "Update interval", alias = STATS_UPDATE_INTERVAL_PROP_KEY)
-	private long  updateInterval   = 10;
+	private ErrorsStatisticsProvider esp = null;
 	@ConfigField(desc = "High memory level", alias = STATS_HIGH_MEMORY_LEVEL_KEY)
-	private int   highMemoryLevel  = 95;
-	
+	private int highMemoryLevel = 95;
+	@ConfigField(desc = "History size", alias = STATS_HISTORY_SIZE_PROP_KEY)
+	private int historySize = 0;
+	private TimerTask initializationCompletedTask = null;
+	private ServiceEntity serviceEntity = null;
+	private StatisticsProvider sp = null;
+	// private ServiceEntity stats_modules = null;
+	private Level statsLevel = Level.INFO;
+	@ConfigField(desc = "Update interval", alias = STATS_UPDATE_INTERVAL_PROP_KEY)
+	private long updateInterval = 10;
+
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -110,17 +106,16 @@ public class StatisticsCollector
 		ServiceEntity item = serviceEntity.findNode(component.getName());
 
 		if (item == null) {
-			item = new ServiceEntity(getName(), component.getName(), "Component: " + component
-					.getName());
+			item = new ServiceEntity(getName(), component.getName(), "Component: " + component.getName());
 			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity("automation", "command-node",
-					"Component: " + component.getName()));
+			item.addIdentities(new ServiceIdentity("automation", "command-node", "Component: " + component.getName()));
 			serviceEntity.addItems(item);
 		}
 	}
 
 	@Override
-	public void componentRemoved(StatisticsContainer component) {}
+	public void componentRemoved(StatisticsContainer component) {
+	}
 
 	@Override
 	public void initializationCompleted() {
@@ -133,19 +128,19 @@ public class StatisticsCollector
 		try {
 			sp = new StatisticsProvider(this, historySize, updateInterval, highMemoryLevel);
 
-			String     objName = STATISTICS_MBEAN_NAME;
-			ObjectName on      = new ObjectName(objName);
+			String objName = STATISTICS_MBEAN_NAME;
+			ObjectName on = new ObjectName(objName);
 
 			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
 			ConfiguratorAbstract.putMXBean(objName, sp);
-			
+
 			esp = new ErrorsStatisticsProvider();
-			
+
 			objName = ERRORS_STATISTICS_MBEAN_NAME;
-			on      = new ObjectName(objName);
+			on = new ObjectName(objName);
 
 			ManagementFactory.getPlatformMBeanServer().registerMBean(esp, on);
-			ConfiguratorAbstract.putMXBean(objName, esp);			
+			ConfiguratorAbstract.putMXBean(objName, esp);
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
 		}
@@ -158,19 +153,19 @@ public class StatisticsCollector
 			public void run() {
 				everySecond();
 			}
-		}, 1000,1000);
+		}, 1000, 1000);
 		everyX.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				everyMinute();
 			}
-		}, 1000 * 60,1000 * 60);
+		}, 1000 * 60, 1000 * 60);
 		everyX.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				everyHour();
 			}
-		}, 1000 * 60 * 60,1000 * 60 * 60);
+		}, 1000 * 60 * 60, 1000 * 60 * 60);
 	}
 
 	@Override
@@ -179,129 +174,123 @@ public class StatisticsCollector
 			return;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0} command received: {1}", new Object[] { packet
-					.getCommand().name(),
-					packet });
+			log.log(Level.FINEST, "{0} command received: {1}", new Object[]{packet.getCommand().name(), packet});
 		}
 
-		Iq      iqc            = (Iq) packet;
+		Iq iqc = (Iq) packet;
 		BareJID stanzaFromBare = iqc.getStanzaFrom().getBareJID();
-		JID     stanzaFrom     = JID.jidInstance(stanzaFromBare);
+		JID stanzaFrom = JID.jidInstance(stanzaFromBare);
 
 		if (!isAdmin(stanzaFrom)) {
 			Packet result = iqc.commandResult(Command.DataType.result);
 
-			Command.addTextField(result, "Error",
-					"You do not have enough permissions to manage this domain");
+			Command.addTextField(result, "Error", "You do not have enough permissions to manage this domain");
 			results.offer(result);
 
 			return;
 		}
 		switch (iqc.getCommand()) {
-		case GETSTATS : {
+			case GETSTATS: {
 
-			Element        query = new Element("query", STATS_XMLNS);
-			StatisticsList stats = getAllStats();
+				Element query = new Element("query", STATS_XMLNS);
+				StatisticsList stats = getAllStats();
 
-			if (stats != null) {
-				for (StatRecord record : stats) {
-					Element item = new Element("stat");
+				if (stats != null) {
+					for (StatRecord record : stats) {
+						Element item = new Element("stat");
 
-					item.addAttribute("name", record.getComponent() + "/" + record
-							.getDescription());
-					item.addAttribute("value", record.getValue());
-					query.addChild(item);
-				}    // end of for ()
-			}      // end of if (stats != null && stats.count() > 0)
+						item.addAttribute("name", record.getComponent() + "/" + record.getDescription());
+						item.addAttribute("value", record.getValue());
+						query.addChild(item);
+					}    // end of for ()
+				}      // end of if (stats != null && stats.count() > 0)
 
-			Packet result = iqc.okResult(query, 0);
+				Packet result = iqc.okResult(query, 0);
 
-			// Command.setData(result, statistics);
-			results.offer(result);
-
-			break;
-		}
-
-		case OTHER : {
-			if (iqc.getStrCommand() == null) {
-				return;
-			}
-
-			String nick = iqc.getTo().getLocalpart();
-
-			if (!getName().equals(nick)) {
-				return;
-			}
-
-			Command.Action action = Command.getAction(iqc);
-
-			if (action == Command.Action.cancel) {
-				Packet result = iqc.commandResult(null);
-
+				// Command.setData(result, statistics);
 				results.offer(result);
 
-				return;
+				break;
 			}
 
-			String tmp_val = Command.getFieldValue(iqc, "Stats level");
-
-			// copying default value of stats level to local variable to not override default value
-			Level statsLevel = this.statsLevel;
-			if (tmp_val != null) {
-				statsLevel = Level.parse(tmp_val);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "statsLevel parsed to: {0}", statsLevel.getName());
+			case OTHER: {
+				if (iqc.getStrCommand() == null) {
+					return;
 				}
+
+				String nick = iqc.getTo().getLocalpart();
+
+				if (!getName().equals(nick)) {
+					return;
+				}
+
+				Command.Action action = Command.getAction(iqc);
+
+				if (action == Command.Action.cancel) {
+					Packet result = iqc.commandResult(null);
+
+					results.offer(result);
+
+					return;
+				}
+
+				String tmp_val = Command.getFieldValue(iqc, "Stats level");
+
+				// copying default value of stats level to local variable to not override default value
+				Level statsLevel = this.statsLevel;
+				if (tmp_val != null) {
+					statsLevel = Level.parse(tmp_val);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "statsLevel parsed to: {0}", statsLevel.getName());
+					}
+				}
+
+				StatisticsList list = new StatisticsList(statsLevel);
+
+				if (iqc.getStrCommand().equals("stats")) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Getting all stats for level: {0}", statsLevel.getName());
+					}
+					getAllStats(list);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "All stats for level loaded: {0}", statsLevel.getName());
+					}
+				} else {
+					String[] spl = iqc.getStrCommand().split("/");
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Getting stats for component: {0}, level: {1}",
+								new Object[]{spl[1], statsLevel.getName()});
+					}
+					getComponentStats(spl[1], list);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Stats loaded for component: {0}, level: {1}",
+								new Object[]{spl[1], statsLevel.getName()});
+					}
+				}
+
+				Packet result = iqc.commandResult(Command.DataType.form);
+
+				for (StatRecord rec : list) {
+					Command.addFieldValue(result, XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
+										  XMLUtils.escape(rec.getValue()));
+				}
+
+				Command.addFieldValue(result, "Stats level", statsLevel.getName(), "Stats level",
+									  new String[]{Level.INFO.getName(), Level.FINE.getName(), Level.FINER.getName(),
+												   Level.FINEST.getName()},
+									  new String[]{Level.INFO.getName(), Level.FINE.getName(), Level.FINER.getName(),
+												   Level.FINEST.getName()});
+				results.offer(result);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Returning stats result: {0}", result);
+				}
+
+				break;
 			}
 
-			StatisticsList list = new StatisticsList(statsLevel);
-
-			if (iqc.getStrCommand().equals("stats")) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Getting all stats for level: {0}", statsLevel.getName());
-				}
-				getAllStats(list);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "All stats for level loaded: {0}", statsLevel.getName());
-				}
-			} else {
-				String[] spl = iqc.getStrCommand().split("/");
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Getting stats for component: {0}, level: {1}",
-							new Object[] { spl[1],
-							statsLevel.getName() });
-				}
-				getComponentStats(spl[1], list);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Stats loaded for component: {0}, level: {1}",
-							new Object[] { spl[1],
-							statsLevel.getName() });
-				}
-			}
-
-			Packet result = iqc.commandResult(Command.DataType.form);
-
-			for (StatRecord rec : list) {
-				Command.addFieldValue(result, XMLUtils.escape(rec.getComponent() + "/" + rec
-						.getDescription()), XMLUtils.escape(rec.getValue()));
-			}
-
-			Command.addFieldValue(result, "Stats level", statsLevel.getName(), "Stats level",
-					new String[] { Level.INFO.getName(),
-					Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() },
-							new String[] { Level.INFO.getName(),
-					Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() });
-			results.offer(result);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Returning stats result: {0}", result);
-			}
-
-			break;
-		}
-
-		default :
-			break;
+			default:
+				break;
 		}    // end of switch (packet.getCommand())
 	}
 
@@ -315,7 +304,7 @@ public class StatisticsCollector
 	@Override
 	public String shutdown() {
 		StatisticsList allStats = getAllStats();
-		StringBuilder  sb       = new StringBuilder(4096);
+		StringBuilder sb = new StringBuilder(4096);
 
 		for (StatRecord statRecord : allStats) {
 			sb.append(statRecord.toString()).append('\n');
@@ -341,11 +330,11 @@ public class StatisticsCollector
 
 		getStatistics(list);
 
-		int  totalQueuesWait     = 0;
+		int totalQueuesWait = 0;
 		long totalQueuesOverflow = 0;
 
 		for (StatisticsContainer comp : components.values()) {
-			totalQueuesWait     += list.getValue(comp.getName(), "Total queues wait", 0);
+			totalQueuesWait += list.getValue(comp.getName(), "Total queues wait", 0);
 			totalQueuesOverflow += list.getValue(comp.getName(), "Total queues overflow", 0L);
 		}
 		list.add("total", "Total queues wait", totalQueuesWait, Level.INFO);
@@ -386,21 +375,17 @@ public class StatisticsCollector
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Processing discoItems for node: {0}, result: {1}",
-							new Object[] { node, (items == null)
-							? null
-							: items.toString() });
+							new Object[]{node, (items == null) ? null : items.toString()});
 				}
 
 				return items;
 			} else {
 				if (node == null) {
-					Element item = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid
-							.toString()));
+					Element item = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Processing discoItems, result: {0}", ((item == null)
-								? null
-								: item.toString()));
+						log.log(Level.FINEST, "Processing discoItems, result: {0}",
+								((item == null) ? null : item.toString()));
 					}
 
 					return Arrays.asList(item);
@@ -419,27 +404,27 @@ public class StatisticsCollector
 	}
 
 	@Override
-	public boolean isCorrectType(ServerComponent component) {
-		return component instanceof StatisticsContainer;
+	public void setName(String name) {
+		super.setName(name);
+		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
+		serviceEntity.addIdentities(new ServiceIdentity("component", "stats", "Server statistics"),
+									new ServiceIdentity("automation", "command-node", "All statistics"),
+									new ServiceIdentity("automation", "command-list",
+														"Statistics retrieving commands"));
+		serviceEntity.addFeatures(DEF_FEATURES);
+		serviceEntity.addFeatures(CMD_FEATURES);
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
-	public void setName(String name) {
-		super.setName(name);
-		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
-		serviceEntity.addIdentities(new ServiceIdentity("component", "stats",
-				"Server statistics"), new ServiceIdentity("automation", "command-node",
-				"All statistics"), new ServiceIdentity("automation", "command-list",
-				"Statistics retrieving commands"));
-		serviceEntity.addFeatures(DEF_FEATURES);
-		serviceEntity.addFeatures(CMD_FEATURES);
+	public boolean isCorrectType(ServerComponent component) {
+		return component instanceof StatisticsContainer;
 	}
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override
@@ -448,13 +433,6 @@ public class StatisticsCollector
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	protected void statsUpdated() {
-		synchronized (arch_runner) {
-			arch_runner.notifyAll();
-		}
-		esp.update(sp);
-	}
 
 	public void setArchivizers(StatisticsArchivizerIfc[] archivizers) {
 		if (archivizers == null) {
@@ -481,15 +459,23 @@ public class StatisticsCollector
 					};
 					statsArchivTasks.schedule(tt, it.getFrequency() * 1000, it.getFrequency() * 1000);
 					this.archiverTasks.put(it, tt);
-		});
+				});
+	}
+
+	protected void statsUpdated() {
+		synchronized (arch_runner) {
+			arch_runner.notifyAll();
+		}
+		esp.update(sp);
 	}
 
 	//~--- get methods ----------------------------------------------------------
-	
+
 	//~--- inner classes --------------------------------------------------------
 
 	private class ArchivizerRunner
-					extends Thread {
+			extends Thread {
+
 		private boolean stopped = false;
 
 		//~--- constructors -------------------------------------------------------
@@ -520,6 +506,5 @@ public class StatisticsCollector
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

@@ -21,8 +21,8 @@ package tigase.server;
 
 /**
  * Describe class Permissions here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Jan 23 22:52:45 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -30,12 +30,18 @@ package tigase.server;
  */
 public enum Permissions {
 
-	NONE,     // Unknown user JID
-  ANONYM,   // Anonymous user
-  REMOTE,   // Packet from a user from a different XMPP installation
-	LOCAL,    // This is local user JID but not authenticated yet
-	AUTH,     // Local authenticated and authorized user
-	TRUSTED,  // Trusted account, can broadcast packets
+	NONE,
+	// Unknown user JID
+	ANONYM,
+	// Anonymous user
+	REMOTE,
+	// Packet from a user from a different XMPP installation
+	LOCAL,
+	// This is local user JID but not authenticated yet
+	AUTH,
+	// Local authenticated and authorized user
+	TRUSTED,
+	// Trusted account, can broadcast packets
 	ADMIN;    // Admin account already authenticated
 
 }

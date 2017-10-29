@@ -22,7 +22,8 @@ package tigase.eventbus.impl;
 
 import tigase.eventbus.EventListener;
 
-public class ObjectEventsListenerHandler extends AbstractListenerHandler<EventListener> {
+public class ObjectEventsListenerHandler
+		extends AbstractListenerHandler<EventListener> {
 
 	public ObjectEventsListenerHandler(final String packageName, final String eventName, EventListener listener) {
 		super(packageName, eventName, listener);

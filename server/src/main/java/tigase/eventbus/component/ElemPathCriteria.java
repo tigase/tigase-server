@@ -23,7 +23,8 @@ package tigase.eventbus.component;
 import tigase.criteria.Criteria;
 import tigase.xml.Element;
 
-public class ElemPathCriteria implements Criteria {
+public class ElemPathCriteria
+		implements Criteria {
 
 	private final String[] names;
 	private final String[] xmlns;
@@ -42,8 +43,9 @@ public class ElemPathCriteria implements Criteria {
 	public boolean match(Element element) {
 
 		boolean match = element.getName().equals(names[0]);
-		if (match && xmlns[0] != null)
+		if (match && xmlns[0] != null) {
 			match &= xmlns[0].equals(element.getXMLNS());
+		}
 
 		Element child = element;
 		int i = 1;
@@ -55,8 +57,9 @@ public class ElemPathCriteria implements Criteria {
 
 			match &= child != null;
 
-			if (!match)
+			if (!match) {
 				return match;
+			}
 
 		}
 

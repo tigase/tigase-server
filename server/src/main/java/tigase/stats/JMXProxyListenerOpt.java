@@ -23,6 +23,7 @@ package tigase.stats;
  * @author Artur Hefczyc Created Jun 3, 2011
  */
 public interface JMXProxyListenerOpt {
+
 	void connected(String id, JavaJMXProxyOpt bean);
 
 	void disconnected(String id);

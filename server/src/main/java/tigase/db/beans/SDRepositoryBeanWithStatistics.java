@@ -21,25 +21,24 @@ package tigase.db.beans;
 
 import tigase.db.DataSourceAware;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.stats.ComponentStatisticsProvider;
 import tigase.stats.StatisticsInvocationHandler;
 import tigase.stats.StatisticsList;
-import tigase.stats.ComponentStatisticsProvider;
 
 import java.lang.reflect.Proxy;
 
 /**
  * Extended version of SDRepositoryBean class with support for statistics gathering.
- *
+ * <p>
  * Created by andrzej on 15.12.2016.
  */
-public abstract class SDRepositoryBeanWithStatistics<T extends DataSourceAware> extends SDRepositoryBean<T> implements
-																											ComponentStatisticsProvider {
-
-	private StatisticsInvocationHandler<T> handler;
-	private T repoProxy;
+public abstract class SDRepositoryBeanWithStatistics<T extends DataSourceAware>
+		extends SDRepositoryBean<T>
+		implements ComponentStatisticsProvider {
 
 	private final Class<T> repoClazz;
-
+	private StatisticsInvocationHandler<T> handler;
+	private T repoProxy;
 	@ConfigField(desc = "Enable statistics", alias = "statistics")
 	private boolean statisticsEnabled = false;
 
@@ -69,22 +68,6 @@ public abstract class SDRepositoryBeanWithStatistics<T extends DataSourceAware> 
 	}
 
 	@Override
-	protected T getRepository() {
-		if (statisticsEnabled) {
-			return repoProxy;
-		}
-		return super.getRepository();
-	}
-
-	@Override
-	public void setRepository(T repository) {
-		if (statisticsEnabled) {
-			wrapInProxy(repository);
-		}
-		super.setRepository(repository);
-	}
-
-	@Override
 	public void getStatistics(String compName, StatisticsList list) {
 		if (handler != null) {
 			handler.getStatistics(compName, getName(), list);
@@ -108,6 +91,22 @@ public abstract class SDRepositoryBeanWithStatistics<T extends DataSourceAware> 
 	public void wrapInProxy(T repo) {
 		handler = new StatisticsInvocationHandler(getDataSourceName(), repo, repoClazz);
 		repoProxy = (T) Proxy.newProxyInstance(repo.getClass().getClassLoader(), new Class[]{repoClazz}, handler);
+	}
+
+	@Override
+	protected T getRepository() {
+		if (statisticsEnabled) {
+			return repoProxy;
+		}
+		return super.getRepository();
+	}
+
+	@Override
+	public void setRepository(T repository) {
+		if (statisticsEnabled) {
+			wrapInProxy(repository);
+		}
+		super.setRepository(repository);
 	}
 
 }

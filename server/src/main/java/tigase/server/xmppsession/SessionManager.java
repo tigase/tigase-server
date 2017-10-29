@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -84,19 +82,20 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 /**
  * Class SessionManager
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="sess-man", parent=Kernel.class, active = true)
+@Bean(name = "sess-man", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
 @ClusterModeRequired(active = false)
 public class SessionManager
 		extends AbstractMessageReceiver
 		implements Configurable, SessionManagerHandler, OnlineJidsReporter, RegistrarBean {
+
 	/** Field description */
 	protected static final String ADMIN_COMMAND_NODE = "http://jabber.org/protocol/admin";
 
@@ -108,99 +107,88 @@ public class SessionManager
 	private static final String SESSION_CLOSE_TIMER_KEY = "session-close-timer";
 
 	//~--- fields ---------------------------------------------------------------
-
+	/**
+	 * A Map with connectionID as a key and an object with all the user connection data as a value
+	 */
+	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom = new ConcurrentHashMap<JID, XMPPResourceConnection>(
+			100000);
+	/**
+	 * A Map with bare user JID as a key and a user session object as a value.
+	 */
+	protected ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId = new ConcurrentHashMap<BareJID, XMPPSession>(
+			100000);
+	private int activeUserNumber = 0;
 	@Inject
-	private AuthRepository                   auth_repository                 = null;
-	private long                             authTimeouts                    = 0;
-	private long                             closedConnections               = 0;
+	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins = new ConcurrentSkipListSet<XMPPImplIfc>();
+	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
+	private long authTimeout = 120;
+	private long authTimeouts = 0;
 	@Inject
-	private DefaultHandlerProc               defHandlerProc                  = null;
-	private PacketDefaultHandler             defPacketHandler                = new PacketDefaultHandler();
-	private String                           defPluginsThreadsPool = "default-threads-pool";
+	private AuthRepository auth_repository = null;
+	private long closedConnections = 0;
+	private ConnectionCheckCommandHandler connectionCheckCommandHandler = new ConnectionCheckCommandHandler();
+	@Inject
+	private DefaultHandlerProc defHandlerProc = null;
+	private PacketDefaultHandler defPacketHandler = new PacketDefaultHandler();
+	private String defPluginsThreadsPool = "default-threads-pool";
 	// Can not inject eventBus as it is used before injection is done
 	// TODO - Maybe we should allow autoregistration for event bus so that every
 	// annotated bean instance would be registered to eventbus?
 	//@Inject
-	private EventBus						 eventBus = EventBusFactory.getInstance();
+	private EventBus eventBus = EventBusFactory.getInstance();
 	@ConfigField(desc = "Force detail check of stale connections", alias = SessionManagerConfig.STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY)
-	private boolean                          forceDetailStaleConnectionCheck = true;
+	private boolean forceDetailStaleConnectionCheck = true;
 	private Kernel kernel = null;
-	private int                              maxIdx                          = 100;
-	private int                              maxUserConnections              = 0;
-	private int                              maxUserSessions                 = 0;
-	private int                              maxUserSessionsDaily            = 0;
-	private int                              maxUserSessionsYesterday        = 0;
-	@Inject
-	private NonAuthUserRepository            naUserRepository;
-    private MaxDailyCounterQueue<Integer> maxDailyUsersSessions = new MaxDailyCounterQueue<>(31);
-    private int maxDailyUsersConnectionsWithinLastWeek = 0;
-	@Inject
-	private SessionCloseProc                 sessionCloseProc                = null;
-	@Inject
-	private SessionOpenProc                  sessionOpenProc                 = null;
-	private SMResourceConnection             smResourceConnection            = null;
-	private int                              tIdx                            = 0;
-	private long                             totalUserConnections            = 0;
-	private long                             totalUserSessions               = 0;
-	@Inject
-	private UserRepository                   user_repository                 = null;
-	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
-			XMPPStopListenerIfc>(10);
-	@ConfigField(desc = "Skip privacy check", alias = SessionManagerConfig.SKIP_PRIVACY_PROP_KEY)
-	private boolean          skipPrivacy = false;
-	@ConfigField(desc = "Factor for number of threads per plugin", alias = SessionManagerConfig.SM_THREADS_FACTOR_PROP_KEY)
-	private int          pluginsThreadFactor = 1;
-	@ConfigField(desc = "Default processors threads pool size", alias = SessionManagerConfig.SM_THREADS_POOL_PROP_KEY)
-	private String smThreadsPool = SessionManagerConfig.SM_THREADS_POOL_PROP_VAL;
-	@Inject
-	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
-	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
-	private long authTimeout = 120;
-
-	/**
-	 * A Map with bare user JID as a key and a user session object as a value.
+	/*
+	 * Date of moment where daily stats was resetted.
 	 */
-	protected ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
-			new ConcurrentHashMap<BareJID, XMPPSession>(100000);
-	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads =
-			new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(32);
-	private StaleConnectionCloser         staleConnectionCloser =
-			new StaleConnectionCloser();
-	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
-			XMPPProcessorIfc>(32);
-	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
-			XMPPPreprocessorIfc>(10);
-
+	private Calendar lastDailyStatsReset = Calendar.getInstance();
+	private int maxDailyUsersConnectionsWithinLastWeek = 0;
+	private MaxDailyCounterQueue<Integer> maxDailyUsersSessions = new MaxDailyCounterQueue<>(31);
+	private int maxIdx = 100;
+	private int maxUserConnections = 0;
+	private int maxUserSessions = 0;
+	private int maxUserSessionsDaily = 0;
+	private int maxUserSessionsYesterday = 0;
+	@Inject
+	private NonAuthUserRepository naUserRepository;
+	private NodeShutdownTask nodeShutdownTask = new NodeShutdownTask();
+	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String, XMPPPacketFilterIfc>(10);
+	// This is not used any more as plugins settings are passed by annotation and configuration injection
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String, Map<String, Object>>(20);
+	@ConfigField(desc = "Factor for number of threads per plugin", alias = SessionManagerConfig.SM_THREADS_FACTOR_PROP_KEY)
+	private int pluginsThreadFactor = 1;
+	private Map<String, XMPPPostprocessorIfc> postProcessors = new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
 	// private long[] defPrepTime = new long[maxIdx];
 	// private long[] prepTime = new long[maxIdx];
 	// private long[] defForwTime = new long[maxIdx];
 	// private long[] walkTime = new long[maxIdx];
 	// private long[] postTime = new long[maxIdx];
-	private Map<String, long[]>               postTimes = new ConcurrentSkipListMap<String,
-			long[]>();
-	private Map<String, XMPPPostprocessorIfc> postProcessors =
-			new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
-	// This is not used any more as plugins settings are passed by annotation and configuration injection
-	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
-	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
-			Map<String, Object>>(20);
-	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
-			XMPPPacketFilterIfc>(10);
-	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
-			new ConnectionCheckCommandHandler();
-
-	/**
-	 * A Map with connectionID as a key and an object with all the user connection
-	 * data as a value
-	 */
-	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom =
-			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
-	private int activeUserNumber = 0;
-
-	private NodeShutdownTask nodeShutdownTask = new NodeShutdownTask();
+	private Map<String, long[]> postTimes = new ConcurrentSkipListMap<String, long[]>();
+	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String, XMPPPreprocessorIfc>(10);
+	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String, XMPPProcessorIfc>(32);
+	@Inject
+	private SessionCloseProc sessionCloseProc = null;
+	@Inject
+	private SessionOpenProc sessionOpenProc = null;
+	@ConfigField(desc = "Skip privacy check", alias = SessionManagerConfig.SKIP_PRIVACY_PROP_KEY)
+	private boolean skipPrivacy = false;
+	private SMResourceConnection smResourceConnection = null;
+	@ConfigField(desc = "Default processors threads pool size", alias = SessionManagerConfig.SM_THREADS_POOL_PROP_KEY)
+	private String smThreadsPool = SessionManagerConfig.SM_THREADS_POOL_PROP_VAL;
+	private StaleConnectionCloser staleConnectionCloser = new StaleConnectionCloser();
+	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String, XMPPStopListenerIfc>(10);
+	private int tIdx = 0;
+	private long totalUserConnections = 0;
+	private long totalUserSessions = 0;
+	@Inject
+	private UserRepository user_repository = null;
 
 	//~--- methods --------------------------------------------------------------
+	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads = new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(
+			32);
 
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -218,8 +206,7 @@ public class SessionManager
 
 	public XMPPImplIfc addPlugin(XMPPImplIfc proc)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, TigaseDBException {
-		String           version;
-
+		String version;
 
 		boolean loaded = false;
 		if (proc instanceof XMPPProcessorIfc) {
@@ -232,15 +219,13 @@ public class SessionManager
 				if (threadsNo != procca.getThreadsNo()) {
 					threadsNo = procca.getThreadsNo();
 					log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-							new Object[]{proc.id(),
-									threadsNo});
+							new Object[]{proc.id(), threadsNo});
 					requireNewPool = true;
 				}
 				if (procca.getQueueSize() != null) {
 					queueSize = procca.getQueueSize();
 					log.log(Level.CONFIG, "Queue for plugin: {0} set to: {1} per thread",
-							new Object[]{proc.id(),
-									queueSize});
+							new Object[]{proc.id(), queueSize});
 					requireNewPool = true;
 				} else {
 					queueSize = maxQueueSize / threadsNo;
@@ -257,59 +242,51 @@ public class SessionManager
 				// Added to make sure that there will be only one thread pool for plugin
 				// so if one exits we will keep it and not create another one
 				if (!workerThreads.containsKey(proc.id())) {
-					ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-					ProcessingThreads<ProcessorWorkerThread> pt =
-							new ProcessingThreads<ProcessorWorkerThread>(worker, threadsNo,
-									queueSize, proc.id());
+					ProcessorWorkerThread worker = new ProcessorWorkerThread();
+					ProcessingThreads<ProcessorWorkerThread> pt = new ProcessingThreads<ProcessorWorkerThread>(worker,
+																											   threadsNo,
+																											   queueSize,
+																											   proc.id());
 
 					workerThreads.put(proc.id(), pt);
-					log.log(Level.CONFIG,
-							"Created thread pool: {0}, queue per thread: {1} for plugin id: {2}", new Object[] {
-									threadsNo,
-									queueSize, proc.id() });
+					log.log(Level.CONFIG, "Created thread pool: {0}, queue per thread: {1} for plugin id: {2}",
+							new Object[]{threadsNo, queueSize, proc.id()});
 				}
 			}
 			processors.put(proc.id(), (XMPPProcessorIfc) proc);
-			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] { proc
-					.getClass().getSimpleName(),
-					proc.id() });
-			loaded  = true;
+			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
+					new Object[]{proc.getClass().getSimpleName(), proc.id()});
+			loaded = true;
 			version = proc.getComponentInfo().getComponentVersion();
-			System.out.println("Loading plugin: " + proc.id() + "=" + threadsNo + ":" + queueSize +
-					" ... " +	(version.isEmpty()
-					? ""
-					: "\t, version: " + version));
+			System.out.println("Loading plugin: " + proc.id() + "=" + threadsNo + ":" + queueSize + " ... " +
+									   (version.isEmpty() ? "" : "\t, version: " + version));
 		}
 
 		if (proc instanceof XMPPPreprocessorIfc) {
 			preProcessors.put(proc.id(), (XMPPPreprocessorIfc) proc);
-			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}", new Object[] {
-					proc.getClass().getSimpleName(),
-					proc.id() });
+			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}",
+					new Object[]{proc.getClass().getSimpleName(), proc.id()});
 			loaded = true;
 		}
 
 		if (proc instanceof XMPPPostprocessorIfc) {
 			postProcessors.put(proc.id(), (XMPPPostprocessorIfc) proc);
-			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}", new Object[] {
-					proc.getClass().getSimpleName(),
-					proc });
+			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}",
+					new Object[]{proc.getClass().getSimpleName(), proc});
 			loaded = true;
 		}
 
 		if (proc instanceof XMPPStopListenerIfc) {
 			stopListeners.put(proc.id(), (XMPPStopListenerIfc) proc);
 			log.log(Level.CONFIG, "Added stopped processor: {0} for plugin id: {1}",
-					new Object[] { proc.getClass().getSimpleName(),
-							proc.id() });
+					new Object[]{proc.getClass().getSimpleName(), proc.id()});
 			loaded = true;
 		}
 
 		if (proc instanceof XMPPPacketFilterIfc) {
 			outFilters.put(proc.id(), (XMPPPacketFilterIfc) proc);
-			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}", new Object[] {
-					proc.getClass().getSimpleName(),
-					proc.id() });
+			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}",
+					new Object[]{proc.getClass().getSimpleName(), proc.id()});
 			loaded = true;
 		}
 		if (!loaded) {
@@ -321,18 +298,19 @@ public class SessionManager
 				try {
 					Method m = proc.getClass().getDeclaredMethod("init", Map.class);
 					if (m.getAnnotation(Deprecated.class) == null) {
-						log.log(Level.WARNING, "processor " + proc.getClass().getCanonicalName() + " is using deprecated init() method!");
+						log.log(Level.WARNING, "processor " + proc.getClass().getCanonicalName() +
+								" is using deprecated init() method!");
 						proc.init(settings);
 					}
-				} catch (NoSuchMethodException|SecurityException ex) {
+				} catch (NoSuchMethodException | SecurityException ex) {
 					// ignoring...
 				}
 				//settings.put("sm-jid", getComponentId());
 				eventBus.registerAll(proc);
 			}
 			if (proc instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
-				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
-						.PresenceCapabilitiesListener) proc);
+				PresenceCapabilitiesManager.registerPresenceHandler(
+						(PresenceCapabilitiesManager.PresenceCapabilitiesListener) proc);
 			}
 		}
 
@@ -363,9 +341,7 @@ public class SessionManager
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[] {
-					userId,
-					conn });
+			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[]{userId, conn});
 		}
 		registerNewSession(userId, conn);
 	}
@@ -379,8 +355,8 @@ public class SessionManager
 		// session.getActiveResourcesSize() <= 1
 		// was not enough
 		//if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
-		boolean onlyConnectionForSession = session != null && (session.getActiveResourcesSize() == 0
-				|| (session.getActiveResourcesSize() == 1 && session.getActiveResources().contains(conn)));
+		boolean onlyConnectionForSession = session != null && (session.getActiveResourcesSize() == 0 ||
+				(session.getActiveResourcesSize() == 1 && session.getActiveResources().contains(conn)));
 
 		if (onlyConnectionForSession) {
 			sessionsByNodeId.remove(userId);
@@ -388,8 +364,8 @@ public class SessionManager
 		try {
 			connectionsByFrom.remove(conn.getConnectionId());
 
-			Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
-					StanzaType.set, conn.nextStanzaId());
+			Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(), StanzaType.set,
+												 conn.nextStanzaId());
 			String error = (String) conn.getSessionData(XMPPResourceConnection.ERROR_KEY);
 
 			if (error != null) {
@@ -419,12 +395,11 @@ public class SessionManager
 
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
-		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId())) &&!conn
-				.isTmpSession()) {
+		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId())) && !conn.isTmpSession()) {
 			try {
-				Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
-						.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
-						.submit);
+				Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn.getConnectionId(),
+																	 StanzaType.set, conn.nextStanzaId(),
+																	 Command.DataType.submit);
 
 				Command.addFieldValue(user_login_cmd, "user-jid", conn.getjid().toString());
 				addOutPacket(user_login_cmd);
@@ -448,8 +423,7 @@ public class SessionManager
 		// and in other components it causes issues as SM sending packet send packetFrom
 		// to SM address which in fact forced other components to process all packets
 		// from SM on single thread !!
-		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
-				.getPacketFrom())) {
+		if ((packet.getPacketFrom() != null) && !getComponentId().equals(packet.getPacketFrom())) {
 
 			// This comes from connection manager so the best way is to get hashcode
 			// by the connectionId, which is in the getFrom()
@@ -460,7 +434,7 @@ public class SessionManager
 	}
 
 	@Override
-	public void initBindings( Bindings binds ) {
+	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CommandIfc.AUTH_REPO, auth_repository);
 		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
@@ -505,13 +479,12 @@ public class SessionManager
 		removePlugin(plug_id);
 	}
 
-
 	public void removePlugin(String plug_id) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Removing plugin {0}", plug_id);
 		}
 
-		XMPPImplIfc                              p  = null;
+		XMPPImplIfc p = null;
 		ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.remove(plug_id);
 
 		if (pt != null) {
@@ -536,8 +509,8 @@ public class SessionManager
 		if (p != null) {
 			eventBus.unregisterAll(p);
 			if (p instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
-				PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
-						.PresenceCapabilitiesListener) p);
+				PresenceCapabilitiesManager.unregisterPresenceHandler(
+						(PresenceCapabilitiesManager.PresenceCapabilitiesListener) p);
 			}
 		}
 	}
@@ -555,6 +528,8 @@ public class SessionManager
 		eventBus.registerAll(this);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	@Override
 	public void stop() {
 		eventBus.unregisterAll(this);
@@ -569,8 +544,6 @@ public class SessionManager
 
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -598,7 +571,7 @@ public class SessionManager
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		List<Element> features = new LinkedList<Element>();
-		List<Element> tmp      = super.getDiscoFeatures(from);
+		List<Element> tmp = super.getDiscoFeatures(from);
 
 		if (tmp != null) {
 			features.addAll(tmp);
@@ -616,8 +589,7 @@ public class SessionManager
 
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
-		if ((jid != null) && (getName().equals(jid.getLocalpart()) || isLocalDomain(jid
-				.toString()))) {
+		if ((jid != null) && (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))) {
 			Element query = super.getDiscoInfo(node, jid, from);
 
 			if (query == null) {
@@ -634,17 +606,13 @@ public class SessionManager
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Found disco info: {0}", ((query != null)
-						? query.toString()
-						: null));
+				log.log(Level.FINEST, "Found disco info: {0}", ((query != null) ? query.toString() : null));
 			}
 
 			return query;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Not found disco info for node: {0}, jid: {1}",
-					new Object[] { node,
-							jid });
+			log.log(Level.FINEST, "Not found disco info for node: {0}, jid: {1}", new Object[]{node, jid});
 		}
 
 		return null;
@@ -661,8 +629,7 @@ public class SessionManager
 			XMPPResourceConnection res = session.getResourceConnection(jid);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Found session: {0}, for jid: {1}", new Object[] { res,
-						jid });
+				log.log(Level.FINEST, "Found session: {0}, for jid: {1}", new Object[]{res, jid});
 			}
 
 			return res;
@@ -676,7 +643,7 @@ public class SessionManager
 		return null;
 	}
 
-	public int getOpenUsersConnectionsAmount(){
+	public int getOpenUsersConnectionsAmount() {
 		return connectionsByFrom.size();
 	}
 
@@ -685,8 +652,7 @@ public class SessionManager
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		if (list.checkLevel(Level.FINEST)) {
-			list.add(getName(), "Registered accounts", user_repository.getUsersCount(), Level
-					.FINEST);
+			list.add(getName(), "Registered accounts", user_repository.getUsersCount(), Level.FINEST);
 		}
 		list.add(getName(), "Open user connections", connectionsByFrom.size(), Level.INFO);
 		list.add(getName(), "Maximum user connections", maxUserConnections, Level.INFO);
@@ -698,21 +664,19 @@ public class SessionManager
 		list.add(getName(), "Active user connections", activeUserNumber, Level.FINER);
 		list.add(getName(), "Authentication timouts", authTimeouts, Level.INFO);
 		if (list.checkLevel(Level.INFO)) {
-			int  totalQueuesWait     = list.getValue(getName(), "Total queues wait", 0);
+			int totalQueuesWait = list.getValue(getName(), "Total queues wait", 0);
 			long totalQueuesOverflow = list.getValue(getName(), "Total queues overflow", 0l);
 
-			for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent :
-					workerThreads.entrySet()) {
+			for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent : workerThreads.entrySet()) {
 				ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
 
-				totalQueuesWait     += proc.getTotalQueueSize();
+				totalQueuesWait += proc.getTotalQueueSize();
 				totalQueuesOverflow += proc.getDroppedPackets();
-				if (list.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc
-						.getDroppedPackets())) {
-					list.add(getName(), "Processor: " + procent.getKey(), ", Queue: " + proc
-									.getTotalQueueSize() + ", AvTime: " + proc.getAverageProcessingTime() +
-									", Runs: " + proc.getTotalRuns() + ", Lost: " + proc.getDroppedPackets(),
-							Level.INFO);
+				if (list.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
+					list.add(getName(), "Processor: " + procent.getKey(),
+							 ", Queue: " + proc.getTotalQueueSize() + ", AvTime: " + proc.getAverageProcessingTime() +
+									 ", Runs: " + proc.getTotalRuns() + ", Lost: " + proc.getDroppedPackets(),
+							 Level.INFO);
 				}
 			}
 			list.add(getName(), "Total queues wait", totalQueuesWait, Level.INFO);
@@ -725,15 +689,16 @@ public class SessionManager
 				// for statement
 				Map.Entry<String, long[]> entry = tmEntry;
 
-				list.add(getName(), "Average " + tmEntry.getKey() + " on last " + entry.getValue()
-						.length + " runs [ms]", calcAverage(entry.getValue()), Level.FINE);
+				list.add(getName(),
+						 "Average " + tmEntry.getKey() + " on last " + entry.getValue().length + " runs [ms]",
+						 calcAverage(entry.getValue()), Level.FINE);
 			}
 		}
 		list.add(getName(), "Maximum user sessions today", maxUserSessionsDaily, Level.INFO);
 		list.add(getName(), "Maximum user sessions yesterday", maxUserSessionsYesterday, Level.INFO);
 
-        list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions, Level.INFO);
-        list.add(getName(), "Max users sessions within last week", maxDailyUsersConnectionsWithinLastWeek, Level.INFO);
+		list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions, Level.INFO);
+		list.add(getName(), "Max users sessions within last week", maxDailyUsersConnectionsWithinLastWeek, Level.INFO);
 
 		for (XMPPImplIfc plugin : allPlugins) {
 			plugin.getStatistics(list);
@@ -745,6 +710,8 @@ public class SessionManager
 		return true;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	@Override
 	public boolean isLocalDomain(String domain, boolean includeComponents) {
 		if (includeComponents) {
@@ -753,8 +720,6 @@ public class SessionManager
 			return isLocalDomain(domain);
 		}
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setName(String name) {
@@ -766,19 +731,20 @@ public class SessionManager
 		ConcurrentSkipListSet<XMPPImplIfc> oldPlugins = this.allPlugins;
 		HashSet<XMPPImplIfc> removed = new HashSet<>(oldPlugins);
 		removed.removeAll(allPlugins);
-		for (XMPPImplIfc proc : removed)
+		for (XMPPImplIfc proc : removed) {
 			removePlugin(proc);
+		}
 		HashSet<XMPPImplIfc> added = new HashSet<>(allPlugins);
 		added.removeAll(oldPlugins);
 		for (XMPPImplIfc proc : added) {
 			try {
 				addPlugin(proc);
-			} catch (ClassNotFoundException|InstantiationException|IllegalAccessException|TigaseDBException e) {
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | TigaseDBException e) {
 				log.log(Level.SEVERE, "Failed initialization of processor " + proc.id(), e);
 			}
 		}
 	}
-	
+
 	public void setSmThreadsPool(String val) {
 		this.smThreadsPool = val;
 		if (!SM_THREADS_POOL_PROP_VAL.equals(val)) {
@@ -807,7 +773,7 @@ public class SessionManager
 			}
 		}
 	}
-	
+
 	@Override
 	public void initialize() {
 		super.initialize();
@@ -815,6 +781,8 @@ public class SessionManager
 		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository, this);
 		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void setSchedulerThreads_size(int size) {
@@ -824,10 +792,96 @@ public class SessionManager
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	@Override
+	public int schedulerThreads() {
+		return 2;
+	}
 
-	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
-								 Queue<Packet> results) {
+	public void register(Kernel kernel) {
+		this.kernel = kernel;
+	}
+
+	public void unregister(Kernel kernel) {
+		this.kernel = null;
+	}
+
+	public Map<String, XMPPProcessorIfc> getProcessors() {
+		return Collections.unmodifiableMap(processors);
+	}
+
+	public Map<String, XMPPPreprocessorIfc> getPreProcessors() {
+		return Collections.unmodifiableMap(preProcessors);
+	}
+
+	public Map<String, XMPPPostprocessorIfc> getPostProcessors() {
+		return Collections.unmodifiableMap(postProcessors);
+	}
+
+	public Map<String, XMPPPacketFilterIfc> getOutFilters() {
+		return Collections.unmodifiableMap(outFilters);
+	}
+
+	@Override
+	public synchronized void everySecond() {
+		super.everySecond();
+		maxDailyUsersSessions.add(maxUserSessionsDaily - 1);
+		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
+	}
+
+	@Override
+	public synchronized void everyMinute() {
+		super.everyMinute();
+		int count = 0;
+
+		for (BareJID bareJID : sessionsByNodeId.keySet()) {
+			if (!bareJID.toString().startsWith("sess-man")) {
+				XMPPSession session = sessionsByNodeId.get(bareJID);
+				// check if session is still there as it could be closed
+				// if sessionsByNodeId is big collection
+				if (session != null) {
+					for (XMPPResourceConnection xMPPResourceConnection : session.getActiveResources()) {
+						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 * 60 * 1000) {
+							count++;
+						}
+					}
+				}
+			}
+		}
+
+		activeUserNumber = count;
+
+		final Calendar now = Calendar.getInstance();
+		if (now.get(Calendar.YEAR) != lastDailyStatsReset.get(Calendar.YEAR) ||
+				now.get(Calendar.DAY_OF_YEAR) != lastDailyStatsReset.get(Calendar.DAY_OF_YEAR)) {
+			lastDailyStatsReset = Calendar.getInstance();
+
+			maxUserSessionsYesterday = maxUserSessionsDaily;
+			maxUserSessionsDaily = sessionsByNodeId.size();
+		}
+
+		maxDailyUsersSessions.add(maxUserSessionsDaily - 1);
+		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
+	}
+
+	@Override
+	public void handleDomainChange(final String domain, final XMPPResourceConnection conn) {
+		try {
+			VHostItem vHostItem = getVHostItem(domain);
+			if (vHostItem == null) {
+				if (log.isLoggable(Level.INFO)) {
+					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}",
+							new Object[]{domain, getDefHostName()});
+				}
+				vHostItem = new VHostItem(getDefHostName().getDomain());
+			}
+			conn.setDomain(vHostItem.getUnmodifiableVHostItem());
+		} catch (TigaseStringprepException ex) {
+			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
+			// handleLogout(userId, conn);
+		}
+	}
+
+	protected void addOutPackets(Packet packet, XMPPResourceConnection conn, Queue<Packet> results) {
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
 			outfilter.filter(packet, conn, naUserRepository, results);
 		}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
@@ -838,8 +892,8 @@ public class SessionManager
 		return trusted.add(jid.getBareJID().toString());
 	}
 
-	protected void closeConnection(XMPPResourceConnection connection, JID connectionId,
-								   String userId, boolean closeOnly) {
+	protected void closeConnection(XMPPResourceConnection connection, JID connectionId, String userId,
+								   boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Stream closed from: {0}", connectionId);
 		}
@@ -855,35 +909,29 @@ public class SessionManager
 			// closed. The best example is handleLogin, it happens they are called
 			// concurrently and this is where things go wrong....
 			synchronized (connection) {
-				connection.putSessionData(XMPPResourceConnection.CLOSING_KEY,
-						XMPPResourceConnection.CLOSING_KEY);
+				connection.putSessionData(XMPPResourceConnection.CLOSING_KEY, XMPPResourceConnection.CLOSING_KEY);
 				closeSession(connection, closeOnly);
 			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Can not find resource connection for connectionId: {0}",
-						connectionId);
+				log.log(Level.FINE, "Can not find resource connection for connectionId: {0}", connectionId);
 			}
 			if (userId != null) {
 
 				// check using userId if we can find stale XMPPResourceConnection
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"Found trying to find stale XMPPResourceConnection by userId {0}...",
-							userId);
+					log.log(Level.FINEST, "Found trying to find stale XMPPResourceConnection by userId {0}...", userId);
 				}
 
-				JID         userJid         = JID.jidInstanceNS(userId);
+				JID userJid = JID.jidInstanceNS(userId);
 				XMPPSession sessionByUserId = getSession(userJid.getBareJID());
 
 				if (sessionByUserId != null) {
 					connection = sessionByUserId.getResourceForConnectionId(connectionId);
 					if (connection != null) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST,
-									"Found stale XMPPResourceConnection {0} by userId {1}, removing...",
-									new Object[] { connection,
-											userId });
+							log.log(Level.FINEST, "Found stale XMPPResourceConnection {0} by userId {1}, removing...",
+									new Object[]{connection, userId});
 						}
 						sessionByUserId.removeResourceConnection(connection);
 					}
@@ -895,8 +943,9 @@ public class SessionManager
 			// Maybe we should move this loop based check to separe thread for performance reason
 			// Check if our Set<JID> of not found sessions contains each of available connections from each session
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "queuing connection {0} for user {1} for detail stale connection check - should not happen!!",
-						new Object[] { connectionId, userId });
+				log.log(Level.FINE,
+						"queuing connection {0} for user {1} for detail stale connection check - should not happen!!",
+						new Object[]{connectionId, userId});
 			}
 			if (!forceDetailStaleConnectionCheck) {
 				return;
@@ -940,7 +989,7 @@ public class SessionManager
 				JID userJid = conn.getJID();
 
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Closing connection for: {0}, conn: {1}", new Object[] {userJid, conn});
+					log.log(Level.FINE, "Closing connection for: {0}, conn: {1}", new Object[]{userJid, conn});
 				}
 
 				XMPPSession sessionParent = conn.getParentSession();
@@ -957,8 +1006,8 @@ public class SessionManager
 						// we should check if other this is the only connection on session
 						// as in some cases connection can be already removed from active
 						// resources but there might be other connection which is active
-						if ((sessionParent.getActiveResourcesSize() > 0) &&!sessionParent.getActiveResources()
-								.contains(conn)) {
+						if ((sessionParent.getActiveResourcesSize() > 0) &&
+								!sessionParent.getActiveResources().contains(conn)) {
 							log.log(Level.FINE, "Session contains connection for other " +
 									"resource than: {0}, not removing session", userJid);
 							if (log.isLoggable(Level.FINER)) {
@@ -968,26 +1017,23 @@ public class SessionManager
 									sb.append(", res=").append(res_con.getResource());
 								}
 								log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-										new Object[] { sessionParent.getActiveResourcesSize(),
-												userJid, sb.toString() });
+										new Object[]{sessionParent.getActiveResourcesSize(), userJid, sb.toString()});
 							}
 
 							return;
 						}
 
-						XMPPSession sessionFromMap = getSession( userJid.getBareJID());
+						XMPPSession sessionFromMap = getSession(userJid.getBareJID());
 
-						if (sessionParent.equals( sessionFromMap ) && sessionFromMap.getActiveResources().isEmpty() ) {
+						if (sessionParent.equals(sessionFromMap) && sessionFromMap.getActiveResources().isEmpty()) {
 							sessionParent = sessionsByNodeId.remove(userJid.getBareJID());
 						}
 
 						if (sessionParent == null) {
-							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}",
-									userJid);
+							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}", userJid);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
-								log.log(Level.FINER, "Number of user sessions: {0}", sessionsByNodeId
-										.size());
+								log.log(Level.FINER, "Number of user sessions: {0}", sessionsByNodeId.size());
 							}
 						}    // end of else
 						auth_repository.logout(userJid.getBareJID());
@@ -999,8 +1045,7 @@ public class SessionManager
 								sb.append(", res=").append(res_con.getResource());
 							}
 							log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-									new Object[] { sessionParent.getActiveResourcesSize(),
-											userJid, sb.toString() });
+									new Object[]{sessionParent.getActiveResourcesSize(), userJid, sb.toString()});
 						}
 					}    // end of else
 				}      // end of if (session.getActiveResourcesSize() == 0)
@@ -1014,28 +1059,23 @@ public class SessionManager
 		conn.streamClosed();
 	}
 
-	protected XMPPResourceConnection createUserSession(JID conn_id, String domain)
-			throws TigaseStringprepException {
-		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
-				user_repository, auth_repository, this);
+	protected XMPPResourceConnection createUserSession(JID conn_id, String domain) throws TigaseStringprepException {
+		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id, user_repository, auth_repository, this);
 		VHostItem vitem = null;
 
 		if (domain != null) {
 			vitem = getVHostItem(domain);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Setting hostname {0} for connection: {1}, VHostItem: {2}",
-						new Object[] { domain,
-								conn_id, vitem });
+						new Object[]{domain, conn_id, vitem});
 			}
 		}
 		if (vitem == null) {
 
 			// This shouldn't generally happen. Must mean misconfiguration.
 			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO,
-						"Can't get VHostItem for domain: {0}, using default one instead: {1}",
-						new Object[] { domain,
-								getDefHostName() });
+				log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}",
+						new Object[]{domain, getDefHostName()});
 			}
 			vitem = new VHostItem(getDefHostName().getDomain());
 		}
@@ -1064,8 +1104,8 @@ public class SessionManager
 	}
 
 	@SuppressWarnings("deprecation")
-	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
-													  BareJID user_id, String resource, String xmpp_sessionId, boolean tmpSession) {
+	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id, String resource,
+													  String xmpp_sessionId, boolean tmpSession) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
 
@@ -1077,10 +1117,10 @@ public class SessionManager
 			conn.authorizeJID(user_id, false);
 			if (conn.isAuthorized()) {
 				handleLogin(user_id, conn);
-				if ( resource == null ){
+				if (resource == null) {
 					resource = UUID.randomUUID().toString();
 				}
-				conn.setResource( resource );
+				conn.setResource(resource);
 			} else {
 				connectionsByFrom.remove(conn_id);
 
@@ -1094,6 +1134,8 @@ public class SessionManager
 
 		return null;
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
@@ -1116,18 +1158,16 @@ public class SessionManager
 				packet.processedBy("admins-or-domains");
 
 				return true;
-			} else if (packet.getElemName() == "iq"
-					&& packet.getType() == StanzaType.result) {
-				if ( log.isLoggable( Level.FINER ) ){
-					log.log( Level.FINER, "IQ result packet addressed directly to server and not handle by any plugin: {0}",
-							packet );
+			} else if (packet.getElemName() == "iq" && packet.getType() == StanzaType.result) {
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER,
+							"IQ result packet addressed directly to server and not handle by any plugin: {0}", packet);
 				}
-				packet.processedBy( "iq-result-to-server" );
+				packet.processedBy("iq-result-to-server");
 				return true;
 			} else {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}",
-							packet);
+					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}", packet);
 				}
 			}
 		}    // end of if (isInRoutings(to))
@@ -1136,37 +1176,34 @@ public class SessionManager
 	}
 
 	protected boolean processCommand(Packet pc) {
-		if ((pc.getStanzaTo() == null) ||!(getComponentId().equals(pc.getStanzaTo()) ||
-				isLocalDomain(pc.getStanzaTo().toString()))) {
+		if ((pc.getStanzaTo() == null) ||
+				!(getComponentId().equals(pc.getStanzaTo()) || isLocalDomain(pc.getStanzaTo().toString()))) {
 			return false;
 		}
 
-		Iq      iqc               = (Iq) pc;
+		Iq iqc = (Iq) pc;
 		boolean processing_result = false;
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0} command from: {1}", new Object[] { iqc.getCommand()
-					.toString(),
-					iqc.getFrom() });
+			log.log(Level.FINER, "{0} command from: {1}", new Object[]{iqc.getCommand().toString(), iqc.getFrom()});
 		}
 
 		XMPPResourceConnection connection = connectionsByFrom.get(iqc.getFrom());
 
 		switch (iqc.getCommand()) {
-			case CLOSE : {
+			case CLOSE: {
 				log.log(Level.WARNING, "Unexpected packet: {0}", pc);
 				processing_result = true;
 			}
 
 			break;
 
-			case STREAM_OPENED : {
+			case STREAM_OPENED: {
 
 				// Response is sent from the thread when opening user session is
 				// completed.
 				// fastAddOutPacket(pc.okResult((String) null, 0));
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionOpenProc
-						.id());
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionOpenProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1177,18 +1214,18 @@ public class SessionManager
 
 			break;
 
-			case GETFEATURES : {
+			case GETFEATURES: {
 				if (iqc.getType() == StanzaType.get) {
 
-					boolean ssl = iqc.getStanzaId().startsWith( "ssl_" );
+					boolean ssl = iqc.getStanzaId().startsWith("ssl_");
 
-					connection = connectionsByFrom.get( iqc.getStanzaFrom() );
-					if ( connection != null && ssl ){
-						connection.putSessionData( "SSL", ssl );
+					connection = connectionsByFrom.get(iqc.getStanzaFrom());
+					if (connection != null && ssl) {
+						connection.putSessionData("SSL", ssl);
 					}
 
-					List<Element> features = getFeatures( connection );
-					Packet result = iqc.commandResult( null );
+					List<Element> features = getFeatures(connection);
+					Packet result = iqc.commandResult(null);
 
 					Command.setData(result, features);
 					addOutPacket(result);
@@ -1198,7 +1235,7 @@ public class SessionManager
 
 			break;
 
-			case STREAM_CLOSED : {
+			case STREAM_CLOSED: {
 				fastAddOutPacket(iqc.okResult((String) null, 0));
 
 				//try {
@@ -1251,8 +1288,7 @@ public class SessionManager
 
 				if (connection == null || !connection.isAuthorized()) {
 					// now we add packet to processing thread to let it close properly in separate thread
-					ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-							.id());
+					ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc.id());
 
 					if (pt == null) {
 						pt = workerThreads.get(defPluginsThreadsPool);
@@ -1268,20 +1304,16 @@ public class SessionManager
 
 			break;
 
-			case STREAM_CLOSED_UPDATE : {
+			case STREAM_CLOSED_UPDATE: {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} processing comment, connection: {1}", new Object[] {
-							iqc.getCommand(), ((connection != null)
-							? connection
-							: " is null") });
+					log.log(Level.FINEST, "{0} processing comment, connection: {1}",
+							new Object[]{iqc.getCommand(), ((connection != null) ? connection : " is null")});
 				}
 
 				// Note! We don't send response to this packet....
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} adding to the processor: {1}", new Object[] { iqc
-							.getCommand(), ((connection != null)
-							? connection
-							: " is null") });
+					log.log(Level.FINEST, "{0} adding to the processor: {1}",
+							new Object[]{iqc.getCommand(), ((connection != null) ? connection : " is null")});
 				}
 				if (connection == null) {
 
@@ -1300,28 +1332,24 @@ public class SessionManager
 						XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
 
 						if (xs == null) {
-							log.log(Level.INFO,
-									"Stream close for the user session which does not exist: {0}", iqc);
+							log.log(Level.INFO, "Stream close for the user session which does not exist: {0}", iqc);
 						} else {
-							XMPPResourceConnection xcr = xs.getResourceForConnectionId(iqc
-									.getPacketFrom());
+							XMPPResourceConnection xcr = xs.getResourceForConnectionId(iqc.getPacketFrom());
 
 							if (xcr == null) {
-								log.log(Level.INFO,
-										"Stream close for the resource connection which does not exist", iqc);
+								log.log(Level.INFO, "Stream close for the resource connection which does not exist",
+										iqc);
 							} else {
 								xs.removeResourceConnection(xcr);
 								if (log.isLoggable(Level.FINEST)) {
 									log.log(Level.FINEST, "{0} removed resource connection: {1}",
-											new Object[] { iqc.getCommand(),
-													xcr });
+											new Object[]{iqc.getCommand(), xcr});
 								}
 							}
 						}
 					}
 				} else {
-					ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-							.id());
+					ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc.id());
 
 					if (pt == null) {
 						pt = workerThreads.get(defPluginsThreadsPool);
@@ -1337,10 +1365,8 @@ public class SessionManager
 
 			case STREAM_FINISHED:
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} processing command, connection: {1}", new Object[] {
-							iqc.getCommand(), ((connection != null)
-							? connection
-							: " is null") });
+					log.log(Level.FINEST, "{0} processing command, connection: {1}",
+							new Object[]{iqc.getCommand(), ((connection != null) ? connection : " is null")});
 				}
 				if (connection != null) {
 					TimerTask task = (TimerTask) connection.getSessionData(SESSION_CLOSE_TIMER_KEY);
@@ -1353,8 +1379,7 @@ public class SessionManager
 				}
 
 				// now we add packet to processing thread to let it close properly in separate thread
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-						.id());
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1365,35 +1390,34 @@ public class SessionManager
 
 				break;
 
-			case USER_STATUS :
+			case USER_STATUS:
 				try {
-					final boolean isTrusted = isTrusted(iqc.getStanzaFrom())
-							|| isTrusted(iqc.getStanzaFrom().getDomain());
-					String pb = Command.getFieldValue( pc, "prebind" );
-					boolean prebind = ( ( pb != null ) && pb.equalsIgnoreCase( "true" ) );
+					final boolean isTrusted =
+							isTrusted(iqc.getStanzaFrom()) || isTrusted(iqc.getStanzaFrom().getDomain());
+					String pb = Command.getFieldValue(pc, "prebind");
+					boolean prebind = ((pb != null) && pb.equalsIgnoreCase("true"));
 
 					if (prebind || isTrusted) {
-						String  av        = Command.getFieldValue(pc, "available");
+						String av = Command.getFieldValue(pc, "available");
 						boolean available = !((av != null) && av.equalsIgnoreCase("false"));
 
-						JID user_jid = JID.jidInstance( Command.getFieldValue( iqc, "jid" ) );
+						JID user_jid = JID.jidInstance(Command.getFieldValue(iqc, "jid"));
 
-						if ( prebind ){
-							String id = Command.getFieldValue( pc, "session-id" );
-							if ( id == null ){
+						if (prebind) {
+							String id = Command.getFieldValue(pc, "session-id");
+							if (id == null) {
 								id = UUID.randomUUID().toString();
 							}
 
-							loginUserSession( iqc.getStanzaFrom(), user_jid.getDomain(),
-									user_jid.getBareJID(), user_jid.getResource(),
-									id, false );
-							fastAddOutPacket( iqc.okResult( (String) null, 0 ) );
+							loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(), user_jid.getBareJID(),
+											 user_jid.getResource(), id, false);
+							fastAddOutPacket(iqc.okResult((String) null, 0));
 
 						}
 
 						if (available) {
-							Packet  presence = null;
-							Element p        = iqc.getElement().getChild("command").getChild("presence");
+							Packet presence = null;
+							Element p = iqc.getElement().getChild("command").getChild("presence");
 
 							if (p != null) {
 
@@ -1408,25 +1432,25 @@ public class SessionManager
 							connection = connectionsByFrom.get(iqc.getStanzaFrom());
 							if (!prebind && connection == null) {
 								connection = loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
-										user_jid.getBareJID(), user_jid.getResource(), "USER_STATUS", false);
+															  user_jid.getBareJID(), user_jid.getResource(),
+															  "USER_STATUS", false);
 								connection.putSessionData("jingle", "active");
 								fastAddOutPacket(iqc.okResult((String) null, 0));
 								if (presence == null) {
-									presence = Packet.packetInstance(new Element("presence", new Element[] {
+									presence = Packet.packetInstance(new Element("presence", new Element[]{
 											new Element("priority", "-1"),
-											new Element("c", new String[] { "node", "ver", "ext", "xmlns" },
-													new String[] { "http://www.google.com/xmpp/client/caps",
-															XMPPServer.getImplementationVersion(), "voice-v1",
-															"http://jabber.org/protocol/caps" }) }, null, null));
+											new Element("c", new String[]{"node", "ver", "ext", "xmlns"},
+														new String[]{"http://www.google.com/xmpp/client/caps",
+																	 XMPPServer.getImplementationVersion(), "voice-v1",
+																	 "http://jabber.org/protocol/caps"})}, null, null));
 								}
 							} else {
 
 								// addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
 								// "The user resource already exists.", true));
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest(
-											"USER_STATUS set to true for user who is already available: " + iqc
-													.toStringSecure());
+									log.finest("USER_STATUS set to true for user who is already available: " +
+													   iqc.toStringSecure());
 								}
 							}
 							if (presence != null) {
@@ -1441,15 +1465,16 @@ public class SessionManager
 								addOutPacket(iqc.okResult((String) null, 0));
 							} else {
 								addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
-										"The user resource you want to remove does not exist.", true));
-								log.info("Can not find resource connection for packet: " + iqc
-										.toStringSecure());
+																							 "The user resource you want to remove does not exist.",
+																							 true));
+								log.info("Can not find resource connection for packet: " + iqc.toStringSecure());
 							}
 						}
 					} else {
 						try {
-							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(iqc,
-									"Only trusted entity can do it.", true));
+							addOutPacket(
+									Authorization.FORBIDDEN.getResponseMessage(iqc, "Only trusted entity can do it.",
+																			   true));
 						} catch (PacketErrorTypeException e) {
 							log.warning("Packet error type when not expected: " + iqc.toStringSecure());
 						}
@@ -1457,7 +1482,8 @@ public class SessionManager
 				} catch (Exception e) {
 					try {
 						addOutPacket(Authorization.UNDEFINED_CONDITION.getResponseMessage(iqc,
-								"Unexpected error occured during the request: " + e, true));
+																						  "Unexpected error occured during the request: " +
+																								  e, true));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -1467,27 +1493,26 @@ public class SessionManager
 
 				break;
 
-			case OTHER :
+			case OTHER:
 				//#2682: Commands addressed to domain should be processed by sess-man
-				if ( iqc.isCommand() && isLocalDomain( iqc.getStanzaTo().getDomain() ) ){
+				if (iqc.isCommand() && isLocalDomain(iqc.getStanzaTo().getDomain())) {
 					Queue<Packet> results = new ArrayDeque<Packet>();
-					processing_result = processScriptCommand( iqc, results );
-					addOutPackets( results );
+					processing_result = processScriptCommand(iqc, results);
+					addOutPackets(results);
 				}
 
-				if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
-						.getPacketFrom())) {
+				if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc.getPacketFrom())) {
 
 					// No such command available. This prevents from an infinite loop in
 					// case there is no implementation to hadle such a command
 					try {
 						addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(iqc,
-								"There is no implementation for such command on the server.", true));
+																							  "There is no implementation for such command on the server.",
+																							  true));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
-					log.log(Level.WARNING,
-							"There is no implementation for such command on the server: " + iqc);
+					log.log(Level.WARNING, "There is no implementation for such command on the server: " + iqc);
 					processing_result = true;
 				}
 
@@ -1495,14 +1520,17 @@ public class SessionManager
 
 			case TLS_HANDSHAKE_COMPLETE:
 				if (connection != null) {
-					if (log.isLoggable(Level.FINEST))
+					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Handshake details received. connection: {0}", connection);
+					}
 					String tlsUniqueId = Command.getFieldValue(pc, "tls-unique-id");
 					if (tlsUniqueId != null) {
 						byte[] bytes = Base64.decode(tlsUniqueId);
 						connection.putSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY, bytes);
-						if (log.isLoggable(Level.FINEST))
-							log.log(Level.FINEST, "tls-unique-id {0} stored in session-data. connection: {1}", new Object[]{tlsUniqueId, connection});
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "tls-unique-id {0} stored in session-data. connection: {1}",
+									new Object[]{tlsUniqueId, connection});
+						}
 					}
 					String encodedCertificate = Command.getFieldValue(pc, "peer-certificate");
 					if (encodedCertificate != null) {
@@ -1514,8 +1542,10 @@ public class SessionManager
 							Certificate certificate = cf.generateCertificate(bais);
 
 							connection.putSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY, certificate);
-							if (log.isLoggable(Level.FINEST))
-								log.log(Level.FINEST, "peer-certificate {0} stored in session-data. connection: {1}", new Object[]{certificate, connection});
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "peer-certificate {0} stored in session-data. connection: {1}",
+										new Object[]{certificate, connection});
+							}
 
 						} catch (Exception ex) {
 							log.log(Level.FINEST, "could not decode peer certificate", ex);
@@ -1531,8 +1561,10 @@ public class SessionManager
 							Certificate certificate = cf.generateCertificate(bais);
 
 							connection.putSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY, certificate);
-							if (log.isLoggable(Level.FINEST))
-								log.log(Level.FINEST, "local-certificate {0} stored in session-data. connection: {1}", new Object[]{certificate, connection});
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "local-certificate {0} stored in session-data. connection: {1}",
+										new Object[]{certificate, connection});
+							}
 						} catch (Exception ex) {
 							log.log(Level.FINEST, "could not decode local certificate", ex);
 						}
@@ -1542,10 +1574,10 @@ public class SessionManager
 				}
 				processing_result = true;
 				break;
-			case STREAM_MOVED :
+			case STREAM_MOVED:
 				if (connection != null) {
 					String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
-					JID    oldConnJid          = JID.jidInstanceNS(oldConnectionJidStr);
+					JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
 
 					try {
 
@@ -1563,9 +1595,8 @@ public class SessionManager
 
 						xmppStreamMoved(oldConn, oldConnJid, oldConn.getConnectionId());
 					} catch (XMPPException ex) {
-						log.log(Level.SEVERE, "exception while replacing old connection id = " +
-										oldConnJid + " with new connection id = " + pc.getPacketFrom().toString(),
-								ex);
+						log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid +
+								" with new connection id = " + pc.getPacketFrom().toString(), ex);
 					}
 				}
 				processing_result = true;
@@ -1631,20 +1662,19 @@ public class SessionManager
 			processing_result = true;
 			break;
 
-			default :
-				if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
-						.getPacketFrom())) {
+			default:
+				if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc.getPacketFrom())) {
 
 					// No such command available. This prevents from an infinite loop in
 					// case there is no implementation to hadle such a command
 					try {
 						addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(iqc,
-								"There is no implementation for such command on the server.", true));
+																							  "There is no implementation for such command on the server.",
+																							  true));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
-					log.log(Level.WARNING,
-							"There is no implementation for such command on the server: " + iqc);
+					log.log(Level.WARNING, "There is no implementation for such command on the server: " + iqc);
 					processing_result = true;
 				}
 
@@ -1656,7 +1686,7 @@ public class SessionManager
 
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
 		long startTime = System.currentTimeMillis();
-		int  idx       = tIdx;
+		int idx = tIdx;
 
 		tIdx = (tIdx + 1) % maxIdx;
 
@@ -1669,13 +1699,12 @@ public class SessionManager
 		// cases like when the error is generated as a response to a bad packet.
 		packet.setPacketTo(getComponentId());
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "processing packet: {0}, connection: {1}", new Object[] {
-					packet.toStringSecure(),
-					conn });
+			log.log(Level.FINEST, "processing packet: {0}, connection: {1}",
+					new Object[]{packet.toStringSecure(), conn});
 		}
 
 		Queue<Packet> results = new ArrayDeque<Packet>(2);
-		boolean       stop    = false;
+		boolean stop = false;
 
 		if (!stop) {
 			if (defPacketHandler.preprocess(packet, conn, naUserRepository, results)) {
@@ -1703,19 +1732,16 @@ public class SessionManager
 		// block certain packets.
 		if (!stop) {
 			for (XMPPPreprocessorIfc preproc : preProcessors.values()) {
-				stop |= preproc.preProcess(packet, conn, naUserRepository, results, plugin_config
-						.get(preproc.id()));
+				stop |= preproc.preProcess(packet, conn, naUserRepository, results, plugin_config.get(preproc.id()));
 				if (stop && log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}", new Object[] {
-							preproc.id(),
-							packet });
+					log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}", new Object[]{preproc.id(), packet});
 
 					break;
 				}
 			}    // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
 
-		setPermissions( conn, packet );
+		setPermissions(conn, packet);
 
 		// prepTm = System.currentTimeMillis() - startTime;
 		if (!stop) {
@@ -1740,17 +1766,15 @@ public class SessionManager
 			} catch (NoConnectionIdException ex) {
 
 				// Ignore, this should not happen at this point, or even at all.
-				log.log(Level.INFO,
-						"Impossible happened, please report to developer packet: {0}, connection: {1}.",
-						new Object[] { packet,
-								conn });
+				log.log(Level.INFO, "Impossible happened, please report to developer packet: {0}, connection: {1}.",
+						new Object[]{packet, conn});
 			}
 		}
 
 		// walkTm = System.currentTimeMillis() - startTime;
 		if (!stop) {
 			for (XMPPPostprocessorIfc postproc : postProcessors.values()) {
-				String plug_id      = postproc.id();
+				String plug_id = postproc.id();
 				long[] postProcTime = null;
 
 				synchronized (postTimes) {
@@ -1763,18 +1787,16 @@ public class SessionManager
 
 				long stTime = System.currentTimeMillis();
 
-				postproc.postProcess(packet, conn, naUserRepository, results, plugin_config.get(
-						postproc.id()));
+				postproc.postProcess(packet, conn, naUserRepository, results, plugin_config.get(postproc.id()));
 				postProcTime[idx] = System.currentTimeMillis() - stTime;
 			}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		}      // end of if (!stop)
 
 		// postTm = System.currentTimeMillis() - startTime;
-		if (!stop &&!packet.wasProcessed() && ((packet.getStanzaTo() == null) ||
-				(!isLocalDomain(packet.getStanzaTo().toString())))) {
+		if (!stop && !packet.wasProcessed() &&
+				((packet.getStanzaTo() == null) || (!isLocalDomain(packet.getStanzaTo().toString())))) {
 			if (defPacketHandler.canHandle(packet, conn)) {
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(defHandlerProc
-						.id());
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(defHandlerProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1787,8 +1809,7 @@ public class SessionManager
 		addOutPackets(packet, conn, results);
 		if (packet.wasProcessed() || processAdminsOrDomains(packet)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Packet processed by: {0}", packet.getProcessorsIds()
-						.toString());
+				log.log(Level.FINEST, "Packet processed by: {0}", packet.getProcessorsIds().toString());
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
@@ -1797,13 +1818,12 @@ public class SessionManager
 
 			Packet error = null;
 
-			if (stop || ((conn == null) && (packet.getStanzaFrom() != null) && (packet
-					.getStanzaTo() != null) &&!packet.getStanzaTo().equals(getComponentId()) &&
-					((packet.getElemName() == Iq.ELEM_NAME) || (packet.getElemName() == Message
-							.ELEM_NAME)))) {
+			if (stop || ((conn == null) && (packet.getStanzaFrom() != null) && (packet.getStanzaTo() != null) &&
+					!packet.getStanzaTo().equals(getComponentId()) &&
+					((packet.getElemName() == Iq.ELEM_NAME) || (packet.getElemName() == Message.ELEM_NAME)))) {
 				try {
-					error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-							"Service not available.", true);
+					error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, "Service not available.",
+																				 true);
 				} catch (PacketErrorTypeException e) {
 					log.log(Level.FINE, "Service not available. Packet is error type already: {0}",
 							packet.toStringSecure());
@@ -1812,22 +1832,25 @@ public class SessionManager
 				if (((packet.getStanzaFrom() != null) || (conn != null)) && packet.wasSkipped()) {
 					try {
 						error = Authorization.RESOURCE_CONSTRAINT.getResponseMessage(packet,
-								"Server subsystem overloaded, service temporarily unavailable.", true);
+																					 "Server subsystem overloaded, service temporarily unavailable.",
+																					 true);
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "Server subsystem overloaded. Packet {0} not processed by processors {1}",
-									new Object[] { packet.toStringSecure(), packet.getSkippedProcessorsIds() });
+							log.log(Level.FINE,
+									"Server subsystem overloaded. Packet {0} not processed by processors {1}",
+									new Object[]{packet.toStringSecure(), packet.getSkippedProcessorsIds()});
 						}
 					} catch (PacketErrorTypeException e) {
-						log.log(Level.FINE, "Internal queues full. Packet is error type already: {0}", packet.toStringSecure());
+						log.log(Level.FINE, "Internal queues full. Packet is error type already: {0}",
+								packet.toStringSecure());
 					}
 				} else if ((packet.getStanzaFrom() != null) || (conn != null)) {
 					try {
 						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-								"Feature not supported yet.", true);
+																						 "Feature not supported yet.",
+																						 true);
 					} catch (PacketErrorTypeException e) {
-						log.log(Level.FINE,
-								"Feature not supported yet. Packet is error type already: {0}", packet
-										.toStringSecure());
+						log.log(Level.FINE, "Feature not supported yet. Packet is error type already: {0}",
+								packet.toStringSecure());
 					}
 				}
 			}
@@ -1863,7 +1886,7 @@ public class SessionManager
 
 			// should not happen
 			log.log(Level.SEVERE,
-			        "exception processing presence update for session = " + session + " and packet = " + packet, ex);
+					"exception processing presence update for session = " + session + " and packet = " + packet, ex);
 		}
 	}
 
@@ -1906,13 +1929,13 @@ public class SessionManager
 								log.log(Level.FINEST, "Checking connection: {0}", connection);
 							}
 							try {
-								Packet command = Command.CHECK_USER_CONNECTION.getPacket(
-										getComponentId(), connection.getConnectionId(), StanzaType.get, UUID
-												.randomUUID().toString());
+								Packet command = Command.CHECK_USER_CONNECTION.getPacket(getComponentId(),
+																						 connection.getConnectionId(),
+																						 StanzaType.get,
+																						 UUID.randomUUID().toString());
 
 								Command.addFieldValue(command, "user-jid", userId.toString());
-								addOutPacketWithTimeout(command, connectionCheckCommandHandler, 30l,
-										TimeUnit.SECONDS);
+								addOutPacketWithTimeout(command, connectionCheckCommandHandler, 30l, TimeUnit.SECONDS);
 							} catch (NoConnectionIdException ex) {
 
 								// This actually should not happen... might be a bug:
@@ -1924,12 +1947,11 @@ public class SessionManager
 			}
 			try {
 				session.addResourceConnection(conn);
-				if ((!"USER_STATUS".equals(conn.getSessionId())) &&!conn.isServerSession() &&!conn
-						.isTmpSession()) {
+				if ((!"USER_STATUS".equals(conn.getSessionId())) && !conn.isServerSession() && !conn.isTmpSession()) {
 					try {
-						Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
-								.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
-								.submit);
+						Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn.getConnectionId(),
+																			 StanzaType.set, conn.nextStanzaId(),
+																			 Command.DataType.submit);
 
 						Command.addFieldValue(user_login_cmd, "user-jid", userId.toString());
 						addOutPacket(user_login_cmd);
@@ -1959,19 +1981,15 @@ public class SessionManager
 		}
 	}
 
-	@Override
-	public int schedulerThreads() {
-		return 2;
-	}
-
 	@HandleEvent
 	protected void nodeShutdown(ShutdownEvent event) {
 		// if not this node is being shutdown then do nothing
-		if (!event.getNode().equals(getComponentId().getDomain()))
+		if (!event.getNode().equals(getComponentId().getDomain())) {
 			return;
+		}
 
 		if (event.getMessage() != null) {
-			Element msgEl = new Element("message", new String[] { Packet.XMLNS_ATT }, new String[] { Packet.CLIENT_XMLNS });
+			Element msgEl = new Element("message", new String[]{Packet.XMLNS_ATT}, new String[]{Packet.CLIENT_XMLNS});
 			msgEl.addChild(new Element("body", event.getMessage()));
 			for (XMPPResourceConnection conn : connectionsByFrom.values()) {
 				try {
@@ -1981,7 +1999,8 @@ public class SessionManager
 					Packet packet = Packet.packetInstance(msgEl, conn.getDomainAsJID(), conn.getJID());
 					addPacket(packet);
 				} catch (NotAuthorizedException ex) {
-					log.log(Level.FINEST, "could not deliver notification about shutdown as session is not authorized", ex);
+					log.log(Level.FINEST, "could not deliver notification about shutdown as session is not authorized",
+							ex);
 				}
 			}
 		}
@@ -1991,17 +2010,8 @@ public class SessionManager
 		addTimerTask(nodeShutdownTask, event.getDelay() * SECOND, 1 * SECOND);
 	}
 
-	public void register(Kernel kernel) {
-		this.kernel = kernel;
-	}
-
-	public void unregister(Kernel kernel) {
-		this.kernel = null;
-	}
-
 	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
-		Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnId,
-				StanzaType.set, "moved");
+		Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnId, StanzaType.set, "moved");
 
 		Command.addFieldValue(cmd, "cmd", "stream-moved");
 		Command.addFieldValue(cmd, "new-conn-jid", newConnId.toString());
@@ -2010,28 +2020,12 @@ public class SessionManager
 		addOutPacket(cmd);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	public Map<String, XMPPProcessorIfc> getProcessors() {
-		return Collections.unmodifiableMap(processors);
-	}
-
-	public Map<String, XMPPPreprocessorIfc> getPreProcessors() {
-		return Collections.unmodifiableMap(preProcessors);
-	}
-
-	public Map<String, XMPPPostprocessorIfc> getPostProcessors() {
-		return Collections.unmodifiableMap(postProcessors);
-	}
-
-	public Map<String, XMPPPacketFilterIfc> getOutFilters() {
-		return Collections.unmodifiableMap(outFilters);
-	}
-
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	protected XMPPSession getSession(BareJID jid) {
 		return sessionsByNodeId.get(jid);
@@ -2041,9 +2035,11 @@ public class SessionManager
 		return connectionsByFrom.get(connId);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
-		JID                    from = p.getPacketFrom();
+		JID from = p.getPacketFrom();
 
 		if (from != null) {
 			conn = connectionsByFrom.get(from);
@@ -2065,8 +2061,7 @@ public class SessionManager
 
 			// Hm, not sure what should I do now....
 			// Maybe I should treat it as message to admin....
-			log.log(Level.INFO,
-					"Message without TO attribute set, don''t know what to do wih this: {0}", p);
+			log.log(Level.INFO, "Message without TO attribute set, don''t know what to do wih this: {0}", p);
 		}    // end of else
 
 		return conn;
@@ -2088,13 +2083,13 @@ public class SessionManager
 
 			return true;
 		}
-		if (!p.getFrom().equals(p.getStanzaFrom()) && (!p.isCommand() || (p.isCommand() && (p
-				.getCommand() == Command.OTHER)))) {
+		if (!p.getFrom().equals(p.getStanzaFrom()) &&
+				(!p.isCommand() || (p.isCommand() && (p.getCommand() == Command.OTHER)))) {
 
 			// Sometimes (Bosh) connection is gone and this is an error packet
 			// sent back to the original sender. This original sender might be
 			// not local....
-			if ((p.getStanzaFrom() != null) &&!isLocalDomain(p.getStanzaFrom().getDomain())) {
+			if ((p.getStanzaFrom() != null) && !isLocalDomain(p.getStanzaFrom().getDomain())) {
 
 				// ok just forward it there....
 				p.setPacketFrom(null);
@@ -2106,13 +2101,15 @@ public class SessionManager
 
 			// this is special case in which we know and expect that there will be
 			// no session for this packet but we still need to process it
-			if (C2SDeliveryErrorProcessor.isDeliveryError(p))
+			if (C2SDeliveryErrorProcessor.isDeliveryError(p)) {
 				return false;
+			}
 
 			// if this is packet to bare jid then we need to process it on behalf of a user
 			// even if there is no session for this user
-			if (p.getStanzaTo() != null && p.getStanzaTo().getResource() == null)
+			if (p.getStanzaTo() != null && p.getStanzaTo().getResource() == null) {
 				return false;
+			}
 
 			// It doesn't look good, there should really be a connection for
 			// this packet....
@@ -2122,8 +2119,8 @@ public class SessionManager
 			// we do not want to send presence error packets here...
 			if ((p.getElemName() == Iq.ELEM_NAME) || (p.getElemName() == Message.ELEM_NAME)) {
 				try {
-					Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
-							"Service not available.", true);
+					Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p, "Service not available.",
+																						true);
 
 					error.setPacketTo(p.getFrom());
 					fastAddOutPacket(error);
@@ -2137,8 +2134,6 @@ public class SessionManager
 
 		return false;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private long calcAverage(long[] timings) {
 		long res = 0;
@@ -2157,13 +2152,12 @@ public class SessionManager
 		// final Element elem, final Queue<Packet> results) {
 		for (XMPPProcessorIfc proc_t : processors.values()) {
 			XMPPProcessorIfc processor = proc_t;
-			Authorization    result    = processor.canHandle(packet, connection);
+			Authorization result = processor.canHandle(packet, connection);
 
 			if (result == Authorization.AUTHORIZED) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "Request: " +
-							"{2}, conn: {3}", new Object[] { processor.getClass().getSimpleName(),
-							processor.id(), packet, connection });
+					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "Request: " + "{2}, conn: {3}",
+							new Object[]{processor.getClass().getSimpleName(), processor.id(), packet, connection});
 				}
 
 				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(processor.id());
@@ -2177,10 +2171,8 @@ public class SessionManager
 					packet.notProcessedBy(processor.id());
 					// proc_t.debugQueue();
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE,
-								"Can not add packet: {0} to processor: {1} internal queue full.",
-								new Object[] { packet.toStringSecure(),
-										pt.getName() });
+						log.log(Level.FINE, "Can not add packet: {0} to processor: {1} internal queue full.",
+								new Object[]{packet.toStringSecure(), pt.getName()});
 					}
 				}
 			} else {
@@ -2192,57 +2184,6 @@ public class SessionManager
 			}
 		}    // end of for ()
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	@Override
-	public synchronized void everySecond() {
-		super.everySecond();
-		maxDailyUsersSessions.add(maxUserSessionsDaily-1);
-		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
-	}
-
-	@Override
-	public synchronized void everyMinute() {
-		super.everyMinute();
-		int count = 0;
-
-		for (BareJID bareJID : sessionsByNodeId.keySet()) {
-			if (!bareJID.toString().startsWith("sess-man")) {
-				XMPPSession session = sessionsByNodeId.get(bareJID);
-				// check if session is still there as it could be closed
-				// if sessionsByNodeId is big collection
-				if (session != null) {
-					for (XMPPResourceConnection xMPPResourceConnection : session
-							.getActiveResources()) {
-						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5
-								* 60 * 1000) {
-							count++;
-						}
-					}
-				}
-			}
-		}
-
-		activeUserNumber = count;
-
-		final Calendar now = Calendar.getInstance();
-		if (now.get(Calendar.YEAR) != lastDailyStatsReset.get(Calendar.YEAR)
-				|| now.get(Calendar.DAY_OF_YEAR) != lastDailyStatsReset.get(Calendar.DAY_OF_YEAR)) {
-			lastDailyStatsReset = Calendar.getInstance();
-
-			maxUserSessionsYesterday = maxUserSessionsDaily;
-			maxUserSessionsDaily = sessionsByNodeId.size();
-		}
-
-        maxDailyUsersSessions.add(maxUserSessionsDaily-1);
-        maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
-	}
-
-	/*
-	 * Date of moment where daily stats was resetted.
-	 */
-	private Calendar lastDailyStatsReset = Calendar.getInstance();
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
@@ -2258,8 +2199,9 @@ public class SessionManager
 		return results;
 	}
 
-	private Map<String, Object> getPluginSettings(String plug_id, Map<String,
-			Object> props) {
+	//~--- set methods ----------------------------------------------------------
+
+	private Map<String, Object> getPluginSettings(String plug_id, Map<String, Object> props) {
 		Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);
 
 		// First set all options common for all plugins and then set all options
@@ -2275,8 +2217,7 @@ public class SessionManager
 				if (nodes.length == 2) {
 					plugin_settings.put(nodes[1], entry.getValue());
 					log.log(Level.CONFIG, "Adding a common plugins option: {0} = {1}",
-							new Object[] { nodes[1],
-									entry.getValue() });
+							new Object[]{nodes[1], entry.getValue()});
 				}
 			}
 		}
@@ -2288,8 +2229,9 @@ public class SessionManager
 				// Workaround for plugin id containing "/" in id
 				String key = entry.getKey();
 				if (plug_id.contains("/")) {
-					if (!key.contains(plug_id))
+					if (!key.contains(plug_id)) {
 						continue;
+					}
 					key = key.replace(plug_id, "plugin-id");
 				}
 				// Split the key to configuration nodes separated with '/'
@@ -2303,8 +2245,7 @@ public class SessionManager
 					if (Arrays.binarySearch(ids, plug_id) >= 0 || Arrays.binarySearch(ids, "plugin-id") >= 0) {
 						plugin_settings.put(nodes[2], entry.getValue());
 						log.log(Level.CONFIG, "Adding a specific plugins option [{0}]: {1} = {2}",
-								new Object[] { plug_id,
-										nodes[2], entry.getValue() });
+								new Object[]{plug_id, nodes[2], entry.getValue()});
 					}
 				}
 			}
@@ -2314,21 +2255,21 @@ public class SessionManager
 		return plugin_settings;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	private void setPermissions( XMPPResourceConnection conn, Packet packet ) {
-		Permissions perms = getPermissionForConnection( conn );
-		packet.setPermissions( perms );
+	private void setPermissions(XMPPResourceConnection conn, Packet packet) {
+		Permissions perms = getPermissionForConnection(conn);
+		packet.setPermissions(perms);
 	}
 
 	private void setPermissions(XMPPResourceConnection conn, Queue<Packet> results) {
-		Permissions perms = getPermissionForConnection( conn );
+		Permissions perms = getPermissionForConnection(conn);
 		for (Packet res : results) {
 			res.setPermissions(perms);
 		}
 	}
 
-	private Permissions getPermissionForConnection( XMPPResourceConnection conn ) {
+	//~--- inner classes --------------------------------------------------------
+
+	private Permissions getPermissionForConnection(XMPPResourceConnection conn) {
 		Permissions perms = Permissions.NONE;
 		if (conn != null) {
 			perms = Permissions.LOCAL;
@@ -2355,10 +2296,15 @@ public class SessionManager
 		return perms;
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	public interface ProcessorResultWriter {
+
+		void write(Packet packet, XMPPResourceConnection session, Queue<Packet> results);
+
+	}
 
 	private static class AuthenticationTimer
 			extends TimerTask {
+
 		private final SessionManager sm;
 		private JID connId = null;
 
@@ -2379,29 +2325,140 @@ public class SessionManager
 				synchronized (conn) {
 					if (!conn.isAuthorized()) {
 						conn.putSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY,
-								XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY);
+											XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY);
 						sm.connectionsByFrom.remove(connId);
 						++sm.authTimeouts;
-						log.log(Level.FINE,
-								"Authentication timeout expired, closing connection: {0}", connId);
-						sm.fastAddOutPacket(Command.CLOSE.getPacket(sm.getComponentId(), connId, StanzaType
-								.set, conn.nextStanzaId()));
+						log.log(Level.FINE, "Authentication timeout expired, closing connection: {0}", connId);
+						sm.fastAddOutPacket(Command.CLOSE.getPacket(sm.getComponentId(), connId, StanzaType.set,
+																	conn.nextStanzaId()));
 					}
 				}
 			}
 		}
 	}
 
+	@Bean(name = defaultHandlerProcId, parent = SessionManager.class, active = true)
+	public static class DefaultHandlerProc
+			extends XMPPProcessor
+			implements XMPPProcessorIfc {
+
+		@Inject
+		SessionManager sm;
+
+		@Override
+		public int concurrentQueuesNo() {
+			return Runtime.getRuntime().availableProcessors() * 4;
+		}
+
+		@Override
+		public String id() {
+			return defaultHandlerProcId;
+		}
+
+		@Override
+		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+							Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Executing default packet handler for: {0}", packet);
+			}
+			sm.defPacketHandler.process(packet, session, repo, results);
+		}
+	}
+
+	@Bean(name = sessionCloseProcId, parent = SessionManager.class, active = true)
+	public static class SessionCloseProc
+			extends XMPPProcessor
+			implements XMPPProcessorIfc {
+
+		@Inject
+		SessionManager sm;
+
+		@Override
+		public int concurrentQueuesNo() {
+			return super.concurrentQueuesNo() * 4;
+		}
+
+		@Override
+		public String id() {
+			return sessionCloseProcId;
+		}
+
+		@Override
+		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+							Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Executing connection close for: {0}", packet);
+			}
+
+			String userJid = Command.getFieldValue(packet, "user-jid");
+
+			sm.closeConnection(session, packet.getFrom(), userJid, false);
+		}
+	}
+
+	@Bean(name = sessionOpenProcId, parent = SessionManager.class, active = true)
+	public static class SessionOpenProc
+			extends XMPPProcessor
+			implements XMPPProcessorIfc {
+
+		@Inject
+		SessionManager sm;
+
+		@Override
+		public int concurrentQueuesNo() {
+			return super.concurrentQueuesNo() * 2;
+		}
+
+		@Override
+		public String id() {
+			return sessionOpenProcId;
+		}
+
+		@Override
+		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+							Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+			XMPPResourceConnection conn = session;
+
+			// It might be existing opened stream after TLS/SASL authorization
+			// If not, it means this is new stream
+			if (conn == null) {
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Adding resource connection for: {0}", packet.getFrom());
+				}
+
+				final String hostname = Command.getFieldValue(packet, "hostname");
+
+				try {
+					conn = sm.createUserSession(packet.getFrom(), hostname);
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.WARNING, "Incrrect hostname, did not pass stringprep processing: {0}", hostname);
+
+					return;
+				}
+				sm.addTimerTask(new AuthenticationTimer(sm, packet.getFrom()), sm.authTimeout, TimeUnit.SECONDS);
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}", conn.isAuthorized());
+				}
+			}    // end of else
+			conn.setSessionId(Command.getFieldValue(packet, "session-id"));
+			conn.setDefLang(Command.getFieldValue(packet, "xml:lang"));
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Setting session-id {0} for connection: {1}",
+						new Object[]{conn.getSessionId(), conn});
+			}
+			sm.fastAddOutPacket(packet.okResult((String) null, 0));
+		}
+	}
 
 	private class ConnectionCheckCommandHandler
 			implements ReceiverTimeoutHandler {
+
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER,
-							"Connection checker error received, closing connection: {0}", packet
-									.getTo());
+					log.log(Level.FINER, "Connection checker error received, closing connection: {0}", packet.getTo());
 				}
 
 				// The connection is not longer active, closing the user session here.
@@ -2423,41 +2480,14 @@ public class SessionManager
 		}
 	}
 
-
-	@Bean(name = defaultHandlerProcId, parent = SessionManager.class, active = true)
-	public static class DefaultHandlerProc
-			extends XMPPProcessor
-			implements XMPPProcessorIfc {
-		@Inject
-		SessionManager sm;
-
-		@Override
-		public int concurrentQueuesNo() {
-			return Runtime.getRuntime().availableProcessors() * 4;
-		}
-
-		@Override
-		public String id() {
-			return defaultHandlerProcId;
-		}
-
-		@Override
-		public void process(Packet packet, XMPPResourceConnection session,
-							NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-				throws XMPPException {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Executing default packet handler for: {0}", packet);
-			}
-			sm.defPacketHandler.process(packet, session, repo, results);
-		}
-	}
-
-	private class NodeShutdownTask extends TimerTask {
+	private class NodeShutdownTask
+			extends TimerTask {
 
 		@Override
 		public void run() {
 			// we are stopping server so let's check if all session are closed
-			if (sessionsByNodeId.isEmpty() || (sessionsByNodeId.size() == 1 && sessionsByNodeId.get(getComponentId().getBareJID()) != null)) {
+			if (sessionsByNodeId.isEmpty() ||
+					(sessionsByNodeId.size() == 1 && sessionsByNodeId.get(getComponentId().getBareJID()) != null)) {
 				log.log(Level.INFO, "shutdown - stopping JVM");
 				System.exit(0);
 			} else {
@@ -2477,6 +2507,7 @@ public class SessionManager
 
 	private class ProcessorWorkerThread
 			extends WorkerThread {
+
 		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>(100);
 
 		//~--- methods ------------------------------------------------------------
@@ -2486,18 +2517,16 @@ public class SessionManager
 			XMPPProcessorIfc processor = item.getProcessor();
 
 			try {
-				processor.process(item.getPacket(), item.getConn(), naUserRepository,
-						local_results, plugin_config.get(processor.id()));
+				processor.process(item.getPacket(), item.getConn(), naUserRepository, local_results,
+								  plugin_config.get(processor.id()));
 				if (item.getConn() != null) {
 					setPermissions(item.getConn(), local_results);
 				}
 				addOutPackets(item.getPacket(), item.getConn(), local_results);
 			} catch (PacketErrorTypeException e) {
-				log.log(Level.INFO, "Already error packet, ignoring: {0}", item.getPacket()
-						.toStringSecure());
+				log.log(Level.INFO, "Already error packet, ignoring: {0}", item.getPacket().toStringSecure());
 			} catch (XMPPException e) {
-				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket()
-						.toStringSecure(), e);
+				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket().toStringSecure(), e);
 			}
 		}
 
@@ -2511,104 +2540,13 @@ public class SessionManager
 		}
 	}
 
-
-	@Bean(name = sessionCloseProcId, parent = SessionManager.class, active = true)
-	public static class SessionCloseProc
-			extends XMPPProcessor
-			implements XMPPProcessorIfc {
-
-		@Inject
-		SessionManager sm;
-
-		@Override
-		public int concurrentQueuesNo() {
-			return super.concurrentQueuesNo() * 4;
-		}
-
-		@Override
-		public String id() {
-			return sessionCloseProcId;
-		}
-
-		@Override
-		public void process(Packet packet, XMPPResourceConnection session,
-							NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-				throws XMPPException {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Executing connection close for: {0}", packet);
-			}
-
-			String userJid = Command.getFieldValue(packet, "user-jid");
-
-			sm.closeConnection(session, packet.getFrom(), userJid, false);
-		}
-	}
-
-
-	@Bean(name = sessionOpenProcId, parent = SessionManager.class, active = true)
-	public static class SessionOpenProc
-			extends XMPPProcessor
-			implements XMPPProcessorIfc {
-
-		@Inject
-		SessionManager sm;
-
-		@Override
-		public int concurrentQueuesNo() {
-			return super.concurrentQueuesNo() * 2;
-		}
-
-		@Override
-		public String id() {
-			return sessionOpenProcId;
-		}
-
-		@Override
-		public void process(Packet packet, XMPPResourceConnection session,
-							NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-				throws XMPPException {
-			XMPPResourceConnection conn = session;
-
-			// It might be existing opened stream after TLS/SASL authorization
-			// If not, it means this is new stream
-			if (conn == null) {
-				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Adding resource connection for: {0}", packet.getFrom());
-				}
-
-				final String hostname = Command.getFieldValue(packet, "hostname");
-
-				try {
-					conn = sm.createUserSession(packet.getFrom(), hostname);
-				} catch (TigaseStringprepException ex) {
-					log.log(Level.WARNING,
-							"Incrrect hostname, did not pass stringprep processing: {0}", hostname);
-
-					return;
-				}
-				sm.addTimerTask(new AuthenticationTimer(sm, packet.getFrom()), sm.authTimeout, TimeUnit.SECONDS);
-			} else {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}",
-							conn.isAuthorized());
-				}
-			}    // end of else
-			conn.setSessionId(Command.getFieldValue(packet, "session-id"));
-			conn.setDefLang(Command.getFieldValue(packet, "xml:lang"));
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Setting session-id {0} for connection: {1}",
-						new Object[] { conn.getSessionId(),
-								conn });
-			}
-			sm.fastAddOutPacket(packet.okResult((String) null, 0));
-		}
-	}
-
 	/**
-	 * Class implements timer which will be scheduled on STREAM_CLOSED to ensure
-	 * that session is properly closed, even if STREAM_FINISHED would not be received
+	 * Class implements timer which will be scheduled on STREAM_CLOSED to ensure that session is properly closed, even
+	 * if STREAM_FINISHED would not be received
 	 */
-	private class SessionCloseTimer extends TimerTask {
+	private class SessionCloseTimer
+			extends TimerTask {
+
 		private JID connId = null;
 		private String sessId = null;
 
@@ -2625,8 +2563,9 @@ public class SessionManager
 		public void run() {
 			XMPPResourceConnection conn = connectionsByFrom.get(connId);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "session closed timer executed for connId = {0}, "
-						+ "sessionId = {1}, conn = {2}", new Object[] { connId, sessId, conn });
+				log.log(Level.FINEST,
+						"session closed timer executed for connId = {0}, " + "sessionId = {1}, conn = {2}",
+						new Object[]{connId, sessId, conn});
 			}
 			// if connection still exists then close it
 			if (conn != null && (sessId == null || sessId.equals(conn.getSessionId()))) {
@@ -2639,6 +2578,7 @@ public class SessionManager
 
 	private class StaleConnectionCloser
 			extends TimerTask {
+
 		/** Field description */
 		public static final int DEF_QUEUE_SIZE = 1000;
 
@@ -2647,10 +2587,10 @@ public class SessionManager
 
 		//~--- fields -------------------------------------------------------------
 
-		private int      maxQueueSize;
+		private int maxQueueSize;
 		private Set<JID> queueSet;
-		private Thread   thread;
-		private long     timeout;
+		private Thread thread;
+		private long timeout;
 		private Set<JID> workingSet;
 
 		//~--- constructors -------------------------------------------------------
@@ -2660,10 +2600,10 @@ public class SessionManager
 		}
 
 		public StaleConnectionCloser(int queueSize, long timeout) {
-			this.timeout      = timeout;
+			this.timeout = timeout;
 			this.maxQueueSize = queueSize;
-			workingSet        = new HashSet<JID>(queueSize);
-			queueSet          = new HashSet<JID>(queueSize);
+			workingSet = new HashSet<JID>(queueSize);
+			queueSet = new HashSet<JID>(queueSize);
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -2676,8 +2616,7 @@ public class SessionManager
 			}
 			log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnections");
 
-			LinkedList<XMPPResourceConnection> staleConnections =
-					new LinkedList<XMPPResourceConnection>();
+			LinkedList<XMPPResourceConnection> staleConnections = new LinkedList<XMPPResourceConnection>();
 
 			for (XMPPSession session : sessionsByNodeId.values()) {
 				List<XMPPResourceConnection> connections = session.getActiveResources();
@@ -2704,8 +2643,7 @@ public class SessionManager
 				XMPPResourceConnection connection;
 
 				while ((connection = staleConnections.poll()) != null) {
-					log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...",
-							connection);
+					log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...", connection);
 					session.removeResourceConnection(connection);
 				}
 
@@ -2727,8 +2665,8 @@ public class SessionManager
 			}
 			if (!result && log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
-						"connection with id {0} already queued for removing as stale" +
-								" XMPPResourceConnection", connectionId);
+						"connection with id {0} already queued for removing as stale" + " XMPPResourceConnection",
+						connectionId);
 			}
 
 			return result;
@@ -2755,14 +2693,14 @@ public class SessionManager
 			return maxQueueSize;
 		}
 
-		public long getTimeout() {
-			return timeout;
+		public void setMaxQueueSize(int queueSize) {
+			this.maxQueueSize = queueSize;
 		}
 
 		//~--- set methods --------------------------------------------------------
 
-		public void setMaxQueueSize(int queueSize) {
-			this.maxQueueSize = queueSize;
+		public long getTimeout() {
+			return timeout;
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -2783,35 +2721,11 @@ public class SessionManager
 				Set<JID> tmp = workingSet;
 
 				workingSet = queueSet;
-				queueSet   = tmp;
+				queueSet = tmp;
 				queueSet.clear();
 
 				return !workingSet.isEmpty();
 			}
 		}
-	}
-
-	@Override
-	public void handleDomainChange(final String domain, final XMPPResourceConnection conn) {
-		try {
-			VHostItem vHostItem = getVHostItem(domain);
-			if (vHostItem == null) {
-				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}", new Object[] {
-							domain, getDefHostName() });
-				}
-				vHostItem = new VHostItem(getDefHostName().getDomain());
-			}
-			conn.setDomain(vHostItem.getUnmodifiableVHostItem());
-		} catch (TigaseStringprepException ex) {
-			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
-			// handleLogout(userId, conn);
-		}
-	}
-
-	public interface ProcessorResultWriter {
-
-		void write(Packet packet, XMPPResourceConnection session, Queue<Packet> results);
-
 	}
 }

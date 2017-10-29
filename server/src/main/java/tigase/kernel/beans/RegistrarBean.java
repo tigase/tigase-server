@@ -23,10 +23,10 @@ import tigase.kernel.core.Kernel;
 
 /**
  * Interface which needs to be implemented by bean classes which are also Registrars.
- *
- * Normal implementations of Registrars cannot be same class as bean inside newly created
- * kernel - with <code>RegistrarBean</code> it is possible.
- *
+ * <p>
+ * Normal implementations of Registrars cannot be same class as bean inside newly created kernel - with
+ * <code>RegistrarBean</code> it is possible.
+ * <p>
  * Created by andrzej on 05.03.2016.
  */
 public interface RegistrarBean {

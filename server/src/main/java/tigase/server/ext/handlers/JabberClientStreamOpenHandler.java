@@ -23,21 +23,19 @@ package tigase.server.ext.handlers;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.ext.CompRepoItem;
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.StreamOpenHandler;
-
 import tigase.xml.Element;
-
-import static tigase.server.ext.ComponentProtocolHandler.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -47,20 +45,18 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberClientStreamOpenHandler implements StreamOpenHandler {
-
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
-	private static final Logger log =
-		Logger.getLogger(JabberClientStreamOpenHandler.class.getName());
+public class JabberClientStreamOpenHandler
+		implements StreamOpenHandler {
 
 	/** Field description */
 	public static final String XMLNS = "jabber:client";
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(JabberClientStreamOpenHandler.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private String[] xmlnss = new String[] { XMLNS };
+	private String[] xmlnss = new String[]{XMLNS};
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -74,7 +70,7 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 	@Override
 	public String serviceStarted(ComponentIOService serv) {
 		switch (serv.connectionType()) {
-			case connect :
+			case connect:
 				CompRepoItem repoItem = (CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY);
 
 				String r_host = (String) serv.getSessionData().get("remote-host");
@@ -83,14 +79,13 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 
 				// This should be done only, after authentication is completed
 				// addComponentConnection(hostname, serv);
-				String data = "<stream:stream" + " xmlns='" + XMLNS + "'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " version ='1.0'"
-					+ " xml:lang='en'" + " from='" + repoItem.getDomain() + "'" + " to ='"
-					+ r_host + "'" + ">";
+				String data = "<stream:stream" + " xmlns='" + XMLNS + "'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" + " version ='1.0'" + " xml:lang='en'" +
+						" from='" + repoItem.getDomain() + "'" + " to ='" + r_host + "'" + ">";
 
 				return data;
 
-			default :
+			default:
 
 				// Do nothing, more/some data should come soon...
 				break;
@@ -100,12 +95,11 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
-			ComponentProtocolHandler handler) {
+	public String streamOpened(ComponentIOService serv, Map<String, String> attribs, ComponentProtocolHandler handler) {
 		serv.getSessionData().put(XMLNS_KEY, XMLNS);
 
 		switch (serv.connectionType()) {
-			case connect : {
+			case connect: {
 				String id = attribs.get("id");
 
 				if (id != null) {
@@ -116,7 +110,7 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 				return null;
 			}
 
-			case accept : {
+			case accept: {
 				String from_hostname = attribs.get("from");
 				String to_hostname = attribs.get("to");
 				CompRepoItem repoItem = handler.getCompRepoItem(from_hostname);
@@ -132,10 +126,10 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 				// addComponentConnection(hostname, serv);
 				StringBuilder sb = new StringBuilder();
 
-				sb.append("<stream:stream" + " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " version ='1.0'"
-							+ " xml:lang='en'" + " from='" + to_hostname + "'" + " to='" + from_hostname
-								+ "'" + " id='" + id + "'" + "><stream:features>");
+				sb.append("<stream:stream" + " xmlns='" + XMLNS + "'" +
+								  " xmlns:stream='http://etherx.jabber.org/streams'" + " version ='1.0'" +
+								  " xml:lang='en'" + " from='" + to_hostname + "'" + " to='" + from_hostname + "'" +
+								  " id='" + id + "'" + "><stream:features>");
 
 				List<Element> features = handler.getStreamFeatures(serv);
 
@@ -148,7 +142,7 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 				return sb.toString();
 			}
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
@@ -158,8 +152,6 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

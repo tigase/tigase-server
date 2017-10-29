@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.auth;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -34,25 +32,20 @@ import java.util.Enumeration;
 
 /**
  * Interface for implementing selectors of SASL mechanisms.
- *
  */
 public interface MechanismSelector {
-	/**
-	 * Method filters all available SASL mechanisms from
-	 * {@link SaslServerFactory factories} with current
-	 * {@link XMPPResourceConnection session} state.
-	 *
-	 * @param serverFactories
-	 *            {@link SaslServerFactory SaslServerFactory} enumeration.
-	 * @param session
-	 *            current session
-	 * @return collection of all SASL mechanisms available in given session (and
-	 *         current XMPP Stream).
-	 */
-	Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories,
-			XMPPResourceConnection session);
-	
-}
 
+	/**
+	 * Method filters all available SASL mechanisms from {@link SaslServerFactory factories} with current {@link
+	 * XMPPResourceConnection session} state.
+	 *
+	 * @param serverFactories {@link SaslServerFactory SaslServerFactory} enumeration.
+	 * @param session current session
+	 *
+	 * @return collection of all SASL mechanisms available in given session (and current XMPP Stream).
+	 */
+	Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories, XMPPResourceConnection session);
+
+}
 
 //~ Formatted in Tigase Code Convention on 13/09/21

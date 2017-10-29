@@ -22,64 +22,63 @@ package tigase.util.repository;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.RepositoryFactory;
 import tigase.db.AuthRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
-
 import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.impl.roster.RosterAbstract;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
-
 import java.util.List;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class RepositoryUtils here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Oct 28 13:09:26 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class RepositoryUtils {
+
+	private static boolean add = false;
+	private static boolean add_user_test = false;
+	private static boolean allowed_empty_groups = true;
+	private static boolean check_roster = false;
+	private static String content = null;
+	private static boolean copy_repos = false;
 	private static long counter = 0;
+	private static boolean del = false;
+	private static String dst_class = null;
+	private static String dst_uri = null;
+	private static boolean export_data = false;
+	private static String export_file = null;
+	private static boolean import_data = false;
+	private static String import_file = null;
+	private static String key = null;
+	private static boolean key_val = false;
+	private static boolean node = false;
+	private static boolean print_repo = false;
+	private static boolean simple_test = false;
+	private static String src_class = "tigase.db.jdbc.JDBCRepository";
+	private static String src_uri = null;
+	private static String subnode = null;
+	private static BareJID user = null;
 	private static BareJID user1 = BareJID.bareJIDInstanceNS("user111@hostname");
 	private static BareJID user2 = BareJID.bareJIDInstanceNS("user222@hostname");
 	private static BareJID user3 = BareJID.bareJIDInstanceNS("user333@hostname");
-	private static String src_class = "tigase.db.jdbc.JDBCRepository";
-	private static String src_uri = null;
-	private static String dst_class = null;
-	private static String dst_uri = null;
-	private static String content = null;
-	private static BareJID user = null;
-	private static boolean simple_test = false;
-	private static boolean add_user_test = false;
-	private static boolean copy_repos = false;
-	private static boolean print_repo = false;
-	private static boolean add = false;
-	private static boolean del = false;
-	private static boolean node = false;
-	private static boolean key_val = false;
-	private static boolean check_roster = false;
-	private static boolean allowed_empty_groups = true;
-	private static boolean import_data = false;
-	private static boolean export_data = false;
-	private static String subnode = null;
-	private static String key = null;
 	private static String value = null;
-	private static String import_file = null;
-	private static String export_file = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -102,17 +101,13 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param user
 	 * @param repo
 	 * @param cont
 	 *
-	 * 
-	 *
 	 * @throws Exception
 	 */
-	public static boolean checkContact(BareJID user, UserRepository repo, String cont)
-			throws Exception {
+	public static boolean checkContact(BareJID user, UserRepository repo, String cont) throws Exception {
 
 		// String[] keys = repo.getKeys(user, "roster/"+contact);
 		JID contact = JID.jidInstanceNS(cont);
@@ -121,7 +116,7 @@ public class RepositoryUtils {
 		if ((vals == null) || (vals.length == 0)) {
 			System.out.println("      Empty groups list");
 
-			if ( !allowed_empty_groups) {
+			if (!allowed_empty_groups) {
 				return false;
 			}
 		} else {
@@ -140,7 +135,6 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param user
 	 * @param node
 	 * @param src
@@ -148,8 +142,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyNode(BareJID user, String node, UserRepository src, UserRepository dst)
-			throws Exception {
+	public static void copyNode(BareJID user, String node, UserRepository src, UserRepository dst) throws Exception {
 		String[] keys = src.getKeys(user, node);
 
 		if (keys != null) {
@@ -173,7 +166,6 @@ public class RepositoryUtils {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param src
 	 * @param dst
@@ -202,7 +194,6 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param src
 	 * @param dst
 	 *
@@ -227,15 +218,13 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param user
 	 * @param src
 	 * @param dst
 	 *
 	 * @throws Exception
 	 */
-	public static void copyUser(BareJID user, UserRepository src, UserRepository dst)
-			throws Exception {
+	public static void copyUser(BareJID user, UserRepository src, UserRepository dst) throws Exception {
 		if (user == null) {
 			return;
 		}
@@ -254,15 +243,13 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param user
 	 * @param src
 	 * @param dst
 	 *
 	 * @throws Exception
 	 */
-	public static void copyUser(BareJID user, UserRepository src, AuthRepository dst)
-			throws Exception {
+	public static void copyUser(BareJID user, UserRepository src, AuthRepository dst) throws Exception {
 		if ((user == null)) {
 			return;
 		}
@@ -281,7 +268,6 @@ public class RepositoryUtils {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param repo
 	 * @param w
@@ -309,15 +295,13 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param user
 	 * @param repo
 	 * @param w
 	 *
 	 * @throws Exception
 	 */
-	public static void exportUserRoster(BareJID user, UserRepository repo, Writer w)
-			throws Exception {
+	public static void exportUserRoster(BareJID user, UserRepository repo, Writer w) throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
 
 		String[] contacts = repo.getSubnodes(user, "roster");
@@ -334,8 +318,7 @@ public class RepositoryUtils {
 					String password = repo.getData(user, "password");
 					String[] groups = repo.getDataList(user, "roster/" + contact, RosterAbstract.GROUPS);
 					String contact_nick = repo.getData(user, "roster/" + contact, RosterAbstract.NAME);
-					String subscription = repo.getData(user, "roster/" + contact,
-						RosterAbstract.SUBSCRIPTION);
+					String subscription = repo.getData(user, "roster/" + contact, RosterAbstract.SUBSCRIPTION);
 					StringBuilder sb = new StringBuilder(user.toString());
 
 					sb.append(",");
@@ -381,9 +364,37 @@ public class RepositoryUtils {
 		}
 	}
 
+	private static String help() {
+		return "\n" + "Parameters:\n" + " -h          this help message\n" +
+				" -sc class   source repository class name\n" + " -su uri     source repository init string\n" +
+				" -dc class   destination repository class name\n" +
+				" -du uri     destination repository init string\n" +
+				" -dt string  data content to set/remove in repository\n" +
+				" -u user     user ID, if given all operations are only for that ID\n" +
+				"             if you want to add user to AuthRepository parameter must\n" +
+				"             in form: \"user:password\"\n" + " -st         perform simple test on repository\n" +
+				" -at         simple test for adding and removing user\n" +
+				" -cp         copy content from source to destination repository\n" +
+				" -pr         print content of the repository\n" +
+				" -n          data content string is a node string\n" +
+				" -kv         data content string is node/key=value string\n" +
+				" -add        add data content to repository\n" + " -del        delete data content from repository\n" +
+				" ------------\n" + " -roster     check the user roster\n" +
+				" -aeg [true|false]  Allow empty group list for the contact\n" +
+				" -import file  import user data from the file of following format:\n" +
+				"         user_jid, password, roser_jid, roster_nick, subscription, group\n" +
+				" -export file  export user roster data to the specified file in the following\n" +
+				"              format: user_jid, password, roser_jid, roster_nick, subscription,\n" +
+				"               group\n" + "\n" + "\n" +
+				"Note! If you put UserAuthRepository implementation as a class name\n" +
+				"      some operation are not allowed and will be silently skipped.\n" +
+				"      Have a look at UserAuthRepository to see what operations are\n" +
+				"      possible or what operation does make sense.\n" +
+				"      Alternatively look for admin tools guide on web site.\n";
+	}
+
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param repo
 	 *
@@ -392,15 +403,18 @@ public class RepositoryUtils {
 	public static void loadTestData(UserRepository repo) throws Exception {
 		try {
 			repo.addUser(user1);
-		} catch (UserExistsException e) {}
+		} catch (UserExistsException e) {
+		}
 
 		try {
 			repo.addUser(user2);
-		} catch (UserExistsException e) {}
+		} catch (UserExistsException e) {
+		}
 
 		try {
 			repo.addUser(user3);
-		} catch (UserExistsException e) {}
+		} catch (UserExistsException e) {
+		}
 
 		repo.setData(user1, null, "password", "secret111");
 		repo.setData(user2, null, "password", "secret222");
@@ -408,9 +422,9 @@ public class RepositoryUtils {
 		repo.setData(user1, "roster/buddy111", "name", "budy1");
 		repo.setData(user1, "roster/buddy222", "name", "budy2");
 		repo.setData(user1, "roster/buddy333", "name", "budy3");
-		repo.setDataList(user1, "roster/buddy111", "groups", new String[] { "buddies", "friends" });
-		repo.setDataList(user2, "roster/buddy111", "groups", new String[] { "buddies", "friends" });
-		repo.addDataList(user2, "roster/buddy111", "groups", new String[] { "family", "home" });
+		repo.setDataList(user1, "roster/buddy111", "groups", new String[]{"buddies", "friends"});
+		repo.setDataList(user2, "roster/buddy111", "groups", new String[]{"buddies", "friends"});
+		repo.addDataList(user2, "roster/buddy111", "groups", new String[]{"family", "home"});
 	}
 
 	/**
@@ -429,8 +443,9 @@ public class RepositoryUtils {
 
 		try {
 			src_repo = RepositoryFactory.getUserRepository(src_class, src_uri, null);
-			System.out.println("Loaded src_repo " + src_repo.getClass().getName() + " for parameters:"
-					+ "\n   src_class=" + src_class + "\n   src_uri=" + src_uri);
+			System.out.println(
+					"Loaded src_repo " + src_repo.getClass().getName() + " for parameters:" + "\n   src_class=" +
+							src_class + "\n   src_uri=" + src_uri);
 		} catch (Exception e) {
 			repo_exc = e;
 			src_repo = null;
@@ -441,8 +456,9 @@ public class RepositoryUtils {
 		if (src_repo == null) {
 			try {
 				src_auth = RepositoryFactory.getAuthRepository(src_class, src_uri, null);
-				System.out.println("Loaded src_auth " + src_auth.getClass().getName() + " for parameters:"
-						+ "\n   src_class=" + src_class + "\n   src_uri=" + src_uri);
+				System.out.println(
+						"Loaded src_auth " + src_auth.getClass().getName() + " for parameters:" + "\n   src_class=" +
+								src_class + "\n   src_uri=" + src_uri);
 			} catch (Exception e) {
 				System.out.println("Incorrect source class name given (or connection URI).");
 				System.out.println("class: " + src_class);
@@ -468,8 +484,8 @@ public class RepositoryUtils {
 			if (key_val && (src_repo != null)) {
 				System.out.println("Adding key=value: " + content);
 				parseNodeKeyValue(content);
-				System.out.println("Parsed parameters: user=" + user + ", node=" + subnode + ", key=" + key
-						+ ", value=" + value);
+				System.out.println(
+						"Parsed parameters: user=" + user + ", node=" + subnode + ", key=" + key + ", value=" + value);
 				src_repo.setData(user, subnode, key, value);
 			} else {
 				System.out.println("Adding user: " + user);
@@ -492,8 +508,9 @@ public class RepositoryUtils {
 				if (key_val) {
 					System.out.println("Deleting data: " + content);
 					parseNodeKeyValue(content);
-					System.out.println("Parsed parameters: user=" + user + ", node=" + subnode + ", key="
-							+ key + ", value=" + value);
+					System.out.println(
+							"Parsed parameters: user=" + user + ", node=" + subnode + ", key=" + key + ", value=" +
+									value);
 					src_repo.removeData(user, subnode, key);
 				}    // end of if (key_val)
 
@@ -521,8 +538,9 @@ public class RepositoryUtils {
 
 			try {
 				dst_repo = RepositoryFactory.getUserRepository(dst_class, dst_uri, null);
-				System.out.println("Loaded dst_repo " + dst_repo.getClass().getName() + " for parameters:"
-						+ "\n   src_class=" + dst_class + "\n   src_uri=" + dst_uri);
+				System.out.println(
+						"Loaded dst_repo " + dst_repo.getClass().getName() + " for parameters:" + "\n   src_class=" +
+								dst_class + "\n   src_uri=" + dst_uri);
 				copyRepositories(src_repo, dst_repo);
 			} catch (Exception e) {
 				dst_exc = e;
@@ -532,8 +550,8 @@ public class RepositoryUtils {
 			if (dst_repo == null) {
 				try {
 					dst_auth = RepositoryFactory.getAuthRepository(dst_class, dst_uri, null);
-					System.out.println("Loaded dst_auth " + dst_auth.getClass().getName()
-							+ " for parameters:" + "\n   src_class=" + dst_class + "\n   src_uri=" + dst_uri);
+					System.out.println("Loaded dst_auth " + dst_auth.getClass().getName() + " for parameters:" +
+											   "\n   src_class=" + dst_class + "\n   src_uri=" + dst_uri);
 				} catch (Exception e) {
 					System.out.println("Incorrect destination class name given (or connection URI).");
 					System.out.println("Can't initialize repository:");
@@ -566,7 +584,8 @@ public class RepositoryUtils {
 
 				try {
 					src_repo.addUser(userId);
-				} catch (UserExistsException e) {}
+				} catch (UserExistsException e) {
+				}
 
 				if ((vals.length >= 2) && (vals[1].trim().length() > 0)) {
 					src_repo.setData(userId, null, "password", vals[1].trim());
@@ -631,9 +650,25 @@ public class RepositoryUtils {
 		}          // end of if (print_repo)
 	}
 
+	private static void parseNodeKeyValue(String data) {
+		int val_idx = data.indexOf('=');
+
+		value = data.substring(val_idx + 1);
+
+		String tmp_str = data.substring(0, val_idx);
+		int key_idx = tmp_str.lastIndexOf('/');
+
+		if (key_idx >= 0) {
+			key = tmp_str.substring(key_idx + 1);
+			subnode = tmp_str.substring(0, key_idx);
+		}    // end of if (key_idx >= 0)
+		else {
+			key = tmp_str;
+		}    // end of if (key_idx >= 0) else
+	}
+
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param args
 	 *
@@ -727,7 +762,6 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param user
 	 * @param repo
 	 * @param prefix
@@ -735,8 +769,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void printNode(BareJID user, UserRepository repo, String prefix, String node)
-			throws Exception {
+	public static void printNode(BareJID user, UserRepository repo, String prefix, String node) throws Exception {
 		if (node != null) {
 			System.out.println(prefix + "node: " + node);
 		}    // end of if (node != null)
@@ -773,7 +806,6 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param repo
 	 *
 	 * @throws Exception
@@ -798,7 +830,6 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param repo
 	 *
 	 * @throws Exception
@@ -811,7 +842,6 @@ public class RepositoryUtils {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param repo
 	 *
@@ -837,7 +867,6 @@ public class RepositoryUtils {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param user
 	 * @param repo
@@ -875,7 +904,6 @@ public class RepositoryUtils {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param repo
 	 *
 	 * @throws Exception
@@ -885,7 +913,8 @@ public class RepositoryUtils {
 
 		try {
 			repo.addUser(user1);
-		} catch (UserExistsException e) {}
+		} catch (UserExistsException e) {
+		}
 
 		printRepoContent(repo);
 		removeTestData(repo);
@@ -894,7 +923,6 @@ public class RepositoryUtils {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param re
 	 *
@@ -917,60 +945,8 @@ public class RepositoryUtils {
 		repo.removeUser(test_user);
 		printRepoContent(re);
 	}
-
-	private static String help() {
-		return "\n" + "Parameters:\n" + " -h          this help message\n"
-				+ " -sc class   source repository class name\n"
-				+ " -su uri     source repository init string\n"
-				+ " -dc class   destination repository class name\n"
-				+ " -du uri     destination repository init string\n"
-				+ " -dt string  data content to set/remove in repository\n"
-				+ " -u user     user ID, if given all operations are only for that ID\n"
-				+ "             if you want to add user to AuthRepository parameter must\n"
-				+ "             in form: \"user:password\"\n"
-				+ " -st         perform simple test on repository\n"
-				+ " -at         simple test for adding and removing user\n"
-				+ " -cp         copy content from source to destination repository\n"
-				+ " -pr         print content of the repository\n"
-				+ " -n          data content string is a node string\n"
-				+ " -kv         data content string is node/key=value string\n"
-				+ " -add        add data content to repository\n"
-				+ " -del        delete data content from repository\n" + " ------------\n"
-				+ " -roster     check the user roster\n"
-				+ " -aeg [true|false]  Allow empty group list for the contact\n"
-				+ " -import file  import user data from the file of following format:\n"
-				+ "         user_jid, password, roser_jid, roster_nick, subscription, group\n"
-				+ " -export file  export user roster data to the specified file in the following\n"
-				+ "              format: user_jid, password, roser_jid, roster_nick, subscription,\n"
-				+ "               group\n" + "\n" + "\n"
-				+ "Note! If you put UserAuthRepository implementation as a class name\n"
-				+ "      some operation are not allowed and will be silently skipped.\n"
-				+ "      Have a look at UserAuthRepository to see what operations are\n"
-				+ "      possible or what operation does make sense.\n"
-				+ "      Alternatively look for admin tools guide on web site.\n"
-		;
-	}
-
-	private static void parseNodeKeyValue(String data) {
-		int val_idx = data.indexOf('=');
-
-		value = data.substring(val_idx + 1);
-
-		String tmp_str = data.substring(0, val_idx);
-		int key_idx = tmp_str.lastIndexOf('/');
-
-		if (key_idx >= 0) {
-			key = tmp_str.substring(key_idx + 1);
-			subnode = tmp_str.substring(0, key_idx);
-		}    // end of if (key_idx >= 0)
-				else {
-			key = tmp_str;
-		}    // end of if (key_idx >= 0) else
-	}
 }    // RepositoryUtils
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

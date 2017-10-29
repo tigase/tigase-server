@@ -44,15 +44,12 @@ public class PropertiesBeanConfiguratorTest {
 		props.put("alias1", "a0@b.c/d");
 		props.put("alias2", "a2@b.c/d");
 
-
 		Kernel k = new Kernel("test");
 		k.registerBean(DefaultTypesConverter.class).exec();
 		k.registerBean(PropertiesBeanConfigurator.class).exec();
 		k.registerBean(Bean1.class).exec();
 
-
 		k.getInstance(PropertiesBeanConfigurator.class).setProperties(props);
-
 
 		Assert.assertNull(k.getInstance(Bean1.class).getField1());
 		Assert.assertEquals(124, k.getInstance(Bean1.class).getField2());
@@ -70,7 +67,6 @@ public class PropertiesBeanConfiguratorTest {
 		props.put("alias1", "a0@b.c/d");
 		props.put("alias2", "a2@b.c/d");
 
-
 		Kernel k = new Kernel("test");
 		k.registerBean(DefaultTypesConverter.class).exec();
 		k.registerBean(PropertiesBeanConfigurator.class).exec();
@@ -78,7 +74,6 @@ public class PropertiesBeanConfiguratorTest {
 
 		k.getInstance(PropertiesBeanConfigurator.class).setAccessToAllFields(true);
 		k.getInstance(PropertiesBeanConfigurator.class).setProperties(props);
-
 
 		Assert.assertEquals("abc", k.getInstance(Bean1.class).getField1());
 		Assert.assertEquals(124, k.getInstance(Bean1.class).getField2());

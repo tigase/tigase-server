@@ -114,17 +114,17 @@ public class PacketCounter
 
 		long value = 0;
 
+		@Override
+		public String toString() {
+			return String.valueOf(value);
+		}
+
 		private long get() {
 			return value;
 		}
 
 		private void increment() {
 			++value;
-		}
-
-		@Override
-		public String toString() {
-			return String.valueOf(value);
 		}
 
 	}
@@ -152,11 +152,11 @@ public class PacketCounter
 			list.add(name, qType.name() + " processed " + counterName, total.get(), level);
 			if (this.withoutValue.get() > 0) {
 				list.add(name, qType.name() + " processed " + counterName + " no XMLNS", this.withoutValue.get(),
-				         level);
+						 level);
 			}
 			for (Entry<String, MutableLong> xmlnsValues : counter.entrySet()) {
 				list.add(name, qType.name() + " processed " + counterName + " " + xmlnsValues.getKey(),
-				         xmlnsValues.getValue().get(), level);
+						 xmlnsValues.getValue().get(), level);
 
 			}
 		}

@@ -41,7 +41,8 @@ import java.util.stream.Collectors;
  * Created by andrzej on 11.08.2016.
  */
 @Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME, active = true)
-public class DSLBeanConfigurator extends AbstractBeanConfigurator {
+public class DSLBeanConfigurator
+		extends AbstractBeanConfigurator {
 
 	private static final Logger log = Logger.getLogger(DSLBeanConfigurator.class.getCanonicalName());
 	private ConfigHolder configHolder;
@@ -50,12 +51,38 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 
 	@Override
 	public Map<String, Object> getConfiguration(BeanConfig beanConfig) {
-		if (props == null)
+		if (props == null) {
 			return new HashMap<>();
+		}
 
 		Map<String, String> aliassesToFields = getFieldAliasses(beanConfig);
 
 		return getBeanConfigurationProperties(beanConfig, aliassesToFields);
+	}
+
+	public Map<String, Object> getProperties() {
+		return props;
+	}
+
+	public void setProperties(Map<String, Object> props) {
+		this.props = props;
+	}
+
+	public ConfigHolder getConfigHolder() {
+		return configHolder;
+	}
+
+	public void setConfigHolder(ConfigHolder config) {
+		this.configHolder = config;
+		setProperties(config.getProperties());
+	}
+
+	public void dumpConfiguration(File f) throws IOException {
+		log.log(Level.WARNING, "Dumping full server configuration to: {0}", f);
+		Map<String, Object> dump = new LinkedHashMap<>(props);
+		dumpConfiguration(dump, kernel);
+
+		new ConfigWriter().resolveVariables().write(f, dump);
 	}
 
 	protected boolean hasDirectConfiguration(BeanConfig beanConfig) {
@@ -75,7 +102,8 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		return result != null;
 	}
 
-	protected Map<String, Object> getBeanConfigurationProperties(BeanConfig beanConfig, Map<String, String> aliasesToFields) {
+	protected Map<String, Object> getBeanConfigurationProperties(BeanConfig beanConfig,
+																 Map<String, String> aliasesToFields) {
 		HashMap<String, Object> result = new HashMap<>();
 		ArrayDeque<String> path = getBeanConfigPath(beanConfig);
 		Queue<Map<String, Object>> configPath = new ArrayDeque<>();
@@ -83,7 +111,7 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		configPath.add(props);
 
 		String name;
-		while((name = path.poll()) != null) {
+		while ((name = path.poll()) != null) {
 			props = (Map<String, Object>) props.get(name);
 			if (props == null) {
 				configPath.offer(Collections.emptyMap());
@@ -157,37 +185,15 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		return beanDefinitions;
 	}
 
-	public Map<String, Object> getProperties() {
-		return props;
-	}
-
-	public void setProperties(Map<String, Object> props) {
-		this.props = props;
-	}
-
-	public ConfigHolder getConfigHolder() {
-		return configHolder;
-	}
-
-	public void setConfigHolder(ConfigHolder config) {
-		this.configHolder = config;
-		setProperties(config.getProperties());
-	}
-
-	public void dumpConfiguration(File f) throws IOException {
-		log.log(Level.WARNING, "Dumping full server configuration to: {0}", f);
-		Map<String, Object> dump = new LinkedHashMap<>(props);
-		dumpConfiguration(dump, kernel);
-
-		new ConfigWriter().resolveVariables().write(f, dump);
-	}
-
 	private void dumpConfiguration(Map<String, Object> dump, Kernel kernel) {
-		List<BeanConfig> beansToDump = kernel.getDependencyManager().getBeanConfigs().stream()
-				.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()) && !(bc instanceof Kernel.DelegatedBeanConfig))
+		List<BeanConfig> beansToDump = kernel.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()) &&
+						!(bc instanceof Kernel.DelegatedBeanConfig))
 				.collect(Collectors.toList());
 
-		for(BeanConfig bc : beansToDump) {
+		for (BeanConfig bc : beansToDump) {
 			BeanDefinition forBean = getBeanDefinitionFromDump(dump, bc.getBeanName());
 
 			if (forBean.getClazzName() == null) {
@@ -215,7 +221,8 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 					});
 
 					Map<Field, Object> defaults = grabCurrentConfig(bean, bc.getBeanName());
-					Map<String, Object> cfg = bc.getState() != BeanConfig.State.initialized ? getConfiguration(bc) : null;
+					Map<String, Object> cfg =
+							bc.getState() != BeanConfig.State.initialized ? getConfiguration(bc) : null;
 					Set<String> validProps = new HashSet<>();
 					if (defaults != null) {
 						defaults.forEach((field, v) -> {
@@ -245,7 +252,9 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 					dumpConfigFromSubBeans(forBean, kernel);
 				}
 			} catch (Exception ex) {
-				log.log(Level.FINEST, "failed to retrieve default values for bean " + bc.getBeanName() + ", class = " + bc.getClazz(), ex);
+				log.log(Level.FINEST,
+						"failed to retrieve default values for bean " + bc.getBeanName() + ", class = " + bc.getClazz(),
+						ex);
 			}
 		}
 
@@ -305,15 +314,15 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 					}
 
 					@Override
-					protected <T> T getInstance(Class<T> beanClass, boolean allowNonExportable) {
-						if (AbstractBeanConfigurator.class.isAssignableFrom(beanClass)) {
-							return (T) DSLBeanConfigurator.this;
-						}
+					public <T> T getInstance(String beanName) {
 						return null;
 					}
 
 					@Override
-					public <T> T getInstance(String beanName) {
+					protected <T> T getInstance(Class<T> beanClass, boolean allowNonExportable) {
+						if (AbstractBeanConfigurator.class.isAssignableFrom(beanClass)) {
+							return (T) DSLBeanConfigurator.this;
+						}
 						return null;
 					}
 
@@ -336,7 +345,8 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 						.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()))
 						.forEach(bc -> subbeans.put(bc.getBeanName(), bc.getClazz()));
 				subbeans.putAll(getBeanClassesFromAnnotations(kernel, bean.getClass()));
-				Map<String, BeanDefinition> beansFromConfig = mergeWithBeansPropertyValue(getBeanDefinitions(beanDef), beanDef);
+				Map<String, BeanDefinition> beansFromConfig = mergeWithBeansPropertyValue(getBeanDefinitions(beanDef),
+																						  beanDef);
 				subbeans.entrySet().stream().filter(e -> !beansFromConfig.containsKey(e.getKey())).map(e -> {
 					BeanDefinition def = new BeanDefinition();
 					def.setBeanName(e.getKey());
@@ -346,7 +356,7 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 					if (b != null) {
 						def.setActive(b.active());
 					}
-					
+
 					Object tmp = beanDef.get(def.getBeanName());
 					cfg.entrySet()
 							.stream()

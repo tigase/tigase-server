@@ -31,26 +31,31 @@ import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Activator implements BundleActivator {
+public class Activator
+		implements BundleActivator {
 
-        private static final Logger log = Logger.getLogger(Activator.class.getCanonicalName());
+	private static final Logger log = Logger.getLogger(Activator.class.getCanonicalName());
 
-        private static Bundle bundle = null;
-        
-        @Override
-        public void start(BundleContext bc) throws Exception {
-                try {
-                        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                        bc.registerService(MBeanServer.class.getName(), mbs, null);
+	private static Bundle bundle = null;
 
-                        bundle = bc.getBundle();
-                        
-                        if (!SLF4JBridgeHandler.isInstalled()) {
-                                SLF4JBridgeHandler.install();
-                        }
-                        
-                        XMPPServer.setOSGi(true);
-                        
+	public static Bundle getBundle() {
+		return bundle;
+	}
+
+	@Override
+	public void start(BundleContext bc) throws Exception {
+		try {
+			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			bc.registerService(MBeanServer.class.getName(), mbs, null);
+
+			bundle = bc.getBundle();
+
+			if (!SLF4JBridgeHandler.isInstalled()) {
+				SLF4JBridgeHandler.install();
+			}
+
+			XMPPServer.setOSGi(true);
+
 //                        try {
 //                                Set<Class<XMPPImplIfc>> procs = ClassUtil.getClassesImplementing(XMPPImplIfc.class);
 //                                ArrayList<String> elems = new ArrayList<String>(32);
@@ -77,36 +82,30 @@ public class Activator implements BundleActivator {
 //						} catch (Exception e) {
 //								log.log(Level.SEVERE, "Could not initialize properly ResourceFactory", e);
 //						}
-						
-						// we need to export this before we start, so if start will fail due to missing
-						// dependencies we would be able to add them later and recorver from this
-						ModulesManagerImpl.getInstance().setActive(true);
-                        bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
-						
-                        XMPPServer.start(new String[0]);
-                        
-                        // if it is not too late
-                        SLF4JBridgeHandler.install();
-                }
-                catch (Exception ex) {
-                        log.log(Level.SEVERE, "Error starting bundle: ", ex);
-                        throw ex;
-                }
-        }
 
-        @Override
-        public void stop(BundleContext bc) throws Exception {
-                try {
-                        ModulesManagerImpl.getInstance().setActive(false);
-                        XMPPServer.stop();
-                }
-                catch (Exception ex) {
-                        log.log(Level.SEVERE, "Error stopping bundle: ", ex);
-                        throw ex;
-                }
-        }
-        
-        public static Bundle getBundle() {
-                return bundle;
-        }
+			// we need to export this before we start, so if start will fail due to missing
+			// dependencies we would be able to add them later and recorver from this
+			ModulesManagerImpl.getInstance().setActive(true);
+			bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
+
+			XMPPServer.start(new String[0]);
+
+			// if it is not too late
+			SLF4JBridgeHandler.install();
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Error starting bundle: ", ex);
+			throw ex;
+		}
+	}
+
+	@Override
+	public void stop(BundleContext bc) throws Exception {
+		try {
+			ModulesManagerImpl.getInstance().setActive(false);
+			XMPPServer.stop();
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Error stopping bundle: ", ex);
+			throw ex;
+		}
+	}
 }

@@ -20,33 +20,28 @@
 
 package tigase.server;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Class ThreadExceptionHandler.java is responsible helper class used to catch
- * all unhandled exception from all threads.
- * This is default handler which sends exception stack trace to log system. If
- * necessary other server packages can use own custom handlers and do something
- * else with unhandled exceptions. This handler is only implemented to avoid
- * hidden exception causing bugs.
- *
+ * Class ThreadExceptionHandler.java is responsible helper class used to catch all unhandled exception from all threads.
+ * This is default handler which sends exception stack trace to log system. If necessary other server packages can use
+ * own custom handlers and do something else with unhandled exceptions. This handler is only implemented to avoid hidden
+ * exception causing bugs.
  * <p>
- * Created: Thu Sep 30 22:24:24 2004
- * </p>
+ * <p> Created: Thu Sep 30 22:24:24 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 
 public class ThreadExceptionHandler
-  implements Thread.UncaughtExceptionHandler {
+		implements Thread.UncaughtExceptionHandler {
 
-  private static final Logger log =
-    Logger.getLogger("tigase.server.ThreadExceptionHandler");
+	private static final Logger log = Logger.getLogger("tigase.server.ThreadExceptionHandler");
 
-  public void uncaughtException(final Thread t, final Throwable e) {
-    log.log(Level.SEVERE,
-      "Uncaught thread: \"" + t.getName() + "\" exception", e);
-  }
+	public void uncaughtException(final Thread t, final Throwable e) {
+		log.log(Level.SEVERE, "Uncaught thread: \"" + t.getName() + "\" exception", e);
+	}
 
 }// ThreadExceptionHandler

@@ -23,12 +23,11 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.server.Packet;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -38,13 +37,12 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPPacketFilterIfc extends XMPPImplIfc {
-	void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results);
+public interface XMPPPacketFilterIfc
+		extends XMPPImplIfc {
+
+	void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

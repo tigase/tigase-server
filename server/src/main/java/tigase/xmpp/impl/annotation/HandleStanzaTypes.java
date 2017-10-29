@@ -19,17 +19,19 @@
  */
 package tigase.xmpp.impl.annotation;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import tigase.xmpp.StanzaType;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
- * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor}
- * can define which stanza types are supported by implemented processor
- * 
+ * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor} can
+ * define which stanza types are supported by implemented processor
+ *
  * @author andrzej
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HandleStanzaTypes {
+
 	StanzaType[] value();
 }

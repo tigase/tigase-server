@@ -1,4 +1,3 @@
-
 /*
  * MonitorClustered.java
  *
@@ -36,5 +35,7 @@ import tigase.server.monitor.MonitorComponent;
  */
 @Deprecated
 @TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-public class MonitorClustered extends MonitorComponent {
+public class MonitorClustered
+		extends MonitorComponent {
+
 }

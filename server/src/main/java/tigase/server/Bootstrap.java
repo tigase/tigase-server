@@ -38,8 +38,8 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.util.dns.DNSResolverDefault;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.dns.DNSResolverIfc;
-import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.impl.roster.RosterFactory;
+import tigase.xmpp.jid.BareJID;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
 
 /**
  * Bootstrap class is responsible for initialization of Kernel to start Tigase XMPP Server.
- *
+ * <p>
  * Created by andrzej on 05.03.2016.
  */
 public class Bootstrap {
@@ -62,6 +62,8 @@ public class Bootstrap {
 
 	private final Kernel kernel;
 	private ConfigHolder config = new ConfigHolder();
+	// Common logging setup
+	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
 
 	public Bootstrap() {
 		kernel = new Kernel("root");
@@ -72,13 +74,14 @@ public class Bootstrap {
 		configureLogManager();
 	}
 
-	public void setProperties(Map<String,Object> props) {
+	public void setProperties(Map<String, Object> props) {
 		this.config.setProperties(props);
 	}
-	
+
 	public void start() throws ConfigReader.ConfigException {
 		initializeDnsResolver();
-		Object clusterMode = config.getProperties().getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", Boolean.FALSE));
+		Object clusterMode = config.getProperties()
+				.getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", Boolean.FALSE));
 		if (clusterMode instanceof ConfigReader.Variable) {
 			clusterMode = ((ConfigReader.Variable) clusterMode).calculateValue();
 			if (clusterMode == null) {
@@ -94,7 +97,8 @@ public class Bootstrap {
 		}
 		config.getProperties().put("cluster-mode", clusterMode);
 
-		Optional.ofNullable((String) config.getProperties().get("stringprep-processor")).ifPresent(val -> BareJID.useStringprepProcessor(val));
+		Optional.ofNullable((String) config.getProperties().get("stringprep-processor"))
+				.ifPresent(val -> BareJID.useStringprepProcessor(val));
 
 		for (Map.Entry<String, Object> e : config.getProperties().entrySet()) {
 			if (e.getKey().startsWith("--")) {
@@ -109,11 +113,17 @@ public class Bootstrap {
 
 		try {
 			if (XMPPServer.isOSGi()) {
-				kernel.registerBean("classUtilBean").asInstance(Class.forName("tigase.osgi.util.ClassUtilBean").newInstance()).exportable().exec();
+				kernel.registerBean("classUtilBean")
+						.asInstance(Class.forName("tigase.osgi.util.ClassUtilBean").newInstance())
+						.exportable()
+						.exec();
 			} else {
-				kernel.registerBean("classUtilBean").asInstance(Class.forName("tigase.util.reflection.ClassUtilBean").newInstance()).exportable().exec();
+				kernel.registerBean("classUtilBean")
+						.asInstance(Class.forName("tigase.util.reflection.ClassUtilBean").newInstance())
+						.exportable()
+						.exec();
 			}
-		} catch (ClassNotFoundException|InstantiationException|IllegalAccessException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -130,7 +140,7 @@ public class Bootstrap {
 		kernel.getInstance("logging");
 
 		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
-		
+
 		kernel.registerBean(RosterFactory.Bean.class).setPinned(true).exec();
 		kernel.getInstance(RosterFactory.Bean.class);
 
@@ -179,7 +189,7 @@ public class Bootstrap {
 			log.log(Level.FINE, "failed to dump configuration to file etc/config-dump.properties");
 		}
 	}
-	
+
 	public void stop() {
 		MessageRouter mr = kernel.getInstance("message-router");
 		mr.stop();
@@ -189,10 +199,6 @@ public class Bootstrap {
 		return kernel.getInstance(beanName);
 	}
 
-	public <T> T getInstance(Class<T> clazz) {
-		return kernel.getInstance(clazz);
-	}
-	
 	// moved to AbstractBeanConfigurator
 //	public void registerBeans() {
 //	}
@@ -218,12 +224,13 @@ public class Bootstrap {
 //		return parent.isAssignableFrom(requiredClass) ? annotation : null;
 //	}
 
+	public <T> T getInstance(Class<T> clazz) {
+		return kernel.getInstance(clazz);
+	}
+
 	protected Kernel getKernel() {
 		return kernel;
 	}
-
-	// Common logging setup
-	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
 
 	private void configureLogManager() {
 		Map<String, Object> cfg = prepareLogManagerConfiguration(config.getProperties());
@@ -253,25 +260,21 @@ public class Bootstrap {
 
 	private Map<String, Object> prepareLogManagerConfiguration(Map<String, Object> params) {
 		Map<String, Object> defaults = new HashMap<>();
-		String              levelStr = ".level";
+		String levelStr = ".level";
 
 //		if ((Boolean) params.get("test")) {
 //			defaults.put(LOGGING_KEY + levelStr, "WARNING");
 //		} else {
 		defaults.put(LOGGING_KEY + levelStr, "CONFIG");
 //		}
-		defaults.put(LOGGING_KEY + "handlers",
-				"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
-				"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", "tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
-				"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", "tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
-				"logs/tigase.log");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 		if (params.get(GEN_DEBUG) != null) {
@@ -292,23 +295,23 @@ public class Bootstrap {
 		return defaults;
 	}
 
-	private void setupLogManager( Map<String, Object> properties ) {
+	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
-		StringBuilder buff = new StringBuilder( 200 );
+		StringBuilder buff = new StringBuilder(200);
 
-		for ( Map.Entry<String, Object> entry : entries ) {
-			if ( entry.getKey().startsWith( LOGGING_KEY ) ){
-				String key = entry.getKey().substring( LOGGING_KEY.length() );
-				loggingSetup.put( key, entry.getValue().toString() );
+		for (Map.Entry<String, Object> entry : entries) {
+			if (entry.getKey().startsWith(LOGGING_KEY)) {
+				String key = entry.getKey().substring(LOGGING_KEY.length());
+				loggingSetup.put(key, entry.getValue().toString());
 			}
 		}
 
-		for ( String key : loggingSetup.keySet() ) {
-			String entry = loggingSetup.get( key );
-			buff.append( key ).append( "=" ).append( entry ).append( "\n" );
-			if ( key.equals( "java.util.logging.FileHandler.pattern" ) ){
-				File log_path = new File( entry ).getParentFile();
-				if ( !log_path.exists() ){
+		for (String key : loggingSetup.keySet()) {
+			String entry = loggingSetup.get(key);
+			buff.append(key).append("=").append(entry).append("\n");
+			if (key.equals("java.util.logging.FileHandler.pattern")) {
+				File log_path = new File(entry).getParentFile();
+				if (!log_path.exists()) {
 					log_path.mkdirs();
 				}
 			}    // end of if (key.equals())

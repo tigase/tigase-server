@@ -1,4 +1,3 @@
-
 /*
  * UserRepositoryMDImpl.java
  *
@@ -44,8 +43,10 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<UserRepository,UserRepositoryMDPoolBean.UserRepositoryConfigBean>
+public abstract class UserRepositoryMDImpl
+		extends MDPoolBeanWithStatistics<UserRepository, UserRepositoryMDPoolBean.UserRepositoryConfigBean>
 		implements UserRepository {
+
 	private static final Logger log = Logger.getLogger(UserRepositoryMDImpl.class.getName());
 
 	@Inject
@@ -68,8 +69,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			repo.addDataList(user, subnode, key, list);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -81,8 +81,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			repo.addUser(user);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -97,40 +96,35 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			return repo.getData(user, subnode, key, def);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
 	}
 
 	@Override
-	public String getData(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException {
+	public String getData(BareJID user, String subnode, String key) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			return repo.getData(user, subnode, key);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
 	}
 
 	@Override
-	public String getData(BareJID user, String key)
-			throws UserNotFoundException, TigaseDBException {
+	public String getData(BareJID user, String key) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			return repo.getData(user, key);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
@@ -145,24 +139,21 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			return repo.getDataList(user, subnode, key);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
 	}
 
 	@Override
-	public String[] getKeys(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException {
+	public String[] getKeys(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			return repo.getKeys(user, subnode);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
@@ -176,8 +167,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			return repo.getKeys(user);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
@@ -189,16 +179,14 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 	}
 
 	@Override
-	public String[] getSubnodes(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException {
+	public String[] getSubnodes(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			return repo.getSubnodes(user, subnode);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
@@ -212,8 +200,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			repo.getSubnodes(user);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return null;
@@ -227,8 +214,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			return repo.getUserUID(user);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return -1;
@@ -265,8 +251,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 		if (repo != null) {
 			return repo.getUsersCount(domain);
 		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + domain + ", not even default one!");
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain + ", not even default one!");
 		}
 
 		return -1;
@@ -276,51 +261,43 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 
 	@Override
 	@Deprecated
-	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {
-		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: "
-				+ params);
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: " + params);
 	}
 
 	@Override
-	public void removeData(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException {
+	public void removeData(BareJID user, String subnode, String key) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.removeData(user, subnode, key);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
 	@Override
-	public void removeData(BareJID user, String key)
-			throws UserNotFoundException, TigaseDBException {
+	public void removeData(BareJID user, String key) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.removeData(user, key);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
 	@Override
-	public void removeSubnode(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException {
+	public void removeSubnode(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.removeSubnode(user, subnode);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -334,8 +311,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			eventBus.fire(new UserRemovedEvent(user));
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -350,22 +326,19 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			repo.setData(user, subnode, key, value);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
 	@Override
-	public void setData(BareJID user, String key, String value)
-			throws UserNotFoundException, TigaseDBException {
+	public void setData(BareJID user, String key, String value) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.setData(user, key, value);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -378,8 +351,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			repo.setDataList(user, subnode, key, list);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -393,8 +365,7 @@ public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<User
 			return repo.userExists(user);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 
 		return false;

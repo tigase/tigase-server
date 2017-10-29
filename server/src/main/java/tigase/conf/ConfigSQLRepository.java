@@ -22,25 +22,20 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.util.repository.DataTypes;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -52,7 +47,8 @@ import tigase.util.repository.DataTypes;
  */
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
-public class ConfigSQLRepository extends ConfigurationCache {
+public class ConfigSQLRepository
+		extends ConfigurationCache {
 
 	/** Field description */
 	public static final String CONFIG_REPO_URI_PROP_KEY = "tigase-config-repo-uri";
@@ -123,10 +119,9 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			log.severe("You can provide it in a few ways and the Tigase server checks");
 			log.severe("following parameters in the order below:");
 			log.severe("1. System property: -Dtigase-config-repo-uri=db-connection-string");
-			log.severe("2. init.properties file or command line parameter: "
-					+ "--tigase-config-repo-uri=db-connection-string");
-			log.severe("3. init.properties file or command line parameter: "
-					+ "--user-db-uri=db-connection-string");
+			log.severe("2. init.properties file or command line parameter: " +
+							   "--tigase-config-repo-uri=db-connection-string");
+			log.severe("3. init.properties file or command line parameter: " + "--user-db-uri=db-connection-string");
 			log.severe("Please correct the error and restart the server.");
 			System.exit(1);
 		}
@@ -135,8 +130,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			dbAccess.initRepository(config_db_uri, null);
 		} catch (SQLException ex) {
 			log.log(Level.SEVERE, "Problem connecting to configuration database: ", ex);
-			log.severe("Please check whether the database connection string is correct: "
-					+ config_db_uri);
+			log.severe("Please check whether the database connection string is correct: " + config_db_uri);
 			System.exit(1);
 		}
 	}
@@ -165,44 +159,46 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		private static final String FLAG_COLUMN = "flag";
 		private static final String VALUE_TYPE_COLUMN = "value_type";
 		private static final String LAST_UPDATE_COLUMN = "last_update";
-		private static final String CREATE_TABLE_QUERY = "create table " + TABLE_NAME + " (" + "  "
-			+ COMPONENT_NAME_COLUMN + " varchar(127) NOT NULL," + "  " + KEY_NAME_COLUMN
-			+ " varchar(127) NOT NULL," + "  " + VALUE_COLUMN + " varchar(8191) NOT NULL," + "  "
-			+ CLUSTER_NODE_COLUMN + " varchar(255) NOT NULL DEFAULT ''," + "  " + NODE_NAME_COLUMN
-			+ " varchar(127) NOT NULL DEFAULT ''," + "  " + FLAG_COLUMN
-			+ " varchar(32) NOT NULL DEFAULT 'DEFAULT'," + "  " + VALUE_TYPE_COLUMN
-			+ " varchar(8) NOT NULL DEFAULT 'S'," + "  " + LAST_UPDATE_COLUMN + " timestamp,"
-			+ "  primary key(" + CLUSTER_NODE_COLUMN + ", " + COMPONENT_NAME_COLUMN + ", "
-			+ NODE_NAME_COLUMN + ", " + KEY_NAME_COLUMN + ", " + FLAG_COLUMN + "))";
-		private static final String CLUSTER_NODE_WHERE_PART = " (" + CLUSTER_NODE_COLUMN + " = '' "
-			+ " OR " + CLUSTER_NODE_COLUMN + " = ?) ";
-		private static final String ITEM_WHERE_PART = " where " + CLUSTER_NODE_WHERE_PART + " AND ("
-			+ COMPONENT_NAME_COLUMN + " = ?) " + " AND (" + NODE_NAME_COLUMN + " = ?) " + " AND ("
-			+ KEY_NAME_COLUMN + " = ?) ";
+		private static final String CREATE_TABLE_QUERY =
+				"create table " + TABLE_NAME + " (" + "  " + COMPONENT_NAME_COLUMN + " varchar(127) NOT NULL," + "  " +
+						KEY_NAME_COLUMN + " varchar(127) NOT NULL," + "  " + VALUE_COLUMN + " varchar(8191) NOT NULL," +
+						"  " + CLUSTER_NODE_COLUMN + " varchar(255) NOT NULL DEFAULT ''," + "  " + NODE_NAME_COLUMN +
+						" varchar(127) NOT NULL DEFAULT ''," + "  " + FLAG_COLUMN +
+						" varchar(32) NOT NULL DEFAULT 'DEFAULT'," + "  " + VALUE_TYPE_COLUMN +
+						" varchar(8) NOT NULL DEFAULT 'S'," + "  " + LAST_UPDATE_COLUMN + " timestamp," +
+						"  primary key(" + CLUSTER_NODE_COLUMN + ", " + COMPONENT_NAME_COLUMN + ", " +
+						NODE_NAME_COLUMN + ", " + KEY_NAME_COLUMN + ", " + FLAG_COLUMN + "))";
+		private static final String CLUSTER_NODE_WHERE_PART =
+				" (" + CLUSTER_NODE_COLUMN + " = '' " + " OR " + CLUSTER_NODE_COLUMN + " = ?) ";
+		private static final String ITEM_WHERE_PART =
+				" where " + CLUSTER_NODE_WHERE_PART + " AND (" + COMPONENT_NAME_COLUMN + " = ?) " + " AND (" +
+						NODE_NAME_COLUMN + " = ?) " + " AND (" + KEY_NAME_COLUMN + " = ?) ";
 
 		private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME + ITEM_WHERE_PART;
-		private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " ("
-			+ CLUSTER_NODE_COLUMN + ", " + COMPONENT_NAME_COLUMN + ", " + NODE_NAME_COLUMN + ", "
-			+ KEY_NAME_COLUMN + ", " + VALUE_COLUMN + ", " + VALUE_TYPE_COLUMN + ", " + FLAG_COLUMN
-			+ ") " + " values (?, ?, ?, ?, ?, ?, ?)";
-		private static final String UPDATE_ITEM_QUERY = "update " + TABLE_NAME + " set " + VALUE_COLUMN
-			+ " = ? " + " where (" + CLUSTER_NODE_COLUMN + " = ?) " + " AND (" + COMPONENT_NAME_COLUMN
-			+ " = ?) " + " AND (" + NODE_NAME_COLUMN + " = ?) " + " AND (" + KEY_NAME_COLUMN + " = ?)";
+		private static final String ADD_ITEM_QUERY =
+				"insert into " + TABLE_NAME + " (" + CLUSTER_NODE_COLUMN + ", " + COMPONENT_NAME_COLUMN + ", " +
+						NODE_NAME_COLUMN + ", " + KEY_NAME_COLUMN + ", " + VALUE_COLUMN + ", " + VALUE_TYPE_COLUMN +
+						", " + FLAG_COLUMN + ") " + " values (?, ?, ?, ?, ?, ?, ?)";
+		private static final String UPDATE_ITEM_QUERY =
+				"update " + TABLE_NAME + " set " + VALUE_COLUMN + " = ? " + " where (" + CLUSTER_NODE_COLUMN +
+						" = ?) " + " AND (" + COMPONENT_NAME_COLUMN + " = ?) " + " AND (" + NODE_NAME_COLUMN +
+						" = ?) " + " AND (" + KEY_NAME_COLUMN + " = ?)";
 		private static final String DELETE_ITEM_QUERY = "delete from " + TABLE_NAME + ITEM_WHERE_PART;
-		private static final String GET_ALL_ITEMS_QUERY = "select * from " + TABLE_NAME + " where "
-			+ CLUSTER_NODE_WHERE_PART;
-		private static final String GET_COMPONENT_ITEMS_QUERY = "select * from " + TABLE_NAME
-			+ " where " + CLUSTER_NODE_WHERE_PART + " AND (" + COMPONENT_NAME_COLUMN + " = ?)";
-		private static final String GET_UPDATED_ITEMS_QUERY = "select * from " + TABLE_NAME + " where "
-			+ CLUSTER_NODE_WHERE_PART + " AND (" + FLAG_COLUMN + " <> 'INITIAL')" + " AND ("
-			+ LAST_UPDATE_COLUMN + " > ?)";
-		private static final String GET_COMPONENT_NAMES_QUERY = "select distinct("
-			+ COMPONENT_NAME_COLUMN + ") from " + TABLE_NAME + " where " + CLUSTER_NODE_COLUMN;
-		private static final String GET_PROPERTIES_COUNT_QUERY = "select count(*) as count from "
-			+ TABLE_NAME + " where " + CLUSTER_NODE_COLUMN;
-		private static final String GET_KEYS_QUERY = "select " + KEY_NAME_COLUMN + " from "
-			+ TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART + " AND (" + COMPONENT_NAME_COLUMN
-			+ " = ?)" + " AND (" + NODE_NAME_COLUMN + " = ?)";
+		private static final String GET_ALL_ITEMS_QUERY =
+				"select * from " + TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART;
+		private static final String GET_COMPONENT_ITEMS_QUERY =
+				"select * from " + TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART + " AND (" + COMPONENT_NAME_COLUMN +
+						" = ?)";
+		private static final String GET_UPDATED_ITEMS_QUERY =
+				"select * from " + TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART + " AND (" + FLAG_COLUMN +
+						" <> 'INITIAL')" + " AND (" + LAST_UPDATE_COLUMN + " > ?)";
+		private static final String GET_COMPONENT_NAMES_QUERY =
+				"select distinct(" + COMPONENT_NAME_COLUMN + ") from " + TABLE_NAME + " where " + CLUSTER_NODE_COLUMN;
+		private static final String GET_PROPERTIES_COUNT_QUERY =
+				"select count(*) as count from " + TABLE_NAME + " where " + CLUSTER_NODE_COLUMN;
+		private static final String GET_KEYS_QUERY =
+				"select " + KEY_NAME_COLUMN + " from " + TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART + " AND (" +
+						COMPONENT_NAME_COLUMN + " = ?)" + " AND (" + NODE_NAME_COLUMN + " = ?)";
 
 		//~--- fields -------------------------------------------------------------
 
@@ -212,7 +208,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		/**
 		 * Method description
-		 *
 		 *
 		 * @param conn_str
 		 * @param params
@@ -235,7 +230,8 @@ public class ConfigSQLRepository extends ConfigurationCache {
 				data_repo.initPreparedStatement(GET_COMPONENT_NAMES_QUERY, GET_COMPONENT_NAMES_QUERY);
 				data_repo.initPreparedStatement(GET_PROPERTIES_COUNT_QUERY, GET_PROPERTIES_COUNT_QUERY);
 				data_repo.initPreparedStatement(GET_KEYS_QUERY, GET_KEYS_QUERY);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 		}
 
 		private void addItem(ConfigItem item) {
@@ -260,16 +256,14 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 					synchronized (updateItemSt) {
 						updateItemSt.setString(1, item.getConfigValToString());
-						updateItemSt.setString(2,
-								((item.getClusterNode() != null) ? item.getClusterNode() : ""));
+						updateItemSt.setString(2, ((item.getClusterNode() != null) ? item.getClusterNode() : ""));
 						updateItemSt.setString(3, item.getCompName());
 						updateItemSt.setString(4, ((item.getNodeName() != null) ? item.getNodeName() : ""));
 						updateItemSt.setString(5, item.getKeyName());
 						updateItemSt.executeUpdate();
 					}
 				} catch (SQLException ex) {
-					log.log(Level.WARNING,
-							"Problem adding/updating an item to DB: " + item.toElement() + "\n", ex);
+					log.log(Level.WARNING, "Problem adding/updating an item to DB: " + item.toElement() + "\n", ex);
 
 				}
 			} catch (Exception e) {
@@ -282,7 +276,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			Statement st = null;
 
 			try {
-				if ( !data_repo.checkTable(TABLE_NAME)) {
+				if (!data_repo.checkTable(TABLE_NAME)) {
 					st = data_repo.createStatement(null);
 					st.executeUpdate(CREATE_TABLE_QUERY);
 				} else {
@@ -305,8 +299,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			String value_type = rs.getString(VALUE_TYPE_COLUMN);
 			String flag_str = rs.getString(FLAG_COLUMN);
 
-			result.set(clusterNode, compName, nodeName, keyName, value_str, value_type.charAt(0),
-					flag_str);
+			result.set(clusterNode, compName, nodeName, keyName, value_str, value_type.charAt(0), flag_str);
 
 			return result;
 		}
@@ -348,8 +341,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				ResultSet rs = null;
-				PreparedStatement getCompItemsSt =
-					data_repo.getPreparedStatement(null, GET_COMPONENT_ITEMS_QUERY);
+				PreparedStatement getCompItemsSt = data_repo.getPreparedStatement(null, GET_COMPONENT_ITEMS_QUERY);
 
 				synchronized (getCompItemsSt) {
 					try {
@@ -380,8 +372,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				ResultSet rs = null;
-				PreparedStatement getCompNamesSt =
-					data_repo.getPreparedStatement(null, GET_COMPONENT_NAMES_QUERY);
+				PreparedStatement getCompNamesSt = data_repo.getPreparedStatement(null, GET_COMPONENT_NAMES_QUERY);
 
 				synchronized (getCompNamesSt) {
 					try {
@@ -470,8 +461,8 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				ResultSet rs = null;
-				PreparedStatement getPropertiesCountSt =
-					data_repo.getPreparedStatement(null, GET_PROPERTIES_COUNT_QUERY);
+				PreparedStatement getPropertiesCountSt = data_repo.getPreparedStatement(null,
+																						GET_PROPERTIES_COUNT_QUERY);
 
 				synchronized (getPropertiesCountSt) {
 					try {
@@ -512,8 +503,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

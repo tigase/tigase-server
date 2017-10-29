@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -54,46 +52,43 @@ import static tigase.db.RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY;
  * @version $Rev$
  */
 public class CounterDataArchivizer
-				implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
+		implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
+
 	public static final String DB_URL_PROP_KEY = "db-url";
 	public static final String KEY_FIELD_PROP_KEY = "key-field";
 	public static final String TABLE_NAME_PROP_KEY = "table-name";
-	public static final String  VAL_FIELD_PROP_KEY   = "val-field";
-	private static final String CPU_USAGE_TEXT       = "Usage CPU [%]: ";
-	private static final String DEF_KEY_FIELD_NAME   = "counter_name";
-	private static final String DEF_TABLE_NAME       = "counter_data";
+	public static final String VAL_FIELD_PROP_KEY = "val-field";
+	private static final String CPU_USAGE_TEXT = "Usage CPU [%]: ";
+	private static final String DEF_KEY_FIELD_NAME = "counter_name";
+	private static final String DEF_TABLE_NAME = "counter_data";
 	private static final String DEF_VALUE_FIELD_NAME = "counter_value";
-	private static final String MEM_USAGE_TEXT       = "Usage RAM [%]: ";
-	private static final Logger log = Logger.getLogger(CounterDataArchivizer.class
-			.getName());
+	private static final String MEM_USAGE_TEXT = "Usage RAM [%]: ";
+	private static final Logger log = Logger.getLogger(CounterDataArchivizer.class.getName());
 	private static final String SERVER_CONNECTIONS_TEXT = "Connections s2s: ";
-	private static final String UPTIME_TEXT             = "Uptime: ";
-	private static final String USER_CONNECTIONS_TEXT   = "Connections c2s: ";
-	private static final String USER_REGISTERED_TEXT    = "Registered user: ";
-	private static final String VERSION_TEXT            = "Version: ";
-	private static final String VHOSTS_TEXT             = "VHosts: ";
+	private static final String UPTIME_TEXT = "Uptime: ";
+	private static final String USER_CONNECTIONS_TEXT = "Connections c2s: ";
+	private static final String USER_REGISTERED_TEXT = "Registered user: ";
+	private static final String VERSION_TEXT = "Version: ";
+	private static final String VHOSTS_TEXT = "VHosts: ";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String         create_table_query = null;
-	private DataRepository data_repo          = null;
-	private String         init_entry_query   = null;
-
+	private String create_table_query = null;
+	private DataRepository data_repo = null;
 	@ConfigField(desc = "Database URL", alias = DB_URL_PROP_KEY)
 	private String databaseUrl = null;
+	@ConfigField(desc = "Frequency")
+	private long frequency = -1;
+	private String init_entry_query = null;
+	@ConfigField(desc = "Key field", alias = KEY_FIELD_PROP_KEY)
+	private String keyField = DEF_KEY_FIELD_NAME;
 	// private PreparedStatement initEntry = null;
 	@ConfigField(desc = "Table name", alias = TABLE_NAME_PROP_KEY)
-	private String tableName          = DEF_TABLE_NAME;
-	@ConfigField(desc = "Key field", alias = KEY_FIELD_PROP_KEY)
-	private String keyField           = DEF_KEY_FIELD_NAME;
+	private String tableName = DEF_TABLE_NAME;
 	private String update_entry_query = null;
-
-
 	// private PreparedStatement updateEntry = null;
 	@ConfigField(desc = "Value field", alias = VAL_FIELD_PROP_KEY)
 	private String valueField = DEF_VALUE_FIELD_NAME;
-	@ConfigField(desc = "Frequency")
-	private long frequency = -1;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -114,10 +109,8 @@ public class CounterDataArchivizer
 
 	public void initData(String key, String value) {
 		try {
-			PreparedStatement updateEntry = data_repo.getPreparedStatement(null,
-					update_entry_query);
-			PreparedStatement initEntry = data_repo.getPreparedStatement(null,
-					init_entry_query);
+			PreparedStatement updateEntry = data_repo.getPreparedStatement(null, update_entry_query);
+			PreparedStatement initEntry = data_repo.getPreparedStatement(null, init_entry_query);
 
 			synchronized (updateEntry) {
 				updateEntry.setString(1, value);
@@ -136,8 +129,8 @@ public class CounterDataArchivizer
 	}
 
 	public void initRepository(String conn_str, Map<String, String> params)
-					throws SQLException, ClassNotFoundException, InstantiationException,
-							IllegalAccessException, DBInitException {
+			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+				   DBInitException {
 		data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 		checkDB();
 		data_repo.initPreparedStatement(init_entry_query, init_entry_query);
@@ -152,8 +145,7 @@ public class CounterDataArchivizer
 
 	public void updateData(String key, String value) {
 		try {
-			PreparedStatement updateEntry = data_repo.getPreparedStatement(null,
-					update_entry_query);
+			PreparedStatement updateEntry = data_repo.getPreparedStatement(null, update_entry_query);
 
 			synchronized (updateEntry) {
 				updateEntry.setString(1, value);
@@ -168,16 +160,15 @@ public class CounterDataArchivizer
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		log.log(Level.SEVERE, "Initialize stats archive, table: {0} ", tableName);
-		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField +
-				") " + " (select ?, ? from " + tableName + " where " + keyField +
-				" = ? HAVING count(*)=0)";
-		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " +
-				keyField + " = ?";
-		create_table_query = "CREATE TABLE " + tableName + " ( " + keyField +
-				" varchar(255) NOT NULL DEFAULT '0', " + valueField +
-				" varchar(255) NOT NULL DEFAULT '0'," + "  PRIMARY KEY ( " + keyField + " ));";
+		init_entry_query =
+				"insert into " + tableName + " (" + keyField + ", " + valueField + ") " + " (select ?, ? from " +
+						tableName + " where " + keyField + " = ? HAVING count(*)=0)";
+		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " + keyField + " = ?";
+		create_table_query =
+				"CREATE TABLE " + tableName + " ( " + keyField + " varchar(255) NOT NULL DEFAULT '0', " + valueField +
+						" varchar(255) NOT NULL DEFAULT '0'," + "  PRIMARY KEY ( " + keyField + " ));";
 		try {
-			Map<String,String> params = new HashMap<>();
+			Map<String, String> params = new HashMap<>();
 			params.put(DATA_REPO_POOL_SIZE_PROP_KEY, "1");
 			initRepository(databaseUrl, params);
 			initData(VERSION_TEXT, XMPPServer.getImplementationVersion());
@@ -206,6 +197,5 @@ public class CounterDataArchivizer
 		data_repo.checkTable(tableName, create_table_query);
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/02

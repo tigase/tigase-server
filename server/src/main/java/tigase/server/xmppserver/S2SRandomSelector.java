@@ -1,4 +1,3 @@
-
 /*
  * S2SRandomSelector.java
  *
@@ -40,7 +39,9 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "s2sRandomSelector", parent = S2SConnectionManager.class, active = true)
-public class S2SRandomSelector implements S2SConnectionSelector {
+public class S2SRandomSelector
+		implements S2SConnectionSelector {
+
 	private static final Logger log = Logger.getLogger(S2SRandomSelector.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -73,8 +74,6 @@ public class S2SRandomSelector implements S2SConnectionSelector {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

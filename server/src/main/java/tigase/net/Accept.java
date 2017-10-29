@@ -24,8 +24,8 @@ import java.nio.channels.SocketChannel;
 
 /**
  * Describe interface Accept here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat May 14 07:00:16 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -33,6 +33,6 @@ import java.nio.channels.SocketChannel;
  */
 public interface Accept {
 
-  void accept(final SocketChannel sc) throws IOException;
+	void accept(final SocketChannel sc) throws IOException;
 
 } // Accept

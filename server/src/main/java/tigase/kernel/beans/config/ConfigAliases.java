@@ -22,15 +22,16 @@ package tigase.kernel.beans.config;
 import java.lang.annotation.*;
 
 /**
- * Annotation allows to add multiple {@link tigase.kernel.beans.config.ConfigAlias} aliases for multiple configuration fields
- *
+ * Annotation allows to add multiple {@link tigase.kernel.beans.config.ConfigAlias} aliases for multiple configuration
+ * fields
+ * <p>
  * Created by andrzej on 05.08.2016.
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface ConfigAliases  {
+public @interface ConfigAliases {
 
 	ConfigAlias[] value();
 

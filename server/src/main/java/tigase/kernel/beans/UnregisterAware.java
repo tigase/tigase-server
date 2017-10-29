@@ -21,8 +21,8 @@
 package tigase.kernel.beans;
 
 /**
- * If bean implements this interface then just before unregistering bean Kernel
- * calls method {@link UnregisterAware#beforeUnregister()}.
+ * If bean implements this interface then just before unregistering bean Kernel calls method {@link
+ * UnregisterAware#beforeUnregister()}.
  */
 public interface UnregisterAware {
 

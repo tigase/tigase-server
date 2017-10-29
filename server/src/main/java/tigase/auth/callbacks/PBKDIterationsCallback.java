@@ -22,7 +22,8 @@ package tigase.auth.callbacks;
 
 import javax.security.auth.callback.Callback;
 
-public class PBKDIterationsCallback implements Callback, java.io.Serializable {
+public class PBKDIterationsCallback
+		implements Callback, java.io.Serializable {
 
 	private static final long serialVersionUID = -4342673378785456908L;
 
@@ -42,8 +43,7 @@ public class PBKDIterationsCallback implements Callback, java.io.Serializable {
 	}
 
 	/**
-	 * @param interations
-	 *            the interations to set
+	 * @param interations the interations to set
 	 */
 	public void setInterations(int interations) {
 		this.interations = interations;

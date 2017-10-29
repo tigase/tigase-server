@@ -28,7 +28,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Configurator extends ConfiguratorAbstract {
+public class Configurator
+		extends ConfiguratorAbstract {
 
 	private static final Logger log = Logger.getLogger(Configurator.class.getCanonicalName());
 
@@ -56,6 +57,6 @@ public class Configurator extends ConfiguratorAbstract {
 			setup(getComponent("message-router"));
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem instantiating component:", e);
-		}	 // end of try-catch		
+		}     // end of try-catch
 	}
 }

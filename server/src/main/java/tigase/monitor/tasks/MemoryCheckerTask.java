@@ -120,6 +120,19 @@ public class MemoryCheckerTask
 	}
 
 	@Override
+	public void setNewConfiguration(Form form) {
+		Field heapMemUsage = form.get("maxHeapMemUsagePercentThreshold");
+		if (heapMemUsage != null) {
+			this.maxHeapMemUsagePercentThreshold = Integer.parseInt(heapMemUsage.getValue());
+		}
+		Field nonHeapMemUsage = form.get("maxNonHeapMemUsagePercentThreshold");
+		if (nonHeapMemUsage != null) {
+			this.maxNonHeapMemUsagePercentThreshold = Integer.parseInt(nonHeapMemUsage.getValue());
+		}
+		super.setNewConfiguration(form);
+	}
+
+	@Override
 	protected void run() {
 		float curHeapMemUsagePercent = runtime.getHeapMemUsage();
 		if (curHeapMemUsagePercent >= maxHeapMemUsagePercentThreshold) {
@@ -166,19 +179,6 @@ public class MemoryCheckerTask
 		} else {
 			triggeredEvents.remove(NONHEAP_MEMORY_MONITOR_EVENT_NAME);
 		}
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field heapMemUsage = form.get("maxHeapMemUsagePercentThreshold");
-		if (heapMemUsage != null) {
-			this.maxHeapMemUsagePercentThreshold = Integer.parseInt(heapMemUsage.getValue());
-		}
-		Field nonHeapMemUsage = form.get("maxNonHeapMemUsagePercentThreshold");
-		if (nonHeapMemUsage != null) {
-			this.maxNonHeapMemUsagePercentThreshold = Integer.parseInt(nonHeapMemUsage.getValue());
-		}
-		super.setNewConfiguration(form);
 	}
 
 }

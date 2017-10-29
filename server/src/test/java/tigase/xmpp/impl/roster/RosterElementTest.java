@@ -29,7 +29,7 @@ public class RosterElementTest {
 
 	@Test
 	public void testSetName() {
-		RosterElement e = new RosterElement(JID.jidInstanceNS("a@b.c"), null, new String[] {});
+		RosterElement e = new RosterElement(JID.jidInstanceNS("a@b.c"), null, new String[]{});
 		assertNull(e.getName());
 		assertTrue(e.isModified());
 

@@ -52,5 +52,5 @@ public class MD5UserIdPasswordCredentialsEntryTest {
 
 		assertTrue(entry.verifyPlainPassword(testPassword));
 	}
-	
+
 }

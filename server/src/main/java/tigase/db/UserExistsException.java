@@ -24,21 +24,19 @@ package tigase.db;
 
 import tigase.xmpp.jid.BareJID;
 
-
 /**
- * The <code>UserExistsException</code> is thrown when application tries to add
- * new user with user ID which already exists in repository.
- * According to <code>UserRepository</code> specification there can be the only
- * one registered user with particular ID.
- * <p>
- * Created: Wed Oct 27 14:17:44 2004
- * </p>
+ * The <code>UserExistsException</code> is thrown when application tries to add new user with user ID which already
+ * exists in repository. According to <code>UserRepository</code> specification there can be the only one registered
+ * user with particular ID. <p> Created: Wed Oct 27 14:17:44 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserExistsException extends TigaseDBException {
-	private BareJID userId = null;
+public class UserExistsException
+		extends TigaseDBException {
+
 	private static final long serialVersionUID = 1L;
+	private BareJID userId = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -47,7 +45,7 @@ public class UserExistsException extends TigaseDBException {
 	}
 
 	public UserExistsException(BareJID user, String message, Throwable cause) {
-		super(message + " (" + user + ")", cause );
+		super(message + " (" + user + ")", cause);
 		userId = user;
 	}
 

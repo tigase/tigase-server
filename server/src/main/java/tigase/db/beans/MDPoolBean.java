@@ -26,23 +26,21 @@ import tigase.kernel.core.Kernel;
 
 /**
  * Abstract class providing base part for implementation of pool for multiple domains.
- *
+ * <p>
  * Created by andrzej on 08.03.2016.
  */
-public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements RegistrarBeanWithDefaultBeanClass {
+public abstract class MDPoolBean<S, T extends MDPoolConfigBean<S, T>>
+		implements RegistrarBeanWithDefaultBeanClass {
 
 	public static final String REPO_URI = "repo-uri";
 	public static final String REPO_CLASS = "repo-class";
 	public static final String POOL_CLASS = "pool-class";
 	public static final String POOL_SIZE = "pool-size";
-	
-	@ConfigField(desc = "Bean name")
-	private String name;
-
-	private Kernel kernel;
-
 	@Inject(nullAllowed = true)
 	private MDPoolConfigBean[] configBeans;
+	private Kernel kernel;
+	@ConfigField(desc = "Bean name")
+	private String name;
 
 	public String getName() {
 		return name;
@@ -51,7 +49,7 @@ public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements R
 	@Override
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
-		if (!kernel.isBeanClassRegistered("default")){
+		if (!kernel.isBeanClassRegistered("default")) {
 			registerConfigBean("default");
 		}
 	}
@@ -61,26 +59,29 @@ public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements R
 		this.kernel = null;
 	}
 
-	protected void registerConfigBean(String domain) {
-		kernel.registerBean(domain).asClass(getConfigClass()).exec();
-	}
-
 	/**
 	 * Default alias used if for provided domain then is no repo instance.
+	 *
 	 * @return default alias
 	 */
 	public String getDefaultAlias() {
 		return "default";
 	}
 
+	protected void registerConfigBean(String domain) {
+		kernel.registerBean(domain).asClass(getConfigClass()).exec();
+	}
+
 	/**
 	 * Returns per domain configuration class
+	 *
 	 * @return class
 	 */
 	protected abstract Class<? extends T> getConfigClass();
 
 	/**
 	 * Method called to add repo instance for domain
+	 *
 	 * @param domain
 	 * @param repo
 	 */
@@ -88,13 +89,16 @@ public abstract class MDPoolBean<S,T extends MDPoolConfigBean<S,T>> implements R
 
 	/**
 	 * Method called to remove repo instance for domain
+	 *
 	 * @param domain
+	 *
 	 * @return removed instance of repo
 	 */
 	protected abstract S removeRepo(String domain);
 
 	/**
 	 * Method called to set default repo instance.
+	 *
 	 * @param repo instance of repo
 	 */
 	protected abstract void setDefault(S repo);

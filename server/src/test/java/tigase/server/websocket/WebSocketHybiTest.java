@@ -30,29 +30,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author andrzej
  */
-public class WebSocketHybiTest extends TestCase {
-	
-	private WebSocketHybi impl;
-	
-	@Override
-	protected void setUp() throws Exception {
-		impl = new WebSocketHybi();
-	}
+public class WebSocketHybiTest
+		extends TestCase {
 
-	@Override
-	protected void tearDown() throws Exception {
-		impl = null;
-	}
+	private WebSocketHybi impl;
 
 	@Test
 	public void testFrameEncodingDecoding() throws IOException {
 		String input = "<test-data><subdata/></test-data>";
 		ByteBuffer buf = ByteBuffer.wrap(input.getBytes());
 		final ByteBuffer tmp = ByteBuffer.allocate(1024);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHybi() }) {
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHybi()}) {
 
 			@Override
 			protected void writeBytes(ByteBuffer data) {
@@ -65,45 +56,28 @@ public class WebSocketHybiTest extends TestCase {
 		tmp.flip();
 		ByteBuffer tmp1 = maskFrame(tmp);
 		ByteBuffer decoded = impl.decodeFrame(io, tmp1);
-		Assert.assertArrayEquals("Data before encoding do not match data after decoding", input.getBytes(), decoded.array());
+		Assert.assertArrayEquals("Data before encoding do not match data after decoding", input.getBytes(),
+								 decoded.array());
 	}
-
-	private ByteBuffer maskFrame(ByteBuffer data) {
-		ByteBuffer tmp = ByteBuffer.allocate(1024);
-		byte[] header = new byte[2];
-		data.get(header);
-		header[header.length - 1] = (byte) (header[header.length - 1] | 0x80);
-		tmp.put(header);
-		byte[] mask = { 0x00, 0x00, 0x00, 0x00 };
-		tmp.put(mask);
-		byte b;
-		while (data.hasRemaining()) {
-			b = data.get();
-			b = (byte) (b ^ 0x00);
-			tmp.put(b);
-		}
-		tmp.flip();
-		return tmp;
-	}
-
 
 	@Test
 	public void testHandshakeFail() throws NoSuchAlgorithmException, IOException {
 		final ByteBuffer tmp = ByteBuffer.allocate(2048);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHybi() }) {
-
-			@Override
-			protected void writeBytes(ByteBuffer data) {
-				tmp.put(data);
-			}
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHybi()}) {
 
 			@Override
 			public int getLocalPort() {
 				return 80;
 			}
 
+			@Override
+			protected void writeBytes(ByteBuffer data) {
+				tmp.put(data);
+			}
+
 		};
-		Map<String,String> params = new HashMap<String,String>();
+		Map<String, String> params = new HashMap<String, String>();
 		params.put("Sec-WebSocket-Key1", "1C2J899_05  6  !  M 9    ^4");
 		params.put("Sec-WebSocket-Key2", "23 2ff0M_E0#.454X23");
 		params.put("Sec-WebSocket-Protocol", "xmpp");
@@ -112,24 +86,25 @@ public class WebSocketHybiTest extends TestCase {
 		bytes[1] = '\n';
 		Assert.assertFalse("Handshake succeeded", impl.handshake(io, params, bytes));
 	}
-	
+
 	@Test
 	public void testHandshakeOK() throws NoSuchAlgorithmException, IOException {
 		final ByteBuffer tmp = ByteBuffer.allocate(2048);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHybi() }) {
-
-			@Override
-			protected void writeBytes(ByteBuffer data) {
-				tmp.put(data);
-			}
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHybi()}) {
 
 			@Override
 			public int getLocalPort() {
 				return 80;
 			}
 
-		};		
-		Map<String,String> params = new HashMap<String,String>();
+			@Override
+			protected void writeBytes(ByteBuffer data) {
+				tmp.put(data);
+			}
+
+		};
+		Map<String, String> params = new HashMap<String, String>();
 		params.put("Sec-WebSocket-Version", "13");
 		params.put("Sec-WebSocket-Key", "some random data as a key");
 		params.put("Sec-WebSocket-Protocol", "xmpp");
@@ -137,7 +112,7 @@ public class WebSocketHybiTest extends TestCase {
 		bytes[0] = '\r';
 		bytes[1] = '\n';
 		Assert.assertTrue("Handshake failed", impl.handshake(io, params, bytes));
-	}	
+	}
 
 	@Test
 	public void testTwoWebSocketTextFramesInSingleTcpFrame() throws Exception {
@@ -151,12 +126,15 @@ public class WebSocketHybiTest extends TestCase {
 		tmp.put(frame2);
 		tmp.flip();
 
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHybi() });
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHybi()});
 		io.maskingKey = new byte[4];
 		ByteBuffer decoded = impl.decodeFrame(io, tmp);
-		Assert.assertArrayEquals("Data of first frame before encoding do not match data after decoding", input1.getBytes(), decoded.array());
+		Assert.assertArrayEquals("Data of first frame before encoding do not match data after decoding",
+								 input1.getBytes(), decoded.array());
 		decoded = impl.decodeFrame(io, tmp);
-		Assert.assertArrayEquals("Data of second frame before encoding do not match data after decoding", input2.getBytes(), decoded.array());
+		Assert.assertArrayEquals("Data of second frame before encoding do not match data after decoding",
+								 input2.getBytes(), decoded.array());
 	}
 
 	@Test
@@ -165,7 +143,7 @@ public class WebSocketHybiTest extends TestCase {
 		ByteBuffer frame1 = ByteBuffer.allocate(20);
 		frame1.put((byte) 0x89);
 		frame1.put((byte) 0x04);
-		frame1.put(new byte[] { 0x00, 0x00, 0x00, 0x00 });
+		frame1.put(new byte[]{0x00, 0x00, 0x00, 0x00});
 		frame1.flip();
 		frame1 = maskFrame(frame1);
 		ByteBuffer frame2 = generateIncomingFrame(input2);
@@ -176,7 +154,8 @@ public class WebSocketHybiTest extends TestCase {
 		tmp.flip();
 
 		ByteBuffer tmp2 = ByteBuffer.allocate(1024);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHybi() }) {
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHybi()}) {
 			@Override
 			protected void writeBytes(ByteBuffer data) {
 				tmp2.put(data);
@@ -185,20 +164,51 @@ public class WebSocketHybiTest extends TestCase {
 		io.maskingKey = new byte[4];
 		ByteBuffer decoded = impl.decodeFrame(io, tmp);
 		Assert.assertNotNull(decoded);
-		Assert.assertArrayEquals("Data of first frame before encoding do not match data after decoding", new byte[0], decoded.array());
+		Assert.assertArrayEquals("Data of first frame before encoding do not match data after decoding", new byte[0],
+								 decoded.array());
 		tmp2.flip();
 		Assert.assertNotEquals("PONG frame not sent!", 0, tmp2.remaining());
 		assertEquals("PONG frame not sent!", (byte) 0x8A, tmp2.get(0));
 
 		decoded = impl.decodeFrame(io, tmp);
-		Assert.assertArrayEquals("Data of second frame before encoding do not match data after decoding", input2.getBytes(), decoded.array());
+		Assert.assertArrayEquals("Data of second frame before encoding do not match data after decoding",
+								 input2.getBytes(), decoded.array());
 
+	}
+
+	@Override
+	protected void setUp() throws Exception {
+		impl = new WebSocketHybi();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		impl = null;
+	}
+
+	private ByteBuffer maskFrame(ByteBuffer data) {
+		ByteBuffer tmp = ByteBuffer.allocate(1024);
+		byte[] header = new byte[2];
+		data.get(header);
+		header[header.length - 1] = (byte) (header[header.length - 1] | 0x80);
+		tmp.put(header);
+		byte[] mask = {0x00, 0x00, 0x00, 0x00};
+		tmp.put(mask);
+		byte b;
+		while (data.hasRemaining()) {
+			b = data.get();
+			b = (byte) (b ^ 0x00);
+			tmp.put(b);
+		}
+		tmp.flip();
+		return tmp;
 	}
 
 	private ByteBuffer generateIncomingFrame(String input) throws IOException {
 		ByteBuffer buf = ByteBuffer.wrap(input.getBytes());
 		final ByteBuffer tmp = ByteBuffer.allocate(1024);
-		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(new WebSocketProtocolIfc[]{ new WebSocketHybi() }) {
+		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
+				new WebSocketProtocolIfc[]{new WebSocketHybi()}) {
 
 			@Override
 			protected void writeBytes(ByteBuffer data) {

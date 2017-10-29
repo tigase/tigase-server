@@ -24,17 +24,24 @@ import tigase.xmpp.jid.JID;
 import java.util.Objects;
 
 /**
- *
  * @author Wojtek
  */
-public class Rule implements Comparable<Rule> {
+public class Rule
+		implements Comparable<Rule> {
 
-	int id;
+	public static enum RuleType {
+
+		jid,
+		self,
+		domain,
+		all
+	}
 	boolean allow;
+	int id;
 	RuleType type;
 	JID value;
 
-	public Rule( int id, boolean allow, RuleType type, JID value ) {
+	public Rule(int id, boolean allow, RuleType type, JID value) {
 		this.id = id;
 		this.allow = allow;
 		this.type = type;
@@ -42,29 +49,29 @@ public class Rule implements Comparable<Rule> {
 	}
 
 	@Override
-	public int compareTo( Rule o ) {
+	public int compareTo(Rule o) {
 		return id > o.getId() ? +1 : id < o.getId() ? -1 : 0;
 	}
 
 	@Override
-	public boolean equals( Object obj ) {
-		if ( obj == null ){
+	public boolean equals(Object obj) {
+		if (obj == null) {
 			return false;
 		}
-		if ( getClass() != obj.getClass() ){
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		final Rule other = (Rule) obj;
-		if ( this.id != other.id ){
+		if (this.id != other.id) {
 			return false;
 		}
-		if ( this.allow != other.allow ){
+		if (this.allow != other.allow) {
 			return false;
 		}
-		if ( this.type != other.type ){
+		if (this.type != other.type) {
 			return false;
 		}
-		if ( !Objects.equals( this.value, other.value ) ){
+		if (!Objects.equals(this.value, other.value)) {
 			return false;
 		}
 		return true;
@@ -74,17 +81,13 @@ public class Rule implements Comparable<Rule> {
 		return allow;
 	}
 
-	protected int getId() {
-		return id;
-	}
-
 	@Override
 	public int hashCode() {
 		int hash = 5;
 		hash = 11 * hash + this.id;
-		hash = 11 * hash + ( this.allow ? 1 : 0 );
-		hash = 11 * hash + Objects.hashCode( this.type );
-		if ( value != null ){
+		hash = 11 * hash + (this.allow ? 1 : 0);
+		hash = 11 * hash + Objects.hashCode(this.type);
+		if (value != null) {
 			hash = 11 * hash + value.toString().hashCode();
 		}
 		return hash;
@@ -97,36 +100,36 @@ public class Rule implements Comparable<Rule> {
 
 	public String toConfigurationString() {
 		return id + "|" + (allow ? "allow" : "deny") + "|" + type +
-					 (type == RuleType.domain || type == RuleType.jid ? "|" + value :  "") + ";";
+				(type == RuleType.domain || type == RuleType.jid ? "|" + value : "") + ";";
 	}
 
-	boolean isMatched( JID source, JID destination ) {
+	boolean isMatched(JID source, JID destination) {
 		boolean result = false;
-		switch ( type ) {
+		switch (type) {
 			case all:
 				result = true;
 				break;
 			case self:
-				if ( source != null && destination != null ){
-					result = source.getBareJID().equals( destination.getBareJID() );
-				} else if (source == null ) {
+				if (source != null && destination != null) {
+					result = source.getBareJID().equals(destination.getBareJID());
+				} else if (source == null) {
 					result = true;
 				}
 				break;
 			case domain:
-				if ( value != null && destination != null ){
-					result = value.getDomain().equals( destination.getDomain() );
+				if (value != null && destination != null) {
+					result = value.getDomain().equals(destination.getDomain());
 				}
-				if ( value != null && destination != null ){
-					result |= value.getDomain().equals( source.getDomain() );
+				if (value != null && destination != null) {
+					result |= value.getDomain().equals(source.getDomain());
 				}
 				break;
 			case jid:
-				if ( value != null && destination != null ){
-					result = value.getBareJID().equals( destination.getBareJID() );
+				if (value != null && destination != null) {
+					result = value.getBareJID().equals(destination.getBareJID());
 				}
-				if ( value != null && destination != null ){
-					result |= value.getBareJID().equals( source.getBareJID() );
+				if (value != null && destination != null) {
+					result |= value.getBareJID().equals(source.getBareJID());
 				}
 				break;
 		}
@@ -134,9 +137,10 @@ public class Rule implements Comparable<Rule> {
 		return result;
 	}
 
-	public static enum RuleType {
+	protected int getId() {
+		return id;
+	}
 
-		jid, self, domain, all
-	};
+	;
 
 }

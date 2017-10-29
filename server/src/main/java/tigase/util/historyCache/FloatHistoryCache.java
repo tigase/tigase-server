@@ -18,7 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
 package tigase.util.historyCache;
 
 /**
@@ -30,8 +29,8 @@ package tigase.util.historyCache;
 public class FloatHistoryCache {
 
 	private float[] buffer = null;
-	private int start = 0;
 	private int count = 0;
+	private int start = 0;
 
 	public FloatHistoryCache(int limit) {
 		buffer = new float[limit];

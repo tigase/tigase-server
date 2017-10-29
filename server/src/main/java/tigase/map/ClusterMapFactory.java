@@ -34,8 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClusterMapFactory {
 
 	private static ClusterMapFactory instance;
-	private final TypesConverter typesConverter = new DefaultTypesConverter();
 	private final ConcurrentHashMap<String, DMap> maps = new ConcurrentHashMap<>();
+	private final TypesConverter typesConverter = new DefaultTypesConverter();
 	private EventBus eventBus;
 	private final DMap.DMapListener mapListener = new DMap.DMapListener() {
 		@Override
@@ -74,11 +74,6 @@ public class ClusterMapFactory {
 		}
 	};
 
-	ClusterMapFactory() {
-		this.eventBus = EventBusFactory.getInstance();
-		this.eventBus.registerAll(this);
-	}
-
 	public static final ClusterMapFactory get() {
 		if (instance == null) {
 			instance = new ClusterMapFactory();
@@ -86,8 +81,13 @@ public class ClusterMapFactory {
 		return instance;
 	}
 
+	ClusterMapFactory() {
+		this.eventBus = EventBusFactory.getInstance();
+		this.eventBus.registerAll(this);
+	}
+
 	public <K, V> Map<K, V> createMap(final String type, final Class<K> keyClass, final Class<V> valueClass,
-			final String... params) {
+									  final String... params) {
 		final String uid = UUID.randomUUID().toString();
 
 		NewMapCreatedEvent event = new NewMapCreatedEvent();
@@ -98,7 +98,8 @@ public class ClusterMapFactory {
 		event.setParams(params);
 		eventBus.fire(event);
 
-		DMap<K, V> map = maps.computeIfAbsent(uid, (u) -> new DMap<K, V>(uid, type, this.mapListener, keyClass, valueClass));
+		DMap<K, V> map = maps.computeIfAbsent(uid,
+											  (u) -> new DMap<K, V>(uid, type, this.mapListener, keyClass, valueClass));
 
 		return map;
 	}
@@ -112,16 +113,6 @@ public class ClusterMapFactory {
 			eventBus.fire(event);
 			this.maps.remove(((DMap) map).mapID, map);
 		}
-	}
-
-	private void fireOnMapCreated(Map map, String type, String... parameters) {
-		MapCreatedEvent event = new MapCreatedEvent(map, type, parameters);
-		eventBus.fire(event);
-	}
-
-	private void fireOnMapDestroyed(final Map map, final String type) {
-		MapDestroyedEvent event = new MapDestroyedEvent(map, type);
-		eventBus.fire(event);
 	}
 
 	public EventBus getEventBus() {
@@ -191,13 +182,116 @@ public class ClusterMapFactory {
 		fireOnMapCreated(map, type, parameters);
 	}
 
-	public static class NewMapCreatedEvent implements Serializable {
+	private void fireOnMapCreated(Map map, String type, String... parameters) {
+		MapCreatedEvent event = new MapCreatedEvent(map, type, parameters);
+		eventBus.fire(event);
+	}
+
+	private void fireOnMapDestroyed(final Map map, final String type) {
+		MapDestroyedEvent event = new MapDestroyedEvent(map, type);
+		eventBus.fire(event);
+	}
+
+	public static class ElementAddEvent
+			implements Serializable {
+
+		private String key;
+		private String uid;
+		private String value;
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+	}
+
+	public static class ElementRemoveEvent
+			implements Serializable {
+
+		private String key;
+		private String uid;
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+	}
+
+	public static class MapClearEvent
+			implements Serializable {
+
+		private String uid;
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+	}
+
+	public static class MapDestroyEvent
+			implements Serializable {
 
 		private String type;
 		private String uid;
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+	}
+
+	public static class NewMapCreatedEvent
+			implements Serializable {
+
 		private Class keyClass;
-		private Class valueClass;
 		private String[] params;
+		private String type;
+		private String uid;
+		private Class valueClass;
 
 		public Class getKeyClass() {
 			return keyClass;
@@ -237,94 +331,6 @@ public class ClusterMapFactory {
 
 		public void setValueClass(Class valueClass) {
 			this.valueClass = valueClass;
-		}
-	}
-
-	public static class MapDestroyEvent implements Serializable {
-
-		private String uid;
-		private String type;
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public String getUid() {
-			return uid;
-		}
-
-		public void setUid(String uid) {
-			this.uid = uid;
-		}
-	}
-
-	public static class MapClearEvent implements Serializable {
-
-		private String uid;
-
-		public String getUid() {
-			return uid;
-		}
-
-		public void setUid(String uid) {
-			this.uid = uid;
-		}
-	}
-
-	public static class ElementRemoveEvent implements Serializable {
-
-		private String uid;
-		private String key;
-
-		public String getKey() {
-			return key;
-		}
-
-		public void setKey(String key) {
-			this.key = key;
-		}
-
-		public String getUid() {
-			return uid;
-		}
-
-		public void setUid(String uid) {
-			this.uid = uid;
-		}
-	}
-
-	public static class ElementAddEvent implements Serializable {
-
-		private String uid;
-		private String key;
-		private String value;
-
-		public String getKey() {
-			return key;
-		}
-
-		public void setKey(String key) {
-			this.key = key;
-		}
-
-		public String getUid() {
-			return uid;
-		}
-
-		public void setUid(String uid) {
-			this.uid = uid;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
 		}
 	}
 

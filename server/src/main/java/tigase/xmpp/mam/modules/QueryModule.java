@@ -36,27 +36,23 @@ import tigase.xmpp.mam.Query;
 import tigase.xmpp.mam.QueryParser;
 
 /**
- * Implementation of module processing requests to retrieve items
- * using XEP-0313: Message Archive Management
- *
+ * Implementation of module processing requests to retrieve items using XEP-0313: Message Archive Management
+ * <p>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamQueryModule", active = true)
-public class QueryModule implements Module {
+public class QueryModule
+		implements Module {
 
-	private static final String[] FEATURES = { "urn:xmpp:mam:1" };
-
-	@Inject(bean = "mamQueryParser")
-	private QueryParser queryParser;
-
-	@Inject
-	private MAMRepository mamRepository;
-
+	private static final String[] FEATURES = {"urn:xmpp:mam:1"};
 	@Inject(bean = "mamItemHandler")
 	private MAMRepository.ItemHandler itemHandler;
-
+	@Inject
+	private MAMRepository mamRepository;
 	@Inject
 	private PacketWriter packetWriter;
+	@Inject(bean = "mamQueryParser")
+	private QueryParser queryParser;
 
 	@Override
 	public String[] getFeatures() {
@@ -70,7 +66,8 @@ public class QueryModule implements Module {
 
 	@Override
 	public boolean canHandle(Packet packet) {
-		return packet.getElement().getChildStaticStr("query", "urn:xmpp:mam:1") != null && packet.getType() == StanzaType.set;
+		return packet.getElement().getChildStaticStr("query", "urn:xmpp:mam:1") != null &&
+				packet.getType() == StanzaType.set;
 	}
 
 	@Override

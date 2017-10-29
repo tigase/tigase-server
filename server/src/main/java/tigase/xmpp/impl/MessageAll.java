@@ -18,45 +18,32 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.Authorization;
+import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-
 /**
- * Variant of the <code>Message</code> forwarder class. This implementation forwards
- * messages to all connected resources. <br>
- * When a message <strong>'from'</strong> the user is being processed, the plugin forwards
- * the message to the destination address and also sends the message to all other connected
- * resources.<br>
- * When a message <strong>'to'</strong> the user is being processed, the plugin forwards
- * the message to all connected resources.<br>
- * The idea behind this implementation is to keep all connected resources synchronized with
- * a complete chat content. User should be able to switch between connections and continue
- * the chat.
- *
+ * Variant of the <code>Message</code> forwarder class. This implementation forwards messages to all connected
+ * resources. <br> When a message <strong>'from'</strong> the user is being processed, the plugin forwards the message
+ * to the destination address and also sends the message to all other connected resources.<br> When a message
+ * <strong>'to'</strong> the user is being processed, the plugin forwards the message to all connected resources.<br>
+ * The idea behind this implementation is to keep all connected resources synchronized with a complete chat content.
+ * User should be able to switch between connections and continue the chat.
+ * <p>
  * Created: Feb 14, 2010 4:35:45 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -64,17 +51,15 @@ import java.util.Queue;
  */
 @Bean(name = MessageAll.ID, parent = SessionManager.class, active = false)
 public class MessageAll
-				extends XMPPProcessor
-				implements XMPPProcessorIfc {
-	private static final String[][] ELEMENTS = {
-		{ "message" }
-	};
-	protected static final String     ID       = "message-all";
+		extends XMPPProcessor
+		implements XMPPProcessorIfc {
 
+	protected static final String ID = "message-all";
+	private static final String[][] ELEMENTS = {{"message"}};
 	/** Class logger */
-	private static final Logger   log    = Logger.getLogger(MessageAll.class.getName());
-	private static final String   XMLNS  = "jabber:client";
-	private static final String[] XMLNSS = { XMLNS };
+	private static final Logger log = Logger.getLogger(MessageAll.class.getName());
+	private static final String XMLNS = "jabber:client";
+	private static final String[] XMLNSS = {XMLNS};
 
 	//~--- methods --------------------------------------------------------------
 
@@ -84,9 +69,8 @@ public class MessageAll
 	}
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-					throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 
 		// For performance reasons it is better to do the check
 		// before calling logging method.
@@ -101,9 +85,7 @@ public class MessageAll
 		try {
 
 			// Remember to cut the resource part off before comparing JIDs
-			BareJID id = (packet.getStanzaTo() != null)
-					? packet.getStanzaTo().getBareJID()
-					: null;
+			BareJID id = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
 
 			// Checking if this is a packet TO the owner of the session
 			if (session.isUserId(id)) {
@@ -132,9 +114,7 @@ public class MessageAll
 			}    // end of else
 
 			// Remember to cut the resource part off before comparing JIDs
-			id = (packet.getStanzaFrom() != null)
-					? packet.getStanzaFrom().getBareJID()
-					: null;
+			id = (packet.getStanzaFrom() != null) ? packet.getStanzaFrom().getBareJID() : null;
 
 			// Checking if this is maybe packet FROM the client
 			if (session.isUserId(id)) {
@@ -174,8 +154,8 @@ public class MessageAll
 			// to address. In such a case we ignore it.
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			results.offer(
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		}    // end of try-catch
 	}
 

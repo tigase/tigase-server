@@ -44,28 +44,28 @@ public class Bean1 {
 		return bean2;
 	}
 
-	public Bean3 getBean3() {
-		return bean3;
-	}
-
-	public Set<Special> getCollectionOfSpecial() {
-		return collectionOfSpecial;
-	}
-
-	public Special[] getTableOfSpecial() {
-		return tableOfSpecial;
-	}
-
 	public void setBean2(Bean2 bean2) {
 		this.bean2 = bean2;
+	}
+
+	public Bean3 getBean3() {
+		return bean3;
 	}
 
 	public void setBean3(Bean3 bean3) {
 		this.bean3 = bean3;
 	}
 
+	public Set<Special> getCollectionOfSpecial() {
+		return collectionOfSpecial;
+	}
+
 	public void setCollectionOfSpecial(Set<Special> xxx) {
 		this.collectionOfSpecial = xxx;
+	}
+
+	public Special[] getTableOfSpecial() {
+		return tableOfSpecial;
 	}
 
 	public void setTableOfSpecial(Special[] ss) {

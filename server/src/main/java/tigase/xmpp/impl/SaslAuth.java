@@ -33,7 +33,10 @@ import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -91,29 +94,9 @@ public class SaslAuth
 		return super.concurrentQueuesNo() * 4;
 	}
 
-	private Element createReply(final ElementType type, final String cdata) {
-		Element reply = new Element(type.toString());
-
-		reply.setXMLNS(_XMLNS);
-		if (cdata != null) {
-			reply.setCData(cdata);
-		}
-
-		return reply;
-	}
-
 	@Override
 	public String id() {
 		return ID;
-	}
-	
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 */
-	protected void onAuthFail(final XMPPResourceConnection session) {
-		session.removeSessionData(SASL_SERVER_KEY);
 	}
 
 	@Override
@@ -173,8 +156,7 @@ public class SaslAuth
 						session.removeSessionData(ALLOWED_SASL_MECHANISMS_KEY);
 
 						if (allowedMechanisms == null) {
-							allowedMechanisms = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(),
-																				   session);
+							allowedMechanisms = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(), session);
 						}
 
 						if ((mechanismName == null) || allowedMechanisms == null ||
@@ -333,6 +315,26 @@ public class SaslAuth
 
 			return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param session
+	 */
+	protected void onAuthFail(final XMPPResourceConnection session) {
+		session.removeSessionData(SASL_SERVER_KEY);
+	}
+
+	private Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.toString());
+
+		reply.setXMLNS(_XMLNS);
+		if (cdata != null) {
+			reply.setCData(cdata);
+		}
+
+		return reply;
 	}
 
 }

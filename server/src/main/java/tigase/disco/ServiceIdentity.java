@@ -23,8 +23,8 @@ import tigase.xml.Element;
 
 /**
  * Describe class ServiceIdentity here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Feb 10 13:34:54 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -33,12 +33,11 @@ import tigase.xml.Element;
 public class ServiceIdentity {
 
 	private String category = null;
-	private String type = null;
 	private String name = null;
+	private String type = null;
 
 	/**
 	 * Creates a new <code>ServiceIdentity</code> instance.
-	 *
 	 */
 	public ServiceIdentity(String category, String type, String name) {
 		this.category = category;
@@ -59,9 +58,7 @@ public class ServiceIdentity {
 	}
 
 	public Element getElement() {
-		return new Element("identity",
-			new String[] {"category", "type", "name"},
-			new String[] {category, type, name});
+		return new Element("identity", new String[]{"category", "type", "name"}, new String[]{category, type, name});
 	}
 
 }

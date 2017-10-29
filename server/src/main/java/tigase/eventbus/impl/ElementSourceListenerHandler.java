@@ -23,10 +23,11 @@ package tigase.eventbus.impl;
 import tigase.eventbus.EventSourceListener;
 import tigase.xml.Element;
 
-class ElementSourceListenerHandler extends AbstractListenerHandler<EventSourceListener<Element>> {
+class ElementSourceListenerHandler
+		extends AbstractListenerHandler<EventSourceListener<Element>> {
 
 	public ElementSourceListenerHandler(final String packageName, final String eventName,
-			EventSourceListener<Element> listener) {
+										EventSourceListener<Element> listener) {
 		super(packageName, eventName, listener);
 	}
 

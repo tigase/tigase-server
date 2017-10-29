@@ -23,11 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author andrzej
  */
 public enum StreamError {
-	
+
 	BadFormat("bad-format"),
 	BadNamespacePrefix("bad-namespace-prefix"),
 	Conflict("conflict"),
@@ -53,24 +52,25 @@ public enum StreamError {
 	UnsupportedFeature("unsupported-feature"),
 	UnsupportedStanzaType("unsupported-stanza-type"),
 	UnsupportedVersion("unsupported-version");
-	
-	private static final Map<String,StreamError> BY_CONDITION = new HashMap<>();
-	
+
+	private static final Map<String, StreamError> BY_CONDITION = new HashMap<>();
+
 	static {
 		for (StreamError err : StreamError.values()) {
 			BY_CONDITION.put(err.getCondition(), err);
 		}
 	}
-	
+
+	private final String condition;
+
 	public static StreamError getByCondition(String condition) {
 		StreamError err = BY_CONDITION.get(condition);
-		if (err == null)
+		if (err == null) {
 			return UndefinedCondition;
+		}
 		return err;
 	}
 
-	private final String condition;
-	
 	private StreamError(String condition) {
 		this.condition = condition;
 	}

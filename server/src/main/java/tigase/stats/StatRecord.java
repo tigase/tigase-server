@@ -24,8 +24,8 @@ import java.util.logging.Level;
 
 /**
  * Describe class StatRecord here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Nov 23 21:28:53 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -33,17 +33,16 @@ import java.util.logging.Level;
  */
 public class StatRecord<E extends Number> {
 
-	private StatisticType type = StatisticType.OTHER;
+	private Collection<E> collection = null;
+	private String component = null;
+	private String description = null;
+	private float floatValue = -1f;
+	private int intValue = -1;
 	private Level level = Level.INFO;
 	private long longValue = -1;
- 	private int intValue = -1;
-	private float floatValue = -1f;
-	private Collection<E> collection = null;
 	private boolean nonZero = false;
-
-	private String description = null;
+	private StatisticType type = StatisticType.OTHER;
 	private String value = null;
-	private String component = null;
 
 	public StatRecord(String comp, String description, String value, Level level) {
 		this.description = description.intern();
@@ -55,8 +54,7 @@ public class StatRecord<E extends Number> {
 		this.component = comp.intern();
 	}
 
-	public StatRecord(String comp, String description, int value,
-		Level level) {
+	public StatRecord(String comp, String description, int value, Level level) {
 		this(comp, description, "" + value, level);
 		this.intValue = value;
 		this.nonZero = (value > 0);
@@ -76,8 +74,7 @@ public class StatRecord<E extends Number> {
 		this.nonZero = (value > 0);
 	}
 
-	public StatRecord(String comp, String description, long value,
-		Level level) {
+	public StatRecord(String comp, String description, long value, Level level) {
 		this(comp, description, "" + value, level);
 		this.longValue = value;
 		this.nonZero = (value > 0);
@@ -123,20 +120,11 @@ public class StatRecord<E extends Number> {
 		return this.intValue;
 	}
 
-	public Collection<E> getCollection() { return this.collection; };
-
-	boolean isNonZero() {
-		return nonZero;
+	public Collection<E> getCollection() {
+		return this.collection;
 	}
 
-	private boolean isCollectionNonZero(Collection<E> collection) {
-		for (E e : collection) {
-			if (e.byteValue() > 0)
-				return true;
-		}
-		return false;
-	}
-
+	;
 
 	@Override
 	public String toString() {
@@ -144,19 +132,38 @@ public class StatRecord<E extends Number> {
 		sb.append(component).append('/').append(description);
 
 		sb.append('[');
-		if (longValue > -1) { sb.append('L');
-		} else if (intValue > -1) { sb.append('I');
-		} else if (floatValue > -1f) { sb.append('F');
-		} else if (collection != null) { sb.append('C');
-		} else { sb.append('S'); }
+		if (longValue > -1) {
+			sb.append('L');
+		} else if (intValue > -1) {
+			sb.append('I');
+		} else if (floatValue > -1f) {
+			sb.append('F');
+		} else if (collection != null) {
+			sb.append('C');
+		} else {
+			sb.append('S');
+		}
 		sb.append(']');
 
 		sb.append(" = ").append(value);
 		return sb.toString();
 	}
 
+	boolean isNonZero() {
+		return nonZero;
+	}
+
 	float getFloatValue() {
 		return this.floatValue;
+	}
+
+	private boolean isCollectionNonZero(Collection<E> collection) {
+		for (E e : collection) {
+			if (e.byteValue() > 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 } // StatRecord

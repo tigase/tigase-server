@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.sys;
 
 import tigase.server.XMPPServer;
@@ -41,29 +39,29 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public abstract class TigaseRuntime {
+
 	protected static final long SECOND = 1000;
-	private static final Logger log    = Logger.getLogger(TigaseRuntime.class.getName());
 	protected static final long MINUTE = 60 * SECOND;
 	protected static final long HOUR = 60 * MINUTE;
+	private static final Logger log = Logger.getLogger(TigaseRuntime.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private int              cpus        = Runtime.getRuntime().availableProcessors();
-	private float            cpuUsage    = 0F;
-	private MemoryPoolMXBean oldMemPool  = null;
-	private Map<String,MemoryPoolMXBean> memoryPoolMXBeans  = null;
-	private long             prevCputime = 0;
-	private long             prevUptime  = 0;
+	private float cpuUsage = 0F;
+	private int cpus = Runtime.getRuntime().availableProcessors();
+	private Map<String, MemoryPoolMXBean> memoryPoolMXBeans = null;
+	private MemoryPoolMXBean oldMemPool = null;
+	private long prevCputime = 0;
+	private long prevUptime = 0;
 
 	//~--- constructors ---------------------------------------------------------
 
-
-	public Map<String, MemoryPoolMXBean> getMemoryPoolMXBeans() {
-		return memoryPoolMXBeans;
+	public static TigaseRuntime getTigaseRuntime() {
+		return MonitorRuntime.getMonitorRuntime();
 	}
 
-	public MemoryPoolMXBean getOldMemPool() {
-		return oldMemPool;
+	public static void main(String[] args) {
+		final TigaseRuntime tigaseRuntime = getTigaseRuntime();
+		tigaseRuntime.shutdownTigase(new String[]{"there", "was", "an", "error"});
 	}
 
 	protected TigaseRuntime() {
@@ -75,31 +73,42 @@ public abstract class TigaseRuntime {
 			if (memoryPoolMXBean.getName().toLowerCase().contains("old")) {
 				oldMemPool = memoryPoolMXBean;
 
-				memoryPoolMXBeans.put("old",memoryPoolMXBean);
-				log.log(Level.CONFIG, "Using {0} memory pool for reporting (old) memory usage.", memoryPoolMXBean.getName());
+				memoryPoolMXBeans.put("old", memoryPoolMXBean);
+				log.log(Level.CONFIG, "Using {0} memory pool for reporting (old) memory usage.",
+						memoryPoolMXBean.getName());
 			}
 			if (memoryPoolMXBean.getName().toLowerCase().contains("survivor")) {
-				memoryPoolMXBeans.put("survivor",memoryPoolMXBean);
-				log.log(Level.CONFIG, "Using {0} memory pool for reporting survivor memory usage.", memoryPoolMXBean.getName());
+				memoryPoolMXBeans.put("survivor", memoryPoolMXBean);
+				log.log(Level.CONFIG, "Using {0} memory pool for reporting survivor memory usage.",
+						memoryPoolMXBean.getName());
 			}
 			if (memoryPoolMXBean.getName().toLowerCase().contains("eden")) {
-				memoryPoolMXBeans.put("eden",memoryPoolMXBean);
-				log.log(Level.CONFIG, "Using {0} memory pool for reporting eden memory usage.", memoryPoolMXBean.getName());
+				memoryPoolMXBeans.put("eden", memoryPoolMXBean);
+				log.log(Level.CONFIG, "Using {0} memory pool for reporting eden memory usage.",
+						memoryPoolMXBean.getName());
 			}
 		}
 	}
 
 	//~--- methods --------------------------------------------------------------
 
+	public Map<String, MemoryPoolMXBean> getMemoryPoolMXBeans() {
+		return memoryPoolMXBeans;
+	}
+
+	public MemoryPoolMXBean getOldMemPool() {
+		return oldMemPool;
+	}
+
 	public abstract void addCPULoadListener(CPULoadListener cpuListener);
 
 	public abstract void addMemoryChangeListener(MemoryChangeListener memListener);
 
+	//~--- get methods ----------------------------------------------------------
+
 	public abstract void addOnlineJidsReporter(OnlineJidsReporter onlineReporter);
 
 	public abstract void addShutdownHook(ShutdownHook hook);
-
-	//~--- get methods ----------------------------------------------------------
 
 	public abstract JID[] getConnectionIdsForJid(JID jid);
 
@@ -113,17 +122,17 @@ public abstract class TigaseRuntime {
 
 	public float getCPUUsage() {
 		long currCputime = -1;
-		long elapsedCpu  = -1;
-		long currUptime  = getUptime();
+		long elapsedCpu = -1;
+		long currUptime = getUptime();
 		long elapsedTime = currUptime - prevUptime;
 
 		if ((prevUptime > 0L) && (elapsedTime > 500L)) {
 			currCputime = getProcessCPUTime();
-			elapsedCpu  = currCputime - prevCputime;
-			cpuUsage    = Math.min(99.99F, elapsedCpu / (elapsedTime * 10000F * cpus));
+			elapsedCpu = currCputime - prevCputime;
+			cpuUsage = Math.min(99.99F, elapsedCpu / (elapsedTime * 10000F * cpus));
 		}
 		if (elapsedTime > 500L) {
-			prevUptime  = currUptime;
+			prevUptime = currUptime;
 			prevCputime = currCputime;
 		}
 
@@ -131,7 +140,7 @@ public abstract class TigaseRuntime {
 	}
 
 	public long getDirectMemUsed() {
-		long                   result   = -1;
+		long result = -1;
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
 
 		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
@@ -151,8 +160,8 @@ public abstract class TigaseRuntime {
 		// need to re-do it each time
 		StringBuilder sb = new StringBuilder();
 		List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
-		for ( GarbageCollectorMXBean gcBean : gcBeans ) {
-			if (sb.length() > 0 ){
+		for (GarbageCollectorMXBean gcBean : gcBeans) {
+			if (sb.length() > 0) {
 				sb.append('|');
 			}
 			sb.append('{');
@@ -173,9 +182,8 @@ public abstract class TigaseRuntime {
 	}
 
 	/**
-	 * We try to return OLD memory pool size as this is what is the most interesting
-	 * to us. If this is not possible then we return total Heap size.
-	 *
+	 * We try to return OLD memory pool size as this is what is the most interesting to us. If this is not possible then
+	 * we return total Heap size.
 	 *
 	 * @return a value of <code>long</code>
 	 */
@@ -190,13 +198,12 @@ public abstract class TigaseRuntime {
 	}
 
 	public float getHeapMemUsage() {
-		return  getHeapMemMax() == -1 ? -1.0F : (getHeapMemUsed() * 100F) / getHeapMemMax();
+		return getHeapMemMax() == -1 ? -1.0F : (getHeapMemUsed() * 100F) / getHeapMemMax();
 	}
 
 	/**
-	 * We try to return OLD memory pool size as this is what is the most interesting
-	 * to us. If this is not possible then we return total Heap used.
-	 *
+	 * We try to return OLD memory pool size as this is what is the most interesting to us. If this is not possible then
+	 * we return total Heap used.
 	 *
 	 * @return a value of <code>long</code>
 	 */
@@ -231,14 +238,13 @@ public abstract class TigaseRuntime {
 	}
 
 	public long getProcessCPUTime() {
-		long                  result   = 0;
+		long result = 0;
 		OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
 
 		if (osMXBean instanceof com.sun.management.OperatingSystemMXBean) {
 
 			// The easy way if possible
-			com.sun.management.OperatingSystemMXBean sunOSMXBean = (com.sun.management
-					.OperatingSystemMXBean) osMXBean;
+			com.sun.management.OperatingSystemMXBean sunOSMXBean = (com.sun.management.OperatingSystemMXBean) osMXBean;
 
 			result = sunOSMXBean.getProcessCpuTime();
 		} else {
@@ -258,43 +264,30 @@ public abstract class TigaseRuntime {
 		return ManagementFactory.getThreadMXBean().getThreadCount();
 	}
 
-	public static TigaseRuntime getTigaseRuntime() {
-		return MonitorRuntime.getMonitorRuntime();
-	}
-
 	public long getUptime() {
 		return ManagementFactory.getRuntimeMXBean().getUptime();
 	}
 
 	public String getUptimeString() {
-		long uptime  = ManagementFactory.getRuntimeMXBean().getUptime();
-		long days    = uptime / (24 * HOUR);
-		long hours   = (uptime - (days * 24 * HOUR)) / HOUR;
+		long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+		long days = uptime / (24 * HOUR);
+		long hours = (uptime - (days * 24 * HOUR)) / HOUR;
 		long minutes = (uptime - (days * 24 * HOUR + hours * HOUR)) / MINUTE;
-		long seconds = (uptime - (days * 24 * HOUR + hours * HOUR + minutes * MINUTE)) /
-				SECOND;
+		long seconds = (uptime - (days * 24 * HOUR + hours * HOUR + minutes * MINUTE)) / SECOND;
 		StringBuilder sb = new StringBuilder();
 
-		sb.append((days > 0)
-				? days + ((days == 1)
-				? " day"
-				: " days")
-				: "");
+		sb.append((days > 0) ? days + ((days == 1) ? " day" : " days") : "");
 		if (hours > 0) {
 			if (sb.length() > 0) {
 				sb.append(", ");
 			}
-			sb.append(hours + ((hours == 1)
-					? " hour"
-					: " hours"));
+			sb.append(hours + ((hours == 1) ? " hour" : " hours"));
 		}
 		if ((days == 0) && (minutes > 0)) {
 			if (sb.length() > 0) {
 				sb.append(", ");
 			}
-			sb.append(minutes + ((minutes == 1)
-					? " min"
-					: " mins"));
+			sb.append(minutes + ((minutes == 1) ? " min" : " mins"));
 		}
 		if ((days == 0) && (hours == 0) && (seconds > 0)) {
 			if (sb.length() > 0) {
@@ -309,9 +302,9 @@ public abstract class TigaseRuntime {
 	public abstract boolean hasCompleteJidsInfo();
 
 	public abstract boolean isJidOnline(JID jid);
-	
+
 	public abstract boolean isJidOnlineLocally(BareJID jid);
-	
+
 	public abstract boolean isJidOnlineLocally(JID jid);
 
 	public abstract void removeShutdownHook(ShutdownHook hook);
@@ -321,7 +314,7 @@ public abstract class TigaseRuntime {
 	}
 
 	public void shutdownTigase(String[] msg) {
-		shutdownTigase(msg,1);
+		shutdownTigase(msg, 1);
 	}
 
 	public void shutdownTigase(String[] msg, int exitCode) {
@@ -348,11 +341,6 @@ public abstract class TigaseRuntime {
 		}
 
 		System.exit(exitCode);
-	}
-
-	public static void main(String[] args) {
-		final TigaseRuntime tigaseRuntime = getTigaseRuntime();
-		tigaseRuntime.shutdownTigase(new String[] {"there", "was", "an", "error"});
 	}
 
 }

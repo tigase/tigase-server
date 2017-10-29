@@ -33,7 +33,7 @@ package tigase.admin
 
 import tigase.db.comp.ComponentRepository
 
-def repo = (ComponentRepository)comp_repo
+def repo = (ComponentRepository) comp_repo
 repo.reload()
 
 def result = "Reloaded items - " + repo.size() + ":\n"

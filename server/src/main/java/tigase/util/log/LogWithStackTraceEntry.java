@@ -28,6 +28,7 @@ package tigase.util.log;
  *
  */
 public class LogWithStackTraceEntry {
+
 	private long counter = 0;
 	private String msg = null;
 	private String record = null;
@@ -36,7 +37,6 @@ public class LogWithStackTraceEntry {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param record
 	 * @param msg
@@ -50,9 +50,6 @@ public class LogWithStackTraceEntry {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public long getCounter() {
 		return counter;
@@ -60,9 +57,6 @@ public class LogWithStackTraceEntry {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getMessage() {
 		return msg;
@@ -70,9 +64,6 @@ public class LogWithStackTraceEntry {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getRecord() {
 		return record;
@@ -82,17 +73,12 @@ public class LogWithStackTraceEntry {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public long increment() {
 		return ++counter;
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

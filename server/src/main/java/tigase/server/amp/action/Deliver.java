@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -38,17 +36,19 @@ import tigase.xml.Element;
  */
 @Bean(name = "deliver", parent = AmpComponent.class, active = true)
 public class Deliver
-				extends ActionAbstract {
+		extends ActionAbstract {
+
 	private static final String name = "deliver";
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean execute(Packet packet, Element rule) {
-		Packet result     = packet.copyElementOnly();
-		if (packet.getAttributeStaticStr(FROM_CONN_ID) == null)
-			result.setPacketFrom(packet.getPacketTo());	
-		removeTigasePayload(result);	
+		Packet result = packet.copyElementOnly();
+		if (packet.getAttributeStaticStr(FROM_CONN_ID) == null) {
+			result.setPacketFrom(packet.getPacketTo());
+		}
+		removeTigasePayload(result);
 		resultsHandler.addOutPacket(result);
 		return true;
 	}

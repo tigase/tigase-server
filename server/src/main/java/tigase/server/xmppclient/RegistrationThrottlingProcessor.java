@@ -40,10 +40,8 @@ import java.util.logging.Logger;
 public class RegistrationThrottlingProcessor
 		implements XMPPIOProcessor {
 
-	private static final Logger log = Logger.getLogger(RegistrationThrottlingProcessor.class.getCanonicalName());
-
 	public static final String ID = RegistrationThrottling.ID + "-processor";
-
+	private static final Logger log = Logger.getLogger(RegistrationThrottlingProcessor.class.getCanonicalName());
 	private static final String[] REGISTER_PATH = Iq.IQ_QUERY_PATH;
 	private static final String[] REMOVE_PATH = new String[]{Iq.ELEM_NAME, Iq.QUERY_NAME, "remove"};
 	private static final String[] USERNAME_PATH = new String[]{Iq.ELEM_NAME, Iq.QUERY_NAME, "username"};
@@ -92,7 +90,7 @@ public class RegistrationThrottlingProcessor
 		try {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "User from IP {0} exceeded registration limit trying to register account {1}",
-						new Object[] { service.getRemoteAddress(), packet.getElemCDataStaticStr(USERNAME_PATH) });
+						new Object[]{service.getRemoteAddress(), packet.getElemCDataStaticStr(USERNAME_PATH)});
 			}
 			Packet errorPacket = Authorization.POLICY_VIOLATION.getResponseMessage(packet, "Policy violation", true);
 

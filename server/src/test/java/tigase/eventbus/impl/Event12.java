@@ -22,7 +22,9 @@ package tigase.eventbus.impl;
 
 import java.io.Serializable;
 
-public class Event12 extends Event1 implements Serializable {
+public class Event12
+		extends Event1
+		implements Serializable {
 
 	public Runnable r;
 

@@ -31,48 +31,44 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Class implements Hixie-76 version of WebSocket protocol specification
- * which is used in connection handshaking as well as in frameing/deframing of
- * data sent over WebSocket connection
- * 
- * @see <a href="https://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76">WebSocket Hixie-76 specification</a>
+ * Class implements Hixie-76 version of WebSocket protocol specification which is used in connection handshaking as well
+ * as in frameing/deframing of data sent over WebSocket connection
  *
  * @author andrzej
+ * @see <a href="https://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76">WebSocket Hixie-76 specification</a>
  */
 @Bean(name = "hyxie76Protocol", parent = WebSocketClientConnectionManager.class, active = false)
-public class WebSocketHixie76 implements WebSocketProtocolIfc {
-	
-	private static final Logger log = Logger.getLogger(WebSocketHixie76.class.getCanonicalName());
+public class WebSocketHixie76
+		implements WebSocketProtocolIfc {
 
 	public static final String ID = "hixie-76";
-	
+	private static final Logger log = Logger.getLogger(WebSocketHixie76.class.getCanonicalName());
 	private static final String RESPONSE_HEADER =
-		"HTTP/1.1 101 Switching Protocols\r\n" + "Upgrade: WebSocket\r\n" +
-		"Connection: Upgrade\r\n" + "Access-Control-Allow-Origin: *\r\n" +
-		"Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
-		"Access-Control-Allow-Headers: Content-Type\r\n" +
-		"Access-Control-Max-Age: 86400\r\n";	
-	
-	private static final String HOST_KEY		= "Host";
-	private static final String ORIGIN_KEY		= "Origin";
-	private static final String WS_KEY1_KEY		= "Sec-WebSocket-Key1";
-	private static final String WS_KEY2_KEY		= "Sec-WebSocket-Key2";
-	private static final String WS_ORIGIN_KEY	= "Sec-WebSocket-Origin";
-	private static final String WS_LOCATION_KEY	= "Sec-WebSocket-Location";	
-	
-	private static final byte[] FRAME_HEADER = new byte[] { (byte) 0x00 };
-	private static final byte[] FRAME_FOOTER = new byte[] { (byte) 0xFF };
-	
+			"HTTP/1.1 101 Switching Protocols\r\n" + "Upgrade: WebSocket\r\n" + "Connection: Upgrade\r\n" +
+					"Access-Control-Allow-Origin: *\r\n" + "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
+					"Access-Control-Allow-Headers: Content-Type\r\n" + "Access-Control-Max-Age: 86400\r\n";
+
+	private static final String HOST_KEY = "Host";
+	private static final String ORIGIN_KEY = "Origin";
+	private static final String WS_KEY1_KEY = "Sec-WebSocket-Key1";
+	private static final String WS_KEY2_KEY = "Sec-WebSocket-Key2";
+	private static final String WS_ORIGIN_KEY = "Sec-WebSocket-Origin";
+	private static final String WS_LOCATION_KEY = "Sec-WebSocket-Location";
+
+	private static final byte[] FRAME_HEADER = new byte[]{(byte) 0x00};
+	private static final byte[] FRAME_FOOTER = new byte[]{(byte) 0xFF};
+
 	@Override
 	public String getId() {
 		return ID;
 	}
-	
+
 	@Override
-	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf) throws NoSuchAlgorithmException, IOException {
+	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
+			throws NoSuchAlgorithmException, IOException {
 		if (headers.containsKey(WS_VERSION_KEY)) {
 			return false;
-		}	
+		}
 
 		byte[] secBufArr = new byte[16];
 		Long secKey1 = decodeHyxie76SecKey(headers.get(WS_KEY1_KEY));
@@ -103,15 +99,17 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 		} else {
 			response.append("xmpp");
 		}
-		response.append("\r\n");		
+		response.append("\r\n");
 		if (headers.containsKey(ORIGIN_KEY)) {
 			response.append(WS_ORIGIN_KEY).append(": ").append(headers.get(ORIGIN_KEY)).append("\r\n");
 		}
 
 		boolean ssl = SocketType.ssl == ((SocketType) service.getSessionData().get("socket"));
 		int localPort = service.getLocalPort();
-		String location = (ssl ? "wss://" : "ws://")
-				+ headers.get(HOST_KEY) + (((ssl && localPort == 443) || (!ssl && localPort == 80) || headers.get(HOST_KEY).contains(":")) ? "" : (":" + localPort)) + "/";
+		String location = (ssl ? "wss://" : "ws://") + headers.get(HOST_KEY) +
+				(((ssl && localPort == 443) || (!ssl && localPort == 80) || headers.get(HOST_KEY).contains(":"))
+				 ? ""
+				 : (":" + localPort)) + "/";
 		response.append(WS_LOCATION_KEY).append(": ").append(location).append("\r\n");
 
 		response.append("\r\n");
@@ -139,26 +137,26 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 
 			return null;
 		}
-		
-		int position   = buf.position();
+
+		int position = buf.position();
 		byte type = buf.get();
-		
+
 		log.finest("read type = " + type);
-		
+
 		if ((type & 0x80) != 0x80) {
 			int idx = position + 1;
 			int remaining = buf.remaining();
 			log.finest("remaining = " + remaining + " on position " + position);
-			while ((remaining - ((idx-position))) >= 0) {
+			while ((remaining - ((idx - position))) >= 0) {
 				log.finest("checking byte at " + idx + " = " + buf.get(idx));
 				if (buf.get(idx) != ((byte) 0xFF)) {
 					idx++;
 					continue;
 				}
-				log.finest("found data of " + ((idx-position)-1) + " bytes");
-				byte[] data = new byte[(idx-position)-1];
+				log.finest("found data of " + ((idx - position) - 1) + " bytes");
+				byte[] data = new byte[(idx - position) - 1];
 				buf.get(data);
-				buf.position(buf.position()+1);
+				buf.position(buf.position() + 1);
 				log.finest("read data = " + new String(data));
 				return ByteBuffer.wrap(data);
 			}
@@ -167,11 +165,11 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 		} else {
 			long len = 0;
 			byte b = 0;
-			while (((b=buf.get()) & 0x80 ) == 0x80) {
+			while (((b = buf.get()) & 0x80) == 0x80) {
 				len = (len * 128) + (b & 0x7f);
 			}
 			len = (len * 128) + (b & 0x7f);
-			
+
 			if (len == 0) {
 				// close request
 				if (log.isLoggable(Level.FINEST)) {
@@ -180,14 +178,14 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 				service.setState(WebSocketXMPPIOService.State.closed);
 				//service.forceStop();
 
-				return null;				
+				return null;
 			}
-			
+
 			if (buf.remaining() < len) {
 				buf.position(position);
 				return null;
 			}
-			
+
 			byte[] data = new byte[(int) len];
 			buf.get(data);
 			return ByteBuffer.wrap(data);
@@ -203,24 +201,25 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 
 	@Override
 	public void closeConnection(WebSocketXMPPIOService service) {
-		if (!service.isConnected())
+		if (!service.isConnected()) {
 			return;
+		}
 
 		service.setState(WebSocketXMPPIOService.State.closed);
-		service.writeBytes(ByteBuffer.wrap(new byte[] { (byte) 0xFF, (byte) 0x00 }));
+		service.writeBytes(ByteBuffer.wrap(new byte[]{(byte) 0xFF, (byte) 0x00}));
 	}
-	
+
 	private void uintToBytes(byte[] arr, int offset, long val) {
-		for (int i=3; i>=0; i--) {
+		for (int i = 3; i >= 0; i--) {
 			arr[offset + i] = (byte) (val % 256);
 			val = val / 256;
 		}
 	}
-	
+
 	private Long decodeHyxie76SecKey(String data) {
 		long result = 0;
 		int spaces = 0;
-		
+
 		for (char ch : data.trim().toCharArray()) {
 			switch (ch) {
 				case '0':
@@ -260,7 +259,7 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 					break;
 			}
 		}
-		
+
 		return result / spaces;
-	}	
+	}
 }

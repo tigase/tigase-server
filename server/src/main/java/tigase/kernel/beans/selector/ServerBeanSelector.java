@@ -16,7 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- */package tigase.kernel.beans.selector;
+ */
+package tigase.kernel.beans.selector;
 
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
@@ -29,11 +30,12 @@ import java.util.List;
 /**
  * Created by andrzej on 26.04.2017.
  */
-public class ServerBeanSelector implements BeanSelector {
+public class ServerBeanSelector
+		implements BeanSelector {
 
-	@Override
-	public boolean shouldRegister(Class clazz, Kernel kernel) {
-		return checkClusterMode(clazz, kernel) && checkConfigType(clazz, kernel);
+	private static boolean checkClusterMode(Class clazz, Kernel kernel) {
+		ClusterModeRequired clusterModeRequired = (ClusterModeRequired) clazz.getAnnotation(ClusterModeRequired.class);
+		return clusterModeRequired == null || clusterModeRequired.active() == getClusterMode(kernel);
 	}
 
 	private static boolean checkConfigType(Class clazz, Kernel kernel) {
@@ -48,11 +50,15 @@ public class ServerBeanSelector implements BeanSelector {
 		return supportedTypes.contains(activeConfigType);
 	}
 
-	private static boolean checkClusterMode(Class clazz, Kernel kernel) {
-		ClusterModeRequired clusterModeRequired = (ClusterModeRequired) clazz.getAnnotation(ClusterModeRequired.class);
-		return clusterModeRequired == null || clusterModeRequired.active() == getClusterMode(kernel);
-	}
+	public static boolean getClusterMode(Kernel kernel) {
+		Object val = getProperty(kernel, "cluster-mode", false);
+		if (val instanceof Boolean) {
+			return (Boolean) val;
+		} else {
+			return Boolean.valueOf((String) val);
+		}
 
+	}
 
 	public static ConfigTypeEnum getConfigType(Kernel kernel) {
 		while (kernel.getParent() != null) {
@@ -72,18 +78,13 @@ public class ServerBeanSelector implements BeanSelector {
 
 	protected static <T> T getProperty(Kernel kernel, String name, T defValue) {
 		if (kernel.isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
-			return  (T) kernel.getInstance(AbstractBeanConfigurator.class).getProperties().getOrDefault(name, defValue);
+			return (T) kernel.getInstance(AbstractBeanConfigurator.class).getProperties().getOrDefault(name, defValue);
 		}
 		return defValue;
 	}
 
-	public static boolean getClusterMode(Kernel kernel) {
-		Object val = getProperty(kernel, "cluster-mode", false);
-		if (val instanceof Boolean) {
-			return (Boolean) val;
-		} else {
-			return Boolean.valueOf((String) val);
-		}
-
+	@Override
+	public boolean shouldRegister(Class clazz, Kernel kernel) {
+		return checkClusterMode(clazz, kernel) && checkConfigType(clazz, kernel);
 	}
 }

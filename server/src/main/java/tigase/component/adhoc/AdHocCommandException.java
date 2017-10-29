@@ -24,10 +24,9 @@ import tigase.xmpp.Authorization;
 
 /**
  * Class description
- *
- *
  */
-public class AdHocCommandException extends Exception {
+public class AdHocCommandException
+		extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +41,6 @@ public class AdHocCommandException extends Exception {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param errorCondition
 	 */
 	public AdHocCommandException(final Authorization errorCondition) {
@@ -51,7 +49,6 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param errorCondition
 	 * @param message
@@ -63,7 +60,6 @@ public class AdHocCommandException extends Exception {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param item
 	 * @param errorCondition
 	 */
@@ -73,7 +69,6 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param item
 	 * @param errorCondition
@@ -94,7 +89,6 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @return
 	 */
@@ -131,7 +125,6 @@ public class AdHocCommandException extends Exception {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @return
 	 */
 	public Element makeElement() {
@@ -140,7 +133,6 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param insertOriginal
 	 *
@@ -154,8 +146,8 @@ public class AdHocCommandException extends Exception {
 		answer.addAttribute("to", item.getAttributeStaticStr("from"));
 		answer.addAttribute("from", item.getAttributeStaticStr("to"));
 		if (this.message != null) {
-			Element text = new Element("text", this.message, new String[] { "xmlns" },
-					new String[] { "urn:ietf:params:xml:ns:xmpp-stanzas" });
+			Element text = new Element("text", this.message, new String[]{"xmlns"},
+									   new String[]{"urn:ietf:params:xml:ns:xmpp-stanzas"});
 
 			answer.addChild(text);
 		}
@@ -166,7 +158,6 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param sourceElement
 	 *
@@ -186,7 +177,7 @@ public class AdHocCommandException extends Exception {
 
 		error.setAttribute("code", String.valueOf(this.errorCondition.getErrorCode()));
 		error.setAttribute("type", this.errorCondition.getErrorType());
-		error.addChild(new Element(this.errorCondition.getCondition(), new String[] { "xmlns" }, new String[] { xmlns }));
+		error.addChild(new Element(this.errorCondition.getCondition(), new String[]{"xmlns"}, new String[]{xmlns}));
 
 		return error;
 	}

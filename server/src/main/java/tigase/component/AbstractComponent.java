@@ -45,15 +45,14 @@ import java.util.logging.Logger;
  * Base class for implement XMPP Component.
  *
  * @author bmalkow
- *
- * @deprecated Do not use this class at all. Use
- *             {@link AbstractKernelBasedComponent} instead. This class is here
- *             just because developer wants to know how some parts of code
- *             worked before migration to Kernel Based TCF.
+ * @deprecated Do not use this class at all. Use {@link AbstractKernelBasedComponent} instead. This class is here just
+ * because developer wants to know how some parts of code worked before migration to Kernel Based TCF.
  */
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
-public abstract class AbstractComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
+public abstract class AbstractComponent
+		extends AbstractMessageReceiver
+		implements XMPPService, DisableDisco {
 
 	protected static final String COMPONENT = "component";
 	/** Logger */
@@ -75,15 +74,12 @@ public abstract class AbstractComponent extends AbstractMessageReceiver implemen
 	public AbstractComponent() {
 	}
 
-	protected void addOutPacket(Packet packet, AsyncCallback asyncCallback) {
-		addOutPacket(packet);
-	}
-
 	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
-		if (responseManager != null)
+		if (responseManager != null) {
 			responseManager.checkTimeouts();
+		}
 	}
 
 	/**
@@ -93,37 +89,18 @@ public abstract class AbstractComponent extends AbstractMessageReceiver implemen
 	 */
 	public abstract String getComponentVersion();
 
-	/**
-	 * Returns default map of components. Keys in map are used as component
-	 * identifiers.<br>
-	 *
-	 * This map may be modified by <code>config.tdsl</code>:<br>
-	 * <code>&lt;component_name&gt;/modules/&lt;module_name&gt;[S]=&lt;module_class&gt;</code>
-	 *
-	 *
-	 * @return map of default modules.
-	 */
-	protected abstract Map<String, Class<? extends Module>> getDefaultModulesList();
-
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		final Map<String, Object> props = super.getDefaults(params);
 
 		Map<String, Class<? extends Module>> modules = getDefaultModulesList();
-		if (modules != null)
+		if (modules != null) {
 			for (Entry<String, Class<? extends Module>> m : modules.entrySet()) {
 				props.put("modules/" + m.getKey(), m.getValue());
 			}
+		}
 
 		return props;
-	}
-
-	EventBus getEventBus() {
-		return eventBus;
-	}
-
-	public void setEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
 	}
 
 	public Kernel getKernel() {
@@ -158,19 +135,8 @@ public abstract class AbstractComponent extends AbstractMessageReceiver implemen
 		binds.put(COMPONENT, this);
 	}
 
-	protected void initModules(Map<String, Object> props)
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		for (Entry<String, Object> e : props.entrySet()) {
-			if (e.getKey().startsWith("modules/")) {
-				final String id = e.getKey().substring(8);
-				kernel.registerBean(id).asClass((Class<?>) e.getValue()).exec();
-			}
-		}
-	}
-
 	/**
-	 * Is this component discoverable by disco#items for domain by non admin
-	 * users.
+	 * Is this component discoverable by disco#items for domain by non admin users.
 	 *
 	 * @return <code>true</code> - if yes
 	 */
@@ -201,7 +167,39 @@ public abstract class AbstractComponent extends AbstractMessageReceiver implemen
 		this.updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), !isDiscoNonAdmin());
 	}
 
-	public static class DefaultPacketWriter implements PacketWriter {
+	EventBus getEventBus() {
+		return eventBus;
+	}
+
+	public void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
+	}
+
+	protected void addOutPacket(Packet packet, AsyncCallback asyncCallback) {
+		addOutPacket(packet);
+	}
+
+	/**
+	 * Returns default map of components. Keys in map are used as component identifiers.<br>
+	 * <p>
+	 * This map may be modified by <code>config.tdsl</code>:<br> <code>&lt;component_name&gt;/modules/&lt;module_name&gt;[S]=&lt;module_class&gt;</code>
+	 *
+	 * @return map of default modules.
+	 */
+	protected abstract Map<String, Class<? extends Module>> getDefaultModulesList();
+
+	protected void initModules(Map<String, Object> props)
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		for (Entry<String, Object> e : props.entrySet()) {
+			if (e.getKey().startsWith("modules/")) {
+				final String id = e.getKey().substring(8);
+				kernel.registerBean(id).asClass((Class<?>) e.getValue()).exec();
+			}
+		}
+	}
+
+	public static class DefaultPacketWriter
+			implements PacketWriter {
 
 		protected final Logger log = Logger.getLogger(this.getClass().getName());
 		@Inject(bean = "service")

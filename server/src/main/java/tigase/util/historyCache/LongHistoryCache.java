@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.util.historyCache;
 
 /**
@@ -29,15 +27,15 @@ package tigase.util.historyCache;
  * @version $Rev$
  */
 public class LongHistoryCache {
+
 	private long[] buffer = null;
-	private int    count  = 0;
-	private int    start  = 0;
+	private int count = 0;
+	private int start = 0;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param limit
 	 */
@@ -49,7 +47,6 @@ public class LongHistoryCache {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param item is a <code>long</code>
 	 */
@@ -70,7 +67,6 @@ public class LongHistoryCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @return a value of <code>long[]</code>
 	 */
 	public synchronized long[] getCurrentHistory() {
@@ -85,6 +81,5 @@ public class LongHistoryCache {
 		return result;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

@@ -1,4 +1,3 @@
-
 /*
  * StartZlib.java
  *
@@ -41,11 +40,13 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "startZlib", parent = S2SConnectionManager.class, active = true)
-public class StartZlib extends S2SAbstractProcessor {
+public class StartZlib
+		extends S2SAbstractProcessor {
+
 	private static final Logger log = Logger.getLogger(StartZlib.class.getName());
-	private static final Element features = new Element("compression",
-		new Element[] { new Element("method", "zlib") }, new String[] { "xmlns" },
-		new String[] { "http://jabber.org/features/compress" });
+	private static final Element features = new Element("compression", new Element[]{new Element("method", "zlib")},
+														new String[]{"xmlns"},
+														new String[]{"http://jabber.org/features/compress"});
 
 	//~--- methods --------------------------------------------------------------
 
@@ -53,7 +54,7 @@ public class StartZlib extends S2SAbstractProcessor {
 	public int order() {
 		return Order.StartZlib.ordinal();
 	}
-	
+
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 

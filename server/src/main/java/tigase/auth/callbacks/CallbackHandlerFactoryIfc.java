@@ -31,6 +31,7 @@ import java.util.Map;
 public interface CallbackHandlerFactoryIfc {
 
 	CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
-						   Map<String, Object> settings) throws ClassNotFoundException, InstantiationException, IllegalAccessException;
+						   Map<String, Object> settings)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException;
 
 }

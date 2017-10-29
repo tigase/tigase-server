@@ -26,7 +26,8 @@ import java.util.Spliterator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-class CollectionWrapper<E> implements Collection<E> {
+class CollectionWrapper<E>
+		implements Collection<E> {
 
 	private final Collection<E> collection;
 

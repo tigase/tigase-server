@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -36,8 +34,8 @@ import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.ServerComponent;
 import tigase.xml.Element;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.Map;
@@ -50,30 +48,31 @@ import java.util.logging.Logger;
 
 /**
  * Describe class ClusterController here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Jun 9 20:03:28 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 @Bean(name = "cluster-contr", parent = Kernel.class, active = true, exportable = true)
-@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 @ClusterModeRequired(active = true)
 public class ClusterController
-				extends AbstractComponentRegistrator<ClusteredComponentIfc>
-				implements Configurable, ClusterControllerIfc {
+		extends AbstractComponentRegistrator<ClusteredComponentIfc>
+		implements Configurable, ClusterControllerIfc {
+
 	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 
 	/** Field description */
-	public static final String  MY_DOMAIN_NAME_PROP_VAL = "localhost";
+	public static final String MY_DOMAIN_NAME_PROP_VAL = "localhost";
 	private static final Logger log = Logger.getLogger(ClusterController.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private ConcurrentSkipListMap<String, CommandListener> commandListeners =
-			new ConcurrentSkipListMap<String, CommandListener>();
+	private ConcurrentSkipListMap<String, CommandListener> commandListeners = new ConcurrentSkipListMap<String, CommandListener>();
 	private AtomicLong currId = new AtomicLong(1L);
 
 	//~--- methods --------------------------------------------------------------
@@ -88,24 +87,24 @@ public class ClusterController
 			Wrapper wrapper = new Wrapper(this, component);
 			component.setClusterController(wrapper);
 		}
-		updateServiceDiscoveryItem(getName(), component.getName(), "Component: " + component
-				.getName(), true);
+		updateServiceDiscoveryItem(getName(), component.getName(), "Component: " + component.getName(), true);
 	}
 
 	@Override
-	public void componentRemoved(ClusteredComponentIfc component) {}
+	public void componentRemoved(ClusteredComponentIfc component) {
+	}
 
 	@Override
 	public void handleClusterPacket(Element packet) {
-		ClusterElement  clel    = new ClusterElement(packet);
+		ClusterElement clel = new ClusterElement(packet);
 		CommandListener cmdList = commandListeners.get(clel.getMethodName());
 
 		if (cmdList != null) {
 			clel.addVisitedNode(JID.jidInstanceNS(packet.getAttributeStaticStr(Packet.TO_ATT)));
 
-			Map<String, String> data         = clel.getAllMethodParams();
-			Set<JID>            visitedNodes = clel.getVisitedNodes();
-			Queue<Element>      packets      = clel.getDataPackets();
+			Map<String, String> data = clel.getAllMethodParams();
+			Set<JID> visitedNodes = clel.getVisitedNodes();
+			Queue<Element> packets = clel.getDataPackets();
 
 			try {
 				cmdList.executeCommand(clel.getFirstNode(), visitedNodes, data, packets);
@@ -117,11 +116,10 @@ public class ClusterController
 				ex.printStackTrace();
 			}
 		} else {
-			log.log(Level.WARNING, "Missing CommandListener for cluster method: {0}", clel
-					.getMethodName());
+			log.log(Level.WARNING, "Missing CommandListener for cluster method: {0}", clel.getMethodName());
 		}
 	}
-	
+
 	@Override
 	public void nodeConnected(String node) {
 		super.nodeConnected(node);
@@ -139,7 +137,8 @@ public class ClusterController
 	}
 
 	@Override
-	public void processPacket(final Packet packet, final Queue<Packet> results) {}
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
+	}
 
 	@Override
 	public void removeCommandListener(CommandListener listener) {
@@ -147,15 +146,16 @@ public class ClusterController
 	}
 
 	@Override
-	public void sendToNodes(String command, Map<String, String> data,
-			Queue<Element> packets, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
+	public void sendToNodes(String command, Map<String, String> data, Queue<Element> packets, JID fromNode,
+							Set<JID> visitedNodes, JID... toNodes) {
 		// this command should not be prefixed as we passed original instance instead of 
 		// wrapper to ClusterConnectionManager
 		CommandListener packetSender = commandListeners.get(DELIVER_CLUSTER_PACKET_CMD);
 
 		if (packetSender == null) {
-			log.log(Level.SEVERE, "Misconfiguration or packaging error, can not send a " +
-					"cluster packet! No CommandListener for " + DELIVER_CLUSTER_PACKET_CMD);
+			log.log(Level.SEVERE,
+					"Misconfiguration or packaging error, can not send a " + "cluster packet! No CommandListener for " +
+							DELIVER_CLUSTER_PACKET_CMD);
 
 			return;
 		}
@@ -165,17 +165,17 @@ public class ClusterController
 		// retrive listener for command and it's priority to if available
 		CommandListener listener = commandListeners.get(command);
 		Priority priority = listener != null ? listener.getPriority() : null;
-		
+
 		// TODO: Maybe more optimal would be creating the object once and then clone
 		// it? However, the 'to' parameter must be double-checked whether all
 		// internal states are set properly for each different to parameter
 		for (JID to : toNodes) {
-			ClusterElement clel = ClusterElement.createClusterMethodCall(fromNode, to,
-					StanzaType.set, command, data);
+			ClusterElement clel = ClusterElement.createClusterMethodCall(fromNode, to, StanzaType.set, command, data);
 
 			// set priority to ClusterElement so it will get proper priority for processing
-			if (priority != null)
+			if (priority != null) {
 				clel.setPriority(priority);
+			}
 			clel.addVisitedNodes(visitedNodes);
 			clel.addDataPackets(packets);
 
@@ -193,20 +193,19 @@ public class ClusterController
 	}
 
 	@Override
-	public void sendToNodes(String command, Queue<Element> packets, JID fromNode,
-			Set<JID> visitedNodes, JID... toNodes) {
+	public void sendToNodes(String command, Queue<Element> packets, JID fromNode, Set<JID> visitedNodes,
+							JID... toNodes) {
 		sendToNodes(command, null, packets, fromNode, visitedNodes, toNodes);
 	}
 
 	@Override
-	public void sendToNodes(String command, Map<String, String> data, JID fromNode,
-			Set<JID> visitedNodes, JID... toNodes) {
+	public void sendToNodes(String command, Map<String, String> data, JID fromNode, Set<JID> visitedNodes,
+							JID... toNodes) {
 		sendToNodes(command, data, (Queue<Element>) null, fromNode, visitedNodes, toNodes);
 	}
 
 	@Override
-	public void sendToNodes(String command, Map<String, String> data, JID fromNode,
-			JID... toNodes) {
+	public void sendToNodes(String command, Map<String, String> data, JID fromNode, JID... toNodes) {
 		sendToNodes(command, data, (Queue<Element>) null, fromNode, null, toNodes);
 	}
 
@@ -216,14 +215,13 @@ public class ClusterController
 	}
 
 	@Override
-	public void sendToNodes(String command, Element packet, JID fromNode,
-			Set<JID> visitedNodes, JID... toNodes) {
+	public void sendToNodes(String command, Element packet, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, null, packet, fromNode, visitedNodes, toNodes);
 	}
 
 	@Override
-	public void sendToNodes(String command, Map<String, String> data, Element packet,
-			JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
+	public void sendToNodes(String command, Map<String, String> data, Element packet, JID fromNode,
+							Set<JID> visitedNodes, JID... toNodes) {
 		Queue<Element> packets = new ArrayDeque<Element>();
 
 		packets.offer(packet);
@@ -260,27 +258,28 @@ public class ClusterController
 	private String nextId() {
 		return "cl-" + currId.incrementAndGet();
 	}
-	
+
 	private void removeCommandListener(String name, CommandListener listener) {
 		commandListeners.remove(name, listener);
 	}
-	
+
 	private void setCommandListener(String name, CommandListener listener) {
 		commandListeners.put(name, listener);
 	}
-	
-	private class Wrapper implements ClusterControllerIfc {
 
-		private final ClusterController controller;
+	private class Wrapper
+			implements ClusterControllerIfc {
+
 		private final ClusteredComponentIfc component;
+		private final ClusterController controller;
 		private final String name;
-		
+
 		public Wrapper(ClusterController controller, ClusteredComponentIfc component) {
 			this.controller = controller;
 			this.component = component;
 			name = component.getName();
 		}
-		
+
 		@Override
 		public void handleClusterPacket(Element packet) {
 			controller.handleClusterPacket(packet);
@@ -288,7 +287,7 @@ public class ClusterController
 
 		@Override
 		public void nodeConnected(String addr) {
-			throw new UnsupportedOperationException("This method should not be called."); 
+			throw new UnsupportedOperationException("This method should not be called.");
 		}
 
 		@Override
@@ -303,19 +302,22 @@ public class ClusterController
 		}
 
 		@Override
-		public void sendToNodes(String command, Map<String, String> data, Queue<Element> packets, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
+		public void sendToNodes(String command, Map<String, String> data, Queue<Element> packets, JID fromNode,
+								Set<JID> visitedNodes, JID... toNodes) {
 			command = name + "-" + command;
 			controller.sendToNodes(command, data, packets, fromNode, visitedNodes, toNodes);
 		}
 
 		@Override
-		public void sendToNodes(String command, Queue<Element> packets, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
+		public void sendToNodes(String command, Queue<Element> packets, JID fromNode, Set<JID> visitedNodes,
+								JID... toNodes) {
 			command = name + "-" + command;
 			controller.sendToNodes(command, packets, fromNode, visitedNodes, toNodes);
 		}
 
 		@Override
-		public void sendToNodes(String command, Map<String, String> data, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
+		public void sendToNodes(String command, Map<String, String> data, JID fromNode, Set<JID> visitedNodes,
+								JID... toNodes) {
 			command = name + "-" + command;
 			controller.sendToNodes(command, data, fromNode, visitedNodes, toNodes);
 		}
@@ -339,7 +341,8 @@ public class ClusterController
 		}
 
 		@Override
-		public void sendToNodes(String command, Map<String, String> data, Element packet, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
+		public void sendToNodes(String command, Map<String, String> data, Element packet, JID fromNode,
+								Set<JID> visitedNodes, JID... toNodes) {
 			command = name + "-" + command;
 			controller.sendToNodes(command, data, packet, fromNode, visitedNodes, toNodes);
 		}
@@ -349,9 +352,8 @@ public class ClusterController
 			String name = this.name + "-" + listener.getName();
 			controller.setCommandListener(name, listener);
 		}
-		
+
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/10/15

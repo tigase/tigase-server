@@ -28,20 +28,24 @@ import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Created by andrzej on 04.04.2017.
  */
-@Repository.Meta( supportedUris = {"memory://.*" } )
-public class XMLMsgRepository extends MsgRepository<String,XMLDataSource> {
+@Repository.Meta(supportedUris = {"memory://.*"})
+public class XMLMsgRepository
+		extends MsgRepository<String, XMLDataSource> {
 
 	private static final Logger log = Logger.getLogger(XMLMsgRepository.class.getCanonicalName());
 
@@ -77,7 +81,7 @@ public class XMLMsgRepository extends MsgRepository<String,XMLDataSource> {
 		try {
 			String[] old_data = xmldb.getDataList(user.toString(), "offline", "messages");
 			String[] all = null;
-			String[] list = new String[] { msg.toString() };
+			String[] list = new String[]{msg.toString()};
 
 			if (old_data != null) {
 				all = new String[old_data.length + 1];
@@ -95,21 +99,6 @@ public class XMLMsgRepository extends MsgRepository<String,XMLDataSource> {
 	}
 
 	@Override
-	protected void loadExpiredQueue(int max) {
-		// nothing to do
-	}
-
-	@Override
-	protected void loadExpiredQueue(Date expired) {
-		// nothing to do
-	}
-
-	@Override
-	protected void deleteMessage(String db_id) {
-		throw new UnsupportedOperationException("Removal of messages using id is not supported!");
-	}
-
-	@Override
 	public Queue<Element> loadMessagesToJID(List<String> db_ids, XMPPResourceConnection session, boolean delete,
 											OfflineMessagesProcessor proc) throws UserNotFoundException {
 		BareJID user = null;
@@ -123,13 +112,13 @@ public class XMLMsgRepository extends MsgRepository<String,XMLDataSource> {
 				DomBuilderHandler domHandler = new DomBuilderHandler();
 				StringBuilder sb = new StringBuilder();
 
-				for ( String msg : msgs ) {
-					sb.append( msg );
+				for (String msg : msgs) {
+					sb.append(msg);
 				}
 
 				char[] data = sb.toString().toCharArray();
 
-				parser.parse( domHandler, data, 0, data.length );
+				parser.parse(domHandler, data, 0, data.length);
 
 				return domHandler.getParsedElements();
 			}
@@ -145,5 +134,20 @@ public class XMLMsgRepository extends MsgRepository<String,XMLDataSource> {
 	public int deleteMessagesToJID(List<String> db_ids, XMPPResourceConnection session) throws UserNotFoundException {
 		Queue<Element> msgs = loadMessagesToJID(null, session, true, null);
 		return msgs == null ? 0 : msgs.size();
+	}
+
+	@Override
+	protected void loadExpiredQueue(int max) {
+		// nothing to do
+	}
+
+	@Override
+	protected void loadExpiredQueue(Date expired) {
+		// nothing to do
+	}
+
+	@Override
+	protected void deleteMessage(String db_id) {
+		throw new UnsupportedOperationException("Removal of messages using id is not supported!");
 	}
 }

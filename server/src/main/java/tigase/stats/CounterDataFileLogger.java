@@ -51,60 +51,55 @@ public class CounterDataFileLogger
 		implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
 
 	/* logger instance */
-	private static final Logger log = Logger.getLogger( CounterDataFileLogger.class.getName() );
-
+	private static final Logger log = Logger.getLogger(CounterDataFileLogger.class.getName());
+	private final static ExecutorService service = Executors.newSingleThreadScheduledExecutor();
+	private final AtomicBoolean collectionReady = new AtomicBoolean(false);
+	private Charset charset = StandardCharsets.UTF_8;
+	/* Field holding datetime format configuration */
+	@ConfigField(desc = "Format of a date time", alias = "stats-datetime-format")
+	private String dateTimeFormat = "yyyy-MM-dd_HH:mm:ss";
+	private DateTimeFormatter dateTimeFormatter;
 	/* Field holding directory path configuration */
 	@ConfigField(desc = "Directory path", alias = "stats-directory")
 	private String directory = "logs/stats";
 	/* Field holding file prefix configuration */
 	@ConfigField(desc = "Name of a file", alias = "stats-filename")
 	private String filename = "stats";
-	/* Field holding configuration whether include or not unixtime into filename */
-	@ConfigField(desc = "Should include unix time", alias = "stats-unixtime")
-	private boolean includeUnixTime = true;
+	@ConfigField(desc = "Remaining space in MB resulting in shrinking the collection", alias = "automatically-prune-resize-mb")
+	private int freeSpaceMB = 100;
+	@ConfigField(desc = "Remaining space in % resulting in shrinking the collection", alias = "automatically-prune-resize-percent")
+	private int freeSpacePerCent = 5;
+	@ConfigField(desc = "Frequency")
+	private long frequency = -1;
 	/* Field holding configuration whether include or not datetime timestamp into filename */
 	@ConfigField(desc = "Should include date time", alias = "stats-datetime")
 	private boolean includeDateTime = true;
-
-	/* Field holding datetime format configuration */
-	@ConfigField(desc = "Format of a date time", alias = "stats-datetime-format")
-	private String dateTimeFormat = "yyyy-MM-dd_HH:mm:ss";
-
+	/* Field holding configuration whether include or not unixtime into filename */
+	@ConfigField(desc = "Should include unix time", alias = "stats-unixtime")
+	private boolean includeUnixTime = true;
+	@ConfigField(desc = "Whether old entries should be pruned automatically", alias = "automatically-prune-limit")
+	private int limit = 60 * 60 * 24;
+	private CircularFifoQueue<Path> pathsQueue = null;
+	@ConfigField(desc = "Whether old entries should be pruned automatically", alias = "automatically-prune-old")
+	private boolean pruneOldEntries = true;
+	@ConfigField(desc = "Factor by which collection will be shrunk", alias = "automatically-prune-resize-factor")
+	private double shrinkFactor = 0.75;
 	/* Field holding level of the statistics configuration */
 	@ConfigField(desc = "Statistics detail level", alias = "stats-level")
 	private Level statsLevel = Level.ALL;
 
-	@ConfigField(desc = "Frequency")
-	private long frequency = -1;
-
-	private final static ExecutorService service = Executors.newSingleThreadScheduledExecutor();
-
-	private final AtomicBoolean collectionReady = new AtomicBoolean(false);
-
-	private DateTimeFormatter dateTimeFormatter;
-
-	@ConfigField(desc = "Whether old entries should be pruned automatically", alias = "automatically-prune-old")
-	private boolean pruneOldEntries = true;
-
-	@ConfigField(desc = "Whether old entries should be pruned automatically", alias = "automatically-prune-limit")
-	private int limit = 60 * 60 * 24;
-
-	@ConfigField(desc = "Remaining space in MB resulting in shrinking the collection", alias = "automatically-prune-resize-mb")
-	private int freeSpaceMB = 100;
-
-	@ConfigField(desc = "Remaining space in % resulting in shrinking the collection", alias = "automatically-prune-resize-percent")
-	private int freeSpacePerCent = 5;
-
-	@ConfigField(desc = "Factor by which collection will be shrunk", alias = "automatically-prune-resize-factor")
-	private double shrinkFactor = 0.75;
-
-	private CircularFifoQueue<Path> pathsQueue = null;
-
-	private Charset charset = StandardCharsets.UTF_8;
-
+	private static void deleteFile(Path file) {
+		try {
+			if (Files.exists(file)) {
+				Files.delete(file);
+			}
+		} catch (IOException e) {
+			log.log(Level.FINEST, "Error deleting file " + file, e);
+		}
+	}
 
 	@Override
-	public void execute( StatisticsProvider sp ) {
+	public void execute(StatisticsProvider sp) {
 
 		if (pruneOldEntries && !collectionReady.get()) {
 			return;
@@ -141,18 +136,12 @@ public class CounterDataFileLogger
 				int newLimit = (int) (pathsQueue.limit() * shrinkFactor);
 
 				log.log(Level.FINEST,
-				        "Shrinking stats file history from {0} to {1} (usable space: {2}, total space: {3}",
-				        new Object[]{limit, newLimit, file.getUsableSpace(), file.getTotalSpace()});
+						"Shrinking stats file history from {0} to {1} (usable space: {2}, total space: {3}",
+						new Object[]{limit, newLimit, file.getUsableSpace(), file.getTotalSpace()});
 				limit = newLimit;
 				pathsQueue.setLimit(limit);
 			}
 		}
-	}
-
-	private String getPath(ZonedDateTime time) {
-		return directory + "/" + filename +
-				(includeUnixTime ? "_" + time.toInstant().toEpochMilli() : "") +
-				(includeDateTime ? "_" + dateTimeFormatter.format(time) : "") + ".txt";
 	}
 
 	@Override
@@ -185,7 +174,7 @@ public class CounterDataFileLogger
 						e.printStackTrace();
 					}
 					log.log(Level.CONFIG, "Statistics files collection finished in: {0}s ",
-					        new Object[]{(System.currentTimeMillis() - start) / 1000});
+							new Object[]{(System.currentTimeMillis() - start) / 1000});
 
 					collectionReady.set(true);
 				});
@@ -198,16 +187,6 @@ public class CounterDataFileLogger
 		}
 	}
 
-	private static void deleteFile(Path file) {
-		try {
-			if (Files.exists(file)) {
-				Files.delete(file);
-			}
-		} catch (IOException e) {
-			log.log(Level.FINEST, "Error deleting file " + file, e);
-		}
-	}
-
 	@Override
 	public long getFrequency() {
 		return frequency;
@@ -216,5 +195,10 @@ public class CounterDataFileLogger
 	@Override
 	public void initialize() {
 		beanConfigurationChanged(Collections.emptyList());
+	}
+
+	private String getPath(ZonedDateTime time) {
+		return directory + "/" + filename + (includeUnixTime ? "_" + time.toInstant().toEpochMilli() : "") +
+				(includeDateTime ? "_" + dateTimeFormatter.format(time) : "") + ".txt";
 	}
 }

@@ -20,33 +20,31 @@
 
 package tigase.eventbus;
 
-import java.util.Collection;
-
 import tigase.eventbus.component.stores.Subscription;
 
+import java.util.Collection;
+
 /**
- * This interface is required to be implemented by every class which wants to change
- * routing of delivering events to other machines.
- * 
+ * This interface is required to be implemented by every class which wants to change routing of delivering events to
+ * other machines.
+ *
  * @author andrzej
  */
 public interface EventRoutingSelector {
-	
+
 	/**
 	 * Returns class of event for which it modifies delivery
-	 * 
-	 * @return 
+	 *
+	 * @return
 	 */
 	Class getEventClass();
-	
+
 	/**
-	 * Method responsible for actual modification of delivery by adding and removing
-	 * items to Subscriptions collection
-	 * 
-	 * @param event				instance of event
-	 * @param subscriptions		original list of subscriptions
-	 * @return					modified list of subscriptions
+	 * Method responsible for actual modification of delivery by adding and removing items to Subscriptions collection
+	 *
+	 * @param event instance of event
+	 * @param subscriptions original list of subscriptions
 	 */
 	Collection<Subscription> getSubscriptions(Object event, Collection<Subscription> subscriptions);
-	
+
 }

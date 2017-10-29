@@ -44,6 +44,18 @@ public class PropertiesBeanConfigurator
 		return getCurrentConfigurations(false);
 	}
 
+	public Collection<ConfigEntry> getCurrentConfigurations() {
+		return getCurrentConfigurations(true);
+	}
+
+	public Map<String, Object> getProperties() {
+		return props;
+	}
+
+	public void setProperties(Map<String, Object> props) {
+		this.props = props;
+	}
+
 	@Override
 	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
 		Map<String, BeanDefinition> beanPropConfigMap = super.getBeanDefinitions(values);
@@ -91,6 +103,100 @@ public class PropertiesBeanConfigurator
 		}
 
 		return beanPropConfigMap;
+	}
+
+	protected boolean hasDirectConfiguration(BeanConfig beanConfig) {
+		ArrayDeque<String> path = getBeanConfigPath(beanConfig);
+		StringBuilder sb = new StringBuilder();
+
+		String name;
+		while ((name = path.poll()) != null) {
+			sb.append(name);
+			sb.append('/');
+		}
+
+		String prefix = sb.toString();
+
+		for (Map.Entry<String, Object> e : props.entrySet()) {
+			if (e.getKey().startsWith(prefix)) {
+				if (e.getKey().substring(prefix.length()).indexOf('/') == -1) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	protected Map<String, String> getConfigAliasses(BeanConfig beanConfig) {
+		Map<String, String> configAliasses = new HashMap<>();
+		Class<?> cls = beanConfig.getClass();
+		do {
+			ConfigAliases ca = cls.getAnnotation(ConfigAliases.class);
+			if (ca != null) {
+				for (ConfigAlias a : ca.value()) {
+					configAliasses.put(a.field(), a.alias());
+				}
+			} else {
+				break;
+			}
+		} while ((cls = cls.getSuperclass()) != null);
+		return configAliasses;
+	}
+
+	@Override
+	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
+		final HashMap<String, Object> valuesToSet = new HashMap<>();
+
+		resolveAliases(beanConfig, props, valuesToSet);
+
+		// Preparing set of properties based on given properties set
+		HashMap<String, Object> beanProps = getBeanProps(beanConfig);
+		resolveAliases(beanConfig, beanProps, valuesToSet);
+		for (Map.Entry<String, Object> e : beanProps.entrySet()) {
+			final String property = e.getKey();
+			final Object value = e.getValue();
+
+			valuesToSet.put(property, value);
+		}
+
+		return valuesToSet;
+	}
+
+	protected void resolveAliases(BeanConfig beanConfig, Map<String, Object> props, Map<String, Object> valuesToSet) {
+		// Preparing set of properties based on @ConfigField annotation and
+		// aliases
+		Map<String, String> configAliasses = getConfigAliasses(beanConfig);
+		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
+		for (Field field : fields) {
+			final ConfigField cf = field.getAnnotation(ConfigField.class);
+			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias()) &&
+					(this.props != props || cf.allowAliasFromParent())) {
+				final Object value = props.get(cf.alias());
+
+				if (props.containsKey(field)) {
+					if (log.isLoggable(Level.CONFIG)) {
+						log.config("Alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." +
+										   field.getName() +
+										   " will not be used, because there is configuration for this property already.");
+					}
+					continue;
+				}
+				if (log.isLoggable(Level.CONFIG)) {
+					log.config("Using alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." +
+									   field.getName());
+				}
+
+				valuesToSet.put(field.getName(), value);
+			}
+			if (cf != null && configAliasses.containsKey(field.getName())) {
+				String alias = configAliasses.get(field.getName());
+				final Object value = props.get(alias);
+				if (value != null) {
+					valuesToSet.put(field.getName(), value);
+				}
+			}
+		}
 	}
 
 	private HashMap<String, Object> getBeanProps(BeanConfig beanConfig) {
@@ -165,68 +271,6 @@ public class PropertiesBeanConfigurator
 		return result;
 	}
 
-	protected boolean hasDirectConfiguration(BeanConfig beanConfig) {
-		ArrayDeque<String> path = getBeanConfigPath(beanConfig);
-		StringBuilder sb = new StringBuilder();
-
-		String name;
-		while ((name = path.poll()) != null) {
-			sb.append(name);
-			sb.append('/');
-		}
-
-		String prefix = sb.toString();
-
-		for (Map.Entry<String, Object> e : props.entrySet()) {
-			if (e.getKey().startsWith(prefix)) {
-				if (e.getKey().substring(prefix.length()).indexOf('/') == -1) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	protected Map<String, String> getConfigAliasses(BeanConfig beanConfig) {
-		Map<String, String> configAliasses = new HashMap<>();
-		Class<?> cls = beanConfig.getClass();
-		do {
-			ConfigAliases ca = cls.getAnnotation(ConfigAliases.class);
-			if (ca != null) {
-				for (ConfigAlias a : ca.value()) {
-					configAliasses.put(a.field(), a.alias());
-				}
-			} else {
-				break;
-			}
-		} while ((cls = cls.getSuperclass()) != null);
-		return configAliasses;
-	}
-
-	@Override
-	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
-		final HashMap<String, Object> valuesToSet = new HashMap<>();
-
-		resolveAliases(beanConfig, props, valuesToSet);
-
-		// Preparing set of properties based on given properties set
-		HashMap<String, Object> beanProps = getBeanProps(beanConfig);
-		resolveAliases(beanConfig, beanProps, valuesToSet);
-		for (Map.Entry<String, Object> e : beanProps.entrySet()) {
-			final String property = e.getKey();
-			final Object value = e.getValue();
-
-			valuesToSet.put(property, value);
-		}
-
-		return valuesToSet;
-	}
-
-	public Collection<ConfigEntry> getCurrentConfigurations() {
-		return getCurrentConfigurations(true);
-	}
-
 	private Collection<ConfigEntry> getCurrentConfigurations(boolean forceInit) {
 		HashSet<ConfigEntry> result = new HashSet<>();
 
@@ -261,50 +305,6 @@ public class PropertiesBeanConfigurator
 		}
 
 		return result;
-	}
-
-	public Map<String, Object> getProperties() {
-		return props;
-	}
-
-	public void setProperties(Map<String, Object> props) {
-		this.props = props;
-	}
-
-	protected void resolveAliases(BeanConfig beanConfig, Map<String, Object> props, Map<String, Object> valuesToSet) {
-		// Preparing set of properties based on @ConfigField annotation and
-		// aliases
-		Map<String, String> configAliasses = getConfigAliasses(beanConfig);
-		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
-		for (Field field : fields) {
-			final ConfigField cf = field.getAnnotation(ConfigField.class);
-			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias()) &&
-					(this.props != props || cf.allowAliasFromParent())) {
-				final Object value = props.get(cf.alias());
-
-				if (props.containsKey(field)) {
-					if (log.isLoggable(Level.CONFIG)) {
-						log.config("Alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." +
-										   field.getName() +
-										   " will not be used, because there is configuration for this property already.");
-					}
-					continue;
-				}
-				if (log.isLoggable(Level.CONFIG)) {
-					log.config("Using alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." +
-									   field.getName());
-				}
-
-				valuesToSet.put(field.getName(), value);
-			}
-			if (cf != null && configAliasses.containsKey(field.getName())) {
-				String alias = configAliasses.get(field.getName());
-				final Object value = props.get(alias);
-				if (value != null) {
-					valuesToSet.put(field.getName(), value);
-				}
-			}
-		}
 	}
 
 	public static class ConfigEntry {

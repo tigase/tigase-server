@@ -33,7 +33,8 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 29.02.2016.
  */
-public abstract class SSLContextContainerAbstract implements SSLContextContainerIfc {
+public abstract class SSLContextContainerAbstract
+		implements SSLContextContainerIfc {
 
 	private static final Logger log = Logger.getLogger(SSLContextContainerAbstract.class.getCanonicalName());
 
@@ -43,13 +44,13 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 	private SecureRandom secureRandom = new SecureRandom();
 
 	/**
-	 * Generic method responsible for lookup of value in <code>Map</code>
-	 * where passed key is domain name and in <code>Map</code> wildcard
-	 * name may be used as a key.
+	 * Generic method responsible for lookup of value in <code>Map</code> where passed key is domain name and in
+	 * <code>Map</code> wildcard name may be used as a key.
 	 *
 	 * @param data
 	 * @param key
 	 * @param <T>
+	 *
 	 * @return
 	 */
 	public static <T> T find(Map<String, T> data, String key) {
@@ -76,6 +77,21 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 		this.certificateContainer = certContainer;
 	}
 
+	@Override
+	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
+		this.certificateContainer.addCertificates(params);
+	}
+
+	@Override
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+		return getSSLContext(protocol, hostname, clientMode, null);
+	}
+
+	@Override
+	public KeyStore getTrustStore() {
+		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
+	}
+
 	/**
 	 * Common method used to create SSLContext instance based on provided parameters
 	 *
@@ -84,10 +100,13 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 	 * @param alias
 	 * @param clientMode
 	 * @param tms
+	 *
 	 * @return
+	 *
 	 * @throws Exception
 	 */
-	protected SSLContext createContext(String protocol, String hostname, String alias, boolean clientMode, TrustManager[] tms) throws Exception {
+	protected SSLContext createContext(String protocol, String hostname, String alias, boolean clientMode,
+									   TrustManager[] tms) throws Exception {
 		SSLContext sslContext = null;
 
 		KeyManager[] kms = getKeyManagers(hostname);
@@ -108,16 +127,6 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 		return sslContext;
 	}
 
-	@Override
-	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
-		this.certificateContainer.addCertificates(params);
-	}
-
-	@Override
-	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
-		return getSSLContext(protocol, hostname, clientMode, null);
-	}
-
 	protected String getDefCertAlias() {
 		return certificateContainer.getDefCertAlias();
 	}
@@ -125,16 +134,13 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 	protected KeyManager[] getKeyManagers(String hostname) {
 		return certificateContainer.getKeyManagers(hostname);
 	}
+
 	protected TrustManager[] getTrustManagers() {
 		return certificateContainer.getTrustManagers();
 	}
-	@Override
-	public KeyStore getTrustStore() {
-		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
-	}
+
 	protected KeyManager[] createCertificate(String alias) throws Exception {
 		return certificateContainer.createCertificate(alias);
 	}
-
 
 }

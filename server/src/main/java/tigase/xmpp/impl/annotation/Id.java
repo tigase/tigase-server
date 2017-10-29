@@ -23,12 +23,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor}
- * can define of processor implementation
- * 
+ * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor} can
+ * define of processor implementation
+ *
  * @author andrzej
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Id {
+
 	String value();
 }

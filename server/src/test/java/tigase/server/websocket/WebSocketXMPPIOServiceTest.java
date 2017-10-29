@@ -28,28 +28,11 @@ import java.util.*;
 /**
  * Created by andrzej on 18.07.2016.
  */
-public class WebSocketXMPPIOServiceTest extends TestCase {
+public class WebSocketXMPPIOServiceTest
+		extends TestCase {
 
 	private HashMap<String, String> headers;
 	private WebSocketXMPPIOService service;
-
-	@Override
-	protected void setUp() throws Exception {
-		service = new WebSocketXMPPIOService(new WebSocketProtocolIfc[0]);
-		headers = new HashMap<String, String>();
-		headers.put("Connection", "Upgrade");
-		headers.put("Host", "test.example.com:5291");
-		headers.put("Origin", "test.example.com:5291");
-		headers.put("Sec-WebSocket-Key", "JRqGsrthbnle6zl8sFQPpQ==");
-		headers.put("Sec-WebSocket-Protocol", "xmpp");
-		headers.put("Sec-WebSocket-Version", "13");
-		headers.put("Upgrade", "websocket");
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		service = null;
-	}
 
 	@Test
 	public void testHttpHeadersParsingWithSpaces() throws UnsupportedEncodingException {
@@ -71,6 +54,24 @@ public class WebSocketXMPPIOServiceTest extends TestCase {
 		assertMaps(headers, parsedHeaders);
 	}
 
+	@Override
+	protected void setUp() throws Exception {
+		service = new WebSocketXMPPIOService(new WebSocketProtocolIfc[0]);
+		headers = new HashMap<String, String>();
+		headers.put("Connection", "Upgrade");
+		headers.put("Host", "test.example.com:5291");
+		headers.put("Origin", "test.example.com:5291");
+		headers.put("Sec-WebSocket-Key", "JRqGsrthbnle6zl8sFQPpQ==");
+		headers.put("Sec-WebSocket-Protocol", "xmpp");
+		headers.put("Sec-WebSocket-Version", "13");
+		headers.put("Upgrade", "websocket");
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		service = null;
+	}
+
 	private void assertMaps(Map<String, String> expected, Map<String, String> actual) {
 		List<String> expectedKeys = new ArrayList<>(expected.keySet());
 		List<String> actualKeys = new ArrayList<>(actual.keySet());
@@ -85,9 +86,10 @@ public class WebSocketXMPPIOServiceTest extends TestCase {
 		}
 	}
 
-	private byte[] prepareHTTPRequest(Map<String,String> headers, boolean useSpaces) throws UnsupportedEncodingException {
+	private byte[] prepareHTTPRequest(Map<String, String> headers, boolean useSpaces)
+			throws UnsupportedEncodingException {
 		StringBuilder sb = new StringBuilder("GET HTTP/1.1\r\n");
-		for (Map.Entry<String,String> e : headers.entrySet()) {
+		for (Map.Entry<String, String> e : headers.entrySet()) {
 			sb.append(e.getKey());
 			sb.append(':');
 			if (useSpaces) {

@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.db.comp;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -38,11 +36,13 @@ import java.util.logging.Logger;
  * Created: Oct 3, 2009 2:58:41 PM
  *
  * @param <Item>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class ConfigRepository<Item extends RepositoryItem>
-				implements ComponentRepository<Item>, Initializable, UnregisterAware {
+		implements ComponentRepository<Item>, Initializable, UnregisterAware {
+
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -51,24 +51,25 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	@ConfigField(desc = "Automatic items load interval", alias = "repo-autoreload-interval")
 	protected long autoReloadInterval = 0;
 	@ConfigField(desc = "Items in repository")
-	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>( String.CASE_INSENSITIVE_ORDER );
+	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>(String.CASE_INSENSITIVE_ORDER);
 	protected int itemsHash = 0;
 
-	private Timer                             autoLoadTimer  = null;
-	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
+	private Timer autoLoadTimer = null;
 	private boolean initialized = false;
+	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
 	public ConfigRepository() {
 		String propKey = getPropertyKey();
 		if (propKey != null) {
-			if (propKey.startsWith("--"))
+			if (propKey.startsWith("--")) {
 				propKey = propKey.substring(2);
+			}
 
 			String value = System.getProperty(propKey);
 			String[] items = null;
 			if (value != null) {
 				items = value.split(",");
-				for (int i=0; i<items.length; i++) {
+				for (int i = 0; i < items.length; i++) {
 					items[i] = items[i].trim();
 				}
 			}
@@ -109,17 +110,15 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void addRepoChangeListener(
-			RepositoryChangeListenerIfc<Item> repoChangeListener) {
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Adding new repository listener: {0}", repoChangeListener );
+	public void addRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Adding new repository listener: {0}", repoChangeListener);
 		}
 		this.repoChangeList = repoChangeListener;
 	}
 
 	@Override
-	public void removeRepoChangeListener(
-			RepositoryChangeListenerIfc<Item> repoChangeListener) {
+	public void removeRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = null;
 	}
 
@@ -132,33 +131,22 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public abstract String getConfigKey();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public abstract String[] getDefaultPropetyItems();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public abstract String getPropertyKey();
 
 	//~--- methods --------------------------------------------------------------
-
-
 
 	@Override
 	public void addItem(Item item) {
@@ -181,36 +169,22 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 					repoChangeList.itemUpdated(item);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Not calling itemUpadted for: {0}, item unchanged.",
-								item);
+						log.log(Level.FINEST, "Not calling itemUpadted for: {0}, item unchanged.", item);
 					}
 				}
 			}
 		} else {
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST, "No repoChangeListener for: {0}", item );
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "No repoChangeListener for: {0}", item);
 			}
 		}
 	}
 
 	/**
-	 * Method create instance of items Map. By overriding it it's possible to
-	 * change implementation and it's settings.
-	 */
-	protected void initItemsMap() {
-		if ( null == items ){
-			items = new ConcurrentSkipListMap<String, Item>( String.CASE_INSENSITIVE_ORDER );
-		}
-	}
-	
-	/**
 	 * Method description
-	 *
 	 *
 	 * @param oldItem
 	 * @param newItem
-	 *
-	 *
 	 */
 	public boolean itemChanged(Item oldItem, Item newItem) {
 		return true;
@@ -225,8 +199,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	public boolean contains(String key) {
 		return items.keySet().contains(key);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Deprecated
 	@Override
@@ -243,10 +215,12 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		defs.put(getConfigKey(), items_arr);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	@Override
 	public Item getItem(String key) {
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Getting item: {0} of items: {1}", new Object[] {key, items.keySet()} );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Getting item: {0} of items: {1}", new Object[]{key, items.keySet()});
 		}
 
 		return items.get(key);
@@ -257,7 +231,25 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		for (Item item : items.values()) {
 			itemsStrs.add(item.toPropertyString());
 		}
-		return  itemsStrs.toArray(new String[itemsStrs.size()]);
+		return itemsStrs.toArray(new String[itemsStrs.size()]);
+	}
+
+	public void setItems(String[] items_arr) {
+		if (items_arr != null) {
+			for (String it : items_arr) {
+				log.log(Level.CONFIG, "Loading config item: {0}", it);
+
+				Item item = getItemInstance();
+
+				item.initFromPropertyString(it);
+				if (!items.containsKey(item.getKey())) {
+					addItem(item);
+					log.log(Level.CONFIG, "Loaded config item: {0}", item);
+				} else {
+					log.log(Level.CONFIG, "Config item already loaded, skipping: {0}", item);
+				}
+			}
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -268,7 +260,8 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	}
 
 	@Override
-	public void reload() {}
+	public void reload() {
+	}
 
 	@Override
 	public void removeItem(String key) {
@@ -279,31 +272,13 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 			if (repoChangeList != null) {
 				repoChangeList.itemRemoved(item);
 			}
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST, "Removing item: {0}", item );
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Removing item: {0}", item);
 			}
 		}
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	public void setItems(String[] items_arr) {
-			if (items_arr != null) {
-				for (String it : items_arr) {
-					log.log(Level.CONFIG, "Loading config item: {0}", it);
-
-					Item item = getItemInstance();
-
-					item.initFromPropertyString(it);
-					if (!items.containsKey(item.getKey())) {
-						addItem(item);
-						log.log(Level.CONFIG, "Loaded config item: {0}", item);
-					} else {
-						log.log(Level.CONFIG, "Config item already loaded, skipping: {0}", item);
-					}
-				}
-			}
-	}
 
 	@Deprecated
 	@Override
@@ -318,15 +293,16 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public int size() {
 		return items.size();
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	@Override
-	public void store() {}
+	public void store() {
+	}
 
 	@Override
 	public String validateItem(Item item) {
@@ -347,6 +323,15 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 			store();
 		}
 		setAutoReloadInterval(autoReloadInterval);
+	}
+
+	/**
+	 * Method create instance of items Map. By overriding it it's possible to change implementation and it's settings.
+	 */
+	protected void initItemsMap() {
+		if (null == items) {
+			items = new ConcurrentSkipListMap<String, Item>(String.CASE_INSENSITIVE_ORDER);
+		}
 	}
 
 	protected boolean isInitialized() {

@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -34,21 +32,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Not synchronized implementation! Musn't be used by more than one thread at
- * the same time.
- * <p>
- * Thanks to Daniele for better unique IDs handling. Created: Thu Oct 26
- * 11:48:53 2006
- * </p>
+ * Not synchronized implementation! Musn't be used by more than one thread at the same time. <p> Thanks to Daniele for
+ * better unique IDs handling. Created: Thu Oct 26 11:48:53 2006 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @author <a href="mailto:piras@tiscali.com">Daniele</a>
  * @version $Rev$
  */
-@Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.Meta(supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCRepository
-				implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
+		implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
+
 	/** Field description */
 	public static final String CURRENT_DB_SCHEMA_VER = "8.0.0";
 
@@ -68,135 +63,59 @@ public class JDBCRepository
 	public static final String DEF_USERS_TBL = "tig_users";
 
 	/** Field description */
-	public static final String DERBY_GETSCHEMAVER_QUERY =
-		"values TigGetDBProperty('schema-version')";
+	public static final String DERBY_GETSCHEMAVER_QUERY = "values TigGetDBProperty('schema-version')";
 
-	/** Stored procedure used to check version of the schema
-	 * 
-	 * neither MS SQL Server JDBC driver supports default
-	 * schema prefix in connection string for stored functions
+	/**
+	 * Stored procedure used to check version of the schema
+	 * <p>
+	 * neither MS SQL Server JDBC driver supports default schema prefix in connection string for stored functions
 	 */
-	public static final String SQLSERVER_GETSCHEMAVER_QUERY =
-		"select dbo.TigGetDBProperty('schema-version')";
+	public static final String SQLSERVER_GETSCHEMAVER_QUERY = "select dbo.TigGetDBProperty('schema-version')";
 
 	/** Field description */
-	public static final String JDBC_GETSCHEMAVER_QUERY =
-		"select TigGetDBProperty('schema-version')";
+	public static final String JDBC_GETSCHEMAVER_QUERY = "select TigGetDBProperty('schema-version')";
 
 	/** Field description */
-	public static final String SCHEMA_UPGRADE_LINK =
-		"Administration Guide > Tigase Server Schema v8.0 Updates (available locally in docs directory and online http://docs.tigase.org)";
-	private static final String ADD_NODE_QUERY          = "{ call TigAddNode(?, ?, ?) }";
-	private static final String ADD_USER_PLAIN_PW_QUERY =
-		"{ call TigAddUserPlainPw(?, ?) }";
-	private static final String COUNT_USERS_FOR_DOMAIN_QUERY =
-		"select count(*) from tig_users where user_id like ?";
-	private static final String DEF_GET_USERS_QUERY   = "{ call TigAllUsers() }";
+	public static final String SCHEMA_UPGRADE_LINK = "Administration Guide > Tigase Server Schema v8.0 Updates (available locally in docs directory and online http://docs.tigase.org)";
+	private static final String ADD_NODE_QUERY = "{ call TigAddNode(?, ?, ?) }";
+	private static final String ADD_USER_PLAIN_PW_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
+	private static final String COUNT_USERS_FOR_DOMAIN_QUERY = "select count(*) from tig_users where user_id like ?";
+	private static final String DEF_GET_USERS_QUERY = "{ call TigAllUsers() }";
 	private static final String GET_USER_DB_UID_QUERY = "{ call TigGetUserDBUid(?) }";
 	private static final String GET_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
-	private static final Logger log                   =
-		Logger.getLogger(JDBCRepository.class.getName());
+	private static final Logger log = Logger.getLogger(JDBCRepository.class.getName());
 	private static final String PGSQL_GET_USERS_QUERY = "select TigAllUsers()";
-	private static final String REMOVE_USER_QUERY     = "{ call TigRemoveUser(?) }";
-	private static final String UPDATE_PAIRS_QUERY    =
-		"{ call TigUpdatePairs(?, ?, ?, ?) }";
-	private static final String USER_STR              = "User: ";
-	private static final String REMOVE_KEY_DATA_QUERY = "delete from " + DEF_PAIRS_TBL +
-																											" where (nid = ?) AND (pkey = ?)";
-	private static final String NODES_FOR_NODE_QUERY = "select nid, node from " +
-																										 DEF_NODES_TBL +
-																										 " where parent_nid = ?";
-	private static final String KEYS_FOR_NODE_QUERY = "select pkey from " + DEF_PAIRS_TBL +
-																										" where (nid = ?)";
-	private static final String INSERT_KEY_VAL_QUERY = "insert into " + DEF_PAIRS_TBL +
-																										 " (nid, uid, pkey, pval) " +
-																										 " values (?, ?, ?, ?)";
-	private static final String DATA_FOR_NODE_QUERY = "select pval from " + DEF_PAIRS_TBL +
-																										" where (nid = ?) AND (pkey = ?)";
+	private static final String REMOVE_USER_QUERY = "{ call TigRemoveUser(?) }";
+	private static final String UPDATE_PAIRS_QUERY = "{ call TigUpdatePairs(?, ?, ?, ?) }";
+	private static final String USER_STR = "User: ";
+	private static final String REMOVE_KEY_DATA_QUERY =
+			"delete from " + DEF_PAIRS_TBL + " where (nid = ?) AND (pkey = ?)";
+	private static final String NODES_FOR_NODE_QUERY =
+			"select nid, node from " + DEF_NODES_TBL + " where parent_nid = ?";
+	private static final String KEYS_FOR_NODE_QUERY = "select pkey from " + DEF_PAIRS_TBL + " where (nid = ?)";
+	private static final String INSERT_KEY_VAL_QUERY =
+			"insert into " + DEF_PAIRS_TBL + " (nid, uid, pkey, pval) " + " values (?, ?, ?, ?)";
+	private static final String DATA_FOR_NODE_QUERY =
+			"select pval from " + DEF_PAIRS_TBL + " where (nid = ?) AND (pkey = ?)";
 
-	private static final String UPDATE_LAST_LOGIN_QUERY = "update "+DEF_USERS_TBL+" set last_login=? where user_id=?";
+	private static final String UPDATE_LAST_LOGIN_QUERY =
+			"update " + DEF_USERS_TBL + " set last_login=? where user_id=?";
 
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
 	private AuthRepository auth = null;
-
+	private boolean autoCreateUser = false;
 	// Cache moved to connection pool
 	private Map<String, Object> cache = null;
-	private DataRepository data_repo  = null;
-	private String get_users_query    = null;
-	private boolean autoCreateUser    = false;
+	private DataRepository data_repo = null;
+	private String get_users_query = null;
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-	private void addDataList(DataRepository repo, BareJID user_id, final String subnode,
-													 final String key, final String[] list)
-					throws UserNotFoundException, SQLException, UserNotFoundException {
-		long uid = -2;
-		long nid = -2;
-
-		try {
-
-			// OK
-			uid = getUserUID(repo, user_id, autoCreateUser);
-
-			// OK
-			nid = getNodeNID(repo, uid, subnode);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-								"Saving data adding data list, user_id: {0}, subnode: {1}, key: {2}, " +
-								"uid: {3}, nid: {4}, list: {5}", new Object[] {
-					user_id, subnode, key, uid, nid, Arrays.toString(list)
-				});
-			}
-			if (nid < 0) {
-				try {
-
-					// OK
-					nid = createNodePath(repo, user_id, subnode);
-				} catch (SQLException e) {
-
-					// This may happen in cluster node, when 2 nodes at the same
-					// time write data to the same location, like offline messages....
-					// Let's try to get the nid again.
-					// OK
-					nid = getNodeNID(repo, uid, subnode);
-				}
-			}
-
-			PreparedStatement insert_key_val_st = null;
-
-			if (repo == null) {
-				insert_key_val_st = data_repo.getPreparedStatement(user_id, INSERT_KEY_VAL_QUERY);
-			} else {
-				insert_key_val_st = repo.getPreparedStatement(user_id, INSERT_KEY_VAL_QUERY);
-			}
-			synchronized (insert_key_val_st) {
-				insert_key_val_st.setLong(1, nid);
-				insert_key_val_st.setLong(2, uid);
-				insert_key_val_st.setString(3, key);
-				for (String val : list) {
-					insert_key_val_st.setString(4, val);
-					insert_key_val_st.executeUpdate();
-				}    // end of for (String val: list)
-			}
-		} catch (SQLException e) {
-			log.log(Level.WARNING,
-							"Error adding data list, user_id: " + user_id + ", subnode: " + subnode +
-							", key: " + key + ", uid: " + uid + ", nid: " + nid + ", list: " +
-							Arrays.toString(list), e);
-
-			throw e;
-		}
-
-		// cache.put(user_id+"/"+subnode+"/"+key, list);
-	}
-
 	@Override
-	public void addDataList(BareJID user_id, final String subnode, final String key,
-													final String[] list)
-					throws UserNotFoundException, TigaseDBException {
+	public void addDataList(BareJID user_id, final String subnode, final String key, final String[] list)
+			throws UserNotFoundException, TigaseDBException {
 		try {
 			addDataList(null, user_id, subnode, key, list);
 		} catch (SQLException ex) {
@@ -214,34 +133,26 @@ public class JDBCRepository
 	}
 
 	@Override
-	public void addUser(BareJID user, final String password)
-					throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		auth.addUser(user, password);
 	}
-	
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public String getData(BareJID user_id, final String subnode, final String key,
-												final String def)
-					throws UserNotFoundException, TigaseDBException {
+	public String getData(BareJID user_id, final String subnode, final String key, final String def)
+			throws UserNotFoundException, TigaseDBException {
 
 		try {
 			long nid = getNodeNID(null, user_id, subnode);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(
-						Level.FINEST,
-						"Loading data for key: {0}, user: {1}, node: {2}, def: {3}, found nid: {4}",
-						new Object[] { key,
-													 user_id, subnode, def, nid });
+				log.log(Level.FINEST, "Loading data for key: {0}, user: {1}, node: {2}, def: {3}, found nid: {4}",
+						new Object[]{key, user_id, subnode, def, nid});
 			}
 
 			if (nid > 0) {
 				ResultSet rs = null;
 
-				PreparedStatement data_for_node_st = data_repo.getPreparedStatement(user_id,
-						DATA_FOR_NODE_QUERY);
+				PreparedStatement data_for_node_st = data_repo.getPreparedStatement(user_id, DATA_FOR_NODE_QUERY);
 
 				synchronized (data_for_node_st) {
 					try {
@@ -267,26 +178,26 @@ public class JDBCRepository
 				return def;
 			}    // end of if (nid > 0) else
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error getting user data for: " + user_id + "/" +
-																	subnode + "/" + key, e);
-		} 
+			throw new TigaseDBException("Error getting user data for: " + user_id + "/" + subnode + "/" + key, e);
+		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getData(BareJID user_id, final String subnode, final String key)
-					throws UserNotFoundException, TigaseDBException {
+			throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, subnode, key, null);
 	}
 
 	@Override
-	public String getData(BareJID user_id, final String key)
-					throws UserNotFoundException, TigaseDBException {
+	public String getData(BareJID user_id, final String key) throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, null, key, null);
 	}
 
 	@Override
 	public String[] getDataList(BareJID user_id, final String subnode, final String key)
-					throws UserNotFoundException, TigaseDBException {
+			throws UserNotFoundException, TigaseDBException {
 
 		// String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
 		// if (cache_res != null) {
@@ -297,17 +208,14 @@ public class JDBCRepository
 			long nid = getNodeNID(null, user_id, subnode);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-								"Loading data for key: {0}, user: {1}, node: {2}, found nid: {3}",
-								new Object[] { key,
-															 user_id, subnode, nid });
+				log.log(Level.FINEST, "Loading data for key: {0}, user: {1}, node: {2}, found nid: {3}",
+						new Object[]{key, user_id, subnode, nid});
 			}
 
 			if (nid > 0) {
 				ResultSet rs = null;
-				
-				PreparedStatement data_for_node_st = data_repo.getPreparedStatement(user_id,
-						DATA_FOR_NODE_QUERY);
+
+				PreparedStatement data_for_node_st = data_repo.getPreparedStatement(user_id, DATA_FOR_NODE_QUERY);
 
 				synchronized (data_for_node_st) {
 					try {
@@ -323,9 +231,7 @@ public class JDBCRepository
 							}
 						}
 
-						String[] result = (results.size() == 0)
-								? null
-								: results.toArray(new String[results.size()]);
+						String[] result = (results.size() == 0) ? null : results.toArray(new String[results.size()]);
 
 						// cache.put(user_id+"/"+subnode+"/"+key, result);
 						return result;
@@ -335,37 +241,32 @@ public class JDBCRepository
 				}
 			} else {
 				return null;
-			}    // end of if (nid > 0) else			
+			}    // end of if (nid > 0) else
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error getting data list for: " + user_id + "/"
-					+ subnode + "/" + key, e);
+			throw new TigaseDBException("Error getting data list for: " + user_id + "/" + subnode + "/" + key, e);
 		}
 	}
 
 	@Override
-	public String[] getKeys(BareJID user_id, final String subnode)
-					throws UserNotFoundException, TigaseDBException {
+	public String[] getKeys(BareJID user_id, final String subnode) throws UserNotFoundException, TigaseDBException {
 
 		try {
 			long nid = getNodeNID(null, user_id, subnode);
 
 			if (nid > 0) {
 				ResultSet rs = null;
-				List<String> results               = new ArrayList<String>();
-				PreparedStatement keys_for_node_st = data_repo.getPreparedStatement(user_id,
-																							 KEYS_FOR_NODE_QUERY);
+				List<String> results = new ArrayList<String>();
+				PreparedStatement keys_for_node_st = data_repo.getPreparedStatement(user_id, KEYS_FOR_NODE_QUERY);
 
 				synchronized (keys_for_node_st) {
 					try {
-					keys_for_node_st.setLong(1, nid);
-					rs = keys_for_node_st.executeQuery();
-					while (rs.next()) {
-						results.add(rs.getString(1));
-					}
+						keys_for_node_st.setLong(1, nid);
+						rs = keys_for_node_st.executeQuery();
+						while (rs.next()) {
+							results.add(rs.getString(1));
+						}
 
-					return (results.size() == 0)
-								 ? null
-								 : results.toArray(new String[results.size()]);
+						return (results.size() == 0) ? null : results.toArray(new String[results.size()]);
 					} finally {
 						data_repo.release(null, rs);
 					}
@@ -379,29 +280,22 @@ public class JDBCRepository
 	}
 
 	@Override
-	public String[] getKeys(BareJID user_id)
-					throws UserNotFoundException, TigaseDBException {
+	public String[] getKeys(BareJID user_id) throws UserNotFoundException, TigaseDBException {
 		return getKeys(user_id, null);
 	}
-	
+
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
 	}
 
-	protected DataRepository getRepository() {
-		return data_repo;
-	}
-
 	@Override
-	public String[] getSubnodes(BareJID user_id, final String subnode)
-					throws UserNotFoundException, TigaseDBException {
+	public String[] getSubnodes(BareJID user_id, final String subnode) throws UserNotFoundException, TigaseDBException {
 		try {
 			long nid = getNodeNID(null, user_id, subnode);
 			if (nid > 0) {
 				ResultSet rs = null;
-				PreparedStatement nodes_for_node_st = data_repo.getPreparedStatement(user_id,
-						NODES_FOR_NODE_QUERY);
+				PreparedStatement nodes_for_node_st = data_repo.getPreparedStatement(user_id, NODES_FOR_NODE_QUERY);
 
 				synchronized (nodes_for_node_st) {
 					try {
@@ -413,9 +307,7 @@ public class JDBCRepository
 							results.add(rs.getString(2));
 						}
 
-						return (results.size() == 0)
-								? null
-								: results.toArray(new String[results.size()]);
+						return (results.size() == 0) ? null : results.toArray(new String[results.size()]);
 					} finally {
 						data_repo.release(null, rs);
 					}
@@ -430,8 +322,7 @@ public class JDBCRepository
 	}
 
 	@Override
-	public String[] getSubnodes(BareJID user_id)
-					throws UserNotFoundException, TigaseDBException {
+	public String[] getSubnodes(BareJID user_id) throws UserNotFoundException, TigaseDBException {
 		return getSubnodes(user_id, null);
 	}
 
@@ -443,15 +334,14 @@ public class JDBCRepository
 			throw new TigaseDBException("Error retrieving user UID from repository: ", e);
 		}
 	}
-	
+
 	@Override
 	public List<BareJID> getUsers() throws TigaseDBException {
 		ResultSet rs = null;
 		List<BareJID> users = null;
 
 		try {
-			PreparedStatement all_users_sp = data_repo.getPreparedStatement(null,
-					get_users_query);
+			PreparedStatement all_users_sp = data_repo.getPreparedStatement(null, get_users_query);
 
 			synchronized (all_users_sp) {
 				try {
@@ -478,8 +368,7 @@ public class JDBCRepository
 		try {
 			ResultSet rs = null;
 			long users = -1;
-			PreparedStatement users_count_sp = data_repo.getPreparedStatement(null,
-					GET_USERS_COUNT_QUERY);
+			PreparedStatement users_count_sp = data_repo.getPreparedStatement(null, GET_USERS_COUNT_QUERY);
 
 			synchronized (users_count_sp) {
 				try {
@@ -510,7 +399,7 @@ public class JDBCRepository
 			ResultSet rs = null;
 			long users = -1;
 			PreparedStatement users_domain_count_st = data_repo.getPreparedStatement(null,
-					COUNT_USERS_FOR_DOMAIN_QUERY);
+																					 COUNT_USERS_FOR_DOMAIN_QUERY);
 
 			synchronized (users_domain_count_st) {
 				try {
@@ -588,14 +477,13 @@ public class JDBCRepository
 
 	@Override
 	@Deprecated
-	public void initRepository(final String connection_str, Map<String, String> params)
-					throws DBInitException {
+	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
-			if (data_repo == null)
+			if (data_repo == null) {
 				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+			}
 		} catch (Exception e) {
-			throw new DBInitException("Problem initializing jdbc connection: " +
-																connection_str, e);
+			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 	}
 
@@ -611,12 +499,10 @@ public class JDBCRepository
 
 	@Override
 	public boolean otherAuth(final Map<String, Object> props)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException {
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.otherAuth(props);
 	}
 
-	// Implementation of tigase.db.AuthRepository
-	
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		auth.queryAuth(authProps);
@@ -624,62 +510,27 @@ public class JDBCRepository
 
 	@Override
 	public void removeData(BareJID user_id, final String subnode, final String key)
-					throws UserNotFoundException, TigaseDBException {
+			throws UserNotFoundException, TigaseDBException {
 		removeData(null, user_id, subnode, key);
 	}
 
-	private void removeData(DataRepository repo, BareJID user_id, final String subnode,
-													final String key)
-					throws UserNotFoundException, TigaseDBException {
-
-		// cache.remove(user_id+"/"+subnode+"/"+key);
-		try {
-			long nid = getNodeNID(repo, user_id, subnode);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-								"Removing data, user_id: {0}, subnode: {1}, key: {2}, nid: {3}",
-								new Object[] { user_id,
-															 subnode, key, nid });
-			}
-
-			PreparedStatement remove_key_data_st = null;
-
-			if (repo == null) {
-				remove_key_data_st = data_repo.getPreparedStatement(user_id,
-								REMOVE_KEY_DATA_QUERY);
-			} else {
-				remove_key_data_st = repo.getPreparedStatement(user_id, REMOVE_KEY_DATA_QUERY);
-			}
-			if (nid > 0) {
-				synchronized (remove_key_data_st) {
-					remove_key_data_st.setLong(1, nid);
-					remove_key_data_st.setString(2, key);
-					remove_key_data_st.executeUpdate();
-				}
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Error getting subnodes list.", e);
-		}
-	}
+	// Implementation of tigase.db.AuthRepository
 
 	@Override
-	public void removeData(BareJID user_id, final String key)
-					throws UserNotFoundException, TigaseDBException {
+	public void removeData(BareJID user_id, final String key) throws UserNotFoundException, TigaseDBException {
 		removeData(user_id, null, key);
 	}
 
 	@Override
-	public void removeSubnode(BareJID user_id, final String subnode)
-					throws UserNotFoundException, TigaseDBException {
+	public void removeSubnode(BareJID user_id, final String subnode) throws UserNotFoundException, TigaseDBException {
 		if (subnode == null) {
 			return;
 		}    // end of if (subnode == null)
 		try {
-			String[] subnodes = getSubnodes( user_id, subnode );
-			if (subnodes != null && subnodes.length > 0 ) {
-				for ( String innerSubNode : subnodes) {
-					removeSubnode( user_id, subnode + "/" + innerSubNode);
+			String[] subnodes = getSubnodes(user_id, subnode);
+			if (subnodes != null && subnodes.length > 0) {
+				for (String innerSubNode : subnodes) {
+					removeSubnode(user_id, subnode + "/" + innerSubNode);
 				}
 			}
 			long nid = getNodeNID(null, user_id, subnode);
@@ -694,21 +545,17 @@ public class JDBCRepository
 	}
 
 	/**
-	 * <code>removeUser</code> method is thread safe. It uses local variable for
-	 * storing <code>Statement</code>.
+	 * <code>removeUser</code> method is thread safe. It uses local variable for storing <code>Statement</code>.
 	 *
-	 * @param user_id
-	 *          a <code>String</code> value the user Jabber ID.
+	 * @param user_id a <code>String</code> value the user Jabber ID.
 	 *
 	 * @throws TigaseDBException
-	 * @exception UserNotFoundException
-	 *              if an error occurs
+	 * @throws UserNotFoundException if an error occurs
 	 */
 	@Override
-	public void removeUser(BareJID user_id)
-					throws UserNotFoundException, TigaseDBException {
+	public void removeUser(BareJID user_id) throws UserNotFoundException, TigaseDBException {
 		Statement stmt = null;
-		String query   = null;
+		String query = null;
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Removing user: {0}", user_id);
@@ -727,8 +574,7 @@ public class JDBCRepository
 			query = "delete from " + DEF_NODES_TBL + " where uid = " + uid;
 			stmt.executeUpdate(query);
 
-			PreparedStatement user_del_sp = data_repo.getPreparedStatement(user_id,
-																				REMOVE_USER_QUERY);
+			PreparedStatement user_del_sp = data_repo.getPreparedStatement(user_id, REMOVE_USER_QUERY);
 
 			// Remove user account from users table
 			synchronized (user_del_sp) {
@@ -746,14 +592,11 @@ public class JDBCRepository
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
-	public void setData(BareJID user_id, final String subnode, final String key,
-											final String value)
-					throws UserNotFoundException, TigaseDBException {
-		long uid            = -2;
-		long nid            = -2;
+	public void setData(BareJID user_id, final String subnode, final String key, final String value)
+			throws UserNotFoundException, TigaseDBException {
+		long uid = -2;
+		long nid = -2;
 		DataRepository repo = data_repo.takeRepoHandle(user_id);
 
 		synchronized (repo) {
@@ -761,11 +604,8 @@ public class JDBCRepository
 				uid = getUserUID(repo, user_id, autoCreateUser);
 				nid = getNodeNID(repo, uid, subnode);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-									"Saving data setting data, user_id: {0}, subnode: {1}, key: {2}, " +
-									"uid: {3}, nid: {4}, value: {5}", new Object[] {
-						user_id, subnode, key, uid, nid, value
-					});
+					log.log(Level.FINEST, "Saving data setting data, user_id: {0}, subnode: {1}, key: {2}, " +
+							"uid: {3}, nid: {4}, value: {5}", new Object[]{user_id, subnode, key, uid, nid, value});
 				}
 				if (nid < 0) {
 					try {
@@ -782,41 +622,38 @@ public class JDBCRepository
 					}
 				}
 
-				PreparedStatement update_pairs_sp = repo.getPreparedStatement(user_id,
-																							UPDATE_PAIRS_QUERY);
+				PreparedStatement update_pairs_sp = repo.getPreparedStatement(user_id, UPDATE_PAIRS_QUERY);
 
 				update_pairs_sp.setLong(1, nid);
 				update_pairs_sp.setLong(2, uid);
 				update_pairs_sp.setString(3, key);
-				switch ( data_repo.getDatabaseType() ) {
+				switch (data_repo.getDatabaseType()) {
 					case derby:
 						Clob c = update_pairs_sp.getConnection().createClob();
-						c.setString( 1, value);
-						update_pairs_sp.setClob( 4, c);
+						c.setString(1, value);
+						update_pairs_sp.setClob(4, c);
 						break;
 					default:
-						update_pairs_sp.setString( 4, value );
+						update_pairs_sp.setString(4, value);
 				}
 				update_pairs_sp.executeUpdate();
-			} catch ( SQLException e ) {
+			} catch (SQLException e) {
 				log.log(Level.WARNING,
-								"Error setting data , user_id: " + user_id + ", subnode: " + subnode +
-								", key: " + key + ", uid: " + uid + ", nid: " + nid + ", value: " +
-								value, e);
+						"Error setting data , user_id: " + user_id + ", subnode: " + subnode + ", key: " + key +
+								", uid: " + uid + ", nid: " + nid + ", value: " + value, e);
 			}
 		}
 	}
 
 	@Override
 	public void setData(BareJID user_id, final String key, final String value)
-					throws UserNotFoundException, TigaseDBException {
+			throws UserNotFoundException, TigaseDBException {
 		setData(user_id, null, key, value);
 	}
 
 	@Override
-	public void setDataList(BareJID user_id, final String subnode, final String key,
-													final String[] list)
-					throws UserNotFoundException, TigaseDBException {
+	public void setDataList(BareJID user_id, final String subnode, final String key, final String[] list)
+			throws UserNotFoundException, TigaseDBException {
 
 		// Transactions may not yet work properly but at least let's make sure
 		// both calls below are executed exclusively on the same DB connection
@@ -828,9 +665,9 @@ public class JDBCRepository
 				try {
 					addDataList(repo, user_id, subnode, key, list);
 				} catch (SQLException ex) {
-					throw new TigaseDBException("Problem adding data to DB, user_id: " + user_id +
-																			", subnode: " + subnode + ", key: " + key +
-																			", list: " + Arrays.toString(list), ex);
+					throw new TigaseDBException(
+							"Problem adding data to DB, user_id: " + user_id + ", subnode: " + subnode + ", key: " +
+									key + ", list: " + Arrays.toString(list), ex);
 				}
 			} finally {
 				data_repo.releaseRepoHandle(repo);
@@ -839,11 +676,10 @@ public class JDBCRepository
 
 	}
 
-	//~--- methods --------------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
 	@Override
-	public void updatePassword(BareJID user, final String password)
-					throws TigaseDBException {
+	public void updatePassword(BareJID user, final String password) throws TigaseDBException {
 		auth.updatePassword(user, password);
 	}
 
@@ -858,9 +694,149 @@ public class JDBCRepository
 		}
 	}
 
-	private long addNode(DataRepository repo, long uid, long parent_nid, String node_name)
-					throws SQLException {
-		ResultSet rs                  = null;
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		return auth.isUserDisabled(user);
+	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		auth.setAccountStatus(user, status);
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return auth.getAccountStatus(user);
+	}
+
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		auth.setUserDisabled(user, value);
+	}
+
+	protected DataRepository getRepository() {
+		return data_repo;
+	}
+
+	protected boolean isExceptionKeyViolation(SQLException ex) {
+		String sqlState = ex.getSQLState();
+		boolean keyViolation = false;
+		switch (data_repo.getDatabaseType()) {
+
+			case derby:
+				keyViolation = (sqlState.equals("X0Y78"));
+				break;
+			case postgresql:
+				keyViolation = (sqlState.equals("23505") || sqlState.equals("23000"));
+				break;
+			default:
+				keyViolation = sqlState.equals("23000");
+				break;
+		}
+		return keyViolation;
+	}
+
+	// ~--- methods --------------------------------------------------------------
+	private void addDataList(DataRepository repo, BareJID user_id, final String subnode, final String key,
+							 final String[] list) throws UserNotFoundException, SQLException, UserNotFoundException {
+		long uid = -2;
+		long nid = -2;
+
+		try {
+
+			// OK
+			uid = getUserUID(repo, user_id, autoCreateUser);
+
+			// OK
+			nid = getNodeNID(repo, uid, subnode);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Saving data adding data list, user_id: {0}, subnode: {1}, key: {2}, " +
+								"uid: {3}, nid: {4}, list: {5}",
+						new Object[]{user_id, subnode, key, uid, nid, Arrays.toString(list)});
+			}
+			if (nid < 0) {
+				try {
+
+					// OK
+					nid = createNodePath(repo, user_id, subnode);
+				} catch (SQLException e) {
+
+					// This may happen in cluster node, when 2 nodes at the same
+					// time write data to the same location, like offline messages....
+					// Let's try to get the nid again.
+					// OK
+					nid = getNodeNID(repo, uid, subnode);
+				}
+			}
+
+			PreparedStatement insert_key_val_st = null;
+
+			if (repo == null) {
+				insert_key_val_st = data_repo.getPreparedStatement(user_id, INSERT_KEY_VAL_QUERY);
+			} else {
+				insert_key_val_st = repo.getPreparedStatement(user_id, INSERT_KEY_VAL_QUERY);
+			}
+			synchronized (insert_key_val_st) {
+				insert_key_val_st.setLong(1, nid);
+				insert_key_val_st.setLong(2, uid);
+				insert_key_val_st.setString(3, key);
+				for (String val : list) {
+					insert_key_val_st.setString(4, val);
+					insert_key_val_st.executeUpdate();
+				}    // end of for (String val: list)
+			}
+		} catch (SQLException e) {
+			log.log(Level.WARNING,
+					"Error adding data list, user_id: " + user_id + ", subnode: " + subnode + ", key: " + key +
+							", uid: " + uid + ", nid: " + nid + ", list: " + Arrays.toString(list), e);
+
+			throw e;
+		}
+
+		// cache.put(user_id+"/"+subnode+"/"+key, list);
+	}
+
+	private void removeData(DataRepository repo, BareJID user_id, final String subnode, final String key)
+			throws UserNotFoundException, TigaseDBException {
+
+		// cache.remove(user_id+"/"+subnode+"/"+key);
+		try {
+			long nid = getNodeNID(repo, user_id, subnode);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Removing data, user_id: {0}, subnode: {1}, key: {2}, nid: {3}",
+						new Object[]{user_id, subnode, key, nid});
+			}
+
+			PreparedStatement remove_key_data_st = null;
+
+			if (repo == null) {
+				remove_key_data_st = data_repo.getPreparedStatement(user_id, REMOVE_KEY_DATA_QUERY);
+			} else {
+				remove_key_data_st = repo.getPreparedStatement(user_id, REMOVE_KEY_DATA_QUERY);
+			}
+			if (nid > 0) {
+				synchronized (remove_key_data_st) {
+					remove_key_data_st.setLong(1, nid);
+					remove_key_data_st.setString(2, key);
+					remove_key_data_st.executeUpdate();
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error getting subnodes list.", e);
+		}
+	}
+
+	private long addNode(DataRepository repo, long uid, long parent_nid, String node_name) throws SQLException {
+		ResultSet rs = null;
 		PreparedStatement node_add_sp = null;
 
 		if (repo == null) {
@@ -878,7 +854,7 @@ public class JDBCRepository
 				node_add_sp.setLong(2, uid);
 				node_add_sp.setString(3, node_name);
 
-				switch ( data_repo.getDatabaseType() ) {
+				switch (data_repo.getDatabaseType()) {
 //					case sqlserver:
 //						node_add_sp.executeUpdate();
 //						rs = node_add_sp.getGeneratedKeys();
@@ -906,20 +882,21 @@ public class JDBCRepository
 		// return new_nid;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
-	 * <code>addUserRepo</code> method is thread safe. It uses local variable for
-	 * storing <code>Statement</code>.
+	 * <code>addUserRepo</code> method is thread safe. It uses local variable for storing <code>Statement</code>.
 	 *
-	 * @param user_id
-	 *          a <code>String</code> value of the user ID.
+	 * @param user_id a <code>String</code> value of the user ID.
+	 *
 	 * @return a <code>long</code> value of <code>uid</code> database user ID.
-	 * @exception SQLException if an error occurs
-	 * @exception UserExistsException if the user already exists in repository
+	 *
+	 * @throws SQLException if an error occurs
+	 * @throws UserExistsException if the user already exists in repository
 	 */
-	private long addUserRepo( DataRepository repo, BareJID user_id )
-			throws SQLException, UserExistsException {
-		ResultSet rs                  = null;
-		long uid                      = -1;
+	private long addUserRepo(DataRepository repo, BareJID user_id) throws SQLException, UserExistsException {
+		ResultSet rs = null;
+		long uid = -1;
 		PreparedStatement user_add_sp = null;
 
 		if (repo == null) {
@@ -932,9 +909,9 @@ public class JDBCRepository
 				user_add_sp.setString(1, user_id.toString());
 				user_add_sp.setNull(2, Types.VARCHAR);
 
-				log.log(Level.FINEST, "Adding non existing user to user-repository: " + user_id.toString() );
+				log.log(Level.FINEST, "Adding non existing user to user-repository: " + user_id.toString());
 
-				switch ( data_repo.getDatabaseType() ) {
+				switch (data_repo.getDatabaseType()) {
 					default:
 						rs = user_add_sp.executeQuery();
 						break;
@@ -947,9 +924,9 @@ public class JDBCRepository
 				} else {
 					log.warning("Missing UID after adding new user...");
 				}    // end of if (isnext) else
-			} catch ( SQLException ex ) {
-				if ( isExceptionKeyViolation( ex ) ){
-					throw new UserExistsException(user_id, "User already exist in the database", ex );
+			} catch (SQLException ex) {
+				if (isExceptionKeyViolation(ex)) {
+					throw new UserExistsException(user_id, "User already exist in the database", ex);
 				} else {
 					throw ex;
 				}
@@ -963,44 +940,24 @@ public class JDBCRepository
 		return uid;
 	}
 
-	protected boolean isExceptionKeyViolation( SQLException ex ) {
-		String sqlState = ex.getSQLState();
-		boolean keyViolation = false;
-		switch ( data_repo.getDatabaseType() ) {
-
-			case derby:
-				keyViolation = (sqlState.equals( "X0Y78" ));
-				break;
-			case postgresql:
-				keyViolation = (sqlState.equals( "23505" ) || sqlState.equals( "23000"));
-				break;
-			default:
-				keyViolation = sqlState.equals( "23000");
-				break;
-		}
-		return keyViolation;
-	}
-
 	private String buildNodeQuery(long uid, String node_path) {
-		String query = "select nid as nid1 from " + DEF_NODES_TBL + " where (uid = " + uid +
-									 ")" + " AND (parent_nid is null)" + " AND (node = '" + DEF_ROOT_NODE +
-									 "')";
+		String query = "select nid as nid1 from " + DEF_NODES_TBL + " where (uid = " + uid + ")" +
+				" AND (parent_nid is null)" + " AND (node = '" + DEF_ROOT_NODE + "')";
 
 		if (node_path == null) {
 			return query;
 		} else {
 			StringTokenizer strtok = new StringTokenizer(node_path, "/", false);
-			int cnt                = 1;
-			String subquery        = query;
+			int cnt = 1;
+			String subquery = query;
 
 			while (strtok.hasMoreTokens()) {
 				String token = strtok.nextToken();
 
 				++cnt;
-				subquery = "select nid as nid" + cnt + ", node as node" + cnt + " from " +
-									 DEF_NODES_TBL + ", (" + subquery + ") nodes" + (cnt - 1) +
-									 " where (parent_nid = nid" + (cnt - 1) + ")" + " AND (node = '" +
-									 token + "')";
+				subquery = "select nid as nid" + cnt + ", node as node" + cnt + " from " + DEF_NODES_TBL + ", (" +
+						subquery + ") nodes" + (cnt - 1) + " where (parent_nid = nid" + (cnt - 1) + ")" +
+						" AND (node = '" + token + "')";
 			}    // end of while (strtok.hasMoreTokens())
 
 			return subquery;
@@ -1012,7 +969,7 @@ public class JDBCRepository
 		String schema_version = "1.0";
 		String query = null;
 
-		switch ( data_repo.getDatabaseType() ) {
+		switch (data_repo.getDatabaseType()) {
 			case derby:
 				query = DERBY_GETSCHEMAVER_QUERY;
 				break;
@@ -1024,16 +981,16 @@ public class JDBCRepository
 				query = JDBC_GETSCHEMAVER_QUERY;
 				break;
 		}
-		Statement stmt        = data_repo.createStatement(null);
-		ResultSet rs          = stmt.executeQuery(query);
+		Statement stmt = data_repo.createStatement(null);
+		ResultSet rs = stmt.executeQuery(query);
 
 		try {
 			if (rs.next()) {
 				schema_version = rs.getString(1);
 				if (false == CURRENT_DB_SCHEMA_VER.equals(schema_version)) {
 					System.err.println("\n\nPlease upgrade database schema now.");
-					System.err.println("Current scheme version is: " + schema_version +
-														 ", expected: " + CURRENT_DB_SCHEMA_VER);
+					System.err.println(
+							"Current scheme version is: " + schema_version + ", expected: " + CURRENT_DB_SCHEMA_VER);
 					System.err.println("Check the schema upgrade guide at the address:");
 					System.err.println(SCHEMA_UPGRADE_LINK);
 					System.err.println("----");
@@ -1051,7 +1008,7 @@ public class JDBCRepository
 	}
 
 	private long createNodePath(DataRepository repo, BareJID user_id, String node_path)
-					throws SQLException, UserNotFoundException {
+			throws SQLException, UserNotFoundException {
 		if (node_path == null) {
 
 			// Or should I throw NullPointerException?
@@ -1063,8 +1020,8 @@ public class JDBCRepository
 		long uid = getUserUID(repo, user_id, autoCreateUser);
 
 		// OK
-		long nid                 = getNodeNID(repo, uid, null);
-		StringTokenizer strtok   = new StringTokenizer(node_path, "/", false);
+		long nid = getNodeNID(repo, uid, null);
+		StringTokenizer strtok = new StringTokenizer(node_path, "/", false);
 		StringBuilder built_path = new StringBuilder();
 
 		while (strtok.hasMoreTokens()) {
@@ -1089,8 +1046,8 @@ public class JDBCRepository
 
 	private void deleteSubnode(DataRepository repo, long nid) throws SQLException {
 		Statement stmt = null;
-		ResultSet rs   = null;
-		String query   = null;
+		ResultSet rs = null;
+		String query = null;
 
 		try {
 			if (repo == null) {
@@ -1107,10 +1064,10 @@ public class JDBCRepository
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- inner classes --------------------------------------------------------
 
 	private long getNodeNID(DataRepository repo, long uid, String node_path)
-					throws SQLException, UserNotFoundException {
+			throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -1118,8 +1075,8 @@ public class JDBCRepository
 		}
 
 		Statement stmt = null;
-		ResultSet rs   = null;
-		long nid       = -1;
+		ResultSet rs = null;
+		long nid = -1;
 
 		try {
 			if (repo == null) {
@@ -1135,17 +1092,15 @@ public class JDBCRepository
 			}    // end of if (isnext) else
 			if (nid <= 0) {
 				if (node_path == null) {
-					log.info(
-							"Missing root node, database upgrade or bug in the code? Adding missing " +
-							"root node now.");
+					log.info("Missing root node, database upgrade or bug in the code? Adding missing " +
+									 "root node now.");
 
 					// OK
 					nid = addNode(repo, uid, -1, "root");
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Missing nid for node path: {0} and uid: {1}",
-										new Object[] { node_path,
-																	 uid });
+								new Object[]{node_path, uid});
 					}
 				}
 			}
@@ -1154,12 +1109,12 @@ public class JDBCRepository
 		} finally {
 			data_repo.release(stmt, rs);
 			stmt = null;
-			rs   = null;
+			rs = null;
 		}
 	}
 
 	private long getNodeNID(DataRepository repo, BareJID user_id, String node_path)
-					throws SQLException, UserNotFoundException {
+			throws SQLException, UserNotFoundException {
 		Long cache_res = (Long) cache.get(user_id + "/" + node_path);
 
 		if (cache_res != null) {
@@ -1193,7 +1148,7 @@ public class JDBCRepository
 	}
 
 	private long getUserUIDDirect(DataRepository repo, BareJID user_id) throws SQLException {
-		long result  = -1;
+		long result = -1;
 
 		ResultSet rs = null;
 		PreparedStatement uid_sp = null;
@@ -1221,7 +1176,7 @@ public class JDBCRepository
 	}
 
 	private long getUserUID(DataRepository repo, BareJID user_id, boolean autoCreate)
-					throws SQLException, UserNotFoundException {
+			throws SQLException, UserNotFoundException {
 
 		// OK
 		long result = getUserUID(repo, user_id);
@@ -1235,7 +1190,7 @@ public class JDBCRepository
 				} catch (UserExistsException ex) {
 					// there was unique key violation which indicates that the user
 					// already exists in the database therefore we can retrieve it's UID
-					result = getUserUID( repo, user_id );
+					result = getUserUID(repo, user_id);
 				}
 			} else {
 				throw new UserNotFoundException("User does not exist: " + user_id);
@@ -1245,14 +1200,12 @@ public class JDBCRepository
 		return result;
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	// ~--- inner classes --------------------------------------------------------
 	private class RepoCache
-					extends SimpleCache<String, Object> {
+			extends SimpleCache<String, Object> {
+
 		/**
 		 * Constructs ...
-		 *
 		 *
 		 * @param maxsize
 		 * @param cache_time
@@ -1269,8 +1222,8 @@ public class JDBCRepository
 				return null;
 			}
 
-			Object val          = super.remove(key);
-			String strk         = key.toString();
+			Object val = super.remove(key);
+			String strk = key.toString();
 			Iterator<String> ks = keySet().iterator();
 
 			while (ks.hasNext()) {
@@ -1283,32 +1236,6 @@ public class JDBCRepository
 
 			return val;
 		}
-	}	
-	
-	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
-		// TODO Auto-generated method stub
-		return null;
 	}
-	
-	@Override
-	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		return auth.isUserDisabled(user);
-	}
-
-	@Override
-	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
-		auth.setAccountStatus(user, status);
-	}
-
-	@Override
-	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
-		return auth.getAccountStatus(user);
-	}
-	
-	@Override
-	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
-		auth.setUserDisabled(user, value);
-	}	
 }    // JDBCRepository
 

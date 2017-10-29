@@ -26,8 +26,7 @@ import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * A queue implementation which stores highest added value on a given day
- * and has limited size.
+ * A queue implementation which stores highest added value on a given day and has limited size.
  *
  * @param <E>
  */
@@ -122,6 +121,11 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return toString;
+	}
+
 	protected boolean isNextItem() {
 		LocalDate now = LocalDate.now();
 		if (now.getYear() != lastDailyStatsReset.getYear() ||
@@ -131,11 +135,6 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	public String toString() {
-		return toString;
 	}
 
 //	private String toStringReversed() {

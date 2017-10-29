@@ -30,14 +30,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * SASL-ANONYMOUS mechanism.
- * <br>
- * Called {@linkplain Callback callbacks} in order:
- * <ul>
- * <li>{@link NameCallback}</li>
+ * SASL-ANONYMOUS mechanism. <br> Called {@linkplain Callback callbacks} in order: <ul> <li>{@link NameCallback}</li>
  * </ul>
  */
-public class SaslANONYMOUS extends AbstractSasl {
+public class SaslANONYMOUS
+		extends AbstractSasl {
 
 	public static final String IS_ANONYMOUS_PROPERTY = "IS_ANONYMOUS";
 

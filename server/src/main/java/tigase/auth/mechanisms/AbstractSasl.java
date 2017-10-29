@@ -30,20 +30,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public abstract class AbstractSasl implements SaslServer {
+public abstract class AbstractSasl
+		implements SaslServer {
 
 	public static final String SASL_STRICT_MODE_KEY = "sasl-strict";
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	protected final CallbackHandler callbackHandler;
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	protected final Map<String, Object> negotiatedProperty = new HashMap<String, Object>();
 	protected final Map<? super String, ?> props;
 	protected String authorizedId = null;
 	protected boolean complete = false;
-
-	protected AbstractSasl(Map<? super String, ?> props, CallbackHandler callbackHandler) {
-		this.props = props;
-		this.callbackHandler = callbackHandler;
-	}
 
 	public static boolean isAuthzIDIgnored() {
 		String x = System.getProperty(SASL_STRICT_MODE_KEY, "true");
@@ -54,6 +50,11 @@ public abstract class AbstractSasl implements SaslServer {
 		return x == null || x.toString().length() == 0;
 	}
 
+	protected AbstractSasl(Map<? super String, ?> props, CallbackHandler callbackHandler) {
+		this.props = props;
+		this.callbackHandler = callbackHandler;
+	}
+
 	@Override
 	public void dispose() throws SaslException {
 		this.authorizedId = null;
@@ -61,9 +62,15 @@ public abstract class AbstractSasl implements SaslServer {
 
 	@Override
 	public Object getNegotiatedProperty(String propName) {
-		if (!isComplete())
+		if (!isComplete()) {
 			throw new IllegalStateException("Server negotiation not complete");
+		}
 		return negotiatedProperty.get(propName);
+	}
+
+	@Override
+	public boolean isComplete() {
+		return complete;
 	}
 
 	protected void handleCallbacks(Callback... callbacks) throws SaslException {
@@ -76,14 +83,10 @@ public abstract class AbstractSasl implements SaslServer {
 		}
 	}
 
-	@Override
-	public boolean isComplete() {
-		return complete;
-	}
-
 	protected String[] split(final byte[] byteArray, final String defaultValue) {
-		if (byteArray == null)
+		if (byteArray == null) {
 			return new String[]{};
+		}
 		ArrayList<String> result = new ArrayList<String>();
 
 		int pi = 0;
@@ -104,8 +107,9 @@ public abstract class AbstractSasl implements SaslServer {
 		if (pi < byteArray.length) {
 			String item = new String(byteArray, pi, byteArray.length - pi);
 			result.add(item);
-		} else
+		} else {
 			result.add(defaultValue);
+		}
 
 		return result.toArray(new String[]{});
 	}

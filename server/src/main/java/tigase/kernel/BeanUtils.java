@@ -32,16 +32,13 @@ import java.util.List;
 
 public class BeanUtils {
 
-	private BeanUtils() {
-	}
-
 	public static Field[] getAllFields(Class<?> klass) {
 		List<Field> fields = new ArrayList<Field>();
 		fields.addAll(Arrays.asList(klass.getDeclaredFields()));
 		if (klass.getSuperclass() != null) {
 			fields.addAll(Arrays.asList(getAllFields(klass.getSuperclass())));
 		}
-		return fields.toArray(new Field[] {});
+		return fields.toArray(new Field[]{});
 	}
 
 	public static Method[] getAllMethods(Class<?> klass) {
@@ -50,7 +47,29 @@ public class BeanUtils {
 		if (klass.getSuperclass() != null) {
 			fields.addAll(Arrays.asList(getAllMethods(klass.getSuperclass())));
 		}
-		return fields.toArray(new Method[] {});
+		return fields.toArray(new Method[]{});
+	}
+
+	public static java.lang.reflect.Field getField(BeanConfig bc, String fieldName) {
+		final Class<?> cl = bc.getClazz();
+		java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
+		for (java.lang.reflect.Field field : fields) {
+			if (field.getName().equals(fieldName)) {
+				return field;
+			}
+		}
+		return null;
+	}
+
+	public static Class getGetterSetterMethodsParameterType(Field f) {
+		Method getter = prepareGetterMethod(f);
+		if (getter == null) {
+			return null;
+		}
+		Class rt = getter.getReturnType();
+		Method setter = prepareSetterMethod(f, rt);
+
+		return (setter == null) ? null : rt;
 	}
 
 	public static Object getValue(Object fromBean, Field field)
@@ -63,17 +82,6 @@ public class BeanUtils {
 			return field.get(fromBean);
 		}
 
-	}
-
-	public static java.lang.reflect.Field getField(BeanConfig bc, String fieldName) {
-		final Class<?> cl = bc.getClazz();
-		java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
-		for (java.lang.reflect.Field field : fields) {
-			if (field.getName().equals(fieldName)) {
-				return field;
-			}
-		}
-		return null;
 	}
 
 	public static String prepareAccessorMainPartName(final String fieldName) {
@@ -95,8 +103,7 @@ public class BeanUtils {
 
 	public static Method prepareGetterMethod(Field f) {
 		String t = prepareAccessorMainPartName(f.getName());
-		@SuppressWarnings("unused")
-		String sm;
+		@SuppressWarnings("unused") String sm;
 		String gm;
 		if (f.getType().isPrimitive() && f.getType().equals(boolean.class)) {
 			sm = "set" + t;
@@ -121,8 +128,7 @@ public class BeanUtils {
 	public static Method prepareSetterMethod(Field f, Class type) {
 		String t = prepareAccessorMainPartName(f.getName());
 		String sm;
-		@SuppressWarnings("unused")
-		String gm;
+		@SuppressWarnings("unused") String gm;
 		if (f.getType().isPrimitive() && f.getType().equals(boolean.class)) {
 			sm = "set" + t;
 			gm = "is" + t;
@@ -140,17 +146,6 @@ public class BeanUtils {
 			// f.getDeclaringClass().getName() + " has no setter of field " +
 			// f.getName(), e);
 		}
-	}
-
-	public static Class getGetterSetterMethodsParameterType(Field f) {
-		Method getter = prepareGetterMethod(f);
-		if (getter == null) {
-			return null;
-		}
-		Class rt = getter.getReturnType();
-		Method setter = prepareSetterMethod(f, rt);
-
-		return (setter == null) ? null : rt;
 	}
 
 	public static ArrayList<Method> prepareSetterMethods(Class<?> destination, String fieldName) {
@@ -200,6 +195,9 @@ public class BeanUtils {
 
 		throw new IllegalArgumentException(
 				"Cannot set value type " + valueToSet.getClass().getName() + " to property '" + fieldName + "'.");
+	}
+
+	private BeanUtils() {
 	}
 
 }

@@ -19,18 +19,15 @@
  */
 package tigase.server;
 
-import tigase.xmpp.jid.JID;
-import tigase.xmpp.StanzaType;
-
-import tigase.xml.Element;
-
 import org.junit.Before;
 import org.junit.Test;
+import tigase.xml.Element;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
- *
  * @author Wojciech Kapcia
  */
 public class PacketTest {
@@ -43,48 +40,47 @@ public class PacketTest {
 	@Before
 	public void setUp() {
 
-		JID from = JID.jidInstanceNS( "server" );
-		JID to = JID.jidInstanceNS( "user" );
+		JID from = JID.jidInstanceNS("server");
+		JID to = JID.jidInstanceNS("user");
 
-		Element property = new Element( "property", new String[] { "name", "value", "xmlns" },
-																		new String[] { "some name", "some value", "namespace" } );
-		Element iq = Command.createIqCommand( from, to, StanzaType.get, "myId", "node", Command.DataType.submit );
-		iq.findChild( new String[] { "iq", "command", "x" } ).addChild( property );
-		packetInstance = Iq.packetInstance( iq, from, to );
+		Element property = new Element("property", new String[]{"name", "value", "xmlns"},
+									   new String[]{"some name", "some value", "namespace"});
+		Element iq = Command.createIqCommand(from, to, StanzaType.get, "myId", "node", Command.DataType.submit);
+		iq.findChild(new String[]{"iq", "command", "x"}).addChild(property);
+		packetInstance = Iq.packetInstance(iq, from, to);
 		packetInstance.getStanzaFrom().getDomain();
 
 	}
-
 
 	@Test
 	public void testOkResult_String_int() {
 
 		String includeXML = null;
 		int depth = 5;
-		Packet result = packetInstance.okResult( includeXML, depth );
-		Element property = result.getElement().findChild( new String[] { "iq", "command", "x", "property" } );
+		Packet result = packetInstance.okResult(includeXML, depth);
+		Element property = result.getElement().findChild(new String[]{"iq", "command", "x", "property"});
 
-		assertEquals( "some name", property.getAttributeStaticStr( "name" ) );
-		assertEquals( "some value", property.getAttributeStaticStr( "value" ) );
-		assertEquals( "namespace", property.getAttributeStaticStr( "xmlns" ) );
-		assertEquals( null, property.getAttributeStaticStr( "unknown" ) );
+		assertEquals("some name", property.getAttributeStaticStr("name"));
+		assertEquals("some value", property.getAttributeStaticStr("value"));
+		assertEquals("namespace", property.getAttributeStaticStr("xmlns"));
+		assertEquals(null, property.getAttributeStaticStr("unknown"));
 
 		depth = 0;
-		result = packetInstance.okResult( includeXML, depth );
-		property = result.getElement().findChild( new String[] { "iq", "command", "x", "property" } );
+		result = packetInstance.okResult(includeXML, depth);
+		property = result.getElement().findChild(new String[]{"iq", "command", "x", "property"});
 
-		assertEquals( null, property );
+		assertEquals(null, property);
 
 		depth = 1;
-		result = packetInstance.okResult( includeXML, depth );
-		property = result.getElement().findChild( new String[] { "iq", "command", "x" } );
-		assertEquals( null, property );
+		result = packetInstance.okResult(includeXML, depth);
+		property = result.getElement().findChild(new String[]{"iq", "command", "x"});
+		assertEquals(null, property);
 
-		property = result.getElement().findChild( new String[] { "iq", "command" } );
-		assertEquals( "command", property.getName() );
-		assertEquals( "http://jabber.org/protocol/commands", property.getAttributeStaticStr( "xmlns" ) );
-		assertEquals( "node", property.getAttributeStaticStr( "node" ) );
-		assertEquals( null, property.getAttributeStaticStr( "unknown" ) );
+		property = result.getElement().findChild(new String[]{"iq", "command"});
+		assertEquals("command", property.getName());
+		assertEquals("http://jabber.org/protocol/commands", property.getAttributeStaticStr("xmlns"));
+		assertEquals("node", property.getAttributeStaticStr("node"));
+		assertEquals(null, property.getAttributeStaticStr("unknown"));
 
 	}
 
@@ -92,30 +88,30 @@ public class PacketTest {
 	public void testOkResult_Element_int() {
 		Element includeXML = null;
 		int depth = 5;
-		Packet result = packetInstance.okResult( includeXML, depth );
-		Element property = result.getElement().findChild( new String[] { "iq", "command", "x", "property" } );
+		Packet result = packetInstance.okResult(includeXML, depth);
+		Element property = result.getElement().findChild(new String[]{"iq", "command", "x", "property"});
 
-		assertEquals( "some name", property.getAttributeStaticStr( "name" ) );
-		assertEquals( "some value", property.getAttributeStaticStr( "value" ) );
-		assertEquals( "namespace", property.getAttributeStaticStr( "xmlns" ) );
-		assertEquals( null, property.getAttributeStaticStr( "unknown" ) );
+		assertEquals("some name", property.getAttributeStaticStr("name"));
+		assertEquals("some value", property.getAttributeStaticStr("value"));
+		assertEquals("namespace", property.getAttributeStaticStr("xmlns"));
+		assertEquals(null, property.getAttributeStaticStr("unknown"));
 
 		depth = 0;
-		result = packetInstance.okResult( includeXML, depth );
-		property = result.getElement().findChild( new String[] { "iq", "command", "x", "property" } );
+		result = packetInstance.okResult(includeXML, depth);
+		property = result.getElement().findChild(new String[]{"iq", "command", "x", "property"});
 
-		assertEquals( null, property );
+		assertEquals(null, property);
 
 		depth = 1;
-		result = packetInstance.okResult( includeXML, depth );
-		property = result.getElement().findChild( new String[] { "iq", "command", "x" } );
-		assertEquals( null, property );
+		result = packetInstance.okResult(includeXML, depth);
+		property = result.getElement().findChild(new String[]{"iq", "command", "x"});
+		assertEquals(null, property);
 
-		property = result.getElement().findChild( new String[] { "iq", "command" } );
-		assertEquals( "command", property.getName() );
-		assertEquals( "http://jabber.org/protocol/commands", property.getAttributeStaticStr( "xmlns" ) );
-		assertEquals( "node", property.getAttributeStaticStr( "node" ) );
-		assertEquals( null, property.getAttributeStaticStr( "unknown" ) );
+		property = result.getElement().findChild(new String[]{"iq", "command"});
+		assertEquals("command", property.getName());
+		assertEquals("http://jabber.org/protocol/commands", property.getAttributeStaticStr("xmlns"));
+		assertEquals("node", property.getAttributeStaticStr("node"));
+		assertEquals(null, property.getAttributeStaticStr("unknown"));
 
 	}
 

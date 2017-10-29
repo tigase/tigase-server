@@ -20,32 +20,23 @@
 package tigase.xmpp.impl.annotation;
 
 import tigase.xmpp.StanzaType;
+
 import static tigase.xmpp.impl.annotation.TestAnnotatedXMPPProcessor.*;
 
 /**
- *
  * @author andrzej
  */
 @Id(ID)
-@Handles({
-	@Handle(path={ "iq", "query" }, xmlns=XMLNS1),
-	@Handle(pathStr=IQ_QUERY_PATH, xmlns=XMLNS2)
-})
-@DiscoFeatures({
-	XMLNS1,
-	XMLNS2
-})
-@StreamFeatures({
-	@StreamFeature(elem="bind", xmlns="urn:ietf:params:xml:ns:xmpp-bind")
-})
-@HandleStanzaTypes({
-	StanzaType.get
-})
-class TestAnnotatedXMPPProcessor extends AnnotatedXMPPProcessor {
-	
+@Handles({@Handle(path = {"iq", "query"}, xmlns = XMLNS1), @Handle(pathStr = IQ_QUERY_PATH, xmlns = XMLNS2)})
+@DiscoFeatures({XMLNS1, XMLNS2})
+@StreamFeatures({@StreamFeature(elem = "bind", xmlns = "urn:ietf:params:xml:ns:xmpp-bind")})
+@HandleStanzaTypes({StanzaType.get})
+class TestAnnotatedXMPPProcessor
+		extends AnnotatedXMPPProcessor {
+
 	protected static final String ID = "test-123";
 	protected static final String XMLNS1 = "tigase:test1";
 	protected static final String XMLNS2 = "tigase:test2";
 	protected static final String IQ_QUERY_PATH = "iq/query";
-	
+
 }

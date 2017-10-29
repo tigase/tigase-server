@@ -31,8 +31,8 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.util.Arrays;
@@ -43,26 +43,23 @@ public class TestSpamModule
 		extends AbstractModule {
 
 	private static final Logger log = Logger.getLogger(TestSpamModule.class.getCanonicalName());
-
-	private Criteria CRITERIA = ElementCriteria.name("message");
-
 	private static final String BAD_WORDS_KEY = "bad-words";
 	private static final String WHITELIST_KEY = "white-list";
-
-	@ConfigField(desc = "Abuse notification address", alias = "abuse-address")
-	private JID abuseAddress = JID.jidInstanceNS("abuse@locahost");
-
 	/**
-	 * This might be changed in one threads while it is iterated in
-	 * processPacket(...) in another thread. We expect that changes are very rare
-	 * and small, most of operations are just iterations.
+	 * This might be changed in one threads while it is iterated in processPacket(...) in another thread. We expect that
+	 * changes are very rare and small, most of operations are just iterations.
 	 */
 	@ConfigField(desc = "Bad words", alias = "bad-words")
 	protected String[] badWords = {"word1", "word2", "word3"};
-
 	@ConfigField(desc = "White listed addresses", alias = "white-list")
 	protected String[] whiteList = {"admin@localhost"};
-
+	private Criteria CRITERIA = ElementCriteria.name("message");
+	@ConfigField(desc = "Abuse notification address", alias = "abuse-address")
+	private JID abuseAddress = JID.jidInstanceNS("abuse@locahost");
+	@Inject
+	private TestComponent component;
+	private int delayCounter = 0;
+	private long messagesCounter = 0;
 	@ConfigField(desc = "Frequency of notification", alias = "notification-frequency")
 	private int notificationFrequency = 10;
 	@ConfigField(desc = "Logged packet types", alias = "packet-types")
@@ -71,20 +68,14 @@ public class TestSpamModule
 	private String prependText = "Spam detected: ";
 	@ConfigField(desc = "Secure logging", alias = "secure-logging")
 	private boolean secureLogging = false;
-
-	private int delayCounter = 0;
-	private long messagesCounter = 0;
 	private long spamCounter = 0;
 	private long totalSpamCounter = 0;
-
-	@Inject
-	private TestComponent component;
 
 	public void everyMinute() {
 		if ((++delayCounter) >= notificationFrequency) {
 			write(Message.getMessage(abuseAddress, component.getComponentId(), StanzaType.chat,
-			                         "Detected spam messages: " + spamCounter, "Spam counter", null,
-			                         component.newPacketId("spam-")));
+									 "Detected spam messages: " + spamCounter, "Spam counter", null,
+									 component.newPacketId("spam-")));
 			delayCounter = 0;
 			spamCounter = 0;
 		}
@@ -111,8 +102,8 @@ public class TestSpamModule
 						if (body.contains(word)) {
 							log.finest(prependText + packet.toString(secureLogging));
 							++spamCounter;
-							component.updateServiceDiscoveryItem(component.getName(), "spam", "Spam caught: [" +
-									(++totalSpamCounter) + "]", true);
+							component.updateServiceDiscoveryItem(component.getName(), "spam",
+																 "Spam caught: [" + (++totalSpamCounter) + "]", true);
 							return;
 						}
 					}

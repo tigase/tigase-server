@@ -25,20 +25,17 @@ import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 
 /**
- * Basic interface to implement component module. Single module should implement
- * fragment of component logic. Is easy to add or remove in component (Server)
- * configuration.
+ * Basic interface to implement component module. Single module should implement fragment of component logic. Is easy to
+ * add or remove in component (Server) configuration.
  *
  * @author bmalkow
- *
  */
 public interface Module {
 
 	String[] EMPTY_FEATURES = new String[0];
 
 	/**
-	 * Returns XMPP features offered by module. Features will be returned by
-	 * Service Discovery.
+	 * Returns XMPP features offered by module. Features will be returned by Service Discovery.
 	 *
 	 * @return array of features or <code>null</code>.
 	 */
@@ -47,18 +44,17 @@ public interface Module {
 	}
 
 	/**
-	 * Returns critera used by Component to select module to handle incoming
-	 * stanza.
+	 * Returns critera used by Component to select module to handle incoming stanza.
 	 *
 	 * @return criteria of selecting module.
 	 */
 	Criteria getModuleCriteria();
 
 	/**
-	 * Returns true if Packet can be procesed by module.
-	 * Default implementation uses Criteria.
+	 * Returns true if Packet can be procesed by module. Default implementation uses Criteria.
 	 *
 	 * @param packet
+	 *
 	 * @return
 	 */
 	default boolean canHandle(Packet packet) {
@@ -69,13 +65,11 @@ public interface Module {
 	/**
 	 * Process incoming stanza.
 	 *
-	 * @param packet
-	 *            received {@link Packet stanza}.
-	 * @throws ComponentException
-	 *             if stanza can't be processed correctly. ComponentException is
-	 *             converted to error stanza and returned to stanza sender.
-	 * @throws TigaseStringprepException
-	 *             if there was an error during stringprep processing.
+	 * @param packet received {@link Packet stanza}.
+	 *
+	 * @throws ComponentException if stanza can't be processed correctly. ComponentException is converted to error
+	 * stanza and returned to stanza sender.
+	 * @throws TigaseStringprepException if there was an error during stringprep processing.
 	 */
 	void process(final Packet packet) throws ComponentException, TigaseStringprepException;
 

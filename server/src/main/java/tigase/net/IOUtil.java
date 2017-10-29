@@ -27,19 +27,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author andrzej
  */
 public class IOUtil {
 
 	private static final Logger log = Logger.getLogger(IOUtil.class.getCanonicalName());
-	
+
 	private static final String DIRECT_BUFFER_DEFAULT_SIZE = "direct-buffer-default-size";
-	
+
 	private static final ThreadLocal<BufferCache> buffers = new ThreadLocal<BufferCache>();
-	
+
 	private static int bufferSize;
-	
+
 	static {
 		Integer size = Integer.getInteger(DIRECT_BUFFER_DEFAULT_SIZE);
 		if (size == null) {
@@ -47,62 +46,58 @@ public class IOUtil {
 			try {
 				// using socket native buffer size for best performance
 				bufferSize = java.lang.Math.max(socket.getReceiveBufferSize(), socket.getSendBufferSize());
-			}
-			catch(SocketException ex) {
+			} catch (SocketException ex) {
 				// cloud not get default value from system - setting to 64k
 				bufferSize = 64 * 1024;
 			}
-		}
-		else {
+		} else {
 			bufferSize = size;
 		}
-		
+
 		log.log(Level.CONFIG, "using direct byte buffers with size {0} per buffer", bufferSize);
 	}
-	
+
 	public static ByteBuffer getDirectBuffer(int size) {
 		BufferCache cache = buffers.get();
 		if (cache == null) {
 			cache = new BufferCache(bufferSize);
 			buffers.set(cache);
 		}
-		
-		return cache.get(size);		
+
+		return cache.get(size);
 	}
-	
+
 	public static void returnDirectBuffer(ByteBuffer buf) {
 		BufferCache cache = buffers.get();
 		if (cache != null) {
 			cache.offer(buf);
-		}
-		else {
+		} else {
 			log.log(Level.SEVERE, "returning direct buffer to cache, but no cache found");
 		}
 	}
-	
+
 	private static class BufferCache {
-	
-		private int count = 1;
+
 		private final ByteBuffer buffer;
-		
+		private int count = 1;
+
 		public BufferCache(int size) {
 			buffer = ByteBuffer.allocateDirect(size);
-		}		
-		
+		}
+
 		public ByteBuffer get(int size) {
 			if (count == 1 && size <= buffer.capacity()) {
 				count = 0;
 				buffer.limit(size);
 				return buffer;
-			}
-			else {
+			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "allocating buffer with size = {0}", size);
 				}
 				return ByteBuffer.allocateDirect(size);
 			}
 		}
-		
+
 		public void offer(ByteBuffer buffer) {
 			if (this.buffer == buffer) {
 				count = 1;
@@ -119,7 +114,7 @@ public class IOUtil {
 //			java.lang.ref.Cleaner
 //			((DirectBuffer) buf).cleaner().clean();
 //		}
-		
+
 	}
-	
+
 }

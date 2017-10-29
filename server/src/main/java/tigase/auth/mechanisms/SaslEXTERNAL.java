@@ -29,11 +29,11 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import java.util.Map;
 
-public class SaslEXTERNAL extends AbstractSasl {
-
-	private static final String MECHANISM = "EXTERNAL";
+public class SaslEXTERNAL
+		extends AbstractSasl {
 
 	public static final String PEER_CERTIFICATE_KEY = "PEER_CERTIFICATE_ENTRY_KEY";
+	private static final String MECHANISM = "EXTERNAL";
 
 	SaslEXTERNAL(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(props, callbackHandler);

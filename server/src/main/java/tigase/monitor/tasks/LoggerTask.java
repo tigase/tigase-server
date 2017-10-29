@@ -37,7 +37,9 @@ import java.util.LinkedList;
 import java.util.logging.*;
 
 @Bean(name = "logger-task", parent = MonitorComponent.class, active = true)
-public class LoggerTask extends AbstractConfigurableTask implements Initializable {
+public class LoggerTask
+		extends AbstractConfigurableTask
+		implements Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
 	private static final String LOGGER_MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoggerMonitorEvent";
@@ -48,33 +50,25 @@ public class LoggerTask extends AbstractConfigurableTask implements Initializabl
 	private long lastWarningSent = 0;
 	@ConfigField(desc = "Log Level Threshold")
 	private Level levelTreshold = Level.WARNING;
-	private int loggerSize = 50;
 	private long logWarings = 0;
+	private int loggerSize = 50;
 	private int maxLogBuffer = 1000 * 1000;
 	private MemoryHandlerFlush memoryHandler = null;
 	private MonitorHandler monitorHandler = null;
-
-	@Override
-	protected void disable() {
-		removeHandler();
-		super.disable();
-	}
-
-	@Override
-	protected void enable() {
-		registerHandler();
-		super.enable();
-	}
 
 	@Override
 	public Form getCurrentConfiguration() {
 		Form f = super.getCurrentConfiguration();
 
 		Field x = Field.fieldListSingle("levelTreshold", levelTreshold.getName(), "Log level threshold",
-				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
-						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() },
-				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
-						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() });
+										new String[]{Level.SEVERE.getName(), Level.WARNING.getName(),
+													 Level.INFO.getName(), Level.CONFIG.getName(), Level.FINE.getName(),
+													 Level.FINER.getName(), Level.FINEST.getName(),
+													 Level.ALL.getName()},
+										new String[]{Level.SEVERE.getName(), Level.WARNING.getName(),
+													 Level.INFO.getName(), Level.CONFIG.getName(), Level.FINE.getName(),
+													 Level.FINER.getName(), Level.FINEST.getName(),
+													 Level.ALL.getName()});
 		f.addField(x);
 
 		return f;
@@ -104,6 +98,37 @@ public class LoggerTask extends AbstractConfigurableTask implements Initializabl
 		eventBus.registerEvent(LOGGER_MONITOR_EVENT_NAME, "Fired when logger receives with specific level", false);
 	}
 
+	public void sendWarningOut(String logBuff) {
+		Element event = new Element(LOGGER_MONITOR_EVENT_NAME);
+		event.addChild(new Element("hostname", component.getDefHostName().toString()));
+		event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+		event.addChild(new Element("hostname", component.getDefHostName().toString()));
+		event.addChild(new Element("log", logBuff));
+
+		eventBus.fire(event);
+	}
+
+	@Override
+	public void setNewConfiguration(Form form) {
+		Field f = form.get("levelTreshold");
+		if (f != null) {
+			setLevelTreshold(f.getValue());
+		}
+		super.setNewConfiguration(form);
+	}
+
+	@Override
+	protected void disable() {
+		removeHandler();
+		super.disable();
+	}
+
+	@Override
+	protected void enable() {
+		registerHandler();
+		super.enable();
+	}
+
 	private void registerHandler() {
 		removeHandler();
 		if (monitorHandler == null) {
@@ -121,25 +146,8 @@ public class LoggerTask extends AbstractConfigurableTask implements Initializabl
 		}
 	}
 
-	public void sendWarningOut(String logBuff) {
-		Element event = new Element(LOGGER_MONITOR_EVENT_NAME);
-		event.addChild(new Element("hostname", component.getDefHostName().toString()));
-		event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
-		event.addChild(new Element("hostname", component.getDefHostName().toString()));
-		event.addChild(new Element("log", logBuff));
-
-		eventBus.fire(event);
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field f = form.get("levelTreshold");
-		if (f != null)
-			setLevelTreshold(f.getValue());
-		super.setNewConfiguration(form);
-	}
-
-	private class MemoryHandlerFlush extends MemoryHandler {
+	private class MemoryHandlerFlush
+			extends MemoryHandler {
 
 		MonitorHandler monHandle = null;
 
@@ -160,7 +168,8 @@ public class LoggerTask extends AbstractConfigurableTask implements Initializabl
 		}
 	}
 
-	private class MonitorHandler extends Handler {
+	private class MonitorHandler
+			extends Handler {
 
 		private LogFormatter formatter = new LogFormatter();
 		private LinkedList<String> logs = new LinkedList<String>();

@@ -1,4 +1,3 @@
-
 /*
  * ConditionIfc.java
  *
@@ -23,7 +22,6 @@ package tigase.server.amp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.xml.Element;
 
 //~--- interfaces -------------------------------------------------------------
@@ -34,12 +32,12 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ConditionIfc extends AmpFeatureIfc {
+public interface ConditionIfc
+		extends AmpFeatureIfc {
+
 	boolean match(Packet packet, Element rule);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

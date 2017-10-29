@@ -23,12 +23,12 @@ package tigase.xmpp.impl;
 import tigase.db.TigaseDBException;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterElement;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.function.Function;
@@ -39,17 +39,18 @@ import java.util.stream.Stream;
 
 public class PrivacyList {
 
-	private static final Logger log = Logger.getLogger(PrivacyList.class.getCanonicalName());
-
-	private static final Set<Item.Type> ALL_TYPES = EnumSet.allOf(Item.Type.class);
-
 	public static final PrivacyList ALLOW_ALL = new PrivacyList(null, new Element("list"));
+	private static final Logger log = Logger.getLogger(PrivacyList.class.getCanonicalName());
+	private static final Set<Item.Type> ALL_TYPES = EnumSet.allOf(Item.Type.class);
 	private static final PrivacyList DENY_ALL = new PrivacyList(null, new Element("list")) {
 		@Override
 		public boolean isAllowed(JID jid, Item.Type type) {
 			return false;
 		}
 	};
+	private final Item[] items;
+	private final String name;
+	private final Function<JID, RosterElement> rosterElementGetter;
 
 	public static PrivacyList create(final Map<BareJID, RosterElement> roster, Element el) {
 		if (el == null) {
@@ -77,10 +78,6 @@ public class PrivacyList {
 			}
 		}, el).getSingletonIfPossible();
 	}
-
-	private final String name;
-	private final Function<JID,RosterElement> rosterElementGetter;
-	private final Item[] items;
 
 	public PrivacyList(Function<JID, RosterElement> rosterElementGetter, Element el) {
 		this.rosterElementGetter = rosterElementGetter;
@@ -206,7 +203,22 @@ public class PrivacyList {
 		}
 	}
 
-	private abstract class AbstractItem implements Item {
+	public interface Item {
+
+		enum Type {
+			message,
+			iq,
+			presenceIn,
+			presenceOut
+		}
+
+		boolean isAllowed();
+
+		boolean matches(JID jid, Type type);
+	}
+
+	private abstract class AbstractItem
+			implements Item {
 
 		protected final boolean allowed;
 		protected final Set<Type> types;
@@ -232,7 +244,56 @@ public class PrivacyList {
 		}
 	}
 
-	private class ItemJid extends AbstractItem {
+	private class ItemAll
+			implements Item {
+
+		private final boolean allowed;
+
+		public ItemAll(boolean allowed) {
+			this.allowed = allowed;
+		}
+
+		@Override
+		public boolean isAllowed() {
+			return allowed;
+		}
+
+		@Override
+		public boolean matches(JID jid, Type type) {
+			return true;
+		}
+	}
+
+	private class ItemGroup
+			extends AbstractItem {
+
+		private final String group;
+
+		public ItemGroup(String group, boolean allowed, Set<Type> types) {
+			super(allowed, types);
+			this.group = group;
+		}
+
+		@Override
+		public boolean matches(JID jid, Type type) {
+			if (!types.contains(type)) {
+				return false;
+			}
+
+			String[] groups = getRosterGroupsForJid(jid);
+			if (groups != null) {
+				for (String group : groups) {
+					if (group.equals(this.group)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	private class ItemJid
+			extends AbstractItem {
 
 		private final JID jid;
 
@@ -248,15 +309,15 @@ public class PrivacyList {
 
 		private boolean matches(JID jid) {
 			if (this.jid.getLocalpart() != null) {
-				if (this.jid.getResource() != null ) {
+				if (this.jid.getResource() != null) {
 					return jid.equals(this.jid);
-				} else if (this.jid.getResource() == null ) {
+				} else if (this.jid.getResource() == null) {
 					return jid.getBareJID().equals(this.jid.getBareJID());
 				}
 			} else {
-				if (this.jid.getResource() != null ) {
+				if (this.jid.getResource() != null) {
 					return jid.equals(this.jid);
-				} else if (this.jid.getResource() == null ) {
+				} else if (this.jid.getResource() == null) {
 					return jid.getDomain().equals(this.jid.getDomain());
 				}
 			}
@@ -264,34 +325,8 @@ public class PrivacyList {
 		}
 	}
 
-	private class ItemGroup extends AbstractItem {
-
-		private final String group;
-
-		public ItemGroup(String group, boolean allowed, Set<Type> types) {
-			super(allowed, types);
-			this.group = group;
-		}
-
-		@Override
-		public boolean matches(JID jid, Type type) {
-			if (!types.contains(type)) {
-				return false;
-			}
-			
-			String[] groups = getRosterGroupsForJid(jid);
-			if (groups != null) {
-				for (String group : groups) {
-					if (group.equals(this.group)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-	}
-
-	private class ItemSubscription extends AbstractItem {
+	private class ItemSubscription
+			extends AbstractItem {
 
 		private final RosterAbstract.SubscriptionType subscription;
 
@@ -320,39 +355,6 @@ public class PrivacyList {
 							RosterAbstract.FROM_SUBSCRIBED.contains(subscription);
 			}
 			return false;
-		}
-	}
-
-	private class ItemAll implements Item {
-
-		private final boolean allowed;
-
-		public ItemAll(boolean allowed) {
-			this.allowed = allowed;
-		}
-
-		@Override
-		public boolean isAllowed() {
-			return allowed;
-		}
-
-		@Override
-		public boolean matches(JID jid, Type type) {
-			return true;
-		}
-	}
-
-	public interface Item {
-
-		boolean isAllowed();
-
-		boolean matches(JID jid, Type type);
-
-		enum Type {
-			message,
-			iq,
-			presenceIn,
-			presenceOut
 		}
 	}
 }

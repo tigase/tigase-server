@@ -22,26 +22,6 @@ package tigase.eventbus.impl;
 
 public abstract class AbstractHandler {
 
-	private final String packageName;
-	private final String eventName;
-
-	public AbstractHandler(String packageName, String eventName) {
-		this.packageName = packageName;
-		this.eventName = eventName;
-	}
-
-	public abstract void dispatch(Object event, Object source, boolean remotelyGeneratedEvent);
-
-	public String getEventName() {
-		return eventName;
-	}
-
-	public String getPackageName() {
-		return packageName;
-	}
-
-	public abstract Type getRequiredEventType();
-
 	/**
 	 * Defines what type of event is expected by Handler.
 	 */
@@ -59,5 +39,24 @@ public abstract class AbstractHandler {
 		 */
 		asIs
 	}
+	private final String eventName;
+	private final String packageName;
+
+	public AbstractHandler(String packageName, String eventName) {
+		this.packageName = packageName;
+		this.eventName = eventName;
+	}
+
+	public abstract void dispatch(Object event, Object source, boolean remotelyGeneratedEvent);
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public abstract Type getRequiredEventType();
 
 }

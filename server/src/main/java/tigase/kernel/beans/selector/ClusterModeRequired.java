@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 /**
  * Marks bean as it required cluster mode value to be equal to value of active property.
  */
-@Target({ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented

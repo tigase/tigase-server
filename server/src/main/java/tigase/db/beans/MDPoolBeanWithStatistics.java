@@ -33,24 +33,21 @@ import java.util.stream.Stream;
 
 /**
  * Class extends MDPoolBean class by adding support for statistics gathering for every managed repository.
- *
+ * <p>
  * Created by andrzej on 14.12.2016.
  */
 public abstract class MDPoolBeanWithStatistics<S extends Repository, T extends MDPoolConfigBean<S, T>>
 		extends MDPoolBean<S, T>
 		implements ComponentStatisticsProvider {
 
+	private final Class<S> repoClazz;
+	private S def;
+	private S defProxy;
 	private ConcurrentHashMap<String, StatisticsInvocationHandler<S>> handlers = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, S> repos = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, S> reposProxy = new ConcurrentHashMap<>();
-
-	private S def;
-	private S defProxy;
-
 	@ConfigField(desc = "Enable statistics", alias = "statistics")
 	private boolean statisticsEnabled = true;
-
-	private final Class<S> repoClazz;
 
 	public MDPoolBeanWithStatistics(Class<S> repoClazz) {
 		this.repoClazz = repoClazz;

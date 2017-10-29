@@ -32,11 +32,11 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.ProcessorTestCase;
+import tigase.xmpp.jid.JID;
 
 import java.io.File;
 import java.util.*;
@@ -49,11 +49,11 @@ import static org.junit.Assert.*;
  * Created by andrzej on 22.03.2017.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extends ProcessorTestCase {
+public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
+		extends ProcessorTestCase {
 
+	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
 	protected static String uri = System.getProperty("testDbUri");
-
-
 	@ClassRule
 	public static TestRule rule = new TestRule() {
 		@Override
@@ -69,19 +69,29 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 			return stmnt;
 		}
 	};
-
-	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
 	protected boolean checkEmoji = true;
 	protected DS dataSource;
 	protected MsgRepository repo;
-	private JID sender;
 	private JID recipient;
 	private XMPPResourceConnection recipientSession;
+	private JID sender;
 
-	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
-		DataSource dataSource = DataSourceHelper.getDefaultClass(DataSource.class, uri).newInstance();//RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
-		dataSource.initRepository(uri, new HashMap<>());
-		return (DS) dataSource;
+	@AfterClass
+	public static void cleanDerby() {
+		if (uri.contains("jdbc:derby:")) {
+			File f = new File("derby_test");
+			if (f.exists()) {
+				if (f.listFiles() != null) {
+					Arrays.asList(f.listFiles()).forEach(f2 -> {
+						if (f2.listFiles() != null) {
+							Arrays.asList(f2.listFiles()).forEach(f3 -> f3.delete());
+						}
+						f2.delete();
+					});
+				}
+				f.delete();
+			}
+		}
 	}
 
 	@BeforeClass
@@ -99,7 +109,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 			loader.shutdown();
 		}
 	}
-	
+
 	@Before
 	public void setup() throws Exception {
 		super.setUp();
@@ -124,30 +134,13 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 		super.tearDown();
 	}
 
-	@AfterClass
-	public static void cleanDerby() {
-		if (uri.contains("jdbc:derby:")) {
-			File f = new File("derby_test");
-			if (f.exists()) {
-				if (f.listFiles() != null) {
-					Arrays.asList(f.listFiles()).forEach(f2 -> {
-						if (f2.listFiles() != null) {
-							Arrays.asList(f2.listFiles()).forEach(f3 -> f3.delete());
-						}
-						f2.delete();
-					});
-				}
-				f.delete();
-			}
-		}
-	}
-
 	@Test
 	public void testStorageOfOfflineMessage()
 			throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
 		List<Packet> messages = new ArrayList<>();
-		for (int i=0; i<5; i++) {
-			Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null, null, UUID.randomUUID().toString());
+		for (int i = 0; i < 5; i++) {
+			Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null, null,
+												UUID.randomUUID().toString());
 			assertTrue(repo.storeMessage(sender, recipient, null, message.getElement(), null));
 			messages.add(message);
 		}
@@ -182,7 +175,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 		}
 
 		loaded = repo.loadMessagesToJID(msgIds.subList(0, 3), recipientSession, false, null);
-		for (Packet message : messages.subList(0,3)) {
+		for (Packet message : messages.subList(0, 3)) {
 			Element el1 = message.getElement();
 			Element el2 = loaded.poll();
 			assertNotNull(el2);
@@ -191,9 +184,9 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 		}
 
 		repo.deleteMessage(getMsgId(msgIds.remove(0)));
-		
+
 		loaded = repo.loadMessagesToJID(msgIds.subList(0, 3), recipientSession, false, null);
-		for (Packet message : messages.subList(1,4)) {
+		for (Packet message : messages.subList(1, 4)) {
 			Element el1 = message.getElement();
 			Element el2 = loaded.poll();
 			assertNotNull(el2);
@@ -212,14 +205,15 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 	}
 
 	@Test
-	public void testStorageOfOfflineMessageWithExpiration1() throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
+	public void testStorageOfOfflineMessageWithExpiration1()
+			throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
 		try {
 			Date expire = new Date(System.currentTimeMillis() - 60 * 1000);
 
 			List<Packet> messages = new ArrayList<>();
 			for (int i = 0; i < 5; i++) {
-				Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null, null,
-													UUID.randomUUID().toString());
+				Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null,
+													null, UUID.randomUUID().toString());
 				assertTrue(repo.storeMessage(sender, recipient, expire, message.getElement(), null));
 				messages.add(message);
 			}
@@ -260,7 +254,14 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T> extend
 			throw ex;
 		}
 	}
-	
+
+	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
+		DataSource dataSource = DataSourceHelper.getDefaultClass(DataSource.class, uri)
+				.newInstance();//RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
+		dataSource.initRepository(uri, new HashMap<>());
+		return (DS) dataSource;
+	}
+
 	protected abstract <T> T getMsgId(String msgIdStr);
 
 	protected String generateRandomBody() {

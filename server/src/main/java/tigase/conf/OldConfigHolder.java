@@ -61,29 +61,15 @@ public class OldConfigHolder {
 		dsl,
 		properties
 	}
-
-	private Map<String, Object> props = new LinkedHashMap<>();
-
-	private Path[] propertyFileNames = null;
-
 	private List<String> output = new ArrayList<>();
+	private Path[] propertyFileNames = null;
+	private Map<String, Object> props = new LinkedHashMap<>();
 
 	public Optional<String[]> getOutput() {
 		if (output.isEmpty()) {
 			return Optional.empty();
 		}
 		return Optional.ofNullable(output.toArray(new String[output.size()]));
-	}
-
-	private void logOutput(String msg, Object... args) {
-		if (log.isLoggable(Level.CONFIG)) {
-			log.log(Level.CONFIG, msg, args);
-		}
-		if (args.length > 0) {
-			output.add(java.text.MessageFormat.format(msg, args));
-		} else {
-			output.add(msg);
-		}
 	}
 
 	public void convert(String[] args, Path tdslPath) throws IOException, ConfigReader.ConfigException {
@@ -99,7 +85,8 @@ public class OldConfigHolder {
 			Files.move(propertyFileNames[0], tdslPath);
 			logOutput("Configuration file {0} was updated to match current configuration format and renamed to {1}.",
 					  propertyFileNames[0], tdslPath);
-			backup.ifPresent(backupPath -> logOutput("Previous version of a configuration file was saved as {0}", backupPath));
+			backup.ifPresent(
+					backupPath -> logOutput("Previous version of a configuration file was saved as {0}", backupPath));
 			return;
 		}
 
@@ -134,7 +121,7 @@ public class OldConfigHolder {
 	protected Map<String, Object> getProperties() {
 		return props;
 	}
-	
+
 	protected Format detectPathAndFormat() {
 		String property_filenames = (String) props.remove(PROPERTY_FILENAME_PROP_KEY);
 		if (property_filenames == null) {
@@ -158,7 +145,7 @@ public class OldConfigHolder {
 					.map(filename -> Paths.get(filename))
 					.filter(path -> Files.exists(path))
 					.toArray(x -> new Path[x]);
-			
+
 			for (Path path : propertyFileNames) {
 				File file = path.toFile();
 				try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -185,14 +172,6 @@ public class OldConfigHolder {
 			}
 		}
 		return Format.properties;
-	}
-
-	private void loadFromPropertyFiles() throws ConfigReader.ConfigException {
-		LinkedList<String> settings = new LinkedList<>();
-		for (Path path : propertyFileNames) {
-			ConfiguratorAbstract.loadFromPropertiesFiles(path.toString(), props, settings);
-			loadFromPropertyStrings(settings);
-		}
 	}
 
 	protected Map<String, Object> loadFromPropertyStrings(List<String> settings) {
@@ -277,8 +256,8 @@ public class OldConfigHolder {
 				if ("tigase.http.HttpMessageReceiver".equals(cls)) {
 					props.entrySet().stream().filter(e -> e.getKey().startsWith(name + "/http/")).forEach(e -> {
 						String key = e.getKey().replace(name + "/http/", "");
-						Map<String, Object> httpServerCfg = (Map<String, Object>) toAdd.computeIfAbsent(
-								"httpServer", (k1) -> new HashMap<>());
+						Map<String, Object> httpServerCfg = (Map<String, Object>) toAdd.computeIfAbsent("httpServer",
+																										(k1) -> new HashMap<>());
 						if (key.equals("server-class")) {
 							httpServerCfg.put("class", e.getValue());
 							toRemove.add(e.getKey());
@@ -309,7 +288,8 @@ public class OldConfigHolder {
 									"connections", (k1) -> new HashMap<>());
 							String[] parts = key.split("/");
 							String port = parts[0];
-							Map<String, Object> portCfg = (Map<String, Object>) connections.computeIfAbsent(port, (k1) -> new HashMap<>());
+							Map<String, Object> portCfg = (Map<String, Object>) connections.computeIfAbsent(port,
+																											(k1) -> new HashMap<>());
 							portCfg.put(parts[1], e.getValue());
 
 							toRemove.add(e.getKey());
@@ -382,8 +362,8 @@ public class OldConfigHolder {
 						String k1 = k.replace("presence-state/extended-presence-processors", "");
 						for (String ext : v.toString().split(",")) {
 							String[] parts = ext.split(".");
-							toAdd.put(k + "/" + parts[parts.length-1] + "/class", ext);
-							toAdd.put(k + "/" + parts[parts.length-1] + "/active", true);
+							toAdd.put(k + "/" + parts[parts.length - 1] + "/class", ext);
+							toAdd.put(k + "/" + parts[parts.length - 1] + "/active", true);
 						}
 					} else {
 						toAdd.put(k, v);
@@ -450,14 +430,16 @@ public class OldConfigHolder {
 				toRemove.add(k);
 			}
 			if (k.startsWith("basic-conf/logging/")) {
-				String t = k.replace("basic-conf/logging/","");
+				String t = k.replace("basic-conf/logging/", "");
 				if (t.contains(".")) {
 					int idx = t.lastIndexOf('.');
 					if (idx > 0) {
 						String group = t.substring(0, idx);
-						String key = t.substring(idx+1);
-						Map<String, Object> logging = (Map<String, Object>) toAdd.computeIfAbsent("logging", (k1) -> new HashMap<>());
-						Map<String, Object> handler = (Map<String, Object>) logging.computeIfAbsent(group, (k1) -> new HashMap<>());
+						String key = t.substring(idx + 1);
+						Map<String, Object> logging = (Map<String, Object>) toAdd.computeIfAbsent("logging",
+																								  (k1) -> new HashMap<>());
+						Map<String, Object> handler = (Map<String, Object>) logging.computeIfAbsent(group,
+																									(k1) -> new HashMap<>());
 						handler.put(key, v);
 						toRemove.add(k);
 					}
@@ -474,7 +456,8 @@ public class OldConfigHolder {
 					prop = tmp[1];
 				}
 				Map<String, Object> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
-				Map<String, Object> authParams = (Map<String, Object>) ds.computeIfAbsent("user-params", (x) -> new HashMap<String, Object>());
+				Map<String, Object> authParams = (Map<String, Object>) ds.computeIfAbsent("user-params",
+																						  (x) -> new HashMap<String, Object>());
 				authParams.put(prop, v.toString());
 				toRemove.add(k);
 			}
@@ -489,7 +472,8 @@ public class OldConfigHolder {
 					prop = tmp[1];
 				}
 				Map<String, Object> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
-				Map<String, Object> authParams = (Map<String, Object>) ds.computeIfAbsent("auth-params", (x) -> new HashMap<String, Object>());
+				Map<String, Object> authParams = (Map<String, Object>) ds.computeIfAbsent("auth-params",
+																						  (x) -> new HashMap<String, Object>());
 				authParams.put(prop, v.toString());
 				toRemove.add(k);
 			}
@@ -551,7 +535,7 @@ public class OldConfigHolder {
 				props.put("msgRepository/" + domain + "/cls", ampType);
 			}
 			if (authParams != null) {
-				authParams.forEach((k,v) -> {
+				authParams.forEach((k, v) -> {
 					if (k.equals(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY)) {
 						props.put(authPrefix + "/cls", v);
 					} else if (k.equals(RepositoryFactory.AUTH_REPO_POOL_CLASS_PROP_KEY)) {
@@ -564,7 +548,7 @@ public class OldConfigHolder {
 				});
 			}
 			if (userParams != null) {
-				userParams.forEach((k,v) -> {
+				userParams.forEach((k, v) -> {
 					if (k.equals(RepositoryFactory.USER_REPO_CLASS_PROP_KEY)) {
 						props.put(userPrefix + "/cls", v);
 					} else if (k.equals(RepositoryFactory.USER_REPO_POOL_CLASS_PROP_KEY)) {
@@ -589,7 +573,8 @@ public class OldConfigHolder {
 							e.getValue().equals(ComponentProtocol.class.getCanonicalName()))
 					.map(e -> e.getKey().replace("/class", ""))
 					.findFirst();
-			extCmpName.ifPresent(cmpName -> toAdd.put(cmpName + "/repository/items", Arrays.asList(external.split(","))));
+			extCmpName.ifPresent(
+					cmpName -> toAdd.put(cmpName + "/repository/items", Arrays.asList(external.split(","))));
 			renameIfExists(props, ComponentProtocol.EXTCOMP_BIND_HOSTNAMES,
 						   ComponentProtocol.EXTCOMP_BIND_HOSTNAMES_PROP_KEY,
 						   value -> Arrays.asList(((String) value).split(",")));
@@ -607,7 +592,7 @@ public class OldConfigHolder {
 			props.put("trusted", trusted.split(","));
 		}
 
-		String maxQueueSize = (String)props.remove("--max-queue-size");
+		String maxQueueSize = (String) props.remove("--max-queue-size");
 		if (maxQueueSize != null) {
 			props.put("max-queue-size", Integer.valueOf(maxQueueSize));
 		}
@@ -690,9 +675,7 @@ public class OldConfigHolder {
 			String[] parts = plugins.split(",");
 			for (String part : parts) {
 				String[] tmp = part.split("=");
-				final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-')
-									? tmp[0].substring(1)
-									: tmp[0];
+				final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-') ? tmp[0].substring(1) : tmp[0];
 				boolean active = !tmp[0].startsWith("-");
 
 				props.put("sess-man/" + name + "/active", String.valueOf(active));
@@ -735,18 +718,35 @@ public class OldConfigHolder {
 				try {
 					props.put(prefix + "threadsNo", Integer.parseInt(tmp[0]));
 				} catch (Exception ex) {
-					log.log(Level.WARNING, "Plugin " + e.getKey() + " concurrency parsing error for: " + tmp[0],
-							ex);
+					log.log(Level.WARNING, "Plugin " + e.getKey() + " concurrency parsing error for: " + tmp[0], ex);
 				}
 				if (tmp.length > 1) {
 					try {
 						props.put(prefix + "queueSize", Integer.parseInt(tmp[1]));
 					} catch (Exception ex) {
-						log.log(Level.WARNING, "Plugin " + e.getKey() + " queueSize parsing error for: " + tmp[1],
-								ex);
+						log.log(Level.WARNING, "Plugin " + e.getKey() + " queueSize parsing error for: " + tmp[1], ex);
 					}
 				}
 			}
+		}
+	}
+
+	private void logOutput(String msg, Object... args) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, msg, args);
+		}
+		if (args.length > 0) {
+			output.add(java.text.MessageFormat.format(msg, args));
+		} else {
+			output.add(msg);
+		}
+	}
+
+	private void loadFromPropertyFiles() throws ConfigReader.ConfigException {
+		LinkedList<String> settings = new LinkedList<>();
+		for (Path path : propertyFileNames) {
+			ConfiguratorAbstract.loadFromPropertiesFiles(path.toString(), props, settings);
+			loadFromPropertyStrings(settings);
 		}
 	}
 

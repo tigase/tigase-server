@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -40,77 +38,65 @@ import java.util.logging.Logger;
 //~--- JDK imports ------------------------------------------------------------
 
 /**
- * <code>XMPPProcessor</code> abstract class contains basic definition for
- * <em>XMPP</em> processor.
- * To create new processor implementing particular <em>XMPP</em> functionality
- * it is enough to extend this class and implement one abstract method.<br>
- * Additionally to allow system properly recognise this processor you need also
- * to implement own constructor which sets proper values to parent constructor.
- * You must implement exactly one constructor with zero parameters which calls
- * parent constructor with proper values. Refer to constructor documentation
- * for information about required parameters.<br>
- * To fully interact with entity connected to the session or with other entities
- * in <em>XMPP</em> network you should be also familiar with
- * <code>addReply(...)</code>, <code>addMessage(...)</code> and
- * <code>addBroadcast(...)</code> methods.<br>
- * There is also partially implemented functionality to send messages to entities
- * in other networks like <em>SMTP</em> or other implemented by the server.
- * Once this implementation is finished there will be more information available.
- * If you, however, are interested in this particular feature send a question
- * to author.
- *
+ * <code>XMPPProcessor</code> abstract class contains basic definition for <em>XMPP</em> processor. To create new
+ * processor implementing particular <em>XMPP</em> functionality it is enough to extend this class and implement one
+ * abstract method.<br> Additionally to allow system properly recognise this processor you need also to implement own
+ * constructor which sets proper values to parent constructor. You must implement exactly one constructor with zero
+ * parameters which calls parent constructor with proper values. Refer to constructor documentation for information
+ * about required parameters.<br> To fully interact with entity connected to the session or with other entities in
+ * <em>XMPP</em> network you should be also familiar with <code>addReply(...)</code>, <code>addMessage(...)</code> and
+ * <code>addBroadcast(...)</code> methods.<br> There is also partially implemented functionality to send messages to
+ * entities in other networks like <em>SMTP</em> or other implemented by the server. Once this implementation is
+ * finished there will be more information available. If you, however, are interested in this particular feature send a
+ * question to author.
  * <p>
- * Created: Tue Oct  5 20:31:23 2004
- * </p>
+ * <p> Created: Tue Oct  5 20:31:23 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class XMPPProcessor
-				implements XMPPImplIfc, XMPPProcessorConcurrencyAwareIfc {
+		implements XMPPImplIfc, XMPPProcessorConcurrencyAwareIfc {
+
 	/** Field description */
 	protected static final String ALL_NAMES = "*";
 
 	/** Field description */
-	protected static final String[][] ALL_PATHS = {
-		{ "*" }
-	};
-	protected static ComponentInfo cmpInfo = null;
-
-	{
-		cmpInfo = new ComponentInfo( id(), this.getClass() );
-	}
-
+	protected static final String[][] ALL_PATHS = {{"*"}};
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(XMPPProcessor.class.getName());
-
+	protected static ComponentInfo cmpInfo = null;
+	@ConfigField(desc = "Queue size which should be used by processor")
+	private Integer queueSize = null;
 	@ConfigField(desc = "Numbers of threads which should be used by processor")
 	private int threadsNo = concurrentQueuesNo();
 
-	@ConfigField(desc = "Queue size which should be used by processor")
-	private Integer queueSize = null;
+	{
+		cmpInfo = new ComponentInfo(id(), this.getClass());
+	}
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
-	protected XMPPProcessor() {}
+	protected XMPPProcessor() {
+	}
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
-		Authorization result    = null;
-		String[][]    elemPaths = supElementNamePaths();
+		Authorization result = null;
+		String[][] elemPaths = supElementNamePaths();
 
 		if (elemPaths != null) {
 
 			// This is the new API style
-			String[]        elemXMLNS = supNamespaces();
-			Set<StanzaType> types     = supTypes();
+			String[] elemXMLNS = supNamespaces();
+			Set<StanzaType> types = supTypes();
 
 			result = checkPacket(packet, elemPaths, elemXMLNS, types);
 		} else {
@@ -122,10 +108,8 @@ public abstract class XMPPProcessor
 			}
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1})\n Request: " +
-					"{2}, conn: {3}, authorization: {4}", new Object[] { this.getClass()
-					.getSimpleName(),
-					id(), packet, conn, result });
+			log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1})\n Request: " + "{2}, conn: {3}, authorization: {4}",
+					new Object[]{this.getClass().getSimpleName(), id(), packet, conn, result});
 		}
 
 		return result;
@@ -144,7 +128,8 @@ public abstract class XMPPProcessor
 
 	@Override
 	@Deprecated
-	public void init(Map<String, Object> settings) throws TigaseDBException {}
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+	}
 
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -181,21 +166,19 @@ public abstract class XMPPProcessor
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public XMPPProcessor getInstance() {
 		return this;
 	}
 
 	@Override
-	public void getStatistics(StatisticsList list) {}
+	public void getStatistics(StatisticsList list) {
+	}
 
 	@Override
 	public ComponentInfo getComponentInfo() {
-		if ( cmpInfo == null ){
-			cmpInfo = new ComponentInfo( id(), this.getClass() );
+		if (cmpInfo == null) {
+			cmpInfo = new ComponentInfo(id(), this.getClass());
 		}
 		return cmpInfo;
 	}
@@ -209,7 +192,7 @@ public abstract class XMPPProcessor
 	@Deprecated
 	public boolean isSupporting(final String element, final String ns) {
 		String[] impl_elements = supElements();
-		String[] impl_xmlns    = supNamespaces();
+		String[] impl_xmlns = supNamespaces();
 
 		if ((impl_elements != null) && (impl_xmlns != null)) {
 			for (int i = 0; (i < impl_elements.length) && (i < impl_xmlns.length); i++) {
@@ -241,10 +224,9 @@ public abstract class XMPPProcessor
 
 	//~--- methods --------------------------------------------------------------
 
-	private Authorization checkPacket(Packet packet, String[][] elemPaths,
-			String[] elemXMLNS, Set<StanzaType> types) {
-		Authorization result   = null;
-		boolean       names_ok = elemPaths == ALL_PATHS;
+	private Authorization checkPacket(Packet packet, String[][] elemPaths, String[] elemXMLNS, Set<StanzaType> types) {
+		Authorization result = null;
+		boolean names_ok = elemPaths == ALL_PATHS;
 
 		if (!names_ok) {
 			for (int i = 0; i < elemPaths.length; i++) {
@@ -264,7 +246,7 @@ public abstract class XMPPProcessor
 
 	private boolean walk(Element elem) {
 		boolean result;
-		String  xmlns = elem.getXMLNS();
+		String xmlns = elem.getXMLNS();
 
 		if (xmlns == null) {
 			xmlns = "jabber:client";
@@ -283,6 +265,5 @@ public abstract class XMPPProcessor
 		return result;
 	}
 }    // XMPPProcessor
-
 
 //~ Formatted in Tigase Code Convention on 13/04/24

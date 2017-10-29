@@ -20,18 +20,18 @@
 package tigase.cluster.api;
 
 /**
- * @author Artur Hefczyc
- * Created Mar 16, 2011
+ * @author Artur Hefczyc Created Mar 16, 2011
  */
-public class ClusterCommandException extends Exception {
+public class ClusterCommandException
+		extends Exception {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	public ClusterCommandException() {
 		super();

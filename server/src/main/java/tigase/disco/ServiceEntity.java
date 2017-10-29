@@ -18,58 +18,51 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.disco;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Set;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class ServiceEntity here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Feb 10 13:11:34 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ServiceEntity {
+
 	private static Logger log = Logger.getLogger(ServiceEntity.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private Set<String>           features   = null;
+	private boolean adminOnly = false;
+	private Set<String> features = null;
 	private List<ServiceIdentity> identities = null;
-	private Set<ServiceEntity>    items      = null;
-	private String                jid        = null;
-	private String                name       = null;
-	private String                node       = null;
-	private boolean               adminOnly  = false;
+	private Set<ServiceEntity> items = null;
+	private String jid = null;
+	private String name = null;
+	private String node = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>ServiceEntity</code> instance.
 	 *
-	 *
 	 * @param jid
 	 * @param node
 	 * @param name
 	 */
 	public ServiceEntity(String jid, String node, String name) {
-		this.jid  = jid;
+		this.jid = jid;
 		this.node = node;
 		this.name = name;
 	}
@@ -77,16 +70,15 @@ public class ServiceEntity {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param jid
 	 * @param node
 	 * @param name
 	 * @param adminOnly
 	 */
 	public ServiceEntity(String jid, String node, String name, boolean adminOnly) {
-		this.jid       = jid;
-		this.node      = node;
-		this.name      = name;
+		this.jid = jid;
+		this.node = node;
+		this.name = name;
 		this.adminOnly = adminOnly;
 	}
 
@@ -94,7 +86,6 @@ public class ServiceEntity {
 
 	/**
 	 * Describe <code>addFeatures</code> method here.
-	 *
 	 *
 	 * @param features
 	 */
@@ -108,7 +99,6 @@ public class ServiceEntity {
 	/**
 	 * Describe <code>addIdentities</code> method here.
 	 *
-	 *
 	 * @param identities
 	 */
 	public void addIdentities(ServiceIdentity... identities) {
@@ -120,7 +110,6 @@ public class ServiceEntity {
 
 	/**
 	 * Describe <code>addItems</code> method here.
-	 *
 	 *
 	 * @param items
 	 */
@@ -147,6 +136,7 @@ public class ServiceEntity {
 	 * 2 ServiceEntities are equal of JIDs are equal and NODEs are equal.
 	 *
 	 * @param obj an <code>Object</code> value
+	 *
 	 * @return a <code>boolean</code> value
 	 */
 	@Override
@@ -156,11 +146,8 @@ public class ServiceEntity {
 
 			// Assuming here that jid can never be NULL
 			// Node can be NULL so we need to do more calculation on it
-			return ((se == null)
-					? false
-					: jid.equals(se.jid)) && ((node == se.node) || ((node != null)
-					? node.equals(se.node)
-					: se.node.equals(node)));
+			return ((se == null) ? false : jid.equals(se.jid)) &&
+					((node == se.node) || ((node != null) ? node.equals(se.node) : se.node.equals(node)));
 		}
 
 		return false;
@@ -170,6 +157,7 @@ public class ServiceEntity {
 	 * Describe <code>findNode</code> method here.
 	 *
 	 * @param node a <code>String</code> value
+	 *
 	 * @return a <code>ServiceEntity</code> value
 	 */
 	public ServiceEntity findNode(String node) {
@@ -205,7 +193,7 @@ public class ServiceEntity {
 		int idx = node.indexOf('/');
 
 		if (idx >= 0) {
-			String        top     = node.substring(0, idx);
+			String top = node.substring(0, idx);
 			ServiceEntity current = findNode(top);
 
 			if (current != null) {
@@ -224,16 +212,11 @@ public class ServiceEntity {
 	 * @return an <code>int</code> value
 	 */
 	public int hashCode() {
-		return ((jid != null)
-				? jid.hashCode()
-				: 0) + ((node != null)
-				? node.hashCode()
-				: 0);
+		return ((jid != null) ? jid.hashCode() : 0) + ((node != null) ? node.hashCode() : 0);
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param items is a <code>ServiceEntity</code>
 	 */
@@ -256,7 +239,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param node is a <code>String</code>
 	 *
 	 * @return a value of <code>Element[]</code>
@@ -266,19 +248,15 @@ public class ServiceEntity {
 
 		if (features != null) {
 			for (String feature : features) {
-				elFeatures.add(new Element("feature", new String[] { "var" }, new String[] {
-						feature }));
+				elFeatures.add(new Element("feature", new String[]{"var"}, new String[]{feature}));
 			}
 		}
 
-		return (elFeatures.size() > 0)
-				? elFeatures.toArray(new Element[elFeatures.size()])
-				: null;
+		return (elFeatures.size() > 0) ? elFeatures.toArray(new Element[elFeatures.size()]) : null;
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param node is a <code>String</code>
 	 *
@@ -293,6 +271,7 @@ public class ServiceEntity {
 	 *
 	 * @param node a <code>String</code> value
 	 * @param admin is a <code>boolean</code>
+	 *
 	 * @return an <code>Element</code> value
 	 */
 	public Element getDiscoInfo(String node, boolean admin) {
@@ -307,14 +286,13 @@ public class ServiceEntity {
 		if (node == null) {
 
 			// If the node is for admins only and this is not admin return null
-			if (adminOnly &&!admin) {
+			if (adminOnly && !admin) {
 				return null;
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("It's me: " + toString());
 			}
-			query = new Element("query", new String[] { "xmlns" }, new String[] {
-					"http://jabber.org/protocol/disco#info" });
+			query = new Element("query", new String[]{"xmlns"}, new String[]{"http://jabber.org/protocol/disco#info"});
 			if (identities != null) {
 				for (ServiceIdentity ident : identities) {
 					query.addChild(ident.getElement());
@@ -322,15 +300,14 @@ public class ServiceEntity {
 			}
 			if (features != null) {
 				for (String feature : features) {
-					query.addChild(new Element("feature", new String[] { "var" }, new String[] {
-							feature }));
+					query.addChild(new Element("feature", new String[]{"var"}, new String[]{feature}));
 				}
 			}
 		} else {
 			ServiceEntity entity = findNode(node);
 
 			// If the entity is for admins only and this is not admin return null
-			if ((entity != null) && entity.adminOnly &&!admin) {
+			if ((entity != null) && entity.adminOnly && !admin) {
 				entity = null;
 			}
 			if (entity != null) {
@@ -350,6 +327,7 @@ public class ServiceEntity {
 	 *
 	 * @param node a <code>String</code> value
 	 * @param jid a <code>String</code> value
+	 *
 	 * @return an <code>Element</code> value
 	 */
 	public Element getDiscoItem(String node, String jid) {
@@ -363,9 +341,7 @@ public class ServiceEntity {
 			}
 		}
 		if (node != null) {
-			item.setAttribute("node", node + ((this.node != null)
-					? "/" + this.node
-					: ""));
+			item.setAttribute("node", node + ((this.node != null) ? "/" + this.node : ""));
 		} else {
 			if (this.node != null) {
 				item.setAttribute("node", this.node);
@@ -381,7 +357,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param node is a <code>String</code>
 	 * @param jid is a <code>String</code>
 	 *
@@ -393,7 +368,6 @@ public class ServiceEntity {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param node is a <code>String</code>
 	 * @param jid is a <code>String</code>
@@ -415,15 +389,13 @@ public class ServiceEntity {
 		} else {
 			ServiceEntity entity = findNode(node);
 
-			if ((entity != null) && entity.adminOnly &&!admin) {
+			if ((entity != null) && entity.adminOnly && !admin) {
 				entity = null;
 			}
 
 			// System.out.println("Found disco entity: " + entity.toString());
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Found disco entity: " + ((entity != null)
-						? entity.toString()
-						: null));
+				log.finest("Found disco entity: " + ((entity != null) ? entity.toString() : null));
 			}
 			if (entity != null) {
 				result = entity.getItems(node, jid, admin);
@@ -435,7 +407,6 @@ public class ServiceEntity {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param node is a <code>String</code>
 	 * @param jid is a <code>String</code>
@@ -449,7 +420,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param node is a <code>String</code>
 	 * @param jid is a <code>String</code>
 	 * @param admin is a <code>boolean</code>
@@ -462,7 +432,7 @@ public class ServiceEntity {
 		if (items != null) {
 			result = new ArrayList<Element>();
 			for (ServiceEntity item : items) {
-				if (item.adminOnly &&!admin) {
+				if (item.adminOnly && !admin) {
 					continue;
 				}
 				result.add(item.getDiscoItem(node, jid));
@@ -502,7 +472,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isAdminOnly() {
@@ -514,7 +483,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param adminOnly is a <code>boolean</code>
 	 */
 	public void setAdminOnly(boolean adminOnly) {
@@ -524,7 +492,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param description is a <code>String</code>
 	 */
 	public void setDescription(String description) {
@@ -533,7 +500,6 @@ public class ServiceEntity {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param features is a <code>String</code>
 	 */
@@ -545,7 +511,6 @@ public class ServiceEntity {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param identities is a <code>ServiceIdentity</code>
 	 */
 	public void setIdentities(ServiceIdentity... identities) {
@@ -553,6 +518,5 @@ public class ServiceEntity {
 		Collections.addAll(this.identities, identities);
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/10/16

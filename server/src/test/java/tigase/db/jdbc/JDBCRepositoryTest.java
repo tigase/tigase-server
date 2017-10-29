@@ -38,15 +38,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Wojtek
  */
 public class JDBCRepositoryTest {
 
 	private static final Logger log = TestLogger.getLogger(JDBCRepositoryTest.class);
-
-	UserRepository repo = null;
 	boolean initialised = false;
+	UserRepository repo = null;
 
 	public JDBCRepositoryTest() {
 	}
@@ -54,7 +52,7 @@ public class JDBCRepositoryTest {
 	@Before
 	public void setUp() {
 		HashMap map = new LinkedHashMap();
-		map.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "2");
+		map.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "2");
 
 		String repositoryURI = null;
 //		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
@@ -67,86 +65,86 @@ public class JDBCRepositoryTest {
 		Assume.assumeNotNull(repositoryURI);
 		repo = new JDBCRepository();
 		try {
-			repo.initRepository( repositoryURI, map );
+			repo.initRepository(repositoryURI, map);
 			initialised = true;
-		} catch ( DBInitException ex ) {
-			Logger.getLogger( JDBCRepositoryTest.class.getName() ).log( Level.SEVERE, "db initialisation failed", ex );
+		} catch (DBInitException ex) {
+			Logger.getLogger(JDBCRepositoryTest.class.getName()).log(Level.SEVERE, "db initialisation failed", ex);
 		}
 
 		Assume.assumeTrue(initialised);
 
 	}
 
-	private void getData( BareJID user )  {
-		if ( user == null ){
-			user = BareJID.bareJIDInstanceNS( "user", "domain" );
-		}
-		log.log(Level.FINE, "retrieve: " + user + " / thread: " + Thread.currentThread().getName() );
-		try {
-//			repo.getData( user, "privacy", "default-list", null );
-			repo.addUser( user );
-		} catch ( UserExistsException ex ) {
-			log.log(Level.FINE, "User exists, ignore: " + ex.getUserId() );
-		} catch ( TigaseDBException ex ) {
-			Logger.getLogger( JDBCRepositoryTest.class.getName() ).log( Level.SEVERE, null, ex );
-		}
-
-	}
-
 	@Test
 	public void testLongNode() throws InterruptedException, TigaseDBException {
 
-		BareJID user = BareJID.bareJIDInstanceNS( "user", "domain" );
-		repo.setData( user, "node1/node2/node3", "key", "value" );
+		BareJID user = BareJID.bareJIDInstanceNS("user", "domain");
+		repo.setData(user, "node1/node2/node3", "key", "value");
 		String node3val;
-		node3val = repo.getData( user, "node1/node2/node3", "key" );
+		node3val = repo.getData(user, "node1/node2/node3", "key");
 		Assert.assertEquals("String differ from expected!", "value", node3val);
-		repo.removeSubnode( user, "node1" );
-		node3val = repo.getData( user, "node1/node2/node3", "key" );
-		Assert.assertNull( "Node not removed", node3val );
+		repo.removeSubnode(user, "node1");
+		node3val = repo.getData(user, "node1/node2/node3", "key");
+		Assert.assertNull("Node not removed", node3val);
 
 	}
-
 
 	@Test
 	public void testGetData() throws InterruptedException {
 
-		log.log(Level.FINE, "repo: " + repo );
-		if ( repo != null ){
+		log.log(Level.FINE, "repo: " + repo);
+		if (repo != null) {
 			LocalDateTime localNow = LocalDateTime.now();
 //			getData( null );
 
 			long initalDelay = 5;
 
-			ScheduledExecutorService scheduler = Executors.newScheduledThreadPool( 10 );
+			ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 			final int iter = 50;
 			final int threads = 10;
 
-			for ( int i = 0 ; i < threads ; i++ ) {
-				scheduler.scheduleAtFixedRate( new RunnableImpl( iter ), initalDelay, 100, TimeUnit.MILLISECONDS );
+			for (int i = 0; i < threads; i++) {
+				scheduler.scheduleAtFixedRate(new RunnableImpl(iter), initalDelay, 100, TimeUnit.MILLISECONDS);
 			}
 
-			Thread.sleep( threads * 1000 );
+			Thread.sleep(threads * 1000);
 		}
-
 
 	}
 
-	private class RunnableImpl implements Runnable {
+	private void getData(BareJID user) {
+		if (user == null) {
+			user = BareJID.bareJIDInstanceNS("user", "domain");
+		}
+		log.log(Level.FINE, "retrieve: " + user + " / thread: " + Thread.currentThread().getName());
+		try {
+//			repo.getData( user, "privacy", "default-list", null );
+			repo.addUser(user);
+		} catch (UserExistsException ex) {
+			log.log(Level.FINE, "User exists, ignore: " + ex.getUserId());
+		} catch (TigaseDBException ex) {
+			Logger.getLogger(JDBCRepositoryTest.class.getName()).log(Level.SEVERE, null, ex);
+		}
+
+	}
+
+	private class RunnableImpl
+			implements Runnable {
 
 		int count = 0;
 		int max = 50;
+
 		public RunnableImpl(int max) {
 			this.max = max;
 		}
 
 		@Override
 		public void run() {
-			while ( count < max ) {
+			while (count < max) {
 				count++;
 				BareJID user;
-				user = BareJID.bareJIDInstanceNS( String.valueOf( ( new Date() ).getTime() / 10 ), "domain" );
-				getData( user );
+				user = BareJID.bareJIDInstanceNS(String.valueOf((new Date()).getTime() / 10), "domain");
+				getData(user);
 			}
 		}
 	}

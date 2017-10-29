@@ -19,8 +19,6 @@
  */
 package tigase.component.modules;
 
-import java.util.logging.Logger;
-
 import tigase.component.PacketWriter;
 import tigase.component.responses.AsyncCallback;
 import tigase.eventbus.EventBus;
@@ -28,31 +26,22 @@ import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
+import java.util.logging.Logger;
+
 /**
- * Abstract class for help building a module. It has implemented few default
- * methods from {@code Module}, {@code ContextAware} and
- * {@code InitializingModule}.
+ * Abstract class for help building a module. It has implemented few default methods from {@code Module}, {@code
+ * ContextAware} and {@code InitializingModule}.
  *
  * @author bmalkow
- *
  */
-public abstract class AbstractModule implements Module {
+public abstract class AbstractModule
+		implements Module {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	@Inject(bean = "eventBus")
 	protected EventBus eventBus;
 	@Inject
 	protected PacketWriter writer;
-
-	/**
-	 * Fires event.
-	 *
-	 * @param event
-	 *            event to fire.
-	 */
-	protected void fireEvent(Element event) {
-		eventBus.fire(event);
-	}
 
 	public EventBus getEventBus() {
 		return eventBus;
@@ -68,6 +57,15 @@ public abstract class AbstractModule implements Module {
 
 	public void setWriter(PacketWriter writer) {
 		this.writer = writer;
+	}
+
+	/**
+	 * Fires event.
+	 *
+	 * @param event event to fire.
+	 */
+	protected void fireEvent(Element event) {
+		eventBus.fire(event);
 	}
 
 	protected void write(Packet packet) {

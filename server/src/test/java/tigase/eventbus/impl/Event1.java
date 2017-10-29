@@ -20,27 +20,21 @@
 
 package tigase.eventbus.impl;
 
-import java.util.HashSet;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
+import java.util.HashSet;
+
 public class Event1 {
 
-	private String v1;
-
-	private int v2;
-
-	private transient String transientField;
-
-	private JID jid;
-
-	private String emptyField;
-
 	private Element elementField;
-	
-	private String[] strArrField;
-	
+	private String emptyField;
+	private JID jid;
 	private HashSet<String> setField;
+	private String[] strArrField;
+	private transient String transientField;
+	private String v1;
+	private int v2;
 
 	public Element getElementField() {
 		return elementField;
@@ -97,11 +91,11 @@ public class Event1 {
 	public void setV2(int v2) {
 		this.v2 = v2;
 	}
-	
+
 	public HashSet<String> getSetField() {
 		return setField;
 	}
-	
+
 	public void setSetField(HashSet<String> set) {
 		this.setField = set;
 	}

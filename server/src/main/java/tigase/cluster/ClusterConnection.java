@@ -19,35 +19,35 @@
  */
 package tigase.cluster;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import tigase.xmpp.XMPPIOService;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
- *
  * @author andrzej
  */
 public class ClusterConnection {
-	
+
 	private final String addr;
 	private final CopyOnWriteArrayList<XMPPIOService<Object>> conns = new CopyOnWriteArrayList<>();
-	
+
 	public ClusterConnection(String addr) {
 		this.addr = addr;
 	}
-	
+
 	public void addConn(XMPPIOService<Object> conn) {
 		conns.add(conn);
 	}
-	
+
 	public void removeConn(XMPPIOService<Object> conn) {
 		conns.remove(conn);
 	}
-	
+
 	public int size() {
 		return conns.size();
 	}
-	
+
 	public List<XMPPIOService<Object>> getConnections() {
 		return conns;
 	}
@@ -56,5 +56,5 @@ public class ClusterConnection {
 	public String toString() {
 		return addr + conns;
 	}
-	
+
 }

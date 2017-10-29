@@ -20,7 +20,8 @@
 
 package tigase.eventbus;
 
-public class RegistrationException extends RuntimeException {
+public class RegistrationException
+		extends RuntimeException {
 
 	public RegistrationException() {
 	}
@@ -37,7 +38,8 @@ public class RegistrationException extends RuntimeException {
 		super(cause);
 	}
 
-	public RegistrationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	public RegistrationException(String message, Throwable cause, boolean enableSuppression,
+								 boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }

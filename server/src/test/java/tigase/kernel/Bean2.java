@@ -34,12 +34,12 @@ public class Bean2 {
 		return bean3;
 	}
 
-	public Bean4 getBean4() {
-		return bean4;
-	}
-
 	public void setBean3(Bean3 bean3) {
 		this.bean3 = bean3;
+	}
+
+	public Bean4 getBean4() {
+		return bean4;
 	}
 
 	public void setBean4(Bean4 bean4) {

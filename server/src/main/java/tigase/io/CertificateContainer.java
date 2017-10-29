@@ -45,63 +45,37 @@ import static tigase.io.SSLContextContainerIfc.*;
 
 /**
  * Class used to keep SSL certificates loaded in memory. To get instance use getter from TLSUtil class.
- *
+ * <p>
  * Created by andrzej on 29.02.2016.
  */
 @Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true)
-public class CertificateContainer implements CertificateContainerIfc, Initializable {
-
-	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());
-	private static final EventBus eventBus = EventBusFactory.getInstance();
+public class CertificateContainer
+		implements CertificateContainerIfc, Initializable {
 
 	public final static String PER_DOMAIN_CERTIFICATE_KEY = "virt-hosts-cert-";
 	public final static String SNI_DISABLE_KEY = "sni-disable";
-
-	private String email = "admin@tigase.org";
-	private String o = "Tigase.org";
-	private String ou = "XMPP Service";
-
+	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());
+	private static final EventBus eventBus = EventBusFactory.getInstance();
 	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<String, CertificateEntry>();
-	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
-	private KeyManager[] kms = new KeyManager[] { new SniKeyManager() };
-	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
-	private KeyStore trustKeyStore = null;
-
+	private File[] certsDirs = null;
+	@ConfigField(desc = "Custom certificates")
+	private Map<String, String> customCerts = new HashMap<>();
 	@ConfigField(desc = "Alias for default certificate", alias = DEFAULT_DOMAIN_CERT_KEY)
 	private String def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;
-	private File[] certsDirs = null;
+	private String email = "admin@tigase.org";
 	private char[] emptyPass = new char[0];
-
+	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
+	private KeyManager[] kms = new KeyManager[]{new SniKeyManager()};
+	private String o = "Tigase.org";
+	private String ou = "XMPP Service";
 	@ConfigField(desc = "Disable SNI support", alias = SNI_DISABLE_KEY)
 	private boolean sniDisable = false;
 	@ConfigField(desc = "Location of server SSL certificates", alias = SERVER_CERTS_LOCATION_KEY)
-	private String[] sslCertsLocation = { SERVER_CERTS_LOCATION_VAL };
+	private String[] sslCertsLocation = {SERVER_CERTS_LOCATION_VAL};
+	private X509TrustManager[] tms = new X509TrustManager[]{new FakeTrustManager()};
+	private KeyStore trustKeyStore = null;
 	@ConfigField(desc = "Location of trusted certificates", alias = TRUSTED_CERTS_DIR_KEY)
-	private String[] trustedCertsDir = { TRUSTED_CERTS_DIR_VAL };
-
-	@ConfigField(desc = "Custom certificates")
-	private Map<String,String> customCerts = new HashMap<>();
-
-	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
-			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
-		KeyStore keys = KeyStore.getInstance("JKS");
-
-		keys.load(null, emptyPass);
-		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, CertificateUtil.sort(entry.getCertChain()));
-
-
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-
-		kmf.init(keys, emptyPass);
-		kmfs.put(alias, kmf);
-		cens.put(alias, entry);
-
-		if (store) {
-			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(), entry);
-		}
-
-		return kmf;
-	}
+	private String[] trustedCertsDir = {TRUSTED_CERTS_DIR_VAL};
 
 	@Override
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
@@ -128,20 +102,13 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	}
 
 	@Override
-	public KeyManager[] createCertificate(String alias) throws NoSuchAlgorithmException, CertificateException, SignatureException,
-			NoSuchProviderException, InvalidKeyException, IOException, UnrecoverableKeyException, KeyStoreException {
+	public KeyManager[] createCertificate(String alias)
+			throws NoSuchAlgorithmException, CertificateException, SignatureException, NoSuchProviderException,
+				   InvalidKeyException, IOException, UnrecoverableKeyException, KeyStoreException {
 		final KeyManagerFactory keyManagerFactory = createCertificateKmf(alias);
 		KeyManager[] kms = keyManagerFactory.getKeyManagers();
 		log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
 		return kms;
-	}
-
-	private KeyManagerFactory createCertificateKmf(String alias)
-			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
-			       NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
-		CertificateEntry entry = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
-																		   () -> CertificateUtil.createKeyPair(1024, "secret"));
-		return addCertificateEntry(entry, alias, true);
 	}
 
 	@Override
@@ -149,10 +116,11 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		return def_cert_alias;
 	}
 
-	public CertificateEntry getCertificateEntry(String hostname){
+	public CertificateEntry getCertificateEntry(String hostname) {
 		String alias = hostname;
-		if (alias == null)
+		if (alias == null) {
 			alias = getDefCertAlias();
+		}
 
 		CertificateEntry c = SSLContextContainerAbstract.find(cens, alias);
 		return c;
@@ -160,35 +128,17 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 
 	@Override
 	public KeyManager[] getKeyManagers(String hostname) {
-		if (hostname == null && !sniDisable)
+		if (hostname == null && !sniDisable) {
 			return kms;
+		}
 
 		String alias = hostname;
-		if (alias == null)
+		if (alias == null) {
 			alias = getDefCertAlias();
+		}
 
 		KeyManagerFactory kmf = SSLContextContainerAbstract.find(kmfs, alias);
 		return (kmf == null) ? null : kmf.getKeyManagers();
-	}
-
-	private Map<String, File> findPredefinedCertificates(Map<String, Object> params) {
-		final Map<String, File> result = new HashMap<String, File>();
-		if (params == null)
-			return result;
-
-		Iterator<String> it = params.keySet().iterator();
-		while (it.hasNext()) {
-			String t = it.next();
-			if (t.startsWith(PER_DOMAIN_CERTIFICATE_KEY)) {
-				String domainName = t.substring(PER_DOMAIN_CERTIFICATE_KEY.length());
-				File f = new File(params.get(t).toString());
-
-				result.put(domainName, f);
-			}
-		}
-
-		return result;
-
 	}
 
 	@Override
@@ -216,7 +166,6 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 				sniDisable = false;
 			}
 
-
 			String pemD = (String) params.get(SERVER_CERTS_LOCATION_KEY);
 
 			if (pemD == null) {
@@ -236,8 +185,8 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 					CertificateEntry certEntry = CertificateUtil.loadCertificate(entry.getValue());
 					String alias = entry.getKey();
 					addCertificateEntry(certEntry, alias, false);
-					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}", new Object[] { alias,
-							entry.getValue() });
+					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
+							new Object[]{alias, entry.getValue()});
 				} catch (Exception ex) {
 					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue(), ex);
 				}
@@ -255,12 +204,13 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 					try {
 						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
 						String alias = file.getName();
-						if (alias.endsWith(".pem"))
+						if (alias.endsWith(".pem")) {
 							alias = alias.substring(0, alias.length() - 4);
+						}
 
 						addCertificateEntry(certEntry, alias, false);
-						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}", new Object[] { alias,
-								file });
+						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
+								new Object[]{alias, file});
 					} catch (Exception ex) {
 						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
 					}
@@ -287,6 +237,114 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		}.start();
 	}
 
+	@Override
+	public void initialize() {
+		try {
+			String[] pemDirs = sslCertsLocation;
+			certsDirs = new File[pemDirs.length];
+
+			int certsDirsIdx = -1;
+
+			Map<String, String> predefined = customCerts;
+			log.log(Level.CONFIG, "Loading predefined server certificates");
+			for (final Map.Entry<String, String> entry : predefined.entrySet()) {
+				try {
+					File file = new File(entry.getValue());
+					CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+					String alias = entry.getKey();
+					addCertificateEntry(certEntry, alias, false);
+					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
+							new Object[]{alias, entry.getValue()});
+				} catch (Exception ex) {
+					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue(), ex);
+				}
+			}
+
+			for (String pemDir : pemDirs) {
+				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
+				certsDirs[++certsDirsIdx] = new File(pemDir);
+
+				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
+					try {
+						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+						String alias = file.getName();
+						if (alias.endsWith(".pem")) {
+							alias = alias.substring(0, alias.length() - 4);
+						}
+
+						addCertificateEntry(certEntry, alias, false);
+						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
+								new Object[]{alias, file});
+					} catch (Exception ex) {
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "There was a problem initializing SSL certificates.", ex);
+		}
+
+		// It may take a while, let's do it in background
+		new Thread() {
+			@Override
+			public void run() {
+				loadTrustedCerts(trustedCertsDir);
+			}
+		}.start();
+
+	}
+
+	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
+			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
+				   UnrecoverableKeyException {
+		KeyStore keys = KeyStore.getInstance("JKS");
+
+		keys.load(null, emptyPass);
+		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, CertificateUtil.sort(entry.getCertChain()));
+
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+
+		kmf.init(keys, emptyPass);
+		kmfs.put(alias, kmf);
+		cens.put(alias, entry);
+
+		if (store) {
+			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(), entry);
+		}
+
+		return kmf;
+	}
+
+	private KeyManagerFactory createCertificateKmf(String alias)
+			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
+				   NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
+		CertificateEntry entry = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
+																			 () -> CertificateUtil.createKeyPair(1024,
+																												 "secret"));
+		return addCertificateEntry(entry, alias, true);
+	}
+
+	private Map<String, File> findPredefinedCertificates(Map<String, Object> params) {
+		final Map<String, File> result = new HashMap<String, File>();
+		if (params == null) {
+			return result;
+		}
+
+		Iterator<String> it = params.keySet().iterator();
+		while (it.hasNext()) {
+			String t = it.next();
+			if (t.startsWith(PER_DOMAIN_CERTIFICATE_KEY)) {
+				String domainName = t.substring(PER_DOMAIN_CERTIFICATE_KEY.length());
+				File f = new File(params.get(t).toString());
+
+				result.put(domainName, f);
+			}
+		}
+
+		return result;
+
+	}
+
 	private void loadTrustedCerts(String[] trustLocations) {
 		int counter = 0;
 		long start = System.currentTimeMillis();
@@ -296,12 +354,13 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 			trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 			trustKeyStore.load(null, emptyPass);
 
-			final File trustStoreFile = new File(System.getProperty("java.home")
-					+ "/lib/security/cacerts".replace('/', File.separatorChar));
+			final File trustStoreFile = new File(
+					System.getProperty("java.home") + "/lib/security/cacerts".replace('/', File.separatorChar));
 			final File userStoreFile = new File("~/.keystore");
 
-			if (log.isLoggable(Level.FINE))
+			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Looking for trusted certs in: {0}", trustStoreFile);
+			}
 
 			if (trustStoreFile.exists()) {
 				log.log(Level.CONFIG, "Loading trustKeyStore from location: {0}", trustStoreFile);
@@ -310,8 +369,9 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 				in.close();
 			}
 
-			if (log.isLoggable(Level.FINE))
+			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Looking for trusted certs in: {0}", userStoreFile);
+			}
 
 			if (userStoreFile.exists()) {
 				log.log(Level.CONFIG, "Loading trustKeyStore from location: {0}", userStoreFile);
@@ -358,104 +418,28 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		try {
 			if (!trustKeyStore.aliases().hasMoreElements()) {
 				log.log(Level.CONFIG, "No Trusted Anchors!!! Creating temporary trusted CA cert!");
-				CertificateEntry entry = CertificateUtil.createSelfSignedCertificate("fake_local@tigase", "fake one", "none",
-						"none", "none", "none", "US", () -> CertificateUtil.createKeyPair(1024, "secret"));
+				CertificateEntry entry = CertificateUtil.createSelfSignedCertificate("fake_local@tigase", "fake one",
+																					 "none", "none", "none", "none",
+																					 "US",
+																					 () -> CertificateUtil.createKeyPair(
+																							 1024, "secret"));
 				trustKeyStore.setCertificateEntry("generated fake CA", entry.getCertChain()[0]);
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't generate fake trusted CA certificate", e);
 		}
 
-		tms = new X509TrustManager[] { new FakeTrustManager(
-				acceptedIssuers.toArray(new X509Certificate[acceptedIssuers.size()])) };
+		tms = new X509TrustManager[]{
+				new FakeTrustManager(acceptedIssuers.toArray(new X509Certificate[acceptedIssuers.size()]))};
 
 		long seconds = (System.currentTimeMillis() - start) / 1000;
 
-		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[] { counter, seconds });
+		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[]{counter, seconds});
 	}
 
-	@Override
-	public void initialize() {
-		try {
-			String[] pemDirs = sslCertsLocation;
-			certsDirs = new File[pemDirs.length];
+	private static class FakeTrustManager
+			implements X509TrustManager {
 
-			int certsDirsIdx = -1;
-
-			Map<String, String> predefined = customCerts;
-			log.log(Level.CONFIG, "Loading predefined server certificates");
-			for (final Map.Entry<String, String> entry : predefined.entrySet()) {
-				try {
-					File file = new File(entry.getValue());
-					CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-					String alias = entry.getKey();
-					addCertificateEntry(certEntry, alias, false);
-					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}", new Object[] { alias,
-							entry.getValue() });
-				} catch (Exception ex) {
-					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue(), ex);
-				}
-			}
-
-			for (String pemDir : pemDirs) {
-				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
-				certsDirs[++certsDirsIdx] = new File(pemDir);
-
-				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
-					try {
-						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-						String alias = file.getName();
-						if (alias.endsWith(".pem"))
-							alias = alias.substring(0, alias.length() - 4);
-
-						addCertificateEntry(certEntry, alias, false);
-						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}", new Object[] { alias,
-								file });
-					} catch (Exception ex) {
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
-					}
-				}
-			}
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "There was a problem initializing SSL certificates.", ex);
-		}
-
-		// It may take a while, let's do it in background
-		new Thread() {
-			@Override
-			public void run() {
-				loadTrustedCerts(trustedCertsDir);
-			}
-		}.start();
-
-	}
-
-
-	public class CertificateChanged {
-
-		private String alias;
-
-		public CertificateChanged(String alias) {
-			this.alias = alias;
-		}
-
-		public String getAlias() {
-			return alias;
-		}
-	}
-
-	private class PEMFileFilter implements FileFilter {
-
-		@Override
-		public boolean accept(File pathname) {
-			return pathname.isFile() && (pathname.getName().endsWith(".pem") || pathname.getName().endsWith(".PEM") ||
-					pathname.getName().endsWith(".crt") || pathname.getName().endsWith(".CRT") ||
-					pathname.getName().endsWith(".cer") || pathname.getName().endsWith(".CER"));
-
-		}
-	}
-
-	private static class FakeTrustManager implements X509TrustManager {
 		private X509Certificate[] issuers = null;
 
 		// ~--- constructors
@@ -463,7 +447,6 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 
 		/**
 		 * Constructs ...
-		 *
 		 */
 		FakeTrustManager() {
 			this(new X509Certificate[0]);
@@ -471,7 +454,6 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 
 		/**
 		 * Constructs ...
-		 *
 		 *
 		 * @param ai
 		 */
@@ -501,7 +483,33 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		}
 	}
 
-	private class SniKeyManager extends X509ExtendedKeyManager {
+	public class CertificateChanged {
+
+		private String alias;
+
+		public CertificateChanged(String alias) {
+			this.alias = alias;
+		}
+
+		public String getAlias() {
+			return alias;
+		}
+	}
+
+	private class PEMFileFilter
+			implements FileFilter {
+
+		@Override
+		public boolean accept(File pathname) {
+			return pathname.isFile() && (pathname.getName().endsWith(".pem") || pathname.getName().endsWith(".PEM") ||
+					pathname.getName().endsWith(".crt") || pathname.getName().endsWith(".CRT") ||
+					pathname.getName().endsWith(".cer") || pathname.getName().endsWith(".CER"));
+
+		}
+	}
+
+	private class SniKeyManager
+			extends X509ExtendedKeyManager {
 
 		@Override
 		public String[] getClientAliases(String string, Principal[] prncpls) {
@@ -537,45 +545,18 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		}
 
 		/**
-		 * Method retrieves requested server name from ExtendedSSLSession and
-		 * uses it to return proper alias for server certificate
-		 *
-		 * @param session
-		 * @return
-		 */
-		private String chooseServerAlias(ExtendedSSLSession session) {
-			// Pick first SNIHostName in the list of SNI names.
-			String hostname = null;
-			for (SNIServerName name : session.getRequestedServerNames()) {
-				if (name.getType() == StandardConstants.SNI_HOST_NAME) {
-					hostname = ((SNIHostName) name).getAsciiName();
-					break;
-				}
-			}
-
-			// If we got given a hostname over SNI, check if we have a cert and
-			// key for that hostname. If so, we use it.
-			// Otherwise, we fall back to the default certificate.
-			if (hostname != null && (getCertificateChain(hostname) != null
-					&& getPrivateKey(hostname) != null)) {
-				return hostname;
-			} else {
-				return def_cert_alias;
-			}
-		}
-
-		/**
-		 * Using passed alias method searches for proper KeyManagerFactory to
-		 * return proper certificate chain for alias
+		 * Using passed alias method searches for proper KeyManagerFactory to return proper certificate chain for alias
 		 *
 		 * @param alias
+		 *
 		 * @return
 		 */
 		@Override
 		public X509Certificate[] getCertificateChain(String alias) {
 			KeyManagerFactory kmf;
-			if (alias == null)
+			if (alias == null) {
 				alias = def_cert_alias;
+			}
 			kmf = SSLContextContainerAbstract.find(kmfs, alias);
 			if (kmf == null) {
 				alias = def_cert_alias;
@@ -594,17 +575,18 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 		}
 
 		/**
-		 * Using passed alias method searches for proper KeyManagerFactory to
-		 * return proper private key for alias
+		 * Using passed alias method searches for proper KeyManagerFactory to return proper private key for alias
 		 *
 		 * @param alias
+		 *
 		 * @return
 		 */
 		@Override
 		public PrivateKey getPrivateKey(String alias) {
 			KeyManagerFactory kmf;
-			if (alias == null)
+			if (alias == null) {
 				alias = def_cert_alias;
+			}
 			kmf = SSLContextContainerAbstract.find(kmfs, alias);
 			if (kmf == null) {
 				alias = def_cert_alias;
@@ -619,7 +601,35 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 				}
 			}
 
-			return kmf != null ? ((X509KeyManager) kmf.getKeyManagers()[0]).getPrivateKey(alias) : null ;
+			return kmf != null ? ((X509KeyManager) kmf.getKeyManagers()[0]).getPrivateKey(alias) : null;
+		}
+
+		/**
+		 * Method retrieves requested server name from ExtendedSSLSession and uses it to return proper alias for server
+		 * certificate
+		 *
+		 * @param session
+		 *
+		 * @return
+		 */
+		private String chooseServerAlias(ExtendedSSLSession session) {
+			// Pick first SNIHostName in the list of SNI names.
+			String hostname = null;
+			for (SNIServerName name : session.getRequestedServerNames()) {
+				if (name.getType() == StandardConstants.SNI_HOST_NAME) {
+					hostname = ((SNIHostName) name).getAsciiName();
+					break;
+				}
+			}
+
+			// If we got given a hostname over SNI, check if we have a cert and
+			// key for that hostname. If so, we use it.
+			// Otherwise, we fall back to the default certificate.
+			if (hostname != null && (getCertificateChain(hostname) != null && getPrivateKey(hostname) != null)) {
+				return hostname;
+			} else {
+				return def_cert_alias;
+			}
 		}
 
 	}

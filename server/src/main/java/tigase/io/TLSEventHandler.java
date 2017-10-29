@@ -24,19 +24,19 @@ package tigase.io;
 
 /**
  * Describe interface TLSEventHandler here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Feb  7 23:20:14 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public interface TLSEventHandler {
+
 	void handshakeCompleted(TLSWrapper wrapper);
+
 	int getSocketInputSize();
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

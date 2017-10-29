@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -43,25 +41,24 @@ import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 
 /**
  * Describe class AuthRepositoryImpl here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Nov 11 21:46:50 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class AuthRepositoryImpl
-				implements AuthRepository {
-	/** Field description */
-	protected static final Logger log = Logger.getLogger(
-			"tigase.db.UserAuthRepositoryImpl");
+		implements AuthRepository {
 
-	/** Field description */
-	protected static final String DISABLED_KEY   = "disabled";
 	public static final String ACCOUNT_STATUS_KEY = "account_status";
-	protected static final String PASSWORD_KEY   = "password";
-	private static final String[] non_sasl_mechs = { "password", "digest" };
-	private static final String[] sasl_mechs     = { "PLAIN", "DIGEST-MD5", "CRAM-MD5" };
+	/** Field description */
+	protected static final Logger log = Logger.getLogger("tigase.db.UserAuthRepositoryImpl");
+	/** Field description */
+	protected static final String DISABLED_KEY = "disabled";
+	protected static final String PASSWORD_KEY = "password";
+	private static final String[] non_sasl_mechs = {"password", "digest"};
+	private static final String[] sasl_mechs = {"PLAIN", "DIGEST-MD5", "CRAM-MD5"};
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -75,7 +72,6 @@ public class AuthRepositoryImpl
 	/**
 	 * Creates a new <code>AuthRepositoryImpl</code> instance.
 	 *
-	 *
 	 * @param repo
 	 */
 	public AuthRepositoryImpl(UserRepository repo) {
@@ -88,30 +84,11 @@ public class AuthRepositoryImpl
 	}
 
 	@Override
-	public void addUser(BareJID user, final String password)
-					throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		repo.addUser(user);
 		log.info("Repo user added: " + user);
 		updateCredential(user, DEFAULT_USERNAME, password);
 		log.info("Password updated: " + user + ":" + password);
-	}
-
-	private boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		final String db_password = getPassword(user);
-
-		try {
-			final String digest_db_pass = Algorithms.hexDigest(id, db_password, alg);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Comparing passwords, given: " + digest + ", db: " + digest_db_pass);
-			}
-
-			return digest.equals(digest_db_pass);
-		} catch (NoSuchAlgorithmException e) {
-			throw new AuthorizationException("No such algorithm.", e);
-		}    // end of try-catch
 	}
 
 	@Override
@@ -140,15 +117,16 @@ public class AuthRepositoryImpl
 
 	@Override
 	@Deprecated
-	public void initRepository(final String string, Map<String, String> params)
-					throws DBInitException {}
+	public void initRepository(final String string, Map<String, String> params) throws DBInitException {
+	}
 
 	@Override
-	public void logout(BareJID user) {}
+	public void logout(BareJID user) {
+	}
 
 	@Override
 	public boolean otherAuth(final Map<String, Object> props)
-					throws UserNotFoundException, TigaseDBException, AuthorizationException {
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "otherAuth: {0}", props);
 		}
@@ -161,8 +139,8 @@ public class AuthRepositoryImpl
 			return saslAuth(props);
 		}    // end of if (proto.equals(PROTOCOL_VAL_SASL))
 		if (proto.equals(PROTOCOL_VAL_NONSASL)) {
-			String  password = (String) props.get(PASSWORD_KEY);
-			BareJID user_id  = (BareJID) props.get(USER_ID_KEY);
+			String password = (String) props.get(PASSWORD_KEY);
+			BareJID user_id = (BareJID) props.get(USER_ID_KEY);
 
 			if (password != null) {
 				return plainAuth(user_id, password);
@@ -179,19 +157,6 @@ public class AuthRepositoryImpl
 
 		throw new AuthorizationException("Protocol is not supported.");
 	}
-
-	private boolean plainAuth(BareJID user, final String password)
-					throws UserNotFoundException, TigaseDBException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "plainAuth: {0}:{1}", new Object[] { user, password });
-		}
-
-		String db_password = getPassword(user);
-
-		return (password != null) && (db_password != null) && db_password.equals(password);
-	}
-
-	// Implementation of tigase.db.AuthRepository
 
 	@Override
 	public void queryAuth(final Map<String, Object> authProps) {
@@ -210,16 +175,14 @@ public class AuthRepositoryImpl
 		repo.removeUser(user);
 	}
 
+	// Implementation of tigase.db.AuthRepository
+
 	@Override
-	public void updatePassword(BareJID user, final String password)
-					throws TigaseDBException {
+	public void updatePassword(BareJID user, final String password) throws TigaseDBException {
 		repo.setData(user, PASSWORD_KEY, password);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	public String getPassword(BareJID user)
-					throws UserNotFoundException, TigaseDBException {
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return repo.getData(user, PASSWORD_KEY);
 	}
 
@@ -228,6 +191,8 @@ public class AuthRepositoryImpl
 		String value = repo.getData(user, ACCOUNT_STATUS_KEY);
 		return value == null ? null : AccountStatus.valueOf(value);
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
@@ -256,10 +221,36 @@ public class AuthRepositoryImpl
 			setAccountStatus(user, value ? AccountStatus.disabled : AccountStatus.active);
 		}
 	}
-	
+
+	private boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		final String db_password = getPassword(user);
+
+		try {
+			final String digest_db_pass = Algorithms.hexDigest(id, db_password, alg);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Comparing passwords, given: " + digest + ", db: " + digest_db_pass);
+			}
+
+			return digest.equals(digest_db_pass);
+		} catch (NoSuchAlgorithmException e) {
+			throw new AuthorizationException("No such algorithm.", e);
+		}    // end of try-catch
+	}
+
+	private boolean plainAuth(BareJID user, final String password) throws UserNotFoundException, TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "plainAuth: {0}:{1}", new Object[]{user, password});
+		}
+
+		String db_password = getPassword(user);
+
+		return (password != null) && (db_password != null) && db_password.equals(password);
+	}
+
 	// ~--- methods --------------------------------------------------------------
-	private boolean saslAuth(final Map<String, Object> props)
-					throws AuthorizationException {
+	private boolean saslAuth(final Map<String, Object> props) throws AuthorizationException {
 		try {
 			SaslServer ss = (SaslServer) props.get("SaslServer");
 
@@ -268,15 +259,13 @@ public class AuthRepositoryImpl
 
 				sasl_props.put(Sasl.QOP, "auth");
 				ss = Sasl.createSaslServer((String) props.get(MACHANISM_KEY), "xmpp",
-						(String) props.get(SERVER_NAME_KEY), sasl_props, new SaslCallbackHandler(
-						props));
+										   (String) props.get(SERVER_NAME_KEY), sasl_props,
+										   new SaslCallbackHandler(props));
 				props.put("SaslServer", ss);
 			}    // end of if (ss == null)
 
 			String data_str = (String) props.get(DATA_KEY);
-			byte[] in_data  = ((data_str != null)
-					? Base64.decode(data_str)
-					: new byte[0]);
+			byte[] in_data = ((data_str != null) ? Base64.decode(data_str) : new byte[0]);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("response: " + new String(in_data));
@@ -285,14 +274,10 @@ public class AuthRepositoryImpl
 			byte[] challenge = ss.evaluateResponse(in_data);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("challenge: " + ((challenge != null)
-						? new String(challenge)
-						: "null"));
+				log.finest("challenge: " + ((challenge != null) ? new String(challenge) : "null"));
 			}
 
-			String challenge_str = (((challenge != null) && (challenge.length > 0))
-					? Base64.encode(challenge)
-					: null);
+			String challenge_str = (((challenge != null) && (challenge.length > 0)) ? Base64.encode(challenge) : null);
 
 			props.put(RESULT_KEY, challenge_str);
 			if (ss.isComplete()) {
@@ -308,7 +293,8 @@ public class AuthRepositoryImpl
 	//~--- inner classes --------------------------------------------------------
 
 	private class SaslCallbackHandler
-					implements CallbackHandler {
+			implements CallbackHandler {
+
 		private Map<String, Object> options = null;
 
 		//~--- constructors -------------------------------------------------------
@@ -318,8 +304,7 @@ public class AuthRepositoryImpl
 		}
 
 		@Override
-		public void handle(final Callback[] callbacks)
-				throws IOException, UnsupportedCallbackException {
+		public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 			BareJID jid = null;
 
 			for (int i = 0; i < callbacks.length; i++) {
@@ -327,8 +312,8 @@ public class AuthRepositoryImpl
 					log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
 				}
 				if (callbacks[i] instanceof RealmCallback) {
-					RealmCallback rc    = (RealmCallback) callbacks[i];
-					String        realm = (String) options.get(REALM_KEY);
+					RealmCallback rc = (RealmCallback) callbacks[i];
+					String realm = (String) options.get(REALM_KEY);
 
 					if (realm != null) {
 						rc.setText(realm);
@@ -338,8 +323,8 @@ public class AuthRepositoryImpl
 					}
 				} else {
 					if (callbacks[i] instanceof NameCallback) {
-						NameCallback nc        = (NameCallback) callbacks[i];
-						String       user_name = nc.getName();
+						NameCallback nc = (NameCallback) callbacks[i];
+						String user_name = nc.getName();
 
 						if (user_name == null) {
 							user_name = nc.getDefaultName();
@@ -366,8 +351,8 @@ public class AuthRepositoryImpl
 						} else {
 							if (callbacks[i] instanceof AuthorizeCallback) {
 								AuthorizeCallback authCallback = ((AuthorizeCallback) callbacks[i]);
-								String            authenId     = authCallback.getAuthenticationID();
-								String            authorId     = authCallback.getAuthorizationID();
+								String authenId = authCallback.getAuthenticationID();
+								String authorId = authCallback.getAuthorizationID();
 
 								if (log.isLoggable(Level.FINEST)) {
 									log.finest("AuthorizeCallback: authenId: " + authenId);
@@ -379,8 +364,7 @@ public class AuthRepositoryImpl
 
 								// } // end of if (authenId.equals(authorId))
 							} else {
-								throw new UnsupportedCallbackException(callbacks[i],
-										"Unrecognized Callback");
+								throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 							}
 						}
 					}

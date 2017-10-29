@@ -30,22 +30,27 @@ AS:Component: sess-man
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
-import tigase.db.*
-import tigase.xml.*
-import tigase.vhosts.*
-import tigase.xmpp.impl.roster.*
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
+import tigase.xml.Element
+import tigase.xmpp.XMPPSession
+import tigase.xmpp.impl.roster.RosterAbstract
+import tigase.xmpp.impl.roster.RosterElement
+import tigase.xmpp.impl.roster.RosterFactory
+import tigase.xmpp.impl.roster.RosterFlat
 import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
 def SHOW_AS_TABLE = "Present roster in table (required for UI)";
 
-def p = (Packet)packet
-def repository = (UserRepository)userRepository
-def sessions = (Map<BareJID, XMPPSession>)userSessions
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def repository = (UserRepository) userRepository
+def sessions = (Map<BareJID, XMPPSession>) userSessions
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -59,8 +64,8 @@ if (userJid == null) {
 	Command.addInstructions(result, "Fill out this form to get a user's roster.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
-    Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for which to retrieve roster")
-	Command.addCheckBoxField(result, SHOW_AS_TABLE, showAsTable);	
+	Command.addFieldValue(result, JID, userJid ?: "", "jid-single", "The Jabber ID for which to retrieve roster")
+	Command.addCheckBoxField(result, SHOW_AS_TABLE, showAsTable);
 
 	return result
 }
@@ -70,18 +75,18 @@ VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def result = p.commandResult(Command.DataType.result)
 
 if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
-	
-	Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for which to retrieve roster")
-	
+		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+
+	Command.addFieldValue(result, JID, userJid ?: "", "jid-single", "The Jabber ID for which to retrieve roster")
+
 	XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
-	
-	if (!showAsTable) {	
+
+	if (!showAsTable) {
 		Element query = new Element("query");
 		query.setXMLNS("jabber:iq:roster");
 		if (session == null) {
 			String rosterStr = repository.getData(bareJID, null,
-				RosterAbstract.ROSTER, null) ?: ""
+												  RosterAbstract.ROSTER, null) ?: ""
 			Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
 			RosterFlat.parseRosterUtil(rosterStr, roster, null)
 			roster.values().each {
@@ -93,19 +98,19 @@ if (isServiceAdmin ||
 		}
 		if (query != null) {
 			result.getElement().getChild("command").getChild("x", "jabber:x:data").addChild(query);
-		}		
+		}
 	} else {
 		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
 		if (session == null) {
 			String rosterStr = repository.getData(bareJID, null,
-				RosterAbstract.ROSTER, null) ?: ""
+												  RosterAbstract.ROSTER, null) ?: ""
 			RosterFlat.parseRosterUtil(rosterStr, roster, null)
 		} else {
 			def conn = session.getActiveResources().get(0)
 			RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
-			rosterUtil.getBuddies(conn).each { buddyJid ->
-				roster.put(buddyJid.getBareJID(), rosterUtil.getRosterElement(conn, buddyJid));
-			}
+			rosterUtil.getBuddies(conn).
+					each { buddyJid -> roster.put(buddyJid.getBareJID(), rosterUtil.getRosterElement(conn, buddyJid));
+					}
 		}
 		if (roster.isEmpty()) {
 			Command.addTextField(result, "Note", "Not found any roster entries for " + bareJID);
@@ -113,7 +118,7 @@ if (isServiceAdmin ||
 			Command.addTextField(result, "Note", "Found " + roster.size() + " entries in roster for " + bareJID);
 			Element reported = new Element("reported");
 			reported.addAttribute("label", "Connected resources");
-			def cols = ["JID", "Name", "Subscription", "Groups"];
+			def cols = [ "JID", "Name", "Subscription", "Groups" ];
 			cols.each {
 				Element el = new Element("field");
 				el.setAttribute("var", it);
@@ -126,14 +131,16 @@ if (isServiceAdmin ||
 					Element res = new Element("field");
 					res.setAttribute("var", col);
 					def val = null;
-					if (col == "JID")
-						val = rosterEntry.getJid().toString();
-					else if (col == "Name")
-						val = rosterEntry.getName();
-					else if (col == "Subscription")
-						val = rosterEntry.getSubscription()?.name() ?: "none";
-					else if (col == "Groups")
-						val = rosterEntry.getGroups()?.join(", ")?: "";
+					if (col == "JID") {
+						val = rosterEntry.getJid().toString()
+					} else if (col == "Name") {
+						val = rosterEntry.
+								getName()
+					} else if (col == "Subscription") {
+						val = rosterEntry.getSubscription()?.name() ?: "none"
+					} else if (col == "Groups") {
+						val = rosterEntry.getGroups()?.join(", ") ?: ""
+					};
 					res.addChild(new Element("value", val));
 					item.addChild(res);
 				}
@@ -142,7 +149,8 @@ if (isServiceAdmin ||
 		}
 	}
 } else {
-	Command.addTextField(result, "Error", "You do not have enough permissions to retrieve roster for user in this domain.");
+	Command.addTextField(result, "Error",
+						 "You do not have enough permissions to retrieve roster for user in this domain.");
 }
 
 return result

@@ -24,25 +24,21 @@ package tigase.server.ext.handlers;
 
 import tigase.server.Packet;
 import tigase.server.ext.CompRepoItem;
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.ExtProcessor;
-
 import tigase.util.Algorithms;
-
 import tigase.xml.Element;
 
-import static tigase.server.ext.ComponentProtocolHandler.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.security.NoSuchAlgorithmException;
-
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -52,7 +48,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class HandshakeProcessor implements ExtProcessor {
+public class HandshakeProcessor
+		implements ExtProcessor {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -69,23 +66,21 @@ public class HandshakeProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(ComponentIOService serv,
-			ComponentProtocolHandler handler) {
+	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		return null;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results) {
+	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
 		boolean result = false;
 
 		if (p.getElemName() == EL_NAME) {
 			result = true;
 
 			switch (serv.connectionType()) {
-				case connect : {
+				case connect: {
 					String data = p.getElemCData();
 
 					if (data == null) {
@@ -100,10 +95,10 @@ public class HandshakeProcessor implements ExtProcessor {
 					break;
 				}
 
-				case accept : {
+				case accept: {
 					String digest = p.getElemCData();
-					CompRepoItem comp =
-						(CompRepoItem) serv.getSessionData().get(ComponentProtocolHandler.REPO_ITEM_KEY);
+					CompRepoItem comp = (CompRepoItem) serv.getSessionData()
+							.get(ComponentProtocolHandler.REPO_ITEM_KEY);
 					String id = (String) serv.getSessionData().get(ComponentIOService.SESSION_ID_KEY);
 					String secret = comp.getAuthPasswd();
 
@@ -111,8 +106,8 @@ public class HandshakeProcessor implements ExtProcessor {
 						String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest="
-									+ loc_digest);
+							log.finest(
+									"Calculating digest: id=" + id + ", secret=" + secret + ", digest=" + loc_digest);
 						}
 
 						// Password digest matches, authentication OK
@@ -133,7 +128,7 @@ public class HandshakeProcessor implements ExtProcessor {
 					break;
 				}
 
-				default :
+				default:
 
 					// Do nothing, more data should come soon...
 					break;
@@ -144,8 +139,8 @@ public class HandshakeProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public void startProcessing(Packet p, ComponentIOService serv,
-			ComponentProtocolHandler handler, Queue<Packet> results) {
+	public void startProcessing(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
+								Queue<Packet> results) {
 		String secret = ((CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY)).getAuthPasswd();
 
 		try {

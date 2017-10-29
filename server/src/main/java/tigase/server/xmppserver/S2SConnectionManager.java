@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -39,9 +37,9 @@ import tigase.stats.StatisticsList;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.util.*;
@@ -56,21 +54,20 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="s2s", parent=Kernel.class, active = true)
+@Bean(name = "s2s", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 public class S2SConnectionManager
-				extends ConnectionManager<S2SIOService>
-				implements S2SConnectionHandlerIfc<S2SIOService> {
+		extends ConnectionManager<S2SIOService>
+		implements S2SConnectionHandlerIfc<S2SIOService> {
+
 	/** Field description */
 	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
 	/** Field description */
-	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY =
-			"cid-connections-tasks-threads";
+	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY = "cid-connections-tasks-threads";
 
 	/** Field description */
-	public static final String MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY =
-			"max-inactivity-time";
+	public static final String MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY = "max-inactivity-time";
 
 	/** Field description */
 	public static final String MAX_INCOMING_CONNECTIONS_PROP_KEY = "max-in-conns";
@@ -97,93 +94,71 @@ public class S2SConnectionManager
 	public static final String S2S_CONNECTION_SELECTOR_PROP_KEY = "s2s-conn-selector";
 
 	/** Field description */
-	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL =
-			"tigase.server.xmppserver.S2SRandomSelector";
+	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL = "tigase.server.xmppserver.S2SRandomSelector";
 
 	/** Field description */
 	public static final String S2S_DOMAIN_MAPPING_PROP_KEY = "s2s-domain-mapping";
-	
+
 	/** Field description */
 	public static final String S2S_DOMAIN_MAPPING_PROP_VAL = "";
 
 	/** Field description */
-	public static final String S2S_HT_TRAFFIC_THROTTLING_PROP_VAL =
-			"xmpp:15k:0:disc,bin:120m:0:disc";
-
-	/** Field description */
-	protected static final String DB_RESULT_EL_NAME = "db:result";
-
-	/** Field description */
-	protected static final String DB_VERIFY_EL_NAME = "db:verify";
-
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
-	private static final Logger log = Logger.getLogger(S2SConnectionManager.class
-			.getName());
-	private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
-	private static final String XMLNS_CLIENT_VAL         = "jabber:client";
-	private static final String XMLNS_SERVER_VAL         = "jabber:server";
-
+	public static final String S2S_HT_TRAFFIC_THROTTLING_PROP_VAL = "xmpp:15k:0:disc,bin:120m:0:disc";
 	/** Field description */
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
-
 	/** Field description */
 	public static final long MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL = 15 * MINUTE;
-
 	/** Field description */
 
 	// TODO: #1195 - estimate proper default value
-	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime()
-			.availableProcessors();
+	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
+	/** Field description */
+	protected static final String DB_RESULT_EL_NAME = "db:result";
+	/** Field description */
+	protected static final String DB_VERIFY_EL_NAME = "db:verify";
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(S2SConnectionManager.class.getName());
+	private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
+	private static final String XMLNS_CLIENT_VAL = "jabber:client";
+	private static final String XMLNS_SERVER_VAL = "jabber:server";
 
 	//~--- fields ---------------------------------------------------------------
-
+	/**
+	 * Outgoing and incoming connections for a given domains pair (localdomain, remotedomain)
+	 */
+	protected Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID, CIDConnections>(10000);
+	@Inject
+	private CIDConnections.CIDConnectionsOpenerService cidConnectionsOpenerService;
 	// ~--- fields ---------------------------------------------------------------
 	@Inject
 	private S2SConnectionSelector connSelector;
-
 	/**
-	 * <code>maxPacketWaitingTime</code> keeps the maximum time packets can wait
-	 * for sending in ServerPacketQueue. Packets are put in the queue only when
-	 * connection to remote server is not established so effectively this timeout
-	 * specifies the maximum time for connecting to remote server. If this time is
-	 * exceeded then no more reconnecting attempts are performed and packets are
-	 * sent back with error information.
-	 *
-	 * Default TCP/IP timeout is 300 seconds so we can follow this convention but
-	 * administrator can set different timeout in server configuration.
-	 */
-	private long maxPacketWaitingTime   = MAX_PACKET_WAITING_TIME_PROP_VAL;
-	private int  maxOUTTotalConnections = MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL;
-	private int  maxOUTPerIPConnections = MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL;
-	private int  maxINConnections       = MAX_INCOMING_CONNECTIONS_PROP_VAL;
-	private long maxInactivityTime      = MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL;
-
-	/**
-	 * Outgoing and incoming connections for a given domains pair (localdomain,
-	 * remotedomain)
-	 */
-	protected Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
-			CIDConnections>(10000);
-
-	@Inject
-	private CIDConnections.CIDConnectionsOpenerService cidConnectionsOpenerService;
-
-	/**
-	 * Holds list of manually entered mappings which provide substitutions for domains
-	 * matching pattens with names of servers to which we should connect.
+	 * Holds list of manually entered mappings which provide substitutions for domains matching pattens with names of
+	 * servers to which we should connect.
 	 */
 	@Inject
 	private DomainServerNameMapper domainServerNameMapper;
-
 	@Inject
 	private List<S2SFilterIfc> filters = Collections.emptyList();
-
+	private int maxINConnections = MAX_INCOMING_CONNECTIONS_PROP_VAL;
+	private long maxInactivityTime = MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL;
+	private int maxOUTPerIPConnections = MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL;
+	private int maxOUTTotalConnections = MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL;
 	/**
-	 * List of processors which should handle all traffic incoming from the
-	 * network. In most cases if not all, these processors handle just protocol
-	 * traffic, all the rest traffic should be passed on to MR.
+	 * <code>maxPacketWaitingTime</code> keeps the maximum time packets can wait for sending in ServerPacketQueue.
+	 * Packets are put in the queue only when connection to remote server is not established so effectively this timeout
+	 * specifies the maximum time for connecting to remote server. If this time is exceeded then no more reconnecting
+	 * attempts are performed and packets are sent back with error information.
+	 * <p>
+	 * Default TCP/IP timeout is 300 seconds so we can follow this convention but administrator can set different
+	 * timeout in server configuration.
+	 */
+	private long maxPacketWaitingTime = MAX_PACKET_WAITING_TIME_PROP_VAL;
+	/**
+	 * List of processors which should handle all traffic incoming from the network. In most cases if not all, these
+	 * processors handle just protocol traffic, all the rest traffic should be passed on to MR.
 	 */
 	@Inject
 	private List<S2SProcessor> processors = Collections.emptyList();
@@ -248,16 +223,13 @@ public class S2SConnectionManager
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet);
 		}
-		if ((packet.getStanzaTo() == null) || packet.getStanzaTo().getDomain().trim()
-				.isEmpty()) {
+		if ((packet.getStanzaTo() == null) || packet.getStanzaTo().getDomain().trim().isEmpty()) {
 			log.log(Level.WARNING, "Missing ''to'' attribute, ignoring packet...{0}" +
-					"\n This most likely happens due to missconfiguration of components" +
-					" domain names.", packet);
+					"\n This most likely happens due to missconfiguration of components" + " domain names.", packet);
 
 			return;
 		}
-		if ((packet.getStanzaFrom() == null) || packet.getStanzaFrom().getDomain().trim()
-				.isEmpty()) {
+		if ((packet.getStanzaFrom() == null) || packet.getStanzaFrom().getDomain().trim().isEmpty()) {
 			log.log(Level.WARNING, "Missing ''from'' attribute, ignoring packet...{0}", packet);
 
 			return;
@@ -312,19 +284,19 @@ public class S2SConnectionManager
 				log.log(Level.FINEST, "Connection ID is: {0}", cid);
 			}
 			try {
-				CIDConnections cid_conns     = getCIDConnections(cid, true);
-				Packet         server_packet = packet.copyElementOnly();
+				CIDConnections cid_conns = getCIDConnections(cid, true);
+				Packet server_packet = packet.copyElementOnly();
 
 				server_packet.getElement().removeAttribute("xmlns");
 				cid_conns.sendPacket(server_packet);
 			} catch (NotLocalhostException e) {
 				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
-						"S2S - Incorrect source address - none of any local virtual hosts or components.",
-						true));
+																			 "S2S - Incorrect source address - none of any local virtual hosts or components.",
+																			 true));
 			} catch (LocalhostException e) {
 				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
-						"S2S - Incorrect destinationaddress - one of local virtual hosts or components.",
-						true));
+																			 "S2S - Incorrect destinationaddress - one of local virtual hosts or components.",
+																			 true));
 			}
 		} catch (PacketErrorTypeException e) {
 			log.log(Level.WARNING, "Packet processing exception: {0}", e);
@@ -334,7 +306,7 @@ public class S2SConnectionManager
 	@Override
 	public Queue<Packet> processSocketData(S2SIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
-		Packet        p       = null;
+		Packet p = null;
 		Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 		while ((p = packets.poll()) != null) {
@@ -375,8 +347,7 @@ public class S2SConnectionManager
 				try {
 					if (isLocalDomainOrComponent(p.getStanzaTo().getDomain())) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Adding packet out: {1}", new Object[] { serv,
-									p });
+							log.log(Level.FINEST, "{0}, Adding packet out: {1}", new Object[]{serv, p});
 						}
 
 						// TODO: not entirely sure if this is a good idea....
@@ -386,8 +357,10 @@ public class S2SConnectionManager
 					} else {
 						try {
 							serv.addPacketToSend(Authorization.NOT_ACCEPTABLE.getResponseMessage(p,
-									"Not a local virtual domain or component", true));
-						} catch (PacketErrorTypeException ex) {}
+																								 "Not a local virtual domain or component",
+																								 true));
+						} catch (PacketErrorTypeException ex) {
+						}
 					}
 				} catch (Exception e) {
 					log.log(Level.INFO, "Unexpected exception for packet: " + p, e);
@@ -405,14 +378,13 @@ public class S2SConnectionManager
 		addPacket(packet);
 		return true;
 	}
-	
+
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		CID cid = (CID) port_props.get("cid");
 
 		if (cid == null) {
-			log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
-					port_props);
+			log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", port_props);
 
 			return;
 		}
@@ -420,8 +392,7 @@ public class S2SConnectionManager
 		CIDConnections cid_conns = getCIDConnections(cid);
 
 		if (cid_conns == null) {
-			log.log(Level.WARNING,
-					"Protocol error cid_conns not found for outgoing connection: {0}", port_props);
+			log.log(Level.WARNING, "Protocol error cid_conns not found for outgoing connection: {0}", port_props);
 
 			return;
 		} else {
@@ -437,16 +408,15 @@ public class S2SConnectionManager
 	}
 
 	@Override
-	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
-			Boolean valid, String key_sessionId, String serv_sessionId, String cdata,
-			boolean handshakingOnly) {
-		return this.sendVerifyResult(elem_name, connCid, keyCid, valid, key_sessionId, serv_sessionId, cdata, handshakingOnly, null);
+	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid, String key_sessionId,
+									String serv_sessionId, String cdata, boolean handshakingOnly) {
+		return this.sendVerifyResult(elem_name, connCid, keyCid, valid, key_sessionId, serv_sessionId, cdata,
+									 handshakingOnly, null);
 	}
-	
+
 	@Override
-	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
-			Boolean valid, String key_sessionId, String serv_sessionId, String cdata,
-			boolean handshakingOnly, Element errorElem) {	
+	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid, String key_sessionId,
+									String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem) {
 		CIDConnections cid_conns = getCIDConnections(connCid);
 
 		if (cid_conns != null) {
@@ -454,21 +424,19 @@ public class S2SConnectionManager
 			if (valid != null) {
 				if (valid) {
 					type = StanzaType.valid;
-				}
-				else {
+				} else {
 					type = StanzaType.invalid;
 				}
 			}
 			if (errorElem != null) {
 				type = StanzaType.error;
 			}
-			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, type,
-					cdata);
+			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, type, cdata);
 
 			if (errorElem != null) {
 				verify_valid.getElement().addChild(errorElem);
 			}
-			
+
 			if (handshakingOnly) {
 				cid_conns.sendHandshakingOnly(verify_valid);
 
@@ -478,9 +446,7 @@ public class S2SConnectionManager
 			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE,
-						"Can't find CID connections for cid: {0}, can't send verify response.",
-						keyCid);
+				log.log(Level.FINE, "Can't find CID connections for cid: {0}, can't send verify response.", keyCid);
 			}
 		}
 
@@ -526,7 +492,7 @@ public class S2SConnectionManager
 	@Override
 	public void xmppStreamClosed(S2SIOService serv) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Stream closed.", new Object[] { serv });
+			log.log(Level.FINER, "{0}, Stream closed.", new Object[]{serv});
 		}
 		for (S2SProcessor proc : processors) {
 			proc.streamClosed(serv);
@@ -536,7 +502,7 @@ public class S2SConnectionManager
 	@Override
 	public String xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Stream opened: {1}", new Object[] { serv, attribs });
+			log.log(Level.FINER, "{0}, Stream opened: {1}", new Object[]{serv, attribs});
 		}
 
 		StringBuilder sb = new StringBuilder(256);
@@ -549,19 +515,17 @@ public class S2SConnectionManager
 			}
 		}
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[] { serv, sb });
+			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[]{serv, sb});
 		}
 
-		return (sb.length() == 0)
-				? null
-				: sb.toString();
+		return (sb.length() == 0) ? null : sb.toString();
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public CIDConnections getCIDConnections(CID cid, boolean createNew)
-					throws NotLocalhostException, LocalhostException {
+			throws NotLocalhostException, LocalhostException {
 		CIDConnections result = getCIDConnections(cid);
 
 		if ((result == null) && createNew && (cid != null)) {
@@ -588,9 +552,9 @@ public class S2SConnectionManager
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * <p>
 	 * <br><br>
-	 *
+	 * <p>
 	 * Secret is used in generation of dialback key
 	 */
 	@Override
@@ -600,51 +564,51 @@ public class S2SConnectionManager
 			if (this.isLocalDomainOrComponent(domain)) {
 				int idx = domain.indexOf('.');
 				if (idx > 0) {
-					String        basedomain = domain.substring(idx + 1);
+					String basedomain = domain.substring(idx + 1);
 					item = vHostManager.getVHostItem(basedomain);
 				}
-				
+
 				if (item == null) {
 					item = vHostManager.getVHostItem(vHostManager.getDefVHostItem().toString());
 				}
 			}
 		}
-		
+
 		if (item == null) {
 			throw new NotLocalhostException("This is not a valid localhost: " + domain);
 		}
-		
+
 		return item.getS2sSecret();
 	}
 
 	@Override
 	public String getServerNameForDomain(String domain) {
 		return domainServerNameMapper.getServerNameForDomain(domain);
-	}	
-		
+	}
+
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		list.add(getName(), "CIDs number", cidConnections.size(), Level.INFO);
 		if (list.checkLevel(Level.FINEST)) {
-			long total_outgoing             = 0;
-			long total_outgoing_tls         = 0;
+			long total_outgoing = 0;
+			long total_outgoing_tls = 0;
 			long total_outgoing_handshaking = 0;
-			long total_incoming             = 0;
-			long total_incoming_tls         = 0;
-			long total_dbKeys               = 0;
-			long total_waiting              = 0;
-			long total_waiting_control      = 0;
+			long total_incoming = 0;
+			long total_incoming_tls = 0;
+			long total_dbKeys = 0;
+			long total_waiting = 0;
+			long total_waiting_control = 0;
 
 			for (Map.Entry<CID, CIDConnections> cid_conn : cidConnections.entrySet()) {
-				int outgoing             = cid_conn.getValue().getOutgoingCount();
-				int outgoing_tls         = cid_conn.getValue().getOutgoingTLSCount();
+				int outgoing = cid_conn.getValue().getOutgoingCount();
+				int outgoing_tls = cid_conn.getValue().getOutgoingTLSCount();
 				int outgoing_handshaking = cid_conn.getValue().getOutgoingHandshakingCount();
-				int incoming             = cid_conn.getValue().getIncomingCount();
-				int incoming_tls         = cid_conn.getValue().getIncomingTLSCount();
-				int dbKeys               = cid_conn.getValue().getDBKeysCount();
-				int waiting              = cid_conn.getValue().getWaitingCount();
-				int waiting_control      = cid_conn.getValue().getWaitingControlCount();
+				int incoming = cid_conn.getValue().getIncomingCount();
+				int incoming_tls = cid_conn.getValue().getIncomingTLSCount();
+				int dbKeys = cid_conn.getValue().getDBKeysCount();
+				int waiting = cid_conn.getValue().getWaitingCount();
+				int waiting_control = cid_conn.getValue().getWaitingControlCount();
 
 				if (log.isLoggable(Level.FINEST)) {
 
@@ -652,26 +616,23 @@ public class S2SConnectionManager
 					//
 					// thr.fillInStackTrace();
 					// log.log(Level.FINEST, "Called from: ", thr);
-					log.log(Level.FINEST,
-							"CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, " +
-							"waiting: {5}, waiting_control: {6}", new Object[] {
-						cid_conn.getKey(), outgoing, outgoing_handshaking, incoming, dbKeys, waiting,
-								waiting_control
-					});
+					log.log(Level.FINEST, "CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, " +
+									"waiting: {5}, waiting_control: {6}",
+							new Object[]{cid_conn.getKey(), outgoing, outgoing_handshaking, incoming, dbKeys, waiting,
+										 waiting_control});
 				}
-				total_outgoing             += outgoing;
-				total_outgoing_tls         += outgoing_tls;
+				total_outgoing += outgoing;
+				total_outgoing_tls += outgoing_tls;
 				total_outgoing_handshaking += outgoing_handshaking;
-				total_incoming             += incoming;
-				total_incoming_tls         += incoming_tls;
-				total_dbKeys               += dbKeys;
-				total_waiting              += waiting;
-				total_waiting_control      += waiting_control;
+				total_incoming += incoming;
+				total_incoming_tls += incoming_tls;
+				total_dbKeys += dbKeys;
+				total_waiting += waiting;
+				total_waiting_control += waiting_control;
 			}
 			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
 			list.add(getName(), "Total outgoing TLS", total_outgoing_tls, Level.FINEST);
-			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking, Level
-					.FINEST);
+			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking, Level.FINEST);
 			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
 			list.add(getName(), "Total incoming TLS", total_incoming_tls, Level.FINEST);
 			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
@@ -696,7 +657,7 @@ public class S2SConnectionManager
 		VHostItem item = vHostManager.getVHostItemDomainOrComponent(domain);
 		return item != null && item.isTlsRequired();
 	}
-	
+
 	@Override
 	public boolean isTlsWantClientAuthEnabled() {
 		return true;
@@ -706,7 +667,7 @@ public class S2SConnectionManager
 	public boolean isTlsNeedClientAuthEnabled() {
 		return false;
 	}
-	
+
 	//~--- set methods ----------------------------------------------------------
 
 	public void setProcessors(List<S2SProcessor> processors) {
@@ -719,11 +680,12 @@ public class S2SConnectionManager
 
 	@Override
 	protected int[] getDefPlainPorts() {
-		return new int[] { 5269 };
+		return new int[]{5269};
 	}
 
 	/**
 	 * Method from ConnectionManager is overriden as it uses local value S2S_HT_TRAFFIC_THROTTLING_PROP_VAL
+	 *
 	 * @return
 	 */
 	@Override
@@ -754,20 +716,16 @@ public class S2SConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	protected CIDConnections createNewCIDConnections(CID cid)
-					throws NotLocalhostException, LocalhostException {
+	protected CIDConnections createNewCIDConnections(CID cid) throws NotLocalhostException, LocalhostException {
 		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
-			throw new NotLocalhostException("This is not a valid localhost: " + cid
-					.getLocalHost());
+			throw new NotLocalhostException("This is not a valid localhost: " + cid.getLocalHost());
 		}
 		if (isLocalDomainOrComponent(cid.getRemoteHost())) {
-			throw new LocalhostException("This is not a valid remotehost: " + cid
-					.getRemoteHost());
+			throw new LocalhostException("This is not a valid remotehost: " + cid.getRemoteHost());
 		}
 
-		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector,
-				maxINConnections, maxOUTTotalConnections, maxOUTPerIPConnections,
-				maxPacketWaitingTime);
+		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector, maxINConnections, maxOUTTotalConnections,
+													  maxOUTPerIPConnections, maxPacketWaitingTime);
 
 		cidConnections.put(cid, cid_conns);
 
@@ -785,8 +743,7 @@ public class S2SConnectionManager
 		return cidConnections.get(cid);
 	}
 
-	private Packet getValidResponse(String elem_name, CID cid, String id, StanzaType type,
-			String cdata) {
+	private Packet getValidResponse(String elem_name, CID cid, String id, StanzaType type, String cdata) {
 		Element elem = new Element(elem_name);
 
 		if (cdata != null) {
@@ -799,16 +756,79 @@ public class S2SConnectionManager
 			elem.addAttribute("id", id);
 		}
 
-		Packet result = Packet.packetInstance(elem, JID.jidInstanceNS(cid.getLocalHost()), JID
-				.jidInstanceNS(cid.getRemoteHost()));
+		Packet result = Packet.packetInstance(elem, JID.jidInstanceNS(cid.getLocalHost()),
+											  JID.jidInstanceNS(cid.getRemoteHost()));
 
 		return result;
 	}
 
 	@Bean(name = "domainServerNameMapper", parent = S2SConnectionManager.class, active = true)
 	public static class DomainServerNameMapper {
-		
-		private class Entry implements Comparable<Entry>{
+
+		@ConfigField(desc = "Rules for mapping domains")
+		private List<Entry> entries = new ArrayList<Entry>();
+
+		public DomainServerNameMapper() {
+		}
+
+		public String getServerNameForDomain(String domain) {
+			for (Entry e : entries) {
+				if (e.matches(domain)) {
+					return e.getServerName();
+				}
+			}
+			return domain;
+		}
+
+		public Map<String, String> getEntries() {
+			Map<String, String> result = new HashMap<>();
+			for (Entry e : entries) {
+				result.put(e.pattern, e.getServerName());
+			}
+			return result;
+		}
+
+		public void setEntries(Map<String, String> entries) {
+			entries.clear();
+			for (Map.Entry<String, String> e : entries.entrySet()) {
+				addEntry(e.getKey(), e.getValue());
+			}
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(getClass().getName()).append("[");
+			boolean first = true;
+			for (Entry e : entries) {
+				if (!first) {
+					sb.append(",");
+				}
+				sb.append(e.pattern);
+				sb.append("=");
+				sb.append(e.serverName);
+				first = false;
+			}
+			sb.append("]");
+			return sb.toString();
+		}
+
+		protected void addEntry(String pattern, String serverName) {
+			// clone list to fix possible concurrency issues with collection
+			// could use CopyOnWriteArrayList but sorting this collection
+			// is not possible on JDK7
+			synchronized (this) {
+				List<Entry> entries = new ArrayList<Entry>(this.entries);
+				Entry e = new Entry(pattern, serverName);
+				entries.add(e);
+				Collections.sort(entries);
+				this.entries = entries;
+			}
+		}
+
+		private class Entry
+				implements Comparable<Entry> {
+
 			private final String pattern;
 			private final String serverName;
 
@@ -835,7 +855,7 @@ public class S2SConnectionManager
 				}
 				return false;
 			}
-			
+
 			@Override
 			public int hashCode() {
 				return pattern.hashCode();
@@ -844,85 +864,27 @@ public class S2SConnectionManager
 			@Override
 			public int compareTo(Entry o) {
 				if (o.pattern.contains("*")) {
-					if (!pattern.contains("*"))
+					if (!pattern.contains("*")) {
 						return -1;
+					}
 				} else {
-					if (pattern.contains("*"))
+					if (pattern.contains("*")) {
 						return 1;
+					}
 				}
 				int val = (pattern.split(".").length - o.pattern.split(".").length) * -1;
-				if (val != 0)
+				if (val != 0) {
 					return val;
+				}
 				return o.pattern.length() - pattern.length();
 			}
 		}
 
-		@ConfigField(desc = "Rules for mapping domains")
-		private List<Entry> entries = new ArrayList<Entry>();
-
-		public DomainServerNameMapper() {}
-		
-		protected void addEntry(String pattern, String serverName) {
-			// clone list to fix possible concurrency issues with collection
-			// could use CopyOnWriteArrayList but sorting this collection 
-			// is not possible on JDK7
-			synchronized (this) {
-				List<Entry> entries = new ArrayList<Entry>(this.entries);
-				Entry e = new Entry(pattern, serverName);
-				entries.add(e);
-				Collections.sort(entries);
-				this.entries = entries;
-			}
-		}
-		
-		public String getServerNameForDomain(String domain) {
-			for (Entry e : entries) {
-				if (e.matches(domain))
-					return e.getServerName();
-			}
-			return domain;
-		}
-
-		public Map<String, String> getEntries() {
-			Map<String, String> result = new HashMap<>();
-			for (Entry e : entries) {
-				result.put(e.pattern, e.getServerName());
-			}
-			return result;
-		}
-
-		public void setEntries(Map<String, String> entries) {
-			entries.clear();
-			for (Map.Entry<String, String> e : entries.entrySet()) {
-				addEntry(e.getKey(), e.getValue());
-			}
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append(getClass().getName()).append("[");
-			boolean first = true;
-			for (Entry e : entries) {
-				if (!first)
-					sb.append(",");
-				sb.append(e.pattern);
-				sb.append("=");
-				sb.append(e.serverName);
-				first = false;
-			} 
-			sb.append("]");
-			return sb.toString();
-		}
-		
 	}
 }
-
-
 
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
-
 
 //~ Formatted in Tigase Code Convention on 13/10/15

@@ -18,51 +18,25 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.repo;
 
-import tigase.xmpp.jid.BareJID;
-
 import tigase.util.dns.DNSResolverFactory;
+import tigase.xmpp.jid.BareJID;
 
 /**
  * Class description
  *
- *
- * @version        5.2.0, 13/03/09
- * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @version 5.2.0, 13/03/09
  */
 public abstract class ClConRepoDefaults {
+
 	private static final BareJID clcon_user = BareJID.bareJIDInstanceNS("cl-conn-manager");
 
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	static String[] getDefaultPropetyItems() {
-		return new String[] { DNSResolverFactory.getInstance().getDefaultHost()};
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	static String getPropertyKey() {
-		return "--cluster-nodes";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	static String getConfigKey() {
 		return "cluster-nodes";
@@ -70,9 +44,13 @@ public abstract class ClConRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
+	 */
+	static String[] getDefaultPropetyItems() {
+		return new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
+	}
+
+	/**
+	 * Method description
 	 */
 	static ClusterRepoItem getItemInstance() {
 		return new ClusterRepoItem();
@@ -80,14 +58,17 @@ public abstract class ClConRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
+	 */
+	static String getPropertyKey() {
+		return "--cluster-nodes";
+	}
+
+	/**
+	 * Method description
 	 */
 	public static BareJID getRepoUser() {
 		return clcon_user;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/09

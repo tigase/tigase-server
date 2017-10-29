@@ -45,10 +45,9 @@ public class BeanDefinition {
 																							   EventBusComponent.class,
 																							   EventBusComponent.class,
 																							   StatisticsCollector.class);
-
-	private final String name;
-	private final Class<?> clazz;
 	private final boolean active;
+	private final Class<?> clazz;
+	private final String name;
 
 	public BeanDefinition(Class<?> cls) {
 		Bean bean = cls.getAnnotation(Bean.class);

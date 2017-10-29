@@ -1,4 +1,3 @@
-
 /*
  * ActionResultsHandlerIfc.java
  *
@@ -24,9 +23,9 @@ package tigase.server.amp;
 
 import tigase.server.Packet;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -37,13 +36,12 @@ import java.util.Queue;
  * @version $Rev$
  */
 public interface ActionResultsHandlerIfc {
+
 	boolean addOutPacket(Packet packet);
 
 	boolean addOutPackets(Queue<Packet> packets);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

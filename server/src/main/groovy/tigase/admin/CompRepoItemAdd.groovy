@@ -39,41 +39,41 @@ import tigase.server.Permissions
 
 def MARKER = "command-marker"
 
-def repo = (ComponentRepository)comp_repo
-def p = (Iq)packet
-def admins = (Set)adminsSet
+def repo = (ComponentRepository) comp_repo
+def p = (Iq) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def item = repo.getItemInstance()
 def marker = Command.getFieldValue(p, MARKER)
 
-def supportedComponents = ["vhost-man"]
+def supportedComponents = [ "vhost-man" ]
 def NOTIFY_CLUSTER = "notify-cluster"
-boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
-boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.toString()));
+boolean notifyCluster = Boolean.valueOf(Command.getFieldValue(packet, NOTIFY_CLUSTER))
 Queue results = new LinkedList()
 
 
 if (marker == null) {
-  def result = p.commandResult(Command.DataType.form)
-  item.addCommandFields(result)
+	def result = p.commandResult(Command.DataType.form)
+	item.addCommandFields(result)
 	Command.addHiddenField(result, MARKER, MARKER)
-	if 	( clusterMode  ) {
+	if (clusterMode) {
 		Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
 	}
 	return result
 }
 
-if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
-	def nodes = (List)connectedNodes
-	if (nodes && nodes.size() > 0 ) {
+if (clusterMode && notifyCluster && supportedComponents.contains(componentName)) {
+	def nodes = (List) connectedNodes
+	if (nodes && nodes.size() > 0) {
 		nodes.each { node ->
 			def forward = p.copyElementOnly();
 			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-			forward.setPacketTo( node );
-			forward.setPermissions( Permissions.ADMIN );
+			forward.setPacketTo(node);
+			forward.setPermissions(Permissions.ADMIN);
 
 			results.offer(forward)
 		}

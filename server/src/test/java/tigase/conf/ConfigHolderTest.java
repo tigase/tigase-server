@@ -71,7 +71,7 @@ public class ConfigHolderTest {
 		OldConfigHolder.Format format = holder.detectPathAndFormat();
 
 		tmp.delete();
-		
+
 		assertEquals(OldConfigHolder.Format.properties, format);
 
 		tmp = File.createTempFile("test_", ".properties");
@@ -137,24 +137,24 @@ public class ConfigHolderTest {
 	@Test
 	public void testConversionOfAdHocCommandsACLs() throws IOException, ConfigReader.ConfigException {
 		String cfgStr = Stream.of("sess-man/command/http\\://jabber.org/protocol/admin#add-user=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#delete-user=DOMAIN:test.com",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#change-user-password=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-user-roster=JID:ala1@test.com",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#user-stats=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-active-users-num=LOCAL,DOMAIN:test.com",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-idle-users-num=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-registered-users-list=JID:ala@test.coms",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-online-users-list=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-active-users=DOMAIN:example.com",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-idle-users=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#announce=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#add-user-tracker=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#get-top-active-users=LOCAL",
-							 "sess-man/command/http\\://jabber.org/protocol/admin#remove-user-tracker=LOCAL",
-							 "basic-conf/command/user-domain-perm=LOCAL", "sess-man/command/connection-time=LOCAL",
-							 "s2s/command/roster-fixer=LOCAL", "sess-man/command/roster-fixer-cluster=LOCAL",
-							 "s2s/command/user-roster-management=LOCAL",
-							 "c2s/command/user-roster-management-ext=LOCAL").collect(Collectors.joining("\n"));
+								  "sess-man/command/http\\://jabber.org/protocol/admin#delete-user=DOMAIN:test.com",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#change-user-password=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-user-roster=JID:ala1@test.com",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#user-stats=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-active-users-num=LOCAL,DOMAIN:test.com",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-idle-users-num=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-registered-users-list=JID:ala@test.coms",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-online-users-list=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-active-users=DOMAIN:example.com",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-idle-users=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#announce=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#add-user-tracker=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-top-active-users=LOCAL",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#remove-user-tracker=LOCAL",
+								  "basic-conf/command/user-domain-perm=LOCAL", "sess-man/command/connection-time=LOCAL",
+								  "s2s/command/roster-fixer=LOCAL", "sess-man/command/roster-fixer-cluster=LOCAL",
+								  "s2s/command/user-roster-management=LOCAL",
+								  "c2s/command/user-roster-management-ext=LOCAL").collect(Collectors.joining("\n"));
 
 		File tmp = File.createTempFile("test_", ".properties");
 		try (Writer writer = new FileWriter(tmp)) {
@@ -165,8 +165,8 @@ public class ConfigHolderTest {
 		tdslFile.delete();
 
 		OldConfigHolder holder = new OldConfigHolder();
-		holder.convert(new String[] { PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath() }, tdslFile.toPath());
-		
+		holder.convert(new String[]{PROPERTY_FILENAME_PROP_KEY, tmp.getAbsolutePath()}, tdslFile.toPath());
+
 		Map<String, Object> result = ConfigWriter.buildTree(holder.getProperties());
 		result.remove("config-type");
 		result.forEach((comp, properties) -> {
@@ -190,22 +190,24 @@ public class ConfigHolderTest {
 	@Test
 	public void testConversionOfDynamicRosterClasses() throws IOException, ConfigReader.ConfigException {
 		OldConfigHolder holder = new OldConfigHolder();
-		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList(
-				new String[]{"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest,tigase.xmpp.impl.roster.DynamicRosterTest123"}));
+		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList(new String[]{
+				"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest,tigase.xmpp.impl.roster.DynamicRosterTest123"}));
 
 		holder.convertFromOldFormat();
 
 		Map<String, Object> result = ConfigWriter.buildTree(props);
 		Map<String, Object> sessMan = (Map<String, Object>) result.get("sess-man");
 		assertNotNull(sessMan);
-		AbstractBeanConfigurator.BeanDefinition dynamicRoster = (AbstractBeanConfigurator.BeanDefinition) sessMan.get("dynamic-rosters");
+		AbstractBeanConfigurator.BeanDefinition dynamicRoster = (AbstractBeanConfigurator.BeanDefinition) sessMan.get(
+				"dynamic-rosters");
 		assertNotNull(dynamicRoster);
 		assertTrue(dynamicRoster.isActive());
 		assertNull(dynamicRoster.getClazzName());
 
 		assertFalse(dynamicRoster.isEmpty());
 
-		AbstractBeanConfigurator.BeanDefinition roster = (AbstractBeanConfigurator.BeanDefinition) dynamicRoster.get("DynamicRosterTest");
+		AbstractBeanConfigurator.BeanDefinition roster = (AbstractBeanConfigurator.BeanDefinition) dynamicRoster.get(
+				"DynamicRosterTest");
 		assertNotNull(roster);
 		assertTrue(roster.isActive());
 		assertEquals(DynamicRosterTest.class.getCanonicalName(), roster.getClazzName());

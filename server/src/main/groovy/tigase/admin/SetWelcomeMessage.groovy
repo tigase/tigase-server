@@ -62,7 +62,7 @@ Packet process(Kernel kernel, SessionManager component, Iq p) {
 		Command.addTitle(result, "Setting Welcome Message")
 		Command.addInstructions(result, "Fill out this form to set the welcome message for this service.")
 		Command.addHiddenField(result, "FORM_TYPE", "http://jabber.org/protocol/admin")
-		Command.addFieldMultiValue(result, MOTD, [], "Welcome message")
+		Command.addFieldMultiValue(result, MOTD, [ ], "Welcome message")
 
 		return result
 	} else {

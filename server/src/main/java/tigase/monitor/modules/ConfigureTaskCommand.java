@@ -41,7 +41,7 @@ import static tigase.monitor.modules.ConfigureTaskCommand.NODE;
 @Bean(name = NODE, parent = MonitorComponent.class, active = true)
 public class ConfigureTaskCommand
 		implements AdHocCommand {
-	
+
 	public static final String NODE = "x-config";
 
 	@Inject

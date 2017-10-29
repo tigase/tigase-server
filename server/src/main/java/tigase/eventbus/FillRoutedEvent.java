@@ -23,15 +23,14 @@ package tigase.eventbus;
 import java.lang.annotation.*;
 
 /**
- * Annotation used to mark methods of consumer class as responsible for filling
- * event transient fields
+ * Annotation used to mark methods of consumer class as responsible for filling event transient fields
  *
  * @author andrzej
  */
-@Target({ ElementType.METHOD })
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
 public @interface FillRoutedEvent {
-	
+
 }

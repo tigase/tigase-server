@@ -1,4 +1,3 @@
-
 /*
  * Authorization.java
  *
@@ -22,32 +21,27 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import tigase.server.Packet;
 
 //~--- enums ------------------------------------------------------------------
 
 /**
- * <code>Authorization</code> enumeration type defines authorization error
- * codes.
- * It has also capability to build error response message relevant to
- * specific error code (or success code). It is used not only for authorization
- * process but also by other features implementation accessing session
- * data.<br>
- * All defined errors comes directly from <em>XMPP</em> core RFC. For each error
- * has assigned error code - from old <em>Jabber</em> spec. and error condition -
+ * <code>Authorization</code> enumeration type defines authorization error codes. It has also capability to build error
+ * response message relevant to specific error code (or success code). It is used not only for authorization process but
+ * also by other features implementation accessing session data.<br> All defined errors comes directly from
+ * <em>XMPP</em> core RFC. For each error has assigned error code - from old <em>Jabber</em> spec. and error condition -
  * <em>XMPP</em> error spec.
- *
  * <p>
- * Created: Thu Oct 14 22:19:11 2004
- * </p>
+ * <p> Created: Thu Oct 14 22:19:11 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum Authorization {
 	AUTHORIZED {
-
 		@Override
 		public String getCondition() {
 			return null;
@@ -69,7 +63,6 @@ public enum Authorization {
 		}
 	},
 	BAD_REQUEST {
-
 		@Override
 		public String getCondition() {
 			return "bad-request";
@@ -86,7 +79,6 @@ public enum Authorization {
 		}
 	},
 	CONFLICT {
-
 		@Override
 		public String getCondition() {
 			return "conflict";
@@ -103,7 +95,6 @@ public enum Authorization {
 		}
 	},
 	FEATURE_NOT_IMPLEMENTED {
-
 		@Override
 		public String getCondition() {
 			return "feature-not-implemented";
@@ -120,7 +111,6 @@ public enum Authorization {
 		}
 	},
 	FORBIDDEN {
-
 		@Override
 		public String getCondition() {
 			return "forbidden";
@@ -137,7 +127,6 @@ public enum Authorization {
 		}
 	},
 	GONE {
-
 		@Override
 		public String getCondition() {
 			return "gone";
@@ -154,7 +143,6 @@ public enum Authorization {
 		}
 	},
 	INTERNAL_SERVER_ERROR {
-
 		@Override
 		public String getCondition() {
 			return "internal-server-error";
@@ -171,7 +159,6 @@ public enum Authorization {
 		}
 	},
 	ITEM_NOT_FOUND {
-
 		@Override
 		public String getCondition() {
 			return "item-not-found";
@@ -188,7 +175,6 @@ public enum Authorization {
 		}
 	},
 	JID_MALFORMED {
-
 		@Override
 		public String getCondition() {
 			return "jid-malformed";
@@ -205,7 +191,6 @@ public enum Authorization {
 		}
 	},
 	NOT_ACCEPTABLE {
-
 		@Override
 		public String getCondition() {
 			return "not-acceptable";
@@ -238,7 +223,6 @@ public enum Authorization {
 		}
 	},
 	NOT_AUTHORIZED {
-
 		@Override
 		public String getCondition() {
 			return "not-authorized";
@@ -255,7 +239,6 @@ public enum Authorization {
 		}
 	},
 	PAYMENT_REQUIRED {
-
 		@Override
 		public String getCondition() {
 			return "payment-required";
@@ -272,7 +255,6 @@ public enum Authorization {
 		}
 	},
 	POLICY_VIOLATION {
-
 		@Override
 		public String getCondition() {
 			return "policy-violation";
@@ -289,7 +271,6 @@ public enum Authorization {
 		}
 	},
 	RECIPIENT_UNAVAILABLE {
-
 		@Override
 		public String getCondition() {
 			return "recipient-unavailable";
@@ -306,7 +287,6 @@ public enum Authorization {
 		}
 	},
 	REDIRECT {
-
 		@Override
 		public String getCondition() {
 			return "redirect";
@@ -323,7 +303,6 @@ public enum Authorization {
 		}
 	},
 	REGISTRATION_REQUIRED {
-
 		@Override
 		public String getCondition() {
 			return "registration-required";
@@ -340,7 +319,6 @@ public enum Authorization {
 		}
 	},
 	REMOTE_SERVER_NOT_FOUND {
-
 		@Override
 		public String getCondition() {
 			return "remote-server-not-found";
@@ -357,7 +335,6 @@ public enum Authorization {
 		}
 	},
 	REMOTE_SERVER_TIMEOUT {
-
 		@Override
 		public String getCondition() {
 			return "remote-server-timeout";
@@ -374,7 +351,6 @@ public enum Authorization {
 		}
 	},
 	RESOURCE_CONSTRAINT {
-
 		@Override
 		public String getCondition() {
 			return "resource-constraint";
@@ -391,7 +367,6 @@ public enum Authorization {
 		}
 	},
 	SERVICE_UNAVAILABLE {
-
 		@Override
 		public String getCondition() {
 			return "service-unavailable";
@@ -408,7 +383,6 @@ public enum Authorization {
 		}
 	},
 	SUBSCRIPTION_REQUIRED {
-
 		@Override
 		public String getCondition() {
 			return "subscription-required";
@@ -425,7 +399,6 @@ public enum Authorization {
 		}
 	},
 	UNDEFINED_CONDITION {
-
 		@Override
 		public String getCondition() {
 			return "undefined-condition";
@@ -442,7 +415,6 @@ public enum Authorization {
 		}
 	},
 	UNEXPECTED_REQUEST {
-
 		@Override
 		public String getCondition() {
 			return "unexpected-request";
@@ -464,82 +436,67 @@ public enum Authorization {
 	protected static final String ERR_TYPE_MODIFY = "modify";
 	protected static final String ERR_TYPE_WAIT = "wait";
 
-	private static final Map<String,Authorization> BY_CONDITION = new ConcurrentHashMap<String,Authorization>();
-	
+	private static final Map<String, Authorization> BY_CONDITION = new ConcurrentHashMap<String, Authorization>();
+
 	static {
 		for (Authorization v : values()) {
-			if (v.getCondition() == null)
+			if (v.getCondition() == null) {
 				continue;
+			}
 			BY_CONDITION.put(v.getCondition(), v);
 		}
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	public static Authorization getByCondition(String condition) {
-		if (condition == null)
+		if (condition == null) {
 			return null;
+		}
 		return BY_CONDITION.get(condition);
 	}
-	
+
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public abstract String getCondition();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public abstract int getErrorCode();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public abstract String getErrorType();
 
 	/**
-	 * Utility method for generating an error response for a stanza (enclosed by the given
-	 * <code>Packet</code>). In some cases it may happen that the error packet is bounced
-	 * back to the sender which triggers another attempt to generate an error response for
-	 * the error packet. This may lead to an infinite loop inside the component
-	 * (Tigase server) eating up CPU and slowing everything down. To prevent this the
-	 * method detects the <em>error</em> stanza typy and generates an exception.
+	 * Utility method for generating an error response for a stanza (enclosed by the given <code>Packet</code>). In some
+	 * cases it may happen that the error packet is bounced back to the sender which triggers another attempt to
+	 * generate an error response for the error packet. This may lead to an infinite loop inside the component (Tigase
+	 * server) eating up CPU and slowing everything down. To prevent this the method detects the <em>error</em> stanza
+	 * typy and generates an exception.
+	 *
 	 * @param packet is the packet for which the error response is generated.
 	 * @param text is an error human readable text message.
-	 * @param includeOriginalXML is a boolean value indicating whether the original
-	 * content of the stanza (children of the top level element) have to be included in the
-	 * error stanza.
-	 * @return a new <code>Packet</code> instance with an error response for a given
-	 * packet.
-	 * @throws PacketErrorTypeException if the packet given as a parameter encloses
-	 * an error stanza already.
+	 * @param includeOriginalXML is a boolean value indicating whether the original content of the stanza (children of
+	 * the top level element) have to be included in the error stanza.
+	 *
+	 * @return a new <code>Packet</code> instance with an error response for a given packet.
+	 *
+	 * @throws PacketErrorTypeException if the packet given as a parameter encloses an error stanza already.
 	 */
 	public Packet getResponseMessage(Packet packet, String text, boolean includeOriginalXML)
-					throws PacketErrorTypeException {
+			throws PacketErrorTypeException {
 		if ((packet.getType() == null) || (packet.getType() != StanzaType.error)) {
-			return packet.errorResult(getErrorType(),
-																getErrorCode(),
-																getCondition(),
-																text,
-																includeOriginalXML);
+			return packet.errorResult(getErrorType(), getErrorCode(), getCondition(), text, includeOriginalXML);
 		} else {
-			throw new PacketErrorTypeException("The packet has already 'error' type: "
-																				 + packet.toString());
+			throw new PacketErrorTypeException("The packet has already 'error' type: " + packet.toString());
 		}
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

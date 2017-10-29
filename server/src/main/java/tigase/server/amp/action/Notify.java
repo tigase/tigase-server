@@ -1,4 +1,3 @@
-
 /*
  * Notify.java
  *
@@ -40,7 +39,9 @@ import tigase.xmpp.PacketErrorTypeException;
  * @version $Rev$
  */
 @Bean(name = "notify", parent = AmpComponent.class, active = true)
-public class Notify extends ActionAbstract {
+public class Notify
+		extends ActionAbstract {
+
 	private static final String name = "notify";
 
 	//~--- methods --------------------------------------------------------------
@@ -48,7 +49,7 @@ public class Notify extends ActionAbstract {
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		try {
-			if (packet.getStanzaFrom() != null && packet.getStanzaFrom().getBareJID().getLocalpart() != null ) {
+			if (packet.getStanzaFrom() != null && packet.getStanzaFrom().getBareJID().getLocalpart() != null) {
 				Packet result = prepareAmpPacket(packet, rule);
 				resultsHandler.addOutPacket(result);
 			}

@@ -28,57 +28,49 @@ package tigase.cluster.strategy.cmd;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.SessionManagerClustered;
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.api.SessionManagerClusteredIfc;
-import tigase.cluster.SessionManagerClustered;
 import tigase.cluster.strategy.DefaultClusteringStrategyAbstract;
-
 import tigase.server.Packet;
-
+import tigase.server.Priority;
 import tigase.util.stringprep.TigaseStringprepException;
-
 import tigase.xml.Element;
-
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.xmpp.jid.JID;
 
 import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import tigase.server.Priority;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class description
  *
- *
- * @version        5.2.0, 13/06/22
- * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @version 5.2.0, 13/06/22
  */
 public class PacketForwardCmd
-				extends CommandListenerAbstract {
+		extends CommandListenerAbstract {
+
+	public static final String PACKET_FROM_KEY = "packet-from";
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(PacketForwardCmd.class.getName());
 
-	public static final String PACKET_FROM_KEY = "packet-from";
-
 	//~--- fields ---------------------------------------------------------------
-
 	private DefaultClusteringStrategyAbstract strategy;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
-	 *
 	 *
 	 * @param name
 	 * @param strategy
@@ -91,33 +83,30 @@ public class PacketForwardCmd
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
-			String> data, Queue<Element> packets)
-					throws ClusterCommandException {
+	public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data, Queue<Element> packets)
+			throws ClusterCommandException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST,
-					"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
-					new Object[] { fromNode,
-					visitedNodes, data, packets });
+			log.log(Level.FINEST, "Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+					new Object[]{fromNode, visitedNodes, data, packets});
 		}
 		if ((packets != null) && (packets.size() > 0)) {
 			SessionManagerClusteredIfc sm = getSM();
 			for (Element elem : packets) {
 				try {
-					Packet                 el_packet = Packet.packetInstance(elem);
-					String packetFromStr  = data.get(PACKET_FROM_KEY);
-					if (packetFromStr != null)
+					Packet el_packet = Packet.packetInstance(elem);
+					String packetFromStr = data.get(PACKET_FROM_KEY);
+					if (packetFromStr != null) {
 						el_packet.setPacketFrom(JID.jidInstanceNS(packetFromStr));
-					XMPPResourceConnection conn      = sm.getXMPPResourceConnection(el_packet);
-					Map<String, String>    locdata   = null;
+					}
+					XMPPResourceConnection conn = sm.getXMPPResourceConnection(el_packet);
+					Map<String, String> locdata = null;
 
 					if (conn != null) {
 						locdata = new LinkedHashMap<String, String>();
 						if (data != null) {
 							locdata.putAll(data);
 						}
-						data.put(SessionManagerClusteredIfc.SESSION_FOUND_KEY, sm.getComponentId()
-								.toString());
+						data.put(SessionManagerClusteredIfc.SESSION_FOUND_KEY, sm.getComponentId().toString());
 					}
 
 					// The commented if below causes the packet to stop being forwarded
@@ -131,8 +120,7 @@ public class PacketForwardCmd
 					// Instead, always send the packet to next node:
 					boolean isSent;
 
-					isSent = strategy.sendToNextNode(fromNode, visitedNodes, data, Packet
-							.packetInstance(elem));
+					isSent = strategy.sendToNextNode(fromNode, visitedNodes, data, Packet.packetInstance(elem));
 
 					// If there is a user session for the packet, process it
 					if (conn != null) {
@@ -152,8 +140,7 @@ public class PacketForwardCmd
 						if (sm.getComponentId().equals(fromNode)) {
 
 							// However it could have been processed on another node already
-							if ((data == null) || (data.get(SessionManagerClustered
-									.SESSION_FOUND_KEY) == null)) {
+							if ((data == null) || (data.get(SessionManagerClustered.SESSION_FOUND_KEY) == null)) {
 								sm.processPacket(el_packet, conn);
 							}
 						}
@@ -166,11 +153,10 @@ public class PacketForwardCmd
 			log.finest("Empty packets list in the forward command");
 		}
 	}
-	
+
 	private SessionManagerClusteredIfc getSM() {
 		return strategy.getSM();
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

@@ -24,7 +24,8 @@ import tigase.auth.mechanisms.AbstractSaslSCRAM;
 
 import javax.security.auth.callback.Callback;
 
-public class ChannelBindingCallback implements Callback, java.io.Serializable {
+public class ChannelBindingCallback
+		implements Callback, java.io.Serializable {
 
 	private final String prompt;
 	private final AbstractSaslSCRAM.BindType requestedBindType;

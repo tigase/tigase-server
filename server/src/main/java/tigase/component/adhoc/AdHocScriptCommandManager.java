@@ -19,14 +19,13 @@
  */
 package tigase.component.adhoc;
 
-import java.util.List;
-
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
+import java.util.List;
+
 /**
- *
  * @author andrzej
  */
 public interface AdHocScriptCommandManager {

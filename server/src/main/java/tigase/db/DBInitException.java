@@ -21,21 +21,24 @@ package tigase.db;
 
 /**
  * Describe class DBInitException here.
- *
- *
+ * <p>
+ * <p>
  * Created: Thu Oct 26 12:18:05 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DBInitException extends TigaseDBException {
+public class DBInitException
+		extends TigaseDBException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-	public DBInitException(String message) { super(message); }
+	public DBInitException(String message) {
+		super(message);
+	}
 
-  public DBInitException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	public DBInitException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 } // DBInitException

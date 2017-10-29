@@ -37,14 +37,15 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Implementation of multi domain pool for authentication repositories.
- * Created: Mar 27, 2010 9:10:21 PM
+ * Implementation of multi domain pool for authentication repositories. Created: Mar 27, 2010 9:10:21 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<AuthRepository,AuthRepositoryMDPoolBean.AuthRepositoryConfigBean>
+public abstract class AuthRepositoryMDImpl
+		extends MDPoolBeanWithStatistics<AuthRepository, AuthRepositoryMDPoolBean.AuthRepositoryConfigBean>
 		implements AuthRepository {
+
 	private static final Logger log = Logger.getLogger(AuthRepositoryMDImpl.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -65,8 +66,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 			repo.addUser(user, password);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -115,18 +115,15 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 		if (repo != null) {
 			return repo.getUsersCount(domain);
 		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + domain + ", not even default one!");
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain + ", not even default one!");
 		}
 
 		return -1;
 	}
 
 	@Override
-	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {
-		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: "
-				+ params);
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: " + params);
 	}
 
 	@Override
@@ -135,7 +132,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 		if (repo != null) {
 			return repo.isMechanismSupported(domain, mechanism);
 		} else {
-			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain +", not even default one!");
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + domain + ", not even default one!");
 			return false;
 		}
 	}
@@ -179,17 +176,14 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 	}
 
 	@Override
-	public boolean otherAuth(Map<String, Object> authProps)
- throws TigaseDBException, AuthorizationException {
+	public boolean otherAuth(Map<String, Object> authProps) throws TigaseDBException, AuthorizationException {
 		AuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
 
 		if (repo != null) {
 			return repo.otherAuth(authProps);
 		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: "
- + authProps.get(SERVER_NAME_KEY)
-					+ ", not even default one!");
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + authProps.get(SERVER_NAME_KEY) +
+					", not even default one!");
 		}
 
 		return false;
@@ -202,10 +196,8 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 		if (repo != null) {
 			repo.queryAuth(authProps);
 		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: "
- + authProps.get(SERVER_NAME_KEY)
-					+ ", not even default one!");
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + authProps.get(SERVER_NAME_KEY) +
+					", not even default one!");
 		}
 	}
 
@@ -220,8 +212,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 			repo.removeCredential(user, username);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-							+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -235,8 +226,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 			eventBus.fire(new UserRepository.UserRemovedEvent(user));
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
@@ -259,21 +249,21 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 		if (repo != null) {
 			repo.setUserDisabled(user, value);
 		} else {
-			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
 
-	public void loggedIn(BareJID user) throws TigaseDBException{
+	public void loggedIn(BareJID user) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.loggedIn(user);
 		} else {
 			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-							+ ", not even default one!");
-		}	}
-
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+		}
+	}
 
 	@Override
 	public void updatePassword(BareJID user, String password) throws TigaseDBException {
@@ -288,8 +278,7 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<Auth
 	}
 
 	@Override
-	public void updateCredential(BareJID user, String username, String password)
-			throws TigaseDBException {
+	public void updateCredential(BareJID user, String username, String password) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {

@@ -1,4 +1,3 @@
-
 /*
  * S2SIOService.java
  *
@@ -24,12 +23,12 @@ package tigase.server.xmppserver;
 
 import tigase.xmpp.XMPPIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -39,32 +38,31 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class S2SIOService extends XMPPIOService<Object> {
-	private static final Logger log = Logger.getLogger(S2SIOService.class.getName());
+public class S2SIOService
+		extends XMPPIOService<Object> {
 
 	/** Field description */
 	public static final String S2S_CONNECTION_KEY = "s2s-connection-key";
-        public static final String HANDSHAKING_DOMAIN_KEY = "handshaking-domain-key";
+	public static final String HANDSHAKING_DOMAIN_KEY = "handshaking-domain-key";
 	protected static final String HANDSHAKING_ONLY_KEY = "handshaking-only-key";
+	private static final Logger log = Logger.getLogger(S2SIOService.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
+	/**
+	 * This structure keeps a set of all CIDs reusing this connection. If the connection goes down all CIDs must be
+	 * notified.
+	 */
+	private Set<CID> authenticatedCIDs = new CopyOnWriteArraySet<CID>();
 	private CIDConnections cid_conns = null;
 	private String dbKey = null;
 	private S2SConnection s2s_conn = null;
-	private String session_id = null;
 
 ///**
 // * This structure keeps a set of domains which are authorized to send or
 // * receive packets on this connection.
 // */
 //private Set<String> authenticatedDomains = new CopyOnWriteArraySet<String>();
-
-	/**
-	 * This structure keeps a set of all CIDs reusing this connection. If the connection
-	 * goes down all CIDs must be notified.
-	 */
-	private Set<CID> authenticatedCIDs = new CopyOnWriteArraySet<CID>();
+	private String session_id = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -81,12 +79,11 @@ public class S2SIOService extends XMPPIOService<Object> {
 	/**
 	 * Adds another connection id (CID) to the authenticated list for this connection
 	 *
-	 *
 	 * @param cid
 	 */
 	public void addCID(CID cid) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Adding CID to authenticated: {1}", new Object[] { this, cid });
+			log.log(Level.FINEST, "{0}, Adding CID to authenticated: {1}", new Object[]{this, cid});
 		}
 
 		authenticatedCIDs.add(cid);
@@ -106,9 +103,6 @@ public class S2SIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public Set<CID> getCIDs() {
 		return authenticatedCIDs;
@@ -116,9 +110,6 @@ public class S2SIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public S2SConnection getS2SConnection() {
 		return s2s_conn;
@@ -127,11 +118,10 @@ public class S2SIOService extends XMPPIOService<Object> {
 	/**
 	 * Method description
 	 *
-	 *
-	 * 
+	 * @param s2s_conn
 	 */
-	public String getSessionId() {
-		return session_id;
+	public void setS2SConnection(S2SConnection s2s_conn) {
+		this.s2s_conn = s2s_conn;
 	}
 
 ///**
@@ -148,21 +138,33 @@ public class S2SIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param cid
-	 *
-	 * 
 	 */
-	public boolean isAuthenticated(CID cid) {
-		return authenticatedCIDs.contains(cid);
+	public String getSessionId() {
+		return session_id;
 	}
 
 	/**
 	 * Method description
 	 *
+	 * @param session_id
+	 */
+	public void setSessionId(String session_id) {
+		this.session_id = session_id;
+	}
+
+	/**
+	 * Method description
 	 *
-	 * 
+	 * @param cid
+	 */
+	public boolean isAuthenticated(CID cid) {
+		return authenticatedCIDs.contains(cid);
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
 	 */
 	public boolean isAuthenticated() {
 		return authenticatedCIDs.size() > 0;
@@ -170,45 +172,18 @@ public class S2SIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public boolean isHandshakingOnly() {
 		return getSessionData().get(HANDSHAKING_ONLY_KEY) != null;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param key
 	 */
 	public void setDBKey(String key) {
 		dbKey = key;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param s2s_conn
-	 */
-	public void setS2SConnection(S2SConnection s2s_conn) {
-		this.s2s_conn = s2s_conn;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param session_id
-	 */
-	public void setSessionId(String session_id) {
-		this.session_id = session_id;
 	}
 
 	//~--- methods --------------------------------------------------------------

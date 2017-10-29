@@ -36,7 +36,8 @@ public class MD5UsernamePasswordCredentialsEntryTest {
 		System.out.println(encPassword);
 
 		MD5UsernamePasswordCredentialsEntry.Decoder decoder = new MD5UsernamePasswordCredentialsEntry.Decoder();
-		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user, encPassword);
+		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user,
+																										 encPassword);
 
 		assertTrue(entry.verifyPlainPassword(testPassword));
 	}
@@ -48,9 +49,10 @@ public class MD5UsernamePasswordCredentialsEntryTest {
 
 		String encPassword = "3e470bf91e38446f3d58ce890b1a8b63";
 		MD5UsernamePasswordCredentialsEntry.Decoder decoder = new MD5UsernamePasswordCredentialsEntry.Decoder();
-		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user, encPassword);
+		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user,
+																										 encPassword);
 
 		assertTrue(entry.verifyPlainPassword(testPassword));
 	}
-	
+
 }

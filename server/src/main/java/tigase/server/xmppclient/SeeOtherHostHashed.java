@@ -40,41 +40,40 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Default implementation for cluster environment of SeeOtherHostIfc returning
- * redirect host based on the hash value of the user's JID
+ * Default implementation for cluster environment of SeeOtherHostIfc returning redirect host based on the hash value of
+ * the user's JID
  *
  * @author Wojtek
  */
 @Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true)
 @ClusterModeRequired(active = true)
-public class SeeOtherHostHashed extends SeeOtherHost {
+public class SeeOtherHostHashed
+		extends SeeOtherHost {
 
-//	protected List<BareJID> defaultHost = null;
-	protected List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
 	private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
+	//	protected List<BareJID> defaultHost = null;
+	protected List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
 		int hash = Math.abs(jid.hashCode());
-		if (defaultHost !=null
-			&& !defaultHost.isEmpty()
-			&& connectedNodes.contains( defaultHost.get( hash % defaultHost.size() ) ) ) {
-				return defaultHost.get( hash % defaultHost.size() );
-		} else if (connectedNodes.size() > 0 ) {
-			return connectedNodes.get( hash % connectedNodes.size());
+		if (defaultHost != null && !defaultHost.isEmpty() &&
+				connectedNodes.contains(defaultHost.get(hash % defaultHost.size()))) {
+			return defaultHost.get(hash % defaultHost.size());
+		} else if (connectedNodes.size() > 0) {
+			return connectedNodes.get(hash % connectedNodes.size());
 		} else {
 			return host;
 		}
 	}
-
 
 	@Override
 	public void setNodes(List<JID> connectedNodes) {
 		synchronized (this) {
 			JID[] arr_in = connectedNodes.toArray(new JID[connectedNodes.size()]);
 			List<BareJID> list_out = new ArrayList<BareJID>();
-			
-			for (int i=0; i<arr_in.length; i++) {
+
+			for (int i = 0; i < arr_in.length; i++) {
 				BareJID jid = BareJID.bareJIDInstanceNS(null, arr_in[i].getDomain());
 				list_out.add(jid);
 			}
@@ -83,7 +82,15 @@ public class SeeOtherHostHashed extends SeeOtherHost {
 		}
 		super.setNodes(connectedNodes);
 	}
-	
+
+	@Override
+	protected void nodeShutdown(ShutdownEvent event) {
+		super.nodeShutdown(event);
+		synchronized (this) {
+			setConnectedNodes(new ArrayList<>(this.connectedNodes));
+		}
+	}
+
 	private void setConnectedNodes(List<BareJID> connectedNodes) {
 		connectedNodes = filterNodes(connectedNodes);
 		synchronized (this) {
@@ -94,7 +101,7 @@ public class SeeOtherHostHashed extends SeeOtherHost {
 			log.log(Level.FINEST, "setting list of connected nodes: {0}", this.connectedNodes);
 		}
 	}
-	
+
 	private List<BareJID> filterNodes(List<BareJID> list) {
 		Iterator<BareJID> it = list.iterator();
 		while (it.hasNext()) {
@@ -107,13 +114,5 @@ public class SeeOtherHostHashed extends SeeOtherHost {
 			}
 		}
 		return list;
-	}
-
-	@Override
-	protected void nodeShutdown(ShutdownEvent event) {
-		super.nodeShutdown(event);
-		synchronized (this) {
-			setConnectedNodes(new ArrayList<>(this.connectedNodes));
-		}
 	}
 }

@@ -27,8 +27,8 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.Kernel;
 import tigase.server.ServerComponent;
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.XMPPImplIfc;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,38 +38,21 @@ import java.util.stream.Collectors;
  */
 public class SetupHelper {
 
-	public static List<BeanDefinition> getAvailableComponents() {
-		return getAvailableBeans(ServerComponent.class);
-	}
-
-	public static List<BeanDefinition> getAvailableProcessors(Class componentClazz, Class processorClazz) {
-		return getAvailableBeans(processorClazz, componentClazz);
-	}
-
-	public static List<BeanDefinition> getAvailableBeans(Class processorClazz) {
-		return getAvailableBeans(processorClazz, Kernel.class);
-	}
-
-	public static List<BeanDefinition> getAvailableBeans(Class processorClazz, Class componentClazz) {
-		Kernel kernel = new Kernel();
-		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
-		return AbstractBeanConfigurator.getBeanClassesFromAnnotations(kernel, componentClazz)
-				.entrySet()
-				.stream()
-				.filter(e -> processorClazz.isAssignableFrom(e.getValue()))
-				.map(e -> e.getValue())
-				.map(SetupHelper::convertToBeanDefinition)
-				.collect(Collectors.toList());
+	public static enum RestApiSecurity {
+		forbidden,
+		api_keys,
+		open_access
 	}
 
 	public static BeanDefinition convertToBeanDefinition(Class<?> cls) {
 		return new BeanDefinition(cls);
 	}
 
-	public static ConfigBuilder generateConfig(ConfigTypeEnum configType, String dbUri, boolean clusterMode, boolean acs,
-											   Optional<Set<String>> optionalComponentsOption, Optional<Set<String>> forceEnabledComponentsOptions, Optional<Set<String>> pluginsOption,
-											   String[] virtualDomains, Optional<BareJID[]> admins,
-											   Optional<HttpSecurity> httpSecurity) {
+	public static ConfigBuilder generateConfig(ConfigTypeEnum configType, String dbUri, boolean clusterMode,
+											   boolean acs, Optional<Set<String>> optionalComponentsOption,
+											   Optional<Set<String>> forceEnabledComponentsOptions,
+											   Optional<Set<String>> pluginsOption, String[] virtualDomains,
+											   Optional<BareJID[]> admins, Optional<HttpSecurity> httpSecurity) {
 		ConfigBuilder builder = new ConfigBuilder().with("config-type", configType.id().toLowerCase());
 
 		if (clusterMode) {
@@ -107,69 +90,79 @@ public class SetupHelper {
 																				 .filter(def -> !def.isCoreComponent())
 																				 .map(def -> def.getName())
 																				 .collect(Collectors.toSet()));
-		SetupHelper.getAvailableComponents()
-				.stream()
-				.filter(def -> !def.isCoreComponent())
-				.filter(def -> {
-					ConfigType ct = def.getClazz().getAnnotation(ConfigType.class);
+		SetupHelper.getAvailableComponents().stream().filter(def -> !def.isCoreComponent()).filter(def -> {
+			ConfigType ct = def.getClazz().getAnnotation(ConfigType.class);
 
-					if (optionalComponents.contains(def.getName())) {
-						return def.isActive() == false ||
-								(ct != null && !Arrays.asList(ct.value()).contains(configType)) ||
-								(forceEnabledComponentsOptions.isPresent() &&
-										forceEnabledComponentsOptions.get().contains(def.getName()));
-					} else {
-						return def.isActive() == true && (ct != null && Arrays.asList(ct.value()).contains(configType));
-					}
-				})
-				.forEach(def -> {
-					ConfigType ct = def.getClazz().getAnnotation(ConfigType.class);
+			if (optionalComponents.contains(def.getName())) {
+				return def.isActive() == false || (ct != null && !Arrays.asList(ct.value()).contains(configType)) ||
+						(forceEnabledComponentsOptions.isPresent() &&
+								forceEnabledComponentsOptions.get().contains(def.getName()));
+			} else {
+				return def.isActive() == true && (ct != null && Arrays.asList(ct.value()).contains(configType));
+			}
+		}).forEach(def -> {
+			ConfigType ct = def.getClazz().getAnnotation(ConfigType.class);
 
-					builder.withBean(b -> {
-						b.name(def.getName())
-								.active(optionalComponents.contains(def.getName()))
-								.clazz((ct != null && !Arrays.asList(ct.value()).contains(configType))
-									   ? def.getClazz()
-									   : null);
-						if ("http".equals(def.getName())) {
-							httpSecurity.ifPresent(sec -> {
-								switch (sec.restApiSecurity) {
-									case forbidden:
-										break;
-									case api_keys:
-										b.with("api-keys", sec.restApiKeys);
-										break;
-									case open_access:
-										b.with("api-keys", "open_access");
-								}
-								if (sec.setupUser != null && !sec.setupUser.isEmpty() && sec.setupPassword != null &&
-										!sec.setupPassword.isEmpty()) {
-									b.withBean(setup -> setup.name("setup")
-											.with("admin-user", sec.setupUser)
-											.with("admin-password", sec.setupPassword));
-								}
-							});
+			builder.withBean(b -> {
+				b.name(def.getName())
+						.active(optionalComponents.contains(def.getName()))
+						.clazz((ct != null && !Arrays.asList(ct.value()).contains(configType)) ? def.getClazz() : null);
+				if ("http".equals(def.getName())) {
+					httpSecurity.ifPresent(sec -> {
+						switch (sec.restApiSecurity) {
+							case forbidden:
+								break;
+							case api_keys:
+								b.with("api-keys", sec.restApiKeys);
+								break;
+							case open_access:
+								b.with("api-keys", "open_access");
+						}
+						if (sec.setupUser != null && !sec.setupUser.isEmpty() && sec.setupPassword != null &&
+								!sec.setupPassword.isEmpty()) {
+							b.withBean(setup -> setup.name("setup")
+									.with("admin-user", sec.setupUser)
+									.with("admin-password", sec.setupPassword));
 						}
 					});
-				});
+				}
+			});
+		});
 
 		return builder;
 	}
 
-	public static class HttpSecurity {
-
-		public RestApiSecurity restApiSecurity = RestApiSecurity.forbidden;
-
-		public String setupUser;
-		public String setupPassword;
-		public String[] restApiKeys = new String[0];
-
+	public static List<BeanDefinition> getAvailableBeans(Class processorClazz) {
+		return getAvailableBeans(processorClazz, Kernel.class);
 	}
 
-	public static enum RestApiSecurity {
-		forbidden,
-		api_keys,
-		open_access
+	public static List<BeanDefinition> getAvailableBeans(Class processorClazz, Class componentClazz) {
+		Kernel kernel = new Kernel();
+		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
+		return AbstractBeanConfigurator.getBeanClassesFromAnnotations(kernel, componentClazz)
+				.entrySet()
+				.stream()
+				.filter(e -> processorClazz.isAssignableFrom(e.getValue()))
+				.map(e -> e.getValue())
+				.map(SetupHelper::convertToBeanDefinition)
+				.collect(Collectors.toList());
+	}
+
+	public static List<BeanDefinition> getAvailableComponents() {
+		return getAvailableBeans(ServerComponent.class);
+	}
+
+	public static List<BeanDefinition> getAvailableProcessors(Class componentClazz, Class processorClazz) {
+		return getAvailableBeans(processorClazz, componentClazz);
+	}
+
+	public static class HttpSecurity {
+
+		public String[] restApiKeys = new String[0];
+		public RestApiSecurity restApiSecurity = RestApiSecurity.forbidden;
+		public String setupPassword;
+		public String setupUser;
+
 	}
 
 }

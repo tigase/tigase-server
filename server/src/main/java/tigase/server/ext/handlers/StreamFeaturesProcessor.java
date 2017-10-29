@@ -23,18 +23,16 @@ package tigase.server.ext.handlers;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.ExtProcessor;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -44,7 +42,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StreamFeaturesProcessor implements ExtProcessor {
+public class StreamFeaturesProcessor
+		implements ExtProcessor {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -63,16 +62,14 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(ComponentIOService serv,
-			ComponentProtocolHandler handler) {
+	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		return null;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results) {
+	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
 		if (p.isElement("features", "http://etherx.jabber.org/streams")) {
 			log.fine("Received stream features: " + p.toString());
 
@@ -101,8 +98,8 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public void startProcessing(Packet p, ComponentIOService serv,
-			ComponentProtocolHandler handler, Queue<Packet> results) {
+	public void startProcessing(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
+								Queue<Packet> results) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

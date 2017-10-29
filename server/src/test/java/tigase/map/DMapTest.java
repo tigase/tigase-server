@@ -20,10 +20,10 @@
 
 package tigase.map;
 
-import java.util.*;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.*;
 
 /**
  * Created by bmalkow on 04.12.2015.
@@ -34,7 +34,7 @@ public class DMapTest {
 	public void testBasicOperations() throws Exception {
 		final Set<String> removedItems = new HashSet<>();
 		final Map<String, String> addedItems = new HashMap<>();
-		final boolean[] cleared = new boolean[] { false };
+		final boolean[] cleared = new boolean[]{false};
 
 		final DMap.DMapListener listener = new DMap.DMapListener() {
 			@Override
@@ -74,7 +74,8 @@ public class DMapTest {
 
 		Assert.assertEquals(6, map.size());
 		Assert.assertEquals(map.size(), addedItems.size());
-		Assert.assertTrue(map.values().containsAll(addedItems.values()) && addedItems.values().containsAll(map.values()));
+		Assert.assertTrue(
+				map.values().containsAll(addedItems.values()) && addedItems.values().containsAll(map.values()));
 
 		map.putAll(tmp);
 

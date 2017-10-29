@@ -1,4 +1,3 @@
-
 /*
  * ActionIfc.java
  *
@@ -35,17 +34,17 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ActionIfc extends AmpFeatureIfc {
+public interface ActionIfc
+		extends AmpFeatureIfc {
+
 	boolean execute(Packet packet, Element rule);
 
 	//~--- get methods ----------------------------------------------------------
-	
+
 	//~--- set methods ----------------------------------------------------------
 	void setActionResultsHandler(ActionResultsHandlerIfc resultsHandler);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

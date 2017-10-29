@@ -22,25 +22,14 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.server.Iq;
+import tigase.server.*;
 import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.Permissions;
-import tigase.server.Presence;
-
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPStopListenerIfc;
+import tigase.sys.TigaseRuntime;
+import tigase.xml.Element;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.DiscoFeatures;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
@@ -49,9 +38,8 @@ import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFactory;
-
-import tigase.sys.TigaseRuntime;
-import tigase.xml.Element;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -63,23 +51,20 @@ import static tigase.xmpp.impl.LastActivity.ID;
 import static tigase.xmpp.impl.LastActivity.XMLNS;
 
 /**
- * Implementation of <a
- * href='http://xmpp.org/extensions/xep-0012.html'>XEP-0012</a>: Last Activity.
+ * Implementation of <a href='http://xmpp.org/extensions/xep-0012.html'>XEP-0012</a>: Last Activity.
  *
  * @author bmalkow
- *
  */
 
 @Id(ID)
-@DiscoFeatures({ XMLNS })
-@Handles({ @Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = XMLNS), @Handle(path = { Presence.ELEM_NAME }, xmlns = Packet.CLIENT_XMLNS),
-		@Handle(path = { Message.ELEM_NAME }, xmlns = Packet.CLIENT_XMLNS) })
+@DiscoFeatures({XMLNS})
+@Handles({@Handle(path = {Iq.ELEM_NAME, Iq.QUERY_NAME}, xmlns = XMLNS),
+		  @Handle(path = {Presence.ELEM_NAME}, xmlns = Packet.CLIENT_XMLNS),
+		  @Handle(path = {Message.ELEM_NAME}, xmlns = Packet.CLIENT_XMLNS)})
 @Bean(name = LastActivity.ID, parent = SessionManager.class, active = false)
-public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListenerIfc {
-
-	enum ProtectionLevel {
-		ALL, BUDDIES;
-	}
+public class LastActivity
+		extends XMPPProcessorAbstract
+		implements XMPPStopListenerIfc {
 
 	protected static final String XMLNS = "jabber:iq:last";
 	protected final static String ID = XMLNS;
@@ -87,33 +72,35 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 	private final static String LAST_STATUS_KEY = "LAST_STATUS_KEY";
 	private static final Logger log = Logger.getLogger(LastActivity.class.getName());
 	private final static String PROTECTION_LEVEL_KEY = "protection-level";
-	private final static String[] STATUS_PATH = new String[] { Presence.ELEM_NAME, "status" };
+	private final static String[] STATUS_PATH = new String[]{Presence.ELEM_NAME, "status"};
 	private final static EnumSet<SubscriptionType> inTypes = EnumSet.of(SubscriptionType.both, SubscriptionType.from);
 	private final static EnumSet<SubscriptionType> outTypes = EnumSet.of(SubscriptionType.both, SubscriptionType.to);
-
 	@ConfigField(desc = "Protection level", alias = PROTECTION_LEVEL_KEY)
 	private ProtectionLevel protectionLevel = ProtectionLevel.ALL;
 
 	private static long getLastActivity(NonAuthUserRepository repo, BareJID requestedJid) throws UserNotFoundException {
 		String result = repo.getPublicData(requestedJid, ID, LAST_ACTIVITY_KEY, "-1");
-		if (result != null)
+		if (result != null) {
 			return Long.parseLong(result);
-		else
+		} else {
 			throw new UserNotFoundException(requestedJid + " doesn't exist");
+		}
 	}
 
 	private static long getLastActivity(XMPPResourceConnection session, boolean global) {
 		Long res = null;
 
-		if (global)
+		if (global) {
 			res = (Long) session.getCommonSessionData(LAST_ACTIVITY_KEY);
-		else
+		} else {
 			res = (Long) session.getSessionData(LAST_ACTIVITY_KEY);
+		}
 		return res == null ? -1 : res;
 	}
 
 	private static long getLastActivity(XMPPResourceConnection session, Packet packet) {
-		return getLastActivity(session, (packet.getStanzaTo().getResource() == null || packet.getStanzaTo().getResource().length() == 0));
+		return getLastActivity(session, (packet.getStanzaTo().getResource() == null ||
+				packet.getStanzaTo().getResource().length() == 0));
 	}
 
 	protected static RosterAbstract getRosterUtil() {
@@ -134,37 +121,18 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 		session.putSessionData(LAST_ACTIVITY_KEY, last);
 	}
 
-	private String getStatus(XMPPResourceConnection session) {
-		return session.getPresence() == null ? null : session.getPresence().getChildCDataStaticStr(STATUS_PATH);
-	}
-
-	private void handleLastActivityRequest(Packet packet, long last, String status, Queue<Packet> results) throws PacketErrorTypeException {
-		if (last >= 0) {
-			long result = (System.currentTimeMillis() - last) / 1000;
-			Packet resp = packet.okResult((Element) null, 0);
-			Element q;
-			if (status == null) {
-				q = new Element(Iq.QUERY_NAME, new String[] { Packet.XMLNS_ATT, "seconds" }, new String[] { XMLNS, "" + result });
-			} else {
-				q = new Element(Iq.QUERY_NAME, status, new String[] { Packet.XMLNS_ATT, "seconds" }, new String[] { XMLNS, "" + result });
-			}
-			resp.getElement().addChild(q);
-			results.offer(resp);
-		} else {
-			results.offer(preventFromINFLoop(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "Unknown last activity time", false)));
-		}
-	}
-
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws XMPPException {
-		if (log.isLoggable(Level.FINEST))
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet);
+		}
 
 		if (packet.getElemName() == Iq.ELEM_NAME) {
 			super.process(packet, session, repo, results, settings);
 		} else {
-			if ((session != null && (packet.getStanzaFrom() != null) && session.isAuthorized() && session.getBareJID().equals(packet.getStanzaFrom().getBareJID()))) {
+			if ((session != null && (packet.getStanzaFrom() != null) && session.isAuthorized() &&
+					session.getBareJID().equals(packet.getStanzaFrom().getBareJID()))) {
 				final long time = System.currentTimeMillis();
 
 				if (log.isLoggable(Level.FINEST)) {
@@ -177,53 +145,59 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 	}
 
 	@Override
-	public void processFromUserPacket(JID connectionId, Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
+	public void processFromUserPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+									  NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Process From user packet: {0}", packet);
 		}
 
 		switch (packet.getType()) {
-		case get:
-			switch (protectionLevel) {
-			case BUDDIES:
-				if (getRosterUtil() == null) {
-					log.warning("Roster factory returned null");
-					results.offer(preventFromINFLoop(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
-					break;
-				}
-				try {
-					RosterElement element = getRosterUtil().getRosterElement(session, packet.getStanzaTo());
-					if (element == null || !outTypes.contains(element.getSubscription())) {
-						results.offer(preventFromINFLoop(Authorization.FORBIDDEN.getResponseMessage(packet, null, false)));
-					} else {
+			case get:
+				switch (protectionLevel) {
+					case BUDDIES:
+						if (getRosterUtil() == null) {
+							log.warning("Roster factory returned null");
+							results.offer(preventFromINFLoop(
+									Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
+							break;
+						}
+						try {
+							RosterElement element = getRosterUtil().getRosterElement(session, packet.getStanzaTo());
+							if (element == null || !outTypes.contains(element.getSubscription())) {
+								results.offer(preventFromINFLoop(
+										Authorization.FORBIDDEN.getResponseMessage(packet, null, false)));
+							} else {
+								super.processFromUserPacket(connectionId, packet, session, repo, results, settings);
+							}
+						} catch (NotAuthorizedException | TigaseDBException e) {
+							if (log.isLoggable(Level.FINE)) {
+								log.log(Level.FINE, e.getMessage(), e);
+							}
+							results.offer(preventFromINFLoop(
+									Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
+						}
+						break;
+					case ALL:
 						super.processFromUserPacket(connectionId, packet, session, repo, results, settings);
-					}
-				} catch (NotAuthorizedException | TigaseDBException e) {
-					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, e.getMessage(), e);
-					}
-					results.offer(preventFromINFLoop(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
+						break;
 				}
 				break;
-			case ALL:
+			case error:
+			case result:
 				super.processFromUserPacket(connectionId, packet, session, repo, results, settings);
 				break;
-			}
-			break;
-		case error:
-		case result:
-			super.processFromUserPacket(connectionId, packet, session, repo, results, settings);
-			break;
-		default:
-			results.offer(preventFromINFLoop(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false)));
-			break;
+			default:
+				results.offer(preventFromINFLoop(
+						Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false)));
+				break;
 		}
 	}
 
 	@Override
-	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
+	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+											  NonAuthUserRepository repo, Queue<Packet> results,
+											  Map<String, Object> settings) throws PacketErrorTypeException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing from user to server packet: {0}", packet);
 		}
@@ -237,36 +211,38 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 	}
 
 	@Override
-	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws PacketErrorTypeException {
+	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results,
+										 Map<String, Object> settings) throws PacketErrorTypeException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing null session packet: {0}", packet);
 		}
 
 		packet.processedBy(ID);
 		switch (packet.getType()) {
-		case get:
-			BareJID requestedJid = packet.getStanzaTo().getBareJID();
-			try {
-				final long last = getLastActivity(repo, requestedJid);
-				final String status = getStatus(repo, requestedJid);
-				handleLastActivityRequest(packet, last, status, results);
-			} catch (UserNotFoundException e) {
-				results.offer(preventFromINFLoop(Authorization.FORBIDDEN.getResponseMessage(packet, null, false)));
-			}
-		case error:
-		case result:
-			super.processNullSessionPacket(packet, repo, results, settings);
-			break;
-		default:
-			results.offer(preventFromINFLoop(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false)));
-			break;
+			case get:
+				BareJID requestedJid = packet.getStanzaTo().getBareJID();
+				try {
+					final long last = getLastActivity(repo, requestedJid);
+					final String status = getStatus(repo, requestedJid);
+					handleLastActivityRequest(packet, last, status, results);
+				} catch (UserNotFoundException e) {
+					results.offer(preventFromINFLoop(Authorization.FORBIDDEN.getResponseMessage(packet, null, false)));
+				}
+			case error:
+			case result:
+				super.processNullSessionPacket(packet, repo, results, settings);
+				break;
+			default:
+				results.offer(preventFromINFLoop(
+						Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false)));
+				break;
 		}
 	}
 
 	@Override
-	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings) throws PacketErrorTypeException {
+	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+										   Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing server session packet: {0}", packet);
 		}
@@ -275,51 +251,56 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 	}
 
 	@Override
-	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings) throws PacketErrorTypeException {
+	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+									Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing to user packet: {0}", packet);
 		}
 
 		packet.processedBy(ID);
 		switch (packet.getType()) {
-		case get:
-			long last = getLastActivity(session, packet);
-			String status = getStatus(session);
+			case get:
+				long last = getLastActivity(session, packet);
+				String status = getStatus(session);
 
-			switch (protectionLevel) {
-			case BUDDIES:
-				if (getRosterUtil() == null) {
-					log.warning("Roster factory returned null");
-					results.offer(preventFromINFLoop(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
-					break;
-				}
-				try {
-					RosterElement element = getRosterUtil().getRosterElement(session, packet.getStanzaFrom());
-					if (element == null || !inTypes.contains(element.getSubscription())) {
-						results.offer(preventFromINFLoop(Authorization.FORBIDDEN.getResponseMessage(packet, null, false)));
-					} else {
+				switch (protectionLevel) {
+					case BUDDIES:
+						if (getRosterUtil() == null) {
+							log.warning("Roster factory returned null");
+							results.offer(preventFromINFLoop(
+									Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
+							break;
+						}
+						try {
+							RosterElement element = getRosterUtil().getRosterElement(session, packet.getStanzaFrom());
+							if (element == null || !inTypes.contains(element.getSubscription())) {
+								results.offer(preventFromINFLoop(
+										Authorization.FORBIDDEN.getResponseMessage(packet, null, false)));
+							} else {
+								handleLastActivityRequest(packet, last, status, results);
+							}
+						} catch (NotAuthorizedException | TigaseDBException e) {
+							if (log.isLoggable(Level.FINE)) {
+								log.log(Level.FINE, e.getMessage(), e);
+							}
+							results.offer(preventFromINFLoop(
+									Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
+						}
+						break;
+					case ALL:
 						handleLastActivityRequest(packet, last, status, results);
-					}
-				} catch (NotAuthorizedException | TigaseDBException e) {
-					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, e.getMessage(), e);
-					}
-					results.offer(preventFromINFLoop(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, false)));
+						break;
 				}
 				break;
-			case ALL:
-				handleLastActivityRequest(packet, last, status, results);
+			case error:
+			case result:
+				super.processToUserPacket(packet, session, repo, results, settings);
 				break;
-			}
-			break;
-		case error:
-		case result:
-			super.processToUserPacket(packet, session, repo, results, settings);
-			break;
-		default:
-			results.offer(preventFromINFLoop(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false)));
-			break;
+			default:
+				results.offer(preventFromINFLoop(
+						Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false)));
+				break;
 		}
 	}
 
@@ -330,9 +311,11 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 			String status = getStatus(session);
 
 			try {
-				if (log.isLoggable(Level.FINEST))
-					log.finest("Persiting last:activity of user " + session.getUserName() + " in storage (value=" + last + ", " + "status=" + status
-							+ ").");
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest(
+							"Persiting last:activity of user " + session.getUserName() + " in storage (value=" + last +
+									", " + "status=" + status + ").");
+				}
 				session.setPublicData(ID, LAST_ACTIVITY_KEY, String.valueOf(last));
 				session.setPublicData(ID, LAST_STATUS_KEY, status);
 			} catch (NotAuthorizedException e) {
@@ -343,5 +326,35 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 				log.warning("Tigase Db Exception");
 			}
 		}
+	}
+
+	private String getStatus(XMPPResourceConnection session) {
+		return session.getPresence() == null ? null : session.getPresence().getChildCDataStaticStr(STATUS_PATH);
+	}
+
+	private void handleLastActivityRequest(Packet packet, long last, String status, Queue<Packet> results)
+			throws PacketErrorTypeException {
+		if (last >= 0) {
+			long result = (System.currentTimeMillis() - last) / 1000;
+			Packet resp = packet.okResult((Element) null, 0);
+			Element q;
+			if (status == null) {
+				q = new Element(Iq.QUERY_NAME, new String[]{Packet.XMLNS_ATT, "seconds"},
+								new String[]{XMLNS, "" + result});
+			} else {
+				q = new Element(Iq.QUERY_NAME, status, new String[]{Packet.XMLNS_ATT, "seconds"},
+								new String[]{XMLNS, "" + result});
+			}
+			resp.getElement().addChild(q);
+			results.offer(resp);
+		} else {
+			results.offer(preventFromINFLoop(
+					Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "Unknown last activity time", false)));
+		}
+	}
+
+	enum ProtectionLevel {
+		ALL,
+		BUDDIES;
 	}
 }

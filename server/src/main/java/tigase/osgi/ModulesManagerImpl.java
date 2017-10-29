@@ -30,15 +30,15 @@ import java.util.logging.Logger;
 /**
  * @author andrzej
  */
-public class ModulesManagerImpl implements ModulesManager {
+public class ModulesManagerImpl
+		implements ModulesManager {
 
 	private static final Logger log = Logger.getLogger(ModulesManagerImpl.class.getCanonicalName());
 
 	private static ModulesManagerImpl instance = null;
-	private AbstractBeanConfigurator beanConfigurator;
-
-	private ConcurrentHashMap<String, Class<?>> classes = null;
 	private boolean active = false;
+	private AbstractBeanConfigurator beanConfigurator;
+	private ConcurrentHashMap<String, Class<?>> classes = null;
 
 	public static ModulesManagerImpl getInstance() {
 		if (instance == null) {
@@ -94,10 +94,10 @@ public class ModulesManagerImpl implements ModulesManager {
 	@Override
 	public Class<?> forName(String className) throws ClassNotFoundException {
 		if ("tigase.cluster.strategy.OnlineUsersCachingStrategy".equals(className)) {
-			log.warning("You are using old name for SM clustering strategy in property "
-					+ "--sm-cluster-strategy-class\nYou are using name: " + className + "\n"
-					+ " while name: tigase.server.cluster.strategy.OnlineUsersCachingStrategy"
-					+ " should be used.");
+			log.warning("You are using old name for SM clustering strategy in property " +
+								"--sm-cluster-strategy-class\nYou are using name: " + className + "\n" +
+								" while name: tigase.server.cluster.strategy.OnlineUsersCachingStrategy" +
+								" should be used.");
 			className = "tigase.server.cluster.strategy.OnlineUsersCachingStrategy";
 		}
 		Class<?> cls = classes.get(className);

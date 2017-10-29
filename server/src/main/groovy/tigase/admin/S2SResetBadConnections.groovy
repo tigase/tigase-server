@@ -27,13 +27,14 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.server.xmppserver.*
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.xmppserver.CIDConnections
 
-def cidConns = (Map)cidConnections
+def cidConns = (Map) cidConnections
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -44,7 +45,7 @@ if (!isServiceAdmin) {
 }
 
 
-def conns = []
+def conns = [ ]
 
 conns += "Total count: " + cidConns.size()
 
@@ -52,8 +53,7 @@ cidConns.entrySet().each {
 	CIDConnections con = it.getValue()
 	// Bad state is when the OutgoingInProgress is set to true but there is no outgoing
 	// or outgoing handshaking connections.
-	if (con.getOutgoingInProgress() && (con.getOutgoingCount() == 0) &&
-	(con.getOutgoingHandshakingCount() == 0)) {
+	if (con.getOutgoingInProgress() && (con.getOutgoingCount() == 0) && (con.getOutgoingHandshakingCount() == 0)) {
 		conns += it.getKey().toString() + ", waiting: " + con.getWaitingCount()
 		con.resetOutgoingInProgress()
 	}

@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -39,8 +37,8 @@ import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.server.xmppsession.UserConnectedEvent;
-import tigase.util.dns.DNSResolverFactory;
 import tigase.util.cache.LRUConcurrentCache;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
@@ -60,8 +58,8 @@ import static tigase.xmpp.impl.Privacy.*;
 
 /**
  * Describe class JabberIqPrivacy here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Oct  9 18:18:11 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -69,46 +67,142 @@ import static tigase.xmpp.impl.Privacy.*;
  */
 @Bean(name = JabberIqPrivacy.ID, parent = SessionManager.class, active = true)
 public class JabberIqPrivacy
-				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, RegistrarBean {
-	protected static final String     ACTIVE_EL_NAME  = "active";
-	protected static final Element     BLOCKED_ELEM = new Element("blocked", new String[] { "xmlns" }, new String[] { "urn:xmpp:blocking:errors" });
-	protected static final String     DEFAULT_EL_NAME = "default";
-	protected static final String[][] ELEMENTS        = {
-		Iq.IQ_QUERY_PATH
-	};
-	protected static final String     LIST_EL_NAME    = "list";
+		extends XMPPProcessor
+		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, RegistrarBean {
 
-	/**
-	 * Private logger for class instances.
-	 */
-	protected static Logger          log = Logger.getLogger(JabberIqPrivacy.class.getName());
-	protected static final String    ERROR_EL_NAME        = "error";
-	protected static final String    PRESENCE_EL_NAME     = "presence";
-	protected static final String    PRESENCE_IN_EL_NAME  = "presence-in";
-	protected static final String    PRESENCE_OUT_EL_NAME = "presence-out";
-	protected static final String    XMLNS                = "jabber:iq:privacy";
-	protected static final String    ID                   = XMLNS;
-	protected static final String[]  XMLNSS               = { XMLNS };
-	protected static RosterAbstract  roster_util = RosterFactory.getRosterImplementation(
-			true);
-	protected static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
-			"var" }, new String[] { XMLNS }) };
+	protected static final String ACTIVE_EL_NAME = "active";
+	protected static final Element BLOCKED_ELEM = new Element("blocked", new String[]{"xmlns"},
+															  new String[]{"urn:xmpp:blocking:errors"});
+	protected static final String DEFAULT_EL_NAME = "default";
+	protected static final String[][] ELEMENTS = {Iq.IQ_QUERY_PATH};
+	protected static final String LIST_EL_NAME = "list";
+	protected static final String ERROR_EL_NAME = "error";
+	protected static final String PRESENCE_EL_NAME = "presence";
+	protected static final String PRESENCE_IN_EL_NAME = "presence-in";
+	protected static final String PRESENCE_OUT_EL_NAME = "presence-out";
+	protected static final String XMLNS = "jabber:iq:privacy";
+	protected static final String ID = XMLNS;
+	protected static final String[] XMLNSS = {XMLNS};
+	protected static final Element[] DISCO_FEATURES = {
+			new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 	protected static final Comparator<Element> compar = new Comparator<Element>() {
 		@Override
 		public int compare(Element el1, Element el2) {
 			String or1 = el1.getAttributeStaticStr(ORDER);
 			String or2 = el2.getAttributeStaticStr(ORDER);
-			if (or1.length() != or2.length())
+			if (or1.length() != or2.length()) {
 				return Integer.compare(or1.length(), or2.length());
+			}
 
 			return or1.compareTo(or2);
 		}
 	};
+	/**
+	 * Private logger for class instances.
+	 */
+	protected static Logger log = Logger.getLogger(JabberIqPrivacy.class.getName());
+	protected static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
+	@Inject(nullAllowed = true)
+	protected PrivacyListOfflineCache cache;
+
+	/**
+	 * Method description
+	 *
+	 * @param session
+	 * @param items
+	 */
+	public static Authorization validateList(final XMPPResourceConnection session, final List<Element> items) {
+		Authorization result = null;
+
+		try {
+			HashSet<Integer> orderSet = new HashSet<Integer>();
+
+			// creating set of all known groups in roster
+			HashSet<String> groups = new HashSet<String>();
+
+			if (session != null) {
+				JID[] jids = roster_util.getBuddies(session);
+
+				if (jids != null) {
+					for (JID jid : jids) {
+						String[] buddyGroups = roster_util.getBuddyGroups(session, jid);
+
+						if (buddyGroups != null) {
+							for (String group : buddyGroups) {
+								groups.add(group);
+							}
+						}
+					}
+				}
+			}
+			for (Element item : items) {
+				ITEM_TYPE type = ITEM_TYPE.all;
+
+				if (item.getAttributeStaticStr(TYPE) != null) {
+					type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
+				}    // end of if (item.getAttribute(TYPE) != null)
+
+				String value = item.getAttributeStaticStr(VALUE);
+
+				switch (type) {
+					case jid:
+
+						// if jid is not valid it will throw exception
+						JID.jidInstance(value);
+
+						break;
+
+					case group:
+						boolean matched = groups.contains(value);
+
+						if (!matched) {
+							result = Authorization.ITEM_NOT_FOUND;
+						}
+
+						break;
+
+					case subscription:
+
+						// if subscription is not valid it will throw exception
+						ITEM_SUBSCRIPTIONS.valueOf(value);
+
+						break;
+
+					case all:
+					default:
+						break;
+				}
+				if (result != null) {
+					break;
+				}
+
+				// if action is not valid it will throw exception
+				ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
+
+				// checking unique order attribute value
+				Integer order = Integer.parseInt(item.getAttributeStaticStr(ORDER));
+
+				if ((order == null) || (order < 0) || !orderSet.add(order)) {
+					result = Authorization.BAD_REQUEST;
+				}
+				if (result != null) {
+					break;
+				}
+			}
+		} catch (Exception ex) {
+
+			// if we get exception list is not valid
+			result = Authorization.BAD_REQUEST;
+		}
+
+		return result;
+	}
+
+	//~--- constant enums -------------------------------------------------------
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override
@@ -116,28 +210,10 @@ public class JabberIqPrivacy
 
 	}
 
-	//~--- constant enums -------------------------------------------------------
-
-	protected enum ITEM_ACTION { allow, deny }
-
-	protected enum ITEM_SUBSCRIPTIONS {
-		both, to, from, none
-	}
-
-	protected enum ITEM_TYPE {
-		jid, group, subscription, all
-	}
-
-	@Inject(nullAllowed = true)
-	protected PrivacyListOfflineCache cache;
-
-	//~--- methods --------------------------------------------------------------
-
 	@Override
-	public void filter(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
-		if ((session == null) ||!session.isAuthorized() || (results == null) || (results
-				.size() == 0)) {
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+					   Queue<Packet> results) {
+		if ((session == null) || !session.isAuthorized() || (results == null) || (results.size() == 0)) {
 			return;
 		}
 		Queue<Packet> errors = null;
@@ -150,25 +226,27 @@ public class JabberIqPrivacy
 
 			// Always allow presence unavailable to go, privacy lists packets and
 			// all other which are allowed by privacy rules
-			if ((res.getType() == StanzaType.unavailable) || res.isXMLNSStaticStr(Iq
-					.IQ_QUERY_PATH, XMLNS) || allowed(res, session)) {
+			if ((res.getType() == StanzaType.unavailable) || res.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, XMLNS) ||
+					allowed(res, session)) {
 				continue;
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Packet not allowed to go, removing: {0}", res);
 			}
 			it.remove();
-			
+
 			// support for sending error responses if packet is blocked
 			Packet error = prepareError(res, session);
 			if (error != null) {
-				if (errors == null)
+				if (errors == null) {
 					errors = new ArrayDeque<Packet>();
+				}
 				errors.offer(error);
 			}
 		}
-		if (errors != null)
+		if (errors != null) {
 			results.addAll(errors);
+		}
 	}
 
 	@Override
@@ -176,19 +254,19 @@ public class JabberIqPrivacy
 		return ID;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * {@inheritDoc}
-	 *
+	 * <p>
 	 * <br><br>
-	 *
-	 * <code>preProcess</code> method checks only incoming stanzas
-	 * so it doesn't check for presence-out at all.
+	 * <p>
+	 * <code>preProcess</code> method checks only incoming stanzas so it doesn't check for presence-out at all.
 	 */
 	@Override
-	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		if (packet.isXMLNSStaticStr(Iq
-				.IQ_QUERY_PATH, XMLNS)) {
+	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+							  Queue<Packet> results, Map<String, Object> settings) {
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, XMLNS)) {
 			return false;
 		}    // end of if (session == null)
 
@@ -197,17 +275,16 @@ public class JabberIqPrivacy
 		boolean allowed = allowed(packet, session);
 		if (!allowed && sendError) {
 			Packet error = prepareError(packet, session);
-			if (error != null)
+			if (error != null) {
 				results.offer(error);
+			}
 		}
 		return !allowed;
 	}
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
-			Object> settings)
-					throws XMPPException {
+	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+						final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
@@ -227,14 +304,14 @@ public class JabberIqPrivacy
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Request type is incorrect", false));
 			}
 		} catch (NotAuthorizedException e) {
-			log.log(Level.FINEST,
-					"Received privacy request but user session is not authorized yet: {0}", packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			log.log(Level.FINEST, "Received privacy request but user session is not authorized yet: {0}", packet);
+			results.offer(
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "Database problem, please contact admin: {0}", e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-					"Database access problem, please contact administrator.", true));
+																				 "Database access problem, please contact administrator.",
+																				 true));
 		}
 	}
 
@@ -292,10 +369,10 @@ public class JabberIqPrivacy
 				return privacyList.isAllowed(jid, type);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	protected boolean allowed(Packet packet, XMPPResourceConnection session) {
 		if (session != null && session.isAuthorized()) {
 			try {
@@ -338,39 +415,42 @@ public class JabberIqPrivacy
 		}
 
 		// allow packets without from attribute and packets with from attribute same as domain name
-		if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart()
-				== null) && userJid.getDomain().equals(packet.getStanzaFrom()
-						.getDomain()))) {
+		if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart() == null) &&
+				userJid.getDomain().equals(packet.getStanzaFrom().getDomain()))) {
 			return true;
 		}
 
 		// allow packets without to attribute and packets with to attribute same as domain name
-		if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart()
-				== null) && userJid.getDomain().equals(packet.getStanzaTo()
-						.getDomain()))) {
+		if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart() == null) &&
+				userJid.getDomain().equals(packet.getStanzaTo().getDomain()))) {
 			return true;
 		}
 
 		// Always allow packets sent between sessions of same user and
 		// packets sent from user to his bare jid and results of this
 		// packets
-		if (packet.getStanzaFrom() != null && packet.getStanzaTo() != null
-				&& packet.getStanzaFrom().getBareJID().equals(packet.getStanzaTo().getBareJID())) {
+		if (packet.getStanzaFrom() != null && packet.getStanzaTo() != null &&
+				packet.getStanzaFrom().getBareJID().equals(packet.getStanzaTo().getBareJID())) {
 			return true;
 		}
-		
-		if (packet.getType() == StanzaType.error && packet.getStanzaTo() != null && userJid.equals(packet.getStanzaTo().getBareJID())) {
+
+		if (packet.getType() == StanzaType.error && packet.getStanzaTo() != null &&
+				userJid.equals(packet.getStanzaTo().getBareJID())) {
 			// this may be error sent back to sender of blocked request
 			// or even to user who sent packet to blocked user
 			Element error = packet.getElement().findChild(e -> e.getName() == ERROR_EL_NAME);
-			if (error != null && error.findChild(e -> e.getName() == Authorization.NOT_ACCEPTABLE.getCondition()) != null 
-					&& error.findChild(e -> e.getName() == BLOCKED_ELEM.getName() && e.getXMLNS() == BLOCKED_ELEM.getXMLNS()) != null)
+			if (error != null &&
+					error.findChild(e -> e.getName() == Authorization.NOT_ACCEPTABLE.getCondition()) != null &&
+					error.findChild(
+							e -> e.getName() == BLOCKED_ELEM.getName() && e.getXMLNS() == BLOCKED_ELEM.getXMLNS()) !=
+							null) {
 				return true;
+			}
 		}
 
 		return false;
 	}
-	
+
 	protected Packet prepareError(Packet packet, XMPPResourceConnection session) {
 		if (packet.getType() != StanzaType.error) {
 			try {
@@ -383,9 +463,10 @@ public class JabberIqPrivacy
 							// we need this here to make sure that this error will be sent to user only once
 							// as there might be many outgoing messages as result of sending message to single
 							// user - ie. messages sent to message archive, etc.
-							if (packet.getPacketTo() != null)
+							if (packet.getPacketTo() != null) {
 								return null;
-							
+							}
+
 							error = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, null, true);
 							error.getElement().getChild("error").addChild(BLOCKED_ELEM.clone());
 						} else {
@@ -394,7 +475,8 @@ public class JabberIqPrivacy
 						return error;
 					case "iq":
 						if (packet.getType() == StanzaType.get || packet.getType() == StanzaType.set) {
-							if (packet.getStanzaFrom() == null || session.isUserId(packet.getStanzaFrom().getBareJID())) {
+							if (packet.getStanzaFrom() == null ||
+									session.isUserId(packet.getStanzaFrom().getBareJID())) {
 								error = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, null, true);
 								error.getElement().getChild("error").addChild(BLOCKED_ELEM.clone());
 							} else {
@@ -404,8 +486,9 @@ public class JabberIqPrivacy
 						return error;
 				}
 			} catch (NotAuthorizedException ex) {
-				log.log(Level.FINEST, "Packet droped due to privacy list rules. Error could not be generated properly "
-						+ "as session is not authorized yet, should not happen.", ex);
+				log.log(Level.FINEST,
+						"Packet droped due to privacy list rules. Error could not be generated properly " +
+								"as session is not authorized yet, should not happen.", ex);
 			} catch (PacketErrorTypeException ex) {
 				log.log(Level.FINER, "Packet dropped due to privacy list rules. Packet is error type already: {0}",
 						packet.toStringSecure());
@@ -414,9 +497,9 @@ public class JabberIqPrivacy
 		return null;
 	}
 
-	protected void processGetRequest(final Packet packet,
-			final XMPPResourceConnection session, final Queue<Packet> results)
-					throws NotAuthorizedException, XMPPException, TigaseDBException {
+	protected void processGetRequest(final Packet packet, final XMPPResourceConnection session,
+									 final Queue<Packet> results)
+			throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if ((children == null) || (children.size() == 0)) {
@@ -445,24 +528,24 @@ public class JabberIqPrivacy
 		} else {
 			if (children.size() > 1) {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"You can retrieve only one list at a time.", true));
+																		   "You can retrieve only one list at a time.",
+																		   true));
 			} else {
-				Element eList = Privacy.getList(session, children.get(0).getAttributeStaticStr(
-						"name"));
+				Element eList = Privacy.getList(session, children.get(0).getAttributeStaticStr("name"));
 
 				if (eList != null) {
 					results.offer(packet.okResult(eList, 1));
 				} else {
-					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-							"Requested list not found.", true));
+					results.offer(
+							Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "Requested list not found.", true));
 				}    // end of if (eList != null) else
 			}      // end of else
 		}        // end of else
 	}
 
-	protected void processSetRequest(final Packet packet,
-			final XMPPResourceConnection session, final Queue<Packet> results)
-					throws NotAuthorizedException, XMPPException, TigaseDBException {
+	protected void processSetRequest(final Packet packet, final XMPPResourceConnection session,
+									 final Queue<Packet> results)
+			throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if ((children != null) && (children.size() == 1)) {
@@ -483,12 +566,12 @@ public class JabberIqPrivacy
 
 				if ((items == null) || items.isEmpty()) {
 					// if the list is in use then forbid changes
-					boolean inUse = session.getCommonSessionData(PRIVACY_LIST_LOADED) != null
-													&& session.getCommonSessionData(DEFAULT) != null;
+					boolean inUse = session.getCommonSessionData(PRIVACY_LIST_LOADED) != null &&
+							session.getCommonSessionData(DEFAULT) != null;
 
 					if (!inUse) {
 						for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
-							if (activeSession.equals( session)) {
+							if (activeSession.equals(session)) {
 								// don't apply to the current session
 								continue;
 							}
@@ -496,7 +579,9 @@ public class JabberIqPrivacy
 						}
 					}
 					if (inUse) {
-						results.offer(Authorization.CONFLICT.getResponseMessage(packet, "Can not modify list while being in use by other session", true));
+						results.offer(Authorization.CONFLICT.getResponseMessage(packet,
+																				"Can not modify list while being in use by other session",
+																				true));
 					} else {
 						Privacy.removeList(session, child);
 						results.offer(packet.okResult((String) null, 0));
@@ -514,8 +599,8 @@ public class JabberIqPrivacy
 							}
 						}
 						// update default list
-						if (name.equals( Privacy.getDefaultListName( session))) {
-							Privacy.setDefaultList( session, child );
+						if (name.equals(Privacy.getDefaultListName(session))) {
+							Privacy.setDefaultList(session, child);
 						}
 						results.offer(packet.okResult((String) null, 0));
 					} else {
@@ -526,27 +611,29 @@ public class JabberIqPrivacy
 			if (child.getName() == DEFAULT_EL_NAME) {
 
 				// User selects a different default list
-				String  listName = child.getAttributeStaticStr(NAME);
-				Element list     = Privacy.getList(session, listName);
+				String listName = child.getAttributeStaticStr(NAME);
+				Element list = Privacy.getList(session, listName);
 
 				if ((listName != null) && (list == null)) {
 					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-							"Selected list was not found on the server", true));
+																				  "Selected list was not found on the server",
+																				  true));
 				} else {
 					// This is either declining of default list use or setting a new default list
-					Privacy.setDefaultList( session, list );
+					Privacy.setDefaultList(session, list);
 					results.offer(packet.okResult((String) null, 0));
 				}
 			}      // end of if (child.getName().equals("list))
 			if (child.getName() == ACTIVE_EL_NAME) {
 
 				// User selects a different active list
-				String  listName = child.getAttributeStaticStr(NAME);
-				Element list     = Privacy.getList(session, listName);
+				String listName = child.getAttributeStaticStr(NAME);
+				Element list = Privacy.getList(session, listName);
 
 				if ((listName != null) && (list == null)) {
 					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-							"Selected list was not found on the server", true));
+																				  "Selected list was not found on the server",
+																				  true));
 				} else {
 
 					// This is either declining of active list use or setting a new active list
@@ -556,127 +643,68 @@ public class JabberIqPrivacy
 			}    // end of if (child.getName().equals("list))
 		} else {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-					"Only 1 element is allowed in privacy set request.", true));
+																	   "Only 1 element is allowed in privacy set request.",
+																	   true));
 		}    // end of else
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param items
-	 *
-	 * 
-	 */
-	public static Authorization validateList(final XMPPResourceConnection session,
-			final List<Element> items) {
-		Authorization result = null;
+	protected enum ITEM_ACTION {
+		allow,
+		deny
+	}
 
-		try {
-			HashSet<Integer> orderSet = new HashSet<Integer>();
+	protected enum ITEM_SUBSCRIPTIONS {
+		both,
+		to,
+		from,
+		none
+	}
 
-			// creating set of all known groups in roster
-			HashSet<String> groups = new HashSet<String>();
+	protected enum ITEM_TYPE {
+		jid,
+		group,
+		subscription,
+		all
+	}
 
-			if (session != null) {
-				JID[] jids = roster_util.getBuddies(session);
+	public static class OfflineResourceConnection
+			extends XMPPResourceConnection {
 
-				if (jids != null) {
-					for (JID jid : jids) {
-						String[] buddyGroups = roster_util.getBuddyGroups(session, jid);
-
-						if (buddyGroups != null) {
-							for (String group : buddyGroups) {
-								groups.add(group);
-							}
-						}
-					}
-				}
-			}
-			for (Element item : items) {
-				ITEM_TYPE type = ITEM_TYPE.all;
-
-				if (item.getAttributeStaticStr(TYPE) != null) {
-					type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
-				}    // end of if (item.getAttribute(TYPE) != null)
-
-				String value = item.getAttributeStaticStr(VALUE);
-
-				switch (type) {
-				case jid :
-
-					// if jid is not valid it will throw exception
-					JID.jidInstance(value);
-
-					break;
-
-				case group :
-					boolean matched = groups.contains(value);
-
-					if (!matched) {
-						result = Authorization.ITEM_NOT_FOUND;
-					}
-
-					break;
-
-				case subscription :
-
-					// if subscription is not valid it will throw exception
-					ITEM_SUBSCRIPTIONS.valueOf(value);
-
-					break;
-
-				case all :
-				default :
-					break;
-				}
-				if (result != null) {
-					break;
-				}
-
-				// if action is not valid it will throw exception
-				ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
-
-				// checking unique order attribute value
-				Integer order = Integer.parseInt(item.getAttributeStaticStr(ORDER));
-
-				if ((order == null) || (order < 0) ||!orderSet.add(order)) {
-					result = Authorization.BAD_REQUEST;
-				}
-				if (result != null) {
-					break;
-				}
-			}
-		} catch (Exception ex) {
-
-			// if we get exception list is not valid
-			result = Authorization.BAD_REQUEST;
+		/**
+		 * Creates a new <code>XMPPResourceConnection</code> instance.
+		 *
+		 * @param connectionId
+		 * @param rep
+		 * @param authRepo
+		 * @param loginHandler
+		 */
+		public OfflineResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
+										 SessionManagerHandler loginHandler) {
+			super(connectionId, rep, authRepo, loginHandler);
 		}
 
-		return result;
+		@Override
+		public boolean isAuthorized() {
+			return true;
+		}
 	}
 
 	@Bean(name = "privacyListOfflineCache", parent = JabberIqPrivacy.class, active = false)
 	public static class PrivacyListOfflineCache
 			implements SessionManagerHandler, Initializable, UnregisterAware {
 
-		private JID compId = JID.jidInstanceNS("privacy-sessman", DNSResolverFactory.getInstance().getDefaultHost());
-		private JID offlineConnectionId = JID.jidInstanceNS("offline-connection", DNSResolverFactory.getInstance().getDefaultHost());
-
-		@ConfigField(desc = "Cache size", alias = "size")
-		private int cacheSize = 10000;
-
-		private LRUConcurrentCache<BareJID,PrivacyList> cache = new LRUConcurrentCache<>(cacheSize);
-
-		@Inject
-		private UserRepository userRepository;
-
 		@Inject
 		private AuthRepository authRepository;
-
+		@ConfigField(desc = "Cache size", alias = "size")
+		private int cacheSize = 10000;
+		private LRUConcurrentCache<BareJID, PrivacyList> cache = new LRUConcurrentCache<>(cacheSize);
+		private JID compId = JID.jidInstanceNS("privacy-sessman", DNSResolverFactory.getInstance().getDefaultHost());
 		@Inject
 		private EventBus eventBus;
+		private JID offlineConnectionId = JID.jidInstanceNS("offline-connection",
+															DNSResolverFactory.getInstance().getDefaultHost());
+		@Inject
+		private UserRepository userRepository;
 
 		public void clear() {
 			cache.clear();
@@ -711,11 +739,6 @@ public class JabberIqPrivacy
 
 		}
 
-		@HandleEvent
-		protected void userConnected(UserConnectedEvent event) {
-			cache.remove(event.getUserJid().getBareJID());
-		}
-
 		@Override
 		public boolean isLocalDomain(String domain, boolean includeComponents) {
 			return false;
@@ -738,12 +761,17 @@ public class JabberIqPrivacy
 			}
 		}
 
+		@HandleEvent
+		protected void userConnected(UserConnectedEvent event) {
+			cache.remove(event.getUserJid().getBareJID());
+		}
+
 		protected PrivacyList getPrivacyList(BareJID userJID) {
 			if (!cache.containsKey(userJID)) {
 				try {
 					PrivacyList list = this.loadList(userJID);
 					cache.put(userJID, list);
-				} catch (NotAuthorizedException|TigaseDBException ex) {
+				} catch (NotAuthorizedException | TigaseDBException ex) {
 					return null;
 				}
 			}
@@ -767,7 +795,7 @@ public class JabberIqPrivacy
 		protected XMPPResourceConnection createXMPPResourceConnection(BareJID userJid) {
 			try {
 				XMPPResourceConnection session = new OfflineResourceConnection(offlineConnectionId, userRepository,
-																			authRepository, this);
+																			   authRepository, this);
 				VHostItem vhost = new VHostItem();
 				vhost.setVHost(userJid.getDomain());
 				session.setDomain(vhost);
@@ -784,29 +812,6 @@ public class JabberIqPrivacy
 		}
 
 	}
-
-	public static class OfflineResourceConnection
-			extends XMPPResourceConnection {
-
-		/**
-		 * Creates a new <code>XMPPResourceConnection</code> instance.
-		 *
-		 * @param connectionId
-		 * @param rep
-		 * @param authRepo
-		 * @param loginHandler
-		 */
-		public OfflineResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
-										 SessionManagerHandler loginHandler) {
-			super(connectionId, rep, authRepo, loginHandler);
-		}
-
-		@Override
-		public boolean isAuthorized() {
-			return true;
-		}
-	}
 }    // JabberIqPrivacy
-
 
 //~ Formatted in Tigase Code Convention on 13/03/12

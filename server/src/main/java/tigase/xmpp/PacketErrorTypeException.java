@@ -18,28 +18,26 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp;
 
 /**
  * Describe class PacketErrorTypeException here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class PacketErrorTypeException
-				extends XMPPException {
+		extends XMPPException {
+
 	private static final long serialVersionUID = 1L;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>PacketErrorTypeException</code> instance.
-	 *
 	 *
 	 * @param message
 	 */
@@ -50,7 +48,6 @@ public class PacketErrorTypeException
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param message
 	 * @param cause
 	 */
@@ -58,6 +55,5 @@ public class PacketErrorTypeException
 		super(message, cause);
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

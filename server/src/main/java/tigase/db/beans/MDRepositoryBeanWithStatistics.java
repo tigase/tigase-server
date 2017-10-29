@@ -34,20 +34,18 @@ import java.util.stream.Stream;
 
 /**
  * Extended version of MDRepositoryBean class with support for statistics gathering.
- *
+ * <p>
  * Created by andrzej on 15.12.2016.
  */
 public abstract class MDRepositoryBeanWithStatistics<T extends DataSourceAware>
 		extends MDRepositoryBean<T>
 		implements ComponentStatisticsProvider {
 
+	private final Class<?>[] repoInterfaces;
 	private ConcurrentHashMap<String, StatisticsInvocationHandler<T>> handlers = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, T> reposProxy = new ConcurrentHashMap<>();
-
 	@ConfigField(desc = "Enable statistics", alias = "statistics")
 	private boolean statisticsEnabled = true;
-
-	private final Class<?>[] repoInterfaces;
 
 	public MDRepositoryBeanWithStatistics(Class<?>... repoClazz) {
 		this.repoInterfaces = repoClazz;
@@ -72,36 +70,6 @@ public abstract class MDRepositoryBeanWithStatistics<T extends DataSourceAware>
 		if (statisticsEnabled) {
 			handlers.values().forEach(StatisticsInvocationHandler::everySecond);
 		}
-	}
-
-	@Override
-	protected T getRepository(String domain) {
-		if (statisticsEnabled) {
-			T repo = reposProxy.get(aliases.getOrDefault(domain, domain));
-			if (repo == null) {
-				repo = reposProxy.get("default");
-			}
-			return repo;
-		}
-		return super.getRepository(domain);
-	}
-
-	@Override
-	protected Map<String, T> getRepositories() {
-		if (statisticsEnabled) {
-			return Collections.unmodifiableMap(reposProxy);
-		}
-		return super.getRepositories();
-	}
-
-	@Override
-	protected void updateDataSourceAware(String domain, T newRepo, T oldRepo) {
-		if (statisticsEnabled && newRepo != null) {
-			wrapInProxy(domain, newRepo);
-		} else {
-			reposProxy.remove(domain);
-		}
-		super.updateDataSourceAware(domain, newRepo, oldRepo);
 	}
 
 	@Override
@@ -133,5 +101,35 @@ public abstract class MDRepositoryBeanWithStatistics<T extends DataSourceAware>
 		T proxy = (T) Proxy.newProxyInstance(repo.getClass().getClassLoader(), repoInterfaces, handler);
 		handlers.put(name, handler);
 		reposProxy.put(name, proxy);
+	}
+
+	@Override
+	protected T getRepository(String domain) {
+		if (statisticsEnabled) {
+			T repo = reposProxy.get(aliases.getOrDefault(domain, domain));
+			if (repo == null) {
+				repo = reposProxy.get("default");
+			}
+			return repo;
+		}
+		return super.getRepository(domain);
+	}
+
+	@Override
+	protected Map<String, T> getRepositories() {
+		if (statisticsEnabled) {
+			return Collections.unmodifiableMap(reposProxy);
+		}
+		return super.getRepositories();
+	}
+
+	@Override
+	protected void updateDataSourceAware(String domain, T newRepo, T oldRepo) {
+		if (statisticsEnabled && newRepo != null) {
+			wrapInProxy(domain, newRepo);
+		} else {
+			reposProxy.remove(domain);
+		}
+		super.updateDataSourceAware(domain, newRepo, oldRepo);
 	}
 }

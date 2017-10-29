@@ -46,15 +46,15 @@ public class KernelTest {
 
 	private static final Logger log = TestLogger.getLogger(KernelTest.class);
 
-	public KernelTest() {
-	}
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+	}
+
+	public KernelTest() {
 	}
 
 	@Test
@@ -195,22 +195,24 @@ public class KernelTest {
 			krnl.getInstance("bean8");
 			fail("This bean shouldn't be initialized because of empty dependency.");
 		} catch (KernelException e) {
-			Assert.assertEquals("tigase.kernel.KernelException: Can't inject <null> to field tigase.kernel.Bean8.bean6", e.getMessage());
+			Assert.assertEquals("tigase.kernel.KernelException: Can't inject <null> to field tigase.kernel.Bean8.bean6",
+								e.getMessage());
 		}
 	}
 
 	@Test
-	public void testBeanConfiguration() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public void testBeanConfiguration()
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Kernel krnl = new Kernel();
-
 
 		krnl.registerBean(CustomTypesConverter.class).exec();
 		krnl.registerBean("bean5").asClass(Bean5.class).exec();
 		krnl.registerBean(DefaultTypesConverter.class).exec();
-		krnl.registerBean(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME).asClass(TestBeanConfigurationProvider.class).exec();
+		krnl.registerBean(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
+				.asClass(TestBeanConfigurationProvider.class)
+				.exec();
 		krnl.registerBean("bean6").asClass(Bean6.class).exec();
 		krnl.registerBean(Bean8.class).exec();
-
 
 		Bean5 b5 = krnl.getInstance(Bean5.class);
 		Bean6 b6 = krnl.getInstance(Bean6.class);
@@ -220,11 +222,13 @@ public class KernelTest {
 		assertEquals(9987l, b5.getValue().longValue());
 		assertEquals("EXAMPLE", b8.getSample());
 
-		((TestBeanConfigurationProvider) krnl.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)).restoreDefaults("bean5");
+		((TestBeanConfigurationProvider) krnl.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)).restoreDefaults(
+				"bean5");
 		assertEquals("yytestxx", b6.getTestValue());
 		assertEquals(15l, b5.getValue().longValue());
 
-		((TestBeanConfigurationProvider) krnl.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)).restoreDefaults("bean6");
+		((TestBeanConfigurationProvider) krnl.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)).restoreDefaults(
+				"bean6");
 		assertNull(b6.getTestValue());
 		assertEquals(15l, b5.getValue().longValue());
 	}
@@ -261,8 +265,7 @@ public class KernelTest {
 
 		assertTrue("Bean should be located in parent", krnlChild2.isBeanClassRegistered("bean40"));
 		assertNotNull("Bean should be get from parent!", krnlChild2.getInstance("bean40"));
-		assertEquals((Object) krnlParent.getInstance("bean40"),
-				krnlChild2.getInstance("bean40"));
+		assertEquals((Object) krnlParent.getInstance("bean40"), krnlChild2.getInstance("bean40"));
 
 		assertTrue(bean1.getCollectionOfSpecial().contains(krnlParent.getInstance("bean40")));
 		assertTrue(bean1.getCollectionOfSpecial().contains(krnlParent.getInstance("bean42")));
@@ -315,35 +318,63 @@ public class KernelTest {
 		PlantUMLGrapher g = new PlantUMLGrapher(krnl);
 		log.log(Level.FINE, g.getDependencyGraph());
 
-		Assert.assertEquals(1, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(1, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 
 		krnl.getInstance(Bean1.class);
 		krnl.getInstance(Bean10.class);
 
-		Assert.assertEquals(7, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(7, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 
 		krnl.gc();
 
-		Assert.assertEquals(1, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(1, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 
 		krnl.getInstance(Bean5.class);
 
-		Assert.assertEquals(3, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(3, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 
 		krnl.gc();
 
-		Assert.assertEquals(1, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(1, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 
 		krnl.getDependencyManager().getBeanConfig("bean10").setPinned(true);
 
 		krnl.getInstance(Bean1.class);
 		krnl.getInstance(Bean10.class);
 
-		Assert.assertEquals(3, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(3, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 
 		krnl.gc();
 
-		Assert.assertEquals(2, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
+		Assert.assertEquals(2, krnl.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.count());
 	}
 
 	@Test
@@ -361,7 +392,6 @@ public class KernelTest {
 		krnl.registerBean("bean3").asClass(Bean3.class).exec();
 		krnl.registerBean("bean4").asClass(Bean4.class).exec();
 		krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
-
 
 		Bean1 b1 = krnl.getInstance(Bean1.class);
 		Bean10 b10 = krnl.getInstance("bean10");
@@ -387,7 +417,8 @@ public class KernelTest {
 	}
 
 	@Bean(name = "customTypesConverter", active = true)
-	public static class CustomTypesConverter extends DefaultTypesConverter {
+	public static class CustomTypesConverter
+			extends DefaultTypesConverter {
 
 		@Override
 		public <T> T convert(Object value, Class<T> expectedType, Type type) {
@@ -400,16 +431,12 @@ public class KernelTest {
 		}
 	}
 
-	public static class TestBeanConfigurationProvider extends AbstractBeanConfigurator {
+	public static class TestBeanConfigurationProvider
+			extends AbstractBeanConfigurator {
 
 		@Override
 		public Map<String, Object> getProperties() {
 			return new HashMap<>();
-		}
-
-		@Override
-		protected boolean hasDirectConfiguration(BeanConfig bc) {
-			return false;
 		}
 
 		@Override
@@ -426,8 +453,14 @@ public class KernelTest {
 				HashMap<String, Object> result = new HashMap<String, Object>();
 				result.put("sample", "___EXAMPLE");
 				return result;
-			} else
+			} else {
 				return null;
+			}
+		}
+
+		@Override
+		protected boolean hasDirectConfiguration(BeanConfig bc) {
+			return false;
 		}
 	}
 }

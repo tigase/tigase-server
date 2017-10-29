@@ -23,20 +23,21 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import tigase.util.stringprep.TigaseStringprepException;
 
-public class VHostJDBCRepositoryTest extends TestCase {
+public class VHostJDBCRepositoryTest
+		extends TestCase {
 
-	VHostJDBCRepository vHostJDBCRepository;
 	String domain = "domain.com";
+	VHostJDBCRepository vHostJDBCRepository;
+
+	@Test
+	public void testDomainNameCases() throws TigaseStringprepException {
+		VHostItem vHostItem = new VHostItem(domain);
+		vHostJDBCRepository.addItem(vHostItem);
+		assertEquals(vHostItem, vHostJDBCRepository.getItem(domain.toUpperCase()));
+	}
 
 	@Override
 	protected void setUp() throws Exception {
 		vHostJDBCRepository = new VHostJDBCRepository();
-	}
-
-	@Test
-	public void testDomainNameCases() throws TigaseStringprepException {
-		VHostItem vHostItem = new VHostItem( domain );
-		vHostJDBCRepository.addItem( vHostItem );
-		assertEquals( vHostItem, vHostJDBCRepository.getItem( domain.toUpperCase() ) );
 	}
 }

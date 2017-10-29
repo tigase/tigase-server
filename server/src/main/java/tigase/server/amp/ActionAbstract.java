@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -33,12 +31,12 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFlat;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,11 +51,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@ConfigAliases({
-		@ConfigAlias(field = "security", alias = "amp-security-level")
-})
+@ConfigAliases({@ConfigAlias(field = "security", alias = "amp-security-level")})
 public abstract class ActionAbstract
-				implements ActionIfc {
+		implements ActionIfc {
+
 	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
@@ -70,74 +67,65 @@ public abstract class ActionAbstract
 
 	/** Field description */
 	public static final String SECURITY_PROP_KEY = "security-level";
-	private static Logger log                    =
-		Logger.getLogger(ActionAbstract.class.getName());
+	private static Logger log = Logger.getLogger(ActionAbstract.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
 	protected ActionResultsHandlerIfc resultsHandler = null;
+	RosterFlat rosterUtil = new RosterFlat();
 	@ConfigField(alias = "security", desc = "Security level")
-	private SECURITY security                        = SECURITY.STRICT;
+	private SECURITY security = SECURITY.STRICT;
 	@Inject
-	private UserRepository user_repository           = null;
-	RosterFlat rosterUtil                            = new RosterFlat();
+	private UserRepository user_repository = null;
 
 	//~--- constant enums -------------------------------------------------------
-
-	private enum SECURITY {
-
-		NONE, PERFORMANCE, STRICT
-	};
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setActionResultsHandler(ActionResultsHandlerIfc resultsHandler) {
 		this.resultsHandler = resultsHandler;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	;
+
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param rule
 	 *
-	 * 
-	 *
 	 * @throws PacketErrorTypeException
 	 */
-	protected Packet prepareAmpPacket(Packet packet, Element rule)
-					throws PacketErrorTypeException {
+	protected Packet prepareAmpPacket(Packet packet, Element rule) throws PacketErrorTypeException {
 		boolean error_result = false;
 
 		switch (security) {
-		case NONE :
-			break;
+			case NONE:
+				break;
 
-		case PERFORMANCE :
-			error_result = true;
+			case PERFORMANCE:
+				error_result = true;
 
-			break;
+				break;
 
-		case STRICT :
-			error_result = !checkUserRoster(packet.getStanzaTo(), packet.getStanzaFrom());
+			case STRICT:
+				error_result = !checkUserRoster(packet.getStanzaTo(), packet.getStanzaFrom());
 
-			break;
+				break;
 		}
 
 		Packet result = null;
 
 		if (error_result) {
-			result = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, "Subscription between users not valid", false);
+			result = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, "Subscription between users not valid",
+																	 false);
 		} else {
-			JID old_from        = packet.getStanzaFrom();
-			JID old_to          = packet.getStanzaTo();
+			JID old_from = packet.getStanzaFrom();
+			JID old_to = packet.getStanzaTo();
 			String from_conn_id = packet.getAttributeStaticStr(FROM_CONN_ID);
-			JID new_from        = null;
+			JID new_from = null;
 
 			if (from_conn_id != null) {
 				new_from = JID.jidInstanceNS(old_from.getDomain());
@@ -152,9 +140,8 @@ public abstract class ActionAbstract
 			Element amp = result.getElement().getChild("amp", AMP_XMLNS);
 
 			result.getElement().removeChild(amp);
-			amp = new Element("amp", new Element[] { rule }, new String[] { "from", "to",
-							"xmlns", "status" }, new String[] { old_from.toString(), old_to.toString(),
-							AMP_XMLNS, getName() });
+			amp = new Element("amp", new Element[]{rule}, new String[]{"from", "to", "xmlns", "status"},
+							  new String[]{old_from.toString(), old_to.toString(), AMP_XMLNS, getName()});
 			result.getElement().addChild(amp);
 			removeTigasePayload(result);
 			if (from_conn_id != null) {
@@ -165,9 +152,10 @@ public abstract class ActionAbstract
 		return result;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param packet
 	 */
@@ -182,14 +170,13 @@ public abstract class ActionAbstract
 
 	private boolean checkUserRoster(JID user, JID contact) {
 
-		if ( user.getBareJID().equals( contact.getBareJID() ) ){
+		if (user.getBareJID().equals(contact.getBareJID())) {
 			// this is the same user, no point in checking sub
 			return true;
 		}
 
 		try {
-			String roster_str = user_repository.getData(user.getBareJID(),
-														RosterAbstract.ROSTER);
+			String roster_str = user_repository.getData(user.getBareJID(), RosterAbstract.ROSTER);
 
 			if (roster_str != null) {
 				Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>();
@@ -208,7 +195,13 @@ public abstract class ActionAbstract
 
 		return false;
 	}
-}
 
+	private enum SECURITY {
+
+		NONE,
+		PERFORMANCE,
+		STRICT
+	}
+}
 
 //~ Formatted in Tigase Code Convention on 13/02/20

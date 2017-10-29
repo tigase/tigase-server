@@ -26,16 +26,17 @@ import java.util.logging.LogRecord;
 /**
  * @author kobit Created Dec 20, 2011
  */
-public class LogFilter implements Filter {
+public class LogFilter
+		implements Filter {
 
-	private String[] trackers = null;
 	private String id = null;
+	private String[] trackers = null;
 
-	public LogFilter(String id, String ... trackers) {
+	public LogFilter(String id, String... trackers) {
 		this.id = id;
 		this.trackers = trackers;
 	}
-	
+
 	public String getId() {
 		return id;
 	}

@@ -25,7 +25,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import java.util.Map;
 
-public class SaslSCRAMPlus extends AbstractSaslSCRAM {
+public class SaslSCRAMPlus
+		extends AbstractSaslSCRAM {
 
 	public final static String NAME = "SCRAM-SHA-1-PLUS";
 	protected final static String ALGO = "SHA1";

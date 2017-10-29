@@ -19,26 +19,26 @@
  */
 package tigase.xmpp.mam;
 
-import tigase.xmpp.mam.modules.QueryModule;
 import tigase.component.PacketWriter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Message;
 import tigase.server.Priority;
 import tigase.xml.Element;
+import tigase.xmpp.mam.modules.QueryModule;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 /**
- * Basic implementation of handler processing items found in repository
- * and converting into forward messages for delivery to client as
- * specified in XEP-0313: Message Archive Management
- *
+ * Basic implementation of handler processing items found in repository and converting into forward messages for
+ * delivery to client as specified in XEP-0313: Message Archive Management
+ * <p>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamItemHandler", parent = QueryModule.class, active = true)
-public class MAMItemHandler implements MAMRepository.ItemHandler {
+public class MAMItemHandler
+		implements MAMRepository.ItemHandler {
 
 	private static final SimpleDateFormat TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX");
 
@@ -52,12 +52,13 @@ public class MAMItemHandler implements MAMRepository.ItemHandler {
 	@Override
 	public void itemFound(Query query, MAMRepository.Item item) {
 		Element m = new Element("message");
-		Element result = new Element("result", new String[] { "xmlns", "id" }, new String[] { "urn:xmpp:mam:1", item.getId() });
+		Element result = new Element("result", new String[]{"xmlns", "id"},
+									 new String[]{"urn:xmpp:mam:1", item.getId()});
 		if (query.getId() != null) {
 			result.setAttribute("queryid", query.getId());
 		}
 		m.addChild(result);
-		Element forwarded = new Element("forwarded", new String[] { "xmlns" }, new String[] { "urn:xmpp:forward:0" });
+		Element forwarded = new Element("forwarded", new String[]{"xmlns"}, new String[]{"urn:xmpp:forward:0"});
 		result.addChild(forwarded);
 
 		String timestampStr;
@@ -65,7 +66,8 @@ public class MAMItemHandler implements MAMRepository.ItemHandler {
 			timestampStr = TIMESTAMP_FORMATTER.format(item.getTimestamp());
 		}
 
-		Element delay = new Element("delay", new String[] { "xmlns", "stamp" }, new String[] { "urn:xmpp:delay", timestampStr });
+		Element delay = new Element("delay", new String[]{"xmlns", "stamp"},
+									new String[]{"urn:xmpp:delay", timestampStr});
 		forwarded.addChild(delay);
 
 		forwarded.addChild(item.getMessage());

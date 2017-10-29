@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -44,39 +42,31 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * This implementation stores virtual domains in the UserRepository database. It
- * loads initial settings and virtual hosts from the configuration file and then
- * loads more vhosts from the database. Virtual domains from the database can
+ * This implementation stores virtual domains in the UserRepository database. It loads initial settings and virtual
+ * hosts from the configuration file and then loads more vhosts from the database. Virtual domains from the database can
  * overwrite (disable) vhosts loaded from the configuration file.
- *
- * This implementation keeps all virtual hosts and their parameters in a single
- * database field. This might not be very efficient if you want to manager big
- * number of virtual domains. It is sufficient for hundreds of vhosts. If you
- * need thousands of VHosts support I advice to implement this storage in more
- * efficient way using separate database tables instead of UserRepository.
- * Please note there is a limit of about 300 vhosts if you use Derby database.
- *
- *
+ * <p>
+ * This implementation keeps all virtual hosts and their parameters in a single database field. This might not be very
+ * efficient if you want to manager big number of virtual domains. It is sufficient for hundreds of vhosts. If you need
+ * thousands of VHosts support I advice to implement this storage in more efficient way using separate database tables
+ * instead of UserRepository. Please note there is a limit of about 300 vhosts if you use Derby database.
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @since Nov 29, 2008 2:32:48 PM
  */
-@Repository.Meta( supportedUris = { ".*" }, isDefault = true)
-@ConfigAliases({
-		@ConfigAlias(field = "items", alias = "virtual-hosts")
-})
+@Repository.Meta(supportedUris = {".*"}, isDefault = true)
+@ConfigAliases({@ConfigAlias(field = "items", alias = "virtual-hosts")})
 public class VHostJDBCRepository
-				extends UserRepoRepository<VHostItem>
-				implements ComponentRepositoryDataSourceAware<VHostItem,DataSource> {
+		extends UserRepoRepository<VHostItem>
+		implements ComponentRepositoryDataSourceAware<VHostItem, DataSource> {
 
-	private static final Logger log                         =
-		Logger.getLogger(VHostJDBCRepository.class.getName());
+	private static final Logger log = Logger.getLogger(VHostJDBCRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 	@ConfigField(desc = "Default IP to which VHost should resolve", alias = "dns-def-ip")
-	private String def_ip_address    = null;
+	private String def_ip_address = null;
 	@ConfigField(desc = "Default hostname to which VHost should resolve", alias = "dns-srv-def-addr")
-	private String def_srv_address   = null;
+	private String def_srv_address = null;
 	@ConfigField(desc = "Max allowed number of domains per user", alias = "domains-per-user-limit")
 	private int max_domains_per_user = 25;
 	private String[] pendingItemsToSet = null;
@@ -100,7 +90,7 @@ public class VHostJDBCRepository
 	public void destroy() {
 		// Nothing to do
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -175,14 +165,12 @@ public class VHostJDBCRepository
 			}
 		}
 		if (vhost_count >= max_domains_per_user) {
-			return "Maximum number of domains exceeded for the user! Current number is: " +
-						 vhost_count;
+			return "Maximum number of domains exceeded for the user! Current number is: " + vhost_count;
 		}
-		
+
 		if (item.getS2sSecret() == null) {
 			return "S2S Secret is required";
 		}
-
 
 		if (!vhostDefaults.isCheckDns()) {
 			return null;
@@ -194,9 +182,8 @@ public class VHostJDBCRepository
 
 			if (entries != null) {
 				for (DNSEntry dNSEntry : entries) {
-					log.finest("Validating DNS SRV settings ('" + dNSEntry +
-										 "') for the given hostname: " + item.getKey() + " (defaults: " +
-										 def_ip_address + ", " + def_srv_address);
+					log.finest("Validating DNS SRV settings ('" + dNSEntry + "') for the given hostname: " +
+									   item.getKey() + " (defaults: " + def_ip_address + ", " + def_srv_address);
 					if (Arrays.asList(dNSEntry.getIps()).contains(def_ip_address) ||
 							def_srv_address.equals(dNSEntry.getDnsResultHost())) {
 
@@ -221,7 +208,7 @@ public class VHostJDBCRepository
 					return null;
 				} else {
 					return "Incorrect IP address: '" + Arrays.asList(ipAddress) +
-								 "' found in DNS for the given host: " + item.getKey();
+							"' found in DNS for the given host: " + item.getKey();
 				}
 			} else {
 				return "No DNS settings found for given host: " + item.getKey();
@@ -254,6 +241,5 @@ public class VHostJDBCRepository
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/09

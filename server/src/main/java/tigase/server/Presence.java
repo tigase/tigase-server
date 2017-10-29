@@ -18,16 +18,12 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.util.stringprep.TigaseStringprepException;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.jid.JID;
 
 /**
@@ -37,22 +33,22 @@ import tigase.xmpp.jid.JID;
  * @version $Rev$
  */
 public class Presence
-				extends Packet {
+		extends Packet {
+
 	/** Field description */
 	public static final String ELEM_NAME = "presence";
 
 	/** Field description */
-	public static final String[] PRESENCE_ERROR_PATH = { ELEM_NAME, "error" };
+	public static final String[] PRESENCE_ERROR_PATH = {ELEM_NAME, "error"};
 
 	/** Field description */
-	public static final String[] PRESENCE_PRIORITY_PATH = { ELEM_NAME, "priority" };
-	public static final String[] PRESENCE_SHOW_PATH = { ELEM_NAME, "show" };
+	public static final String[] PRESENCE_PRIORITY_PATH = {ELEM_NAME, "priority"};
+	public static final String[] PRESENCE_SHOW_PATH = {ELEM_NAME, "show"};
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param elem
 	 *
@@ -64,7 +60,6 @@ public class Presence
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param elem
 	 * @param stanzaFrom
@@ -81,6 +76,5 @@ public class Presence
 		return PRESENCE_ERROR_PATH;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/15

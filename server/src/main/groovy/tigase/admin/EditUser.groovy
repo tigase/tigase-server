@@ -41,11 +41,11 @@ import tigase.xmpp.jid.BareJID
 def JID = "accountjid"
 def EMAIL = "email"
 
-def p = (Iq)packet
-def auth_repo = (AuthRepository)authRepository
-def user_repo = (UserRepository)userRepository
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Iq) packet
+def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -60,7 +60,7 @@ if (userJid == null) {
 	Command.addInstructions(result, "Fill out this form to modify a user.")
 
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
-			"The Jabber ID for the account to be modified")
+						  "The Jabber ID for the account to be modified")
 
 	return result
 }
@@ -70,36 +70,42 @@ try {
 	def bareJID = BareJID.bareJIDInstance(userJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 
-		if (Command.getFieldValue(packet, "FORM_TYPE") == null || Command.getFieldValue(packet, "FORM_TYPE").isEmpty()) {
-		//if (Command.getFieldValue(packet, EMAIL) == null)
+		if (Command.getFieldValue(packet, "FORM_TYPE") == null ||
+				Command.getFieldValue(packet, "FORM_TYPE").isEmpty()) {
+			//if (Command.getFieldValue(packet, EMAIL) == null)
 			result = p.commandResult(Command.DataType.form);
 
 			Command.addTitle(result, "Modifying a User")
 			Command.addInstructions(result, "Fill out this form to modify a user " + (userJid ?: ""))
 
 			Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-					"hidden")
-			Command.addFieldValue(result, JID, userJid ?: "", "hidden")	
+								  "hidden")
+			Command.addFieldValue(result, JID, userJid ?: "", "hidden")
 			Command.addFieldValue(result, EMAIL, user_repo.getData(bareJID, "email") ?: "", "text-single",
-					"Email address")
-			
-			Command.addCheckBoxField(result, "Account enabled", !auth_repo.getAccountStatus(bareJID) == AuthRepository.AccountStatus.active);
+								  "Email address")
+
+			Command.addCheckBoxField(result, "Account enabled",
+									 !auth_repo.getAccountStatus(bareJID) == AuthRepository.AccountStatus.active);
 //			-- add disabled/enabled? vcard? roster?
 		} else {
 			result = p.commandResult(Command.DataType.result);
 			user_repo.setData(bareJID, "email", userEmail);
 			Command.addTextField(result, "Note", "Operation successful");
 			try {
-				auth_repo.setAccountStatus(bareJID, Command.getCheckBoxFieldValue(p, "Account enabled") ? AuthRepository.AccountStatus.active : AuthRepository.AccountStatus.disabled);
+				auth_repo.setAccountStatus(bareJID, Command.getCheckBoxFieldValue(p,
+																				  "Account enabled") ? AuthRepository.AccountStatus.active :
+													AuthRepository.AccountStatus.disabled);
 			} catch (TigaseDBException ex) {
-				Command.addTextField(result, "Warning", "Account state was not changed as it is not supported by used auth repository: " + ex.getMessage());
+				Command.addTextField(result, "Warning",
+									 "Account state was not changed as it is not supported by used auth repository: " +
+											 ex.getMessage());
 			}
 		}
 	} else {
 		result = p.commandResult(Command.DataType.result)
-		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");	
+		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");
 	}
 } catch (TigaseDBException ex) {
 	result = p.commandResult(Command.DataType.result)

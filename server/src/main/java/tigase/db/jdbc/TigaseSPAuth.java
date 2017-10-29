@@ -34,10 +34,10 @@ import java.util.logging.Logger;
 
 /**
  * Tigase Salted Password Auth.
- * 
  */
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
-public class TigaseSPAuth extends TigaseCustomAuth {
+public class TigaseSPAuth
+		extends TigaseCustomAuth {
 
 	private static final Logger log = Logger.getLogger(TigaseSPAuth.class.getName());
 
@@ -49,8 +49,8 @@ public class TigaseSPAuth extends TigaseCustomAuth {
 		return encode(pwd, salt);
 	}
 
-	private static final String encode(final String pwd, final byte[] salt) throws InvalidKeyException,
-			NoSuchAlgorithmException {
+	private static final String encode(final String pwd, final byte[] salt)
+			throws InvalidKeyException, NoSuchAlgorithmException {
 		byte[] saltedPassword = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(pwd), salt, 4096);
 		byte[] result = new byte[salt.length + saltedPassword.length];
 
@@ -69,39 +69,9 @@ public class TigaseSPAuth extends TigaseCustomAuth {
 		}
 	}
 
-	private String encodeWithUserSalt(final BareJID user, final String password) throws UserNotFoundException,
-			TigaseDBException, InvalidKeyException, NoSuchAlgorithmException {
-		String pwd = getPassword(user);
-		if (pwd == null)
-			throw new UserNotFoundException("User " + user + " not found.");
-		byte[] buffer = Base64.decode(pwd);
-		byte[] salt = new byte[20];
-		System.arraycopy(buffer, 0, salt, 0, salt.length);
-
-		return encode(password, salt);
-	}
-
-	@SuppressWarnings("unused")
-	private boolean isPasswordValid(final BareJID user, final String password) throws UserNotFoundException, TigaseDBException,
-			InvalidKeyException, NoSuchAlgorithmException {
-
-		// String saltedPassword = getPassword(user);
-		String pwd = getPassword(user);
-		if (pwd == null)
-			throw new UserNotFoundException("User " + user + " not found.");
-		byte[] buffer = Base64.decode(pwd);
-		byte[] salt = new byte[20];
-		byte[] saltedPassword = new byte[20];
-		System.arraycopy(buffer, 0, salt, 0, salt.length);
-		System.arraycopy(buffer, salt.length, saltedPassword, 0, saltedPassword.length);
-
-		byte[] np = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(password), salt, 4096);
-
-		return Arrays.equals(saltedPassword, np);
-	}
-
 	@Override
-	public boolean otherAuth(Map<String, Object> props) throws UserNotFoundException, TigaseDBException, AuthorizationException {
+	public boolean otherAuth(Map<String, Object> props)
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String password = (String) props.get(PASSWORD_KEY);
 		BareJID user_id = (BareJID) props.get(USER_ID_KEY);
 
@@ -121,6 +91,39 @@ public class TigaseSPAuth extends TigaseCustomAuth {
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't update password for user " + user, e);
 		}
+	}
+
+	private String encodeWithUserSalt(final BareJID user, final String password)
+			throws UserNotFoundException, TigaseDBException, InvalidKeyException, NoSuchAlgorithmException {
+		String pwd = getPassword(user);
+		if (pwd == null) {
+			throw new UserNotFoundException("User " + user + " not found.");
+		}
+		byte[] buffer = Base64.decode(pwd);
+		byte[] salt = new byte[20];
+		System.arraycopy(buffer, 0, salt, 0, salt.length);
+
+		return encode(password, salt);
+	}
+
+	@SuppressWarnings("unused")
+	private boolean isPasswordValid(final BareJID user, final String password)
+			throws UserNotFoundException, TigaseDBException, InvalidKeyException, NoSuchAlgorithmException {
+
+		// String saltedPassword = getPassword(user);
+		String pwd = getPassword(user);
+		if (pwd == null) {
+			throw new UserNotFoundException("User " + user + " not found.");
+		}
+		byte[] buffer = Base64.decode(pwd);
+		byte[] salt = new byte[20];
+		byte[] saltedPassword = new byte[20];
+		System.arraycopy(buffer, 0, salt, 0, salt.length);
+		System.arraycopy(buffer, salt.length, saltedPassword, 0, saltedPassword.length);
+
+		byte[] np = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(password), salt, 4096);
+
+		return Arrays.equals(saltedPassword, np);
 	}
 
 }

@@ -39,43 +39,42 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Default and basic implementation of SeeOtherHost returning same host as the
- * initial one
+ * Default and basic implementation of SeeOtherHost returning same host as the initial one
  *
  * @author Wojtek
  */
 @Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true)
 @ClusterModeRequired(active = false)
-public class SeeOtherHost implements SeeOtherHostIfc, Initializable {
+public class SeeOtherHost
+		implements SeeOtherHostIfc, Initializable {
 
-	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 	public static final String REDIRECTION_ENABLED = "see-other-host-redirect-enabled";
-
+	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 	@ConfigField(desc = "Default host to redirect to")
 	protected List<BareJID> defaultHost = null;
 	@Inject
 	protected EventBus eventBus;
-	@ConfigField(desc = "Active phases")
-	private ArrayList<Phase> active = new ArrayList<Phase>(Arrays.asList(Phase.OPEN));
 	@Inject
 	protected VHostManagerIfc vHostManager = null;
+	@ConfigField(desc = "Active phases")
+	private ArrayList<Phase> active = new ArrayList<Phase>(Arrays.asList(Phase.OPEN));
 	private Set<String> shutdownNodes = new CopyOnWriteArraySet<String>();
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
 		if (defaultHost != null && !defaultHost.isEmpty()) {
-			return defaultHost.get( 0 );
+			return defaultHost.get(0);
 		} else {
 			return host;
 		}
 	}
-	
+
 	@Override
 	public void initialize() {
 		List<VHostItem.DataType> types = new ArrayList<VHostItem.DataType>();
-		types.add(new VHostItem.DataType( REDIRECTION_ENABLED, "see-other-host redirection enabled",
-				Boolean.class, Boolean.TRUE ) );
-		VHostItem.registerData( types );
+		types.add(new VHostItem.DataType(REDIRECTION_ENABLED, "see-other-host redirection enabled", Boolean.class,
+										 Boolean.TRUE));
+		VHostItem.registerData(types);
 	}
 
 	public void setDefaultHost(List<BareJID> defaultHost) {
@@ -109,15 +108,14 @@ public class SeeOtherHost implements SeeOtherHostIfc, Initializable {
 
 	@Override
 	public boolean isEnabled(VHostItem vHost, Phase ph) {
-		return (boolean) vHost.getData( REDIRECTION_ENABLED )
-					 && active.contains( ph );
+		return (boolean) vHost.getData(REDIRECTION_ENABLED) && active.contains(ph);
 	}
-	
+
 	@Override
 	public void start() {
 		eventBus.registerAll(this);
 	}
-	
+
 	@Override
 	public void stop() {
 		eventBus.unregisterAll(this);
@@ -133,5 +131,5 @@ public class SeeOtherHost implements SeeOtherHostIfc, Initializable {
 			shutdownNodes.add(event.getNode());
 		}
 	}
-	
+
 }

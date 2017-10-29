@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -40,28 +38,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Class implements basic support for WebSocket protocol. It extends
- * XMPPIOService so it can be used instead of XMPPIOService in
- * ClientConnectionManager to allow web clients to connect to it without using
- * BOSH extension.
+ * Class implements basic support for WebSocket protocol. It extends XMPPIOService so it can be used instead of
+ * XMPPIOService in ClientConnectionManager to allow web clients to connect to it without using BOSH extension.
  *
  * @param <RefObject>
  */
 public class WebSocketXMPPIOService<RefObject>
-				extends XMPPIOService<RefObject> {
-	private static final String BAD_REQUEST    = "HTTP/1.0 400 Bad request\r\n\r\n";
+		extends XMPPIOService<RefObject> {
+
+	private static final String BAD_REQUEST = "HTTP/1.0 400 Bad request\r\n\r\n";
 	private static final String CONNECTION_KEY = "Connection";
-	private static final Logger log            =
-		Logger.getLogger(WebSocketXMPPIOService.class.getCanonicalName());
+	private static final Logger log = Logger.getLogger(WebSocketXMPPIOService.class.getCanonicalName());
 
 	private static final String CLOSE_EL = "close";
 	private static final String OPEN_EL = "open";
 	private static final String XMLNS_FRAMING = "urn:ietf:params:xml:ns:xmpp-framing";
-	
-	public static enum WebSocketXMPPSpec {
-		hybi,
-		xmpp
-	}
 
 	public enum State {
 		// begining state - used when we retrieve data from
@@ -77,23 +68,25 @@ public class WebSocketXMPPIOService<RefObject>
 		closed
 	}
 
-	/* static variables used by WebSocket protocol */
-	
-	//~--- fields ---------------------------------------------------------------
+	public static enum WebSocketXMPPSpec {
+		hybi,
+		xmpp
+	}
 
-	protected long frameLength  = -1;
+	/* static variables used by WebSocket protocol */
+
+	//~--- fields ---------------------------------------------------------------
+	private final WebSocketProtocolIfc[] protocols;
+	protected long frameLength = -1;
 	protected byte[] maskingKey = null;
 	private byte[] partialData = null;
-	
+	private WebSocketProtocolIfc protocol = null;
+	private boolean started = false;
 	// internal properties
 	//private boolean websocket = false;
 	private State state = State.handshaking;
-	private boolean started   = false;
-
-	private final WebSocketProtocolIfc[] protocols;
-	private WebSocketProtocolIfc protocol = null;
 	private WebSocketXMPPSpec webSocketXMPPSpec = WebSocketXMPPSpec.hybi;
-	
+
 	public WebSocketXMPPIOService(WebSocketProtocolIfc[] enabledProtocols) {
 		this.protocols = enabledProtocols;
 	}
@@ -104,15 +97,30 @@ public class WebSocketXMPPIOService<RefObject>
 		super.stop(); //To change body of generated methods, choose Tools | Templates.
 	}
 
+	public void dumpHeaders(Map<String, String> headers) {
+		if (log.isLoggable(Level.FINEST)) {
+			StringBuilder builder = new StringBuilder(1000);
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				builder.append("KEY = ");
+				builder.append(entry.getKey());
+				builder.append("VALUE = ");
+				builder.append(entry.getValue());
+				builder.append('\n');
+			}
+
+			log.log(Level.FINEST, "received headers = \n{0}", builder.toString());
+		}
+	}
+
 	protected State getState() {
 		return state;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	protected void setState(State state) {
 		this.state = state;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	protected void addReceivedPacket(Packet packet) {
@@ -142,13 +150,14 @@ public class WebSocketXMPPIOService<RefObject>
 	protected WebSocketXMPPSpec getWebSocketXMPPSpec() {
 		return webSocketXMPPSpec;
 	}
-	
+
 	@Override
 	protected String prepareStreamClose() {
-		if (webSocketXMPPSpec == WebSocketXMPPSpec.hybi)
+		if (webSocketXMPPSpec == WebSocketXMPPSpec.hybi) {
 			return "</stream:stream>";
+		}
 		return "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' />";
-	}		
+	}
 
 	@Override
 	protected char[] readData() throws IOException {
@@ -169,12 +178,11 @@ public class WebSocketXMPPIOService<RefObject>
 			oldtmp.clear();
 			partialData = null;
 		}
-		
+
 		if (state != State.handshaking) {
 
-			
 			// data needs to be decoded fully not just first frame!!
-			ByteBuffer tmp = ByteBuffer.allocate(cb.remaining());	
+			ByteBuffer tmp = ByteBuffer.allocate(cb.remaining());
 			// here we got buffer overflow
 			ByteBuffer decoded = null;
 			while (cb.hasRemaining() && (decoded = decodeFrame(cb)) != null) {
@@ -183,53 +191,52 @@ public class WebSocketXMPPIOService<RefObject>
 					tmp.put(decoded);
 				}
 			}
-			
+
 			// handling data which were not decoded - not complete data
 			if (cb.hasRemaining()) {
 				partialData = new byte[cb.remaining()];
 				cb.get(partialData);
 			}
-			
+
 			// compact buffer after reading all frames
 			cb.compact();
-			
+
 			if (tmp.capacity() > 0) {
 				tmp.flip();
 			}
-			cb = tmp; 
+			cb = tmp;
 		}
 		if (started) {
 			return decode(cb);
 		}
-		
+
 		if (!cb.hasRemaining()) {
 			return null;
 		}
-		
+
 		try {
 /*			if (!started && (cb.get(0) != (byte) 'G')) {
 				started = true;
 
 				return decode(cb);
 			}*/
-			
+
 			int remaining = cb.remaining();
 			byte[] buf = new byte[remaining];
-			
+
 			cb.get(buf, 0, remaining);
 			//pos += read;
 			cb.compact();
 			int pos = remaining;
-			if ((pos > 100) &&
-					(((buf[pos - 1] == '\n') && (buf[pos - 1] == buf[pos - 3])) ||
-					 ((buf[pos - 9] == '\n') && (buf[pos - 9] == buf[pos - 11])))) {
+			if ((pos > 100) && (((buf[pos - 1] == '\n') && (buf[pos - 1] == buf[pos - 3])) ||
+					((buf[pos - 9] == '\n') && (buf[pos - 9] == buf[pos - 11])))) {
 				started = true;
 				processWebSocketHandshake(buf);
 				//websocket = true;
-				if (protocol != null)
+				if (protocol != null) {
 					state = State.handshaked;
-			}
-			else {
+				}
+			} else {
 				partialData = buf;
 			}
 		} catch (Exception ex) {
@@ -243,8 +250,7 @@ public class WebSocketXMPPIOService<RefObject>
 	}
 
 	/**
-	 * Custom implementation of writeData function which encodes data
-	 * in WebSocket protocol frames
+	 * Custom implementation of writeData function which encodes data in WebSocket protocol frames
 	 *
 	 * @param data
 	 */
@@ -260,13 +266,13 @@ public class WebSocketXMPPIOService<RefObject>
 			if (data == null) {
 				return;
 			}
-			
+
 			writeInProgress.lock();
 		}
 		try {
 			if (state != State.handshaking) {
 				try {
-					if (data != null) {					
+					if (data != null) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "sending data = {0}", data);
 						}
@@ -275,8 +281,7 @@ public class WebSocketXMPPIOService<RefObject>
 						protocol.encodeFrameAndWrite(this, buf);
 
 						//buf.compact();
-					}
-					else {
+					} else {
 						writeBytes(null);
 					}
 				} catch (Exception ex) {
@@ -293,54 +298,8 @@ public class WebSocketXMPPIOService<RefObject>
 		}
 	}
 
-	/**
-	 * Process data from internal temporary buffer used to decode HTTP request
-	 * used by WebSocket protocol to switch protocol to WebSocket protocol
-	 *
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
-	 */
-	private void processWebSocketHandshake(byte[] buf) throws NoSuchAlgorithmException, IOException {
-		HashMap<String, String> headers = new HashMap<String, String>();
-		int i = parseHttpHeaders(buf, headers);
-
-		if (!headers.containsKey(CONNECTION_KEY) ||
-				!headers.get(CONNECTION_KEY).contains("Upgrade")) {
-			writeRawData(BAD_REQUEST);
-			
-			dumpHeaders(headers);
-			forceStop();
-			return;
-		}
-		if (!headers.containsKey(WebSocketProtocolIfc.WS_PROTOCOL_KEY) ||
-				!headers.get(WebSocketProtocolIfc.WS_PROTOCOL_KEY).contains("xmpp")) {
-			writeRawData(BAD_REQUEST);
-
-			dumpHeaders(headers);
-			forceStop();
-			return;
-		}
-
-		i=0;
-		while (protocol == null && i < protocols.length) {
-			if (protocols[i].handshake(this, headers, buf)) {
-				protocol = protocols[i];
-			} else {
-				i++;
-			}
-		}
-		
-		if (protocol == null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "could not find implementation for WebSocket protocol for {0}", this);
-			}
-			dumpHeaders(headers);
-			forceStop();
-		}
-	}
-
 	protected int parseHttpHeaders(byte[] buf, Map<String, String> headers) {
-		int i                           = 0;
+		int i = 0;
 
 		while (buf[i] != '\n') {
 			i++;
@@ -351,7 +310,7 @@ public class WebSocketXMPPIOService<RefObject>
 		}
 
 		StringBuilder builder = new StringBuilder(64);
-		String key            = null;
+		String key = null;
 
 		boolean skipWhitespace = false;
 		for (; i < buf.length; i++) {
@@ -393,17 +352,61 @@ public class WebSocketXMPPIOService<RefObject>
 		}
 		return i;
 	}
-	
+
 	@Override
 	protected void writeBytes(ByteBuffer data) {
 		super.writeBytes(data);
 	}
 
 	/**
+	 * Process data from internal temporary buffer used to decode HTTP request used by WebSocket protocol to switch
+	 * protocol to WebSocket protocol
+	 *
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 */
+	private void processWebSocketHandshake(byte[] buf) throws NoSuchAlgorithmException, IOException {
+		HashMap<String, String> headers = new HashMap<String, String>();
+		int i = parseHttpHeaders(buf, headers);
+
+		if (!headers.containsKey(CONNECTION_KEY) || !headers.get(CONNECTION_KEY).contains("Upgrade")) {
+			writeRawData(BAD_REQUEST);
+
+			dumpHeaders(headers);
+			forceStop();
+			return;
+		}
+		if (!headers.containsKey(WebSocketProtocolIfc.WS_PROTOCOL_KEY) ||
+				!headers.get(WebSocketProtocolIfc.WS_PROTOCOL_KEY).contains("xmpp")) {
+			writeRawData(BAD_REQUEST);
+
+			dumpHeaders(headers);
+			forceStop();
+			return;
+		}
+
+		i = 0;
+		while (protocol == null && i < protocols.length) {
+			if (protocols[i].handshake(this, headers, buf)) {
+				protocol = protocols[i];
+			} else {
+				i++;
+			}
+		}
+
+		if (protocol == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "could not find implementation for WebSocket protocol for {0}", this);
+			}
+			dumpHeaders(headers);
+			forceStop();
+		}
+	}
+
+	/**
 	 * Decode data encoded in WebSocket frames from buffer
 	 *
 	 * @param buf
-	 * 
 	 */
 	private ByteBuffer decodeFrame(ByteBuffer buf) {
 		return protocol.decodeFrame(this, buf);
@@ -413,7 +416,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Decode data from buffer to chars array
 	 *
 	 * @param tmpBuffer
-	 * 
+	 *
 	 * @throws MalformedInputException
 	 */
 	private char[] decode(ByteBuffer tmpBuffer) throws MalformedInputException {
@@ -427,8 +430,7 @@ public class WebSocketXMPPIOService<RefObject>
 		if (partialCharacterBytes != null) {
 			ByteBuffer oldTmpBuffer = tmpBuffer;
 
-			tmpBuffer = ByteBuffer.allocate(partialCharacterBytes.length +
-																			oldTmpBuffer.remaining() + 2);
+			tmpBuffer = ByteBuffer.allocate(partialCharacterBytes.length + oldTmpBuffer.remaining() + 2);
 			tmpBuffer.put(partialCharacterBytes);
 			tmpBuffer.put(oldTmpBuffer);
 			tmpBuffer.flip();
@@ -466,7 +468,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Encode string into buffer
 	 *
 	 * @param data
-	 * 
+	 *
 	 * @throws CharacterCodingException
 	 */
 	private ByteBuffer encode(String data) throws CharacterCodingException {
@@ -482,23 +484,7 @@ public class WebSocketXMPPIOService<RefObject>
 		// dataBuffer.flip();
 		return dataBuffer;
 	}
-	
-	public void dumpHeaders(Map<String,String> headers) {
-		if (log.isLoggable(Level.FINEST)) {
-			StringBuilder builder = new StringBuilder(1000);
-			for(Map.Entry<String,String> entry : headers.entrySet()) {
-				builder.append("KEY = ");
-				builder.append(entry.getKey());
-				builder.append("VALUE = ");
-				builder.append(entry.getValue());
-				builder.append('\n');
-			}
-			
-			log.log(Level.FINEST, "received headers = \n{0}", builder.toString());
-		}		
-	}
-	
-}
 
+}
 
 //~ Formatted in Tigase Code Convention on 13/02/19

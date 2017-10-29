@@ -44,13 +44,15 @@ import java.util.logging.Logger;
  * Created by andrzej on 06.09.2016.
  */
 @Bean(name = "extDiscoModule", parent = ExternalServiceDiscoveryComponent.class, active = true)
-public class ExternalServiceDiscoveryModule implements Module {
+public class ExternalServiceDiscoveryModule
+		implements Module {
 
 	private static final Logger log = Logger.getLogger(ExternalServiceDiscoveryModule.class.getCanonicalName());
 
 	private static final String XMLNS = "urn:xmpp:extdisco:2";
 
-	private static final Criteria CRITERIA = ElementCriteria.name(Iq.ELEM_NAME).add(ElementCriteria.name("services", XMLNS));
+	private static final Criteria CRITERIA = ElementCriteria.name(Iq.ELEM_NAME)
+			.add(ElementCriteria.name("services", XMLNS));
 
 	@Inject
 	private PacketWriter packetWriter;

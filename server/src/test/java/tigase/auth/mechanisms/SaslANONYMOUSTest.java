@@ -20,21 +20,20 @@
 
 package tigase.auth.mechanisms;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import junit.framework.TestCase;
-
-import org.junit.Before;
-import org.junit.Test;
-
-public class SaslANONYMOUSTest extends TestCase {
+public class SaslANONYMOUSTest
+		extends TestCase {
 
 	private SaslANONYMOUS sasl;
 
@@ -49,8 +48,9 @@ public class SaslANONYMOUSTest extends TestCase {
 				for (Callback callback : callbacks) {
 					if (callback instanceof NameCallback) {
 						((NameCallback) callback).setName("somerandomname@domain.com");
-					} else
+					} else {
 						throw new UnsupportedCallbackException(callback);
+					}
 				}
 			}
 		};

@@ -33,10 +33,16 @@ import java.util.logging.Logger;
  */
 public class ClassUtilBean {
 
-	private static Logger log = Logger.getLogger(ClassUtilBean.class.getCanonicalName());
-
 	private static ClassUtilBean instance;
+	private static Logger log = Logger.getLogger(ClassUtilBean.class.getCanonicalName());
 	protected HashSet<Class<?>> classes = new HashSet<>();
+
+	public static ClassUtilBean getInstance() {
+		if (instance == null) {
+			instance = new ClassUtilBean();
+		}
+		return instance;
+	}
 
 	public ClassUtilBean() {
 		try {
@@ -44,7 +50,7 @@ public class ClassUtilBean {
 			// support for handling debugging test cases started by Maven Surefire Plugin
 			// as without it Tigase Kernel is not able to see annotated beans
 			classes.addAll(getClassesFromSurefireClassLoader());
-		} catch (IOException|ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			log.log(Level.SEVERE, "Could not initialize list of classes", e);
 		}
 		instance = this;
@@ -52,13 +58,6 @@ public class ClassUtilBean {
 
 	public Set<Class<?>> getAllClasses() {
 		return Collections.unmodifiableSet(classes);
-	}
-
-	public static ClassUtilBean getInstance() {
-		if (instance == null) {
-			instance = new ClassUtilBean();
-		}
-		return instance;
 	}
 
 	private Set<Class<?>> getClassesFromSurefireClassLoader() {
@@ -97,7 +96,7 @@ public class ClassUtilBean {
 
 						// System.out.println("Loaded jar file: "+path);
 					} // end of if (file.isFile())
-				} catch (ClassNotFoundException|IOException ex) {
+				} catch (ClassNotFoundException | IOException ex) {
 					log.log(Level.WARNING, "Could not load classes for " + file.getAbsolutePath());
 				}
 			} // end of if (file.exists())

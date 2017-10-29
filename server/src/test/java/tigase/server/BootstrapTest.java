@@ -48,20 +48,20 @@ import static org.junit.Assert.assertTrue;
 public class BootstrapTest {
 
 	private static final Logger log = TestLogger.getLogger(BootstrapTest.class);
-	
+
 	private Map<String, Object> props = new HashMap<>();
 
 	@Test
 	public void testNonCluster() throws InterruptedException, ConfigReader.ConfigException {
-		props.put("cluster-mode","false");
-		Bootstrap  bootstrap = executeTest();
+		props.put("cluster-mode", "false");
+		Bootstrap bootstrap = executeTest();
 		Thread.sleep(10 * 60 * 1000);
 		bootstrap.stop();
 	}
 
 	@Test
 	public void testCluster() throws ConfigReader.ConfigException {
-		props.put("cluster-mode","true");
+		props.put("cluster-mode", "true");
 		Bootstrap bootstrap = executeTest();
 		bootstrap.stop();
 	}
@@ -96,12 +96,26 @@ public class BootstrapTest {
 		return bootstrap;
 	}
 
+	public Map<String, Object> getProps() {
+		Map<String, Object> props = new HashMap<>(this.props);
+
+		//props.put("userRepository/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
+		props.put("dataSource/repo-uri",
+				  "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
+		props.put("sess-man/commands/ala-ma-kota", "LOCAL");
+		props.put("sess-man/commands/ala-ma-kota1", "test.com");
+		props.put("sess-man/commands/ala-ma-kota2", "ala@test.com");
+		props.put("c2s/incoming-filters", "tigase.server.filters.PacketCounter,tigase.server.filters.PacketCounter");
+
+		return props;
+	}
+
 	private void assertCommandACL(Kernel kernel, String cmdId, CmdAcl expectedAcl) {
 		try {
 			SessionManager sm = kernel.getInstance(SessionManager.class);
 			Field commandsAcl = BasicComponent.class.getDeclaredField("commandsACL");
 			commandsAcl.setAccessible(true);
-			Map<String,Set<CmdAcl>> val = (Map<String, Set<CmdAcl>>) commandsAcl.get(sm);
+			Map<String, Set<CmdAcl>> val = (Map<String, Set<CmdAcl>>) commandsAcl.get(sm);
 			log.log(Level.FINE, "ACL = " + val);
 			Set<CmdAcl> acl = val.get(cmdId);
 			assertTrue(acl.stream().filter(a -> a.equals(expectedAcl)).findAny().isPresent());
@@ -110,19 +124,6 @@ public class BootstrapTest {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	public Map<String, Object> getProps() {
-		Map<String, Object> props = new HashMap<>(this.props);
-
-		//props.put("userRepository/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
-		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
-		props.put("sess-man/commands/ala-ma-kota", "LOCAL");
-		props.put("sess-man/commands/ala-ma-kota1", "test.com");
-		props.put("sess-man/commands/ala-ma-kota2", "ala@test.com");
-		props.put("c2s/incoming-filters", "tigase.server.filters.PacketCounter,tigase.server.filters.PacketCounter");
-
-		return props;
 	}
 
 }

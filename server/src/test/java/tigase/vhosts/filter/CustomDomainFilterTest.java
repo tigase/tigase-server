@@ -19,11 +19,13 @@
  */
 package tigase.vhosts.filter;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import tigase.TestLogger;
-import tigase.xmpp.jid.JID;
-
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.filter.Rule.RuleType;
+import tigase.xmpp.jid.JID;
 
 import java.text.ParseException;
 import java.util.Set;
@@ -31,32 +33,21 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 /**
- *
  * @author Wojtek
  */
 public class CustomDomainFilterTest {
 
 	private static final Logger log = TestLogger.getLogger(CustomDomainFilterTest.class);
-	
-	public CustomDomainFilterTest() {
-	}
-
-	String[] rules = {
-		"4|deny|all",
-		"1|allow|self",
-		"3|allow|jid|pubsub@test.com",
-		"2|allow|jid|admin@test2.com", };
-
+	String[] rules = {"4|deny|all", "1|allow|self", "3|allow|jid|pubsub@test.com", "2|allow|jid|admin@test2.com",};
 
 	@BeforeClass
 	public static void setUpClass() {
+	}
+
+	public CustomDomainFilterTest() {
 	}
 
 	@Before
@@ -65,103 +56,100 @@ public class CustomDomainFilterTest {
 
 	@Test
 	public void testParseRules() throws TigaseStringprepException, ParseException {
-		log.log(Level.FINE, "parseRules" );
+		log.log(Level.FINE, "parseRules");
 
 		Set<Rule> expResult = new TreeSet<>();
-		Rule rule = new Rule( 1, true, RuleType.self, null );
+		Rule rule = new Rule(1, true, RuleType.self, null);
 
-		if ( rule != null ){
-			expResult.add( rule );
+		if (rule != null) {
+			expResult.add(rule);
 		}
-		rule = new Rule( 2, true, RuleType.jid, JID.jidInstance( "admin@test2.com" ) );
-		if ( rule != null ){
-			expResult.add( rule );
+		rule = new Rule(2, true, RuleType.jid, JID.jidInstance("admin@test2.com"));
+		if (rule != null) {
+			expResult.add(rule);
 		}
-		rule = new Rule( 3, true, RuleType.jid, JID.jidInstance( "pubsub@test.com" ) );
-		if ( rule != null ){
-			expResult.add( rule );
+		rule = new Rule(3, true, RuleType.jid, JID.jidInstance("pubsub@test.com"));
+		if (rule != null) {
+			expResult.add(rule);
 		}
-		rule = new Rule( 4, false, RuleType.all, null );
-		if ( rule != null ){
-			expResult.add( rule );
+		rule = new Rule(4, false, RuleType.all, null);
+		if (rule != null) {
+			expResult.add(rule);
 		}
 
-		Set<Rule> result = CustomDomainFilter.parseRules( rules );
-		assertEquals( expResult, result );
+		Set<Rule> result = CustomDomainFilter.parseRules(rules);
+		assertEquals(expResult, result);
 	}
 
 	@Test
 	public void testParseRulesString() throws TigaseStringprepException, ParseException {
-		log.log(Level.FINE,  "parseRules" );
+		log.log(Level.FINE, "parseRules");
 		String rulseString = "4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com";
 
 		Set<Rule> expResult = new TreeSet<>();
-		Rule rule = new Rule( 1, true, RuleType.self, null );
+		Rule rule = new Rule(1, true, RuleType.self, null);
 
-		if ( rule != null ){
-			expResult.add( rule );
+		if (rule != null) {
+			expResult.add(rule);
 		}
-		rule = new Rule( 2, true, RuleType.jid, JID.jidInstance( "admin@test2.com" ) );
-		if ( rule != null ){
-			expResult.add( rule );
+		rule = new Rule(2, true, RuleType.jid, JID.jidInstance("admin@test2.com"));
+		if (rule != null) {
+			expResult.add(rule);
 		}
-		rule = new Rule( 3, true, RuleType.jid, JID.jidInstance( "pubsub@test.com" ) );
-		if ( rule != null ){
-			expResult.add( rule );
+		rule = new Rule(3, true, RuleType.jid, JID.jidInstance("pubsub@test.com"));
+		if (rule != null) {
+			expResult.add(rule);
 		}
-		rule = new Rule( 4, false, RuleType.all, null );
-		if ( rule != null ){
-			expResult.add( rule );
+		rule = new Rule(4, false, RuleType.all, null);
+		if (rule != null) {
+			expResult.add(rule);
 		}
 
-		Set<Rule> result = CustomDomainFilter.parseRules( rulseString );
-		assertEquals( expResult, result );
+		Set<Rule> result = CustomDomainFilter.parseRules(rulseString);
+		assertEquals(expResult, result);
 
 		rulseString = "1|allow|self;2|allow|jid|admin@test2.com;3|allow|jid|pubsub@test.com;4|deny|all;";
 		String resultString = new String();
-		for ( Rule res : result) {
+		for (Rule res : result) {
 			resultString += res.toConfigurationString();
 		}
-		assertEquals( rulseString, resultString );
+		assertEquals(rulseString, resultString);
 
 	}
 
 	@Test(expected = ParseException.class)
 	public void testParseRulesException() throws TigaseStringprepException, ParseException {
-		String[] rules_fail = {
-			"8|deny|||self,",
-			"|||18|||deny,self::::"
-		};
-		Set<Rule> result = CustomDomainFilter.parseRules( rules_fail );
+		String[] rules_fail = {"8|deny|||self,", "|||18|||deny,self::::"};
+		Set<Rule> result = CustomDomainFilter.parseRules(rules_fail);
 	}
 
 	@Test
 	public void testIsAllowed() throws TigaseStringprepException, ParseException {
 
-		JID jid1_r1 = JID.jidInstance( "user1", "domain1", "resource1" );
-		JID jid1_r2 = JID.jidInstance( "user1", "domain1", "resource2" );
-		JID jid2_r1 = JID.jidInstance( "user2", "domain1", "resource1" );
-		JID jid3_r1 = JID.jidInstance( "user3", "domain1", "resource1" );
-		JID admin = JID.jidInstance( "admin", "test2.com" );
-		JID pubsub = JID.jidInstance( "pubsub", "test.com" );
+		JID jid1_r1 = JID.jidInstance("user1", "domain1", "resource1");
+		JID jid1_r2 = JID.jidInstance("user1", "domain1", "resource2");
+		JID jid2_r1 = JID.jidInstance("user2", "domain1", "resource1");
+		JID jid3_r1 = JID.jidInstance("user3", "domain1", "resource1");
+		JID admin = JID.jidInstance("admin", "test2.com");
+		JID pubsub = JID.jidInstance("pubsub", "test.com");
 
-		boolean allowed = CustomDomainFilter.isAllowed( jid1_r1, jid1_r2, rules );
-		assertTrue( "should be allowed / self / permitted jid", allowed );
+		boolean allowed = CustomDomainFilter.isAllowed(jid1_r1, jid1_r2, rules);
+		assertTrue("should be allowed / self / permitted jid", allowed);
 
-		allowed = CustomDomainFilter.isAllowed( jid1_r1, admin, rules );
-		assertTrue( "should be allowed / permitted jid", allowed );
+		allowed = CustomDomainFilter.isAllowed(jid1_r1, admin, rules);
+		assertTrue("should be allowed / permitted jid", allowed);
 
-		allowed = CustomDomainFilter.isAllowed( jid1_r1, pubsub, rules );
-		assertTrue( "should be allowed / permitted jid", allowed );
+		allowed = CustomDomainFilter.isAllowed(jid1_r1, pubsub, rules);
+		assertTrue("should be allowed / permitted jid", allowed);
 
-		allowed = CustomDomainFilter.isAllowed( jid1_r1, jid2_r1, rules );
-		assertFalse( "should be denyed / permitted jid", allowed );
+		allowed = CustomDomainFilter.isAllowed(jid1_r1, jid2_r1, rules);
+		assertFalse("should be denyed / permitted jid", allowed);
 
-		allowed = CustomDomainFilter.isAllowed( jid2_r1, jid2_r1, rules );
-		assertTrue( "should be allowed / self", allowed );
+		allowed = CustomDomainFilter.isAllowed(jid2_r1, jid2_r1, rules);
+		assertTrue("should be allowed / self", allowed);
 
-		allowed = CustomDomainFilter.isAllowed( jid3_r1, jid2_r1, rules );
-		assertFalse( "should be denied / not permitted jids", allowed );
+		allowed = CustomDomainFilter.isAllowed(jid3_r1, jid2_r1, rules);
+		assertFalse("should be denied / not permitted jids", allowed);
 
 	}
 

@@ -111,18 +111,21 @@ public class ConfigHelperTest {
 		assertEquals("123", result.get("test1"));
 		assertEquals("456", result.get("test2"));
 
-		AbstractBeanConfigurator.BeanDefinition bean1a = ((AbstractBeanConfigurator.BeanDefinition) result.get(bean1.getBeanName()));
+		AbstractBeanConfigurator.BeanDefinition bean1a = ((AbstractBeanConfigurator.BeanDefinition) result.get(
+				bean1.getBeanName()));
 		assertEquals(bean1.getClazzName(), bean1a.getClazzName());
 		assertEquals(bean1.isActive(), bean1a.isActive());
 		assertEquals(((Map) prop2.get("sess-man")).get("plugins"), bean1a.get("plugins"));
 		assertEquals("right", ((Map) bean1a.get("map")).get("left"));
 		assertEquals("down", ((Map) bean1a.get("map")).get("up"));
 
-		AbstractBeanConfigurator.BeanDefinition sBean = (AbstractBeanConfigurator.BeanDefinition) bean1a.get("strategy");
+		AbstractBeanConfigurator.BeanDefinition sBean = (AbstractBeanConfigurator.BeanDefinition) bean1a.get(
+				"strategy");
 		assertEquals(DefaultClusteringStrategy.class.getCanonicalName(), sBean.getClazzName());
 		assertFalse((Boolean) sBean.get("force"));
 
-		AbstractBeanConfigurator.BeanDefinition bean2a = (AbstractBeanConfigurator.BeanDefinition) result.get(bean2.getBeanName());
+		AbstractBeanConfigurator.BeanDefinition bean2a = (AbstractBeanConfigurator.BeanDefinition) result.get(
+				bean2.getBeanName());
 		assertEquals(bean3.getClazzName(), bean2a.getClazzName());
 		assertEquals(bean3.isActive(), bean2a.isActive());
 		assertEquals(987, bean2a.get("test4"));

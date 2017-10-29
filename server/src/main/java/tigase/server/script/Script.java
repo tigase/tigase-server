@@ -26,22 +26,14 @@ import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
-//~--- JDK imports ------------------------------------------------------------
-
+import javax.script.*;
 import java.io.StringWriter;
-
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.Bindings;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -51,7 +43,9 @@ import javax.script.ScriptException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Script extends AbstractScriptCommand {
+public class Script
+		extends AbstractScriptCommand {
+
 	private static final Logger log = Logger.getLogger(Script.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -76,12 +70,11 @@ public class Script extends AbstractScriptCommand {
 	public String getLanguageName() {
 		return language;
 	}
-	
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param id
 	 * @param description
@@ -94,8 +87,7 @@ public class Script extends AbstractScriptCommand {
 	 * @throws ScriptException
 	 */
 	public void init(String id, String description, String group, String script, String lang, String ext,
-			Bindings binds)
-			throws ScriptException {
+					 Bindings binds) throws ScriptException {
 		super.init(id, description, group);
 		this.script = script;
 		this.language = lang;
@@ -103,9 +95,8 @@ public class Script extends AbstractScriptCommand {
 
 		ScriptEngineManager scriptEngineManager = (ScriptEngineManager) binds.get(SCRI_MANA);
 
-		log.log( Level.FINEST,
-						 "Trying to load admin command: {0}, description: {1}, language: {2}, ext: {3}",
-						 new Object[] { id, description, this.language, this.ext } );
+		log.log(Level.FINEST, "Trying to load admin command: {0}, description: {1}, language: {2}, ext: {3}",
+				new Object[]{id, description, this.language, this.ext});
 
 		if (language != null) {
 			scriptEngine = scriptEngineManager.getEngineByName(language);
@@ -115,7 +106,7 @@ public class Script extends AbstractScriptCommand {
 			scriptEngine = scriptEngineManager.getEngineByExtension(ext);
 		}
 
-		if ( !Packet.FULL_DEBUG && (scriptEngine instanceof Compilable)) {
+		if (!Packet.FULL_DEBUG && (scriptEngine instanceof Compilable)) {
 			compiledScript = ((Compilable) scriptEngine).compile(script);
 		}
 
@@ -128,12 +119,12 @@ public class Script extends AbstractScriptCommand {
 		}
 
 		log.log(Level.FINE, "Initialized script command, id: {0}, lang: {1}, ext: {2}",
-				new Object[] { id, this.language, this.ext });
+				new Object[]{id, this.language, this.ext});
 
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
 		ScriptContext context = null;
 		StringWriter writer = null;
@@ -192,7 +183,7 @@ public class Script extends AbstractScriptCommand {
 					if (res != null) {
 						text = res.toString().split("\n");
 					} else {
-						text = new String[] { "Script returned no results." };
+						text = new String[]{"Script returned no results."};
 					}
 
 					Command.addFieldMultiValue(result, SCRIPT_RESULT, Arrays.asList(text));
@@ -200,15 +191,14 @@ public class Script extends AbstractScriptCommand {
 				}
 			}
 			long end = System.currentTimeMillis();
-			statisticExecutedIn(end-start);
+			statisticExecutedIn(end - start);
 		} catch (Exception e) {
 			Packet result = packet.commandResult(Command.DataType.result);
 
 			Command.addTextField(result, "Note", "Script execution error.");
 
 			StackTraceElement[] ste = e.getStackTrace();
-			String[] error =
-				new String[ste.length + 2 + ((writer != null) ? writer.toString().split("\n").length : 0)];
+			String[] error = new String[ste.length + 2 + ((writer != null) ? writer.toString().split("\n").length : 0)];
 
 			error[0] = e.getMessage();
 			error[1] = e.toString();
@@ -232,11 +222,9 @@ public class Script extends AbstractScriptCommand {
 			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 			results.offer(result);
 		}
-	}	
+	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

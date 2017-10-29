@@ -20,26 +20,25 @@
 
 package tigase.eventbus.impl;
 
-import static tigase.util.reflection.ReflectionHelper.Handler;
-import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
-
-import java.lang.reflect.Method;
-import java.util.Collection;
-
 import tigase.eventbus.EventRoutingSelector;
 import tigase.eventbus.RegistrationException;
 import tigase.eventbus.RouteEvent;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+
+import static tigase.util.reflection.ReflectionHelper.Handler;
+import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
+
 /**
- * Class responsible for generation of <code>EventRoutingSelectors</code> based
- * on methods of consumer class annotated with <code>@RouteEvent</code>
+ * Class responsible for generation of <code>EventRoutingSelectors</code> based on methods of consumer class annotated
+ * with <code>@RouteEvent</code>
  *
  * @author andrzej
  */
 public class ReflectEventRoutingSelectorFactory {
 
-	private static final Handler<RouteEvent, EventRoutingSelector> HANDLER = (Object consumer, Method method,
-			RouteEvent annotation) -> {
+	private static final Handler<RouteEvent, EventRoutingSelector> HANDLER = (Object consumer, Method method, RouteEvent annotation) -> {
 		if (method.getParameterCount() < 1) {
 			throw new RegistrationException("Event routing selection method must have parameter to receive event!");
 		}
@@ -50,11 +49,11 @@ public class ReflectEventRoutingSelectorFactory {
 	};
 
 	/**
-	 * Method looks for methods of consumer class and returns list of
-	 * <code>EventRoutingSelectors</code> created based on methods annotated
-	 * with <code>@RouteEvent</code>
+	 * Method looks for methods of consumer class and returns list of <code>EventRoutingSelectors</code> created based
+	 * on methods annotated with <code>@RouteEvent</code>
 	 *
 	 * @param consumer
+	 *
 	 * @return
 	 */
 	public Collection<EventRoutingSelector> create(Object consumer) {

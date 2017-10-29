@@ -1,4 +1,3 @@
-
 /*
  * NoConnectionIdException.java
  *
@@ -23,17 +22,17 @@ package tigase.xmpp;
 //~--- classes ----------------------------------------------------------------
 
 /**
- *
  * @author kobit
  */
-public class NoConnectionIdException extends XMPPException {
+public class NoConnectionIdException
+		extends XMPPException {
+
 	private static final long serialVersionUID = 1L;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public NoConnectionIdException() {
 		super();
@@ -41,7 +40,6 @@ public class NoConnectionIdException extends XMPPException {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param message
 	 */
@@ -52,7 +50,6 @@ public class NoConnectionIdException extends XMPPException {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param cause
 	 */
 	public NoConnectionIdException(Throwable cause) {
@@ -62,7 +59,6 @@ public class NoConnectionIdException extends XMPPException {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param message
 	 * @param cause
 	 */
@@ -71,8 +67,6 @@ public class NoConnectionIdException extends XMPPException {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

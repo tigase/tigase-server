@@ -35,11 +35,19 @@ public class ConfigReader {
 //	private State state = State.NORMAL;
 //	private ArrayDeque<State> stack = new ArrayDeque<>();
 
-	private StateHolder holder = new StateHolder();
-
-	public ConfigReader() {
-
+	public static enum State {
+		MAP,
+		QUOTE,
+		LIST,
+		COMMENT,
+		BEAN,
+		ENVIRONMENT,
+		PROPERTY
 	}
+	private static Pattern DOUBLE_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+)([dDfF]*)");
+	private static Pattern INTEGER_PATTERN = Pattern.compile("([0-9]+)([lL]*)");
+	private static double x = 2.1f;
+	private StateHolder holder = new StateHolder();
 
 	public static Map<String, Object> flatTree(Map<String, Object> props) {
 		Map<String, Object> result = new HashMap<>();
@@ -47,8 +55,13 @@ public class ConfigReader {
 		return result;
 	}
 
+//	private void injectBeans(Map<String, Object> props) {
+//		List<String> beans
+//		props.entrySet().forEach();
+//	}
+
 	private static void flatTree(Map<String, Object> result, String prefix, Map<String, Object> props) {
-		props.forEach((k,v) -> {
+		props.forEach((k, v) -> {
 			String key = prefix == null ? k : (prefix + "/" + k);
 			if (v instanceof AbstractBeanConfigurator.BeanDefinition) {
 				AbstractBeanConfigurator.BeanDefinition beanDefinition = (AbstractBeanConfigurator.BeanDefinition) v;
@@ -69,6 +82,10 @@ public class ConfigReader {
 		});
 	}
 
+	public ConfigReader() {
+
+	}
+
 	public Map<String, Object> read(Reader reader) throws IOException, ConfigException {
 		BufferedReader buffReader = new BufferedReader(reader);
 		Map<String, Object> props = process(buffReader);
@@ -85,10 +102,68 @@ public class ConfigReader {
 		return props;
 	}
 
-//	private void injectBeans(Map<String, Object> props) {
-//		List<String> beans
-//		props.entrySet().forEach();
-//	}
+	protected Object decodeValue(String string_in) {
+		String string = string_in.trim();
+		// Decoding doubles and floats
+		Matcher matcher = DOUBLE_PATTERN.matcher(string);
+		if (matcher.matches()) {
+			String value = matcher.group(1);
+			String type = matcher.group(2);
+			if (type.isEmpty() || "D".equals(type) || "d".equals(type)) {
+				return Double.parseDouble(value);
+			} else {
+				return Float.parseFloat(value);
+			}
+		}
+
+		// Decoding integers and longs
+		matcher = INTEGER_PATTERN.matcher(string);
+		if (matcher.matches()) {
+			String value = matcher.group(1);
+			String type = matcher.group(2);
+			if ("l".equals(type) || "L".equals(type)) {
+				return Long.parseLong(value);
+			} else {
+				return Integer.parseInt(value);
+			}
+		}
+
+		// Decoding booleans
+		switch (string) {
+			case "true":
+				return true;
+			case "false":
+				return false;
+			case "null":
+				return null;
+			default:
+				break;
+		}
+
+		return string_in;
+	}
+
+	protected void setBeanDefinitionValue(Object val) {
+		if (holder.key == null || holder.key.isEmpty()) {
+			return;
+		}
+
+		switch (holder.key) {
+			case "class":
+				holder.bean.setClazzName((String) val);
+				break;
+			case "active":
+				holder.bean.setActive((Boolean) val);
+				break;
+			case "exportable":
+				holder.bean.setExportable((Boolean) val);
+				break;
+			default:
+				throw new RuntimeException(
+						"Error in configuration file - unknown bean definition field: " + holder.key);
+		}
+
+	}
 
 	private Map<String, Object> process(Reader reader) throws IOException, ConfigException {
 		holder.map = new HashMap<>();
@@ -101,7 +176,7 @@ public class ConfigReader {
 				char c = (char) read;
 				if (c != '\n') {
 					lineContent.append(c);
-				} else  {
+				} else {
 					lineContent = new StringBuilder();
 				}
 				pos++;
@@ -120,7 +195,9 @@ public class ConfigReader {
 					continue;
 				}
 				if (holder.state == State.COMMENT) {
-					if (c != '\n') continue;
+					if (c != '\n') {
+						continue;
+					}
 					holder = holder.parent;
 				}
 
@@ -152,7 +229,8 @@ public class ConfigReader {
 						break;
 					}
 					case ']': {
-						if (holder.variable != null && (holder.state != State.PROPERTY && holder.state != State.ENVIRONMENT)) {
+						if (holder.variable != null &&
+								(holder.state != State.PROPERTY && holder.state != State.ENVIRONMENT)) {
 							if (holder.variable instanceof CompositeVariable) {
 								Object value = holder.value;
 								if (value == null) {
@@ -270,7 +348,8 @@ public class ConfigReader {
 								break;
 							case BEAN:
 								val = holder.bean;
-								Object val1 = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+								Object val1 =
+										holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
 								setBeanDefinitionValue(val1);
 								break;
 						}
@@ -283,7 +362,8 @@ public class ConfigReader {
 						pos = 0;
 						// there should be no break here!
 					case ',':
-						if (holder.variable != null && (holder.state != State.PROPERTY && holder.state != State.ENVIRONMENT)) {
+						if (holder.variable != null &&
+								(holder.state != State.PROPERTY && holder.state != State.ENVIRONMENT)) {
 							if (holder.variable instanceof CompositeVariable) {
 								Object value = holder.value;
 								if (value == null) {
@@ -317,12 +397,14 @@ public class ConfigReader {
 								}
 								break;
 							case BEAN:
-								Object val = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+								Object val =
+										holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
 								setBeanDefinitionValue(val);
 								break;
 							case ENVIRONMENT:
 							case PROPERTY:
-								((AbstractEnvironmentPropertyVariable) holder.variable).setName(holder.value.toString().trim());
+								((AbstractEnvironmentPropertyVariable) holder.variable).setName(
+										holder.value.toString().trim());
 								holder.value = holder.variable;
 								break;
 						}
@@ -379,7 +461,8 @@ public class ConfigReader {
 			throw new UnsupportedOperationException(ex.getMessage(), line, pos, lineContent.toString(), ex);
 		}
 		if (holder.state != State.MAP || holder.parent != null) {
-			throw new InvalidFormatException("Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);
+			throw new InvalidFormatException(
+					"Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);
 		}
 
 		if (holder.key != null && !holder.key.isEmpty()) {
@@ -389,151 +472,17 @@ public class ConfigReader {
 		return holder.map;
 	}
 
-	public static class ConfigException extends Exception {
-
-		public ConfigException(String msg) {
-			super(msg);
-		}
-
-		public ConfigException(String msg, Throwable cause) {
-			super(msg, cause);
-		}
-	}
-
-	public static class InvalidFormatException extends ConfigException {
-
-		public InvalidFormatException(String msg) {
-			super(msg);
-		}
-
-	}
-
-	public static class UnsupportedOperationException extends ConfigException {
-
-		private final int line;
-		private final int position;
-		private final String lineContent;
-
-		public UnsupportedOperationException(String msg, int line, int position, String lineContent, Throwable cause) {
-			super(msg, cause);
-			this.line = line;
-			this.position = position;
-			this.lineContent = lineContent;
-		}
-
-		public int getLine() {
-			return line;
-		}
-
-		public int getPosition() {
-			return position;
-		}
-
-		public String getLineContent() {
-			return lineContent;
-		}
-	}
-
-	private static Pattern INTEGER_PATTERN = Pattern.compile("([0-9]+)([lL]*)");
-	private static Pattern DOUBLE_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+)([dDfF]*)");
-
-	private static double x = 2.1f;
-
-	protected Object decodeValue(String string_in) {
-		String string = string_in.trim();
-		// Decoding doubles and floats
-		Matcher matcher = DOUBLE_PATTERN.matcher(string);
-		if (matcher.matches()) {
-			String value = matcher.group(1);
-			String type = matcher.group(2);
-			if (type.isEmpty() || "D".equals(type) || "d".equals(type) ) {
-				return Double.parseDouble(value);
-			} else {
-				return Float.parseFloat(value);
-			}
-		}
-
-		// Decoding integers and longs
-		matcher = INTEGER_PATTERN.matcher(string);
-		if (matcher.matches()) {
-			String value = matcher.group(1);
-			String type = matcher.group(2);
-			if ("l".equals(type) || "L".equals(type)) {
-				return Long.parseLong(value);
-			} else {
-				return Integer.parseInt(value);
-			}
-		}
-
-		// Decoding booleans
-		switch (string) {
-			case "true":
-				return true;
-			case "false":
-				return false;
-			case "null":
-				return null;
-			default:
-				break;
-		}
-
-		return string_in;
-	}
-
-	protected void setBeanDefinitionValue(Object val) {
-		if (holder.key == null || holder.key.isEmpty()) {
-			return;
-		}
-
-		switch (holder.key) {
-			case "class":
-				holder.bean.setClazzName((String) val);
-				break;
-			case "active":
-				holder.bean.setActive((Boolean) val);
-				break;
-			case "exportable":
-				holder.bean.setExportable((Boolean) val);
-				break;
-			default:
-				throw new RuntimeException("Error in configuration file - unknown bean definition field: " + holder.key);
-		}
-
-	}
-
-	public class StateHolder {
-		public State state = State.MAP;
-		public StringBuilder sb = new StringBuilder();
-		public String key;
-		public List list;
-		public Map<String, Object> map;
-		public AbstractBeanConfigurator.BeanDefinition bean;
-		public Variable variable;
-		public StateHolder parent = null;
-		public char quoteChar = '\'';
-		public Object value;
-	}
-
-	public static enum State {
-		MAP,
-		QUOTE,
-		LIST,
-		COMMENT,
-		BEAN,
-		ENVIRONMENT,
-		PROPERTY
-	}
-
 	public interface Variable {
 
 		Object calculateValue();
 
 	}
 
-	public static abstract class AbstractEnvironmentPropertyVariable implements Variable {
+	public static abstract class AbstractEnvironmentPropertyVariable
+			implements Variable {
 
-		private String name;
 		private String defValue;
+		private String name;
 
 		protected AbstractEnvironmentPropertyVariable() {
 		}
@@ -541,6 +490,20 @@ public class ConfigReader {
 		protected AbstractEnvironmentPropertyVariable(String name, String defValue) {
 			this.setName(name);
 			this.setDefValue(defValue);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof AbstractEnvironmentPropertyVariable) {
+				AbstractEnvironmentPropertyVariable v = (AbstractEnvironmentPropertyVariable) obj;
+
+				if (v.name == this.name || (v.name != null && v.name.equals(this.name))) {
+					if (v.defValue == this.defValue || (v.defValue != null && v.defValue.equals(this.defValue))) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		protected String getName() {
@@ -558,68 +521,82 @@ public class ConfigReader {
 		protected void setDefValue(String defValue) {
 			this.defValue = defValue;
 		}
+	}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof AbstractEnvironmentPropertyVariable) {
-				AbstractEnvironmentPropertyVariable v = (AbstractEnvironmentPropertyVariable) obj;
+	public static class CompositeVariable
+			implements Variable {
 
-				if (v.name == this.name || (v.name != null && v.name.equals(this.name))) {
-					if (v.defValue == this.defValue || (v.defValue != null && v.defValue.equals(this.defValue))) {
-						return true;
+		public enum Operation {
+			multiply,
+			divide,
+			add,
+			substract;
+
+			public Number execute(Number arg1, Number arg2) {
+				if (arg1 instanceof Double || arg2 instanceof Double) {
+					double a1 = arg1.doubleValue();
+					double a2 = arg2.doubleValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				} else if (arg1 instanceof Float || arg2 instanceof Float) {
+					float a1 = arg1.floatValue();
+					float a2 = arg2.floatValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				} else if (arg1 instanceof Long || arg2 instanceof Long) {
+					long a1 = arg1.longValue();
+					long a2 = arg2.longValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				} else if (arg1 instanceof Integer || arg2 instanceof Integer) {
+					int a1 = arg1.intValue();
+					int a2 = arg2.intValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
 					}
 				}
+				throw new RuntimeException("Invalid argument exception");
 			}
-			return false;
 		}
-	}
-
-	public static class EnvironmentVariable extends AbstractEnvironmentPropertyVariable {
-
-		public EnvironmentVariable() {
-		}
-
-		public EnvironmentVariable(String name, String defValue) {
-			super(name, defValue);
-		}
-
-		@Override
-		public Object calculateValue() {
-			Object val = System.getenv(getName());
-			if (val == null) {
-				val = getDefValue();
-			}
-			return val;
-		}
-
-	}
-
-	public static class PropertyVariable extends AbstractEnvironmentPropertyVariable {
-
-		public PropertyVariable() {
-		}
-
-		public PropertyVariable(String name, String defValue) {
-			super(name, defValue);
-		}
-
-
-		@Override
-		public Object calculateValue() {
-			return System.getProperty(getName(), getDefValue());
-		}
-		
-	}
-
-	public static class CompositeVariable implements Variable {
-
-		private final List<Object> values = new ArrayList<>();
 		private final List<Operation> operations = new ArrayList<>();
+		private final List<Object> values = new ArrayList<>();
 
 		@Override
 		public Object calculateValue() {
-			if (values.isEmpty())
+			if (values.isEmpty()) {
 				return null;
+			}
 
 			List<Object> values = this.values.stream()
 					.map(val -> (val instanceof Variable) ? ((Variable) val).calculateValue() : val)
@@ -691,70 +668,6 @@ public class ConfigReader {
 			values.add(value);
 		}
 
-		public enum Operation {
-			multiply,
-			divide,
-			add,
-			substract;
-
-			public Number execute(Number arg1, Number arg2) {
-				if (arg1 instanceof Double || arg2 instanceof Double) {
-					double a1 = arg1.doubleValue();
-					double a2 = arg2.doubleValue();
-					switch (this) {
-						case multiply:
-							return a1 * a2;
-						case divide:
-							return a1 / a2;
-						case add:
-							return a1 + a2;
-						case substract:
-							return a1 - a2;
-					}
-				} else if (arg1 instanceof Float || arg2 instanceof Float) {
-					float a1 = arg1.floatValue();
-					float a2 = arg2.floatValue();
-					switch (this) {
-						case multiply:
-							return a1 * a2;
-						case divide:
-							return a1 / a2;
-						case add:
-							return a1 + a2;
-						case substract:
-							return a1 - a2;
-					}
-				} else if (arg1 instanceof Long || arg2 instanceof Long) {
-					long a1 = arg1.longValue();
-					long a2 = arg2.longValue();
-					switch (this) {
-						case multiply:
-							return a1 * a2;
-						case divide:
-							return a1 / a2;
-						case add:
-							return a1 + a2;
-						case substract:
-							return a1 - a2;
-					}
-				} else if (arg1 instanceof Integer || arg2 instanceof Integer) {
-					int a1 = arg1.intValue();
-					int a2 = arg2.intValue();
-					switch (this) {
-						case multiply:
-							return a1 * a2;
-						case divide:
-							return a1 / a2;
-						case add:
-							return a1 + a2;
-						case substract:
-							return a1 - a2;
-					}
-				}
-				throw new RuntimeException("Invalid argument exception");
-			}
-		}
-
 		public List<Object> getArguments() {
 			return values;
 		}
@@ -774,13 +687,13 @@ public class ConfigReader {
 					return false;
 				}
 
-				for (int i=0; i<values.size(); i++) {
+				for (int i = 0; i < values.size(); i++) {
 					if (!values.get(i).equals(v.values.get(i))) {
 						return false;
 					}
 				}
 
-				for (int i=0; i<operations.size(); i++) {
+				for (int i = 0; i < operations.size(); i++) {
 					if (!operations.get(i).equals(v.operations.get(i))) {
 						return false;
 					}
@@ -789,5 +702,105 @@ public class ConfigReader {
 			}
 			return false;
 		}
+	}
+
+	public static class ConfigException
+			extends Exception {
+
+		public ConfigException(String msg) {
+			super(msg);
+		}
+
+		public ConfigException(String msg, Throwable cause) {
+			super(msg, cause);
+		}
+	}
+
+	public static class EnvironmentVariable
+			extends AbstractEnvironmentPropertyVariable {
+
+		public EnvironmentVariable() {
+		}
+
+		public EnvironmentVariable(String name, String defValue) {
+			super(name, defValue);
+		}
+
+		@Override
+		public Object calculateValue() {
+			Object val = System.getenv(getName());
+			if (val == null) {
+				val = getDefValue();
+			}
+			return val;
+		}
+
+	}
+
+	public static class InvalidFormatException
+			extends ConfigException {
+
+		public InvalidFormatException(String msg) {
+			super(msg);
+		}
+
+	}
+
+	public static class PropertyVariable
+			extends AbstractEnvironmentPropertyVariable {
+
+		public PropertyVariable() {
+		}
+
+		public PropertyVariable(String name, String defValue) {
+			super(name, defValue);
+		}
+
+		@Override
+		public Object calculateValue() {
+			return System.getProperty(getName(), getDefValue());
+		}
+
+	}
+
+	public static class UnsupportedOperationException
+			extends ConfigException {
+
+		private final int line;
+		private final String lineContent;
+		private final int position;
+
+		public UnsupportedOperationException(String msg, int line, int position, String lineContent, Throwable cause) {
+			super(msg, cause);
+			this.line = line;
+			this.position = position;
+			this.lineContent = lineContent;
+		}
+
+		public int getLine() {
+			return line;
+		}
+
+		public int getPosition() {
+			return position;
+		}
+
+		public String getLineContent() {
+			return lineContent;
+		}
+	}
+
+	public class StateHolder {
+
+		public AbstractBeanConfigurator.BeanDefinition bean;
+		public String key;
+		public List list;
+		public Map<String, Object> map;
+		public StateHolder parent = null;
+		public char quoteChar = '\'';
+		public StringBuilder sb = new StringBuilder();
+		public State state = State.MAP;
+		public Object value;
+		public Variable variable;
 	}
 }

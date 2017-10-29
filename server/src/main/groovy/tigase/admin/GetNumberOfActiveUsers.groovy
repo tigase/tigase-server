@@ -27,9 +27,14 @@
  AS:Group: Statistics
  */
 package tigase.admin
-import tigase.server.*
-import tigase.db.*
-import tigase.vhosts.*
+
+import tigase.db.AuthRepository
+import tigase.db.TigaseDBException
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
 def SECOND = 1000;
@@ -37,12 +42,12 @@ def MINUTE = 60 * SECOND;
 def JID = "domainjid"
 def TIME_BEFORE_IDLE = 5 * MINUTE;
 
-def p = (Packet)packet
-def auth_repo = (AuthRepository)authRepository
-def user_repo = (UserRepository)userRepository
-def users_sessions = (Map)userSessions
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
+def users_sessions = (Map) userSessions
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 def domainJid = Command.getFieldValue(packet, JID);
@@ -51,20 +56,20 @@ if (domainJid == null) {
 	Command.addTitle(result, "Requesting Number of Active Users")
 	Command.addInstructions(result, "Fill out this form to request the number of active users\nof this service.")
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 //	if (isServiceAdmin) {
 	//Command.addFieldValue(result, JID, domainJid ?: "", "jid-single",
 	//		"The domain for the list of active users")
 //	}
 //	else {
-		def vhosts = [];
-		vhost_man.repo.allItems().each {
-			if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
-				vhosts += it.getVhost().toString()
-			}
+	def vhosts = [ ];
+	vhost_man.repo.allItems().each {
+		if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
+			vhosts += it.getVhost().toString()
 		}
-		def vhostsArr = vhosts.toArray(new String[vhosts.size()]);
-		Command.addFieldValue(result, JID, "", "The domain for the number of active users", vhostsArr, vhostsArr);
+	}
+	def vhostsArr = vhosts.toArray(new String[vhosts.size()]);
+	Command.addFieldValue(result, JID, "", "The domain for the number of active users", vhostsArr, vhostsArr);
 //	}
 	return result
 }
@@ -73,29 +78,31 @@ try {
 	bareJID = BareJID.bareJIDInstance(domainJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
-		def users_list = [];
+			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		def users_list = [ ];
 		users_sessions.entrySet().each {
 			if (!it.getKey().toString().startsWith("sess-man") && it.getKey().getDomain().equals(bareJID.getDomain())) {
 				//if (!maxItems || users_list.size() < maxItems) {
-					def user = it.getKey().toString();
-					def session = it.getValue();
-					def active = false;
-					session.getActiveResources().each {
-						active = active || ((System.currentTimeMillis() - it.getLastAccessed()) < TIME_BEFORE_IDLE);
-					}
-					if (active == true) {
+				def user = it.getKey().toString();
+				def session = it.getValue();
+				def active = false;
+				session.getActiveResources().each {
+					active = active || ((System.currentTimeMillis() - it.getLastAccessed()) < TIME_BEFORE_IDLE);
+				}
+				if (active == true) {
 //						user += " (" + session.getActiveResourcesSize() + ":";
 //						session.getJIDs().each { user += it.getResource() + ", "; }
 //						user = user[0..user.size() - 3] + ")";
-						users_list += user;
-					}
+					users_list += user;
+				}
 				//}
 			}
 		}
-		Command.addFieldValue(result, "activeusersnum", String.valueOf(users_list.size()), "fixed", "The number of active users");
+		Command.addFieldValue(result, "activeusersnum", String.valueOf(users_list.size()), "fixed",
+							  "The number of active users");
 	} else {
-		Command.addTextField(result, "Error", "You do not have enough permissions to get number of active accounts for this domain.");
+		Command.addTextField(result, "Error",
+							 "You do not have enough permissions to get number of active accounts for this domain.");
 	}
 } catch (TigaseDBException ex) {
 	Command.addTextField(result, "Note", "Problem accessing database, active users not counted.");

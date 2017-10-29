@@ -20,10 +20,10 @@
 
 package tigase.eventbus.impl;
 
-import java.util.Collection;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Collection;
 
 /**
  * Created by bmalkow on 26.01.2016.

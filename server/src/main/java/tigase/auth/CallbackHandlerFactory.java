@@ -35,7 +35,6 @@ import java.util.Map;
 
 /**
  * Factory of {@linkplain CallbackHandler CallbackHandlers}.
- *
  */
 @Bean(name = "callback-handler-factory", parent = TigaseSaslProvider.class, active = true)
 public class CallbackHandlerFactory
@@ -45,12 +44,14 @@ public class CallbackHandlerFactory
 
 	@Override
 	public CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Map<String, Object> settings) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+								  Map<String, Object> settings)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		String handlerClassName = getHandlerClassname(mechanismName, session, repo, settings);
-		if (handlerClassName == null)
+		if (handlerClassName == null) {
 			handlerClassName = PlainCallbackHandler.class.getName();
-		@SuppressWarnings("unchecked")
-		Class<CallbackHandler> handlerClass = (Class<CallbackHandler>) Class.forName(handlerClassName);
+		}
+		@SuppressWarnings("unchecked") Class<CallbackHandler> handlerClass = (Class<CallbackHandler>) Class.forName(
+				handlerClassName);
 
 		CallbackHandler handler = handlerClass.newInstance();
 
@@ -70,11 +71,11 @@ public class CallbackHandlerFactory
 			((AuthRepositoryAware) handler).setAuthRepository(session.getAuthRepository());
 		}
 
-        if (handler instanceof PluginSettingsAware) {
-            ((PluginSettingsAware) handler).setPluginSettings(settings);
-        }
+		if (handler instanceof PluginSettingsAware) {
+			((PluginSettingsAware) handler).setPluginSettings(settings);
+		}
 
-        if (handler instanceof MechanismNameAware) {
+		if (handler instanceof MechanismNameAware) {
 			((MechanismNameAware) handler).setMechanismName(mechanismName);
 		}
 

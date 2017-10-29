@@ -22,15 +22,15 @@ package tigase.stats;
 import java.util.logging.Level;
 
 /**
- *
  * @author andrzej
  */
-public class Counter extends CounterValue {
-		
+public class Counter
+		extends CounterValue {
+
 	private long last_hour_counter = 0;
 	private long last_minute_counter = 0;
 	private long last_second_counter = 0;
-	
+
 	private long per_hour = 0;
 	private long per_minute = 0;
 	private long per_second = 0;
@@ -43,29 +43,29 @@ public class Counter extends CounterValue {
 		per_hour = counter - last_hour_counter;
 		last_hour_counter = counter;
 	}
-	
+
 	public synchronized void everyMinute() {
 		per_minute = counter - last_minute_counter;
 		last_minute_counter = counter;
 	}
-	
+
 	public synchronized void everySecond() {
 		per_second = counter - last_second_counter;
 		last_second_counter = counter;
-	}		
-	
+	}
+
 	public long getPerHour() {
 		return per_hour;
 	}
-	
+
 	public long getPerMinute() {
 		return per_minute;
 	}
-	
+
 	public long getPerSecond() {
 		return per_second;
 	}
-	
+
 	public void getStatistics(String compName, StatisticsList list) {
 		if (list.checkLevel(level)) {
 			list.add(compName, name + " last hour", per_hour, level);
@@ -73,5 +73,5 @@ public class Counter extends CounterValue {
 			list.add(compName, name + " last second", per_second, level);
 		}
 	}
-	
+
 }

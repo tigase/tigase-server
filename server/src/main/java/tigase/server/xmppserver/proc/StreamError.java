@@ -1,4 +1,3 @@
-
 /*
  * StreamError.java
  *
@@ -27,10 +26,10 @@ import tigase.server.Packet;
 import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Queue;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -41,7 +40,9 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "streamError", parent = S2SConnectionManager.class, active = true)
-public class StreamError extends S2SAbstractProcessor {
+public class StreamError
+		extends S2SAbstractProcessor {
+
 	private static final Logger log = Logger.getLogger(StreamError.class.getName());
 
 	//~--- methods --------------------------------------------------------------
@@ -50,7 +51,7 @@ public class StreamError extends S2SAbstractProcessor {
 	public int order() {
 		return Order.StreamError.ordinal();
 	}
-	
+
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.getElemName() == "error") {

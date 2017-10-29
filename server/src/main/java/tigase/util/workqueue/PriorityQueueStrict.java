@@ -1,4 +1,3 @@
-
 /*
  * PriorityQueueStrict.java
  *
@@ -31,10 +30,12 @@ import java.util.logging.Logger;
  * Created: Jul 25, 2010 4:09:05 PM
  *
  * @param <E>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
+public class PriorityQueueStrict<E>
+		extends PriorityQueueAbstract<E> {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -42,26 +43,24 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private LinkedBlockingQueue<E>[] qs = null;
 	private int lowestNonEmpty = Integer.MAX_VALUE;
+	private LinkedBlockingQueue<E>[] qs = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
-	public PriorityQueueStrict() {}
+	public PriorityQueueStrict() {
+	}
 
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param maxPriority
 	 * @param maxSize
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	protected PriorityQueueStrict(int maxPriority, int maxSize) {
 		init(maxPriority, maxSize);
 	}
@@ -150,7 +149,8 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 //          log.finest("[" + owner + "] waiting...");
 						this.wait();
 					}
-				} catch (InterruptedException ex) {}
+				} catch (InterruptedException ex) {
+				}
 
 				LinkedBlockingQueue<E> q = qs[lowestNonEmpty];
 
@@ -191,8 +191,7 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 		int priority = pr;
 
 		if (priority < 0) {
-			throw new IllegalArgumentException("parameter priority must be " + "between 0 and "
-					+ (qs.length - 1));
+			throw new IllegalArgumentException("parameter priority must be " + "between 0 and " + (qs.length - 1));
 		}
 
 		if (qs.length <= priority) {
@@ -234,7 +233,7 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 
 	private int findNextNonEmpty() {
 		for (int i = 0; i < qs.length; i++) {
-			if ( !qs[i].isEmpty()) {
+			if (!qs[i].isEmpty()) {
 				return i;
 			}
 		}
@@ -243,8 +242,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

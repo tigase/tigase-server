@@ -27,12 +27,13 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.xmpp.XMPPSession
 
 def TOP_NUM = "top-num"
 
-def p = (Packet)packet
+def p = (Packet) packet
 
 def topNum = Command.getFieldValue(packet, TOP_NUM)
 
@@ -43,22 +44,20 @@ if (topNum == null) {
 	Command.addInstructions(result, "Fill out this form to get top active users.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, TOP_NUM, topNum ?: "10", "text-single",
-			"Number of top active users to show")
+						  "Number of top active users to show")
 
 	return result
 }
 
-def user_sessions = (Map)userSessions
+def user_sessions = (Map) userSessions
 
-def mc= [
-			compare: {XMPPSession a, XMPPSession b->
-				a.getPacketsCounter() == b.getPacketsCounter() ? 0: a.getPacketsCounter()>b.getPacketsCounter()? -1: 1
-			}
-		] as Comparator
+def mc = [ compare: { XMPPSession a, XMPPSession b ->
+	a.getPacketsCounter() == b.getPacketsCounter() ? 0 : a.getPacketsCounter() > b.getPacketsCounter() ? -1 : 1
+} ] as Comparator
 
-def sessions = []
+def sessions = [ ]
 // TODO: this is memory inefficient way to do it. We need to find a more memory friendly way
 user_sessions.entrySet().each {
 	if (!it.getKey().toString().startsWith("sess-man")) {
@@ -68,14 +67,15 @@ user_sessions.entrySet().each {
 
 sessions.sort(mc)
 def max = topNum.toInteger()
-if (max > sessions.size() ) {
+if (max > sessions.size()) {
 	max = sessions.size()
 }
 
-def usr_list = []
+def usr_list = [ ]
 
-sessions[0..(max-1)].each { XMPPSession it ->
-	usr_list += it.getJIDs()[0].toString() + " online " + (it.getLiveTime()/1000) + " sec, " + it.getPacketsCounter() + " packets"
+sessions[0..(max - 1)].each { XMPPSession it ->
+	usr_list += it.getJIDs()[0].toString() + " online " + (it.getLiveTime() / 1000) + " sec, " +
+			it.getPacketsCounter() + " packets"
 }
 
 def result = p.commandResult(Command.DataType.result)

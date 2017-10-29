@@ -28,27 +28,25 @@ package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.List;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
-
 import tigase.xml.Element;
-
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
+
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- *
  * @author kobit
  */
 public interface SessionManagerClusteredIfc
-				extends SessionManagerHandler {
+		extends SessionManagerHandler {
+
 	/** Field description */
 	public static final String SESSION_FOUND_KEY = "user-session-found-key";
 
@@ -57,10 +55,7 @@ public interface SessionManagerClusteredIfc
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
-	 *
-	 *
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
@@ -69,7 +64,6 @@ public interface SessionManagerClusteredIfc
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param el_packet
 	 * @param conn
 	 */
@@ -77,7 +71,6 @@ public interface SessionManagerClusteredIfc
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param session is a <code>XMPPSession</code>
 	 * @param element is a <code>Element</code>
@@ -89,10 +82,7 @@ public interface SessionManagerClusteredIfc
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param el_packet
-	 *
-	 *
 	 *
 	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
@@ -101,9 +91,6 @@ public interface SessionManagerClusteredIfc
 	/**
 	 * Method description
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of {@code ConcurrentHashMap<JID,XMPPResourceConnection>}
 	 */
 	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
@@ -111,18 +98,15 @@ public interface SessionManagerClusteredIfc
 	/**
 	 * Method description
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of {@code ConcurrentHashMap<BareJID,XMPPSession>}
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
-	
+
 	/**
-	 * Method to check if there is XMPPResourceConnection instance for 
-	 * connection JID.
-	 * 
+	 * Method to check if there is XMPPResourceConnection instance for connection JID.
+	 *
 	 * @param connJid
+	 *
 	 * @return true - if there is XMPPResourceConnection for connection JID
 	 */
 	boolean hasXMPPResourceConnectionForConnectionJid(JID connJid);
@@ -131,6 +115,5 @@ public interface SessionManagerClusteredIfc
 
 	List<JID> getNodesConnected();
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

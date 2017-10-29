@@ -26,21 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventsNameMap<M> {
 
-	private final static String NULL_NAME = new String(new byte[] { 0 });
+	private final static String NULL_NAME = new String(new byte[]{0});
 
 	private final Map<String, Map<String, Collection<M>>> dataMap = createMainDataMap();
-
-	protected Collection<M> createDataList() {
-		return new HashSet<M>();
-	}
-
-	protected Map<String, Map<String, Collection<M>>> createMainDataMap() {
-		return new ConcurrentHashMap<String, Map<String, Collection<M>>>();
-	}
-
-	protected Map<String, Collection<M>> createNamesDataMap() {
-		return new ConcurrentHashMap<String, Collection<M>>();
-	}
 
 	public void delete(M data) {
 		Iterator<Entry<String, Map<String, Collection<M>>>> namesIt = dataMap.entrySet().iterator();
@@ -64,12 +52,14 @@ public class EventsNameMap<M> {
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 
 		Map<String, Collection<M>> namesData = dataMap.get(eventPackage);
-		if (namesData == null)
+		if (namesData == null) {
 			return;
+		}
 
 		Collection<M> dataCollection = namesData.get(eventName);
-		if (dataCollection == null)
+		if (dataCollection == null) {
 			return;
+		}
 
 		dataCollection.remove(data);
 
@@ -87,12 +77,14 @@ public class EventsNameMap<M> {
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 
 		Map<String, Collection<M>> namesData = dataMap.get(eventPackage);
-		if (namesData == null)
+		if (namesData == null) {
 			return Collections.emptyList();
+		}
 
 		Collection<M> dataList = namesData.get(eventName);
-		if (dataList == null)
+		if (dataList == null) {
 			return Collections.emptyList();
+		}
 
 		return dataList;
 	}
@@ -130,8 +122,9 @@ public class EventsNameMap<M> {
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 
 		Map<String, Collection<M>> namesData = dataMap.get(eventPackage);
-		if (namesData == null || namesData.isEmpty())
+		if (namesData == null || namesData.isEmpty()) {
 			return false;
+		}
 
 		Collection<M> dataList = namesData.get(eventName);
 		return !(dataList == null || dataList.isEmpty());
@@ -154,6 +147,18 @@ public class EventsNameMap<M> {
 		}
 
 		dataList.add(data);
+	}
+
+	protected Collection<M> createDataList() {
+		return new HashSet<M>();
+	}
+
+	protected Map<String, Map<String, Collection<M>>> createMainDataMap() {
+		return new ConcurrentHashMap<String, Map<String, Collection<M>>>();
+	}
+
+	protected Map<String, Collection<M>> createNamesDataMap() {
+		return new ConcurrentHashMap<String, Collection<M>>();
 	}
 
 }

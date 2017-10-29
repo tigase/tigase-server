@@ -25,19 +25,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-class DMap<K, V> implements Map<K, V> {
+class DMap<K, V>
+		implements Map<K, V> {
 
-	final String mapID;
-
+	final Class<K> keyClass;
 	final DMapListener listener;
 
 	final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
-
-	final Class<K> keyClass;
-
-	final Class<V> valueClass;
-
+	final String mapID;
 	final String type;
+	final Class<V> valueClass;
 
 	public DMap(String mapID, String type, DMapListener listener, final Class<K> keyClass, final Class<V> valueClass) {
 		this.listener = listener;

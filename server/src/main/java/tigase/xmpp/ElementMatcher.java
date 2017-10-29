@@ -26,14 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author andrzej
  */
 public class ElementMatcher {
 
 	private final String[] path;
-	private final String xmlns;
 	private final boolean value;
+	private final String xmlns;
 
 	public static ElementMatcher create(String str) {
 		List<String> path = new ArrayList<String>();

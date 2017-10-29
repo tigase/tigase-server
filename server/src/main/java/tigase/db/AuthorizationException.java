@@ -21,27 +21,31 @@ package tigase.db;
 
 /**
  * Describe class AuthorizationException here.
- *
- *
+ * <p>
+ * <p>
  * Created: Fri Nov 10 18:07:21 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AuthorizationException extends Exception {
+public class AuthorizationException
+		extends Exception {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates a new <code>AuthorizationException</code> instance.
-	 *
 	 */
-	public AuthorizationException() { super(); }
+	public AuthorizationException() {
+		super();
+	}
 
-	public AuthorizationException(String message) { super(message); }
+	public AuthorizationException(String message) {
+		super(message);
+	}
 
-  public AuthorizationException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	public AuthorizationException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 } // AuthorizationException

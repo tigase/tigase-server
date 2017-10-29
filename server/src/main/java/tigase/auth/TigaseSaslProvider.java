@@ -38,9 +38,9 @@ import java.util.stream.Collectors;
 
 /**
  * Describe class TigaseSaslProvider here.
- * 
+ * <p>
  * Created: Sun Nov 5 22:31:20 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 @Bean(name = "sasl-provider", parent = SessionManager.class, active = true)
@@ -77,9 +77,13 @@ public class TigaseSaslProvider
 	}
 
 	public void setSaslServerFactories(CopyOnWriteArraySet<SaslServerFactory> saslServerFactories) {
-		this.saslServerFactories.stream().filter(factory -> saslServerFactories == null || !saslServerFactories.contains(factory)).forEach(this::unregisterFactory);
+		this.saslServerFactories.stream()
+				.filter(factory -> saslServerFactories == null || !saslServerFactories.contains(factory))
+				.forEach(this::unregisterFactory);
 		if (saslServerFactories != null) {
-			saslServerFactories.stream().filter(factory -> !this.saslServerFactories.contains(factory)).forEach(this::registerFactory);
+			saslServerFactories.stream()
+					.filter(factory -> !this.saslServerFactories.contains(factory))
+					.forEach(this::registerFactory);
 		}
 		this.saslServerFactories = saslServerFactories == null ? new CopyOnWriteArraySet<>() : saslServerFactories;
 	}
@@ -113,24 +117,6 @@ public class TigaseSaslProvider
 	public void unregister(Kernel kernel) {
 	}
 
-	private void registerFactory(SaslServerFactory factory) {
-		String factoryClassName = factory.getClass().getName();
-
-		List<Service> services = Arrays.stream(factory.getMechanismNames(new HashMap<>()))
-				.map(name -> new Provider.Service(this, "SaslServerFactory", name, factoryClassName, null, null))
-				.collect(Collectors.toList());
-
-		services.forEach(this::putService);
-		saslServerFactoriesServices.put(factory,services);
-	}
-
-	private void unregisterFactory(SaslServerFactory factory) {
-		List<Service> services = saslServerFactoriesServices.remove(factory);
-		if (services != null) {
-			services.forEach(this::removeService);
-		}
-	}
-
 	@Override
 	protected synchronized void putService(Service s) {
 		log.config("Registering SASL mechanism '" + s.getAlgorithm() + "' with factory " + s.getClassName());
@@ -141,5 +127,23 @@ public class TigaseSaslProvider
 	protected synchronized void removeService(Service s) {
 		log.config("Unregistering SASL mechanism '" + s.getAlgorithm() + "' with factory " + s.getClassName());
 		super.removeService(s);
+	}
+
+	private void registerFactory(SaslServerFactory factory) {
+		String factoryClassName = factory.getClass().getName();
+
+		List<Service> services = Arrays.stream(factory.getMechanismNames(new HashMap<>()))
+				.map(name -> new Provider.Service(this, "SaslServerFactory", name, factoryClassName, null, null))
+				.collect(Collectors.toList());
+
+		services.forEach(this::putService);
+		saslServerFactoriesServices.put(factory, services);
+	}
+
+	private void unregisterFactory(SaslServerFactory factory) {
+		List<Service> services = saslServerFactoriesServices.remove(factory);
+		if (services != null) {
+			services.forEach(this::removeService);
+		}
 	}
 }

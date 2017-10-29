@@ -31,13 +31,14 @@ import tigase.stats.StatisticsList;
 
 /**
  * Class implements bean for multi domain pool for user repositories.
- * 
+ * <p>
  * Created by andrzej on 07.03.2016.
  */
-@Bean(name="userRepository", parent = Kernel.class, exportable = true, active = true)
+@Bean(name = "userRepository", parent = Kernel.class, exportable = true, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})
-public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
+public class UserRepositoryMDPoolBean
+		extends UserRepositoryMDImpl {
 
 	@Override
 	public boolean belongsTo(Class<? extends BasicComponent> component) {
@@ -59,7 +60,8 @@ public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
 		return UserRepositoryConfigBean.class;
 	}
 
-	public static class UserRepositoryConfigBean extends AuthUserRepositoryConfigBean<UserRepository, UserRepositoryConfigBean> {
+	public static class UserRepositoryConfigBean
+			extends AuthUserRepositoryConfigBean<UserRepository, UserRepositoryConfigBean> {
 
 		@Override
 		protected Class<UserRepository> getRepositoryIfc() {

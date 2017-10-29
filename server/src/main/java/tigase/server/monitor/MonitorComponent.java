@@ -1,4 +1,3 @@
-
 /*
  * MonitorComponent.java
  *
@@ -45,7 +44,9 @@ import java.util.logging.Logger;
  */
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
-public class MonitorComponent extends AbstractMessageReceiver {
+public class MonitorComponent
+		extends AbstractMessageReceiver {
+
 	private static final Logger log = Logger.getLogger(MonitorComponent.class.getName());
 
 	//~--- get methods ----------------------------------------------------------
@@ -80,7 +81,8 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	}
 
 	@Override
-	public void processPacket(Packet packet) {}
+	public void processPacket(Packet packet) {
+	}
 
 	@Override
 	public int processingInThreads() {

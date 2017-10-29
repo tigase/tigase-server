@@ -20,49 +20,47 @@
 
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Queue;
-
 import org.junit.After;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.JID;
+
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Queue;
 
 /**
- *
  * @author andrzej
  */
-public class MobileV3Test extends ProcessorTestCase {
-	
-	private MobileV3 mobileV3;
+public class MobileV3Test
+		extends ProcessorTestCase {
+
 	private SessionManagerHandler loginHandler;
-	
+	private MobileV3 mobileV3;
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		mobileV3 = new MobileV3();
-		mobileV3.init(new HashMap<String,Object>());
+		mobileV3.init(new HashMap<String, Object>());
 		super.setUp();
 	}
-	
+
 	@After
 	@Override
 	public void tearDown() throws Exception {
 		mobileV3 = null;
 		super.tearDown();
 	}
-	
+
 	@Test
 	public void testRecipientDisabledFor2ResourcesMessage() throws TigaseStringprepException, NotAuthorizedException {
 		String recipient = "recipient-1@localhost";
@@ -81,7 +79,7 @@ public class MobileV3Test extends ProcessorTestCase {
 		Packet[] processed = results.toArray(new Packet[0]);
 		Assert.assertArrayEquals(expected, processed);
 	}
-	
+
 	@Test
 	public void testRecipientEnabledFor2ResourcesMessage() throws TigaseStringprepException, NotAuthorizedException {
 		String recipient = "recipient-1@localhost";
@@ -91,9 +89,9 @@ public class MobileV3Test extends ProcessorTestCase {
 		JID connId2 = JID.jidInstanceNS("c2s@localhost/recipient1-res2");
 		XMPPResourceConnection session1 = getSession(connId1, recp1);
 		getSession(connId2, recp2);
-		
+
 		enableMobileV3(session1, recp1);
-		
+
 		Packet p = Packet.packetInstance("message", "sender-1@localhost/res1", recp1.toString(), StanzaType.chat);
 		p.setPacketTo(connId1);
 		ArrayDeque<Packet> results = new ArrayDeque<Packet>();
@@ -132,10 +130,11 @@ public class MobileV3Test extends ProcessorTestCase {
 		JID connId2 = JID.jidInstanceNS("c2s@localhost/recipient1-res2");
 		XMPPResourceConnection session1 = getSession(connId1, recp1);
 		getSession(connId2, recp2);
-		
+
 		enableMobileV3(session1, recp1);
-		
-		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.available);
+
+		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(),
+												StanzaType.available);
 		presence.setPacketTo(connId1);
 		ArrayDeque<Packet> results = new ArrayDeque<Packet>();
 		results.offer(presence);
@@ -154,10 +153,11 @@ public class MobileV3Test extends ProcessorTestCase {
 		JID connId2 = JID.jidInstanceNS("c2s@localhost/recipient1-res2");
 		XMPPResourceConnection session1 = getSession(connId1, recp1);
 		getSession(connId2, recp2);
-		
+
 		enableMobileV3(session1, recp1);
-		
-		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.available);
+
+		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(),
+												StanzaType.available);
 		presence.setPacketTo(connId1);
 		ArrayDeque<Packet> results = new ArrayDeque<Packet>();
 		results.offer(presence);
@@ -165,7 +165,7 @@ public class MobileV3Test extends ProcessorTestCase {
 		mobileV3.filter(presence, session1, null, results);
 		Packet[] processed = results.toArray(new Packet[0]);
 		Assert.assertArrayEquals(expected, processed);
-		
+
 		presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.available);
 		presence.setPacketTo(connId1);
 		results = new ArrayDeque<Packet>();
@@ -174,21 +174,20 @@ public class MobileV3Test extends ProcessorTestCase {
 		mobileV3.filter(presence, session1, null, results);
 		processed = results.toArray(new Packet[0]);
 		Assert.assertArrayEquals(expected, processed);
-	
+
 		results.clear();
 		Packet p = Packet.packetInstance("message", "sender-1@localhost/res1", recp1.toString(), StanzaType.chat);
 		p.setPacketTo(connId1);
 		results.offer(p);
 		Packet p1 = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.error);
-		p1.setPacketTo(connId1);		
+		p1.setPacketTo(connId1);
 		results.offer(p1);
-		expected = new Packet[] { presence, p, p1 };
+		expected = new Packet[]{presence, p, p1};
 		mobileV3.filter(p, session1, null, results);
 		processed = results.toArray(new Packet[0]);
-		Assert.assertArrayEquals(expected, processed);		
-	}	
-	
-	
+		Assert.assertArrayEquals(expected, processed);
+	}
+
 	@Test
 	public void testRecipientEnabledFor2Resources() throws TigaseStringprepException, NotAuthorizedException {
 		String recipient = "recipient-1@localhost";
@@ -198,10 +197,11 @@ public class MobileV3Test extends ProcessorTestCase {
 		JID connId2 = JID.jidInstanceNS("c2s@localhost/recipient1-res2");
 		XMPPResourceConnection session1 = getSession(connId1, recp1);
 		getSession(connId2, recp2);
-		
+
 		enableMobileV3(session1, recp1);
-		
-		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.available);
+
+		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(),
+												StanzaType.available);
 		presence.setPacketTo(connId1);
 		ArrayDeque<Packet> results = new ArrayDeque<Packet>();
 		results.offer(presence);
@@ -209,20 +209,20 @@ public class MobileV3Test extends ProcessorTestCase {
 		mobileV3.filter(presence, session1, null, results);
 		Packet[] processed = results.toArray(new Packet[0]);
 		Assert.assertArrayEquals(expected, processed);
-		
+
 		results.clear();
 		Packet p = Packet.packetInstance("message", "sender-1@localhost/res1", recp1.toString(), StanzaType.chat);
 		p.setPacketTo(connId1);
 		results.offer(p);
 		Packet p1 = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.error);
-		p1.setPacketTo(connId1);		
+		p1.setPacketTo(connId1);
 		results.offer(p1);
-		expected = new Packet[] { presence, p, p1 };
+		expected = new Packet[]{presence, p, p1};
 		mobileV3.filter(p, session1, null, results);
 		processed = results.toArray(new Packet[0]);
-		Assert.assertArrayEquals(expected, processed);		
-	}	
-	
+		Assert.assertArrayEquals(expected, processed);
+	}
+
 	@Test
 	public void testRecipientEnabledFor2ResourcesMixed() throws TigaseStringprepException, NotAuthorizedException {
 		String recipient = "recipient-1@localhost";
@@ -232,10 +232,11 @@ public class MobileV3Test extends ProcessorTestCase {
 		JID connId2 = JID.jidInstanceNS("c2s@localhost/recipient1-res2");
 		XMPPResourceConnection session1 = getSession(connId1, recp1);
 		getSession(connId2, recp2);
-		
+
 		enableMobileV3(session1, recp1);
-		
-		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.available);
+
+		Packet presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(),
+												StanzaType.available);
 		presence.setPacketTo(connId1);
 		ArrayDeque<Packet> results = new ArrayDeque<Packet>();
 		results.offer(presence);
@@ -246,9 +247,10 @@ public class MobileV3Test extends ProcessorTestCase {
 
 		results.clear();
 		Packet m1 = Packet.packetInstance("message", recp2.toString(), recp1.toString(), StanzaType.chat);
-		Element receivedEl = new Element("received", new String[] { "xmlns" }, new String[] { "urn:xmpp:carbons:2" });
-		Element forwardedEl = new Element("forwarded", new String[] {"xmlns" }, new String[] { "urn:xmpp:forward:0" });
-		forwardedEl.addChild(new Element("message", new String[] { "from", "to" }, new String[] { recp2.toString(), "sender-1@localhost/res1" }));
+		Element receivedEl = new Element("received", new String[]{"xmlns"}, new String[]{"urn:xmpp:carbons:2"});
+		Element forwardedEl = new Element("forwarded", new String[]{"xmlns"}, new String[]{"urn:xmpp:forward:0"});
+		forwardedEl.addChild(new Element("message", new String[]{"from", "to"},
+										 new String[]{recp2.toString(), "sender-1@localhost/res1"}));
 		receivedEl.addChild(forwardedEl);
 		m1.getElement().addChild(receivedEl);
 		m1.setPacketTo(connId1);
@@ -256,8 +258,8 @@ public class MobileV3Test extends ProcessorTestCase {
 		expected = new Packet[0];
 		mobileV3.filter(m1, session1, null, results);
 		processed = results.toArray(new Packet[0]);
-		Assert.assertArrayEquals(expected, processed);			
-		
+		Assert.assertArrayEquals(expected, processed);
+
 		results.clear();
 		presence = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.available);
 		presence.setPacketTo(connId1);
@@ -266,27 +268,28 @@ public class MobileV3Test extends ProcessorTestCase {
 		mobileV3.filter(presence, session1, null, results);
 		processed = results.toArray(new Packet[0]);
 		Assert.assertArrayEquals(expected, processed);
-	
+
 		results.clear();
 		Packet p = Packet.packetInstance("message", "sender-1@localhost/res1", recp1.toString(), StanzaType.chat);
 		p.setPacketTo(connId1);
 		results.offer(p);
 		Packet p1 = Packet.packetInstance("presence", "sender-1@localhost/res1", recp1.toString(), StanzaType.error);
-		p1.setPacketTo(connId1);		
+		p1.setPacketTo(connId1);
 		results.offer(p1);
-		expected = new Packet[] { presence, m1, p, p1 };
+		expected = new Packet[]{presence, m1, p, p1};
 		mobileV3.filter(p, session1, null, results);
 		processed = results.toArray(new Packet[0]);
-		Assert.assertArrayEquals(expected, processed);		
-	}	
+		Assert.assertArrayEquals(expected, processed);
+	}
 
 	private Queue<Packet> enableMobileV3(XMPPResourceConnection session, JID userJid) throws TigaseStringprepException {
 		Packet p = Packet.packetInstance("iq", userJid.toString(), userJid.toString(), StanzaType.set);
-		p.getElement().addChild(new Element("mobile", new String[] { "xmlns", "enable" }, 
-				new String[] { "http://tigase.org/protocol/mobile#v3", "true" }));
+		p.getElement()
+				.addChild(new Element("mobile", new String[]{"xmlns", "enable"},
+									  new String[]{"http://tigase.org/protocol/mobile#v3", "true"}));
 		ArrayDeque<Packet> results = new ArrayDeque<Packet>();
 		mobileV3.process(p, session, null, results, null);
 		return results;
 	}
-	
+
 }

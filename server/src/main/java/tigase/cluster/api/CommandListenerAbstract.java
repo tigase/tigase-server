@@ -28,19 +28,18 @@ package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Priority;
 import tigase.stats.StatisticsList;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import tigase.server.Priority;
-
 /**
- *
  * @author kobit
  */
 public abstract class CommandListenerAbstract
-				implements CommandListener {
-	private static long syncInTraffic  = 0;
+		implements CommandListener {
+
+	private static long syncInTraffic = 0;
 	private static long syncOutTraffic = 0;
 
 	//~--- fields ---------------------------------------------------------------
@@ -51,8 +50,27 @@ public abstract class CommandListenerAbstract
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Constructs ...
+	 * Method description
 	 *
+	 * @return a value of <code>long</code>
+	 */
+	public static long getSyncInTraffic() {
+		return syncInTraffic;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public static long getSyncOutTraffic() {
+		return syncOutTraffic;
+	}
+
+	/**
+	 * Constructs ...
 	 *
 	 * @param name
 	 */
@@ -61,8 +79,6 @@ public abstract class CommandListenerAbstract
 		setPriority(priority);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public int compareTo(CommandListener cl) {
 		return commandName.compareTo(cl.getName());
@@ -70,24 +86,23 @@ public abstract class CommandListenerAbstract
 
 	@Override
 	public boolean equals(Object cl) {
-		return ((cl != null) && (cl instanceof CommandListener) && commandName.equals(
-				((CommandListener) cl).getName()));
+		return ((cl != null) && (cl instanceof CommandListener) &&
+				commandName.equals(((CommandListener) cl).getName()));
 	}
 
 	@Override
 	public int hashCode() {
 		int hash = 265;
 
-		hash = hash + ((this.commandName != null)
-				? this.commandName.hashCode()
-				: 0);
+		hash = hash + ((this.commandName != null) ? this.commandName.hashCode() : 0);
 
 		return hash;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
-	 *
 	 */
 	public synchronized void incSyncInTraffic() {
 		++syncInTraffic;
@@ -95,13 +110,10 @@ public abstract class CommandListenerAbstract
 
 	/**
 	 * Method description
-	 *
 	 */
 	public synchronized void incSyncOutTraffic() {
 		++syncOutTraffic;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getName() {
@@ -109,44 +121,23 @@ public abstract class CommandListenerAbstract
 	}
 
 	@Override
-	public Priority getPriority() {
-		return priority;
-	}
-
-	@Override
-	public void getStatistics(StatisticsList list) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
-	public static long getSyncInTraffic() {
-		return syncInTraffic;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
-	public static long getSyncOutTraffic() {
-		return syncOutTraffic;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	@Override
 	public final void setName(String name) {
 		commandName = name;
 	}
 
+	@Override
+	public Priority getPriority() {
+		return priority;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
 	public void setPriority(Priority priority) {
 		this.priority = priority;
 	}
-	
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+	}
+
 }

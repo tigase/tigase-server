@@ -29,14 +29,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Class implements ComponentRepository interfaces and extends SDRepositoryBean
- * and is designed to be based bean used by other classes responsible for loading
- * proper implementation of ComponentRepository depending on used implementation
+ * Class implements ComponentRepository interfaces and extends SDRepositoryBean and is designed to be based bean used by
+ * other classes responsible for loading proper implementation of ComponentRepository depending on used implementation
  * of DataSource.
- *
+ * <p>
  * Created by andrzej on 18.03.2016.
  */
-public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryItem> extends SDRepositoryBean<ComponentRepositoryDataSourceAware<Item, DataSource>> implements ComponentRepository<Item> {
+public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryItem>
+		extends SDRepositoryBean<ComponentRepositoryDataSourceAware<Item, DataSource>>
+		implements ComponentRepository<Item> {
 
 	@Override
 	public void setRepository(ComponentRepositoryDataSourceAware<Item, DataSource> repository) {

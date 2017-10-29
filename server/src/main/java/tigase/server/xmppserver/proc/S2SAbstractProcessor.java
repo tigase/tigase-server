@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -42,46 +40,32 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public abstract class S2SAbstractProcessor
-	extends S2SAbstract
-				implements S2SProcessor {
-	
-	// Order of enum values is important as it is an order in which packet 
-	// is processed by processors
-	protected static enum Order {
-		StreamOpen,				// 0
-		StreamError,			// 1
-		StreamFeatures,			// 2
-		StartTLS,				// 3
-		StartZlib,				// 4
-		Dialback				// 5
-	}
+		extends S2SAbstract
+		implements S2SProcessor {
 
-	private static final Logger log                        =
-			Logger.getLogger(S2SAbstractProcessor.class.getName());
-
+	private static final Logger log = Logger.getLogger(S2SAbstractProcessor.class.getName());
 	@ConfigField(desc = "Skip StartTLS for domains", alias = "skip-tls-hostnames")
 	private String[] skipTlsHosts;
 
-	//~--- methods --------------------------------------------------------------
-	
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		return false;
 	}
 
-	@Override
-	public void serviceStarted(S2SIOService serv) {}
+	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void serviceStopped(S2SIOService serv) {}
+	public void serviceStarted(S2SIOService serv) {
+	}
+
+	@Override
+	public void serviceStopped(S2SIOService serv) {
+	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param hostname
-	 *
-	 * 
 	 */
 	public boolean skipTLSForHost(String hostname) {
 		// TODO: this is slow, optimize it somehow!!!
@@ -102,18 +86,36 @@ public abstract class S2SAbstractProcessor
 	}
 
 	@Override
-	public void streamClosed(S2SIOService serv) {}
+	public void streamClosed(S2SIOService serv) {
+	}
 
 	@Override
-	public void streamFeatures(S2SIOService serv, List<Element> results) {}
+	public void streamFeatures(S2SIOService serv, List<Element> results) {
+	}
 
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
 		return null;
 	}
-	
+
 	@Override
 	public int compareTo(S2SProcessor proc) {
 		return (-1) * (proc.order() - order());
+	}
+
+	// Order of enum values is important as it is an order in which packet
+	// is processed by processors
+	protected static enum Order {
+		StreamOpen,
+		// 0
+		StreamError,
+		// 1
+		StreamFeatures,
+		// 2
+		StartTLS,
+		// 3
+		StartZlib,
+		// 4
+		Dialback                // 5
 	}
 }

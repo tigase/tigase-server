@@ -24,8 +24,8 @@ import java.util.Set;
 
 /**
  * Describe class StanzaType here.
- *
- *
+ * <p>
+ * <p>
  * Created: Fri Feb 10 13:13:50 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -33,16 +33,45 @@ import java.util.Set;
  */
 public enum StanzaType {
 
-	error,                                      // Common type
-		get, set, result,                         // iq types
-		available, unavailable, probe, subscribe, // presence types
-		subscribed, unsubscribe, unsubscribed,    // presence types
-		chat, groupchat, headline, normal,        // message types
-		valid, invalid,                           // Dialback verification packets
-		terminate,                                // Bosh - session termination stanza
-    invisible;                                // Other unknown types...
+	error,
+	// Common type
+	get,
+	set,
+	result,
+	// iq types
+	available,
+	unavailable,
+	probe,
+	subscribe,
+	// presence types
+	subscribed,
+	unsubscribe,
+	unsubscribed,
+	// presence types
+	chat,
+	groupchat,
+	headline,
+	normal,
+	// message types
+	valid,
+	invalid,
+	// Dialback verification packets
+	terminate,
+	// Bosh - session termination stanza
+	invisible;                                // Other unknown types...
 
 	private static Set<StanzaType> subTypes;
+
+	public static Set<StanzaType> getSubsTypes() {
+		if (subTypes == null) {
+			subTypes = new HashSet<>();
+			subTypes.add(subscribe);
+			subTypes.add(subscribed);
+			subTypes.add(unsubscribe);
+			subTypes.add(unsubscribed);
+		}
+		return subTypes;
+	}
 
 	public static StanzaType valueof(String cmd) {
 		try {
@@ -50,17 +79,6 @@ public enum StanzaType {
 		} catch (IllegalArgumentException e) {
 			return null;
 		} // end of try-catch
-	}
-
-	public static Set<StanzaType> getSubsTypes() {
-		if ( subTypes == null ){
-			subTypes = new HashSet<>();
-			subTypes.add( subscribe );
-			subTypes.add( subscribed );
-			subTypes.add( unsubscribe );
-			subTypes.add( unsubscribed );
-		}
-		return subTypes;
 	}
 
 } // StanzaType

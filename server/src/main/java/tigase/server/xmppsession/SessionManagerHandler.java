@@ -20,14 +20,14 @@
 
 package tigase.server.xmppsession;
 
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * Describe interface SessionManagerHandler here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Feb 18 13:27:58 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -41,8 +41,8 @@ public interface SessionManagerHandler {
 	JID getComponentId();
 
 	void handleLogin(BareJID userId, XMPPResourceConnection conn);
-	
-	void handleDomainChange(String domain,XMPPResourceConnection conn);
+
+	void handleDomainChange(String domain, XMPPResourceConnection conn);
 
 	void handleLogout(BareJID userId, XMPPResourceConnection conn);
 

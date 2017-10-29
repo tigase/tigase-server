@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -40,46 +38,41 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshIOService here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Jun 5 22:33:18 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class BoshIOService
-				extends XMPPIOService<Object> {
-	private static final String CONNECTION           = "Connection: ";
-	private static final String CONTENT_TYPE_HEADER  = "Content-Type: ";
-	private static final String CONTENT_TYPE_LENGTH  = "Content-Length: ";
-	public static final String EOL                  = "\r\n";
+		extends XMPPIOService<Object> {
 
+	public static final String EOL = "\r\n";
+	private static final String CONNECTION = "Connection: ";
+	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
+	private static final String CONTENT_TYPE_LENGTH = "Content-Length: ";
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(BoshIOService.class.getName());
 	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
-	private static final String SERVER = "Server: Tigase Bosh/" + tigase.server.XMPPServer
-			.getImplementationVersion();
-	private static final char[] HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER =
-			"GET /clientaccesspolicy.xml".toCharArray();
+	private static final String SERVER = "Server: Tigase Bosh/" + tigase.server.XMPPServer.getImplementationVersion();
+	private static final char[] HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER = "GET /clientaccesspolicy.xml".toCharArray();
 
 	//~--- fields ---------------------------------------------------------------
-
-	private String   content_type                = "text/xml; charset=utf-8";
-	private long     rid                         = -1;
-	private UUID     sid                         = null;
-	private BoshTask waitTimer                   = null;
-	private boolean  firstPassCORS               = true;
-	private boolean  firstPassClientAccessPolicy = true;
-
 	private final ConfigProvider configProvider;
+	private String content_type = "text/xml; charset=utf-8";
+	private boolean firstPassCORS = true;
+	private boolean firstPassClientAccessPolicy = true;
+	private long rid = -1;
+	private UUID sid = null;
+	private BoshTask waitTimer = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public BoshIOService(ConfigProvider configProvider) {
 		super();
@@ -90,9 +83,6 @@ public class BoshIOService
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public long getRid() {
 		return this.rid;
@@ -101,23 +91,19 @@ public class BoshIOService
 	/**
 	 * Method description
 	 *
-	 *
-	 * 
+	 * @param rid
 	 */
-	public UUID getSid() {
-		return this.sid;
+	public void setRid(long rid) {
+		this.rid = rid;
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param timer
 	 */
-	public void setWaitTimer(BoshTask timer) {
-		waitTimer = timer;
+	public UUID getSid() {
+		return this.sid;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -125,18 +111,34 @@ public class BoshIOService
 	/**
 	 * Method description
 	 *
-	 *
-	 * 
+	 * @param sid
 	 */
-	public BoshTask getWaitTimer() {
-		return waitTimer;
+	public void setSid(UUID sid) {
+		this.sid = sid;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
+	 */
+	public BoshTask getWaitTimer() {
+		return waitTimer;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
 	 *
+	 * @param timer
+	 */
+	public void setWaitTimer(BoshTask timer) {
+		waitTimer = timer;
+	}
+
+	/**
+	 * Method description
 	 *
 	 * @param errorCode
 	 * @param packet
@@ -145,11 +147,12 @@ public class BoshIOService
 	 * @throws IOException
 	 */
 	public void sendErrorAndStop(Authorization errorCode, StreamError streamError, Packet packet, String errorMsg)
-					throws IOException {
-		for (XMPPIOProcessor proc  : processors) {
+			throws IOException {
+		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(this, streamError);
 		}
-		String code = "<body type='terminate'" + " condition='" + (streamError != null ? streamError.getCondition() : errorCode.getCondition()) + "'" +
+		String code = "<body type='terminate'" + " condition='" +
+				(streamError != null ? streamError.getCondition() : errorCode.getCondition()) + "'" +
 				" xmlns='http://jabber.org/protocol/httpbind'/>";
 
 		try {
@@ -184,11 +187,8 @@ public class BoshIOService
 		stop();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param ct
 	 */
@@ -196,35 +196,12 @@ public class BoshIOService
 		this.content_type = ct;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param rid
-	 */
-	public void setRid(long rid) {
-		this.rid = rid;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sid
-	 */
-	public void setSid(UUID sid) {
-		this.sid = sid;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param data
-	 *
-	 * 
 	 */
 	public StringBuilder prepareHeaders(String data) {
 		StringBuilder sb = new StringBuilder(200);
@@ -233,8 +210,7 @@ public class BoshIOService
 		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
 		if (data != null) {
 			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
-		}
-		else {
+		} else {
 			sb.append(CONTENT_TYPE_LENGTH).append("0").append(EOL);
 		}
 		String extra_headers = configProvider.getExtraHeaders();
@@ -271,8 +247,8 @@ public class BoshIOService
 		// existing connections and repeat this CORS request every 10 minutes
 		//if (firstPassCORS && 
 		if ((data != null) && (data.length > 7)) {
-			if ((data[0] == 'O') && (data[1] == 'P') && (data[2] == 'T') && (data[3] == 'I') &&
-					(data[4] == 'O') && (data[5] == 'N') && (data[6] == 'S')) {
+			if ((data[0] == 'O') && (data[1] == 'P') && (data[2] == 'T') && (data[3] == 'I') && (data[4] == 'O') &&
+					(data[5] == 'N') && (data[6] == 'S')) {
 
 				// responding with headers - needed for Chrome browser
 				this.writeRawData(prepareHeaders(null).toString());
@@ -285,11 +261,11 @@ public class BoshIOService
 			}
 			//firstPassCORS = false;
 		}
-		if (firstPassClientAccessPolicy && (data != null) && (data.length >=
-				HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
+		if (firstPassClientAccessPolicy && (data != null) &&
+				(data.length >= HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
 			if ((data[0] == 'G') && (data[1] == 'E') && (data[2] == 'T')) {
 				boolean ok = true;
-				int     i  = 3;
+				int i = 3;
 
 				while (ok && (i < HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
 					ok &= (data[i] == HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER[i]);
@@ -297,8 +273,7 @@ public class BoshIOService
 				}
 				if (ok) {
 					String client_access_policy = configProvider.getClientAccessPolicy();
-					this.writeRawData(prepareHeaders(client_access_policy).toString() +
-							client_access_policy);
+					this.writeRawData(prepareHeaders(client_access_policy).toString() + client_access_policy);
 
 					// connection needs to be closed as in other case data headers are not sent to browser
 					// until connection is closed
@@ -324,6 +299,5 @@ public class BoshIOService
 
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/19

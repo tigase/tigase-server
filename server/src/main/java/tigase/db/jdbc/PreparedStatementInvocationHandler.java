@@ -26,7 +26,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.sql.PreparedStatement;
 
-public class PreparedStatementInvocationHandler implements InvocationHandler {
+public class PreparedStatementInvocationHandler
+		implements InvocationHandler {
 
 	private final PreparedStatement ps;
 

@@ -27,25 +27,48 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This is internal configuration of each bean. It stores name of bean,
- * dependencies, state of bean etc.
+ * This is internal configuration of each bean. It stores name of bean, dependencies, state of bean etc.
  */
 public class BeanConfig {
 
+	public enum Source {
+		hardcoded,
+		annotation,
+		configuration
+	}
+	/**
+	 * State of bean.
+	 */
+	public enum State {
+		/**
+		 * Bean is initialized and ready to use.
+		 */
+		initialized,
+		/**
+		 * Instance of bean is created, but bean isn't initialized.
+		 */
+		instanceCreated,
+		/**
+		 * Bean class is registered, but instance of bean isn't created yet.
+		 */
+		registered,
+		/**
+		 * Bean class is registered, but it CANNOT be used!!! Should be treated as not registered at all.
+		 */
+		inactive,
+	}
 	private final String beanName;
 	private final Class<?> clazz;
 	private final Map<Field, Dependency> fieldDependencies = new HashMap<Field, Dependency>();
+	private String beanInstanceName = null;
 	private boolean exportable;
-	private boolean pinned = true;
 	private BeanConfig factory;
 	private Kernel kernel;
-	private Source source = Source.hardcoded;
-	private State state;
-
+	private boolean pinned = true;
 	private Set<BeanConfig> registeredBeans = new HashSet<>();
 	private Set<BeanConfig> registeredBy = new HashSet<>();
-
-	private String beanInstanceName = null;
+	private Source source = Source.hardcoded;
+	private State state;
 
 	BeanConfig(String id, Class<?> clazz) {
 		super();
@@ -55,18 +78,23 @@ public class BeanConfig {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		BeanConfig other = (BeanConfig) obj;
 		if (beanName == null) {
-			if (other.beanName != null)
+			if (other.beanName != null) {
 				return false;
-		} else if (!beanName.equals(other.beanName))
+			}
+		} else if (!beanName.equals(other.beanName)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -78,7 +106,7 @@ public class BeanConfig {
 	public String getBeanName() {
 		return beanName;
 	}
-	
+
 	/**
 	 * Returns class of bean.
 	 *
@@ -91,8 +119,7 @@ public class BeanConfig {
 	/**
 	 * Return factory of bean.
 	 *
-	 * @return factory of bean. It may return <code>null</code> if default
-	 * factory is used.
+	 * @return factory of bean. It may return <code>null</code> if default factory is used.
 	 */
 	public BeanConfig getFactory() {
 		return factory;
@@ -103,8 +130,8 @@ public class BeanConfig {
 	}
 
 	/**
-	 * Returns map of dependencies. Note that Kernel has field-based-dependency
-	 * model, it means that each dependency must be related to field in class.
+	 * Returns map of dependencies. Note that Kernel has field-based-dependency model, it means that each dependency
+	 * must be related to field in class.
 	 *
 	 * @return map of dependencies.
 	 */
@@ -149,8 +176,8 @@ public class BeanConfig {
 	/**
 	 * Checks if bean may be visible in child Kernels.
 	 *
-	 * @return <code>true</code> if beans will be visible in child Kernel (other
-	 * Kernels deployed as beans to current Kernel).
+	 * @return <code>true</code> if beans will be visible in child Kernel (other Kernels deployed as beans to current
+	 * Kernel).
 	 */
 	public boolean isExportable() {
 		return exportable;
@@ -222,33 +249,5 @@ public class BeanConfig {
 
 	protected void setBeanInstanceName(String beanInstanceName) {
 		this.beanInstanceName = beanInstanceName;
-	}
-
-	/**
-	 * State of bean.
-	 */
-	public enum State {
-		/**
-		 * Bean is initialized and ready to use.
-		 */
-		initialized,
-		/**
-		 * Instance of bean is created, but bean isn't initialized.
-		 */
-		instanceCreated,
-		/**
-		 * Bean class is registered, but instance of bean isn't created yet.
-		 */
-		registered,
-		/**
-		 * Bean class is registered, but it CANNOT be used!!! Should be treated as not registered at all.
-		 */
-		inactive,
-	}
-
-	public enum Source {
-		hardcoded,
-		annotation,
-		configuration
 	}
 }

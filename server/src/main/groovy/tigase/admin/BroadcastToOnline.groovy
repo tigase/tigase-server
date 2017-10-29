@@ -31,18 +31,20 @@ AS:Group: Notifications
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
-import tigase.cluster.strategy.*
-import tigase.xmpp.jid.JID;
-
+import tigase.cluster.strategy.ClusteringStrategyIfc
+import tigase.server.Command
+import tigase.server.Iq
+import tigase.server.Message
+import tigase.server.Permissions
+import tigase.xmpp.StanzaType
+import tigase.xmpp.jid.JID
 
 def FROM_JID = "from-jid"
 def SUBJECT = "subject"
 def MSG_TYPE = "msg-type"
 def MSG_BODY = "announcement"
 
-def p = (Iq)packet
+def p = (Iq) packet
 
 def fromJid = Command.getFieldValue(p, FROM_JID)
 def subject = Command.getFieldValue(p, SUBJECT)
@@ -50,30 +52,31 @@ def msg_type = Command.getFieldValue(p, MSG_TYPE)
 def body = Command.getFieldValues(p, MSG_BODY)
 
 def NOTIFY_CLUSTER = "notify-cluster"
-boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
-boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.toString()));
+boolean notifyCluster = Boolean.valueOf(Command.getFieldValue(packet, NOTIFY_CLUSTER))
 
 if (fromJid == null || subject == null || msg_type == null || body == null) {
-	def res = (Iq)p.commandResult(Command.DataType.form);
-  Command.addTitle(res, "Message to online users")
-  Command.addInstructions(res, "Fill out this form to make an announcement to all active users of this service.")
+	def res = (Iq) p.commandResult(Command.DataType.form);
+	Command.addTitle(res, "Message to online users")
+	Command.addInstructions(res, "Fill out this form to make an announcement to all active users of this service.")
 
-  Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
+	Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
 
-  Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(), "jid-single", "From address")
+	Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(), "jid-single",
+						  "From address")
 
-  Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "text-single", "Subject")
+	Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "text-single", "Subject")
 
-  def msg_types = ["normal", "headline", "chat" ]
-  Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type", (String[])msg_types, (String[])msg_types)
+	def msg_types = [ "normal", "headline", "chat" ]
+	Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type", (String[]) msg_types, (String[]) msg_types)
 
-  if (body == null) {
-     body = [""]
-  }
+	if (body == null) {
+		body = [ "" ]
+	}
 
 	Command.addFieldMultiValue(res, MSG_BODY, body as List)
 
-	if 	( clusterMode  ) {
+	if (clusterMode) {
 		Command.addHiddenField(res, NOTIFY_CLUSTER, true.toString())
 	}
 
@@ -82,8 +85,8 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
 }
 
 Queue results = new LinkedList()
-if 	( clusterMode && notifyCluster ) {
-	if ( null != clusterStrategy ) {
+if (clusterMode && notifyCluster) {
+	if (null != clusterStrategy) {
 		def cluster = (ClusteringStrategyIfc) clusterStrategy
 		List<JID> cl_conns = cluster.getNodesConnected()
 		if (cl_conns && cl_conns.size() > 0) {
@@ -92,8 +95,8 @@ if 	( clusterMode && notifyCluster ) {
 				def forward = p.copyElementOnly();
 				Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 				Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-				forward.setPacketTo( node );
-				forward.setPermissions( Permissions.ADMIN );
+				forward.setPacketTo(node);
+				forward.setPermissions(Permissions.ADMIN);
 
 				results.offer(forward)
 			}
@@ -110,9 +113,9 @@ def msg = Message.getMessage(null, null, type, msg_body, subject, null, "admin")
 def result = p.commandResult(Command.DataType.result)
 Command.addTextField(result, "Note", "Operation successful");
 results += result
-def conns = (Map)userConnections
+def conns = (Map) userConnections
 conns.each { key, value ->
-  if (value.isAuthorized()) {
+	if (value.isAuthorized()) {
 		def res = msg.copyElementOnly()
 		res.initVars(jidFrom, value.getJID())
 		res.setPacketTo(key)
@@ -121,4 +124,4 @@ conns.each { key, value ->
 
 }
 
-return (Queue)results
+return (Queue) results

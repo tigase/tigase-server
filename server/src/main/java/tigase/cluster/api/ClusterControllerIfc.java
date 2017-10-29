@@ -18,26 +18,24 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xml.Element;
-
 import tigase.xmpp.jid.JID;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+//~--- JDK imports ------------------------------------------------------------
+
 /**
  * @author Artur Hefczyc Created Mar 16, 2011
  */
 public interface ClusterControllerIfc {
+
 	/** Field description */
 	public static final String DELIVER_CLUSTER_PACKET_CMD = "deliver-cluster-packet-cmd";
 
@@ -46,34 +44,28 @@ public interface ClusterControllerIfc {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet which should be handled
 	 */
 	void handleClusterPacket(Element packet);
 
 	/**
-	 * Method is called on cluster node connection event. This is a
-	 * notification to the component that a new cluster node has connected.
+	 * Method is called on cluster node connection event. This is a notification to the component that a new cluster
+	 * node has connected.
 	 *
-	 * @param addr
-	 *          is a hostname of a cluster node generating the event.
+	 * @param addr is a hostname of a cluster node generating the event.
 	 */
 	void nodeConnected(String addr);
 
 	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
+	 * Method is called on cluster node disconnection event. This is a notification to the component that there was
+	 * network connection lost to one of the cluster nodes.
 	 *
-	 * @param addr
-	 *          is a hostname of a cluster node generating the event.
-
+	 * @param addr is a hostname of a cluster node generating the event.
 	 */
 	void nodeDisconnected(String addr);
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param listener CommandListener object
 	 */
@@ -89,8 +81,8 @@ public interface ClusterControllerIfc {
 	 * @param visitedNodes list of all already visited nodes
 	 * @param toNodes list of nodes to which packet should be sent
 	 */
-	void sendToNodes(String command, Map<String, String> data, Queue<Element> packets,
-			JID fromNode, Set<JID> visitedNodes, JID... toNodes);
+	void sendToNodes(String command, Map<String, String> data, Queue<Element> packets, JID fromNode,
+					 Set<JID> visitedNodes, JID... toNodes);
 
 	/**
 	 * Method which sends command to desired nodes
@@ -100,10 +92,8 @@ public interface ClusterControllerIfc {
 	 * @param fromNode address of the source node
 	 * @param visitedNodes list of all already visited nodes
 	 * @param toNodes list of nodes to which packet should be sent
-	 *
 	 */
-	void sendToNodes(String command, Queue<Element> packets, JID fromNode,
-			Set<JID> visitedNodes, JID... toNodes);
+	void sendToNodes(String command, Queue<Element> packets, JID fromNode, Set<JID> visitedNodes, JID... toNodes);
 
 	/**
 	 * Method which sends command to desired nodes
@@ -113,10 +103,8 @@ public interface ClusterControllerIfc {
 	 * @param fromNode address of the source node
 	 * @param visitedNodes list of all already visited nodes
 	 * @param toNodes list of nodes to which packet should be sent
-	 *
 	 */
-	void sendToNodes(String command, Map<String, String> data, JID fromNode,
-			Set<JID> visitedNodes, JID... toNodes);
+	void sendToNodes(String command, Map<String, String> data, JID fromNode, Set<JID> visitedNodes, JID... toNodes);
 
 	/**
 	 * Method which sends command to desired nodes
@@ -126,8 +114,7 @@ public interface ClusterControllerIfc {
 	 * @param fromNode address of the source node
 	 * @param toNodes list of nodes to which packet should be sent
 	 */
-	void sendToNodes(String command, Map<String, String> data, JID fromNode,
-			JID... toNodes);
+	void sendToNodes(String command, Map<String, String> data, JID fromNode, JID... toNodes);
 
 	/**
 	 * Method which sends command to desired nodes
@@ -147,8 +134,7 @@ public interface ClusterControllerIfc {
 	 * @param visitedNodes list of all already visited nodes
 	 * @param toNodes list of nodes to which packet should be sent
 	 */
-	void sendToNodes(String command, Element packet, JID fromNode, Set<JID> visitedNodes,
-			JID... toNodes);
+	void sendToNodes(String command, Element packet, JID fromNode, Set<JID> visitedNodes, JID... toNodes);
 
 	/**
 	 * Method which sends command to desired nodes
@@ -160,14 +146,13 @@ public interface ClusterControllerIfc {
 	 * @param visitedNodes list of all already visited nodes
 	 * @param toNodes list of nodes to which packet should be sent
 	 */
-	void sendToNodes(String command, Map<String, String> data, Element packet,
-			JID fromNode, Set<JID> visitedNodes, JID... toNodes);
+	void sendToNodes(String command, Map<String, String> data, Element packet, JID fromNode, Set<JID> visitedNodes,
+					 JID... toNodes);
 
 	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param listener CommandListener object
 	 */

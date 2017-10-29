@@ -29,116 +29,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Works like a LinkedBlockingQueue using the put() and take() methods but
- * with an additional priority integer parameter. The elemnt returned from
- * take() will honor the priority in such a way that all elements of a lower
+ * Works like a LinkedBlockingQueue using the put() and take() methods but with an additional priority integer
+ * parameter. The elemnt returned from take() will honor the priority in such a way that all elements of a lower
  * priority will be returned before any elemens of a higher priority.
- *
- * Modified proposition taken from Noa Resare:
- * http://resare.com/noa/ref/MultiPrioQueue.java
+ * <p>
+ * Modified proposition taken from Noa Resare: http://resare.com/noa/ref/MultiPrioQueue.java
  *
  * @param <E>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class PriorityQueueAbstract<E> {
 
-	private static final Logger log = Logger.getLogger(PriorityQueueAbstract.class.getName());
-
 	/** Field description */
 	public static final String NONPRIORITY_QUEUE = "nonpriority-queue";
-
 	/** Field description */
 	public static final String QUEUE_IMPLEMENTATION = "queue-implementation";
+	private static final Logger log = Logger.getLogger(PriorityQueueAbstract.class.getName());
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 */
-	public abstract void init(int maxPriority, int maxSize);
-
-	// public boolean offer(E element, int priority, String owner) {
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * 
-	 */
-	public abstract boolean offer(E element, int priority);
-
-	// public void put(E element, int priority, String owner) throws InterruptedException {
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * @throws InterruptedException
-	 */
-	public abstract void put(E element, int priority) throws InterruptedException;
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param maxSize
-	 */
-	public abstract void setMaxSize(int maxSize);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	public abstract int[] size();
-
-	// public E take(String owner) throws InterruptedException {
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws InterruptedException
-	 */
-	public abstract E take() throws InterruptedException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	public abstract int totalSize();
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
 	 *
 	 * @param maxPriority
 	 * @param maxSize
 	 * @param <E>
-	 *
-	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	@Deprecated
@@ -158,16 +75,20 @@ public abstract class PriorityQueueAbstract<E> {
 				result = (Class<? extends PriorityQueueAbstract>) Class.forName(queue_class);
 			} catch (Exception e) {
 				e.printStackTrace();
-				TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-						"Error: Could not instantiate or initialize priority queue of class: " + queue_class,
-						"Got exception: " + e.getMessage()});
+				TigaseRuntime.getTigaseRuntime()
+						.shutdownTigase(new String[]{
+								"Error: Could not instantiate or initialize priority queue of class: " + queue_class,
+								"Got exception: " + e.getMessage()});
 			}
 		}
 
 		return getPriorityQueue(maxPriority, maxSize, result);
 	}
 
-	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize, Class<? extends PriorityQueueAbstract> queueClass) {
+	// public boolean offer(E element, int priority, String owner) {
+
+	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize,
+																Class<? extends PriorityQueueAbstract> queueClass) {
 		try {
 			PriorityQueueAbstract<E> result = queueClass.newInstance();
 			result.init(maxPriority, maxSize);
@@ -175,11 +96,72 @@ public abstract class PriorityQueueAbstract<E> {
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"Error: Could not instantiate or initialize priority queue of class: " + queueClass,
-					"Got exception: " + e.getMessage()});
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{
+							"Error: Could not instantiate or initialize priority queue of class: " + queueClass,
+							"Got exception: " + e.getMessage()});
 		}
 		return null;
 	}
+
+	// public void put(E element, int priority, String owner) throws InterruptedException {
+
+	/**
+	 * Method description
+	 *
+	 * @param maxPriority
+	 * @param maxSize
+	 */
+	public abstract void init(int maxPriority, int maxSize);
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param element
+	 * @param priority
+	 */
+	public abstract boolean offer(E element, int priority);
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param element
+	 * @param priority
+	 *
+	 * @throws InterruptedException
+	 */
+	public abstract void put(E element, int priority) throws InterruptedException;
+
+	// public E take(String owner) throws InterruptedException {
+
+	/**
+	 * Method description
+	 *
+	 * @param maxSize
+	 */
+	public abstract void setMaxSize(int maxSize);
+
+	/**
+	 * Method description
+	 */
+	public abstract int[] size();
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @throws InterruptedException
+	 */
+	public abstract E take() throws InterruptedException;
+
+	/**
+	 * Method description
+	 */
+	public abstract int totalSize();
 
 }

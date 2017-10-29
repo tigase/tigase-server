@@ -23,7 +23,6 @@ package tigase.util.processing;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -36,6 +35,7 @@ import tigase.xmpp.XMPPResourceConnection;
  * @version $Rev$
  */
 public class QueueItem {
+
 	private XMPPResourceConnection conn;
 	private Packet packet;
 	private XMPPProcessorIfc processor;
@@ -44,7 +44,6 @@ public class QueueItem {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param processor
 	 * @param packet
@@ -82,17 +81,12 @@ public class QueueItem {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public XMPPProcessorIfc getProcessor() {
 		return processor;
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

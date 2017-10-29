@@ -29,7 +29,8 @@ import tigase.conf.ConfiguratorAbstract;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface MessageRouterIfc extends ServerComponent {
+public interface MessageRouterIfc
+		extends ServerComponent {
 
 	void setConfig(ConfiguratorAbstract config) throws ConfigurationException;
 

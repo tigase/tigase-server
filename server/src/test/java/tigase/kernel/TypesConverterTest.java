@@ -36,7 +36,12 @@ import static org.junit.Assert.assertEquals;
 
 public class TypesConverterTest {
 
-	private HashMap<String,EnumSet<XT>> mapEnumSetField;
+	public enum XT {
+		a1,
+		b2,
+		c3
+	}
+	private HashMap<String, EnumSet<XT>> mapEnumSetField;
 
 	@Test
 	public void testConvert() throws Exception {
@@ -79,7 +84,8 @@ public class TypesConverterTest {
 				converter.convert("1@b.c/a,2@b.c/a,3@b.c/a", JID[].class));
 
 		assertArrayEquals(new BareJID[]{BareJID.bareJIDInstanceNS("1@b.c"), BareJID.bareJIDInstanceNS("2@b.c"),
-				BareJID.bareJIDInstanceNS("3@b.c")}, converter.convert("1@b.c,2@b.c,3@b.c", BareJID[].class));
+										BareJID.bareJIDInstanceNS("3@b.c")},
+						  converter.convert("1@b.c,2@b.c,3@b.c", BareJID[].class));
 
 		assertArrayEquals(new String[]{"1", "2", "3"}, converter.convert("1,2,3", String[].class));
 		assertArrayEquals(new XT[]{XT.a1, XT.a1, XT.c3}, converter.convert("a1,a1,c3", XT[].class));
@@ -101,23 +107,26 @@ public class TypesConverterTest {
 
 		Assert.assertEquals(new File("/dupa.txt"), converter.convert("/dupa.txt", File.class));
 		Assert.assertEquals(new File("/dupa.txt"),
-				converter.convert(converter.toString(new File("/dupa.txt")), File.class));
+							converter.convert(converter.toString(new File("/dupa.txt")), File.class));
 
-		HashMap<String,String> values = new HashMap<>();
+		HashMap<String, String> values = new HashMap<>();
 		values.put("t1", "a1,b2");
 		values.put("t2", "b2,c3");
-		mapEnumSetField = converter.convert(values, HashMap.class, this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
+		mapEnumSetField = converter.convert(values, HashMap.class,
+											this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
 		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
 		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
 
-		assertEquals(System.getProperty("java.home"), converter.convert(new ConfigReader.PropertyVariable("java.home", null), String.class));
+		assertEquals(System.getProperty("java.home"),
+					 converter.convert(new ConfigReader.PropertyVariable("java.home", null), String.class));
 
 		ConfigReader.CompositeVariable compositeVariable = new ConfigReader.CompositeVariable();
 		compositeVariable.add("Java: ");
 		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.vendor", null));
 		compositeVariable.add('+', " ");
 		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.version", null));
-		assertEquals("Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version"), converter.convert(compositeVariable, String.class));
+		assertEquals("Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version"),
+					 converter.convert(compositeVariable, String.class));
 
 		compositeVariable = new ConfigReader.CompositeVariable();
 		compositeVariable.add(5);
@@ -145,14 +154,16 @@ public class TypesConverterTest {
 		Assert.assertEquals("1,2,3", converter.toString(new byte[]{1, 2, 3}));
 		Assert.assertEquals("1@b.c/a,2@b.c/a,3@b.c/a", converter.toString(
 				new JID[]{JID.jidInstanceNS("1@b.c/a"), JID.jidInstanceNS("2@b.c/a"), JID.jidInstanceNS("3@b.c/a")}));
-		Assert.assertEquals(System.getProperty("java.home"), converter.toString(new ConfigReader.PropertyVariable("java.home", null)));
+		Assert.assertEquals(System.getProperty("java.home"),
+							converter.toString(new ConfigReader.PropertyVariable("java.home", null)));
 
 		ConfigReader.CompositeVariable compositeVariable = new ConfigReader.CompositeVariable();
 		compositeVariable.add("Java: ");
 		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.vendor", null));
 		compositeVariable.add('+', " ");
 		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.version", null));
-		assertEquals("Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version"), converter.toString(compositeVariable));
+		assertEquals("Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version"),
+					 converter.toString(compositeVariable));
 
 		compositeVariable = new ConfigReader.CompositeVariable();
 		compositeVariable.add(5);
@@ -166,11 +177,5 @@ public class TypesConverterTest {
 		compositeVariable.add('*', 60.0);
 		compositeVariable.add('*', 1000);
 		assertEquals("300000.0", converter.toString(compositeVariable));
-	}
-
-	public enum XT {
-		a1,
-		b2,
-		c3
 	}
 }

@@ -23,15 +23,14 @@ package tigase.util.processing;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -39,10 +38,12 @@ import java.util.logging.Logger;
  * Created: Apr 21, 2009 8:50:50 PM
  *
  * @param <E>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ProcessingThreads<E extends WorkerThread> {
+
 	private static final Logger log = Logger.getLogger(ProcessingThreads.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -70,16 +71,16 @@ public class ProcessingThreads<E extends WorkerThread> {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param worker
 	 * @param numWorkerThreads
 	 * @param maxQueueSize
 	 * @param name
+	 *
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	public ProcessingThreads(E worker, int numWorkerThreads, int maxQueueSize, String name)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
@@ -100,7 +101,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 			t.setName(name + " Queue Worker " + j);
 			t.start();
 			workerThreads.add((E) t);
-			log.log(Level.FINEST, "Created worker thread: {0}, queueSize: {1}", new Object[] {t.getName(), maxQueueSize});
+			log.log(Level.FINEST, "Created worker thread: {0}, queueSize: {1}",
+					new Object[]{t.getName(), maxQueueSize});
 		}
 
 //  }
@@ -111,12 +113,9 @@ public class ProcessingThreads<E extends WorkerThread> {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param processor
 	 * @param packet
 	 * @param conn
-	 *
-	 *
 	 */
 	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		boolean ret = false;
@@ -126,8 +125,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 			if ((item.getConn() != null) && item.getConn().isAuthorized()) {
 
 				// Queueing packets per user...
-				ret = workerThreads.get(Math.abs(conn.getJID().getBareJID().hashCode())
-						% numWorkerThreads).offer(item);
+				ret = workerThreads.get(Math.abs(conn.getJID().getBareJID().hashCode()) % numWorkerThreads).offer(item);
 
 //      ret = queues.get(Math.abs(conn.getJID().getBareJID().hashCode()
 //          % numQueues)).offer(item, packet.getPriority().ordinal());
@@ -135,15 +133,14 @@ public class ProcessingThreads<E extends WorkerThread> {
 				if (packet.getPacketFrom() != null) {
 
 					// Queueing packets per user's connection...
-					ret = workerThreads.get(Math.abs(packet.getPacketFrom().hashCode())
-							% numWorkerThreads).offer(item);
+					ret = workerThreads.get(Math.abs(packet.getPacketFrom().hashCode()) % numWorkerThreads).offer(item);
 				} else {
 
 					// Otherwise per destination address
 					// If the packet elemTo is set then used it, otherwise just packetTo:
 					if (packet.getStanzaTo() != null) {
-						ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
-								% numWorkerThreads).offer(item);
+						ret = workerThreads.get(
+								Math.abs(packet.getStanzaTo().getBareJID().hashCode()) % numWorkerThreads).offer(item);
 
 //          ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
 //              packet.getPriority().ordinal());
@@ -162,8 +159,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 			// Otherwise per destination address
 			// If the packet elemTo is set then used it, otherwise just packetTo:
 			if (packet.getStanzaTo() != null) {
-				ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
-						% numWorkerThreads).offer(item);
+				ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode()) % numWorkerThreads)
+						.offer(item);
 			} else {
 				ret = workerThreads.get(Math.abs(packet.getTo().hashCode()) % numWorkerThreads).offer(item);
 			}
@@ -171,7 +168,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 			// ret = nullQueue.offer(item, packet.getPriority().ordinal());
 		}
 
-		if ( !ret) {
+		if (!ret) {
 			++droppedPackets;
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -186,9 +183,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public long getAverageProcessingTime() {
 		long average = 0;
@@ -210,9 +204,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public long getDroppedPackets() {
 		return droppedPackets;
@@ -220,9 +211,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public String getName() {
 		return name;
@@ -230,9 +218,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public int getTotalQueueSize() {
 		int ret = 0;
@@ -246,9 +231,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public int getTotalRuns() {
 		int ret = 0;
@@ -260,11 +242,11 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
-        public void shutdown() {
-                for (WorkerThread workerThread : workerThreads) {
-                        workerThread.shutdown();
-                }
-        }
+	public void shutdown() {
+		for (WorkerThread workerThread : workerThreads) {
+			workerThread.shutdown();
+		}
+	}
 ///**
 // * Method description
 // *
@@ -280,8 +262,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 //}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

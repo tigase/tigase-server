@@ -21,4 +21,5 @@
 package tigase.eventbus.impl;
 
 public class Event2 {
+
 }

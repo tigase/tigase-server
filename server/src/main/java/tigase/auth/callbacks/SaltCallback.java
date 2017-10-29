@@ -22,7 +22,8 @@ package tigase.auth.callbacks;
 
 import javax.security.auth.callback.Callback;
 
-public class SaltCallback implements Callback, java.io.Serializable {
+public class SaltCallback
+		implements Callback, java.io.Serializable {
 
 	private static final long serialVersionUID = -4342673378785456908L;
 
@@ -42,8 +43,7 @@ public class SaltCallback implements Callback, java.io.Serializable {
 	}
 
 	/**
-	 * @param salt
-	 *            the salt to set
+	 * @param salt the salt to set
 	 */
 	public void setSalt(byte[] salt) {
 		this.salt = salt;

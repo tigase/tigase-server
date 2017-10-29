@@ -40,7 +40,10 @@ import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-import tigase.xmpp.*;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
@@ -60,37 +63,39 @@ import java.util.logging.Logger;
 import static tigase.xmpp.impl.roster.RosterAbstract.ROSTER;
 
 @Id(PresenceOffline.ID)
-@Handles({ @Handle(path = { PresenceAbstract.PRESENCE_ELEMENT_NAME }, xmlns = PresenceAbstract.CLIENT_XMLNS),
-		@Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = RosterAbstract.XMLNS) })
+@Handles({@Handle(path = {PresenceAbstract.PRESENCE_ELEMENT_NAME}, xmlns = PresenceAbstract.CLIENT_XMLNS),
+		  @Handle(path = {Iq.ELEM_NAME, Iq.QUERY_NAME}, xmlns = RosterAbstract.XMLNS)})
 @Bean(name = PresenceOffline.ID, parent = SessionManager.class, active = false)
-public class PresenceOffline extends PresenceAbstract implements XMPPStopListenerIfc, Initializable, UnregisterAware {
+public class PresenceOffline
+		extends PresenceAbstract
+		implements XMPPStopListenerIfc, Initializable, UnregisterAware {
 
 	public static final String CACHE_SIZE_PROP_KEY = "cache-size";
 	protected static final String ID = "presence-offline";
 	private static final Logger log = Logger.getLogger(PresenceOffline.class.getCanonicalName());
 	private static final EnumSet<StanzaType> PRESENCE_SUB_CHANGE_TYPES = EnumSet.of(StanzaType.subscribed,
-			StanzaType.unsubscribe, StanzaType.unsubscribed);
+																					StanzaType.unsubscribe,
+																					StanzaType.unsubscribed);
 	private final static String LAST_OFFLINE_PRESENCE_KEY = "last-offline-presence";
 	private final static String DELAY_STAMP_KEY = "delay-stamp";
-	@ConfigField(desc = "Default cache size", alias = CACHE_SIZE_PROP_KEY)
-	private int cacheSize = 1000;
-	private final SimpleParser parser = SingletonFactory.getParserInstance();
-	private final String presenceSessionEventName = "start-stop";
 	private final EventBus eventBus = EventBusFactory.getInstance();
 	private final SimpleDateFormat formatter;
-
+	private final SimpleParser parser = SingletonFactory.getParserInstance();
+	private final String presenceSessionEventName = "start-stop";
 	@ConfigField(desc = "Add delay stamp to offline presences", alias = DELAY_STAMP_KEY)
 	boolean delayStamp = true;
-	@Inject
-	private UserRepository userRepository = null;
+	@ConfigField(desc = "Default cache size", alias = CACHE_SIZE_PROP_KEY)
+	private int cacheSize = 1000;
 	private LRUConcurrentCache<BareJID, Element> presenceCache = new LRUConcurrentCache<>(10000);
 	private LRUConcurrentCache<BareJID, Map<BareJID, RosterElement>> rosterCache = new LRUConcurrentCache<>(10000);
+	@Inject
+	private UserRepository userRepository = null;
 
 	{
 		this.formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		this.formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-	
+
 	@Override
 	public void initialize() {
 		eventBus.registerAll(this);
@@ -103,103 +108,9 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 
 	public void setCacheSize(int size) {
 		this.cacheSize = size;
-		
+
 		presenceCache = new LRUConcurrentCache<>(cacheSize);
 		rosterCache = new LRUConcurrentCache<>(cacheSize);
-	}
-
-	protected boolean isNotOnlySession(XMPPResourceConnection session) {
-		if (TigaseRuntime.getTigaseRuntime().hasCompleteJidsInfo() && session != null) {
-			final JID userJID = session.getjid();
-			if (TigaseRuntime.getTigaseRuntime().isJidOnline(userJID)) {
-				// ok, this use is still connected - don't update the repository
-				// just yet
-				JID[] connectionIdsForJid = TigaseRuntime.getTigaseRuntime().getConnectionIdsForJid(userJID);
-				if (connectionIdsForJid != null && connectionIdsForJid.length > 0) {
-					if (connectionIdsForJid.length != 1 || !connectionIdsForJid[0].equals(userJID)) {
-
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "There are other user {0} sessions still active: {1}",
-									new Object[] { session.getjid(), Arrays.asList(connectionIdsForJid) });
-						}
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	protected boolean isSubscriptionValid(BareJID owner, BareJID contact) {
-		RosterAbstract.SubscriptionType buddy_subscr = null;
-		Map<BareJID, RosterElement> roster = null;
-
-		boolean result = false;
-
-		roster = rosterCache.get(owner);
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Checking user {0} subscription of {1}, present in cache: {2}",
-					new Object[] { owner, contact, roster != null });
-		}
-
-		if (roster == null) {
-			String rosterString = null;
-			try {
-				rosterString = userRepository.getData(owner, ROSTER);
-			} catch (TigaseDBException ex) {
-				log.log(Level.WARNING, "Problem reading roster from DB: ", ex);
-			}
-
-			if (rosterString != null) {
-				roster = new ConcurrentHashMap<BareJID, RosterElement>(100, 0.25f, 1);
-				RosterFlat.parseRosterUtil(rosterString, roster, null);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Loaded roster from DB: {0}", roster);
-				}
-			}
-		}
-
-		if (roster != null) {
-			RosterElement rosterElement = roster.get(contact);
-			buddy_subscr = rosterElement.getSubscription();
-			if (buddy_subscr == null) {
-				buddy_subscr = RosterAbstract.SubscriptionType.none;
-			}
-			result = roster_util.isSubscribedFrom(buddy_subscr);
-		}
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "isSubscriptionValid, owner: {0}, contact: {1}, result: {2}",
-					new Object[] { owner, contact, result });
-		}
-		return result;
-	}
-
-	protected Element loadPresenceFromRepo(BareJID stanzaTo) {
-		Element presence = null;
-		try {
-			String presString = userRepository.getData(stanzaTo, LAST_OFFLINE_PRESENCE_KEY);
-			DomBuilderHandler domHandler = new DomBuilderHandler();
-
-			Queue<Element> parsedElements = null;
-			if (presString != null) {
-
-				char[] data = presString.toCharArray();
-				parser.parse(domHandler, data, 0, data.length);
-				parsedElements = domHandler.getParsedElements();
-			}
-
-			if (parsedElements != null && parsedElements.size() > 0) {
-				presence = parsedElements.poll();
-				presenceCache.put(stanzaTo, presence);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Loaded presence: {0} and stored it in cache", presence);
-				}
-			}
-		} catch (TigaseDBException ex) {
-			log.log(Level.WARNING, "Loading presence from repository failed!", ex);
-		}
-		return presence;
 	}
 
 	@HandleEvent(filter = HandleEvent.Type.remote)
@@ -209,7 +120,7 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Procesing userPresence event: {0} with following jids: {1}",
-					new Object[] { event, jidElements });
+					new Object[]{event, jidElements});
 		}
 
 		if (jidElements != null) {
@@ -218,31 +129,31 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 				if (actionStr != null) {
 
 					switch (actionStr) {
-					case "presence":
-						presenceCache.remove(jid);
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Clearing presence cache: {0}, remaining items: {1}",
-									new Object[] { jid, presenceCache.size() });
-						}
-						break;
+						case "presence":
+							presenceCache.remove(jid);
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Clearing presence cache: {0}, remaining items: {1}",
+										new Object[]{jid, presenceCache.size()});
+							}
+							break;
 
-					case "roster":
-						rosterCache.remove(jid);
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Clearing roster cache: {0}, remaining items: {1}",
-									new Object[] { jid, rosterCache.size() });
-						}
-						break;
+						case "roster":
+							rosterCache.remove(jid);
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Clearing roster cache: {0}, remaining items: {1}",
+										new Object[]{jid, rosterCache.size()});
+							}
+							break;
 					}
 				}
 			}
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "fallthrough" })
+	@SuppressWarnings({"unchecked", "fallthrough"})
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
-			final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
+						final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
 
 		// if presence probe & user is offline -> send last offline presence
 		// if presence unavailable - from that user - store presence &
@@ -250,15 +161,15 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 		// if presence sub change or roster change -- invalidate roster cache
 		if ("presence".equals(packet.getElemName())) {
 
-			if (session == null && packet.getType() == StanzaType.probe && packet.getStanzaFrom() != null
-					&& packet.getStanzaTo() != null && !packet.getStanzaFrom().equals(packet.getStanzaTo())) {
+			if (session == null && packet.getType() == StanzaType.probe && packet.getStanzaFrom() != null &&
+					packet.getStanzaTo() != null && !packet.getStanzaFrom().equals(packet.getStanzaTo())) {
 
 				BareJID stanzaTo = packet.getStanzaTo() != null ? packet.getStanzaTo().getBareJID() : null;
 				BareJID stanzaFrom = packet.getStanzaFrom() != null ? packet.getStanzaFrom().getBareJID() : null;
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Processing presence probe {0} to offline user: {1}",
-							new Object[] { packet, packet.getStanzaTo() });
+							new Object[]{packet, packet.getStanzaTo()});
 				}
 
 				if (stanzaTo != null && stanzaFrom != null) {
@@ -294,23 +205,24 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 				if (PRESENCE_SUB_CHANGE_TYPES.contains(packet.getType())) {
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Presence sub change - sending event to cleare cache {0}", packet.getElement());
+						log.log(Level.FINEST, "Presence sub change - sending event to cleare cache {0}",
+								packet.getElement());
 					}
 
 					sendEvent("roster", packet.getStanzaFrom() != null ? packet.getStanzaFrom().getBareJID() : null,
-							packet.getStanzaTo() != null ? packet.getStanzaTo().getBareJID() : null);
+							  packet.getStanzaTo() != null ? packet.getStanzaTo().getBareJID() : null);
 
-				} else if (session.isUserId(packet.getStanzaFrom().getBareJID())
-						&& ((packet.getType() == null) || (packet.getType() == StanzaType.available)) // &&
-																										// !isNotOnlySession(
-																										// session
-																										// )
-				) {
+				} else if (session.isUserId(packet.getStanzaFrom().getBareJID()) &&
+						((packet.getType() == null) || (packet.getType() == StanzaType.available)) // &&
+					// !isNotOnlySession(
+					// session
+					// )
+						) {
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
 								"Presence session: {0} started - sending event and removing data from repository, packet: ",
-								new Object[] { session, packet });
+								new Object[]{session, packet});
 					}
 
 					sendEvent("presence", session.getJID().getBareJID());
@@ -318,13 +230,14 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 					try {
 						userRepository.removeData(packet.getStanzaFrom().getBareJID(), LAST_OFFLINE_PRESENCE_KEY);
 					} catch (TigaseDBException ex) {
-						log.log(Level.WARNING, "Error removing data from repository while starting new presence session", ex);
+						log.log(Level.WARNING,
+								"Error removing data from repository while starting new presence session", ex);
 					}
 				}
 
 			}
-		} else if (packet.getType() == StanzaType.set
-				&& packet.getElement().getXMLNSStaticStr(Iq.IQ_QUERY_PATH) == RosterAbstract.XMLNS) {
+		} else if (packet.getType() == StanzaType.set &&
+				packet.getElement().getXMLNSStaticStr(Iq.IQ_QUERY_PATH) == RosterAbstract.XMLNS) {
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Roster change - updated roster cache, packet: {0}", packet);
@@ -335,22 +248,6 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 				sendEvent("roster", user);
 			}
 		}
-	}
-
-	private void sendEvent(String action, BareJID... user) {
-		if (user != null && user.length > 0) {
-
-			StartStopEvent event = new StartStopEvent();
-			event.setAction(action);
-			event.setJids(user);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Sending event: " + event);
-			}
-
-			eventBus.fire(event);
-		}
-
 	}
 
 	@Override
@@ -374,7 +271,7 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Session: {0} stopped, storing to repository last presence: {1}",
-							new Object[] { session, lastPresence });
+							new Object[]{session, lastPresence});
 				}
 
 				if (delayStamp) {
@@ -385,8 +282,8 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 					}
 
 					if (stamp != null) {
-						Element x = new Element("delay", new String[] { "stamp", "xmlns" },
-								new String[] { stamp, "urn:xmpp:delay" });
+						Element x = new Element("delay", new String[]{"stamp", "xmlns"},
+												new String[]{stamp, "urn:xmpp:delay"});
 						lastPresence.addChild(x);
 					}
 
@@ -397,7 +294,8 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 				}
 
 				try {
-					userRepository.setData(session.getjid().getBareJID(), LAST_OFFLINE_PRESENCE_KEY, lastPresence.toString());
+					userRepository.setData(session.getjid().getBareJID(), LAST_OFFLINE_PRESENCE_KEY,
+										   lastPresence.toString());
 				} catch (TigaseDBException ex) {
 					log.log(Level.WARNING, "Error storing last offline presence to repository: " + lastPresence, ex);
 				}
@@ -406,7 +304,118 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 
 	}
 
-	public class StartStopEvent implements Serializable {
+	protected boolean isNotOnlySession(XMPPResourceConnection session) {
+		if (TigaseRuntime.getTigaseRuntime().hasCompleteJidsInfo() && session != null) {
+			final JID userJID = session.getjid();
+			if (TigaseRuntime.getTigaseRuntime().isJidOnline(userJID)) {
+				// ok, this use is still connected - don't update the repository
+				// just yet
+				JID[] connectionIdsForJid = TigaseRuntime.getTigaseRuntime().getConnectionIdsForJid(userJID);
+				if (connectionIdsForJid != null && connectionIdsForJid.length > 0) {
+					if (connectionIdsForJid.length != 1 || !connectionIdsForJid[0].equals(userJID)) {
+
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "There are other user {0} sessions still active: {1}",
+									new Object[]{session.getjid(), Arrays.asList(connectionIdsForJid)});
+						}
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	protected boolean isSubscriptionValid(BareJID owner, BareJID contact) {
+		RosterAbstract.SubscriptionType buddy_subscr = null;
+		Map<BareJID, RosterElement> roster = null;
+
+		boolean result = false;
+
+		roster = rosterCache.get(owner);
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Checking user {0} subscription of {1}, present in cache: {2}",
+					new Object[]{owner, contact, roster != null});
+		}
+
+		if (roster == null) {
+			String rosterString = null;
+			try {
+				rosterString = userRepository.getData(owner, ROSTER);
+			} catch (TigaseDBException ex) {
+				log.log(Level.WARNING, "Problem reading roster from DB: ", ex);
+			}
+
+			if (rosterString != null) {
+				roster = new ConcurrentHashMap<BareJID, RosterElement>(100, 0.25f, 1);
+				RosterFlat.parseRosterUtil(rosterString, roster, null);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Loaded roster from DB: {0}", roster);
+				}
+			}
+		}
+
+		if (roster != null) {
+			RosterElement rosterElement = roster.get(contact);
+			buddy_subscr = rosterElement.getSubscription();
+			if (buddy_subscr == null) {
+				buddy_subscr = RosterAbstract.SubscriptionType.none;
+			}
+			result = roster_util.isSubscribedFrom(buddy_subscr);
+		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "isSubscriptionValid, owner: {0}, contact: {1}, result: {2}",
+					new Object[]{owner, contact, result});
+		}
+		return result;
+	}
+
+	protected Element loadPresenceFromRepo(BareJID stanzaTo) {
+		Element presence = null;
+		try {
+			String presString = userRepository.getData(stanzaTo, LAST_OFFLINE_PRESENCE_KEY);
+			DomBuilderHandler domHandler = new DomBuilderHandler();
+
+			Queue<Element> parsedElements = null;
+			if (presString != null) {
+
+				char[] data = presString.toCharArray();
+				parser.parse(domHandler, data, 0, data.length);
+				parsedElements = domHandler.getParsedElements();
+			}
+
+			if (parsedElements != null && parsedElements.size() > 0) {
+				presence = parsedElements.poll();
+				presenceCache.put(stanzaTo, presence);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Loaded presence: {0} and stored it in cache", presence);
+				}
+			}
+		} catch (TigaseDBException ex) {
+			log.log(Level.WARNING, "Loading presence from repository failed!", ex);
+		}
+		return presence;
+	}
+
+	private void sendEvent(String action, BareJID... user) {
+		if (user != null && user.length > 0) {
+
+			StartStopEvent event = new StartStopEvent();
+			event.setAction(action);
+			event.setJids(user);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Sending event: " + event);
+			}
+
+			eventBus.fire(event);
+		}
+
+	}
+
+	public class StartStopEvent
+			implements Serializable {
 
 		private String action;
 		private BareJID[] jids;

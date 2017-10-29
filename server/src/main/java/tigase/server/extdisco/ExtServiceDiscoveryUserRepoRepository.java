@@ -30,7 +30,8 @@ import java.util.Map;
  * Created by andrzej on 06.09.2016.
  */
 @Bean(name = "externalServiceDiscoveryRepository", parent = ExternalServiceDiscoveryComponent.class, active = true)
-public class ExtServiceDiscoveryUserRepoRepository extends UserRepoRepository<ExtServiceDiscoItem> {
+public class ExtServiceDiscoveryUserRepoRepository
+		extends UserRepoRepository<ExtServiceDiscoItem> {
 
 	private static final BareJID repoUser = BareJID.bareJIDInstanceNS("external-service-discovery");
 

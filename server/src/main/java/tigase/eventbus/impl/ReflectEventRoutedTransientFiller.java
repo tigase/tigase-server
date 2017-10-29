@@ -20,22 +20,22 @@
 
 package tigase.eventbus.impl;
 
-import java.lang.reflect.Method;
-
 import tigase.eventbus.EventRoutedTransientFiller;
 
+import java.lang.reflect.Method;
+
 /**
- * Class responsible for calling method on consumer instance which will fill
- * event transient fields.
- * 
+ * Class responsible for calling method on consumer instance which will fill event transient fields.
+ *
  * @author andrzej
  */
-public class ReflectEventRoutedTransientFiller implements EventRoutedTransientFiller {
+public class ReflectEventRoutedTransientFiller
+		implements EventRoutedTransientFiller {
 
-	private final Class eventClass;
 	private final Object consumer;
+	private final Class eventClass;
 	private final Method method;
-	
+
 	public ReflectEventRoutedTransientFiller(Class eventClass, Object consumer, Method method) {
 		this.eventClass = eventClass;
 		this.consumer = consumer;
@@ -44,14 +44,17 @@ public class ReflectEventRoutedTransientFiller implements EventRoutedTransientFi
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == this)
+		if (o == this) {
 			return true;
-		if (o == null || o.getClass() != getClass())
+		}
+		if (o == null || o.getClass() != getClass()) {
 			return false;
+		}
 
 		ReflectEventRoutedTransientFiller s = (ReflectEventRoutedTransientFiller) o;
-		if (!consumer.equals(s.consumer))
+		if (!consumer.equals(s.consumer)) {
 			return false;
+		}
 		return method.equals(s.method);
 	}
 
@@ -68,11 +71,11 @@ public class ReflectEventRoutedTransientFiller implements EventRoutedTransientFi
 	public Class getEventClass() {
 		return eventClass;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int result = consumer.hashCode();
 		result = 31 * result + method.hashCode();
 		return result;
-	}	
+	}
 }

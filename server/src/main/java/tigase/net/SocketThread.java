@@ -24,59 +24,51 @@ package tigase.net;
 
 import tigase.annotations.TODO;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-
 import java.util.Comparator;
 import java.util.Set;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class SocketThread here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Jan 30 12:01:17 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SocketThread implements Runnable {
-	private static final Logger log = Logger.getLogger(SocketThread.class.getName());
+public class SocketThread
+		implements Runnable {
 
 	/** Field description */
 	public static final int DEF_MAX_THREADS_PER_CPU = 8;
+	private static final Logger log = Logger.getLogger(SocketThread.class.getName());
 	private static final int MAX_EMPTY_SELECTIONS = 10;
-	private static SocketThread[] socketReadThread = null;
-	private static SocketThread[] socketWriteThread = null;
-	private static int cpus = Runtime.getRuntime().availableProcessors();
-	private static ThreadPoolExecutor executor = null;
-
 	/**
-	 * Variable <code>completionService</code> keeps reference to server thread pool.
-	 * There is only one thread pool used by all server modules. Each module requiring
-	 * separate threads for tasks processing must have access to server thread pool.
+	 * Variable <code>completionService</code> keeps reference to server thread pool. There is only one thread pool used
+	 * by all server modules. Each module requiring separate threads for tasks processing must have access to server
+	 * thread pool.
 	 */
 	private static CompletionService<IOService<?>> completionService = null;
+	private static int cpus = Runtime.getRuntime().availableProcessors();
+	private static ThreadPoolExecutor executor = null;
+	private static SocketThread[] socketReadThread = null;
+	private static SocketThread[] socketWriteThread = null;
 
 	//~--- static initializers --------------------------------------------------
 
-//private static int threadNo = 0;
+	//private static int threadNo = 0;
 //private static final int READ_ONLY = SelectionKey.OP_READ;
 //private static final int READ_WRITE = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 	static {
@@ -84,7 +76,7 @@ public class SocketThread implements Runnable {
 			int nThreads = (cpus * DEF_MAX_THREADS_PER_CPU) / 2 + 1;
 
 			executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
-					new LinkedBlockingQueue<Runnable>());
+											  new LinkedBlockingQueue<Runnable>());
 			completionService = new ExecutorCompletionService<IOService<?>>(executor);
 			socketReadThread = new SocketThread[nThreads];
 			socketWriteThread = new SocketThread[nThreads];
@@ -121,34 +113,39 @@ public class SocketThread implements Runnable {
 
 	// private boolean selecting = false;
 	private int empty_selections = 0;
-	private boolean reading = false;
-	private boolean writing = false;
-	private ConcurrentSkipListSet<IOService<?>> waiting =
-		new ConcurrentSkipListSet<IOService<?>>(new IOServiceComparator());
-	private boolean stopping = false;
-
 	// IOServices must be added to thread pool after they are removed from
 	// the selector and the selector and key is cleared, otherwise we have
 	// dead-lock somewhere down in the:
 	// java.nio.channels.spi.AbstractSelectableChannel.removeKey(AbstractSelectableChannel.java:111)
-	private ConcurrentSkipListSet<IOService<?>> forCompletion =
-		new ConcurrentSkipListSet<IOService<?>>(new IOServiceComparator());
+	private ConcurrentSkipListSet<IOService<?>> forCompletion = new ConcurrentSkipListSet<IOService<?>>(
+			new IOServiceComparator());
+	private boolean reading = false;
+	private boolean stopping = false;
+	private ConcurrentSkipListSet<IOService<?>> waiting = new ConcurrentSkipListSet<IOService<?>>(
+			new IOServiceComparator());
+	private boolean writing = false;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Creates a new <code>SocketThread</code> instance.
+	 * Method description
 	 *
+	 * @param s
 	 */
-	private SocketThread(String name) {
-		try {
-			clientsSel = Selector.open();
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
-			stopping = true;
-		}    // end of try-catch
+	public static void addSocketService(IOService<?> s) {
+		s.setSocketServiceReady(true);
+		// Due to a delayed SelectionKey cancelling deregistering
+		// nature this distribution doesn't work well, it leads to
+		// dead-lock. Let's make sure the service is always processed
+		// by the same thread thus the same Selector.
+		// socketReadThread[incrementAndGet()].addSocketServicePriv(s);
+		if (s.waitingToRead()) {
+			socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
+		}
 
-		new ResultsListener("ResultsListener-" + name).start();
+		if (s.waitingToSend()) {
+			socketWriteThread[s.hashCode() % socketWriteThread.length].addSocketServicePriv(s);
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -175,29 +172,6 @@ public class SocketThread implements Runnable {
 	/**
 	 * Method description
 	 *
-	 *
-	 * @param s
-	 */
-	public static void addSocketService(IOService<?> s) {
-		s.setSocketServiceReady(true);
-		// Due to a delayed SelectionKey cancelling deregistering
-		// nature this distribution doesn't work well, it leads to
-		// dead-lock. Let's make sure the service is always processed
-		// by the same thread thus the same Selector.
-		// socketReadThread[incrementAndGet()].addSocketServicePriv(s);
-		if (s.waitingToRead()) {
-			socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
-		}
-
-		if (s.waitingToSend()) {
-			socketWriteThread[s.hashCode() % socketWriteThread.length].addSocketServicePriv(s);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param s
 	 */
 	public static void removeSocketService(IOService<Object> s) {
@@ -207,8 +181,21 @@ public class SocketThread implements Runnable {
 	}
 
 	/**
+	 * Creates a new <code>SocketThread</code> instance.
+	 */
+	private SocketThread(String name) {
+		try {
+			clientsSel = Selector.open();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
+			stopping = true;
+		}    // end of try-catch
+
+		new ResultsListener("ResultsListener-" + name).start();
+	}
+
+	/**
 	 * Method description
-	 *
 	 *
 	 * @param s
 	 */
@@ -229,17 +216,17 @@ public class SocketThread implements Runnable {
 
 	public void removeSocketServicePriv(IOService<?> s) {
 		waiting.remove(s);
-		
+
 		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
 		if ((key != null) && (key.attachment() == s)) {
 			key.cancel();
 		}
 	}
-	
-	@SuppressWarnings({ "unchecked" })
+
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public void run() {
-		while ( !stopping) {
+		while (!stopping) {
 			try {
 				clientsSel.select();
 
@@ -386,7 +373,6 @@ public class SocketThread implements Runnable {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param threads
 	 */
 	public void setMaxThread(int threads) {
@@ -396,7 +382,6 @@ public class SocketThread implements Runnable {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param threads
 	 */
@@ -498,14 +483,15 @@ public class SocketThread implements Runnable {
 			IOService<?> serv = (IOService<?>) sk.attachment();
 			SocketChannel sc = serv.getSocketChannel();
 
-			if ((sc == null) ||!sc.isConnected()) {
+			if ((sc == null) || !sc.isConnected()) {
 				cancelled = true;
 				sk.cancel();
 
 				try {
 					log.log(Level.INFO, "Forcing stopping the service: {0}", serv.getUniqueId());
 					serv.forceStop();
-				} catch (Exception e) {}
+				} catch (Exception e) {
+				}
 			}
 
 			// waiting.offer(serv);
@@ -534,7 +520,8 @@ public class SocketThread implements Runnable {
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class IOServiceComparator implements Comparator<IOService<?>> {
+	private class IOServiceComparator
+			implements Comparator<IOService<?>> {
 
 		@Override
 		public int compare(IOService<?> o1, IOService<?> o2) {
@@ -542,13 +529,12 @@ public class SocketThread implements Runnable {
 		}
 	}
 
-
 	@TODO(note = "ExecutionException is poorly implemented.")
-	protected class ResultsListener extends Thread {
+	protected class ResultsListener
+			extends Thread {
 
 		/**
 		 * Constructs ...
-		 *
 		 *
 		 * @param name
 		 */
@@ -561,7 +547,7 @@ public class SocketThread implements Runnable {
 
 		@Override
 		public void run() {
-			for (;;) {
+			for (; ; ) {
 				try {
 					IOService<?> service = completionService.take().get();
 
@@ -583,10 +569,10 @@ public class SocketThread implements Runnable {
 
 					// TODO: Do something with this
 				}        // end of catch
-						catch (InterruptedException e) {
+				catch (InterruptedException e) {
 					log.log(Level.WARNING, "Protocol execution interrupted.", e);
 				}        // end of try-catch
-						catch (Exception e) {
+				catch (Exception e) {
 					log.log(Level.WARNING, "Protocol execution unknown exception.", e);
 				}        // end of catch
 			}          // end of for ()
@@ -594,8 +580,6 @@ public class SocketThread implements Runnable {
 	}
 }    // SocketThread
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

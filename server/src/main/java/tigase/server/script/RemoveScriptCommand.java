@@ -20,12 +20,12 @@
 
 package tigase.server.script;
 
+import tigase.disco.ServiceEntity;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
-import tigase.disco.ServiceEntity;
-
+import javax.script.Bindings;
 import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -34,15 +34,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.Bindings;
-
 /**
  * Created: Jan 2, 2009 2:30:41 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RemoveScriptCommand extends AbstractScriptCommand {
+public class RemoveScriptCommand
+		extends AbstractScriptCommand {
 
 	private static final Logger log = Logger.getLogger(RemoveScriptCommand.class.getName());
 
@@ -55,61 +54,53 @@ public class RemoveScriptCommand extends AbstractScriptCommand {
 		} else {
 			boolean removeFromDisk = Command.getCheckBoxFieldValue(packet, REMOVE_FROM_DISK);
 
-			Map<String, CommandIfc> adminCommands =
-							(Map<String, CommandIfc>) binds.get(ADMN_CMDS);
-			Script command = (Script)adminCommands.remove(commandId);
+			Map<String, CommandIfc> adminCommands = (Map<String, CommandIfc>) binds.get(ADMN_CMDS);
+			Script command = (Script) adminCommands.remove(commandId);
 			ServiceEntity serviceEntity = (ServiceEntity) binds.get(ADMN_DISC);
-			ServiceEntity item =
-							serviceEntity.findNode("http://jabber.org/protocol/admin#" +
-							commandId);
+			ServiceEntity item = serviceEntity.findNode("http://jabber.org/protocol/admin#" + commandId);
 			serviceEntity.removeItems(item);
 
 			if (removeFromDisk) {
-				deleteCommandFromDisk(command.getCommandId(), command.getFileExtension(),binds);
+				deleteCommandFromDisk(command.getCommandId(), command.getFileExtension(), binds);
 			}
 
 			Packet result = packet.commandResult(Command.DataType.result);
-			Command.addTextField(result, "Note",
-							"Script removed correctly");
+			Command.addTextField(result, "Note", "Script removed correctly");
 			results.offer(result);
-		}
-	}
-
-	@SuppressWarnings({"unchecked"})
-	private Packet prepareScriptCommand(Iq packet, Bindings binds) {
-		Packet result = null;
-		Map<String, CommandIfc> adminCommands =
-						(Map<String, CommandIfc>) binds.get(ADMN_CMDS);
-		if (adminCommands.size() > 2) {
-			result = packet.commandResult(Command.DataType.form);
-			Set<String> ids = new LinkedHashSet<String>(adminCommands.keySet());
-			ids.remove(ADD_SCRIPT_CMD);
-			ids.remove(DEL_SCRIPT_CMD);
-			String[] commandIds = ids.toArray(new String[ids.size()]);
-			Command.addFieldValue(result, COMMAND_ID, commandIds[0], "Command Id",
-							commandIds, commandIds);
-			Command.addCheckBoxField(result, REMOVE_FROM_DISK, true);
-		} else {
-			result = packet.commandResult(Command.DataType.result);
-			Command.addTextField(result, "Note",
-							"There is no command script to remove");
-		}
-		return result;
-	}
-
-
-	private void deleteCommandFromDisk(String commandId, String fileExtension,Bindings binds) {
-		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." + fileExtension);
-
-		if (fileName.exists()) {
-			log.log(Level.CONFIG, "Deleting file: {0}", fileName);
-			fileName.delete();
 		}
 	}
 
 	@Override
 	public Bindings getBindings() {
 		return null;
+	}
+
+	@SuppressWarnings({"unchecked"})
+	private Packet prepareScriptCommand(Iq packet, Bindings binds) {
+		Packet result = null;
+		Map<String, CommandIfc> adminCommands = (Map<String, CommandIfc>) binds.get(ADMN_CMDS);
+		if (adminCommands.size() > 2) {
+			result = packet.commandResult(Command.DataType.form);
+			Set<String> ids = new LinkedHashSet<String>(adminCommands.keySet());
+			ids.remove(ADD_SCRIPT_CMD);
+			ids.remove(DEL_SCRIPT_CMD);
+			String[] commandIds = ids.toArray(new String[ids.size()]);
+			Command.addFieldValue(result, COMMAND_ID, commandIds[0], "Command Id", commandIds, commandIds);
+			Command.addCheckBoxField(result, REMOVE_FROM_DISK, true);
+		} else {
+			result = packet.commandResult(Command.DataType.result);
+			Command.addTextField(result, "Note", "There is no command script to remove");
+		}
+		return result;
+	}
+
+	private void deleteCommandFromDisk(String commandId, String fileExtension, Bindings binds) {
+		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." + fileExtension);
+
+		if (fileName.exists()) {
+			log.log(Level.CONFIG, "Deleting file: {0}", fileName);
+			fileName.delete();
+		}
 	}
 
 }

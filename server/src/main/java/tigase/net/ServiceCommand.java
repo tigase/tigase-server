@@ -20,29 +20,24 @@
 package tigase.net;
 
 /**
- * <code>ServiceCommand</code> is enumerated type defining all possible
- * commands related to <code>ServiceData</code> instances.
- * These commands are processed by <code>MessageDispatcher</code>
- * implementations. Some commands are related to data encapsulated in
- * <code>ServiceData</code> instance like <code>SEND_MESSAGE</code> or
- * <code>BROADCAST</code> others are related to <code>ServerService</code>
- * sending or receiving this message like:
- * <code>STOP</code>, <code>CONNECTED</code> and so on. Please refer to detailed
- * API documentation for more information.
- *
+ * <code>ServiceCommand</code> is enumerated type defining all possible commands related to <code>ServiceData</code>
+ * instances. These commands are processed by <code>MessageDispatcher</code> implementations. Some commands are related
+ * to data encapsulated in <code>ServiceData</code> instance like <code>SEND_MESSAGE</code> or <code>BROADCAST</code>
+ * others are related to <code>ServerService</code> sending or receiving this message like: <code>STOP</code>,
+ * <code>CONNECTED</code> and so on. Please refer to detailed API documentation for more information.
  * <p>
- * Created: Sun Oct 17 22:32:22 2004
- * </p>
+ * <p> Created: Sun Oct 17 22:32:22 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum ServiceCommand {
 
-  STOP,
-  STOPPED,
-  CONNECT,
-  CONNECTED,
-  SEND_MESSAGE,
-  BROADCAST;
+	STOP,
+	STOPPED,
+	CONNECT,
+	CONNECTED,
+	SEND_MESSAGE,
+	BROADCAST;
 
 } // ServiceCommand

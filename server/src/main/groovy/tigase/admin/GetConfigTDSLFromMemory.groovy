@@ -33,9 +33,9 @@ import tigase.db.comp.ComponentRepository
 import tigase.server.Command
 import tigase.server.Packet
 
-def repo = (ComponentRepository)comp_repo
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def repo = (ComponentRepository) comp_repo
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -43,11 +43,9 @@ def result = p.commandResult(Command.DataType.result);
 
 if (!isServiceAdmin) {
 	Command.addTextField(result, "Error", "You are not service administrator");
-}
-else {
-	def lines = [];
-	initProperties.each { key, value ->
-		lines += key + "=" + value;
+} else {
+	def lines = [ ];
+	initProperties.each { key, value -> lines += key + "=" + value;
 	}
 
 	Command.addFieldMultiValue(result, "config.tdsl", lines);

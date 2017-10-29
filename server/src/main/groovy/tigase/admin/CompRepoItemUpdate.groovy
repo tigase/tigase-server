@@ -40,24 +40,24 @@ import tigase.server.Permissions
 def MARKER = "command-marker"
 def ITEMS = "item-list"
 
-def repo = (ComponentRepository)comp_repo
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def repo = (ComponentRepository) comp_repo
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def itemKey = Command.getFieldValue(packet, ITEMS)
 def marker = Command.getFieldValue(packet, MARKER)
 
-def supportedComponents = ["vhost-man"]
+def supportedComponents = [ "vhost-man" ]
 def NOTIFY_CLUSTER = "notify-cluster"
-boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
-boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.toString()));
+boolean notifyCluster = Boolean.valueOf(Command.getFieldValue(packet, NOTIFY_CLUSTER))
 Queue results = new LinkedList()
 
 if (itemKey == null) {
 	def items = repo.allItems()
-	def itemsStr = []
+	def itemsStr = [ ]
 	if (items.size() > 0) {
 		items.each {
 			if (isServiceAdmin || it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString())) {
@@ -65,10 +65,10 @@ if (itemKey == null) {
 			}
 		}
 	}
-	if(itemsStr.size() > 0) {
+	if (itemsStr.size() > 0) {
 		def result = p.commandResult(Command.DataType.form)
 		Command.addFieldValue(result, ITEMS, itemsStr[0], "List of items",
-			(String[])itemsStr, (String[])itemsStr)
+							  (String[]) itemsStr, (String[]) itemsStr)
 		return result
 	} else {
 		def result = p.commandResult(Command.DataType.result)
@@ -87,7 +87,7 @@ if (marker == null) {
 			item.addCommandFields(result)
 			Command.addHiddenField(result, MARKER, MARKER)
 			Command.addHiddenField(result, ITEMS, itemKey)
-			if 	( clusterMode  ) {
+			if (clusterMode) {
 				Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
 			}
 			return result
@@ -99,16 +99,16 @@ if (marker == null) {
 	}
 }
 
-if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
-	def nodes = (List)connectedNodes
+if (clusterMode && notifyCluster && supportedComponents.contains(componentName)) {
+	def nodes = (List) connectedNodes
 
-	if (nodes && nodes.size() > 0 ) {
+	if (nodes && nodes.size() > 0) {
 		nodes.each { node ->
 			def forward = p.copyElementOnly();
 			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-			forward.setPacketTo( node );
-			forward.setPermissions( Permissions.ADMIN );
+			forward.setPacketTo(node);
+			forward.setPermissions(Permissions.ADMIN);
 
 			results.offer(forward)
 		}
@@ -127,14 +127,13 @@ if (oldItem == null) {
 	def validateResult = repo.validateItem(item)
 	if (validateResult == null) {
 		if (isServiceAdmin || oldItem.isOwner(stanzaFromBare.toString())
-			// we allow changes by admins, except for changing the owner of the domain.
-			|| oldItem.isAdmin(stanzaFromBare.toString()) && oldItem.getOwner().equals(item.getOwner())
-		) {
+				// we allow changes by admins, except for changing the owner of the domain.
+				|| oldItem.isAdmin(stanzaFromBare.toString()) && oldItem.getOwner().equals(item.getOwner())) {
 			repo.addItem(item)
 			Command.addTextField(result, "Note", "Operation successful");
 		} else {
-			Command.addTextField(result, "Error", "You are not the Item owner or you have no "
-				+ "enough permission to change the item.")
+			Command.addTextField(result, "Error",
+								 "You are not the Item owner or you have no " + "enough permission to change the item.")
 		}
 	} else {
 		Command.addTextField(result, "Error", "The item did not pass validation checking.")

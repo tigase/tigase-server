@@ -26,17 +26,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Artur Hefczyc
- * Created May 28, 2011
+ * @author Artur Hefczyc Created May 28, 2011
  */
 public class AllHistoryCache {
 
-	private static final Logger log = Logger.getLogger( AllHistoryCache.class.getName());
+	private static final Logger log = Logger.getLogger(AllHistoryCache.class.getName());
 	private StatisticsList[] buffer = null;
-	private int start = 0;
 	private int count = 0;
 	private int highMemoryLevel = 95;
 	private int highMemoryUsageCount = 0;
+	private int start = 0;
 
 	public AllHistoryCache(int limit, int highMemoryLevel) {
 		buffer = new StatisticsList[limit];
@@ -55,16 +54,18 @@ public class AllHistoryCache {
 		if (isHighMemoryUsage()) {
 			highMemoryUsageCount++;
 			int minimalSize = count / 2;
-			if (minimalSize < 5)
+			if (minimalSize < 5) {
 				minimalSize = 5;
+			}
 			if (count > minimalSize) {
-				for (int i=0; i<count-minimalSize; i++) {
+				for (int i = 0; i < count - minimalSize; i++) {
 					buffer[(start + i) % buffer.length] = null;
 				}
 				start = (start + count) - minimalSize;
 				count = minimalSize;
 			}
-			log.log( Level.CONFIG, "Shrinking statistics to {0} items for {1} time", new Object[] { minimalSize, highMemoryUsageCount } );
+			log.log(Level.CONFIG, "Shrinking statistics to {0} items for {1} time",
+					new Object[]{minimalSize, highMemoryUsageCount});
 		} else {
 			highMemoryUsageCount = 0;
 		}

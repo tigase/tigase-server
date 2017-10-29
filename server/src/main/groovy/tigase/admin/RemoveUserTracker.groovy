@@ -25,16 +25,19 @@
  */
 package tigase.admin
 
-import tigase.server.*
+import tigase.server.Command
+import tigase.server.Packet
 import tigase.util.log.LogUserFilter
 
-import java.util.logging.*
+import java.util.logging.Filter
+import java.util.logging.Handler
+import java.util.logging.Logger
 
 def JID = "accountjid"
 
-def p = (Packet)packet
+def p = (Packet) packet
 
-def admins = (Set)adminsSet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -53,9 +56,9 @@ if (userJid == null) {
 	//Command.addInstructions(result, "Fill out this form to add a user log tracker.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
-			"The Jabber ID for the tracker to be removed")
+						  "The Jabber ID for the tracker to be removed")
 	return result
 }
 
@@ -66,7 +69,7 @@ def hand = null
 Handler[] handlers = Logger.getLogger("").getHandlers()
 handlers.each {
 	Filter filt = it.getFilter()
-	if (filt != null && filt.class == LogUserFilter && ((LogUserFilter)filt).getId() == userJid) {
+	if (filt != null && filt.class == LogUserFilter && ((LogUserFilter) filt).getId() == userJid) {
 		hand = it
 	}
 }

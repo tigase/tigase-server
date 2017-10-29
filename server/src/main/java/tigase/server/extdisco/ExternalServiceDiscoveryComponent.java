@@ -33,7 +33,8 @@ import javax.script.Bindings;
  * Created by andrzej on 06.09.2016.
  */
 @Bean(name = "ext-disco", parent = Kernel.class, active = false)
-public class ExternalServiceDiscoveryComponent extends AbstractKernelBasedComponent {
+public class ExternalServiceDiscoveryComponent
+		extends AbstractKernelBasedComponent {
 
 	@Inject
 	private ComponentRepository<ExtServiceDiscoItem> repo;

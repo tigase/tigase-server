@@ -44,21 +44,24 @@ import java.util.Collection;
 import java.util.logging.Level;
 
 @Bean(name = EventPublisherModule.ID, active = true)
-public class EventPublisherModule extends AbstractEventBusModule implements Initializable, UnregisterAware {
+public class EventPublisherModule
+		extends AbstractEventBusModule
+		implements Initializable, UnregisterAware {
 
 	public final static String ID = "publisher";
 	@Inject
 	private EventBusComponent component;
 	@Inject(nullAllowed = false, bean = "localEventBus")
 	private EventBusImplementation localEventBus;
+	private EventBusSerializer serializer = new EventBusSerializer();
 	@Inject
 	private SubscriptionStore subscriptionStore;
-	private EventBusSerializer serializer = new EventBusSerializer();
 	private final AbstractHandler firedEventHandler = new AbstractHandler(null, null) {
 		@Override
 		public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
-			if (remotelyGeneratedEvent)
+			if (remotelyGeneratedEvent) {
 				return;
+			}
 
 			if (event instanceof Element) {
 				publishEvent((Element) event);
@@ -88,20 +91,6 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 		return null;
 	}
 
-	protected Collection<Subscription> getSubscribers(String packageName, String eventName, Object event) {
-		Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
-
-		EventRoutingSelector selector = localEventBus.getEventRoutingSelector(event.getClass());
-		if (selector != null) {
-			subscribers = selector.getSubscriptions(event, subscribers);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for event {0}, found subscribers using selector: {1}", new Object[] { event.getClass().getCanonicalName(), selector.getClass() });
-			}
-		}
-
-		return subscribers;
-	}
-
 	@Override
 	public void initialize() {
 		localEventBus.addHandler(firedEventHandler);
@@ -110,17 +99,6 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-	}
-
-	private void publishEvent(Element pubsubEventElem, String from, JID toJID) throws TigaseStringprepException {
-		Packet message = Packet.packetInstance(new Element("message", new String[] { "to", "from", "id" },
-				new String[] { toJID.toString(), from, nextStanzaID() }));
-		message.getElement().addChild(pubsubEventElem);
-		message.setXMLNS(Packet.CLIENT_XMLNS);
-
-		message.setPermissions(Permissions.ADMIN);
-
-		write(message);
 	}
 
 	public void publishEvent(final Element event) {
@@ -140,16 +118,17 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 			}
 			return;
 		}
-		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(en.getPackage(), en.getName());
+		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(en.getPackage(),
+																						  en.getName());
 		publishEvent(en.getPackage(), en.getName(), event, subscribers);
 	}
 
 	public void publishEvent(String eventPackage, String name, Element event, Collection<Subscription> subscribers) {
 		try {
-			final Element eventElem = new Element("event", new String[] { "xmlns" },
-					new String[] { "http://jabber.org/protocol/pubsub#event" });
-			final Element itemsElem = new Element("items", new String[] { "node" },
-					new String[] { EventName.toString(eventPackage, name) });
+			final Element eventElem = new Element("event", new String[]{"xmlns"},
+												  new String[]{"http://jabber.org/protocol/pubsub#event"});
+			final Element itemsElem = new Element("items", new String[]{"node"},
+												  new String[]{EventName.toString(eventPackage, name)});
 			eventElem.addChild(itemsElem);
 			final Element itemElem = new Element("item");
 			itemElem.addChild(event);
@@ -157,7 +136,7 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Sending event ({0}, {1}, {2}) to {3}",
-						new Object[] { name, eventPackage, event, subscribers });
+						new Object[]{name, eventPackage, event, subscribers});
 			}
 
 			for (Subscription subscriber : subscribers) {
@@ -178,18 +157,46 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 	}
 
 	public void publishObjectEvent(Object event) {
-		if (!(event instanceof Serializable))
+		if (!(event instanceof Serializable)) {
 			return;
+		}
 		Class<?> eventClass = event.getClass();
 		final String packageName = eventClass.getPackage().getName();
 		final String eventName = eventClass.getSimpleName();
 
 		final Collection<Subscription> subscribers = getSubscribers(packageName, eventName, event);
-		if (subscribers.isEmpty())
+		if (subscribers.isEmpty()) {
 			return;
+		}
 
 		Element eventElement = serializer.serialize(event);
 
 		publishEvent(packageName, eventName, eventElement, subscribers);
+	}
+
+	protected Collection<Subscription> getSubscribers(String packageName, String eventName, Object event) {
+		Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
+
+		EventRoutingSelector selector = localEventBus.getEventRoutingSelector(event.getClass());
+		if (selector != null) {
+			subscribers = selector.getSubscriptions(event, subscribers);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event {0}, found subscribers using selector: {1}",
+						new Object[]{event.getClass().getCanonicalName(), selector.getClass()});
+			}
+		}
+
+		return subscribers;
+	}
+
+	private void publishEvent(Element pubsubEventElem, String from, JID toJID) throws TigaseStringprepException {
+		Packet message = Packet.packetInstance(new Element("message", new String[]{"to", "from", "id"},
+														   new String[]{toJID.toString(), from, nextStanzaID()}));
+		message.getElement().addChild(pubsubEventElem);
+		message.setXMLNS(Packet.CLIENT_XMLNS);
+
+		message.setPermissions(Permissions.ADMIN);
+
+		write(message);
 	}
 }

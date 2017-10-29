@@ -34,13 +34,13 @@ import tigase.kernel.core.Kernel
 import tigase.server.Command
 import tigase.server.Packet
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def CFGFILE_TYPE = "config-file";
-def CFGFILE_OPTIONS = ["config.tdsl", "tigase.conf"];
+def CFGFILE_OPTIONS = [ "config.tdsl", "tigase.conf" ];
 
 def cfgfile = Command.getFieldValue(p, CFGFILE_TYPE);
 
@@ -48,20 +48,21 @@ def result = p.commandResult(cfgfile ? Command.DataType.result : Command.DataTyp
 
 if (!isServiceAdmin) {
 	Command.addTextField(result, "Error", "You are not service administrator");
-}
-else if (cfgfile == null) {
+} else if (cfgfile == null) {
 	def filesArray = CFGFILE_OPTIONS.toArray(new String[CFGFILE_OPTIONS.size()]);
 	Command.addFieldValue(result, CFGFILE_TYPE, "config.tdsl", "File", filesArray, filesArray);
-}
-else {
-	def filepath = []
+} else {
+	def filepath = [ ]
 	switch (cfgfile) {
 		case "config.tdsl":
-			filepath = [((Kernel) kernel).getInstance(DSLBeanConfigurator).getConfigHolder().getConfigFilePath().toString()];
+			filepath = [ ((Kernel) kernel).getInstance(DSLBeanConfigurator).
+								 getConfigHolder().
+								 getConfigFilePath().
+								 toString() ];
 			break;
 
 		case "tigase.conf":
-			def filenames = ["/etc/default/tigase", "/etc/tigase/tigase.conf", "etc/tigase.conf"];
+			def filenames = [ "/etc/default/tigase", "/etc/tigase/tigase.conf", "etc/tigase.conf" ];
 			filenames.each { it ->
 				def file = new File(it);
 				if (filepath.size() == 0 && file.exists()) {
@@ -76,11 +77,10 @@ else {
 
 	if (filepath == null) {
 		Command.addTextField(result, "Error", "Config file not specified");
-	}
-	else {
-		filepath.each{ it ->
+	} else {
+		filepath.each { it ->
 			def file = new File(it);
-			def lines = [];
+			def lines = [ ];
 			file.eachLine { line -> lines += line; };
 			Command.addFieldMultiValue(result, "Content", lines);
 		}

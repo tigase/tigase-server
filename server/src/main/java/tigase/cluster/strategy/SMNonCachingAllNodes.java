@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -28,9 +26,9 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.StanzaType;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -45,20 +43,18 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public abstract class SMNonCachingAllNodes
-				implements ClusteringStrategyIfc<ConnectionRecord> {
+		implements ClusteringStrategyIfc<ConnectionRecord> {
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(SMNonCachingAllNodes.class
-			.getName());
-
-	//~--- fields ---------------------------------------------------------------
-	@Inject
-	private SessionManagerClusteredIfc     sm            = null;
-
+	private static final Logger log = Logger.getLogger(SMNonCachingAllNodes.class.getName());
 	// Simple random generator, we do not need a strong randomization here.
 	// Just enough to ensure better traffic distribution
 	private Random rand = new Random();
+	//~--- fields ---------------------------------------------------------------
+	@Inject
+	private SessionManagerClusteredIfc sm = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -101,10 +97,7 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param jid
-	 *
-	 * 
 	 */
 	public List<JID> getNodesForJid(JID jid) {
 		return getNodesConnected();
@@ -113,15 +106,11 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param fromNode
 	 * @param visitedNodes
 	 * @param packet
-	 *
-	 * 
 	 */
-	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
-			Packet packet) {
+	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 
 		// If the packet visited other nodes already it means it went through other
 		// checking
@@ -130,10 +119,8 @@ public abstract class SMNonCachingAllNodes
 			List<JID> result = selectNodes(fromNode, visitedNodes);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Visited nodes not null: {0}, selecting new node: {1}, for packet: {2}",
-						new Object[] { visitedNodes,
-						result, packet });
+				log.log(Level.FINEST, "Visited nodes not null: {0}, selecting new node: {1}, for packet: {2}",
+						new Object[]{visitedNodes, result, packet});
 			}
 
 			return result;
@@ -146,8 +133,7 @@ public abstract class SMNonCachingAllNodes
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Presence packet found: {0}, selecting all nodes: {1}",
-						new Object[] { packet,
-						result });
+						new Object[]{packet, result});
 			}
 
 			return result;
@@ -156,17 +142,14 @@ public abstract class SMNonCachingAllNodes
 			List<JID> result = selectNodes(fromNode, visitedNodes);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Visited nodes null, selecting new node: {0}, for packet: {1}",
-						new Object[] { result,
-						packet });
+				log.log(Level.FINEST, "Visited nodes null, selecting new node: {0}, for packet: {1}",
+						new Object[]{result, packet});
 			}
 
 			return result;
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Packet not suitable for forwarding: {0}", new Object[] {
-						packet });
+				log.log(Level.FINEST, "Packet not suitable for forwarding: {0}", new Object[]{packet});
 			}
 
 			return null;
@@ -182,10 +165,7 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param jid
-	 *
-	 * 
 	 */
 	public List<JID> getNodesForUserConnect(JID jid) {
 		return getNodesConnected();
@@ -201,10 +181,7 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param jid
-	 *
-	 * 
 	 */
 	public List<JID> getNodesForUserDisconnect(JID jid) {
 		return getNodesConnected();
@@ -222,17 +199,15 @@ public abstract class SMNonCachingAllNodes
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
-	public void setProperties(Map<String, Object> props) {}
+	public void setProperties(Map<String, Object> props) {
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
-	 *
-	 * 
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
 
@@ -243,25 +218,22 @@ public abstract class SMNonCachingAllNodes
 
 		// Artur: Moved it to the front of the method for performance reasons.
 		// TODO: make sure it does not affect logic.
-		if ((packet.getPacketFrom() != null) &&!sm.getComponentId().equals(packet
-				.getPacketFrom())) {
+		if ((packet.getPacketFrom() != null) && !sm.getComponentId().equals(packet.getPacketFrom())) {
 			return false;
 		}
 
 		// This is for packet forwarding logic.
 		// Some packets are for certain not forwarded like packets without to
 		// attribute set.
-		if ((packet.getStanzaTo() == null) || sm.isLocalDomain(packet.getStanzaTo()
-				.toString(), false) || sm.getComponentId().equals((packet.getStanzaTo()
-				.getBareJID()))) {
+		if ((packet.getStanzaTo() == null) || sm.isLocalDomain(packet.getStanzaTo().toString(), false) ||
+				sm.getComponentId().equals((packet.getStanzaTo().getBareJID()))) {
 			return false;
 		}
 
 		// Also packets sent from the server to user are not being forwarded like
 		// service discovery perhaps?
-		if ((packet.getStanzaFrom() == null) || sm.isLocalDomain(packet.getStanzaFrom()
-				.toString(), false) || sm.getComponentId().equals((packet.getStanzaFrom()
-				.getBareJID()))) {
+		if ((packet.getStanzaFrom() == null) || sm.isLocalDomain(packet.getStanzaFrom().toString(), false) ||
+				sm.getComponentId().equals((packet.getStanzaFrom().getBareJID()))) {
 			return false;
 		}
 
@@ -280,12 +252,11 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * @param fromNode
 	 * @param visitedNodes
-	 * 
 	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
 		List<JID> cl_nodes_list = getNodesConnected();
-		int       size   = cl_nodes_list.size();
+		int size = cl_nodes_list.size();
 
 		if (size == 0) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -330,11 +301,10 @@ public abstract class SMNonCachingAllNodes
 			// If all nodes visited already. We have to either send it back to the
 			// first node
 			// or if this is the first node return null
-			if ((result == null) &&!sm.getComponentId().equals(fromNode)) {
+			if ((result == null) && !sm.getComponentId().equals(fromNode)) {
 				result = Collections.singletonList(fromNode);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"All nodes visited, sending it back to the first node: " + result);
+					log.log(Level.FINEST, "All nodes visited, sending it back to the first node: " + result);
 				}
 			}
 		}

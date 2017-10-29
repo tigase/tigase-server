@@ -21,8 +21,8 @@ package tigase.stats;
 
 /**
  * Describe class StatisticType here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Nov 23 21:20:20 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -38,13 +38,14 @@ public enum StatisticType {
 	OUT_QUEUE_OVERFLOW("OUT Queue overflow"),
 	OTHER(null);
 
-
 	private String description = null;
 
 	private StatisticType(String description) {
 		this.description = description;
 	}
 
-	public String getDescription() { return description; }
+	public String getDescription() {
+		return description;
+	}
 
 } // StatisticType

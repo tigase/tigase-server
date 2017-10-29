@@ -24,7 +24,8 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import javax.security.auth.callback.Callback;
 
-public class XMPPSessionCallback implements Callback, java.io.Serializable {
+public class XMPPSessionCallback
+		implements Callback, java.io.Serializable {
 
 	private final String prompt;
 	private XMPPResourceConnection session;

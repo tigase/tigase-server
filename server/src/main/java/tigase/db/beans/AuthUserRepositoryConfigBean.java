@@ -38,94 +38,37 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Configuration bean for authentication repository per domain
- * Created by andrzej on 09.03.2016.
+ * Configuration bean for authentication repository per domain Created by andrzej on 09.03.2016.
  */
-public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserRepositoryConfigBean<T,U>> extends MDPoolConfigBean<T,U> implements ConfigurationChangedAware, Initializable, UnregisterAware {
+public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserRepositoryConfigBean<T, U>>
+		extends MDPoolConfigBean<T, U>
+		implements ConfigurationChangedAware, Initializable, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger(AuthUserRepositoryConfigBean.class.getCanonicalName());
-
-	@Inject
-	private EventBus eventBus;
+	private DataSource dataSource;
 	@Inject
 	private DataSourceBean dataSourceBean;
 
 	@ConfigField(desc = "Name of data source to use", alias = "data-source")
 	private String dataSourceName;
-
-	private DataSource dataSource;
+	@Inject
+	private EventBus eventBus;
 	private String repositoryUri;
 
-	@Override
-	protected String getUri() {
-		return repositoryUri;
-	}
-
-	/**
-	 * Returns class name of a repository to initialize for domain
-	 * @return
-	 * @throws DBInitException
-	 */
-	@Override
-	protected String getRepositoryClassName() throws DBInitException {
-		if (cls != null)
-			return cls;
-		return RepositoryFactory.getRepoClassName(getRepositoryIfc(), repositoryUri);
-	}
-	
-	@Override
-	protected void initRepository(T repository) throws RepositoryException {
-		boolean initialized = false;
-		if (repository instanceof Repository) {
-			try {
-				Method m = repository.getClass().getDeclaredMethod("initRepository", String.class, Map.class);
-				if (m.getAnnotation(Deprecated.class) == null) {
-					log.log(Level.WARNING, "Class {0} is using deprecated initialization using method initRepository()", repository.getClass().getCanonicalName());
-					((Repository) repository).initRepository(getUri(), new HashMap<>());
-					initialized = true;
-				}
-			} catch (NoSuchMethodException|SecurityException ex) {
-				// ignoring exception
-			}
-		}
-		if (!initialized && repository instanceof DataSourceAware) {
-			((DataSourceAware) repository).setDataSource(dataSource);
-		}
-	}
-	
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		if (dataSourceBean != null) {
 			if (uri == null) {
 				repositoryUri = dataSourceName != null ? dataSourceName : name;
 				dataSource = dataSourceBean.getRepository(repositoryUri);
-				if (dataSource != null)
+				if (dataSource != null) {
 					repositoryUri = dataSource.getResourceUri();
+				}
 			} else {
 				repositoryUri = uri;
 			}
 		}
 		super.beanConfigurationChanged(changedFields);
-	}
-
-	/**
-	 * Returns class name of repository pool for domain
-	 * @return
-	 */
-	@Override
-	protected String getRepositoryPoolClassName() {
-		return null;
-	}
-
-	@HandleEvent
-	protected void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
-		if (!event.isCorrectSender(dataSourceBean))
-			return;
-
-		if (uri != null || (!event.getDomain().equals(name) && !event.getDomain().equals(dataSourceName)))
-			return;
-
-		beanConfigurationChanged(Collections.singleton("uri"));
 	}
 
 	@Override
@@ -137,5 +80,69 @@ public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserReposito
 	@Override
 	public void beforeUnregister() {
 		eventBus.unregisterAll(this);
+	}
+
+	@Override
+	protected String getUri() {
+		return repositoryUri;
+	}
+
+	/**
+	 * Returns class name of a repository to initialize for domain
+	 *
+	 * @return
+	 *
+	 * @throws DBInitException
+	 */
+	@Override
+	protected String getRepositoryClassName() throws DBInitException {
+		if (cls != null) {
+			return cls;
+		}
+		return RepositoryFactory.getRepoClassName(getRepositoryIfc(), repositoryUri);
+	}
+
+	@Override
+	protected void initRepository(T repository) throws RepositoryException {
+		boolean initialized = false;
+		if (repository instanceof Repository) {
+			try {
+				Method m = repository.getClass().getDeclaredMethod("initRepository", String.class, Map.class);
+				if (m.getAnnotation(Deprecated.class) == null) {
+					log.log(Level.WARNING, "Class {0} is using deprecated initialization using method initRepository()",
+							repository.getClass().getCanonicalName());
+					((Repository) repository).initRepository(getUri(), new HashMap<>());
+					initialized = true;
+				}
+			} catch (NoSuchMethodException | SecurityException ex) {
+				// ignoring exception
+			}
+		}
+		if (!initialized && repository instanceof DataSourceAware) {
+			((DataSourceAware) repository).setDataSource(dataSource);
+		}
+	}
+
+	/**
+	 * Returns class name of repository pool for domain
+	 *
+	 * @return
+	 */
+	@Override
+	protected String getRepositoryPoolClassName() {
+		return null;
+	}
+
+	@HandleEvent
+	protected void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
+		if (!event.isCorrectSender(dataSourceBean)) {
+			return;
+		}
+
+		if (uri != null || (!event.getDomain().equals(name) && !event.getDomain().equals(dataSourceName))) {
+			return;
+		}
+
+		beanConfigurationChanged(Collections.singleton("uri"));
 	}
 }

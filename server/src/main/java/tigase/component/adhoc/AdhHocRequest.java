@@ -71,7 +71,9 @@ public class AdhHocRequest {
 		return sender;
 	}
 
-	public JID getRecipient() { return iq.getStanzaTo(); }
+	public JID getRecipient() {
+		return iq.getStanzaTo();
+	}
 
 	public String getSessionId() {
 		return sessionId;

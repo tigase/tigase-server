@@ -18,73 +18,60 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.server.Packet;
-
-import tigase.xmpp.Authorization;
+import tigase.xmpp.*;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
+
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Queue;
-
 /**
  * Describe class PacketDefaultHandler here.
- *
- *
+ * <p>
+ * <p>
  * Created: Fri Feb 2 15:08:58 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class PacketDefaultHandler {
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(PacketDefaultHandler.class
-			.getName());
+	private static final Logger log = Logger.getLogger(PacketDefaultHandler.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	// private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
 	// private RosterAbstract roster_util =
 	// RosterFactory.getRosterImplementation(true);
-	private String[]     IGNORE_PACKETS  = { "stream:features" };
-	private StanzaType[] IGNORE_TYPES    = { StanzaType.error };
+	private String[] IGNORE_PACKETS = {"stream:features"};
+	private StanzaType[] IGNORE_TYPES = {StanzaType.error};
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>PacketDefaultHandler</code> instance.
-	 *
 	 */
-	public PacketDefaultHandler() {}
+	public PacketDefaultHandler() {
+	}
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param session
-	 *
-	 *
 	 */
 	public boolean canHandle(Packet packet, XMPPResourceConnection session) {
 		if (session == null) {
@@ -114,16 +101,13 @@ public class PacketDefaultHandler {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
-	 *
-	 *
 	 */
-	public boolean forward(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results) {
+	public boolean forward(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+						   final Queue<Packet> results) {
 
 		// Processing of the packets which needs to be processed as quickly
 		// as possible, direct presences from unsubscribed entities apparently
@@ -144,16 +128,13 @@ public class PacketDefaultHandler {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
-	 *
-	 *
 	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results) {
+							  final NonAuthUserRepository repo, final Queue<Packet> results) {
 		if (session != null) {
 			session.incPacketsCounter();
 
@@ -164,8 +145,7 @@ public class PacketDefaultHandler {
 			}
 		}
 		for (int i = 0; i < IGNORE_PACKETS.length; i++) {
-			if ((packet.getElemName() == IGNORE_PACKETS[i]) && (packet.getType() ==
-					IGNORE_TYPES[i])) {
+			if ((packet.getElemName() == IGNORE_PACKETS[i]) && (packet.getType() == IGNORE_TYPES[i])) {
 				return true;
 			}
 		}
@@ -176,18 +156,15 @@ public class PacketDefaultHandler {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 *
-	 *
 	 * @throws XMPPException
 	 */
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results)
-					throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results) throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet.toStringSecure());
 		}
@@ -197,14 +174,13 @@ public class PacketDefaultHandler {
 
 			// If this is simple <iq type="result"/> then ignore it
 			// and consider it OK
-			if ((to == null) && (packet.getElemName() == "iq") && (packet.getType() ==
-					StanzaType.result)) {
+			if ((to == null) && (packet.getElemName() == "iq") && (packet.getType() == StanzaType.result)) {
 
 				// Nothing to do....
 				return;
 			}
-			if (session.isUserId(to.getBareJID()) && (from == null || !session.isUserId(from.getBareJID()) 
-					|| !session.getConnectionId().equals(packet.getPacketFrom()))) {
+			if (session.isUserId(to.getBareJID()) && (from == null || !session.isUserId(from.getBareJID()) ||
+					!session.getConnectionId().equals(packet.getPacketFrom()))) {
 
 				// Yes this is message to 'this' client
 				Packet result;
@@ -219,14 +195,14 @@ public class PacketDefaultHandler {
 
 					// In default packet handler we deliver packets to a specific resource only
 					result = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-							"The feature is not supported yet.", true);
+																					  "The feature is not supported yet.",
+																					  true);
 					result.setPacketFrom(null);
 					result.setPacketTo(null);
 				} else {
 
 					// Otherwise only to the given resource or sent back as error.
-					XMPPResourceConnection con = session.getParentSession().getResourceForResource(
-							resource);
+					XMPPResourceConnection con = session.getParentSession().getResourceForResource(resource);
 
 					if (con != null) {
 						result = packet.copyElementOnly();
@@ -237,12 +213,12 @@ public class PacketDefaultHandler {
 						result.setPacketFrom(packet.getTo());
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Delivering message, packet: {0}, to session: {1}",
-									new Object[] { packet,
-									con });
+									new Object[]{packet, con});
 						}
 					} else {
 						result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-								"The recipient is no longer available.", true);
+																						"The recipient is no longer available.",
+																						true);
 						result.setPacketFrom(null);
 						result.setPacketTo(null);
 					}
@@ -263,8 +239,9 @@ public class PacketDefaultHandler {
 			}
 		} catch (NotAuthorizedException e) {
 			try {
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You must authorize session first.", true));
+				results.offer(
+						Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.",
+																		true));
 				log.log(Level.FINE, "NotAuthorizedException for packet: {0}", packet.toString());
 			} catch (PacketErrorTypeException e2) {
 				log.log(Level.FINE, "Packet processing exception: {0}", e2);
@@ -272,6 +249,5 @@ public class PacketDefaultHandler {
 		}    // end of try-catch
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/05/24

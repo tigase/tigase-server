@@ -18,10 +18,10 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
 package tigase.cluster.repo;
 
 public interface ClusterRepoConstants {
+
 	public static final String CPU_USAGE_COLUMN = "cpu_usage";
 
 	public static final String HOSTNAME_COLUMN = "hostname";

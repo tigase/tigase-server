@@ -1,4 +1,3 @@
-
 /*
  * StatisticsArchivizerIfc.java
  *
@@ -35,7 +34,7 @@ public interface StatisticsArchivizerIfc {
 	long getFrequency();
 
 	void execute(StatisticsProvider sp);
-	
+
 	void release();
 }
 

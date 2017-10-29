@@ -32,16 +32,11 @@ import javax.security.sasl.SaslException;
 import java.util.Map;
 
 /**
- * SASL-PLAIN mechanism.
- * <br>
- * Called {@linkplain Callback callbacks} in order:
- * <ul>
- * <li>{@link NameCallback}</li>
- * <li>{@link VerifyPasswordCallback}</li>
- * <li>{@link AuthorizeCallback}</li>
- * </ul>
+ * SASL-PLAIN mechanism. <br> Called {@linkplain Callback callbacks} in order: <ul> <li>{@link NameCallback}</li>
+ * <li>{@link VerifyPasswordCallback}</li> <li>{@link AuthorizeCallback}</li> </ul>
  */
-public class SaslPLAIN extends AbstractSasl {
+public class SaslPLAIN
+		extends AbstractSasl {
 
 	private static final String MECHANISM = "PLAIN";
 
@@ -54,27 +49,33 @@ public class SaslPLAIN extends AbstractSasl {
 
 		String[] data = split(response, "");
 
-		if (data.length != 3)
+		if (data.length != 3) {
 			throw new XmppSaslException(SaslError.malformed_request, "Invalid number of message parts");
+		}
 
 		final String authzid = data[0];
 		final String authcid = data[1];
 		final String passwd = data[2];
 
-		if (authcid.length() < 1)
+		if (authcid.length() < 1) {
 			throw new XmppSaslException(SaslError.malformed_request, "Authentication identity string is empty");
+		}
 
-		if (authcid.length() > 255)
+		if (authcid.length() > 255) {
 			throw new XmppSaslException(SaslError.malformed_request, "Authentication identity string is too long");
+		}
 
-		if (!isEmpty(authzid) && authzid.length() > 255)
+		if (!isEmpty(authzid) && authzid.length() > 255) {
 			throw new XmppSaslException(SaslError.malformed_request, "Authorization identity string is too long");
+		}
 
-		if (passwd.length() > 255)
+		if (passwd.length() > 255) {
 			throw new XmppSaslException(SaslError.malformed_request, "Password string is too long");
+		}
 
 		final NameCallback nc = new NameCallback("Authentication identity", authcid);
-		final AuthorizationIdCallback ai = new AuthorizationIdCallback("Authorization identity", isEmpty(authzid) ? null : authzid);
+		final AuthorizationIdCallback ai = new AuthorizationIdCallback("Authorization identity",
+																	   isEmpty(authzid) ? null : authzid);
 		final VerifyPasswordCallback vpc = new VerifyPasswordCallback(passwd);
 
 		handleCallbacks(nc, ai, vpc);
@@ -91,8 +92,8 @@ public class SaslPLAIN extends AbstractSasl {
 		if (ac.isAuthorized() == true) {
 			authorizedId = ac.getAuthorizedID();
 		} else {
-			throw new XmppSaslException(SaslError.invalid_authzid, "PLAIN: " + authcid + " is not authorized to act as "
-					+ authorizationJID);
+			throw new XmppSaslException(SaslError.invalid_authzid,
+										"PLAIN: " + authcid + " is not authorized to act as " + authorizationJID);
 		}
 
 		complete = true;

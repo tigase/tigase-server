@@ -43,13 +43,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Bean(name = EventReceiverModule.ID, active = true)
-public class EventReceiverModule extends AbstractEventBusModule {
+public class EventReceiverModule
+		extends AbstractEventBusModule {
 
-	private static final Logger log = Logger.getLogger(EventReceiverModule.class.getCanonicalName());
-	
 	public final static String ID = "receiver";
-	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "message", "event" },
-			new String[] { null, "http://jabber.org/protocol/pubsub#event" });
+	private static final Logger log = Logger.getLogger(EventReceiverModule.class.getCanonicalName());
+	private static final Criteria CRIT = new ElemPathCriteria(new String[]{"message", "event"}, new String[]{null,
+																											 "http://jabber.org/protocol/pubsub#event"});
 	@Inject
 	private AffiliationStore affiliationStore;
 
@@ -58,33 +58,9 @@ public class EventReceiverModule extends AbstractEventBusModule {
 
 	@Inject(nullAllowed = false, bean = "localEventBus")
 	private EventBusImplementation localEventBus;
-
+	private EventBusSerializer serializer = new EventBusSerializer();
 	@Inject
 	private SubscriptionStore subscriptionStore;
-	private EventBusSerializer serializer = new EventBusSerializer();
-
-	private void fireEventLocally(final EventName name, final Element event) {
-		Object obj = serializer.deserialize(event);
-		if (obj == null)
-			obj = event;
-		else {
-			boolean ready = true;
-			Collection<EventRoutedTransientFiller> fillers = localEventBus.getEventRoutedTransientFillers(obj.getClass());
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for event = {0}, found following fillers: {1}", new Object[]{name, fillers});
-			}
-			if (fillers != null) {
-				for (EventRoutedTransientFiller f : fillers) {
-					ready &= f.fillEvent(obj);
-				}
-			}
-			if (!ready)
-				return;
-		}
-
-		localEventBus.fire(obj, this, true);
-
-	}
 
 	@Override
 	public String[] getFeatures() {
@@ -99,48 +75,79 @@ public class EventReceiverModule extends AbstractEventBusModule {
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
 		final Affiliation affiliation = affiliationStore.getAffiliation(packet.getStanzaFrom());
-		if (!affiliation.isPublishItem())
+		if (!affiliation.isPublishItem()) {
 			throw new ComponentException(Authorization.FORBIDDEN);
+		}
 
 		final String type = packet.getElement().getAttributeStaticStr("type");
 
 		if (type != null && type.equals("error")) {
-			if (log.isLoggable(Level.FINE))
+			if (log.isLoggable(Level.FINE)) {
 				log.fine("Ignoring error message! " + packet);
+			}
 			return;
 		}
 
-		if (log.isLoggable(Level.FINER))
+		if (log.isLoggable(Level.FINER)) {
 			log.finer("Received event stanza: " + packet.toStringFull());
+		}
 
 		Element eventElem = packet.getElement().getChild("event", "http://jabber.org/protocol/pubsub#event");
 		Element itemsElem = eventElem.getChild("items");
 
 		for (Element item : itemsElem.getChildren()) {
-			if (!"item".equals(item.getName()))
+			if (!"item".equals(item.getName())) {
 				continue;
+			}
 			for (Element event : item.getChildren()) {
 				EventName eventName = new EventName(event.getName());
 
 				event.setAttribute("remote", "true");
 
-				if (log.isLoggable(Level.FINER))
+				if (log.isLoggable(Level.FINER)) {
 					log.finer("Received event " + eventName + ": " + event);
+				}
 
 				fireEventLocally(eventName, event);
 
 				// forwarding event to _non cluster_ subscribers.
-				final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(eventName.getPackage(), eventName.getName()
-				);
+				final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(
+						eventName.getPackage(), eventName.getName());
 				Iterator<Subscription> it = subscribers.iterator();
 				while (it.hasNext()) {
 					Subscription subscription = it.next();
-					if (subscription.isInClusterSubscription())
+					if (subscription.isInClusterSubscription()) {
 						it.remove();
+					}
 				}
 				eventPublisherModule.publishEvent(eventName.getPackage(), eventName.getName(), event, subscribers);
 			}
 		}
+
+	}
+
+	private void fireEventLocally(final EventName name, final Element event) {
+		Object obj = serializer.deserialize(event);
+		if (obj == null) {
+			obj = event;
+		} else {
+			boolean ready = true;
+			Collection<EventRoutedTransientFiller> fillers = localEventBus.getEventRoutedTransientFillers(
+					obj.getClass());
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event = {0}, found following fillers: {1}", new Object[]{name, fillers});
+			}
+			if (fillers != null) {
+				for (EventRoutedTransientFiller f : fillers) {
+					ready &= f.fillEvent(obj);
+				}
+			}
+			if (!ready) {
+				return;
+			}
+		}
+
+		localEventBus.fire(obj, this, true);
 
 	}
 

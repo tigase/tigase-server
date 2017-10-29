@@ -33,22 +33,17 @@ import java.util.Map;
 
 /**
  * Class description
- *
- *
  */
 @Bean(name = "adHocCommandManager", active = true)
 public class AdHocCommandManager {
 
+	private final Map<String, AdHocCommand> commands = new HashMap<String, AdHocCommand>();
+	private final SimpleCache<String, AdHocSession> sessions = new SimpleCache<String, AdHocSession>(100, 10 * 1000);
 	@Inject(nullAllowed = true)
 	private AdHocCommand[] allCommands;
 
-	private final Map<String, AdHocCommand> commands = new HashMap<String, AdHocCommand>();
-
-	private final SimpleCache<String, AdHocSession> sessions = new SimpleCache<String, AdHocSession>(100, 10 * 1000);
-
 	/**
 	 * Method description
-	 *
 	 *
 	 * @return
 	 */
@@ -56,15 +51,25 @@ public class AdHocCommandManager {
 		return this.commands.values();
 	}
 
+	public void setAllCommands(AdHocCommand[] allCommands) {
+		this.allCommands = allCommands;
+		this.commands.clear();
+		if (allCommands != null) {
+			for (AdHocCommand adHocCommand : allCommands) {
+				this.commands.put(adHocCommand.getNode(), adHocCommand);
+			}
+		}
+	}
+
 	public AdHocCommand getCommand(String nodeName) {
 		return this.commands.get(nodeName);
 	}
 
 	/**
-	 * Method checks if exists implementation for this command in this
-	 * CommandManager
+	 * Method checks if exists implementation for this command in this CommandManager
 	 *
 	 * @param node
+	 *
 	 * @return true - if command exists for this node
 	 */
 	public boolean hasCommand(String node) {
@@ -74,7 +79,6 @@ public class AdHocCommandManager {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param packet
 	 *
 	 * @return
@@ -83,8 +87,7 @@ public class AdHocCommandManager {
 	 */
 	public Packet process(Packet packet) throws AdHocCommandException {
 		final Element element = packet.getElement();
-		@SuppressWarnings("unused")
-		final JID senderJid = packet.getStanzaFrom();
+		@SuppressWarnings("unused") final JID senderJid = packet.getStanzaFrom();
 		final Element command = element.getChild("command", "http://jabber.org/protocol/commands");
 		final String node = command.getAttributeStaticStr("node");
 		final String action = command.getAttributeStaticStr("action");
@@ -100,23 +103,23 @@ public class AdHocCommandManager {
 	}
 
 	public Packet process(Packet packet, Element commandElement, String node, String action, String sessionId,
-			AdHocCommand adHocCommand) throws AdHocCommandException {
+						  AdHocCommand adHocCommand) throws AdHocCommandException {
 		State currentState = null;
 		final AdhHocRequest request = new AdhHocRequest(packet, commandElement, node, packet.getStanzaFrom(), action,
-				sessionId);
+														sessionId);
 		final AdHocResponse response = new AdHocResponse(sessionId, currentState);
 		final AdHocSession session = (sessionId == null) ? new AdHocSession() : this.sessions.get(sessionId);
 
 		adHocCommand.execute(request, response);
 
-		Element commandResult = new Element("command", new String[] { "xmlns", "node", },
-				new String[] { "http://jabber.org/protocol/commands", node });
+		Element commandResult = new Element("command", new String[]{"xmlns", "node",},
+											new String[]{"http://jabber.org/protocol/commands", node});
 
 		commandResult.addAttribute("status", response.getNewState().name());
 		if ((response.getCurrentState() == null) && (response.getNewState() == State.executing)) {
 			this.sessions.put(response.getSessionid(), session);
-		} else if ((response.getSessionid() != null)
-				&& ((response.getNewState() == State.canceled) || (response.getNewState() == State.completed))) {
+		} else if ((response.getSessionid() != null) &&
+				((response.getNewState() == State.canceled) || (response.getNewState() == State.completed))) {
 			this.sessions.remove(response.getSessionid());
 		}
 		if (response.getSessionid() != null) {
@@ -132,20 +135,11 @@ public class AdHocCommandManager {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param command
 	 */
 	public void registerCommand(AdHocCommand command) {
-		if (!this.commands.containsKey(command.getNode()))
+		if (!this.commands.containsKey(command.getNode())) {
 			this.commands.put(command.getNode(), command);
-	}
-
-	public void setAllCommands(AdHocCommand[] allCommands) {
-		this.allCommands = allCommands;
-		this.commands.clear();
-		if (allCommands != null)
-			for (AdHocCommand adHocCommand : allCommands) {
-				this.commands.put(adHocCommand.getNode(), adHocCommand);
-			}
+		}
 	}
 }

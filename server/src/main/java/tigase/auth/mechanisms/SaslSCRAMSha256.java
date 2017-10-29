@@ -47,7 +47,7 @@ public class SaslSCRAMSha256
 				break;
 			case tls_server_end_point:
 			case tls_unique:
-				throw new SaslException("Invalid request for "+NAME);
+				throw new SaslException("Invalid request for " + NAME);
 		}
 	}
 

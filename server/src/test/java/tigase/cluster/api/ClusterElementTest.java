@@ -29,38 +29,34 @@ package tigase.cluster.api;
 //~--- non-JDK imports --------------------------------------------------------
 
 import junit.framework.TestCase;
-
 import org.junit.Test;
-
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 
 /**
- *
  * @author andrzej
  */
 public class ClusterElementTest
-				extends TestCase {
+		extends TestCase {
+
 	/**
 	 * Method description
-	 *
 	 */
 	@Test
 	@SuppressWarnings("deprecation")
 	public void testGetMethodName() {
-		SimpleParser parser       = new SimpleParser();
+		SimpleParser parser = new SimpleParser();
 		DomBuilderHandler handler = new DomBuilderHandler();
-		char[] data               =
-			"<cluster to=\"sess-man@blue\" type=\"set\" id=\"cl-6627\" xmlns=\"tigase:cluster\" from=\"sess-man@green\"><control><visited-nodes><node-id>sess-man@green</node-id></visited-nodes><method-call name=\"packet-forward-sm-cmd\"/><first-node>sess-man@green</first-node></control><data><presence to=\"test2@test\" xmlns=\"jabber:client\" from=\"test1@test/test\"><status/><priority>5</priority></presence></data></cluster>".toCharArray();
+		char[] data = "<cluster to=\"sess-man@blue\" type=\"set\" id=\"cl-6627\" xmlns=\"tigase:cluster\" from=\"sess-man@green\"><control><visited-nodes><node-id>sess-man@green</node-id></visited-nodes><method-call name=\"packet-forward-sm-cmd\"/><first-node>sess-man@green</first-node></control><data><presence to=\"test2@test\" xmlns=\"jabber:client\" from=\"test1@test/test\"><status/><priority>5</priority></presence></data></cluster>"
+				.toCharArray();
 
 		parser.parse(handler, data, 0, data.length);
 
 		Element elem = handler.getParsedElements().poll();
 
-		assertEquals(
-				"packet-forward-sm-cmd",
-				elem.findChild("/cluster/control/method-call").getAttributeStaticStr("name"));
+		assertEquals("packet-forward-sm-cmd",
+					 elem.findChild("/cluster/control/method-call").getAttributeStaticStr("name"));
 
 //  assertEquals("cluster/control/method-call".split("/"),
 //               ClusterElement.CLUSTER_METHOD_PATH);
@@ -69,6 +65,5 @@ public class ClusterElementTest
 		assertEquals("packet-forward-sm-cmd", clElem.getMethodName());
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/20

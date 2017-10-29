@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Bean(name = "credentialDecoders", parent = AuthRepositoryMDPoolBean.AuthRepositoryConfigBean.class, active = true)
-public class CredentialsDecoderBean implements RegistrarBean {
+public class CredentialsDecoderBean
+		implements RegistrarBean {
 
 	@Inject
 	private List<Credentials.Decoder> decoders;
@@ -53,7 +54,7 @@ public class CredentialsDecoderBean implements RegistrarBean {
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override

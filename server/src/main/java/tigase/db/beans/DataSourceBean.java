@@ -49,33 +49,34 @@ import java.util.logging.Logger;
 import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
 
 /**
- * This is main bean responsible for managing and initialization of data sources.
- * Created by andrzej on 09.03.2016.
+ * This is main bean responsible for managing and initialization of data sources. Created by andrzej on 09.03.2016.
  */
-@Bean(name="dataSource", parent = Kernel.class, active = true, exportable = true)
+@Bean(name = "dataSource", parent = Kernel.class, active = true, exportable = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})
-public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBean> implements
-																				   ComponentStatisticsProvider {
+public class DataSourceBean
+		extends MDPoolBean<DataSource, DataSourceMDConfigBean>
+		implements ComponentStatisticsProvider {
 
 	private static final Logger log = Logger.getLogger(DataSourceBean.class.getCanonicalName());
 
 	private final Map<String, DataSource> repositories = new ConcurrentHashMap<>();
-
+	@Inject
+	private EventBus eventBus;
 	private ScheduledExecutorService executorService = null;
 	private int watchdogs = 0;
 
-	@Inject
-	private EventBus eventBus;
-
 	/**
 	 * Retrieves data source for provided name
+	 *
 	 * @param name of data source to retrieve
+	 *
 	 * @return instance of data source for name or default instance of data source
 	 */
 	public DataSource getRepository(String name) {
-		if (name == null)
+		if (name == null) {
 			return repositories.get("default");
+		}
 		return repositories.get(name);
 	}
 
@@ -86,6 +87,7 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 
 	/**
 	 * Add data source instance to the pool
+	 *
 	 * @param domain name of data source
 	 * @param repo instance of data source
 	 */
@@ -97,7 +99,9 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 
 	/**
 	 * Remove data source from the pool
+	 *
 	 * @param domain name of data source
+	 *
 	 * @return removed instance of data source
 	 */
 	@Override
@@ -109,12 +113,13 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 
 	/**
 	 * Retrieve list of all available data source names
+	 *
 	 * @return list of names
 	 */
 	public Set<String> getDataSourceNames() {
 		return Collections.unmodifiableSet(repositories.keySet());
 	}
-	
+
 	@Override
 	public void setDefault(DataSource repo) {
 		// here we do nothing
@@ -139,7 +144,7 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 	public void everySecond() {
 
 	}
-	
+
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
 		String name = getName();
@@ -148,11 +153,6 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 				.stream()
 				.filter(e -> e.getValue() instanceof StatisticsProviderIfc)
 				.forEach(e -> ((StatisticsProviderIfc) e.getValue()).getStatistics(name + "/" + e.getKey(), list));
-	}
-
-	private void fire(Object event) {
-		if (eventBus != null)
-			eventBus.fire(event);
 	}
 
 	@Override
@@ -169,7 +169,8 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 				}
 			}
 			watchdogs++;
-			return executorService.scheduleAtFixedRate(task, frequency.toMillis(), frequency.toMillis(), TimeUnit.MILLISECONDS);
+			return executorService.scheduleAtFixedRate(task, frequency.toMillis(), frequency.toMillis(),
+													   TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -187,6 +188,71 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 		}
 	}
 
+	private void fire(Object event) {
+		if (eventBus != null) {
+			eventBus.fire(event);
+		}
+	}
+
+	/**
+	 * Event emitted by {@link tigase.db.beans.DataSourceBean} using {@link tigase.eventbus.EventBus} when instance of
+	 * {@link tigase.db.DataSource} for some name changes.
+	 */
+	public static class DataSourceChangedEvent {
+
+		private final DataSourceBean bean;
+		private final String domain;
+		private final DataSource newDataSource;
+		private final DataSource oldDataSource;
+
+		public DataSourceChangedEvent(DataSourceBean bean, String domain, DataSource newDataSource,
+									  DataSource oldDataSource) {
+			this.bean = bean;
+			this.domain = domain;
+			this.newDataSource = newDataSource;
+			this.oldDataSource = oldDataSource;
+		}
+
+		/**
+		 * Check if event was emitted by provided instance of <code>DataSourceBean</code>
+		 *
+		 * @param bean
+		 *
+		 * @return
+		 */
+		public boolean isCorrectSender(DataSourceBean bean) {
+			return this.bean == bean;
+		}
+
+		/**
+		 * Get name for which data source instance was changed
+		 *
+		 * @return
+		 */
+		public String getDomain() {
+			return domain;
+		}
+
+		/**
+		 * Get old instance of data source
+		 *
+		 * @return
+		 */
+		public DataSource getOldDataSource() {
+			return oldDataSource;
+		}
+
+		/**
+		 * Get new instance of data source
+		 *
+		 * @return
+		 */
+		public DataSource getNewDataSource() {
+			return newDataSource;
+		}
+
+	}
+
 	public static class DataSourceMDConfigBean
 			extends MDPoolConfigBean<DataSource, DataSourceMDConfigBean>
 			implements UnregisterAware {
@@ -195,39 +261,6 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 
 		@ConfigField(desc = "Watchdog data source frequency", alias = "watchdog-frequency")
 		private Duration watchdogFrequency = Duration.ofHours(1);
-
-		/**
-		 * Get interface to which all instances in this pool must conform.
-		 * @return interface 
-		 */
-		@Override
-		protected Class<? extends DataSource> getRepositoryIfc() {
-			return DataSource.class;
-		}
-
-		/**
-		 * Finds and retrieves repository pool class name for data source defined in this config bean.
-		 * <br/>
-		 * Name of a pool class will be retrieved from <code>poolCls</code> field or looked for
-		 * instances of <code>DataSourcePool</code> class annotated with {@link tigase.db.Repository.Meta}
-		 * which supported uri matches (regexp) of data source URI.
-		 *
-		 * @return name of a class
-		 * @throws DBInitException
-		 */
-		@Override
-		protected String getRepositoryPoolClassName() throws DBInitException {
-			if (poolCls != null)
-				return poolCls;
-
-			Class<? extends DataSourcePool> poolClass = null;
-			try {
-				poolClass = DataSourceHelper.getDefaultClass(DataSourcePool.class, uri);
-			} catch (DBInitException ex) {
-				// ok, no problem - it maybe a data source without a pool
-			}
-			return poolClass == null ? null : poolClass.getCanonicalName();
-		}
 
 		public void setWatchdogFrequency(Duration watchdogFrequency) {
 			this.watchdogFrequency = watchdogFrequency;
@@ -240,16 +273,6 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 			updateWatchdogTask();
 		}
 
-		/**
-		 * Initializes instances of provided data source.
-		 * @param repo instance of data source
-		 * @throws RepositoryException
-		 */
-		@Override
-		protected void initRepository(DataSource repo) throws RepositoryException {
-			repo.initialize(getUri());
-		}
-
 		@Override
 		public void beforeUnregister() {
 			if (future != null) {
@@ -260,6 +283,53 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 					((DataSourceBean) mdPool).removeWatchdogTask(future);
 				}
 			}
+		}
+
+		/**
+		 * Get interface to which all instances in this pool must conform.
+		 *
+		 * @return interface
+		 */
+		@Override
+		protected Class<? extends DataSource> getRepositoryIfc() {
+			return DataSource.class;
+		}
+
+		/**
+		 * Finds and retrieves repository pool class name for data source defined in this config bean. <br/> Name of a
+		 * pool class will be retrieved from <code>poolCls</code> field or looked for instances of
+		 * <code>DataSourcePool</code> class annotated with {@link tigase.db.Repository.Meta} which supported uri
+		 * matches (regexp) of data source URI.
+		 *
+		 * @return name of a class
+		 *
+		 * @throws DBInitException
+		 */
+		@Override
+		protected String getRepositoryPoolClassName() throws DBInitException {
+			if (poolCls != null) {
+				return poolCls;
+			}
+
+			Class<? extends DataSourcePool> poolClass = null;
+			try {
+				poolClass = DataSourceHelper.getDefaultClass(DataSourcePool.class, uri);
+			} catch (DBInitException ex) {
+				// ok, no problem - it maybe a data source without a pool
+			}
+			return poolClass == null ? null : poolClass.getCanonicalName();
+		}
+
+		/**
+		 * Initializes instances of provided data source.
+		 *
+		 * @param repo instance of data source
+		 *
+		 * @throws RepositoryException
+		 */
+		@Override
+		protected void initRepository(DataSource repo) throws RepositoryException {
+			repo.initialize(getUri());
 		}
 
 		private void executeWatchdog() {
@@ -288,58 +358,5 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 				}
 			}
 		}
-	}
-
-	/**
-	 * Event emitted by {@link tigase.db.beans.DataSourceBean} using {@link tigase.eventbus.EventBus}
-	 * when instance of {@link tigase.db.DataSource} for some name changes.
-	 */
-	public static class DataSourceChangedEvent {
-
-		private final DataSourceBean bean;
-		private final String domain;
-		private final DataSource newDataSource;
-		private final DataSource oldDataSource;
-
-		public DataSourceChangedEvent(DataSourceBean bean, String domain, DataSource newDataSource, DataSource oldDataSource) {
-			this.bean = bean;
-			this.domain = domain;
-			this.newDataSource = newDataSource;
-			this.oldDataSource = oldDataSource;
-		}
-
-		/**
-		 * Check if event was emitted by provided instance of <code>DataSourceBean</code>
-		 * @param bean
-		 * @return
-		 */
-		public boolean isCorrectSender(DataSourceBean bean) {
-			return this.bean == bean;
-		}
-
-		/**
-		 * Get name for which data source instance was changed
-		 * @return
-		 */
-		public String getDomain() {
-			return domain;
-		}
-
-		/**
-		 * Get old instance of data source
-		 * @return
-		 */
-		public DataSource getOldDataSource() {
-			return oldDataSource;
-		}
-
-		/**
-		 * Get new instance of data source
-		 * @return
-		 */
-		public DataSource getNewDataSource() {
-			return newDataSource;
-		}
-
 	}
 }

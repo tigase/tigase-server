@@ -33,6 +33,7 @@ import tigase.xmpp.jid.BareJID;
  * @version $Rev$
  */
 public abstract class CompRepoDefaults {
+
 	private static final BareJID comp_user = BareJID.bareJIDInstanceNS("ext-comp-manager");
 	private static final String comp_list_pkey = "ext-comp-lists";
 
@@ -40,9 +41,6 @@ public abstract class CompRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String getConfigKey() {
 		return "comp-items";
@@ -50,19 +48,13 @@ public abstract class CompRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String[] getDefaultPropetyItems() {
-		return new String[] { "muc.domain.tld:passwd:listen:5277:accept" };
+		return new String[]{"muc.domain.tld:passwd:listen:5277:accept"};
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static CompRepoItem getItemInstance() {
 		return new CompRepoItem();
@@ -70,9 +62,6 @@ public abstract class CompRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String getItemsListPKey() {
 		return comp_list_pkey;
@@ -80,9 +69,6 @@ public abstract class CompRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String getPropertyKey() {
 		return "--external";
@@ -90,17 +76,12 @@ public abstract class CompRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static BareJID getRepoUser() {
 		return comp_user;
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

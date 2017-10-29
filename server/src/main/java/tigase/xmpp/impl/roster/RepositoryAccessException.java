@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -27,11 +25,11 @@ package tigase.xmpp.impl.roster;
 import tigase.xmpp.XMPPException;
 
 /**
- *
  * @author kobit
  */
 public class RepositoryAccessException
-				extends XMPPException {
+		extends XMPPException {
+
 	private static final long serialVersionUID = 1L;
 
 	//~--- constructors ---------------------------------------------------------
@@ -48,7 +46,6 @@ public class RepositoryAccessException
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param message
 	 * @param cause
 	 */
@@ -56,6 +53,5 @@ public class RepositoryAccessException
 		super(message, cause);
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/27

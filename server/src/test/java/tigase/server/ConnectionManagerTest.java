@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  * Created by andrzej on 20.01.2017.
  */
 public class ConnectionManagerTest {
-	
+
 	@Test
 	public void test_watchDog_timeout_whitespace() throws Exception {
 		test_watchDogStop(ConnectionManager.WATCHDOG_PING_TYPE.WHITESPACE, Type.timeout, false);
@@ -81,16 +81,6 @@ public class ConnectionManagerTest {
 			}
 
 			@Override
-			protected long getMaxInactiveTime() {
-				return 3 * MINUTE;
-			}
-
-			@Override
-			protected XMPPIOService<?> getXMPPIOServiceInstance() {
-				return null;
-			}
-
-			@Override
 			public void xmppStreamClosed(XMPPIOService serv) {
 
 			}
@@ -114,8 +104,18 @@ public class ConnectionManagerTest {
 			public void tlsHandshakeCompleted(IOService service) {
 
 			}
+
+			@Override
+			protected long getMaxInactiveTime() {
+				return 3 * MINUTE;
+			}
+
+			@Override
+			protected XMPPIOService<?> getXMPPIOServiceInstance() {
+				return null;
+			}
 		};
-		
+
 		Field f = ConnectionManager.class.getDeclaredField("watchdogPingType");
 		f.setAccessible(true);
 		f.set(connectionManager, pingType);
@@ -125,7 +125,7 @@ public class ConnectionManagerTest {
 		f = ConnectionManager.class.getDeclaredField("watchdogTimeout");
 		f.setAccessible(true);
 		f.set(connectionManager, -1);
-		
+
 		return connectionManager;
 
 	}
@@ -144,7 +144,8 @@ public class ConnectionManagerTest {
 		};
 	}
 
-	protected XMPPIOService registerService(ConnectionManager connectionManager, boolean waitingToSend) throws Exception {
+	protected XMPPIOService registerService(ConnectionManager connectionManager, boolean waitingToSend)
+			throws Exception {
 
 		XMPPIOService service = getXMPPIOServiceInstance();
 		assertNotNull(service);
@@ -259,7 +260,8 @@ public class ConnectionManagerTest {
 		return service;
 	}
 
-	protected void test_watchDogStop(ConnectionManager.WATCHDOG_PING_TYPE pingType, Type testType, boolean waitingToSend) throws Exception {
+	protected void test_watchDogStop(ConnectionManager.WATCHDOG_PING_TYPE pingType, Type testType,
+									 boolean waitingToSend) throws Exception {
 		ConnectionManager connectionManager = newConnectionManager(pingType);
 
 		XMPPIOService service = registerService(connectionManager, waitingToSend);

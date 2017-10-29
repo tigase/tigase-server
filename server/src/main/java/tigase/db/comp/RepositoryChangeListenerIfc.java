@@ -20,13 +20,12 @@
 package tigase.db.comp;
 
 /**
- * @author Artur Hefczyc
- * Created May 23, 2011
+ * @author Artur Hefczyc Created May 23, 2011
  */
 public interface RepositoryChangeListenerIfc<Item extends RepositoryItem> {
 
 	void itemAdded(Item item);
-	
+
 	void itemUpdated(Item item);
 
 	void itemRemoved(Item item);

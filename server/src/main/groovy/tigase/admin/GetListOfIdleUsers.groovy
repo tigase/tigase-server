@@ -27,9 +27,14 @@
  AS:Group: Statistics
  */
 package tigase.admin
-import tigase.server.*
-import tigase.db.*
-import tigase.vhosts.*
+
+import tigase.db.AuthRepository
+import tigase.db.TigaseDBException
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
 def SECOND = 1000;
@@ -38,12 +43,12 @@ def JID = "domainjid"
 def MAX_ITEMS = "max_items"
 def TIME_BEFORE_IDLE = 5 * MINUTE;
 
-def p = (Packet)packet
-def auth_repo = (AuthRepository)authRepository
-def user_repo = (UserRepository)userRepository
-def users_sessions = (Map)userSessions
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
+def users_sessions = (Map) userSessions
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 def domainJid = Command.getFieldValue(packet, JID);
@@ -53,32 +58,34 @@ if (domainJid == null || maxItemsStr == null) {
 	Command.addTitle(result, "Requesting List of Idle Users")
 	Command.addInstructions(result, "Fill out this form to request the idle users\nof this service.")
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 //	if (isServiceAdmin) {
 	//Command.addFieldValue(result, JID, domainJid ?: "", "jid-single",
 	//		"The domain for the list of active users")
 //	}
 //	else {
-		def vhosts = [];
-		vhost_man.repo.allItems().each {
-			if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
-				vhosts += it.getVhost().toString()
-			}
+	def vhosts = [ ];
+	vhost_man.repo.allItems().each {
+		if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
+			vhosts += it.getVhost().toString()
 		}
-		def vhostsArr = vhosts.toArray(new String[vhosts.size()]);
-		Command.addFieldValue(result, JID, "", "The domain for the list of idle users", vhostsArr, vhostsArr);
+	}
+	def vhostsArr = vhosts.toArray(new String[vhosts.size()]);
+	Command.addFieldValue(result, JID, "", "The domain for the list of idle users", vhostsArr, vhostsArr);
 //	}
-	Command.addFieldValue(result, MAX_ITEMS, maxItemsStr ?: "", "Maximum number of items to show", ["25", "50", "75", "100", "150", "200", "None"].toArray(new String[7]),  ["25", "50", "75", "100", "150", "200", "None"].toArray(new String[7]));
+	Command.addFieldValue(result, MAX_ITEMS, maxItemsStr ?: "", "Maximum number of items to show",
+						  [ "25", "50", "75", "100", "150", "200", "None" ].toArray(new String[7]),
+						  [ "25", "50", "75", "100", "150", "200", "None" ].toArray(new String[7]));
 	return result
 }
 def result = p.commandResult(Command.DataType.result)
 try {
-	def maxItems = maxItemsStr ?  (maxItemsStr == "None" ? null : Integer.parseInt(maxItemsStr)) : 25;
+	def maxItems = maxItemsStr ? (maxItemsStr == "None" ? null : Integer.parseInt(maxItemsStr)) : 25;
 	bareJID = BareJID.bareJIDInstance(domainJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
-		def users_list = [];
+			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		def users_list = [ ];
 		users_sessions.entrySet().each {
 			if (!it.getKey().toString().startsWith("sess-man") && it.getKey().getDomain().equals(bareJID.getDomain())) {
 				if (!maxItems || users_list.size() < maxItems) {
@@ -97,9 +104,10 @@ try {
 				}
 			}
 		}
-		Command.addFieldMultiValue(result, "Users: "+users_list.size(), users_list);
+		Command.addFieldMultiValue(result, "Users: " + users_list.size(), users_list);
 	} else {
-		Command.addTextField(result, "Error", "You do not have enough permissions to list idle accounts for this domain.");
+		Command.addTextField(result, "Error",
+							 "You do not have enough permissions to list idle accounts for this domain.");
 	}
 } catch (TigaseDBException ex) {
 	Command.addTextField(result, "Note", "Problem accessing database, idle users not listed.");

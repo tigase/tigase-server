@@ -20,20 +20,19 @@
 
 package tigase.eventbus.impl;
 
-import java.lang.reflect.Method;
-
 import tigase.eventbus.HandleEvent;
 
-public class ReflectEventListenerHandler extends AbstractHandler {
+import java.lang.reflect.Method;
+
+public class ReflectEventListenerHandler
+		extends AbstractHandler {
 
 	protected final Object consumerObject;
-
+	protected final HandleEvent.Type filter;
 	protected final Method handlerMethod;
 
-	protected final HandleEvent.Type filter;
-
 	public ReflectEventListenerHandler(HandleEvent.Type filter, final String packageName, final String eventName,
-			Object consumerObject, Method handlerMethod) {
+									   Object consumerObject, Method handlerMethod) {
 		super(packageName, eventName);
 		this.filter = filter;
 		this.consumerObject = consumerObject;
@@ -42,9 +41,10 @@ public class ReflectEventListenerHandler extends AbstractHandler {
 
 	@Override
 	public void dispatch(final Object event, final Object source, boolean remotelyGeneratedEvent) {
-		if (remotelyGeneratedEvent && filter == HandleEvent.Type.local
-				|| !remotelyGeneratedEvent && filter == HandleEvent.Type.remote)
+		if (remotelyGeneratedEvent && filter == HandleEvent.Type.local ||
+				!remotelyGeneratedEvent && filter == HandleEvent.Type.remote) {
 			return;
+		}
 		try {
 			handlerMethod.invoke(consumerObject, event);
 		} catch (Exception e) {
@@ -55,15 +55,18 @@ public class ReflectEventListenerHandler extends AbstractHandler {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 
 		ReflectEventListenerHandler that = (ReflectEventListenerHandler) o;
 
-		if (!consumerObject.equals(that.consumerObject))
+		if (!consumerObject.equals(that.consumerObject)) {
 			return false;
+		}
 		return handlerMethod.equals(that.handlerMethod);
 
 	}

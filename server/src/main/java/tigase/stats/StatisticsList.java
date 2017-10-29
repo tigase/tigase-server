@@ -27,18 +27,18 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  * Created: Jul 10, 2009 3:23:23 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StatisticsList implements Iterable<StatRecord> {
+public class StatisticsList
+		implements Iterable<StatRecord> {
+
 	private static final Logger log = Logger.getLogger(StatisticsList.class.getName());
+	private final LinkedHashMap<String, LinkedHashMap<String, StatRecord>> stats = new LinkedHashMap<String, LinkedHashMap<String, StatRecord>>();
 	private Level statLevel = Level.ALL;
-	private final LinkedHashMap<String, LinkedHashMap<String, StatRecord>> stats =
-			new LinkedHashMap<String, LinkedHashMap<String, StatRecord>>();
 
 	// ~--- constructors ---------------------------------------------------------
 
@@ -68,23 +68,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return addEntry(comp, description, recordLevel, new StatRecord(comp, description, value, recordLevel));
 	}
 
-	private boolean addEntry(String comp, String description, Level recordLevel, StatRecord statRecord) {
-		description = description.intern();
-		if (checkLevel(recordLevel, statRecord)) {
-			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
-
-			if (compStats == null) {
-				compStats = addCompStats(comp);
-			}
-
-			compStats.put(description, statRecord);
-
-			return true;
-		}
-
-		return false;
-	}
-
 	public LinkedHashMap<String, StatRecord> addCompStats(String comp) {
 		LinkedHashMap<String, StatRecord> compStats = new LinkedHashMap<String, StatRecord>();
 
@@ -111,11 +94,11 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	public int getCompConnections(String comp) {
 		return getValue(comp, "Open connections", 0);
 	}
+
+	// ~--- get methods ----------------------------------------------------------
 
 	public long getCompIq(String comp) {
 		return getCompIqSent(comp) + getCompIqReceived(comp);
@@ -131,13 +114,13 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Returns names of every component for which statistics are stored in <code>stats</code> variable
-	 * 
-	 * @return 
+	 *
+	 * @return
 	 */
 	public Set<String> getCompNames() {
 		return stats.keySet();
 	}
-	
+
 	public long getCompMsg(String comp) {
 		return getCompMsgSent(comp) + getCompMsgReceived(comp);
 	}
@@ -253,7 +236,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return result;
 	}
 
-
 	public <E> Collection<E> getCollectionValue(String dataId) {
 		String dataName = DataTypes.stripNameFromTypeId(dataId);
 		int idx = dataName.indexOf('/');
@@ -300,21 +282,40 @@ public class StatisticsList implements Iterable<StatRecord> {
 		}
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public Iterator<StatRecord> iterator() {
 		return new StatsIterator();
 	}
+
+	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public String toString() {
 		return stats.toString();
 	}
 
+	private boolean addEntry(String comp, String description, Level recordLevel, StatRecord statRecord) {
+		description = description.intern();
+		if (checkLevel(recordLevel, statRecord)) {
+			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
+
+			if (compStats == null) {
+				compStats = addCompStats(comp);
+			}
+
+			compStats.put(description, statRecord);
+
+			return true;
+		}
+
+		return false;
+	}
+
 	// ~--- inner classes --------------------------------------------------------
 
-	private class StatsIterator implements Iterator<StatRecord> {
+	private class StatsIterator
+			implements Iterator<StatRecord> {
+
 		Iterator<LinkedHashMap<String, StatRecord>> compsIt = stats.values().iterator();
 		Iterator<StatRecord> recIt = null;
 

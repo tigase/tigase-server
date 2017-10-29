@@ -20,30 +20,29 @@
 package tigase.db;
 
 /**
- * The <code>UserNotFoundException</code> exception is thrown when application
- * tries to access data for user which does not exist in repository.
- * <p>
- * Created: Wed Oct 27 14:17:44 2004
- * </p>
+ * The <code>UserNotFoundException</code> exception is thrown when application tries to access data for user which does
+ * not exist in repository. <p> Created: Wed Oct 27 14:17:44 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserNotFoundException extends TigaseDBException {
+public class UserNotFoundException
+		extends TigaseDBException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  /**
-   * Creates a new <code>UserNotFoundException</code> instance.
-   *
-   */
-  public UserNotFoundException(String message) { super(message); }
+	/**
+	 * Creates a new <code>UserNotFoundException</code> instance.
+	 */
+	public UserNotFoundException(String message) {
+		super(message);
+	}
 
-  /**
-   * Creates a new <code>UserNotFoundException</code> instance.
-   *
-   */
-  public UserNotFoundException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	/**
+	 * Creates a new <code>UserNotFoundException</code> instance.
+	 */
+	public UserNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 } // UserNotFoundException

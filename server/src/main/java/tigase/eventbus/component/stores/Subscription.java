@@ -25,10 +25,8 @@ import tigase.xmpp.jid.JID;
 public class Subscription {
 
 	private final JID jid;
-
-	private JID serviceJID;
-
 	private boolean inClusterSubscription;
+	private JID serviceJID;
 
 	public Subscription(JID jid) {
 		super();
@@ -43,18 +41,23 @@ public class Subscription {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Subscription other = (Subscription) obj;
 		if (jid == null) {
-			if (other.jid != null)
+			if (other.jid != null) {
 				return false;
-		} else if (!jid.equals(other.jid))
+			}
+		} else if (!jid.equals(other.jid)) {
 			return false;
+		}
 		return true;
 	}
 

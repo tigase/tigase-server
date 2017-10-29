@@ -22,15 +22,13 @@ package tigase.server.ext.handlers;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.StreamOpenHandler;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.List;
 import java.util.Map;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -40,14 +38,15 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
+public class ComponentConnectStreamOpenHandler
+		implements StreamOpenHandler {
 
 	/** Field description */
 	public static final String XMLNS = "jabber:component:connect";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String[] xmlnss = new String[] { XMLNS };
+	private String[] xmlnss = new String[]{XMLNS};
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -64,8 +63,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
-			ComponentProtocolHandler handler) {
+	public String streamOpened(ComponentIOService serv, Map<String, String> attribs, ComponentProtocolHandler handler) {
 
 		// Not sure if this is really used. For sure it is not well documented
 		// and perhaps it is not worth implementing, unless someone requests it

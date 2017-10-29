@@ -32,19 +32,19 @@ import java.util.Collection;
 
 /**
  * Abstract class extending TimerTask which allows easy configuration and usage of TimerTask as a bean
- *
+ * <p>
  * Created by andrzej on 09.08.2016.
  */
-public abstract class ScheduledTask extends TimerTask implements ConfigurationChangedAware, Initializable, UnregisterAware {
-
-	@ConfigField(desc = "Execution period", alias = "period")
-	private Duration period;
-
-	@ConfigField(desc = "Delay", alias = "delay")
-	private Duration delay;
+public abstract class ScheduledTask
+		extends TimerTask
+		implements ConfigurationChangedAware, Initializable, UnregisterAware {
 
 	@Inject(bean = "service")
 	protected AbstractMessageReceiver component;
+	@ConfigField(desc = "Delay", alias = "delay")
+	private Duration delay;
+	@ConfigField(desc = "Execution period", alias = "period")
+	private Duration period;
 
 	/**
 	 * Default constructor allows providing default values
@@ -72,11 +72,13 @@ public abstract class ScheduledTask extends TimerTask implements ConfigurationCh
 
 		cancel();
 
-		if (delay == null && period == null)
+		if (delay == null && period == null) {
 			return;
+		}
 
-		if (delay != null && delay.isZero() && period != null && period.isZero())
+		if (delay != null && delay.isZero() && period != null && period.isZero()) {
 			return;
+		}
 
 		if (delay != null) {
 			if (period != null) {

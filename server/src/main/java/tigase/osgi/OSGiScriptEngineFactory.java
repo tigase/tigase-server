@@ -19,67 +19,80 @@
  */
 package tigase.osgi;
 
-import java.util.List;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
+import java.util.List;
 
 /**
- * This is a wrapper class for the ScriptEngineFactory class that deals with context class loader issues
- * It is necessary because engines (at least ruby) use the context classloader to find their resources (i.e., their "native" classes)
- *
+ * This is a wrapper class for the ScriptEngineFactory class that deals with context class loader issues It is necessary
+ * because engines (at least ruby) use the context classloader to find their resources (i.e., their "native" classes)
  */
-public class OSGiScriptEngineFactory implements ScriptEngineFactory{
-	private ScriptEngineFactory factory;
+public class OSGiScriptEngineFactory
+		implements ScriptEngineFactory {
+
 	private ClassLoader contextClassLoader;
-	public OSGiScriptEngineFactory (ScriptEngineFactory factory, ClassLoader contextClassLoader){
-		this.factory=factory;
-		this.contextClassLoader=contextClassLoader;
+	private ScriptEngineFactory factory;
+
+	public OSGiScriptEngineFactory(ScriptEngineFactory factory, ClassLoader contextClassLoader) {
+		this.factory = factory;
+		this.contextClassLoader = contextClassLoader;
 	}
+
 	public String getEngineName() {
 		return factory.getEngineName();
 	}
+
 	public String getEngineVersion() {
 		return factory.getEngineVersion();
 	}
+
 	public List<String> getExtensions() {
 		return factory.getExtensions();
 	}
+
 	public String getLanguageName() {
 		return factory.getLanguageName();
 	}
+
 	public String getLanguageVersion() {
 		return factory.getLanguageVersion();
 	}
+
 	public String getMethodCallSyntax(String obj, String m, String... args) {
 		return factory.getMethodCallSyntax(obj, m, args);
 	}
+
 	public List<String> getMimeTypes() {
 		return factory.getMimeTypes();
 	}
+
 	public List<String> getNames() {
 		return factory.getNames();
 	}
+
 	public String getOutputStatement(String toDisplay) {
 		return factory.getOutputStatement(toDisplay);
 	}
+
 	public Object getParameter(String key) {
 		return factory.getParameter(key);
 	}
+
 	public String getProgram(String... statements) {
 		return factory.getProgram(statements);
 	}
+
 	public ScriptEngine getScriptEngine() {
-		ScriptEngine engine=null;
-		if(contextClassLoader!=null){
-		ClassLoader old=Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(contextClassLoader);
-		engine=factory.getScriptEngine();
-		Thread.currentThread().setContextClassLoader(old);
+		ScriptEngine engine = null;
+		if (contextClassLoader != null) {
+			ClassLoader old = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(contextClassLoader);
+			engine = factory.getScriptEngine();
+			Thread.currentThread().setContextClassLoader(old);
+		} else {
+			engine = factory.getScriptEngine();
 		}
-		else engine=factory.getScriptEngine();
 		return engine;
 	}
-	
 
 }

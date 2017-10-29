@@ -18,33 +18,24 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Packet;
-
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Jul 29, 2009 4:03:44 PM
@@ -54,25 +45,21 @@ import java.util.Queue;
  */
 @Bean(name = StartZLib.ID, parent = SessionManager.class, active = true)
 public class StartZLib
-				extends XMPPProcessor
-				implements XMPPProcessorIfc {
-	private static final String[][] ELEMENTS = {
-		{ "compress" }, { "compressed" }, { "failure" }
-	};
-	protected static final String     ID       = "zlib";
-	private static Logger           log      = Logger.getLogger(StartZLib.class.getName());
-	private static final String     XMLNS    = "http://jabber.org/protocol/compress";
-	private static final String[]   XMLNSS   = { XMLNS, XMLNS, XMLNS };
-	private static final Element[]  FEATURES = { new Element("compression", new Element[] {
-			new Element("method", "zlib") }, new String[] { "xmlns" }, new String[] {
-			"http://jabber.org/features/compress" }) };
+		extends XMPPProcessor
+		implements XMPPProcessorIfc {
+
+	protected static final String ID = "zlib";
+	private static final String[][] ELEMENTS = {{"compress"}, {"compressed"}, {"failure"}};
+	private static final String XMLNS = "http://jabber.org/protocol/compress";
+	private static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
+	private static final Element[] FEATURES = {
+			new Element("compression", new Element[]{new Element("method", "zlib")}, new String[]{"xmlns"},
+						new String[]{"http://jabber.org/features/compress"})};
+	private static Logger log = Logger.getLogger(StartZLib.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private Element compressed = new Element("compressed", new String[] { "xmlns" },
-			new String[] { XMLNS });
-	private Element failure = new Element("failure", new String[] { "xmlns" },
-			new String[] { XMLNS });
+	private Element compressed = new Element("compressed", new String[]{"xmlns"}, new String[]{XMLNS});
+	private Element failure = new Element("failure", new String[]{"xmlns"}, new String[]{XMLNS});
 
 	//~--- methods --------------------------------------------------------------
 
@@ -82,9 +69,8 @@ public class StartZLib
 	}
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-					throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
@@ -95,27 +81,25 @@ public class StartZLib
 				// This is possible and can even work but this can also be
 				// a DOS attack. Blocking it now, unless someone requests he wants
 				// to have multiple layers of TLS for his connection
-				log.log(Level.WARNING,
-						"Multiple ZLib requests, possible DOS attack, closing connection: {0}",
-						packet);
+				log.log(Level.WARNING, "Multiple ZLib requests, possible DOS attack, closing connection: {0}", packet);
 				results.offer(packet.swapFromTo(failure, null, null));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
-						.set, session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+													  session.nextStanzaId()));
 
 				return;
 			}
 			session.putSessionData(ID, "true");
 
-			Packet result = Command.STARTZLIB.getPacket(packet.getTo(), packet.getFrom(),
-					StanzaType.set, session.nextStanzaId(), Command.DataType.submit);
+			Packet result = Command.STARTZLIB.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+														session.nextStanzaId(), Command.DataType.submit);
 
 			Command.setData(result, compressed);
 			results.offer(result);
 		} else {
 			log.log(Level.WARNING, "Unknown ZLIB element: {0}", packet);
 			results.offer(packet.swapFromTo(failure, null, null));
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
-					.set, session.nextStanzaId()));
+			results.offer(
+					Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set, session.nextStanzaId()));
 		}
 	}
 
@@ -145,6 +129,5 @@ public class StartZLib
 		}    // end of if (session.isAuthorized()) else
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/03/12

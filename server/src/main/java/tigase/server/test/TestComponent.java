@@ -34,9 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A test component used to demonstrate API and for running different kinds of
- * tests on the Tigase server - generate local traffic for performance and load tests.
- * Created: Nov 28, 2009 9:22:36 PM
+ * A test component used to demonstrate API and for running different kinds of tests on the Tigase server - generate
+ * local traffic for performance and load tests. Created: Nov 28, 2009 9:22:36 PM
  */
 @Bean(name = "test", parent = Kernel.class, active = false)
 public class TestComponent

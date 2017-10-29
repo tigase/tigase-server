@@ -30,12 +30,15 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
-import tigase.server.*;
 import tigase.server.Message;
+import tigase.server.Packet;
 import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
@@ -59,6 +62,7 @@ import static tigase.xmpp.impl.MotdProcessor.ID;
 public class MotdProcessor
 		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc, Initializable, UnregisterAware {
+
 	protected static final String ID = "motd";
 	private static final Logger log = Logger.getLogger(MotdProcessor.class.getCanonicalName());
 	private static final long HOURS_24 = 24 * 60 * 60 * 1000;
@@ -191,7 +195,8 @@ public class MotdProcessor
 		private String message;
 		private Long timestamp;
 
-		public MotdUpdatedEvent() {}
+		public MotdUpdatedEvent() {
+		}
 
 		public MotdUpdatedEvent(String msg, Long timestamp) {
 			this.message = msg;

@@ -20,23 +20,22 @@
 
 package tigase.eventbus.impl;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.Executor;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import tigase.eventbus.EventListener;
 import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.RouteEvent;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.xml.Element;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.Executor;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class EventBusImplementationTest {
 
@@ -91,7 +90,7 @@ public class EventBusImplementationTest {
 
 	@Test
 	public void testAddListener() {
-		final Object resp[] = new Object[] { null, null, null, null, null };
+		final Object resp[] = new Object[]{null, null, null, null, null};
 
 		Arrays.fill(resp, null);
 		eventBus.fire(new Event12());
@@ -129,7 +128,7 @@ public class EventBusImplementationTest {
 
 	@Test
 	public void testFire() throws Exception {
-		Object resp[] = new Object[] { null, null, null, null, null };
+		Object resp[] = new Object[]{null, null, null, null, null};
 		eventBus.addListener(Event1.class, e -> resp[0] = e);
 		eventBus.addListener(Event12.class, e -> resp[1] = e);
 		eventBus.addListener(Event1.class.getPackage().getName(), Event1.class.getSimpleName(), e -> resp[2] = e);
@@ -196,12 +195,13 @@ public class EventBusImplementationTest {
 
 			}
 		});
-		eventBus.addListener(Event1.class.getPackage().getName(), Event1.class.getSimpleName(), new EventListener<Element>() {
-			@Override
-			public void onEvent(Element e) {
+		eventBus.addListener(Event1.class.getPackage().getName(), Event1.class.getSimpleName(),
+							 new EventListener<Element>() {
+								 @Override
+								 public void onEvent(Element e) {
 
-			}
-		});
+								 }
+							 });
 		eventBus.addListener(Event1.class.getPackage().getName(), null, new EventListener<Element>() {
 			@Override
 			public void onEvent(Element e) {
@@ -216,8 +216,8 @@ public class EventBusImplementationTest {
 		});
 
 		Assert.assertEquals(4, eventBus.getListenersForEvent(Event1.class).size());
-		Assert.assertEquals(4,
-				eventBus.getListenersForEvent(Event1.class.getPackage().getName(), Event1.class.getSimpleName()).size());
+		Assert.assertEquals(4, eventBus.getListenersForEvent(Event1.class.getPackage().getName(),
+															 Event1.class.getSimpleName()).size());
 		Assert.assertEquals(5, eventBus.getListenersForEvent(Event12.class).size());
 
 	}
@@ -261,12 +261,12 @@ public class EventBusImplementationTest {
 
 		Assert.assertEquals(0, eventBus.getListenersForEvent(String.class).size());
 
-		Assert.assertEquals(1,
-				eventBus.getListenersForEvent(Event1.class.getPackage().getName(), Event1.class.getSimpleName()).size());
-		Assert.assertEquals(2,
-				eventBus.getListenersForEvent(Event2.class.getPackage().getName(), Event12.class.getSimpleName()).size());
-		Assert.assertEquals(2,
-				eventBus.getListenersForEvent(Event12.class.getPackage().getName(), Event12.class.getSimpleName()).size());
+		Assert.assertEquals(1, eventBus.getListenersForEvent(Event1.class.getPackage().getName(),
+															 Event1.class.getSimpleName()).size());
+		Assert.assertEquals(2, eventBus.getListenersForEvent(Event2.class.getPackage().getName(),
+															 Event12.class.getSimpleName()).size());
+		Assert.assertEquals(2, eventBus.getListenersForEvent(Event12.class.getPackage().getName(),
+															 Event12.class.getSimpleName()).size());
 	}
 
 	@Test
@@ -277,11 +277,11 @@ public class EventBusImplementationTest {
 		Assert.assertNotNull(eventBus.getEventRoutingSelector(Event1.class));
 		Assert.assertNotNull(eventBus.getEventRoutingSelector(Event12.class));
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event2.class));
-		
+
 		Assert.assertEquals(1, eventBus.getEventRoutedTransientFillers(Event1.class).size());
 		Assert.assertEquals(1, eventBus.getEventRoutedTransientFillers(Event12.class).size());
 		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event2.class).size());
-		
+
 		eventBus.fire(new Event12(), this);
 		Assert.assertNotNull(c.resp[0]);
 		Assert.assertNotNull(c.resp[1]);
@@ -294,18 +294,18 @@ public class EventBusImplementationTest {
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event1.class));
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event12.class));
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event2.class));
-		
+
 		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event1.class).size());
 		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event12.class).size());
 		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event2.class).size());
-		
+
 		eventBus.fire(new Event12());
 
 		Assert.assertNull(c.resp[0]);
 		Assert.assertNull(c.resp[1]);
 		Assert.assertNull(c.resp[2]);
 	}
-	
+
 	@Test
 	public void testRegisterAll_InheritanceTest() {
 		ConsumerChild c = new ConsumerChild();
@@ -354,10 +354,10 @@ public class EventBusImplementationTest {
 		assertNull(cmv.resp[1]);
 		assertNull(cmv.resp[2]);
 	}
-	
+
 	@Test
 	public void testRemoveListener() {
-		final Object resp[] = new Object[] { null, null, null, null, null };
+		final Object resp[] = new Object[]{null, null, null, null, null};
 
 		EventListener<Event1> l0 = e -> resp[0] = e;
 		eventBus.addListener(Event1.class, l0);
@@ -446,7 +446,7 @@ public class EventBusImplementationTest {
 
 	public static class Consumer {
 
-		private final Object resp[] = new Object[] { null, null, null };
+		private final Object resp[] = new Object[]{null, null, null};
 
 		@HandleEvent
 		public void event0(Event1 e) {
@@ -466,85 +466,20 @@ public class EventBusImplementationTest {
 
 		@FillRoutedEvent
 		public void fillRoutedEvent1(Event1 e) {
-			
+
 		}
-		
+
 		@RouteEvent
 		public Collection<Subscription> routeEvent1(Event1 e, Collection<Subscription> subscriptions) {
 			return null;
 		}
 	}
-	
-	public static class ConsumerMethodVisibility {
 
-		private final Object resp[] = new Object[] { null, null, null };
-		
-		@HandleEvent
-		public void event0public(Event1 e) {
-			resp[0] = e;
-		}
-		
-		@HandleEvent
-		protected void event1protected(Event1 e) {
-			resp[1] = e;
-		}
-		
-		@HandleEvent
-		private void event2private(Event1 e) {
-			resp[2] = e;
-		}
-	}
-	
-	public static class ConsumerParent {
-		
-		protected final Object[] respParent = new Object[] { null, null, null, null, null, null, null, null };
-		
-		@HandleEvent
-		public void event0(Event1 e) {
-			respParent[0] = e;
-		}
-		
-		@HandleEvent
-		public void event1(Event1 e) {
-			respParent[1] = e;
-		}
+	public static class ConsumerChild
+			extends ConsumerParent {
 
-		@HandleEvent
-		public void event2(Event1 e) {
-			respParent[2] = e;
-		}
+		private final Object[] respChild = new Object[]{null, null, null, null, null, null, null, null};
 
-		@HandleEvent
-		public void event3(Event1 e) {
-			respParent[3] = e;
-		}
-
-		@HandleEvent
-		private void event4(Event1 e) {
-			respParent[4] = e;
-		}
-
-		@HandleEvent
-		protected void event5(Event1 e) {
-			respParent[5] = e;
-		}
-
-		@HandleEvent
-		protected void event6(Event1 e) {
-			respParent[6] = e;
-		}
-	
-		@HandleEvent
-		protected void event7(Event1 e) {
-			respParent[7] = e;
-		}
-		
-	}
-	
-	public static class ConsumerChild extends ConsumerParent {
-		
-		private final Object[] respChild = new Object[] { null, null, null, null, null, null, null, null };
-		
 		@HandleEvent
 		@Override
 		public void event0(Event1 e) {
@@ -562,13 +497,9 @@ public class EventBusImplementationTest {
 			respChild[2] = e;
 			super.event2(e);
 		}
-		
+
 		public void event3(Event1 e, String x) {
 			respChild[3] = e;
-		}
-
-		private void event4(Event1 e) {
-			respChild[4] = e;
 		}
 
 		@Override
@@ -580,6 +511,76 @@ public class EventBusImplementationTest {
 		protected void event6(Event1 e) {
 			respChild[6] = e;
 			super.event6(e);
+		}
+
+		private void event4(Event1 e) {
+			respChild[4] = e;
+		}
+
+	}
+
+	public static class ConsumerMethodVisibility {
+
+		private final Object resp[] = new Object[]{null, null, null};
+
+		@HandleEvent
+		public void event0public(Event1 e) {
+			resp[0] = e;
+		}
+
+		@HandleEvent
+		protected void event1protected(Event1 e) {
+			resp[1] = e;
+		}
+
+		@HandleEvent
+		private void event2private(Event1 e) {
+			resp[2] = e;
+		}
+	}
+
+	public static class ConsumerParent {
+
+		protected final Object[] respParent = new Object[]{null, null, null, null, null, null, null, null};
+
+		@HandleEvent
+		public void event0(Event1 e) {
+			respParent[0] = e;
+		}
+
+		@HandleEvent
+		public void event1(Event1 e) {
+			respParent[1] = e;
+		}
+
+		@HandleEvent
+		public void event2(Event1 e) {
+			respParent[2] = e;
+		}
+
+		@HandleEvent
+		public void event3(Event1 e) {
+			respParent[3] = e;
+		}
+
+		@HandleEvent
+		protected void event5(Event1 e) {
+			respParent[5] = e;
+		}
+
+		@HandleEvent
+		protected void event6(Event1 e) {
+			respParent[6] = e;
+		}
+
+		@HandleEvent
+		protected void event7(Event1 e) {
+			respParent[7] = e;
+		}
+
+		@HandleEvent
+		private void event4(Event1 e) {
+			respParent[4] = e;
 		}
 
 	}

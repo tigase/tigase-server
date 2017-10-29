@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -35,9 +33,9 @@ import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
 import tigase.util.common.TimerTask;
+import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.XMPPIOService;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -46,8 +44,8 @@ import java.util.logging.Logger;
 
 /**
  * Describe class ClientConnectionClustered here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Jun 21 22:23:18 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -57,25 +55,23 @@ import java.util.logging.Logger;
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 @ClusterModeRequired(active = true)
 public class ClientConnectionClustered
-				extends ClientConnectionManager
-				implements ClusteredComponentIfc {
+		extends ClientConnectionManager
+		implements ClusteredComponentIfc {
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class
-			.getName());
+	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-//	private SeeOtherHostIfc see_other_host_strategy = null;
+	private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
+	//	private SeeOtherHostIfc see_other_host_strategy = null;
 	@SuppressWarnings("serial")
-	private List<BareJID>   connectedNodes          = new CopyOnWriteArrayList<BareJID>() {
+	private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>() {
 		{
 			add(getDefHostName());
 		}
 	};
-
-    private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
 
 	public ClientConnectionClustered() {
 		delayPortListening = true;
@@ -83,16 +79,6 @@ public class ClientConnectionClustered
 
 	//~--- methods --------------------------------------------------------------
 
-	@Override
-	protected void onNodeConnected(JID jid) {
-		super.onNodeConnected(jid);
-		
-		List<JID> connectedNodes = getNodesConnectedWithLocal();
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.setNodes(connectedNodes);
-		}
-	}	
-	
 	@Override
 	public void onNodeDisconnected(JID jid) {
 		super.onNodeDisconnected(jid);
@@ -130,8 +116,7 @@ public class ClientConnectionClustered
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Configuring see_other_host clustered strategy for: " +
-					see_other_host_class);
+			log.finest("Configuring see_other_host clustered strategy for: " + see_other_host_class);
 		}
 		if (see_other_host_class == null) {
 			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
@@ -144,35 +129,47 @@ public class ClientConnectionClustered
 		return see_other_host_strategy;
 	}
 
-    @Override
-    public void start() {
-        super.start();
+	@Override
+	public void start() {
+		super.start();
 
-        if (clusterEventHandler == null) {
-            clusterEventHandler = (ClusterConnectionManager.ClusterInitializedEvent event) -> {
+		if (clusterEventHandler == null) {
+			clusterEventHandler = (ClusterConnectionManager.ClusterInitializedEvent event) -> {
 				ClientConnectionClustered.this.connectWaitingTasks();
-				log.log(Level.WARNING, "Starting listening on ports of component: {0}", ClientConnectionClustered.this.getName());
+				log.log(Level.WARNING, "Starting listening on ports of component: {0}",
+						ClientConnectionClustered.this.getName());
 				eventBus.removeListener(clusterEventHandler);
-            };
-        }
+			};
+		}
 
-        eventBus.addListener(ClusterConnectionManager.ClusterInitializedEvent.class, clusterEventHandler);
+		eventBus.addListener(ClusterConnectionManager.ClusterInitializedEvent.class, clusterEventHandler);
 
 		if (delayPortListening) {
 			addTimerTask(new TimerTask() {
 				@Override
 				public void run() {
-					log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
+					log.log(Level.FINE,
+							"Cluster synchronization timed-out, starting pending connections for " + getName());
 					ClientConnectionClustered.this.connectWaitingTasks();
 				}
 			}, connectionDelay * 30);
 		}
-    }
+	}
 
-    @Override
-    public void stop() {
-        super.stop();
+	@Override
+	public void stop() {
+		super.stop();
 		eventBus.removeListener(clusterEventHandler);
-        clusterEventHandler = null;
-    }
+		clusterEventHandler = null;
+	}
+
+	@Override
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
+
+		List<JID> connectedNodes = getNodesConnectedWithLocal();
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.setNodes(connectedNodes);
+		}
+	}
 }

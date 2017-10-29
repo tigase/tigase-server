@@ -18,7 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
 package tigase.util.routing;
 
 import java.util.Comparator;
@@ -30,7 +29,8 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class PatternComparator implements Comparator<Pattern> {
+public class PatternComparator
+		implements Comparator<Pattern> {
 
 	@Override
 	public int compare(Pattern o1, Pattern o2) {

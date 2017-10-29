@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.stats;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -34,9 +32,12 @@ import java.util.Map;
  * @author kobit
  */
 public interface StatisticsProviderMBean {
+
 	/**
 	 * Operation exposed for management
+	 *
 	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
+	 *
 	 * @return {@code java.util.Map<String, String>}
 	 */
 	public Map<String, String> getAllStats(int level);
@@ -59,11 +60,8 @@ public interface StatisticsProviderMBean {
 
 	public float getClusterPacketsPerSec();
 
-
 	/**
 	 * Get Attribute exposed for management
-	 *
-	 *
 	 *
 	 * @return a value of {@code List<String>}
 	 */
@@ -71,8 +69,10 @@ public interface StatisticsProviderMBean {
 
 	/**
 	 * Operation exposed for management
+	 *
 	 * @param compName The component name to provide statistics for
 	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
+	 *
 	 * @return {@code java.util.Map<String, String>}
 	 */
 	public Map<String, String> getComponentStats(String compName, int level);

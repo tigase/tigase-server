@@ -21,8 +21,8 @@ package tigase.io;
 
 /**
  * Describe class TLSStatus here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Mar  5 09:28:45 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -30,10 +30,10 @@ package tigase.io;
  */
 public enum TLSStatus {
 
-  NEED_WRITE,
-  NEED_READ,
-  UNDERFLOW,
-  CLOSED,
-  OK;
+	NEED_WRITE,
+	NEED_READ,
+	UNDERFLOW,
+	CLOSED,
+	OK;
 
 } // TLSStatus

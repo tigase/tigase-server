@@ -28,19 +28,19 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 
 @Bean(name = XmppPingModule.ID, active = true)
-public class XmppPingModule extends AbstractModule {
-
-	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get").add(
-			ElementCriteria.name("ping", "urn:xmpp:ping"));
+public class XmppPingModule
+		extends AbstractModule {
 
 	public final static String ID = "urn:xmpp:ping";
+	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get")
+			.add(ElementCriteria.name("ping", "urn:xmpp:ping"));
 
 	public XmppPingModule() {
 	}
 
 	@Override
 	public String[] getFeatures() {
-		return new String[] { "urn:xmpp:ping" };
+		return new String[]{"urn:xmpp:ping"};
 	}
 
 	@Override

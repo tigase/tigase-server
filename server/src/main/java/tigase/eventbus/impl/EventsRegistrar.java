@@ -36,8 +36,9 @@ public class EventsRegistrar {
 	public Collection<String> getRegisteredEvents() {
 		ArrayList<String> result = new ArrayList<>();
 		for (EventInfo info : events.values()) {
-			if (info.isPrivateEvent())
+			if (info.isPrivateEvent()) {
 				continue;
+			}
 			result.add(info.event);
 		}
 		return result;

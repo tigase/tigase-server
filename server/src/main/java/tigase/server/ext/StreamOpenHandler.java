@@ -22,7 +22,6 @@ package tigase.server.ext;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.List;
 import java.util.Map;
 
 //~--- interfaces -------------------------------------------------------------
@@ -46,12 +45,9 @@ public interface StreamOpenHandler {
 
 	String serviceStarted(ComponentIOService s);
 
-	String streamOpened(ComponentIOService s, Map<String, String> attribs,
-			ComponentProtocolHandler handler);
+	String streamOpened(ComponentIOService s, Map<String, String> attribs, ComponentProtocolHandler handler);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

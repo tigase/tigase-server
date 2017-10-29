@@ -18,43 +18,38 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.net.ConnectionOpenListener;
-
+import tigase.net.IOUtil;
 import tigase.stats.StatisticsList;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.EOFException;
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Queue;
-import tigase.net.IOUtil;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class SocketIO here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat May 14 07:18:30 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class SocketIO
-				implements IOInterface {
-	private static final Logger log                          =
-		Logger.getLogger(SocketIO.class.getName());
+		implements IOInterface {
+
+	private static final Logger log = Logger.getLogger(SocketIO.class.getName());
 	private static final int MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
 
 	// ~--- fields ---------------------------------------------------------------
@@ -62,17 +57,17 @@ public class SocketIO
 
 	//~--- fields ---------------------------------------------------------------
 
-	private long buffOverflow            = 0;
-	private int bytesRead                = 0;
-	private long bytesReceived           = 0;
-	private long bytesSent               = 0;
-	private SocketChannel channel        = null;
+	private long buffOverflow = 0;
+	private int bytesRead = 0;
+	private long bytesReceived = 0;
+	private long bytesSent = 0;
+	private SocketChannel channel = null;
 	private Queue<ByteBuffer> dataToSend = null;
-	private String logId                 = null;
-	private String remoteAddress         = null;
-	private long totalBuffOverflow       = 0;
-	private long totalBytesReceived      = 0;
-	private long totalBytesSent          = 0;
+	private String logId = null;
+	private String remoteAddress = null;
+	private long totalBuffOverflow = 0;
+	private long totalBytesReceived = 0;
+	private long totalBytesSent = 0;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -80,6 +75,7 @@ public class SocketIO
 	 * Creates a new <code>SocketIO</code> instance.
 	 *
 	 * @param sock
+	 *
 	 * @throws IOException
 	 */
 	public SocketIO(final SocketChannel sock) throws IOException {
@@ -92,8 +88,7 @@ public class SocketIO
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
-			int queue_size = Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY,
-												 MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
+			int queue_size = Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY, MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
 
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(queue_size);
 		}
@@ -132,19 +127,16 @@ public class SocketIO
 		list.add("socketio", "Total bytes received", totalBytesReceived, Level.FINE);
 		list.add("socketio", "Ttoal buffers overflow", totalBuffOverflow, Level.FINE);
 		if (reset) {
-			bytesSent     = 0;
+			bytesSent = 0;
 			bytesReceived = 0;
-			buffOverflow  = 0;
+			buffOverflow = 0;
 		}
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 * 
 	 */
 	public long getBytesSent(boolean reset) {
 		long tmp = bytesSent;
@@ -158,9 +150,6 @@ public class SocketIO
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public long getTotalBytesSent() {
 		return totalBytesSent;
@@ -169,10 +158,7 @@ public class SocketIO
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 * 
 	 */
 	public long getBytesReceived(boolean reset) {
 		long tmp = bytesReceived;
@@ -186,9 +172,6 @@ public class SocketIO
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public long getTotalBytesReceived() {
 		return totalBytesReceived;
@@ -238,10 +221,9 @@ public class SocketIO
 		} finally {
 			IOUtil.returnDirectBuffer(tmp);
 		}
-		
+
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[] { bytesRead,
-							toString() });
+			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[]{bytesRead, toString()});
 		}
 		if (bytesRead == -1) {
 			// we need to close channel but we should not throw exception as
@@ -251,7 +233,7 @@ public class SocketIO
 		}    // end of if (result == -1)
 		if (bytesRead > 0) {
 			buff.flip();
-			bytesReceived      += bytesRead;
+			bytesReceived += bytesRead;
 			totalBytesReceived += bytesRead;
 		}
 
@@ -272,9 +254,7 @@ public class SocketIO
 
 	@Override
 	public String toString() {
-		return logId + ((channel == null)
-										? null
-										: channel.socket());
+		return logId + ((channel == null) ? null : channel.socket());
 	}
 
 	@Override
@@ -303,8 +283,7 @@ public class SocketIO
 		if ((buff != null) && buff.hasRemaining()) {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}",
-								new Object[] { buff.remaining(),
-															 toString() });
+						new Object[]{buff.remaining(), toString()});
 			}
 			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
@@ -312,9 +291,9 @@ public class SocketIO
 			}
 		}
 
-		int result            = 0;
+		int result = 0;
 		ByteBuffer dataBuffer = null;
-		
+
 		// we are processing all buffers one by one to reduce need for direct 
 		// memory, and we use our own cache of DirectByteBuffers as cache from JDK
 		// may keep up to 1024 buffers for single thread!!
@@ -323,7 +302,7 @@ public class SocketIO
 			int lim = dataBuffer.limit();
 			int rem = (pos <= lim ? lim - pos : 0);
 			int res = 0;
-			
+
 			ByteBuffer tmp = IOUtil.getDirectBuffer(rem);
 			try {
 				tmp.put(dataBuffer);
@@ -336,31 +315,28 @@ public class SocketIO
 			} finally {
 				IOUtil.returnDirectBuffer(tmp);
 			}
-			
+
 			if (res == -1) {
 				throw new EOFException("Channel has been closed.");
 			} else {
 				result += res;
 			}
-			
+
 			if (!dataBuffer.hasRemaining()) {
 				dataToSend.poll();
-			}
-			else {
+			} else {
 				break;
 			}
 		}
-		
-		
+
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result,
-							toString() });
+			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[]{result, toString()});
 		}
 
 		// if (isRemoteAddress("81.142.228.219")) {
 		// log.warning("Wrote to channel " + result + " bytes.");
 		// }
-		bytesSent      += result;
+		bytesSent += result;
 		totalBytesSent += result;
 
 		return result;
@@ -371,5 +347,5 @@ public class SocketIO
 	@Override
 	public void setLogId(String logId) {
 		this.logId = logId + " ";
-	}		
+	}
 }    // SocketIO

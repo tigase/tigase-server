@@ -30,7 +30,8 @@ import tigase.db.DataRepository;
 /**
  * Created by andrzej on 24.03.2017.
  */
-public class JDBCMsgBroadcastRepositoryTest extends AbstractMsgBroadcastRepositoryTest<DataRepository> {
+public class JDBCMsgBroadcastRepositoryTest
+		extends AbstractMsgBroadcastRepositoryTest<DataRepository> {
 
 	@ClassRule
 	public static TestRule rule = new TestRule() {

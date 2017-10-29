@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -49,7 +47,9 @@ import tigase.stats.StatisticsList;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -61,8 +61,8 @@ import java.util.logging.Logger;
 
 /**
  * Class SessionManagerClusteredOld
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -71,8 +71,9 @@ import java.util.logging.Logger;
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
 @ClusterModeRequired(active = true)
 public class SessionManagerClustered
-				extends SessionManager
-				implements ClusteredComponentIfc, SessionManagerClusteredIfc {
+		extends SessionManager
+		implements ClusteredComponentIfc, SessionManagerClusteredIfc {
+
 	/** Field description */
 	public static final String CLUSTER_STRATEGY_VAR = "clusterStrategy";
 
@@ -83,8 +84,7 @@ public class SessionManagerClustered
 	public static final String STRATEGY_CLASS_PROP_KEY = "sm-cluster-strategy-class";
 
 	/** Field description */
-	public static final String STRATEGY_CLASS_PROP_VAL =
-			"tigase.cluster.strategy.DefaultClusteringStrategy";
+	public static final String STRATEGY_CLASS_PROP_VAL = "tigase.cluster.strategy.DefaultClusteringStrategy";
 
 	/** Field description */
 	public static final String STRATEGY_CLASS_PROPERTY = "--sm-cluster-strategy-class";
@@ -95,25 +95,20 @@ public class SessionManagerClustered
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(SessionManagerClustered.class
-			.getName());
+	private static final Logger log = Logger.getLogger(SessionManagerClustered.class.getName());
+	private ClusterControllerIfc clusterController = null;
 
-	private enum STATUS {CONNECETED, DISCONNECTED};
+	;
 
 	//~--- fields ---------------------------------------------------------------
-
-	private ClusterControllerIfc  clusterController = null;
-	private ComponentInfo         cmpInfo           = null;
+	private ComponentInfo cmpInfo = null;
 	@ConfigField(desc = "Component own internal JID")
 	private JID my_address;
 	@ConfigField(desc = "Server domain name")
-	private JID                   my_hostname;
-	private int                   nodesNo           = 0;
+	private JID my_hostname;
+	private int nodesNo = 0;
 	@Inject
-	private ClusteringStrategyIfc strategy          = null;
-
-	//~--- methods --------------------------------------------------------------
-
+	private ClusteringStrategyIfc strategy = null;
 	public SessionManagerClustered() {
 		String[] local_domains = DNSResolverFactory.getInstance().getDefaultHosts();
 
@@ -123,12 +118,12 @@ public class SessionManagerClustered
 			my_hostname = JID.jidInstance(my_domain);
 			my_address = JID.jidInstance(getName(), my_domain, null);
 		} catch (TigaseStringprepException e) {
-			log.log(Level.WARNING,
-					"Creating component source address failed stringprep processing: {0}@{1}",
-					new Object[] { getName(),
-							my_hostname });
+			log.log(Level.WARNING, "Creating component source address failed stringprep processing: {0}@{1}",
+					new Object[]{getName(), my_hostname});
 		}
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -200,7 +195,7 @@ public class SessionManagerClustered
 		super.handleResourceBind(conn);
 		strategy.handleLocalResourceBind(conn);
 	}
-	
+
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
@@ -213,8 +208,8 @@ public class SessionManagerClustered
 
 		if (!getComponentId().equals(jid)) {
 			strategy.nodeConnected(jid);
-			
-			sendAdminNotification( jid.getDomain(), STATUS.CONNECETED );
+
+			sendAdminNotification(jid.getDomain(), STATUS.CONNECETED);
 		}
 	}
 
@@ -228,7 +223,7 @@ public class SessionManagerClustered
 			// Not sure what to do here, there might be still packets
 			// from the cluster node waiting....
 			// delTrusted(jid);
-			
+
 			sendAdminNotification(jid.toString(), STATUS.DISCONNECTED);
 		}
 	}
@@ -245,12 +240,11 @@ public class SessionManagerClustered
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * <p>
 	 * <br>
-	 * 
-	 * This is a standard component method for processing packets. The method
-	 * takes care of cases where the packet cannot be processed locally, in such a
-	 * case it is forwarded to another node.
+	 * <p>
+	 * This is a standard component method for processing packets. The method takes care of cases where the packet
+	 * cannot be processed locally, in such a case it is forwarded to another node.
 	 *
 	 * @param packet to be processed
 	 */
@@ -306,30 +300,26 @@ public class SessionManagerClustered
 		super.processPresenceUpdate(session, packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public ComponentInfo getComponentInfo() {
 		cmpInfo = super.getComponentInfo();
-		cmpInfo.getComponentData().put("ClusteringStrategy", (strategy != null)
-				? strategy.getClass()
-				: null);
+		cmpInfo.getComponentData().put("ClusteringStrategy", (strategy != null) ? strategy.getClass() : null);
 
 		return cmpInfo;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * {@inheritDoc}
-	 *
+	 * <p>
 	 * <br><br>
+	 * <p>
+	 * If the installation knows about user's JID, that he is connected to the system, then this method returns all
+	 * user's connection IDs. As an optimization we can forward packets to all user's connections directly from a single
+	 * node.
 	 *
-	 * If the installation knows about user's JID, that he is connected to the
-	 * system, then this method returns all user's connection IDs. As an
-	 * optimization we can forward packets to all user's connections directly from
-	 * a single node.
-	 *
-	 * @param jid
-	 *          a user's JID for whom we query information.
+	 * @param jid a user's JID for whom we query information.
 	 *
 	 * @return a list of all user's connection IDs.
 	 */
@@ -341,8 +331,7 @@ public class SessionManagerClustered
 			ids = strategy.getConnectionIdsForJid(jid);
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Called for jid: {0}, results: {1}", new Object[] { jid,
-					Arrays.toString(ids) });
+			log.log(Level.FINEST, "Called for jid: {0}, results: {1}", new Object[]{jid, Arrays.toString(ids)});
 		}
 
 		return ids;
@@ -364,11 +353,10 @@ public class SessionManagerClustered
 
 	}
 
-
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		if (strategy != null ) {
+		if (strategy != null) {
 			strategy.getStatistics(list);
 		}
 	}
@@ -407,59 +395,6 @@ public class SessionManagerClustered
 		return this.connectionsByFrom.containsKey(connJid);
 	}
 
-	@FillRoutedEvent
-	protected boolean fillRoutedUserSessionWithProcessorResultWriter(UserSessionEventWithProcessorResultWriter event) {
-		event.setPacketWriter(this::addOutPackets);
-		return true;
-	}
-	
-	@FillRoutedEvent
-	protected boolean fillRoutedUserSessionEvent(UserSessionEvent event) {
-		XMPPSession session = getSession(event.getUserJid().getBareJID());
-		if (session != null && (event.getUserJid().getResource() == null || session.getResourceForResource(event.getUserJid().getResource()) != null)) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for event {0} setting session to {1}", new Object[]{event, session});
-			}
-			event.setSession(session);
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	@RouteEvent
-	protected Collection<Subscription> routeUserSessionEvent(UserSessionEvent event, Collection<Subscription> subscriptions) {
-		if (strategy.hasCompleteJidsInfo()) {
-			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid().getBareJID());
-			if (records == null)
-				records = Collections.emptySet();
-			if (event.getUserJid().getResource() != null) {
-				Iterator<ConnectionRecordIfc> it = records.iterator();
-				while (it.hasNext()) {
-					if (!it.next().getUserJid().equals(event.getUserJid())) 
-						it.remove();
-				}
-			}
-			Iterator<Subscription> it = subscriptions.iterator();
-			while (it.hasNext()) {
-				Subscription s = it.next();
-				if (!s.isInClusterSubscription())
-					continue;
-				
-				boolean remove = true;
-				
-				for (ConnectionRecordIfc rec : records) {
-					if (rec.getNode().getDomain().equals(s.getJid().getDomain()))
-						remove = false;
-				}
-				
-				if (remove)
-					it.remove();
-			}
-		}
-		return subscriptions;
-	}
-	
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		super.setClusterController(cl_controller);
@@ -480,23 +415,79 @@ public class SessionManagerClustered
 //  clusterController.setCommandListener(RESPOND_SYNCONLINE_CMD, respondSyncOnline);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	@FillRoutedEvent
+	protected boolean fillRoutedUserSessionWithProcessorResultWriter(UserSessionEventWithProcessorResultWriter event) {
+		event.setPacketWriter(this::addOutPackets);
+		return true;
+	}
+
+	@FillRoutedEvent
+	protected boolean fillRoutedUserSessionEvent(UserSessionEvent event) {
+		XMPPSession session = getSession(event.getUserJid().getBareJID());
+		if (session != null && (event.getUserJid().getResource() == null ||
+				session.getResourceForResource(event.getUserJid().getResource()) != null)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event {0} setting session to {1}", new Object[]{event, session});
+			}
+			event.setSession(session);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@RouteEvent
+	protected Collection<Subscription> routeUserSessionEvent(UserSessionEvent event,
+															 Collection<Subscription> subscriptions) {
+		if (strategy.hasCompleteJidsInfo()) {
+			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid().getBareJID());
+			if (records == null) {
+				records = Collections.emptySet();
+			}
+			if (event.getUserJid().getResource() != null) {
+				Iterator<ConnectionRecordIfc> it = records.iterator();
+				while (it.hasNext()) {
+					if (!it.next().getUserJid().equals(event.getUserJid())) {
+						it.remove();
+					}
+				}
+			}
+			Iterator<Subscription> it = subscriptions.iterator();
+			while (it.hasNext()) {
+				Subscription s = it.next();
+				if (!s.isInClusterSubscription()) {
+					continue;
+				}
+
+				boolean remove = true;
+
+				for (ConnectionRecordIfc rec : records) {
+					if (rec.getNode().getDomain().equals(s.getJid().getDomain())) {
+						remove = false;
+					}
+				}
+
+				if (remove) {
+					it.remove();
+				}
+			}
+		}
+		return subscriptions;
+	}
 
 	/**
-	 * The method intercept user's disconnect event. On user disconnect the method
-	 * takes a list of cluster nodes from the strategy and sends a notification to
-	 * all those nodes about the event.
-	 *
-	 * @see SessionManager#closeSession
+	 * The method intercept user's disconnect event. On user disconnect the method takes a list of cluster nodes from
+	 * the strategy and sends a notification to all those nodes about the event.
 	 *
 	 * @param conn {@link XMPPResourceConnection} to be closed
 	 * @param closeOnly whether to perform additional processing before closing
+	 *
+	 * @see SessionManager#closeSession
 	 */
 	@Override
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Called for conn: {0}, closeOnly: {1}", new Object[] { conn,
-					closeOnly });
+			log.log(Level.FINEST, "Called for conn: {0}, closeOnly: {1}", new Object[]{conn, closeOnly});
 		}
 
 		// Exception here should not normally happen, but if it does, then
@@ -520,6 +511,8 @@ public class SessionManagerClustered
 		}
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	@Override
 	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
 		try {
@@ -538,7 +531,7 @@ public class SessionManagerClustered
 			message += "node " + node + " ";
 		}
 
-		switch ( stat ) {
+		switch (stat) {
 			case CONNECETED:
 				message += "connected to ";
 //				subject = "New cluster node connected";
@@ -552,11 +545,16 @@ public class SessionManagerClustered
 
 		message += getDefHostName() + " (" + new Date() + ")";
 
-		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.chat,
-				message, subject, "cluster_status_update", newPacketId(null));
+		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.chat, message, subject,
+										  "cluster_status_update", newPacketId(null));
 
 		sendToAdmins(p_msg);
 
+	}
+
+	private enum STATUS {
+		CONNECETED,
+		DISCONNECTED
 	}
 }
 

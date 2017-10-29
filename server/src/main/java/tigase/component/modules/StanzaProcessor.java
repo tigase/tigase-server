@@ -53,33 +53,24 @@ public class StanzaProcessor {
 		return modules;
 	}
 
+	public void setModules(List<Module> modules) {
+		this.modules = modules == null ? Collections.emptyList() : modules;
+	}
+
 	public ResponseManager getResponseManager() {
 		return responseManager;
+	}
+
+	public void setResponseManager(ResponseManager responseManager) {
+		this.responseManager = responseManager;
 	}
 
 	public PacketWriter getWriter() {
 		return writer;
 	}
 
-	private boolean process(final Packet packet) throws ComponentException, TigaseStringprepException {
-		boolean handled = false;
-		if (log.isLoggable(Level.FINER)) {
-			log.finest("Processing packet: " + packet.toString());
-		}
-
-		for (Module module : this.modules) {
-			if (module.canHandle(packet)) {
-				handled = true;
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("Handled by module " + module.getClass());
-				}
-				module.process(packet);
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Finished " + module.getClass());
-				}
-			}
-		}
-		return handled;
+	public void setWriter(PacketWriter writer) {
+		this.writer = writer;
 	}
 
 	public void processPacket(Packet packet) {
@@ -128,14 +119,10 @@ public class StanzaProcessor {
 	}
 
 	/**
-	 * Converts {@link ComponentException} to XMPP error stanza and sends it to
-	 * sender of packet.
+	 * Converts {@link ComponentException} to XMPP error stanza and sends it to sender of packet.
 	 *
-	 *
-	 * @param packet
-	 *            packet what caused exception.
-	 * @param e
-	 *            exception.
+	 * @param packet packet what caused exception.
+	 * @param e exception.
 	 */
 	public void sendException(final Packet packet, final ComponentException e) {
 		try {
@@ -165,16 +152,25 @@ public class StanzaProcessor {
 		}
 	}
 
-	public void setModules(List<Module> modules) {
-		this.modules = modules == null ? Collections.emptyList() : modules;
-	}
+	private boolean process(final Packet packet) throws ComponentException, TigaseStringprepException {
+		boolean handled = false;
+		if (log.isLoggable(Level.FINER)) {
+			log.finest("Processing packet: " + packet.toString());
+		}
 
-	public void setResponseManager(ResponseManager responseManager) {
-		this.responseManager = responseManager;
-	}
-
-	public void setWriter(PacketWriter writer) {
-		this.writer = writer;
+		for (Module module : this.modules) {
+			if (module.canHandle(packet)) {
+				handled = true;
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Handled by module " + module.getClass());
+				}
+				module.process(packet);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Finished " + module.getClass());
+				}
+			}
+		}
+		return handled;
 	}
 
 }

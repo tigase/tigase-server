@@ -22,32 +22,32 @@ package tigase.stats;
 import java.util.logging.Level;
 
 /**
- *
  * @author andrzej
  */
-public class CounterPerSecond extends CounterValue {
-		
+public class CounterPerSecond
+		extends CounterValue {
+
 	private long last_second_counter = 0;
-	
+
 	private long per_second = 0;
 
 	public CounterPerSecond(String name, Level level) {
 		super(name, level);
 	}
-		
+
 	public synchronized void everySecond() {
 		per_second = counter - last_second_counter;
 		last_second_counter = counter;
-	}		
-		
+	}
+
 	public long getPerSecond() {
 		return per_second;
 	}
-	
+
 	public void getStatistics(String compName, StatisticsList list) {
 		if (list.checkLevel(level)) {
 			list.add(compName, name + " last second", per_second, level);
 		}
 	}
-		
+
 }

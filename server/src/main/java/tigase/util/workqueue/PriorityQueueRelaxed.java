@@ -31,10 +31,12 @@ import java.util.logging.Logger;
  * Created: Feb 9, 2010 11:12:56 AM
  *
  * @param <E>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
+public class PriorityQueueRelaxed<E>
+		extends PriorityQueueAbstract<E> {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -42,26 +44,24 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private LinkedBlockingQueue<E>[] qs = null;
 	private int lowestNonEmpty = Integer.MAX_VALUE;
+	private LinkedBlockingQueue<E>[] qs = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
-	public PriorityQueueRelaxed() {}
+	public PriorityQueueRelaxed() {
+	}
 
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param maxPriority
 	 * @param maxSize
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	protected PriorityQueueRelaxed(int maxPriority, int maxSize) {
 		init(maxPriority, maxSize);
 	}
@@ -150,7 +150,8 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 //          log.finest("[" + owner + "] waiting...");
 						this.wait();
 					}
-				} catch (InterruptedException ex) {}
+				} catch (InterruptedException ex) {
+				}
 
 				LinkedBlockingQueue<E> q = qs[lowestNonEmpty];
 
@@ -189,8 +190,7 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 	// private boolean add(E element, int priority, boolean blocking, String owner)
 	private boolean add(E element, int priority, boolean blocking) throws InterruptedException {
 		if ((priority < 0) || (qs.length <= priority)) {
-			throw new IllegalArgumentException("parameter priority must be " + "between 0 and "
-					+ (qs.length - 1));
+			throw new IllegalArgumentException("parameter priority must be " + "between 0 and " + (qs.length - 1));
 		}
 
 		boolean result = true;
@@ -237,7 +237,7 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 
 	private int findNextNonEmpty() {
 		for (int i = 0; i < qs.length; i++) {
-			if ( !qs[i].isEmpty()) {
+			if (!qs[i].isEmpty()) {
 				return i;
 			}
 		}
@@ -246,8 +246,6 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

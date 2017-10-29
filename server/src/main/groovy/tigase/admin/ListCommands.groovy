@@ -27,13 +27,12 @@
  */
 package tigase.admin
 
-import tigase.server.*
-import tigase.util.*
+import tigase.server.Command
+import tigase.server.Packet
 import tigase.xml.Element
-import tigase.xmpp.*
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -41,48 +40,53 @@ def result = p.commandResult(Command.DataType.form)
 Command.addTitle(result, "Retrieving list of commands");
 
 def type = Command.getFieldValue(p, "type");
-if (!type) {	
+if (!type) {
 	Command.addInstructions(result, "Select a informations to retrieve")
-	Command.addFieldValue(result, "type", "", "Informations to retrive", ["Groups", "Commands"].toArray(new String[2]), ["groups", "commands"].toArray(new String[2]));
+	Command.addFieldValue(result, "type", "", "Informations to retrive",
+						  [ "Groups", "Commands" ].toArray(new String[2]),
+						  [ "groups", "commands" ].toArray(new String[2]));
 	return result;
-}
-else if (type == "groups") {
-	def groups = [];
+} else if (type == "groups") {
+	def groups = [ ];
 	Command.addInstructions(result, "Select a group for which to retrieve commands");
 	Command.addFieldValue(result, "type", "commands", "hidden");
-	adminCommands.each { id, script -> 
-		if (!component.canCallCommand(p.getStanzaFrom(), id))
-			return;
-		
+	adminCommands.each { id, script ->
+		if (!component.canCallCommand(p.getStanzaFrom(), id)) {
+			return
+		};
+
 		def group = script.getGroup();
 		if (group == null) {
 			group = "--";
 		}
-		if (!groups.contains(group))
-			groups.add(group);
+		if (!groups.contains(group)) {
+			groups.add(group)
+		};
 	}
-	Command.addFieldValue(result, "group", "", "Group", groups.toArray(new String[groups.size()]), groups.toArray(new String[groups.size()]));
+	Command.addFieldValue(result, "group", "", "Group", groups.toArray(new String[groups.size()]),
+						  groups.toArray(new String[groups.size()]));
 	return result;
-}
-else if (type == "commands") {
+} else if (type == "commands") {
 	def group = Command.getFieldValue(p, "group");
 	Command.addHiddenField(result, "group", group ?: "");
 	Command.addInstructions(result, "Following commands are available" + (group ? " for group $group" : ""));
 	def x = Command.getData(result).find { it.getName() == "x" && it.getXMLNS() };
 	def reported = new Element("reported");
-	def fields = ["node", "group", "name", "jid"];
+	def fields = [ "node", "group", "name", "jid" ];
 	reported.addChildren(fields.collect {
-		new Element("field", ["var"].toArray(new String[1]), [it].toArray(new String[1]));	
+		new Element("field", [ "var" ].toArray(new String[1]), [ it ].toArray(new String[1]));
 	});
 	x.addChild(reported);
-	def scripts = [];
-	adminCommands.each { id, script -> 
-		if (!component.canCallCommand(p.getStanzaFrom(), id))
-			return;
-			
-		if (group && !group.equals(script.getGroup()))
-			return;
-			
+	def scripts = [ ];
+	adminCommands.each { id, script ->
+		if (!component.canCallCommand(p.getStanzaFrom(), id)) {
+			return
+		};
+
+		if (group && !group.equals(script.getGroup())) {
+			return
+		};
+
 		def item = new Element("item");
 		fields.each {
 			def value = new Element("value");
@@ -90,7 +94,7 @@ else if (type == "commands") {
 			field.setAttribute("var", it);
 			field.addChild(value);
 			item.addChild(field);
-			
+
 			if (it == "node") {
 				value.setCData(id);
 			} else if (it == "group") {
@@ -102,10 +106,12 @@ else if (type == "commands") {
 			}
 		}
 		x.addChild(item);
-		
-		scripts.add([id:id, name:script.getDescription()]);
-	}	
-	
-	Command.addFieldValue(result, "commands", "", "Commands", scripts.collect{ it.name }.toArray(new String[scripts.size()]), scripts.collect{ it.id }.toArray(new String[scripts.size()]));
+
+		scripts.add([ id: id, name: script.getDescription() ]);
+	}
+
+	Command.addFieldValue(result, "commands", "", "Commands",
+						  scripts.collect { it.name }.toArray(new String[scripts.size()]),
+						  scripts.collect { it.id }.toArray(new String[scripts.size()]));
 	return result;
 }

@@ -31,8 +31,8 @@ import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
 import tigase.util.Base64;
-import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -54,17 +54,15 @@ public class ScramCallbackHandler
 		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware, MechanismNameAware {
 
 	private static final Logger log = Logger.getLogger(ScramCallbackHandler.class.getCanonicalName());
+	private boolean accountDisabled = false;
+	private ScramCredentialsEntry credentialsEntry;
 	private boolean credentialsFetched;
-
+	private String domain;
 	private BareJID jid = null;
 	private String mechanismName;
-	private String username = null;
-	private String domain;
 	private AuthRepository repo;
 	private XMPPResourceConnection session;
-
-	private ScramCredentialsEntry credentialsEntry;
-	private boolean accountDisabled = false;
+	private String username = null;
 
 	public ScramCallbackHandler() {
 	}
@@ -79,9 +77,24 @@ public class ScramCallbackHandler
 		}
 	}
 
-	@Override                                                                
+	@Override
 	public void setMechanismName(String mechanismName) {
 		this.mechanismName = mechanismName;
+	}
+
+	@Override
+	public void setAuthRepository(AuthRepository repo) {
+		this.repo = repo;
+	}
+
+	@Override
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	@Override
+	public void setSession(XMPPResourceConnection session) {
+		this.session = session;
 	}
 
 	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
@@ -90,7 +103,6 @@ public class ScramCallbackHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
 		}
-
 
 		fetchCredentials();
 		if (accountDisabled) {
@@ -128,48 +140,6 @@ public class ScramCallbackHandler
 			handleAuthorizeCallback((AuthorizeCallback) callback);
 		} else {
 			throw new UnsupportedCallbackException(callback, "Unrecognized Callback " + callback);
-		}
-	}
-
-	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
-		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null && !callback.getAuthzId().equals(jid.toString())) {
-			try {
-				jid = BareJID.bareJIDInstance(callback.getAuthzId());
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
-			}
-		} else {
-			username = DEFAULT_USERNAME;
-			callback.setAuthzId(jid.toString());
-		}
-	}
-
-	private void handleChannelBindingCallback(ChannelBindingCallback callback) {
-		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
-			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
-		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
-			try {
-				Certificate cert = (Certificate) session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
-				final String usealgo;
-				final String algo = cert.getPublicKey().getAlgorithm();
-				if (algo.equals("MD5") || algo.equals("SHA-1")) {
-					usealgo = "SHA-256";
-				} else {
-					usealgo = algo;
-				}
-				final MessageDigest md = MessageDigest.getInstance(usealgo);
-				final byte[] der = cert.getEncoded();
-				md.update(der);
-				callback.setBindingData(md.digest());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}",
-					new Object[]{callback.getRequestedBindType(),
-								 callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()),
-								 session});
 		}
 	}
 
@@ -218,19 +188,47 @@ public class ScramCallbackHandler
 		}
 	}
 
-	@Override
-	public void setAuthRepository(AuthRepository repo) {
-		this.repo = repo;
+	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
+		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
+				!callback.getAuthzId().equals(jid.toString())) {
+			try {
+				jid = BareJID.bareJIDInstance(callback.getAuthzId());
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		} else {
+			username = DEFAULT_USERNAME;
+			callback.setAuthzId(jid.toString());
+		}
 	}
 
-	@Override
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
-
-	@Override
-	public void setSession(XMPPResourceConnection session) {
-		this.session = session;
+	private void handleChannelBindingCallback(ChannelBindingCallback callback) {
+		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
+			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
+		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
+			try {
+				Certificate cert = (Certificate) session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
+				final String usealgo;
+				final String algo = cert.getPublicKey().getAlgorithm();
+				if (algo.equals("MD5") || algo.equals("SHA-1")) {
+					usealgo = "SHA-256";
+				} else {
+					usealgo = algo;
+				}
+				final MessageDigest md = MessageDigest.getInstance(usealgo);
+				final byte[] der = cert.getEncoded();
+				md.update(der);
+				callback.setBindingData(md.digest());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}",
+					new Object[]{callback.getRequestedBindType(),
+								 callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()),
+								 session});
+		}
 	}
 
 	private void fetchCredentials() {
@@ -254,7 +252,8 @@ public class ScramCallbackHandler
 				if (entry instanceof ScramCredentialsEntry) {
 					credentialsEntry = (ScramCredentialsEntry) entry;
 				} else if (entry instanceof PlainCredentialsEntry) {
-					credentialsEntry = new 	ScramCredentialsEntry(mech.replace("SCRAM-", ""), (PlainCredentialsEntry) entry);
+					credentialsEntry = new ScramCredentialsEntry(mech.replace("SCRAM-", ""),
+																 (PlainCredentialsEntry) entry);
 				}
 
 				accountDisabled = credentials.isAccountDisabled();

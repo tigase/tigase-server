@@ -18,22 +18,18 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.amp.cond;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.amp.ConditionIfc;
 import tigase.server.Packet;
-
+import tigase.server.amp.ConditionIfc;
+import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
-import tigase.xml.Element;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Logger;
 
 /**
  * Created: Apr 27, 2010 5:36:54 PM
@@ -42,62 +38,55 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class MatchResource
-				implements ConditionIfc {
+		implements ConditionIfc {
+
+	private static final String name = "match-resource";
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log        = Logger.getLogger(MatchResource.class.getName());
-	private static final String name = "match-resource";
+	private static Logger log = Logger.getLogger(MatchResource.class.getName());
 
 	//~--- constant enums -------------------------------------------------------
-
-	private enum MatchValue { any, exact, other; }
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getName() {
 		return name;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public boolean match(Packet packet, Element rule) {
-		String value   = rule.getAttributeStaticStr("value");
+		String value = rule.getAttributeStaticStr("value");
 		boolean result = false;
 
 		if (value != null) {
 			try {
-				MatchValue m_val       = MatchValue.valueOf(value);
-				String jid_resource    = (packet.getStanzaTo() != null)
-																 ? packet.getStanzaTo().getResource()
-																 : null;
+				MatchValue m_val = MatchValue.valueOf(value);
+				String jid_resource = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getResource() : null;
 				String target_resource = packet.getAttributeStaticStr(TO_RES);
 				String from_session_jid_string = packet.getAttributeStaticStr(SESSION_JID);
-				JID from_original_jid = from_session_jid_string != null ? 
-																JID.jidInstance( from_session_jid_string)
-																: null;
+				JID from_original_jid =
+						from_session_jid_string != null ? JID.jidInstance(from_session_jid_string) : null;
 
 				switch (m_val) {
-				case any :
-					result = true;
+					case any:
+						result = true;
 
-					break;
+						break;
 
-				case other :
-					result = ( ( jid_resource != null ) && ( target_resource != null )
-										 && !jid_resource.equals( target_resource ) )
-									 
-									 || ( from_original_jid == null && target_resource == null )
-							;
+					case other:
+						result = ((jid_resource != null) && (target_resource != null) &&
+								!jid_resource.equals(target_resource))
 
-					break;
+								|| (from_original_jid == null && target_resource == null);
 
-				case exact :
-					result = (jid_resource != null) && jid_resource.equals(target_resource);
+						break;
 
-					break;
+					case exact:
+						result = (jid_resource != null) && jid_resource.equals(target_resource);
+
+						break;
 				}
 			} catch (Exception e) {
 				log.info("Incorrect " + name + " condition value for rule: " + rule);
@@ -107,5 +96,13 @@ public class MatchResource
 		}
 
 		return result;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private enum MatchValue {
+		any,
+		exact,
+		other;
 	}
 }

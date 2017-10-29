@@ -34,8 +34,8 @@ import static tigase.conf.Configurable.DEF_SM_NAME;
 
 /**
  * Describe class RoutingsContainer here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Feb 11 16:30:42 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -43,17 +43,15 @@ import static tigase.conf.Configurable.DEF_SM_NAME;
  */
 public class RoutingsContainer {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.util.RoutingsContainer");
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.util.RoutingsContainer");
 
 	private RoutingComputer comp = null;
 
 	/**
 	 * Creates a new <code>RoutingsContainer</code> instance.
-	 *
 	 */
 	public RoutingsContainer(boolean multiMode) {
 		if (multiMode) {
@@ -80,7 +78,8 @@ public class RoutingsContainer {
 
 	}
 
-	public static abstract class AbstractRoutingComputer implements RoutingComputer {
+	public static abstract class AbstractRoutingComputer
+			implements RoutingComputer {
 
 		public AbstractRoutingComputer() {
 			addRouting(".+", DEF_SM_NAME + "@" + DNSResolverFactory.getInstance().getDefaultHost());
@@ -88,26 +87,12 @@ public class RoutingsContainer {
 
 	}
 
-	@Bean(name="routingComputer", parent = ClientConnectionManager.class, active = true)
-	public static class SingleMode extends AbstractRoutingComputer {
+	public static class MultiMode
+			extends AbstractRoutingComputer {
 
-		private String routing;
-
-		public void addRouting(final String pattern, final String address) {
-			routing = address;
-		}
-
-		public String computeRouting(final String address) {
-			return routing;
-		}
-
-	}
-
-	public static class MultiMode extends AbstractRoutingComputer {
-
-		@ConfigField(desc = "Routing patterns")
-		private Map<Pattern, String> routings =	new LinkedHashMap<Pattern, String>();
 		private String def = null;
+		@ConfigField(desc = "Routing patterns")
+		private Map<Pattern, String> routings = new LinkedHashMap<Pattern, String>();
 
 		public void addRouting(final String pattern, final String address) {
 			if (log.isLoggable(Level.FINE)) {
@@ -126,16 +111,31 @@ public class RoutingsContainer {
 				}
 				return def;
 			} // end of if (address == null)
-			for (Map.Entry<Pattern, String> entry: routings.entrySet()) {
+			for (Map.Entry<Pattern, String> entry : routings.entrySet()) {
 				if (entry.getKey().matcher(address).find()) {
-    				if (log.isLoggable(Level.FINEST)) {
-        				log.finest("For address: " + address + " pattern: "
-            				+ entry.getKey().pattern() + " matched.");
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("For address: " + address + " pattern: " + entry.getKey().pattern() + " matched.");
+					}
 					return entry.getValue();
 				} // end of if (pattern.matcher(address).find())
 			} // end of for ()
 			return def;
+		}
+
+	}
+
+	@Bean(name = "routingComputer", parent = ClientConnectionManager.class, active = true)
+	public static class SingleMode
+			extends AbstractRoutingComputer {
+
+		private String routing;
+
+		public void addRouting(final String pattern, final String address) {
+			routing = address;
+		}
+
+		public String computeRouting(final String address) {
+			return routing;
 		}
 
 	}

@@ -43,14 +43,16 @@ import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 /**
  * Implementation of CallbackHandler for authentication with SASL PLAIN or using plaintext password.
  */
-public class PlainCallbackHandler implements CallbackHandler, AuthRepositoryAware, DomainAware {
+public class PlainCallbackHandler
+		implements CallbackHandler, AuthRepositoryAware, DomainAware {
+
 	protected String domain;
 
 	protected BareJID jid = null;
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 	protected AuthRepository repo;
-	private String username;
 	private boolean accountDisabled = false;
+	private String username;
 
 	@Override
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -60,6 +62,16 @@ public class PlainCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 			}
 			handleCallback(callbacks[i]);
 		}
+	}
+
+	@Override
+	public void setAuthRepository(AuthRepository repo) {
+		this.repo = repo;
+	}
+
+	@Override
+	public void setDomain(String domain) {
+		this.domain = domain;
 	}
 
 	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
@@ -102,19 +114,7 @@ public class PlainCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 		}
 
 	}
-	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
-		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null && !callback.getAuthzId().equals(jid.toString())) {
-			try {
-				jid = BareJID.bareJIDInstance(callback.getAuthzId());
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
-			}
-		} else {
-			username = DEFAULT_USERNAME;
-			callback.setAuthzId(jid.toString());
-		}
-	}
-	
+
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		username = nc.getDefaultName();
 
@@ -155,14 +155,18 @@ public class PlainCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 		}
 	}
 
-	@Override
-	public void setAuthRepository(AuthRepository repo) {
-		this.repo = repo;
-	}
-
-	@Override
-	public void setDomain(String domain) {
-		this.domain = domain;
+	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
+		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
+				!callback.getAuthzId().equals(jid.toString())) {
+			try {
+				jid = BareJID.bareJIDInstance(callback.getAuthzId());
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		} else {
+			username = DEFAULT_USERNAME;
+			callback.setAuthzId(jid.toString());
+		}
 	}
 
 }

@@ -21,7 +21,8 @@ package tigase.auth.callbacks;
 
 import javax.security.auth.callback.Callback;
 
-public class AuthorizationIdCallback implements Callback, java.io.Serializable {
+public class AuthorizationIdCallback
+		implements Callback, java.io.Serializable {
 
 	private final String prompt;
 	private String authzId;
@@ -35,11 +36,11 @@ public class AuthorizationIdCallback implements Callback, java.io.Serializable {
 		return authzId;
 	}
 
-	public String getPrompt() {
-		return prompt;
-	}
-
 	public void setAuthzId(String authzId) {
 		this.authzId = authzId;
+	}
+
+	public String getPrompt() {
+		return prompt;
 	}
 }

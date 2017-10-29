@@ -25,7 +25,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterator;
 
-class SetWrapper<E> implements Set<E> {
+class SetWrapper<E>
+		implements Set<E> {
 
 	private final Set<E> set;
 

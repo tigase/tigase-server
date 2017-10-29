@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -56,8 +54,8 @@ import java.util.logging.Logger;
 
 /**
  * Describe class VHostManager here.
- *
- *
+ * <p>
+ * <p>
  * Created: Fri Nov 21 14:28:20 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -66,40 +64,34 @@ import java.util.logging.Logger;
 @Bean(name = "vhost-man", parent = Kernel.class, active = true, exportable = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode})
 public class VHostManager
-				extends AbstractComponentRegistrator<VHostListener>
-				implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
+		extends AbstractComponentRegistrator<VHostListener>
+		implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
 
 	/** Field description */
 	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private long getComponentsForLocalDomainCalls    = 0;
-	private long getComponentsForNonLocalDomainCalls = 0;
-
-	// private ServiceEntity serviceEntity = null;
-	private String                       identity_type           = "generic";
-	private long                         isAnonymousEnabledCalls = 0;
-	private long                         isLocalDomainCalls      = 0;
-	private Kernel kernel;
-	private LinkedHashSet<VHostListener> localDomainsHandlers =
-			new LinkedHashSet<VHostListener>(10);
-	private LinkedHashSet<VHostListener> nonLocalDomainsHandlers =
-			new LinkedHashSet<VHostListener>(10);
-	private LinkedHashSet<VHostListener> nameSubdomainsHandlers =
-			new LinkedHashSet<VHostListener>(10);
-	private ConcurrentSkipListSet<String> registeredComponentDomains =
-			new ConcurrentSkipListSet<String>();
 	@Inject
 	protected ComponentRepository<VHostItem> repo = null;
+	private long getComponentsForLocalDomainCalls = 0;
+	private long getComponentsForNonLocalDomainCalls = 0;
+	// private ServiceEntity serviceEntity = null;
+	private String identity_type = "generic";
+	private long isAnonymousEnabledCalls = 0;
+	private long isLocalDomainCalls = 0;
+	private Kernel kernel;
+	private LinkedHashSet<VHostListener> localDomainsHandlers = new LinkedHashSet<VHostListener>(10);
+	private LinkedHashSet<VHostListener> nameSubdomainsHandlers = new LinkedHashSet<VHostListener>(10);
+	private LinkedHashSet<VHostListener> nonLocalDomainsHandlers = new LinkedHashSet<VHostListener>(10);
+	private ConcurrentSkipListSet<String> registeredComponentDomains = new ConcurrentSkipListSet<String>();
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>VHostManager</code> instance.
-	 *
 	 */
-	public VHostManager() {}
+	public VHostManager() {
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -181,13 +173,12 @@ public class VHostManager
 			int idx = domain.indexOf('.');
 
 			if (idx > 0) {
-				String        name       = domain.substring(0, idx);
-				String        basedomain = domain.substring(idx + 1);
-				VHostListener listener   = components.get(name);
+				String name = domain.substring(0, idx);
+				String basedomain = domain.substring(idx + 1);
+				VHostListener listener = components.get(name);
 
-				if ((listener != null) && listener.handlesNameSubdomains() && isLocalDomain(
-						basedomain)) {
-					return new ServerComponent[] { listener };
+				if ((listener != null) && listener.handlesNameSubdomains() && isLocalDomain(basedomain)) {
+					return new ServerComponent[]{listener};
 				}
 			}
 
@@ -235,8 +226,7 @@ public class VHostManager
 
 		// Return components for non-local domains
 		if (nonLocalDomainsHandlers.size() > 0) {
-			return nonLocalDomainsHandlers.toArray(
-					new ServerComponent[nonLocalDomainsHandlers.size()]);
+			return nonLocalDomainsHandlers.toArray(new ServerComponent[nonLocalDomainsHandlers.size()]);
 		} else {
 			return null;
 		}
@@ -267,12 +257,9 @@ public class VHostManager
 	public void getStatistics(StatisticsList list) {
 		list.add(getName(), "Number of VHosts", repo.size(), Level.FINE);
 		list.add(getName(), "Checks: is local domain", isLocalDomainCalls, Level.FINER);
-		list.add(getName(), "Checks: is anonymous domain", isAnonymousEnabledCalls, Level
-				.FINER);
-		list.add(getName(), "Get components for local domain",
-				getComponentsForLocalDomainCalls, Level.FINER);
-		list.add(getName(), "Get components for non-local domain",
-				getComponentsForNonLocalDomainCalls, Level.FINER);
+		list.add(getName(), "Checks: is anonymous domain", isAnonymousEnabledCalls, Level.FINER);
+		list.add(getName(), "Get components for local domain", getComponentsForLocalDomainCalls, Level.FINER);
+		list.add(getName(), "Get components for non-local domain", getComponentsForNonLocalDomainCalls, Level.FINER);
 	}
 
 	@Override
@@ -287,9 +274,9 @@ public class VHostManager
 			int idx = domain.indexOf('.');
 
 			if (idx > 0) {
-				String        name       = domain.substring(0, idx);
-				String        basedomain = domain.substring(idx + 1);
-				VHostListener listener   = components.get(name);
+				String name = domain.substring(0, idx);
+				String basedomain = domain.substring(idx + 1);
+				VHostListener listener = components.get(name);
 				if (listener != null && listener.handlesNameSubdomains()) {
 					item = getVHostItem(basedomain);
 				}
@@ -297,7 +284,7 @@ public class VHostManager
 		}
 		return item;
 	}
-	
+
 	@Override
 	public boolean isAnonymousEnabled(String domain) {
 		++isAnonymousEnabledCalls;
@@ -334,12 +321,11 @@ public class VHostManager
 			int idx = domain.indexOf('.');
 
 			if (idx > 0) {
-				String        name       = domain.substring(0, idx);
-				String        basedomain = domain.substring(idx + 1);
-				VHostListener listener   = components.get(name);
+				String name = domain.substring(0, idx);
+				String basedomain = domain.substring(idx + 1);
+				VHostListener listener = components.get(name);
 
-				result = ((listener != null) && listener.handlesNameSubdomains() && isLocalDomain(
-						basedomain));
+				result = ((listener != null) && listener.handlesNameSubdomains() && isLocalDomain(basedomain));
 			}
 		}
 
@@ -352,11 +338,11 @@ public class VHostManager
 	public void setName(String name) {
 		super.setName(name);
 	}
-	
+
 	public void initializeRepository() throws TigaseDBException {
 		// loading all items
 		repo.reload();
-		
+
 		List<VHostItem> items = new ArrayList<VHostItem>(repo.allItems());
 		for (VHostItem item : items) {
 			// if there is no S2S secret set for vhost, then we need to generate it
@@ -365,9 +351,9 @@ public class VHostManager
 				item.setS2sSecret(secret);
 				repo.addItem(item);
 			}
-		}	
+		}
 	}
-	
+
 	public String generateSecret() {
 		String random = UUID.randomUUID().toString();
 		return random;
@@ -378,22 +364,24 @@ public class VHostManager
 	}
 
 	@Bean(name = "vhostRepository", parent = VHostManager.class, active = true)
-	public static class DefVHostRepositoryBean extends AbstractSDComponentRepositoryBean<VHostItem> {
-
-		private ComponentRepository<VHostItem> repo = null;
+	public static class DefVHostRepositoryBean
+			extends AbstractSDComponentRepositoryBean<VHostItem> {
 
 		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
-			return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] { VHostItem.class, DataSource.class });
+			return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class,
+																	new Type[]{VHostItem.class, DataSource.class});
 		};
+		private ComponentRepository<VHostItem> repo = null;
 
 		@Override
-		protected Class<? extends ComponentRepositoryDataSourceAware<VHostItem, DataSource>> findClassForDataSource(DataSource dataSource) throws DBInitException {
-			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
+		protected Class<? extends ComponentRepositoryDataSourceAware<VHostItem, DataSource>> findClassForDataSource(
+				DataSource dataSource) throws DBInitException {
+			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(),
+														 matcher);
 			return (Class<ComponentRepositoryDataSourceAware<VHostItem, DataSource>>) cls;
 		}
-		
+
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/10/05

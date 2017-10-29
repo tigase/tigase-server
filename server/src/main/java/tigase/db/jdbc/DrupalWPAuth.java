@@ -47,75 +47,64 @@ import java.util.logging.Logger;
 
 /**
  * Describe class DrupalWPAuth here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Nov 11 22:22:04 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Meta( supportedUris = { "jdbc:[^:]+:.*" } )
-public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataRepository> {
+@Meta(supportedUris = {"jdbc:[^:]+:.*"})
+public class DrupalWPAuth
+		implements AuthRepository, DataSourceAware<DataRepository> {
 
+	/** Field description */
+	public static final String DRUPAL_USERS_TBL = "users";
+	/** Field description */
+	public static final String DRUPAL_NAME_FLD = "name";
+	/** Field description */
+	public static final String DRUPAL_PASS_FLD = "pass";
+	/** Field description */
+	public static final String DRUPAL_STATUS_FLD = "status";
+	/** Field description */
+	public static final int DRUPAL_OK_STATUS_VAL = 1;
+	/** Field description */
+	public static final String WP_USERS_TBL = "wp_users";
+	/** Field description */
+	public static final String WP_NAME_FLD = "user_login";
+	/** Field description */
+	public static final String WP_PASS_FLD = "user_pass";
+	/** Field description */
+	public static final String WP_STATUS_FLD = "user_status";
+	/** Field description */
+	public static final int WP_OK_STATUS_VAL = 0;
 	/**
 	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger(DrupalWPAuth.class.getName());
-	private static final String[] non_sasl_mechs = { "password" };
-	private static final String[] sasl_mechs = { "PLAIN" };
-
-	/** Field description */
-	public static final String DRUPAL_USERS_TBL = "users";
-
-	/** Field description */
-	public static final String DRUPAL_NAME_FLD = "name";
-
-	/** Field description */
-	public static final String DRUPAL_PASS_FLD = "pass";
-
-	/** Field description */
-	public static final String DRUPAL_STATUS_FLD = "status";
-
-	/** Field description */
-	public static final int DRUPAL_OK_STATUS_VAL = 1;
-
-	/** Field description */
-	public static final String WP_USERS_TBL = "wp_users";
-
-	/** Field description */
-	public static final String WP_NAME_FLD = "user_login";
-
-	/** Field description */
-	public static final String WP_PASS_FLD = "user_pass";
-
-	/** Field description */
-	public static final String WP_STATUS_FLD = "user_status";
-
-	/** Field description */
-	public static final int WP_OK_STATUS_VAL = 0;
+	private static final String[] non_sasl_mechs = {"password"};
+	private static final String[] sasl_mechs = {"PLAIN"};
 	private static final String SELECT_PASSWORD_QUERY_KEY = "select-password-drupal-wp-query-key";
 	private static final String SELECT_STATUS_QUERY_KEY = "select-status-drupal-wp-query-key";
 	private static final String INSERT_USER_QUERY_KEY = "insert-user-drupal-wp-query-key";
 	private static final String UPDATE_LAST_LOGIN_QUERY_KEY = "update-last-login-drupal-wp-query-key";
-	private static final String UPDATE_ONLINE_STATUS_QUERY_KEY =
-		"update-online-status-drupal-wp-query-key";
+	private static final String UPDATE_ONLINE_STATUS_QUERY_KEY = "update-online-status-drupal-wp-query-key";
 
 	//~--- fields ---------------------------------------------------------------
 
 	private DataRepository data_repo = null;
-	private String name_fld = DRUPAL_NAME_FLD;
-	private String users_tbl = DRUPAL_USERS_TBL;
-	private int status_val = DRUPAL_OK_STATUS_VAL;
-	private String status_fld = DRUPAL_STATUS_FLD;
-	private String pass_fld = DRUPAL_PASS_FLD;
-	private boolean online_status = false;
 	private boolean last_login = true;
+	private String name_fld = DRUPAL_NAME_FLD;
+	private boolean online_status = false;
+	private String pass_fld = DRUPAL_PASS_FLD;
+	private String status_fld = DRUPAL_STATUS_FLD;
+	private int status_val = DRUPAL_OK_STATUS_VAL;
+	private String users_tbl = DRUPAL_USERS_TBL;
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void addUser(BareJID user, final String password)
-			throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		try {
 			PreparedStatement user_add_st = data_repo.getPreparedStatement(user, INSERT_USER_QUERY_KEY);
 
@@ -130,7 +119,7 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
 		}
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -178,13 +167,12 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 			data_repo.initPreparedStatement(SELECT_PASSWORD_QUERY_KEY, query);
 			query = "select " + status_fld + " from " + users_tbl + " where " + name_fld + " = ?";
 			data_repo.initPreparedStatement(SELECT_STATUS_QUERY_KEY, query);
-			query = "insert into " + users_tbl + " (" + name_fld + ", " + pass_fld + ", " + status_fld
-					+ ")" + " values (?, ?, " + status_val + ")";
+			query = "insert into " + users_tbl + " (" + name_fld + ", " + pass_fld + ", " + status_fld + ")" +
+					" values (?, ?, " + status_val + ")";
 			data_repo.initPreparedStatement(INSERT_USER_QUERY_KEY, query);
 			query = "update " + users_tbl + " set access=?, login=? where " + name_fld + " = ?";
 			data_repo.initPreparedStatement(UPDATE_LAST_LOGIN_QUERY_KEY, query);
-			query = "update " + users_tbl + " set online_status=online_status+? where " + name_fld
-					+ " = ?";
+			query = "update " + users_tbl + " set online_status=online_status+? where " + name_fld + " = ?";
 			data_repo.initPreparedStatement(UPDATE_ONLINE_STATUS_QUERY_KEY, query);
 		} catch (SQLException ex) {
 			data_repo = null;
@@ -194,11 +182,11 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 
 	@Override
 	@Deprecated
-	public void initRepository(final String connection_str, Map<String, String> params)
-			throws DBInitException {
+	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
-			if (data_repo == null)
+			if (data_repo == null) {
 				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+			}
 
 		} catch (Exception e) {
 			data_repo = null;
@@ -263,7 +251,7 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 						// Unfortunately, unlike with plainAuth we have to check whether the user
 						// is active after successful authentication as before it is completed the
 						// user id is not known
-						if ( !isActive(user)) {
+						if (!isActive(user)) {
 							throw new AuthorizationException("User account has been blocked.");
 						}    // end of if (!isActive(user))
 
@@ -307,10 +295,83 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
 
+	@Override
+	public void queryAuth(final Map<String, Object> authProps) {
+		String protocol = (String) authProps.get(PROTOCOL_KEY);
+
+		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
+			authProps.put(RESULT_KEY, non_sasl_mechs);
+		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
+
+		if (protocol.equals(PROTOCOL_VAL_SASL)) {
+			authProps.put(RESULT_KEY, sasl_mechs);
+		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
+	}
+
+	// Implementation of tigase.db.AuthRepository
+
+	@Override
+	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Removing user is not supported.");
+	}
+
+	@Override
+	public void updatePassword(BareJID user, final String password) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Updating user password is not supported.");
+	}
+
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		ResultSet rs = null;
+
+		try {
+			PreparedStatement pass_st = data_repo.getPreparedStatement(user, SELECT_PASSWORD_QUERY_KEY);
+
+			synchronized (pass_st) {
+				try {
+					pass_st.setString(1, user.getLocalpart());
+					rs = pass_st.executeQuery();
+
+					if (rs.next()) {
+						return rs.getString(1);
+					} else {
+						throw new UserNotFoundException("User does not exist: " + user);
+					}    // end of if (isnext) else
+				} finally {
+					data_repo.release(null, rs);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem with retrieving user password.", e);
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return AccountStatus.active;
+	}
+
 	private boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		try {
-			if ( !isActive(user)) {
+			if (!isActive(user)) {
 				throw new AuthorizationException("User account has been blocked.");
 			}    // end of if (!isActive(user))
 
@@ -339,82 +400,6 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 		}      // end of catch
 	}
 
-	// Implementation of tigase.db.AuthRepository
-
-	@Override
-	public void queryAuth(final Map<String, Object> authProps) {
-		String protocol = (String) authProps.get(PROTOCOL_KEY);
-
-		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
-			authProps.put(RESULT_KEY, non_sasl_mechs);
-		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
-
-		if (protocol.equals(PROTOCOL_VAL_SASL)) {
-			authProps.put(RESULT_KEY, sasl_mechs);
-		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
-	}
-
-	@Override
-	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Removing user is not supported.");
-	}
-
-	@Override
-	public void updatePassword(BareJID user, final String password)
-			throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Updating user password is not supported.");
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException  {
-		ResultSet rs = null;
-
-		try {
-			PreparedStatement pass_st = data_repo.getPreparedStatement(user, SELECT_PASSWORD_QUERY_KEY);
-
-			synchronized (pass_st) {
-				try {
-					pass_st.setString(1, user.getLocalpart());
-					rs = pass_st.executeQuery();
-
-					if (rs.next()) {
-						return rs.getString(1);
-					} else {
-						throw new UserNotFoundException("User does not exist: " + user);
-					}    // end of if (isnext) else
-				} finally {
-					data_repo.release(null, rs);
-				}
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem with retrieving user password.", e);
-		}
-	}
-
-	@Override
-	public boolean isUserDisabled(BareJID user) 
-					throws UserNotFoundException, TigaseDBException {
-		return false;
-	}
-	
-	@Override
-	public void setUserDisabled(BareJID user, Boolean value) 
-					throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Feature not supported");		
-	}
-
-	@Override
-	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
-		throw new TigaseDBException("Feature not supported");
-	}
-
-	@Override
-	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
-		return AccountStatus.active;
-	}
-	
 	private boolean isActive(BareJID user) throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 
@@ -448,7 +433,8 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 				sasl_props.put(Sasl.QOP, "auth");
 				sasl_props.put("password-encryption", "MD5");
 				ss = Sasl.createSaslServer((String) props.get(MACHANISM_KEY), "xmpp",
-						(String) props.get(SERVER_NAME_KEY), sasl_props, new SaslCallbackHandler(props));
+										   (String) props.get(SERVER_NAME_KEY), sasl_props,
+										   new SaslCallbackHandler(props));
 				props.put("SaslServer", ss);
 			}    // end of if (ss == null)
 
@@ -457,12 +443,10 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 			byte[] challenge = ss.evaluateResponse(in_data);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "challenge: {0}",
-						((challenge != null) ? new String(challenge) : "null"));
+				log.log(Level.FINEST, "challenge: {0}", ((challenge != null) ? new String(challenge) : "null"));
 			}
 
-			String challenge_str = (((challenge != null) && (challenge.length > 0))
-				? Base64.encode(challenge) : null);
+			String challenge_str = (((challenge != null) && (challenge.length > 0)) ? Base64.encode(challenge) : null);
 
 			props.put(RESULT_KEY, challenge_str);
 
@@ -489,8 +473,8 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 	private void updateLastLogin(BareJID user) throws TigaseDBException {
 		if (last_login) {
 			try {
-				PreparedStatement update_last_login_st =
-					data_repo.getPreparedStatement(user, UPDATE_LAST_LOGIN_QUERY_KEY);
+				PreparedStatement update_last_login_st = data_repo.getPreparedStatement(user,
+																						UPDATE_LAST_LOGIN_QUERY_KEY);
 
 				synchronized (update_last_login_st) {
 					BigDecimal bd = new BigDecimal((System.currentTimeMillis() / 1000));
@@ -509,8 +493,8 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 	private void updateOnlineStatus(BareJID user, int status) throws TigaseDBException {
 		if (online_status) {
 			try {
-				PreparedStatement update_online_status =
-					data_repo.getPreparedStatement(user, UPDATE_ONLINE_STATUS_QUERY_KEY);
+				PreparedStatement update_online_status = data_repo.getPreparedStatement(user,
+																						UPDATE_ONLINE_STATUS_QUERY_KEY);
 
 				synchronized (update_online_status) {
 					update_online_status.setInt(1, status);
@@ -525,7 +509,9 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class SaslCallbackHandler implements CallbackHandler {
+	private class SaslCallbackHandler
+			implements CallbackHandler {
+
 		private Map<String, Object> options = null;
 
 		//~--- constructors -------------------------------------------------------
@@ -539,8 +525,7 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 		// Implementation of javax.security.auth.callback.CallbackHandler
 
 		@Override
-		public void handle(final Callback[] callbacks)
-				throws IOException, UnsupportedCallbackException {
+		public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 			BareJID jid = null;
 
 			for (int i = 0; i < callbacks.length; i++) {
@@ -615,8 +600,6 @@ public class DrupalWPAuth implements AuthRepository, DataSourceAware<DataReposit
 	}
 }    // DrupalWPAuth
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

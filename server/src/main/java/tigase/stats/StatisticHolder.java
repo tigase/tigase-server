@@ -20,19 +20,20 @@
 package tigase.stats;
 
 /**
- *
  * @author andrzej
  */
 public interface StatisticHolder {
-	
+
 	void statisticExecutedIn(long executionTime);
-	
-	void everyHour();	
+
+	void everyHour();
+
 	void everyMinute();
-	void everySecond();	
-	
-	void getStatistics(String compName, StatisticsList list);	
+
+	void everySecond();
+
+	void getStatistics(String compName, StatisticsList list);
 
 	void setStatisticsPrefix(String prefix);
-	
+
 }

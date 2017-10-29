@@ -22,11 +22,11 @@ package tigase.stats;
 
 /**
  * Interface StatisticsContainerIfc
- *
- * Objects which inherits this type can return runtime statistics. Any object
- * can collect job statistics and implementing this interface guarantees that
- * statistics will be presented in configured way to user who wants to see them.
- *
+ * <p>
+ * Objects which inherits this type can return runtime statistics. Any object can collect job statistics and
+ * implementing this interface guarantees that statistics will be presented in configured way to user who wants to see
+ * them.
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -34,8 +34,8 @@ package tigase.stats;
  */
 public interface StatisticsContainerIfc {
 
-  public String getName();
+	public String getName();
 
-  public void getStatistics(StatisticsList list);
+	public void getStatistics(StatisticsList list);
 
 }

@@ -102,23 +102,6 @@ public class SaslSCRAMTest
 		}
 	}
 
-	/**
-	 * @param salt password salt
-	 * @param snonce server once
-	 * @param password user password (plaintext)
-	 *
-	 * @return
-	 */
-	private SaslSCRAM create(String salt, String snonce, String password) {
-		TestCallbackHandler h = new TestCallbackHandler();
-		h.setSalt(salt);
-		h.setPassword(password);
-		SaslSCRAM m = new SaslSCRAM(null, h, snonce) {
-		};
-
-		return m;
-	}
-
 	@Test
 	public void testHmac() {
 		SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
@@ -175,18 +158,6 @@ public class SaslSCRAMTest
 		}
 	}
 
-//	@Test
-//	public void testServerFirstMessageFail_2() {
-//		try {
-//			SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
-//			byte[] r = m.evaluateResponse("y,,n=bmalkow,r=SpiXKmhi57DBp5sdE5G3H3ms".getBytes());
-//			fail();
-//		} catch (SaslException e) {
-//			Assert.assertEquals("Server supports PLUS. Please use 'p'", e.getMessage());
-//
-//		}
-//	}
-
 	@Test
 	public void testDataExchange01() throws Exception {
 		final byte[] CFM = Base64.decode("biwsbj1qZW5raW5zLHI9YmdId0xRSEJkNFMrK3F2VEIzZis0QT09");
@@ -211,15 +182,62 @@ public class SaslSCRAMTest
 		}
 	}
 
+//	@Test
+//	public void testServerFirstMessageFail_2() {
+//		try {
+//			SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
+//			byte[] r = m.evaluateResponse("y,,n=bmalkow,r=SpiXKmhi57DBp5sdE5G3H3ms".getBytes());
+//			fail();
+//		} catch (SaslException e) {
+//			Assert.assertEquals("Server supports PLUS. Please use 'p'", e.getMessage());
+//
+//		}
+//	}
+
+	/**
+	 * @param salt password salt
+	 * @param snonce server once
+	 * @param password user password (plaintext)
+	 *
+	 * @return
+	 */
+	private SaslSCRAM create(String salt, String snonce, String password) {
+		TestCallbackHandler h = new TestCallbackHandler();
+		h.setSalt(salt);
+		h.setPassword(password);
+		SaslSCRAM m = new SaslSCRAM(null, h, snonce) {
+		};
+
+		return m;
+	}
+
 	static class TestCallbackHandler
 			implements CallbackHandler {
+
+		private String authorizedId = "user@domain.com";
+		private byte[] bindingData;
+		private int iterations = 4096;
+		private String name = "user@domain.com";
+		private String password;
+		private String salt;
+
+		public TestCallbackHandler() {
+		}
 
 		public byte[] getBindingData() {
 			return bindingData;
 		}
 
+		public void setBindingData(byte[] bindingData) {
+			this.bindingData = bindingData;
+		}
+
 		public String getPassword() {
 			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
 		}
 
 		public String getName() {
@@ -242,34 +260,16 @@ public class SaslSCRAMTest
 			return salt;
 		}
 
+		public void setSalt(String salt) {
+			this.salt = salt;
+		}
+
 		public int getIterations() {
 			return iterations;
 		}
 
 		public void setIterations(int iterations) {
 			this.iterations = iterations;
-		}
-
-		private byte[] bindingData;
-		private String password;
-		private String name = "user@domain.com";
-		private String authorizedId = "user@domain.com";
-		private String salt;
-		private int iterations = 4096;
-
-		public void setBindingData(byte[] bindingData) {
-			this.bindingData = bindingData;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		public void setSalt(String salt) {
-			this.salt = salt;
-		}
-
-		public TestCallbackHandler() {
 		}
 
 		@Override

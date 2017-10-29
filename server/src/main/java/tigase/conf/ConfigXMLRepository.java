@@ -1,4 +1,3 @@
-
 /*
  * ConfigXMLRepository.java
  *
@@ -22,37 +21,30 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
 import tigase.xml.db.XMLDBException;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Class <code>ConfigXMLRepository</code> provides access to configuration
- * settings.
- *
+ * Class <code>ConfigXMLRepository</code> provides access to configuration settings.
  * <p>
- * Created: Sat Nov 13 18:53:21 2004
- * </p>
+ * <p> Created: Sat Nov 13 18:53:21 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ConfigXMLRepository extends ConfigurationCache {
+public class ConfigXMLRepository
+		extends ConfigurationCache {
 
 	/** Field description */
 	public static final String COMPONENT_NODE = "component";
@@ -65,44 +57,18 @@ public class ConfigXMLRepository extends ConfigurationCache {
 
 	/** Field description */
 	public static final String XMPP_CONFIG_FILE_PROPERTY_VAL = "xmpp_server.xml";
-	private static ConfigXMLRepository def_config = null;
 	private static final Logger log = Logger.getLogger("tigase.conf.ConfigRepository");
-	private static Map<String, ConfigXMLRepository> configs = new LinkedHashMap<String,
-																															ConfigXMLRepository>();
+	private static Map<String, ConfigXMLRepository> configs = new LinkedHashMap<String, ConfigXMLRepository>();
+	private static ConfigXMLRepository def_config = null;
 
 	//~--- fields ---------------------------------------------------------------
-
 	private String config_file = null;
 	private XMLDB xmldb = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Constructs ...
-	 *
-	 */
-	public ConfigXMLRepository() {}
-
-	private ConfigXMLRepository(final boolean debug) throws XMLDBException {
-		config_file = System.getProperty(XMPP_CONFIG_FILE_PROPERTY_KEY,
-																		 XMPP_CONFIG_FILE_PROPERTY_VAL);
-		init();
-		def_config = this;
-	}
-
-	private ConfigXMLRepository(final boolean debug, final String file)
-					throws XMLDBException {
-		config_file = file;
-		init();
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 *
 	 * @throws XMLDBException
 	 */
@@ -113,38 +79,30 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param file_name
-	 *
-	 * 
 	 *
 	 * @throws XMLDBException
 	 */
-	public static ConfigXMLRepository getConfigRepository(final String file_name)
-					throws XMLDBException {
+	public static ConfigXMLRepository getConfigRepository(final String file_name) throws XMLDBException {
 		return getConfigRepository(false, file_name);
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param debug
 	 * @param file_name
 	 *
-	 * 
-	 *
 	 * @throws XMLDBException
 	 */
-	public static ConfigXMLRepository getConfigRepository(final boolean debug,
-					final String file_name)
-					throws XMLDBException {
+	public static ConfigXMLRepository getConfigRepository(final boolean debug, final String file_name)
+			throws XMLDBException {
 		ConfigXMLRepository config = null;
 
 		if (file_name == null) {
 			config = def_config;
 		}    // end of if (file_name == null)
-						else {
+		else {
 			config = configs.get(file_name);
 		}    // end of if (file_name == null) else
 
@@ -152,7 +110,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 			if (file_name == null) {
 				config = new ConfigXMLRepository(debug);
 			}    // end of if (file_name == null)
-							else {
+			else {
 				config = new ConfigXMLRepository(debug, file_name);
 			}    // end of if (file_name == null) else
 		}      // end of if (config == null)
@@ -160,35 +118,44 @@ public class ConfigXMLRepository extends ConfigurationCache {
 		return config;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 */
+	public ConfigXMLRepository() {
+	}
+
+	private ConfigXMLRepository(final boolean debug) throws XMLDBException {
+		config_file = System.getProperty(XMPP_CONFIG_FILE_PROPERTY_KEY, XMPP_CONFIG_FILE_PROPERTY_VAL);
+		init();
+		def_config = this;
+	}
+
+	private ConfigXMLRepository(final boolean debug, final String file) throws XMLDBException {
+		config_file = file;
+		init();
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addItem(String compName, ConfigItem item) {
 		try {
-			xmldb.setData(item.getCompName(),
-										item.getNodeName(),
-										item.getKeyName(),
-										item.getConfigVal());
+			xmldb.setData(item.getCompName(), item.getNodeName(), item.getKeyName(), item.getConfigVal());
 		} catch (NodeNotFoundException e1) {
 			try {
 				xmldb.addNode1(item.getCompName());
-				xmldb.setData(item.getCompName(),
-											item.getNodeName(),
-											item.getKeyName(),
-											item.getConfigVal());
+				xmldb.setData(item.getCompName(), item.getNodeName(), item.getKeyName(), item.getConfigVal());
 			} catch (Exception e2) {
 				log.log(Level.WARNING,
-								"Can't add item for compName=" + item.getCompName() + ", node="
-								+ item.getNodeName() + ", key=" + item.getKeyName() + ", value="
-								+ item.getConfigValToString(),
-								e2);
+						"Can't add item for compName=" + item.getCompName() + ", node=" + item.getNodeName() +
+								", key=" + item.getKeyName() + ", value=" + item.getConfigValToString(), e2);
 			}    // end of try-catch
 		} catch (Exception e) {
 			log.log(Level.WARNING,
-							"Can't add item for compName=" + item.getCompName() + ", node="
-							+ item.getNodeName() + ", key=" + item.getKeyName() + ", value="
-							+ item.getConfigValToString(),
-							e);
+					"Can't add item for compName=" + item.getCompName() + ", node=" + item.getNodeName() + ", key=" +
+							item.getKeyName() + ", value=" + item.getConfigValToString(), e);
 		}
 	}
 
@@ -229,10 +196,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 
 			return item;
 		} catch (Exception e) {
-			log.log(Level.WARNING,
-							"Can't load value for compName=" + compName + ", node=" + node + ", key="
-							+ key,
-							e);
+			log.log(Level.WARNING, "Can't load value for compName=" + compName + ", node=" + node + ", key=" + key, e);
 
 			return null;
 		}
@@ -265,7 +229,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 		try {
 			return xmldb.getKeys(root, node);
 		}    // end of try
-						catch (NodeNotFoundException e) {
+		catch (NodeNotFoundException e) {
 			return null;
 		}    // end of try-catch
 	}
@@ -279,18 +243,14 @@ public class ConfigXMLRepository extends ConfigurationCache {
 		try {
 			init();
 		} catch (XMLDBException ex) {
-			throw new DBInitException("Can not initialize configuration repository: ",
-																			 ex);
+			throw new DBInitException("Can not initialize configuration repository: ", ex);
 		}
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param cls
-	 *
-	 * 
 	 */
 	public String nodeForPackage(Class cls) {
 		return cls.getPackage().getName().replace('.', '/');
@@ -302,10 +262,8 @@ public class ConfigXMLRepository extends ConfigurationCache {
 			xmldb.removeData(item.getCompName(), item.getNodeName(), item.getKeyName());
 		} catch (Exception e) {
 			log.log(Level.WARNING,
-							"Can't remove item for compName=" + item.getCompName() + ", node="
-							+ item.getNodeName() + ", key=" + item.getKeyName() + ", value="
-							+ item.getConfigValToString(),
-							e);
+					"Can't remove item for compName=" + item.getCompName() + ", node=" + item.getNodeName() + ", key=" +
+							item.getKeyName() + ", value=" + item.getConfigValToString(), e);
 		}
 	}
 
@@ -323,9 +281,8 @@ public class ConfigXMLRepository extends ConfigurationCache {
 		}
 	}
 
-	/** ************ Old code ************ */
-	private void addVals(Set<ConfigItem> props, String compName, String node,
-											 String[] keys) {
+	/** *********** Old code ************ */
+	private void addVals(Set<ConfigItem> props, String compName, String node, String[] keys) {
 		if (keys != null) {
 			for (String key : keys) {
 				try {
@@ -336,9 +293,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 					props.add(item);
 				} catch (NodeNotFoundException ex) {
 					log.log(Level.WARNING,
-									"Can't load value for compName=" + compName + ", node=" + node
-									+ ", key=" + key,
-									ex);
+							"Can't load value for compName=" + compName + ", node=" + node + ", key=" + key, ex);
 				}
 			}    // end of for (String key : keys)
 		}      // end of if (keys != null)
@@ -385,8 +340,6 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	}
 }    // ConfigXMLRepository
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

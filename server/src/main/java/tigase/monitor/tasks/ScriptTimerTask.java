@@ -20,29 +20,31 @@
 
 package tigase.monitor.tasks;
 
+import tigase.kernel.beans.Inject;
+import tigase.monitor.ConfigurableTask;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import tigase.kernel.beans.Inject;
-import tigase.monitor.ConfigurableTask;
-
-public class ScriptTimerTask extends AbstractConfigurableTimerTask implements ConfigurableTask {
+public class ScriptTimerTask
+		extends AbstractConfigurableTimerTask
+		implements ConfigurableTask {
 
 	@Inject
 	protected Bindings bindings;
-
-	private ScriptEngine engine;
-
-	private String script;
-
 	@Inject
 	protected ScriptEngineManager scriptEngineManager;
-
+	private ScriptEngine engine;
+	private String script;
 	private String scriptExtension;
 
 	public Bindings getBindings() {
 		return bindings;
+	}
+
+	public void setBindings(Bindings bindings) {
+		this.bindings = bindings;
 	}
 
 	public String getScript() {
@@ -53,8 +55,18 @@ public class ScriptTimerTask extends AbstractConfigurableTimerTask implements Co
 		return scriptEngineManager;
 	}
 
+	public void setScriptEngineManager(ScriptEngineManager scriptEngineManager) {
+		this.scriptEngineManager = scriptEngineManager;
+	}
+
 	public String getScriptExtension() {
 		return scriptExtension;
+	}
+
+	public void setScript(String script, String scriptExtension) {
+		this.engine = scriptEngineManager.getEngineByExtension(scriptExtension);
+		this.script = script;
+		this.scriptExtension = scriptExtension;
 	}
 
 	@Override
@@ -64,20 +76,6 @@ public class ScriptTimerTask extends AbstractConfigurableTimerTask implements Co
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void setBindings(Bindings bindings) {
-		this.bindings = bindings;
-	}
-
-	public void setScript(String script, String scriptExtension) {
-		this.engine = scriptEngineManager.getEngineByExtension(scriptExtension);
-		this.script = script;
-		this.scriptExtension = scriptExtension;
-	}
-
-	public void setScriptEngineManager(ScriptEngineManager scriptEngineManager) {
-		this.scriptEngineManager = scriptEngineManager;
 	}
 
 }

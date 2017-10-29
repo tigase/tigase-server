@@ -1,4 +1,3 @@
-
 /*
  * S2SProcessor.java
  *
@@ -23,14 +22,13 @@ package tigase.server.xmppserver;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -40,19 +38,18 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface S2SProcessor extends Comparable<S2SProcessor> {
+public interface S2SProcessor
+		extends Comparable<S2SProcessor> {
 
 	/**
-	 * Returns order of processor which is used to set order in which processors
-	 * will be processing packet
-	 * 
-	 * @return 
+	 * Returns order of processor which is used to set order in which processors will be processing packet
+	 *
+	 * @return
 	 */
 	public int order();
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param serv
 	 */
@@ -61,7 +58,6 @@ public interface S2SProcessor extends Comparable<S2SProcessor> {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param serv
 	 */
 	public void serviceStopped(S2SIOService serv);
@@ -69,14 +65,12 @@ public interface S2SProcessor extends Comparable<S2SProcessor> {
 	/**
 	 * Method description
 	 *
-	 *
-	 *
 	 * @param serv
 	 * @param results
 	 */
 	public void streamFeatures(S2SIOService serv, List<Element> results);
 
-	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String,Object> props);
+	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props);
 
 	boolean process(Packet p, S2SIOService serv, Queue<Packet> results);
 
@@ -89,8 +83,6 @@ public interface S2SProcessor extends Comparable<S2SProcessor> {
 	String streamOpened(S2SIOService serv, Map<String, String> attribs);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

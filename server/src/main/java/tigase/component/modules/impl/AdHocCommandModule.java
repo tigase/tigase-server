@@ -40,28 +40,17 @@ import java.util.List;
 import java.util.Queue;
 
 @Bean(name = AdHocCommandModule.ID, active = true)
-public class AdHocCommandModule extends AbstractModule implements Initializable {
-
-	public static interface ScriptCommandProcessor {
-
-		List<Element> getScriptItems(String node, JID jid, JID from);
-
-		boolean processScriptCommand(Packet pc, Queue<Packet> results);
-
-	}
-
-	protected static final String[] COMMAND_PATH = { "iq", "command" };
-
-	protected static final Criteria CRIT = ElementCriteria.nameType("iq", "set").add(
-			ElementCriteria.name("command", Command.XMLNS));
+public class AdHocCommandModule
+		extends AbstractModule
+		implements Initializable {
 
 	public final static String ID = "commands";
-
 	public static final String XMLNS = Command.XMLNS;
-
+	protected static final String[] COMMAND_PATH = {"iq", "command"};
+	protected static final Criteria CRIT = ElementCriteria.nameType("iq", "set")
+			.add(ElementCriteria.name("command", Command.XMLNS));
 	@Inject(nullAllowed = false)
 	protected AdHocCommandManager commandsManager;
-
 	@Inject(nullAllowed = false)
 	protected ScriptCommandProcessor scriptProcessor;
 
@@ -72,9 +61,10 @@ public class AdHocCommandModule extends AbstractModule implements Initializable 
 	public List<Element> getCommandListItems(final JID senderJid, final JID toJid) {
 		ArrayList<Element> commandsList = new ArrayList<Element>();
 		for (AdHocCommand command : this.commandsManager.getAllCommands()) {
-			if (command.isAllowedFor(senderJid))
-				commandsList.add(new Element("item", new String[] { "jid", "node", "name" },
-						new String[] { toJid.toString(), command.getNode(), command.getName() }));
+			if (command.isAllowedFor(senderJid)) {
+				commandsList.add(new Element("item", new String[]{"jid", "node", "name"},
+											 new String[]{toJid.toString(), command.getNode(), command.getName()}));
+			}
 		}
 
 		List<Element> scriptCommandsList = scriptProcessor.getScriptItems(Command.XMLNS, toJid, senderJid);
@@ -88,9 +78,13 @@ public class AdHocCommandModule extends AbstractModule implements Initializable 
 		return commandsManager;
 	}
 
+	public void setCommandsManager(AdHocCommandManager commandsManager) {
+		this.commandsManager = commandsManager;
+	}
+
 	@Override
 	public String[] getFeatures() {
-		return new String[] { Command.XMLNS };
+		return new String[]{Command.XMLNS};
 	}
 
 	@Override
@@ -103,15 +97,16 @@ public class AdHocCommandModule extends AbstractModule implements Initializable 
 
 		for (AdHocCommand c : commandsManager.getAllCommands()) {
 			if (c.isAllowedFor(stanzaFrom)) {
-				Element i = new Element("item", new String[] { "jid", "node", "name" },
-						new String[] { stanzaTo.toString(), c.getNode(), c.getName() });
+				Element i = new Element("item", new String[]{"jid", "node", "name"},
+										new String[]{stanzaTo.toString(), c.getNode(), c.getName()});
 				result.add(i);
 			}
 		}
 
 		List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
-		if (scripts != null)
+		if (scripts != null) {
 			result.addAll(scripts);
+		}
 
 		return result;
 	}
@@ -120,10 +115,15 @@ public class AdHocCommandModule extends AbstractModule implements Initializable 
 		return scriptProcessor;
 	}
 
+	public void setScriptProcessor(ScriptCommandProcessor scriptProcessor) {
+		this.scriptProcessor = scriptProcessor;
+	}
+
 	@Override
 	public void initialize() {
-		if (scriptProcessor == null)
+		if (scriptProcessor == null) {
 			throw new RuntimeException("scriptProcessor cannot be null!");
+		}
 	}
 
 	@Override
@@ -140,6 +140,10 @@ public class AdHocCommandModule extends AbstractModule implements Initializable 
 		}
 	}
 
+	public void register(AdHocCommand command) {
+		this.commandsManager.registerCommand(command);
+	}
+
 	protected void processScriptAdHoc(Packet packet) {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 
@@ -150,16 +154,12 @@ public class AdHocCommandModule extends AbstractModule implements Initializable 
 		}
 	}
 
-	public void register(AdHocCommand command) {
-		this.commandsManager.registerCommand(command);
-	}
+	public static interface ScriptCommandProcessor {
 
-	public void setCommandsManager(AdHocCommandManager commandsManager) {
-		this.commandsManager = commandsManager;
-	}
+		List<Element> getScriptItems(String node, JID jid, JID from);
 
-	public void setScriptProcessor(ScriptCommandProcessor scriptProcessor) {
-		this.scriptProcessor = scriptProcessor;
+		boolean processScriptCommand(Packet pc, Queue<Packet> results);
+
 	}
 
 }

@@ -39,14 +39,15 @@ import java.util.logging.Logger;
 
 /**
  * Describe class TLSIO here.
- * 
- * 
+ * <p>
+ * <p>
  * Created: Sat May 14 07:43:30 2005
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TLSIO implements IOInterface {
+public class TLSIO
+		implements IOInterface {
 
 	/** Field description */
 	public static final String TLS_CAPS = "tls-caps";
@@ -59,15 +60,14 @@ public class TLSIO implements IOInterface {
 	// ~--- fields ---------------------------------------------------------------
 
 	private IOInterface io = null;
-	
+
 	/**
 	 * <code>tlsInput</code> buffer keeps data decoded from tlsWrapper.
 	 */
 	private ByteBuffer tlsInput = null;
 
 	/**
-	 * <code>tlsWrapper</code> is a TLS wrapper for connections requiring TLS
-	 * protocol.
+	 * <code>tlsWrapper</code> is a TLS wrapper for connections requiring TLS protocol.
 	 */
 	private TLSWrapper tlsWrapper = null;
 
@@ -86,7 +86,6 @@ public class TLSIO implements IOInterface {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param ioi
 	 * @param wrapper
 	 *
@@ -97,7 +96,7 @@ public class TLSIO implements IOInterface {
 		tlsWrapper = wrapper;
 		tlsWrapper.setDebugId(toString());
 		tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
-                tlsInput.order(order);
+		tlsInput.order(order);
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "TLS Socket created: {0}", io.toString());
@@ -198,15 +197,15 @@ public class TLSIO implements IOInterface {
 
 		if (io.bytesRead() > 0) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Read bytes: {0}, {1}", new Object[] { io.bytesRead(),
-						toString() });
+				log.log(Level.FINER, "Read bytes: {0}, {1}", new Object[]{io.bytesRead(), toString()});
 			}
 
 			return decodeData(tmpBuffer);
 		} else {
 			if (tlsInput.capacity() > tlsWrapper.getAppBuffSize() && tlsInput.capacity() == tlsInput.remaining()) {
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[] { tlsWrapper.getAppBuffSize(), toString() });
+					log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}",
+							new Object[]{tlsWrapper.getAppBuffSize(), toString()});
 				}
 				ByteBuffer bb = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
 
@@ -258,9 +257,8 @@ public class TLSIO implements IOInterface {
 		int max_loop_runs = 100000;
 
 		boolean breakNow = true;
-		
-		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ))
-				&& (++loop_cnt < max_loop_runs)) {
+
+		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ)) && (++loop_cnt < max_loop_runs)) {
 			switch (stat) {
 				case NEED_WRITE:
 					writeBuff(ByteBuffer.allocate(0));
@@ -273,15 +271,14 @@ public class TLSIO implements IOInterface {
 					// from this loop
 					if (io.waitingToSend()) {
 						io.write(null);
-						
+
 						// it appears only during handshake so force break only in this case
-						if (tlsWrapper.getHandshakeStatus() ==
-								SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING 
-								&& (buff == null || !buff.hasRemaining())) {
+						if (tlsWrapper.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING &&
+								(buff == null || !buff.hasRemaining())) {
 							breakNow = true;
 						}
 					}
-					
+
 					// I wonder if some real data can be read from the socket here (and we
 					// would
 					// loose the data) or this is just TLS stuff here.....
@@ -301,7 +298,7 @@ public class TLSIO implements IOInterface {
 			}
 
 			stat = tlsWrapper.getStatus();
-		
+
 			// We can get NEED_READ TLS status while there are data awaiting to be
 			// sent thru network connection - we need to force sending data and to break
 			// from this loop
@@ -313,8 +310,7 @@ public class TLSIO implements IOInterface {
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.log(Level.WARNING,
 					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}, io: {1}",
-					new Object[] {tlsWrapper.getStatus() , toString() }
-			);
+					new Object[]{tlsWrapper.getStatus(), toString()});
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
@@ -334,8 +330,8 @@ public class TLSIO implements IOInterface {
 			result = io.write(null);
 		} else {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}", new Object[] {
-						buff.remaining(), toString() });
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
+						new Object[]{buff.remaining(), toString()});
 			}
 
 			result = writeBuff(buff);
@@ -348,6 +344,11 @@ public class TLSIO implements IOInterface {
 		// log.warning("TLS - written: " + result);
 		// }
 		return result;
+	}
+
+	@Override
+	public void setLogId(String logId) {
+		io.setLogId(logId);
 	}
 
 	private ByteBuffer decodeData(ByteBuffer input) throws IOException {
@@ -441,8 +442,7 @@ public class TLSIO implements IOInterface {
 			} // end of switch (tlsWrapper.getStatus())
 
 			stat = tlsWrapper.getStatus();
-		} while (continueLoop && ((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK))
-				&& input.hasRemaining());
+		} while (continueLoop && ((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK)) && input.hasRemaining());
 
 		if (continueLoop) {
 			if (input.hasRemaining()) {
@@ -499,17 +499,17 @@ public class TLSIO implements IOInterface {
 			wr = io.write(tlsOutput);
 			result += wr;
 
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
-															new Object[] {buff.remaining(), toString() } );
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
+						new Object[]{buff.remaining(), toString()});
 			}
 
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.warning("Infinite loop detected in writeBuff(buff) TLS code, "
-					+ "tlsWrapper.getStatus(): " + tlsWrapper.getStatus()
-									+ ", buff.remaining(): " + buff.remaining() + " io: " + toString() );
+			log.warning("Infinite loop detected in writeBuff(buff) TLS code, " + "tlsWrapper.getStatus(): " +
+								tlsWrapper.getStatus() + ", buff.remaining(): " + buff.remaining() + " io: " +
+								toString());
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
@@ -520,10 +520,5 @@ public class TLSIO implements IOInterface {
 		} // end of if ()
 
 		return result;
-	}
-	
-	@Override
-	public void setLogId(String logId) {
-		io.setLogId(logId);
 	}
 } // TLSIO

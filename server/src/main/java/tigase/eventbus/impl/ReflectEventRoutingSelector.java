@@ -20,24 +20,25 @@
 
 package tigase.eventbus.impl;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-
 import tigase.eventbus.EventRoutingSelector;
 import tigase.eventbus.component.stores.Subscription;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+
 /**
- * This class is implementation of <code>EventRoutingSelector</code> used when
- * this selector is created based on annotated method of consumer class.
- * 
+ * This class is implementation of <code>EventRoutingSelector</code> used when this selector is created based on
+ * annotated method of consumer class.
+ *
  * @author andrzej
  */
-public class ReflectEventRoutingSelector implements EventRoutingSelector {
+public class ReflectEventRoutingSelector
+		implements EventRoutingSelector {
 
-	private final Class eventClass;
 	private final Object consumer;
+	private final Class eventClass;
 	private final Method method;
-	
+
 	public ReflectEventRoutingSelector(Class eventClass, Object consumer, Method method) {
 		this.eventClass = eventClass;
 		this.consumer = consumer;
@@ -46,14 +47,17 @@ public class ReflectEventRoutingSelector implements EventRoutingSelector {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == this)
+		if (o == this) {
 			return true;
-		if (o == null || o.getClass() != getClass())
+		}
+		if (o == null || o.getClass() != getClass()) {
 			return false;
+		}
 
 		ReflectEventRoutingSelector s = (ReflectEventRoutingSelector) o;
-		if (!consumer.equals(s.consumer))
+		if (!consumer.equals(s.consumer)) {
 			return false;
+		}
 		return method.equals(s.method);
 	}
 
@@ -61,7 +65,7 @@ public class ReflectEventRoutingSelector implements EventRoutingSelector {
 	public Class getEventClass() {
 		return eventClass;
 	}
-	
+
 	@Override
 	public Collection<Subscription> getSubscriptions(Object event, Collection<Subscription> subscriptions) {
 		try {
@@ -70,11 +74,11 @@ public class ReflectEventRoutingSelector implements EventRoutingSelector {
 			throw new RuntimeException(ex);
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int result = consumer.hashCode();
 		result = 31 * result + method.hashCode();
 		return result;
-	}	
+	}
 }

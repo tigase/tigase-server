@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -44,29 +42,29 @@ import java.util.logging.Logger;
  * @author kobit
  */
 public class StatisticsProvider
-				extends StandardMBean
-				implements StatisticsProviderMBean {
+		extends StandardMBean
+		implements StatisticsProviderMBean {
+
 	private static final Logger log = Logger.getLogger(StatisticsProvider.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
-	private StatisticsCache     cache = null;
+	private StatisticsCache cache = null;
 	private StatisticsCollector theRef;
 
 	//~--- constructors ---------------------------------------------------------
 
 	// ~--- constructors ---------------------------------------------------------
 
-	public StatisticsProvider(StatisticsCollector theRef, int historySize,
-			long updateInterval, int highMemoryLevel)
-					throws NotCompliantMBeanException {
+	public StatisticsProvider(StatisticsCollector theRef, int historySize, long updateInterval, int highMemoryLevel)
+			throws NotCompliantMBeanException {
 
 		// WARNING Uncomment the following call to super() to make this class
 		// compile (see BUG ID 122377)
 		super(StatisticsProviderMBean.class, false);
 		this.theRef = theRef;
-		cache       = new StatisticsCache(historySize, updateInterval, highMemoryLevel);
+		cache = new StatisticsCache(historySize, updateInterval, highMemoryLevel);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -79,13 +77,11 @@ public class StatisticsProvider
 
 	//~--- get methods ----------------------------------------------------------
 
-
 	@Override
 	public Map<String, String> getAllStats(int level) {
 //		if (log.isLoggable(Level.FINEST)) {
 //			log.log(Level.FINEST, "Get all stats called for level: {0}", level);
 //		}
-
 
 		StatisticsList list = new StatisticsList(Level.parse("" + level));
 
@@ -101,9 +97,7 @@ public class StatisticsProvider
 
 	@Override
 	public float[] getCLPacketsPerSecHistory() {
-		return (cache.clpacks_history != null)
-				? cache.clpacks_history.getCurrentHistory()
-				: null;
+		return (cache.clpacks_history != null) ? cache.clpacks_history.getCurrentHistory() : null;
 	}
 
 	@Override
@@ -188,9 +182,7 @@ public class StatisticsProvider
 
 	@Override
 	public int[] getConnectionsNumberHistory() {
-		return (cache.conns_history != null)
-				? cache.conns_history.getCurrentHistory()
-				: null;
+		return (cache.conns_history != null) ? cache.conns_history.getCurrentHistory() : null;
 	}
 
 	@Override
@@ -205,9 +197,7 @@ public class StatisticsProvider
 
 	@Override
 	public float[] getCPUUsageHistory() {
-		return (cache.cpu_usage_history != null)
-				? cache.cpu_usage_history.getCurrentHistory()
-				: null;
+		return (cache.cpu_usage_history != null) ? cache.cpu_usage_history.getCurrentHistory() : null;
 	}
 
 	public Map<String, Object> getCurStats(String[] statsKeys) {
@@ -227,11 +217,9 @@ public class StatisticsProvider
 
 	@Override
 	public long[] getDirectMemUsedHistory() {
-		return (cache.direct_used_history != null)
-				? cache.direct_used_history.getCurrentHistory()
-				: null;
+		return (cache.direct_used_history != null) ? cache.direct_used_history.getCurrentHistory() : null;
 	}
-	
+
 	@Override
 	public float getHeapMemUsage() {
 		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage();
@@ -239,9 +227,7 @@ public class StatisticsProvider
 
 	@Override
 	public float[] getHeapUsageHistory() {
-		return (cache.heap_usage_history != null)
-				? cache.heap_usage_history.getCurrentHistory()
-				: null;
+		return (cache.heap_usage_history != null) ? cache.heap_usage_history.getCurrentHistory() : null;
 	}
 
 	@Override
@@ -267,9 +253,8 @@ public class StatisticsProvider
 	public MBeanInfo getMBeanInfo() {
 		MBeanInfo mbinfo = super.getMBeanInfo();
 
-		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(), mbinfo
-				.getAttributes(), mbinfo.getConstructors(), mbinfo.getOperations(),
-				getNotificationInfo());
+		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(), mbinfo.getAttributes(),
+							 mbinfo.getConstructors(), mbinfo.getOperations(), getNotificationInfo());
 	}
 
 	@Override
@@ -295,7 +280,7 @@ public class StatisticsProvider
 	}
 
 	public MBeanNotificationInfo[] getNotificationInfo() {
-		return new MBeanNotificationInfo[] {};
+		return new MBeanNotificationInfo[]{};
 	}
 
 	@Override
@@ -342,9 +327,7 @@ public class StatisticsProvider
 
 	@Override
 	public int[] getServerConnectionsHistory() {
-		return (cache.server_conns_history != null)
-				? cache.server_conns_history.getCurrentHistory()
-				: null;
+		return (cache.server_conns_history != null) ? cache.server_conns_history.getCurrentHistory() : null;
 	}
 
 	@Override
@@ -359,9 +342,7 @@ public class StatisticsProvider
 
 	@Override
 	public float[] getSMPacketsPerSecHistory() {
-		return (cache.smpacks_history != null)
-				? cache.smpacks_history.getCurrentHistory()
-				: null;
+		return (cache.smpacks_history != null) ? cache.smpacks_history.getCurrentHistory() : null;
 	}
 
 	@Override
@@ -386,8 +367,7 @@ public class StatisticsProvider
 	}
 
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
-		log.log(Level.INFO, "Generating history for metrics: {0}", Arrays.toString(
-				statsKeys));
+		log.log(Level.INFO, "Generating history for metrics: {0}", Arrays.toString(statsKeys));
 
 		Map<String, LinkedList<Object>> result = null;
 
@@ -440,8 +420,7 @@ public class StatisticsProvider
 				description = "List of components names for which statistics are available";
 			} else {
 				if (info.getName().equals("Name")) {
-					description =
-							"This is a component name - name of the statistics collector component,";
+					description = "This is a component name - name of the statistics collector component,";
 				} else {
 					if (info.getName().equals("getUptime")) {
 						description = "Returns JVM uptime.";
@@ -458,27 +437,26 @@ public class StatisticsProvider
 	}
 
 	@Override
-	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
-			int sequence) {
+	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
-			case 0 :
-				return "Statistics level, 0 - All, 500 - Medium, 800 - Minimal";
+				case 0:
+					return "Statistics level, 0 - All, 500 - Medium, 800 - Minimal";
 
-			default :
-				return null;
+				default:
+					return null;
 			}
 		} else {
 			if (op.getName().equals("getComponentStats")) {
 				switch (sequence) {
-				case 0 :
-					return "The component name to provide statistics for";
+					case 0:
+						return "The component name to provide statistics for";
 
-				case 1 :
-					return "Statistics level, 0 - All, 500 - Medium, 800 - Minimal";
+					case 1:
+						return "Statistics level, 0 - All, 500 - Medium, 800 - Minimal";
 
-				default :
-					return null;
+					default:
+						return null;
 				}
 			}
 		}
@@ -488,9 +466,9 @@ public class StatisticsProvider
 
 	@Override
 	protected String getDescription(MBeanOperationInfo info) {
-		String               description = null;
-		MBeanParameterInfo[] params      = info.getSignature();
-		String[]             signature   = new String[params.length];
+		String description = null;
+		MBeanParameterInfo[] params = info.getSignature();
+		String[] signature = new String[params.length];
 
 		for (int i = 0; i < params.length; i++) {
 			signature[i] = params[i].getType();
@@ -498,44 +476,39 @@ public class StatisticsProvider
 
 		String[] methodSignature;
 
-		methodSignature = new String[] { java.lang.Integer.TYPE.getName() };
-		if (info.getName().equals("getAllStats") && Arrays.equals(signature,
-				methodSignature)) {
+		methodSignature = new String[]{java.lang.Integer.TYPE.getName()};
+		if (info.getName().equals("getAllStats") && Arrays.equals(signature, methodSignature)) {
 			description = "Provides statistics for all components for a given level.";
 		}
-		methodSignature = new String[] { java.lang.String.class.getName(),
-				java.lang.Integer.TYPE.getName() };
-		if (info.getName().equals("getComponentStats") && Arrays.equals(signature,
-				methodSignature)) {
-			description =
-					"Provides statistics for a given component name and statistics level.";
+		methodSignature = new String[]{java.lang.String.class.getName(), java.lang.Integer.TYPE.getName()};
+		if (info.getName().equals("getComponentStats") && Arrays.equals(signature, methodSignature)) {
+			description = "Provides statistics for a given component name and statistics level.";
 		}
 
 		return description;
 	}
 
 	@Override
-	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,
-			int sequence) {
+	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
-			case 0 :
-				return "level";
+				case 0:
+					return "level";
 
-			default :
-				return null;
+				default:
+					return null;
 			}
 		} else {
 			if (op.getName().equals("getComponentStats")) {
 				switch (sequence) {
-				case 0 :
-					return "compName";
+					case 0:
+						return "compName";
 
-				case 1 :
-					return "level";
+					case 1:
+						return "level";
 
-				default :
-					return null;
+					default:
+						return null;
 				}
 			}
 		}
@@ -546,13 +519,13 @@ public class StatisticsProvider
 	protected Set<String> getCompNames() {
 		return cache.allStats.getCompNames();
 	}
-	
+
 	private Map<String, String> getMapFromList(StatisticsList list) {
 		if (list != null) {
 			Map<String, String> result = new LinkedHashMap<String, String>(300);
 
 			for (StatRecord rec : list) {
-				String key   = rec.getComponent() + "/" + rec.getDescription();
+				String key = rec.getComponent() + "/" + rec.getDescription();
 				String value = rec.getValue();
 
 				result.put(key, value);
@@ -568,101 +541,100 @@ public class StatisticsProvider
 
 	// ~--- inner classes --------------------------------------------------------
 	private class StatisticsCache {
+
 		private static final String WS2S_COMP = "ws2s";
 		private static final String BOSH_COMP = "bosh";
-		private static final String C2S_COMP  = "c2s";
-		private static final String CL_COMP   = "cl-comp";
+		private static final String C2S_COMP = "c2s";
+		private static final String CL_COMP = "cl-comp";
 
 		// private static final int HISTORY_SIZE = 8640;
-		private static final int    HISTORY_SIZE = 30;
-		private static final String S2S_COMP     = "s2s";
-		private static final long   SECOND       = 1000;
-		private static final String SM_COMP      = "sess-man";
-		private static final long   MINUTE       = 60 * SECOND;
-		private static final long   HOUR         = 60 * MINUTE;
+		private static final int HISTORY_SIZE = 30;
+		private static final String S2S_COMP = "s2s";
+		private static final long SECOND = 1000;
+		private static final String SM_COMP = "sess-man";
+		private static final long MINUTE = 60 * SECOND;
+		private static final long HOUR = 60 * MINUTE;
 
 		//~--- fields -------------------------------------------------------------
 
-		private AllHistoryCache allHistory        = null;
-		private int             clientConnections = 0;
-
+		private AllHistoryCache allHistory = null;
 		// ~--- fields -------------------------------------------------------------
-		private int               clIOQueue                        = 0;
-		private FloatHistoryCache clpacks_history                  = null;
-		private int               clQueue                          = 0;
-		private int               clusterCache                     = 0;
-		private float             clusterCompressionRatio          = 0f;
-		private long              clusterNetworkBytes              = 0L;
-		private float             clusterNetworkBytesPerSecond     = 0L;
-		private long              clusterNetworkBytesReceived      = 0L;
-		private long              clusterNetworkBytesSent          = 0L;
-		private long              clusterPackets                   = 0L;
-		private float             clusterPacketsPerSec             = 0;
-		private long              clusterPacketsReceived           = 0L;
-		private long              clusterPacketsSent               = 0L;
-		private int               cnt                              = 0;
-		private IntHistoryCache   conns_history                    = null;
-		private FloatHistoryCache cpu_usage_history                = null;
-		private float             cpuUsage                         = 0f;
-		private LongHistoryCache  direct_used_history              = null;
-		private FloatHistoryCache heap_usage_history               = null;
-		private int               inter                            = 10;
-		private long              iqAuthNumber                     = 0;
-		private long              iqOtherNumber                    = 0;
-		private float             iqOtherNumberPerSec              = 0;
-		private String            largeQueues                      = "";
-		private long              lastPresencesReceived            = 0;
-		private long              lastPresencesSent                = 0;
-		private long              messagesNumber                   = 0;
-		private float             messagesPerSec                   = 0;
-		private long              presences_received_per_update    = 0;
-		private long              presences_sent_per_update        = 0;
-		private long              presencesNumber                  = 0;
-		private float             presencesPerSec                  = 0;
-		private long              prevClusterNetworkBytes          = 0L;
-		private float             prevClusterNetworkBytesPerSecond = 0L;
-		private long              prevClusterPackets               = 0L;
-		private float             prevClusterPacketsPerSec         = 0;
-		private float             prevCpuUsage                     = 0f;
-		private float             prevIqOtherNumber                = 0;
-		private float             prevIqOtherNumberPerSec          = 0;
-		private long              prevMessagesNumber               = 0;
-		private float             prevMessagesPerSec               = 0;
-		private long              prevPresencesNumber              = 0;
-		private float             prevPresencesPerSec              = 0;
-		private long              prevSmPackets                    = 0;
-		private float             prevSmPacketsPerSec              = 0;
-		private long              queueOverflow                    = 0;
-		private int               queueSize                        = 0;
-		private long              registered                       = 0;
-		private int               runs_counter                     = 100;
-		private IntHistoryCache   server_conns_history             = null;
-		private int               serverConnections                = 0;
-		private long              smPackets                        = 0;
-		private float             smPacketsPerSec                  = 0;
-		private FloatHistoryCache smpacks_history                  = null;
-		private int               smQueue                          = 0;
-		private String            systemDetails                    = "";
-		private Timer             updateTimer                      = null;
-
+		private int clIOQueue = 0;
+		private int clQueue = 0;
+		private int clientConnections = 0;
+		private FloatHistoryCache clpacks_history = null;
+		private int clusterCache = 0;
+		private float clusterCompressionRatio = 0f;
+		private long clusterNetworkBytes = 0L;
+		private float clusterNetworkBytesPerSecond = 0L;
+		private long clusterNetworkBytesReceived = 0L;
+		private long clusterNetworkBytesSent = 0L;
+		private long clusterPackets = 0L;
+		private float clusterPacketsPerSec = 0;
+		private long clusterPacketsReceived = 0L;
+		private long clusterPacketsSent = 0L;
+		private int cnt = 0;
+		private IntHistoryCache conns_history = null;
+		private float cpuUsage = 0f;
+		private FloatHistoryCache cpu_usage_history = null;
+		private LongHistoryCache direct_used_history = null;
+		private FloatHistoryCache heap_usage_history = null;
+		private int inter = 10;
+		private long iqAuthNumber = 0;
+		private long iqOtherNumber = 0;
+		private float iqOtherNumberPerSec = 0;
+		private String largeQueues = "";
+		private long lastPresencesReceived = 0;
+		private long lastPresencesSent = 0;
 		// private long lastUpdate = 0;
 		private Level level = Level.FINER;
-//		private Level level = Level.FINEST;
+		//		private Level level = Level.FINEST;
 		private StatisticsList allStats = new StatisticsList(level);
+		private long messagesNumber = 0;
+		private float messagesPerSec = 0;
+		private long presencesNumber = 0;
+		private float presencesPerSec = 0;
+		private long presences_received_per_update = 0;
+		private long presences_sent_per_update = 0;
+		private long prevClusterNetworkBytes = 0L;
+		private float prevClusterNetworkBytesPerSecond = 0L;
+		private long prevClusterPackets = 0L;
+		private float prevClusterPacketsPerSec = 0;
+		private float prevCpuUsage = 0f;
+		private float prevIqOtherNumber = 0;
+		private float prevIqOtherNumberPerSec = 0;
+		private long prevMessagesNumber = 0;
+		private float prevMessagesPerSec = 0;
+		private long prevPresencesNumber = 0;
+		private float prevPresencesPerSec = 0;
+		private long prevSmPackets = 0;
+		private float prevSmPacketsPerSec = 0;
+		private long queueOverflow = 0;
+		private int queueSize = 0;
+		private long registered = 0;
+		private int runs_counter = 100;
+		private int serverConnections = 0;
+		private IntHistoryCache server_conns_history = null;
+		private long smPackets = 0;
+		private float smPacketsPerSec = 0;
+		private int smQueue = 0;
+		private FloatHistoryCache smpacks_history = null;
+		private String systemDetails = "";
+		private Timer updateTimer = null;
 
 		//~--- constructors -------------------------------------------------------
 
 		// ~--- constructors -------------------------------------------------------
 		private StatisticsCache(int historySize, long cacheUpdate, int highMemoryLevel) {
 			if (historySize > 0) {
-				smpacks_history      = new FloatHistoryCache(historySize);
+				smpacks_history = new FloatHistoryCache(historySize);
 				server_conns_history = new IntHistoryCache(historySize);
-				heap_usage_history   = new FloatHistoryCache(historySize);
-				cpu_usage_history    = new FloatHistoryCache(historySize);
-				conns_history        = new IntHistoryCache(historySize);
-				clpacks_history      = new FloatHistoryCache(historySize);
-				direct_used_history  = new LongHistoryCache(historySize);
-				allHistory           = new AllHistoryCache(historySize, highMemoryLevel);
+				heap_usage_history = new FloatHistoryCache(historySize);
+				cpu_usage_history = new FloatHistoryCache(historySize);
+				conns_history = new IntHistoryCache(historySize);
+				clpacks_history = new FloatHistoryCache(historySize);
+				direct_used_history = new LongHistoryCache(historySize);
+				allHistory = new AllHistoryCache(historySize, highMemoryLevel);
 			}
 			updateTimer = new Timer("stats-cache", true);
 			updateTimer.scheduleAtFixedRate(new TimerTask() {
@@ -692,8 +664,7 @@ public class StatisticsProvider
 
 			float temp = cpuUsage;
 
-			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime()
-					.getCPUUsage()) / 4;
+			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime().getCPUUsage()) / 4;
 			if (cpu_usage_history != null) {
 				cpu_usage_history.addItem(cpuUsage);
 			}
@@ -705,7 +676,7 @@ public class StatisticsProvider
 				direct_used_history.addItem(getDirectMemUsed());
 			}
 			if (++runs_counter >= 100) {
-				allStats     = new StatisticsList(Level.FINEST);
+				allStats = new StatisticsList(Level.FINEST);
 				runs_counter = 0;
 			} else {
 				allStats = new StatisticsList(level);
@@ -722,31 +693,29 @@ public class StatisticsProvider
 			}
 
 			// System.out.println(allStats.toString());
-			clusterCompressionRatio = (allStats.getValue(CL_COMP, "Average compression ratio",
-					-1f) + allStats.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
+			clusterCompressionRatio = (allStats.getValue(CL_COMP, "Average compression ratio", -1f) +
+					allStats.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
 			clusterPacketsReceived = allStats.getCompReceivedPackets(CL_COMP);
-			clusterPacketsSent     = allStats.getCompSentPackets(CL_COMP);
-			clusterPackets         = clusterPacketsSent + clusterPacketsReceived;
-			temp                   = clusterPacketsPerSec;
-			clusterPacketsPerSec = (prevClusterPacketsPerSec + (temp * 2f) + (clusterPackets -
-					prevClusterPackets)) / 4f;
+			clusterPacketsSent = allStats.getCompSentPackets(CL_COMP);
+			clusterPackets = clusterPacketsSent + clusterPacketsReceived;
+			temp = clusterPacketsPerSec;
+			clusterPacketsPerSec =
+					(prevClusterPacketsPerSec + (temp * 2f) + (clusterPackets - prevClusterPackets)) / 4f;
 			if (clpacks_history != null) {
 				clpacks_history.addItem(clusterPacketsPerSec);
 			}
 			prevClusterPacketsPerSec = temp;
-			prevClusterPackets       = clusterPackets;
-			smPackets                = allStats.getCompPackets(SM_COMP);
-			temp                     = smPacketsPerSec;
-			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) + (smPackets -
-					prevSmPackets)) / 4f;
+			prevClusterPackets = clusterPackets;
+			smPackets = allStats.getCompPackets(SM_COMP);
+			temp = smPacketsPerSec;
+			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) + (smPackets - prevSmPackets)) / 4f;
 			if (smpacks_history != null) {
 				smpacks_history.addItem(smPacketsPerSec);
 			}
 			prevSmPacketsPerSec = temp;
-			prevSmPackets       = smPackets;
-			clientConnections = allStats.getCompConnections(C2S_COMP)
-													+ allStats.getCompConnections( BOSH_COMP )
-													+ allStats.getCompConnections( WS2S_COMP );
+			prevSmPackets = smPackets;
+			clientConnections = allStats.getCompConnections(C2S_COMP) + allStats.getCompConnections(BOSH_COMP) +
+					allStats.getCompConnections(WS2S_COMP);
 			if (conns_history != null) {
 				conns_history.addItem(clientConnections);
 			}
@@ -754,19 +723,20 @@ public class StatisticsProvider
 			if (server_conns_history != null) {
 				server_conns_history.addItem(serverConnections);
 			}
-			clIOQueue      = allStats.getValue(CL_COMP, "Waiting to send", 0);
-			clusterCache   = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
+			clIOQueue = allStats.getValue(CL_COMP, "Waiting to send", 0);
+			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
 			messagesNumber = allStats.getCompMsg(SM_COMP);
-			temp           = messagesPerSec;
-			messagesPerSec = (prevMessagesPerSec + (temp * 2f) + (messagesNumber -
-					prevMessagesNumber)) / 4f;
-			prevMessagesPerSec          = temp;
-			prevMessagesNumber          = messagesNumber;
+			temp = messagesPerSec;
+			messagesPerSec = (prevMessagesPerSec + (temp * 2f) + (messagesNumber - prevMessagesNumber)) / 4f;
+			prevMessagesPerSec = temp;
+			prevMessagesNumber = messagesNumber;
 
-			iqAuthNumber = allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " processed IQ jabber:iq:auth", 0L)
-			+ allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " processed IQ jabber:iq:auth", 0L)
-			+ allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " processed other urn:ietf:params:xml:ns:xmpp-sasl", 0L)
-			+ allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " processed other urn:ietf:params:xml:ns:xmpp-sasl", 0L);
+			iqAuthNumber = allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " processed IQ jabber:iq:auth", 0L) +
+					allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " processed IQ jabber:iq:auth", 0L) +
+					allStats.getValue(SM_COMP,
+									  QueueType.OUT_QUEUE.name() + " processed other urn:ietf:params:xml:ns:xmpp-sasl",
+									  0L) + allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
+					" processed other urn:ietf:params:xml:ns:xmpp-sasl", 0L);
 
 			iqOtherNumber = allStats.getCompIq(SM_COMP);
 
@@ -775,44 +745,43 @@ public class StatisticsProvider
 			prevIqOtherNumberPerSec = temp;
 			prevIqOtherNumber = iqOtherNumber;
 
-			clusterNetworkBytesSent     = allStats.getValue(CL_COMP, "Bytes sent", 0L);
+			clusterNetworkBytesSent = allStats.getValue(CL_COMP, "Bytes sent", 0L);
 			clusterNetworkBytesReceived = allStats.getValue(CL_COMP, "Bytes received", 0L);
-			clusterNetworkBytes         = clusterNetworkBytesSent + clusterNetworkBytesReceived;
-			temp                        = clusterNetworkBytesPerSecond;
-			clusterNetworkBytesPerSecond = (prevClusterNetworkBytesPerSecond + (temp * 2f) +
-					(clusterNetworkBytes - prevClusterNetworkBytes)) / 4f;
+			clusterNetworkBytes = clusterNetworkBytesSent + clusterNetworkBytesReceived;
+			temp = clusterNetworkBytesPerSecond;
+			clusterNetworkBytesPerSecond =
+					(prevClusterNetworkBytesPerSecond + (temp * 2f) + (clusterNetworkBytes - prevClusterNetworkBytes)) /
+							4f;
 			prevClusterNetworkBytesPerSecond = temp;
-			prevClusterNetworkBytes          = clusterNetworkBytes;
+			prevClusterNetworkBytes = clusterNetworkBytes;
 
 			long currPresencesReceived = allStats.getCompPresReceived(SM_COMP);
-			long currPresencesSent     = allStats.getCompPresSent(SM_COMP);
+			long currPresencesSent = allStats.getCompPresSent(SM_COMP);
 
 			presencesNumber = currPresencesReceived + currPresencesSent;
-			temp            = presencesPerSec;
-			presencesPerSec = (prevPresencesPerSec + (temp * 2f) + (presencesNumber -
-					prevPresencesNumber)) / 4f;
+			temp = presencesPerSec;
+			presencesPerSec = (prevPresencesPerSec + (temp * 2f) + (presencesNumber - prevPresencesNumber)) / 4f;
 			prevPresencesPerSec = temp;
 			prevPresencesNumber = presencesNumber;
 			if (++cnt >= inter) {
 				presences_sent_per_update = (currPresencesSent - lastPresencesSent) / 10;
-				presences_received_per_update = (currPresencesReceived - lastPresencesReceived) /
-						10;
-				lastPresencesSent     = currPresencesSent;
+				presences_received_per_update = (currPresencesReceived - lastPresencesReceived) / 10;
+				lastPresencesSent = currPresencesSent;
 				lastPresencesReceived = currPresencesReceived;
-				cnt                   = 0;
+				cnt = 0;
 			}
-			queueSize     = 0;
+			queueSize = 0;
 			queueOverflow = 0;
-			smQueue       = 0;
-			clQueue       = 0;
-			largeQueues   = "";
+			smQueue = 0;
+			clQueue = 0;
+			largeQueues = "";
 			for (StatRecord rec : allStats) {
 				if ((rec.getDescription() == StatisticType.IN_QUEUE_OVERFLOW.getDescription()) ||
 						(rec.getDescription() == StatisticType.OUT_QUEUE_OVERFLOW.getDescription())) {
 					queueOverflow += rec.getLongValue();
 				}
-				if ((rec.getDescription() == "Total In queues wait") || (rec.getDescription() ==
-						"Total Out queues wait")) {
+				if ((rec.getDescription() == "Total In queues wait") ||
+						(rec.getDescription() == "Total Out queues wait")) {
 					queueSize += rec.getIntValue();
 					if (rec.getComponent().equals(SM_COMP)) {
 						smQueue += rec.getIntValue();
@@ -821,8 +790,7 @@ public class StatisticsProvider
 						clQueue += rec.getIntValue();
 					}
 					if (rec.getIntValue() > 10000) {
-						largeQueues += rec.getComponent() + " - queue size: " + rec.getIntValue() +
-								"\n";
+						largeQueues += rec.getComponent() + " - queue size: " + rec.getIntValue() + "\n";
 					}
 				}
 			}
@@ -900,6 +868,5 @@ public class StatisticsProvider
 		}
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/11/29

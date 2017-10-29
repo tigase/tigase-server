@@ -37,9 +37,11 @@ import static tigase.conf.Configurable.GEN_CONFIG_DEF;
 /**
  * Created by andrzej on 12.08.2016.
  */
-public class DSLBeanConfiguratorWithBackwardCompatibility extends DSLBeanConfigurator {
+public class DSLBeanConfiguratorWithBackwardCompatibility
+		extends DSLBeanConfigurator {
 
-	private static final Logger log = Logger.getLogger(DSLBeanConfiguratorWithBackwardCompatibility.class.getCanonicalName());
+	private static final Logger log = Logger.getLogger(
+			DSLBeanConfiguratorWithBackwardCompatibility.class.getCanonicalName());
 
 	@Override
 	public void configure(BeanConfig beanConfig, Object bean, Map<String, Object> values) {
@@ -53,7 +55,9 @@ public class DSLBeanConfiguratorWithBackwardCompatibility extends DSLBeanConfigu
 				Method setPropertiesMethod = bean.getClass().getMethod("setProperties", Map.class);
 
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
-					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
+					log.log(Level.WARNING,
+							"Class {0} is using deprecated configuration using methods getDefaults() and setProperties()",
+							bean.getClass().getCanonicalName());
 				}
 
 				if (setPropertiesMethod != null && setPropertiesMethod.getAnnotation(Deprecated.class) == null) {
@@ -62,7 +66,7 @@ public class DSLBeanConfiguratorWithBackwardCompatibility extends DSLBeanConfigu
 					Map<String, Object> params = getDefConfigParams(getKernel(), configType, dbUri, getProperties());
 					Map<String, Object> props = new HashMap<>(params);
 
-					props.putAll( conf.getDefaults(params) );
+					props.putAll(conf.getDefaults(params));
 					fillProps(beanConfig, props);
 					((Configurable) bean).setProperties(props);
 				}
@@ -73,7 +77,9 @@ public class DSLBeanConfiguratorWithBackwardCompatibility extends DSLBeanConfigu
 				Method setPropertiesMethod = bean.getClass().getMethod("setProperties", Map.class);
 
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
-					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
+					log.log(Level.WARNING,
+							"Class {0} is using deprecated configuration using methods getDefaults() and setProperties()",
+							bean.getClass().getCanonicalName());
 				}
 				if (setPropertiesMethod != null && setPropertiesMethod.getAnnotation(Deprecated.class) == null) {
 					String configType = (String) getProperties().getOrDefault("config-type", GEN_CONFIG_DEF);
@@ -104,10 +110,11 @@ public class DSLBeanConfiguratorWithBackwardCompatibility extends DSLBeanConfigu
 
 	private <T> T getPropertyAtPath(String... path) {
 		Object val = getProperties();
-		for (int i=0; i<path.length; i++) {
+		for (int i = 0; i < path.length; i++) {
 			val = ((Map<String, Object>) val).get(path[i]);
-			if (val == null)
+			if (val == null) {
 				break;
+			}
 		}
 		return (T) val;
 	}

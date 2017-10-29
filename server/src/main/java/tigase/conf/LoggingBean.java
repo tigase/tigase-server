@@ -41,27 +41,23 @@ import java.util.stream.Stream;
 /**
  * Created by andrzej on 02.04.2017.
  */
-public class LoggingBean implements ConfigurationChangedAware {
+public class LoggingBean
+		implements ConfigurationChangedAware {
 
 	@ConfigField(desc = "Debug", alias = "debug")
 	private String[] debug;
 	@ConfigField(desc = "Debug packages", alias = "debug-packages")
 	private String[] debugPackages;
-
-	@ConfigField(desc = "Loggers")
-	private HashMap<String, HashMap<String, Object>> loggers = new HashMap<>();
 	@ConfigField(desc = "Handlers")
 	private HashMap<String, HashMap<String, Object>> handlers = new HashMap<>();
-
+	@ConfigField(desc = "Loggers")
+	private HashMap<String, HashMap<String, Object>> loggers = new HashMap<>();
 	@ConfigField(desc = "Packet full debug", alias = "packet-debug-full")
 	private boolean packetFullDebug = Packet.FULL_DEBUG;
-
-	@ConfigField(desc ="Root level")
-	private Level rootLevel = Level.CONFIG;
-
 	@ConfigField(desc = "Root handlers")
 	private String[] rootHandlers = new String[0];
-
+	@ConfigField(desc = "Root level")
+	private Level rootLevel = Level.CONFIG;
 	@ConfigField(desc = "Log thread dump on shutdown", alias = "shutdown-thread-dump")
 	private boolean shutdownThreadDump = true;
 
@@ -69,10 +65,7 @@ public class LoggingBean implements ConfigurationChangedAware {
 		setLoggers(new HashMap<>());
 		setHandlers(new HashMap<>());
 
-		rootHandlers = new String[] {
-				ConsoleHandler.class.getCanonicalName(),
-				FileHandler.class.getCanonicalName()
-		};
+		rootHandlers = new String[]{ConsoleHandler.class.getCanonicalName(), FileHandler.class.getCanonicalName()};
 	}
 
 	public void setLoggers(HashMap<String, HashMap<String, Object>> loggers) {
@@ -164,14 +157,13 @@ public class LoggingBean implements ConfigurationChangedAware {
 		});
 		sb.append("handlers=");
 		if (rootHandlers != null) {
-			for (int i=0; i<rootHandlers.length; i++) {
-				if (i>0) {
+			for (int i = 0; i < rootHandlers.length; i++) {
+				if (i > 0) {
 					sb.append(" ");
 				}
 				sb.append(rootHandlers[i]);
 			}
 		}
-
 
 		byte[] data = sb.toString().getBytes(Charset.forName("UTF-8"));
 		try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {

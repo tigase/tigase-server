@@ -38,9 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by andrzej on 24.03.2017.
@@ -48,8 +46,9 @@ import static org.junit.Assert.assertTrue;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> {
 
+	protected static boolean checkEmoji = true;
+	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
 	protected static String uri = System.getProperty("testDbUri");
-
 	@ClassRule
 	public static TestRule rule = new TestRule() {
 		@Override
@@ -65,20 +64,11 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 			return stmnt;
 		}
 	};
-
-	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
-	protected static boolean checkEmoji = true;
+	private static BareJID jid;
+	private static Element msg;
+	private static String msgId;
 	protected DS dataSource;
 	protected MsgBroadcastRepository repo;
-	private static BareJID jid;
-	private static String msgId;
-	private static Element msg;
-
-	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
-		DataSource dataSource = RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
-		dataSource.initRepository(uri, new HashMap<>());
-		return (DS) dataSource;
-	}
 
 	@BeforeClass
 	public static void init() throws TigaseStringprepException {
@@ -119,7 +109,14 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 		repo.loadMessagesToBroadcast();
 		assertNotNull("Not found message with id = " + msgId, repo.getBroadcastMsg(msgId));
 
-		assertFalse("Added message instead of adding message recipient!", repo.updateBroadcastMessage(msgId, null, null, jid));
+		assertFalse("Added message instead of adding message recipient!",
+					repo.updateBroadcastMessage(msgId, null, null, jid));
 	}
-	
+
+	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
+		DataSource dataSource = RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
+		dataSource.initRepository(uri, new HashMap<>());
+		return (DS) dataSource;
+	}
+
 }

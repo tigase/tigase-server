@@ -23,22 +23,23 @@ package tigase.eventbus.events;
 import java.io.Serializable;
 
 /**
- *
  * @author andrzej
  */
-public class ShutdownEvent implements Serializable {
-	
-	private String node;
+public class ShutdownEvent
+		implements Serializable {
+
 	private long delay = 0;
 	private String msg;
-	
-	public ShutdownEvent() {}
-	
+	private String node;
+
+	public ShutdownEvent() {
+	}
+
 	public ShutdownEvent(String node, long delay, String msg) {
 		this.node = node;
 		this.delay = delay;
 	}
-	
+
 	public long getDelay() {
 		return delay;
 	}
@@ -46,9 +47,9 @@ public class ShutdownEvent implements Serializable {
 	public String getMessage() {
 		return msg;
 	}
-	
+
 	public String getNode() {
 		return node;
 	}
-	
+
 }

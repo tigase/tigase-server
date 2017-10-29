@@ -27,7 +27,8 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.ConfigurableTask;
 import tigase.monitor.MonitorTask;
 
-public abstract class AbstractConfigurableTask implements MonitorTask, ConfigurableTask, UnregisterAware {
+public abstract class AbstractConfigurableTask
+		implements MonitorTask, ConfigurableTask, UnregisterAware {
 
 	private final static String ENABLED_VAR = "x-task#enabled";
 
@@ -37,12 +38,6 @@ public abstract class AbstractConfigurableTask implements MonitorTask, Configura
 	@Override
 	public void beforeUnregister() {
 		setEnabled(false);
-	}
-
-	protected void disable() {
-	}
-
-	protected void enable() {
 	}
 
 	@Override
@@ -79,6 +74,12 @@ public abstract class AbstractConfigurableTask implements MonitorTask, Configura
 			boolean value = Field.getAsBoolean(f);
 			setEnabled(value);
 		}
+	}
+
+	protected void disable() {
+	}
+
+	protected void enable() {
 	}
 
 }

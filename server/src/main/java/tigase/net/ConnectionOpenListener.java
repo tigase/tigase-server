@@ -18,30 +18,27 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.net;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.net.InetSocketAddress;
-
 import java.nio.channels.SocketChannel;
 
 /**
  * Describe interface ConnectionOpenListener here.
- *
- *
+ * <p>
+ * <p>
  * Created: Thu Jan 26 00:00:39 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public interface ConnectionOpenListener {
+
 	/**
-	 * <code>RECEIVE_BUFFER_SIZE</code> defines a size for TCP/IP packets.
-	 * XMPP data packets are quite small usually, below 1kB so we don't need
-	 * big TCP/IP data buffers.
+	 * <code>RECEIVE_BUFFER_SIZE</code> defines a size for TCP/IP packets. XMPP data packets are quite small usually,
+	 * below 1kB so we don't need big TCP/IP data buffers.
 	 */
 	public static final int DEF_RECEIVE_BUFFER_SIZE = 2 * 1024;
 
@@ -65,7 +62,6 @@ public interface ConnectionOpenListener {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param sc
 	 */
 	void accept(SocketChannel sc);
@@ -74,73 +70,46 @@ public interface ConnectionOpenListener {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	int getPort();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	String[] getIfcs();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	String getSRVType();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	String getRemoteHostname();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	InetSocketAddress getRemoteAddress();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	ConnectionType getConnectionType();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	SocketType getSocketType();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	int getReceiveBufferSize();
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	int getTrafficClass();
 
@@ -148,6 +117,5 @@ public interface ConnectionOpenListener {
 		return ConnectionOpenThread.def_5222_throttling;
 	}
 }    // ConnectionOpenListener
-
 
 //~ Formatted in Tigase Code Convention on 13/03/11

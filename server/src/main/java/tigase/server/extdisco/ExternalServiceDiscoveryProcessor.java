@@ -26,11 +26,11 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.dns.DNSResolverFactory;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.*;
+import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;
@@ -43,11 +43,11 @@ import static tigase.server.extdisco.ExternalServiceDiscoveryProcessor.XMLNS;
  */
 @Bean(name = ID, parent = SessionManager.class, active = false)
 @Id(ID)
-@DiscoFeatures({ XMLNS })
-@Handles({
-	@Handle(path = {Iq.ELEM_NAME, "services"}, xmlns = XMLNS)
-})
-public class ExternalServiceDiscoveryProcessor extends AnnotatedXMPPProcessor implements XMPPProcessorIfc {
+@DiscoFeatures({XMLNS})
+@Handles({@Handle(path = {Iq.ELEM_NAME, "services"}, xmlns = XMLNS)})
+public class ExternalServiceDiscoveryProcessor
+		extends AnnotatedXMPPProcessor
+		implements XMPPProcessorIfc {
 
 	protected static final String XMLNS = "urn:xmpp:extdisco:2";
 	protected static final String ID = XMLNS;
@@ -56,11 +56,13 @@ public class ExternalServiceDiscoveryProcessor extends AnnotatedXMPPProcessor im
 	private JID extServiceDiscoJid = JID.jidInstanceNS("ext-disco", DNSResolverFactory.getInstance().getDefaultHost());
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 		if (extServiceDiscoJid.equals(packet.getPacketFrom())) {
 			// No session, skipping processing result
-			if (session == null)
+			if (session == null) {
 				return;
+			}
 
 			Packet forward = packet.copyElementOnly();
 			forward.setPacketTo(session.getConnectionId(packet.getStanzaTo()));

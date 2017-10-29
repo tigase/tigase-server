@@ -19,17 +19,17 @@
  */
 package tigase.server.ext.lb;
 
-import java.util.List;
-
 import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 
+import java.util.List;
+
 /**
- * @author Artur Hefczyc
- * Created Jul 9, 2011
+ * @author Artur Hefczyc Created Jul 9, 2011
  */
-public class SenderBareJidLB implements LoadBalancerIfc {
+public class SenderBareJidLB
+		implements LoadBalancerIfc {
 
 	@Override
 	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {

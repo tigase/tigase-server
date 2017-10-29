@@ -30,8 +30,7 @@ import java.sql.*;
  */
 public class MsgBroadcastRepositoryStoredProcedures {
 
-	public static void addMessage(String msgId, Timestamp expired, String msg)
-			throws SQLException {
+	public static void addMessage(String msgId, Timestamp expired, String msg) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
@@ -60,8 +59,7 @@ public class MsgBroadcastRepositoryStoredProcedures {
 		}
 	}
 
-	public static void addMessageRecipient(String msgId, String jid)
-			throws SQLException {
+	public static void addMessageRecipient(String msgId, String jid) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
@@ -90,7 +88,6 @@ public class MsgBroadcastRepositoryStoredProcedures {
 				rs.close();
 			}
 
-
 			stmt = conn.prepareStatement("select 1 from tig_broadcast_recipients where 	msg_id = ? and jid_id = ?");
 			stmt.setString(1, msgId);
 			stmt.setLong(2, jidId);
@@ -115,24 +112,7 @@ public class MsgBroadcastRepositoryStoredProcedures {
 		}
 	}
 
-	public static void getMessages(Timestamp expired, ResultSet[] data)
-			throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");
-
-		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-		try {
-			PreparedStatement stmt = conn.prepareStatement(
-					"select id, expired, msg from tig_broadcast_messages where expired >= ?");
-			stmt.setTimestamp(1, expired);
-			data[0] = stmt.executeQuery();
-		} finally {
-			conn.close();
-		}
-	}
-
-	public static void getMessageRecipients(String msgId, ResultSet[] data)
-			throws SQLException {
+	public static void getMessageRecipients(String msgId, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
@@ -141,6 +121,21 @@ public class MsgBroadcastRepositoryStoredProcedures {
 			PreparedStatement stmt = conn.prepareStatement(
 					"select j.jid from tig_broadcast_recipients r inner join tig_broadcast_jids j on j.jid_id = r.jid_id where r.msg_id = ?");
 			stmt.setString(1, msgId);
+			data[0] = stmt.executeQuery();
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static void getMessages(Timestamp expired, ResultSet[] data) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement stmt = conn.prepareStatement(
+					"select id, expired, msg from tig_broadcast_messages where expired >= ?");
+			stmt.setTimestamp(1, expired);
 			data[0] = stmt.executeQuery();
 		} finally {
 			conn.close();

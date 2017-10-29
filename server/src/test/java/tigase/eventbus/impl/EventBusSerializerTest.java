@@ -20,13 +20,13 @@
 
 package tigase.eventbus.impl;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Test;
-
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class EventBusSerializerTest {
 
@@ -39,8 +39,8 @@ public class EventBusSerializerTest {
 		eo.setTransientField("123");
 		eo.setV1("message");
 		eo.setV2(9898);
-		eo.setElementField(new Element("x", "v", new String[] { "a" }, new String[] { "b" }));
-		eo.setStrArrField(new String[] { "ala", "m,a", "kota" });
+		eo.setElementField(new Element("x", "v", new String[]{"a"}, new String[]{"b"}));
+		eo.setStrArrField(new String[]{"ala", "m,a", "kota"});
 		eo.setSetField(new HashSet<>(Arrays.asList("test123")));
 
 		Element ex = serializer.serialize(eo);
@@ -53,8 +53,8 @@ public class EventBusSerializerTest {
 		Assert.assertNull(ed.getTransientField());
 		Assert.assertEquals("message", ed.getV1());
 		Assert.assertEquals(9898, ed.getV2());
-		Assert.assertEquals(new Element("x", "v", new String[] { "a" }, new String[] { "b" }), ed.getElementField());
-		Assert.assertArrayEquals(new String[] { "ala", "m,a", "kota" }, ed.getStrArrField());
+		Assert.assertEquals(new Element("x", "v", new String[]{"a"}, new String[]{"b"}), ed.getElementField());
+		Assert.assertArrayEquals(new String[]{"ala", "m,a", "kota"}, ed.getStrArrField());
 		Assert.assertTrue(eo.getSetField().contains("test123"));
 	}
 
@@ -67,18 +67,18 @@ public class EventBusSerializerTest {
 		eo.setTransientField("123");
 		eo.setV1("message");
 		eo.setV2(9898);
-		eo.setElementField(new Element("x", "v", new String[] { "a" }, new String[] { "b" }));
-		eo.setStrArrField(new String[] { "ala", "m,a", "kota" });
+		eo.setElementField(new Element("x", "v", new String[]{"a"}, new String[]{"b"}));
+		eo.setStrArrField(new String[]{"ala", "m,a", "kota"});
 
 		Element ex = serializer.serialize(eo);
 
 		Assert.assertEquals(5, ex.getChildren().size());
-		Assert.assertEquals("a@b.c/d", ex.getCData(new String[] { "tigase.eventbus.impl.Event1", "jid" }));
-		Assert.assertNull(ex.getCData(new String[] { "tigase.eventbus.impl.Event1", "transientField" }));
-		Assert.assertEquals("message", ex.getCData(new String[] { "tigase.eventbus.impl.Event1", "v1" }));
-		Assert.assertEquals("9898", ex.getCData(new String[] { "tigase.eventbus.impl.Event1", "v2" }));
-		Assert.assertEquals("v", ex.getCData(new String[] { "tigase.eventbus.impl.Event1", "elementField", "x" }));
-		Assert.assertNotEquals("ala,m,a,kota", ex.getCData(new String[] { "tigase.eventbus.impl.Event1", "strArrField" }));
+		Assert.assertEquals("a@b.c/d", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "jid"}));
+		Assert.assertNull(ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "transientField"}));
+		Assert.assertEquals("message", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "v1"}));
+		Assert.assertEquals("9898", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "v2"}));
+		Assert.assertEquals("v", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "elementField", "x"}));
+		Assert.assertNotEquals("ala,m,a,kota", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "strArrField"}));
 	}
-	
+
 }

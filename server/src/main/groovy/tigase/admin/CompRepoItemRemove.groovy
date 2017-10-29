@@ -39,23 +39,23 @@ import tigase.server.Permissions
 
 def ITEMS = "item-list"
 
-def repo = (ComponentRepository)comp_repo
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def repo = (ComponentRepository) comp_repo
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def itemKey = Command.getFieldValue(packet, ITEMS)
 
-def supportedComponents = ["vhost-man"]
+def supportedComponents = [ "vhost-man" ]
 def NOTIFY_CLUSTER = "notify-cluster"
-boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
-boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+boolean clusterMode = Boolean.valueOf(System.getProperty("cluster-mode", false.toString()));
+boolean notifyCluster = Boolean.valueOf(Command.getFieldValue(packet, NOTIFY_CLUSTER))
 Queue results = new LinkedList()
 
 if (itemKey == null) {
 	def items = repo.allItems()
-	def itemsStr = []
+	def itemsStr = [ ]
 	if (items.size() > 0) {
 		items.each {
 			if (isServiceAdmin || it.isOwner(stanzaFromBare.toString())) {
@@ -63,11 +63,11 @@ if (itemKey == null) {
 			}
 		}
 	}
-	if(itemsStr.size() > 0) {
+	if (itemsStr.size() > 0) {
 		def result = p.commandResult(Command.DataType.form)
 		Command.addFieldValue(result, ITEMS, itemsStr[0], "List of items",
-			(String[])itemsStr, (String[])itemsStr)
-		if 	( clusterMode  ) {
+							  (String[]) itemsStr, (String[]) itemsStr)
+		if (clusterMode) {
 			Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
 		}
 		return result
@@ -78,15 +78,15 @@ if (itemKey == null) {
 	}
 }
 
-if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
-	def nodes = (List)connectedNodes
-	if (nodes && nodes.size() > 0 ) {
+if (clusterMode && notifyCluster && supportedComponents.contains(componentName)) {
+	def nodes = (List) connectedNodes
+	if (nodes && nodes.size() > 0) {
 		nodes.each { node ->
 			def forward = p.copyElementOnly();
 			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
 			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-			forward.setPacketTo( node );
-			forward.setPermissions( Permissions.ADMIN );
+			forward.setPacketTo(node);
+			forward.setPermissions(Permissions.ADMIN);
 
 			results.offer(forward)
 		}
@@ -98,12 +98,12 @@ def item = repo.getItem(itemKey)
 if (item == null) {
 	Command.addTextField(result, "Error", "No such item, deletion impossible.");
 } else {
-  if (isServiceAdmin || item.isOwner(stanzaFromBare.toString())) {
+	if (isServiceAdmin || item.isOwner(stanzaFromBare.toString())) {
 		repo.removeItem(itemKey)
 		Command.addTextField(result, "Note", "Operation successful")
 	} else {
-		Command.addTextField(result, "Error", "You are not the Item owner or you have no "
-			+ "enough permission to remove the item.")
+		Command.addTextField(result, "Error",
+							 "You are not the Item owner or you have no " + "enough permission to remove the item.")
 	}
 }
 

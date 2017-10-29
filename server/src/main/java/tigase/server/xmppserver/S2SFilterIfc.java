@@ -30,7 +30,7 @@ import java.util.Queue;
  */
 public interface S2SFilterIfc {
 
-	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String,Object> props);
+	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props);
 
 	boolean filter(Packet p, S2SIOService serv, Queue<Packet> results);
 

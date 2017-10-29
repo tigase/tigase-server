@@ -1,4 +1,3 @@
-
 /*
  * Error.java
  *
@@ -40,16 +39,18 @@ import tigase.xmpp.PacketErrorTypeException;
  * @version $Rev$
  */
 @Bean(name = "error", parent = AmpComponent.class, active = true)
-public class Error extends ActionAbstract {
+public class Error
+		extends ActionAbstract {
+
 	private static final String name = "error";
 	private static final String FAILED_RULES_PATH = "error/failed-rules";
-	private static final Element UNDEF_CONDITION = new Element("undefined-condition",
-		new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-stanzas" });
-	private static final Element FAILED_RULES = new Element("failed-rules",
-		new String[] { "xmlns" }, new String[] { "http://jabber.org/protocol/amp#errors" });
-	private static final Element ERROR_TEMPLATE = new Element("error",
-		new Element[] { UNDEF_CONDITION }, new String[] { "type",
-			"code" }, new String[] { "modify", "500" });
+	private static final Element UNDEF_CONDITION = new Element("undefined-condition", new String[]{"xmlns"},
+															   new String[]{"urn:ietf:params:xml:ns:xmpp-stanzas"});
+	private static final Element FAILED_RULES = new Element("failed-rules", new String[]{"xmlns"},
+															new String[]{"http://jabber.org/protocol/amp#errors"});
+	private static final Element ERROR_TEMPLATE = new Element("error", new Element[]{UNDEF_CONDITION},
+															  new String[]{"type", "code"},
+															  new String[]{"modify", "500"});
 
 	//~--- methods --------------------------------------------------------------
 

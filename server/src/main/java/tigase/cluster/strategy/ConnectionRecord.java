@@ -18,39 +18,36 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xml.Element;
-
 import tigase.xmpp.jid.JID;
 
 /**
  * @author Artur Hefczyc Created Mar 15, 2011
  */
 public class ConnectionRecord
-				implements ConnectionRecordIfc, Comparable<ConnectionRecord> {
+		implements ConnectionRecordIfc, Comparable<ConnectionRecord> {
+
 	private static final String CONNECTION_ID_ELEMENT = "connection-id";
-	private static final String JID_ELEMENT           = "user-jid";
-	private static final String NODE_ELEMENT          = "node-jid";
-	private static final String SESSION_ID_ELEMENT    = "session-id";
-	private static final String TOP_ELEMENT           = "conn-rec";
+	private static final String JID_ELEMENT = "user-jid";
+	private static final String NODE_ELEMENT = "node-jid";
+	private static final String SESSION_ID_ELEMENT = "session-id";
+	private static final String TOP_ELEMENT = "conn-rec";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private JID    connectionId;
-	private JID    node;
+	private JID connectionId;
+	private JID node;
 	private String sessionId;
-	private JID    userJid;
+	private JID userJid;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public ConnectionRecord() {
 		super();
@@ -112,6 +109,10 @@ public class ConnectionRecord
 		return connectionId;
 	}
 
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+	}
+
 	@Override
 	public JID getNode() {
 		return node;
@@ -122,31 +123,26 @@ public class ConnectionRecord
 		return sessionId;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	@Override
 	public JID getUserJid() {
 		return userJid;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	public void setConnectionId(JID connectionId) {
-		this.connectionId = connectionId;
-	}
-
 	@Override
 	public void setElement(Element elem) {
-		this.node         = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());
-		this.userJid      = JID.jidInstanceNS(elem.getChild(JID_ELEMENT).getCData());
-		this.connectionId = JID.jidInstanceNS(elem.getChild(CONNECTION_ID_ELEMENT)
-				.getCData());
+		this.node = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());
+		this.userJid = JID.jidInstanceNS(elem.getChild(JID_ELEMENT).getCData());
+		this.connectionId = JID.jidInstanceNS(elem.getChild(CONNECTION_ID_ELEMENT).getCData());
 		this.sessionId = elem.getChild(SESSION_ID_ELEMENT).getCData();
 	}
 
 	@Override
 	public void setRecordFields(JID node, JID userJid, String sessionId, JID connectionId) {
-		this.node         = node;
-		this.userJid      = userJid;
+		this.node = node;
+		this.userJid = userJid;
 		this.connectionId = connectionId;
-		this.sessionId    = sessionId;
+		this.sessionId = sessionId;
 	}
 }

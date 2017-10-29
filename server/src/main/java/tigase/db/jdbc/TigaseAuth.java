@@ -28,7 +28,10 @@ import tigase.util.Base64;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.jid.BareJID;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,36 +44,35 @@ import static tigase.db.AuthRepository.Meta;
 
 /**
  * Describe class TigaseAuth here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Nov 11 22:22:04 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Meta( supportedUris = { "jdbc:[^:]+:.*" } )
+@Meta(supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
-public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepository> {
+public class TigaseAuth
+		implements AuthRepository, DataSourceAware<DataRepository> {
 
 	/**
 	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.db.jdbc.TigaseAuth");
-	private static final String[] non_sasl_mechs = { "password" };
-	private static final String[] sasl_mechs = { "PLAIN" };
+	private static final String[] non_sasl_mechs = {"password"};
+	private static final String[] sasl_mechs = {"PLAIN"};
 	private static final String INIT_DB_QUERY = "{ call TigInitdb() }";
 	private static final String ADD_USER_PLAIN_PW_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
 	private static final String REMOVE_USER_QUERY = "{ call TigRemoveUser(?) }";
 	private static final String GET_PASSWORD_QUERY = "{ call TigGetPassword(?) }";
-	private static final String UPDATE_PASSWORD_PLAIN_PW_QUERY =
-		"{ call TigUpdatePasswordPlainPw(?, ?) }";
+	private static final String UPDATE_PASSWORD_PLAIN_PW_QUERY = "{ call TigUpdatePasswordPlainPw(?, ?) }";
 	private static final String USER_LOGIN_PLAIN_PW_QUERY = "{ call TigUserLoginPlainPw(?, ?) }";
 	private static final String USER_LOGOUT_QUERY = "{ call TigUserLogout(?) }";
 	private static final String USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
-	private static final String USERS_DOMAIN_COUNT_QUERY =
-		"select count(*) from tig_users where user_id like ?";
+	private static final String USERS_DOMAIN_COUNT_QUERY = "select count(*) from tig_users where user_id like ?";
 	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
 
 	//~--- fields ---------------------------------------------------------------
@@ -80,13 +82,11 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void addUser(BareJID user, final String password)
-			throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement add_user_plain_pw_sp =
-				data_repo.getPreparedStatement(user, ADD_USER_PLAIN_PW_QUERY);
+			PreparedStatement add_user_plain_pw_sp = data_repo.getPreparedStatement(user, ADD_USER_PLAIN_PW_QUERY);
 
 			synchronized (add_user_plain_pw_sp) {
 				try {
@@ -103,7 +103,7 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 			throw new TigaseDBException("Problem accessing repository.", e);
 		}
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -112,8 +112,7 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 	}
 
 	/**
-	 * <code>getUsersCount</code> method is thread safe. It uses local variable
-	 * for storing <code>Statement</code>.
+	 * <code>getUsersCount</code> method is thread safe. It uses local variable for storing <code>Statement</code>.
 	 *
 	 * @return a <code>long</code> number of user accounts in database.
 	 */
@@ -153,8 +152,7 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 
 		try {
 			long users = -1;
-			PreparedStatement users_domain_count_st =
-				data_repo.getPreparedStatement(null, USERS_DOMAIN_COUNT_QUERY);
+			PreparedStatement users_domain_count_st = data_repo.getPreparedStatement(null, USERS_DOMAIN_COUNT_QUERY);
 
 			synchronized (users_domain_count_st) {
 				try {
@@ -204,11 +202,11 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 
 	@Override
 	@Deprecated
-	public void initRepository(final String connection_str, Map<String, String> params)
-			throws DBInitException {
+	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
-			if (data_repo == null)
+			if (data_repo == null) {
 				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+			}
 		} catch (Exception e) {
 			data_repo = null;
 
@@ -266,16 +264,109 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 		if (proto.equals(PROTOCOL_VAL_NONSASL)) {
 			String password = (String) props.get(PASSWORD_KEY);
 			BareJID user_id = (BareJID) props.get(USER_ID_KEY);
-				if (password != null) {
-					return plainAuth(user_id, password);
-				}
-				String digest = (String) props.get(DIGEST_KEY);
-				if (digest != null) {
-					throw new AuthorizationException("Not supported.");
-				}
+			if (password != null) {
+				return plainAuth(user_id, password);
+			}
+			String digest = (String) props.get(DIGEST_KEY);
+			if (digest != null) {
+				throw new AuthorizationException("Not supported.");
+			}
 		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
 
 		throw new AuthorizationException("Protocol is not supported: " + proto);
+	}
+
+	@Override
+	public void queryAuth(final Map<String, Object> authProps) {
+		String protocol = (String) authProps.get(PROTOCOL_KEY);
+
+		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
+			authProps.put(RESULT_KEY, non_sasl_mechs);
+		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
+
+		if (protocol.equals(PROTOCOL_VAL_SASL)) {
+			authProps.put(RESULT_KEY, sasl_mechs);
+		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
+	}
+
+	// Implementation of tigase.db.AuthRepository
+
+	@Override
+	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
+		try {
+			PreparedStatement remove_user_sp = data_repo.getPreparedStatement(user, REMOVE_USER_QUERY);
+
+			synchronized (remove_user_sp) {
+				remove_user_sp.setString(1, user.toString());
+				remove_user_sp.execute();
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		}
+	}
+
+	@Override
+	public void updatePassword(BareJID user, final String password) throws UserNotFoundException, TigaseDBException {
+		try {
+			PreparedStatement update_pass_plain_pw_sp = data_repo.getPreparedStatement(user,
+																					   UPDATE_PASSWORD_PLAIN_PW_QUERY);
+
+			synchronized (update_pass_plain_pw_sp) {
+				update_pass_plain_pw_sp.setString(1, user.toString());
+				update_pass_plain_pw_sp.setString(2, password);
+				update_pass_plain_pw_sp.execute();
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		}
+	}
+
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		ResultSet rs = null;
+
+		try {
+			PreparedStatement get_pass_sp = data_repo.getPreparedStatement(user, GET_PASSWORD_QUERY);
+
+			synchronized (get_pass_sp) {
+				try {
+					get_pass_sp.setString(1, user.toString());
+					rs = get_pass_sp.executeQuery();
+
+					if (rs.next()) {
+						return rs.getString(1);
+					} else {
+						throw new UserNotFoundException("User does not exist: " + user);
+					}    // end of if (isnext) else
+				} finally {
+					data_repo.release(null, rs);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem with retrieving user password.", e);
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		return AccountStatus.active;
 	}
 
 	private boolean plainAuth(BareJID user, final String password)
@@ -284,8 +375,7 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 		String res_string = null;
 
 		try {
-			PreparedStatement user_login_plain_pw_sp
-					= data_repo.getPreparedStatement(user, USER_LOGIN_PLAIN_PW_QUERY);
+			PreparedStatement user_login_plain_pw_sp = data_repo.getPreparedStatement(user, USER_LOGIN_PLAIN_PW_QUERY);
 
 			synchronized (user_login_plain_pw_sp) {
 				try {
@@ -318,9 +408,8 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 						} else {
 							if (log.isLoggable(Level.FINE)) {
 								log.log(Level.FINE,
-										"Login failed, for user: ''{0}" + "''" + ", password: ''" + "{1}" + "''"
-										+ ", from DB got: " + "{2}", new Object[]{user,
-											password, res_string});
+										"Login failed, for user: ''{0}" + "''" + ", password: ''" + "{1}" + "''" +
+												", from DB got: " + "{2}", new Object[]{user, password, res_string});
 							}
 						}
 					}
@@ -336,107 +425,10 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 		}    // end of catch
 	}
 
-	// Implementation of tigase.db.AuthRepository
-
-	@Override
-	public void queryAuth(final Map<String, Object> authProps) {
-		String protocol = (String) authProps.get(PROTOCOL_KEY);
-
-		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
-			authProps.put(RESULT_KEY, non_sasl_mechs);
-		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
-
-		if (protocol.equals(PROTOCOL_VAL_SASL)) {
-			authProps.put(RESULT_KEY, sasl_mechs);
-		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
-	}
-
-	@Override
-	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
-		try {
-			PreparedStatement remove_user_sp = data_repo.getPreparedStatement(user, REMOVE_USER_QUERY);
-
-			synchronized (remove_user_sp) {
-				remove_user_sp.setString(1, user.toString());
-				remove_user_sp.execute();
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem accessing repository.", e);
-		}
-	}
-
-	@Override
-	public void updatePassword(BareJID user, final String password)
-			throws UserNotFoundException, TigaseDBException {
-		try {
-			PreparedStatement update_pass_plain_pw_sp =
-				data_repo.getPreparedStatement(user, UPDATE_PASSWORD_PLAIN_PW_QUERY);
-
-			synchronized (update_pass_plain_pw_sp) {
-				update_pass_plain_pw_sp.setString(1, user.toString());
-				update_pass_plain_pw_sp.setString(2, password);
-				update_pass_plain_pw_sp.execute();
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem accessing repository.", e);
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
-		ResultSet rs = null;
-
-		try {
-			PreparedStatement get_pass_sp = data_repo.getPreparedStatement(user, GET_PASSWORD_QUERY);
-
-			synchronized (get_pass_sp) {
-				try {
-					get_pass_sp.setString(1, user.toString());
-					rs = get_pass_sp.executeQuery();
-
-					if (rs.next()) {
-						return rs.getString(1);
-					} else {
-						throw new UserNotFoundException("User does not exist: " + user);
-					}    // end of if (isnext) else
-				} finally {
-					data_repo.release(null, rs);
-				}
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem with retrieving user password.", e);
-		}
-	}
-
-	@Override
-	public boolean isUserDisabled(BareJID user) 
-					throws UserNotFoundException, TigaseDBException {
-		return false;
-	}
-	
-	@Override
-	public void setUserDisabled(BareJID user, Boolean value) 
-					throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Feature not supported");	
-	}
-
-	@Override
-	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
-		throw new TigaseDBException("Feature not supported");
-	}
-
-	@Override
-	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
-		return AccountStatus.active;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	private boolean saslAuth(final Map<String, Object> props)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException,
-			TigaseStringprepException {
+			throws UserNotFoundException, TigaseDBException, AuthorizationException, TigaseStringprepException {
 		String data_str = (String) props.get(DATA_KEY);
 		String domain = (String) props.get(REALM_KEY);
 
@@ -476,8 +468,6 @@ public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepositor
 	}
 }    // TigaseAuth
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

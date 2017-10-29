@@ -30,9 +30,11 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by andrzej on 13.03.2016.
  */
-public interface MsgRepositoryIfc<T extends DataSource> extends OfflineMsgRepositoryIfc, DataSourceAware<T> {
+public interface MsgRepositoryIfc<T extends DataSource>
+		extends OfflineMsgRepositoryIfc, DataSourceAware<T> {
 
-	Map<Enum,Long> getMessagesCount(JID to) throws UserNotFoundException;
+	Map<Enum, Long> getMessagesCount(JID to) throws UserNotFoundException;
+
 	List<Element> getMessagesList(JID to) throws UserNotFoundException;
 
 	void setCondition(ReentrantLock lock, Condition condition);

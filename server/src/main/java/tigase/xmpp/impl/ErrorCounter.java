@@ -18,7 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
 package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
@@ -27,7 +26,10 @@ import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
-import tigase.xmpp.*;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPPacketFilterIfc;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.HandleStanzaTypes;
 import tigase.xmpp.impl.annotation.Id;
@@ -36,22 +38,22 @@ import java.util.Queue;
 import java.util.logging.Level;
 
 /**
- * ErrorCounter class is implementation of XMPPProcessor responsible for counting 
- * packets with type=error which value is added to Tigase XMPP Server statistics.
- * 
+ * ErrorCounter class is implementation of XMPPProcessor responsible for counting packets with type=error which value is
+ * added to Tigase XMPP Server statistics.
+ *
  * @author andrzej
  */
 @Id(ErrorCounter.ID)
 @HandleStanzaTypes(StanzaType.error)
 @Bean(name = ErrorCounter.ID, parent = SessionManager.class, active = false)
-public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPPacketFilterIfc {
-
-	private static final String SM_COMP = "sess-man";
+public class ErrorCounter
+		extends AnnotatedXMPPProcessor
+		implements XMPPPacketFilterIfc {
 
 	protected static final String ID = "error-counter";
-
+	private static final String SM_COMP = "sess-man";
 	private final ErrorStatisticsHolder holder = new ErrorStatisticsHolder();
-	
+
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -64,7 +66,8 @@ public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPPacketFi
 	}
 
 	@Override
-	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+					   Queue<Packet> results) {
 		//process(packet, session);
 		for (Packet r : results) {
 			process(r, session);
@@ -78,18 +81,18 @@ public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPPacketFi
 	}
 
 	public static class ErrorStatisticsHolder {
-		
+
 		private static final String[] ERROR_NAMES;
-		
-		private final CounterValue[] counters;
-		
+
 		static {
-			int counters = Authorization.values().length+1;
+			int counters = Authorization.values().length + 1;
 			ERROR_NAMES = new String[counters];
 			Authorization[] vals = Authorization.values();
-			for (int i=0; i<vals.length; i++) {
+			for (int i = 0; i < vals.length; i++) {
 				String name = vals[i].getCondition();
-				if (name == null) name = vals[i].name().toLowerCase();
+				if (name == null) {
+					name = vals[i].name().toLowerCase();
+				}
 				StringBuilder sb = new StringBuilder();
 				sb.append(vals[i].getErrorCode());
 				for (String part : name.split("-")) {
@@ -100,33 +103,35 @@ public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPPacketFi
 			}
 			ERROR_NAMES[vals.length] = "0Unknown";
 		}
-		
+
+		private final CounterValue[] counters;
+
 		public static String[] getErrorNames() {
 			return ERROR_NAMES;
 		}
-		
+
 		public ErrorStatisticsHolder() {
 			counters = new CounterValue[ERROR_NAMES.length];
-			for (int i=0; i<ERROR_NAMES.length; i++) {
+			for (int i = 0; i < ERROR_NAMES.length; i++) {
 				counters[i] = new CounterValue(ERROR_NAMES[i], Level.FINER);
 			}
 		}
-		
+
 		public void count(Packet packet) {
 			String condition = packet.getErrorCondition();
 			Authorization val = Authorization.getByCondition(condition);
-			if (val != null)
+			if (val != null) {
 				counters[val.ordinal()].inc();
-			else
-				counters[counters.length-1].inc();
+			} else {
+				counters[counters.length - 1].inc();
+			}
 		}
 
-	
 		public void getStatistics(StatisticsList list) {
 			for (CounterValue c : counters) {
 				list.add(SM_COMP, "ErrorStats/" + c.getName() + "ErrorsNumber", c.getValue(), c.getLevel());
 			}
 		}
 	}
-	
+
 }

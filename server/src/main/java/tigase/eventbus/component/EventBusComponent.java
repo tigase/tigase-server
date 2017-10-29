@@ -43,7 +43,9 @@ import java.util.logging.Level;
 @Bean(name = "eventbus", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})
-public class EventBusComponent extends AbstractKernelBasedComponent implements ClusteredComponentIfc {
+public class EventBusComponent
+		extends AbstractKernelBasedComponent
+		implements ClusteredComponentIfc {
 
 	public EventBusComponent() {
 	}
@@ -79,21 +81,6 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 	}
 
 	@Override
-	protected void onNodeConnected(JID jid) {
-		super.onNodeConnected(jid);
-
-		if (log.isLoggable(Level.FINE))
-			log.fine("Cluster node " + jid + " added to Affiliation Store");
-		kernel.getInstance(AffiliationStore.class).putAffiliation(jid, Affiliation.owner);
-
-		Module module = kernel.getInstance(SubscribeModule.ID);
-		if (module != null && module instanceof SubscribeModule) {
-			((SubscribeModule) module).clusterNodeConnected(jid);
-		}
-
-	}
-
-	@Override
 	public void onNodeDisconnected(JID jid) {
 		super.onNodeDisconnected(jid);
 
@@ -107,6 +94,26 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 	@Override
 	public void processPacket(tigase.server.Packet packet) {
 		super.processPacket(packet);
+	}
+
+	@Override
+	public void setClusterController(ClusterControllerIfc cl_controller) {
+	}
+
+	@Override
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
+
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Cluster node " + jid + " added to Affiliation Store");
+		}
+		kernel.getInstance(AffiliationStore.class).putAffiliation(jid, Affiliation.owner);
+
+		Module module = kernel.getInstance(SubscribeModule.ID);
+		if (module != null && module instanceof SubscribeModule) {
+			((SubscribeModule) module).clusterNodeConnected(jid);
+		}
+
 	}
 
 	@Override
@@ -133,10 +140,6 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 		// ad-hoc commands
 		// kernel.registerBean(AddListenerScriptCommand.class).exec();
 		// kernel.registerBean(RemoveListenerScriptCommand.class).exec();
-	}
-
-	@Override
-	public void setClusterController(ClusterControllerIfc cl_controller) {
 	}
 
 }

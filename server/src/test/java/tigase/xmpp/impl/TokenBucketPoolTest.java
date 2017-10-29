@@ -20,13 +20,13 @@
 
 package tigase.xmpp.impl;
 
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.Assert;
 import org.junit.Test;
 import tigase.TestLogger;
+
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TokenBucketPoolTest {
 
@@ -44,8 +44,9 @@ public class TokenBucketPoolTest {
 			Thread.sleep(3);
 		}
 
-		log.log(Level.FINE, "Received " + registrations + " events in " + ((endTime - startTime) / 1000.0) + " seconds ("
-				+ registrations / ((endTime - startTime) / 1000.0) + " eps).");
+		log.log(Level.FINE,
+				"Received " + registrations + " events in " + ((endTime - startTime) / 1000.0) + " seconds (" +
+						registrations / ((endTime - startTime) / 1000.0) + " eps).");
 
 		return registrations / ((endTime - startTime) / 1000.0);
 	}
@@ -164,15 +165,15 @@ public class TokenBucketPoolTest {
 
 	}
 
-	private void assertInRange(double expectedValue, double devPercent, double value) {
-		if (Math.abs(value - expectedValue) > (devPercent * expectedValue)) {
-			Assert.fail("Value not in range: expected " + expectedValue + " +/- " + (devPercent * expectedValue)
-					+ ", but received " + value);
-		}
-	}
-
 	public void testConsume() throws Exception {
 		assertInRange(2, 0.06, makeTest(new TokenBucketPool(2, 1, TimeUnit.SECONDS), TimeUnit.SECONDS.toMillis(60)));
+	}
+
+	private void assertInRange(double expectedValue, double devPercent, double value) {
+		if (Math.abs(value - expectedValue) > (devPercent * expectedValue)) {
+			Assert.fail("Value not in range: expected " + expectedValue + " +/- " + (devPercent * expectedValue) +
+								", but received " + value);
+		}
 	}
 
 }

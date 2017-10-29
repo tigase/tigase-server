@@ -1,4 +1,3 @@
-
 /*
  * NonAuthUserRepositoryImpl.java
  *
@@ -44,20 +43,19 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "nonAuthUserRepository", parent = Kernel.class, active = true, exportable = true)
-public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
+public class NonAuthUserRepositoryImpl
+		implements NonAuthUserRepository {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger(NonAuthUserRepositoryImpl.class.getName());
+	private static final Logger log = Logger.getLogger(NonAuthUserRepositoryImpl.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private BareJID defDomain = null;
 	private final Set<BareJID> existing_domains = new ConcurrentSkipListSet<BareJID>();
 	@ConfigField(alias = "offline-user-autocreate", desc = "Autocreate offline users")
 	private boolean autoCreateOffline = false;
+	private BareJID defDomain = null;
 	@Inject
 	private UserRepository rep;
 
@@ -66,13 +64,11 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param userRep
 	 * @param defDomain
 	 * @param autoCreateOffline
 	 */
-	public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain,
-			boolean autoCreateOffline) {
+	public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain, boolean autoCreateOffline) {
 		rep = userRep;
 		this.defDomain = defDomain;
 		this.autoCreateOffline = autoCreateOffline;
@@ -112,8 +108,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 			if (autoCreateOffline || rep.userExists(user)) {
 				rep.addDataList(user, calcNode(OFFLINE_DATA_NODE, subnode), key, list);
 			} else {
-				throw new UserNotFoundException("User: " + user
-						+ " has not been found inthe repository.");
+				throw new UserNotFoundException("User: " + user + " has not been found inthe repository.");
 			}
 		} catch (UserNotFoundException e) {
 
@@ -127,19 +122,16 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public String getDomainTempData(BareJID domain, String subnode, String key, String def)
-			throws TigaseDBException {
+	public String getDomainTempData(BareJID domain, String subnode, String key, String def) throws TigaseDBException {
 		checkDomain(domain);
 
 		return rep.getData(domain, subnode, key, def);
 	}
 
 	@Override
-	public String getPublicData(BareJID user, String subnode, String key, String def)
-			throws UserNotFoundException {
+	public String getPublicData(BareJID user, String subnode, String key, String def) throws UserNotFoundException {
 		try {
-			return (rep.userExists(user)
-					? rep.getData(user, calcNode(PUBLIC_DATA_NODE, subnode), key, def) : null);
+			return (rep.userExists(user) ? rep.getData(user, calcNode(PUBLIC_DATA_NODE, subnode), key, def) : null);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem accessing repository data.", e);
 
@@ -148,11 +140,9 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	}
 
 	@Override
-	public String[] getPublicDataList(BareJID user, String subnode, String key)
-			throws UserNotFoundException {
+	public String[] getPublicDataList(BareJID user, String subnode, String key) throws UserNotFoundException {
 		try {
-			return (rep.userExists(user)
-					? rep.getDataList(user, calcNode(PUBLIC_DATA_NODE, subnode), key) : null);
+			return (rep.userExists(user) ? rep.getDataList(user, calcNode(PUBLIC_DATA_NODE, subnode), key) : null);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem accessing repository data.", e);
 
@@ -170,8 +160,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void putDomainTempData(BareJID domain, String subnode, String key, String value)
-			throws TigaseDBException {
+	public void putDomainTempData(BareJID domain, String subnode, String key, String value) throws TigaseDBException {
 		checkDomain(domain);
 		rep.setData(domain, subnode, key, value);
 	}
@@ -183,8 +172,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	}
 
 	@Override
-	public void removeDomainTempData(BareJID domain, String subnode, String key)
-			throws TigaseDBException {
+	public void removeDomainTempData(BareJID domain, String subnode, String key) throws TigaseDBException {
 		checkDomain(defDomain);
 		rep.removeData(domain, subnode, key);
 	}
@@ -204,7 +192,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	}
 
 	private void checkDomain(BareJID domain) throws TigaseDBException {
-		if ( !existing_domains.contains(domain) &&!rep.userExists(domain)) {
+		if (!existing_domains.contains(domain) && !rep.userExists(domain)) {
 			rep.addUser(domain);
 			existing_domains.add(domain);
 		}

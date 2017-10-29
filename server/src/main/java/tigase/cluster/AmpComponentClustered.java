@@ -43,47 +43,38 @@ import java.util.logging.Logger;
 import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
 
 /**
- *
  * @author andrzej
  */
-@Bean(name="amp", parent=Kernel.class, active = true)
-@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@Bean(name = "amp", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 @ClusterModeRequired(active = true)
-public class AmpComponentClustered extends AmpComponent implements ClusteredComponentIfc {
+public class AmpComponentClustered
+		extends AmpComponent
+		implements ClusteredComponentIfc {
 
 	private static final Logger log = Logger.getLogger(AmpComponentClustered.class.getCanonicalName());
 
 	@Inject
 	private ClusterControllerIfc clusterController = null;
 	private Set<CommandListener> commandListeners = new CopyOnWriteArraySet<CommandListener>();
-	
+
 	public AmpComponentClustered() {
 		commandListeners.add(new PacketForwardCommand("packet-forward"));
 	}
-	
-	protected void forwardPacket(Packet packet) {
-		List<JID> toNodes = new ArrayList<JID>();
-		for (JID jid : getNodesConnected()) {
-			// jid of local node should not be part of getNodesConnected but let's keep this check for now
-			if (jid.equals(getComponentId()))
-				continue;
-			toNodes.add(jid);
-		}
-		if (!toNodes.isEmpty())
-			clusterController.sendToNodes("packet-forward", null, packet.getElement(), getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
-	}
-	
+
 	@Override
 	public void processPacket(Packet packet) {
 		if (packet.getPacketFrom() == null || getComponentId().getDomain().equals(packet.getPacketFrom().getDomain())) {
-			if (packet.getElemName() == Message.ELEM_NAME && packet.getElement().getChild("broadcast", "http://tigase.org/protocol/broadcast") != null
-					&& packet.getAttributeStaticStr(FROM_CONN_ID) == null) {
+			if (packet.getElemName() == Message.ELEM_NAME &&
+					packet.getElement().getChild("broadcast", "http://tigase.org/protocol/broadcast") != null &&
+					packet.getAttributeStaticStr(FROM_CONN_ID) == null) {
 				forwardPacket(packet.copyElementOnly());
 			}
 		}
 		super.processPacket(packet); //To change body of generated methods, choose Tools | Templates.
 	}
-	
+
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		super.setClusterController(cl_controller);
@@ -100,14 +91,31 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 		}
 	}
 
-	protected class PacketForwardCommand extends CommandListenerAbstract {
+	protected void forwardPacket(Packet packet) {
+		List<JID> toNodes = new ArrayList<JID>();
+		for (JID jid : getNodesConnected()) {
+			// jid of local node should not be part of getNodesConnected but let's keep this check for now
+			if (jid.equals(getComponentId())) {
+				continue;
+			}
+			toNodes.add(jid);
+		}
+		if (!toNodes.isEmpty()) {
+			clusterController.sendToNodes("packet-forward", null, packet.getElement(), getComponentId(), null,
+										  toNodes.toArray(new JID[toNodes.size()]));
+		}
+	}
+
+	protected class PacketForwardCommand
+			extends CommandListenerAbstract {
 
 		public PacketForwardCommand(String name) {
 			super(name, Priority.HIGH);
 		}
 
 		@Override
-		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
+								   Queue<Element> packets) throws ClusterCommandException {
 			Element packetEl = null;
 			while ((packetEl = packets.poll()) != null) {
 				try {
@@ -116,10 +124,11 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 					packet.setPacketTo(getComponentId());
 					AmpComponentClustered.this.addPacket(packet);
 				} catch (TigaseStringprepException ex) {
-					log.log(Level.WARNING, "exception converting element to packet after forwarding from other node", ex);
+					log.log(Level.WARNING, "exception converting element to packet after forwarding from other node",
+							ex);
 				}
 			}
 		}
-		
+
 	}
 }

@@ -29,7 +29,8 @@ import tigase.db.DataRepository;
 /**
  * Created by andrzej on 22.03.2017.
  */
-public class JDBCMsgRepositoryTest extends AbstractMsgRepositoryTest<DataRepository, Long> {
+public class JDBCMsgRepositoryTest
+		extends AbstractMsgRepositoryTest<DataRepository, Long> {
 
 	@ClassRule
 	public static TestRule rule = new TestRule() {
@@ -49,8 +50,9 @@ public class JDBCMsgRepositoryTest extends AbstractMsgRepositoryTest<DataReposit
 
 	@Override
 	protected Long getMsgId(String msgIdStr) {
-		if (msgIdStr == null)
+		if (msgIdStr == null) {
 			return null;
+		}
 		return Long.parseLong(msgIdStr);
 	}
 }

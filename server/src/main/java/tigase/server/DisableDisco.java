@@ -18,18 +18,16 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server;
 
 /**
  * Disables service discovery processing for a component implementing this interface.
  *
- *
- * @version  13/03/04
- * @author   <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @version 13/03/04
  */
-public interface DisableDisco {}
+public interface DisableDisco {
 
+}
 
 //~ Formatted in Tigase Code Convention on 13/03/04

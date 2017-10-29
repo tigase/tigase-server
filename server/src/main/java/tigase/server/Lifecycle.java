@@ -20,17 +20,16 @@
 package tigase.server;
 
 /**
- * Generic inteface which should be implemented by every class which can be
- * started/stopped during runtime it Tigase XMPP Server (especially for 
- * components, processors, etc. which instances can be replaced and they
- * need information that it's lifecycle has ended).
+ * Generic inteface which should be implemented by every class which can be started/stopped during runtime it Tigase
+ * XMPP Server (especially for components, processors, etc. which instances can be replaced and they need information
+ * that it's lifecycle has ended).
  *
  * @author andrzej
  */
 public interface Lifecycle {
 
 	void start();
-	
+
 	void stop();
-	
+
 }

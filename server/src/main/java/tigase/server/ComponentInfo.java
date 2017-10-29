@@ -19,9 +19,10 @@
  */
 package tigase.server;
 
-import java.util.HashMap;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.xml.Element;
+
+import java.util.HashMap;
 
 /**
  * Helper class for storing and handling additional informations about components
@@ -29,11 +30,75 @@ import tigase.xml.Element;
  * @author Wojciech Kapcia
  */
 public class ComponentInfo {
+
+	private String cls;
+	private HashMap<String, Object> cmpData;
 	private String name = null;
 	private String title;
 	private String version;
-	private String cls;
-	private HashMap<String, Object> cmpData;
+
+	/**
+	 * Allows retrieving implementation package (obtained from jar package) for a given class
+	 *
+	 * @param c class for which package is to be retrieved
+	 *
+	 * @return package containing given class
+	 */
+	public static Package getImplementation(Class<?> c) {
+		return c.getPackage() == null ? XMPPServer.class.getPackage() : c.getPackage();
+	}
+
+	/**
+	 * Allows retrieving implementation information (obtained from jar package) for a given class
+	 *
+	 * @param c class for which Package information is to be retrieved
+	 *
+	 * @return title and version of the Package holding class
+	 */
+	public static String getImplementationInfo(Class<?> c) {
+		return getImplementationTitle(c) + ", version: " + getImplementationVersion(c);
+	}
+
+	/**
+	 * Allows retrieving implementation title (obtained from jar package) for a given class
+	 *
+	 * @param c class for which Package title is to be retrieved
+	 *
+	 * @return Package title of the given class
+	 */
+	public static String getImplementationTitle(Class<?> c) {
+		Package p = getImplementation(c);
+
+		String title = p == null ? null : p.getImplementationTitle();
+
+		return title == null ? "" : title;
+	}
+
+	/**
+	 * Allows retrieving implementation version (obtained from jar package) for a given class
+	 *
+	 * @param c class for which Package version is to be retrieved
+	 *
+	 * @return Package version of the given class
+	 */
+	public static String getImplementationVersion(Class<?> c) {
+		Package p = getImplementation(c);
+
+		String version = p == null ? null : p.getImplementationVersion();
+
+		if (ClusteredComponentIfc.class.isAssignableFrom(c)) {
+			Class<?> superClass = c.getSuperclass();
+			Package superPackage = getImplementation(superClass);
+			if (p != superPackage && superPackage != null && !p.equals(superPackage)) {
+				String superVersion = superPackage.getImplementationVersion();
+				if (superVersion != null && version != null && !version.equals(superVersion)) {
+					version += "-" + superVersion;
+				}
+			}
+		}
+
+		return (version == null) ? "" : version;
+	}
 
 	/**
 	 * Creates ComponentInfo object with initial data
@@ -42,8 +107,8 @@ public class ComponentInfo {
 	 * @param cmpVersion version of the component
 	 * @param cmpCls class of the component
 	 */
-	public ComponentInfo( String cmpTitle, String cmpVersion, String cmpCls ) {
-		this( null, cmpTitle, cmpVersion, cmpCls);
+	public ComponentInfo(String cmpTitle, String cmpVersion, String cmpCls) {
+		this(null, cmpTitle, cmpVersion, cmpCls);
 	}
 
 	/**
@@ -54,8 +119,8 @@ public class ComponentInfo {
 	 * @param cmpVersion version of the component
 	 * @param cmpCls class of the component
 	 */
-	public ComponentInfo( String cmpName, String cmpTitle, String cmpVersion, String cmpCls ) {
-		this(null, cmpTitle, cmpVersion, cmpCls, new HashMap<String, Object>() );
+	public ComponentInfo(String cmpName, String cmpTitle, String cmpVersion, String cmpCls) {
+		this(null, cmpTitle, cmpVersion, cmpCls, new HashMap<String, Object>());
 	}
 
 	/**
@@ -67,7 +132,8 @@ public class ComponentInfo {
 	 * @param cmpCls class of the component
 	 * @param cmpData additional information about component
 	 */
-	public ComponentInfo( String cmpName, String cmpTitle, String cmpVersion, String cmpCls, HashMap<String, Object> cmpData ) {
+	public ComponentInfo(String cmpName, String cmpTitle, String cmpVersion, String cmpCls,
+						 HashMap<String, Object> cmpData) {
 		this.name = cmpName;
 		this.title = cmpTitle;
 		this.version = cmpVersion;
@@ -80,8 +146,8 @@ public class ComponentInfo {
 	 *
 	 * @param c class of the component
 	 */
-	public ComponentInfo( Class<?> c ) {
-		this( null, c);
+	public ComponentInfo(Class<?> c) {
+		this(null, c);
 	}
 
 	/**
@@ -90,10 +156,10 @@ public class ComponentInfo {
 	 * @param cmpName name of the component
 	 * @param c class of the component
 	 */
-	public ComponentInfo(String cmpName, Class<?> c ) {
+	public ComponentInfo(String cmpName, Class<?> c) {
 		this.name = cmpName;
-		this.title = getImplementationTitle( c );
-		this.version = getImplementationVersion( c );
+		this.title = getImplementationTitle(c);
+		this.version = getImplementationVersion(c);
 		this.cls = c.getName();
 		this.cmpData = new HashMap<>();
 	}
@@ -137,7 +203,7 @@ public class ComponentInfo {
 	/**
 	 * Allows retrieving of component's additional data
 	 *
-	 * @return  component additional data
+	 * @return component additional data
 	 */
 	public HashMap<String, Object> getComponentData() {
 		return cmpData;
@@ -145,11 +211,10 @@ public class ComponentInfo {
 
 	@Override
 	public String toString() {
-		return (name == null ? "" : name + " :: ") + "componentInfo{"
-					 + (title.isEmpty() ? "" : "Title=" + title + ", ")
-					 + (version.isEmpty() ? "" : "Version=" + version + ", ")
-					 + "Class=" + cls
-					 +  ( cmpData.isEmpty() ? "" : ", componentData=" + cmpData) + '}';
+		return (name == null ? "" : name + " :: ") + "componentInfo{" +
+				(title.isEmpty() ? "" : "Title=" + title + ", ") +
+				(version.isEmpty() ? "" : "Version=" + version + ", ") + "Class=" + cls +
+				(cmpData.isEmpty() ? "" : ", componentData=" + cmpData) + '}';
 	}
 
 	/**
@@ -158,89 +223,26 @@ public class ComponentInfo {
 	 * @return component information as Element
 	 */
 	public Element toElement() {
-		Element cmpInfo = new Element( "cmpInfo" );
-		if ( name != null ){
-			cmpInfo.addChild(new Element( "name", name ) );
+		Element cmpInfo = new Element("cmpInfo");
+		if (name != null) {
+			cmpInfo.addChild(new Element("name", name));
 		}
-		if ( !title.isEmpty() ){
-			cmpInfo.addChild( new Element( "title", title ) );
+		if (!title.isEmpty()) {
+			cmpInfo.addChild(new Element("title", title));
 		}
-		if ( !version.isEmpty() ){
-			cmpInfo.addChild( new Element( "version", version ) );
+		if (!version.isEmpty()) {
+			cmpInfo.addChild(new Element("version", version));
 		}
-		if ( !cls.isEmpty() ){
-			cmpInfo.addChild( new Element( "class", cls ) );
+		if (!cls.isEmpty()) {
+			cmpInfo.addChild(new Element("class", cls));
 		}
-		if ( !cmpData.isEmpty() ){
-			Element data = new Element( "cmpData" );
-			for ( String key : cmpData.keySet() ) {
-				data.addChild( new Element( key, cmpData.get( key ).toString() ) );
+		if (!cmpData.isEmpty()) {
+			Element data = new Element("cmpData");
+			for (String key : cmpData.keySet()) {
+				data.addChild(new Element(key, cmpData.get(key).toString()));
 			}
-			cmpInfo.addChild( data );
+			cmpInfo.addChild(data);
 		}
 		return cmpInfo;
-	}
-
-	/**
-	 * Allows retrieving implementation package (obtained from jar package)
-	 * for a given class
-	 *
-	 * @param c class for which package is to be retrieved
-	 * @return package containing given class
-	 */
-	public static Package getImplementation( Class<?> c ) {
-		return c.getPackage() == null ? XMPPServer.class.getPackage() : c.getPackage();
-	}
-
-	/**
-	 * Allows retrieving implementation version (obtained from jar package)
-	 * for a given class
-	 *
-	 * @param c class for which Package version is to be retrieved
-	 * @return Package version of the given class
-	 */
-	public static String getImplementationVersion( Class<?> c ) {
-		Package p = getImplementation( c );
-
-		String version = p == null ? null : p.getImplementationVersion();
-
-		if (ClusteredComponentIfc.class.isAssignableFrom(c)) {
-			Class<?> superClass = c.getSuperclass();
-			Package superPackage = getImplementation( superClass );
-			if (p != superPackage && superPackage != null && !p.equals(superPackage)) {
-				String superVersion  = superPackage.getImplementationVersion();
-				if (superVersion != null && version != null && !version.equals(superVersion)) {
-					version += "-" + superVersion;
-				}
-			}
-		}
-		
-		return ( version == null ) ? "" : version;
-	}
-
-	/**
-	 * Allows retrieving implementation title (obtained from jar package)
-	 * for a given class
-	 *
-	 * @param c class for which Package title is to be retrieved
-	 * @return Package title of the given class
-	 */
-	public static String getImplementationTitle( Class<?> c ) {
-		Package p = getImplementation( c );
-
-		String title = p == null ? null : p.getImplementationTitle();
-
-		return title == null ? "" : title;
-	}
-
-	/**
-	 * Allows retrieving implementation information (obtained from jar package)
-	 * for a given class
-	 *
-	 * @param c class for which Package information is to be retrieved
-	 * @return title and version of the Package holding class
-	 */
-	public static String getImplementationInfo( Class<?> c ) {
-		return getImplementationTitle( c ) + ", version: " + getImplementationVersion( c );
 	}
 }

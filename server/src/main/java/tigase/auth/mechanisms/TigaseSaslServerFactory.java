@@ -29,7 +29,8 @@ import javax.security.sasl.SaslServerFactory;
 import java.util.Map;
 
 @Bean(name = "tigaseSaslServerFactory", parent = TigaseSaslProvider.class, active = true)
-public class TigaseSaslServerFactory implements SaslServerFactory {
+public class TigaseSaslServerFactory
+		implements SaslServerFactory {
 
 	public static final String ANONYMOUS_MECHANISM_ALLOWED = "anonymous-mechanism-allowed";
 
@@ -38,7 +39,8 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 
 	@Override
 	public SaslServer createSaslServer(final String mechanism, final String protocol, final String serverName,
-									   final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
+									   final Map<String, ?> props, final CallbackHandler callbackHandler)
+			throws SaslException {
 		switch (mechanism) {
 			case SaslSCRAM.NAME:
 				return new SaslSCRAM(props, callbackHandler);
@@ -64,12 +66,7 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 		return new String[]{
 //				SaslSCRAMSha256Plus.NAME,
 //				SaslSCRAMPlus.NAME,
-SaslSCRAMSha256.NAME,
-SaslSCRAM.NAME,
-"PLAIN",
-"EXTERNAL",
-"ANONYMOUS",
-};
+SaslSCRAMSha256.NAME, SaslSCRAM.NAME, "PLAIN", "EXTERNAL", "ANONYMOUS",};
 	}
 
 }

@@ -19,31 +19,32 @@
  */
 package tigase.cluster.api;
 
-import java.util.Map;
 import tigase.cluster.ClusterConnection;
 import tigase.server.Packet;
 import tigase.xmpp.XMPPIOService;
 
+import java.util.Map;
+
 /**
- * Interface ClusterConnectionSelectorIfc is base interface for classes responsible
- * for selecting connection which should be used to send packet between cluster nodes
- * 
+ * Interface ClusterConnectionSelectorIfc is base interface for classes responsible for selecting connection which
+ * should be used to send packet between cluster nodes
+ *
  * @author andrzej
  */
 public interface ClusterConnectionSelectorIfc {
-	
+
 	/**
-	 * Method returns XMPPIOService instances which should be used to
-	 * send packet between cluster nodes
-	 * 
+	 * Method returns XMPPIOService instances which should be used to send packet between cluster nodes
+	 *
 	 * @param packet
 	 * @param conn
-	 * @return 
+	 *
+	 * @return
 	 */
 	XMPPIOService<Object> selectConnection(Packet packet, ClusterConnection conn);
-	
+
 	void setClusterConnectionHandler(ClusterConnectionHandler handler);
 
-	void setProperties(Map<String,Object> props);
-	
+	void setProperties(Map<String, Object> props);
+
 }

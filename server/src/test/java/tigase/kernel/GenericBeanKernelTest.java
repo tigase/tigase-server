@@ -44,12 +44,13 @@ public class GenericBeanKernelTest {
 
 	}
 
-
 	public interface Converter<T> {
+
 		String toString(T object);
 	}
 
-	public static class Converter1 implements Converter<String> {
+	public static class Converter1
+			implements Converter<String> {
 
 		@Override
 		public String toString(String object) {
@@ -57,7 +58,8 @@ public class GenericBeanKernelTest {
 		}
 	}
 
-	public static class Converter2 implements Converter<Long> {
+	public static class Converter2
+			implements Converter<Long> {
 
 		@Override
 		public String toString(Long object) {

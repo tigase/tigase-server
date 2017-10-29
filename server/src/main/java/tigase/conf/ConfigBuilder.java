@@ -24,7 +24,8 @@ import java.util.HashMap;
 /**
  * Created by andrzej on 11.05.2017.
  */
-public class ConfigBuilder extends AbstractConfigBuilder<HashMap, ConfigBuilder> {
+public class ConfigBuilder
+		extends AbstractConfigBuilder<HashMap, ConfigBuilder> {
 
 	public ConfigBuilder() {
 		super(new HashMap<>());

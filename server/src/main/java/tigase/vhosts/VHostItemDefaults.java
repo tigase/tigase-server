@@ -35,30 +35,28 @@ import static tigase.vhosts.VHostItem.*;
 @Bean(name = "defaults", parent = VHostManager.class, active = true, exportable = true)
 public class VHostItemDefaults {
 
+	@ConfigField(desc = "ANONYMOUS authentication enabled", alias = VHOST_ANONYMOUS_ENABLED_PROP_KEY)
+	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
 	@ConfigField(desc = "Check DNS for domain", alias = "vhost-disable-dns-check")
 	private boolean disableDnsCheck = false;
-
-	@ConfigField(desc = "Global trusted jids", alias = "trusted")
-	private ConcurrentSkipListSet<String> trusted = null;
-
+	@ConfigField(desc = "Domain filter policy", alias = DOMAIN_FILTER_POLICY_PROP_KEY)
+	private DomainFilterPolicy domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
+	@ConfigField(desc = "Hardened mode", alias = "hardened-mode")
+	private boolean hardenedMode = false;
 	@ConfigField(desc = "Maximal number of users", alias = VHOST_MAX_USERS_PROP_KEY)
 	private long maxUsersNumber = VHOST_MAX_USERS_PROP_DEF;
 	@ConfigField(desc = "Message forward JID", alias = VHOST_MESSAGE_FORWARD_PROP_KEY)
 	private JID messageForward = JID.jidInstanceNS(VHOST_MESSAGE_FORWARD_PROP_DEF);
 	@ConfigField(desc = "Presence forward JID", alias = VHOST_PRESENCE_FORWARD_PROP_KEY)
 	private JID presenceForward = JID.jidInstanceNS(VHOST_PRESENCE_FORWARD_PROP_DEF);
-	@ConfigField(desc = "TLS required", alias = VHOST_TLS_REQUIRED_PROP_KEY)
-	private boolean tlsRequired = VHOST_TLS_REQUIRED_PROP_DEF;
-	@ConfigField(desc = "S2S secret", alias = S2S_SECRET_PROP_KEY)
-	private String  s2sSecret = S2S_SECRET_PROP_DEF;
 	@ConfigField(desc = "Registration allowed", alias = VHOST_REGISTER_ENABLED_PROP_KEY)
 	private boolean registerEnabled = VHOST_REGISTER_ENABLED_PROP_DEF;
-	@ConfigField(desc = "Domain filter policy", alias = DOMAIN_FILTER_POLICY_PROP_KEY)
-	private DomainFilterPolicy domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
-	@ConfigField(desc = "ANONYMOUS authentication enabled", alias = VHOST_ANONYMOUS_ENABLED_PROP_KEY)
-	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
-	@ConfigField(desc = "Hardened mode", alias = "hardened-mode")
-	private boolean hardenedMode = false;
+	@ConfigField(desc = "S2S secret", alias = S2S_SECRET_PROP_KEY)
+	private String s2sSecret = S2S_SECRET_PROP_DEF;
+	@ConfigField(desc = "TLS required", alias = VHOST_TLS_REQUIRED_PROP_KEY)
+	private boolean tlsRequired = VHOST_TLS_REQUIRED_PROP_DEF;
+	@ConfigField(desc = "Global trusted jids", alias = "trusted")
+	private ConcurrentSkipListSet<String> trusted = null;
 
 	public long getMaxUsersNumber() {
 		return maxUsersNumber;

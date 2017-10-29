@@ -23,7 +23,8 @@ package tigase.kernel;
 import tigase.kernel.beans.BeanFactory;
 import tigase.kernel.beans.Inject;
 
-public class Bean5Factory implements BeanFactory<Bean5> {
+public class Bean5Factory
+		implements BeanFactory<Bean5> {
 
 	@Inject(nullAllowed = true)
 	private Bean1 bean;

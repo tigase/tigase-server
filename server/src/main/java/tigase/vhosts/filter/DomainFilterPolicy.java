@@ -20,19 +20,19 @@
 
 package tigase.vhosts.filter;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- *	Enumeration of all possible filtering modes
+ * Enumeration of all possible filtering modes
  */
 public enum DomainFilterPolicy {
 
 	/** user can communicate with anyone */
 	ALL(false),
 
-	/** user can communicate with other local users
-	 * (i.e. of the domains hosted on the same Tigase instance) */
+	/**
+	 * user can communicate with other local users (i.e. of the domains hosted on the same Tigase instance)
+	 */
 	LOCAL(false),
 
 	/** user can communicate with other users of the same domain */
@@ -44,9 +44,9 @@ public enum DomainFilterPolicy {
 	/** user can communicate with anyone except of the users within listed domains */
 	BLACKLIST(true),
 
-	/** Custom rules defining communication policies in CSV (using semicolon) in the
-	 * format of {@code rule_number;(allow|deny);[type_of_value];[value]}
-	 * where {@code type_of_value::(jid)}
+	/**
+	 * Custom rules defining communication policies in CSV (using semicolon) in the format of {@code
+	 * rule_number;(allow|deny);[type_of_value];[value]} where {@code type_of_value::(jid)}
 	 * <pre>
 	 * 1|allow|self;
 	 * 2|allow|jid|admin@test2.com;
@@ -59,31 +59,39 @@ public enum DomainFilterPolicy {
 	/** user can not communicate with anyone, account virtually disabled */
 	BLOCK(false);
 
+	private static HashSet<String> valuesDomainsListStr = null;
+	private static String[] valuesStr = null;
 	boolean domainListRequired;
 
-	DomainFilterPolicy(boolean domainListRequired) {
-		this.domainListRequired = domainListRequired;
+	public static HashSet<String> valuePoliciesWithDomainListStr() {
+		if (valuesDomainsListStr == null) {
+			DomainFilterPolicy[] vals = values();
+
+			valuesDomainsListStr = new HashSet<>();
+			for (DomainFilterPolicy val : vals) {
+				if (val.isDomainListRequired()) {
+					valuesDomainsListStr.add(val.name());
+				}
+			}
+		}
+
+		return valuesDomainsListStr;
 	}
 
-	private static String[] valuesStr = null;
-	private static HashSet<String> valuesDomainsListStr = null;
-
-
 	/**
-	 * Helper method returning proper defaults in case parsed value doesn't
-	 * correspond to any of the available modes.
+	 * Helper method returning proper defaults in case parsed value doesn't correspond to any of the available modes.
 	 *
 	 * @param domainFilteringPolicy policy name as string
 	 *
 	 * @return enum value of corresponding mode, ALL if value doesn't match any mode or null for null parameter.
 	 */
-	public static DomainFilterPolicy valueof( String domainFilteringPolicy ) {
-		if ( domainFilteringPolicy == null ){
+	public static DomainFilterPolicy valueof(String domainFilteringPolicy) {
+		if (domainFilteringPolicy == null) {
 			return null;
 		}
 		try {
-			return DomainFilterPolicy.valueOf( domainFilteringPolicy );
-		} catch ( Exception e ) {
+			return DomainFilterPolicy.valueOf(domainFilteringPolicy);
+		} catch (Exception e) {
 			return ALL;
 		}    // end of try-catch
 	}
@@ -94,11 +102,11 @@ public enum DomainFilterPolicy {
 	 * @return String array with mode values
 	 */
 	public static String[] valuesStr() {
-		if ( valuesStr == null ){
+		if (valuesStr == null) {
 			DomainFilterPolicy[] vals = values();
 
-			valuesStr = new String[ vals.length ];
-			for ( int i = 0 ; i < vals.length ; i++ ) {
+			valuesStr = new String[vals.length];
+			for (int i = 0; i < vals.length; i++) {
 				valuesStr[i] = vals[i].name();
 			}
 		}
@@ -106,19 +114,8 @@ public enum DomainFilterPolicy {
 		return valuesStr;
 	}
 
-	public static HashSet<String> valuePoliciesWithDomainListStr() {
-		if ( valuesDomainsListStr == null ){
-			DomainFilterPolicy[] vals = values();
-
-			valuesDomainsListStr = new HashSet<>();
-			for ( DomainFilterPolicy val : vals ) {
-				if ( val.isDomainListRequired() ){
-					valuesDomainsListStr.add( val.name() );
-				}
-			}
-		}
-
-		return valuesDomainsListStr;
+	DomainFilterPolicy(boolean domainListRequired) {
+		this.domainListRequired = domainListRequired;
 	}
 
 	public boolean isDomainListRequired() {

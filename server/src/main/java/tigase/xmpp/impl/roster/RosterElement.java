@@ -24,8 +24,8 @@ import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.stringprep.XMPPStringPrepFactory;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+import tigase.xmpp.jid.JID;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -35,52 +35,49 @@ import java.util.logging.Logger;
 
 /**
  * Describe class RosterElement here.
- *
+ * <p>
  * Created: Wed Oct 29 14:21:16 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class RosterElement {
+
 	/** Field description */
 	protected static final long INITIAL_LAST_SEEN_VAL = 1000l;
-	private static final String ACTIVITY_ATT          = "activity";
-	private static final String ELEM_NAME             = "contact";
-	private static final String GRP_ATT               = "groups";
-	private static final double INITIAL_ACTIVITY_VAL  = 1d;
-	private static final double INITIAL_WEIGHT_VAL    = 1d;
-	private static final String JID_ATT               = "jid";
-	private static final String LAST_SEEN_ATT         = "last-seen";
-	private static final Logger log                   =
-		Logger.getLogger(RosterElement.class.getName());
-	private static final String NAME_ATT              = "name";
-	private static final String OTHER_ATT             = "other";
-	private static final String STRINGPREP_ATT        = "preped";
-	private static final String SUBS_ATT              = "subs";
-	private static final String WEIGHT_ATT            = "weight";
+	private static final String ACTIVITY_ATT = "activity";
+	private static final String ELEM_NAME = "contact";
+	private static final String GRP_ATT = "groups";
+	private static final double INITIAL_ACTIVITY_VAL = 1d;
+	private static final double INITIAL_WEIGHT_VAL = 1d;
+	private static final String JID_ATT = "jid";
+	private static final String LAST_SEEN_ATT = "last-seen";
+	private static final Logger log = Logger.getLogger(RosterElement.class.getName());
+	private static final String NAME_ATT = "name";
+	private static final String OTHER_ATT = "other";
+	private static final String STRINGPREP_ATT = "preped";
+	private static final String SUBS_ATT = "subs";
+	private static final String WEIGHT_ATT = "weight";
 
 	//~--- fields ---------------------------------------------------------------
-
-	private String[] groups                = null;
-	private JID jid                        = null;
-	private String name                    = null;
-	private String otherData               = null;
-	private long lastSeen                  = INITIAL_LAST_SEEN_VAL;
-	private double activity                = INITIAL_ACTIVITY_VAL;
-	private String stringpreped            = null;
-	private SubscriptionType subscription  = null;
-	private double weight                  = INITIAL_WEIGHT_VAL;
-	private boolean presence_sent          = false;
-	private boolean persistent             = true;
-	private Map<String, Boolean> onlineMap = new ConcurrentHashMap<String, Boolean>();
-
+	private double activity = INITIAL_ACTIVITY_VAL;
+	private String[] groups = null;
+	private JID jid = null;
+	private long lastSeen = INITIAL_LAST_SEEN_VAL;
 	// private Element item = null;
 	// private boolean online = false;
 	private boolean modified = false;
+	private String name = null;
+	private Map<String, Boolean> onlineMap = new ConcurrentHashMap<String, Boolean>();
+	private String otherData = null;
+	private boolean persistent = true;
+	private boolean presence_sent = false;
+	private String stringpreped = null;
+	private SubscriptionType subscription = null;
+	private double weight = INITIAL_WEIGHT_VAL;
 
 	//~--- constructors ---------------------------------------------------------
 
-	public RosterElement(Element roster_el)
-					throws TigaseStringprepException {
+	public RosterElement(Element roster_el) throws TigaseStringprepException {
 		if (roster_el.getName() == ELEM_NAME) {
 			this.stringpreped = roster_el.getAttributeStaticStr(STRINGPREP_ATT);
 			setJid(roster_el.getAttributeStaticStr(JID_ATT));
@@ -88,19 +85,18 @@ public class RosterElement {
 			if (roster_el.getAttributeStaticStr(SUBS_ATT) == null) {
 				subscription = SubscriptionType.none;
 			} else {
-				subscription =
-					SubscriptionType.valueOf(roster_el.getAttributeStaticStr(SUBS_ATT));
+				subscription = SubscriptionType.valueOf(roster_el.getAttributeStaticStr(SUBS_ATT));
 			}
 
 			String grps = roster_el.getAttributeStaticStr(GRP_ATT);
 
-			if ((grps != null) &&!grps.trim().isEmpty()) {
+			if ((grps != null) && !grps.trim().isEmpty()) {
 				setGroups(grps.split(","));
 			}
 
 			String other_data = roster_el.getAttributeStaticStr(OTHER_ATT);
 
-			if ((other_data != null) &&!other_data.trim().isEmpty()) {
+			if ((other_data != null) && !other_data.trim().isEmpty()) {
 				otherData = other_data;
 			}
 
@@ -172,24 +168,73 @@ public class RosterElement {
 		return groups;
 	}
 
+	public final void setGroups(String[] groups) {
+		if ((groups != null) && (groups.length > 0)) {
+			this.groups = new String[groups.length];
+			for (int i = 0; i < groups.length; i++) {
+				this.groups[i] = XMLUtils.unescape(groups[i]);
+			}
+		} else {
+			this.groups = null;
+		}
+		modified = true;
+	}
+
 	public JID getJid() {
 		return jid;
+	}
+
+	private void setJid(String jid) throws TigaseStringprepException {
+		if (XMPPStringPrepFactory.STRINGPREP_PROCESSOR.equals(stringpreped)) {
+			this.jid = JID.jidInstanceNS(jid);
+		} else {
+			this.jid = JID.jidInstance(jid);
+			modified = true;
+		}
+		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 	}
 
 	public String getName() {
 		return name;
 	}
 
+	public final void setName(final String name) {
+		if (name == this.name || (name != null && this.name != null && name.equals(this.name))) {
+			return;
+		} else {
+			this.name = name == null ? null : XMLUtils.unescape(name);
+			this.modified = true;
+		}
+
+//		String old_name = this.name;
+//		if (name == null) {
+//			this.name = this.jid.getLocalpart();
+//			if ((this.name == null) || this.name.trim().isEmpty()) {
+//				this.name = this.jid.getBareJID().toString();
+//			}
+//		} else {
+//			this.name = XMLUtils.unescape(name);
+//		}
+//		if (!this.name.equals(old_name)) {
+//			modified = true;
+//		}
+	}
+
 	public String getOtherData() {
 		return otherData;
 	}
 
-	public Element getRosterElement() {
-		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, STRINGPREP_ATT },
-				new String[] { jid.toString(), subscription.toString(), "" + stringpreped });
+	public void setOtherData(String other_data) {
+		otherData = other_data;
+	}
 
-		if (name != null)
+	public Element getRosterElement() {
+		Element elem = new Element(ELEM_NAME, new String[]{JID_ATT, SUBS_ATT, STRINGPREP_ATT},
+								   new String[]{jid.toString(), subscription.toString(), "" + stringpreped});
+
+		if (name != null) {
 			elem.setAttribute(NAME_ATT, XMLUtils.escape(name));
+		}
 
 		if ((groups != null) && (groups.length > 0)) {
 			String grps = "";
@@ -244,6 +289,15 @@ public class RosterElement {
 		return subscription;
 	}
 
+	public void setSubscription(SubscriptionType subscription) {
+		if (subscription == null) {
+			this.subscription = SubscriptionType.none;
+		} else {
+			this.subscription = subscription;
+		}
+		modified = true;
+	}
+
 	public boolean isModified() {
 		return modified;
 	}
@@ -256,44 +310,8 @@ public class RosterElement {
 		return presence_sent;
 	}
 
-	public final void setGroups(String[] groups) {
-		if ((groups != null) && (groups.length > 0)) {
-			this.groups = new String[groups.length];
-			for (int i = 0; i < groups.length; i++) {
-				this.groups[i] = XMLUtils.unescape(groups[i]);
-			}
-		} else {
-			this.groups = null;
-		}
-		modified = true;
-	}
-
-	public final void setName(final String name) {
-		if(name==this.name || (name!=null && this.name!=null && name.equals(this.name))){
-			return ;
-		} else {
-			this.name = name==null?null:XMLUtils.unescape(name);
-			this.modified = true;
-		}
-		
-		
-
-			
-		
-		
-		
-//		String old_name = this.name;
-//		if (name == null) {
-//			this.name = this.jid.getLocalpart();
-//			if ((this.name == null) || this.name.trim().isEmpty()) {
-//				this.name = this.jid.getBareJID().toString();
-//			}
-//		} else {
-//			this.name = XMLUtils.unescape(name);
-//		}
-//		if (!this.name.equals(old_name)) {
-//			modified = true;
-//		}
+	public void setPresence_sent(boolean presence_sent) {
+		this.presence_sent = presence_sent;
 	}
 
 	public void setOnline(String resource, boolean online) {
@@ -304,38 +322,6 @@ public class RosterElement {
 				onlineMap.remove(resource);
 			}
 		}
-	}
-
-	public void setOtherData(String other_data) {
-		otherData = other_data;
-	}
-
-	public void setPresence_sent(boolean presence_sent) {
-		this.presence_sent = presence_sent;
-	}
-
-	public void setSubscription(SubscriptionType subscription) {
-		if (subscription == null) {
-			this.subscription = SubscriptionType.none;
-		} else {
-			this.subscription = subscription;
-		}
-		modified = true;
-	}
-
-	private void setJid(JID jid) {
-		this.jid = jid;
-		modified = true;
-	}
-
-	private void setJid(String jid) throws TigaseStringprepException {
-		if (XMPPStringPrepFactory.STRINGPREP_PROCESSOR.equals(stringpreped)) {
-			this.jid = JID.jidInstanceNS(jid);
-		} else {
-			this.jid = JID.jidInstance(jid);
-			modified = true;
-		}
-		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 	}
 
 	public boolean isPersistent() {
@@ -364,7 +350,7 @@ public class RosterElement {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
-		modified    = true;
+		modified = true;
 	}
 
 	public long getLastSeen() {
@@ -373,6 +359,11 @@ public class RosterElement {
 
 	public void setLastSeen(long lastSeen) {
 		this.lastSeen = lastSeen;
-		modified      = true;
+		modified = true;
+	}
+
+	private void setJid(JID jid) {
+		this.jid = jid;
+		modified = true;
 	}
 }

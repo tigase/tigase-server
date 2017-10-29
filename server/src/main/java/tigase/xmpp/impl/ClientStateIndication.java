@@ -40,45 +40,40 @@ import java.util.logging.Logger;
  * Created by andrzej on 25.06.2016.
  */
 @Id(ClientStateIndication.ID)
-@Handles({
-		@Handle(path = {ClientStateIndication.ACTIVE_NAME}, xmlns = ClientStateIndication.XMLNS),
-		@Handle(path = {ClientStateIndication.INACTIVE_NAME}, xmlns = ClientStateIndication.XMLNS)
-})
-@StreamFeatures({
-		@StreamFeature(elem = "csi", xmlns = ClientStateIndication.XMLNS)
-})
+@Handles({@Handle(path = {ClientStateIndication.ACTIVE_NAME}, xmlns = ClientStateIndication.XMLNS),
+		  @Handle(path = {ClientStateIndication.INACTIVE_NAME}, xmlns = ClientStateIndication.XMLNS)})
+@StreamFeatures({@StreamFeature(elem = "csi", xmlns = ClientStateIndication.XMLNS)})
 @Bean(name = ClientStateIndication.ID, parent = SessionManager.class, active = true)
-public class ClientStateIndication extends AnnotatedXMPPProcessor
+public class ClientStateIndication
+		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc, XMPPPacketFilterIfc, RegistrarBean {
-
-	private static final Logger log = Logger.getLogger(ClientStateIndication.class.getCanonicalName());
 
 	protected static final String XMLNS = "urn:xmpp:csi:0";
 	protected static final String ID = XMLNS;
-
 	protected static final String ACTIVE_NAME = "active";
 	protected static final String INACTIVE_NAME = "inactive";
-
+	private static final Logger log = Logger.getLogger(ClientStateIndication.class.getCanonicalName());
 	@Inject
 	private Logic logic;
 
 	@Override
-	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+					   Queue<Packet> results) {
 		logic.filter(packet, session, repo, results);
 	}
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		}
 		if (!session.isAuthorized()) {
 			try {
-				results.offer(session.getAuthState().getResponseMessage(packet,
-						"Session is not yet authorized.", false));
+				results.offer(
+						session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
 			} catch (PacketErrorTypeException ex) {
-				log.log(Level.FINEST,
-						"ignoring packet from not authorized session which is already of type error");
+				log.log(Level.FINEST, "ignoring packet from not authorized session which is already of type error");
 			}
 
 			return;
@@ -98,8 +93,9 @@ public class ClientStateIndication extends AnnotatedXMPPProcessor
 
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
-		if (session == null || !session.isAuthorized())
+		if (session == null || !session.isAuthorized()) {
 			return null;
+		}
 		return super.supStreamFeatures(session);
 	}
 
@@ -113,7 +109,8 @@ public class ClientStateIndication extends AnnotatedXMPPProcessor
 
 	}
 
-	public interface Logic extends XMPPPacketFilterIfc {
+	public interface Logic
+			extends XMPPPacketFilterIfc {
 
 		void activate(XMPPResourceConnection session, Queue<Packet> results);
 

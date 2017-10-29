@@ -77,15 +77,15 @@ public class OfflineMessages_StampComparatorTest {
 
 	private Packet createJabberXDelayPacket(String timestamp) throws TigaseStringprepException {
 		Element elem = new Element("message", new Element[]{
-				new Element("x", new String[]{"xmlns", "stamp"}, new String[]{"jabber:x:delay", timestamp})},
-								   null, null);
+				new Element("x", new String[]{"xmlns", "stamp"}, new String[]{"jabber:x:delay", timestamp})}, null,
+								   null);
 		return Packet.packetInstance(elem);
 	}
 
 	private Packet createUrnXmppDelayPacket(String timestamp) throws TigaseStringprepException {
 		Element elem = new Element("message", new Element[]{
-				new Element("delay", new String[]{"xmlns", "stamp"}, new String[]{"urn:xmpp:delay", timestamp})},
-								   null, null);
+				new Element("delay", new String[]{"xmlns", "stamp"}, new String[]{"urn:xmpp:delay", timestamp})}, null,
+								   null);
 		return Packet.packetInstance(elem);
 	}
 }

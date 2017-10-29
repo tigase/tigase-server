@@ -36,12 +36,14 @@ import java.util.logging.Logger;
 
 /**
  * Created: Dec 9, 2010 1:59:56 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 @Bean(name = "streamOpen", parent = S2SConnectionManager.class, active = true)
-public class StreamOpen extends S2SAbstractProcessor {
+public class StreamOpen
+		extends S2SAbstractProcessor {
+
 	private static final Logger log = Logger.getLogger(StreamOpen.class.getName());
 
 	// ~--- methods --------------------------------------------------------------
@@ -50,7 +52,7 @@ public class StreamOpen extends S2SAbstractProcessor {
 	public int order() {
 		return Order.StreamOpen.ordinal();
 	}
-	
+
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		switch (serv.connectionType()) {
@@ -61,22 +63,18 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 				// Send init xmpp stream here
 				// XMPPIOService serv = (XMPPIOService)service;
-				String data =
-						"<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
-								+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'"
-								+ " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
-								+ "'" + " version='1.0'>";
+				String data = "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'" +
+						" xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'" + " from='" +
+						cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + " version='1.0'>";
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, sending: {1}", new Object[] { serv, data });
+					log.log(Level.FINEST, "{0}, sending: {1}", new Object[]{serv, data});
 				}
 
-				S2SConnection s2s_conn =
-						(S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
+				S2SConnection s2s_conn = (S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
 
 				if (s2s_conn == null) {
-					log.log(Level.WARNING,
-							"Protocol error s2s_connection not set for outgoing connection: {0}", serv);
+					log.log(Level.WARNING, "Protocol error s2s_connection not set for outgoing connection: {0}", serv);
 					serv.stop();
 				} else {
 					s2s_conn.setS2SIOService(serv);
@@ -100,8 +98,7 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 		if (cid == null) {
 			if (serv.connectionType() == ConnectionType.connect) {
-				log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
-						serv);
+				log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", serv);
 			}
 
 			return;
@@ -111,10 +108,9 @@ public class StreamOpen extends S2SAbstractProcessor {
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
 			if (cid_conns == null) {
-                                if (log.isLoggable(Level.FINE)) {
-                                        log.log(Level.FINE,
-						"Protocol error cid_conns not found for outgoing connection: {0}", serv);
-                                }
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Protocol error cid_conns not found for outgoing connection: {0}", serv);
+				}
 				return;
 			} else {
 				cid_conns.connectionStopped(serv);
@@ -153,7 +149,7 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "{0}, Connect Stream opened for: {1}, session id{2}",
-								new Object[] { serv, cid, remote_id });
+								new Object[]{serv, cid, remote_id});
 					}
 
 					if (cid_conns == null) {
@@ -161,22 +157,16 @@ public class StreamOpen extends S2SAbstractProcessor {
 						// This should actually not happen. Let's be clear here about
 						// handling unexpected
 						// cases.
-						log.log(
-								Level.WARNING,
-								"{0} This might be a bug in s2s code, should not happen."
-										+ " Missing CIDConnections for stream open to ''connect'' service type.",
-								serv);
+						log.log(Level.WARNING, "{0} This might be a bug in s2s code, should not happen." +
+								" Missing CIDConnections for stream open to ''connect'' service type.", serv);
 						generateStreamError(false, "internal-server-error", serv);
 
 						return null;
 					}
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(
-								Level.FINEST,
-								"{0}, stream open for cid: {1}, outgoint: {2}, incoming: {3}",
-								new Object[] { serv, cid, cid_conns.getOutgoingCount(),
-										cid_conns.getIncomingCount() });
+						log.log(Level.FINEST, "{0}, stream open for cid: {1}, outgoint: {2}, incoming: {3}",
+								new Object[]{serv, cid, cid_conns.getOutgoingCount(), cid_conns.getIncomingCount()});
 					}
 
 					serv.setSessionId(remote_id);
@@ -197,33 +187,27 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 					serv.setSessionId(id);
 
-					String stream_open =
-							"<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
-									+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'"
-									+ " id='" + id + "'";
+					String stream_open = "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'" +
+							" xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'" + " id='" + id + "'";
 
 					if (cid != null) {
-						stream_open +=
-								" from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
-										+ "'";
+						stream_open += " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'";
 
 						if (cid_conns == null) {
 							cid_conns = handler.getCIDConnections(cid, true);
 						}
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST,
-									"{0}, Accept Stream opened for: {1}, session id: {2}", new Object[] {
-											serv, cid, id });
+							log.log(Level.FINEST, "{0}, Accept Stream opened for: {1}, session id: {2}",
+									new Object[]{serv, cid, id});
 						}
 
 						serv.getSessionData().put("cid", cid);
 						cid_conns.addIncoming(serv);
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST,
-									"{0}, Accept Stream opened for unknown CID, session id: {1}",
-									new Object[] { serv, id });
+							log.log(Level.FINEST, "{0}, Accept Stream opened for unknown CID, session id: {1}",
+									new Object[]{serv, id});
 						}
 					}
 

@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -28,14 +26,15 @@ import java.util.Map;
 
 /**
  * Describe class MessageRouterConfig here.
- *
- *
+ * <p>
+ * <p>
  * Created: Fri Jan  6 14:54:21 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class MessageRouterConfig {
+
 	/** Field description */
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";
 
@@ -52,23 +51,20 @@ public class MessageRouterConfig {
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 
 	/** Field description */
-	public static final String UPDATES_CHECKING_INTERVAL_PROP_KEY =
-			"updates-checking-interval";
+	public static final String UPDATES_CHECKING_INTERVAL_PROP_KEY = "updates-checking-interval";
 
 	/** Field description */
 	public static final long UPDATES_CHECKING_INTERVAL_PROP_VAL = 7;
 
 	/** Field description */
-	public static final String    UPDATES_CHECKING_PROP_KEY        = "updates-checking";
+	public static final String UPDATES_CHECKING_PROP_KEY = "updates-checking";
 	/** Field description */
-	public static final String MSG_RECEIVERS_NAMES_PROP_KEY = MSG_RECEIVERS_PROP_KEY +
-			"id-names";
+	public static final String MSG_RECEIVERS_NAMES_PROP_KEY = MSG_RECEIVERS_PROP_KEY + "id-names";
 	/** Field description */
 	public static final Boolean UPDATES_CHECKING_PROP_VAL = true;
 
 	/** Field description */
-	public static final String REGISTRATOR_NAMES_PROP_KEY = REGISTRATOR_PROP_KEY +
-			"id-names";
+	public static final String REGISTRATOR_NAMES_PROP_KEY = REGISTRATOR_PROP_KEY + "id-names";
 
 	/** Field description */
 	public static final boolean DISCO_SHOW_VERSION_PROP_VAL = true;
@@ -84,9 +80,20 @@ public class MessageRouterConfig {
 
 	//~--- constructors ---------------------------------------------------------
 
+	private static boolean isTrue(String val) {
+		if (val == null) {
+			return false;
+		}
+
+		String value = val.toLowerCase();
+
+		return (value.equals("true") || value.equals("yes") || value.equals("on") || value.equals("1"));
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param props
 	 */
@@ -95,20 +102,6 @@ public class MessageRouterConfig {
 
 		// System.out.println("MessageRouterConfig() properties: " + props.toString());
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	private static boolean isTrue(String val) {
-		if (val == null) {
-			return false;
-		}
-
-		String value = val.toLowerCase();
-
-		return (value.equals("true") || value.equals("yes") || value.equals("on") || value
-				.equals("1"));
-	}
 }    // MessageRouterConfig
-
 
 //~ Formatted in Tigase Code Convention on 13/10/15

@@ -28,11 +28,12 @@ AS:Component: monitor
 
 package tigase.admin
 
-import tigase.server.*
+import tigase.server.Command
+import tigase.server.Packet
 import tigase.util.log.LogFormatter
 
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -42,7 +43,7 @@ if (!isServiceAdmin) {
 	return result
 }
 
-def result = []
+def result = [ ]
 
 def size = LogFormatter.errors.size()
 if (size > 0) {

@@ -20,7 +20,8 @@
 
 package tigase.eventbus;
 
-public class EventBusException extends RuntimeException {
+public class EventBusException
+		extends RuntimeException {
 
 	public EventBusException() {
 	}

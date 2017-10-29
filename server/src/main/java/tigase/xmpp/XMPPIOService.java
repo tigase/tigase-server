@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -47,33 +45,30 @@ import java.util.logging.Logger;
 
 /**
  * Describe class XMPPIOService here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Feb 7 07:15:02 2006
  *
- * @param <RefObject>
- *          is a reference object stored by this service. This is e reference to
- *          higher level data object keeping more information about the
- *          connection.
+ * @param <RefObject> is a reference object stored by this service. This is e reference to higher level data object
+ * keeping more information about the connection.
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class XMPPIOService<RefObject>
-				extends IOService<RefObject> {
+		extends IOService<RefObject> {
+
 	/** Field description */
 	public static final String ACK_NAME = "ack";
 
 	/** Field description */
-	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_KEY =
-			"cross-domain-policy-file";
+	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_KEY = "cross-domain-policy-file";
 
 	/** Field description */
-	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL =
-			"etc/cross-domain-policy.xml";
+	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL = "etc/cross-domain-policy.xml";
 
 	/**
-	 * Key name of the system property for configuration protection
-	 * from system overload and DOS attack.
+	 * Key name of the system property for configuration protection from system overload and DOS attack.
 	 */
 	public static final String DOM_HANDLER = "XMPPDomBuilderHandler";
 
@@ -81,9 +76,9 @@ public class XMPPIOService<RefObject>
 	public static final String ID_ATT = "id";
 
 	/** Field description */
-	public static final String REQ_NAME            = "req";
+	public static final String REQ_NAME = "req";
 
-	public static final String STREAM_CLOSING        = "stream-closing";
+	public static final String STREAM_CLOSING = "stream-closing";
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -91,70 +86,58 @@ public class XMPPIOService<RefObject>
 	private static final Logger log = Logger.getLogger(XMPPIOService.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private XMPPDomBuilderHandler<RefObject> domHandler = null;
-	
-	/** Field description */
-	protected SimpleParser        parser = SingletonFactory.getParserInstance();
-	private String                jid                  = null;
-	private long                  packetsReceived      = 0;
-	private long                  packetsSent          = 0;
-	protected XMPPIOProcessor[]     processors           = null;
-	private long                  req_idx              = 0;
-	@SuppressWarnings("rawtypes")
-	private XMPPIOServiceListener serviceListener      = null;
-	private long                  totalPacketsReceived = 0;
-	private long                  totalPacketsSent     = 0;
-	/**
-	 * This variable keeps the time of last received XMPP packet, it is used to
-	 * help detect dead connections.
-	 */
-	private long                                    lastXmppPacketReceivedTime = 0;
-
-	/**
-	 * The <code>waitingPackets</code> queue keeps data which have to be
-	 * processed.
-	 */
-	private ConcurrentLinkedQueue<Packet> waitingPackets =
-			new ConcurrentLinkedQueue<Packet>();
-	private ConcurrentSkipListMap<String, Packet> waitingForAck =
-			new ConcurrentSkipListMap<String, Packet>();
-	private boolean white_char_ack = false;
-	private String  xmlns          = null;
-	private boolean xmpp_ack       = false;
-	private boolean strict_ack     = false;
-
-	/**
-	 * The <code>readyPackets</code> queue keeps data which have been already
-	 * processed and they are actual processing results.
-	 */
-	private ConcurrentLinkedQueue<Packet> receivedPackets =
-			new ConcurrentLinkedQueue<Packet>();
-	private boolean firstPacket = true;
-
 	/** Field description */
 	public ReentrantLock writeInProgress = new ReentrantLock();
+	/** Field description */
+	protected SimpleParser parser = SingletonFactory.getParserInstance();
+	protected XMPPIOProcessor[] processors = null;
+	private XMPPDomBuilderHandler<RefObject> domHandler = null;
+	private boolean firstPacket = true;
+	private String jid = null;
+	/**
+	 * This variable keeps the time of last received XMPP packet, it is used to help detect dead connections.
+	 */
+	private long lastXmppPacketReceivedTime = 0;
+	private long packetsReceived = 0;
+	private long packetsSent = 0;
+	/**
+	 * The <code>readyPackets</code> queue keeps data which have been already processed and they are actual processing
+	 * results.
+	 */
+	private ConcurrentLinkedQueue<Packet> receivedPackets = new ConcurrentLinkedQueue<Packet>();
+	private long req_idx = 0;
+	@SuppressWarnings("rawtypes")
+	private XMPPIOServiceListener serviceListener = null;
+	private boolean strict_ack = false;
+	private long totalPacketsReceived = 0;
+	private long totalPacketsSent = 0;
+	private ConcurrentSkipListMap<String, Packet> waitingForAck = new ConcurrentSkipListMap<String, Packet>();
+	/**
+	 * The <code>waitingPackets</code> queue keeps data which have to be processed.
+	 */
+	private ConcurrentLinkedQueue<Packet> waitingPackets = new ConcurrentLinkedQueue<Packet>();
+	private boolean white_char_ack = false;
+	private String xmlns = null;
+	private boolean xmpp_ack = false;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>XMPPIOService</code> instance.
-	 *
 	 */
 	public XMPPIOService() {
 		super();
-		domHandler = new XMPPDomBuilderHandler<>( this );
-		getSessionData().put( DOM_HANDLER, domHandler );
+		domHandler = new XMPPDomBuilderHandler<>(this);
+		getSessionData().put(DOM_HANDLER, domHandler);
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method <code>addPacketToSend</code> adds new data which will be processed
-	 * during next run. Data are kept in proper order like in <em>FIFO</em> queue.
+	 * Method <code>addPacketToSend</code> adds new data which will be processed during next run. Data are kept in
+	 * proper order like in <em>FIFO</em> queue.
 	 *
-	 * @param packet
-	 *          a <code>Packet</code> value of data to process.
+	 * @param packet a <code>Packet</code> value of data to process.
 	 */
 	public void addPacketToSend(Packet packet) {
 
@@ -169,13 +152,10 @@ public class XMPPIOService<RefObject>
 		if (xmpp_ack) {
 			String req = "" + (++req_idx);
 
-			packet.getElement().addChild(new Element(REQ_NAME, new String[] { ID_ATT },
-					new String[] { req }));
+			packet.getElement().addChild(new Element(REQ_NAME, new String[]{ID_ATT}, new String[]{req}));
 			waitingForAck.put(req, packet);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Added req {1} for packet: {2}", new Object[] {
-						toString(),
-						req, packet });
+				log.log(Level.FINEST, "{0}, Added req {1} for packet: {2}", new Object[]{toString(), req, packet});
 			}
 		}
 		++packetsSent;
@@ -183,7 +163,7 @@ public class XMPPIOService<RefObject>
 		waitingPackets.offer(packet);
 	}
 
-		@Override
+	@Override
 	public IOService<?> call() throws IOException {
 		IOService<?> io = super.call();
 		// needed to send packets added by addPacketToSent when it was not able
@@ -195,18 +175,17 @@ public class XMPPIOService<RefObject>
 				processWaitingPackets();
 			} finally {
 				writeInProgress.unlock();
-			}			
+			}
 		}
 		return io;
 	}
-	
+
 	@Override
 	public boolean checkBufferLimit(int bufferSize) {
 		if (!super.checkBufferLimit(bufferSize)) {
 			try {
-				writeRawData("<stream:error>" + "<policy-violation "
-						+ "xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-						+ "</stream:error></stream:stream>");
+				writeRawData("<stream:error>" + "<policy-violation " + "xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+									 "</stream:error></stream:stream>");
 				int counter = 0;
 
 				while (isConnected() && waitingToSend() && (++counter < 10)) {
@@ -216,23 +195,20 @@ public class XMPPIOService<RefObject>
 					} catch (InterruptedException ex) {
 					}
 				}
-			}
-			catch (IOException ex) {
-				log.log(Level.FINEST, "{0}, Exception sending policy-violation stream error", 
-						new Object[]{toString()});
+			} catch (IOException ex) {
+				log.log(Level.FINEST, "{0}, Exception sending policy-violation stream error", new Object[]{toString()});
 			}
 			this.forceStop();
 			return false;
 		}
 		return true;
-	}	
-	
+	}
+
 	/**
-	 *
 	 * @param data
 	 *
-	 *
 	 * @return a value of <code>boolean</code>
+	 *
 	 * @throws IOException
 	 */
 	public boolean checkData(char[] data) throws IOException {
@@ -242,25 +218,23 @@ public class XMPPIOService<RefObject>
 	}
 
 	/**
-	 * Clears queue of packets waiting to send.
-	 * In case of connection close this packets may be sent to offline store 
-	 * but some processors may want stop this from happening - for that they 
-	 * may use this method
+	 * Clears queue of packets waiting to send. In case of connection close this packets may be sent to offline store
+	 * but some processors may want stop this from happening - for that they may use this method
 	 */
 	public void clearWaitingPackets() {
 		this.waitingPackets.clear();
 	}
-	
+
 	/**
-	 * Returns queue with packets waiting to send. For use by ConnectionManager
-	 * which may need to get undelivered packets 
-	 * 
-	 * @return 
+	 * Returns queue with packets waiting to send. For use by ConnectionManager which may need to get undelivered
+	 * packets
+	 *
+	 * @return
 	 */
 	public Queue<Packet> getWaitingPackets() {
 		return waitingPackets;
 	}
-	
+
 	@Override
 	public void forceStop() {
 		boolean stop = false;
@@ -275,30 +249,27 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
-
 	@Override
 	public void processWaitingPackets() throws IOException {
 		Packet packet = null;
 
 		// int cnt = 0;
 		// while ((packet = waitingPackets.poll()) != null && (cnt < 1000)) {
-		
+
 		// we should only peek for packet now, and poll it after sending it
 		while ((packet = waitingPackets.peek()) != null) {
 
 			// ++cnt;
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { toString(),
-						packet });
+				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[]{toString(), packet});
 			}
 			writeRawData(packet.getElement().toString());
-			
+
 			// and after sending it we should remove it to minimalize chances of lost packets
 			waitingPackets.poll();
-			
+
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, SENT: {1}", new Object[] { toString(),
-						packet.getElement().toString() });
+				log.log(Level.FINEST, "{0}, SENT: {1}", new Object[]{toString(), packet.getElement().toString()});
 			}
 		}    // end of while (packet = waitingPackets.poll() != null)
 
@@ -328,7 +299,6 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param data
 	 *
 	 * @throws IOException
@@ -350,21 +320,17 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param data
 	 */
 	public void xmppStreamOpen(final String data) {
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(),
-						data });
+				log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), data});
 			}
 			writeRawData(data);
 			assert debug(data, "--SENT:");
 		} catch (IOException e) {
-			log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[] {
-					toString(),
-					e });
+			log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[]{toString(), e});
 			forceStop();
 		}
 	}
@@ -379,14 +345,10 @@ public class XMPPIOService<RefObject>
 //		return elements_number_limit;
 //	}
 
-
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 *
 	 *
 	 * @return a value of <code>long</code>
 	 */
@@ -403,10 +365,7 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 *
 	 *
 	 * @return a value of <code>long</code>
 	 */
@@ -423,9 +382,6 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of {@code Queue<Packet>}
 	 */
 	public Queue<Packet> getReceivedPackets() {
@@ -434,9 +390,6 @@ public class XMPPIOService<RefObject>
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 *
 	 * @return a value of <code>long</code>
 	 */
@@ -447,9 +400,6 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
-	 *
-	 *
 	 * @return a value of <code>long</code>
 	 */
 	public long getTotalPacketsSent() {
@@ -458,7 +408,6 @@ public class XMPPIOService<RefObject>
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @return a value of <code>String</code>
 	 */
@@ -469,93 +418,6 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Packet>}
-	 */
-	public Map<String, Packet> getWaitingForAct() {
-		for (Packet p : waitingForAck.values()) {
-			Element req = p.getElement().getChild(REQ_NAME);
-
-			if (req == null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"{0}, Missing req element in waiting for ACK packet: {1}", new Object[] {
-							toString(),
-							p });
-				}
-			} else {
-				p.getElement().removeChild(req);
-			}
-		}
-
-		return waitingForAck;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
-	public String getXMLNS() {
-		return this.xmlns;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param white_char_ack
-	 * @param xmpp_ack
-	 * @param strict
-	 */
-	public void setAckMode(boolean white_char_ack, boolean xmpp_ack, boolean strict) {
-		this.white_char_ack = white_char_ack;
-		this.xmpp_ack       = xmpp_ack;
-		this.strict_ack     = strict;
-	}
-
-
-	/**
-	 *
-	 * @param limit
-	 */
-	public void setElementLimits(int limit) {
-
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param servList
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setIOServiceListener(XMPPIOServiceListener servList) {
-		this.serviceListener = servList;
-		super.setIOServiceListener(servList);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param processors is a <code>XMPPIOProcessor[]</code>
-	 */
-	public void setProcessors(XMPPIOProcessor[] processors) {
-		this.processors = processors;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param jid
 	 */
 	public void setUserJid(String jid) {
@@ -565,6 +427,38 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
+	 * @return a value of {@code Map<String,Packet>}
+	 */
+	public Map<String, Packet> getWaitingForAct() {
+		for (Packet p : waitingForAck.values()) {
+			Element req = p.getElement().getChild(REQ_NAME);
+
+			if (req == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Missing req element in waiting for ACK packet: {1}",
+							new Object[]{toString(), p});
+				}
+			} else {
+				p.getElement().removeChild(req);
+			}
+		}
+
+		return waitingForAck;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getXMLNS() {
+		return this.xmlns;
+	}
+
+	/**
+	 * Method description
 	 *
 	 * @param xmlns
 	 */
@@ -572,21 +466,70 @@ public class XMPPIOService<RefObject>
 		this.xmlns = xmlns;
 	}
 
+	/**
+	 * Method description
+	 *
+	 * @param white_char_ack
+	 * @param xmpp_ack
+	 * @param strict
+	 */
+	public void setAckMode(boolean white_char_ack, boolean xmpp_ack, boolean strict) {
+		this.white_char_ack = white_char_ack;
+		this.xmpp_ack = xmpp_ack;
+		this.strict_ack = strict;
+	}
+
+	/**
+	 * @param limit
+	 */
+	public void setElementLimits(int limit) {
+
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param servList
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public void setIOServiceListener(XMPPIOServiceListener servList) {
+		this.serviceListener = servList;
+		super.setIOServiceListener(servList);
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param processors is a <code>XMPPIOProcessor[]</code>
+	 */
+	public void setProcessors(XMPPIOProcessor[] processors) {
+		this.processors = processors;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method <code>addReceivedPacket</code> puts processing results to queue. The
-	 * processing results are usually data (messages) which has been just received
-	 * from socket.
+	 * This method returns the time when the last XMPP packet was received, it is used to help detect dead connections.
 	 *
-	 * @param packet
-	 *          a <code>Packet</code> value of processing results.
+	 * @return {@code long} number denoting time when the last XMPP packet was received.
+	 */
+	public long getLastXmppPacketReceiveTime() {
+		return lastXmppPacketReceivedTime;
+	}
+
+	/**
+	 * Method <code>addReceivedPacket</code> puts processing results to queue. The processing results are usually data
+	 * (messages) which has been just received from socket.
+	 *
+	 * @param packet a <code>Packet</code> value of processing results.
 	 */
 	protected void addReceivedPacket(final Packet packet) {
 		if (firstPacket) {
 			if ("policy-file-request" == packet.getElemName()) {
 				log.fine("Got flash cross-domain request" + packet);
-				String cross_domain_policy = (this.serviceListener instanceof ConnectionManager) ? ((ConnectionManager) serviceListener).getFlashCrossDomainPolicy() : null;
+				String cross_domain_policy = (this.serviceListener instanceof ConnectionManager)
+											 ? ((ConnectionManager) serviceListener).getFlashCrossDomainPolicy()
+											 : null;
 				if (cross_domain_policy != null) {
 					try {
 						writeRawData(cross_domain_policy);
@@ -625,8 +568,8 @@ public class XMPPIOService<RefObject>
 
 	protected String prepareStreamClose() {
 		return "</stream:stream>";
-	}	
-	
+	}
+
 	@Override
 	protected void processSocketData() throws IOException {
 
@@ -646,17 +589,15 @@ public class XMPPIOService<RefObject>
 
 			while (isConnected() && (data != null) && (data.length > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, READ:{1}", new Object[] { toString(),
-							new String(data) });
+					log.log(Level.FINEST, "{0}, READ:{1}", new Object[]{toString(), new String(data)});
 				}
 
 				boolean disconnect = checkData(data);
 
 				if (disconnect) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "{0}, checkData says disconnect: {1}", new Object[] {
-								toString(),
-								new String(data) });
+						log.log(Level.FINE, "{0}, checkData says disconnect: {1}",
+								new Object[]{toString(), new String(data)});
 					} else {
 						log.log(Level.WARNING, "{0}, checkData says disconnect", toString());
 					}
@@ -677,16 +618,16 @@ public class XMPPIOService<RefObject>
 					parser.parse(domHandler, data, 0, data.length);
 					if (domHandler.parseError()) {
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "{0}, Data parsing error: {1}", new Object[] {
-									toString(),
-									new String(data) });
+							log.log(Level.FINE, "{0}, Data parsing error: {1}",
+									new Object[]{toString(), new String(data)});
 						} else {
-							log.log(Level.WARNING, "{0}, data parsing error, stopping connection",
-									toString());
+							log.log(Level.WARNING, "{0}, data parsing error, stopping connection", toString());
 						}
 						if (serviceListener != null) {
-							Element err = new Element("not-well-formed", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-streams" });
-							String streamErrorStr = serviceListener.xmppStreamError(this, Collections.singletonList(err));
+							Element err = new Element("not-well-formed", new String[]{"xmlns"},
+													  new String[]{"urn:ietf:params:xml:ns:xmpp-streams"});
+							String streamErrorStr = serviceListener.xmppStreamError(this,
+																					Collections.singletonList(err));
 							writeRawData(streamErrorStr);
 						}
 						forceStop();
@@ -706,8 +647,7 @@ public class XMPPIOService<RefObject>
 						// assert debug(elem.toString() + "\n");
 						// log.finer("Read element: " + elem.getName());
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[] { toString(),
-									elem });
+							log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[]{toString(), elem});
 						}
 
 						// System.out.print(elem.toString());
@@ -717,23 +657,23 @@ public class XMPPIOService<RefObject>
 						sendAck(pack);
 					}    // end of while ((elem = elems.poll()) != null)
 				} catch (TigaseStringprepException ex) {
-					log.log(Level.INFO, toString() +
-							", Incorrect to/from JID format for stanza: " + elem.toString(), ex);
+					log.log(Level.INFO, toString() + ", Incorrect to/from JID format for stanza: " + elem.toString(),
+							ex);
 				} catch (Exception ex) {
-					log.log(Level.INFO, toString() + ", Incorrect XML data: " + new String(data) +
-							", stopping connection: " + getConnectionId() + ", exception: ", ex);
+					log.log(Level.INFO,
+							toString() + ", Incorrect XML data: " + new String(data) + ", stopping connection: " +
+									getConnectionId() + ", exception: ", ex);
 					forceStop();
 				} finally {
-					if (domHandler.isStreamClosed())
+					if (domHandler.isStreamClosed()) {
 						xmppStreamClosed();
+					}
 				}  // end of try-catch
 				data = readData();
 			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE,
-						"{0}, function called when the service is not connected! forceStop()",
-						toString());
+				log.log(Level.FINE, "{0}, function called when the service is not connected! forceStop()", toString());
 			}
 			forceStop();
 		}
@@ -750,9 +690,8 @@ public class XMPPIOService<RefObject>
 
 	/**
 	 * Method description
-	 *
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamClosed() {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Received STREAM-CLOSE from the client", toString());
@@ -763,22 +702,22 @@ public class XMPPIOService<RefObject>
 				processor.serviceStopped(this, true);
 			}
 		}
-		
+
 		try {
 			if (isConnected()) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: </stream:stream>, as socket is still connected", toString());
+					log.log(Level.FINEST, "{0}, Sending data: </stream:stream>, as socket is still connected",
+							toString());
 				}
 				writeRawData(prepareStreamClose());
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Not sending data: </stream:stream>, as socket is alreadt closed", toString());
-				}				
+					log.log(Level.FINEST, "{0}, Not sending data: </stream:stream>, as socket is alreadt closed",
+							toString());
+				}
 			}
 		} catch (IOException e) {
-			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[] {
-					toString(),
-					e });
+			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[]{toString(), e});
 		}
 
 		// streamClosed = true;
@@ -796,18 +735,16 @@ public class XMPPIOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param attribs
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamOpened(Map<String, String> attribs) {
 		if (serviceListener != null) {
 			String response = serviceListener.xmppStreamOpened(this, attribs);
 
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(),
-							response });
+					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), response});
 				}
 				if (response == null) {
 					if (writeInProgress.tryLock()) {
@@ -831,9 +768,7 @@ public class XMPPIOService<RefObject>
 					stop();
 				}    // end of if (response.endsWith())
 			} catch (IOException e) {
-				log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[] {
-						toString(),
-						e });
+				log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[]{toString(), e});
 				forceStop();
 			}
 		}
@@ -880,24 +815,11 @@ public class XMPPIOService<RefObject>
 	}
 
 	/**
-	 * This method sets the time of last received XMPP packet, it is used to
-	 * help detect dead connections.
+	 * This method sets the time of last received XMPP packet, it is used to help detect dead connections.
 	 */
 	private void setLastXmppPacketReceiveTime() {
 		lastXmppPacketReceivedTime = System.currentTimeMillis();
 	}
-
-	/**
-	 * This method returns the time when the last XMPP packet was received, it is
-	 * used to help detect dead connections.
-	 *
-	 * @return {@code long} number denoting time when the last XMPP packet was
-	 *         received.
-	 */
-	public long getLastXmppPacketReceiveTime() {
-		return lastXmppPacketReceivedTime;
-	}
 }    // XMPPIOService
-
 
 //~ Formatted in Tigase Code Convention on 13/09/21

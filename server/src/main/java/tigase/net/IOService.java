@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -52,34 +50,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * <code>IOService</code> offers thread safe
- * <code>call()</code> method execution, however you must be prepared that other
- * methods can be called simultaneously like
- * <code>stop()</code>,
- * <code>getProtocol()</code> or
- * <code>isConnected()</code>. <br> It is recommended that developers extend
- * <code>AbsractServerService</code> rather then implement
- * <code>ServerService</code> interface directly. <p> If you directly implement
- * <code>ServerService</code> interface you must take care about
- * <code>SocketChannel</code> I/O, queuing tasks, processing results and thread
- * safe execution of
- * <code>call()</code> method. If you however extend
- * <code>IOService</code> class all this basic operation are implemented and you
- * have only to take care about parsing data received from network socket.
- * Parsing data is expected to be implemented in
- * <code>parseData(char[] data)</code> method. </p>
- *
+ * <code>IOService</code> offers thread safe <code>call()</code> method execution, however you must be prepared that
+ * other methods can be called simultaneously like <code>stop()</code>, <code>getProtocol()</code> or
+ * <code>isConnected()</code>. <br> It is recommended that developers extend <code>AbsractServerService</code> rather
+ * then implement <code>ServerService</code> interface directly. <p> If you directly implement
+ * <code>ServerService</code> interface you must take care about <code>SocketChannel</code> I/O, queuing tasks,
+ * processing results and thread safe execution of <code>call()</code> method. If you however extend
+ * <code>IOService</code> class all this basic operation are implemented and you have only to take care about parsing
+ * data received from network socket. Parsing data is expected to be implemented in <code>parseData(char[] data)</code>
+ * method. </p>
+ * <p>
  * <p> Created: Tue Sep 28 23:00:34 2004 </p>
  *
- * @param <RefObject> is a reference object stored by this service. This is e
- * reference to higher level data object keeping more information about the
- * connection.
+ * @param <RefObject> is a reference object stored by this service. This is e reference to higher level data object
+ * keeping more information about the connection.
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class IOService<RefObject>
-				implements Callable<IOService<?>>, TLSEventHandler,
-				IOListener {
+		implements Callable<IOService<?>>, TLSEventHandler, IOListener {
+
 	/**
 	 * Field description
 	 */
@@ -101,9 +92,8 @@ public abstract class IOService<RefObject>
 	public static final String PORT_TYPE_PROP_KEY = "type";
 
 	/**
-	 * This is key used to store session ID in temporary session data
-	 * storage. As it is used by many components it is required that all
-	 * components access session ID with this constant.
+	 * This is key used to store session ID in temporary session data storage. As it is used by many components it is
+	 * required that all components access session ID with this constant.
 	 */
 	public static final String SESSION_ID_KEY = "sessionID";
 
@@ -111,81 +101,68 @@ public abstract class IOService<RefObject>
 	public static final String SSL_PROTOCOLS_KEY = "ssl-protocols";
 
 	/**
-	 * Variable
-	 * <code>log</code> is a class logger.
+	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(IOService.class.getName());
-	private static final long   MAX_ALLOWED_EMPTY_CALLS = 1000;
+	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
 
 	//~--- fields ---------------------------------------------------------------
-
+	private final ReentrantLock readInProgress = new ReentrantLock();
+	private final ReentrantLock writeInProgress = new ReentrantLock();
+	/** Field description */
+	protected CharBuffer cb = CharBuffer.allocate(2048);
+	/** Field description */
+	protected CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+	/** Field description */
+	protected CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
 	/**
 	 * The saved partial bytes for multi-byte UTF-8 characters between reads
 	 */
-	protected byte[]       partialCharacterBytes = null;
-	private JID            connectionId          = null;
-	private ConnectionType connectionType        = null;
-	private JID            dataReceiver          = null;
-
+	protected byte[] partialCharacterBytes = null;
+	private int bufferLimit = 0;
+	private CertificateContainerIfc certificateContainer;
+	private JID connectionId = null;
+	private ConnectionType connectionType = null;
+	private JID dataReceiver = null;
 	/**
 	 * Field description
 	 */
-	private long   empty_read_call_count = 0;
-	private String id                    = null;
-
+	private long empty_read_call_count = 0;
+	private String id = null;
 	/**
-	 * This variable keeps the time of last transfer in any direction it is
-	 * used to help detect dead connections.
+	 * This variable keeps the time of last transfer in any direction it is used to help detect dead connections.
 	 */
-	private long                                    lastTransferTime = 0;
-	private String                                  local_address    = null;
-	private long[]                                  rdData           = new long[60];
-	private RefObject                               refObject        = null;
-	private String                                  remote_address   = null;
-	private IOServiceListener<IOService<RefObject>> serviceListener  = null;
-	private boolean socketServiceReady = false;
-
-	/**
-	 * <code>socketInput</code> buffer keeps data read from socket.
-	 */
-	private ByteBuffer                    socketInput     = null;
-	private int                           socketInputSize = 2048;
-	private IOInterface                   socketIO        = null;
-	private boolean                       stopping        = false;
-	private long[]                        wrData          = new long[60];
-	private ConcurrentMap<String, Object> sessionData = new ConcurrentHashMap<String,
-			Object>(4, 0.75f, 4);
+	private long lastTransferTime = 0;
+	private Certificate localCertificate;
+	private String local_address = null;
+	private Certificate peerCertificate;
+	private long[] rdData = new long[60];
+	private RefObject refObject = null;
 
 	// properties from block below should not be used without proper knowledge
 	// ----- BEGIN ---------------------------------------------------------------
-
-	/** Field description */
-	protected CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
-
-	/** Field description */
-	protected CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-
-	/** Field description */
-	protected CharBuffer        cb              = CharBuffer.allocate(2048);
-	private final ReentrantLock writeInProgress = new ReentrantLock();
-	private final ReentrantLock readInProgress  = new ReentrantLock();
+	private String remote_address = null;
+	private IOServiceListener<IOService<RefObject>> serviceListener = null;
+	private ConcurrentMap<String, Object> sessionData = new ConcurrentHashMap<String, Object>(4, 0.75f, 4);
+	private IOInterface socketIO = null;
+	/**
+	 * <code>socketInput</code> buffer keeps data read from socket.
+	 */
+	private ByteBuffer socketInput = null;
+	private int socketInputSize = 2048;
+	private boolean socketServiceReady = false;
 	private SSLContextContainerIfc sslContextContainer;
-	private TrustManager[]      x509TrustManagers;
-	private int bufferLimit = 0;
-
-	private Certificate peerCertificate;
-
+	private boolean stopping = false;
 	private byte[] tlsUniqueId;
-	private Certificate localCertificate;
+	private long[] wrData = new long[60];
 
 	//~--- methods --------------------------------------------------------------
+	private TrustManager[] x509TrustManagers;
 
 	/**
-	 * Method
-	 * <code>accept</code> is used to perform
+	 * Method <code>accept</code> is used to perform
 	 *
-	 * @param socketChannel a
-	 * <code>SocketChannel</code> value
+	 * @param socketChannel a <code>SocketChannel</code> value
 	 *
 	 * @throws IOException
 	 */
@@ -211,21 +188,19 @@ public abstract class IOService<RefObject>
 			}
 			log.log(Level.FINER,
 					"Problem connecting to remote host: {0}, address: {1}, socket: {2} - exception: {3}, session data: {4}",
-					new Object[] { host,
-					remote_address, sock_str, e, sessionData });
+					new Object[]{host, remote_address, sock_str, e, sessionData});
 
 			throw e;
 		}
 		socketInputSize = socketIO.getSocketChannel().socket().getReceiveBufferSize();
-		socketInput     = ByteBuffer.allocate(socketInputSize);
+		socketInput = ByteBuffer.allocate(socketInputSize);
 		socketInput.order(byteOrder());
 
 		Socket sock = socketIO.getSocketChannel().socket();
 
-		local_address  = sock.getLocalAddress().getHostAddress();
+		local_address = sock.getLocalAddress().getHostAddress();
 		remote_address = sock.getInetAddress().getHostAddress();
-		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_" + sock
-				.getPort();
+		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_" + sock.getPort();
 		setLastTransferTime();
 	}
 
@@ -250,7 +225,9 @@ public abstract class IOService<RefObject>
 					if (!isConnected()) {
 						// added to sooner detect disconnection of peer - ie. client
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, stopping connection due to the fact that it was disconnected, forceStop()", toString());
+							log.log(Level.FINEST,
+									"{0}, stopping connection due to the fact that it was disconnected, forceStop()",
+									toString());
 						}
 						forceStop();
 					}
@@ -258,9 +235,7 @@ public abstract class IOService<RefObject>
 			}
 		}
 
-		return readLock && socketServiceReady
-				? this
-				: null;
+		return readLock && socketServiceReady ? this : null;
 	}
 
 	@Override
@@ -270,9 +245,6 @@ public abstract class IOService<RefObject>
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public ConnectionType connectionType() {
 		return this.connectionType;
@@ -280,7 +252,6 @@ public abstract class IOService<RefObject>
 
 	/**
 	 * Method description
-	 *
 	 */
 	public void forceStop() {
 		if (log.isLoggable(Level.FINER)) {
@@ -299,8 +270,7 @@ public abstract class IOService<RefObject>
 
 			// Well, do nothing, we are closing the connection anyway....
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: " + socketIO +
-						", Exception while stopping service: " + connectionId, e);
+				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception while stopping service: " + connectionId, e);
 			}
 		} finally {
 			if (serviceListener != null) {
@@ -336,7 +306,8 @@ public abstract class IOService<RefObject>
 				if (certs != null && certs.length > 0) {
 					Certificate peerCert = certs[0];
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, TLS handshake veryfing if certificate from connection matches domain {1}",
+						log.log(Level.FINEST,
+								"{0}, TLS handshake veryfing if certificate from connection matches domain {1}",
 								new Object[]{this, reqCertDomain});
 					}
 					if (!CertificateUtil.verifyCertificateForDomain((X509Certificate) peerCert, reqCertDomain)) {
@@ -349,8 +320,7 @@ public abstract class IOService<RefObject>
 		}
 		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[]{this,
-					certCheckResult});
+			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[]{this, certCheckResult});
 		}
 		if (!wrapper.isClientMode()) {
 			this.tlsUniqueId = wrapper.getTlsUniqueBindingData();
@@ -380,14 +350,12 @@ public abstract class IOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws IOException
 	 */
 	public abstract void processWaitingPackets() throws IOException;
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param clientMode
 	 *
@@ -397,21 +365,24 @@ public abstract class IOService<RefObject>
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
-		if (sslContextContainer == null)
-			throw new IllegalStateException("SSL cannot be activated - sslContextContainer is not set for " + connectionId);
+		if (sslContextContainer == null) {
+			throw new IllegalStateException(
+					"SSL cannot be activated - sslContextContainer is not set for " + connectionId);
+		}
 
 		String tls_hostname = null;
 		int port = 0;
 		if (clientMode) {
 			tls_hostname = (String) this.getSessionData().get("remote-host");
-			if (tls_hostname == null)
+			if (tls_hostname == null) {
 				tls_hostname = (String) this.getSessionData().get("remote-hostname");
+			}
 			port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
 		}
 
 		socketIO = sslContextContainer.createIoInterface("SSL", tls_hostname, port, clientMode, wantClientAuth,
-														 needClientAuth, byteOrder(), x509TrustManagers, this,
-														 socketIO, certificateContainer);
+														 needClientAuth, byteOrder(), x509TrustManagers, this, socketIO,
+														 certificateContainer);
 //		if (!clientMode && useBouncyCastle) {
 //			socketIO = new BcTLSIO(certificateContainer, this, socketIO, tls_hostname, byteOrder(), wantClientAuth,
 //								   needClientAuth, sslContextContainer.getEnabledCiphers(),
@@ -438,11 +409,8 @@ public abstract class IOService<RefObject>
 		this.certificateContainer = certificateContainer;
 	}
 
-private	CertificateContainerIfc certificateContainer;
-
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param clientMode
 	 *
@@ -452,8 +420,10 @@ private	CertificateContainerIfc certificateContainer;
 		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
 			throw new IllegalStateException("TLS mode is already activated " + connectionId);
 		}
-		if (sslContextContainer == null)
-			throw new IllegalStateException("TLS cannot be activated - sslContextContainer is not set for " + connectionId);
+		if (sslContextContainer == null) {
+			throw new IllegalStateException(
+					"TLS cannot be activated - sslContextContainer is not set for " + connectionId);
+		}
 
 		// This should not take more then 100ms
 		int counter = 0;
@@ -462,7 +432,8 @@ private	CertificateContainerIfc certificateContainer;
 			writeData(null);
 			try {
 				Thread.sleep(10);
-			} catch (InterruptedException ex) {}
+			} catch (InterruptedException ex) {
+			}
 		}
 		if (counter >= 10) {
 			stop();
@@ -473,14 +444,14 @@ private	CertificateContainerIfc certificateContainer;
 				port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
 				if (tls_hostname == null) {
 					tls_hostname = (String) this.getSessionData().get("remote-host");
-					if (tls_hostname == null)
+					if (tls_hostname == null) {
 						tls_hostname = (String) this.getSessionData().get("remote-hostname");
+					}
 				}
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[] { this,
-						tls_hostname });
+				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[]{this, tls_hostname});
 			}
 
 			socketIO = sslContextContainer.createIoInterface("TLS", tls_hostname, port, clientMode, wantClientAuth,
@@ -509,7 +480,6 @@ private	CertificateContainerIfc certificateContainer;
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param level
 	 */
 	public void startZLib(int level) {
@@ -521,9 +491,7 @@ private	CertificateContainerIfc certificateContainer;
 	}
 
 	/**
-	 * Describe
-	 * <code>stop</code> method here.
-	 *
+	 * Describe <code>stop</code> method here.
 	 */
 	public void stop() {
 		if ((socketIO != null) && socketIO.waitingToSend()) {
@@ -540,9 +508,6 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public boolean waitingToRead() {
 		return true;
@@ -550,9 +515,6 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public boolean waitingToSend() {
 		return socketIO.waitingToSend();
@@ -560,9 +522,6 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public int waitingToSendSize() {
 		return socketIO.waitingToSendSize();
@@ -573,10 +532,7 @@ private	CertificateContainerIfc certificateContainer;
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 *
 	 */
 	public long getBuffOverflow(boolean reset) {
 		return socketIO.getBuffOverflow(reset);
@@ -585,10 +541,7 @@ private	CertificateContainerIfc certificateContainer;
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 *
 	 */
 	public long getBytesReceived(boolean reset) {
 		return socketIO.getBytesReceived(reset);
@@ -597,10 +550,7 @@ private	CertificateContainerIfc certificateContainer;
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param reset
-	 *
-	 *
 	 */
 	public long getBytesSent(boolean reset) {
 		return socketIO.getBytesSent(reset);
@@ -614,20 +564,32 @@ private	CertificateContainerIfc certificateContainer;
 	}
 
 	/**
+	 * @param connectionId the connectionId to set
+	 */
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+		socketIO.setLogId(connectionId.toString());
+	}
+
+	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public JID getDataReceiver() {
 		return this.dataReceiver;
 	}
 
 	/**
-	 * This method returns the time of last transfer in any direction
-	 * through this service. It is used to help detect dead connections.
+	 * Method description
 	 *
-	 *
+	 * @param address
+	 */
+	public void setDataReceiver(JID address) {
+		this.dataReceiver = address;
+	}
+
+	/**
+	 * This method returns the time of last transfer in any direction through this service. It is used to help detect
+	 * dead connections.
 	 */
 	public long getLastTransferTime() {
 		return lastTransferTime;
@@ -635,9 +597,6 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public String getLocalAddress() {
 		return local_address;
@@ -659,9 +618,6 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public long[] getReadCounters() {
 		return rdData;
@@ -669,17 +625,22 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public RefObject getRefObject() {
 		return refObject;
 	}
 
 	/**
-	 * Returns a remote IP address for the TCP/IP connection.
+	 * Method description
 	 *
+	 * @param refObject
+	 */
+	public void setRefObject(RefObject refObject) {
+		this.refObject = refObject;
+	}
+
+	/**
+	 * Returns a remote IP address for the TCP/IP connection.
 	 *
 	 * @return a remote IP address for the TCP/IP connection.
 	 */
@@ -689,168 +650,13 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public ConcurrentMap<String, Object> getSessionData() {
 		return sessionData;
 	}
 
-	public int getSocketInputSize() {
-		return socketInputSize;
-	}
-
-	/**
-	 * Method
-	 * <code>getSocketChannel</code> is used to perform
-	 *
-	 * @return a
-	 * <code>SocketChannel</code> value
-	 */
-	public SocketChannel getSocketChannel() {
-		return socketIO.getSocketChannel();
-	}
-
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param list
-	 * @param reset
-	 */
-	public void getStatistics(StatisticsList list, boolean reset) {
-		if (socketIO != null) {
-			socketIO.getStatistics(list, reset);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
-	public long getTotalBuffOverflow() {
-		return socketIO.getTotalBuffOverflow();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
-	public long getTotalBytesReceived() {
-		return socketIO.getTotalBytesReceived();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
-	public long getTotalBytesSent() {
-		return socketIO.getTotalBytesSent();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
-	public String getUniqueId() {
-		return id;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
-	public long[] getWriteCounters() {
-		return wrData;
-	}
-
-	/**
-	 * Describe
-	 * <code>isConnected</code> method here.
-	 *
-	 * @return a
-	 * <code>boolean</code> value
-	 */
-	public boolean isConnected() {
-		boolean result = (socketIO != null) && socketIO.isConnected();
-
-		if (log.isLoggable(Level.FINEST)) {
-
-			// if (socketIO.getSocketChannel().socket().getLocalPort() == 5269) {
-			// Throwable thr = new Throwable();
-			//
-			// thr.fillInStackTrace();
-			// log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result,
-			// thr);
-			// }
-			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[] {
-					socketIO,
-					result, connectionId });
-		}
-
-		return result;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	public void setBufferLimit(int bufferLimit) {
-		this.bufferLimit = bufferLimit;
-	}
-
-	/**
-	 * @param connectionId the connectionId to set
-	 */
-	public void setConnectionId(JID connectionId) {
-		this.connectionId = connectionId;
-		socketIO.setLogId(connectionId.toString());
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param address
-	 */
-	public void setDataReceiver(JID address) {
-		this.dataReceiver = address;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sl
-	 */
-
-	// @SuppressWarnings("unchecked")
-	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
-		this.serviceListener = sl;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param refObject
-	 */
-	public void setRefObject(RefObject refObject) {
-		this.refObject = refObject;
-	}
-
-	/**
-	 * Method description
-	 *
 	 *
 	 * @param props
 	 */
@@ -865,8 +671,107 @@ private	CertificateContainerIfc certificateContainer;
 				sessionData.put(entry.getKey(), entry.getValue());
 			}
 		}
-		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY)
-				.toString());
+		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
+	}
+
+	public int getSocketInputSize() {
+		return socketInputSize;
+	}
+
+	/**
+	 * Method <code>getSocketChannel</code> is used to perform
+	 *
+	 * @return a <code>SocketChannel</code> value
+	 */
+	public SocketChannel getSocketChannel() {
+		return socketIO.getSocketChannel();
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param list
+	 * @param reset
+	 */
+	public void getStatistics(StatisticsList list, boolean reset) {
+		if (socketIO != null) {
+			socketIO.getStatistics(list, reset);
+		}
+	}
+
+	/**
+	 * Method description
+	 */
+	public long getTotalBuffOverflow() {
+		return socketIO.getTotalBuffOverflow();
+	}
+
+	/**
+	 * Method description
+	 */
+	public long getTotalBytesReceived() {
+		return socketIO.getTotalBytesReceived();
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 */
+	public long getTotalBytesSent() {
+		return socketIO.getTotalBytesSent();
+	}
+
+	/**
+	 * Method description
+	 */
+	public String getUniqueId() {
+		return id;
+	}
+
+	/**
+	 * Method description
+	 */
+	public long[] getWriteCounters() {
+		return wrData;
+	}
+
+	/**
+	 * Describe <code>isConnected</code> method here.
+	 *
+	 * @return a <code>boolean</code> value
+	 */
+	public boolean isConnected() {
+		boolean result = (socketIO != null) && socketIO.isConnected();
+
+		if (log.isLoggable(Level.FINEST)) {
+
+			// if (socketIO.getSocketChannel().socket().getLocalPort() == 5269) {
+			// Throwable thr = new Throwable();
+			//
+			// thr.fillInStackTrace();
+			// log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result,
+			// thr);
+			// }
+			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[]{socketIO, result, connectionId});
+		}
+
+		return result;
+	}
+
+	public void setBufferLimit(int bufferLimit) {
+		this.bufferLimit = bufferLimit;
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param sl
+	 */
+
+	// @SuppressWarnings("unchecked")
+	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
+		this.serviceListener = sl;
 	}
 
 	public void setSslContextContainer(SSLContextContainerIfc sslContextContainer) {
@@ -876,7 +781,6 @@ private	CertificateContainerIfc certificateContainer;
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param trustManager
 	 */
 	public void setX509TrustManagers(TrustManager[] trustManager) {
@@ -885,24 +789,27 @@ private	CertificateContainerIfc certificateContainer;
 
 	//~--- methods --------------------------------------------------------------
 
+	public Certificate getPeerCertificate() {
+		return peerCertificate;
+	}
+
+	public Certificate getLocalCertificate() {
+		return localCertificate;
+	}
+
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	protected ByteOrder byteOrder() {
 		return ByteOrder.BIG_ENDIAN;
 	}
 
 	/**
-	 * Describe
-	 * <code>debug</code> method here.
+	 * Describe <code>debug</code> method here.
 	 *
-	 * @param msg a
-	 * <code>char[]</code> value
-	 * @return a
-	 * <code>boolean</code> value
+	 * @param msg a <code>char[]</code> value
+	 *
+	 * @return a <code>boolean</code> value
 	 */
 	protected boolean debug(final char[] msg) {
 		if (msg != null) {
@@ -915,21 +822,19 @@ private	CertificateContainerIfc certificateContainer;
 	}
 
 	/**
-	 * Describe
-	 * <code>debug</code> method here.
+	 * Describe <code>debug</code> method here.
 	 *
-	 * @param msg a
-	 * <code>String</code> value
+	 * @param msg a <code>String</code> value
 	 * @param prefix
-	 * @return a
-	 * <code>boolean</code> value
+	 *
+	 * @return a <code>boolean</code> value
 	 */
 	protected boolean debug(final String msg, final String prefix) {
 		if (log.isLoggable(Level.FINEST)) {
 			if ((msg != null) && (msg.trim().length() > 0)) {
-				String log_msg = "\n" + ((connectionType() != null)
-						? connectionType().toString()
-						: "null-type") + " " + prefix + "\n" + msg + "\n";
+				String log_msg =
+						"\n" + ((connectionType() != null) ? connectionType().toString() : "null-type") + " " + prefix +
+								"\n" + msg + "\n";
 
 				// System.out.print(log_msg);
 				log.finest(log_msg);
@@ -942,16 +847,12 @@ private	CertificateContainerIfc certificateContainer;
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws IOException
 	 */
 	protected abstract void processSocketData() throws IOException;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 *
 	 * @throws IOException
 	 */
@@ -971,10 +872,8 @@ private	CertificateContainerIfc certificateContainer;
 
 				return tmpBuffer;
 			} else {
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress
-						.isLocked())) {
-					log.log(Level.WARNING,
-							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress.isLocked())) {
+					log.log(Level.WARNING, "Socket: {0}, Max allowed empty calls excceeded, closing connection.",
 							socketIO);
 					forceStop();
 				}
@@ -997,19 +896,17 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
 	 */
 	protected void readCompleted() {
 		decoder.reset();
 	}
 
 	/**
-	 * Describe
-	 * <code>readData</code> method here.
+	 * Describe <code>readData</code> method here.
 	 *
-	 * @return a
-	 * <code>char[]</code> value
-	 * @exception IOException if an error occurs
+	 * @return a <code>char[]</code> value
+	 *
+	 * @throws IOException if an error occurs
 	 */
 	protected char[] readData() throws IOException {
 		setLastTransferTime();
@@ -1027,14 +924,12 @@ private	CertificateContainerIfc certificateContainer;
 
 			// resizeInputBuffer();
 			// Maybe we can shrink the input buffer??
-			if ((socketInput.capacity() > socketInputSize) && (socketInput.remaining() ==
-					socketInput.capacity())) {
+			if ((socketInput.capacity() > socketInputSize) && (socketInput.remaining() == socketInput.capacity())) {
 
 				// Yes, looks like we can
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE, "Socket: {0}, Resizing socketInput down to {1} bytes.",
-							new Object[] { socketIO,
-							socketInputSize });
+							new Object[]{socketIO, socketInputSize});
 				}
 				socketInput = ByteBuffer.allocate(socketInputSize);
 				socketInput.order(byteOrder());
@@ -1061,8 +956,7 @@ private	CertificateContainerIfc certificateContainer;
 				if (tmpBuffer != null) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Socket: {0}, Reading network binary data: {1}",
-								new Object[] { socketIO,
-								socketIO.bytesRead() });
+								new Object[]{socketIO, socketIO.bytesRead()});
 					}
 
 					// Restore the partial bytes for multibyte UTF8 characters
@@ -1073,8 +967,7 @@ private	CertificateContainerIfc certificateContainer;
 
 						ByteBuffer oldTmpBuffer = tmpBuffer;
 
-						tmpBuffer = ByteBuffer.allocate(partialCharacterBytes.length + oldTmpBuffer
-								.remaining() + 2);
+						tmpBuffer = ByteBuffer.allocate(partialCharacterBytes.length + oldTmpBuffer.remaining() + 2);
 						tmpBuffer.order(byteOrder());
 						tmpBuffer.put(partialCharacterBytes);
 						tmpBuffer.put(oldTmpBuffer);
@@ -1102,8 +995,7 @@ private	CertificateContainerIfc certificateContainer;
 					if (cb.capacity() < tmpBuffer.remaining() * 4) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Socket: {0}, resizing character buffer to: {1}",
-									new Object[] { socketIO,
-									tmpBuffer.remaining() });
+									new Object[]{socketIO, tmpBuffer.remaining()});
 						}
 						cb = CharBuffer.allocate(tmpBuffer.remaining() * 4);
 					}
@@ -1119,8 +1011,7 @@ private	CertificateContainerIfc certificateContainer;
 						cb.get(result);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Socket: {0}, Decoded character data: {1}",
-									new Object[] { socketIO,
-									new String(result) });
+									new Object[]{socketIO, new String(result)});
 						}
 
 						// if (log.isLoggable(Level.FINEST)) {
@@ -1138,8 +1029,7 @@ private	CertificateContainerIfc certificateContainer;
 					if (cr.isUnderflow() && (tmpBuffer.remaining() > 0)) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Socket: {0}, UTF-8 decoder data underflow: {1}",
-									new Object[] { socketIO,
-									tmpBuffer.remaining() });
+									new Object[]{socketIO, tmpBuffer.remaining()});
 						}
 
 						// Save the partial bytes of a multibyte character such that they
@@ -1169,10 +1059,8 @@ private	CertificateContainerIfc certificateContainer;
 				// sometimes it happens that the connection has been lost
 				// and the select thinks there are some bytes waiting for reading
 				// and 0 bytes are read
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress
-						.isLocked())) {
-					log.log(Level.WARNING,
-							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress.isLocked())) {
+					log.log(Level.WARNING, "Socket: {0}, Max allowed empty calls excceeded, closing connection.",
 							socketIO);
 					forceStop();
 				}
@@ -1203,15 +1091,11 @@ private	CertificateContainerIfc certificateContainer;
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	protected abstract int receivedPackets();
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param data
 	 */
@@ -1238,8 +1122,7 @@ private	CertificateContainerIfc certificateContainer;
 
 				socketIO.write(data);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
-							length });
+					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[]{socketIO, length});
 				}
 
 				// idx_start = idx_offset;
@@ -1267,11 +1150,9 @@ private	CertificateContainerIfc certificateContainer;
 	}
 
 	/**
-	 * Describe
-	 * <code>writeData</code> method here.
+	 * Describe <code>writeData</code> method here.
 	 *
-	 * @param data a
-	 * <code>String</code> value
+	 * @param data a <code>String</code> value
 	 */
 	protected void writeData(final String data) {
 
@@ -1294,13 +1175,10 @@ private	CertificateContainerIfc certificateContainer;
 			if ((data != null) && (data.length() > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
 					if (data.length() < 256) {
-						log.log(Level.FINEST, "Socket: {0}, Writing data ({1}): {2}", new Object[] {
-								socketIO,
-								data.length(), data });
+						log.log(Level.FINEST, "Socket: {0}, Writing data ({1}): {2}",
+								new Object[]{socketIO, data.length(), data});
 					} else {
-						log.log(Level.FINEST, "Socket: {0}, Writing data: {1}", new Object[] {
-								socketIO,
-								data.length() });
+						log.log(Level.FINEST, "Socket: {0}, Writing data: {1}", new Object[]{socketIO, data.length()});
 					}
 				}
 
@@ -1324,8 +1202,7 @@ private	CertificateContainerIfc certificateContainer;
 				encoder.flush(dataBuffer);
 				socketIO.write(dataBuffer);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
-							data.length() });
+					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[]{socketIO, data.length()});
 				}
 
 				// idx_start = idx_offset;
@@ -1352,26 +1229,26 @@ private	CertificateContainerIfc certificateContainer;
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	protected boolean isSocketServiceReady() {
 		return socketServiceReady;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	protected void setSocketServiceReady(boolean value) {
 		this.socketServiceReady = value;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
 	 */
 	protected boolean isInputBufferEmpty() {
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void resizeInputBuffer() throws IOException {
 		int netSize = socketIO.getInputPacketSize();
@@ -1390,9 +1267,7 @@ private	CertificateContainerIfc certificateContainer;
 			}
 
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.",
-						new Object[] { socketIO,
-						newSize });
+				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.", new Object[]{socketIO, newSize});
 			}
 
 			ByteBuffer b = ByteBuffer.allocate(newSize);
@@ -1432,23 +1307,10 @@ private	CertificateContainerIfc certificateContainer;
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	private void setLastTransferTime() {
 		lastTransferTime = System.currentTimeMillis();
 	}
 
-	public Certificate getPeerCertificate() {
-		return peerCertificate;
-	}
-
-	public Certificate getLocalCertificate() {
-		return localCertificate;
-	}
-
-
-
 }    // IOService
-
 
 //~ Formatted in Tigase Code Convention on 13/05/29

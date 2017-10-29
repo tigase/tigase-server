@@ -25,7 +25,10 @@ import tigase.db.DataSource;
 import tigase.db.DataSourceAware;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
-import tigase.kernel.beans.*;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.kernel.core.Kernel;
@@ -37,38 +40,28 @@ import java.util.Collections;
 import static tigase.db.beans.MDPoolBean.REPO_CLASS;
 
 /**
- * Abstract class implementing bean to which can be used to create name unaware repository pool.
- * This class is resposible for creation of correct repository instance for single specified data source.
- *
+ * Abstract class implementing bean to which can be used to create name unaware repository pool. This class is
+ * resposible for creation of correct repository instance for single specified data source.
+ * <p>
  * Created by andrzej on 17.08.2016.
  */
-public abstract class SDRepositoryBean <A extends DataSourceAware> implements Initializable, UnregisterAware, ConfigurationChangedAware, RegistrarBean {
-
-	@Inject
-	private DataSourceBean dataSourceBean;
-
-	@Inject
-	private EventBus eventBus;
-
-	@Inject(bean = "instance", nullAllowed = true)
-	private A repository;
+public abstract class SDRepositoryBean<A extends DataSourceAware>
+		implements Initializable, UnregisterAware, ConfigurationChangedAware, RegistrarBean {
 
 	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
 	private String cls;
-
-	@ConfigField(desc = "Bean name")
-	private String name;
-
+	private DataSource dataSource;
+	@Inject
+	private DataSourceBean dataSourceBean;
 	@ConfigField(desc = "Name of data source", alias = "data-source")
 	private String dataSourceName;
-
-	private DataSource dataSource;
-
+	@Inject
+	private EventBus eventBus;
 	private Kernel kernel;
-
-	protected abstract Class<?> findClassForDataSource(DataSource dataSource) throws DBInitException;
-
-	protected void initializeRepository(A repository) {}
+	@ConfigField(desc = "Bean name")
+	private String name;
+	@Inject(bean = "instance", nullAllowed = true)
+	private A repository;
 
 	public String getDataSourceName() {
 		if (dataSourceName == null) {
@@ -81,26 +74,16 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 		return name;
 	}
 
-	protected A getRepository() {
-		return repository;
-	}
-
-
-	protected Class<?> getRepositoryClassName() throws DBInitException, ClassNotFoundException {
-		if (cls == null) {
-			return findClassForDataSource(dataSource);
-		}
-		return ModulesManagerImpl.getInstance().forName(cls);
-	}
-
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
-		if (dataSourceBean == null)
+		if (dataSourceBean == null) {
 			return;
+		}
 
 		String name = "default";
-		if (dataSourceName != null && !dataSourceName.isEmpty())
+		if (dataSourceName != null && !dataSourceName.isEmpty()) {
 			name = dataSourceName;
+		}
 
 		dataSource = dataSourceBean.getRepository(name);
 
@@ -117,29 +100,6 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 				kernel.unregister("instance");
 			}
 		}
-	}
-
-	@HandleEvent
-	protected void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
-		if (!event.isCorrectSender(dataSourceBean))
-			return;
-
-		if (!event.getDomain().equals("default") && !event.getDomain().equals(dataSourceName))
-			return;
-
-		beanConfigurationChanged(Collections.singleton("uri"));
-	}
-
-	public void setRepository(A repository) {
-		if (repository != null) {
-			initializeRepository(repository);
-			try {
-				repository.setDataSource(dataSource);
-			} catch (RepositoryException ex) {
-				throw new RuntimeException("Failed to initialize repository", ex);
-			}
-		}
-		this.repository = repository;
 	}
 
 	@Override
@@ -163,6 +123,47 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 	public void beforeUnregister() {
 		eventBus.unregisterAll(this);
 		kernel.unregister("instance");
+	}
+
+	protected abstract Class<?> findClassForDataSource(DataSource dataSource) throws DBInitException;
+
+	protected void initializeRepository(A repository) {
+	}
+
+	protected A getRepository() {
+		return repository;
+	}
+
+	public void setRepository(A repository) {
+		if (repository != null) {
+			initializeRepository(repository);
+			try {
+				repository.setDataSource(dataSource);
+			} catch (RepositoryException ex) {
+				throw new RuntimeException("Failed to initialize repository", ex);
+			}
+		}
+		this.repository = repository;
+	}
+
+	protected Class<?> getRepositoryClassName() throws DBInitException, ClassNotFoundException {
+		if (cls == null) {
+			return findClassForDataSource(dataSource);
+		}
+		return ModulesManagerImpl.getInstance().forName(cls);
+	}
+
+	@HandleEvent
+	protected void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
+		if (!event.isCorrectSender(dataSourceBean)) {
+			return;
+		}
+
+		if (!event.getDomain().equals("default") && !event.getDomain().equals(dataSourceName)) {
+			return;
+		}
+
+		beanConfigurationChanged(Collections.singleton("uri"));
 	}
 
 }

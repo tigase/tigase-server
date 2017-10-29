@@ -27,12 +27,12 @@
 
 package tigase.admin
 
-import tigase.conf.*
-import tigase.server.*
-import tigase.xmpp.*
+import tigase.server.Command
+import tigase.server.Iq
+import tigase.xmpp.XMPPResourceConnection
 
-def user_connections = (Map)userConnections
-def p = (Iq)packet
+def user_connections = (Map) userConnections
+def p = (Iq) packet
 
 def total_time = 0
 def max_time = 0
@@ -42,7 +42,7 @@ user_connections.entrySet().each {
 		def session = (XMPPResourceConnection) it.getValue()
 		def creation_time = start_time - session.getCreationTime()
 		total_time += creation_time
-		if (creation_time  > max_time) {
+		if (creation_time > max_time) {
 			max_time = creation_time
 		}
 	}
@@ -50,10 +50,8 @@ user_connections.entrySet().each {
 def average_time = total_time / user_connections.size()
 
 
-def res = (Iq)p.commandResult(Command.DataType.result)
+def res = (Iq) p.commandResult(Command.DataType.result)
 Command.addFieldMultiValue(res, "Connections time: ",
-		[
-			"Longest connection: " + (max_time / 1000),
-			"Average connection time:" + (average_time / 1000)
-		])
+						   [ "Longest connection: " + (max_time / 1000),
+							 "Average connection time:" + (average_time / 1000) ])
 return res

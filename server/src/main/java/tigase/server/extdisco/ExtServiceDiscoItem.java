@@ -27,7 +27,8 @@ import tigase.xml.Element;
 /**
  * Created by andrzej on 06.09.2016.
  */
-public class ExtServiceDiscoItem implements RepositoryItem {
+public class ExtServiceDiscoItem
+		implements RepositoryItem {
 
 	private static final String KEY_LABEL = "Service";
 	private static final String HOST_LABEL = "Host";
@@ -38,17 +39,15 @@ public class ExtServiceDiscoItem implements RepositoryItem {
 	private static final String RESTRICTED_LABEL = "Requires username and password";
 	private static final String USERNAME_LABEL = "Username";
 	private static final String PASSWORD_LABEL = "Password";
-
-	private String key;
-
 	private String host;
+	private String key;
 	private String name;
+	private String password;
 	private Integer port;
+	private boolean restricted;
 	private String transport;
 	private String type;
-	private boolean restricted;
 	private String username;
-	private String password;
 
 	@Override
 	public void addCommandFields(Packet packet) {
@@ -69,6 +68,11 @@ public class ExtServiceDiscoItem implements RepositoryItem {
 	}
 
 	@Override
+	public void setAdmins(String[] admins) {
+
+	}
+
+	@Override
 	public String getKey() {
 		return key;
 	}
@@ -76,6 +80,11 @@ public class ExtServiceDiscoItem implements RepositoryItem {
 	@Override
 	public String getOwner() {
 		return null;
+	}
+
+	@Override
+	public void setOwner(String owner) {
+
 	}
 
 	public String getType() {
@@ -166,7 +175,7 @@ public class ExtServiceDiscoItem implements RepositoryItem {
 			String key = part;
 			String val = null;
 			if (idx > -1) {
-				val = part.substring(idx+1);
+				val = part.substring(idx + 1);
 				key = part.substring(0, idx);
 			}
 
@@ -212,16 +221,6 @@ public class ExtServiceDiscoItem implements RepositoryItem {
 	}
 
 	@Override
-	public void setAdmins(String[] admins) {
-
-	}
-
-	@Override
-	public void setOwner(String owner) {
-
-	}
-
-	@Override
 	public Element toElement() {
 		Element service = new Element("service");
 		service.setAttribute("key", key);
@@ -238,7 +237,7 @@ public class ExtServiceDiscoItem implements RepositoryItem {
 		}
 
 		// Options for credentials to authenticate for external service
-		if (restricted){
+		if (restricted) {
 			service.setAttribute("restricted", "true");
 		}
 		if (username != null) {

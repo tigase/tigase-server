@@ -20,9 +20,8 @@
 
 package tigase.vhosts;
 
-import tigase.xmpp.jid.BareJID;
-
 import tigase.util.dns.DNSResolverFactory;
+import tigase.xmpp.jid.BareJID;
 
 import static tigase.conf.Configurable.GEN_VIRT_HOSTS;
 import static tigase.conf.Configurable.HOSTNAMES_PROP_KEY;
@@ -36,6 +35,7 @@ import static tigase.conf.Configurable.HOSTNAMES_PROP_KEY;
  * @version $Rev$
  */
 public abstract class VHostRepoDefaults {
+
 	private static final BareJID vhost_user = BareJID.bareJIDInstanceNS("vhost-manager");
 	private static final String vhost_list_pkey = "vhosts-lists";
 
@@ -43,9 +43,6 @@ public abstract class VHostRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String getConfigKey() {
 		return HOSTNAMES_PROP_KEY;
@@ -53,9 +50,6 @@ public abstract class VHostRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String[] getDefaultPropetyItems() {
 		return DNSResolverFactory.getInstance().getDefaultHosts();
@@ -63,9 +57,6 @@ public abstract class VHostRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static VHostItem getItemInstance() {
 		return new VHostItem();
@@ -73,9 +64,6 @@ public abstract class VHostRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String getItemsListPKey() {
 		return vhost_list_pkey;
@@ -83,9 +71,6 @@ public abstract class VHostRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String getPropertyKey() {
 		return GEN_VIRT_HOSTS;
@@ -93,17 +78,12 @@ public abstract class VHostRepoDefaults {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static BareJID getRepoUser() {
 		return vhost_user;
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

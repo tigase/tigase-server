@@ -19,22 +19,23 @@
  */
 package tigase.xmpp.impl.roster;
 
+import tigase.xml.Element;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.JID;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import tigase.xml.Element;
-import tigase.xmpp.jid.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
-
 /**
  * @author Artur Hefczyc Created Apr 1, 2011
  */
-public class DynamicRosterTest123 implements DynamicRosterIfc {
+public class DynamicRosterTest123
+		implements DynamicRosterIfc {
 
-	private static final String[] buddy_names = { "test1", "test2", "test3" };
-	private static final String[] managers = { "manager1" };
+	private static final String[] buddy_names = {"test1", "test2", "test3"};
+	private static final String[] managers = {"manager1"};
 
 	@Override
 	public void setItemExtraData(Element item) {
@@ -79,23 +80,19 @@ public class DynamicRosterTest123 implements DynamicRosterIfc {
 	}
 
 	@Override
-	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException {
-		return new Element("item", new Element[] { new Element("group", "test group") },
-				new String[] { "jid", "name", "subscription" }, new String[] {
-					buddy.getBareJID().toString(),
-					buddy.getLocalpart(),
-					( buddy.toString().contains("manager") ? "from" : "to" )
-		});
+	public Element getBuddyItem(XMPPResourceConnection session, JID buddy) throws NotAuthorizedException {
+		return new Element("item", new Element[]{new Element("group", "test group")},
+						   new String[]{"jid", "name", "subscription"},
+						   new String[]{buddy.getBareJID().toString(), buddy.getLocalpart(),
+										(buddy.toString().contains("manager") ? "from" : "to")});
 
 	}
 
 	@Override
-	public List<Element> getRosterItems(XMPPResourceConnection session)
-			throws NotAuthorizedException {
+	public List<Element> getRosterItems(XMPPResourceConnection session) throws NotAuthorizedException {
 		ArrayList<Element> result = new ArrayList<Element>(buddy_names.length);
 		for (JID buddy : getBuddies(session)) {
-				result.add(getBuddyItem(session, buddy));
+			result.add(getBuddyItem(session, buddy));
 		}
 		return result;
 	}

@@ -40,7 +40,8 @@ import java.util.logging.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MonitorRuntime extends TigaseRuntime {
+public class MonitorRuntime
+		extends TigaseRuntime {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -48,26 +49,22 @@ public class MonitorRuntime extends TigaseRuntime {
 	private static final Logger log = Logger.getLogger(MonitorRuntime.class.getName());
 
 	private static MonitorRuntime runtime = null;
-	private final LinkedHashSet<ShutdownHook> shutdownHooks =
-					new LinkedHashSet<ShutdownHook>();
-	private final LinkedList<OnlineJidsReporter> onlineJidsReporters =
-					new LinkedList<OnlineJidsReporter>();
-	
+	private final LinkedList<OnlineJidsReporter> onlineJidsReporters = new LinkedList<OnlineJidsReporter>();
+	private final LinkedHashSet<ShutdownHook> shutdownHooks = new LinkedHashSet<ShutdownHook>();
+	private Thread mainShutdownThread;
 	private boolean shutdownThreadDump = true;
 
-	private Thread mainShutdownThread;
-
-	private MonitorRuntime() {
-		super();
-		mainShutdownThread = new MainShutdownThread();
-		Runtime.getRuntime().addShutdownHook(mainShutdownThread);
-	}
-	
 	public static MonitorRuntime getMonitorRuntime() {
 		if (runtime == null) {
 			runtime = new MonitorRuntime();
 		}
 		return runtime;
+	}
+
+	private MonitorRuntime() {
+		super();
+		mainShutdownThread = new MainShutdownThread();
+		Runtime.getRuntime().addShutdownHook(mainShutdownThread);
 	}
 
 	@Override
@@ -131,7 +128,7 @@ public class MonitorRuntime extends TigaseRuntime {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean isJidOnlineLocally(JID jid) {
 		if (onlineJidsReporters.size() == 1) {
@@ -144,8 +141,8 @@ public class MonitorRuntime extends TigaseRuntime {
 			}
 		}
 		return false;
-	}	
-	
+	}
+
 	@Override
 	public JID[] getConnectionIdsForJid(JID jid) {
 		if (onlineJidsReporters.size() == 1) {
@@ -174,29 +171,8 @@ public class MonitorRuntime extends TigaseRuntime {
 		this.shutdownThreadDump = shutdownThreadDump;
 	}
 
-	private class ShutdownHandlerThread extends Thread {
-
-		private ShutdownHook hook = null;
-		private String result = null;
-
-		public ShutdownHandlerThread(ThreadGroup group, ShutdownHook hook) {
-			super(group, hook.getName());
-			this.hook = hook;
-			setDaemon(true);
-		}
-
-		@Override
-		public void run () {
-			result = hook.shutdown();
-		}
-
-		public String getResultMessage() {
-			return result;
-		}
-
-	}
-	
-	private class MainShutdownThread extends Thread {
+	private class MainShutdownThread
+			extends Thread {
 
 		public MainShutdownThread() {
 			super();
@@ -207,24 +183,20 @@ public class MonitorRuntime extends TigaseRuntime {
 		public void run() {
 			System.out.println("ShutdownThread started...");
 			log.warning("ShutdownThread started...");
-			LinkedList<ShutdownHandlerThread> thlist = 
-							new LinkedList<ShutdownHandlerThread>();
-			ThreadGroup threads =
-							new ThreadGroup(Thread.currentThread().getThreadGroup(),
-							"Tigase Shutdown");
+			LinkedList<ShutdownHandlerThread> thlist = new LinkedList<ShutdownHandlerThread>();
+			ThreadGroup threads = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Tigase Shutdown");
 			for (ShutdownHook shutdownHook : shutdownHooks) {
-				ShutdownHandlerThread thr =
-								new ShutdownHandlerThread(threads, shutdownHook);
+				ShutdownHandlerThread thr = new ShutdownHandlerThread(threads, shutdownHook);
 				thr.start();
 				thlist.add(thr);
 			}
 			// We allow for max 10 secs for the shutdown code to run...
 			long shutdownStart = System.currentTimeMillis();
-			while (threads.activeCount() > 0 &&
-							(System.currentTimeMillis() - shutdownStart) < 10000) {
+			while (threads.activeCount() > 0 && (System.currentTimeMillis() - shutdownStart) < 10000) {
 				try {
 					sleep(100);
-				} catch (Exception e) {	}
+				} catch (Exception e) {
+				}
 			}
 			StringBuilder sb = new StringBuilder();
 			for (ShutdownHandlerThread shutdownHandlerThread : thlist) {
@@ -264,7 +236,6 @@ public class MonitorRuntime extends TigaseRuntime {
 				System.out.println(sb.toString());
 				log.warning(sb.toString());
 			}
-
 
 			if (shutdownThreadDump) {
 
@@ -306,6 +277,29 @@ public class MonitorRuntime extends TigaseRuntime {
 			System.out.println("ShutdownThread finished...");
 			log.warning("ShutdownThread finished...");
 		}
+	}
+
+	private class ShutdownHandlerThread
+			extends Thread {
+
+		private ShutdownHook hook = null;
+		private String result = null;
+
+		public ShutdownHandlerThread(ThreadGroup group, ShutdownHook hook) {
+			super(group, hook.getName());
+			this.hook = hook;
+			setDaemon(true);
+		}
+
+		@Override
+		public void run() {
+			result = hook.shutdown();
+		}
+
+		public String getResultMessage() {
+			return result;
+		}
+
 	}
 
 }

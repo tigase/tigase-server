@@ -39,27 +39,26 @@ import java.util.logging.Logger;
 
 /**
  * Created: Sep 4, 2010 2:13:22 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
-public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRepository>, StatisticsProviderIfc {
+@Repository.Meta(supportedUris = {"jdbc:[^:]+:.*"})
+public class DataRepositoryPool
+		implements DataRepository, DataSourcePool<DataRepository>, StatisticsProviderIfc {
+
 	private static final Logger log = Logger.getLogger(DataRepositoryPool.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------
-
-	private CopyOnWriteArrayList<DataRepository> repoPool =
-			new CopyOnWriteArrayList<DataRepository>();
-	private String resource_uri = null;
 	private dbTypes database = null;
+	private CopyOnWriteArrayList<DataRepository> repoPool = new CopyOnWriteArrayList<DataRepository>();
+	private String resource_uri = null;
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
 	 * @param repo
 	 */
 	public void addRepo(DataRepository repo) {
@@ -73,9 +72,6 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * 
 	 */
 	public DataRepository takeRepo(BareJID user_id) {
 		int idx = user_id != null ? Math.abs(user_id.hashCode() % repoPool.size()) : 0;
@@ -121,7 +117,8 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 	}
 
 	@Override
-	public boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer) throws SQLException {
+	public boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer)
+			throws SQLException {
 		DataRepository repo = takeRepo(null);
 
 		if (repo != null) {
@@ -206,7 +203,6 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 		return resource_uri;
 	}
 
-
 	@Override
 	public dbTypes getDatabaseType() {
 		return database;
@@ -243,16 +239,16 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 	public void initialize(String resource_uri) throws DBInitException {
 		this.resource_uri = resource_uri;
 
-		if ( this.database == null ){
-			if ( resource_uri.startsWith( "jdbc:postgresql" ) ){
+		if (this.database == null) {
+			if (resource_uri.startsWith("jdbc:postgresql")) {
 				database = dbTypes.postgresql;
-			} else if ( resource_uri.startsWith( "jdbc:mysql" ) ){
+			} else if (resource_uri.startsWith("jdbc:mysql")) {
 				database = dbTypes.mysql;
-			} else if ( resource_uri.startsWith( "jdbc:derby" ) ){
+			} else if (resource_uri.startsWith("jdbc:derby")) {
 				database = dbTypes.derby;
-			} else if ( resource_uri.startsWith( "jdbc:jtds:sqlserver" ) ){
+			} else if (resource_uri.startsWith("jdbc:jtds:sqlserver")) {
 				database = dbTypes.jtds;
-			} else if ( resource_uri.startsWith( "jdbc:sqlserver" ) ){
+			} else if (resource_uri.startsWith("jdbc:sqlserver")) {
 				database = dbTypes.sqlserver;
 			}
 		}
@@ -260,8 +256,7 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 
 	@Override
 	@Deprecated
-	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		initialize(resource_uri);
 
 		for (DataRepository dataRepository : repoPool) {

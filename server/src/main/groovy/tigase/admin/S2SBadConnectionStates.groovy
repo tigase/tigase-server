@@ -27,13 +27,14 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.server.xmppserver.*
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.xmppserver.CIDConnections
 
-def p = (Packet)packet
-def cidConns = (Map)cidConnections
+def p = (Packet) packet
+def cidConns = (Map) cidConnections
 
-def admins = (Set)adminsSet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -43,20 +44,17 @@ if (!isServiceAdmin) {
 	return result
 }
 
-def conns = []
+def conns = [ ]
 
 conns += "Total count: " + cidConns.size()
 
 cidConns.entrySet().each {
 	CIDConnections con = it.getValue()
 	if (con.getWaitingCount() > 0) {
-		conns += it.getKey().toString() +
-				", out in progress: " + con.getOutgoingInProgress() +
-				", waiting: " + con.getWaitingCount() +
-				", control: " + con.getWaitingControlCount() +
-				", incoming: " + con.getIncomingCount() +
-				", outgoing: " + con.getOutgoingCount() +
-				", out-handshaking: " + con.getOutgoingHandshakingCount()
+		conns += it.getKey().toString() + ", out in progress: " + con.getOutgoingInProgress() + ", waiting: " +
+				con.getWaitingCount() + ", control: " + con.getWaitingControlCount() + ", incoming: " +
+				con.getIncomingCount() + ", outgoing: " + con.getOutgoingCount() + ", out-handshaking: " +
+				con.getOutgoingHandshakingCount()
 	}
 }
 

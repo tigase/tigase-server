@@ -1,4 +1,3 @@
-
 /*
  * MonitorPluginIfc.java
  *
@@ -23,12 +22,11 @@ package tigase.server.monitor;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.stats.StatisticsList;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -43,14 +41,12 @@ public interface MonitorPluginIfc {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param results
 	 */
 	public void check10Secs(Queue<Packet> results);
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param results
 	 */
@@ -59,7 +55,6 @@ public interface MonitorPluginIfc {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param results
 	 */
 	public void check1Hour(Queue<Packet> results);
@@ -67,22 +62,17 @@ public interface MonitorPluginIfc {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param results
 	 */
 	public void check1Min(Queue<Packet> results);
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String commandsHelp();
 
 	/**
 	 * Method description
-	 *
 	 */
 	public void destroy();
 
@@ -90,19 +80,13 @@ public interface MonitorPluginIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getState();
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param command
-	 *
-	 * 
 	 */
 	public boolean isMonitorCommand(String command);
 
@@ -111,10 +95,7 @@ public interface MonitorPluginIfc {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param command
-	 *
-	 * 
 	 */
 	public String runCommand(String[] command);
 
@@ -123,8 +104,6 @@ public interface MonitorPluginIfc {
 	void getStatistics(StatisticsList list);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

@@ -1,4 +1,3 @@
-
 /*
  * Alert.java
  *
@@ -40,7 +39,9 @@ import tigase.xmpp.PacketErrorTypeException;
  * @version $Rev$
  */
 @Bean(name = "alert", parent = AmpComponent.class, active = true)
-public class Alert extends ActionAbstract {
+public class Alert
+		extends ActionAbstract {
+
 	private static final String name = "alert";
 
 	//~--- methods --------------------------------------------------------------

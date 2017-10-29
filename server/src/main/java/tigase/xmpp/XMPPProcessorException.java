@@ -76,10 +76,6 @@ public class XMPPProcessorException
 		return errorCondition;
 	}
 
-	protected String getErrorMessagePrefix() {
-		return "XMPP error condition: ";
-	}
-
 	@Override
 	public String getMessage() {
 		final StringBuilder sb = new StringBuilder();
@@ -130,5 +126,9 @@ public class XMPPProcessorException
 	public Packet makeElement(Packet packet, boolean insertOriginal) throws PacketErrorTypeException {
 		Packet result = errorCondition.getResponseMessage(packet, text, insertOriginal);
 		return result;
+	}
+
+	protected String getErrorMessagePrefix() {
+		return "XMPP error condition: ";
 	}
 }

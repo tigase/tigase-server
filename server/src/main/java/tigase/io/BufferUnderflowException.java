@@ -23,13 +23,15 @@ import java.io.IOException;
 
 /**
  * Describe class BufferUnderflowException here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sun Sep 24 22:32:37 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BufferUnderflowException extends IOException {
-  private static final long serialVersionUID = 1L;
+public class BufferUnderflowException
+		extends IOException {
+
+	private static final long serialVersionUID = 1L;
 }

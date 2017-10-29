@@ -23,12 +23,11 @@ package tigase.server.ext;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.List;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -73,8 +72,6 @@ public interface ComponentProtocolHandler {
 	void unbindHostname(String hostname, ComponentIOService serv);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

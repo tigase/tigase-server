@@ -18,31 +18,29 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.ext.lb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
-import tigase.server.Packet;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * @author Artur Hefczyc Created Jul 9, 2011
  */
 public class ReceiverBareJidLB
-				implements LoadBalancerIfc {
+		implements LoadBalancerIfc {
+
 	@Override
 	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
-		ComponentIOService  result = null;
-		int                 idx = Math.abs(p.getStanzaTo().getBareJID().hashCode() % conns
-				.size());
-		ComponentConnection conn   = conns.get(idx);
+		ComponentIOService result = null;
+		int idx = Math.abs(p.getStanzaTo().getBareJID().hashCode() % conns.size());
+		ComponentConnection conn = conns.get(idx);
 
 		if ((conn.getService() != null) && conn.getService().isConnected()) {
 			result = conn.getService();

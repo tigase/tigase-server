@@ -36,18 +36,21 @@ import tigase.server.Permissions;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.logging.Level;
 
 @Bean(name = UnsubscribeModule.ID, active = true)
-public class UnsubscribeModule extends AbstractEventBusModule implements Initializable, UnregisterAware {
+public class UnsubscribeModule
+		extends AbstractEventBusModule
+		implements Initializable, UnregisterAware {
 
 	public final static String ID = "unsubscribe";
-	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "iq", "pubsub", "unsubscribe" },
-			new String[] { null, "http://jabber.org/protocol/pubsub", null });
+	private static final Criteria CRIT = new ElemPathCriteria(new String[]{"iq", "pubsub", "unsubscribe"},
+															  new String[]{null, "http://jabber.org/protocol/pubsub",
+																		   null});
 	@Inject
 	private EventBusComponent component;
 	@Inject(nullAllowed = false, bean = "localEventBus")
@@ -56,8 +59,9 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 	private final tigase.eventbus.EventListener<EventBusImplementation.ListenerRemovedEvent> eventBusHandlerRemovedHandler = new tigase.eventbus.EventListener<EventBusImplementation.ListenerRemovedEvent>() {
 		@Override
 		public void onEvent(final EventBusImplementation.ListenerRemovedEvent event) {
-			if (!event.getPackageName().startsWith("tigase.eventbus"))
+			if (!event.getPackageName().startsWith("tigase.eventbus")) {
 				UnsubscribeModule.this.onRemoveHandler(event.getPackageName(), event.getEventName());
+			}
 		}
 	};
 
@@ -71,7 +75,7 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 
 	@Override
 	public String[] getFeatures() {
-		return new String[] { "http://jabber.org/protocol/pubsub#subscribe" };
+		return new String[]{"http://jabber.org/protocol/pubsub#subscribe"};
 	}
 
 	@Override
@@ -84,84 +88,34 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 		localEventBus.addListener(EventBusImplementation.ListenerRemovedEvent.class, eventBusHandlerRemovedHandler);
 	}
 
+	@Override
+	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
+		if (packet.getType() == StanzaType.set) {
+			processSet(packet);
+		} else {
+			throw new ComponentException(Authorization.NOT_ALLOWED);
+		}
+	}
+
 	protected void onRemoveHandler(String eventPackage, String eventName) {
 		boolean listenedByHandlers = localEventBus.isListened(eventPackage, eventName);
 
 		if (!listenedByHandlers) {
 			for (JID node : component.getNodesConnected()) {
-				Element se = prepareUnsubscribeElement(new EventName(eventPackage, eventName), component.getComponentId(),
-						null);
+				Element se = prepareUnsubscribeElement(new EventName(eventPackage, eventName),
+													   component.getComponentId(), null);
 				sendUnsubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 			}
 		}
 	}
 
-	private Element prepareUnsubscribeElement(EventName event, JID jid, String service) {
-		Element subscribeElem = new Element("unsubscribe");
-		subscribeElem.addAttribute("node", event.toString());
-		subscribeElem.addAttribute("jid", jid.toString());
-
-		if (service != null) {
-			subscribeElem.addChild(new Element("service", service));
-		}
-
-		return subscribeElem;
-	}
-
-	@Override
-	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		if (packet.getType() == StanzaType.set) {
-			processSet(packet);
-		} else
-			throw new ComponentException(Authorization.NOT_ALLOWED);
-	}
-
-	private void processSet(final Packet packet) throws TigaseStringprepException {
-		List<Element> unsubscribeElements = packet.getElemChildrenStaticStr(new String[] { "iq", "pubsub" });
-
-		if (isClusteredEventBus(packet.getStanzaFrom())) {
-			// request from cluster node
-			for (Element unsubscribe : unsubscribeElements) {
-				EventName parsedName = new EventName(unsubscribe.getAttributeStaticStr("node"));
-				JID jid = JID.jidInstance(unsubscribe.getAttributeStaticStr("jid"));
-
-				subscriptionStore.removeSubscription(parsedName.getPackage(), parsedName.getName(), new Subscription(jid));
-			}
-		} else {
-			// request from something out of cluster
-			final Set<Element> subscribedNodes = new HashSet<>();
-			for (Element subscribe : unsubscribeElements) {
-				EventName parsedName = new EventName(subscribe.getAttributeStaticStr("node"));
-				JID jid = JID.jidInstance(subscribe.getAttributeStaticStr("jid"));
-
-				if (log.isLoggable(Level.FINER))
-					log.finer("Entity " + jid + " subscribed for events " + parsedName);
-
-				subscriptionStore.removeSubscription(parsedName.getPackage(), parsedName.getName(),
-						new Subscription(jid, packet.getStanzaTo()));
-
-				subscribedNodes.add(prepareUnsubscribeElement(parsedName, jid, packet.getStanzaTo().toString()));
-			}
-
-			if (log.isLoggable(Level.FINER))
-				log.finer("Forwarding unsubcribe to: " + component.getNodesConnected());
-
-			for (JID node : component.getNodesConnected()) {
-				sendUnsubscribeRequest("eventbus@" + node.getDomain(), subscribedNodes);
-			}
-		}
-		Packet response = packet.okResult((Element) null, 0);
-		response.setPermissions(Permissions.ADMIN);
-		write(response);
-	}
-
 	protected void sendUnsubscribeRequest(String to, Collection<Element> subscriptionElement) {
 		try {
-			Element iq = new Element("iq", new String[] { "from", "to", "type", "id" },
-					new String[] { component.getComponentId().toString(), to, "set", nextStanzaID() });
+			Element iq = new Element("iq", new String[]{"from", "to", "type", "id"},
+									 new String[]{component.getComponentId().toString(), to, "set", nextStanzaID()});
 
-			Element pubsubElem = new Element("pubsub", new String[] { "xmlns" },
-					new String[] { "http://jabber.org/protocol/pubsub" });
+			Element pubsubElem = new Element("pubsub", new String[]{"xmlns"},
+											 new String[]{"http://jabber.org/protocol/pubsub"});
 			iq.addChild(pubsubElem);
 
 			for (Element node : subscriptionElement) {
@@ -195,6 +149,60 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private Element prepareUnsubscribeElement(EventName event, JID jid, String service) {
+		Element subscribeElem = new Element("unsubscribe");
+		subscribeElem.addAttribute("node", event.toString());
+		subscribeElem.addAttribute("jid", jid.toString());
+
+		if (service != null) {
+			subscribeElem.addChild(new Element("service", service));
+		}
+
+		return subscribeElem;
+	}
+
+	private void processSet(final Packet packet) throws TigaseStringprepException {
+		List<Element> unsubscribeElements = packet.getElemChildrenStaticStr(new String[]{"iq", "pubsub"});
+
+		if (isClusteredEventBus(packet.getStanzaFrom())) {
+			// request from cluster node
+			for (Element unsubscribe : unsubscribeElements) {
+				EventName parsedName = new EventName(unsubscribe.getAttributeStaticStr("node"));
+				JID jid = JID.jidInstance(unsubscribe.getAttributeStaticStr("jid"));
+
+				subscriptionStore.removeSubscription(parsedName.getPackage(), parsedName.getName(),
+													 new Subscription(jid));
+			}
+		} else {
+			// request from something out of cluster
+			final Set<Element> subscribedNodes = new HashSet<>();
+			for (Element subscribe : unsubscribeElements) {
+				EventName parsedName = new EventName(subscribe.getAttributeStaticStr("node"));
+				JID jid = JID.jidInstance(subscribe.getAttributeStaticStr("jid"));
+
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Entity " + jid + " subscribed for events " + parsedName);
+				}
+
+				subscriptionStore.removeSubscription(parsedName.getPackage(), parsedName.getName(),
+													 new Subscription(jid, packet.getStanzaTo()));
+
+				subscribedNodes.add(prepareUnsubscribeElement(parsedName, jid, packet.getStanzaTo().toString()));
+			}
+
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Forwarding unsubcribe to: " + component.getNodesConnected());
+			}
+
+			for (JID node : component.getNodesConnected()) {
+				sendUnsubscribeRequest("eventbus@" + node.getDomain(), subscribedNodes);
+			}
+		}
+		Packet response = packet.okResult((Element) null, 0);
+		response.setPermissions(Permissions.ADMIN);
+		write(response);
 	}
 
 }

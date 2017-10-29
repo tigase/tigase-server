@@ -33,7 +33,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Bean(name = "credentialsEncoders", parent = AuthRepositoryMDPoolBean.AuthRepositoryConfigBean.class, active = true)
-public class CredentialsEncoderBean implements RegistrarBean {
+public class CredentialsEncoderBean
+		implements RegistrarBean {
 
 	@Inject
 	private List<Credentials.Encoder> encoders;
@@ -55,14 +56,14 @@ public class CredentialsEncoderBean implements RegistrarBean {
 	public List<String[]> encodeForAllMechanisms(BareJID user, String password) {
 		List<String[]> entries = new ArrayList<>();
 		for (Credentials.Encoder enc : encoders) {
-			entries.add(new String[] { enc.getName(), enc.encode(user, password) });
+			entries.add(new String[]{enc.getName(), enc.encode(user, password)});
 		}
 		return entries;
 	}
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override

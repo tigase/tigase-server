@@ -35,51 +35,47 @@ import java.util.logging.Logger;
 import static tigase.server.websocket.WebSocketXMPPIOService.State.closing;
 
 /**
- * Class implements Hybi (RFC compatible) version of WebSocket protocol specification
- * which is used in connection handshaking as well as in frameing/deframing of
- * data sent over WebSocket connection
- * 
- * @see <a href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-13">WebSocket HyBi specification</a>
- * 
+ * Class implements Hybi (RFC compatible) version of WebSocket protocol specification which is used in connection
+ * handshaking as well as in frameing/deframing of data sent over WebSocket connection
+ *
  * @author andrzej
+ * @see <a href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-13">WebSocket HyBi specification</a>
  */
 @Bean(name = "hybiProtocol", parent = WebSocketClientConnectionManager.class, active = true)
-public class WebSocketHybi implements WebSocketProtocolIfc {
+public class WebSocketHybi
+		implements WebSocketProtocolIfc {
 
-	private static final Logger log = Logger.getLogger(WebSocketHybi.class.getCanonicalName());
-	
 	public static final String ID = "hybi";
-	
-	private static final String GUID           = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";	
+	private static final Logger log = Logger.getLogger(WebSocketHybi.class.getCanonicalName());
+	private static final String GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 	private static final String RESPONSE_HEADER =
-		"HTTP/1.1 101 Switching Protocols\r\n" + "Upgrade: websocket\r\n" +
-		"Connection: Upgrade\r\n" + "Access-Control-Allow-Origin: *\r\n" +
-		// Removed header below as it creates issues with connectivity using IE11 
+			"HTTP/1.1 101 Switching Protocols\r\n" + "Upgrade: websocket\r\n" + "Connection: Upgrade\r\n" +
+					"Access-Control-Allow-Origin: *\r\n" +
+					// Removed header below as it creates issues with connectivity using IE11
 //		"Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
-		"Access-Control-Allow-Headers: Content-Type\r\n" +
-		"Access-Control-Max-Age: 86400\r\n";
+					"Access-Control-Allow-Headers: Content-Type\r\n" + "Access-Control-Max-Age: 86400\r\n";
 
-	private static final String WS_ACCEPT_KEY   = "Sec-WebSocket-Accept";
-	private static final String WS_KEY_KEY      = "Sec-WebSocket-Key";
+	private static final String WS_ACCEPT_KEY = "Sec-WebSocket-Accept";
+	private static final String WS_KEY_KEY = "Sec-WebSocket-Key";
 
 	private static final String CLOSE_CODE = "close-code";
+	private static final int PROTOCOL_ERROR = 1003;
+	private static byte[] EMPTY = new byte[0];
 	@ConfigField(desc = "Allow for unmasked frames send from client", alias = "ws-allow-unmasked-frames")
 	private boolean allowUnmaskedFromClient = false;
-	private static final int PROTOCOL_ERROR = 1003;
-
-	private static byte[] EMPTY = new byte[0];
 
 	@Override
 	public String getId() {
 		return ID;
 	}
-	
+
 	@Override
-	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf) throws NoSuchAlgorithmException, IOException {
+	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
+			throws NoSuchAlgorithmException, IOException {
 		if (!headers.containsKey(WS_VERSION_KEY)) {
 			return false;
 		}
-		
+
 		StringBuilder response = new StringBuilder(RESPONSE_HEADER.length() * 2);
 		response.append(RESPONSE_HEADER);
 
@@ -102,7 +98,7 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 		response.append("\r\n");
 		service.maskingKey = new byte[4];
 		service.writeRawData(response.toString());
-			
+
 		return true;
 	}
 
@@ -110,17 +106,17 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	public ByteBuffer decodeFrame(WebSocketXMPPIOService service, ByteBuffer buf) {
 		if (!buf.hasRemaining()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: {0}, no content remainging to process", new Object[] { service });
+				log.log(Level.FINEST, "Socket: {0}, no content remainging to process", new Object[]{service});
 			}
 
 			return null;
 		}
 
 		boolean masked = false;
-		byte type      = 0x00;
-		int position   = buf.position();
+		byte type = 0x00;
+		int position = buf.position();
 		ByteBuffer unmasked = null;
-		
+
 		try {
 			if (service.frameLength == -1) {
 				type = buf.get();
@@ -128,8 +124,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 
 					// close request
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Socket: {0}, closing connection due to client request {1}", 
-								new Object[] { service, String.format("%02X ", type) });
+						log.log(Level.FINEST, "Socket: {0}, closing connection due to client request {1}",
+								new Object[]{service, String.format("%02X ", type)});
 					}
 					service.setState(closing);
 					closeConnection(service, null);
@@ -144,14 +140,14 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 				masked = (b2 & 0x80) == 0x80;
 				if (!masked && !allowUnmaskedFromClient) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Socket: {0}, closing connection due to protocol error - unmasked frame sent by client {1}",
-								new Object[] { service, String.format("%02X ", type) });
+						log.log(Level.FINEST,
+								"Socket: {0}, closing connection due to protocol error - unmasked frame sent by client {1}",
+								new Object[]{service, String.format("%02X ", type)});
 					}
 					closeConnection(service, PROTOCOL_ERROR);
 					//service.forceStop();
 					return null;
 				}
-
 
 				// ignore sign bit
 				service.frameLength = (b2 & 0x7F);
@@ -159,9 +155,7 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 					// if frame length is bigger than 125 then
 					// if is 126 - size is short (unsigned short)
 					// is is 127 - size is long
-					service.frameLength = (service.frameLength == 126)
-							? (buf.getShort() & 0xffff)
-							: buf.getLong();
+					service.frameLength = (service.frameLength == 126) ? (buf.getShort() & 0xffff) : buf.getLong();
 				}
 				if (masked) {
 
@@ -196,14 +190,14 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 				// we need to ignore pong frame
 				if ((type & 0x0A) == 0x0A) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Socket: {0}, ignoring pong frame", new Object[] { service });
+						log.log(Level.FINEST, "Socket: {0}, ignoring pong frame", new Object[]{service});
 					}
 					// We are returning empty byte buffer to make sure other frames remaining in buffer will be processed
 					unmasked = ByteBuffer.wrap(EMPTY);
 				} // if it ping request send pong response
 				else if ((type & 0x09) == 0x09) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Socket: {0}, sending response on ping frame", new Object[] { service });
+						log.log(Level.FINEST, "Socket: {0}, sending response on ping frame", new Object[]{service});
 					}
 					type = (byte) (((byte) (type ^ 0x09)) | 0x0A);
 					try {
@@ -236,7 +230,7 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 
 		// set type as finally part (0x80) of message of type text (0x01)
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Socket: {0}, sending encoded data size = {1}", new Object[] { service, size });
+			log.log(Level.FINEST, "Socket: {0}, sending encoded data size = {1}", new Object[]{service, size});
 		}
 
 		ByteBuffer bbuf = createFrameHeader((byte) 0x81, size);
@@ -244,13 +238,14 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 		// send frame header
 		service.writeBytes(bbuf);
 
-		service.writeBytes(buf);							
+		service.writeBytes(buf);
 	}
-	
+
 	@Override
 	public void closeConnection(WebSocketXMPPIOService service) {
-		if (!service.isConnected())
+		if (!service.isConnected()) {
 			return;
+		}
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Socket: {0}, sending close frame", service);
@@ -273,8 +268,9 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	}
 
 	private void closeConnection(WebSocketXMPPIOService service, Integer code) {
-		if (code != null)
+		if (code != null) {
 			service.getSessionData().put(CLOSE_CODE, code);
+		}
 		switch (service.getState()) {
 			case closing:
 				service.setState(WebSocketXMPPIOService.State.closed);
@@ -286,13 +282,12 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Create WebSocket frame header with specific type and size
 	 *
 	 * @param type
 	 * @param size
-	 * 
 	 */
 	private ByteBuffer createFrameHeader(byte type, int size) {
 		ByteBuffer bbuf = ByteBuffer.allocate(12);
@@ -310,5 +305,5 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 		bbuf.flip();
 
 		return bbuf;
-	}	
+	}
 }

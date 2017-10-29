@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -39,9 +37,9 @@ import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.updater.UpdatesChecker;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.lang.management.ManagementFactory;
@@ -50,27 +48,28 @@ import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.server.MessageRouterConfig.*;
+import static tigase.server.MessageRouterConfig.DISCO_NAME_PROP_VAL;
+import static tigase.server.MessageRouterConfig.DISCO_SHOW_VERSION_PROP_VAL;
 
 /**
  * Class MessageRouter
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name="message-router", parent=Kernel.class, active = true)
+@Bean(name = "message-router", parent = Kernel.class, active = true)
 public class MessageRouter
-				extends AbstractMessageReceiver
-				implements MessageRouterIfc, RegistrarBean {
+		extends AbstractMessageReceiver
+		implements MessageRouterIfc, RegistrarBean {
+
 	// implements XMPPService {
 	// public static final String INFO_XMLNS =
 	// "http://jabber.org/protocol/disco#info";
@@ -83,35 +82,28 @@ public class MessageRouter
 	private static final String JVM_STATS_HEAP_POOLS = "JVM/MemoryPools/HeapMemory/";
 
 	//~--- fields ---------------------------------------------------------------
-
+	private Map<String, ServerComponent> components = new ConcurrentHashMap<>();
+	@Inject
+	private Set<ServerComponent> componentsAll;
+	private Map<JID, ServerComponent> components_byId = new ConcurrentHashMap<>();
 	private ConfiguratorAbstract config = null;
-
+	private Set<String> connectionManagerNames = new ConcurrentSkipListSet<>();
 	// private static final long startupTime = System.currentTimeMillis();
 	// private Set<String> localAddresses = new CopyOnWriteArraySet<String>();
 	@ConfigField(desc = "Name of server software presented in discovery")
-	private String                            disco_name      = DISCO_NAME_PROP_VAL;
+	private String disco_name = DISCO_NAME_PROP_VAL;
 	@ConfigField(desc = "Show version of server software in discovery")
-	private boolean                           disco_show_version =
-			DISCO_SHOW_VERSION_PROP_VAL;
-	@Inject
-	private UpdatesChecker                    updates_checker = null;
-	private Map<String, XMPPService>          xmppServices = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<String, ComponentRegistrator> registrators = new ConcurrentHashMap<>();
-	private Map<String, MessageReceiver>      receivers = new ConcurrentHashMap<>();
-	private boolean                           inProperties    = false;
-	private Set<String>                       connectionManagerNames =
-			new ConcurrentSkipListSet<>();
-	private Map<JID, ServerComponent>         components_byId = new ConcurrentHashMap<>();
-	private Map<String, ServerComponent>      components      = new ConcurrentHashMap<>();
-
+	private boolean disco_show_version = DISCO_SHOW_VERSION_PROP_VAL;
+	private boolean inProperties = false;
 	@Inject(bean = "kernel")
 	private Kernel kernel;
-	
-	@Inject
-	private Set<ServerComponent> componentsAll;
-
 	@Inject(nullAllowed = true)
 	private MonitoringBeanIfc monitoringBean;
+	private Map<String, MessageReceiver> receivers = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, ComponentRegistrator> registrators = new ConcurrentHashMap<>();
+	@Inject
+	private UpdatesChecker updates_checker = null;
+	private Map<String, XMPPService> xmppServices = new ConcurrentHashMap<>();
 
 	@Override
 	public void register(Kernel kernel) {
@@ -124,8 +116,9 @@ public class MessageRouter
 	}
 
 	public void setComponentsAll(Set<ServerComponent> components) {
-		if (components == null)
+		if (components == null) {
 			return;
+		}
 
 		HashSet<ServerComponent> removeComponents = new HashSet<>(this.components.values());
 		removeComponents.removeAll(components);
@@ -137,23 +130,24 @@ public class MessageRouter
 			} else {
 				removeComponent(comp);
 			}
-			if (comp instanceof ConnectionManager)
+			if (comp instanceof ConnectionManager) {
 				connectionManagerNames.remove(comp.getName());
+			}
 			comp.release();
 		}
-
 
 		HashSet<ServerComponent> newComponents = new HashSet<>(components);
 		newComponents.removeAll(this.components.values());
 		for (ServerComponent comp : newComponents) {
 			try {
-				if (comp instanceof  MessageReceiver) {
+				if (comp instanceof MessageReceiver) {
 					MessageReceiver mr = (MessageReceiver) comp;
 					mr.setParent(this);
 					mr.start();
 				}
-				if (comp instanceof ConnectionManager)
+				if (comp instanceof ConnectionManager) {
 					connectionManagerNames.add(comp.getName());
+				}
 				if (comp instanceof ComponentRegistrator) {
 					addRegistrator((ComponentRegistrator) comp);
 				} else if (comp instanceof MessageReceiver) {
@@ -173,7 +167,6 @@ public class MessageRouter
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param component
 	 */
 	public void addComponent(ServerComponent component) throws ConfigurationException {
@@ -182,8 +175,7 @@ public class MessageRouter
 			if (registr != component) {
 				if (log.isLoggable(Level.FINER)) {
 					log.log(Level.FINER, "Adding: {0} component to {1} registrator.",
-							new Object[] { component.getName(),
-							registr.getName() });
+							new Object[]{component.getName(), registr.getName()});
 				}
 				registr.addComponent(component);
 			}    // end of if (reg != component)
@@ -197,7 +189,6 @@ public class MessageRouter
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param registr
 	 */
@@ -217,7 +208,6 @@ public class MessageRouter
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param receiver
 	 */
 	public void addRouter(MessageReceiver receiver) throws ConfigurationException {
@@ -229,10 +219,9 @@ public class MessageRouter
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		super.beanConfigurationChanged(changedFields);
-		if (getServiceEntity() != null
-				&& (changedFields.contains("disco_name") || changedFields.contains("disco_show_version"))) {
-			updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im",
-					false);
+		if (getServiceEntity() != null &&
+				(changedFields.contains("disco_name") || changedFields.contains("disco_show_version"))) {
+			updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im", false);
 		}
 	}
 
@@ -248,8 +237,7 @@ public class MessageRouter
 		// So, kind of a workaround here....
 		// TODO: develop a proper solution discovering which components are
 		// connection managers and use their names here instead of static names.
-		if ((packet.getPacketFrom() != null) && (packet.getPacketFrom().getLocalpart() !=
-				null)) {
+		if ((packet.getPacketFrom() != null) && (packet.getPacketFrom().getLocalpart() != null)) {
 			if (connectionManagerNames.contains(packet.getPacketFrom().getLocalpart())) {
 				return packet.getPacketFrom().hashCode();
 			}
@@ -262,14 +250,13 @@ public class MessageRouter
 		if (packet.getStanzaTo() != null) {
 			return packet.getStanzaTo().getBareJID().hashCode();
 		}
-		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
-				.getPacketFrom())) {
+		if ((packet.getPacketFrom() != null) && !getComponentId().equals(packet.getPacketFrom())) {
 
 			// This comes from connection manager so the best way is to get hashcode
 			// by the connectionId, which is in the getFrom()
 			return packet.getPacketFrom().hashCode();
 		}
-		if ((packet.getPacketTo() != null) &&!getComponentId().equals(packet.getPacketTo())) {
+		if ((packet.getPacketTo() != null) && !getComponentId().equals(packet.getPacketTo())) {
 			return packet.getPacketTo().hashCode();
 		}
 
@@ -281,8 +268,7 @@ public class MessageRouter
 	@Override
 	public void initialize() {
 		super.initialize();
-		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im",
-				false);
+		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im", false);
 	}
 
 	@Override
@@ -347,9 +333,9 @@ public class MessageRouter
 		// There is a need to process packets with the same from and to address
 		// let't try to relax restriction and block all packets with error type
 		// 2008-06-16
-		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) && packet
-				.getFrom().equals(packet.getTo()) 
-				&& (packet.getStanzaFrom() == null || packet.getStanzaFrom().equals(packet.getStanzaTo())))) {
+		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) &&
+				packet.getFrom().equals(packet.getTo()) &&
+				(packet.getStanzaFrom() == null || packet.getStanzaFrom().equals(packet.getStanzaTo())))) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Possible infinite loop, dropping packet: {0}", packet);
 			}
@@ -387,9 +373,8 @@ public class MessageRouter
 
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "1. Packet will be processed by: {0}, {1}", new Object[] {
-						comp.getComponentId(),
-						packet });
+				log.log(Level.FINEST, "1. Packet will be processed by: {0}, {1}",
+						new Object[]{comp.getComponentId(), packet});
 			}
 
 			Queue<Packet> results = new ArrayDeque<Packet>();
@@ -425,7 +410,7 @@ public class MessageRouter
 		// The code below finds all components which handle packets addressed
 		// to a virtual domains (implement VHostListener and return 'true' from
 		// handlesLocalDomains() method call)
-		String            host  = packet.getTo().getDomain();
+		String host = packet.getTo().getDomain();
 		ServerComponent[] comps = getComponentsForLocalDomain(host);
 
 		if (comps == null) {
@@ -434,7 +419,7 @@ public class MessageRouter
 			// Checking regex routings provided by the component.
 			comps = getServerComponentsForRegex(packet.getTo().getBareJID().toString());
 		}
-		if ((comps == null) &&!isLocalDomain(host)) {
+		if ((comps == null) && !isLocalDomain(host)) {
 
 			// None of the component want to process the packet.
 			// If the packet is addressed to non-local domain then it is processed by
@@ -452,8 +437,7 @@ public class MessageRouter
 			for (ServerComponent serverComponent : comps) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "2. Packet will be processed by: {0}, {1}",
-							new Object[] { serverComponent.getComponentId(),
-							packet });
+							new Object[]{serverComponent.getComponentId(), packet});
 				}
 				serverComponent.processPacket(packet, results);
 				if (results.size() > 0) {
@@ -474,20 +458,19 @@ public class MessageRouter
 			}
 			try {
 				addOutPacketNB(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-						"There is no service found to process your request.", true));
+																					"There is no service found to process your request.",
+																					true));
 			} catch (PacketErrorTypeException e) {
 
 				// This packet is to local domain, we don't want to send it out
 				// drop packet :-(
-				log.warning("Can't process packet to local domain, dropping..." + packet
-						.toStringSecure());
+				log.warning("Can't process packet to local domain, dropping..." + packet.toStringSecure());
 			}
 		}
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param packet
 	 * @param results
@@ -500,15 +483,15 @@ public class MessageRouter
 		} else {
 
 			// Not a command for sure...
-			log.warning("I expect command (Iq) packet here, instead I got: " + packet
-					.toString());
+			log.warning("I expect command (Iq) packet here, instead I got: " + packet.toString());
 
 			return;
 		}
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			try {
 				Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You are not authorized for this action.", true);
+																			 "You are not authorized for this action.",
+																			 true);
 
 				results.offer(res);
 
@@ -523,38 +506,37 @@ public class MessageRouter
 			log.finest("Command received: " + iq.toString());
 		}
 		switch (iq.getCommand()) {
-		case OTHER :
-			if (iq.getStrCommand() != null) {
-				if (iq.getStrCommand().startsWith("controll/")) {
-					String[] spl = iq.getStrCommand().split("/");
-					String   cmd = spl[1];
+			case OTHER:
+				if (iq.getStrCommand() != null) {
+					if (iq.getStrCommand().startsWith("controll/")) {
+						String[] spl = iq.getStrCommand().split("/");
+						String cmd = spl[1];
 
-					if (cmd.equals("stop")) {
-						Packet result = iq.commandResult(Command.DataType.result);
+						if (cmd.equals("stop")) {
+							Packet result = iq.commandResult(Command.DataType.result);
 
-						results.offer(result);
+							results.offer(result);
 
-						// processPacket(result);
-						new Timer("Stopping...", true).schedule(new TimerTask() {
-							@Override
-							public void run() {
-								System.exit(0);
-							}
-						}, 2000);
+							// processPacket(result);
+							new Timer("Stopping...", true).schedule(new TimerTask() {
+								@Override
+								public void run() {
+									System.exit(0);
+								}
+							}, 2000);
+						}
 					}
 				}
-			}
 
-			break;
+				break;
 
-		default :
-			break;
+			default:
+				break;
 		}
 	}
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param component
 	 */
@@ -563,8 +545,7 @@ public class MessageRouter
 			if (registr != component) {
 				if (log.isLoggable(Level.FINER)) {
 					log.log(Level.FINER, "Removing: {0} component from {1} registrator.",
-							new Object[] { component.getName(),
-							registr.getName() });
+							new Object[]{component.getName(), registr.getName()});
 				}
 				registr.deleteComponent(component);
 			}    // end of if (reg != component)
@@ -588,10 +569,9 @@ public class MessageRouter
 			// } // end of if (comp != registr)
 		}    // end of for (ServerComponent comp : components)
 	}
-	
+
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param receiver
 	 */
@@ -630,9 +610,7 @@ public class MessageRouter
 
 	@Override
 	public String getDiscoDescription() {
-		return disco_name + (disco_show_version
-				? (" ver. " + XMPPServer.getImplementationVersion())
-				: "");
+		return disco_name + (disco_show_version ? (" ver. " + XMPPServer.getImplementationVersion()) : "");
 	}
 
 	@Override
@@ -649,13 +627,12 @@ public class MessageRouter
 		list.add(getName(), "Version", XMPPServer.getImplementationVersion(), Level.INFO);
 
 		format.setMaximumFractionDigits(4);
-		list.add(getName(), "Load average", format.format(runtime.getLoadAverage()), Level
-				.FINE);
+		list.add(getName(), "Load average", format.format(runtime.getLoadAverage()), Level.FINE);
 		list.add(getName(), "CPUs no", runtime.getCPUsNumber(), Level.FINEST);
 		list.add(getName(), "Threads count", runtime.getThreadsNumber(), Level.FINEST);
 
-		float cpuUsage     = runtime.getCPUUsage();
-		float heapUsage    = runtime.getHeapMemUsage();
+		float cpuUsage = runtime.getCPUUsage();
+		float heapUsage = runtime.getHeapMemUsage();
 		float nonHeapUsage = runtime.getNonHeapMemUsage();
 
 		list.add(getName(), "CPU usage [%]", cpuUsage, Level.FINE);
@@ -674,15 +651,15 @@ public class MessageRouter
 		}
 		list.add(getName(), "Max Heap mem", format.format(runtime.getHeapMemMax() / 1024), Level.INFO);
 		list.add(getName(), "Used Heap", format.format(runtime.getHeapMemUsed() / 1024), Level.INFO);
-		list.add(getName(), "Free Heap", format.format( runtime.getHeapMemMax() == -1 ? -1.0 :
-				(runtime.getHeapMemMax() - runtime.getHeapMemUsed()) / 1024), Level.FINE);
-		list.add(getName(), "Max NonHeap mem", format.format(runtime.getNonHeapMemMax() / 1024), Level
-				.FINE);
-		list.add(getName(), "Used NonHeap", format.format(runtime.getNonHeapMemUsed() / 1024), Level
-				.FINE);
-		list.add(getName(), "Free NonHeap", format.format( runtime.getNonHeapMemMax() == -1 ? -1.0 :
-				(runtime.getNonHeapMemMax() - runtime.getNonHeapMemUsed()) / 1024), Level.FINE);
-
+		list.add(getName(), "Free Heap", format.format(
+				runtime.getHeapMemMax() == -1 ? -1.0 : (runtime.getHeapMemMax() - runtime.getHeapMemUsed()) / 1024),
+				 Level.FINE);
+		list.add(getName(), "Max NonHeap mem", format.format(runtime.getNonHeapMemMax() / 1024), Level.FINE);
+		list.add(getName(), "Used NonHeap", format.format(runtime.getNonHeapMemUsed() / 1024), Level.FINE);
+		list.add(getName(), "Free NonHeap", format.format(runtime.getNonHeapMemMax() == -1
+														  ? -1.0
+														  : (runtime.getNonHeapMemMax() - runtime.getNonHeapMemUsed()) /
+																  1024), Level.FINE);
 
 		// general JVM/GC info
 		list.add(getName(), "Heap region name", runtime.getOldGenName(), Level.FINE);
@@ -698,28 +675,27 @@ public class MessageRouter
 		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_USED, heapMemoryUsage.getUsed() / factor, statLevel);
 		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_MAX, heapMemoryUsage.getMax() / factor, statLevel);
 		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_FREE,
-				(heapMemoryUsage.getMax() - heapMemoryUsage.getUsed())/factor, statLevel);
+				 (heapMemoryUsage.getMax() - heapMemoryUsage.getUsed()) / factor, statLevel);
 		list.add(getName(), JVM_STATS_HEAP_TOTAL + "Usage [%]",
-				heapMemoryUsage.getUsed() * 100F / heapMemoryUsage.getMax(), statLevel);
-
+				 heapMemoryUsage.getUsed() * 100F / heapMemoryUsage.getMax(), statLevel);
 
 		// per-heap-pool metrics
 		for (Map.Entry<String, MemoryPoolMXBean> entry : runtime.getMemoryPoolMXBeans().entrySet()) {
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Name", entry.getValue().getName(), statLevel);
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Usage/" + JVM_STATS_USED,
-					entry.getValue().getUsage().getUsed() / factor, statLevel);
+					 entry.getValue().getUsage().getUsed() / factor, statLevel);
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Usage/" + JVM_STATS_MAX,
-					entry.getValue().getUsage().getMax() / factor, statLevel);
+					 entry.getValue().getUsage().getMax() / factor, statLevel);
 
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Peak Usage/" + JVM_STATS_USED,
-					entry.getValue().getPeakUsage().getUsed() / factor, statLevel);
+					 entry.getValue().getPeakUsage().getUsed() / factor, statLevel);
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Peak Usage/" + JVM_STATS_MAX,
-					entry.getValue().getPeakUsage().getMax() / factor, statLevel);
+					 entry.getValue().getPeakUsage().getMax() / factor, statLevel);
 
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Collection Usage/" + JVM_STATS_USED,
-					entry.getValue().getCollectionUsage().getUsed() / factor, statLevel);
+					 entry.getValue().getCollectionUsage().getUsed() / factor, statLevel);
 			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Collection Usage/" + JVM_STATS_MAX,
-					entry.getValue().getCollectionUsage().getMax() / factor, statLevel);
+					 entry.getValue().getCollectionUsage().getMax() / factor, statLevel);
 
 		}
 	}
@@ -747,22 +723,20 @@ public class MessageRouter
 			log.log(Level.FINEST, "Processing disco query by: {0}", packet.toStringSecure());
 		}
 
-		JID     toJid   = packet.getStanzaTo();
-		JID     fromJid = packet.getStanzaFrom();
-		String  node    = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
-		Element query   = packet.getElement().getChild("query").clone();
+		JID toJid = packet.getStanzaTo();
+		JID fromJid = packet.getStanzaFrom();
+		String node = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
+		Element query = packet.getElement().getChild("query").clone();
 
 		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
 			if (isLocalDomain(toJid.toString()) && (node == null)) {
 				try {
-					query = getDiscoInfo(node, (toJid.getLocalpart() == null)
-							? JID.jidInstance(getName(), toJid.toString(), null)
-							: toJid, fromJid);
+					query = getDiscoInfo(node,
+										 (toJid.getLocalpart() == null) ? JID.jidInstance(getName(), toJid.toString(),
+																						  null) : toJid, fromJid);
 				} catch (TigaseStringprepException e) {
-					log.log(Level.WARNING,
-							"processing by stringprep throw exception for = {0}@{1}", new Object[] {
-							getName(),
-							toJid.toString() });
+					log.log(Level.WARNING, "processing by stringprep throw exception for = {0}@{1}",
+							new Object[]{getName(), toJid.toString()});
 				}
 				for (XMPPService comp : xmppServices.values()) {
 
@@ -777,8 +751,9 @@ public class MessageRouter
 							query.addChildren(features);
 						}
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Component service disco problem: " + comp.getName() + ", during processing packet: " + packet,
-								e);
+						log.log(Level.WARNING,
+								"Component service disco problem: " + comp.getName() + ", during processing packet: " +
+										packet, e);
 					}
 				}
 			} else {
@@ -797,8 +772,7 @@ public class MessageRouter
 							query.addChildren(resp.getChildren());
 						}
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(),
-								e);
+						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
 					}
 
 					// }
@@ -822,20 +796,15 @@ public class MessageRouter
 						List<Element> items = comp.getDiscoItems(node, toJid, fromJid);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST,
-									"Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
-									new Object[] { toJid,
-									comp.getComponentId(),
-									(items == null)
-									? null
-									: items.toString() });
+							log.log(Level.FINEST, "Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
+									new Object[]{toJid, comp.getComponentId(),
+												 (items == null) ? null : items.toString()});
 						}
 						if ((items != null) && (items.size() > 0)) {
 							query.addChildren(items);
 						}
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(),
-								e);
+						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
 					}
 				}    // end of for ()
 			} else {
@@ -846,9 +815,7 @@ public class MessageRouter
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "DiscoItems processed by: {0}, items: {1}",
-								new Object[] { comp.getComponentId(), (items == null)
-								? null
-								: items.toString() });
+								new Object[]{comp.getComponentId(), (items == null) ? null : items.toString()});
 					}
 					if ((items != null) && (items.size() > 0)) {
 						query.addChildren(items);
@@ -885,9 +852,8 @@ public class MessageRouter
 			return comp;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log( Level.FINEST, "No componentID matches (fast lookup against exact address): "
-														 + "{0}, for map: {1}; trying VHost lookup",
-							 new Object[] { jid, components_byId.keySet() } );
+			log.log(Level.FINEST, "No componentID matches (fast lookup against exact address): " +
+					"{0}, for map: {1}; trying VHost lookup", new Object[]{jid, components_byId.keySet()});
 		}
 
 		// Note, component ID consists of the component name + default hostname
@@ -898,16 +864,15 @@ public class MessageRouter
 		// active virtual hostname.
 		if (jid.getLocalpart() != null) {
 			comp = components.get(jid.getLocalpart());
-			if ((comp != null) && (isLocalDomain(jid.getDomain()) || jid.getDomain().equals(
-					getDefHostName().getDomain()))) {
+			if ((comp != null) &&
+					(isLocalDomain(jid.getDomain()) || jid.getDomain().equals(getDefHostName().getDomain()))) {
 				return comp;
 			}
 		}
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST,
-							 "No component name matches (VHost lookup against component name): "
-							 + "{0}, for map: {1}, for all VHosts: {2}; trying other forms of addressing",
-							 new Object[] { jid, components.keySet(), vHostManager.getAllVHosts() } );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "No component name matches (VHost lookup against component name): " +
+							"{0}, for map: {1}, for all VHosts: {2}; trying other forms of addressing",
+					new Object[]{jid, components.keySet(), vHostManager.getAllVHosts()});
 		}
 
 		// Instead of a component ID built of: component name + "@" domain name
@@ -917,23 +882,20 @@ public class MessageRouter
 		int idx = jid.getDomain().indexOf('.');
 
 		if (idx > 0) {
-			String cmpName  = jid.getDomain().substring(0, idx);
+			String cmpName = jid.getDomain().substring(0, idx);
 			String basename = jid.getDomain().substring(idx + 1);
 
 			comp = components.get(cmpName);
-			if ((comp != null) && (isLocalDomain(basename) || basename.equals(getDefHostName()
-					.getDomain()))) {
-				if ( log.isLoggable( Level.FINEST ) ){
-					log.log( Level.FINEST,
-									 "Component matched: {0}, for comp: {1}, basename: {3}",
-									 new Object[] { jid, components.keySet(), comp, basename } );
+			if ((comp != null) && (isLocalDomain(basename) || basename.equals(getDefHostName().getDomain()))) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Component matched: {0}, for comp: {1}, basename: {3}",
+							new Object[]{jid, components.keySet(), comp, basename});
 				}
 				return comp;
 			}
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST,
-								 "Component match failed: {0}, for comp: {1}, basename: {3}",
-								 new Object[] { jid, components.keySet(), comp, basename } );
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Component match failed: {0}, for comp: {1}, basename: {3}",
+						new Object[]{jid, components.keySet(), comp, basename});
 			}
 		}
 
@@ -977,16 +939,14 @@ public class MessageRouter
 	}
 
 	private boolean isLocalDiscoRequest(Packet packet) {
-		boolean         result = false;
-		JID             to     = packet.getStanzaTo();
-		ServerComponent comp   = (to == null)
-				? null
-				: getLocalComponent(to);
+		boolean result = false;
+		JID to = packet.getStanzaTo();
+		ServerComponent comp = (to == null) ? null : getLocalComponent(to);
 
-		result = packet.isServiceDisco() && (packet.getType() == StanzaType.get) && (packet
-				.getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || (((comp !=
-				null) || isLocalDomain(packet.getStanzaTo().toString())) &&!isDiscoDisabled(comp,
-				to)));
+		result = packet.isServiceDisco() && (packet.getType() == StanzaType.get) && (packet.getStanzaFrom() != null) &&
+				((packet.getStanzaTo() == null) ||
+						(((comp != null) || isLocalDomain(packet.getStanzaTo().toString())) &&
+								!isDiscoDisabled(comp, to)));
 
 //  .getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || ((comp != null) &&
 //  !(comp instanceof DisableDisco)) || isLocalDomain(packet.getStanzaTo()
@@ -994,6 +954,5 @@ public class MessageRouter
 		return result;
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/10/16

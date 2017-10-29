@@ -23,20 +23,18 @@ package tigase.server.ext.handlers;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.ExtProcessor;
 import tigase.server.ext.StreamOpenHandler;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -46,7 +44,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StartTLSProcessor implements ExtProcessor {
+public class StartTLSProcessor
+		implements ExtProcessor {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -54,9 +53,9 @@ public class StartTLSProcessor implements ExtProcessor {
 	private static final Logger log = Logger.getLogger(StartTLSProcessor.class.getName());
 	private static final String EL_NAME = "starttls";
 	private static final String ID = EL_NAME;
-	private static final Element FEATURES = new Element(EL_NAME,
-		new Element[] { new Element("required") }, new String[] { "xmlns" },
-		new String[] { "urn:ietf:params:xml:ns:xmpp-tls" });
+	private static final Element FEATURES = new Element(EL_NAME, new Element[]{new Element("required")},
+														new String[]{"xmlns"},
+														new String[]{"urn:ietf:params:xml:ns:xmpp-tls"});
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -66,8 +65,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(ComponentIOService serv,
-			ComponentProtocolHandler handler) {
+	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		if (serv.getSessionData().get(ID) != null) {
 			return null;
 		} else {
@@ -78,8 +76,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results) {
+	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
 		if (p.getElemName() == EL_NAME) {
 			serv.getSessionData().put(ID, ID);
 
@@ -109,10 +106,11 @@ public class StartTLSProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public void startProcessing(Packet p, ComponentIOService serv,
-			ComponentProtocolHandler handler, Queue<Packet> results) {
-		results.offer(Packet.packetInstance(new Element(EL_NAME, new String[] { "xmlns" },
-				new String[] { "urn:ietf:params:xml:ns:xmpp-tls" }), null, null));
+	public void startProcessing(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
+								Queue<Packet> results) {
+		results.offer(Packet.packetInstance(
+				new Element(EL_NAME, new String[]{"xmlns"}, new String[]{"urn:ietf:params:xml:ns:xmpp-tls"}), null,
+				null));
 	}
 
 	private void initTLS(ComponentIOService serv, String data, boolean client) {
@@ -133,8 +131,6 @@ public class StartTLSProcessor implements ExtProcessor {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

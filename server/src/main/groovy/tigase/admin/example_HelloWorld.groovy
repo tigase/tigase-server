@@ -29,9 +29,10 @@ AS:Group: Example scripts
 
 package tigase.admin
 
-import tigase.server.*
+import tigase.server.Command
+import tigase.server.Packet
 
-def p = (Packet)packet
+def p = (Packet) packet
 
 def name = Command.getFieldValue(packet, "name")
 
@@ -40,7 +41,7 @@ if (name == null) {
 	Command.addTitle(res, "Hello World Script")
 	Command.addInstructions(res, "Please provide some details")
 	Command.addFieldValue(res, "name", name ?: "", "text-single",
-	  "Your name")
+						  "Your name")
 	return res
 }
 

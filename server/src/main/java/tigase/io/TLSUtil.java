@@ -39,27 +39,25 @@ import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_VAL;
 
 /**
  * Describe class TLSUtil here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Jan 23 14:21:31 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class TLSUtil {
-	private static final Logger log = Logger.getLogger(TLSUtil.class.getName());
 
-//private static Map<String, SSLContextContainerIfc> sslContexts =
+	private static final Logger log = Logger.getLogger(TLSUtil.class.getName());
+	private static CertificateContainerIfc certificateContainer = null;
+	//private static Map<String, SSLContextContainerIfc> sslContexts =
 //  new HashMap<String, SSLContextContainerIfc>();
 	private static SSLContextContainerIfc sslContextContainer = null;
-
-	private static CertificateContainerIfc certificateContainer = null;
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param params
 	 *
@@ -72,13 +70,13 @@ public abstract class TLSUtil {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param params
 	 */
 	public static void configureSSLContext(Map<String, Object> params) {
 		// we should initialize this only once
-		if (sslContextContainer != null)
+		if (sslContextContainer != null) {
 			return;
+		}
 
 		String sslCC_class = (String) params.get(SSL_CONTAINER_CLASS_KEY);
 		String certC_class = (String) params.get(CERTIFICATE_CONTAINER_CLASS_KEY);
@@ -94,18 +92,24 @@ public abstract class TLSUtil {
 		if (sslCC_class.equals("tigase.extras.io.PEMSSLContextContainer")) {
 			log.log(Level.WARNING, "You are using '" + sslCC_class + "' as " + SSL_CONTAINER_CLASS_KEY + ".\n" +
 					"This class is not available any more. To keep using this feature please replace configuration\n" +
-					"of " + SSL_CONTAINER_CLASS_KEY + " to " + sslCC_class + " with " + CERTIFICATE_CONTAINER_CLASS_KEY + "\n" +
-					"set to tigase.extras.io.PEMCertificateContainer");
+					"of " + SSL_CONTAINER_CLASS_KEY + " to " + sslCC_class + " with " +
+					CERTIFICATE_CONTAINER_CLASS_KEY + "\n" + "set to tigase.extras.io.PEMCertificateContainer");
 			sslCC_class = SSL_CONTAINER_CLASS_VAL;
 			certC_class = "tigase.extras.io.PEMCertificateContainer";
 		}
-		if (certC_class == null)
+		if (certC_class == null) {
 			certC_class = CERTIFICATE_CONTAINER_CLASS_VAL;
+		}
 
 		try {
-			certificateContainer = (CertificateContainerIfc) ModulesManagerImpl.getInstance().forName(certC_class).newInstance();
+			certificateContainer = (CertificateContainerIfc) ModulesManagerImpl.getInstance()
+					.forName(certC_class)
+					.newInstance();
 			certificateContainer.init(params);
-			sslContextContainer = (SSLContextContainerIfc) ModulesManagerImpl.getInstance().forName(sslCC_class).getDeclaredConstructor(CertificateContainerIfc.class).newInstance(certificateContainer);
+			sslContextContainer = (SSLContextContainerIfc) ModulesManagerImpl.getInstance()
+					.forName(sslCC_class)
+					.getDeclaredConstructor(CertificateContainerIfc.class)
+					.newInstance(certificateContainer);
 			//sslContextContainer = (SSLContextContainerIfc) Class.forName(sslCC_class).newInstance();
 			sslContextContainer.start();
 		} catch (Exception e) {
@@ -115,8 +119,8 @@ public abstract class TLSUtil {
 	}
 
 	/**
-	 * Method returns singleton instance of class implementing CertificateContainterIfc
-	 * responsible for caching SSL certificates in memory.
+	 * Method returns singleton instance of class implementing CertificateContainterIfc responsible for caching SSL
+	 * certificates in memory.
 	 *
 	 * @return
 	 */
@@ -125,11 +129,11 @@ public abstract class TLSUtil {
 	}
 
 	/**
-	 * Method returns singleton instance of class implementing SSLContextContainerIfc
-	 * responsible for caching SSLContext instances.
-	 *
-	 * This instance should be wrapped by new instance of SSLContextContainer
-	 * if method getSSLContext will be used with TrustManager array passed!
+	 * Method returns singleton instance of class implementing SSLContextContainerIfc responsible for caching SSLContext
+	 * instances.
+	 * <p>
+	 * This instance should be wrapped by new instance of SSLContextContainer if method getSSLContext will be used with
+	 * TrustManager array passed!
 	 *
 	 * @return
 	 */
@@ -139,19 +143,14 @@ public abstract class TLSUtil {
 
 	//~--- get methods ----------------------------------------------------------
 
-        /**
+	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static KeyStore getTrustStore() {
 		return sslContextContainer.getTrustStore();
 	}
 }    // TLSUtil
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

@@ -28,8 +28,8 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
-import tigase.util.datetime.DateTimeFormatter;
 import tigase.util.common.OSUtils;
+import tigase.util.datetime.DateTimeFormatter;
 import tigase.xml.Element;
 
 import java.io.BufferedReader;
@@ -65,6 +65,57 @@ public class DiskTask
 		setPeriod(1000 * 60);
 	}
 
+	@Override
+	public Form getCurrentConfiguration() {
+		Form x = super.getCurrentConfiguration();
+		x.addField(Field.fieldTextSingle("threshold", "" + threshold, "Disk usage ratio threshold"));
+		return x;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(DISK_USAGE_MONITOR_EVENT_NAME, "Fired if disk usage is too high", false);
+		findAllRoots();
+	}
+
+	@Override
+	public void setNewConfiguration(Form form) {
+		Field diskUsageField = form.get("threshold");
+		if (diskUsageField != null) {
+			this.threshold = Float.parseFloat(diskUsageField.getValue());
+		}
+
+		super.setNewConfiguration(form);
+	}
+
+	public void setThreshold(Float threshold) {
+		this.threshold = threshold;
+	}
+
+	@Override
+	protected void run() {
+		for (File file : roots) {
+			if (file.getUsableSpace() < file.getTotalSpace() * (1 - threshold)) {
+
+				Element event = new Element(DISK_USAGE_MONITOR_EVENT_NAME);
+				event.addChild(new Element("hostname", component.getDefHostName().toString()));
+				event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+				event.addChild(new Element("hostname", component.getDefHostName().toString()));
+				event.addChild(new Element("root", file.toString()));
+				event.addChild(new Element("usableSpace", "" + file.getUsableSpace()));
+				event.addChild(new Element("totalSpace", "" + file.getTotalSpace()));
+
+				if (!triggeredEvents.contains(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file)) {
+					eventBus.fire(event);
+					triggeredEvents.add(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file);
+				}
+
+			} else {
+				triggeredEvents.remove(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file);
+			}
+		}
+	}
+
 	private void findAllRoots() {
 		switch (OSUtils.getOSType()) {
 			case windows:
@@ -94,13 +145,6 @@ public class DiskTask
 					roots = otherRoots;
 				}
 		}
-	}
-
-	@Override
-	public Form getCurrentConfiguration() {
-		Form x = super.getCurrentConfiguration();
-		x.addField(Field.fieldTextSingle("threshold", "" + threshold, "Disk usage ratio threshold"));
-		return x;
 	}
 
 	private File[] getLinuxRoots() {
@@ -152,50 +196,6 @@ public class DiskTask
 
 	private File[] getSolarisRoots() {
 		return File.listRoots();
-	}
-
-	@Override
-	public void initialize() {
-		eventBus.registerEvent(DISK_USAGE_MONITOR_EVENT_NAME, "Fired if disk usage is too high", false);
-		findAllRoots();
-	}
-
-	@Override
-	protected void run() {
-		for (File file : roots) {
-			if (file.getUsableSpace() < file.getTotalSpace() * (1 - threshold)) {
-
-				Element event = new Element(DISK_USAGE_MONITOR_EVENT_NAME);
-				event.addChild(new Element("hostname", component.getDefHostName().toString()));
-				event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
-				event.addChild(new Element("hostname", component.getDefHostName().toString()));
-				event.addChild(new Element("root", file.toString()));
-				event.addChild(new Element("usableSpace", "" + file.getUsableSpace()));
-				event.addChild(new Element("totalSpace", "" + file.getTotalSpace()));
-
-				if (!triggeredEvents.contains(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file)) {
-					eventBus.fire(event);
-					triggeredEvents.add(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file);
-				}
-
-			} else {
-				triggeredEvents.remove(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file);
-			}
-		}
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field diskUsageField = form.get("threshold");
-		if (diskUsageField != null) {
-			this.threshold = Float.parseFloat(diskUsageField.getValue());
-		}
-
-		super.setNewConfiguration(form);
-	}
-
-	public void setThreshold(Float threshold) {
-		this.threshold = threshold;
 	}
 
 }

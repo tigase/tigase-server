@@ -20,7 +20,6 @@
 package tigase.server.bosh;
 
 import tigase.server.Packet;
-
 import tigase.util.common.TimerTask;
 
 import java.util.ArrayDeque;
@@ -30,26 +29,27 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshWaitTimer here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Oct 30 16:38:15 2012
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev: $
  */
-public class BoshTask extends TimerTask {
+public class BoshTask
+		extends TimerTask {
+
 	private static final Logger log = Logger.getLogger(BoshTask.class.getName());
 
 	protected long timerOrder = System.currentTimeMillis();
 	private BoshSession bs = null;
 	private BoshConnectionManager manager = null;
-	
+
 	// ~--- constructors -------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
 	 * @param bs
 	 */
 	public BoshTask(BoshSession bs, BoshConnectionManager manager) {

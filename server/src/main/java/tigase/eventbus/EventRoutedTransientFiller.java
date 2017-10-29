@@ -21,15 +21,15 @@
 package tigase.eventbus;
 
 /**
- * Interface implemented by classes responsible for filling transient fields of
- * events after event is delivered on other node in cluster
+ * Interface implemented by classes responsible for filling transient fields of events after event is delivered on other
+ * node in cluster
  *
  * @author andrzej
  */
 public interface EventRoutedTransientFiller {
-	
+
 	boolean fillEvent(Object event);
 
 	Class<?> getEventClass();
-	
+
 }

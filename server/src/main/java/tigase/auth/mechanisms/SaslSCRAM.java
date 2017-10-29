@@ -23,7 +23,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import java.util.Map;
 
-public class SaslSCRAM extends AbstractSaslSCRAM {
+public class SaslSCRAM
+		extends AbstractSaslSCRAM {
 
 	public final static String NAME = "SCRAM-SHA-1";
 	protected final static String ALGO = "SHA1";
@@ -46,7 +47,7 @@ public class SaslSCRAM extends AbstractSaslSCRAM {
 				break;
 			case tls_server_end_point:
 			case tls_unique:
-				throw new SaslException("Invalid request for "+NAME);
+				throw new SaslException("Invalid request for " + NAME);
 		}
 	}
 

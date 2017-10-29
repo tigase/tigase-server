@@ -20,7 +20,8 @@
 
 package tigase.eventbus.impl;
 
-public abstract class AbstractListenerHandler<T> extends AbstractHandler {
+public abstract class AbstractListenerHandler<T>
+		extends AbstractHandler {
 
 	protected final T listener;
 
@@ -31,10 +32,12 @@ public abstract class AbstractListenerHandler<T> extends AbstractHandler {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || !(o instanceof AbstractListenerHandler))
+		}
+		if (o == null || !(o instanceof AbstractListenerHandler)) {
 			return false;
+		}
 
 		AbstractListenerHandler that = (AbstractListenerHandler) o;
 

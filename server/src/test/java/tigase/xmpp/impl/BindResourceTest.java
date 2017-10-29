@@ -19,37 +19,30 @@
  */
 package tigase.xmpp.impl;
 
-import tigase.TestLogger;
-
-import tigase.server.Packet;
-
-import tigase.xmpp.jid.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
-
-import tigase.util.stringprep.TigaseStringprepException;
-import tigase.xml.Element;
-
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.TestLogger;
+import tigase.server.Packet;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.NoConnectionIdException;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.JID;
 
-import static org.junit.Assert.*;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
- *
  * @author Wojtek
  */
-public class BindResourceTest extends ProcessorTestCase {
+public class BindResourceTest
+		extends ProcessorTestCase {
 
 	private static final Logger log = TestLogger.getLogger(BindResourceTest.class);
 
@@ -75,96 +68,91 @@ public class BindResourceTest extends ProcessorTestCase {
 	public void testPreProcess() throws TigaseStringprepException, NotAuthorizedException, NoConnectionIdException {
 		JID senderJid = JID.jidInstance("sender@example.com/res-1");
 		JID recipientJid = JID.jidInstance("recipient@example.com/res-2");
-		XMPPResourceConnection senderSession = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
-																											senderJid);
+		XMPPResourceConnection senderSession = getSession(
+				JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), senderJid);
 
-		Element messageEl = new Element("message",
-				new String[] { "from" },
-				new String[] { senderJid.toString() });
+		Element messageEl = new Element("message", new String[]{"from"}, new String[]{senderJid.toString()});
 		Packet p = Packet.packetInstance(messageEl);
 		p.setPacketFrom(senderSession.getConnectionId());
 
-		Map<String,Object> settings = new HashMap<>();
+		Map<String, Object> settings = new HashMap<>();
 		Queue<Packet> results = new ArrayDeque<>();
 
 		// message / non-presence
-		log.log(Level.FINE, p.getElement() +"" );
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n" );
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
-		p.getElement().setAttribute( "from", senderJid.getBareJID().toString());
-		log.log(Level.FINE,  p.getElement() +"" );
+		p.getElement().setAttribute("from", senderJid.getBareJID().toString());
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n");
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().removeAttribute("from");
-		log.log(Level.FINE,  p.getElement()  +"");
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n"  );
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		// presence -- non-sub
-		log.log(Level.FINE,  "====="  );
+		log.log(Level.FINE, "=====");
 
-		Element presenceEl = new Element("presence",
-				new String[] { "from" },
-				new String[] { senderJid.toString() });
+		Element presenceEl = new Element("presence", new String[]{"from"}, new String[]{senderJid.toString()});
 		p = Packet.packetInstance(presenceEl);
 		p.setPacketFrom(senderSession.getConnectionId());
 
-		log.log(Level.FINE,  p.getElement() +"" );
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n" );
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
-		p.getElement().setAttribute( "from", senderJid.getBareJID().toString());
-		log.log(Level.FINE,  p.getElement() +"" );
+		p.getElement().setAttribute("from", senderJid.getBareJID().toString());
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n");
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().removeAttribute("from");
-		log.log(Level.FINE,  p.getElement()  +"");
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n"  );
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		// presence -- sub
-		log.log(Level.FINE,  "====="  );
+		log.log(Level.FINE, "=====");
 
-		p.getElement().setAttribute( "type", "subscribe");
-		p.getElement().setAttribute( "from", senderJid.toString());
+		p.getElement().setAttribute("type", "subscribe");
+		p.getElement().setAttribute("from", senderJid.toString());
 		p = Packet.packetInstance(p.getElement());
 		p.setPacketFrom(senderSession.getConnectionId());
 
-		log.log(Level.FINE,  p.getElement() +"" );
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
-		assertEquals(JID.jidInstance( senderJid.getBareJID()), p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n" );
+		assertEquals(JID.jidInstance(senderJid.getBareJID()), p.getStanzaFrom());
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
-		p.getElement().setAttribute( "from", senderJid.getBareJID().toString());
-		log.log(Level.FINE,  p.getElement() +"" );
+		p.getElement().setAttribute("from", senderJid.getBareJID().toString());
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
-		assertEquals(JID.jidInstance( senderJid.getBareJID()), p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n");
+		assertEquals(JID.jidInstance(senderJid.getBareJID()), p.getStanzaFrom());
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().removeAttribute("from");
-		log.log(Level.FINE,  p.getElement()  +"");
+		log.log(Level.FINE, p.getElement() + "");
 		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
-		assertEquals(JID.jidInstance( senderJid.getBareJID()), p.getStanzaFrom());
-		log.log(Level.FINE,  p.getStanzaFrom() +"\n"  );
-
+		assertEquals(JID.jidInstance(senderJid.getBareJID()), p.getStanzaFrom());
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 	}
 

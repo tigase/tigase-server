@@ -64,12 +64,17 @@ public class ReflectionHelperTest {
 
 	@Test
 	public void testClassMatchesClassWithParameters() {
-		assertTrue(ReflectionHelper.classMatchesClassWithParameters(ClConSQLRepository.class, ComponentRepository.class, new Type[] { ClusterRepoItem.class }));
-		assertFalse(ReflectionHelper.classMatchesClassWithParameters(ClConSQLRepository.class, ComponentRepository.class, new Type[] { VHostItem.class }));
-		assertTrue(ReflectionHelper.classMatchesClassWithParameters(ClConSQLRepository.class, ComponentRepository.class, new Type[] { RepositoryItem.class }));
+		assertTrue(ReflectionHelper.classMatchesClassWithParameters(ClConSQLRepository.class, ComponentRepository.class,
+																	new Type[]{ClusterRepoItem.class}));
+		assertFalse(
+				ReflectionHelper.classMatchesClassWithParameters(ClConSQLRepository.class, ComponentRepository.class,
+																 new Type[]{VHostItem.class}));
+		assertTrue(ReflectionHelper.classMatchesClassWithParameters(ClConSQLRepository.class, ComponentRepository.class,
+																	new Type[]{RepositoryItem.class}));
 	}
 
 	private class Test1 {
+
 		private ComponentRepository<ClusterRepoItem> repo1;
 		private ComponentRepository<VHostItem> repo2;
 	}

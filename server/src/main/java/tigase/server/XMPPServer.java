@@ -39,10 +39,11 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 //~--- classes ----------------------------------------------------------------
+
 /**
  * Describe class XMPPServer here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Nov 23 07:04:18 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -53,142 +54,30 @@ public final class XMPPServer {
 	@SuppressWarnings("PMD")
 	/** property allowing setting up configurator implementation of
 	 * {@link tigase.conf.ConfiguratorAbstract} used in Tigase.
-	 */
-	public static final String CONFIGURATOR_PROP_KEY = "tigase-configurator";
-
-	/** default configurator implementation of
-	 * {@link tigase.conf.ConfiguratorAbstract} used in Tigase, which is
-	 * tigase.conf.Configurator. */
-	private static final String DEF_CONFIGURATOR = "tigase.conf.Configurator";
-	
+	 */ public static final String CONFIGURATOR_PROP_KEY = "tigase-configurator";
 	/** Field description */
 	public static final String NAME = "Tigase";
-	private static String serverName = "message-router";
-
+	/**
+	 * default configurator implementation of {@link tigase.conf.ConfiguratorAbstract} used in Tigase, which is
+	 * tigase.conf.Configurator.
+	 */
+	private static final String DEF_CONFIGURATOR = "tigase.conf.Configurator";
 	private static Bootstrap bootstrap;
 	private static boolean inOSGi = false;
+	private static String serverName = "message-router";
 
 	//~--- constructors ---------------------------------------------------------
-	/**
-	 * Creates a new <code>XMPPServer</code> instance.
-	 */
-	private XMPPServer() {
-	}
-
-	//~--- get methods ----------------------------------------------------------
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
-	public static String getImplementationVersion() {
-		String version = ComponentInfo.getImplementationVersion( XMPPServer.class );
-		return ( version.isEmpty() ? "0.0.0-0" : version );
-	}
-
-	public static Version getVersion() {
-		return Version.of(getImplementationVersion());
-	}
-
-	//~--- methods --------------------------------------------------------------
-	/**
-	 * Returns help regarding command line parameters
-	 */
-	public static String help() {
-		return "\n" + "Parameters:\n"
-					 + " -h               this help message\n"
-					 + " -v               prints server version info\n"
-					 + " -n server-name    sets server name\n";
-	}
 
 	/**
-	 * Describe <code>main</code> method here.
+	 * Allows obtaining {@link tigase.conf.ConfiguratorAbstract} implementation used by Tigase to handle all
+	 * configuration of the server.
 	 *
-	 * @param args a <code>String[]</code> value
-	 */
-	@SuppressWarnings("PMD")
-	public static void main( final String[] args ) {
-
-		parseParams( args );
-
-		System.out.println( ( new ComponentInfo( XMLUtils.class ) ).toString() );
-		System.out.println( ( new ComponentInfo( ClassUtil.class ) ).toString() );
-		System.out.println( ( new ComponentInfo( XMPPServer.class ) ).toString() );
-		start( args );
-	}
-
-	public static void start( String[] args ) {
-		Thread.setDefaultUncaughtExceptionHandler( new ThreadExceptionHandler() );
-
-		if ( !isOSGi() ){
-			String initial_config
-						 = "tigase.level=ALL\n" + "tigase.xml.level=INFO\n"
-							 + "handlers=java.util.logging.ConsoleHandler\n"
-							 + "java.util.logging.ConsoleHandler.level=ALL\n"
-							 + "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n";
-
-			ConfiguratorAbstract.loadLogManagerConfig( initial_config );
-		}
-
-		try {
-			bootstrap = new Bootstrap();
-			bootstrap.init(args);
-			bootstrap.start();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
-			if (ServerBeanSelector.getConfigType(bootstrap.getKernel()) == ConfigTypeEnum.SetupMode) {
-				System.out.println("== " + sdf.format(new Date()) +
-										   " Please setup server at http://localhost:8080/\n");
-			} else {
-				System.out.println("== " + sdf.format(new Date()) +
-										   " Server finished starting up and (if there wasn't any error) is ready to use\n");
-			}
-		} catch ( ConfigReader.UnsupportedOperationException e ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"ERROR! Terminating the server process.",
-					e.getMessage() + " at line " + e.getLine() + " position " + e.getPosition(),
-					"Line: " + e.getLineContent(),
-					"Please fix the problem and start the server again."
-			});
-		} catch ( ConfigReader.ConfigException e ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"ERROR! Terminating the server process.",
-					"Issue with configuration file: " + e,
-					"Please fix the problem and start the server again."
-			});
-		} catch ( Exception e ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"ERROR! Terminating the server process.",
-					"Problem initializing the server: " + e,
-					"Please fix the problem and start the server again."
-			});
-		}
-	}
-
-	public static void setOSGi( boolean val ) {
-		inOSGi = val;
-	}
-
-	public static boolean isOSGi() {
-		return inOSGi;
-	}
-
-	public static void stop() {
-		( (AbstractMessageReceiver) bootstrap.getInstance(MessageRouterIfc.class) ).stop();
-	}
-
-	/**
-	 * Allows obtaining {@link tigase.conf.ConfiguratorAbstract} implementation
-	 * used by Tigase to handle all configuration of the server.
-	 *
-	 * @return implementation of {@link tigase.conf.ConfiguratorAbstract}
-	 *         interface.
+	 * @return implementation of {@link tigase.conf.ConfiguratorAbstract} interface.
 	 */
 //	@Deprecated
 //	public static ConfiguratorAbstract getConfigurator() {
 //		return config;
 //	}
-
 	public static <T> T getComponent(String name) {
 		try {
 			return bootstrap.getInstance(name);
@@ -198,6 +87,8 @@ public final class XMPPServer {
 			return null;
 		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	public static <T> T getComponent(Class<T> clazz) {
 		try {
@@ -218,30 +109,75 @@ public final class XMPPServer {
 				.map(bc -> (T) bootstrap.getInstance(bc.getBeanName()));
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
+	 */
+	public static String getImplementationVersion() {
+		String version = ComponentInfo.getImplementationVersion(XMPPServer.class);
+		return (version.isEmpty() ? "0.0.0-0" : version);
+	}
+
+	public static Version getVersion() {
+		return Version.of(getImplementationVersion());
+	}
+
+	/**
+	 * Returns help regarding command line parameters
+	 */
+	public static String help() {
+		return "\n" + "Parameters:\n" + " -h               this help message\n" +
+				" -v               prints server version info\n" + " -n server-name    sets server name\n";
+	}
+
+	public static boolean isOSGi() {
+		return inOSGi;
+	}
+
+	public static void setOSGi(boolean val) {
+		inOSGi = val;
+	}
+
+	/**
+	 * Describe <code>main</code> method here.
 	 *
+	 * @param args a <code>String[]</code> value
+	 */
+	@SuppressWarnings("PMD")
+	public static void main(final String[] args) {
+
+		parseParams(args);
+
+		System.out.println((new ComponentInfo(XMLUtils.class)).toString());
+		System.out.println((new ComponentInfo(ClassUtil.class)).toString());
+		System.out.println((new ComponentInfo(XMPPServer.class)).toString());
+		start(args);
+	}
+
+	/**
+	 * Method description
 	 *
 	 * @param args
 	 */
 	@SuppressWarnings("PMD")
-	public static void parseParams( final String[] args ) {
-		if ( ( args != null ) && ( args.length > 0 ) ){
-			for ( int i = 0 ; i < args.length ; i++ ) {
-				if ( args[i].equals( "-h" ) ){
-					System.out.print( help() );
-					System.exit( 0 );
+	public static void parseParams(final String[] args) {
+		if ((args != null) && (args.length > 0)) {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].equals("-h")) {
+					System.out.print(help());
+					System.exit(0);
 				}      // end of if (args[i].equals("-h"))
 
-				if ( args[i].equals( "-v" ) ){
-					System.out.print( version() );
-					System.exit( 0 );
+				if (args[i].equals("-v")) {
+					System.out.print(version());
+					System.exit(0);
 				}      // end of if (args[i].equals("-h"))
 
-				if ( args[i].equals( "-n" ) ){
-					if ( i + 1 == args.length ){
-						System.out.print( help() );
-						System.exit( 1 );
+				if (args[i].equals("-n")) {
+					if (i + 1 == args.length) {
+						System.out.print(help());
+						System.exit(1);
 					} // end of if (i+1 == args.length)
 					else {
 						serverName = args[++i];
@@ -252,19 +188,67 @@ public final class XMPPServer {
 		}
 	}
 
+	public static void start(String[] args) {
+		Thread.setDefaultUncaughtExceptionHandler(new ThreadExceptionHandler());
+
+		if (!isOSGi()) {
+			String initial_config =
+					"tigase.level=ALL\n" + "tigase.xml.level=INFO\n" + "handlers=java.util.logging.ConsoleHandler\n" +
+							"java.util.logging.ConsoleHandler.level=ALL\n" +
+							"java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n";
+
+			ConfiguratorAbstract.loadLogManagerConfig(initial_config);
+		}
+
+		try {
+			bootstrap = new Bootstrap();
+			bootstrap.init(args);
+			bootstrap.start();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
+			if (ServerBeanSelector.getConfigType(bootstrap.getKernel()) == ConfigTypeEnum.SetupMode) {
+				System.out.println("== " + sdf.format(new Date()) + " Please setup server at http://localhost:8080/\n");
+			} else {
+				System.out.println("== " + sdf.format(new Date()) +
+										   " Server finished starting up and (if there wasn't any error) is ready to use\n");
+			}
+		} catch (ConfigReader.UnsupportedOperationException e) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
+												 e.getMessage() + " at line " + e.getLine() + " position " +
+														 e.getPosition(), "Line: " + e.getLineContent(),
+												 "Please fix the problem and start the server again."});
+		} catch (ConfigReader.ConfigException e) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
+												 "Issue with configuration file: " + e,
+												 "Please fix the problem and start the server again."});
+		} catch (Exception e) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
+												 "Problem initializing the server: " + e,
+												 "Please fix the problem and start the server again."});
+		}
+	}
+
+	public static void stop() {
+		((AbstractMessageReceiver) bootstrap.getInstance(MessageRouterIfc.class)).stop();
+	}
+
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public static String version() {
-		return "\n" + "-- \n" + NAME + " XMPP Server, version: " + getImplementationVersion()
-					 + "\n" + "Author:  Artur Hefczyc <artur.hefczyc@tigase.org>\n" + "-- \n";
+		return "\n" + "-- \n" + NAME + " XMPP Server, version: " + getImplementationVersion() + "\n" +
+				"Author:  Artur Hefczyc <artur.hefczyc@tigase.org>\n" + "-- \n";
+	}
+
+	/**
+	 * Creates a new <code>XMPPServer</code> instance.
+	 */
+	private XMPPServer() {
 	}
 }    // XMPPServer
 
 //~ Formatted in Sun Code Convention on 2010.01.15 at 08:51:06 PST
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

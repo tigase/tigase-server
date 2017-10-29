@@ -1,4 +1,3 @@
-
 /*
  * S2SConnection.java
  *
@@ -24,13 +23,12 @@ package tigase.server.xmppserver;
 
 import tigase.server.Packet;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -40,16 +38,16 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class S2SConnection implements Comparable<S2SConnection> {
+public class S2SConnection
+		implements Comparable<S2SConnection> {
+
 	private static final Logger log = Logger.getLogger(S2SConnection.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
+	private OutgoingState conn_state = OutgoingState.NULL;
 	private S2SConnectionHandlerIfc<S2SIOService> handler = null;
 	private String ipAddress = null;
 	private S2SIOService service = null;
-	private OutgoingState conn_state = OutgoingState.NULL;
-
 	/**
 	 * Control packets for s2s connection establishing
 	 */
@@ -59,7 +57,6 @@ public class S2SConnection implements Comparable<S2SConnection> {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param handler
 	 * @param ip
@@ -73,7 +70,6 @@ public class S2SConnection implements Comparable<S2SConnection> {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param packet
 	 */
@@ -90,9 +86,6 @@ public class S2SConnection implements Comparable<S2SConnection> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getIPAddress() {
 		return ipAddress;
@@ -100,9 +93,6 @@ public class S2SConnection implements Comparable<S2SConnection> {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public S2SIOService getS2SIOService() {
 		return service;
@@ -111,53 +101,39 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	/**
 	 * Method description
 	 *
-	 *
-	 * 
+	 * @param serv
 	 */
-	public int getWaitingControlCount() {
-		return waitingControlPackets.size();
+	public void setS2SIOService(S2SIOService serv) {
+		this.service = serv;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
-	public boolean isConnected() {
-		return (service != null) && service.isConnected();
+	public int getWaitingControlCount() {
+		return waitingControlPackets.size();
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
 	 */
-	public void sendAllControlPackets() {
-		if (log.isLoggable(Level.FINEST)) {
-			for (Packet packet : waitingControlPackets) {
-				log.log(Level.FINEST, "Sending on connection: {0} control packet: {1}",
-						new Object[] { service,
-						packet });
-			}
-		}
-
-		handler.writePacketsToSocket(service, waitingControlPackets);
+	public boolean isConnected() {
+		return (service != null) && service.isConnected();
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 *
-	 * @throws IOException
 	 */
-	public boolean sendPacket(Packet packet) throws IOException {
-		return handler.writePacketToSocket(service, packet);
+	public void sendAllControlPackets() {
+		if (log.isLoggable(Level.FINEST)) {
+			for (Packet packet : waitingControlPackets) {
+				log.log(Level.FINEST, "Sending on connection: {0} control packet: {1}", new Object[]{service, packet});
+			}
+		}
+
+		handler.writePacketsToSocket(service, waitingControlPackets);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -165,11 +141,12 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	/**
 	 * Method description
 	 *
+	 * @param packet
 	 *
-	 * @param serv
+	 * @throws IOException
 	 */
-	public void setS2SIOService(S2SIOService serv) {
-		this.service = serv;
+	public boolean sendPacket(Packet packet) throws IOException {
+		return handler.writePacketToSocket(service, packet);
 	}
 
 	//~--- methods --------------------------------------------------------------

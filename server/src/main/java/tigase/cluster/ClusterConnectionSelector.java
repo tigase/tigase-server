@@ -32,30 +32,31 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Advanced implementation of ClusterConnectionSelectorIfc which separates packets
- * with priority CLUSTER or higher from other packets in cluster connections
- * by using separate connections for them
- * 
+ * Advanced implementation of ClusterConnectionSelectorIfc which separates packets with priority CLUSTER or higher from
+ * other packets in cluster connections by using separate connections for them
+ *
  * @author andrzej
  */
 @Bean(name = "clusterConnectionSelector", parent = ClusterConnectionManager.class, active = true)
-public class ClusterConnectionSelector implements ClusterConnectionSelectorIfc {
+public class ClusterConnectionSelector
+		implements ClusterConnectionSelectorIfc {
 
 	protected static final String CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-sys-connections-per-node";
 
 	@ConfigField(desc = "Number of cluster connetions per node", alias = "cluster-connections-per-node")
 	private int allConns = ClusterConnectionManager.CLUSTER_CONNECTIONS_PER_NODE_VAL;
-	@ConfigField(desc = "Number of system connections per node", alias = "cluster-sys-connections-per-node")
-	private int sysConns = 2;
 	@Inject(nullAllowed = true)
 	private ClusterConnectionHandler handler;
-	
+	@ConfigField(desc = "Number of system connections per node", alias = "cluster-sys-connections-per-node")
+	private int sysConns = 2;
+
 	@Override
 	public XMPPIOService<Object> selectConnection(Packet p, ClusterConnection conn) {
-		if (conn == null)
+		if (conn == null) {
 			return null;
-		
-		int code  = Math.abs(handler.hashCodeForPacket(p));
+		}
+
+		int code = Math.abs(handler.hashCodeForPacket(p));
 		List<XMPPIOService<Object>> conns = conn.getConnections();
 		if (conns.size() > 0) {
 			if (conns.size() > sysConns) {
@@ -68,21 +69,21 @@ public class ClusterConnectionSelector implements ClusterConnectionSelectorIfc {
 				return conns.get(code % conns.size());
 			}
 		}
-		return null;		
+		return null;
 	}
-	
+
 	@Override
 	public void setClusterConnectionHandler(ClusterConnectionHandler handler) {
 		this.handler = handler;
 	}
-	
+
 	@Override
-	public void setProperties(Map<String,Object> props) {
+	public void setProperties(Map<String, Object> props) {
 		if (props.containsKey(CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY)) {
 			sysConns = (Integer) props.get(CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY);
 		}
 		if (props.containsKey(ClusterConnectionManager.CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY)) {
 			allConns = (Integer) props.get(ClusterConnectionManager.CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		}
-	}	
+	}
 }

@@ -29,25 +29,25 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.SessionBind;
 
 /**
- *
  * @author andrzej
  */
 public class AnnotatedXMPPProcessorTest {
-	
+
 	@Test
 	public void test1() {
 		TestAnnotatedXMPPProcessor test1 = new TestAnnotatedXMPPProcessor();
 		for (String[] path : test1.supElementNamePaths()) {
-			Assert.assertArrayEquals("Wrong element paths", new String[] { "iq", "query" }, path);
+			Assert.assertArrayEquals("Wrong element paths", new String[]{"iq", "query"}, path);
 		}
-		Assert.assertArrayEquals("Wrong xmlnss", new String[] { "tigase:test1", "tigase:test2" }, test1.supNamespaces());
-		
-		Assert.assertArrayEquals("Wrong disco features", new Element[] { 
-			new Element("feature", new String[] { "var" }, new String[] { "tigase:test1" }), 
-			new Element("feature", new String[] { "var" }, new String[] { "tigase:test2" }) }, test1.supDiscoFeatures(null));
-		Assert.assertArrayEquals("Wrong stream features", new Element[] {
-			new Element("bind", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-bind" })
-		}, test1.supStreamFeatures(null));
+		Assert.assertArrayEquals("Wrong xmlnss", new String[]{"tigase:test1", "tigase:test2"}, test1.supNamespaces());
+
+		Assert.assertArrayEquals("Wrong disco features", new Element[]{
+										 new Element("feature", new String[]{"var"}, new String[]{"tigase:test1"}),
+										 new Element("feature", new String[]{"var"}, new String[]{"tigase:test2"})},
+								 test1.supDiscoFeatures(null));
+		Assert.assertArrayEquals("Wrong stream features", new Element[]{
+										 new Element("bind", new String[]{"xmlns"}, new String[]{"urn:ietf:params:xml:ns:xmpp-bind"})},
+								 test1.supStreamFeatures(null));
 		Assert.assertTrue("Stanza type not set as 'get'", test1.supTypes().contains(StanzaType.get));
 	}
 
@@ -56,8 +56,8 @@ public class AnnotatedXMPPProcessorTest {
 		TestAnnotatedXMPPProcessor2 test2 = new TestAnnotatedXMPPProcessor2();
 		Assert.assertNull("Wrong element paths, should not be inherited", test2.supElementNamePaths());
 
-		Assert.assertNull("Wrong xmlnss",test2.supNamespaces());
-		
+		Assert.assertNull("Wrong xmlnss", test2.supNamespaces());
+
 		Assert.assertNull("Wrong disco features", test2.supDiscoFeatures(null));
 		Assert.assertNull("Wrong stream features", test2.supStreamFeatures(null));
 	}
@@ -67,13 +67,14 @@ public class AnnotatedXMPPProcessorTest {
 		SessionBind sessionBind = new SessionBind();
 		Assert.assertEquals("Wrong processor id", "urn:ietf:params:xml:ns:xmpp-session", sessionBind.id());
 		for (String[] path : sessionBind.supElementNamePaths()) {
-			Assert.assertArrayEquals("Wrong element paths", new String[] { "iq", "session" }, path);
+			Assert.assertArrayEquals("Wrong element paths", new String[]{"iq", "session"}, path);
 		}
-		Assert.assertArrayEquals("Wrong xmlnss", new String[] { "urn:ietf:params:xml:ns:xmpp-session" }, sessionBind.supNamespaces());
-		
-		Assert.assertArrayEquals("Wrong disco features", new Element[] { 
-			new Element("feature", new String[] { "var" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
-		}, sessionBind.supDiscoFeatures(null));
+		Assert.assertArrayEquals("Wrong xmlnss", new String[]{"urn:ietf:params:xml:ns:xmpp-session"},
+								 sessionBind.supNamespaces());
+
+		Assert.assertArrayEquals("Wrong disco features", new Element[]{
+										 new Element("feature", new String[]{"var"}, new String[]{"urn:ietf:params:xml:ns:xmpp-session"})},
+								 sessionBind.supDiscoFeatures(null));
 
 		final XMPPResourceConnection session = getSession();
 
@@ -82,7 +83,7 @@ public class AnnotatedXMPPProcessorTest {
 		xmppSession.addChild(new Element("optional"));
 
 		Assert.assertArrayEquals("Lack optional child", new Element[]{xmppSession},
-		                         sessionBind.supStreamFeatures(session));
+								 sessionBind.supStreamFeatures(session));
 		session.putSessionData("Session-Set", "true");
 		Assert.assertArrayEquals("Lack optional child", null, sessionBind.supStreamFeatures(session));
 	}

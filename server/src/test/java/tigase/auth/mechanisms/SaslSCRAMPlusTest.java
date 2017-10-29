@@ -34,15 +34,6 @@ public class SaslSCRAMPlusTest
 		extends TestCase {
 
 	private static final Logger log = TestLogger.getLogger(SaslSCRAMPlusTest.class);
-	
-	private SaslSCRAMPlus create(String salt, String snonce, String password, byte[] bindingData) {
-		SaslSCRAMTest.TestCallbackHandler h = new SaslSCRAMTest.TestCallbackHandler();
-		h.setBindingData(bindingData);
-		h.setPassword(password);
-		h.setSalt(salt);
-		return new SaslSCRAMPlus(null, h, snonce) {
-		};
-	}
 
 	@Test
 	public void testChannelBindingEncodingEncoding() throws SaslException {
@@ -147,6 +138,15 @@ public class SaslSCRAMPlusTest
 
 		assertTrue(m.isComplete());
 		assertEquals("user@domain.com", m.getAuthorizationID());
+	}
+
+	private SaslSCRAMPlus create(String salt, String snonce, String password, byte[] bindingData) {
+		SaslSCRAMTest.TestCallbackHandler h = new SaslSCRAMTest.TestCallbackHandler();
+		h.setBindingData(bindingData);
+		h.setPassword(password);
+		h.setSalt(salt);
+		return new SaslSCRAMPlus(null, h, snonce) {
+		};
 	}
 
 }

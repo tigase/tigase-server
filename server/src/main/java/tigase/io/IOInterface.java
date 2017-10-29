@@ -22,27 +22,26 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.IOListener;
 import tigase.stats.StatisticsList;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface IOInterface here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat May 14 08:07:38 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public interface IOInterface {
+
 	int bytesRead();
 
 	boolean checkCapabilities(String caps);
@@ -66,7 +65,7 @@ public interface IOInterface {
 	long getBuffOverflow(boolean reset);
 
 	long getTotalBuffOverflow();
-	
+
 	boolean isConnected();
 
 	boolean isRemoteAddress(String addr);
@@ -82,13 +81,11 @@ public interface IOInterface {
 	int waitingToSendSize();
 
 	int write(final ByteBuffer buff) throws IOException;
-	
+
 	void setLogId(String logId);
-	
+
 }    // IOInterface
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

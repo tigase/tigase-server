@@ -37,56 +37,34 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
- *
  * @author andrzej
  */
 public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
-	
+
 	public static enum Result {
 		ok,
 		error,
 		warning,
 		skipped
 	}
+	private String type;
 
-	public interface Parameters {
-		
-		void parseUri(String uri);
-		
-		void setProperties(Properties props);
-
-		List<BareJID> getAdmins();
-
-		String getAdminPassword();
-
-		void setAdmins(List<BareJID> admins, String password);
-
-		void setDbRootCredentials(String username, String password);
-
-		Level getLogLevel();
-
-		void setLogLevel(Level level);
+	private static List<CommandlineParameter> getDbTypeDependentParameters(String type) {
+		SchemaLoader loader = newInstance(type);
+		return loader.getCommandlineParameters();
 	}
 
-	public static SchemaLoader newInstance(String type) {
-		if (type == null) {
-			throw new RuntimeException("Missing dbType property");
-		}
-		SchemaLoader schemaLoader = getSchemaLoaderInstances()
-				.filter(instance -> instance.isSupported(type))
-				.findAny()
-				.get();
-		schemaLoader.setType(type);
-		return schemaLoader;
-	}
-
-	public static SchemaLoader newInstanceForURI(String uri) {
-		int idx = uri.indexOf(":");
-		if (idx < 0) {
-			throw new RuntimeException("Unsupported URI");
-		}
-		String type = uri.substring(0, idx);
-		return newInstance(type);
+	public static List<CommandlineParameter> getMainCommandlineParameters(boolean forceNotRequired) {
+		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(
+				loader -> loader.getSupportedTypes().stream()).map(x -> (String) x).sorted().toArray(String[]::new);
+		return Arrays.asList(new CommandlineParameter.Builder("T",
+															  DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
+				"Database server type")
+									 .options(supportedTypes)
+									 //.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
+									 .valueDependentParametersProvider(SchemaLoader::getDbTypeDependentParameters)
+									 .required(!forceNotRequired)
+									 .build());
 	}
 
 	private static Stream<Class<?>> getSchemaLoaderClasses() {
@@ -109,36 +87,12 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		}).filter(Objects::nonNull);
 	}
 
-	public static List<CommandlineParameter> getMainCommandlineParameters(boolean forceNotRequired) {
-		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(
-				loader -> loader.getSupportedTypes().stream())
-				.map(x -> (String) x)
-				.sorted()
-				.toArray(String[]::new);
-		return Arrays.asList(
-				new CommandlineParameter.Builder("T", DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
-						"Database server type")
-						.options(supportedTypes)
-						//.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
-						.valueDependentParametersProvider(SchemaLoader::getDbTypeDependentParameters)
-						.required(!forceNotRequired)
-						.build()
-		);
-	}
-
-	private static List<CommandlineParameter> getDbTypeDependentParameters(String type) {
-		SchemaLoader loader = newInstance(type);
-		return loader.getCommandlineParameters();
-	}
-
 	/**
-	 * Main method allowing pass arguments to the class and setting all logging to
-	 * be printed to console.
+	 * Main method allowing pass arguments to the class and setting all logging to be printed to console.
 	 *
-	 * @param args key-value (in the form of {@code "-<variable> value"})
-	 *             parameters.
+	 * @param args key-value (in the form of {@code "-<variable> value"}) parameters.
 	 */
-	public static void main( String[] args ) {
+	public static void main(String[] args) {
 		ParameterParser parser = new ParameterParser(true);
 
 		parser.addOptions(getMainCommandlineParameters(false));
@@ -162,14 +116,24 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		dbHelper.execute(params);
 	}
 
-	private String type;
-
-	protected String getType() {
-		return type;
+	public static SchemaLoader newInstance(String type) {
+		if (type == null) {
+			throw new RuntimeException("Missing dbType property");
+		}
+		SchemaLoader schemaLoader = getSchemaLoaderInstances().filter(instance -> instance.isSupported(type))
+				.findAny()
+				.get();
+		schemaLoader.setType(type);
+		return schemaLoader;
 	}
 
-	private void setType(String type) {
-		this.type = type;
+	public static SchemaLoader newInstanceForURI(String uri) {
+		int idx = uri.indexOf(":");
+		if (idx < 0) {
+			throw new RuntimeException("Unsupported URI");
+		}
+		String type = uri.substring(0, idx);
+		return newInstance(type);
 	}
 
 	public abstract P createParameters();
@@ -195,19 +159,19 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public abstract List<CommandlineParameter> getCommandlineParameters();
 
 	/**
-	 * Method validates whether the connection can at least be eI stablished. If yes
-	 * then appropriate flag is set.
+	 * Method validates whether the connection can at least be eI stablished. If yes then appropriate flag is set.
 	 */
 	public abstract Result validateDBConnection();
 
 	/**
-	 * Method, if the connection is validated by {@code validateDBConnection},
-	 * checks whether desired database exists. If not it creates such database
-	 * using {@code *-installer-create-db.sql} schema file substituting it's
-	 * variables with ones provided.
+	 * Method, if the connection is validated by {@code validateDBConnection}, checks whether desired database exists.
+	 * If not it creates such database using {@code *-installer-create-db.sql} schema file substituting it's variables
+	 * with ones provided.
 	 */
 	public abstract Result validateDBExists();
+
 	public abstract Result postInstallation();
+
 	public Result printInfo() {
 		String dataSourceUri = getDBUri();
 
@@ -223,13 +187,13 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 			configStr = "Failure: " + ex.getMessage();
 		}
 		Logger.getLogger(this.getClass().getCanonicalName())
-				.log(Level.INFO, "\n\nDatabase " + ConfigHolder.TDSL_CONFIG_FILE_DEF + " configuration:\n{0}\n", new Object[]{configStr});
+				.log(Level.INFO, "\n\nDatabase " + ConfigHolder.TDSL_CONFIG_FILE_DEF + " configuration:\n{0}\n",
+					 new Object[]{configStr});
 		return Result.ok;
 	}
 
 	/**
-	 * Method attempts to add XMPP admin user account to the database using
-	 * {@code AuthRepository}.
+	 * Method attempts to add XMPP admin user account to the database using {@code AuthRepository}.
 	 */
 	public abstract Result addXmppAdminAccount();
 
@@ -242,18 +206,47 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	 * @return a {@link Result} object indicating whether the call was successful
 	 */
 	public abstract Result setComponentVersion(String component, String version);
+
 	public abstract Version getComponentVersionFromDb(String component);
 
 	/**
-	 * Method checks whether the connection to the database is possible and that
-	 * database of specified name exists. If yes then a schema file from
-	 * properties is loaded.
+	 * Method checks whether the connection to the database is possible and that database of specified name exists. If
+	 * yes then a schema file from properties is loaded.
 	 *
 	 * @param fileName set of {@code String} with path to file
 	 */
-	public abstract Result loadSchemaFile( String fileName );
+	public abstract Result loadSchemaFile(String fileName);
+
 	public abstract Result shutdown();
 
 	public abstract Result loadSchema(String schemaId, String version);
+
 	public abstract Result destroyDataSource();
+
+	protected String getType() {
+		return type;
+	}
+
+	private void setType(String type) {
+		this.type = type;
+	}
+
+	public interface Parameters {
+
+		void parseUri(String uri);
+
+		void setProperties(Properties props);
+
+		List<BareJID> getAdmins();
+
+		String getAdminPassword();
+
+		void setAdmins(List<BareJID> admins, String password);
+
+		void setDbRootCredentials(String username, String password);
+
+		Level getLogLevel();
+
+		void setLogLevel(Level level);
+	}
 }

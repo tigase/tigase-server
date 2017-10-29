@@ -27,7 +27,8 @@ import tigase.kernel.beans.Bean;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-public class ScramSha256CredentialsEntry extends ScramCredentialsEntry {
+public class ScramSha256CredentialsEntry
+		extends ScramCredentialsEntry {
 
 	private static final String ALGORITHM = "SHA-256";
 
@@ -40,17 +41,9 @@ public class ScramSha256CredentialsEntry extends ScramCredentialsEntry {
 		super(ALGORITHM, salt, iterations, saltedPassword);
 	}
 
-	@Bean(name = "SCRAM-SHA-256", parent = CredentialsEncoderBean.class, active = true)
-	public static class Encoder extends ScramCredentialsEntry.Encoder {
-
-		public Encoder() {
-			super(ALGORITHM);
-		}
-
-	}
-
 	@Bean(name = "SCRAM-SHA-256", parent = CredentialsDecoderBean.class, active = true)
-	public static class Decoder extends ScramCredentialsEntry.Decoder {
+	public static class Decoder
+			extends ScramCredentialsEntry.Decoder {
 
 		public Decoder() {
 			super(ALGORITHM);
@@ -60,5 +53,15 @@ public class ScramSha256CredentialsEntry extends ScramCredentialsEntry {
 		protected Credentials.Entry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
 			return new ScramSha256CredentialsEntry(salt, iterations, saltedPassword);
 		}
+	}
+
+	@Bean(name = "SCRAM-SHA-256", parent = CredentialsEncoderBean.class, active = true)
+	public static class Encoder
+			extends ScramCredentialsEntry.Encoder {
+
+		public Encoder() {
+			super(ALGORITHM);
+		}
+
 	}
 }

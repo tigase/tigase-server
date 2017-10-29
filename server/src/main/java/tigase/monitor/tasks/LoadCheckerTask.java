@@ -86,6 +86,16 @@ public class LoadCheckerTask
 	}
 
 	@Override
+	public void setNewConfiguration(Form form) {
+		Field tmp = form.get("averageLoadThreshold");
+		if (tmp != null) {
+			this.averageLoadThreshold = Long.parseLong(tmp.getValue());
+		}
+
+		super.setNewConfiguration(form);
+	}
+
+	@Override
 	protected void run() {
 		double curAverageLoad = runtime.getLoadAverage();
 		if (curAverageLoad >= averageLoadThreshold) {
@@ -104,16 +114,6 @@ public class LoadCheckerTask
 		} else {
 			triggeredEvents.remove(MONITOR_EVENT_NAME);
 		}
-	}
-
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field tmp = form.get("averageLoadThreshold");
-		if (tmp != null) {
-			this.averageLoadThreshold = Long.parseLong(tmp.getValue());
-		}
-
-		super.setNewConfiguration(form);
 	}
 
 }

@@ -30,12 +30,17 @@ import java.util.Date;
 /**
  * Created by andrzej on 15.03.2016.
  */
-public interface MsgBroadcastRepositoryIfc<T extends DataSource> extends DataSourceAware<T> {
+public interface MsgBroadcastRepositoryIfc<T extends DataSource>
+		extends DataSourceAware<T> {
 
 	void loadMessagesToBroadcast();
+
 	MsgBroadcastRepository.BroadcastMsg getBroadcastMsg(String id);
+
 	String dumpBroadcastMessageKeys();
+
 	Collection<MsgBroadcastRepository.BroadcastMsg> getBroadcastMessages();
+
 	boolean updateBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
 
 }

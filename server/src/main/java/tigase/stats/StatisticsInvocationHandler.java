@@ -28,16 +28,15 @@ import java.util.logging.Level;
 
 /**
  * Generic class used by MD connection pools and repositories to wrap and measure method execution times.
- *
+ * <p>
  * Created by andrzej on 15.12.2016.
  */
 public class StatisticsInvocationHandler<S>
 		implements InvocationHandler {
 
-	private final String name;
 	private final S instance;
 	private final Class[] monitoredIfcs;
-
+	private final String name;
 	private final ConcurrentHashMap<Method, MethodStatistics> statistics = new ConcurrentHashMap<>();
 
 	public StatisticsInvocationHandler(String name, S instance, Class... monitoredIfcs) {
@@ -108,19 +107,15 @@ public class StatisticsInvocationHandler<S>
 	public static class MethodStatistics {
 
 		private final Method method;
-
-		private long executions_counter = 0;
+		private long avgProcessingTime = 0;
 		private long exceptions_counter = 0;
-
+		private long executions_counter = 0;
 		private long last_hour_counter = 0;
 		private long last_minute_counter = 0;
 		private long last_second_counter = 0;
-
 		private long per_hour = 0;
 		private long per_minute = 0;
 		private long per_second = 0;
-
-		private long avgProcessingTime = 0;
 
 		public MethodStatistics(Method method) {
 			this.method = method;

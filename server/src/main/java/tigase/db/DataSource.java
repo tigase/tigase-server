@@ -25,32 +25,34 @@ import java.time.Duration;
 
 /**
  * Interface implemented by every class providing access to data storage, ie. databases, files, key-value stores.
- * 
+ * <p>
  * Created by andrzej on 09.03.2016.
  */
-public interface DataSource extends Repository {
+public interface DataSource
+		extends Repository {
 
 	/**
 	 * Returns a DB connection string or DB connection URI.
 	 *
-	 * @return a <code>String</code> value representing database connection
-	 *         string.
+	 * @return a <code>String</code> value representing database connection string.
 	 */
 	String getResourceUri();
 
 	/**
 	 * The method is called to initialize the data repository.
+	 *
 	 * @param resource_uri value in most cases representing the database connection string.
-	 * @throws RepositoryException if there was an error during initialization of data source.
-	 * Some implementations, though, perform so called lazy initialization so even though there
-	 * is a problem with the underlying data source it may not be signaled through this method
-	 * call.
+	 *
+	 * @throws RepositoryException if there was an error during initialization of data source. Some implementations,
+	 * though, perform so called lazy initialization so even though there is a problem with the underlying data source
+	 * it may not be signaled through this method call.
 	 */
 	void initialize(String resource_uri) throws RepositoryException;
 
 	/**
-	 * This method is called by data source bean watchdog mechanism to ensure that there is proper
-	 * connectivity to underlying data storage.
+	 * This method is called by data source bean watchdog mechanism to ensure that there is proper connectivity to
+	 * underlying data storage.
+	 *
 	 * @param watchdogTime time which should pass between checks
 	 */
 	default void checkConnectivity(Duration watchdogTime) {

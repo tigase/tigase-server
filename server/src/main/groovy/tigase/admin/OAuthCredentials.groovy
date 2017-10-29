@@ -29,11 +29,12 @@ AS:Component: sess-man
 package tigase.admin
 
 import tigase.kernel.KernelException
-import tigase.server.*
+import tigase.server.Command
+import tigase.server.Packet
 import tigase.xmpp.Authorization
 import tigase.xmpp.impl.JabberIqRegister
 
-def p = (Packet)packet
+def p = (Packet) packet
 
 def oauthTokenKey = Command.getFieldValue(packet, "oauthTokenKey")
 def oauthTokenSecret = Command.getFieldValue(packet, "oauthTokenSecret")
@@ -42,10 +43,12 @@ def signedFormRequired = Command.getFieldValue(packet, "signedFormRequired")
 if (signedFormRequired == null) {
 	def res = p.commandResult(Command.DataType.form)
 	Command.addTitle(res, "OAuth Credentials")
-	Command.addInstructions(res, "It allows to set new OAuth credentials and enable or disable requirement of registration with Signed Form.")
+	Command.addInstructions(res,
+							"It allows to set new OAuth credentials and enable or disable requirement of registration with Signed Form.")
 	Command.addFieldValue(res, "oauthTokenKey", "", "text-single", "OAuth Token Key")
 	Command.addFieldValue(res, "oauthTokenSecret", "", "text-single", "OAuth Token Secret")
-	Command.addFieldValue(res, "signedFormRequired", Boolean.toString(JabberIqRegister.isSignedFormRequired()), "boolean", "Signed Form required to registration") 
+	Command.addFieldValue(res, "signedFormRequired", Boolean.toString(JabberIqRegister.isSignedFormRequired()),
+						  "boolean", "Signed Form required to registration")
 	return res
 } else {
 	try {
@@ -58,7 +61,8 @@ if (signedFormRequired == null) {
 		Command.addInstructions(res, "Credentials set.")
 		return res
 	} catch (KernelException ex) {
-		return Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(p, "JabberIqRegister processor is not loaded", false);
+		return Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(p, "JabberIqRegister processor is not loaded",
+																	  false);
 	}
 }
 

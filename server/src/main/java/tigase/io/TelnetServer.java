@@ -44,25 +44,26 @@ import static tigase.io.SSLContextContainerIfc.*;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * This is sample class demonstrating how to use <code>tigase.io</code> library
- * for TLS/SSL server connection. This is simple telnet server class which can
- * be run to receive plain connections or SSL connections.
- *
- *
+ * This is sample class demonstrating how to use <code>tigase.io</code> library for TLS/SSL server connection. This is
+ * simple telnet server class which can be run to receive plain connections or SSL connections.
+ * <p>
+ * <p>
  * Created: Sun Aug  6 22:27:13 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TelnetServer implements SampleSocketThread.SocketHandler {
+public class TelnetServer
+		implements SampleSocketThread.SocketHandler {
+
 	private static final Logger log = Logger.getLogger("tigase.io.TelnetServer");
 	private static final Charset coder = Charset.forName("UTF-8");
-	private static int port = 7777;
-	private static String hostname = "localhost";
-	private static boolean debug = false;
-	private static String file = null;
 	private static boolean continuous = false;
+	private static boolean debug = false;
 	private static long delay = 100;
+	private static String file = null;
+	private static String hostname = "localhost";
+	private static int port = 7777;
 	private static boolean ssl = false;
 
 	//~--- fields ---------------------------------------------------------------
@@ -73,43 +74,24 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Creates a new <code>TelnetServer</code> instance.
-	 *
-	 *
-	 * @param port
-	 *
-	 * @throws IOException
+	 * Method description
 	 */
-	public TelnetServer(int port) throws IOException {
-		reader = new SampleSocketThread(this);
-		reader.start();
-		reader.addForAccept(new InetSocketAddress(port));
+	public static String help() {
+		return "\n" + "Parameters:\n" + " -?                this help message\n" + " -h hostname       host name\n" +
+				" -p port           port number\n" + " -ssl              turn SSL on for all connections\n" +
+				" -f file           file with content to send to remote host\n" +
+				" -c                continuous sending file content\n" +
+				" -t millis         delay between sending file content\n" +
+				" -v                prints server version info\n" + " -d [true|false]   turn on|off debug mode\n";
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	public static String help() {
-		return "\n" + "Parameters:\n" + " -?                this help message\n"
-				+ " -h hostname       host name\n" + " -p port           port number\n"
-					+ " -ssl              turn SSL on for all connections\n"
-						+ " -f file           file with content to send to remote host\n"
-							+ " -c                continuous sending file content\n"
-								+ " -t millis         delay between sending file content\n"
-									+ " -v                prints server version info\n"
-										+ " -d [true|false]   turn on|off debug mode\n"
-		;
-	}
-
-	/**
 	 * Describe <code>main</code> method here.
 	 *
 	 * @param args a <code>String[]</code> value
+	 *
 	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {
@@ -137,7 +119,6 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param args
 	 *
 	 * @throws Exception
@@ -160,7 +141,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 						System.out.print(help());
 						System.exit(1);
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						file = args[++i];
 					}    // end of else
 				}      // end of if (args[i].equals("-h"))
@@ -170,7 +151,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 						System.out.print(help());
 						System.exit(1);
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						hostname = args[++i];
 					}    // end of else
 				}      // end of if (args[i].equals("-h"))
@@ -180,7 +161,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 						System.out.print(help());
 						System.exit(1);
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						port = Integer.decode(args[++i]);
 					}    // end of else
 				}      // end of if (args[i].equals("-h"))
@@ -189,7 +170,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 					if ((i + 1 == args.length) || args[i + 1].startsWith("-")) {
 						debug = true;
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						++i;
 						debug = (args[i].charAt(0) != '-') && (args[i].equals("true") || args[i].equals("yes"));
 					}    // end of else
@@ -199,10 +180,9 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 					if ((i + 1 == args.length) || args[i + 1].startsWith("-")) {
 						continuous = true;
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						++i;
-						continuous = (args[i].charAt(0) != '-')
-								&& (args[i].equals("true") || args[i].equals("yes"));
+						continuous = (args[i].charAt(0) != '-') && (args[i].equals("true") || args[i].equals("yes"));
 					}    // end of else
 				}      // end of if (args[i].equals("-c"))
 
@@ -210,7 +190,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 					if ((i + 1 == args.length) || args[i + 1].startsWith("-")) {
 						ssl = true;
 					}    // end of if (i+1 == args.length)
-							else {
+					else {
 						++i;
 						ssl = (args[i].charAt(0) != '-') && (args[i].equals("true") || args[i].equals("yes"));
 					}    // end of else
@@ -221,7 +201,6 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 
 	/**
 	 * Method description
-	 *
 	 */
 	public static void turnDebugOn() {
 		Map<String, String> properties = new HashMap<String, String>();
@@ -250,21 +229,29 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public static String version() {
-		return "\n" + "-- \n" + "Tigase XMPP Telnet, version: "
-				+ TelnetServer.class.getPackage().getImplementationVersion() + "\n"
-					+ "Author:  Artur Hefczyc <artur.hefczyc@tigase.org>\n" + "-- \n"
-		;
+		return "\n" + "-- \n" + "Tigase XMPP Telnet, version: " +
+				TelnetServer.class.getPackage().getImplementationVersion() + "\n" +
+				"Author:  Artur Hefczyc <artur.hefczyc@tigase.org>\n" + "-- \n";
+	}
+
+	/**
+	 * Creates a new <code>TelnetServer</code> instance.
+	 *
+	 * @param port
+	 *
+	 * @throws IOException
+	 */
+	public TelnetServer(int port) throws IOException {
+		reader = new SampleSocketThread(this);
+		reader.start();
+		reader.addForAccept(new InetSocketAddress(port));
 	}
 
 	@Override
 	public void handleIOInterface(IOInterface ioifc) throws IOException {
-		ByteBuffer socketInput =
-			ByteBuffer.allocate(ioifc.getSocketChannel().socket().getReceiveBufferSize());
+		ByteBuffer socketInput = ByteBuffer.allocate(ioifc.getSocketChannel().socket().getReceiveBufferSize());
 		ByteBuffer tmpBuffer = ioifc.read(socketInput);
 
 		if (ioifc.bytesRead() > 0) {
@@ -279,9 +266,10 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 			}    // end of if (cb != null)
 		}      // end of if (socketIO.bytesRead() > 0)
 
-		if (!ioifc.isConnected())
+		if (!ioifc.isConnected()) {
 			throw new EOFException("Channel has been closed.");
-		
+		}
+
 		reader.addIOInterface(ioifc);
 	}
 
@@ -291,7 +279,9 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 
 		if (ssl) {
 			SSLContextContainerIfc sslContextContainer = TLSUtil.getRootSslContextContainer();
-			iosock = new TLSIO(iosock, new JcaTLSWrapper(sslContextContainer.getSSLContext("SSL", null, false), null, null, 0, false, false), ByteOrder.BIG_ENDIAN);
+			iosock = new TLSIO(iosock,
+							   new JcaTLSWrapper(sslContextContainer.getSSLContext("SSL", null, false), null, null, 0,
+												 false, false), ByteOrder.BIG_ENDIAN);
 		}    // end of if (ssl)
 
 		reader.addIOInterface(iosock);
@@ -314,14 +304,13 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws IOException
 	 */
 	public void run() throws IOException {
 		InputStreamReader isr = new InputStreamReader(System.in);
 		char[] buff = new char[1024];
 
-		for (;;) {
+		for (; ; ) {
 			int res = isr.read(buff);
 
 			if (iosock != null) {
@@ -329,15 +318,13 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 
 				iosock.write(dataBuffer);
 			}    // end of if (ioscok != null)
-					else {
+			else {
 				System.err.println("Can't write to socket, no open socket.");
 			}    // end of if (ioscok != null) else
 		}      // end of for (;;)
 	}
 }    // Telnetserver
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

@@ -28,8 +28,8 @@ import tigase.xmpp.jid.BareJID;
 
 /**
  * Describe interface WriteOnlyUserRepository here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sat Oct 14 20:42:30 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -46,123 +46,113 @@ public interface NonAuthUserRepository {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * <code>addDataList</code> method adds mode entries to existing data list
-	 * associated with given key in repository under given node path.
-	 * This method is very similar to <code>setDataList(...)</code> except it
-	 * doesn't remove existing data.
+	 * <code>addDataList</code> method adds mode entries to existing data list associated with given key in repository
+	 * under given node path. This method is very similar to <code>setDataList(...)</code> except it doesn't remove
+	 * existing data.
 	 *
-	 * @param user a <code>String</code> value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param subnode a <code>String</code> value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param user a <code>String</code> value of user ID for which data must be stored. User ID consists of user name
+	 * and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a <code>String</code> with which the specified values list is to
-	 * be associated.
-	 * @param value a <code>String</code> is an array of values to be assosiated
-	 * with the specified key.
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @param key a <code>String</code> with which the specified values list is to be associated.
+	 * @param value a <code>String</code> is an array of values to be assosiated with the specified key.
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in reository.
 	 * @throws DataOverwriteException
 	 */
 	void addOfflineData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, DataOverwriteException;
 
 	/**
-	 * <code>addDataList</code> method adds mode entries to existing data list
-	 * associated with given key in repository under given node path.
-	 * This method is very similar to <code>setDataList(...)</code> except it
-	 * doesn't remove existing data.
+	 * <code>addDataList</code> method adds mode entries to existing data list associated with given key in repository
+	 * under given node path. This method is very similar to <code>setDataList(...)</code> except it doesn't remove
+	 * existing data.
 	 *
-	 * @param user a <code>String</code> value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param subnode a <code>String</code> value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param user a <code>String</code> value of user ID for which data must be stored. User ID consists of user name
+	 * and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a <code>String</code> with which the specified values list is to
-	 * be associated.
-	 * @param list a <code>String[]</code> is an array of values to be assosiated
-	 * with the specified key.
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @param key a <code>String</code> with which the specified values list is to be associated.
+	 * @param list a <code>String[]</code> is an array of values to be assosiated with the specified key.
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in reository.
 	 */
-	void addOfflineDataList(BareJID user, String subnode, String key, String[] list)
-			throws UserNotFoundException;
+	void addOfflineDataList(BareJID user, String subnode, String key, String[] list) throws UserNotFoundException;
 
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Retrieves and returns a value associated with given subnode and key from a publicly
-	 * available space. The space is specific to given virtual domain and is shared among all
-	 * running cluster nodes. The data are stored in some temporary space outside of the
-	 * registered user data so no information for registered users can be retrieved.<br>
+	 * Retrieves and returns a value associated with given subnode and key from a publicly available space. The space is
+	 * specific to given virtual domain and is shared among all running cluster nodes. The data are stored in some
+	 * temporary space outside of the registered user data so no information for registered users can be retrieved.<br>
 	 *
 	 * @param domain is a DNS domain name with which the data is associated.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the needed value is
-	 * associated.
-	 * @param def a {@link String} value which is returned in case if data
-	 * for specified key does not exixist in repository.
-	 * @return a {@link String} value for a given subnode and key or {@code def]}
-	 * if no entry has been found.
+	 * @param key a {@link String} with which the needed value is associated.
+	 * @param def a {@link String} value which is returned in case if data for specified key does not exixist in
+	 * repository.
+	 *
+	 * @return a {@link String} value for a given subnode and key or {@code def]} if no entry has been found.
+	 *
 	 * @throws TigaseDBException if there was an error during reading data from the repository.
 	 */
-	String getDomainTempData(BareJID domain, String subnode, String key, String def)
-			throws TigaseDBException;
+	String getDomainTempData(BareJID domain, String subnode, String key, String def) throws TigaseDBException;
 
 	/**
-	 * <code>getPublicData</code> method returns a value associated with given key for
-	 * user repository in given subnode.
+	 * <code>getPublicData</code> method returns a value associated with given key for user repository in given subnode.
 	 * If key is not found in repository given default value is returned.
 	 *
-	 * @param user a {@link String} value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param user a {@link String} value of user ID for which data must be stored. User ID consists of user name and
+	 * domain name.
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the needed value is
-	 * associated.
-	 * @param def a {@link String} value which is returned in case if data
-	 * for specified key does not exixist in repository.
-	 * @return a {@link String} value for a given subnode and key or {@code def}
-	 * if no entry has been found.
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @param key a {@link String} with which the needed value is associated.
+	 * @param def a {@link String} value which is returned in case if data for specified key does not exixist in
+	 * repository.
+	 *
+	 * @return a {@link String} value for a given subnode and key or {@code def} if no entry has been found.
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in reository.
 	 */
-	String getPublicData(BareJID user, String subnode, String key, String def)
-			throws UserNotFoundException;
+	String getPublicData(BareJID user, String subnode, String key, String def) throws UserNotFoundException;
 
 	/**
-	 * <code>getPublicDataList</code> method returns array of values associated with
-	 * given key or <code>null</code> if given key does not exist for given user
-	 * ID in given node path.
+	 * <code>getPublicDataList</code> method returns array of values associated with given key or <code>null</code> if
+	 * given key does not exist for given user ID in given node path.
 	 *
-	 * @param user a {@link String} value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param user a {@link String} value of user ID for which data must be stored. User ID consists of user name and
+	 * domain name.
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the needed values list is
-	 * associated.
+	 * @param key a {@link String} with which the needed values list is associated.
+	 *
 	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in reository.
 	 */
-	String[] getPublicDataList(BareJID user, String subnode, String key)
-			throws UserNotFoundException;
+	String[] getPublicDataList(BareJID user, String subnode, String key) throws UserNotFoundException;
 
 	/**
-	 * Retrieves and returns a value associated with given subnode and key from a publicly
-	 * available space. The space is specific for the Tigase instance and is not shared among
-	 * different cluster nodes. The data is stored in some temporary space outside of the
-	 * registered user data. So no information for registered users can be retrieved.<br>
+	 * Retrieves and returns a value associated with given subnode and key from a publicly available space. The space is
+	 * specific for the Tigase instance and is not shared among different cluster nodes. The data is stored in some
+	 * temporary space outside of the registered user data. So no information for registered users can be
+	 * retrieved.<br>
 	 *
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the needed value is
-	 * associated.
-	 * @param def a {@link String} value which is returned in case if data
-	 * for specified key does not exixist in repository.
-	 * @return a {@link String} value for a given subnode and key or <code>def</code>
-	 * if no entry has been found.
+	 * @param key a {@link String} with which the needed value is associated.
+	 * @param def a {@link String} value which is returned in case if data for specified key does not exixist in
+	 * repository.
+	 *
+	 * @return a {@link String} value for a given subnode and key or <code>def</code> if no entry has been found.
+	 *
 	 * @throws TigaseDBException if there was an error during reading data from the repository.
 	 */
 	String getTempData(String subnode, String key, String def) throws TigaseDBException;
@@ -170,72 +160,65 @@ public interface NonAuthUserRepository {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * The method allows to store some temporary data by the plugin in publicly available
-	 * space. The space is specific to given virtual domain and is shared among all
-	 * running cluster nodes. The data is stored in some place outside of the normal user space
-	 * so no information for registered user can be overwriten.<br>
-	 * If there is already a value for a given subnode and key it will be overwritten otherwise
-	 * a new entry will be created.
+	 * The method allows to store some temporary data by the plugin in publicly available space. The space is specific
+	 * to given virtual domain and is shared among all running cluster nodes. The data is stored in some place outside
+	 * of the normal user space so no information for registered user can be overwriten.<br> If there is already a value
+	 * for a given subnode and key it will be overwritten otherwise a new entry will be created.
+	 *
 	 * @param domain is a DNS domain name with which the data is associated.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the specified values list is to
-	 * be associated.
-	 * @param value a {@link String} is an array of values to be assosiated
-	 * with the specified key.
+	 * @param key a {@link String} with which the specified values list is to be associated.
+	 * @param value a {@link String} is an array of values to be assosiated with the specified key.
+	 *
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
-	void putDomainTempData(BareJID domain, String subnode, String key, String value)
-			throws TigaseDBException;
+	void putDomainTempData(BareJID domain, String subnode, String key, String value) throws TigaseDBException;
 
 	/**
-	 * The method allows to store some temporary data by the plugin in publicly available
-	 * space. The space is specific for the Tigase instance and is not shared among different
-	 * cluster nodes. The data is stored in some place outside of the normal user space so
-	 * no information for registered user can be overwriten.<br>
-	 * If there is already a value for a given subnode and key it will be overwritten otherwise
-	 * a new entry will be created.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * The method allows to store some temporary data by the plugin in publicly available space. The space is specific
+	 * for the Tigase instance and is not shared among different cluster nodes. The data is stored in some place outside
+	 * of the normal user space so no information for registered user can be overwriten.<br> If there is already a value
+	 * for a given subnode and key it will be overwritten otherwise a new entry will be created.
+	 *
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the specified values list is to
-	 * be associated.
-	 * @param value a {@link String} is an array of values to be assosiated
-	 * with the specified key.
+	 * @param key a {@link String} with which the specified values list is to be associated.
+	 * @param value a {@link String} is an array of values to be assosiated with the specified key.
+	 *
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
 	void putTempData(String subnode, String key, String value) throws TigaseDBException;
 
 	/**
-	 * The method allows to remove existing data stored in a temporary storage space associated
-	 * with a given DNS domain.
+	 * The method allows to remove existing data stored in a temporary storage space associated with a given DNS
+	 * domain.
+	 *
 	 * @param domain is a DNS domain name with which the data is associated.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the specified values list is to
-	 * be associated.
+	 * @param key a {@link String} with which the specified values list is to be associated.
+	 *
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
-	void removeDomainTempData(BareJID domain, String subnode, String key)
-			throws TigaseDBException;
+	void removeDomainTempData(BareJID domain, String subnode, String key) throws TigaseDBException;
 
 	/**
-	 * The method allows to remove existing data stored in the Tigase instance specific
-	 * temporary storage.
-	 * @param subnode a {@link String} value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
+	 * The method allows to remove existing data stored in the Tigase instance specific temporary storage.
+	 *
+	 * @param subnode a {@link String} value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a {@link String} with which the specified values list is to
-	 * be associated.
+	 * @param key a {@link String} with which the specified values list is to be associated.
+	 *
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
 	void removeTempData(String subnode, String key) throws TigaseDBException;
 }    // WriteOnlyUserRepository
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

@@ -38,18 +38,14 @@ import java.util.Collection;
 import java.util.List;
 
 @Bean(name = DiscoveryModule.ID, parent = MonitorComponent.class, active = true)
-public class DiscoveryMonitorModule extends DiscoveryModule {
+public class DiscoveryMonitorModule
+		extends DiscoveryModule {
 
 	@Inject
 	private Kernel kernel;
 
 	@Inject(nullAllowed = true)
 	private MonitorTask[] takss;
-
-	private boolean isAdHocCompatible(Object taskInstance) {
-		return taskInstance != null && (taskInstance instanceof AdHocTask || taskInstance instanceof InfoTask
-				|| taskInstance instanceof ConfigurableTask);
-	}
 
 	@Override
 	protected void processAdHocCommandItems(Packet packet, JID jid, String node, JID senderJID)
@@ -58,16 +54,16 @@ public class DiscoveryMonitorModule extends DiscoveryModule {
 			final Object taskInstance = kernel.getInstance(jid.getResource());
 
 			List<Element> items = new ArrayList<Element>();
-			Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
+			Element resultQuery = new Element("query", new String[]{Packet.XMLNS_ATT}, new String[]{DISCO_ITEMS_XMLNS});
 			Packet result = packet.okResult(resultQuery, 0);
 
 			if (taskInstance instanceof InfoTask) {
-				items.add(new Element("item", new String[] { "jid", "node", "name" },
-						new String[] { jid.toString(), InfoTaskCommand.NODE, "Task Info" }));
+				items.add(new Element("item", new String[]{"jid", "node", "name"},
+									  new String[]{jid.toString(), InfoTaskCommand.NODE, "Task Info"}));
 			}
 			if (taskInstance instanceof ConfigurableTask) {
-				items.add(new Element("item", new String[] { "jid", "node", "name" },
-						new String[] { jid.toString(), ConfigureTaskCommand.NODE, "Task config" }));
+				items.add(new Element("item", new String[]{"jid", "node", "name"},
+									  new String[]{jid.toString(), ConfigureTaskCommand.NODE, "Task config"}));
 			}
 
 			if (taskInstance instanceof AdHocTask) {
@@ -79,8 +75,9 @@ public class DiscoveryMonitorModule extends DiscoveryModule {
 
 		} else if (jid.getResource() != null) {
 			throw new ComponentException(Authorization.ITEM_NOT_FOUND);
-		} else
+		} else {
 			super.processAdHocCommandItems(packet, jid, node, senderJID);
+		}
 	}
 
 	@Override
@@ -91,19 +88,20 @@ public class DiscoveryMonitorModule extends DiscoveryModule {
 		} else if (jid.getResource() != null && kernel.getInstance(jid.getResource()) != null) {
 			final Object taskInstance = kernel.getInstance(jid.getResource());
 
-			Element resultQuery = new Element("query", new String[] { "xmlns" }, new String[] { DISCO_INFO_XMLNS });
+			Element resultQuery = new Element("query", new String[]{"xmlns"}, new String[]{DISCO_INFO_XMLNS});
 			Packet resultIq = packet.okResult(resultQuery, 0);
 
-			resultQuery.addChild(new Element("identity", new String[] { "category", "type", "name" },
-					new String[] { "automation", "task", "Task " + jid.getResource() }));
+			resultQuery.addChild(new Element("identity", new String[]{"category", "type", "name"},
+											 new String[]{"automation", "task", "Task " + jid.getResource()}));
 
 			if (isAdHocCompatible(taskInstance)) {
-				resultQuery.addChild(new Element("feature", new String[] { "var" }, new String[] { Command.XMLNS }));
+				resultQuery.addChild(new Element("feature", new String[]{"var"}, new String[]{Command.XMLNS}));
 			}
 
 			write(resultIq);
-		} else
+		} else {
 			throw new ComponentException(Authorization.ITEM_NOT_FOUND);
+		}
 
 	}
 
@@ -111,18 +109,23 @@ public class DiscoveryMonitorModule extends DiscoveryModule {
 	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID)
 			throws ComponentException, RepositoryException {
 		if (node == null && jid.getResource() == null) {
-			Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
+			Element resultQuery = new Element("query", new String[]{Packet.XMLNS_ATT}, new String[]{DISCO_ITEMS_XMLNS});
 
 			Collection<String> taskNames = kernel.getNamesOf(MonitorTask.class);
 			for (String taskName : taskNames) {
-				resultQuery.addChild(new Element("item", new String[] { "jid", "name" },
-						new String[] { jid.toString() + "/" + taskName, "Task " + taskName }));
+				resultQuery.addChild(new Element("item", new String[]{"jid", "name"},
+												 new String[]{jid.toString() + "/" + taskName, "Task " + taskName}));
 			}
 
 			write(packet.okResult(resultQuery, 0));
 		} else {
-			Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
+			Element resultQuery = new Element("query", new String[]{Packet.XMLNS_ATT}, new String[]{DISCO_ITEMS_XMLNS});
 			write(packet.okResult(resultQuery, 0));
 		}
+	}
+
+	private boolean isAdHocCompatible(Object taskInstance) {
+		return taskInstance != null && (taskInstance instanceof AdHocTask || taskInstance instanceof InfoTask ||
+				taskInstance instanceof ConfigurableTask);
 	}
 }

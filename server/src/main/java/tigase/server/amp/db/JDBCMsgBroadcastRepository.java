@@ -31,7 +31,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,9 +43,10 @@ import static tigase.server.amp.db.JDBCMsgRepository.Meta;
 /**
  * Created by andrzej on 15.03.2016.
  */
-@Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
+@Meta(isDefault = true, supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
-public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,DataRepository> {
+public class JDBCMsgBroadcastRepository
+		extends MsgBroadcastRepository<Long, DataRepository> {
 
 	private static final Logger log = Logger.getLogger(JDBCMsgBroadcastRepository.class.getCanonicalName());
 
@@ -91,8 +95,9 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 						String msgId = rs.getString(1);
 						System.out.println("loaded msg with id = " + msgId);
 						oldMessages.remove(msgId);
-						if (broadcastMessages.containsKey(msgId))
+						if (broadcastMessages.containsKey(msgId)) {
 							continue;
+						}
 
 						Date expire = data_repo.getTimestamp(rs, 2);
 						char[] msgChars = rs.getString(3).toCharArray();
@@ -147,7 +152,7 @@ public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,Data
 			PreparedStatement stmt = data_repo.getPreparedStatement(recipient, BROADCAST_ADD_MESSAGE);
 			synchronized (stmt) {
 				stmt.setString(1, id);
-				data_repo.setTimestamp(stmt,2, new Timestamp(expire.getTime()));
+				data_repo.setTimestamp(stmt, 2, new Timestamp(expire.getTime()));
 				stmt.setString(3, msg.toString());
 				stmt.executeUpdate();
 			}

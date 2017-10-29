@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -41,15 +39,15 @@ import java.util.logging.Logger;
 /**
  * Class description
  *
- *
- * @version        5.2.0, 13/03/09
- * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @version 5.2.0, 13/03/09
  */
-@Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
+@Repository.Meta(supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class ClConSQLRepository
-				extends ClConConfigRepository
-				implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem,DataRepository> {
+		extends ClConConfigRepository
+		implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem, DataRepository> {
+
 	/**
 	 * Private logger for class instances.
 	 */
@@ -58,49 +56,24 @@ public class ClConSQLRepository
 	//J-
 	/* @formatter:off */
 	private static final String GET_ITEM_QUERY =
-					"select "
-					+ HOSTNAME_COLUMN + ", "
-					+ SECONDARY_HOSTNAME_COLUMN + ", "
-					+ PASSWORD_COLUMN + ", "
-					+ LASTUPDATE_COLUMN + ", "
-					+ PORT_COLUMN + ", "
-					+ CPU_USAGE_COLUMN + ", "
-					+ MEM_USAGE_COLUMN
-					+ " from " + TABLE_NAME + " where " + HOSTNAME_COLUMN + " = ?";
+			"select " + HOSTNAME_COLUMN + ", " + SECONDARY_HOSTNAME_COLUMN + ", " + PASSWORD_COLUMN + ", " +
+					LASTUPDATE_COLUMN + ", " + PORT_COLUMN + ", " + CPU_USAGE_COLUMN + ", " + MEM_USAGE_COLUMN +
+					" from " + TABLE_NAME + " where " + HOSTNAME_COLUMN + " = ?";
 	private static final String GET_ALL_ITEMS_QUERY =
-					"select "
-					+ HOSTNAME_COLUMN + ", "
-					+ SECONDARY_HOSTNAME_COLUMN + ", "
-					+ PASSWORD_COLUMN + ", "
-					+ LASTUPDATE_COLUMN + ", "
-					+ PORT_COLUMN + ", "
-					+ CPU_USAGE_COLUMN + ", "
-					+ MEM_USAGE_COLUMN
-					+ " from " + TABLE_NAME;
+			"select " + HOSTNAME_COLUMN + ", " + SECONDARY_HOSTNAME_COLUMN + ", " + PASSWORD_COLUMN + ", " +
+					LASTUPDATE_COLUMN + ", " + PORT_COLUMN + ", " + CPU_USAGE_COLUMN + ", " + MEM_USAGE_COLUMN +
+					" from " + TABLE_NAME;
 	private static final String DELETE_ITEM_QUERY =
-					"delete from " + TABLE_NAME + " where (" + HOSTNAME_COLUMN + " = ?)";
+			"delete from " + TABLE_NAME + " where (" + HOSTNAME_COLUMN + " = ?)";
 	private static final String INSERT_ITEM_QUERY =
-					"insert into " + TABLE_NAME + " ("
-					+ HOSTNAME_COLUMN + ", "
-					+ SECONDARY_HOSTNAME_COLUMN + ", "
-					+ PASSWORD_COLUMN + ", "
-					+ LASTUPDATE_COLUMN + ", "
-					+ PORT_COLUMN + ", "
-					+ CPU_USAGE_COLUMN + ", "
-					+ MEM_USAGE_COLUMN
-					+ ") "
-					+ " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME
-					+ " WHERE " + HOSTNAME_COLUMN + "=? HAVING count(*)=0)";
+			"insert into " + TABLE_NAME + " (" + HOSTNAME_COLUMN + ", " + SECONDARY_HOSTNAME_COLUMN + ", " +
+					PASSWORD_COLUMN + ", " + LASTUPDATE_COLUMN + ", " + PORT_COLUMN + ", " + CPU_USAGE_COLUMN + ", " +
+					MEM_USAGE_COLUMN + ") " + " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME + " WHERE " +
+					HOSTNAME_COLUMN + "=? HAVING count(*)=0)";
 	private static final String UPDATE_ITEM_QUERY =
-					"update " + TABLE_NAME + " set "
-					+ HOSTNAME_COLUMN + "= ?, "
-					+ SECONDARY_HOSTNAME_COLUMN + "= ?, "
-					+ PASSWORD_COLUMN + "= ?, "
-					+ LASTUPDATE_COLUMN + " = ?,"
-					+ PORT_COLUMN + "= ?, "
-					+ CPU_USAGE_COLUMN + "= ?, "
-					+ MEM_USAGE_COLUMN + "= ? "
-					+ " where " + HOSTNAME_COLUMN + "= ?"	;
+			"update " + TABLE_NAME + " set " + HOSTNAME_COLUMN + "= ?, " + SECONDARY_HOSTNAME_COLUMN + "= ?, " +
+					PASSWORD_COLUMN + "= ?, " + LASTUPDATE_COLUMN + " = ?," + PORT_COLUMN + "= ?, " + CPU_USAGE_COLUMN +
+					"= ?, " + MEM_USAGE_COLUMN + "= ? " + " where " + HOSTNAME_COLUMN + "= ?";
 	/* @formatter:on */
 	//J+
 
@@ -115,7 +88,7 @@ public class ClConSQLRepository
 		// in other places, so we can not destroy it.
 		super.destroy();
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Deprecated
@@ -133,7 +106,6 @@ public class ClConSQLRepository
 	}
 
 	//~--- methods --------------------------------------------------------------
-
 
 	@Override
 	public void setDataSource(DataRepository data_repo) {
@@ -154,8 +126,7 @@ public class ClConSQLRepository
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	@Override
-	public void initRepository(String conn_str, Map<String, String> params)
-					throws DBInitException {
+	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
 		super.initRepository(conn_str, params);
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
@@ -166,16 +137,16 @@ public class ClConSQLRepository
 	}
 
 	@Override
-	public void removeItem( String key ) {
-		super.removeItem( key );
+	public void removeItem(String key) {
+		super.removeItem(key);
 
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Removing item form database: {0}", key );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Removing item form database: {0}", key);
 		}
 		try {
-			PreparedStatement removeItem = data_repo.getPreparedStatement( null, DELETE_ITEM_QUERY );
-			synchronized ( removeItem ) {
-				removeItem.setString( 1, key );
+			PreparedStatement removeItem = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
+			synchronized (removeItem) {
+				removeItem.setString(1, key);
 				removeItem.executeUpdate();
 			}
 
@@ -187,11 +158,11 @@ public class ClConSQLRepository
 
 	@Override
 	public void storeItem(ClusterRepoItem item) {
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Storing item to repository: {0}", item );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Storing item to repository: {0}", item);
 		}
 		try {
-			PreparedStatement updateItemSt = data_repo.getPreparedStatement(null,	UPDATE_ITEM_QUERY);
+			PreparedStatement updateItemSt = data_repo.getPreparedStatement(null, UPDATE_ITEM_QUERY);
 			PreparedStatement insertItemSt = data_repo.getPreparedStatement(null, INSERT_ITEM_QUERY);
 
 			// relatively most DB compliant UPSERT
@@ -201,7 +172,7 @@ public class ClConSQLRepository
 				updateItemSt.setString(1, item.getHostname());
 				updateItemSt.setString(2, item.getSecondaryHostname());
 				updateItemSt.setString(3, item.getPassword());
-				data_repo.setTimestamp(updateItemSt,4, new Timestamp(date.getTime()));
+				data_repo.setTimestamp(updateItemSt, 4, new Timestamp(date.getTime()));
 				updateItemSt.setInt(5, item.getPortNo());
 				updateItemSt.setFloat(6, item.getCpuUsage());
 				updateItemSt.setFloat(7, item.getMemUsage());
@@ -213,7 +184,7 @@ public class ClConSQLRepository
 				insertItemSt.setString(1, item.getHostname());
 				insertItemSt.setString(2, item.getSecondaryHostname());
 				insertItemSt.setString(3, item.getPassword());
-				data_repo.setTimestamp(insertItemSt,4, new Timestamp(date.getTime()));
+				data_repo.setTimestamp(insertItemSt, 4, new Timestamp(date.getTime()));
 				insertItemSt.setInt(5, item.getPortNo());
 				insertItemSt.setFloat(6, item.getCpuUsage());
 				insertItemSt.setFloat(7, item.getMemUsage());
@@ -228,13 +199,14 @@ public class ClConSQLRepository
 
 	@Override
 	public void reload() {
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Reloading items" );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Reloading items");
 		}
 
-		if ( ( System.currentTimeMillis() - lastReloadTime ) <= ( autoReloadInterval * lastReloadTimeFactor ) ){
-			if ( log.isLoggable( Level.FINE ) ){
-				log.log( Level.FINE, "Last reload performed in {0}, skipping: ", ( System.currentTimeMillis() - lastReloadTime ) );
+		if ((System.currentTimeMillis() - lastReloadTime) <= (autoReloadInterval * lastReloadTimeFactor)) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Last reload performed in {0}, skipping: ",
+						(System.currentTimeMillis() - lastReloadTime));
 			}
 			return;
 		}
@@ -244,9 +216,8 @@ public class ClConSQLRepository
 
 		try {
 			ResultSet rs = null;
-			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
-					GET_ALL_ITEMS_QUERY);
-			
+			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
+
 			synchronized (getAllItemsSt) {
 				try {
 					rs = getAllItemsSt.executeQuery();
@@ -297,11 +268,11 @@ public class ClConSQLRepository
 		if (!data_repo.checkTable(TABLE_NAME)) {
 			log.info("DB for external component is not OK, stopping server...");
 
-			TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-					"ERROR! Terminating the server process.",
-					"Problem initializing the server: missing tig_cluster_nodes table on " + data_repo.getResourceUri(),
-					"Please fix the problem and start the server again."
-			}, 1);
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
+												 "Problem initializing the server: missing tig_cluster_nodes table on " +
+														 data_repo.getResourceUri(),
+												 "Please fix the problem and start the server again."}, 1);
 		}
 	}
 }

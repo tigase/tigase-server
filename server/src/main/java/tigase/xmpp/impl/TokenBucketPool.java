@@ -32,16 +32,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TokenBucketPool implements Initializable, UnregisterAware {
+public class TokenBucketPool
+		implements Initializable, UnregisterAware {
 
 	private final static Logger log = Logger.getLogger(TokenBucketPool.class.getName());
-	private Timer timer;
 	private final ConcurrentHashMap<String, TokenBucket> items = new ConcurrentHashMap<>();
-	private TimeUnit timeUnit = TimeUnit.SECONDS;
-	// unit: events
-	private long defaultRate = 100000;
-	// unit: ns
-	private long defaultPer = timeUnit.toNanos(1);
 	private boolean autoPurgeEnabled = true;
 	private final TimerTask purgerTask = new TimerTask() {
 		@Override
@@ -51,6 +46,12 @@ public class TokenBucketPool implements Initializable, UnregisterAware {
 			}
 		}
 	};
+	// unit: events
+	private long defaultRate = 100000;
+	private TimeUnit timeUnit = TimeUnit.SECONDS;
+	// unit: ns
+	private long defaultPer = timeUnit.toNanos(1);
+	private Timer timer;
 
 	public TokenBucketPool(long rate, long per, TimeUnit timeUnit) {
 		this.defaultRate = rate;
@@ -105,8 +106,9 @@ public class TokenBucketPool implements Initializable, UnregisterAware {
 	}
 
 	public void purge() {
-		if (log.isLoggable(Level.FINE))
+		if (log.isLoggable(Level.FINE)) {
 			log.fine("Purging full TokenBuckets...");
+		}
 		Iterator<Map.Entry<String, TokenBucket>> iterator = this.items.entrySet().iterator();
 		final long current = System.nanoTime();
 
@@ -131,31 +133,33 @@ public class TokenBucketPool implements Initializable, UnregisterAware {
 		if (timer != null) {
 			beforeUnregister();
 		}
-		
-		if (log.isLoggable(Level.FINE))
+
+		if (log.isLoggable(Level.FINE)) {
 			log.fine("TokenBucketPool Created. Auto purge task created.");
+		}
 
 		timer = new Timer("TokenBuckerPoolTimerThread", true);
 
 		timer.schedule(purgerTask, TimeUnit.HOURS.toMillis(4));
 	}
 
-	private boolean consume(TokenBucket item) {
-		return item.consume();
-	}
-
 	int size() {
 		return this.items.size();
+	}
+
+	private boolean consume(TokenBucket item) {
+		return item.consume();
 	}
 
 	/**
 	 * Single TokenBucket.
 	 */
 	public static class TokenBucket {
-		// unit: events
-		private final float rate;
+
 		// unit: ns
 		private final float per;
+		// unit: events
+		private final float rate;
 		// unit: events
 		private float allowance = 1;
 		// unit: ns
@@ -169,11 +173,9 @@ public class TokenBucketPool implements Initializable, UnregisterAware {
 
 		/**
 		 * Create Token Bucket.
-		 * 
-		 * @param rate
-		 *            amount of available tokens
-		 * @param per
-		 *            per nanosecond!
+		 *
+		 * @param rate amount of available tokens
+		 * @param per per nanosecond!
 		 */
 		public TokenBucket(long rate, long per) {
 			this.lastCheck = System.nanoTime();
@@ -183,7 +185,7 @@ public class TokenBucketPool implements Initializable, UnregisterAware {
 
 		/**
 		 * Consume token if available.
-		 * 
+		 *
 		 * @return {@code true} if token was available.
 		 */
 		public boolean consume() {
@@ -215,8 +217,9 @@ public class TokenBucketPool implements Initializable, UnregisterAware {
 			final long timePassed = current - this.lastCheck;
 			this.lastCheck = current;
 			this.allowance += timePassed * (this.rate / this.per);
-			if (this.allowance > this.rate)
+			if (this.allowance > this.rate) {
 				this.allowance = this.rate; // throttle
+			}
 
 		}
 	}

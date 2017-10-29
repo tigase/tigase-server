@@ -23,40 +23,36 @@ import tigase.server.ServerComponent;
 
 /**
  * Describe interface ClusteredComponent here.
- *
- *
+ * <p>
+ * <p>
  * Created: Mon Jun  9 20:00:46 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ClusteredComponentIfc extends ServerComponent {
-	
+public interface ClusteredComponentIfc
+		extends ServerComponent {
+
 	/**
-	 * Set's the configures the cluster controller object for cluster
-	 * communication and API.
+	 * Set's the configures the cluster controller object for cluster communication and API.
 	 *
-	 * @param cl_controller cluster controller object used for cluster
-	 *                      communication
+	 * @param cl_controller cluster controller object used for cluster communication
 	 */
 	void setClusterController(ClusterControllerIfc cl_controller);
 
 	/**
-	 * Method is called on cluster node connection event. This is a
-	 * notification to the component that a new cluster node has connected.
+	 * Method is called on cluster node connection event. This is a notification to the component that a new cluster
+	 * node has connected.
 	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
+	 * @param node is a hostname of a cluster node generating the event.
 	 */
 	void nodeConnected(String node);
 
 	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
+	 * Method is called on cluster node disconnection event. This is a notification to the component that there was
+	 * network connection lost to one of the cluster nodes.
 	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
+	 * @param node is a hostname of a cluster node generating the event.
 	 */
 	void nodeDisconnected(String node);
 

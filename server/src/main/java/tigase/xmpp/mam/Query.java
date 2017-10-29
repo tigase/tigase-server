@@ -25,9 +25,9 @@ import tigase.xmpp.rsm.RSM;
 import java.util.Date;
 
 /**
- * Interface defining methods required by base version MAMRepository to execute
- * queries. Custom implementations of MAMRepository may use additional methods.
- *
+ * Interface defining methods required by base version MAMRepository to execute queries. Custom implementations of
+ * MAMRepository may use additional methods.
+ * <p>
  * Created by andrzej on 19.07.2016.
  */
 public interface Query {

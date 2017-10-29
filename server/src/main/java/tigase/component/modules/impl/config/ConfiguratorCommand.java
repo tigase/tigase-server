@@ -49,15 +49,16 @@ import java.util.logging.Logger;
 import static java.util.Collections.sort;
 
 @Bean(name = "BeanConfiguratorAdHocCommand", active = true)
-public class ConfiguratorCommand implements AdHocCommand {
+public class ConfiguratorCommand
+		implements AdHocCommand {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	@Inject(bean = "defaultTypesConverter")
 	protected TypesConverter defaultTypesConverter;
-	@Inject(bean = "kernel")
-	private Kernel kernel;
 	@Inject(bean = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
 	private AbstractBeanConfigurator beanConfigurator;
+	@Inject(bean = "kernel")
+	private Kernel kernel;
 
 	@Override
 	public void execute(AdhHocRequest request, AdHocResponse response) throws AdHocCommandException {
@@ -83,7 +84,7 @@ public class ConfiguratorCommand implements AdHocCommand {
 			}
 
 			form.addField(Field.fieldListSingle("bean", "-", "Bean to configure", options.toArray(new String[]{}),
-					values.toArray(new String[]{})));
+												values.toArray(new String[]{})));
 
 			response.getElements().add(form.getElement());
 			response.startSession();
@@ -115,7 +116,7 @@ public class ConfiguratorCommand implements AdHocCommand {
 					}
 
 					Field field = Field.fieldTextSingle(key, value == null ? "" : converter.toString(value),
-							cfi.configField.desc());
+														cfi.configField.desc());
 					form.addField(field);
 				}
 
@@ -133,7 +134,6 @@ public class ConfiguratorCommand implements AdHocCommand {
 				final String fn = field.getVar().substring(i + 1);
 				final String value = field.getValue();
 
-
 				BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(bn);
 				if (!values.containsKey(beanConfig)) {
 					values.put(beanConfig, new HashMap<>());
@@ -150,11 +150,27 @@ public class ConfiguratorCommand implements AdHocCommand {
 		}
 	}
 
+	@Override
+	public String getName() {
+		return "Configurator";
+	}
+
+	@Override
+	public String getNode() {
+		return "bean-configurator";
+	}
+
+	@Override
+	public boolean isAllowedFor(JID jid) {
+		return true;
+	}
+
 	private ArrayList<ConfigFieldItem> getConfigItems(final String beanName) {
 		ArrayList<ConfigFieldItem> result = new ArrayList<>();
 		for (BeanConfig bc : kernel.getDependencyManager().getBeanConfigs()) {
-			if (beanName != null && !beanName.equals(bc.getBeanName()))
+			if (beanName != null && !beanName.equals(bc.getBeanName())) {
 				continue;
+			}
 			final Class<?> cl = bc.getClazz();
 			java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
 			for (java.lang.reflect.Field field : fields) {
@@ -189,25 +205,12 @@ public class ConfiguratorCommand implements AdHocCommand {
 		return result;
 	}
 
-	@Override
-	public String getName() {
-		return "Configurator";
-	}
+	private class ConfigFieldItem
+			implements Comparable<ConfigFieldItem> {
 
-	@Override
-	public String getNode() {
-		return "bean-configurator";
-	}
-
-	@Override
-	public boolean isAllowedFor(JID jid) {
-		return true;
-	}
-
-	private class ConfigFieldItem implements Comparable<ConfigFieldItem> {
 		BeanConfig beanConfig;
-		java.lang.reflect.Field field;
 		ConfigField configField;
+		java.lang.reflect.Field field;
 
 		@Override
 		public int compareTo(ConfigFieldItem o) {

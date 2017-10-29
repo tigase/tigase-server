@@ -23,13 +23,12 @@ package tigase.server.ext;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -40,21 +39,18 @@ import java.util.Queue;
  * @version $Rev$
  */
 public interface ExtProcessor {
+
 	String getId();
 
 	List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler);
 
 	//~--- methods --------------------------------------------------------------
 
-	boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results);
+	boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results);
 
-	void startProcessing(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results);
+	void startProcessing(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results);
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

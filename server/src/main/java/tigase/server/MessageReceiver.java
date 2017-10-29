@@ -24,32 +24,33 @@ package tigase.server;
 
 import tigase.xmpp.jid.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- interfaces -------------------------------------------------------------
 
 /**
  * Interface MessageReceiver
- *
- * Objects of this type can receive messages. They can be in fact routing
- * destination depending on target address. Message are routed to proper
- * destination in MessageRouter class.
- *
+ * <p>
+ * Objects of this type can receive messages. They can be in fact routing destination depending on target address.
+ * Message are routed to proper destination in MessageRouter class.
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface MessageReceiver extends ServerComponent {
+public interface MessageReceiver
+		extends ServerComponent {
 
 	/**
 	 * Describe <code>addPacket</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @return a <code>boolean</code> value <code>true</code> if packet has been
-	 * successfully added, <code>false</code> otherwise.
+	 *
+	 * @return a <code>boolean</code> value <code>true</code> if packet has been successfully added, <code>false</code>
+	 * otherwise.
 	 */
 	boolean addPacket(Packet packet);
 
@@ -59,6 +60,7 @@ public interface MessageReceiver extends ServerComponent {
 	 * Describe <code>addPackets</code> method here.
 	 *
 	 * @param packets
+	 *
 	 * @return a <code>boolean</code> value
 	 */
 	boolean addPackets(Queue<Packet> packets);
@@ -67,7 +69,7 @@ public interface MessageReceiver extends ServerComponent {
 
 	BareJID getDefHostName();
 
-///**
+	///**
 // * Returns array of Strings. Each String should be a regular expression
 // * defining destination addresses for which this receiver can process
 // * messages. There can be more than one message receiver for each messages.
@@ -93,8 +95,6 @@ public interface MessageReceiver extends ServerComponent {
 
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

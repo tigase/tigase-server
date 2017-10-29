@@ -22,7 +22,7 @@ package tigase.stats;
 
 import org.junit.Test;
 
-import java.util.*;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
 
 import static org.junit.Assert.*;
@@ -46,7 +46,7 @@ public class StatisticsListTest {
 		statRecords.add(compName, "float-zero", 0F, Level.INFO);
 
 		LinkedHashMap<String, StatRecord> compStats = statRecords.getCompStats(compName);
-		assertTrue("Wrong collection size!" , compStats.size() == 4);
+		assertTrue("Wrong collection size!", compStats.size() == 4);
 		assertNotNull(compStats.get("long"));
 		assertNotNull(compStats.get("int"));
 		assertNotNull(compStats.get("string"));
@@ -68,7 +68,7 @@ public class StatisticsListTest {
 		statRecords.add(compName, "float-zero", 0F, Level.INFO);
 
 		compStats = statRecords.getCompStats(compName);
-		assertTrue("Wrong collection size!" , compStats.size() == 8);
+		assertTrue("Wrong collection size!", compStats.size() == 8);
 
 		assertNotNull(compStats.get("long"));
 		assertNotNull(compStats.get("int"));
@@ -78,7 +78,6 @@ public class StatisticsListTest {
 		assertNotNull(compStats.get("int-zero"));
 		assertNotNull(compStats.get("string-zero"));
 		assertNotNull(compStats.get("float-zero"));
-
 
 	}
 

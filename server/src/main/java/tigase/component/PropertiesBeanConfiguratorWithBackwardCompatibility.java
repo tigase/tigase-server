@@ -38,9 +38,11 @@ import static tigase.conf.Configurable.GEN_CONFIG_DEF;
 /**
  * Created by andrzej on 30.05.2016.
  */
-public class PropertiesBeanConfiguratorWithBackwardCompatibility extends PropertiesBeanConfigurator {
+public class PropertiesBeanConfiguratorWithBackwardCompatibility
+		extends PropertiesBeanConfigurator {
 
-	private static final Logger log = Logger.getLogger(PropertiesBeanConfiguratorWithBackwardCompatibility.class.getCanonicalName());
+	private static final Logger log = Logger.getLogger(
+			PropertiesBeanConfiguratorWithBackwardCompatibility.class.getCanonicalName());
 
 	@Override
 	public void configure(BeanConfig beanConfig, Object bean, Map<String, Object> values) {
@@ -54,7 +56,9 @@ public class PropertiesBeanConfiguratorWithBackwardCompatibility extends Propert
 				Method setPropertiesMethod = bean.getClass().getMethod("setProperties", Map.class);
 
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
-					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
+					log.log(Level.WARNING,
+							"Class {0} is using deprecated configuration using methods getDefaults() and setProperties()",
+							bean.getClass().getCanonicalName());
 				}
 
 				if (setPropertiesMethod != null && setPropertiesMethod.getAnnotation(Deprecated.class) == null) {
@@ -63,7 +67,7 @@ public class PropertiesBeanConfiguratorWithBackwardCompatibility extends Propert
 					Map<String, Object> params = getDefConfigParams(getKernel(), configType, dbUri, getProperties());
 					Map<String, Object> props = new HashMap<>(params);
 
-					props.putAll( conf.getDefaults(params) );
+					props.putAll(conf.getDefaults(params));
 					fillProps(beanConfig, props);
 					((Configurable) bean).setProperties(props);
 				}
@@ -74,7 +78,9 @@ public class PropertiesBeanConfiguratorWithBackwardCompatibility extends Propert
 				Method setPropertiesMethod = bean.getClass().getMethod("setProperties", Map.class);
 
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
-					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
+					log.log(Level.WARNING,
+							"Class {0} is using deprecated configuration using methods getDefaults() and setProperties()",
+							bean.getClass().getCanonicalName());
 				}
 				if (setPropertiesMethod != null && setPropertiesMethod.getAnnotation(Deprecated.class) == null) {
 					String configType = (String) getProperties().getOrDefault("config-type", GEN_CONFIG_DEF);
@@ -107,14 +113,16 @@ public class PropertiesBeanConfiguratorWithBackwardCompatibility extends Propert
 				kernel = kernel.getParent();
 			}
 			while ((kernel = kernels.poll()) != null) {
-				if (sb.length() > 0)
+				if (sb.length() > 0) {
 					sb.append("/");
+				}
 				sb.append(kernel.getName());
 			}
 
 			if (!beanConfig.getBeanName().equals(beanConfig.getKernel().getName())) {
-				if (sb.length() > 0)
+				if (sb.length() > 0) {
 					sb.append("/");
+				}
 				sb.append(beanConfig.getBeanName());
 			}
 

@@ -34,7 +34,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class WorkerThread extends Thread {
+public abstract class WorkerThread
+		extends Thread {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -45,7 +46,7 @@ public abstract class WorkerThread extends Thread {
 
 	private long averageProcessingTime = 0;
 
-//private PriorityQueueAbstract<QueueItem> queue = null;
+	//private PriorityQueueAbstract<QueueItem> queue = null;
 	private LinkedBlockingQueue<QueueItem> queue = null;
 	private long runsCnt = 0;
 	private boolean stopped = false;
@@ -54,10 +55,6 @@ public abstract class WorkerThread extends Thread {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
-	 *
 	 */
 	public abstract WorkerThread getNewInstance();
 
@@ -72,7 +69,6 @@ public abstract class WorkerThread extends Thread {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param item
 	 */
 	public abstract void process(QueueItem item);
@@ -81,9 +77,6 @@ public abstract class WorkerThread extends Thread {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public long getAverageProcessingTime() {
 		return averageProcessingTime;
@@ -91,9 +84,6 @@ public abstract class WorkerThread extends Thread {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public long getRunsCounter() {
 		return runsCnt;
@@ -104,10 +94,7 @@ public abstract class WorkerThread extends Thread {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param item
-	 *
-	 *
 	 */
 	public boolean offer(QueueItem item) {
 		return queue.offer(item);
@@ -117,7 +104,7 @@ public abstract class WorkerThread extends Thread {
 	public void run() {
 		QueueItem item = null;
 
-		while ( !stopped) {
+		while (!stopped) {
 			try {
 				item = queue.take();
 
@@ -131,10 +118,11 @@ public abstract class WorkerThread extends Thread {
 					averageProcessingTime = (averageProcessingTime + end) / 2;
 				}
 			} catch (Exception e) {
-				if (!stopped)
+				if (!stopped) {
 					log.log(Level.SEVERE,
-							this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: "
-								+ item.getPacket(), e);
+							this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: " +
+									item.getPacket(), e);
+				}
 			}
 
 			++runsCnt;
@@ -145,7 +133,6 @@ public abstract class WorkerThread extends Thread {
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param maxSize
 	 */
@@ -163,9 +150,6 @@ public abstract class WorkerThread extends Thread {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 *
 	 */
 	public int size() {
 		return queue.size();
@@ -181,8 +165,6 @@ public abstract class WorkerThread extends Thread {
 
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

@@ -28,7 +28,7 @@ public class PlantUMLGrapher {
 		Kernel bk = beanConfig.getKernel();
 		String kernelName = bk.getName();
 		String beanName = beanConfig.getBeanName();
-		return (kernelName + "." + beanName).replace("#", "_").replace("<","_").replace(">","_");
+		return (kernelName + "." + beanName).replace("#", "_").replace("<", "_").replace(">", "_");
 	}
 
 	public PlantUMLGrapher() {
@@ -58,11 +58,7 @@ public class PlantUMLGrapher {
 
 	private StringBuilder makeObject(BeanConfig bc) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("object ")
-				.append("\"")
-				.append(bc.getBeanName())
-				.append("\" as ")
-				.append(n(bc));
+		sb.append("object ").append("\"").append(bc.getBeanName()).append("\" as ").append(n(bc));
 		if (true) {
 			sb.append("{\n");
 			for (Dependency d : bc.getFieldDependencies().values()) {
@@ -104,11 +100,9 @@ public class PlantUMLGrapher {
 				BeanConfig[] dBeans = k.getDependencyManager().getBeanConfig(dp);
 
 				for (BeanConfig dBean : dBeans) {
-					if(dBean!=null)
-					sb.append(n(dBean))
-							.append(" *- ")
-							.append(n(bc))
-							.append('\n');
+					if (dBean != null) {
+						sb.append(n(dBean)).append(" *- ").append(n(bc)).append('\n');
+					}
 				}
 
 			}
@@ -116,12 +110,11 @@ public class PlantUMLGrapher {
 			if (bc instanceof Kernel.DelegatedBeanConfig) {
 				final BeanConfig orginal = ((Kernel.DelegatedBeanConfig) bc).getOriginal();
 				sb.append(n(orginal)).
-				append(" .. ")
-				.append(n(bc)).append('\n');
+						append(" .. ").append(n(bc)).append('\n');
 
 			}
 
-			}
+		}
 
 		sb.append("}\n");
 		return sb;

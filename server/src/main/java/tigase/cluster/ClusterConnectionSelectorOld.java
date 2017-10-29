@@ -29,22 +29,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ClusterConnectionSelectorOld class implements old cluster connection selection
- * algoritm which before was part of ClusterConnectionManager class.
- * 
+ * ClusterConnectionSelectorOld class implements old cluster connection selection algoritm which before was part of
+ * ClusterConnectionManager class.
+ *
  * @author andrzej
  */
 @Bean(name = "clusterConnectionSelector", active = true)
-public class ClusterConnectionSelectorOld implements ClusterConnectionSelectorIfc {
+public class ClusterConnectionSelectorOld
+		implements ClusterConnectionSelectorIfc {
 
 	private ClusterConnectionHandler handler;
-	
+
 	@Override
 	public XMPPIOService<Object> selectConnection(Packet p, ClusterConnection conn) {
-		if (conn == null)
+		if (conn == null) {
 			return null;
-		
-		int code  = Math.abs(handler.hashCodeForPacket(p));
+		}
+
+		int code = Math.abs(handler.hashCodeForPacket(p));
 		List<XMPPIOService<Object>> conns = conn.getConnections();
 		if (conns.size() > 0) {
 			return conns.get(code % conns.size());
@@ -56,10 +58,10 @@ public class ClusterConnectionSelectorOld implements ClusterConnectionSelectorIf
 	public void setClusterConnectionHandler(ClusterConnectionHandler handler) {
 		this.handler = handler;
 	}
-	
+
 	@Override
-	public void setProperties(Map<String,Object> props) {
-		
+	public void setProperties(Map<String, Object> props) {
+
 	}
-	
+
 }

@@ -19,35 +19,40 @@
  */
 package tigase.server.xmppsession;
 
-import java.io.Serializable;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPSession;
+import tigase.xmpp.jid.JID;
+
+import java.io.Serializable;
 
 /**
- * Base class for implementation of events related to user session. For this event
- * exists additional routing mechanism which will optimize delivery of this event
- * in clustered environment.
+ * Base class for implementation of events related to user session. For this event exists additional routing mechanism
+ * which will optimize delivery of this event in clustered environment.
  *
  * @author andrzej
  */
-public class UserSessionEvent implements Serializable {
+public class UserSessionEvent
+		implements Serializable {
 
+	private JID sender;
 	private transient XMPPSession session;
-	
 	// this is destination to which event will be routed
 	private JID userJid;
-	private JID sender;
-	
-	public UserSessionEvent() { }
-	
+
+	public UserSessionEvent() {
+	}
+
 	public UserSessionEvent(JID sender, JID userJid, XMPPSession session) {
 		this.sender = sender;
 		this.session = session;
 		this.userJid = userJid;
 	}
-	
+
 	public XMPPSession getSession() {
 		return session;
+	}
+
+	public void setSession(XMPPSession session) {
+		this.session = session;
 	}
 
 	public JID getUserJid() {
@@ -57,9 +62,5 @@ public class UserSessionEvent implements Serializable {
 	public JID getSender() {
 		return sender;
 	}
-	
-	public void setSession(XMPPSession session) {
-		this.session = session;
-	}
-	
+
 }

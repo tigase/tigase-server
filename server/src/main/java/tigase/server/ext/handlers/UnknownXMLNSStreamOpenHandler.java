@@ -22,15 +22,13 @@ package tigase.server.ext.handlers;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.StreamOpenHandler;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.List;
 import java.util.Map;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -40,7 +38,8 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
+public class UnknownXMLNSStreamOpenHandler
+		implements StreamOpenHandler {
 
 	@Override
 	public String[] getXMLNSs() {
@@ -55,12 +54,10 @@ public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
-			ComponentProtocolHandler handler) {
+	public String streamOpened(ComponentIOService serv, Map<String, String> attribs, ComponentProtocolHandler handler) {
 		String xmlns = attribs.get("xmlns");
-		StringBuilder sb =
-			new StringBuilder("<stream:stream xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " version='1.0'" + " xml:lang='en'");
+		StringBuilder sb = new StringBuilder(
+				"<stream:stream xmlns:stream='http://etherx.jabber.org/streams'" + " version='1.0'" + " xml:lang='en'");
 
 		if (xmlns != null) {
 			sb.append(" xmlns='").append(xmlns).append("'");
@@ -79,16 +76,13 @@ public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 		}
 
 		sb.append('>');
-		sb.append("<stream:error>"
-				+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-					+ "</stream:error>" + "</stream:stream>");
+		sb.append("<stream:error>" + "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+						  "</stream:error>" + "</stream:stream>");
 
 		return sb.toString();
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

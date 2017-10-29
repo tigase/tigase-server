@@ -18,21 +18,17 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.server.amp.cond;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.amp.ConditionIfc;
 import tigase.server.Packet;
-
+import tigase.server.amp.ConditionIfc;
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.logging.Logger;
-import java.util.Map;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:36:27 PM
@@ -41,28 +37,21 @@ import java.util.Map;
  * @version $Rev$
  */
 public class Deliver
-				implements ConditionIfc {
+		implements ConditionIfc {
+
+	private static final String name = "deliver";
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log        = Logger.getLogger(Deliver.class.getName());
-	private static final String name = "deliver";
+	private static Logger log = Logger.getLogger(Deliver.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
 	private boolean offline_storage = true;
 
 	//~--- constant enums -------------------------------------------------------
 
-	private enum MatchValue {
-		direct, forward, gateway, none, stored;
-	}
-
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Constructs ...
-	 *
 	 */
 	public Deliver() {
 		String off_val = System.getProperty(MSG_OFFLINE_PROP_KEY);
@@ -70,18 +59,18 @@ public class Deliver
 		offline_storage = (off_val == null) || Boolean.parseBoolean(off_val);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- constructors ---------------------------------------------------------
 
 	@Override
 	public String getName() {
 		return name;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public boolean match(Packet packet, Element rule) {
-		String value   = rule.getAttributeStaticStr("value");
+		String value = rule.getAttributeStaticStr("value");
 		boolean result = false;
 
 		if (value != null) {
@@ -89,31 +78,31 @@ public class Deliver
 				MatchValue m_val = MatchValue.valueOf(value);
 
 				switch (m_val) {
-				case direct :
-					result = (packet.getAttributeStaticStr(OFFLINE) == null) &&
-									 (packet.getAttributeStaticStr(FROM_CONN_ID) == null);
+					case direct:
+						result = (packet.getAttributeStaticStr(OFFLINE) == null) &&
+								(packet.getAttributeStaticStr(FROM_CONN_ID) == null);
 
-					break;
+						break;
 
-				case forward :
+					case forward:
 
-					// Forwarding not supported in Tigase yet
-					break;
+						// Forwarding not supported in Tigase yet
+						break;
 
-				case gateway :
+					case gateway:
 
-					// This can be only determined by the gateway itself
-					break;
+						// This can be only determined by the gateway itself
+						break;
 
-				case none :
-					result = (packet.getAttributeStaticStr(OFFLINE) != null) &&!offline_storage;
+					case none:
+						result = (packet.getAttributeStaticStr(OFFLINE) != null) && !offline_storage;
 
-					break;
+						break;
 
-				case stored :
-					result = (packet.getAttributeStaticStr(OFFLINE) != null) && offline_storage;
+					case stored:
+						result = (packet.getAttributeStaticStr(OFFLINE) != null) && offline_storage;
 
-					break;
+						break;
 				}
 			} catch (Exception e) {
 				log.info("Incorrect " + name + " condition value for rule: " + rule);
@@ -124,7 +113,16 @@ public class Deliver
 
 		return result;
 	}
-}
 
+	//~--- methods --------------------------------------------------------------
+
+	private enum MatchValue {
+		direct,
+		forward,
+		gateway,
+		none,
+		stored;
+	}
+}
 
 //~ Formatted in Tigase Code Convention on 13/02/20

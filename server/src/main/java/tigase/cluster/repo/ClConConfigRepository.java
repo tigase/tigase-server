@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -49,26 +47,23 @@ import java.util.logging.Logger;
 /**
  * Class description
  *
- *
- * @version        5.2.0, 13/03/09
- * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @version 5.2.0, 13/03/09
  */
-@ConfigAliases({
-	@ConfigAlias(field = "items", alias = "cluster-nodes")
-})
+@ConfigAliases({@ConfigAlias(field = "items", alias = "cluster-nodes")})
 public class ClConConfigRepository
 		extends ConfigRepository<ClusterRepoItem>
 		implements ShutdownHook, Initializable, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
-	
+
 	//~--- fields ---------------------------------------------------------------
 
 	@ConfigField(desc = "Automatically remove obsolote items", alias = "repo-auto-remove-obsolete-items")
 	protected boolean auto_remove_obsolete_items = true;
+	protected boolean firstLoadDone = false;
 	protected long lastReloadTime = 0;
 	protected long lastReloadTimeFactor = 10;
-
 	@Inject
 	private EventBus eventBus;
 
@@ -83,13 +78,11 @@ public class ClConConfigRepository
 		}
 	}
 
-    protected boolean firstLoadDone = false;
-
 	@Override
 	public void destroy() {
 		// Nothing to do
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -130,33 +123,34 @@ public class ClConConfigRepository
 	public void reload() {
 		super.reload();
 
-        String host = DNSResolverFactory.getInstance().getDefaultHost();
+		String host = DNSResolverFactory.getInstance().getDefaultHost();
 
-        // we check if we already realoded repo from repository and have all items (own item will have
-        // correct update time), if so we set flag that first load was made and if there was only one item
-        // we send even that cluster was initiated
-        if (!firstLoadDone) {
-            if (log.isLoggable(Level.FINEST)) {
-                log.log(Level.FINEST, "First Cluster repository reload done: {0}, items size: {1}, last updated own item: {2}",
-                        new Object[]{firstLoadDone, items.size(), items.get(host).getLastUpdate()});
-            }
+		// we check if we already realoded repo from repository and have all items (own item will have
+		// correct update time), if so we set flag that first load was made and if there was only one item
+		// we send even that cluster was initiated
+		if (!firstLoadDone) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"First Cluster repository reload done: {0}, items size: {1}, last updated own item: {2}",
+						new Object[]{firstLoadDone, items.size(), items.get(host).getLastUpdate()});
+			}
 
-            if (items.get(host) != null && items.get(host).getLastUpdate() > 0 ) {
-                firstLoadDone = true;
+			if (items.get(host) != null && items.get(host).getLastUpdate() > 0) {
+				firstLoadDone = true;
 
-                if (items.size() == 1) {
-                    eventBus.fire(new ClusterConnectionManager.ClusterInitializedEvent());
-                }
+				if (items.size() == 1) {
+					eventBus.fire(new ClusterConnectionManager.ClusterInitializedEvent());
+				}
 
-            }
-        }
+			}
+		}
 
 		ClusterRepoItem item = getItem(host);
 		try {
-			item = ( item != null ) ? (ClusterRepoItem)(item.clone()) : null;
-		} catch ( CloneNotSupportedException ex ) {
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.SEVERE, "Cloning of ClusterRepoItem has failed", ex );
+			item = (item != null) ? (ClusterRepoItem) (item.clone()) : null;
+		} catch (CloneNotSupportedException ex) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.SEVERE, "Cloning of ClusterRepoItem has failed", ex);
 			}
 		}
 
@@ -164,19 +158,19 @@ public class ClConConfigRepository
 			item = getItemInstance();
 			item.setHostname(host);
 		}
-		item.setSecondaryHostname( DNSResolverFactory.getInstance().getSecondaryHost() );
+		item.setSecondaryHostname(DNSResolverFactory.getInstance().getSecondaryHost());
 		item.setLastUpdate(System.currentTimeMillis());
 		item.setCpuUsage(TigaseRuntime.getTigaseRuntime().getCPUUsage());
 		item.setMemUsage(TigaseRuntime.getTigaseRuntime().getHeapMemUsage());
 		storeItem(item);
 
-
 		if (auto_remove_obsolete_items) {
 			Iterator<ClusterRepoItem> iterator = iterator();
-			while(iterator.hasNext()) {
+			while (iterator.hasNext()) {
 				ClusterRepoItem next = iterator.next();
-				if ( ( next.getLastUpdate() > 0 ) && System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoReloadInterval ){
-					removeItem( next.getHostname() );
+				if ((next.getLastUpdate() > 0) &&
+						System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoReloadInterval) {
+					removeItem(next.getHostname());
 				}
 			}
 		}
@@ -184,52 +178,42 @@ public class ClConConfigRepository
 	}
 
 	public void itemLoaded(ClusterRepoItem item) {
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Item loaded: {0}", item );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Item loaded: {0}", item);
 		}
-		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoReloadInterval && clusterRecordValid(item)) {
+		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoReloadInterval &&
+				clusterRecordValid(item)) {
 			addItem(item);
 		} else {
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST,
-								 "Removing stale item: {0}; current time: {1}, last update: {2} ({3}), diff: {4}, autoreload {5}",
-								 new Object[] { item, System.currentTimeMillis(), item.getLastUpdate(),
-																new Date( item.getLastUpdate() ), System.currentTimeMillis() - item.getLastUpdate(),
-																5000 * autoReloadInterval } );
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Removing stale item: {0}; current time: {1}, last update: {2} ({3}), diff: {4}, autoreload {5}",
+						new Object[]{item, System.currentTimeMillis(), item.getLastUpdate(),
+									 new Date(item.getLastUpdate()), System.currentTimeMillis() - item.getLastUpdate(),
+									 5000 * autoReloadInterval});
 			}
-			if ( auto_remove_obsolete_items ){
-				removeItem( item.getHostname() );
+			if (auto_remove_obsolete_items) {
+				removeItem(item.getHostname());
 			}
 		}
 	}
 
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
-		return !oldItem.getPassword().equals( newItem.getPassword() )
-					 || ( oldItem.getPortNo() != newItem.getPortNo() )
-					 || !Objects.equals( oldItem.getSecondaryHostname(), newItem.getSecondaryHostname() );
+		return !oldItem.getPassword().equals(newItem.getPassword()) || (oldItem.getPortNo() != newItem.getPortNo()) ||
+				!Objects.equals(oldItem.getSecondaryHostname(), newItem.getSecondaryHostname());
 	}
-	
+
 	@Override
 	public String shutdown() {
 		String host = DNSResolverFactory.getInstance().getDefaultHost();
-		removeItem( host );
+		removeItem(host);
 		return "== " + "Removing cluster_nodes item: " + host + "\n";
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	public void storeItem(ClusterRepoItem item) {}
-
-	private boolean clusterRecordValid( ClusterRepoItem item ) {
-
-		// we ignore faulty addresses
-		boolean isCorrect = !item.getHostname().equalsIgnoreCase( "localhost" );
-
-		if ( !isCorrect && log.isLoggable( Level.FINE ) ){
-			log.log( Level.FINE, "Incorrect entry in cluster table, skipping: {0}", item );
-		}
-		return isCorrect;
+	public void storeItem(ClusterRepoItem item) {
 	}
 
 	@Override
@@ -242,6 +226,17 @@ public class ClConConfigRepository
 	public void beforeUnregister() {
 		TigaseRuntime.getTigaseRuntime().removeShutdownHook(this);
 		super.beforeUnregister();
+	}
+
+	private boolean clusterRecordValid(ClusterRepoItem item) {
+
+		// we ignore faulty addresses
+		boolean isCorrect = !item.getHostname().equalsIgnoreCase("localhost");
+
+		if (!isCorrect && log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "Incorrect entry in cluster table, skipping: {0}", item);
+		}
+		return isCorrect;
 	}
 
 }

@@ -29,20 +29,25 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.db.*
-import tigase.vhosts.*
+import tigase.db.AuthRepository
+import tigase.db.TigaseDBException
+import tigase.db.UserNotFoundException
+import tigase.db.UserRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
 def PASSWORD = "password"
 //def PASSWORD_VERIFY = "password-verify"
 
-def p = (Packet)packet
-def auth_repo = (AuthRepository)authRepository
-def user_repo = (UserRepository)userRepository
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -57,11 +62,11 @@ if (userJid == null || userPass == null /*|| userPassVer == null*/) {
 	Command.addInstructions(result, "Fill out this form to change a user's password.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-			"hidden")
+						  "hidden")
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
-			"The Jabber ID for this account")
+						  "The Jabber ID for this account")
 	Command.addFieldValue(result, PASSWORD, userPass ?: "", "text-private",
-			"The new password for this account")
+						  "The new password for this account")
 //	Command.addFieldValue(result, PASSWORD_VERIFY, userPassVer ?: "", "text-private",
 //			"Retype password")
 
@@ -73,16 +78,16 @@ try {
 	bareJID = BareJID.bareJIDInstance(userJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 		if (user_repo.userExists(bareJID)) {
 			auth_repo.updatePassword(bareJID, userPass)
 			Command.addTextField(result, "Note", "Operation successful");
-		}
-		else {
+		} else {
 			Command.addTextField(result, "Note", "User not exists, can't change password.");
 		}
 	} else {
-		Command.addTextField(result, "Error", "You do not have enough permissions to change account password for this domain.");
+		Command.addTextField(result, "Error",
+							 "You do not have enough permissions to change account password for this domain.");
 	}
 } catch (UserNotFoundException ex) {
 	Command.addTextField(result, "Note", "User not exists, can't change password.");

@@ -20,25 +20,25 @@
 
 package tigase.eventbus.impl;
 
-import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
-
-import java.lang.reflect.Method;
-import java.util.Collection;
-
 import tigase.eventbus.EventRoutedTransientFiller;
 import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.RegistrationException;
 import tigase.util.reflection.ReflectionHelper.Handler;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+
+import static tigase.util.reflection.ReflectionHelper.collectAnnotatedMethods;
+
 /**
- * Class responsible for creation of <code>ReflectEventRoutedTransientFiller</code> instances
- * based on methods of consumer class annotated with <code>FillRoutedEvent</code> annotation.
- * 
+ * Class responsible for creation of <code>ReflectEventRoutedTransientFiller</code> instances based on methods of
+ * consumer class annotated with <code>FillRoutedEvent</code> annotation.
+ *
  * @author andrzej
  */
 public class ReflectEventRoutedTransientFillerFactory {
-	
-	private static final Handler<FillRoutedEvent,EventRoutedTransientFiller> HANDLER = (Object consumer, Method method, FillRoutedEvent annotation) -> {
+
+	private static final Handler<FillRoutedEvent, EventRoutedTransientFiller> HANDLER = (Object consumer, Method method, FillRoutedEvent annotation) -> {
 		if (method.getParameterCount() < 1) {
 			throw new RegistrationException("Event routing selection method must have parameter to receive event!");
 		}
@@ -51,5 +51,5 @@ public class ReflectEventRoutedTransientFillerFactory {
 	public Collection<EventRoutedTransientFiller> create(Object consumer) {
 		return collectAnnotatedMethods(consumer, FillRoutedEvent.class, HANDLER);
 	}
-	
+
 }

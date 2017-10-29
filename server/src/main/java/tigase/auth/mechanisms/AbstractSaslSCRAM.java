@@ -78,9 +78,10 @@ public abstract class AbstractSaslSCRAM
 		 */
 		tls_server_end_point
 	}
+
 	private final String algorithm;
-	private final String hmacAlgorithm;
 	private final byte[] clientKeyData;
+	private final String hmacAlgorithm;
 	private final String mechanismName;
 	private final byte[] serverKeyData;
 	private final String serverNonce;
@@ -126,7 +127,8 @@ public abstract class AbstractSaslSCRAM
 		return result;
 	}
 
-	protected static byte[] hmac(final SecretKey key, byte[] data) throws NoSuchAlgorithmException, InvalidKeyException {
+	protected static byte[] hmac(final SecretKey key, byte[] data)
+			throws NoSuchAlgorithmException, InvalidKeyException {
 		Mac mac = Mac.getInstance(key.getAlgorithm());
 		mac.init(key);
 		return mac.doFinal(data);
@@ -158,39 +160,6 @@ public abstract class AbstractSaslSCRAM
 		this.serverNonce = serverOnce;
 	}
 
-	protected byte[] calculateC() {
-		try {
-			final ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-			result.write(this.cfmGs2header.getBytes());
-
-			if (this.requestedBindType == BindType.tls_unique || this.requestedBindType == BindType.tls_server_end_point) {
-				result.write(bindingData);
-			}
-			return result.toByteArray();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected abstract void checkRequestedBindType(BindType requestedBindType) throws SaslException;
-
-	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
-		final char t = cfmGs2header.charAt(0);
-
-		if ('n' == t) {
-			return BindType.n;
-		} else if ('y' == t) {
-			return BindType.y;
-		} else if ("tls-unique".equals(cfmCbname)) {
-			return BindType.tls_unique;
-		} else if ("tls-server-end-point".equals(cfmCbname)) {
-			return BindType.tls_server_end_point;
-		} else {
-			throw new SaslException("Unsupported channel binding type");
-		}
-	}
-
 	@Override
 	public byte[] evaluateResponse(byte[] response) throws SaslException {
 		try {
@@ -220,6 +189,34 @@ public abstract class AbstractSaslSCRAM
 		return mechanismName;
 	}
 
+	@Override
+	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
+		return null;
+	}
+
+	@Override
+	public byte[] wrap(byte[] outgoing, int offset, int len) throws SaslException {
+		return null;
+	}
+
+	protected byte[] calculateC() {
+		try {
+			final ByteArrayOutputStream result = new ByteArrayOutputStream();
+
+			result.write(this.cfmGs2header.getBytes());
+
+			if (this.requestedBindType == BindType.tls_unique ||
+					this.requestedBindType == BindType.tls_server_end_point) {
+				result.write(bindingData);
+			}
+			return result.toByteArray();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected abstract void checkRequestedBindType(BindType requestedBindType) throws SaslException;
+
 	protected byte[] h(byte[] data) throws NoSuchAlgorithmException {
 		MessageDigest digest = MessageDigest.getInstance(algorithm);
 		return digest.digest(data);
@@ -244,7 +241,7 @@ public abstract class AbstractSaslSCRAM
 		final String cfmMext = r.group("mext");
 		this.cfmUsername = r.group("username");
 		final String cfmNonce = r.group("nonce");
-		
+
 		checkRequestedBindType(requestedBindType);
 
 		final ChannelBindingCallback cc = new ChannelBindingCallback("Channel binding data", this.requestedBindType);
@@ -348,33 +345,12 @@ public abstract class AbstractSaslSCRAM
 		return serverStringMessage.toString().getBytes();
 	}
 
-	private String randomString() {
-		final int length = 20;
-		final int x = ALPHABET.length();
-		char[] buffer = new char[length];
-		for (int i = 0; i < length; i++) {
-			int r = random.nextInt(x);
-			buffer[i] = ALPHABET.charAt(r);
-		}
-		return new String(buffer);
-	}
-
-	@Override
-	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
-		return null;
-	}
-
 	protected void validateBindingsData(BindType requestedBindType, byte[] bindingData) throws SaslException {
 		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
 			throw new RuntimeException("Binding data not found!");
 		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
 			throw new RuntimeException("Binding data not found!");
 		}
-	}
-
-	@Override
-	public byte[] wrap(byte[] outgoing, int offset, int len) throws SaslException {
-		return null;
 	}
 
 	protected byte[] xor(final byte[] a, final byte[] b) {
@@ -384,6 +360,33 @@ public abstract class AbstractSaslSCRAM
 			r[i] = (byte) (a[i] ^ b[i]);
 		}
 		return r;
+	}
+
+	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
+		final char t = cfmGs2header.charAt(0);
+
+		if ('n' == t) {
+			return BindType.n;
+		} else if ('y' == t) {
+			return BindType.y;
+		} else if ("tls-unique".equals(cfmCbname)) {
+			return BindType.tls_unique;
+		} else if ("tls-server-end-point".equals(cfmCbname)) {
+			return BindType.tls_server_end_point;
+		} else {
+			throw new SaslException("Unsupported channel binding type");
+		}
+	}
+
+	private String randomString() {
+		final int length = 20;
+		final int x = ALPHABET.length();
+		char[] buffer = new char[length];
+		for (int i = 0; i < length; i++) {
+			int r = random.nextInt(x);
+			buffer[i] = ALPHABET.charAt(r);
+		}
+		return new String(buffer);
 	}
 
 	private enum Step {

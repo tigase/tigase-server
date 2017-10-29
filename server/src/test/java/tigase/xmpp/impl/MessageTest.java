@@ -24,10 +24,10 @@ import org.junit.Before;
 import org.junit.Test;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -35,26 +35,26 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author andrzej
  */
-public class MessageTest extends ProcessorTestCase {
-	
+public class MessageTest
+		extends ProcessorTestCase {
+
 	private Message messageProcessor;
-	
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		messageProcessor = new Message();
 		super.setUp();
 	}
-	
+
 	@After
 	@Override
 	public void tearDown() throws Exception {
 		messageProcessor = null;
 		super.tearDown();
-	}	
+	}
 
 	@Test
 	public void testSilentlyIgnoringMessages() throws Exception {
@@ -62,14 +62,13 @@ public class MessageTest extends ProcessorTestCase {
 		JID res1 = JID.jidInstance(userJid, "res1");
 
 		// testing default behaviour - error message
-		Element packetEl = new Element("message", new String[] { "from", "to" },
-				new String[] { "remote-user@test.com/res1", res1.toString() });
+		Element packetEl = new Element("message", new String[]{"from", "to"},
+									   new String[]{"remote-user@test.com/res1", res1.toString()});
 		Packet packet = Packet.packetInstance(packetEl);
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, null, null, results, null);
 		assertTrue("no error was generated", !results.isEmpty());
-		assertTrue("generated result is not an error", results.poll().getType().equals( StanzaType.error));
-
+		assertTrue("generated result is not an error", results.poll().getType().equals(StanzaType.error));
 
 		// testing silently ignoring error responses
 		results.clear();
@@ -80,7 +79,7 @@ public class MessageTest extends ProcessorTestCase {
 		messageProcessor.process(packet, null, null, results, null);
 		assertTrue("result was generated", results.isEmpty());
 	}
-	
+
 	@Test
 	public void testResourceSelectionForMessageDeliveryMethods() throws Exception {
 		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
@@ -88,112 +87,115 @@ public class MessageTest extends ProcessorTestCase {
 		JID res2 = JID.jidInstance(userJid, "res2");
 		XMPPResourceConnection session1 = getSession(res1, res1);
 		XMPPResourceConnection session2 = getSession(res2, res2);
-		
+
 		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
 		assertEquals(Collections.emptyList(), messageProcessor.getConnectionsForMessageDelivery(session1));
-		
-		assertFalse("found XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
+
+		assertFalse("found XMPPResourceConnection for delivery of message",
+					messageProcessor.hasConnectionForMessageDelivery(session1));
 		session1.setPriority(1);
 		assertTrue("found XMPPResourceConnection for delivery of message",
-				messageProcessor.hasConnectionForMessageDelivery(session1));
-		
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
+
 		session1.setPresence(new Element("presence"));
-		assertTrue("could not find XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
-		
+		assertTrue("could not find XMPPResourceConnection for delivery of message",
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
+
 		assertEquals(Arrays.asList(session1), messageProcessor.getConnectionsForMessageDelivery(session2));
-		
+
 		session2.setPresence(new Element("presence"));
-		assertTrue("could not find XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
+		assertTrue("could not find XMPPResourceConnection for delivery of message",
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
 		assertEquals(Arrays.asList(session1, session2), messageProcessor.getConnectionsForMessageDelivery(session2));
 	}
-	
+
 	@Test
 	public void testResourceSelectionForMessageDeliveryForBareJid() throws Exception {
 		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
 		JID res1 = JID.jidInstance(userJid, "res1");
 		JID res2 = JID.jidInstance(userJid, "res2");
-		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), res1);
-		XMPPResourceConnection session2 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), res2);
-		
+		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
+													 res1);
+		XMPPResourceConnection session2 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
+													 res2);
+
 		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
 		assertEquals(Collections.emptyList(), messageProcessor.getConnectionsForMessageDelivery(session1));
-		
-		Element packetEl = new Element("message", new String[] { "type", "from", "to" },
-				new String[] { "chat", "remote-user@test.com/res1", userJid.toString() });
+
+		Element packetEl = new Element("message", new String[]{"type", "from", "to"},
+									   new String[]{"chat", "remote-user@test.com/res1", userJid.toString()});
 		Packet packet = Packet.packetInstance(packetEl);
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session2, null, results, null);
 		assertTrue("generated result even than no resource had nonnegative priority", results.isEmpty());
-		
+
 //		session1.setPriority(1);
 //		results = new ArrayDeque<Packet>();
 //		messageProcessor.process(packet, session2, null, results, null);
 //		assertTrue("generated result even than no resource had nonnegative priority", results.isEmpty());
-		
+
 		session1.setPresence(new Element("presence"));
-		assertTrue("could not find XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
+		assertTrue("could not find XMPPResourceConnection for delivery of message",
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
-		messageProcessor.process(packet, session2, null, results, null);		
+		messageProcessor.process(packet, session2, null, results, null);
 		assertEquals("not generated result even than 1 resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId()), collectPacketTo(results));
-		
+
 		session2.setPresence(new Element("presence"));
-		assertTrue("could not find XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
+		assertTrue("could not find XMPPResourceConnection for delivery of message",
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
-		messageProcessor.process(packet, session1, null, results, null);		
+		messageProcessor.process(packet, session1, null, results, null);
 		assertEquals("not generated result even than 2 resource had nonnegative priority", 2, results.size());
-		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId(), session2.getConnectionId()), 
-				collectPacketTo(results));		
-	}	
-	
+		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId(), session2.getConnectionId()),
+					 collectPacketTo(results));
+	}
+
 	@Test
 	public void testResourceSelectionForMessageDeliveryForFullJid() throws Exception {
 		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
 		JID res1 = JID.jidInstance(userJid, "res1");
 		JID res2 = JID.jidInstance(userJid, "res2");
-		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), res1);
-		XMPPResourceConnection session2 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), res2);
-		
+		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
+													 res1);
+		XMPPResourceConnection session2 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
+													 res2);
+
 		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
 		assertEquals(Collections.emptyList(), messageProcessor.getConnectionsForMessageDelivery(session1));
-		
-		Element packetEl = new Element("message", new String[] { "type", "from", "to" },
-				new String[] { "chat", "remote-user@test.com/res1", res1.toString() });
+
+		Element packetEl = new Element("message", new String[]{"type", "from", "to"},
+									   new String[]{"chat", "remote-user@test.com/res1", res1.toString()});
 		Packet packet = Packet.packetInstance(packetEl);
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session2, null, results, null);
 		assertEquals("not generated result even than no resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId()), collectPacketTo(results));
-		
+
 		session1.setPriority(1);
 		results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session2, null, results, null);
 		assertEquals("not generated result even than no resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId()), collectPacketTo(results));
-		
+
 		session1.setPresence(new Element("presence"));
-		assertTrue("could not find XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
+		assertTrue("could not find XMPPResourceConnection for delivery of message",
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
-		messageProcessor.process(packet, session2, null, results, null);		
+		messageProcessor.process(packet, session2, null, results, null);
 		assertEquals("not generated result even than 1 resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId()), collectPacketTo(results));
-		
+
 		session2.setPresence(new Element("presence"));
-		assertTrue("could not find XMPPResourceConnection for delivery of message", 
-				messageProcessor.hasConnectionForMessageDelivery(session1));
+		assertTrue("could not find XMPPResourceConnection for delivery of message",
+				   messageProcessor.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
-		messageProcessor.process(packet, session1, null, results, null);		
+		messageProcessor.process(packet, session1, null, results, null);
 		assertEquals("not generated result even than 2 resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session1.getConnectionId()), collectPacketTo(results));
-	}	
+	}
 
-	
 	protected List<JID> collectPacketTo(Queue<Packet> packets) {
 		List<JID> result = new ArrayList<JID>();
 		Packet p;

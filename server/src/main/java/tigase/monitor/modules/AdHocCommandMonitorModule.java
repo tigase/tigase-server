@@ -37,13 +37,13 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
 
 @Bean(name = AdHocCommandModule.ID, parent = MonitorComponent.class, active = true)
-public class AdHocCommandMonitorModule extends AdHocCommandModule implements Initializable {
-
-	@Inject
-	private ConfigureTaskCommand configCommand;
+public class AdHocCommandMonitorModule
+		extends AdHocCommandModule
+		implements Initializable {
 
 	private final AdHocCommandManager customCommandsManager = new AdHocCommandManager();
-
+	@Inject
+	private ConfigureTaskCommand configCommand;
 	@Inject
 	private InfoTaskCommand infoCommand;
 
@@ -51,15 +51,6 @@ public class AdHocCommandMonitorModule extends AdHocCommandModule implements Ini
 	private Kernel kernel;
 
 	public AdHocCommandMonitorModule() {
-	}
-
-	private AdHocCommand getCommand(final Object taskInstance, final String node) {
-		if (node.equals(InfoTaskCommand.NODE)) {
-			return infoCommand;
-		} else if (node.equals(ConfigureTaskCommand.NODE)) {
-			return configCommand;
-		} else
-			return null;
 	}
 
 	@Override
@@ -81,6 +72,16 @@ public class AdHocCommandMonitorModule extends AdHocCommandModule implements Ini
 			super.process(packet);
 		} else {
 			throw new ComponentException(Authorization.NOT_ACCEPTABLE);
+		}
+	}
+
+	private AdHocCommand getCommand(final Object taskInstance, final String node) {
+		if (node.equals(InfoTaskCommand.NODE)) {
+			return infoCommand;
+		} else if (node.equals(ConfigureTaskCommand.NODE)) {
+			return configCommand;
+		} else {
+			return null;
 		}
 	}
 

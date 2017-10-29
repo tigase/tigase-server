@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 /**
  * Defines value of 'config-type' for which bean should be loaded.
  */
-@Target({ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented

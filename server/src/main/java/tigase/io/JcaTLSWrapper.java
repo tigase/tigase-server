@@ -139,14 +139,6 @@ public class JcaTLSWrapper
 		// tlsEngine.closeInbound();
 	}
 
-	private void doTasks() {
-		Runnable runnable = null;
-
-		while ((runnable = tlsEngine.getDelegatedTask()) != null) {
-			runnable.run();
-		} // end of while ((runnable = engine.getDelegatedTask()) != 0)
-	}
-
 	/**
 	 * Method description
 	 */
@@ -274,40 +266,6 @@ public class JcaTLSWrapper
 	}
 
 	/**
-	 * Method <code>resizeApplicationBuffer</code> is used to perform
-	 */
-	private ByteBuffer resizeApplicationBuffer(ByteBuffer net, ByteBuffer app) {
-
-		// if (appBuffSize > app.remaining()) {
-		// if (net.remaining() > app.remaining()) {
-		// if (appBuffSize > app.capacity() - app.remaining()) {
-		// if (log.isLoggable(Level.FINE)) {
-		// log.fine("Resizing tlsInput to " + (appBuffSize + app.capacity()) +
-		// " bytes.");
-		// }
-		//
-		// ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
-		int newSize = app.capacity() * 2;
-		if (log.isLoggable(Level.FINE)) {
-			log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[]{newSize, debugId});
-		}
-
-		ByteBuffer bb = ByteBuffer.allocate(newSize);
-
-		// bb.clear();
-		bb.order(app.order());
-		app.flip();
-		bb.put(app);
-
-		return bb;
-
-		// } else {
-		//
-		// return app;
-		// } // end of else
-	}
-
-	/**
 	 * Method description
 	 *
 	 * @param id
@@ -395,6 +353,48 @@ public class JcaTLSWrapper
 				log.log(Level.FINEST, "doTasks(): {0}, {1}", new Object[]{tlsEngine.getHandshakeStatus(), debugId});
 			}
 		}
+	}
+
+	private void doTasks() {
+		Runnable runnable = null;
+
+		while ((runnable = tlsEngine.getDelegatedTask()) != null) {
+			runnable.run();
+		} // end of while ((runnable = engine.getDelegatedTask()) != 0)
+	}
+
+	/**
+	 * Method <code>resizeApplicationBuffer</code> is used to perform
+	 */
+	private ByteBuffer resizeApplicationBuffer(ByteBuffer net, ByteBuffer app) {
+
+		// if (appBuffSize > app.remaining()) {
+		// if (net.remaining() > app.remaining()) {
+		// if (appBuffSize > app.capacity() - app.remaining()) {
+		// if (log.isLoggable(Level.FINE)) {
+		// log.fine("Resizing tlsInput to " + (appBuffSize + app.capacity()) +
+		// " bytes.");
+		// }
+		//
+		// ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
+		int newSize = app.capacity() * 2;
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[]{newSize, debugId});
+		}
+
+		ByteBuffer bb = ByteBuffer.allocate(newSize);
+
+		// bb.clear();
+		bb.order(app.order());
+		app.flip();
+		bb.put(app);
+
+		return bb;
+
+		// } else {
+		//
+		// return app;
+		// } // end of else
 	}
 
 }

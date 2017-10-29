@@ -37,13 +37,14 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 @Bean(name = "repository", parent = ComponentProtocol.class, active = true)
-public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
+public class CompDBRepository
+		extends UserRepoRepository<CompRepoItem> {
 
 	@Override
 	public void destroy() {
 		// Nothing to destroy here
 	}
-	
+
 	@Override
 	public String getConfigKey() {
 		return CompRepoDefaults.getConfigKey();
@@ -83,5 +84,5 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 		}
 		return result;
 	}
-	
+
 }

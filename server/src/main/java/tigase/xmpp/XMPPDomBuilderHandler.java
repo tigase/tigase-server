@@ -27,74 +27,59 @@ import tigase.xml.Element;
 import tigase.xml.ElementFactory;
 import tigase.xml.SimpleHandler;
 
-import static tigase.server.ConnectionManager.ELEMENTS_NUMBER_LIMIT_PROP_KEY;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
 /**
- * <code>XMPPDomBuilderHandler</code> - implementation of
- *  <code>SimpleHandler</code> building <em>DOM</em> strctures during parsing
- *  time.
- *  It also supports creation multiple, sperate document trees if parsed
- *  buffer contains a few <em>XML</em> documents. As a result of work it returns
- *  always <code>Queue</code> containing all found <em>XML</em> trees in the
- *  same order as they were found in network data.<br>
- *  Document trees created by this <em>DOM</em> builder consist of instances of
- *  <code>Element</code> class or instances of class extending
- *  <code>Element</code> class. To receive trees built with instances of proper
- *  class user must provide <code>ElementFactory</code> implementation creating
- *  instances of required <code>ELement</code> extension.
- *
+ * <code>XMPPDomBuilderHandler</code> - implementation of <code>SimpleHandler</code> building <em>DOM</em> strctures
+ * during parsing time. It also supports creation multiple, sperate document trees if parsed buffer contains a few
+ * <em>XML</em> documents. As a result of work it returns always <code>Queue</code> containing all found <em>XML</em>
+ * trees in the same order as they were found in network data.<br> Document trees created by this <em>DOM</em> builder
+ * consist of instances of <code>Element</code> class or instances of class extending <code>Element</code> class. To
+ * receive trees built with instances of proper class user must provide <code>ElementFactory</code> implementation
+ * creating instances of required <code>ELement</code> extension.
  * <p>
- * Created: Sat Oct  2 22:01:34 2004
- * </p>
+ * <p> Created: Sat Oct  2 22:01:34 2004 </p>
+ *
  * @param <RefObject>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
+public class XMPPDomBuilderHandler<RefObject>
+		implements SimpleHandler {
+
 	private static final Logger log = Logger.getLogger(XMPPDomBuilderHandler.class.getName());
 
 	private static final String ELEM_STREAM_STREAM = "stream:stream";
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
 
 	//~--- fields ---------------------------------------------------------------
-
-	private ElementFactory customFactory = null;
-	private Object parserState = null;
-	private XMPPIOService<RefObject> service = null;
-	private String top_xmlns = null;
-	private Map<String, String> namespaces = new TreeMap<>();
-	private boolean error = false;
-	private ArrayDeque<Element> el_stack = new ArrayDeque<>(10);
 	private ArrayDeque<Element> all_roots = new ArrayDeque<>(1);
-	private boolean streamClosed = false;
-
+	private ElementFactory customFactory = null;
+	private ArrayDeque<Element> el_stack = new ArrayDeque<>(10);
+	private int elements_number_limit;
 	/**
-	 * Protection from the system overload and DOS attack. We want to limit number
-	 * of elements created within a single XMPP stanza.
-	 *
+	 * Protection from the system overload and DOS attack. We want to limit number of elements created within a single
+	 * XMPP stanza.
 	 */
 	private int elements_number_limit_count = 0;
-	private int elements_number_limit;
-
+	private boolean error = false;
+	private Map<String, String> namespaces = new TreeMap<>();
+	private Object parserState = null;
+	private XMPPIOService<RefObject> service = null;
+	private boolean streamClosed = false;
+	private String top_xmlns = null;
 
 	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param ioserv
 	 */
@@ -106,7 +91,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param ioserv
 	 * @param factory
@@ -168,10 +152,11 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 						}
 					}    // end of if (tmp_name.startsWith(xmlns))
 				}      // end of for (String xmlns: namespaces.keys())
-			}		
-		}		
-		if (elem.getName() != tmp_name.intern() || (tmp_xmlns != null && !tmp_xmlns.equals(elem.getXMLNS())))
+			}
+		}
+		if (elem.getName() != tmp_name.intern() || (tmp_xmlns != null && !tmp_xmlns.equals(elem.getXMLNS()))) {
 			return false;
+		}
 
 		if (el_stack.isEmpty()) {
 			elements_number_limit_count = 0;
@@ -201,9 +186,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public Queue<Element> getParsedElements() {
 		return all_roots;
@@ -214,7 +196,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	public boolean isStreamClosed() {
 		return streamClosed;
 	}
-	
+
 	@Override
 	public void otherXML(StringBuilder other) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -226,9 +208,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public boolean parseError() {
 		return error;
@@ -249,8 +228,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	}
 
 	@Override
-	public void startElement(StringBuilder name, StringBuilder[] attr_names,
-			StringBuilder[] attr_values) {
+	public void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Start element name: " + name);
 			log.finest("Element attributes names: " + Arrays.toString(attr_names));
@@ -270,8 +248,8 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 					// TODO should use a StringCache instead of intern() to avoid potential
 					// DOS by exhausting permgen
-					namespaces.put(attr_names[i].substring("xmlns:".length(),
-							attr_names[i].length()).intern(), attr_values[i].toString());
+					namespaces.put(attr_names[i].substring("xmlns:".length(), attr_names[i].length()).intern(),
+								   attr_values[i].toString());
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Namespace found: " + attr_values[i].toString());
@@ -356,21 +334,19 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		el_stack.push(elem);
 	}
 
-	private Element newElement( String name, String cdata, StringBuilder[] attnames,
-															StringBuilder[] attvals ) {
+	private Element newElement(String name, String cdata, StringBuilder[] attnames, StringBuilder[] attvals) {
 		++elements_number_limit_count;
-		Element el = customFactory.elementInstance( name, cdata, attnames, attvals );
+		Element el = customFactory.elementInstance(name, cdata, attnames, attvals);
 
-		if ( elements_number_limit_count > elements_number_limit ){
-			throw new XMPPParserException( "Too many elements for staza, possible DoS attack."
-																		 + "Current service " + service.getClass() + " limit of elements: " + elements_number_limit );
+		if (elements_number_limit_count > elements_number_limit) {
+			throw new XMPPParserException(
+					"Too many elements for staza, possible DoS attack." + "Current service " + service.getClass() +
+							" limit of elements: " + elements_number_limit);
 		}
 		return el;
 	}
 }    // XMPPDomBuilderHandler
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

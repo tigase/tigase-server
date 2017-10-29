@@ -28,20 +28,22 @@
 
 package tigase.admin
 
-import tigase.server.*
-import tigase.xmpp.*
-import tigase.xml.*
-import tigase.vhosts.*
-import tigase.cluster.strategy.*
-import tigase.xmpp.jid.BareJID;
-
+import tigase.cluster.strategy.ClusteringStrategyIfc
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.vhosts.VHostItem
+import tigase.vhosts.VHostManagerIfc
+import tigase.xml.Element
+import tigase.xmpp.XMPPResourceConnection
+import tigase.xmpp.XMPPSession
+import tigase.xmpp.jid.BareJID
 
 def JID = "accountjid"
 
-def p = (Packet)packet
-def sessions = (Map<BareJID, XMPPSession>)userSessions
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def sessions = (Map<BareJID, XMPPSession>) userSessions
+def vhost_man = (VHostManagerIfc) vhostMan
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -54,7 +56,7 @@ if (userJid == null) {
 	Command.addInstructions(result, "Fill out this form to gather informations about user.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
-	Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for statistics")
+	Command.addFieldValue(result, JID, userJid ?: "", "jid-single", "The Jabber ID for statistics")
 	Command.addCheckBoxField(result, "Show connected resources in table", true)
 
 	return result
@@ -66,119 +68,123 @@ def resourcesAsTable = Command.getCheckBoxFieldValue(p, "Show connected resource
 def result = p.commandResult(Command.DataType.result)
 
 if (isServiceAdmin ||
-(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 
-		Command.addTextField(result, "JID", "JID: " + userJid)
-		def userRes = [];
-		if (binding.variables.containsKey("clusterStrategy")) { 
-            def cluster = (ClusteringStrategyIfc) clusterStrategy
-			def conns = cluster.getConnectionRecords(bareJID);
-			if (cluster.containsJid(bareJID) && (conns != null)) {
-				conns.each { rec ->
-					userRes.add([res:rec.getUserJid().getResource(), node:rec.getNode().getDomain()]);
-				}
+	Command.addTextField(result, "JID", "JID: " + userJid)
+	def userRes = [ ];
+	if (binding.variables.containsKey("clusterStrategy")) {
+		def cluster = (ClusteringStrategyIfc) clusterStrategy
+		def conns = cluster.getConnectionRecords(bareJID);
+		if (cluster.containsJid(bareJID) && (conns != null)) {
+			conns.each { rec -> userRes.add([ res: rec.getUserJid().getResource(), node: rec.getNode().getDomain() ]);
 			}
-		} 
-
-		XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
-		if (session != null) {
-			List<XMPPResourceConnection> conns = session.getActiveResources()
-			conns.each { con ->
-				userRes.add([res:con.getResource(), node:con.getConnectionId()?.getDomain()]);
-			}
-			
 		}
-		if (userRes.isEmpty()) {
-			Command.addTextField(result, "Status", "Status: offline")
+	}
+
+	XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
+	if (session != null) {
+		List<XMPPResourceConnection> conns = session.getActiveResources()
+		conns.each { con -> userRes.add([ res: con.getResource(), node: con.getConnectionId()?.getDomain() ]);
+		}
+
+	}
+	if (userRes.isEmpty()) {
+		Command.addTextField(result, "Status", "Status: offline")
+	} else {
+		userRes.sort { it.res };
+		Command.addTextField(result, "Status", "Status: " + (userRes.size() ? "online" : "offline"))
+		Command.addTextField(result, "Active connections", "Active connections: " + userRes.size())
+		if (resourcesAsTable) {
+			Element reported = new Element("reported");
+			reported.addAttribute("label", "Connected resources");
+			def cols = [ "Resource", "Cluster node" ];
+			cols.each {
+				Element el = new Element("field");
+				el.setAttribute("var", it);
+				reported.addChild(el);
+			}
+			result.getElement().getChild('command').getChild('x').addChild(reported);
+			userRes.each { con ->
+				Element item = new Element("item");
+				Element res = new Element("field");
+				res.setAttribute("var", "Resource");
+				res.addChild(new Element("value", con.res));
+				item.addChild(res);
+
+				Element node = new Element("field");
+				node.setAttribute("var", "Cluster node");
+				node.addChild(new Element("value", con.node));
+				item.addChild(node);
+				result.getElement().getChild('command').getChild('x').addChild(item);
+			}
 		} else {
-			userRes.sort { it.res };
-			Command.addTextField(result, "Status", "Status: " + (userRes.size() ? "online" : "offline"))
-			Command.addTextField(result, "Active connections", "Active connections: " + userRes.size())
-			if (resourcesAsTable) {
-				Element reported = new Element("reported");
-				reported.addAttribute("label", "Connected resources");
-				def cols = ["Resource", "Cluster node"];
-				cols.each {
-					Element el = new Element("field");
-					el.setAttribute("var", it);
-					reported.addChild(el);
-				}
-				result.getElement().getChild('command').getChild('x').addChild(reported);
-				userRes.each { con ->	
-					Element item = new Element("item");
-					Element res = new Element("field");
-					res.setAttribute("var", "Resource");
-					res.addChild(new Element("value", con.res));
-					item.addChild(res);
-				
-					Element node = new Element("field");
-					node.setAttribute("var", "Cluster node");
-					node.addChild(new Element("value", con.node));
-					item.addChild(node);
-					result.getElement().getChild('command').getChild('x').addChild(item);
-				}				
-			} else {
-				for (def con: userRes) {
-					Command.addTextField(result, con.res + " is connected to", con.res + " is connected to " + con.node);
-				}
-			}				
-		}
-
-		def sessionManager = component;
-		def offlineMsgsRepo = sessionManager.processors.values().find { it.hasProperty("msg_repo") }?.msg_repo;
-		if (offlineMsgsRepo && offlineMsgsRepo.metaClass.respondsTo(offlineMsgsRepo, "getMessagesCount", [ tigase.xmpp.jid.JID] as Object[])) {
-			def offlineStats = 0;
-			try {
-				offlineStats = offlineMsgsRepo.getMessagesCount(tigase.xmpp.jid.JID.jidInstance(bareJID));
-			} catch (tigase.db.UserNotFoundException ex) {
-				// ignoring this error for now as it is not important
+			for (def con : userRes) {
+				Command.addTextField(result, con.res + " is connected to", con.res + " is connected to " + con.node);
 			}
-			def msg = "Offline messages: " + (offlineStats ? (offlineStats[offlineStats.keySet().find { it.name() == "message" }] ?: 0) : 0);
-			Command.addTextField(result, msg, msg);
-		}		
-		
-		def loginHistoryProcessor = sessionManager.outFilters["login-history"];
-		if (loginHistoryProcessor) {
-			def unifiedArchiveComp = tigase.server.XMPPServer.getComponent(loginHistoryProcessor.getComponentJid().getLocalpart())//sessionManager.parent.components_byId[loginHistoryProcessor.componentJid];
-			if (unifiedArchiveComp) {
-				def ua_repo = unifiedArchiveComp.msg_repo;
-				def criteria = ua_repo.newCriteriaInstance();
-				criteria.setWith(bareJID.toString());
-				criteria.getRSM().hasBefore = true;
-				criteria.getRSM().max = 10;
-				criteria.itemType = "login";
+		}
+	}
+
+	def sessionManager = component;
+	def offlineMsgsRepo = sessionManager.processors.values().find { it.hasProperty("msg_repo") }?.msg_repo;
+	if (offlineMsgsRepo && offlineMsgsRepo.metaClass.respondsTo(offlineMsgsRepo, "getMessagesCount",
+																[ tigase.xmpp.jid.JID ] as Object[])) {
+		def offlineStats = 0;
+		try {
+			offlineStats = offlineMsgsRepo.getMessagesCount(tigase.xmpp.jid.JID.jidInstance(bareJID));
+		} catch (tigase.db.UserNotFoundException ex) {
+			// ignoring this error for now as it is not important
+		}
+		def msg = "Offline messages: " +
+				(offlineStats ? (offlineStats[offlineStats.keySet().find { it.name() == "message" }] ?: 0) : 0);
+		Command.addTextField(result, msg, msg);
+	}
+
+	def loginHistoryProcessor = sessionManager.outFilters["login-history"];
+	if (loginHistoryProcessor) {
+		def unifiedArchiveComp = tigase.server.XMPPServer.getComponent(
+				loginHistoryProcessor.getComponentJid().getLocalpart())
+//sessionManager.parent.components_byId[loginHistoryProcessor.componentJid];
+		if (unifiedArchiveComp) {
+			def ua_repo = unifiedArchiveComp.msg_repo;
+			def criteria = ua_repo.newCriteriaInstance();
+			criteria.setWith(bareJID.toString());
+			criteria.getRSM().hasBefore = true;
+			criteria.getRSM().max = 10;
+			criteria.itemType = "login";
 //				def logins = ua_repo.getItems(bareJID, criteria).reverse().collect { new java.util.Date(criteria.getStart().getTime() + 
 //							(Integer.parseInt(it.getAttribute("secs"))*1000)).toString() + " for resource '" + it.getChildren().first().getCData() + "'" }.join("\n");
 
-				Element reported = new Element("reported");
-				reported.addAttribute("label", "Login times");
-				def cols = ["Resource", "Date"];
-				cols.each {
-					Element el = new Element("field");
-					el.setAttribute("var", it);
-					reported.addChild(el);
-				}
-				result.getElement().getChild('command').getChild('x').addChild(reported);
-			
-				ua_repo.getItems(bareJID, criteria).reverse().each {
-					Element item = new Element("item");
-					Element res = new Element("field");
-					res.setAttribute("var", "Resource");
-					res.addChild(new Element("value", it.getChildren().first().getCData()));
-					item.addChild(res);
-					
-					String ts = new java.util.Date(criteria.getStart().getTime() + 
-						(Integer.parseInt(it.getAttribute("secs"))*1000)).format("yyyy-MM-dd HH:mm:ss.S");
-					Element node = new Element("field");
-					node.setAttribute("var", "Date");
-					node.addChild(new Element("value", ts));
-					item.addChild(node);
-					result.getElement().getChild('command').getChild('x').addChild(item);
-				}
+			Element reported = new Element("reported");
+			reported.addAttribute("label", "Login times");
+			def cols = [ "Resource", "Date" ];
+			cols.each {
+				Element el = new Element("field");
+				el.setAttribute("var", it);
+				reported.addChild(el);
+			}
+			result.getElement().getChild('command').getChild('x').addChild(reported);
+
+			ua_repo.getItems(bareJID, criteria).reverse().each {
+				Element item = new Element("item");
+				Element res = new Element("field");
+				res.setAttribute("var", "Resource");
+				res.addChild(new Element("value", it.getChildren().first().getCData()));
+				item.addChild(res);
+
+				String ts = new java.util.Date(
+						criteria.getStart().getTime() + (Integer.parseInt(it.getAttribute("secs")) * 1000)).format(
+						"yyyy-MM-dd HH:mm:ss.S");
+				Element node = new Element("field");
+				node.setAttribute("var", "Date");
+				node.addChild(new Element("value", ts));
+				item.addChild(node);
+				result.getElement().getChild('command').getChild('x').addChild(item);
 			}
 		}
+	}
 } else {
-	Command.addTextField(result, "Error", "You do not have enough permissions to obtain statistics for user in this domain.");
+	Command.addTextField(result, "Error",
+						 "You do not have enough permissions to obtain statistics for user in this domain.");
 }
 
 return result

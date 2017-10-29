@@ -33,6 +33,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class CID {
+
 	private static final Logger log = Logger.getLogger(CID.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -47,7 +48,6 @@ public class CID {
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param cid
 	 */
 	public CID(String cid) {
@@ -60,8 +60,6 @@ public class CID {
 
 	/**
 	 * Constructs ...
-	 *
-	 *
 	 *
 	 * @param localHost
 	 * @param remoteHost
@@ -87,9 +85,6 @@ public class CID {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getLocalHost() {
 		return localHost;
@@ -97,9 +92,6 @@ public class CID {
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * 
 	 */
 	public String getRemoteHost() {
 		return remoteHost;

@@ -24,8 +24,8 @@ import tigase.db.RepositoryFactory;
 import tigase.db.Schema;
 import tigase.db.TigaseDBException;
 import tigase.server.XMPPServer;
-import tigase.util.log.LogFormatter;
 import tigase.util.Version;
+import tigase.util.log.LogFormatter;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.SystemConsole;
 import tigase.xmpp.jid.BareJID;
@@ -48,73 +48,49 @@ import java.util.stream.Collectors;
 import static tigase.db.jdbc.DataRepositoryImpl.JDBC_SCHEMA_VERSION_QUERY;
 
 /**
- * Simple utility class allowing various Database operations, including
- * executing simple queries, loading specific schema files or performing
- * complete load of all Tigase schema required to run the server.
- *
- * Following set of {@link Properties} is accepted:
- * <ul>
- * <li>{@code dbType} - type of the database, possible values are:
- * {@code mysql}, {@code postgresql}, {@code derby}, {@code sqlserver};
- * <li>{@code schemaVersion} - schema version to be loaded, , possible values
- * are: {@code 7-2}, {@code 7-1}, {@code 5-1}, {@code 5}, {@code 4};
- * <li>{@code dbName} - name of the database to be created/used;
- * <li>{@code dbHostname} - hostname of the database;
- * <li>{@code dbUser} - username of the regular user;
- * <li>{@code dbPass} - password of the regular user;
- * <li>{@code rootUser} - username of the database administrator user;
- * <li>{@code rootPass} - password of the database administrator user;
- * <li>{@code query} - simple, single query to be executed;
- * <li>{@code file} - path to the single schema file to be loaded to the
- * database;
- * <li>{@code adminJID} - JID address of the XMPP administrator account;
- * <li>{@code adminJIDpass} - password of the XMPP administrator account.
+ * Simple utility class allowing various Database operations, including executing simple queries, loading specific
+ * schema files or performing complete load of all Tigase schema required to run the server.
+ * <p>
+ * Following set of {@link Properties} is accepted: <ul> <li>{@code dbType} - type of the database, possible values are:
+ * {@code mysql}, {@code postgresql}, {@code derby}, {@code sqlserver}; <li>{@code schemaVersion} - schema version to be
+ * loaded, , possible values are: {@code 7-2}, {@code 7-1}, {@code 5-1}, {@code 5}, {@code 4}; <li>{@code dbName} - name
+ * of the database to be created/used; <li>{@code dbHostname} - hostname of the database; <li>{@code dbUser} - username
+ * of the regular user; <li>{@code dbPass} - password of the regular user; <li>{@code rootUser} - username of the
+ * database administrator user; <li>{@code rootPass} - password of the database administrator user; <li>{@code query} -
+ * simple, single query to be executed; <li>{@code file} - path to the single schema file to be loaded to the database;
+ * <li>{@code adminJID} - JID address of the XMPP administrator account; <li>{@code adminJIDpass} - password of the XMPP
+ * administrator account.
  *
  * @author wojtek
  */
-public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
+public class DBSchemaLoader
+		extends SchemaLoader<DBSchemaLoader.Parameters> {
 
-	/** Denotes whether there wasn't any problem establishing connection to the
-	 * database */
-	private boolean connection_ok = false;
-	/** Denotes whether database exists */
-	private boolean db_ok = false;
-	/** Denotes whether schema has proper version */
-	private boolean schema_ok = false;
-	/** Holds map of all replacement variables */
-	private Map<String, String> replacementMap = new HashMap<String, String>();
-	private Parameters params;
-	private static final Logger log = Logger.getLogger( DBSchemaLoader.class.getCanonicalName() );
-	
-	enum SQL_LOAD_STATE {
-
-		INIT, IN_SQL;
-	}
-
+	private static final Logger log = Logger.getLogger(DBSchemaLoader.class.getCanonicalName());
 	public enum PARAMETERS_ENUM {
-		DATABASE_TYPE("dbType","mysql"),
-		SCHEMA_VERSION("schemaVersion","8-0"),
-//		COMPONENTS("components","message-archiving,pubsub,muc,sock5"),
-		DATABASE_NAME("dbName","tigasedb"),
-		DATABASE_HOSTNAME("dbHostname","localhost"),
-		TIGASE_USERNAME("dbUser","tigase_user"),
-		TIGASE_PASSWORD("dbPass","tigase_pass"),
-		ROOT_USERNAME("rootUser","root"),
-		ROOT_PASSWORD("rootPass","root"),
-		LOG_LEVEL("logLevel","CONFIG"),
-		USE_SSL("useSSL","false"),
-		GET_URI("getURI","false"),
-		QUERY("query",null),
-		FILE("file",null),
-		ADMIN_JID("adminJID",null),
-		ADMIN_JID_PASS("adminJIDpass",null),
+		DATABASE_TYPE("dbType", "mysql"),
+		SCHEMA_VERSION("schemaVersion", "8-0"),
+		//		COMPONENTS("components","message-archiving,pubsub,muc,sock5"),
+		DATABASE_NAME("dbName", "tigasedb"),
+		DATABASE_HOSTNAME("dbHostname", "localhost"),
+		TIGASE_USERNAME("dbUser", "tigase_user"),
+		TIGASE_PASSWORD("dbPass", "tigase_pass"),
+		ROOT_USERNAME("rootUser", "root"),
+		ROOT_PASSWORD("rootPass", "root"),
+		LOG_LEVEL("logLevel", "CONFIG"),
+		USE_SSL("useSSL", "false"),
+		GET_URI("getURI", "false"),
+		QUERY("query", null),
+		FILE("file", null),
+		ADMIN_JID("adminJID", null),
+		ADMIN_JID_PASS("adminJIDpass", null),
 		IGNORE_MISSING_FILES("ignoreMissingFiles", "false"),
 		DATABASE_OPTIONS("dbOptions", null),
 		USE_LEGACY_DATETIME_CODE("useLegacyDatetimeCode", "false"),
 		SERVER_TIMEZONE("serverTimezone", null);
 
-		private String name = null;
 		private String defaultValue = null;
+		private String name = null;
 
 		PARAMETERS_ENUM(String name, String defaultValue) {
 			this.name = name;
@@ -128,6 +104,26 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		public String getDefaultValue() {
 			return defaultValue;
 		}
+	}
+	/**
+	 * Denotes whether there wasn't any problem establishing connection to the database
+	 */
+	private boolean connection_ok = false;
+	/** Denotes whether database exists */
+	private boolean db_ok = false;
+	private Parameters params;
+	/** Holds map of all replacement variables */
+	private Map<String, String> replacementMap = new HashMap<String, String>();
+	/** Denotes whether schema has proper version */
+	private boolean schema_ok = false;
+
+	/**
+	 * Main method allowing pass arguments to the class and setting all logging to be printed to console.
+	 *
+	 * @param args key-value (in the form of {@code "-<variable> value"}) parameters.
+	 */
+	public static void main(String[] args) {
+		SchemaLoader.main(args);
 	}
 
 	public DBSchemaLoader() {
@@ -172,10 +168,10 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		// configure logger
 		Level lvl = params.logLevel;
 
-		System.out.println( "LogLevel: " + lvl );
+		System.out.println("LogLevel: " + lvl);
 
-		log.setUseParentHandlers( false );
-		log.setLevel( lvl );
+		log.setUseParentHandlers(false);
+		log.setLevel(lvl);
 
 		Arrays.stream(log.getHandlers())
 				.filter((handler) -> handler instanceof ConsoleHandler)
@@ -191,7 +187,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		log.log(Level.CONFIG, "Parameters: {0}", new Object[]{params});
 		this.params = params;
 	}
-	
+
 	public List<String> getSupportedTypes() {
 		return Arrays.asList("derby", "mysql", "postgresql", "sqlserver", "jdbc");
 	}
@@ -202,27 +198,15 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		return path + dbType + "-" + schemaId + "-schema" + (version != null ? "-" + version : "") + ".sql";
 	}
 
-	/**
-	 * Main method allowing pass arguments to the class and setting all logging to
-	 * be printed to console.
-	 *
-	 * @param args key-value (in the form of {@code "-<variable> value"})
-	 *             parameters.
-	 */
-	public static void main( String[] args ) {
-		SchemaLoader.main(args);
-	}
-
 	@Override
 	public Parameters createParameters() {
 		return new Parameters();
 	}
 
 	/**
-	 * Executes set of {@link TigaseDBTask} tasks selected based on set on passed
-	 * properties
+	 * Executes set of {@link TigaseDBTask} tasks selected based on set on passed properties
 	 *
-	 * @param params  set of configuration parameters.
+	 * @param params set of configuration parameters.
 	 */
 	public void execute(SchemaLoader.Parameters params) {
 		if (params instanceof Parameters) {
@@ -244,176 +228,49 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		}
 	}
 
-	/**
-	 * Performs actual read and parsing of queries from resource file. It skips
-	 * comments and require proper syntax of the file, i.e. each query enclosed in
-	 * {@code "-- QUERY START:"} and {@code "-- QUERY END:"}. If the file
-	 * references/sources/import another schema file then it will also be read and
-	 * parsed.
-	 *
-	 * @param resource   name of the resource for which an {@link InputStream}
-	 *                   should be created, either excerpt of the name or a
-	 *                   full/relative path to the schema {@code .sql} file.
-	 * @return
-	 * @throws IOException
-	 */
-	private ArrayList<String> loadSQLQueries( String resource)
-			throws IOException {
-		log.log(Level.FINER, "Loading queries, resource: {0}", new Object[]{resource});
-		ArrayList<String> results = new ArrayList<>();
-		Path p = Paths.get(resource);
-
-		if (!Files.exists(p)) {
-			Path srcPath = Paths.get("src/main/" + resource);
-			if (!Files.exists(srcPath)) {
-				if (params.isIgnoreMissingFiles()) {
-					log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
-					return results;
-				} else {
-					throw new IOException("Required file at " + p.toString() + " doesn't exist!");
-				}
-			} else {
-				p = srcPath;
-			}
-		}
-
-		String sql_query = "";
-		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
-		for (String line : Files.readAllLines(p)) {
-			switch ( state ) {
-				case INIT:
-					if ( line.startsWith( "-- QUERY START:" ) ){
-						sql_query = "";
-						state = SQL_LOAD_STATE.IN_SQL;
-					}
-//					if ( line.startsWith( "-- LOAD SCHEMA:" ) ){
-//						results.addAll( loadSchemaQueries( variables ) );
-//					}
-					if (  line.startsWith( "-- LOAD FILE:" )  && line.trim().contains( "sql" ) )
-					{
-						Matcher matcher = Pattern.compile( "-- LOAD FILE:\\s*(.*\\.sql)" ).matcher( line );
-						if ( matcher.find() ){
-							results.addAll( loadSQLQueries(  matcher.group( 1 ) ) );
-						}
-					}
-					break;
-				case IN_SQL:
-					if ( line.startsWith( "-- QUERY END:" ) ){
-						state = SQL_LOAD_STATE.INIT;
-						sql_query = sql_query.trim();
-						if ( sql_query.endsWith( ";" ) ){
-							sql_query = sql_query.substring( 0, sql_query.length() - 1 );
-						}
-						if ( sql_query.endsWith( "//" ) ){
-							sql_query = sql_query.substring( 0, sql_query.length() - 2 );
-						}
-						for ( Map.Entry<String, String> entry : replacementMap.entrySet() ) {
-							sql_query = sql_query.replace( entry.getKey(), entry.getValue() );
-						}
-
-						results.add( sql_query );
-					}
-					if ( line.isEmpty() || line.trim().startsWith( "--" ) ){
-						continue;
-					} else {
-						sql_query += " " + line.trim();
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		return results;
-	}
-
 	@Override
 	public Result validateDBConnection() {
 		connection_ok = false;
-		String db_conn = getDBUri(false, true );
-		log.log( Level.INFO, "Validating DBConnection, URI: " + db_conn );
-		if ( db_conn == null ){
-			log.log( Level.WARNING, "Missing DB connection URL" );
+		String db_conn = getDBUri(false, true);
+		log.log(Level.INFO, "Validating DBConnection, URI: " + db_conn);
+		if (db_conn == null) {
+			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.ok;
 		} else {
-			try ( Connection conn = DriverManager.getConnection( db_conn ) ) {
+			try (Connection conn = DriverManager.getConnection(db_conn)) {
 				Enumeration<Driver> drivers = DriverManager.getDrivers();
 				ArrayList<String> availableDrivers = new ArrayList<>();
-				while ( drivers.hasMoreElements() ) {
-					availableDrivers.add( drivers.nextElement().toString() );
+				while (drivers.hasMoreElements()) {
+					availableDrivers.add(drivers.nextElement().toString());
 				}
-				log.log( Level.FINE, "DriverManager (available drivers): " +  availableDrivers );
+				log.log(Level.FINE, "DriverManager (available drivers): " + availableDrivers);
 				conn.close();
 				connection_ok = true;
-				log.log( Level.INFO, "Connection OK" );
+				log.log(Level.INFO, "Connection OK");
 				return Result.ok;
-			} catch ( SQLException e ) {
-				log.log( Level.WARNING, e.getMessage() );
+			} catch (SQLException e) {
+				log.log(Level.WARNING, e.getMessage());
 				return Result.error;
 			}
 		}
-	}
-
-	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd) {
-		return withConnection(db_conn, cmd, null);
-	}
-
-	private <R> Optional<R> withConnectionGeneric(String db_conn, SQLCommand<Connection, R> cmd,
-	                                              ExceptionHandler<Exception, R> exceptionHandler) {
-		R result = null;
-		try ( Connection conn = DriverManager.getConnection( db_conn ) ) {
-			Enumeration<Driver> drivers = DriverManager.getDrivers();
-			ArrayList<String> availableDrivers = new ArrayList<>();
-			while ( drivers.hasMoreElements() ) {
-				availableDrivers.add( drivers.nextElement().toString() );
-			}
-			log.log( Level.FINE, "DriverManager (available drivers): " +  availableDrivers ) ;
-			result = cmd.execute(conn);
-			conn.close();
-		} catch (SQLException | IOException e) {
-			if (exceptionHandler != null) {
-				return Optional.of(exceptionHandler.handleException(e));
-			} else {
-				log.log( Level.SEVERE, "\n\n\n=====\nFailure: " + e.getMessage() + "\n=====\n\n" );
-				if (log.isLoggable(Level.FINEST)) {
-
-					log.log( Level.SEVERE, "Failure: " + e.getMessage(), e );
-				}
-				return Optional.empty();
-			}
-		}
-		return Optional.of(result);
-	}
-
-	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd, ExceptionHandler<Exception, Result> exceptionHandler) {
-		final Optional<Result> result = withConnectionGeneric(db_conn, cmd, exceptionHandler);
-		return result.orElse(Result.error);
-	}
-
-
-	private Result withStatement(String dbConn, SQLCommand<Statement, Result> cmd) {
-		return withConnection(dbConn, conn -> {
-			try (Statement stmt = conn.createStatement()) {
-				return cmd.execute(stmt);
-			}
-		});
 	}
 
 	@Override
 	public Result shutdown() {
 		return shutdownDerby();
 	}
-	
+
 	public Result shutdownDerby() {
-		String db_conn = getDBUri( false, true );
-		if ( "derby".equals( params.getDbType() ) ){
-			log.log( Level.INFO, "Validating DBConnection, URI: " + db_conn );
-			if ( db_conn == null ){
-				log.log( Level.WARNING, "Missing DB connection URL" );
+		String db_conn = getDBUri(false, true);
+		if ("derby".equals(params.getDbType())) {
+			log.log(Level.INFO, "Validating DBConnection, URI: " + db_conn);
+			if (db_conn == null) {
+				log.log(Level.WARNING, "Missing DB connection URL");
 			} else {
 				db_conn += ";shutdown=true";
 				return withConnection(db_conn, conn -> {
 					connection_ok = true;
-					log.log( Level.INFO, "Connection OK" );
+					log.log(Level.INFO, "Connection OK");
 					return Result.ok;
 				});
 			}
@@ -423,115 +280,113 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 	@Override
 	public Result validateDBExists() {
-		if ( !connection_ok ){
-			log.log( Level.WARNING, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.WARNING, "Connection not validated");
 			return Result.error;
 		}
 
 		db_ok = false;
-		String db_conn1 = getDBUri(true, false );
-		log.log( Level.INFO, "Validating whether DB Exists, URI: " + db_conn1 );
-		if ( db_conn1 == null ){
-			log.log( Level.WARNING, "Missing DB connection URL" );
+		String db_conn1 = getDBUri(true, false);
+		log.log(Level.INFO, "Validating whether DB Exists, URI: " + db_conn1);
+		if (db_conn1 == null) {
+			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.error;
 		} else {
 			return withConnection(db_conn1, conn -> {
 				db_ok = true;
-				log.log( Level.INFO, "Exists OK" );
+				log.log(Level.INFO, "Exists OK");
 				return Result.ok;
 			}, e -> withConnection(getDBUri(false, true), conn -> {
-						Result result = Result.ok;
-						try {
-							ArrayList<String> queries = loadSQLQueries(
-									"database/" + params.getDbType() + "-installer-create-db.sql");
-							for (String query : queries) {
-								log.log(Level.FINE, "Executing query: " + query);
-								if (!query.isEmpty()) {
-									// Some queries may fail and this is still fine
-									// the user or the database may already exist
-									try (Statement stmt = conn.createStatement()) {
-										stmt.execute(query);
-										stmt.close();
-									} catch (SQLException ex) {
-										result = Result.warning;
-										log.log(Level.WARNING, "Query failed: " + ex.getMessage());
-									}
-								}
+				Result result = Result.ok;
+				try {
+					ArrayList<String> queries = loadSQLQueries(
+							"database/" + params.getDbType() + "-installer-create-db.sql");
+					for (String query : queries) {
+						log.log(Level.FINE, "Executing query: " + query);
+						if (!query.isEmpty()) {
+							// Some queries may fail and this is still fine
+							// the user or the database may already exist
+							try (Statement stmt = conn.createStatement()) {
+								stmt.execute(query);
+								stmt.close();
+							} catch (SQLException ex) {
+								result = Result.warning;
+								log.log(Level.WARNING, "Query failed: " + ex.getMessage());
 							}
-							log.log( Level.INFO, " OK" );
-							db_ok = true;
-						} catch (IOException ex) {
-							log.log( Level.WARNING, ex.getMessage() );
-							result = Result.error;
 						}
-						return result;
-					}));
+					}
+					log.log(Level.INFO, " OK");
+					db_ok = true;
+				} catch (IOException ex) {
+					log.log(Level.WARNING, ex.getMessage());
+					result = Result.error;
+				}
+				return result;
+			}));
 		}
 	}
 
 	/**
-	 * Method performs post-installation action using using
-	 * {@code *-installer-post.sql} schema file substituting it's variables with
-	 * ones provided.
+	 * Method performs post-installation action using using {@code *-installer-post.sql} schema file substituting it's
+	 * variables with ones provided.
 	 */
 	@Override
 	public Result postInstallation() {
 		// part 1, check db preconditions
-		if ( !connection_ok ){
-			log.log( Level.WARNING, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.WARNING, "Connection not validated");
 			return Result.error;
 		}
-		if ( !db_ok ){
-			log.log( Level.WARNING, "Database not validated" );
+		if (!db_ok) {
+			log.log(Level.WARNING, "Database not validated");
 			return Result.error;
 		}
 
-		if ( !schema_ok ){
-			log.log( Level.WARNING, "Database schema is invalid" );
+		if (!schema_ok) {
+			log.log(Level.WARNING, "Database schema is invalid");
 			return Result.error;
 		}
 
 		// part 2, acquire reqired fields and validate them
-		String db_conn = getDBUri(true, true );
-		log.log( Level.INFO, "Post Installation, URI: " + db_conn );
+		String db_conn = getDBUri(true, true);
+		log.log(Level.INFO, "Post Installation, URI: " + db_conn);
 		return withStatement(db_conn, stmt -> {
-			log.log( Level.INFO, "Finalizing..." );
-			ArrayList<String> queries = loadSQLQueries( "database/" + params.getDbType() + "-installer-post.sql" );
-			for ( String query : queries ) {
-				if ( !query.isEmpty() ){
-					log.log( Level.FINEST, "Executing query: " + query );
+			log.log(Level.INFO, "Finalizing...");
+			ArrayList<String> queries = loadSQLQueries("database/" + params.getDbType() + "-installer-post.sql");
+			for (String query : queries) {
+				if (!query.isEmpty()) {
+					log.log(Level.FINEST, "Executing query: " + query);
 					try {
-						stmt.execute( query );
+						stmt.execute(query);
 					} catch (SQLException ex) {
 						log.log(Level.SEVERE, "Failed to execute query: " + query);
 						throw ex;
 					}
 				}
 			}
-			log.log( Level.INFO, " completed OK" );
+			log.log(Level.INFO, " completed OK");
 			return Result.ok;
 		});
 	}
 
 	/**
-	 * Method performs post-installation action using using
-	 * {@code *-installer-post.sql} schema file substituting it's variables with
-	 * ones provided.
+	 * Method performs post-installation action using using {@code *-installer-post.sql} schema file substituting it's
+	 * variables with ones provided.
 	 */
 	@Override
 	public Result printInfo() {
 		// part 1, check db preconditions
-		if ( !connection_ok ){
-			log.log( Level.WARNING, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.WARNING, "Connection not validated");
 			return Result.error;
 		}
-		if ( !db_ok ){
-			log.log( Level.WARNING, "Database not validated" );
+		if (!db_ok) {
+			log.log(Level.WARNING, "Database not validated");
 			return Result.error;
 		}
 
-		if ( !schema_ok ){
-			log.log( Level.WARNING, "Database schema is invalid" );
+		if (!schema_ok) {
+			log.log(Level.WARNING, "Database schema is invalid");
 			return Result.error;
 		}
 
@@ -541,51 +396,50 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 	@Override
 	public Result addXmppAdminAccount() {
 		// part 1, check db preconditions
-		if ( !connection_ok ){
-			log.log( Level.WARNING, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.WARNING, "Connection not validated");
 			return Result.error;
 		}
-		if ( !db_ok ){
-			log.log( Level.WARNING, "Database not validated" );
+		if (!db_ok) {
+			log.log(Level.WARNING, "Database not validated");
 			return Result.error;
 		}
 
-		if ( !schema_ok ){
-			log.log( Level.WARNING, "Database schema is invalid" );
+		if (!schema_ok) {
+			log.log(Level.WARNING, "Database schema is invalid");
 			return Result.error;
 		}
 
 		// part 2, acquire required fields and validate them
 		List<BareJID> jids = params.getAdmins();
-		if ( jids.size() < 1 ){
-			log.log( Level.WARNING, "Error: No admin users entered" );
+		if (jids.size() < 1) {
+			log.log(Level.WARNING, "Error: No admin users entered");
 			return Result.warning;
 		}
 
 		String pwd = params.getAdminPassword();
-		if ( pwd == null ){
-			log.log( Level.WARNING, "Error: No admin password entered" );
+		if (pwd == null) {
+			log.log(Level.WARNING, "Error: No admin password entered");
 			return Result.warning;
 		}
 
-		String dbUri = getDBUri( true, true );
-		log.log( Level.INFO, "Adding XMPP Admin Account, URI: " + dbUri );
+		String dbUri = getDBUri(true, true);
+		log.log(Level.INFO, "Adding XMPP Admin Account, URI: " + dbUri);
 
 		try {
 			Map<String, String> params = new HashMap<>();
-			params.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf( 1 ) );
+			params.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf(1));
 
-			log.log( Level.CONFIG, "RepositoryFactory.getAuthRepository(" + null + ", "
-														 + dbUri + "," +  params + ")" );
-			AuthRepository repo = RepositoryFactory.getAuthRepository( null, dbUri, params );
-			for ( BareJID jid : jids ) {
-				repo.addUser( jid, pwd );
+			log.log(Level.CONFIG, "RepositoryFactory.getAuthRepository(" + null + ", " + dbUri + "," + params + ")");
+			AuthRepository repo = RepositoryFactory.getAuthRepository(null, dbUri, params);
+			for (BareJID jid : jids) {
+				repo.addUser(jid, pwd);
 			}
 
-			log.log( Level.INFO, "All users added" );
+			log.log(Level.INFO, "All users added");
 			return Result.ok;
-		} catch ( TigaseDBException | ClassNotFoundException | InstantiationException | IllegalAccessException e ) {
-			log.log( Level.WARNING, "Error initializing DB" + e );
+		} catch (TigaseDBException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			log.log(Level.WARNING, "Error initializing DB" + e);
 			return Result.error;
 		}
 	}
@@ -608,9 +462,9 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			return Result.error;
 		}
 
-		String db_conn = getDBUri( true, true );
+		String db_conn = getDBUri(true, true);
 		log.log(Level.INFO, "Setting version of the component: {0} to: {1} for connection: {2}",
-		        new Object[]{component, version, db_conn});
+				new Object[]{component, version, db_conn});
 
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
@@ -638,7 +492,7 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			throw new IllegalArgumentException("Wrong component name");
 		} else {
-			String db_conn = getDBUri( true, true );
+			String db_conn = getDBUri(true, true);
 			final SQLCommand<Connection, Version> versionCommand = cmd -> {
 
 				try (PreparedStatement ps = cmd.prepareCall(JDBC_SCHEMA_VERSION_QUERY)) {
@@ -652,7 +506,8 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					}
 					ps.close();
 				} catch (SQLException ex) {
-					log.log(Level.WARNING, "Getting version failed: " + JDBC_SCHEMA_VERSION_QUERY + ", " + ex.getMessage());
+					log.log(Level.WARNING,
+							"Getting version failed: " + JDBC_SCHEMA_VERSION_QUERY + ", " + ex.getMessage());
 				}
 				return Version.ZERO;
 			};
@@ -664,8 +519,8 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 	@Override
 	public Result loadSchema(String schemaId, String version) {
-		if ( !connection_ok ){
-			log.log( Level.INFO, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.INFO, "Connection not validated");
 			return Result.error;
 		}
 
@@ -674,32 +529,31 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 	}
 
 	@Override
-	public Result loadSchemaFile( String fileName ) {
+	public Result loadSchemaFile(String fileName) {
 		// part 1, check db preconditions
-		if ( !connection_ok ){
-			log.log( Level.INFO, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.INFO, "Connection not validated");
 			return Result.error;
 		}
-		if ( !db_ok ){
-			log.log( Level.INFO, "Database not validated" );
-			return Result.error;
-		}
-
-		if ( fileName == null ){
-			log.log( Level.WARNING, "Error: empty query" );
+		if (!db_ok) {
+			log.log(Level.INFO, "Database not validated");
 			return Result.error;
 		}
 
-		String db_conn = getDBUri( true, true );
-		log.log(Level.INFO,
-		        String.format("Loading schema from file(s): %1$s, URI: %2$s", fileName, db_conn));
+		if (fileName == null) {
+			log.log(Level.WARNING, "Error: empty query");
+			return Result.error;
+		}
+
+		String db_conn = getDBUri(true, true);
+		log.log(Level.INFO, String.format("Loading schema from file(s): %1$s, URI: %2$s", fileName, db_conn));
 
 		return withStatement(db_conn, stmt -> {
 			ArrayList<String> queries = new ArrayList<>();
 			queries.addAll(loadSQLQueries(fileName));
-			for ( String query : queries ) {
-				if ( !query.isEmpty() ){
-					log.log( Level.FINEST, "Executing query: " + query );
+			for (String query : queries) {
+				if (!query.isEmpty()) {
+					log.log(Level.FINEST, "Executing query: " + query);
 					try {
 						stmt.execute(query);
 					} catch (SQLException ex) {
@@ -709,53 +563,14 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				}
 			}
 			schema_ok = true;
-			log.log( Level.INFO, " completed OK" );
+			log.log(Level.INFO, " completed OK");
 			return Result.ok;
 		});
 	}
 
-	/**
-	 * Method checks whether the connection to the database is possible and that
-	 * database of specified name exists. If yes then a single query is executed.
-	 *
-	 * @param query to execute
-	 */
-	protected Result executeSingleQuery( String query ) {
-		// part 1, check db preconditions
-		if ( !connection_ok ){
-			log.log( Level.INFO, "Connection not validated" );
-			return Result.error;
-		}
-
-		if ( query == null ) {
-			log.log(Level.WARNING, "Error: empty query");
-			return Result.error;
-		}
-
-		String db_conn = getDBUri( false, false );
-		log.log( Level.INFO, "Executing Simple Query, URI: " + db_conn );
-		if ( db_conn == null ){
-			log.log( Level.WARNING, "Missing DB connection URL" );
-			return Result.error;
-		} else {
-			return withStatement(db_conn, stmt -> {
-				log.log(Level.FINEST, "Executing query: " + query);
-				if (!query.isEmpty()) {
-					try {
-						stmt.execute(query);
-						stmt.close();
-					} catch (SQLException ex) {
-						log.log(Level.WARNING, "Query failed: " + query + ", " + ex.getMessage());
-					}
-				}
-				return Result.ok;
-			});
-		}
-	}
-
 	public Result destroyDataSource() {
-		if ( !connection_ok ){
-			log.log( Level.INFO, "Connection not validated" );
+		if (!connection_ok) {
+			log.log(Level.INFO, "Connection not validated");
 			return Result.error;
 		}
 
@@ -801,101 +616,6 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 	public String getDBUri() {
 		return getDBUri(true, false);
-	}
-
-	/**
-	 * Helper method used to generate proper database URI depending on properties.
-	 *
-	 * @param includeDbName      configure whether to include database name in the
-	 *                           URI
-	 * @param useRootCredentials whether to put in the URI credentials of database
-	 *                           administrator ({@code true}) or regular user.
-	 * @return
-	 */
-	private String getDBUri(boolean includeDbName, boolean useRootCredentials ) {
-		String db_uri = "jdbc:";
-		String database = params.getDbType();
-		String USERNAME = useRootCredentials ? params.getDbRootUser() : params.getDbUser();
-		String PASSWORD = useRootCredentials ? params.getDbRootPass() : params.getDbPass();
-
-		switch ( database ) {
-			case "sqlserver":
-				db_uri += "jtds:sqlserver:";
-				break;
-			default:
-				db_uri += database + ":";
-				break;
-		}
-		switch ( database ) {
-			case "derby":
-				db_uri += params.getDbName() + ";create=true";
-				break;
-			case "sqlserver":
-				db_uri += "//" + params.getDbHostname();
-				if ( includeDbName ){
-					db_uri += ";databaseName=" + params.getDbName();
-				}
-				db_uri += ";user=" + USERNAME;
-				if ( PASSWORD != null
-						 && !PASSWORD.isEmpty() ){
-					db_uri += ";password=" + PASSWORD;
-				}
-				db_uri += ";schema=dbo";
-				db_uri += ";lastUpdateCount=false";
-				db_uri += ";cacheMetaData=false";
-				if ( Boolean.TRUE.equals(params.isUseSSL()) ) {
-					db_uri += ";encrypt=true";
-				}
-				break;
-			case "postgresql":
-				db_uri += "//" + params.getDbHostname() + "/";
-				if ( includeDbName ){
-					db_uri += params.getDbName();
-				} else if (useRootCredentials) {
-					db_uri += "postgres";
-				}
-				db_uri += "?user=" + USERNAME;
-				if ( PASSWORD != null
-						&& !PASSWORD.isEmpty() ){
-					db_uri += "&password=" + PASSWORD;
-				}
-				if ( Boolean.TRUE.equals(params.isUseSSL()) ) {
-					db_uri += "&useSSL=true";
-				}
-				else if ( Boolean.FALSE.equals(params.isUseSSL()) ) {
-					// explicitly disable SSL to avoid a warning by the driver
-					db_uri += "&useSSL=false";
-				}
-				break;
-
-			case "mysql":
-				db_uri += "//" + params.getDbHostname() + "/";
-				if ( includeDbName ){
-					db_uri += params.getDbName();
-				}
-				db_uri += "?user=" + USERNAME;
-				if ( PASSWORD != null
-						 && !PASSWORD.isEmpty() ){
-					db_uri += "&password=" + PASSWORD;
-				}
-				if ( Boolean.TRUE.equals(params.isUseSSL()) ) {
-					db_uri += "&useSSL=true";
-				}
-				else if ( Boolean.FALSE.equals(params.isUseSSL()) ) {
-					// explicitly disable SSL to avoid a warning by the driver
-					db_uri += "&useSSL=false";
-				}
-				if (!params.isUseLegacyDatetimeCode()) {
-					db_uri += "&useLegacyDatetimeCode=" + params.isUseLegacyDatetimeCode();
-				}
-				if (params.getServerTimezone() != null) {
-					db_uri += "&serverTimezone=" + params.getServerTimezone();
-				}
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown database type: " + database);
-		}
-		return db_uri;
 	}
 
 	public List<CommandlineParameter> getCommandlineParameters() {
@@ -988,17 +708,19 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 							.build());
 		switch (this.getType()) {
 			case "mysql":
-				options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE.getName()).description(
+				options.add(new CommandlineParameter.Builder(null,
+															 PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE.getName()).description(
 						"Use legacy datetime code for JDBC connection")
 									.requireArguments(true)
 									.defaultValue(PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE.getDefaultValue())
 									.type(Boolean.class)
 									.build());
-				options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.SERVER_TIMEZONE.getName()).description(
-						"Time zone of database server")
-									.defaultValue(PARAMETERS_ENUM.SERVER_TIMEZONE.getDefaultValue())
-									.requireArguments(true)
-									.build());
+				options.add(
+						new CommandlineParameter.Builder(null, PARAMETERS_ENUM.SERVER_TIMEZONE.getName()).description(
+								"Time zone of database server")
+								.defaultValue(PARAMETERS_ENUM.SERVER_TIMEZONE.getDefaultValue())
+								.requireArguments(true)
+								.build());
 				break;
 			default:
 				break;
@@ -1006,65 +728,339 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		return options;
 	}
 
-	enum Tasks implements TigaseDBTask {
+	/**
+	 * Method checks whether the connection to the database is possible and that database of specified name exists. If
+	 * yes then a single query is executed.
+	 *
+	 * @param query to execute
+	 */
+	protected Result executeSingleQuery(String query) {
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			log.log(Level.INFO, "Connection not validated");
+			return Result.error;
+		}
 
-		VALIDATE_CONNECTION( "Checking connection to the database" ) {
+		if (query == null) {
+			log.log(Level.WARNING, "Error: empty query");
+			return Result.error;
+		}
+
+		String db_conn = getDBUri(false, false);
+		log.log(Level.INFO, "Executing Simple Query, URI: " + db_conn);
+		if (db_conn == null) {
+			log.log(Level.WARNING, "Missing DB connection URL");
+			return Result.error;
+		} else {
+			return withStatement(db_conn, stmt -> {
+				log.log(Level.FINEST, "Executing query: " + query);
+				if (!query.isEmpty()) {
+					try {
+						stmt.execute(query);
+						stmt.close();
+					} catch (SQLException ex) {
+						log.log(Level.WARNING, "Query failed: " + query + ", " + ex.getMessage());
+					}
+				}
+				return Result.ok;
+			});
+		}
+	}
+
+	/**
+	 * Performs actual read and parsing of queries from resource file. It skips comments and require proper syntax of
+	 * the file, i.e. each query enclosed in {@code "-- QUERY START:"} and {@code "-- QUERY END:"}. If the file
+	 * references/sources/import another schema file then it will also be read and parsed.
+	 *
+	 * @param resource name of the resource for which an {@link InputStream} should be created, either excerpt of the
+	 * name or a full/relative path to the schema {@code .sql} file.
+	 *
+	 * @return
+	 *
+	 * @throws IOException
+	 */
+	private ArrayList<String> loadSQLQueries(String resource) throws IOException {
+		log.log(Level.FINER, "Loading queries, resource: {0}", new Object[]{resource});
+		ArrayList<String> results = new ArrayList<>();
+		Path p = Paths.get(resource);
+
+		if (!Files.exists(p)) {
+			Path srcPath = Paths.get("src/main/" + resource);
+			if (!Files.exists(srcPath)) {
+				if (params.isIgnoreMissingFiles()) {
+					log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
+					return results;
+				} else {
+					throw new IOException("Required file at " + p.toString() + " doesn't exist!");
+				}
+			} else {
+				p = srcPath;
+			}
+		}
+
+		String sql_query = "";
+		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
+		for (String line : Files.readAllLines(p)) {
+			switch (state) {
+				case INIT:
+					if (line.startsWith("-- QUERY START:")) {
+						sql_query = "";
+						state = SQL_LOAD_STATE.IN_SQL;
+					}
+//					if ( line.startsWith( "-- LOAD SCHEMA:" ) ){
+//						results.addAll( loadSchemaQueries( variables ) );
+//					}
+					if (line.startsWith("-- LOAD FILE:") && line.trim().contains("sql")) {
+						Matcher matcher = Pattern.compile("-- LOAD FILE:\\s*(.*\\.sql)").matcher(line);
+						if (matcher.find()) {
+							results.addAll(loadSQLQueries(matcher.group(1)));
+						}
+					}
+					break;
+				case IN_SQL:
+					if (line.startsWith("-- QUERY END:")) {
+						state = SQL_LOAD_STATE.INIT;
+						sql_query = sql_query.trim();
+						if (sql_query.endsWith(";")) {
+							sql_query = sql_query.substring(0, sql_query.length() - 1);
+						}
+						if (sql_query.endsWith("//")) {
+							sql_query = sql_query.substring(0, sql_query.length() - 2);
+						}
+						for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
+							sql_query = sql_query.replace(entry.getKey(), entry.getValue());
+						}
+
+						results.add(sql_query);
+					}
+					if (line.isEmpty() || line.trim().startsWith("--")) {
+						continue;
+					} else {
+						sql_query += " " + line.trim();
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		return results;
+	}
+
+	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd) {
+		return withConnection(db_conn, cmd, null);
+	}
+
+	private <R> Optional<R> withConnectionGeneric(String db_conn, SQLCommand<Connection, R> cmd,
+												  ExceptionHandler<Exception, R> exceptionHandler) {
+		R result = null;
+		try (Connection conn = DriverManager.getConnection(db_conn)) {
+			Enumeration<Driver> drivers = DriverManager.getDrivers();
+			ArrayList<String> availableDrivers = new ArrayList<>();
+			while (drivers.hasMoreElements()) {
+				availableDrivers.add(drivers.nextElement().toString());
+			}
+			log.log(Level.FINE, "DriverManager (available drivers): " + availableDrivers);
+			result = cmd.execute(conn);
+			conn.close();
+		} catch (SQLException | IOException e) {
+			if (exceptionHandler != null) {
+				return Optional.of(exceptionHandler.handleException(e));
+			} else {
+				log.log(Level.SEVERE, "\n\n\n=====\nFailure: " + e.getMessage() + "\n=====\n\n");
+				if (log.isLoggable(Level.FINEST)) {
+
+					log.log(Level.SEVERE, "Failure: " + e.getMessage(), e);
+				}
+				return Optional.empty();
+			}
+		}
+		return Optional.of(result);
+	}
+
+	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd,
+								  ExceptionHandler<Exception, Result> exceptionHandler) {
+		final Optional<Result> result = withConnectionGeneric(db_conn, cmd, exceptionHandler);
+		return result.orElse(Result.error);
+	}
+
+	private Result withStatement(String dbConn, SQLCommand<Statement, Result> cmd) {
+		return withConnection(dbConn, conn -> {
+			try (Statement stmt = conn.createStatement()) {
+				return cmd.execute(stmt);
+			}
+		});
+	}
+
+	/**
+	 * Helper method used to generate proper database URI depending on properties.
+	 *
+	 * @param includeDbName configure whether to include database name in the URI
+	 * @param useRootCredentials whether to put in the URI credentials of database administrator ({@code true}) or
+	 * regular user.
+	 *
+	 * @return
+	 */
+	private String getDBUri(boolean includeDbName, boolean useRootCredentials) {
+		String db_uri = "jdbc:";
+		String database = params.getDbType();
+		String USERNAME = useRootCredentials ? params.getDbRootUser() : params.getDbUser();
+		String PASSWORD = useRootCredentials ? params.getDbRootPass() : params.getDbPass();
+
+		switch (database) {
+			case "sqlserver":
+				db_uri += "jtds:sqlserver:";
+				break;
+			default:
+				db_uri += database + ":";
+				break;
+		}
+		switch (database) {
+			case "derby":
+				db_uri += params.getDbName() + ";create=true";
+				break;
+			case "sqlserver":
+				db_uri += "//" + params.getDbHostname();
+				if (includeDbName) {
+					db_uri += ";databaseName=" + params.getDbName();
+				}
+				db_uri += ";user=" + USERNAME;
+				if (PASSWORD != null && !PASSWORD.isEmpty()) {
+					db_uri += ";password=" + PASSWORD;
+				}
+				db_uri += ";schema=dbo";
+				db_uri += ";lastUpdateCount=false";
+				db_uri += ";cacheMetaData=false";
+				if (Boolean.TRUE.equals(params.isUseSSL())) {
+					db_uri += ";encrypt=true";
+				}
+				break;
+			case "postgresql":
+				db_uri += "//" + params.getDbHostname() + "/";
+				if (includeDbName) {
+					db_uri += params.getDbName();
+				} else if (useRootCredentials) {
+					db_uri += "postgres";
+				}
+				db_uri += "?user=" + USERNAME;
+				if (PASSWORD != null && !PASSWORD.isEmpty()) {
+					db_uri += "&password=" + PASSWORD;
+				}
+				if (Boolean.TRUE.equals(params.isUseSSL())) {
+					db_uri += "&useSSL=true";
+				} else if (Boolean.FALSE.equals(params.isUseSSL())) {
+					// explicitly disable SSL to avoid a warning by the driver
+					db_uri += "&useSSL=false";
+				}
+				break;
+
+			case "mysql":
+				db_uri += "//" + params.getDbHostname() + "/";
+				if (includeDbName) {
+					db_uri += params.getDbName();
+				}
+				db_uri += "?user=" + USERNAME;
+				if (PASSWORD != null && !PASSWORD.isEmpty()) {
+					db_uri += "&password=" + PASSWORD;
+				}
+				if (Boolean.TRUE.equals(params.isUseSSL())) {
+					db_uri += "&useSSL=true";
+				} else if (Boolean.FALSE.equals(params.isUseSSL())) {
+					// explicitly disable SSL to avoid a warning by the driver
+					db_uri += "&useSSL=false";
+				}
+				if (!params.isUseLegacyDatetimeCode()) {
+					db_uri += "&useLegacyDatetimeCode=" + params.isUseLegacyDatetimeCode();
+				}
+				if (params.getServerTimezone() != null) {
+					db_uri += "&serverTimezone=" + params.getServerTimezone();
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown database type: " + database);
+		}
+		return db_uri;
+	}
+
+	enum SQL_LOAD_STATE {
+
+		INIT,
+		IN_SQL;
+	}
+
+	enum Tasks
+			implements TigaseDBTask {
+
+		VALIDATE_CONNECTION("Checking connection to the database") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
+			public void execute(DBSchemaLoader helper, Parameters params) {
 				helper.validateDBConnection();
 			}
 		},
-		VALIDATE_DB_EXISTS( "Checking if the database exists" ) {
+		VALIDATE_DB_EXISTS("Checking if the database exists") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
+			public void execute(DBSchemaLoader helper, Parameters params) {
 				helper.validateDBExists();
 			}
 		},
-		VALIDATE_DB_SCHEMA( "Checking the database schema" ) {
+		VALIDATE_DB_SCHEMA("Checking the database schema") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
+			public void execute(DBSchemaLoader helper, Parameters params) {
 				helper.loadSchema(Schema.SERVER_SCHEMA_ID, XMPPServer.class.getPackage().getImplementationVersion());
 			}
 		},
-		ADD_ADMIN_XMPP_ACCOUNT( "Adding XMPP admin accounts" ) {
+		ADD_ADMIN_XMPP_ACCOUNT("Adding XMPP admin accounts") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
+			public void execute(DBSchemaLoader helper, Parameters params) {
 				helper.addXmppAdminAccount();
 			}
 		},
-		EXECUTE_SIMPLE_QUERY( "Executing simple single query" ) {
+		EXECUTE_SIMPLE_QUERY("Executing simple single query") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
-				helper.executeSingleQuery( params.getQuery() );
+			public void execute(DBSchemaLoader helper, Parameters params) {
+				helper.executeSingleQuery(params.getQuery());
 			}
 		},
-		LOAD_SCHEMA_FILE( "Loading schema file from provided file" ) {
+		LOAD_SCHEMA_FILE("Loading schema file from provided file") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
-				helper.loadSchemaFile( params.getFile() );
+			public void execute(DBSchemaLoader helper, Parameters params) {
+				helper.loadSchemaFile(params.getFile());
 			}
 		},
-		POST_INSTALLATION( "Post installation actions" ) {
+		POST_INSTALLATION("Post installation actions") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
-				helper.postInstallation( );
+			public void execute(DBSchemaLoader helper, Parameters params) {
+				helper.postInstallation();
 			}
 		},
-		SHUTDOWN_DATABASE( "Shutting Down Database" ) {
+		SHUTDOWN_DATABASE("Shutting Down Database") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
-				helper.shutdownDerby( );
+			public void execute(DBSchemaLoader helper, Parameters params) {
+				helper.shutdownDerby();
 			}
 		},
-		PRINT_INFO_TASK( "Database Configuration Details" ) {
+		PRINT_INFO_TASK("Database Configuration Details") {
 			@Override
-			public void execute( DBSchemaLoader helper, Parameters params ) {
-				helper.printInfo( );
+			public void execute(DBSchemaLoader helper, Parameters params) {
+				helper.printInfo();
 			}
 		};
 		private final String description;
 
-		private Tasks( String description ) {
+		public static TigaseDBTask[] getQueryTasks() {
+			return new TigaseDBTask[]{VALIDATE_CONNECTION, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE};
+		}
+
+		public static TigaseDBTask[] getSchemaTasks() {
+			return new TigaseDBTask[]{VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, LOAD_SCHEMA_FILE, POST_INSTALLATION,
+									  SHUTDOWN_DATABASE, PRINT_INFO_TASK};
+		}
+
+		public static TigaseDBTask[] getTasksInOrder() {
+			return new TigaseDBTask[]{VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, VALIDATE_DB_SCHEMA,
+									  ADD_ADMIN_XMPP_ACCOUNT, POST_INSTALLATION, SHUTDOWN_DATABASE, PRINT_INFO_TASK};
+		}
+
+		private Tasks(String description) {
 			this.description = description;
 		}
 
@@ -1072,68 +1068,56 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		public String getDescription() {
 			return description;
 		}
+	}
 
-		public static TigaseDBTask[] getTasksInOrder() {
-			return new TigaseDBTask[] {
-				VALIDATE_CONNECTION
-					,VALIDATE_DB_EXISTS
-					,VALIDATE_DB_SCHEMA
-					,ADD_ADMIN_XMPP_ACCOUNT
-					,POST_INSTALLATION
-					,SHUTDOWN_DATABASE
-					,PRINT_INFO_TASK
-			};
-		}
+	public interface ExceptionHandler<T extends Exception, R> {
 
-		public static TigaseDBTask[] getSchemaTasks() {
-			return new TigaseDBTask[]{
-					VALIDATE_CONNECTION,
-					VALIDATE_DB_EXISTS,
-					LOAD_SCHEMA_FILE,
-					POST_INSTALLATION,
-					SHUTDOWN_DATABASE,
-					PRINT_INFO_TASK};
-		}
+		R handleException(T ex);
+	}
 
-		public static TigaseDBTask[] getQueryTasks() {
-			return new TigaseDBTask[] {VALIDATE_CONNECTION, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE};
-		}
+	public interface SQLCommand<C, R> {
+
+		R execute(C conn) throws SQLException, IOException;
+
 	}
 
 	static interface TigaseDBTask {
 
 		String getDescription();
 
-		abstract void execute( DBSchemaLoader helper, Parameters variables );
+		abstract void execute(DBSchemaLoader helper, Parameters variables);
 	}
 
-	public static class Parameters implements SchemaLoader.Parameters {
-
-		private Boolean ingoreMissingFiles = false;
-		private Level logLevel = Level.CONFIG;
+	public static class Parameters
+			implements SchemaLoader.Parameters {
 
 		private String adminPassword;
 		private List<BareJID> admins;
+		private String dbHostname = null;
+		private String dbName = null;
+		private String dbPass = null;
 		private String dbRootPass;
 		private String dbRootUser;
 		private String dbType;
-		private String dbName = null;
-		private String dbHostname = null;
 		private String dbUser = null;
-		private String dbPass = null;
-		private Boolean useSSL = null;
-		private Boolean useLegacyDatetimeCode = false;
-		private String serverTimezone = null;
-
 		private String file;
+		private Boolean ingoreMissingFiles = false;
+		private Level logLevel = Level.CONFIG;
 		private String query;
+		private String serverTimezone = null;
+		private Boolean useLegacyDatetimeCode = false;
+		private Boolean useSSL = null;
 
-		private String getFile() {
-			return file;
+		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
+			return props.getProperty(param.getName(), param.getDefaultValue());
 		}
 
-		private String getQuery() {
-			return query;
+		private static <T> T getProperty(Properties props, PARAMETERS_ENUM param, Function<String, T> converter) {
+			String tmp = getProperty(props, param);
+			if (tmp == null) {
+				return null;
+			}
+			return converter.apply(tmp);
 		}
 
 		@Override
@@ -1194,12 +1178,14 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 		public void parseUri(String uri) {
 			int idx = uri.indexOf(":", 5);
 			dbType = uri.substring(5, idx);
-			if ("jtds".equals(dbType)) dbType = "sqlserver";
+			if ("jtds".equals(dbType)) {
+				dbType = "sqlserver";
+			}
 
 			String rest = null;
 			switch (dbType) {
 				case "derby":
-					dbName = uri.substring(idx+1, uri.indexOf(";"));
+					dbName = uri.substring(idx + 1, uri.indexOf(";"));
 					break;
 				case "sqlserver":
 					idx = uri.indexOf("//", idx) + 2;
@@ -1233,15 +1219,16 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 					rest = uri.substring(idx);
 					idx = rest.indexOf("/");
 					dbHostname = rest.substring(0, idx);
-					rest = rest.substring(idx+1);
+					rest = rest.substring(idx + 1);
 					idx = rest.indexOf("?");
 					dbName = rest.substring(0, idx);
 					rest = rest.substring(idx + 1);
 					useLegacyDatetimeCode = true;
 					for (String x : rest.split("&")) {
 						String p[] = x.split("=");
-						if (p.length < 2)
+						if (p.length < 2) {
 							continue;
+						}
 						switch (p[0]) {
 							case "user":
 								dbUser = p[1];
@@ -1281,7 +1268,8 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 			dbUser = getProperty(props, PARAMETERS_ENUM.TIGASE_USERNAME);
 			dbPass = getProperty(props, PARAMETERS_ENUM.TIGASE_PASSWORD);
 			useSSL = getProperty(props, PARAMETERS_ENUM.USE_SSL, tmp -> Boolean.parseBoolean(tmp));
-			useLegacyDatetimeCode = getProperty(props, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE, tmp -> Boolean.parseBoolean(tmp));
+			useLegacyDatetimeCode = getProperty(props, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE,
+												tmp -> Boolean.parseBoolean(tmp));
 			serverTimezone = getProperty(props, PARAMETERS_ENUM.SERVER_TIMEZONE);
 
 			dbRootUser = getProperty(props, PARAMETERS_ENUM.ROOT_USERNAME);
@@ -1289,48 +1277,6 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 
 			file = getProperty(props, PARAMETERS_ENUM.FILE);
 			query = getProperty(props, PARAMETERS_ENUM.QUERY);
-		}
-
-		protected void init(Optional<SchemaManager.RootCredentialsCache> rootCredentialsCache) {
-			if (dbRootUser == null || dbRootPass == null) {
-				SchemaManager.RootCredentials credentials = rootCredentialsCache.isPresent()
-															? rootCredentialsCache.get().get(dbHostname)
-															: null;
-				if (credentials != null) {
-					dbRootUser = credentials.user;
-					dbRootPass = credentials.password;
-				} else {
-					if (!"derby".equals(dbType)) {
-						SystemConsole console = new SystemConsole();
-						console.writeLine("");
-						if (dbRootUser == null) {
-							dbRootUser = console.readLine(
-									"Database root account username used to create tigase user and database at " +
-											dbHostname + " : ");
-						}
-						if (dbRootPass == null) {
-							dbRootPass = new String(console.readPassword(
-									"Database root account password used to create tigase user and database at " +
-											dbHostname + " : "));
-						}
-						rootCredentialsCache.ifPresent(cache -> cache.set(dbHostname,
-																		  new SchemaManager.RootCredentials(dbRootUser,
-																											dbRootPass)));
-					}
-				}
-			}
-		}
-
-		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
-			return props.getProperty(param.getName(), param.getDefaultValue());
-		}
-
-		private static <T> T getProperty(Properties props, PARAMETERS_ENUM param, Function<String, T> converter) {
-			String tmp = getProperty(props, param);
-			if (tmp == null) {
-				return null;
-			}
-			return converter.apply(tmp);
 		}
 
 		@Override
@@ -1381,15 +1327,43 @@ public class DBSchemaLoader extends SchemaLoader<DBSchemaLoader.Parameters> {
 				return result + value;
 			}).collect(Collectors.joining(", ")) + "]";
 		}
-	}
 
-	public interface SQLCommand<C, R> {
+		protected void init(Optional<SchemaManager.RootCredentialsCache> rootCredentialsCache) {
+			if (dbRootUser == null || dbRootPass == null) {
+				SchemaManager.RootCredentials credentials = rootCredentialsCache.isPresent()
+															? rootCredentialsCache.get().get(dbHostname)
+															: null;
+				if (credentials != null) {
+					dbRootUser = credentials.user;
+					dbRootPass = credentials.password;
+				} else {
+					if (!"derby".equals(dbType)) {
+						SystemConsole console = new SystemConsole();
+						console.writeLine("");
+						if (dbRootUser == null) {
+							dbRootUser = console.readLine(
+									"Database root account username used to create tigase user and database at " +
+											dbHostname + " : ");
+						}
+						if (dbRootPass == null) {
+							dbRootPass = new String(console.readPassword(
+									"Database root account password used to create tigase user and database at " +
+											dbHostname + " : "));
+						}
+						rootCredentialsCache.ifPresent(cache -> cache.set(dbHostname,
+																		  new SchemaManager.RootCredentials(dbRootUser,
+																											dbRootPass)));
+					}
+				}
+			}
+		}
 
-		R execute(C conn) throws SQLException, IOException;
+		private String getFile() {
+			return file;
+		}
 
-	}
-
-	public interface ExceptionHandler<T extends Exception, R> {
-		R handleException(T ex);
+		private String getQuery() {
+			return query;
+		}
 	}
 }

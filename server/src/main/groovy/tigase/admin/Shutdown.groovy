@@ -28,17 +28,15 @@ AS:Group: Configuration
 
 package tigase.admin
 
-import tigase.xml.*;
-import tigase.server.*
-import tigase.server.xmppserver.*
-import tigase.eventbus.EventBusFactory;
+import tigase.server.Command
+import tigase.server.Packet
 
 def DELAY = "delay";
 def NODE = "node";
 def NOTIFY = "Notify users";
 def MESSAGE = "Message to users";
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -50,7 +48,8 @@ if (!isServiceAdmin) {
 
 def nodes = Command.getFieldValues(p, NODE) as List;
 def notify = Command.getCheckBoxFieldValue(p, NOTIFY);
-def msg = (Command.getFieldValues(p, MESSAGE) as List) ?: ["Server will be restarted.", "During restart you will be disconnected from XMPP server."];
+def msg = (Command.getFieldValues(p, MESSAGE) as List) ?:
+		  [ "Server will be restarted.", "During restart you will be disconnected from XMPP server." ];
 def delay = Command.getFieldValue(p, DELAY) ?: "30";
 
 def result = null;
@@ -59,14 +58,16 @@ if (nodes == null || nodes.isEmpty()) {
 	Command.addTitle(result, "Shutting Down the Service")
 	Command.addInstructions(result, "Fill out this form to shut down the service.")
 	nodes = component.getNodesConnectedWithLocal().collect { it.getDomain() };
-	Command.addFieldValue(result, NODE, [] as String[], "Nodes to shutdown", nodes as String[], nodes as String[])
-	Command.addFieldValue(result, DELAY, delay, "Delay before node shutdown", ["30sec", "1min", "3min", "5min"] as String[], ["30", 60, "180", "300"] as String[]);
+	Command.addFieldValue(result, NODE, [ ] as String[], "Nodes to shutdown", nodes as String[], nodes as String[])
+	Command.addFieldValue(result, DELAY, delay, "Delay before node shutdown",
+						  [ "30sec", "1min", "3min", "5min" ] as String[], [ "30", 60, "180", "300" ] as String[]);
 	Command.addCheckBoxField(result, NOTIFY, false);
 	Command.addFieldMultiValue(result, MESSAGE, msg)
 } else {
 	result = p.commandResult(Command.DataType.result);
 	nodes.each { node ->
-		def event = new tigase.eventbus.events.ShutdownEvent(node, delay as Long, (notify && msg) ? msg.join("\n") : null);
+		def event = new tigase.eventbus.events.ShutdownEvent(node, delay as Long,
+															 (notify && msg) ? msg.join("\n") : null);
 		eventBus.fire(event);
 	}
 	Command.addTextField(result, "Info", "Shutdown of service started");

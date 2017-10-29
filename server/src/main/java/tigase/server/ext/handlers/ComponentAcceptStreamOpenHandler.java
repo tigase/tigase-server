@@ -23,23 +23,17 @@ package tigase.server.ext.handlers;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-import tigase.server.ext.CompRepoItem;
-import tigase.server.ext.ComponentConnection;
-import tigase.server.ext.ComponentIOService;
-import tigase.server.ext.ComponentProtocolHandler;
-import tigase.server.ext.ExtProcessor;
-import tigase.server.ext.StreamOpenHandler;
-
-import static tigase.server.ext.ComponentProtocolHandler.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.server.ext.*;
 
 import java.util.ArrayDeque;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -49,20 +43,18 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
-
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
-	private static final Logger log =
-		Logger.getLogger(ComponentAcceptStreamOpenHandler.class.getName());
+public class ComponentAcceptStreamOpenHandler
+		implements StreamOpenHandler {
 
 	/** Field description */
 	public static final String XMLNS = "jabber:component:accept";
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(ComponentAcceptStreamOpenHandler.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
-	private String[] xmlnss = new String[] { XMLNS };
+	private String[] xmlnss = new String[]{XMLNS};
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -76,7 +68,7 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 	@Override
 	public String serviceStarted(ComponentIOService serv) {
 		switch (serv.connectionType()) {
-			case connect :
+			case connect:
 				CompRepoItem repoItem = (CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY);
 				String r_host = (String) serv.getSessionData().get("remote-host");
 
@@ -85,13 +77,12 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 
 				// This should be done only, after authentication is completed
 				// addComponentConnection(hostname, serv);
-				String data = "<stream:stream" + " xmlns='" + XMLNS + "'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " to='"
-					+ repoItem.getDomain() + "'" + ">";
+				String data = "<stream:stream" + " xmlns='" + XMLNS + "'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" + " to='" + repoItem.getDomain() + "'" + ">";
 
 				return data;
 
-			default :
+			default:
 
 				// Do nothing, more/some data should come soon...
 				break;
@@ -101,12 +92,11 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
-			ComponentProtocolHandler handler) {
+	public String streamOpened(ComponentIOService serv, Map<String, String> attribs, ComponentProtocolHandler handler) {
 		serv.getSessionData().put(XMLNS_KEY, XMLNS);
 
 		switch (serv.connectionType()) {
-			case connect : {
+			case connect: {
 				String id = attribs.get("id");
 
 				if (id == null) {
@@ -140,7 +130,7 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 				return null;
 			}
 
-			case accept : {
+			case accept: {
 				String hostname = attribs.get("to");
 				CompRepoItem repoItem = handler.getCompRepoItem(hostname);
 
@@ -156,19 +146,18 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 
 					// This should be done only, after authentication is completed
 					// addComponentConnection(hostname, serv);
-					return "<stream:stream" + " xmlns='" + XMLNS + "'"
-							+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname
-								+ "'" + " id='" + id + "'" + ">";
+					return "<stream:stream" + " xmlns='" + XMLNS + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'" + " id='" +
+							id + "'" + ">";
 				} else {
-					return "<stream:stream" + " xmlns='" + XMLNS + "'"
-							+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname
-								+ "'>" + "<stream:error>"
-									+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-										+ "</stream:error></stream:stream>";
+					return "<stream:stream" + " xmlns='" + XMLNS + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'>" +
+							"<stream:error>" + "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+							"</stream:error></stream:stream>";
 				}
 			}
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
@@ -178,8 +167,6 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 	}
 }
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

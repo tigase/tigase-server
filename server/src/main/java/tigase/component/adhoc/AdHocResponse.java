@@ -19,26 +19,17 @@
  */
 package tigase.component.adhoc;
 
+import tigase.xml.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
-import tigase.xml.Element;
-
 public class AdHocResponse {
 
-	static enum State {
-		canceled,
-		completed,
-		executing
-	}
-
 	private final State currentState;
-
 	private final ArrayList<Element> elements = new ArrayList<Element>();
-
 	private State newState = State.completed;
-
 	private String sessionid;
 
 	AdHocResponse(String sessionid, State currState) {
@@ -54,33 +45,39 @@ public class AdHocResponse {
 		this.newState = State.completed;
 	}
 
-	State getCurrentState() {
-		return currentState;
-	}
-
 	public Collection<Element> getElements() {
 		return elements;
+	}
+
+	public void startSession() {
+		this.newState = State.executing;
+		this.sessionid = UUID.randomUUID().toString();
+	}
+
+	State getCurrentState() {
+		return currentState;
 	}
 
 	State getNewState() {
 		return newState;
 	}
 
-	String getSessionid() {
-		return sessionid;
-	}
-
 	void setNewState(State newState) {
 		this.newState = newState;
+	}
+
+	String getSessionid() {
+		return sessionid;
 	}
 
 	void setSessionid(String sessionid) {
 		this.sessionid = sessionid;
 	}
 
-	public void startSession() {
-		this.newState = State.executing;
-		this.sessionid = UUID.randomUUID().toString();
+	static enum State {
+		canceled,
+		completed,
+		executing
 	}
 
 }

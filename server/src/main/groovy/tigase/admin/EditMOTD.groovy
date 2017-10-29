@@ -63,7 +63,8 @@ Packet process(Kernel kernel, SessionManager component, Iq p) {
 		Command.addInstructions(result, "Fill out this form to edit the message of the day.")
 		Command.addHiddenField(result, "FORM_TYPE", "http://jabber.org/protocol/admin")
 		MotdProcessor motdProcessor = kernel.getInstance(MotdProcessor.class)
-		Command.addFieldMultiValue(result, MOTD, (motdProcessor.getMotd()?.split("\n") ?: []) as List<String>, "Message of the Day")
+		Command.addFieldMultiValue(result, MOTD, (motdProcessor.getMotd()?.split("\n") ?: [ ]) as List<String>,
+								   "Message of the Day")
 
 		return result
 	} else {

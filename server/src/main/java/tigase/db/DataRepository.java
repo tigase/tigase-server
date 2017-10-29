@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -33,26 +31,30 @@ import java.util.TimeZone;
 //~--- JDK imports ------------------------------------------------------------
 
 /**
- * The interface defines a generic data repository for storing arbitrary data in
- * any application specific form. This interface unifies database (repository)
- * access allowing for easier way to create database connections pools or
+ * The interface defines a generic data repository for storing arbitrary data in any application specific form. This
+ * interface unifies database (repository) access allowing for easier way to create database connections pools or
  * database fail-over mechanisms.
- *
+ * <p>
  * Created: Jun 16, 2010 3:34:32 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface DataRepository extends DataSource {
+public interface DataRepository
+		extends DataSource {
 
 	Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-	
+
 	/**
 	 * Helper enumeration with types of supported databases.
-	 *
 	 */
 	public static enum dbTypes {
-		derby, mysql, postgresql, jtds, sqlserver, other
+		derby,
+		mysql,
+		postgresql,
+		jtds,
+		sqlserver,
+		other
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -82,37 +84,34 @@ public interface DataRepository extends DataSource {
 			throws SQLException;
 
 	/**
-	 * The method checks whether a table for the given name exists in the
-	 * database.
+	 * The method checks whether a table for the given name exists in the database.
 	 *
-	 * @param tableName
-	 *          is a <code>String</code> value of the table name to check
-	 * @return <code>true</code> <code>boolean</code> value if the table exist in
-	 *         the database and <code>false</code> if the table was not found.
-	 * @throws SQLException
-	 *           if there was a problem accessing database.
+	 * @param tableName is a <code>String</code> value of the table name to check
+	 *
+	 * @return <code>true</code> <code>boolean</code> value if the table exist in the database and <code>false</code> if
+	 * the table was not found.
+	 *
+	 * @throws SQLException if there was a problem accessing database.
 	 */
 	boolean checkTable(String tableName) throws SQLException;
 
 	/**
-	 * The method checks whether a table for the given name exists in the
-	 * database and if it does not, it automatically creates it.
+	 * The method checks whether a table for the given name exists in the database and if it does not, it automatically
+	 * creates it.
 	 *
-	 * @param tableName
-	 *          is a <code>String</code> value of the table name to check
-	 * @param createTableQuery
-	 *          is a <code>String</code> with the query to create table
-	 * @return <code>true</code> <code>boolean</code> value if the table exist in
-	 *         the database and <code>false</code> if the table was not found.
-	 * @throws SQLException
-	 *           if there was a problem accessing database.
+	 * @param tableName is a <code>String</code> value of the table name to check
+	 * @param createTableQuery is a <code>String</code> with the query to create table
+	 *
+	 * @return <code>true</code> <code>boolean</code> value if the table exist in the database and <code>false</code> if
+	 * the table was not found.
+	 *
+	 * @throws SQLException if there was a problem accessing database.
 	 */
 	boolean checkTable(String tableName, String createTableQuery) throws SQLException;
 
 	/**
-	 * Commits current transaction on the DataRepository connection. Please note
-	 * that calling this method on the repository pool has no effect. You have to
-	 * obtain particular repository handle first, before you can start
+	 * Commits current transaction on the DataRepository connection. Please note that calling this method on the
+	 * repository pool has no effect. You have to obtain particular repository handle first, before you can start
 	 * transaction.
 	 *
 	 * @throws SQLException
@@ -120,23 +119,20 @@ public interface DataRepository extends DataSource {
 	void commit() throws SQLException;
 
 	/**
-	 * Creates a SQL statement on which SQL queries can be executed later by the
-	 * higher repository layer.
+	 * Creates a SQL statement on which SQL queries can be executed later by the higher repository layer.
 	 *
-	 * @param user_id user id for which the statement has to be created. This is an
-	 * optional parameter and null can be provided. It is used mainly to group queries
-	 * for the same user on the same DB connection.
+	 * @param user_id user id for which the statement has to be created. This is an optional parameter and null can be
+	 * provided. It is used mainly to group queries for the same user on the same DB connection.
+	 *
 	 * @return a newly created <code>Statement</code>
-	 * @throws SQLException
-	 *           if a JDBC error occurs.
+	 *
+	 * @throws SQLException if a JDBC error occurs.
 	 */
 	Statement createStatement(BareJID user_id) throws SQLException;
 
 	/**
-	 * Ends current transaction on the DataRepository connection. Please note that
-	 * calling this method on the repository pool has no effect. You have to
-	 * obtain particular repository handle first, before you can start
-	 * transaction.
+	 * Ends current transaction on the DataRepository connection. Please note that calling this method on the repository
+	 * pool has no effect. You have to obtain particular repository handle first, before you can start transaction.
 	 *
 	 * @throws SQLException
 	 */
@@ -145,59 +141,47 @@ public interface DataRepository extends DataSource {
 	// ~--- methods --------------------------------------------------------------
 
 	/**
-	 * Initializes a prepared statement for a given query and stores it internally
-	 * under the given id key. It can be retrieved later using
-	 * <code>getPreparedStatement(stIdKey)</code> method.
+	 * Initializes a prepared statement for a given query and stores it internally under the given id key. It can be
+	 * retrieved later using <code>getPreparedStatement(stIdKey)</code> method.
 	 *
-	 * @param stIdKey
-	 *          is a statement identification key.
-	 * @param query
-	 *          is a query for the prepared statement.
+	 * @param stIdKey is a statement identification key.
+	 * @param query is a query for the prepared statement.
+	 *
 	 * @throws SQLException
 	 */
 	void initPreparedStatement(String stIdKey, String query) throws SQLException;
 
 	/**
-	 * Initializes a prepared statement for a given query and stores it internally
-	 * under the given id key. It can be retrieved later using
-	 * <code>getPreparedStatement(stIdKey)</code> method.
+	 * Initializes a prepared statement for a given query and stores it internally under the given id key. It can be
+	 * retrieved later using <code>getPreparedStatement(stIdKey)</code> method.
 	 *
-	 * @param stIdKey
-	 *          is a statement identification key.
-	 * @param query
-	 *          is a query for the prepared statement.
-	 * @param autoGeneratedKeys
-	 *			defines if statement should return auto generated keys
+	 * @param stIdKey is a statement identification key.
+	 * @param query is a query for the prepared statement.
+	 * @param autoGeneratedKeys defines if statement should return auto generated keys
+	 *
 	 * @throws SQLException
 	 */
-	void initPreparedStatement(String stIdKey, String query, int autoGeneratedKeys) throws SQLException;	
-	
+	void initPreparedStatement(String stIdKey, String query, int autoGeneratedKeys) throws SQLException;
+
 	/**
-	 * A helper method to release resources from the statement and result set.
-	 * This is most common operation for all database calls, therefore it does
-	 * make sense to add such a utility method to the API.
+	 * A helper method to release resources from the statement and result set. This is most common operation for all
+	 * database calls, therefore it does make sense to add such a utility method to the API.
 	 *
-	 * @param stmt
-	 *          a <code>Statement</code> variable to release resources for. Might
-	 *          be null.
-	 * @param rs
-	 *          a <code>ResultSet</code> variable to release resources for. Might
-	 *          be null.
+	 * @param stmt a <code>Statement</code> variable to release resources for. Might be null.
+	 * @param rs a <code>ResultSet</code> variable to release resources for. Might be null.
 	 */
 	void release(Statement stmt, ResultSet rs);
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param repo is a <code>DataRepository</code>
 	 */
 	void releaseRepoHandle(DataRepository repo);
 
 	/**
-	 * Rolls back started transaction on the DataRepository connection. Please
-	 * note that calling this method on the repository pool has no effect. You
-	 * have to obtain particular repository handle first, before you can start
+	 * Rolls back started transaction on the DataRepository connection. Please note that calling this method on the
+	 * repository pool has no effect. You have to obtain particular repository handle first, before you can start
 	 * transaction.
 	 *
 	 * @throws SQLException
@@ -205,23 +189,20 @@ public interface DataRepository extends DataSource {
 	void rollback() throws SQLException;
 
 	/**
-	 * Starts transaction on the DataRepository connection. Please note that
-	 * calling this method on the repository pool has no effect. You have to
-	 * obtain particular repository handle first, before you can start
-	 * transaction.
+	 * Starts transaction on the DataRepository connection. Please note that calling this method on the repository pool
+	 * has no effect. You have to obtain particular repository handle first, before you can start transaction.
 	 *
 	 * @throws SQLException
 	 */
 	void startTransaction() throws SQLException;
 
 	/**
-	 * Returns <code>DataRepository</code> instance. If this is a repository pool
-	 * then it returns particular instance from the pool. It this is a real
-	 * repository instance it returns itself. This is exclusive take, no other
-	 * thread may use this handle until it is returned to the pool.
+	 * Returns <code>DataRepository</code> instance. If this is a repository pool then it returns particular instance
+	 * from the pool. It this is a real repository instance it returns itself. This is exclusive take, no other thread
+	 * may use this handle until it is returned to the pool.
 	 *
-	 * @param user_id
-	 *          is user account ID for which we acquire the handle.
+	 * @param user_id is user account ID for which we acquire the handle.
+	 *
 	 * @return DataRepository instance.
 	 */
 	DataRepository takeRepoHandle(BareJID user_id);
@@ -230,8 +211,6 @@ public interface DataRepository extends DataSource {
 
 	/**
 	 * Returns type of DataRepository database
-	 *
-	 *
 	 *
 	 * @return a value of <code>dbTypes</code>
 	 */
@@ -244,48 +223,44 @@ public interface DataRepository extends DataSource {
 	/**
 	 * Returns a prepared statement for a given key.
 	 *
-	 * @param user_id user id for which the statement has to be created. This is
-	 * an optional parameter and null can be provided. It is used mainly to group
-	 * queries for the same user on the same DB connection.
-	 * @param stIdKey
-	 *          is a statement identification key.
-	 * @return a <code>PreparedStatement</code> for the given id key or null if
-	 *         such a statement does not exist.
+	 * @param user_id user id for which the statement has to be created. This is an optional parameter and null can be
+	 * provided. It is used mainly to group queries for the same user on the same DB connection.
+	 * @param stIdKey is a statement identification key.
+	 *
+	 * @return a <code>PreparedStatement</code> for the given id key or null if such a statement does not exist.
+	 *
 	 * @throws SQLException
 	 */
-	PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey)
-					throws SQLException;
+	PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey) throws SQLException;
 
 	/**
 	 * Returns a prepared statement for a given key.
 	 *
-	 * @param hashCode user for selection of connection to use. It is used mainly
-	 * to group queries for the same user on the same DB connection.
-	 * @param stIdKey
-	 *          is a statement identification key.
-	 * @return a <code>PreparedStatement</code> for the given id key or null if
-	 *         such a statement does not exist.
+	 * @param hashCode user for selection of connection to use. It is used mainly to group queries for the same user on
+	 * the same DB connection.
+	 * @param stIdKey is a statement identification key.
+	 *
+	 * @return a <code>PreparedStatement</code> for the given id key or null if such a statement does not exist.
+	 *
 	 * @throws SQLException
 	 */
-	PreparedStatement getPreparedStatement(int hashCode, String stIdKey)
-			throws SQLException;
+	PreparedStatement getPreparedStatement(int hashCode, String stIdKey) throws SQLException;
 
 	/**
 	 * Returns a DB connection string or DB connection URI.
 	 *
-	 * @return a <code>String</code> value representing database connection
-	 *         string.
+	 * @return a <code>String</code> value representing database connection string.
 	 */
 	String getResourceUri();
 
 	/**
-	 * Helper method to set timestamp into prepared statements. Provides proper
-	 * calendar when needed to adjust timestamps so that they are stored in
-	 * the database in proper time zone.
+	 * Helper method to set timestamp into prepared statements. Provides proper calendar when needed to adjust
+	 * timestamps so that they are stored in the database in proper time zone.
 	 *
 	 * @param stmt
 	 * @param pos
 	 * @param timestamp
+	 *
 	 * @throws SQLException
 	 */
 	default void setTimestamp(PreparedStatement stmt, int pos, java.sql.Timestamp timestamp) throws SQLException {
@@ -301,13 +276,14 @@ public interface DataRepository extends DataSource {
 	}
 
 	/**
-	 * Helper method to get timestamp from result set. Provides proper
-	 * calendar when needed to adjust timestamps so that they are stored in
-	 * the database in proper time zone.
-	 * 
+	 * Helper method to get timestamp from result set. Provides proper calendar when needed to adjust timestamps so that
+	 * they are stored in the database in proper time zone.
+	 *
 	 * @param rs
 	 * @param pos
+	 *
 	 * @return
+	 *
 	 * @throws SQLException
 	 */
 	default Timestamp getTimestamp(ResultSet rs, int pos) throws SQLException {
@@ -321,13 +297,14 @@ public interface DataRepository extends DataSource {
 	}
 
 	/**
-	 * Helper method to get timestamp from result set. Provides proper
-	 * calendar when needed to adjust timestamps so that they are stored in
-	 * the database in proper time zone.
+	 * Helper method to get timestamp from result set. Provides proper calendar when needed to adjust timestamps so that
+	 * they are stored in the database in proper time zone.
 	 *
 	 * @param rs
 	 * @param pos
+	 *
 	 * @return
+	 *
 	 * @throws SQLException
 	 */
 	default Timestamp getTimestamp(ResultSet rs, String field) throws SQLException {
@@ -341,6 +318,5 @@ public interface DataRepository extends DataSource {
 	}
 
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/09/21

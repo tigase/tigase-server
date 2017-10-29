@@ -28,16 +28,36 @@ import java.lang.annotation.Target;
 import java.util.Map;
 
 /**
- * Base interface which should be implemented by every repository to have one 
- * common interface
- * 
+ * Base interface which should be implemented by every repository to have one common interface
+ *
  * @author andrzej
  */
 public interface Repository {
 
 	/**
-	 * Meta created to add possibility to retrieve information about
-	 * implementation of repository (ie. supported database URI)
+	 * Method is deprecated and should not be user any more.
+	 * <p>
+	 * The method is called to initialize the data repository. Depending on the implementation all the initialization
+	 * parameters can be passed either via <code>resource_uri</code> parameter as the database connection string or via
+	 * <code>params</code> map if the required repository parameters are more complex or both.
+	 *
+	 * @param resource_uri value in most cases representing the database connection string.
+	 * @param params is a <code>Map</code> with repository properties necessary to initialize and perform all the
+	 * functions. The initialization parameters are implementation dependent.
+	 *
+	 * @throws tigase.db.DBInitException if there was an error during repository initialization. Some implementations,
+	 * though, perform so called lazy initialization so even though there is a problem with the underlying repository it
+	 * may not be signaled through this method call.
+	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	default void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+
+	}
+
+	/**
+	 * Meta created to add possibility to retrieve information about implementation of repository (ie. supported
+	 * database URI)
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
@@ -45,12 +65,14 @@ public interface Repository {
 
 		/**
 		 * Is it default implementation for supported URIs?
+		 *
 		 * @return true if yes
 		 */
 		boolean isDefault() default false;
 
 		/**
 		 * Method returns and array of strings with regexps matching URIs which are supported by annotated class.
+		 *
 		 * @return string array of regular expressions
 		 */
 		String[] supportedUris();
@@ -65,38 +87,18 @@ public interface Repository {
 
 		/**
 		 * Method returns identifiers of a schema (ie. database schema) required by annotated class.
+		 *
 		 * @return id of a schema
 		 */
 		String id();
 
 		/**
-		 * Method returns name of a schema required by annotated class.
-		 * <br/>
-		 * Result of this method is intended to be displayed to the user.
+		 * Method returns name of a schema required by annotated class. <br/> Result of this method is intended to be
+		 * displayed to the user.
+		 *
 		 * @return name of a schema
 		 */
 		String name();
 	}
 
-	/**
-	 * Method is deprecated and should not be user any more.
-	 *
-	 * The method is called to initialize the data repository. Depending on the implementation
-	 * all the initialization parameters can be passed either via <code>resource_uri</code>
-	 * parameter as the database connection string or via <code>params</code> map if
-	 * the required repository parameters are more complex or both.
-	 * @param resource_uri value in most cases representing the database connection string.
-	 * @param params is a <code>Map</code> with repository properties necessary to initialize
-	 * and perform all the functions. The initialization parameters are implementation dependent.
-	 * @throws tigase.db.DBInitException if there was an error during repository initialization.
-	 * Some implementations, though, perform so called lazy initialization so even though there
-	 * is a problem with the underlying repository it may not be signaled through this method
-	 * call.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
-	default void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
-		
-	}
-	
 }

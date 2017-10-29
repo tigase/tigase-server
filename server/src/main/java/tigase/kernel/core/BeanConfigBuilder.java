@@ -25,10 +25,7 @@ import tigase.kernel.KernelException;
 import java.util.logging.Logger;
 
 /**
- * Builder to help register beans in Kernel.
- * <p>
- * Usage:
- * <p>
+ * Builder to help register beans in Kernel. <p> Usage: <p>
  * <pre>
  * {@code
  *
@@ -55,8 +52,8 @@ public class BeanConfigBuilder {
 	private final Kernel kernel;
 	private BeanConfig beanConfig;
 	private Object beanInstance;
-	private BeanConfig factoryBeanConfig;
 	private Class<?> clazz;
+	private BeanConfig factoryBeanConfig;
 
 	BeanConfigBuilder(Kernel kernel, DependencyManager dependencyManager, String beanName) {
 		this.kernel = kernel;
@@ -68,12 +65,14 @@ public class BeanConfigBuilder {
 	 * Registers bean as type to be created when it will be required.
 	 *
 	 * @param cls class of bean.
+	 *
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder asClass(Class<?> cls) {
 		this.clazz = cls;
-		if (this.beanConfig != null)
+		if (this.beanConfig != null) {
 			throwException(new KernelException("Class or instance is already defined for bean '" + beanName + "'"));
+		}
 
 		this.beanConfig = dependencyManager.createBeanConfig(kernel, beanName, cls);
 		return this;
@@ -83,11 +82,13 @@ public class BeanConfigBuilder {
 	 * Registers class instance as bean.
 	 *
 	 * @param bean instance of bean.
+	 *
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder asInstance(Object bean) {
-		if (this.beanConfig != null)
+		if (this.beanConfig != null) {
 			throwException(new KernelException("Class or instance is already defined for bean '" + beanName + "'"));
+		}
 
 		this.beanConfig = dependencyManager.createBeanConfig(kernel, beanName, bean.getClass());
 		this.beanInstance = bean;
@@ -105,7 +106,8 @@ public class BeanConfigBuilder {
 
 	public BeanConfig execWithoutInject() {
 		if (beanConfig == null) {
-			log.warning("Bean " + clazz + " cannot be registered, because Kernel cannot create configuration for this bean.");
+			log.warning("Bean " + clazz +
+								" cannot be registered, because Kernel cannot create configuration for this bean.");
 			kernel.currentlyUsedConfigBuilder = null;
 			return null;
 		}
@@ -116,8 +118,8 @@ public class BeanConfigBuilder {
 	}
 
 	/**
-	 * Mark bean as 'exportable'. It means that bean will be visible for all
-	 * child Kernels registered in current Kernel.
+	 * Mark bean as 'exportable'. It means that bean will be visible for all child Kernels registered in current
+	 * Kernel.
 	 *
 	 * @return {@link BeanConfigBuilder}.
 	 */
@@ -169,27 +171,31 @@ public class BeanConfigBuilder {
 		return this;
 	}
 
-	protected void throwException(KernelException e) {
-		kernel.currentlyUsedConfigBuilder = null;
-		throw e;
-	}
-
 	/**
 	 * Defines factory for currently registered bean.
 	 *
 	 * @param beanFactoryClass bean factory class.
+	 *
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder withFactory(Class<?> beanFactoryClass) {
-		if (beanInstance != null)
-			throwException(new KernelException("Cannot register factory to bean '" + beanName + "' registered as instance."));
-		if (factoryBeanConfig != null)
+		if (beanInstance != null) {
+			throwException(
+					new KernelException("Cannot register factory to bean '" + beanName + "' registered as instance."));
+		}
+		if (factoryBeanConfig != null) {
 			throwException(new KernelException("Factory for bean '" + beanName + "' is already registered."));
+		}
 
 		this.factoryBeanConfig = dependencyManager.createBeanConfig(kernel, beanName + "#FACTORY", beanFactoryClass);
 		beanConfig.setFactory(factoryBeanConfig);
 
 		return this;
+	}
+
+	protected void throwException(KernelException e) {
+		kernel.currentlyUsedConfigBuilder = null;
+		throw e;
 	}
 
 }

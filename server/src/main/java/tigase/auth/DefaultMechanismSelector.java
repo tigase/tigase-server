@@ -37,7 +37,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 @Bean(name = "mechanism-selector", parent = TigaseSaslProvider.class, active = true)
-public class DefaultMechanismSelector implements MechanismSelector {
+public class DefaultMechanismSelector
+		implements MechanismSelector {
 
 	@ConfigField(desc = "List of allowed SASL mechanisms", alias = "allowed-mechanisms")
 	private HashSet<String> allowedMechanisms = new HashSet<String>();
@@ -53,7 +54,8 @@ public class DefaultMechanismSelector implements MechanismSelector {
 	}
 
 	@Override
-	public Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories, XMPPResourceConnection session) {
+	public Collection<String> filterMechanisms(Enumeration<SaslServerFactory> serverFactories,
+											   XMPPResourceConnection session) {
 		final Map<String, ?> props = new HashMap<String, Object>();
 		final ArrayList<String> result = new ArrayList<String>();
 		while (serverFactories.hasMoreElements()) {
@@ -64,19 +66,21 @@ public class DefaultMechanismSelector implements MechanismSelector {
 				if (result.contains(name)) {
 					continue;
 				}
-				if (match(ss, name, session) && isAllowedForDomain(name, session.getDomain()))
+				if (match(ss, name, session) && isAllowedForDomain(name, session.getDomain())) {
 					result.add(name);
+				}
 			}
 		}
 		return result;
 	}
-	
+
 	protected boolean isAllowedForDomain(final String mechanismName, final VHostItem vhost) {
 		final String[] saslAllowedMechanisms = vhost.getSaslAllowedMechanisms();
 		if (saslAllowedMechanisms != null && saslAllowedMechanisms.length > 0) {
 			for (String allowed : saslAllowedMechanisms) {
-				if (allowed.equals(mechanismName))
+				if (allowed.equals(mechanismName)) {
 					return true;
+				}
 			}
 			return false;
 		} else if (!allowedMechanisms.isEmpty()) {
@@ -85,18 +89,10 @@ public class DefaultMechanismSelector implements MechanismSelector {
 		return true;
 	}
 
-	private boolean isJIDInCertificate(final XMPPResourceConnection session) {
-		Certificate cert = (Certificate) session.getSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY);
-		if (cert == null)
-			return false;
-
-		final List<String> authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert);
-		return authJIDs != null && !authJIDs.isEmpty();
-	}
-
 	protected boolean match(SaslServerFactory factory, String mechanismName, XMPPResourceConnection session) {
-		if (session.isTlsRequired() && !session.isEncrypted())
+		if (session.isTlsRequired() && !session.isEncrypted()) {
 			return false;
+		}
 		if (factory instanceof TigaseSaslServerFactory) {
 			switch (mechanismName) {
 				case "EXTERNAL":
@@ -104,12 +100,24 @@ public class DefaultMechanismSelector implements MechanismSelector {
 				case "ANONYMOUS":
 					return session.getDomain().isAnonymousEnabled();
 				default:
-					if (mechanismName.startsWith("SCRAM-") && mechanismName.endsWith("-PLUS") && !SaslSCRAMPlus.isAvailable(session))
+					if (mechanismName.startsWith("SCRAM-") && mechanismName.endsWith("-PLUS") &&
+							!SaslSCRAMPlus.isAvailable(session)) {
 						return false;
+					}
 
 					return authRepository.isMechanismSupported(session.getDomain().getKey(), mechanismName);
 			}
 		}
 		return false;
+	}
+
+	private boolean isJIDInCertificate(final XMPPResourceConnection session) {
+		Certificate cert = (Certificate) session.getSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY);
+		if (cert == null) {
+			return false;
+		}
+
+		final List<String> authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert);
+		return authJIDs != null && !authJIDs.isEmpty();
 	}
 }

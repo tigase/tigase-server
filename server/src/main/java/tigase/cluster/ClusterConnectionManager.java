@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -53,16 +51,16 @@ import tigase.server.ServiceChecker;
 import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
-import tigase.util.*;
+import tigase.util.Algorithms;
 import tigase.util.common.TimerTask;
 import tigase.util.datetime.TimeUtils;
 import tigase.util.reflection.ReflectionHelper;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.jid.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
 import java.lang.reflect.Type;
@@ -80,22 +78,22 @@ import java.util.zip.Deflater;
 
 /**
  * Class ClusterConnectionManager
- *
+ * <p>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 @Bean(name = "cl-comp", parent = Kernel.class, active = true)
-@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
+			 ConfigTypeEnum.ComponentMode})
 @ClusterModeRequired(active = true)
 public class ClusterConnectionManager
-				extends ConnectionManager<XMPPIOService<Object>>
-				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
+		extends ConnectionManager<XMPPIOService<Object>>
+		implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
 
 	/** Field description */
-	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY =
-			"cluster-connections-per-node";
+	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-connections-per-node";
 
 	/** Field description */
 	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 5;
@@ -114,113 +112,82 @@ public class ClusterConnectionManager
 
 	public static final String NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY = "non-cluster-traffic-allowed";
 	public static final boolean NON_CLUSTER_TRAFFIC_ALLOWED_PROP_VAL = true;
-
-	/**
-	 * Default value for the system property for configuration protection
-	 * from system overload and DOS attack.
-	 */
-	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
-
 	/** Field description */
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
-
 	/** Field description */
 	public static final String IDENTITY_TYPE_VAL = "generic";
-
 	/** Field description */
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
-
 	/** Field description */
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
-
 	/** Field description */
 	public static final String SECRET_PROP_KEY = "secret";
-
 	/** Field description */
 	public static final String XMLNS = "tigase:cluster";
-
+	/** Field description */
+	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
+	/** Field description */
+	public static final boolean CONNECT_ALL_PROP_VAL = false;
+	/** Field description */
+	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
+	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
+	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class
-			.getName());
-
-	/** Field description */
-	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
-
-	/** Field description */
-	public static final boolean CONNECT_ALL_PROP_VAL = false;
-
-	/** Field description */
-	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
-	private static final String SERVICE_CONNECTED_TASK_FUTURE =
-			"service-connected-task-future";
-
-	@Inject
-	private EventBus eventBus = null;
-
-	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
-	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
-
-
-	//~--- fields ---------------------------------------------------------------
-
-	/** Field description */
-	@Inject
-	private ClusterControllerIfc clusterController = null;
+	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class.getName());
+	private static final String SERVICE_CONNECTED_TASK_FUTURE = "service-connected-task-future";
 
 	public static enum REPO_ITEM_UPDATE_TYPE {
 		ADDED,
 		UPDATED,
 		REMOVED
 	}
+	/**
+	 * Default value for the system property for configuration protection from system overload and DOS attack.
+	 */
+	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
 
-
-	// private String cluster_controller_id = null;
-	private IOServiceStatisticsGetter                                ioStatsGetter =
-			new IOServiceStatisticsGetter();
-	private String                                                   identity_type =
-			IDENTITY_TYPE_VAL;
-	private Map<String, ClusterConnection> connectionsPool =
-			new ConcurrentSkipListMap<>();
-	@ConfigField(desc = "Connect to all nodes", alias = CONNECT_ALL_PROP_KEY)
-	private boolean                              connect_all = CONNECT_ALL_PROP_VAL;
+	//~--- fields ---------------------------------------------------------------
+	/** Field description */
+	@Inject
+	private ClusterControllerIfc clusterController = null;
+	private tigase.eventbus.EventListener<ClusterInitializedEvent> clusterEventHandler = null;
 	@ConfigField(desc = "Compress stream", alias = COMPRESS_STREAM_PROP_KEY)
-	private boolean                              compress_stream = COMPRESS_STREAM_PROP_VAL;
-	private long[]                               lastDay               = new long[24];
-	private int                                  lastDayIdx            = 0;
-	private long[]                               lastHour              = new long[60];
-	private int                                  lastHourIdx           = 0;
-	private MaxDailyCounterQueue<Integer> maxNodes = new MaxDailyCounterQueue<>(31);
-	private int maxNodesWithinLastWeek = 0;
-	private int                                  nodesNo               = 0;
-	@ConfigField(desc = "Number of connections to open per node", alias = "connections-per-node")
-	private int                                  per_node_conns =
-			CLUSTER_CONNECTIONS_PER_NODE_VAL;
-	@Inject
-	private DataSourceBean dataSourceBean = null;
-	@Inject
-	private ComponentRepository<ClusterRepoItem> repo                  = null;
-	private long                                 servConnectedTimeouts = 0;
-	private long                                 totalNodeDisconnects  = 0;
-
+	private boolean compress_stream = COMPRESS_STREAM_PROP_VAL;
+	@ConfigField(desc = "Connect to all nodes", alias = CONNECT_ALL_PROP_KEY)
+	private boolean connect_all = CONNECT_ALL_PROP_VAL;
 	// private long packetsSent = 0;
 	// private long packetsReceived = 0;
 	@Inject
 	private ClusterConnectionSelectorIfc connectionSelector = null;
-	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
-			.DELIVER_CLUSTER_PACKET_CMD);
+	private Map<String, ClusterConnection> connectionsPool = new ConcurrentSkipListMap<>();
+	@Inject
+	private DataSourceBean dataSourceBean = null;
+	@Inject
+	private EventBus eventBus = null;
+	private String identity_type = IDENTITY_TYPE_VAL;
+	private boolean initialClusterConnectedDone = false;
+	// private String cluster_controller_id = null;
+	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
+	private long[] lastDay = new long[24];
+	private int lastDayIdx = 0;
+	private long[] lastHour = new long[60];
+	private int lastHourIdx = 0;
+	private MaxDailyCounterQueue<Integer> maxNodes = new MaxDailyCounterQueue<>(31);
+	private int maxNodesWithinLastWeek = 0;
+	private int nodesNo = 0;
 	@ConfigField(desc = "Allow non cluster traffic over cluster connection", alias = NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY)
 	private boolean nonClusterTrafficAllowed = true;
-	private boolean initialClusterConnectedDone = false;
-
-	private tigase.eventbus.EventListener<ClusterInitializedEvent> clusterEventHandler = null;
-
+	@ConfigField(desc = "Number of connections to open per node", alias = "connections-per-node")
+	private int per_node_conns = CLUSTER_CONNECTIONS_PER_NODE_VAL;
+	@Inject
+	private ComponentRepository<ClusterRepoItem> repo = null;
 	private final TimerTask repoReloadTimerTask = new TimerTask() {
 		@Override
 		public void run() {
 			try {
-				if (repo != null ) {
+				if (repo != null) {
 					repo.reload();
 				}
 			} catch (TigaseDBException ex) {
@@ -228,21 +195,22 @@ public class ClusterConnectionManager
 			}
 		}
 	};
+	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc.DELIVER_CLUSTER_PACKET_CMD);
+	private long servConnectedTimeouts = 0;
+	private long totalNodeDisconnects = 0;
 
 	public ClusterConnectionManager() {
 		super();
 		elements_number_limit = ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL;
-		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
-					"ERROR! Tigase is running in Clustered Mode yet the hostname",
-					"of the machine was resolved to *localhost* which will cause",
-					"malfunctioning of Tigase in clustered environment!",
-					"",
-					"To prevent further issues with the clustering Tigase will be shutdown.",
-					"",
-					"Please make sure that FQDN hostname of the machine is set correctly",
-					"and restart the server."
-			} );
+		if (getDefHostName().toString().equalsIgnoreCase("localhost")) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"ERROR! Tigase is running in Clustered Mode yet the hostname",
+												 "of the machine was resolved to *localhost* which will cause",
+												 "malfunctioning of Tigase in clustered environment!", "",
+												 "To prevent further issues with the clustering Tigase will be shutdown.",
+												 "",
+												 "Please make sure that FQDN hostname of the machine is set correctly",
+												 "and restart the server."});
 		}
 
 		connectionDelay = 5 * SECOND;
@@ -277,8 +245,8 @@ public class ClusterConnectionManager
 			Queue<Element> children = clel.getDataPackets();
 
 			if ((children != null) && (children.size() > 0)) {
-				Element child     = children.peek();
-				String  stanzaAdd = child.getAttributeStaticStr(Packet.TO_ATT);
+				Element child = children.peek();
+				String stanzaAdd = child.getAttributeStaticStr(Packet.TO_ATT);
 
 				if (stanzaAdd != null) {
 					return stanzaAdd.hashCode();
@@ -316,10 +284,6 @@ public class ClusterConnectionManager
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
-	boolean isInitialClusterConnectedDone() {
-		return initialClusterConnectedDone;
-	}
-
 	@Override
 	public void itemAdded(ClusterRepoItem repoItem) {
 		log.log(Level.INFO, "Loaded repoItem: {0}", repoItem.toString());
@@ -328,16 +292,16 @@ public class ClusterConnectionManager
 
 		boolean isCorrect = false;
 		try {
-			InetAddress addr = InetAddress.getByName( host );
+			InetAddress addr = InetAddress.getByName(host);
 
 			// we ignore any local addresses
-			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
-									&& !( NetworkInterface.getByInetAddress( addr ) != null );
-			if ( !isCorrect && log.isLoggable( Level.CONFIG ) ){
-				log.log( Level.CONFIG, "ClusterRepoItem of local machine, skipping connection attempt: {0}", repoItem );
+			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress() &&
+					!(NetworkInterface.getByInetAddress(addr) != null);
+			if (!isCorrect && log.isLoggable(Level.CONFIG)) {
+				log.log(Level.CONFIG, "ClusterRepoItem of local machine, skipping connection attempt: {0}", repoItem);
 			}
-		} catch ( UnknownHostException | SocketException ex ) {
-			log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: " + repoItem, ex );
+		} catch (UnknownHostException | SocketException ex) {
+			log.log(Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: " + repoItem, ex);
 		}
 
 		if (isCorrect) {
@@ -351,49 +315,49 @@ public class ClusterConnectionManager
 				port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
 				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
 				port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
-				port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
+				port_props.put(PORT_IFC_PROP_KEY, new String[]{host});
 				port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
 				port_props.put(PORT_KEY, repoItem.getPortNo());
 				addWaitingTask(port_props);
 			}
 
-			sendEvent( REPO_ITEM_UPDATE_TYPE.ADDED, repoItem );
+			sendEvent(REPO_ITEM_UPDATE_TYPE.ADDED, repoItem);
 			// reconnectService(port_props, connectionDelay);
 		}
 	}
 
 	@Override
 	public void itemRemoved(ClusterRepoItem item) {
-		sendEvent( REPO_ITEM_UPDATE_TYPE.REMOVED, item );
+		sendEvent(REPO_ITEM_UPDATE_TYPE.REMOVED, item);
 	}
 
 	@Override
 	public void itemUpdated(ClusterRepoItem item) {
-		sendEvent( REPO_ITEM_UPDATE_TYPE.UPDATED, item );
+		sendEvent(REPO_ITEM_UPDATE_TYPE.UPDATED, item);
 	}
 
 	@Override
 	public void nodeConnected(String node) {
 		super.nodeConnected(node);
 
-        maxNodes.add(getNodesConnectedWithLocal().size());
-        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+		maxNodes.add(getNodesConnectedWithLocal().size());
+		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
 	}
 
 	@Override
 	public synchronized void everyHour() {
 		super.everyHour();
 
-        maxNodes.add(getNodesConnectedWithLocal().size());
-        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+		maxNodes.add(getNodesConnectedWithLocal().size());
+		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
 	}
 
 	@Override
 	public void nodeDisconnected(String node) {
 		super.nodeDisconnected(node);
 
-        maxNodes.add(getNodesConnectedWithLocal().size());
-        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+		maxNodes.add(getNodesConnectedWithLocal().size());
+		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
 	}
 
 	@Override
@@ -441,8 +405,7 @@ public class ClusterConnectionManager
 		}
 		if ((packet.getStanzaTo() != null) && packet.getStanzaTo().equals(getComponentId())) {
 			try {
-				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Not implemented", true));
+				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, "Not implemented", true));
 			} catch (PacketErrorTypeException e) {
 				log.log(Level.WARNING, "Packet processing exception: {0}", e);
 			}
@@ -475,9 +438,9 @@ public class ClusterConnectionManager
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
-				if (p.getAttributeStaticStr(new String[] { Iq.ELEM_NAME, "ping" }, "xmlns") == "urn:xmpp:ping" 
-						&& getDefHostName().getDomain().equals(p.getStanzaTo().getDomain()) 
-						&& p.getStanzaFrom().getDomain().equals(serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY))) {
+				if (p.getAttributeStaticStr(new String[]{Iq.ELEM_NAME, "ping"}, "xmlns") == "urn:xmpp:ping" &&
+						getDefHostName().getDomain().equals(p.getStanzaTo().getDomain()) &&
+						p.getStanzaFrom().getDomain().equals(serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY))) {
 					// received PING between cluster nodes to confirm connectivity
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "{0}, received XMPP ping", serv);
@@ -485,7 +448,6 @@ public class ClusterConnectionManager
 					serv.getSessionData().put("lastConnectivityCheck", System.currentTimeMillis());
 					continue;
 				}
-					
 
 				// ++packetsReceived;
 				Packet result = p;
@@ -495,8 +457,7 @@ public class ClusterConnectionManager
 					try {
 						result = p.unpackRouted();
 					} catch (TigaseStringprepException ex) {
-						log.log(Level.WARNING,
-								"Packet stringprep addressing problem, dropping packet: {0}", p);
+						log.log(Level.WARNING, "Packet stringprep addressing problem, dropping packet: {0}", p);
 
 						return null;
 					}
@@ -510,25 +471,24 @@ public class ClusterConnectionManager
 
 	@Override
 	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
-		// readd packet - this may be good as we would retry to send packet 
+		// readd packet - this may be good as we would retry to send packet
 		// which delivery failed due to IO error
 		addPacket(packet);
 		return true;
-	}	
-	
+	}
+
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
 		// TODO: handle this somehow
 	}
 
-
 	public int schedulerThreads() {
 		return 4;
 	}
 
-    @Override
-    public void serviceStarted(XMPPIOService<Object> serv) {
+	@Override
+	public void serviceStarted(XMPPIOService<Object> serv) {
 		if (!repoReloadTimerTask.isScheduled()) {
 			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15 * SECOND);
 		}
@@ -539,37 +499,36 @@ public class ClusterConnectionManager
 		addTimerTask(task, 10, TimeUnit.SECONDS);
 		super.serviceStarted(serv);
 		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
-				new Object[] { serv.getRemoteAddress(),
-				serv.connectionType().toString(), serv.getUniqueId() });
+				new Object[]{serv.getRemoteAddress(), serv.connectionType().toString(), serv.getUniqueId()});
 		if (compress_stream) {
 			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());
 			serv.startZLib(Deflater.BEST_COMPRESSION);
 		}
 		switch (serv.connectionType()) {
-		case connect :
+			case connect:
 
-			// Send init xmpp stream here
-			String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+				// Send init xmpp stream here
+				String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
-			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
-			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
-					".*@" + remote_host, ".*\\." + remote_host });
+				serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
+				serv.getSessionData()
+						.put(PORT_ROUTING_TABLE_PROP_KEY,
+							 new String[]{remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 
-			String data = "<stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					getDefHostName() + "'" + " to='" + remote_host + "'" + ">";
+				String data = "<stream:stream" + " xmlns='" + XMLNS + "'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName() + "'" +
+						" to='" + remote_host + "'" + ">";
 
-			log.log(Level.INFO, "cid: {0}, sending: {1}", new Object[] { (String) serv
-					.getSessionData().get("cid"),
-					data });
-			serv.xmppStreamOpen(data);
+				log.log(Level.INFO, "cid: {0}, sending: {1}",
+						new Object[]{(String) serv.getSessionData().get("cid"), data});
+				serv.xmppStreamOpen(data);
 
-			break;
+				break;
 
-		default :
+			default:
 
-			// Do nothing, more data should come soon...
-			break;
+				// Do nothing, more data should come soon...
+				break;
 		}    // end of switch (service.connectionType())
 	}
 
@@ -580,9 +539,9 @@ public class ClusterConnectionManager
 		// Make sure it runs just once for each disconnect
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
-			String[] routings = (String[]) sessionData.get( PORT_ROUTING_TABLE_PROP_KEY );
-			String addr = (String) sessionData.get( PORT_REMOTE_HOST_PROP_KEY );
-			ClusterConnection conns = connectionsPool.get( addr );
+			String[] routings = (String[]) sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
+			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+			ClusterConnection conns = connectionsPool.get(addr);
 
 			if (conns == null) {
 				conns = new ClusterConnection(addr);
@@ -591,15 +550,16 @@ public class ClusterConnectionManager
 
 			int size = conns.size();
 
-			conns.removeConn( service );
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST, "serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / type={5}",
-								 new Object[] { result, size, connectionsPool, service, conns, service.connectionType() } );
+			conns.removeConn(service);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / type={5}",
+						new Object[]{result, size, connectionsPool, service, conns, service.connectionType()});
 			}
 
 			if (size != 0 && conns.size() == 0) {
-				if ( routings != null ){
-					updateRoutings( routings, false );
+				if (routings != null) {
+					updateRoutings(routings, false);
 				}
 
 				// removeRouting(serv.getRemoteHost());
@@ -618,7 +578,7 @@ public class ClusterConnectionManager
 			int hour = TimeUtils.getHourNow();
 
 			if (lastDayIdx != hour) {
-				lastDayIdx    = hour;
+				lastDayIdx = hour;
 				lastDay[hour] = 0;
 				Arrays.fill(lastHour, 0);
 			}
@@ -643,11 +603,12 @@ public class ClusterConnectionManager
 	}
 
 	@Override
-	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {
+	}
 
 	@Override
 	public void updateConnectionDetails(Map<String, Object> port_props) {
-		String          host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+		String host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
 		ClusterRepoItem item = repo.getItem(host);
 
 		if (item != null) {
@@ -657,8 +618,7 @@ public class ClusterConnectionManager
 			port_props.put(MAX_RECONNECTS_PROP_KEY, 0);
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "ClusterRepoItem: {0}, port_props: {1}", new Object[] { item,
-					port_props });
+			log.log(Level.FINEST, "ClusterRepoItem: {0}, port_props: {1}", new Object[]{item, port_props});
 		}
 	}
 
@@ -668,68 +628,67 @@ public class ClusterConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
-			String> attribs) {
-		log.log(Level.INFO, "Stream opened: {0}, service: {1}", new Object[] {attribs, service});
+	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
+		log.log(Level.INFO, "Stream opened: {0}, service: {1}", new Object[]{attribs, service});
 		switch (service.connectionType()) {
-		case connect : {
-			String id = attribs.get("id");
+			case connect: {
+				String id = attribs.get("id");
 
-			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
-			ClusterRepoItem item   = repo.getItem(getDefHostName().getDomain());
-			String          secret = item.getPassword();
+				ClusterRepoItem item = repo.getItem(getDefHostName().getDomain());
+				String secret = item.getPassword();
 
-			try {
-				String digest = Algorithms.hexDigest(id, secret, "SHA");
+				try {
+					String digest = Algorithms.hexDigest(id, secret, "SHA");
 
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}, item={3}",
-							new Object[] { id, secret, digest, item });
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}, item={3}",
+								new Object[]{id, secret, digest, item});
+					}
+
+					return "<handshake>" + digest + "</handshake>";
+				} catch (NoSuchAlgorithmException e) {
+					log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
+
+					return null;
 				}
-
-				return "<handshake>" + digest + "</handshake>";
-			} catch (NoSuchAlgorithmException e) {
-				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
-
-				return null;
 			}
-		}
 
-		case accept : {
-			String remote_host = attribs.get("from");
+			case accept: {
+				String remote_host = attribs.get("from");
 
-			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
-			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
-			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] {
-					remote_host,
-					".*@" + remote_host, ".*\\." + remote_host });
+				service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
+				service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
+				service.getSessionData()
+						.put(PORT_ROUTING_TABLE_PROP_KEY,
+							 new String[]{remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 
-			String id = UUID.randomUUID().toString();
+				String id = UUID.randomUUID().toString();
 
-			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
-			updateConnectionDetails(service.getSessionData());
+				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+				updateConnectionDetails(service.getSessionData());
 
-			return "<stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">";
-		}
+				return "<stream:stream" + " xmlns='" + XMLNS + "'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName() + "'" +
+						" to='" + remote_host + "'" + " id='" + id + "'" + ">";
+			}
 
-		default :
+			default:
 
-			// Do nothing, more data should come soon...
-			break;
+				// Do nothing, more data should come soon...
+				break;
 		}    // end of switch (service.connectionType())
 
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getDiscoCategoryType() {
 		return identity_type;
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getDiscoDescription() {
@@ -745,10 +704,8 @@ public class ClusterConnectionManager
 		list.add(getName(), "Last hour disconnects", Arrays.toString(lastHour), Level.FINE);
 		ioStatsGetter.reset();
 		doForAllServices(ioStatsGetter);
-		list.add(getName(), "Average compression ratio", ioStatsGetter
-				.getAverageCompressionRatio(), Level.FINE);
-		list.add(getName(), "Average decompression ratio", ioStatsGetter
-				.getAverageDecompressionRatio(), Level.FINE);
+		list.add(getName(), "Average compression ratio", ioStatsGetter.getAverageCompressionRatio(), Level.FINE);
+		list.add(getName(), "Average decompression ratio", ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
 
 		list.add(getName(), "Max daily cluster nodes count in last month", maxNodes, Level.INFO);
@@ -767,8 +724,6 @@ public class ClusterConnectionManager
 		// Level.FINE);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		super.setClusterController(cl_controller);
@@ -777,6 +732,8 @@ public class ClusterConnectionManager
 		clusterController.setCommandListener(sendPacket);
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	@Override
 	public void start() {
 		super.start();
@@ -784,7 +741,8 @@ public class ClusterConnectionManager
 		if (clusterEventHandler == null) {
 			clusterEventHandler = (ClusterInitializedEvent event) -> {
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Setting initialClusterConnectedDone to true (was: {0})", initialClusterConnectedDone);
+					log.log(Level.FINE, "Setting initialClusterConnectedDone to true (was: {0})",
+							initialClusterConnectedDone);
 				}
 				initialClusterConnectedDone = true;
 				eventBus.removeListener(clusterEventHandler);
@@ -801,27 +759,18 @@ public class ClusterConnectionManager
 		clusterEventHandler = null;
 	}
 
-	//~--- methods --------------------------------------------------------------
-	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, ClusterRepoItem item ) {
-
-		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
-		if ( eventBus == null || item == null ){
-			return;
-		}
-
-		ClusterRepoItemEvent event = new ClusterRepoItemEvent(item, action );
-		eventBus.fire( event );
+	boolean isInitialClusterConnectedDone() {
+		return initialClusterConnectedDone;
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param serv
 	 */
 	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
-		String   addr     = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+		String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
 		ClusterConnection conns = connectionsPool.get(addr);
 
@@ -832,16 +781,16 @@ public class ClusterConnectionManager
 
 		int size = conns.size();
 
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "New service connected: size = {0} / connectionsPool={1} / serv={2} / conns={3}",
-							 new Object[] { size, connectionsPool, serv, conns } );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "New service connected: size = {0} / connectionsPool={1} / serv={2} / conns={3}",
+					new Object[]{size, connectionsPool, serv, conns});
 		}
 
 		// setting userJid to hostname of remote cluster node
 		serv.setUserJid((String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY));
-		
-		conns.addConn(serv );
-		if ( size == 0 && conns.size() > 0 ){
+
+		conns.addConn(serv);
+		if (size == 0 && conns.size() > 0) {
 			updateRoutings(routings, true);
 			log.log(Level.INFO, "Connected to: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
@@ -849,22 +798,22 @@ public class ClusterConnectionManager
 		}
 
 		try {
-            // initial cluster connection done
-            int connectedSize = getNodesConnected().size();
-            int repoSize = repo.allItems().size();
-            if (log.isLoggable(Level.FINEST)) {
-                log.log(Level.FINEST, "All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
-                        new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
-            }
+			// initial cluster connection done
+			int connectedSize = getNodesConnected().size();
+			int repoSize = repo.allItems().size();
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
+						new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
+			}
 
-			if (!initialClusterConnectedDone &&
-                    (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
-                initialClusterConnectedDone = true;
+			if (!initialClusterConnectedDone && (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
+				initialClusterConnectedDone = true;
 
 				eventBus.fire(new ClusterInitializedEvent());
 			}
 		} catch (TigaseDBException e) {
-            log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
+			log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
 		}
 
 		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData()
@@ -894,16 +843,17 @@ public class ClusterConnectionManager
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected int[] getDefPlainPorts() {
-		if (repo == null)
-			return new int[] { ClusterRepoItem.PORT_NO_PROP_VAL };
+		if (repo == null) {
+			return new int[]{ClusterRepoItem.PORT_NO_PROP_VAL};
+		}
 		ClusterRepoItem item = repo.getItem(getDefHostName().getDomain());
 
-		return new int[] { item.getPortNo() };
+		return new int[]{item.getPortNo()};
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected String getDefTrafficThrottling() {
@@ -942,99 +892,109 @@ public class ClusterConnectionManager
 	}
 
 	//~--- methods --------------------------------------------------------------
+	private void sendEvent(REPO_ITEM_UPDATE_TYPE action, ClusterRepoItem item) {
+
+		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
+		if (eventBus == null || item == null) {
+			return;
+		}
+
+		ClusterRepoItemEvent event = new ClusterRepoItemEvent(item, action);
+		eventBus.fire(event);
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Processing handshake: packet={0} / service={1} / sessionData={2}",
-							 new Object[] { p, serv, serv.getSessionData() } );
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Processing handshake: packet={0} / service={1} / sessionData={2}",
+					new Object[]{p, serv, serv.getSessionData()});
 		}
 
-		String serv_addr = (String) serv.getSessionData().get( PORT_REMOTE_HOST_PROP_KEY );
+		String serv_addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		try {
-			InetAddress addr = InetAddress.getByName( serv_addr );
+			InetAddress addr = InetAddress.getByName(serv_addr);
 
 			// we ignore any local addresses
-			if ( ( addr.isAnyLocalAddress() || addr.isLoopbackAddress() )
-					 || NetworkInterface.getByInetAddress( addr ) != null ){
-				log.log( Level.WARNING, "Cluster handshake received from this instance, terminating: {0}", serv_addr );
+			if ((addr.isAnyLocalAddress() || addr.isLoopbackAddress()) ||
+					NetworkInterface.getByInetAddress(addr) != null) {
+				log.log(Level.WARNING, "Cluster handshake received from this instance, terminating: {0}", serv_addr);
 				serv.stop();
 				return;
 			}
-		} catch ( Exception ex ) {
-			log.log( Level.WARNING, "Cluster handshake received from this instance, terminating: " + serv_addr, ex );
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "Cluster handshake received from this instance, terminating: " + serv_addr, ex);
 			serv.stop();
 		}
 
-
 		switch (serv.connectionType()) {
-		case connect : {
-			String data = p.getElemCData();
+			case connect: {
+				String data = p.getElemCData();
 
-			if (data == null) {
-				serviceConnected(serv);
-			} else {
-				log.log(Level.WARNING, "Incorrect packet received: {0}", p);
-			}
-
-			break;
-		}
-
-		case accept : {
-			String digest = p.getElemCData();
-			String id     = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
-			String secret = (String) serv.getSessionData().get(SECRET_PROP_KEY);
-
-			try {
-				String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"Calculating digest: secret={0}, digest={1}, loc_digest={2}, sessionData={3}",
-							new Object[] { secret,
-							digest, loc_digest, serv.getSessionData() });
-				}
-				if ((digest != null) && digest.equals(loc_digest)) {
-					Packet resp = Packet.packetInstance(new Element("handshake"), null, null);
-
-					writePacketToSocket(serv, resp);
+				if (data == null) {
 					serviceConnected(serv);
 				} else {
-					if (secret == null) {
-						log.log( Level.WARNING,
-										 "Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted: {0}", serv );
-
-						if ( log.isLoggable( Level.FINEST ) ){
-							log.log( Level.FINEST,
-											 "Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted! Remote host: {0}, sessionData: {1}, repoItem: {2}, service: {3}",
-											 new Object[] { serv_addr, serv.getSessionData(), repo.getItem( serv_addr ), serv } );
-						}
-
-					} else {
-						log.log(Level.WARNING,
-								"Handshaking password doesn''t match, disconnecting: {0}", serv);
-
-						if ( log.isLoggable( Level.FINEST ) ){
-							log.log( Level.WARNING,
-											 "Handshaking password doesn''t match, disconnecting! Remote host: {0}, sessionData: {1}, repoItem: {2}, service: {3}", new Object[] { serv_addr, serv.getSessionData(), repo.getItem( serv_addr ), serv } );
-
-						}
-
-
-					}
-					serv.stop();
+					log.log(Level.WARNING, "Incorrect packet received: {0}", p);
 				}
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Handshaking error.", e);
+
+				break;
 			}
 
-			break;
-		}
+			case accept: {
+				String digest = p.getElemCData();
+				String id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+				String secret = (String) serv.getSessionData().get(SECRET_PROP_KEY);
 
-		default :
+				try {
+					String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
 
-			// Do nothing, more data should come soon...
-			break;
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Calculating digest: secret={0}, digest={1}, loc_digest={2}, sessionData={3}",
+								new Object[]{secret, digest, loc_digest, serv.getSessionData()});
+					}
+					if ((digest != null) && digest.equals(loc_digest)) {
+						Packet resp = Packet.packetInstance(new Element("handshake"), null, null);
+
+						writePacketToSocket(serv, resp);
+						serviceConnected(serv);
+					} else {
+						if (secret == null) {
+							log.log(Level.WARNING,
+									"Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted: {0}",
+									serv);
+
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST,
+										"Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted! Remote host: {0}, sessionData: {1}, repoItem: {2}, service: {3}",
+										new Object[]{serv_addr, serv.getSessionData(), repo.getItem(serv_addr), serv});
+							}
+
+						} else {
+							log.log(Level.WARNING, "Handshaking password doesn''t match, disconnecting: {0}", serv);
+
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.WARNING,
+										"Handshaking password doesn''t match, disconnecting! Remote host: {0}, sessionData: {1}, repoItem: {2}, service: {3}",
+										new Object[]{serv_addr, serv.getSessionData(), repo.getItem(serv_addr), serv});
+
+							}
+
+						}
+						serv.stop();
+					}
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Handshaking error.", e);
+				}
+
+				break;
+			}
+
+			default:
+
+				// Do nothing, more data should come soon...
+				break;
 		}    // end of switch (service.connectionType())
 	}
 
@@ -1044,9 +1004,7 @@ public class ClusterConnectionManager
 				try {
 					addRegexRouting(route);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can not add regex routing ''{0}'' : {1}",
-							new Object[] { route,
-							e });
+					log.log(Level.WARNING, "Can not add regex routing ''{0}'' : {1}", new Object[]{route, e});
 				}
 			}
 		} else {
@@ -1054,9 +1012,7 @@ public class ClusterConnectionManager
 				try {
 					removeRegexRouting(route);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can not remove regex routing ''{0}'' : {1}",
-							new Object[] { route,
-							e });
+					log.log(Level.WARNING, "Can not remove regex routing ''{0}'' : {1}", new Object[]{route, e});
 				}
 			}
 		}
@@ -1064,20 +1020,50 @@ public class ClusterConnectionManager
 
 	//~--- inner classes --------------------------------------------------------
 
+	public static class ClusterInitializedEvent {
+
+		public ClusterInitializedEvent() {
+
+		}
+
+	}
+
+	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class, active = true)
+	public static class DefClConRepositoryBean
+			extends AbstractSDComponentRepositoryBean<ClusterRepoItem> {
+
+		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
+			return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class,
+																	new Type[]{ClusterRepoItem.class,
+																			   DataSource.class});
+		};
+		private ComponentRepository<ClusterRepoItem> repo = null;
+
+		@Override
+		protected Class<? extends ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>> findClassForDataSource(
+				DataSource dataSource) throws DBInitException {
+			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(),
+														 matcher);
+			return (Class<ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>>) cls;
+		}
+
+	}
+
 	private class IOServiceStatisticsGetter
-					implements ServiceChecker<XMPPIOService<Object>> {
-		private int            clIOQueue          = 0;
-		private float          compressionRatio   = 0f;
-		private int            counter            = 0;
-		private float          decompressionRatio = 0f;
-		private StatisticsList list               = new StatisticsList(Level.ALL);
+			implements ServiceChecker<XMPPIOService<Object>> {
+
+		private int clIOQueue = 0;
+		private float compressionRatio = 0f;
+		private int counter = 0;
+		private float decompressionRatio = 0f;
+		private StatisticsList list = new StatisticsList(Level.ALL);
 
 		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void check(XMPPIOService<Object> service) {
 			service.getStatistics(list, true);
-			compressionRatio   += list.getValue("zlibio", "Average compression rate", -1f);
+			compressionRatio += list.getValue("zlibio", "Average compression rate", -1f);
 			decompressionRatio += list.getValue("zlibio", "Average decompression rate", -1f);
 			++counter;
 			clIOQueue += service.waitingToSendSize();
@@ -1085,7 +1071,6 @@ public class ClusterConnectionManager
 
 		/**
 		 * Method description
-		 *
 		 */
 		public void reset() {
 
@@ -1094,9 +1079,9 @@ public class ClusterConnectionManager
 			// any stats in case of the disconnection.
 			// bytesReceived = 0;
 			// bytesSent = 0;
-			clIOQueue          = 0;
-			counter            = 0;
-			compressionRatio   = 0f;
+			clIOQueue = 0;
+			counter = 0;
+			compressionRatio = 0f;
 			decompressionRatio = 0f;
 		}
 
@@ -1104,9 +1089,6 @@ public class ClusterConnectionManager
 
 		/**
 		 * Method description
-		 *
-		 *
-		 *
 		 *
 		 * @return a value of <code>float</code>
 		 */
@@ -1117,9 +1099,6 @@ public class ClusterConnectionManager
 		/**
 		 * Method description
 		 *
-		 *
-		 *
-		 *
 		 * @return a value of <code>float</code>
 		 */
 		public float getAverageDecompressionRatio() {
@@ -1129,9 +1108,6 @@ public class ClusterConnectionManager
 		/**
 		 * Method description
 		 *
-		 *
-		 *
-		 *
 		 * @return a value of <code>int</code>
 		 */
 		public int getWaitingToSend() {
@@ -1139,9 +1115,9 @@ public class ClusterConnectionManager
 		}
 	}
 
-
 	private class SendPacket
-					extends CommandListenerAbstract {
+			extends CommandListenerAbstract {
+
 		private SendPacket(String name) {
 			super(name, null);
 		}
@@ -1149,14 +1125,11 @@ public class ClusterConnectionManager
 		//~--- methods ------------------------------------------------------------
 
 		@Override
-		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
-				String> data, Queue<Element> packets)
-				throws ClusterCommandException {
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
+								   Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
-						new Object[] { fromNode,
-						visitedNodes, data, packets });
+				log.log(Level.FINEST, "Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[]{fromNode, visitedNodes, data, packets});
 			}
 			for (Element element : packets) {
 				try {
@@ -1170,9 +1143,9 @@ public class ClusterConnectionManager
 		}
 	}
 
-
 	private class ServiceConnectedTimerTask
 			extends TimerTask {
+
 		private XMPPIOService<Object> serv = null;
 
 		//~--- constructors -------------------------------------------------------
@@ -1186,13 +1159,13 @@ public class ClusterConnectionManager
 		@Override
 		public void run() {
 			++servConnectedTimeouts;
-			log.log(Level.INFO,
-					"ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
+			log.log(Level.INFO, "ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
 			serv.forceStop();
 		}
 	}
-	
-	protected class Watchdog extends ConnectionManager.Watchdog {
+
+	protected class Watchdog
+			extends ConnectionManager.Watchdog {
 
 		@Override
 		protected long getDurationSinceLastTransfer(final XMPPIOService service) {
@@ -1202,31 +1175,6 @@ public class ClusterConnectionManager
 				return watchdogTimeout;
 			}
 			return System.currentTimeMillis() - lastTransfer;
-		}
-		
-	}
-
-	public static class ClusterInitializedEvent {
-
-		public ClusterInitializedEvent() {
-
-		}
-
-	}
-
-	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class, active = true)
-	public static class DefClConRepositoryBean extends AbstractSDComponentRepositoryBean<ClusterRepoItem> {
-
-		private ComponentRepository<ClusterRepoItem> repo = null;
-
-		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
-				return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] {ClusterRepoItem.class, DataSource.class });
-		};
-
-		@Override
-		protected Class<? extends ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>> findClassForDataSource(DataSource dataSource) throws DBInitException {
-			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
-			return (Class<ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>>) cls;
 		}
 
 	}

@@ -32,35 +32,29 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SampleSocketThread here.
- *
- *
+ * <p>
+ * <p>
  * Created: Sun Aug  6 22:34:40 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SampleSocketThread extends Thread {
+public class SampleSocketThread
+		extends Thread {
 
-  private static final Logger log =
-		Logger.getLogger("tigase.io.SampleSocketThread");
-
-  private boolean stopping = false;
-
-  private final ConcurrentLinkedQueue<IOInterface> waiting =
-    new ConcurrentLinkedQueue<IOInterface>();
-	private final ConcurrentLinkedQueue<InetSocketAddress> waiting_accept =
-    new ConcurrentLinkedQueue<InetSocketAddress>();
-  private final ConcurrentLinkedQueue<IOInterface> for_removal =
-    new ConcurrentLinkedQueue<IOInterface>();
-
-  private Selector clientSel = null;
+	private static final Logger log = Logger.getLogger("tigase.io.SampleSocketThread");
+	private final ConcurrentLinkedQueue<IOInterface> for_removal = new ConcurrentLinkedQueue<IOInterface>();
+	private final ConcurrentLinkedQueue<IOInterface> waiting = new ConcurrentLinkedQueue<IOInterface>();
+	private final ConcurrentLinkedQueue<InetSocketAddress> waiting_accept = new ConcurrentLinkedQueue<InetSocketAddress>();
+	private Selector clientSel = null;
 	private SocketHandler handler = null;
+	private boolean stopping = false;
 
 	/**
 	 * Creates a new <code>SampleSocketThread</code> instance.
 	 *
-	 *
 	 * @param handler
+	 *
 	 * @throws IOException
 	 */
 	public SampleSocketThread(SocketHandler handler) throws IOException {
@@ -70,8 +64,8 @@ public class SampleSocketThread extends Thread {
 	}
 
 	public void addIOInterface(IOInterface s) {
-    waiting.offer(s);
-    clientSel.wakeup();
+		waiting.offer(s);
+		clientSel.wakeup();
 	}
 
 	public void addForAccept(InetSocketAddress isa) {
@@ -86,16 +80,55 @@ public class SampleSocketThread extends Thread {
 		} // end of if (key != null)
 	}
 
-  private void addAllWaiting() throws IOException {
-    IOInterface s = null;
-    while ((s = waiting.poll()) != null) {
-      final SocketChannel sc = s.getSocketChannel();
-      try {
-        sc.register(clientSel, SelectionKey.OP_READ, s);
+	@Override
+	public void run() {
+		while (!stopping) {
+			try {
+				clientSel.select();
+				for (Iterator i = clientSel.selectedKeys().iterator(); i.hasNext(); ) {
+					SelectionKey sk = (SelectionKey) i.next();
+					i.remove();
+					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
+						ServerSocketChannel nextReady = (ServerSocketChannel) sk.channel();
+						SocketChannel sc = nextReady.accept();
+						if (log.isLoggable(Level.FINER)) {
+							log.finer("Registered new client socket: " + sc);
+						}
+						handler.handleSocketAccept(sc);
+					}
+					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
+						// Not implemented yet
+					}
+					if ((sk.readyOps() & SelectionKey.OP_READ) != 0) {
+						IOInterface s = (IOInterface) sk.attachment();
+						sk.cancel();
+						handler.handleIOInterface(s);
+					}
+				}
+				// Clean-up cancelled keys...
+				clientSel.selectNow();
+				addAllWaiting();
 			} catch (Exception e) {
-        // Ignore such channel
-      } // end of try-catch
-    } // end of for ()
+				log.log(Level.SEVERE, "SampleSocketThread I/O error, can't continue my work.", e);
+				stopping = true;
+			}
+		}
+		System.err.println("SampleSocketThread stopped!");
+		System.exit(2);
+	}
+
+	// Implementation of java.lang.Runnable
+
+	private void addAllWaiting() throws IOException {
+		IOInterface s = null;
+		while ((s = waiting.poll()) != null) {
+			final SocketChannel sc = s.getSocketChannel();
+			try {
+				sc.register(clientSel, SelectionKey.OP_READ, s);
+			} catch (Exception e) {
+				// Ignore such channel
+			} // end of try-catch
+		} // end of for ()
 		InetSocketAddress isa = null;
 		while ((isa = waiting_accept.poll()) != null) {
 			ServerSocketChannel ssc = ServerSocketChannel.open();
@@ -103,46 +136,6 @@ public class SampleSocketThread extends Thread {
 			ssc.socket().bind(isa);
 			ssc.register(clientSel, SelectionKey.OP_ACCEPT, null);
 		} // end of while (isa = waiting_accept.poll() != null)
-  }
-
-	// Implementation of java.lang.Runnable
-
-	@Override
-	public void run() {
-    while (!stopping) {
-      try {
-        clientSel.select();
-        for (Iterator i = clientSel.selectedKeys().iterator(); i.hasNext();) {
-					SelectionKey sk = (SelectionKey)i.next();
-					i.remove();
-					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
-						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
-						SocketChannel sc = nextReady.accept();
-            			if (log.isLoggable(Level.FINER)) {
-            				log.finer("Registered new client socket: "+sc);
-                        }
-						handler.handleSocketAccept(sc);
-					}
-					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
-						// Not implemented yet
-					}
-					if ((sk.readyOps() & SelectionKey.OP_READ) != 0) {
-						IOInterface s = (IOInterface)sk.attachment();
-						sk.cancel();
-						handler.handleIOInterface(s);
-					}
-        }
-				// Clean-up cancelled keys...
-        clientSel.selectNow();
-        addAllWaiting();
-      } catch (Exception e) {
-        log.log(Level.SEVERE,
-					"SampleSocketThread I/O error, can't continue my work.", e);
-        stopping = true;
-      }
-    }
-    System.err.println("SampleSocketThread stopped!");
-    System.exit(2);
 	}
 
 	public interface SocketHandler {

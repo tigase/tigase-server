@@ -56,7 +56,7 @@ Packet process(Kernel kernel, SessionManager component, Iq p) {
 		Command.addTitle(result, "Setting the Message of the Day")
 		Command.addInstructions(result, "Fill out this form to set the message of the day.")
 		Command.addHiddenField(result, "FORM_TYPE", "http://jabber.org/protocol/admin")
-		Command.addFieldMultiValue(result, MOTD, [], "Message of the Day")
+		Command.addFieldMultiValue(result, MOTD, [ ], "Message of the Day")
 
 		return result
 	} else {
