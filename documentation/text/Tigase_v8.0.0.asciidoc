@@ -11,29 +11,39 @@ Tigase v8.0.0 Changenotes and announcement
 
 === Kernel and beans configureation
 Tigase now operates using a Kernel and Beans style of programming.  What does this mean for Tigase and You?  Good news, really.
-Tigase XMPP Server is now working as a Kernel programming, which will operate on it's own and handle all the core functionality of the server.  Component, and non-essential functionality will now be loaded as Beans.  As a user, your experience will not change all that much.  However, beans can be loaded and unloaded without having to restart Tigase, meaning that the program will behave more dynamically.  This means a smaller footprint on memory on resources when components are not needed, and longer uptimes without having to restart the program!  This also allows for greater flexibility for Tigase XMPP Server to be better customized for unique solutions.
+Tigase XMPP Server is now working as a Kernel program, which will operate on it's own and handle all the core functionality of the server.  Component, and non-essential functionality will now be loaded as Beans.  As a user, your experience will not change all that much.  However, beans can be loaded and unloaded without having to restart Tigase, meaning that the program will behave more dynamically.  This means a smaller footprint on memory on resources when components are not needed, and longer uptimes without having to restart the program!  This also allows for greater flexibility for Tigase XMPP Server to be better customized for unique solutions.
 
 === New Configuration File Format
 With the change of Tigase to a Kernal and Beans style of programming, we have also changed how the configuration file is managed.  Although you will still edit the init.properties file like a plaintext file, a new style of formatting will be used known as DSL.
 Domain Specific Language may add more lines, but is a cleaner format, and provides a more secure configuration design since validation of the configuration is done at the domain level.
 For more information on this format and how to configure Tigase, visit xref:dslConfig[DSL Configuration Guide].
 
-=== Changes in password storage
-Before version 8.0.0, user passwords were stored in plaintext in `user_pw` database field within `tig_users` table, but in plaintext.
-It was possible to enable storage of the MD5 hash of the password instead, however this limited authentication mechanism SASL PLAIN only.
-However an MD5 hash of a password is not really a secure method as it is possible to revert this mechanism using rainbow tables.
-
-Therefore, we decided to change this and store only encrypted versions of a password in PBKDF2 form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
-SASL PLAIN mechanism can also used these encrypted passwords.  The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tigase.
-
 === Cluster Node Shutdown Changes
-Starting with Tigase v7.2.0, users connected on clustered nodes will be able use a +see-other-host+ strategy when a node is being shutdown.  *Note: This may not be compatible with all clients.*
+Starting with Tigase v7.2.0, users connected on clustered nodes will be able use a `see-other-host` strategy when a node is being shutdown.  *Note: This may not be compatible with all clients.*
 The Ad-hoc command is designed for a graceful shutdown of cluster nodes as a groovy script Shutdown.groovy.
 This script also allows for the -timeout setting which will delay shutdown of the node, and alert all users (via a headline message) that the server will be shutdown after a time.  User clients that are compatible with the command will then detect other connected clusters and maintain their connections.
 
-If the command is being sent to shut down the whole cluster, no +see-other-host+ implementation will be sent, however -timeout settings may still be used.
+If the command is being sent to shut down the whole cluster, no `see-other-host` implementation will be sent, however -timeout settings may still be used.
 
 The script may be activated by an ad-hoc command, or sent using REST from remote or Tigase Admin UI.
+
+=== BouncyCastle being used for StartTLS
+link:https://www.bouncycastle.org/java.html[BouncyCastle] Crypto API has now been employed to handle StartTLS negioation.  By doing this, Tigase now supports `tls-unique` within the SCRAM PLUS authentication implementation.
+This API is may be employed by calling the class in your configuration file:
+[source,dsl]
+-----
+c2s () {
+    sslContextContainer(class: tigase.extras.bcstarttls.BCSSLContextContainer) {}
+}
+-----
+The BouncyCastle classes are included in the dist-max archives.
+
+=== All artifacts are signed
+Since work began on v8.0.0 Tigase has required that all changes to Tigase XMPP Server and dependencies be signed with known certificates.  This version marks the first to be totally signed.
+
+=== Scaled Down Installation Methods
+We have cleaned up installation methods for Tigase and now recommend the use of web-installer method.  Binary and .jar installation methods have been removed and will no longer be produced for v8.0.0 and later.
+Manual installtion is still available for those unable to use HTTP or browser access.  Visit our xref:quickstart[Quick Start] guide for instructions on these other methods.
 
 === Emojis now supported on Tigase XMPP Servers
 Emojis are now supported on MySQL databases, however some settings may be need to be changed, although they won't affect existing databases.  xref:emojisupportSQL[Visit this section] for details.
@@ -77,8 +87,18 @@ This is a plugin and must be enabled in the init properties file by using the fo
 'account-registration-email-validator'() {}
 -----
 
+=== Changes in password storage
+Before version 8.0.0, user passwords were stored in plaintext in the `user_pw` database field within `tig_users` table, but in plaintext.
+It was possible to enable storage of the MD5 hash of the password instead, however this limited authentication mechanism SASL PLAIN only.
+However an MD5 hash of a password is not really a secure method as it is possible to revert this mechanism using rainbow tables.
+
+Therefore, we decided to change this and store only encrypted versions of a password in PBKDF2 form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
+SASL PLAIN mechanism can also use these encrypted passwords.
+
+The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tigase.
+
 === Dynamic TLS Buffer
-Memory Buffer for TLS no longer remains at highest buffer size needed for the server session. Buffer will now free memory during idle connections.
+Memory Buffer for TLS no longer remains at highest buffer size needed for the server session. Buffer will now free memory during idle connections.  Thus drastically improving program footprint.
 
 === Config-type properties have changed
 Config-type is now configured using DSL format.  Visit xref:configType[this section] for more infomration.
