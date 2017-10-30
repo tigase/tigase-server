@@ -55,12 +55,6 @@ public class S2SConnection
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param handler
-	 * @param ip
-	 */
 	public S2SConnection(S2SConnectionHandlerIfc<S2SIOService> handler, String ip) {
 		this.handler = handler;
 		this.ipAddress = ip;
@@ -68,11 +62,6 @@ public class S2SConnection
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	public void addControlPacket(Packet packet) {
 		waitingControlPackets.add(packet);
 	}
@@ -84,48 +73,28 @@ public class S2SConnection
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public String getIPAddress() {
 		return ipAddress;
 	}
 
-	/**
-	 * Method description
-	 */
 	public S2SIOService getS2SIOService() {
 		return service;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
 	public void setS2SIOService(S2SIOService serv) {
 		this.service = serv;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getWaitingControlCount() {
 		return waitingControlPackets.size();
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public boolean isConnected() {
 		return (service != null) && service.isConnected();
 	}
 
-	/**
-	 * Method description
-	 */
 	public void sendAllControlPackets() {
 		if (log.isLoggable(Level.FINEST)) {
 			for (Packet packet : waitingControlPackets) {
@@ -138,13 +107,6 @@ public class S2SConnection
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 *
-	 * @throws IOException
-	 */
 	public boolean sendPacket(Packet packet) throws IOException {
 		return handler.writePacketToSocket(service, packet);
 	}

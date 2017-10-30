@@ -86,18 +86,8 @@ public abstract class ActionAbstract
 		this.resultsHandler = resultsHandler;
 	}
 
-	;
-
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 * @throws PacketErrorTypeException
-	 */
 	protected Packet prepareAmpPacket(Packet packet, Element rule) throws PacketErrorTypeException {
 		boolean error_result = false;
 
@@ -154,11 +144,6 @@ public abstract class ActionAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	protected void removeTigasePayload(Packet packet) {
 		packet.getElement().removeAttribute(TO_CONN_ID);
 		packet.getElement().removeAttribute(TO_RES);

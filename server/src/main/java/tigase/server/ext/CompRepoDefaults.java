@@ -39,44 +39,26 @@ public abstract class CompRepoDefaults {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static String getConfigKey() {
 		return "comp-items";
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String[] getDefaultPropetyItems() {
 		return new String[]{"muc.domain.tld:passwd:listen:5277:accept"};
 	}
 
-	/**
-	 * Method description
-	 */
 	public static CompRepoItem getItemInstance() {
 		return new CompRepoItem();
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String getItemsListPKey() {
 		return comp_list_pkey;
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String getPropertyKey() {
 		return "--external";
 	}
 
-	/**
-	 * Method description
-	 */
 	public static BareJID getRepoUser() {
 		return comp_user;
 	}

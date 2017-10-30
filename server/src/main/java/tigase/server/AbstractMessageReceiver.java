@@ -579,13 +579,6 @@ public abstract class AbstractMessageReceiver
 		return 1;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param prefix
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String newPacketId(String prefix) {
 		StringBuilder sb = new StringBuilder(32);
 
@@ -674,13 +667,6 @@ public abstract class AbstractMessageReceiver
 		stop();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param address
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean removeRegexRouting(String address) {
 		return regexRoutings.remove(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
 	}
@@ -708,9 +694,6 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public void stop() {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.INFO, "{0}: stopping queue management threads ...", getName());
@@ -886,11 +869,6 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param maxQueueSize
-	 */
 	public void setMaxQueueSize(int maxQueueSize) {
 		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0) ||
 				(!this.priorityQueueClass.equals(in_queues.get(0).getClass()) && this.threadsQueueIn == null)) {
@@ -964,16 +942,6 @@ public abstract class AbstractMessageReceiver
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param handler
-	 * @param delay
-	 * @param unit
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean addOutPacketWithTimeout(Packet packet, ReceiverTimeoutHandler handler, long delay, TimeUnit unit) {
 
 		// It is automatically added to collections and the Timer
@@ -1036,13 +1004,6 @@ public abstract class AbstractMessageReceiver
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packets
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean addOutPackets(Queue<Packet> packets) {
 		Packet p = null;
 		boolean result = true;
@@ -1094,13 +1055,6 @@ public abstract class AbstractMessageReceiver
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param def
-	 *
-	 * @return a value of <code>Integer</code>
-	 */
 	protected Integer getMaxQueueSize(int def) {
 		return def;
 	}
@@ -1276,11 +1230,6 @@ public abstract class AbstractMessageReceiver
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 * @param response
-		 */
 		public void handleResponse(Packet response) {
 			this.cancel();
 
@@ -1290,9 +1239,6 @@ public abstract class AbstractMessageReceiver
 			handler.responseReceived(packet, response);
 		}
 
-		/**
-		 * Method description
-		 */
 		public void handleTimeout() {
 
 			if (log.isLoggable(Level.FINEST)) {

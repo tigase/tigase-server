@@ -35,37 +35,22 @@ public abstract class ClConRepoDefaults {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	static String getConfigKey() {
 		return "cluster-nodes";
 	}
 
-	/**
-	 * Method description
-	 */
 	static String[] getDefaultPropetyItems() {
 		return new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 	}
 
-	/**
-	 * Method description
-	 */
 	static ClusterRepoItem getItemInstance() {
 		return new ClusterRepoItem();
 	}
 
-	/**
-	 * Method description
-	 */
 	static String getPropertyKey() {
 		return "--cluster-nodes";
 	}
 
-	/**
-	 * Method description
-	 */
 	public static BareJID getRepoUser() {
 		return clcon_user;
 	}

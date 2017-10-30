@@ -362,13 +362,6 @@ public class MobileV3
 		holder.reset();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param res
-	 * @param presenceQueue
-	 */
 	private QueueState filter(XMPPResourceConnection session, Packet res, QueueState state,
 							  Map<JID, Packet> presenceQueue, Queue<Packet> packetQueue) {
 		if (log.isLoggable(Level.FINEST)) {

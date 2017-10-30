@@ -79,9 +79,6 @@ public abstract class XMPPProcessor
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
 	protected XMPPProcessor() {
 	}
 
@@ -164,9 +161,6 @@ public abstract class XMPPProcessor
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public XMPPProcessor getInstance() {
 		return this;
 	}

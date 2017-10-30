@@ -40,9 +40,6 @@ import tigase.xml.SimpleParser;
 public class ClusterElementTest
 		extends TestCase {
 
-	/**
-	 * Method description
-	 */
 	@Test
 	@SuppressWarnings("deprecation")
 	public void testGetMethodName() {

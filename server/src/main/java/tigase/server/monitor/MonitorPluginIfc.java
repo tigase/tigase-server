@@ -38,68 +38,23 @@ import java.util.Queue;
  */
 public interface MonitorPluginIfc {
 
-	/**
-	 * Method description
-	 *
-	 * @param results
-	 */
-	public void check10Secs(Queue<Packet> results);
+	void check10Secs(Queue<Packet> results);
 
-	/**
-	 * Method description
-	 *
-	 * @param results
-	 */
-	public void check1Day(Queue<Packet> results);
+	void check1Day(Queue<Packet> results);
 
-	/**
-	 * Method description
-	 *
-	 * @param results
-	 */
-	public void check1Hour(Queue<Packet> results);
+	void check1Hour(Queue<Packet> results);
 
-	/**
-	 * Method description
-	 *
-	 * @param results
-	 */
-	public void check1Min(Queue<Packet> results);
+	void check1Min(Queue<Packet> results);
 
-	/**
-	 * Method description
-	 */
-	public String commandsHelp();
+	String commandsHelp();
 
-	/**
-	 * Method description
-	 */
-	public void destroy();
+	void destroy();
 
-	//~--- get methods ----------------------------------------------------------
+	boolean isMonitorCommand(String command);
 
-	/**
-	 * Method description
-	 */
-	public String getState();
+	String runCommand(String[] command);
 
-	/**
-	 * Method description
-	 *
-	 * @param command
-	 */
-	public boolean isMonitorCommand(String command);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param command
-	 */
-	public String runCommand(String[] command);
-
-	//~--- get methods ----------------------------------------------------------
+	String getState();
 
 	void getStatistics(StatisticsList list);
 }

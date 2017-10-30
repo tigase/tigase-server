@@ -71,9 +71,6 @@ public class BoshIOService
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
 	public BoshIOService(ConfigProvider configProvider) {
 		super();
 		this.configProvider = configProvider;
@@ -81,71 +78,38 @@ public class BoshIOService
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public long getRid() {
 		return this.rid;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param rid
-	 */
 	public void setRid(long rid) {
 		this.rid = rid;
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public UUID getSid() {
 		return this.sid;
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param sid
-	 */
 	public void setSid(UUID sid) {
 		this.sid = sid;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public BoshTask getWaitTimer() {
 		return waitTimer;
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param timer
-	 */
 	public void setWaitTimer(BoshTask timer) {
 		waitTimer = timer;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param errorCode
-	 * @param packet
-	 * @param errorMsg
-	 *
-	 * @throws IOException
-	 */
 	public void sendErrorAndStop(Authorization errorCode, StreamError streamError, Packet packet, String errorMsg)
 			throws IOException {
 		for (XMPPIOProcessor proc : processors) {
@@ -187,22 +151,12 @@ public class BoshIOService
 		stop();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param ct
-	 */
 	public void setContentType(String ct) {
 		this.content_type = ct;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 */
 	public StringBuilder prepareHeaders(String data) {
 		StringBuilder sb = new StringBuilder(200);
 

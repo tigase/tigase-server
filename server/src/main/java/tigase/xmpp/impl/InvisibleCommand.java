@@ -169,11 +169,6 @@ public class InvisibleCommand
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>RosterAbstract</code>
-	 */
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);
 	}

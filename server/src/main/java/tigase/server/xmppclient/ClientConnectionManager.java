@@ -553,16 +553,6 @@ public class ClientConnectionManager
 		return clientTrustManagerFactory;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param newAddress
-	 * @param command_sessionId
-	 * @param serv
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	protected JID changeDataReceiver(Packet packet, JID newAddress, String command_sessionId,
 									 XMPPIOService<Object> serv) {
 		if (serv != null) {
@@ -595,20 +585,10 @@ public class ClientConnectionManager
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>ReceiverTimeoutHandler</code>
-	 */
 	protected ReceiverTimeoutHandler newStartedHandler() {
 		return new StartedHandler();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>ReceiverTimeoutHandler</code>
-	 */
 	protected ReceiverTimeoutHandler newStoppedHandler() {
 		return new StoppedHandler();
 	}
@@ -622,11 +602,6 @@ public class ClientConnectionManager
 		addTimerTask(shutdownTask, event.getDelay() * SECOND);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	protected void processCommand(Packet packet) {
 		XMPPIOService<Object> serv = getXMPPIOService(packet);
 		Iq iqc = (Iq) packet;

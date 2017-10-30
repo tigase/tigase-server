@@ -258,16 +258,6 @@ public class JabberIqAuth
 		} // end of if (session.isAuthorized()) else
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 * @param settings
-	 * @param session
-	 * @param user_id
-	 * @param password
-	 * @param digest
-	 */
 	protected Authorization doAuth(NonAuthUserRepository repo, Map<String, Object> settings,
 								   XMPPResourceConnection session, BareJID user_id, String password, String digest) {
 		try {

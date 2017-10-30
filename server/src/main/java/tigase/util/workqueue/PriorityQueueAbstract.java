@@ -50,13 +50,6 @@ public abstract class PriorityQueueAbstract<E> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 * @param <E>
-	 */
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
@@ -85,8 +78,6 @@ public abstract class PriorityQueueAbstract<E> {
 		return getPriorityQueue(maxPriority, maxSize, result);
 	}
 
-	// public boolean offer(E element, int priority, String owner) {
-
 	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize,
 																Class<? extends PriorityQueueAbstract> queueClass) {
 		try {
@@ -104,64 +95,24 @@ public abstract class PriorityQueueAbstract<E> {
 		return null;
 	}
 
-	// public void put(E element, int priority, String owner) throws InterruptedException {
-
-	/**
-	 * Method description
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 */
 	public abstract void init(int maxPriority, int maxSize);
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param element
-	 * @param priority
-	 */
 	public abstract boolean offer(E element, int priority);
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * @throws InterruptedException
-	 */
 	public abstract void put(E element, int priority) throws InterruptedException;
 
-	// public E take(String owner) throws InterruptedException {
-
-	/**
-	 * Method description
-	 *
-	 * @param maxSize
-	 */
 	public abstract void setMaxSize(int maxSize);
 
-	/**
-	 * Method description
-	 */
 	public abstract int[] size();
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @throws InterruptedException
-	 */
 	public abstract E take() throws InterruptedException;
 
-	/**
-	 * Method description
-	 */
 	public abstract int totalSize();
 
 }

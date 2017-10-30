@@ -64,23 +64,14 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public abstract BareJID getRepoUser();
 
-	/**
-	 * Method description
-	 */
 	public String getItemsListPKey() {
 		return items_list_pkey;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public void reload() {
 		int hashCode = 0;
@@ -145,9 +136,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public void store() {
 		super.store();

@@ -149,13 +149,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigActiveAccounts(ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -176,16 +169,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param parentNid
-	 * @param uid
-	 * @param node
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigAddNode(long parentNid, long uid, String node, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -210,15 +193,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param userPw
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigAddUser(String userId, String userPw, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -275,15 +249,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param userPw
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigAddUserPlainPw(String userId, String userPw, ResultSet[] data) throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
 		String encp = encodePassword(encMethod, userId, userPw);
@@ -291,13 +256,6 @@ public class StoredProcedures {
 		tigAddUser(userId, encp, data);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigAllUsers(ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -318,13 +276,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigAllUsersCount(ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -344,13 +295,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigDisableAccount(final String userId) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -372,13 +316,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigDisabledAccounts(ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -399,13 +336,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigEnableAccount(final String userId) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -454,13 +384,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 *
-	 * @throws SQLException
-	 */
 	public static String tigGetDBProperty(final String key) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -495,14 +418,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigGetPassword(String userId, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -526,14 +441,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigGetUserDBUid(String userId, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -554,11 +461,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigInitdb() throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -578,13 +480,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigOfflineUsers(ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -605,13 +500,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigOnlineUsers(ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -632,14 +520,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param value
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigPutDBProperty(final String key, final String value) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -684,13 +564,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigRemoveUser(final String userId) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -814,14 +687,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * @param nid
-	 * @param uid
-	 * @param key
-	 * @param value
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigUpdatePairs(long nid, long uid, String key, Clob value) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -868,28 +733,12 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param userPw
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigUpdatePasswordPlainPw(String userId, String userPw) throws SQLException {
 		String passwordEncoding = Optional.ofNullable(tigGetDBProperty("password-encoding")).orElse("PLAIN");
 		String encodedPassword = encodePassword(passwordEncoding, userId, userPw);
 		tigUserCredentialUpdate(userId, Credentials.DEFAULT_USERNAME, passwordEncoding, encodedPassword);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userPw
-	 * @param userId
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigUpdatePasswordPlainPwRev(String userPw, String userId) throws SQLException {
 		tigUpdatePasswordPlainPw(userId, userPw);
 	}
@@ -986,15 +835,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param userPw
-	 * @param data
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigUserLoginPlainPw(String userId, String userPw, ResultSet[] data) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
@@ -1045,13 +885,6 @@ public class StoredProcedures {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 *
-	 * @throws SQLException
-	 */
 	public static void tigUserLogout(final String userId) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 

@@ -81,32 +81,7 @@ public class RepositoryUtils {
 	private static String value = null;
 
 	//~--- methods --------------------------------------------------------------
-
-//public static boolean checkJID(JID jid) {
-//  String nick_check = JIDUtils.checkNickName(JIDUtils.getNodeNick(jid));
-//  if (nick_check != null) {
-//    System.out.println("      Invalid nickname - " + JIDUtils.getNodeNick(jid)
-//      + ": " + nick_check);
-//    return false;
-//  }
-//  String host_check = JIDUtils.checkNickName(JIDUtils.getNodeHost(jid));
-//  if (host_check != null) {
-//    System.out.println("      Invalid hostname - " + JIDUtils.getNodeHost(jid)
-//      + ": " + host_check);
-//    return false;
-//  }
-//  return true;
-//}
-
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param repo
-	 * @param cont
-	 *
-	 * @throws Exception
-	 */
+	
 	public static boolean checkContact(BareJID user, UserRepository repo, String cont) throws Exception {
 
 		// String[] keys = repo.getKeys(user, "roster/"+contact);
@@ -132,16 +107,6 @@ public class RepositoryUtils {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param node
-	 * @param src
-	 * @param dst
-	 *
-	 * @throws Exception
-	 */
 	public static void copyNode(BareJID user, String node, UserRepository src, UserRepository dst) throws Exception {
 		String[] keys = src.getKeys(user, node);
 
@@ -164,14 +129,6 @@ public class RepositoryUtils {
 		}      // end of if (ndoes != null)
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param src
-	 * @param dst
-	 *
-	 * @throws Exception
-	 */
 	public static void copyRepositories(UserRepository src, UserRepository dst) throws Exception {
 		if (user != null) {
 			copyUser(user, src, dst);
@@ -191,14 +148,6 @@ public class RepositoryUtils {
 		}        // end of if (user != null) else
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param src
-	 * @param dst
-	 *
-	 * @throws Exception
-	 */
 	public static void copyRepositories(UserRepository src, AuthRepository dst) throws Exception {
 		if (user != null) {
 			copyUser(user, src, dst);
@@ -215,15 +164,6 @@ public class RepositoryUtils {
 		}        // end of if (user != null) else
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param src
-	 * @param dst
-	 *
-	 * @throws Exception
-	 */
 	public static void copyUser(BareJID user, UserRepository src, UserRepository dst) throws Exception {
 		if (user == null) {
 			return;
@@ -240,15 +180,6 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param src
-	 * @param dst
-	 *
-	 * @throws Exception
-	 */
 	public static void copyUser(BareJID user, UserRepository src, AuthRepository dst) throws Exception {
 		if ((user == null)) {
 			return;
@@ -266,14 +197,6 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 * @param w
-	 *
-	 * @throws Exception
-	 */
 	public static void exportRoster(UserRepository repo, Writer w) throws Exception {
 		if (user != null) {
 			exportUserRoster(user, repo, w);
@@ -292,15 +215,6 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param repo
-	 * @param w
-	 *
-	 * @throws Exception
-	 */
 	public static void exportUserRoster(BareJID user, UserRepository repo, Writer w) throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
 
@@ -393,13 +307,6 @@ public class RepositoryUtils {
 				"      Alternatively look for admin tools guide on web site.\n";
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 *
-	 * @throws Exception
-	 */
 	public static void loadTestData(UserRepository repo) throws Exception {
 		try {
 			repo.addUser(user1);
@@ -427,13 +334,6 @@ public class RepositoryUtils {
 		repo.addDataList(user2, "roster/buddy111", "groups", new String[]{"family", "home"});
 	}
 
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 *
-	 * @throws Exception
-	 */
 	public static void main(final String[] args) throws Exception {
 		parseParams(args);
 
@@ -667,13 +567,6 @@ public class RepositoryUtils {
 		}    // end of if (key_idx >= 0) else
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param args
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public static void parseParams(final String[] args) throws TigaseStringprepException {
 		if ((args != null) && (args.length > 0)) {
 			for (int i = 0; i < args.length; i++) {
@@ -759,16 +652,6 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param repo
-	 * @param prefix
-	 * @param node
-	 *
-	 * @throws Exception
-	 */
 	public static void printNode(BareJID user, UserRepository repo, String prefix, String node) throws Exception {
 		if (node != null) {
 			System.out.println(prefix + "node: " + node);
@@ -803,13 +686,6 @@ public class RepositoryUtils {
 		}      // end of if (ndoes != null)
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 *
-	 * @throws Exception
-	 */
 	public static void printRepoContent(UserRepository repo) throws Exception {
 		if (user != null) {
 			printNode(user, repo, "  ", subnode);
@@ -827,26 +703,12 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 *
-	 * @throws Exception
-	 */
 	public static void removeTestData(UserRepository repo) throws Exception {
 		repo.removeUser(user1);
 		repo.removeUser(user2);
 		repo.removeUser(user3);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 *
-	 * @throws Exception
-	 */
 	public static void repairRoster(UserRepository repo) throws Exception {
 		if (user != null) {
 			repairUserRoster(user, repo);
@@ -865,14 +727,6 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param repo
-	 *
-	 * @throws Exception
-	 */
 	public static void repairUserRoster(BareJID user, UserRepository repo) throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
 
@@ -901,13 +755,6 @@ public class RepositoryUtils {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 *
-	 * @throws Exception
-	 */
 	public static void simpleTest(UserRepository repo) throws Exception {
 		printRepoContent(repo);
 
@@ -921,13 +768,6 @@ public class RepositoryUtils {
 		printRepoContent(repo);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param re
-	 *
-	 * @throws Exception
-	 */
 	public static void userAddTest(UserRepository re) throws Exception {
 		AuthRepository repo = (AuthRepository) re;
 		BareJID test_user = BareJID.bareJIDInstanceNS("test111@localhost");

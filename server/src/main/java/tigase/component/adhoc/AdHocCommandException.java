@@ -38,42 +38,18 @@ public class AdHocCommandException
 
 	private String xmlns = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param errorCondition
-	 */
 	public AdHocCommandException(final Authorization errorCondition) {
 		this(null, errorCondition, (String) null);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param errorCondition
-	 * @param message
-	 */
 	public AdHocCommandException(final Authorization errorCondition, String message) {
 		this(null, errorCondition, message);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param item
-	 * @param errorCondition
-	 */
 	public AdHocCommandException(final Element item, final Authorization errorCondition) {
 		this(item, errorCondition, (String) null);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param item
-	 * @param errorCondition
-	 * @param message
-	 */
 	public AdHocCommandException(final Element item, final Authorization errorCondition, final String message) {
 		this.item = item;
 		this.errorCondition = errorCondition;
@@ -87,11 +63,6 @@ public class AdHocCommandException
 		return String.valueOf(this.errorCondition.getErrorCode());
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
 	public Authorization getErrorCondition() {
 		return errorCondition;
 	}
@@ -122,22 +93,10 @@ public class AdHocCommandException
 		return errorCondition.getErrorType();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
 	public Element makeElement() {
 		return makeElement(true);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param insertOriginal
-	 *
-	 * @return
-	 */
 	public Element makeElement(boolean insertOriginal) {
 		Element answer = insertOriginal ? item.clone() : new Element(item.getName());
 
@@ -156,22 +115,12 @@ public class AdHocCommandException
 		return answer;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param sourceElement
-	 *
-	 * @return
-	 */
 	public Element makeElement(Element sourceElement) {
 		this.item = sourceElement;
 
 		return makeElement(true);
 	}
 
-	/**
-	 * @return
-	 */
 	public Element makeErrorElement() {
 		Element error = new Element("error");
 

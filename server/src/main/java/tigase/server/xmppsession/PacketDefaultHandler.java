@@ -68,7 +68,7 @@ public class PacketDefaultHandler {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method checks if packet can be processed by this handler
 	 *
 	 * @param packet
 	 * @param session
@@ -98,14 +98,6 @@ public class PacketDefaultHandler {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 */
 	public boolean forward(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
 						   final Queue<Packet> results) {
 
@@ -125,14 +117,6 @@ public class PacketDefaultHandler {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 							  final NonAuthUserRepository repo, final Queue<Packet> results) {
 		if (session != null) {
@@ -153,16 +137,6 @@ public class PacketDefaultHandler {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 *
-	 * @throws XMPPException
-	 */
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 						Queue<Packet> results) throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {

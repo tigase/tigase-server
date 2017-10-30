@@ -36,60 +36,22 @@ import tigase.xmpp.jid.JID;
  */
 public interface ConnectionRecordIfc {
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>Element</code>
-	 */
 	Element toElement();
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	JID getConnectionId();
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	JID getNode();
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	String getSessionId();
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	JID getUserJid();
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param elem
-	 */
 	void setElement(Element elem);
 
-	/**
-	 * Method description
-	 *
-	 * @param node
-	 * @param userJid
-	 * @param sessionId
-	 * @param connectionId
-	 */
 	void setRecordFields(JID node, JID userJid, String sessionId, JID connectionId);
 }
 

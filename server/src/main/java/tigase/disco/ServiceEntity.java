@@ -54,27 +54,12 @@ public class ServiceEntity {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Creates a new <code>ServiceEntity</code> instance.
-	 *
-	 * @param jid
-	 * @param node
-	 * @param name
-	 */
 	public ServiceEntity(String jid, String node, String name) {
 		this.jid = jid;
 		this.node = node;
 		this.name = name;
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param jid
-	 * @param node
-	 * @param name
-	 * @param adminOnly
-	 */
 	public ServiceEntity(String jid, String node, String name, boolean adminOnly) {
 		this.jid = jid;
 		this.node = node;
@@ -84,11 +69,6 @@ public class ServiceEntity {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>addFeatures</code> method here.
-	 *
-	 * @param features
-	 */
 	public void addFeatures(String... features) {
 		if (this.features == null) {
 			this.features = new LinkedHashSet<String>();
@@ -96,11 +76,6 @@ public class ServiceEntity {
 		Collections.addAll(this.features, features);
 	}
 
-	/**
-	 * Describe <code>addIdentities</code> method here.
-	 *
-	 * @param identities
-	 */
 	public void addIdentities(ServiceIdentity... identities) {
 		if (this.identities == null) {
 			this.identities = new ArrayList<ServiceIdentity>();
@@ -108,11 +83,6 @@ public class ServiceEntity {
 		Collections.addAll(this.identities, identities);
 	}
 
-	/**
-	 * Describe <code>addItems</code> method here.
-	 *
-	 * @param items
-	 */
 	public void addItems(ServiceEntity... items) {
 		if (this.items == null) {
 			this.items = new LinkedHashSet<ServiceEntity>();
@@ -153,13 +123,6 @@ public class ServiceEntity {
 		return false;
 	}
 
-	/**
-	 * Describe <code>findNode</code> method here.
-	 *
-	 * @param node a <code>String</code> value
-	 *
-	 * @return a <code>ServiceEntity</code> value
-	 */
 	public ServiceEntity findNode(String node) {
 
 		// System.out.println("Looking for a node: " + node);
@@ -206,20 +169,10 @@ public class ServiceEntity {
 		return null;
 	}
 
-	/**
-	 * Describe <code>hashCode</code> method here.
-	 *
-	 * @return an <code>int</code> value
-	 */
 	public int hashCode() {
 		return ((jid != null) ? jid.hashCode() : 0) + ((node != null) ? node.hashCode() : 0);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param items is a <code>ServiceEntity</code>
-	 */
 	public void removeItems(ServiceEntity... items) {
 		if (this.items == null) {
 			return;
@@ -236,13 +189,6 @@ public class ServiceEntity {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param node is a <code>String</code>
-	 *
-	 * @return a value of <code>Element[]</code>
-	 */
 	public Element[] getDiscoFeatures(String node) {
 		ArrayList<Element> elFeatures = new ArrayList<Element>();
 
@@ -255,25 +201,10 @@ public class ServiceEntity {
 		return (elFeatures.size() > 0) ? elFeatures.toArray(new Element[elFeatures.size()]) : null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node is a <code>String</code>
-	 *
-	 * @return a value of <code>Element</code>
-	 */
 	public Element getDiscoInfo(String node) {
 		return getDiscoInfo(node, true);
 	}
 
-	/**
-	 * Describe <code>getDiscoInfo</code> method here.
-	 *
-	 * @param node a <code>String</code> value
-	 * @param admin is a <code>boolean</code>
-	 *
-	 * @return an <code>Element</code> value
-	 */
 	public Element getDiscoInfo(String node, boolean admin) {
 
 		// System.out.println("Node: " + node);
@@ -322,14 +253,6 @@ public class ServiceEntity {
 		return query;
 	}
 
-	/**
-	 * Describe <code>getDiscoItem</code> method here.
-	 *
-	 * @param node a <code>String</code> value
-	 * @param jid a <code>String</code> value
-	 *
-	 * @return an <code>Element</code> value
-	 */
 	public Element getDiscoItem(String node, String jid) {
 		Element item = new Element("item");
 
@@ -354,27 +277,10 @@ public class ServiceEntity {
 		return item;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node is a <code>String</code>
-	 * @param jid is a <code>String</code>
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	public List<Element> getDiscoItems(String node, String jid) {
 		return getDiscoItems(node, jid, true);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node is a <code>String</code>
-	 * @param jid is a <code>String</code>
-	 * @param admin is a <code>boolean</code>
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	public List<Element> getDiscoItems(String node, String jid, boolean admin) {
 
 		// System.out.println("node: " + node + ", jid: " + jid);
@@ -405,27 +311,10 @@ public class ServiceEntity {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node is a <code>String</code>
-	 * @param jid is a <code>String</code>
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	public List<Element> getItems(String node, String jid) {
 		return getItems(node, jid, true);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node is a <code>String</code>
-	 * @param jid is a <code>String</code>
-	 * @param admin is a <code>boolean</code>
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	public List<Element> getItems(String node, String jid, boolean admin) {
 		List<Element> result = null;
 
@@ -442,77 +331,37 @@ public class ServiceEntity {
 		return result;
 	}
 
-	/**
-	 * Describe <code>getJID</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	public String getJID() {
 		return jid;
 	}
 
-	/**
-	 * Describe <code>getName</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * Describe <code>getNode</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	public String getNode() {
 		return node;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isAdminOnly() {
 		return adminOnly;
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param adminOnly is a <code>boolean</code>
-	 */
 	public void setAdminOnly(boolean adminOnly) {
 		this.adminOnly = adminOnly;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param description is a <code>String</code>
-	 */
 	public void setDescription(String description) {
 		this.name = description;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param features is a <code>String</code>
-	 */
 	public void setFeatures(String... features) {
 		this.features = null;
 		addFeatures(features);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param identities is a <code>ServiceIdentity</code>
-	 */
 	public void setIdentities(ServiceIdentity... identities) {
 		this.identities = new ArrayList<ServiceIdentity>();
 		Collections.addAll(this.identities, identities);

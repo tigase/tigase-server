@@ -172,11 +172,6 @@ public interface DataRepository
 	 */
 	void release(Statement stmt, ResultSet rs);
 
-	/**
-	 * Method description
-	 *
-	 * @param repo is a <code>DataRepository</code>
-	 */
 	void releaseRepoHandle(DataRepository repo);
 
 	/**

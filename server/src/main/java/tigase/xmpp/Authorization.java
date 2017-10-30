@@ -456,19 +456,10 @@ public enum Authorization {
 		return BY_CONDITION.get(condition);
 	}
 
-	/**
-	 * Method description
-	 */
 	public abstract String getCondition();
 
-	/**
-	 * Method description
-	 */
 	public abstract int getErrorCode();
 
-	/**
-	 * Method description
-	 */
 	public abstract String getErrorType();
 
 	/**

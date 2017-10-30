@@ -119,19 +119,11 @@ public class JcaTLSWrapper
 
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public int bytesConsumed() {
 		return tlsEngineResult.bytesConsumed();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @throws SSLException
-	 */
 	@Override
 	public void close() throws SSLException {
 		tlsEngine.closeOutbound();
@@ -139,19 +131,11 @@ public class JcaTLSWrapper
 		// tlsEngine.closeInbound();
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public int getAppBuffSize() {
 		return appBuffSize;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param revocationEnabled
-	 */
 	@Override
 	public CertCheckResult getCertificateStatus(boolean revocationEnabled, SSLContextContainerIfc sslContextContainer) {
 		Certificate[] peerChain = null;
@@ -186,17 +170,11 @@ public class JcaTLSWrapper
 		return tlsEngine.getSession().getLocalCertificates();
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public int getNetBuffSize() {
 		return netBuffSize;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public int getPacketBuffSize() {
 		return tlsEngine.getSession().getPacketBufferSize();
@@ -207,9 +185,6 @@ public class JcaTLSWrapper
 		return tlsEngine.getSession().getPeerCertificates();
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public TLSStatus getStatus() {
 		TLSStatus status = null;
@@ -252,9 +227,6 @@ public class JcaTLSWrapper
 		return null;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public boolean isClientMode() {
 		return tlsEngine.getUseClientMode();
@@ -265,24 +237,11 @@ public class JcaTLSWrapper
 		return tlsEngine.getNeedClientAuth();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param id
-	 */
 	@Override
 	public void setDebugId(String id) {
 		debugId = id;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param net
-	 * @param app
-	 *
-	 * @throws SSLException
-	 */
 	@Override
 	public ByteBuffer unwrap(ByteBuffer net, ByteBuffer app) throws SSLException {
 		ByteBuffer out = app;
@@ -324,14 +283,6 @@ public class JcaTLSWrapper
 		return tlsEngine.getWantClientAuth();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param app
-	 * @param net
-	 *
-	 * @throws SSLException
-	 */
 	@Override
 	public void wrap(ByteBuffer app, ByteBuffer net) throws SSLException {
 		tlsEngineResult = tlsEngine.wrap(app, net);

@@ -159,13 +159,6 @@ public abstract class IOService<RefObject>
 	//~--- methods --------------------------------------------------------------
 	private TrustManager[] x509TrustManagers;
 
-	/**
-	 * Method <code>accept</code> is used to perform
-	 *
-	 * @param socketChannel a <code>SocketChannel</code> value
-	 *
-	 * @throws IOException
-	 */
 	public void accept(final SocketChannel socketChannel) throws IOException {
 		try {
 			if (socketChannel.isConnectionPending()) {
@@ -243,16 +236,10 @@ public abstract class IOService<RefObject>
 		return (bufferLimit == 0 || bufferSize <= bufferLimit);
 	}
 
-	/**
-	 * Method description
-	 */
 	public ConnectionType connectionType() {
 		return this.connectionType;
 	}
 
-	/**
-	 * Method description
-	 */
 	public void forceStop() {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Socket: {0}, Force stop called...", socketIO);
@@ -347,20 +334,8 @@ public abstract class IOService<RefObject>
 		serviceListener.tlsHandshakeCompleted(this);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @throws IOException
-	 */
 	public abstract void processWaitingPackets() throws IOException;
 
-	/**
-	 * Method description
-	 *
-	 * @param clientMode
-	 *
-	 * @throws IOException
-	 */
 	public void startSSL(boolean clientMode, boolean wantClientAuth, boolean needClientAuth) throws IOException {
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("SSL mode is already activated.");
@@ -409,13 +384,6 @@ public abstract class IOService<RefObject>
 		this.certificateContainer = certificateContainer;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param clientMode
-	 *
-	 * @throws IOException
-	 */
 	public void startTLS(boolean clientMode, boolean wantClientAuth, boolean needClientAuth) throws IOException {
 		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
 			throw new IllegalStateException("TLS mode is already activated " + connectionId);
@@ -477,11 +445,6 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param level
-	 */
 	public void startZLib(int level) {
 		if (socketIO.checkCapabilities(ZLibIO.ZLIB_CAPS)) {
 			throw new IllegalStateException("ZLIB mode is already activated.");
@@ -490,9 +453,6 @@ public abstract class IOService<RefObject>
 		((ZLibIO) socketIO).setIOListener(this);
 	}
 
-	/**
-	 * Describe <code>stop</code> method here.
-	 */
 	public void stop() {
 		if ((socketIO != null) && socketIO.waitingToSend()) {
 			stopping = true;
@@ -506,83 +466,45 @@ public abstract class IOService<RefObject>
 		return getConnectionId() + ", type: " + connectionType + ", Socket: " + socketIO;
 	}
 
-	/**
-	 * Method description
-	 */
 	public boolean waitingToRead() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 */
 	public boolean waitingToSend() {
 		return socketIO.waitingToSend();
 	}
 
-	/**
-	 * Method description
-	 */
 	public int waitingToSendSize() {
 		return socketIO.waitingToSendSize();
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 */
 	public long getBuffOverflow(boolean reset) {
 		return socketIO.getBuffOverflow(reset);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 */
 	public long getBytesReceived(boolean reset) {
 		return socketIO.getBytesReceived(reset);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 */
 	public long getBytesSent(boolean reset) {
 		return socketIO.getBytesSent(reset);
 	}
 
-	/**
-	 * @return the connectionId
-	 */
 	public JID getConnectionId() {
 		return connectionId;
 	}
 
-	/**
-	 * @param connectionId the connectionId to set
-	 */
 	public void setConnectionId(JID connectionId) {
 		this.connectionId = connectionId;
 		socketIO.setLogId(connectionId.toString());
 	}
 
-	/**
-	 * Method description
-	 */
 	public JID getDataReceiver() {
 		return this.dataReceiver;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param address
-	 */
 	public void setDataReceiver(JID address) {
 		this.dataReceiver = address;
 	}
@@ -595,9 +517,6 @@ public abstract class IOService<RefObject>
 		return lastTransferTime;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getLocalAddress() {
 		return local_address;
 	}
@@ -616,25 +535,14 @@ public abstract class IOService<RefObject>
 		return sock.getLocalPort();
 	}
 
-	/**
-	 * Method description
-	 */
 	public long[] getReadCounters() {
 		return rdData;
 	}
 
-	/**
-	 * Method description
-	 */
 	public RefObject getRefObject() {
 		return refObject;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param refObject
-	 */
 	public void setRefObject(RefObject refObject) {
 		this.refObject = refObject;
 	}
@@ -648,18 +556,10 @@ public abstract class IOService<RefObject>
 		return remote_address;
 	}
 
-	/**
-	 * Method description
-	 */
 	public ConcurrentMap<String, Object> getSessionData() {
 		return sessionData;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param props
-	 */
 	public void setSessionData(Map<String, Object> props) {
 
 		// Sometimes, some values are null which is allowed in the original Map
@@ -678,69 +578,38 @@ public abstract class IOService<RefObject>
 		return socketInputSize;
 	}
 
-	/**
-	 * Method <code>getSocketChannel</code> is used to perform
-	 *
-	 * @return a <code>SocketChannel</code> value
-	 */
 	public SocketChannel getSocketChannel() {
 		return socketIO.getSocketChannel();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param list
-	 * @param reset
-	 */
 	public void getStatistics(StatisticsList list, boolean reset) {
 		if (socketIO != null) {
 			socketIO.getStatistics(list, reset);
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public long getTotalBuffOverflow() {
 		return socketIO.getTotalBuffOverflow();
 	}
 
-	/**
-	 * Method description
-	 */
 	public long getTotalBytesReceived() {
 		return socketIO.getTotalBytesReceived();
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public long getTotalBytesSent() {
 		return socketIO.getTotalBytesSent();
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getUniqueId() {
 		return id;
 	}
 
-	/**
-	 * Method description
-	 */
 	public long[] getWriteCounters() {
 		return wrData;
 	}
 
-	/**
-	 * Describe <code>isConnected</code> method here.
-	 *
-	 * @return a <code>boolean</code> value
-	 */
 	public boolean isConnected() {
 		boolean result = (socketIO != null) && socketIO.isConnected();
 
@@ -763,13 +632,6 @@ public abstract class IOService<RefObject>
 		this.bufferLimit = bufferLimit;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param sl
-	 */
-
-	// @SuppressWarnings("unchecked")
 	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
 		this.serviceListener = sl;
 	}
@@ -778,11 +640,6 @@ public abstract class IOService<RefObject>
 		this.sslContextContainer = sslContextContainer;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param trustManager
-	 */
 	public void setX509TrustManagers(TrustManager[] trustManager) {
 		this.x509TrustManagers = trustManager;
 	}
@@ -797,20 +654,10 @@ public abstract class IOService<RefObject>
 		return localCertificate;
 	}
 
-	/**
-	 * Method description
-	 */
 	protected ByteOrder byteOrder() {
 		return ByteOrder.BIG_ENDIAN;
 	}
 
-	/**
-	 * Describe <code>debug</code> method here.
-	 *
-	 * @param msg a <code>char[]</code> value
-	 *
-	 * @return a <code>boolean</code> value
-	 */
 	protected boolean debug(final char[] msg) {
 		if (msg != null) {
 			System.out.print(new String(msg));
@@ -821,14 +668,6 @@ public abstract class IOService<RefObject>
 		return true;
 	}
 
-	/**
-	 * Describe <code>debug</code> method here.
-	 *
-	 * @param msg a <code>String</code> value
-	 * @param prefix
-	 *
-	 * @return a <code>boolean</code> value
-	 */
 	protected boolean debug(final String msg, final String prefix) {
 		if (log.isLoggable(Level.FINEST)) {
 			if ((msg != null) && (msg.trim().length() > 0)) {
@@ -844,18 +683,8 @@ public abstract class IOService<RefObject>
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @throws IOException
-	 */
 	protected abstract void processSocketData() throws IOException;
 
-	/**
-	 * Method description
-	 *
-	 * @throws IOException
-	 */
 	protected ByteBuffer readBytes() throws IOException {
 		setLastTransferTime();
 		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
@@ -894,20 +723,10 @@ public abstract class IOService<RefObject>
 		return null;
 	}
 
-	/**
-	 * Method description
-	 */
 	protected void readCompleted() {
 		decoder.reset();
 	}
 
-	/**
-	 * Describe <code>readData</code> method here.
-	 *
-	 * @return a <code>char[]</code> value
-	 *
-	 * @throws IOException if an error occurs
-	 */
 	protected char[] readData() throws IOException {
 		setLastTransferTime();
 		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
@@ -1089,16 +908,8 @@ public abstract class IOService<RefObject>
 		return null;
 	}
 
-	/**
-	 * Method description
-	 */
 	protected abstract int receivedPackets();
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 */
 	protected void writeBytes(ByteBuffer data) {
 
 		// Try to lock the data writing method
@@ -1149,11 +960,6 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	/**
-	 * Describe <code>writeData</code> method here.
-	 *
-	 * @param data a <code>String</code> value
-	 */
 	protected void writeData(final String data) {
 
 		// Try to lock the data writing method
@@ -1243,9 +1049,6 @@ public abstract class IOService<RefObject>
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	protected boolean isInputBufferEmpty() {
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
 	}

@@ -55,11 +55,6 @@ public class AuthRepositoryPool
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 */
 	public void addRepo(AuthRepository repo) {
 		repoPool.offer(repo);
 	}
@@ -264,9 +259,6 @@ public class AuthRepositoryPool
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public AuthRepository takeRepo() {
 		try {
 			return repoPool.take();

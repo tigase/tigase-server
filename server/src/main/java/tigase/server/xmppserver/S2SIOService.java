@@ -57,24 +57,9 @@ public class S2SIOService
 	private String dbKey = null;
 	private S2SConnection s2s_conn = null;
 
-///**
-// * This structure keeps a set of domains which are authorized to send or
-// * receive packets on this connection.
-// */
-//private Set<String> authenticatedDomains = new CopyOnWriteArraySet<String>();
 	private String session_id = null;
 
 	//~--- methods --------------------------------------------------------------
-
-///**
-// * Method description
-// *
-// *
-// * @param domain
-// */
-//public void addAuthenticatedDomain(String domain) {
-//  authenticatedDomains.add(domain);
-//}
 
 	/**
 	 * Adds another connection id (CID) to the authenticated list for this connection
@@ -89,104 +74,41 @@ public class S2SIOService
 		authenticatedCIDs.add(cid);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-///**
-// * Method description
-// *
-// *
-// * 
-// */
-//public Set<String> getAuthenticatedDomains() {
-//  return authenticatedDomains;
-//}
-
-	/**
-	 * Method description
-	 */
 	public Set<CID> getCIDs() {
 		return authenticatedCIDs;
 	}
 
-	/**
-	 * Method description
-	 */
 	public S2SConnection getS2SConnection() {
 		return s2s_conn;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param s2s_conn
-	 */
 	public void setS2SConnection(S2SConnection s2s_conn) {
 		this.s2s_conn = s2s_conn;
 	}
 
-///**
-// * Method description
-// *
-// *
-// * @param domain
-// *
-// * 
-// */
-//public boolean isAuthenticated(String domain) {
-//  return authenticatedDomains.contains(domain);
-//}
-
-	/**
-	 * Method description
-	 */
 	public String getSessionId() {
 		return session_id;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session_id
-	 */
 	public void setSessionId(String session_id) {
 		this.session_id = session_id;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param cid
-	 */
 	public boolean isAuthenticated(CID cid) {
 		return authenticatedCIDs.contains(cid);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 */
 	public boolean isAuthenticated() {
 		return authenticatedCIDs.size() > 0;
 	}
 
-	/**
-	 * Method description
-	 */
 	public boolean isHandshakingOnly() {
 		return getSessionData().get(HANDSHAKING_ONLY_KEY) != null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 */
 	public void setDBKey(String key) {
 		dbKey = key;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String toString() {

@@ -242,9 +242,6 @@ public class VHostItem
 		}
 	}
 
-	/**
-	 * Constructs ...
-	 */
 	public VHostItem() {
 		// added to ensure that we have s2sSecret set, as without it S2S connections
 		// will always fail (needed mostly for newly added vhosts).
@@ -872,11 +869,6 @@ public class VHostItem
 		return val;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>DomainFilterPolicy</code>
-	 */
 	public DomainFilterPolicy getDomainFilter() {
 		if (domainFilter == null) {
 			domainFilter = defaults.getDomainFilter();
@@ -940,25 +932,14 @@ public class VHostItem
 		this.maxUsersNumber = maxUsersNumber;
 	}
 
-	/**
-	 * @return the messageForward
-	 */
 	public JID getMessageForward() {
 		return messageForward;
 	}
 
-	/**
-	 * @param messageForward the messageForward to set
-	 */
 	public void setMessageForward(JID messageForward) {
 		this.messageForward = messageForward;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	public JID getMessageForwardAddress() {
 		return messageForward;
 	}
@@ -985,43 +966,22 @@ public class VHostItem
 		this.otherDomainParams = otherParams;
 	}
 
-	/**
-	 * @return the presenceForward
-	 */
 	public JID getPresenceForward() {
 		return presenceForward;
 	}
 
-	/**
-	 * @param presenceForward the presenceForward to set
-	 */
 	public void setPresenceForward(JID presenceForward) {
 		this.presenceForward = presenceForward;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	public JID getPresenceForwardAddress() {
 		return presenceForward;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getS2sSecret() {
 		return s2sSecret;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param s2sSecret
-	 */
 	public void setS2sSecret(String s2sSecret) {
 		this.s2sSecret = s2sSecret;
 	}
@@ -1036,11 +996,6 @@ public class VHostItem
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>VHostItem</code>
-	 */
 	public VHostItem getUnmodifiableVHostItem() {
 		if (unmodifiableItem == null) {
 			unmodifiableItem = new UnmodifiableVHostItem();
@@ -1213,13 +1168,6 @@ public class VHostItem
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param vhost
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public void setVHost(String vhost) throws TigaseStringprepException {
 		if (vhost == null) {
 			vhost = "";
@@ -1227,25 +1175,14 @@ public class VHostItem
 		this.vhost = JID.jidInstance(vhost);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param vhost
-	 */
 	public void setVHost(JID vhost) {
 		this.vhost = vhost;
 	}
 
-	/**
-	 * @return the saslAllowedMechanisms
-	 */
 	public String[] getSaslAllowedMechanisms() {
 		return saslAllowedMechanisms;
 	}
 
-	/**
-	 * @param saslAllowedMechanisms the saslAllowedMechanisms to set
-	 */
 	public void setSaslAllowedMechanisms(String[] saslAllowedMechanisms) {
 		this.saslAllowedMechanisms =
 				saslAllowedMechanisms == null || saslAllowedMechanisms.length == 0 ? null : saslAllowedMechanisms;

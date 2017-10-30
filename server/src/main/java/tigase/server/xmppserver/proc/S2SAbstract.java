@@ -102,13 +102,6 @@ public class S2SAbstract {
 		this.handler = handler;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param initStream
-	 * @param error_el
-	 * @param serv
-	 */
 	public void generateStreamError(boolean initStream, String error_el, S2SIOService serv) {
 		String strError = "";
 

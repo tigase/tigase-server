@@ -25,11 +25,8 @@ package tigase.xmpp;
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.credentials.Credentials;
 import tigase.db.*;
-import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
-import tigase.xml.Element;
-import tigase.xmpp.impl.JabberIqRegister;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -106,16 +103,6 @@ public abstract class RepositoryAccess {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void addDataList(final String subnode, final String key, final String[] list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
@@ -136,31 +123,11 @@ public abstract class RepositoryAccess {
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void addOfflineDataList(String subnode, String key, String[] list)
 			throws NotAuthorizedException, TigaseDBException {
 		addDataList(calcNode(OFFLINE_DATA_NODE, subnode), key, list);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void addPublicDataList(String subnode, String key, String[] list)
 			throws NotAuthorizedException, TigaseDBException {
 		addDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
@@ -168,20 +135,6 @@ public abstract class RepositoryAccess {
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param digest
-	 * @param id
-	 * @param alg
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws AuthorizationException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginDigest(BareJID userId, String digest, String id, String alg)
@@ -195,17 +148,6 @@ public abstract class RepositoryAccess {
 		return loginOther(props);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param props
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws AuthorizationException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginOther(Map<String, Object> props)
@@ -266,19 +208,6 @@ public abstract class RepositoryAccess {
 		return loginOther(props);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param xmpp_sessionId
-	 * @param token
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws AuthorizationException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization loginToken(BareJID userId, String xmpp_sessionId, String token)
@@ -304,22 +233,10 @@ public abstract class RepositoryAccess {
 		return authState;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	public void logout() throws NotAuthorizedException {
 		authState = Authorization.NOT_AUTHORIZED;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param authProps
-	 *
-	 * @throws TigaseDBException
-	 */
 	public void queryAuth(Map<String, Object> authProps) throws TigaseDBException {
 		if (authRepo == null) {
 			log.severe("Authentication repository is not available! Misconfiguration error or " +
@@ -343,20 +260,6 @@ public abstract class RepositoryAccess {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param name_param
-	 * @param pass_param
-	 * @param email_param
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 * @deprecated
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization register(String name_param, String pass_param, String email_param)
@@ -386,15 +289,6 @@ public abstract class RepositoryAccess {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void removeData(String subnode, String key) throws NotAuthorizedException, TigaseDBException {
 		try {
 			repo.removeData(getBareJID(), subnode, key);
@@ -439,72 +333,24 @@ public abstract class RepositoryAccess {
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void removeOfflineData(String subnode, String key) throws NotAuthorizedException, TigaseDBException {
 		removeData(calcNode(OFFLINE_DATA_NODE, subnode), key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void removeOfflineDataGroup(String subnode) throws NotAuthorizedException, TigaseDBException {
 		removeDataGroup(calcNode(OFFLINE_DATA_NODE, subnode));
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void removePublicData(String subnode, String key) throws NotAuthorizedException, TigaseDBException {
 		removeData(calcNode(PUBLIC_DATA_NODE, subnode), key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void removePublicDataGroup(String subnode) throws NotAuthorizedException, TigaseDBException {
 		removeDataGroup(calcNode(PUBLIC_DATA_NODE, subnode));
 	}
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param name_param
-	 * @param pass_param
-	 * @param reg_params
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 * @deprecated Replaced by code in {@link JabberIqRegister#doRegisterNewAccount(Packet, Element, * XMPPResourceConnection, Queue)}
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization register(String name_param, String pass_param, Map<String, String> reg_params)
@@ -564,16 +410,6 @@ public abstract class RepositoryAccess {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param xmpp_sessionId
-	 *
-	 * @return a value of <code>String</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public String getAuthenticationToken(String xmpp_sessionId) throws NotAuthorizedException, TigaseDBException {
 		UUID token = UUID.randomUUID();
 
@@ -758,130 +594,42 @@ public abstract class RepositoryAccess {
 		// return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>VHostItem</code>
-	 */
 	public VHostItem getDomain() {
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public void setDomain(final VHostItem domain) throws TigaseStringprepException {
 		this.domain = domain;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	public JID getDomainAsJID() {
 		return domain.getVhost();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * @return a value of <code>String</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public String getOfflineData(String subnode, String key, String def)
 			throws NotAuthorizedException, TigaseDBException {
 		return getData(calcNode(OFFLINE_DATA_NODE, subnode), key, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @return a value of <code>String[]</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public String[] getOfflineDataList(String subnode, String key) throws NotAuthorizedException, TigaseDBException {
 		return getDataList(calcNode(OFFLINE_DATA_NODE, subnode), key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * @return a value of <code>String</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public String getPublicData(String subnode, String key, String def)
 			throws NotAuthorizedException, TigaseDBException {
 		return getData(calcNode(PUBLIC_DATA_NODE, subnode), key, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @return a value of <code>String[]</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public String[] getPublicDataList(String subnode, String key) throws NotAuthorizedException, TigaseDBException {
 		return getDataList(calcNode(PUBLIC_DATA_NODE, subnode), key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	public abstract String getUserName() throws NotAuthorizedException;
 
-	// /**
-	// * Sets the value of authState
-	// *
-	// * @param argAuthState Value to assign to this.authState
-	// */
-	// protected void setAuthState(final Authorization argAuthState) {
-	// this.authState = argAuthState;
-	// }
-
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isAnonymous() {
 		return is_anonymous;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
+	
 	/**
 	 * This method allows you test this session if it already has been authorized. If <code>true</code> is returned as
 	 * method result it means session has already been authorized, if <code>false</code> however session is still not
@@ -980,61 +728,21 @@ public abstract class RepositoryAccess {
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void setOfflineData(String subnode, String key, String value)
 			throws NotAuthorizedException, TigaseDBException {
 		setData(calcNode(OFFLINE_DATA_NODE, subnode), key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void setOfflineDataList(String subnode, String key, String[] list)
 			throws NotAuthorizedException, TigaseDBException {
 		setDataList(calcNode(OFFLINE_DATA_NODE, subnode), key, list);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void setPublicData(String subnode, String key, String value)
 			throws NotAuthorizedException, TigaseDBException {
 		setData(calcNode(PUBLIC_DATA_NODE, subnode), key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public void setPublicDataList(String subnode, String key, String[] list)
 			throws NotAuthorizedException, TigaseDBException {
 		setDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
@@ -1063,18 +771,6 @@ public abstract class RepositoryAccess {
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param name_param
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, * Queue)}
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public Authorization unregister(String name_param)
@@ -1123,9 +819,6 @@ public abstract class RepositoryAccess {
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	protected abstract void login();
 
 	//~--- get methods ----------------------------------------------------------

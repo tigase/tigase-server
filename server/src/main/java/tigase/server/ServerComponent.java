@@ -58,14 +58,16 @@ public interface ServerComponent {
 	void processPacket(Packet packet, Queue<Packet> results);
 
 	/**
-	 * Method description
+	 * Method called when component is being stopped and unloaded.
 	 */
 	void release();
 
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method returns component jid in form of the component name followed by server hostname as a domain.
+	 * 
+	 * @return jid 
 	 */
 	JID getComponentId();
 
@@ -77,13 +79,15 @@ public interface ServerComponent {
 	ComponentInfo getComponentInfo();
 
 	/**
-	 * Method description
+	 * Method returns name of the component.
+	 *
+	 * @return name of the component
 	 */
 	String getName();
 
 	/**
-	 * Method description
-	 *
+	 * Method used to assign component name (localpart of the component)
+	 * 
 	 * @param name
 	 */
 	void setName(String name);

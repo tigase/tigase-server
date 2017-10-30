@@ -53,49 +53,24 @@ public abstract class WorkerThread
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public abstract WorkerThread getNewInstance();
 
 	//~--- methods --------------------------------------------------------------
 
-//{
-//  WorkerThread worker = new WorkerThread();
-//  worker.setQueue(queue);
-//  return worker;
-//}
-
-	/**
-	 * Method description
-	 *
-	 * @param item
-	 */
 	public abstract void process(QueueItem item);
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public long getAverageProcessingTime() {
 		return averageProcessingTime;
 	}
 
-	/**
-	 * Method description
-	 */
 	public long getRunsCounter() {
 		return runsCnt;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param item
-	 */
 	public boolean offer(QueueItem item) {
 		return queue.offer(item);
 	}
@@ -131,11 +106,6 @@ public abstract class WorkerThread
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param maxSize
-	 */
 	public void setQueueMaxSize(int maxSize) {
 		LinkedBlockingQueue<QueueItem> oldQueue = queue;
 
@@ -148,9 +118,6 @@ public abstract class WorkerThread
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public int size() {
 		return queue.size();
 	}

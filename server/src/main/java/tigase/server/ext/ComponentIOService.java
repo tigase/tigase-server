@@ -42,18 +42,10 @@ public class ComponentIOService
 	private SizedCache<JID, JID> recentJIDs = new SizedCache<JID, JID>(MAX_RECENT_JIDS);
 	private String routings = null;
 
-	/**
-	 * Method description
-	 */
 	public boolean isAuthenticated() {
 		return authenticated;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param authenticated
-	 */
 	public void setAuthenticated(boolean authenticated) {
 		this.authenticated = authenticated;
 	}

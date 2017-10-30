@@ -139,11 +139,6 @@ public abstract class ConfiguratorAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param objName
-	 */
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
 			return monitoring.getMXBean(objName);
@@ -231,11 +226,6 @@ public abstract class ConfiguratorAbstract
 		loadFromPropertiesFiles(property_filenames, initProperties, initSettings);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param config
-	 */
 	public static void loadLogManagerConfig(String config) {
 		logManagerConfiguration = config;
 		try {
@@ -248,11 +238,6 @@ public abstract class ConfiguratorAbstract
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param args
-	 */
 	public static void parseArgs(Map<String, Object> initProperties, List<String> initSettings, String[] args) {
 		initProperties.put(GEN_TEST, Boolean.FALSE);
 		initProperties.put("config-type", GEN_CONFIG_DEF);
@@ -284,12 +269,6 @@ public abstract class ConfiguratorAbstract
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param objName
-	 * @param bean
-	 */
 	public static void putMXBean(String objName, Object bean) {
 		if (monitoring != null) {
 			monitoring.putMXBean(objName, bean);
@@ -308,14 +287,6 @@ public abstract class ConfiguratorAbstract
 	public void componentRemoved(Configurable component) {
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param args
-	 *
-	 * @throws ConfigurationException
-	 * @throws TigaseDBException
-	 */
 	public void init(String[] args) throws ConfigurationException, TigaseDBException {
 		parseArgs(initProperties, initSettings, args);
 
@@ -455,25 +426,12 @@ public abstract class ConfiguratorAbstract
 		parseArgs(initProperties, initSettings, args);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compId
-	 * @param props
-	 *
-	 * @throws ConfigurationException
-	 */
 	public void putProperties(String compId, Map<String, Object> props) throws ConfigurationException {
 		configRepo.putProperties(compId, props);
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param component
-	 */
 	public void setup(Configurable component) throws ConfigurationException {
 
 		// Try to avoid recursive execution of the method
@@ -685,27 +643,14 @@ public abstract class ConfiguratorAbstract
 		return defaults;
 	}
 
-	/**
-	 * Method description
-	 */
 	public Map<String, Object> getDefConfigParams() {
 		return initProperties;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getMessageRouterClassName() {
 		return "tigase.server.MessageRouter";
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param nodeId
-	 *
-	 * @throws ConfigurationException
-	 */
 	public Map<String, Object> getProperties(String nodeId) throws ConfigurationException {
 		return configRepo.getProperties(nodeId);
 	}

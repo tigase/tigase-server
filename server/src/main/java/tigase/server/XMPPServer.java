@@ -111,9 +111,6 @@ public final class XMPPServer {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static String getImplementationVersion() {
 		String version = ComponentInfo.getImplementationVersion(XMPPServer.class);
 		return (version.isEmpty() ? "0.0.0-0" : version);
@@ -139,11 +136,6 @@ public final class XMPPServer {
 		inOSGi = val;
 	}
 
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 */
 	@SuppressWarnings("PMD")
 	public static void main(final String[] args) {
 
@@ -155,11 +147,6 @@ public final class XMPPServer {
 		start(args);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param args
-	 */
 	@SuppressWarnings("PMD")
 	public static void parseParams(final String[] args) {
 		if ((args != null) && (args.length > 0)) {
@@ -234,9 +221,6 @@ public final class XMPPServer {
 		((AbstractMessageReceiver) bootstrap.getInstance(MessageRouterIfc.class)).stop();
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String version() {
 		return "\n" + "-- \n" + NAME + " XMPP Server, version: " + getImplementationVersion() + "\n" +
 				"Author:  Artur Hefczyc <artur.hefczyc@tigase.org>\n" + "-- \n";

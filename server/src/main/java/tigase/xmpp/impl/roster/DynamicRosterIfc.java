@@ -165,11 +165,6 @@ public interface DynamicRosterIfc {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param item is a <code>Element</code>
-	 */
 	void setItemExtraData(Element item);
 }
 

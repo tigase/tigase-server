@@ -36,12 +36,6 @@ public class ComponentConnection
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param domain
-	 * @param service
-	 */
 	public ComponentConnection(String domain, ComponentIOService service) {
 		this.domain = domain;
 		this.service = service;
@@ -62,16 +56,10 @@ public class ComponentConnection
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public String getDomain() {
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 */
 	public ComponentIOService getService() {
 		return service;
 	}

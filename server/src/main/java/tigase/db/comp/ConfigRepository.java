@@ -129,19 +129,10 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public abstract String getConfigKey();
 
-	/**
-	 * Method description
-	 */
 	public abstract String[] getDefaultPropetyItems();
 
-	/**
-	 * Method description
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public abstract String getPropertyKey();
@@ -180,12 +171,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param oldItem
-	 * @param newItem
-	 */
 	public boolean itemChanged(Item oldItem, Item newItem) {
 		return true;
 	}

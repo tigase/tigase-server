@@ -133,11 +133,6 @@ public class SocketIO
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 */
 	public long getBytesSent(boolean reset) {
 		long tmp = bytesSent;
 
@@ -148,18 +143,10 @@ public class SocketIO
 		return tmp;
 	}
 
-	/**
-	 * Method description
-	 */
 	public long getTotalBytesSent() {
 		return totalBytesSent;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 */
 	public long getBytesReceived(boolean reset) {
 		long tmp = bytesReceived;
 
@@ -170,9 +157,6 @@ public class SocketIO
 		return tmp;
 	}
 
-	/**
-	 * Method description
-	 */
 	public long getTotalBytesReceived() {
 		return totalBytesReceived;
 	}

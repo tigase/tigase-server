@@ -50,19 +50,6 @@ public class AddScriptCommand
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param cmdId
-	 * @param cmdDescr
-	 * @param cmdGroup
-	 * @param script
-	 * @param lang
-	 * @param ext
-	 * @param binds
-	 *
-	 * @throws ScriptException
-	 */
 	@SuppressWarnings({"unchecked"})
 	public Script addAdminScript(String cmdId, String cmdDescr, String cmdGroup, String script, String lang, String ext,
 								 Bindings binds) throws ScriptException {

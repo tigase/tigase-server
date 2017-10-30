@@ -78,23 +78,12 @@ public class XMPPDomBuilderHandler<RefObject>
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param ioserv
-	 */
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv) {
 		customFactory = defaultFactory;
 		service = ioserv;
 //		elements_number_limit = (int)service.getSessionData().get( ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param ioserv
-	 * @param factory
-	 */
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv, ElementFactory factory) {
 		customFactory = factory;
 		service = ioserv;
@@ -184,9 +173,6 @@ public class XMPPDomBuilderHandler<RefObject>
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public Queue<Element> getParsedElements() {
 		return all_roots;
 	}
@@ -206,9 +192,6 @@ public class XMPPDomBuilderHandler<RefObject>
 		// Just ignore
 	}
 
-	/**
-	 * Method description
-	 */
 	public boolean parseError() {
 		return error;
 	}

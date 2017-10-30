@@ -137,11 +137,6 @@ public class BasicComponent
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 */
 	public void addComponentDomain(String domain) {
 		vHostManager.addComponentDomain(domain);
 	}
@@ -154,8 +149,10 @@ public class BasicComponent
 	}
 
 	/**
-	 * @param jid
-	 * @param commandId
+	 * Method checks if following adhoc command can execute from this JID
+	 *
+	 * @param jid - JID of entity which wants to execute command
+	 * @param commandId - ID of an adhoc command
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
@@ -182,10 +179,10 @@ public class BasicComponent
 	}
 
 	/**
-	 * Method description
+	 * Check if entity with JID is allowed ot execute command with passed access control list.
 	 *
-	 * @param jid
-	 * @param acl
+	 * @param jid - entity JID
+	 * @param acl - access control list
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
@@ -257,11 +254,6 @@ public class BasicComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean handlesLocalDomains() {
 		return false;
@@ -301,12 +293,6 @@ public class BasicComponent
 	@Override
 	public void initializationCompleted() {
 		initializationCompleted = true;
-
-//  log.log(Level.WARNING,
-//      "initializationCompleted for component name: {0}, full JID: {1}", new Object[] {
-//      getName(),
-//      getComponentId() });
-//  Thread.dumpStack();
 	}
 
 	@Override
@@ -375,22 +361,10 @@ public class BasicComponent
 	public void release() {
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 */
 	public void removeComponentDomain(String domain) {
 		vHostManager.removeComponentDomain(domain);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 */
 	public void removeServiceDiscoveryItem(String jid, String node, String description) {
 		ServiceEntity item = new ServiceEntity(jid, node, description);
 
@@ -407,43 +381,15 @@ public class BasicComponent
 
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 * @param admin
-	 */
 	public void updateServiceDiscoveryItem(String jid, String node, String description, boolean admin) {
 		updateServiceDiscoveryItem(jid, node, description, admin, (String[]) null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 * @param admin
-	 * @param features
-	 */
 	public void updateServiceDiscoveryItem(String jid, String node, String description, boolean admin,
 										   String... features) {
 		updateServiceDiscoveryItem(jid, node, description, null, null, admin, features);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 * @param category
-	 * @param type
-	 * @param admin
-	 * @param features
-	 */
 	public void updateServiceDiscoveryItem(String jid, String node, String description, String category, String type,
 										   boolean admin, String... features) {
 		if (serviceEntity.getJID().equals(jid) && (serviceEntity.getNode() == node)) {
@@ -475,9 +421,6 @@ public class BasicComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public void updateServiceEntity() {
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
 		serviceEntity.addIdentities(
@@ -513,55 +456,55 @@ public class BasicComponent
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>BareJID</code>
-	 */
 	public BareJID getDefHostName() {
 		return defHostname;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>BareJID</code>
-	 */
 	public BareJID getDefVHostItem() {
 		return (vHostManager != null) ? vHostManager.getDefVHostItem() : getDefHostName();
 	}
 
 	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
+	 * Method returns category of a component used for service discovery responses.
+	 * 
+	 * @return category of a component
 	 */
 	public String getDiscoCategory() {
 		return "component";
 	}
 
 	/**
-	 * Method description
+	 * Method returns component category type used for service discovery responses.
 	 *
-	 * @return a value of <code>String</code>
+	 * @return category type of a component
 	 */
 	public String getDiscoCategoryType() {
 		return "generic";
 	}
 
 	/**
-	 * Method description
+	 * Method returns description used for service discovery responses.
 	 *
-	 * @return a value of <code>String</code>
+	 * @return description of a component
 	 */
 	public String getDiscoDescription() {
 		return "Undefined description";
 	}
 
+	/**
+	 * Method returns list of features provided by this component.
+	 *
+	 * @return list of features
+	 */
 	public List<Element> getDiscoFeatures() {
 		return null;
 	}
 
+	/**
+	 * Method returns list of features provided by this component for provided JID.
+	 *
+	 * @return list of features
+	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return getDiscoFeatures();
@@ -687,15 +630,6 @@ public class BasicComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
 		LinkedList<Element> result = null;
 		boolean isAdminFrom = isAdmin(from);
@@ -713,24 +647,10 @@ public class BasicComponent
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 *
-	 * @return a value of <code>VHostItem</code>
-	 */
 	public VHostItem getVHostItem(String domain) {
 		return (vHostManager != null) ? vHostManager.getVHostItem(domain) : null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isAdmin(JID jid) {
 		return admins.contains(jid.getBareJID());
 	}
@@ -740,33 +660,14 @@ public class BasicComponent
 		return initializationCompleted;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isLocalDomain(String domain) {
 		return (vHostManager != null) ? vHostManager.isLocalDomain(domain) : false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isLocalDomainOrComponent(String domain) {
 		return (vHostManager != null) ? vHostManager.isLocalDomainOrComponent(domain) : false;
 	}
 
-	/**
-	 * Method returns true is component should be represented as subdomain
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isSubdomain() {
 		return false;
 	}
@@ -827,14 +728,6 @@ public class BasicComponent
 		return connectedNodesWithLocal_ro;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param pc
-	 * @param results
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
 		// TODO: test if this is right
@@ -941,31 +834,16 @@ public class BasicComponent
 
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of {@code Map<String,CommandIfc>}
-	 */
 	protected Map<String, CommandIfc> getScriptCommands() {
 		return scriptCommands;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>ServiceEntity</code>
-	 */
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean isNonAdminCommands() {
 		return nonAdminCommands;
 	}

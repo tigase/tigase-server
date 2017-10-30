@@ -94,22 +94,10 @@ public abstract class SMNonCachingAllNodes
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 */
 	public List<JID> getNodesForJid(JID jid) {
 		return getNodesConnected();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param packet
-	 */
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 
 		// If the packet visited other nodes already it means it went through other
@@ -156,33 +144,10 @@ public abstract class SMNonCachingAllNodes
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForUserConnect()
-	 */
-
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 */
 	public List<JID> getNodesForUserConnect(JID jid) {
 		return getNodesConnected();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForUserDisconnect()
-	 */
-
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 */
 	public List<JID> getNodesForUserDisconnect(JID jid) {
 		return getNodesConnected();
 	}
@@ -204,11 +169,6 @@ public abstract class SMNonCachingAllNodes
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	protected boolean isSuitableForForward(Packet packet) {
 
 		// Do not forward any error packets for now.

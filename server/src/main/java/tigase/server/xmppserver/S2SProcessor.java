@@ -46,29 +46,13 @@ public interface S2SProcessor
 	 *
 	 * @return
 	 */
-	public int order();
+	int order();
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
-	public void serviceStarted(S2SIOService serv);
+	void serviceStarted(S2SIOService serv);
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
-	public void serviceStopped(S2SIOService serv);
+	void serviceStopped(S2SIOService serv);
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 * @param results
-	 */
-	public void streamFeatures(S2SIOService serv, List<Element> results);
+	void streamFeatures(S2SIOService serv, List<Element> results);
 
 	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props);
 

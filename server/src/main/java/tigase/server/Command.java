@@ -279,12 +279,6 @@ public enum Command {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param action
-	 */
 	public static void addAction(final Packet packet, final Action action) {
 		addActionEl(packet.getElement(), action);
 	}
@@ -302,13 +296,6 @@ public enum Command {
 		actions.addChild(new Element(action.toString()));
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param f_value
-	 */
 	public static void addCheckBoxField(Packet packet, String f_name, boolean f_value) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);

@@ -127,11 +127,6 @@ public class SocketThread
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param s
-	 */
 	public static void addSocketService(IOService<?> s) {
 		s.setSocketServiceReady(true);
 		// Due to a delayed SelectionKey cancelling deregistering
@@ -149,31 +144,7 @@ public class SocketThread
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-///**
-// * Method description
-// *
-// *
-// * 
-// */
-//public static SocketThread getInstance() {
-//  return socketReadThread[0];
-//}
-//private static final Object threadNoSync = new Object();
-//private int incrementAndGet() {
-//int result = 0;
-//synchronized (threadNoSync) {
-//  threadNo = (threadNo + 1) % socketReadThread.length;
-//  result = threadNo;
-//}
-//return result;
-//}
-
-	/**
-	 * Method description
-	 *
-	 * @param s
-	 */
+	
 	public static void removeSocketService(IOService<Object> s) {
 		s.setSocketServiceReady(false);
 		socketReadThread[s.hashCode() % socketReadThread.length].removeSocketServicePriv(s);
@@ -194,11 +165,6 @@ public class SocketThread
 		new ResultsListener("ResultsListener-" + name).start();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param s
-	 */
 	@SuppressWarnings("unchecked")
 	public void addSocketServicePriv(IOService<?> s) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -370,21 +336,11 @@ public class SocketThread
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param threads
-	 */
 	public void setMaxThread(int threads) {
 		executor.setCorePoolSize(threads);
 		executor.setMaximumPoolSize(threads);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param threads
-	 */
 	public void setMaxThreadPerCPU(int threads) {
 		setMaxThread(threads * cpus);
 	}
@@ -533,11 +489,6 @@ public class SocketThread
 	protected class ResultsListener
 			extends Thread {
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param name
-		 */
 		public ResultsListener(String name) {
 			super();
 			setName(name);

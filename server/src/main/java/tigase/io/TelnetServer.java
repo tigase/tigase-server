@@ -73,9 +73,6 @@ public class TelnetServer
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static String help() {
 		return "\n" + "Parameters:\n" + " -?                this help message\n" + " -h hostname       host name\n" +
 				" -p port           port number\n" + " -ssl              turn SSL on for all connections\n" +
@@ -87,13 +84,6 @@ public class TelnetServer
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 *
-	 * @throws Exception
-	 */
 	public static void main(final String[] args) throws Exception {
 		parseParams(args);
 
@@ -116,13 +106,6 @@ public class TelnetServer
 		server.run();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param args
-	 *
-	 * @throws Exception
-	 */
 	public static void parseParams(final String[] args) throws Exception {
 		if ((args != null) && (args.length > 0)) {
 			for (int i = 0; i < args.length; i++) {
@@ -199,9 +182,6 @@ public class TelnetServer
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public static void turnDebugOn() {
 		Map<String, String> properties = new HashMap<String, String>();
 
@@ -227,9 +207,6 @@ public class TelnetServer
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String version() {
 		return "\n" + "-- \n" + "Tigase XMPP Telnet, version: " +
 				TelnetServer.class.getPackage().getImplementationVersion() + "\n" +
@@ -301,11 +278,6 @@ public class TelnetServer
 		}      // end of if (file != null)
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @throws IOException
-	 */
 	public void run() throws IOException {
 		InputStreamReader isr = new InputStreamReader(System.in);
 		char[] buff = new char[1024];

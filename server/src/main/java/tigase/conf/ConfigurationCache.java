@@ -80,12 +80,6 @@ public class ConfigurationCache
 		this.repoChangeList = null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compName
-	 * @param item
-	 */
 	public void addItem(String compName, ConfigItem item) {
 		Set<ConfigItem> confItems = config.get(compName);
 
@@ -183,9 +177,6 @@ public class ConfigurationCache
 		return config.keySet().toArray(new String[config.size()]);
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getDefHostname() {
 		return this.hostname;
 	}
@@ -206,13 +197,6 @@ public class ConfigurationCache
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 */
 	public ConfigItem getItem(String compName, String node, String key) {
 		Set<ConfigItem> confItems = getItemsForComponent(compName);
 
@@ -347,12 +331,6 @@ public class ConfigurationCache
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compName
-	 * @param item
-	 */
 	public void removeItem(String compName, ConfigItem item) {
 		Set<ConfigItem> confItems = config.get(compName);
 

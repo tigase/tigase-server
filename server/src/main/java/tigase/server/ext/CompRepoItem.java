@@ -141,48 +141,26 @@ public class CompRepoItem
 
 	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public String getAuthPasswd() {
 		return auth_pass;
 	}
 
-	/**
-	 * Method description
-	 */
 	public ConnectionType getConnectionType() {
 		return type;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param connection_type
-	 */
 	void setConnectionType(String connection_type) {
 		this.type = parseConnectionType(connection_type);
 	}
 
-	/**
-	 * Method description
-	 */
 	public LoadBalancerIfc getLoadBalancer() {
 		return lb;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getDomain() {
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param domain
-	 */
 	public void setDomain(String domain) {
 		this.domain = domain;
 		routings = new String[]{domain, ".*@" + domain, ".*\\." + domain};
@@ -198,41 +176,24 @@ public class CompRepoItem
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getPort() {
 		return port;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param port
-	 */
 	void setPort(int port) {
 		this.port = port;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public String getRemoteHost() {
 		return remoteHost;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String[] getRoutings() {
 		return routings;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getXMLNS() {
 		return xmlns;
 	}
@@ -382,30 +343,15 @@ public class CompRepoItem
 		return toPropertyString();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param password
-	 */
 	void setPassword(String password) {
 		this.auth_pass = password;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param protocol
-	 */
 	void setProtocol(String protocol) {
 		this.prop_xmlns = protocol;
 		this.xmlns = parseProtoXMLNS(protocol);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param remote_domain
-	 */
 	void setRemoteDomain(String remote_domain) {
 		this.remoteHost = remote_domain;
 	}
@@ -423,9 +369,6 @@ public class CompRepoItem
 		return null;
 	}
 
-	/**
-	 * @param tmp
-	 */
 	private LoadBalancerIfc lbInstance(String cls_name) {
 		String class_name = cls_name;
 

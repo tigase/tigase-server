@@ -34,22 +34,12 @@ public class LongHistoryCache {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param limit
-	 */
 	public LongHistoryCache(int limit) {
 		buffer = new long[limit];
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param item is a <code>long</code>
-	 */
 	public synchronized void addItem(long item) {
 		int ix = (start + count) % buffer.length;
 
@@ -64,11 +54,6 @@ public class LongHistoryCache {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long[]</code>
-	 */
 	public synchronized long[] getCurrentHistory() {
 		long[] result = new long[count];
 

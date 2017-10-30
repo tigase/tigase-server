@@ -133,16 +133,10 @@ public class ConfigItem
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public String getClusterNode() {
 		return clusterNode;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getCompName() {
 		return compName;
 	}
@@ -162,9 +156,6 @@ public class ConfigItem
 		return value;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getConfigValToString() {
 		return (value == null) ? null : DataTypes.valueToString(value);
 	}
@@ -198,9 +189,6 @@ public class ConfigItem
 		return keyName;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getNodeName() {
 		return nodeName;
 	}
@@ -234,21 +222,11 @@ public class ConfigItem
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param elem
-	 */
 	@Override
 	public void initFromElement(Element elem) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param propString
-	 */
 	@Override
 	public void initFromPropertyString(String propString) {
 		int idx_eq = propString.indexOf('=');
@@ -286,24 +264,12 @@ public class ConfigItem
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param comp
-	 * @param node
-	 * @param key
-	 */
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param o
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof ConfigItem) {
@@ -313,9 +279,6 @@ public class ConfigItem
 		return false;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public int hashCode() {
 		return getKey().hashCode();
@@ -377,17 +340,6 @@ public class ConfigItem
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param clusterNode_m
-	 * @param compName_m
-	 * @param nodeName_m
-	 * @param key_m
-	 * @param value_str_m
-	 * @param val_type_m
-	 * @param flag_str_m
-	 */
 	public void set(String clusterNode_m, String compName_m, String nodeName_m, String key_m, String value_str_m,
 					char val_type_m, String flag_str_m) {
 		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
@@ -402,16 +354,6 @@ public class ConfigItem
 		set(clusterNode_m, compName_m, nodeName_m, key_m, value_m, flag_m);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param clusterNode_m
-	 * @param compName_m
-	 * @param nodeName_m
-	 * @param key_m
-	 * @param value_m
-	 * @param flag_m
-	 */
 	public void set(String clusterNode_m, String compName_m, String nodeName_m, String key_m, Object value_m,
 					FLAGS flag_m) {
 		if (clusterNode_m != null) {
@@ -435,54 +377,19 @@ public class ConfigItem
 		lastModificationTime = System.currentTimeMillis();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compName_m
-	 * @param nodeName_m
-	 * @param key_m
-	 * @param value_str_m
-	 * @param val_type_m
-	 * @param flag_str_m
-	 */
 	public void set(String compName_m, String nodeName_m, String key_m, String value_str_m, char val_type_m,
 					String flag_str_m) {
 		set(null, compName_m, nodeName_m, key_m, value_str_m, val_type_m, flag_str_m);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compName
-	 * @param nodeName
-	 * @param key
-	 * @param value
-	 */
 	public void set(String compName, String nodeName, String key, Object value) {
 		set(null, compName, nodeName, key, value, null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param clusterNode
-	 * @param compName
-	 * @param nodeName
-	 * @param key
-	 * @param value
-	 */
 	public void set(String clusterNode, String compName, String nodeName, String key, Object value) {
 		set(clusterNode, compName, nodeName, key, value, null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param clusterNode
-	 * @param compName
-	 * @param nodeKey
-	 * @param value
-	 */
 	public void setNodeKey(String clusterNode, String compName, String nodeKey, Object value) {
 		int key_idx = nodeKey.lastIndexOf("/");
 		String method_key = nodeKey;
@@ -513,9 +420,6 @@ public class ConfigItem
 	// private Object value = null;
 	// private FLAGS flag = FLAGS.DEFAULT;
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public Element toElement() {
 		Element elem = super.toElement();
@@ -535,9 +439,6 @@ public class ConfigItem
 		return elem;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public String toPropertyString() {
 		char t = DataTypes.getTypeId(value);
@@ -549,9 +450,6 @@ public class ConfigItem
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public String toString() {
 		return getKey() + "=" + value;

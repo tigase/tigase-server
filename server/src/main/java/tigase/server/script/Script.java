@@ -73,19 +73,6 @@ public class Script
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param id
-	 * @param description
-	 * @param group
-	 * @param script
-	 * @param lang
-	 * @param ext
-	 * @param binds
-	 *
-	 * @throws ScriptException
-	 */
 	public void init(String id, String description, String group, String script, String lang, String ext,
 					 Bindings binds) throws ScriptException {
 		super.init(id, description, group);

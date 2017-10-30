@@ -164,11 +164,6 @@ public class MessageRouter
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param component
-	 */
 	public void addComponent(ServerComponent component) throws ConfigurationException {
 		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
 		for (ComponentRegistrator registr : registrators.values()) {
@@ -187,11 +182,6 @@ public class MessageRouter
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param registr
-	 */
 	public void addRegistrator(ComponentRegistrator registr) throws ConfigurationException {
 		log.log(Level.INFO, "Adding registrator: {0}", registr.getClass().getSimpleName());
 		registrators.put(registr.getName(), registr);
@@ -205,11 +195,6 @@ public class MessageRouter
 		}    // end of for (ServerComponent comp : components)
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param receiver
-	 */
 	public void addRouter(MessageReceiver receiver) throws ConfigurationException {
 		log.info("Adding receiver: " + receiver.getClass().getSimpleName());
 		addComponent(receiver);
@@ -469,12 +454,6 @@ public class MessageRouter
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	public void processPacketMR(Packet packet, Queue<Packet> results) {
 		Iq iq = null;
 
@@ -535,11 +514,6 @@ public class MessageRouter
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param component
-	 */
 	public void removeComponent(ServerComponent component) {
 		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
@@ -570,11 +544,6 @@ public class MessageRouter
 		}    // end of for (ServerComponent comp : components)
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param receiver
-	 */
 	public void removeRouter(MessageReceiver receiver) {
 		log.info("Removing receiver: " + receiver.getClass().getSimpleName());
 		receivers.remove(receiver.getName());

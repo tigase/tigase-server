@@ -59,58 +59,26 @@ public interface ConnectionOpenListener {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param sc
-	 */
 	void accept(SocketChannel sc);
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	int getPort();
 
-	/**
-	 * Method description
-	 */
 	String[] getIfcs();
 
-	/**
-	 * Method description
-	 */
 	String getSRVType();
 
-	/**
-	 * Method description
-	 */
 	String getRemoteHostname();
 
-	/**
-	 * Method description
-	 */
 	InetSocketAddress getRemoteAddress();
 
-	/**
-	 * Method description
-	 */
 	ConnectionType getConnectionType();
 
-	/**
-	 * Method description
-	 */
 	SocketType getSocketType();
 
-	/**
-	 * Method description
-	 */
 	int getReceiveBufferSize();
 
-	/**
-	 * Method description
-	 */
 	int getTrafficClass();
 
 	default long getNewConnectionsThrottling() {

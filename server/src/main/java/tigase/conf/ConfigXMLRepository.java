@@ -67,34 +67,14 @@ public class ConfigXMLRepository
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @throws XMLDBException
-	 */
 	public static ConfigXMLRepository getConfigRepository() throws XMLDBException {
 		return getConfigRepository(null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param file_name
-	 *
-	 * @throws XMLDBException
-	 */
 	public static ConfigXMLRepository getConfigRepository(final String file_name) throws XMLDBException {
 		return getConfigRepository(false, file_name);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param debug
-	 * @param file_name
-	 *
-	 * @throws XMLDBException
-	 */
 	public static ConfigXMLRepository getConfigRepository(final boolean debug, final String file_name)
 			throws XMLDBException {
 		ConfigXMLRepository config = null;
@@ -120,9 +100,6 @@ public class ConfigXMLRepository
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
 	public ConfigXMLRepository() {
 	}
 
@@ -247,11 +224,6 @@ public class ConfigXMLRepository
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param cls
-	 */
 	public String nodeForPackage(Class cls) {
 		return cls.getPackage().getName().replace('.', '/');
 	}

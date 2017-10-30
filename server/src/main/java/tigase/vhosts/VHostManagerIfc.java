@@ -55,11 +55,11 @@ public interface VHostManagerIfc {
 	boolean isLocalDomain(String domain);
 
 	/**
-	 * Method description
+	 * Method check if domains is locally hosted as a vhost or a component of a vhost.
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * @return true - if domain is locally hosted as a vhost of a component of a vhost.
 	 */
 	boolean isLocalDomainOrComponent(String domain);
 
@@ -148,7 +148,8 @@ public interface VHostManagerIfc {
 	BareJID getDefVHostItem();
 
 	/**
-	 * Method description
+	 * Method returns a list of all hosted VHosts.
+	 * @return
 	 */
 	List<JID> getAllVHosts();
 }

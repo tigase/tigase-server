@@ -89,12 +89,6 @@ public class RemoteRosterManagement
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 * @param session
-	 */
 	public static boolean isRemoteAllowed(JID jid, XMPPResourceConnection session) {
 		try {
 			if (session == null) {
@@ -139,17 +133,6 @@ public class RemoteRosterManagement
 		session.setData("remote-roster-management", "allowed", buf.toString());
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param item
-	 * @param update
-	 * @param results
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static void updateBuddyChange(XMPPResourceConnection session, Element item, Element update,
 										 Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
 		JID jid = JID.jidInstanceNS(item.getAttributeStaticStr("jid"));

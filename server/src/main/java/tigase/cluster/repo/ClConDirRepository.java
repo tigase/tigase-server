@@ -133,11 +133,6 @@ public class ClConDirRepository
 	private class DirFilter
 			implements FileFilter {
 
-		/**
-		 * Method description
-		 *
-		 * @param file
-		 */
 		@Override
 		public boolean accept(File file) {
 			return file.isFile() && file.getName().endsWith(REPO_FILE_EXTENSION);

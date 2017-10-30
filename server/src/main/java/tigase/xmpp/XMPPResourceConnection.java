@@ -152,14 +152,6 @@ public class XMPPResourceConnection
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 * @param anonymous
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public void authorizeJID(BareJID jid, boolean anonymous) throws TigaseStringprepException {
 		authState = Authorization.AUTHORIZED;
 		is_anonymous = anonymous;
@@ -233,30 +225,12 @@ public class XMPPResourceConnection
 		return userJid;
 	}
 
-	/**
-	 * Method description
-	 */
 	public void incPacketsCounter() {
 		++packets_counter;
 	}
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param digest
-	 * @param id
-	 * @param alg
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws AuthorizationException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public final Authorization loginDigest(String user, String digest, String id, String alg)
@@ -290,19 +264,6 @@ public class XMPPResourceConnection
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * @return a value of <code>Authorization</code>
-	 *
-	 * @throws AuthorizationException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public final Authorization loginPlain(String user, String password)
@@ -324,18 +285,6 @@ public class XMPPResourceConnection
 		super.logout();
 	}
 
-	// public boolean isDummy() {
-	// return dummy;
-	// }
-	// public void setDummy(boolean dummy) {
-	// this.dummy = dummy;
-	// }
-
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String nextStanzaId() {
 		return "tig" + (++id_counter);
 	}
@@ -367,13 +316,6 @@ public class XMPPResourceConnection
 		}
 		return null;
 	}
-
-	// public void setOnHold() {
-	// onHold = true;
-	// }
-	// public boolean isOnHold() {
-	// return onHold;
-	// }
 
 	/**
 	 * Saves given session data. Data are saved to temporary storage only and are accessible during this session life
@@ -412,43 +354,21 @@ public class XMPPResourceConnection
 		super.queryAuth(authProps);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 *
-	 * @return a value of <code>Object</code>
-	 */
 	public Object removeCommonSessionData(String key) {
 		return (parentSession == null) ? null : parentSession.removeCommonSessionData(key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param parent
-	 */
 	public void removeParentSession(final XMPPSession parent) {
 		synchronized (this) {
 			parentSession = null;
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 */
 	public final void removeSessionData(final String key) {
 		lastAccessed = System.currentTimeMillis();
 		sessionData.remove(key);
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 */
 	public void streamClosed() {
 		synchronized (this) {
 			if (parentSession != null) {
@@ -470,7 +390,7 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * Method description
+	 * Method returns list of active connection for the same <code>XMPPSession</code>.
 	 *
 	 * @return a value of {@code List<XMPPResourceConnection>}
 	 *
@@ -487,7 +407,7 @@ public class XMPPResourceConnection
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method returns list of jids of all connections for the same <code>XMPPSession</code> (same user).
 	 *
 	 * @return a value of <code>JID[]</code>
 	 */
@@ -495,20 +415,10 @@ public class XMPPResourceConnection
 		return (parentSession == null) ? null : parentSession.getJIDs();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>AuthRepository</code>
-	 */
 	public AuthRepository getAuthRepository() {
 		return authRepo;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getAuthTime() {
 		return authenticationTime - creationTime;
 	}
@@ -522,11 +432,6 @@ public class XMPPResourceConnection
 		return userJid.getBareJID();
 	}
 
-	/**
-	 * @param key
-	 *
-	 * @return a value of <code>Object</code>
-	 */
 	public Object getCommonSessionData(String key) {
 		return (parentSession == null) ? null : parentSession.getCommonSessionData(key);
 	}
@@ -558,15 +463,6 @@ public class XMPPResourceConnection
 		this.connectionId = connectionId;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 *
-	 * @return a value of <code>JID</code>
-	 *
-	 * @throws NoConnectionIdException
-	 */
 	public JID getConnectionId(JID jid) throws NoConnectionIdException {
 		JID result = null;
 
@@ -591,29 +487,14 @@ public class XMPPResourceConnection
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getCreationTime() {
 		return creationTime;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getDefLang() {
 		return this.defLang;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param lang
-	 */
 	public void setDefLang(String lang) {
 		this.defLang = lang;
 	}
@@ -652,31 +533,14 @@ public class XMPPResourceConnection
 		this.lastAccessed = argLastAccessed;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getPacketsCounter() {
 		return packets_counter;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>XMPPSession</code>
-	 */
 	public XMPPSession getParentSession() {
 		return parentSession;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param parent
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public void setParentSession(final XMPPSession parent) throws TigaseStringprepException {
 		synchronized (this) {
 			if (parent != null) {
@@ -697,11 +561,6 @@ public class XMPPResourceConnection
 		return (Element) getSessionData(PRESENCE_KEY);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	public void setPresence(Element packet) {
 		putSessionData(PRESENCE_KEY, packet);
 
@@ -732,20 +591,10 @@ public class XMPPResourceConnection
 		loginHandler.handlePresenceSet(this);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getPriority() {
 		return priority;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param priority
-	 */
 	public void setPriority(final int priority) {
 		this.priority = priority;
 	}
@@ -822,11 +671,6 @@ public class XMPPResourceConnection
 		this.sessionId = argSessionId;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	public JID getSMComponentId() {
 		return loginHandler.getComponentId();
 	}
@@ -864,23 +708,10 @@ public class XMPPResourceConnection
 		return super.isAuthorized() && (parentSession != null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param outDomain
-	 * @param includeComponents
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
 		return loginHandler.isLocalDomain(outDomain, includeComponents);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isResourceSet() {
 		return this.resource != null;
 	}
@@ -896,33 +727,14 @@ public class XMPPResourceConnection
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isTmpSession() {
 		return tmpSession;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param tmp is a <code>boolean</code>
-	 */
 	public void setTmpSession(boolean tmp) {
 		tmpSession = tmp;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param bareJID
-	 *
-	 * @return a value of <code>boolean</code>
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);

@@ -49,31 +49,16 @@ public abstract class CommandListenerAbstract
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public static long getSyncInTraffic() {
 		return syncInTraffic;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public static long getSyncOutTraffic() {
 		return syncOutTraffic;
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param name
-	 */
 	public CommandListenerAbstract(String name, Priority priority) {
 		setName(name);
 		setPriority(priority);
@@ -101,16 +86,10 @@ public abstract class CommandListenerAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public synchronized void incSyncInTraffic() {
 		++syncInTraffic;
 	}
 
-	/**
-	 * Method description
-	 */
 	public synchronized void incSyncOutTraffic() {
 		++syncOutTraffic;
 	}

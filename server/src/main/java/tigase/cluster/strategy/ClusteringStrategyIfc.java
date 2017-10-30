@@ -49,55 +49,22 @@ import java.util.Set;
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 		extends OnlineJidsReporter, StatisticHolder {
 
-	/**
-	 * Method description
-	 *
-	 * @param conn
-	 */
 	public void handleLocalPresenceSet(XMPPResourceConnection conn);
 
-	/**
-	 * Method description
-	 *
-	 * @param conn
-	 */
 	public void handleLocalResourceBind(XMPPResourceConnection conn);
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	public void handleLocalUserLogin(BareJID userId, XMPPResourceConnection conn);
 
-	/**
-	 * Method description
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn);
 
 	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId);
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getInfo();
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	void handleLocalPacket(Packet packet, XMPPResourceConnection conn);
 
 	/**
@@ -114,14 +81,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	void nodeDisconnected(JID node);
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param conn
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	boolean processPacket(Packet packet, XMPPResourceConnection conn);
 
 	//~--- get methods ----------------------------------------------------------
@@ -145,11 +104,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	E getConnectionRecord(JID jid);
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>E</code>
-	 */
 	E getConnectionRecordInstance();
 
 	/**
@@ -201,11 +155,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param clComp
-	 */
 	void setClusterController(ClusterControllerIfc clComp);
 
 	/**

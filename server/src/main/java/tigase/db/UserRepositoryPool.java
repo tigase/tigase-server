@@ -75,11 +75,6 @@ public class UserRepositoryPool
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 */
 	public void addRepo(UserRepository repo) {
 		repoPool.offer(repo);
 	}
@@ -463,9 +458,6 @@ public class UserRepositoryPool
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public UserRepository takeRepo() {
 		try {
 			return repoPool.take();

@@ -58,11 +58,6 @@ public class ClassUtil {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param fileName
-	 */
 	public static String getClassNameFromFileName(String fileName) {
 		String class_name = null;
 		if (fileName.endsWith(".class")) {

@@ -105,12 +105,6 @@ public class JabberIqPrivacy
 	@Inject(nullAllowed = true)
 	protected PrivacyListOfflineCache cache;
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param items
-	 */
 	public static Authorization validateList(final XMPPResourceConnection session, final List<Element> items) {
 		Authorization result = null;
 

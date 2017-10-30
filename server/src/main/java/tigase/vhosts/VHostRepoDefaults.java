@@ -41,44 +41,26 @@ public abstract class VHostRepoDefaults {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static String getConfigKey() {
 		return HOSTNAMES_PROP_KEY;
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String[] getDefaultPropetyItems() {
 		return DNSResolverFactory.getInstance().getDefaultHosts();
 	}
 
-	/**
-	 * Method description
-	 */
 	public static VHostItem getItemInstance() {
 		return new VHostItem();
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String getItemsListPKey() {
 		return vhost_list_pkey;
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String getPropertyKey() {
 		return GEN_VIRT_HOSTS;
 	}
 
-	/**
-	 * Method description
-	 */
 	public static BareJID getRepoUser() {
 		return vhost_user;
 	}

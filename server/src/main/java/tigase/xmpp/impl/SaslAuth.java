@@ -317,11 +317,6 @@ public class SaslAuth
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 */
 	protected void onAuthFail(final XMPPResourceConnection session) {
 		session.removeSessionData(SASL_SERVER_KEY);
 	}

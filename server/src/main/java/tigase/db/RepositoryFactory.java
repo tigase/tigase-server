@@ -230,18 +230,6 @@ public abstract class RepositoryFactory {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param class_name
-	 * @param resource
-	 * @param params
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws DBInitException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
 	public static AuthRepository getAuthRepository(String class_name, String resource, Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, DBInitException {
 		String cls = class_name;
@@ -306,19 +294,6 @@ public abstract class RepositoryFactory {
 		return repo;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param class_name
-	 * @param resource
-	 * @param params
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws DBInitException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws SQLException
-	 */
 	public static DataRepository getDataRepository(String class_name, String resource, Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, DBInitException,
 				   SQLException {
@@ -504,18 +479,6 @@ public abstract class RepositoryFactory {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param class_name
-	 * @param resource
-	 * @param params
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws DBInitException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
 	public static UserRepository getUserRepository(String class_name, String resource, Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, DBInitException {
 		String cls = class_name;

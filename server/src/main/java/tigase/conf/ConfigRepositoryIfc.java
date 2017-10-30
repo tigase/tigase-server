@@ -55,11 +55,6 @@ public interface ConfigRepositoryIfc
 	 */
 	Map<String, Object> getProperties(String compName) throws ConfigurationException;
 
-	/**
-	 * Method description
-	 *
-	 * @param compName
-	 */
 	Set<ConfigItem> getItemsForComponent(String compName);
 
 	//~--- methods --------------------------------------------------------------
@@ -149,9 +144,6 @@ public interface ConfigRepositoryIfc
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	Map<String, Object> getInitProperties();
 }
 

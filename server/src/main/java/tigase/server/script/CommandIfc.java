@@ -143,10 +143,7 @@ public interface CommandIfc
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
-	public Bindings getBindings();
+	Bindings getBindings();
 
 	String getCommandId();
 

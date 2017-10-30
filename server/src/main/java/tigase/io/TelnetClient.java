@@ -74,9 +74,6 @@ public class TelnetClient
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static String help() {
 		return "\n" + "Parameters:\n" + " -?                this help message\n" + " -h hostname       host name\n" +
 				" -p port           port number\n" + " -ssl              turn SSL on for all connections\n" +
@@ -88,13 +85,6 @@ public class TelnetClient
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 *
-	 * @throws Exception
-	 */
 	public static void main(final String[] args) throws Exception {
 		parseParams(args);
 
@@ -134,13 +124,6 @@ public class TelnetClient
 		}    // end of for (;;)
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param args
-	 *
-	 * @throws Exception
-	 */
 	public static void parseParams(final String[] args) throws Exception {
 		if ((args != null) && (args.length > 0)) {
 			for (int i = 0; i < args.length; i++) {
@@ -217,9 +200,6 @@ public class TelnetClient
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public static void turnDebugOn() {
 		Map<String, String> properties = new HashMap<String, String>();
 
@@ -245,9 +225,6 @@ public class TelnetClient
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 */
 	public static String version() {
 		return "\n" + "-- \n" + "Tigase XMPP Telnet, version: " +
 				TelnetClient.class.getPackage().getImplementationVersion() + "\n" +
@@ -285,13 +262,6 @@ public class TelnetClient
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param ioifc
-	 *
-	 * @throws IOException
-	 */
 	public void handleIOInterface(IOInterface ioifc) throws IOException {
 		ByteBuffer socketInput = ByteBuffer.allocate(ioifc.getSocketChannel().socket().getReceiveBufferSize());
 		ByteBuffer tmpBuffer = ioifc.read(socketInput);
@@ -315,23 +285,11 @@ public class TelnetClient
 		reader.addIOInterface(ioifc);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param sc
-	 */
 	public void handleSocketAccept(SocketChannel sc) {
 
 		// Empty, not needed any implementation for that
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws IOException
-	 */
 	public void writeData(String data) throws IOException {
 		ByteBuffer dataBuffer = null;
 

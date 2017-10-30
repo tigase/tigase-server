@@ -207,12 +207,6 @@ public class Broadcast
 		return name;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param params
-	 */
-
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new HashMap<String, Object>();
 		String db_uri = (String) params.get(AMP_MSG_REPO_URI_PARAM);
@@ -235,12 +229,6 @@ public class Broadcast
 		repo.loadMessagesToBroadcast();
 		this.repo = repo;
 	}
-
-	/**
-	 * Method description
-	 *
-	 * @param handler
-	 */
 
 	public void setActionResultsHandler(ActionResultsHandlerIfc handler) {
 		this.resultsHandler = handler;

@@ -65,21 +65,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	//~--- constructors ---------------------------------------------------------
 
-//private ArrayList<PriorityQueueAbstract<QueueItem>> queues =
-//  new ArrayList<PriorityQueueAbstract<QueueItem>>(1);
-
-	/**
-	 * Constructs ...
-	 *
-	 * @param worker
-	 * @param numWorkerThreads
-	 * @param maxQueueSize
-	 * @param name
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
 	@SuppressWarnings({"unchecked"})
 	public ProcessingThreads(E worker, int numWorkerThreads, int maxQueueSize, String name)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -110,13 +95,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param processor
-	 * @param packet
-	 * @param conn
-	 */
 	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		boolean ret = false;
 		QueueItem item = new QueueItem(processor, packet, conn);
@@ -181,9 +159,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public long getAverageProcessingTime() {
 		long average = 0;
 		int counters = 0;
@@ -202,23 +177,14 @@ public class ProcessingThreads<E extends WorkerThread> {
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public long getDroppedPackets() {
 		return droppedPackets;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getTotalQueueSize() {
 		int ret = 0;
 
@@ -229,9 +195,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getTotalRuns() {
 		int ret = 0;
 
@@ -247,19 +210,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 			workerThread.shutdown();
 		}
 	}
-///**
-// * Method description
-// *
-// *
-// *
-// */
-//public E getWorkerThread() {
-//  try {
-//    return workerThreads.getFirst();
-//  } catch (Exception e) {
-//    return null;
-//  }
-//}
 }
 
 //~ Formatted in Sun Code Convention

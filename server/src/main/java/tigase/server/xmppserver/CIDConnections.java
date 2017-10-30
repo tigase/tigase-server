@@ -78,17 +78,6 @@ public class CIDConnections {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param cid
-	 * @param handler
-	 * @param selector
-	 * @param maxInConns
-	 * @param maxOutConns
-	 * @param maxOutConnsPerIP
-	 * @param max_waiting_time
-	 */
 	public CIDConnections(CID cid, S2SConnectionHandlerIfc<S2SIOService> handler, S2SConnectionSelector selector,
 						  int maxInConns, int maxOutConns, int maxOutConnsPerIP, long max_waiting_time) {
 		this.cid = cid;
@@ -103,39 +92,22 @@ public class CIDConnections {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public void resetOutgoingInProgress() {
 		outgoingOpenInProgress.set(false);
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public boolean getOutgoingInProgress() {
 		return outgoingOpenInProgress.get();
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param sessId
-	 * @param key
-	 */
 	public void addDBKey(String sessId, String key) {
 		dbKeys.put(sessId, key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
 	public void addIncoming(S2SIOService serv) {
 		S2SConnection s2s_conn = serv.getS2SConnection();
 
@@ -157,11 +129,6 @@ public class CIDConnections {
 		incoming.add(s2s_conn);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
 	public void connectionAuthenticated(S2SIOService serv, CID cid) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
@@ -180,11 +147,6 @@ public class CIDConnections {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param sessionId
-	 */
 	public void connectionAuthenticated(String sessionId, CID cid) {
 		S2SConnection s2s_conn = getS2SConnectionForSessionId(sessionId);
 
@@ -193,11 +155,6 @@ public class CIDConnections {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
 	public void connectionStopped(S2SIOService serv) {
 		S2SConnection s2s_conn = serv.getS2SConnection();
 
@@ -233,25 +190,14 @@ public class CIDConnections {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param key_sessionId
-	 */
 	public String getDBKey(String key_sessionId) {
 		return dbKeys.get(key_sessionId);
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getDBKeysCount() {
 		return dbKeys.size();
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getIncomingCount() {
 		int result = 0;
 
@@ -264,9 +210,6 @@ public class CIDConnections {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getIncomingTLSCount() {
 		int result = 0;
 
@@ -281,23 +224,14 @@ public class CIDConnections {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getMaxOutConns() {
 		return this.max_out_conns;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getMaxOutConnsPerIP() {
 		return this.max_out_conns_per_ip;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getOutgoingCount() {
 		int result = 0;
 
@@ -310,9 +244,6 @@ public class CIDConnections {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getOutgoingHandshakingCount() {
 		int result = 0;
 
@@ -325,9 +256,6 @@ public class CIDConnections {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getOutgoingTLSCount() {
 		int result = 0;
 
@@ -342,11 +270,6 @@ public class CIDConnections {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param sessionId
-	 */
 	public S2SConnection getS2SConnectionForSessionId(String sessionId) {
 		S2SConnection s2s_conn = null;
 
@@ -379,9 +302,6 @@ public class CIDConnections {
 		return s2s_conn;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getWaitingControlCount() {
 		int result = 0;
 
@@ -398,20 +318,12 @@ public class CIDConnections {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public int getWaitingCount() {
 		return waitingPackets.size();
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param port_props
-	 */
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		S2SConnection s2s_conn = (S2SConnection) port_props.get(S2SIOService.S2S_CONNECTION_KEY);
 
@@ -449,12 +361,6 @@ public class CIDConnections {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param sessionId
-	 * @param packet
-	 */
 	public boolean sendControlPacket(String sessionId, Packet packet) {
 
 		// Seraching for a correct connection
@@ -478,11 +384,6 @@ public class CIDConnections {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param verify_req
-	 */
 	public void sendHandshakingOnly(final Packet verify_req) {
 		connectionsOpenerService.schedule(new Runnable() {
 			@Override
@@ -512,11 +413,6 @@ public class CIDConnections {
 		}, 0, TimeUnit.MILLISECONDS);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	public void sendPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Sending packets.");

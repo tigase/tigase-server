@@ -82,11 +82,6 @@ public class ConfiguratorOld
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param objName
-	 */
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
 			return monitoring.getMXBean(objName);
@@ -249,21 +244,12 @@ public class ConfiguratorOld
 		System.out.println(key + " = " + objectToString(value));
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param objName
-	 * @param bean
-	 */
 	public static void putMXBean(String objName, Object bean) {
 		if (monitoring != null) {
 			monitoring.putMXBean(objName, bean);
 		}
 	}
 
-	/**
-	 * Constructs ...
-	 */
 	public ConfiguratorOld() {
 	}
 
@@ -634,26 +620,12 @@ public class ConfiguratorOld
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param name
-	 *
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	public void setup(String name) throws ConfigurationException {
 		Configurable component = getComponent(name);
 
 		setup(component);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 *
-	 * @throws ConfigurationException
-	 */
 	public Map<String, Object> getAllProperties(String key) throws ConfigurationException {
 		Map<String, Object> result = new LinkedHashMap<String, Object>();
 		String[] comps = getComponents();
@@ -679,9 +651,6 @@ public class ConfiguratorOld
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String[] getComponents() {
 		return repository.getCompNames();
 	}
@@ -767,14 +736,6 @@ public class ConfiguratorOld
 		demoMode = (Boolean) props.get("demo-mode");
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param val
-	 * @param result_pack
-	 * @param admin
-	 */
 	public Object setPropertyValue(String key, String val, Packet result_pack, boolean admin) {
 		Object result = null;
 
@@ -796,17 +757,6 @@ public class ConfiguratorOld
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param node_key
-	 * @param value
-	 * @param add
-	 * @param feedback
-	 * @param orig
-	 *
-	 * @throws Exception
-	 */
 	public Object setValue(String node_key, String value, boolean add, boolean feedback, Map<String, Object> orig)
 			throws Exception {
 		int root_idx = node_key.indexOf('/');

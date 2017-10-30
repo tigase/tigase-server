@@ -52,54 +52,18 @@ public interface SessionManagerClusteredIfc
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	boolean fastAddOutPacket(Packet packet);
 
-	/**
-	 * Method description
-	 *
-	 * @param el_packet
-	 * @param conn
-	 */
 	void processPacket(Packet el_packet, XMPPResourceConnection conn);
 
-	/**
-	 * Method description
-	 *
-	 * @param session is a <code>XMPPSession</code>
-	 * @param element is a <code>Element</code>
-	 */
 	void processPresenceUpdate(XMPPSession session, Element element);
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param el_packet
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
 	XMPPResourceConnection getXMPPResourceConnection(Packet el_packet);
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of {@code ConcurrentHashMap<JID,XMPPResourceConnection>}
-	 */
 	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of {@code ConcurrentHashMap<BareJID,XMPPSession>}
-	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
 
 	/**

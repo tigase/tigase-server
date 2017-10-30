@@ -98,15 +98,6 @@ public class Privacy {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static void addList(XMPPResourceConnection session, Element list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -149,24 +140,10 @@ public class Privacy {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	public static PrivacyList getActiveList(XMPPResourceConnection session) throws NotAuthorizedException {
 		return (PrivacyList) session.getSessionData(ACTIVE);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	public static String getActiveListName(XMPPResourceConnection session) throws NotAuthorizedException {
 		PrivacyList list = getActiveList(session);
 
@@ -201,14 +178,6 @@ public class Privacy {
 		return sessionDefaultList;
 	}
 
-	/**
-	 * @param session
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static Element getDefaultListElement(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		Element sessionDefaultList = null;
@@ -219,28 +188,11 @@ public class Privacy {
 		return sessionDefaultList;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static String getDefaultListName(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		return session.getData(PRIVACY, DEFAULT, null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static Element getList(XMPPResourceConnection session, String list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -269,15 +221,6 @@ public class Privacy {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static Element getListOld(XMPPResourceConnection session, String list)
 			throws NotAuthorizedException, TigaseDBException {
 		String lNode = listNode(list);
@@ -321,14 +264,6 @@ public class Privacy {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static String[] getLists(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
 		return session.getDataGroups(PRIVACY);
 	}
@@ -340,24 +275,10 @@ public class Privacy {
 				item.getChildren() == null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param list
-	 */
 	public static String listNode(final String list) {
 		return PRIVACY + "/" + list;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static void removeList(XMPPResourceConnection session, Element list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -370,15 +291,6 @@ public class Privacy {
 		session.removeDataGroup(lNode);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param lName
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static void setActiveList(XMPPResourceConnection session, String lName)
 			throws NotAuthorizedException, TigaseDBException {
 		if (lName == null) {
@@ -399,15 +311,6 @@ public class Privacy {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param list
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public static void setDefaultList(XMPPResourceConnection session, Element list)
 			throws NotAuthorizedException, TigaseDBException {
 		if ((list != null) && (list.getAttributeStaticStr(NAME) != null)) {

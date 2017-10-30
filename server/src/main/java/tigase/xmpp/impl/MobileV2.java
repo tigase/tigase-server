@@ -248,13 +248,6 @@ public class MobileV2
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param res
-	 * @param queue
-	 */
 	public boolean filter(XMPPResourceConnection session, Packet res, Map<JID, Packet> queue) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "checking if packet should be queued {0}", res.toString());

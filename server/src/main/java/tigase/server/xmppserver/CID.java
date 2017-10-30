@@ -45,11 +45,6 @@ public class CID {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param cid
-	 */
 	public CID(String cid) {
 		String[] cid_a = cid.split("@");
 
@@ -58,12 +53,6 @@ public class CID {
 		updateToString();
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param localHost
-	 * @param remoteHost
-	 */
 	public CID(String localHost, String remoteHost) {
 		this.localHost = ((localHost == null) ? null : localHost.intern());
 		this.remoteHost = ((remoteHost == null) ? null : remoteHost.intern());
@@ -83,16 +72,10 @@ public class CID {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public String getLocalHost() {
 		return localHost;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getRemoteHost() {
 		return remoteHost;
 	}

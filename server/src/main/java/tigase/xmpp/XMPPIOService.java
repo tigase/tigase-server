@@ -204,13 +204,6 @@ public class XMPPIOService<RefObject>
 		return true;
 	}
 
-	/**
-	 * @param data
-	 *
-	 * @return a value of <code>boolean</code>
-	 *
-	 * @throws IOException
-	 */
 	public boolean checkData(char[] data) throws IOException {
 
 		// by default do nothing and return false
@@ -296,13 +289,6 @@ public class XMPPIOService<RefObject>
 		return super.toString() + ", jid: " + jid;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 *
-	 * @throws IOException
-	 */
 	public void writeRawData(String data) throws IOException {
 
 		// We change state of this object in this method
@@ -317,11 +303,6 @@ public class XMPPIOService<RefObject>
 		// }
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param data
-	 */
 	public void xmppStreamOpen(final String data) {
 		try {
 			if (log.isLoggable(Level.FINEST)) {
@@ -337,21 +318,6 @@ public class XMPPIOService<RefObject>
 
 	//~--- get methods ----------------------------------------------------------
 
-//	/**
-//	 *
-//	 * @return
-//	 */
-//	public int getElementLimits() {
-//		return elements_number_limit;
-//	}
-
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getPacketsReceived(boolean reset) {
 		long tmp = packetsReceived;
 
@@ -362,13 +328,6 @@ public class XMPPIOService<RefObject>
 		return tmp;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param reset
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getPacketsSent(boolean reset) {
 		long tmp = packetsSent;
 
@@ -379,56 +338,26 @@ public class XMPPIOService<RefObject>
 		return tmp;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of {@code Queue<Packet>}
-	 */
 	public Queue<Packet> getReceivedPackets() {
 		return receivedPackets;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getTotalPacketsReceived() {
 		return totalPacketsReceived;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getTotalPacketsSent() {
 		return totalPacketsSent;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getUserJid() {
 		return this.jid;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 */
 	public void setUserJid(String jid) {
 		this.jid = jid;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return a value of {@code Map<String,Packet>}
-	 */
 	public Map<String, Packet> getWaitingForAct() {
 		for (Packet p : waitingForAck.values()) {
 			Element req = p.getElement().getChild(REQ_NAME);
@@ -446,62 +375,30 @@ public class XMPPIOService<RefObject>
 		return waitingForAck;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getXMLNS() {
 		return this.xmlns;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param xmlns
-	 */
 	public void setXMLNS(String xmlns) {
 		this.xmlns = xmlns;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param white_char_ack
-	 * @param xmpp_ack
-	 * @param strict
-	 */
 	public void setAckMode(boolean white_char_ack, boolean xmpp_ack, boolean strict) {
 		this.white_char_ack = white_char_ack;
 		this.xmpp_ack = xmpp_ack;
 		this.strict_ack = strict;
 	}
 
-	/**
-	 * @param limit
-	 */
 	public void setElementLimits(int limit) {
 
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param servList
-	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void setIOServiceListener(XMPPIOServiceListener servList) {
 		this.serviceListener = servList;
 		super.setIOServiceListener(servList);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param processors is a <code>XMPPIOProcessor[]</code>
-	 */
 	public void setProcessors(XMPPIOProcessor[] processors) {
 		this.processors = processors;
 	}
@@ -688,9 +585,6 @@ public class XMPPIOService<RefObject>
 		return receivedPackets.size();
 	}
 
-	/**
-	 * Method description
-	 */
 	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamClosed() {
 		if (log.isLoggable(Level.FINEST)) {
@@ -732,11 +626,6 @@ public class XMPPIOService<RefObject>
 		// } // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param attribs
-	 */
 	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamOpened(Map<String, String> attribs) {
 		if (serviceListener != null) {

@@ -62,11 +62,6 @@ public abstract class S2SAbstractProcessor
 	public void serviceStopped(S2SIOService serv) {
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param hostname
-	 */
 	public boolean skipTLSForHost(String hostname) {
 		// TODO: this is slow, optimize it somehow!!!
 		// Workaround for buggy servers having problems with establishing TLS over s2s

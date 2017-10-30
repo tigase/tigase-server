@@ -54,9 +54,6 @@ public abstract class RepositoryItemAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public abstract String getElemName();
 
 	//~--- methods --------------------------------------------------------------

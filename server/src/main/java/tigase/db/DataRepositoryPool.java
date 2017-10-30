@@ -56,11 +56,6 @@ public class DataRepositoryPool
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param repo
-	 */
 	public void addRepo(DataRepository repo) {
 		repoPool.addIfAbsent(repo);
 	}
@@ -70,9 +65,6 @@ public class DataRepositoryPool
 		repoPool.forEach(repo -> repo.checkConnectivity(watchdogTime));
 	}
 
-	/**
-	 * Method description
-	 */
 	public DataRepository takeRepo(BareJID user_id) {
 		int idx = user_id != null ? Math.abs(user_id.hashCode() % repoPool.size()) : 0;
 		DataRepository result = null;

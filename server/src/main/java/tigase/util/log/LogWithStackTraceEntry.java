@@ -24,9 +24,6 @@ package tigase.util.log;
 
 //~--- classes ----------------------------------------------------------------
 
-/**
- *
- */
 public class LogWithStackTraceEntry {
 
 	private long counter = 0;
@@ -35,12 +32,6 @@ public class LogWithStackTraceEntry {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param record
-	 * @param msg
-	 */
 	public LogWithStackTraceEntry(String msg, String record) {
 		this.msg = msg;
 		this.record = record;
@@ -48,32 +39,20 @@ public class LogWithStackTraceEntry {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public long getCounter() {
 		return counter;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getMessage() {
 		return msg;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getRecord() {
 		return record;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public long increment() {
 		return ++counter;
 	}

@@ -42,13 +42,6 @@ public class QueueItem {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param processor
-	 * @param packet
-	 * @param conn
-	 */
 	public QueueItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		if (processor == null) {
 			throw new NullPointerException("Processor parameter cannot be null!");
@@ -65,23 +58,14 @@ public class QueueItem {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * @return the conn
-	 */
 	public XMPPResourceConnection getConn() {
 		return conn;
 	}
 
-	/**
-	 * @return the packet
-	 */
 	public Packet getPacket() {
 		return packet;
 	}
 
-	/**
-	 * Method description
-	 */
 	public XMPPProcessorIfc getProcessor() {
 		return processor;
 	}

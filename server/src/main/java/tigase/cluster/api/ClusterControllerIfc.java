@@ -42,7 +42,7 @@ public interface ClusterControllerIfc {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method handles cluster packet received from cluster connection.
 	 *
 	 * @param packet which should be handled
 	 */
@@ -64,11 +64,6 @@ public interface ClusterControllerIfc {
 	 */
 	void nodeDisconnected(String addr);
 
-	/**
-	 * Method description
-	 *
-	 * @param listener CommandListener object
-	 */
 	void removeCommandListener(CommandListener listener);
 
 	/**
@@ -151,11 +146,6 @@ public interface ClusterControllerIfc {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param listener CommandListener object
-	 */
 	void setCommandListener(CommandListener listener);
 }
 

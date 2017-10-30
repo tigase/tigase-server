@@ -91,12 +91,6 @@ public class BoshSessionCache {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param id
-	 * @param data
-	 */
 	public void add(String id, List<Element> data) {
 		if (id == null) {
 			id = DEF_ID;
@@ -114,11 +108,6 @@ public class BoshSessionCache {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param message
-	 */
 	public void addFromMessage(Element message) {
 		Element body = message.findChildStaticStr(Message.MESSAGE_BODY_PATH);
 
@@ -131,11 +120,6 @@ public class BoshSessionCache {
 		addMsgBody(jid, Packet.FROM_ATT, body);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param presence
-	 */
 	public void addPresence(Element presence) {
 		String from = presence.getAttributeStaticStr(Packet.FROM_ATT);
 
@@ -145,11 +129,6 @@ public class BoshSessionCache {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param roster
-	 */
 	public void addRoster(Element roster) {
 
 		// Pushing roster with 'result' packet type will not work
@@ -162,11 +141,6 @@ public class BoshSessionCache {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param message
-	 */
 	public void addToMessage(Element message) {
 		Element body = message.findChildStaticStr(Message.MESSAGE_BODY_PATH);
 
@@ -181,11 +155,6 @@ public class BoshSessionCache {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param id
-	 */
 	public List<Element> get(String id) {
 		if (id == null) {
 			id = DEF_ID;
@@ -200,9 +169,6 @@ public class BoshSessionCache {
 		return data;
 	}
 
-	/**
-	 * Method description
-	 */
 	public List<Element> getAll() {
 		List<Element> result = new ArrayList<Element>();
 
@@ -217,18 +183,10 @@ public class BoshSessionCache {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	public List<Element> getAllPresences() {
 		return new ArrayList<Element>(jid_presence.values());
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param from
-	 */
 	public List<Element> getPresence(String... from) {
 		List<Element> result = new ArrayList<Element>();
 
@@ -245,11 +203,6 @@ public class BoshSessionCache {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param id
-	 */
 	public List<Element> remove(String id) {
 		if (id == null) {
 			id = DEF_ID;
@@ -266,12 +219,6 @@ public class BoshSessionCache {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param id
-	 * @param data
-	 */
 	public void set(String id, List<Element> data) {
 		if (id == null) {
 			id = DEF_ID;

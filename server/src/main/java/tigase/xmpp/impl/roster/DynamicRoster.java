@@ -60,19 +60,6 @@ public class DynamicRoster
 	private DynamicRosterIfc[] dynamicRosters;
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 * @param buddies
-	 *
-	 * @return a value of <code>JID[]</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 */
 	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String, Object> settings,
 								   JID[] buddies)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
@@ -116,12 +103,6 @@ public class DynamicRoster
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param list
-	 * @param buddies
-	 */
 	public static void addBuddiesToList(List<JID> list, JID[] buddies) {
 		for (JID buddy : buddies) {
 			if (!list.contains(buddy)) {
@@ -132,18 +113,6 @@ public class DynamicRoster
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 *
-	 * @return a value of <code>JID[]</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 */
 	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String, Object> settings)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		List<JID> result = getBuddiesList(session, settings);
@@ -155,18 +124,6 @@ public class DynamicRoster
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 *
-	 * @return a value of {@code List<JID>}
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 */
 	public static List<JID> getBuddiesList(final XMPPResourceConnection session, final Map<String, Object> settings)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
@@ -191,19 +148,6 @@ public class DynamicRoster
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 * @param buddy
-	 *
-	 * @return a value of <code>Element</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 */
 	public static Element getBuddyItem(final XMPPResourceConnection session, final Map<String, Object> settings,
 									   JID buddy)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
@@ -222,26 +166,10 @@ public class DynamicRoster
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param settings
-	 *
-	 * @return a value of <code>DynamicRosterIfc[]</code>
-	 */
 	public static DynamicRosterIfc[] getDynamicRosters(Map<String, Object> settings) {
 		return instance == null ? null : instance.dynamicRosters;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 * @param item
-	 *
-	 * @return a value of <code>Element</code>
-	 */
 	public static Element getItemExtraData(XMPPResourceConnection session, Map<String, Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
@@ -260,18 +188,6 @@ public class DynamicRoster
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 *
-	 * @return a value of {@code List<Element>}
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 */
 	public static List<Element> getRosterItems(final XMPPResourceConnection session, final Map<String, Object> settings)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
@@ -296,13 +212,6 @@ public class DynamicRoster
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param settings
-	 * @param item
-	 */
 	public static void setItemExtraData(XMPPResourceConnection session, Map<String, Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 

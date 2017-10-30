@@ -66,18 +66,6 @@ public class VCard4
 	private static final Logger log = Logger.getLogger(VCard4.class.getCanonicalName());
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 
-	/**
-	 * Method description
-	 *
-	 * @param connectionId
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws PacketErrorTypeException
-	 */
 	@Override
 	public void processFromUserOutPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
 										 NonAuthUserRepository repo, Queue<Packet> results,
@@ -106,18 +94,6 @@ public class VCard4
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param connectionId
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws PacketErrorTypeException
-	 */
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
 											  NonAuthUserRepository repo, Queue<Packet> results,
@@ -181,16 +157,6 @@ public class VCard4
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws PacketErrorTypeException
-	 */
 	@Override
 	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results,
 										 Map<String, Object> settings) throws PacketErrorTypeException {
@@ -214,15 +180,6 @@ public class VCard4
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 */
 	@Override
 	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 										   Queue<Packet> results, Map<String, Object> settings) {
@@ -230,17 +187,6 @@ public class VCard4
 		// TODO: Hm, the server vCard should be sent here, not yet implemented....
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws PacketErrorTypeException
-	 */
 	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 									Queue<Packet> results, Map<String, Object> settings)

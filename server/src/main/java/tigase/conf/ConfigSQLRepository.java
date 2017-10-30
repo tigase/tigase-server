@@ -206,14 +206,6 @@ public class ConfigSQLRepository
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 * @param conn_str
-		 * @param params
-		 *
-		 * @throws SQLException
-		 */
 		public void initRepository(String conn_str, Map<String, String> params) throws SQLException {
 			try {
 				data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);

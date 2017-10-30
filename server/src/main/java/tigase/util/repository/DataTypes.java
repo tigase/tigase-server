@@ -71,11 +71,6 @@ public class DataTypes {
 
 	// public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
 
-	/**
-	 * Method description
-	 *
-	 * @param name
-	 */
 	public static char decodeTypeIdFromName(String name) {
 		char result = 'S';
 
@@ -86,14 +81,6 @@ public class DataTypes {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param typeId
-	 * @param value
-	 *
-	 * @throws IllegalArgumentException
-	 */
 	public static Object decodeValueType(char typeId, String value) throws IllegalArgumentException {
 		Object result = value.trim();
 
@@ -247,35 +234,18 @@ public class DataTypes {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param name
-	 * @param value
-	 */
 	public static String encodeTypeIdInName(String name, Object value) {
 		char t = DataTypes.getTypeId(value);
 
 		return name + "[" + t + "]";
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 */
 	public static boolean getProperty(String key, Boolean def) {
 		String val = System.getProperty(key, (def != null) ? def.toString() : null);
 
 		return parseBool(val);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param instance
-	 */
 	public static char getTypeId(Object instance) {
 		Character result;
 
@@ -301,25 +271,12 @@ public class DataTypes {
 		System.out.println(parseNum("25", Byte.class, (byte) 1));
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param val
-	 */
 	public static boolean parseBool(final String val) {
 		return (val != null) &&
 				(val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on") ||
 						val.equals("1"));
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param num
-	 * @param cls
-	 * @param def
-	 * @param <T>
-	 */
 	public static <T extends Number> T parseNum(String num, Class<T> cls, T def) {
 		if (num == null) {
 			return def;
@@ -378,21 +335,10 @@ public class DataTypes {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param size
-	 * @param def
-	 */
 	public static int parseSizeInt(String size, int def) {
 		return parseNum(size, Integer.class, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param name
-	 */
 	public static String stripNameFromTypeId(String name) {
 		if (name.endsWith("]")) {
 			return name.substring(0, name.length() - 3);
@@ -401,11 +347,6 @@ public class DataTypes {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param value
-	 */
 	public static String valueToString(final Object value) {
 
 		if (value == null) {

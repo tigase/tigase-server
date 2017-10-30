@@ -763,11 +763,6 @@ public class ClusterConnectionManager
 		return initialClusterConnectedDone;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
 	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 		String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
@@ -1069,9 +1064,6 @@ public class ClusterConnectionManager
 			clIOQueue += service.waitingToSendSize();
 		}
 
-		/**
-		 * Method description
-		 */
 		public void reset() {
 
 			// Statistics are reset on the low socket level instead. This way we do
@@ -1087,29 +1079,14 @@ public class ClusterConnectionManager
 
 		//~--- get methods --------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 * @return a value of <code>float</code>
-		 */
 		public float getAverageCompressionRatio() {
 			return compressionRatio / counter;
 		}
 
-		/**
-		 * Method description
-		 *
-		 * @return a value of <code>float</code>
-		 */
 		public float getAverageDecompressionRatio() {
 			return decompressionRatio / counter;
 		}
 
-		/**
-		 * Method description
-		 *
-		 * @return a value of <code>int</code>
-		 */
 		public int getWaitingToSend() {
 			return clIOQueue;
 		}

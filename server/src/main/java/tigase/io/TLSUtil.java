@@ -56,22 +56,10 @@ public abstract class TLSUtil {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param params
-	 *
-	 * @throws CertificateParsingException
-	 */
 	public static void addCertificate(Map<String, String> params) throws CertificateParsingException {
 		sslContextContainer.addCertificates(params);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param params
-	 */
 	public static void configureSSLContext(Map<String, Object> params) {
 		// we should initialize this only once
 		if (sslContextContainer != null) {
@@ -143,9 +131,6 @@ public abstract class TLSUtil {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static KeyStore getTrustStore() {
 		return sslContextContainer.getTrustStore();
 	}

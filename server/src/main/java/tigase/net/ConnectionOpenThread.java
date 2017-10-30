@@ -74,9 +74,6 @@ public class ConnectionOpenThread
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public static ConnectionOpenThread getInstance() {
 
 		// Long new_throttling = Long.getLong("new-connections-throttling");
@@ -122,21 +119,11 @@ public class ConnectionOpenThread
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param al
-	 */
 	public void addConnectionOpenListener(ConnectionOpenListener al) {
 		waiting.offer(al);
 		selector.wakeup();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param al
-	 */
 	public void removeConnectionOpenListener(ConnectionOpenListener al) {
 		for (SelectionKey key : selector.keys()) {
 			if (al == key.attachment()) {
@@ -255,9 +242,6 @@ public class ConnectionOpenThread
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public void start() {
 		Thread t = new Thread(this);
 
@@ -267,9 +251,6 @@ public class ConnectionOpenThread
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public void stop() {
 		stopping = true;
 		selector.wakeup();

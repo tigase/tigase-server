@@ -57,13 +57,6 @@ public class CAPS
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param session
-	 * @param feature
-	 */
-	@SuppressWarnings("unchecked")
 	public static Set<JID> getJidsWithFeature(XMPPResourceConnection session, String feature) {
 		Set<JID> jids = new HashSet<JID>();
 		Map<JID, String[]> resources = (Map<JID, String[]>) session.getCommonSessionData(ID);

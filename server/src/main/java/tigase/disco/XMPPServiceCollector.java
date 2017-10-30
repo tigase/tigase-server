@@ -58,9 +58,6 @@ public abstract class XMPPServiceCollector
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
 	public XMPPServiceCollector() {
 		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
 		serviceEntity.addIdentities(new ServiceIdentity[]{new ServiceIdentity("server", "im",
@@ -70,20 +67,10 @@ public abstract class XMPPServiceCollector
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentAdded(XMPPService component) {
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentRemoved(XMPPService component) {
 	}

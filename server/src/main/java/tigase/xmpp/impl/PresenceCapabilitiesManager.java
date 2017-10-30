@@ -33,12 +33,6 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Class description
- *
- * @author Enter your name here...
- * @version Enter version here..., 13/02/16
- */
 public class PresenceCapabilitiesManager {
 
 	// Map<capsNode,Set<feature>>
@@ -51,11 +45,6 @@ public class PresenceCapabilitiesManager {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param capsNode
-	 */
 	public static String[] getNodeFeatures(String capsNode) {
 		return nodeFeatures.get(capsNode);
 	}
@@ -71,14 +60,6 @@ public class PresenceCapabilitiesManager {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param owner
-	 * @param from
-	 * @param capsNodes
-	 * @param results
-	 */
 	public static void handlePresence(JID owner, JID from, String[] capsNodes, Queue<Packet> results) {
 		if (capsNodes == null) {
 			return;
@@ -93,14 +74,6 @@ public class PresenceCapabilitiesManager {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param compJid
-	 * @param to
-	 * @param caps_nodes
-	 * @param results
-	 */
 	public static void prepareCapsQueries(JID compJid, JID to, String[] caps_nodes, Queue<Packet> results) {
 		if (caps_nodes != null) {
 			for (String caps_node : caps_nodes) {
@@ -111,14 +84,6 @@ public class PresenceCapabilitiesManager {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compJid
-	 * @param to
-	 * @param caps_nodes
-	 * @param results
-	 */
 	public static void prepareCapsQueriesEl(JID compJid, JID to, String[] caps_nodes, Queue<Element> results) {
 		if (caps_nodes != null) {
 			for (String caps_node : caps_nodes) {
@@ -129,13 +94,6 @@ public class PresenceCapabilitiesManager {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param to
-	 * @param from
-	 * @param node
-	 */
 	public static Packet prepareCapsQuery(JID to, JID from, String node) {
 		Element iq = prepareCapsQueryEl(to, from, node);
 		final Iq iqPacket = new Iq(iq, from, to);
@@ -144,13 +102,6 @@ public class PresenceCapabilitiesManager {
 		return iqPacket;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param to
-	 * @param from
-	 * @param node
-	 */
 	public static Element prepareCapsQueryEl(JID to, JID from, String node) {
 		String id = String.valueOf(idCounter++);
 		Element iq = new Element("iq", new String[]{"from", "to", "id", "type", Packet.XMLNS_ATT},
@@ -163,11 +114,6 @@ public class PresenceCapabilitiesManager {
 		return iq;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	public static void processCapsQueryResponse(Packet packet) {
 
 		// No need for checking to domain - processors and components should do this
@@ -208,11 +154,6 @@ public class PresenceCapabilitiesManager {
 //  }
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param c
-	 */
 	public static String[] processPresence(Element c) {
 		Set<String> caps_nodes = null;
 
@@ -234,13 +175,6 @@ public class PresenceCapabilitiesManager {
 		return caps_nodes.toArray(new String[caps_nodes.size()]);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param compJid
-	 * @param p
-	 * @param results
-	 */
 	public static String[] processPresence(JID compJid, Packet p, Queue<Packet> results) {
 		Element c = p.getElement().getChild("c");
 		Set<String> features = new HashSet<String>();
@@ -269,21 +203,10 @@ public class PresenceCapabilitiesManager {
 		return features.toArray(new String[features.size()]);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param handler
-	 */
 	public static void registerPresenceHandler(PresenceCapabilitiesListener handler) {
 		handlers.add(handler);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param capsNode
-	 * @param features
-	 */
 	public static void setNodeFeatures(String capsNode, String[] features) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "setting features for node = {0}, features = {1}",
@@ -304,33 +227,14 @@ public class PresenceCapabilitiesManager {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param handler
-	 */
 	public static void unregisterPresenceHandler(PresenceCapabilitiesListener handler) {
 		handlers.remove(handler);
 	}
 
 	//~--- inner interfaces -----------------------------------------------------
 
-	/**
-	 * Interface description
-	 *
-	 * @author Enter your name here...
-	 * @version Enter version here..., 13/02/16
-	 */
 	public static interface PresenceCapabilitiesListener {
 
-		/**
-		 * Method description
-		 *
-		 * @param owner
-		 * @param sender
-		 * @param capsNodes
-		 * @param results
-		 */
 		void handlePresence(JID owner, JID sender, String[] capsNodes, Queue<Packet> results);
 	}
 }

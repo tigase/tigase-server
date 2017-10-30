@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	/**
-	 * Method description
+	 * Returns stream features available for particular S2S connection.
 	 *
 	 * @param serv {@link S2SIOService} for which stream features should be retrieved
 	 *

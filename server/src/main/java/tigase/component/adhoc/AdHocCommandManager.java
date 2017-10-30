@@ -42,11 +42,6 @@ public class AdHocCommandManager {
 	@Inject(nullAllowed = true)
 	private AdHocCommand[] allCommands;
 
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
 	public Collection<AdHocCommand> getAllCommands() {
 		return this.commands.values();
 	}
@@ -76,15 +71,6 @@ public class AdHocCommandManager {
 		return this.commands.containsKey(node);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 *
-	 * @return
-	 *
-	 * @throws AdHocCommandException
-	 */
 	public Packet process(Packet packet) throws AdHocCommandException {
 		final Element element = packet.getElement();
 		@SuppressWarnings("unused") final JID senderJid = packet.getStanzaFrom();
@@ -132,11 +118,6 @@ public class AdHocCommandManager {
 		return packet.okResult(commandResult, 0);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param command
-	 */
 	public void registerCommand(AdHocCommand command) {
 		if (!this.commands.containsKey(command.getNode())) {
 			this.commands.put(command.getNode(), command);

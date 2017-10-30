@@ -125,11 +125,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param cmd
-	 */
 	public final void addCommandListener(CommandListener cmd) {
 		commands.add(cmd);
 	}
@@ -297,15 +292,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param packet
-	 *
-	 * @return a value of {@code List<JID>}
-	 */
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 
 		// If visited nodes is not null then we return null as this strategy never
@@ -392,13 +378,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		eventBus.fire(event);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean isSuitableForForward(Packet packet) {
 		switch (errorForwarding) {
 			case forward:

@@ -78,26 +78,12 @@ public class Iq
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public static Packet commandResultForm(Iq packet) throws TigaseStringprepException {
 		Packet result = packet.commandResult(Command.DataType.form);
 
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public static Packet commandResultResult(Iq packet) throws TigaseStringprepException {
 		Packet result = packet.commandResult(Command.DataType.result);
 
@@ -107,7 +93,7 @@ public class Iq
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description creates a new <code>Packet</code> instance or <code>Iq</code> instance more specificly with a
+	 * Method creates a new <code>Packet</code> instance or <code>Iq</code> instance more specificly with a
 	 * roster entry content. TODO: Remove dependency on RosterAbstract class, possibly move the method again to more
 	 * proper location but it needs to be accessible from all parts of the application.
 	 *
@@ -167,35 +153,16 @@ public class Iq
 		return new Iq(iq, from, to);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param elem
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public Iq(Element elem) throws TigaseStringprepException {
 		super(elem);
 		init();
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param elem
-	 * @param stanzaFrom
-	 * @param stanzaTo
-	 */
 	public Iq(Element elem, JID stanzaFrom, JID stanzaTo) {
 		super(elem, stanzaFrom, stanzaTo);
 		init();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param cmd_type
-	 */
 	public Packet commandResult(Command.DataType cmd_type) {
 		Packet result = packetInstance(
 				command.createIqCommand(getStanzaTo(), getStanzaFrom(), StanzaType.result, getStanzaId(), strCommand,
@@ -214,9 +181,6 @@ public class Iq
 		return command;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getIQChildName() {
 		List<Element> children = elem.getChildren();
 
@@ -227,9 +191,6 @@ public class Iq
 		return null;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getIQXMLNS() {
 		if (iqQueryXMLNS == null) {
 			iqQueryXMLNS = elem.getXMLNSStaticStr(IQ_QUERY_PATH);
@@ -238,9 +199,6 @@ public class Iq
 		return iqQueryXMLNS;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getStrCommand() {
 		return strCommand;
 	}

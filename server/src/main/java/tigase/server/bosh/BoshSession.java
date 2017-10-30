@@ -144,20 +144,12 @@ public class BoshSession {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 */
 	public void close() {
 		terminate = true;
 		processPacket(null, null);
 		closeAllConnections();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param bios
-	 */
 	public void disconnected(BoshIOService bios) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Disconnected called for: " + bios.getUniqueId());
@@ -194,12 +186,6 @@ public class BoshSession {
 			 max_batch_size, batch_queue_timeout, out_results, false);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param out_results
-	 */
 	public synchronized void processPacket(Packet packet, Queue<Packet> out_results) {
 		if (packet != null) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -236,13 +222,6 @@ public class BoshSession {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param service
-	 * @param out_results
-	 */
 	public synchronized void processSocketPacket(Packet packet, BoshIOService service, Queue<Packet> out_results) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + connections.size() + "] Processing socket packet: " + packet.toString());
@@ -431,9 +410,6 @@ public class BoshSession {
 		}
 	}
 
-	/**
-	 * Method description
-	 */
 	public synchronized void sendWaitingPackets() {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("trying to send waiting packets from queue of " + getSid() + " after timer = " +
@@ -452,12 +428,6 @@ public class BoshSession {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param out_results
-	 * @param tt
-	 */
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "task called for {0}, inactivityTimer = {1}, tt = {2}",
@@ -560,78 +530,38 @@ public class BoshSession {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 */
 	public void terminateBoshSession() {
 		terminate = true;
 	}
 
-	/**
-	 * Method description
-	 */
 	public JID getDataReceiver() {
 		return dataReceiver;
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param dataReceiver
-	 */
 	public void setDataReceiver(JID dataReceiver) {
 		this.dataReceiver = dataReceiver;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getDomain() {
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 */
 	public String getSessionId() {
 		return sessionId;
 	}
 
-	/**
-	 * Method description
-	 */
 	public UUID getSid() {
 		return sid;
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param jid
-	 */
 	public void setUserJid(String jid) {
 		userJid = JID.jidInstanceNS(jid);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 * @param service
-	 * @param max_wait
-	 * @param min_polling
-	 * @param max_inactivity
-	 * @param concurrent_requests
-	 * @param hold_requests
-	 * @param max_pause
-	 * @param max_batch_size
-	 * @param batch_queue_timeout
-	 * @param out_results
-	 */
 	protected void init(Packet packet, BoshIOService service, long max_wait, long min_polling, long max_inactivity,
 						int concurrent_requests, int hold_requests, long max_pause, int max_batch_size,
 						long batch_queue_timeout, Queue<Packet> out_results, boolean preBindEnabled) {
