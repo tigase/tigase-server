@@ -25,7 +25,9 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
@@ -309,7 +311,8 @@ public class SSLContextContainer
 
 	@Bean(name = "rootSslContextContainer", parent = Kernel.class, active = true, exportable = true)
 	public static class Root
-			extends SSLContextContainer {
+			extends SSLContextContainer
+			implements Initializable, UnregisterAware {
 
 		public Root() {
 			super();
@@ -318,6 +321,16 @@ public class SSLContextContainer
 		// empty method to ensure that parent will not be injected to root instance
 		public void setParent(SSLContextContainerIfc parent) {
 			log.log(Level.FINE, "setting root = " + parent);
+		}
+
+		@Override
+		public void initialize() {
+			start();
+		}
+
+		@Override
+		public void beforeUnregister() {
+			stop();
 		}
 	}
 
