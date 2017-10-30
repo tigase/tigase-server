@@ -198,7 +198,16 @@ public class SchemaManager {
 
 		});
 
-		Properties props = parser.parseArgs(args);
+		Properties props = null;
+		try {
+			props = parser.parseArgs(args);
+		} catch (IllegalArgumentException ex) {
+			// IllegalArgumentException is thrown if any of required parameters is missing
+			// We can ignore it and just display help for this command.
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, ex.getMessage(), ex);
+			}
+		}
 		Optional<Task> task = parser.getTask();
 		if (props != null && task.isPresent()) {
 			task.get().execute(props);
