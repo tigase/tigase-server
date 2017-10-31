@@ -109,12 +109,12 @@ public abstract class VCardXMPPProcessorAbstract
 						if (extVal != null) {
 							r.addChild(new Element("uri", extVal.getCData()));
 						} else {
-							r.addChild(new Element("uri",
-												   "data:" + c.getChildCData((Element c1) -> c1.getName() == "TYPE") +
-														   ";base64," +
-														   c.getChildCData((Element c1) -> c1.getName() == "BINVAL")
-																   .replace("\n", "")
-																   .replace("\r", "")));
+							String binval = c.getChildCData((Element c1) -> c1.getName() == "BINVAL");
+							String tp = c.getChildCData((Element c1) -> c1.getName() == "TYPE");
+							if (binval != null && tp != null) {
+								r.addChild(new Element("uri", "data:" + tp + ";base64," +
+										binval.replace("\n", "").replace("\r", "")));
+							}
 						}
 						break;
 					case "BDAY":
@@ -570,16 +570,16 @@ public abstract class VCardXMPPProcessorAbstract
 	}
 
 	@Override
-	public void initialize() {
-		PROCESSORS.put(this.id(), this);
-	}
-
-	@Override
 	public void beforeUnregister() {
 		PROCESSORS.remove(this.id(), this);
 	}
 
 	protected abstract String getVCardXMLNS();
+
+	@Override
+	public void initialize() {
+		PROCESSORS.put(this.id(), this);
+	}
 
 	protected void setVCard(XMPPResourceConnection session, Element vcard)
 			throws TigaseDBException, NotAuthorizedException {
