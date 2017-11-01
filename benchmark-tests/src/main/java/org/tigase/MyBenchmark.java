@@ -32,10 +32,7 @@
 package org.tigase;
 
 import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.infra.Blackhole;
-import org.openjdk.jmh.profile.StackProfiler;
-import org.openjdk.jmh.profile.WinPerfAsmProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -45,16 +42,13 @@ import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
 import tigase.server.QueueType;
 import tigase.server.filters.PacketCounter;
-//import tigase.server.filters.PacketCounterOld;
 import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.*;
+
+//import tigase.server.filters.PacketCounterOld;
 
 public class MyBenchmark {
 

@@ -1,7 +1,7 @@
 package org.tigase;
 
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
 import java.util.ArrayDeque;
