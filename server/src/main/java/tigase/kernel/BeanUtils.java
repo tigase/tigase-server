@@ -116,6 +116,8 @@ public class BeanUtils {
 		try {
 			Method m = f.getDeclaringClass().getMethod(gm);
 			return m;
+		} catch (NoClassDefFoundError ex) {
+			throw createExceptionForMissingClassForField(f, ex);
 		} catch (NoSuchMethodException e) {
 			return null;
 		}
@@ -140,6 +142,8 @@ public class BeanUtils {
 		try {
 			Method m = f.getDeclaringClass().getMethod(sm, type);
 			return m;
+		} catch (NoClassDefFoundError ex) {
+			throw createExceptionForMissingClassForField(f, ex);
 		} catch (NoSuchMethodException e) {
 			return null;
 			// throw new KernelException("Class " +
@@ -195,6 +199,14 @@ public class BeanUtils {
 
 		throw new IllegalArgumentException(
 				"Cannot set value type " + valueToSet.getClass().getName() + " to property '" + fieldName + "'.");
+	}
+
+	private static IllegalArgumentException createExceptionForMissingClassForField(Field f, Throwable cause) {
+		return new IllegalArgumentException(
+				"Missing class in classpath for field '" + f + "' in class " + f.getDeclaringClass() + " from " +
+						f.getDeclaringClass()
+								.getResource("/" + f.getDeclaringClass().getName().replace('.', '/') + ".class"),
+				cause);
 	}
 
 	private BeanUtils() {
