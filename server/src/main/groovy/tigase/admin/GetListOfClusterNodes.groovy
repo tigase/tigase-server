@@ -17,6 +17,14 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
+/*
+ Get list of all connected cluster nodes
+
+ AS:Description: Get list of all connected cluster nodes
+ AS:CommandId: cluster-nodes-list
+ AS:Component: cl-comp
+ AS:Group: Configuration
+ */
 package tigase.admin
 
 import tigase.server.Command
