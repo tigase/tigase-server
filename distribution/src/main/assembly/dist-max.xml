@@ -225,6 +225,9 @@
 				<include>tigase:jaxmpp-core</include>
 				<include>tigase:jaxmpp-j2se</include>
 
+				<!-- Tigase Extras mDNS extension-->
+				<include>org.jmdns:jmdns</include>
+
 			</includes>
 		</dependencySet>
 	</dependencySets>
