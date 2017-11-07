@@ -207,7 +207,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	 */
 	public abstract Result setComponentVersion(String component, String version);
 
-	public abstract Version getComponentVersionFromDb(String component);
+	public abstract Optional<Version> getComponentVersionFromDb(String component);
 
 	/**
 	 * Method checks whether the connection to the database is possible and that database of specified name exists. If

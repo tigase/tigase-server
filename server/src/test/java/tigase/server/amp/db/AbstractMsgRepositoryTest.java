@@ -116,6 +116,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
 		dataSource = prepareDataSource();
 		repo = (MsgRepository) DataSourceHelper.getDefaultClass(MsgRepositoryIfc.class, uri).newInstance();
 		try {
+			dataSource.checkSchemaVersion(repo, true);
 			repo.setDataSource(dataSource);
 		} catch (RuntimeException ex) {
 			throw new RepositoryException(ex);

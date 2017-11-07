@@ -20,8 +20,15 @@
 package tigase.db;
 
 import tigase.component.exceptions.RepositoryException;
+import tigase.db.util.RepositoryVersionAware;
+import tigase.sys.TigaseRuntime;
+import tigase.util.Version;
 
+import java.sql.SQLException;
 import java.time.Duration;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Interface implemented by every class providing access to data storage, ie. databases, files, key-value stores.
@@ -30,6 +37,94 @@ import java.time.Duration;
  */
 public interface DataSource
 		extends Repository {
+
+	Logger log = Logger.getLogger(DataSource.class.getName());
+
+	/**
+	 * This method is called by data source bean watchdog mechanism to ensure that there is proper connectivity to
+	 * underlying data storage.
+	 *
+	 * @param watchdogTime time which should pass between checks
+	 */
+	default void checkConnectivity(Duration watchdogTime) {}
+
+	/**
+	 * Method checks version of the particular DataSource stored in the defined source.
+	 *
+	 * @param datasource implementation of {@link DataSourceAware} interface
+	 * @param shutdownServer specifies whether server should be shutdown automatically if the version in the database
+	 * doesn't match required version.
+	 *
+	 * @return a {@code false} when the version doesn't match or there is no version information in the repository. if
+	 * {@code shutdownServer} is set to {@code true} and the component version is final it would force shutting down of
+	 * the server, otherwise (for non-final version) only a warning would be printed.
+	 *
+	 * @throws SQLException when there is a problem accessing the DataSource
+	 */
+	default public boolean checkSchemaVersion(DataSourceAware<? extends DataSource> datasource, boolean shutdownServer) {
+		boolean result = false;
+
+		final Class<? extends DataSourceAware> datasourceClass = datasource.getClass();
+		if (datasourceClass.isAnnotationPresent(SchemaId.class)
+				&& RepositoryVersionAware.class.isAssignableFrom(datasourceClass)) {
+			final String dataSourceID = datasourceClass.getAnnotation(SchemaId.class).id();
+
+			Optional<Version> dbVer = getSchemaVersion(dataSourceID);
+
+			Version implementationVersion;
+			try {
+				final RepositoryVersionAware repositoryVersionAware = (RepositoryVersionAware) datasourceClass.newInstance();
+				implementationVersion = repositoryVersionAware.getVersion();
+			} catch (InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
+				implementationVersion = Version.of(datasourceClass.getPackage().getImplementationVersion());
+			}
+
+			if (!dbVer.isPresent() || !implementationVersion.getBaseVersion().equals(dbVer.get().getBaseVersion())) {
+					result = false;
+
+					String[] errorMsg = new String[]{
+							"ERROR! Component " + dataSourceID + " (" + datasourceClass.getSimpleName() + ") " +  "schema version is not loaded in the database or it is old!",
+							(dbVer.isPresent() ? ("Version in database: " + dbVer.get().getBaseVersion() + ". ") : "")
+									+ "Required version: " + implementationVersion.getBaseVersion(),
+							"Please upgrade the installation by running:",
+							"\t$ ./scripts.sh upgrade-schema etc/tigase.conf"};
+
+					if (shutdownServer) {
+						TigaseRuntime.getTigaseRuntime().shutdownTigase(errorMsg);
+					}
+				} else if (implementationVersion.getBaseVersion().equals(dbVer.get().getBaseVersion()) &&
+						!Version.TYPE.FINAL.equals(implementationVersion.getVersionType())) {
+					result = false;
+
+					log.log(Level.WARNING, "Warning!" + "\n\n\tIt's possible that '" + dataSourceID +
+							"' " + " (" + datasourceClass.getSimpleName() + ") " + "component schema version loaded in the database is out of date!" +
+							"\n\tVersion in database: " + dbVer.get() + ", current component version: " +
+							implementationVersion + "." + "\n\tPlease upgrade the installation by running:" +
+							"\n\t\t$ ./scripts.sh upgrade-schema etc/tigase.conf" + "\n" +
+							"\n\t(this warning is printed each time SNAPSHOT version is started, you can ignore this" +
+							"message if you've just run above command)" + "\n");
+
+				} else {
+					// schema version present in DB and matches component version
+					result = true;
+				}
+		} else {
+			// there is no annotation so we assume schema version is correct;
+			result = true;
+		}
+		return result;
+	}
+
+	/**
+	 * Method obtains version of the schema for particular component stored in the database.
+	 *
+	 * @param component name of the component for which we want to get the schema version
+	 *
+	 * @return an optional value of the version.
+	 */
+	Optional<Version> getSchemaVersion(String component);
+
 
 	/**
 	 * Returns a DB connection string or DB connection URI.
@@ -48,15 +143,5 @@ public interface DataSource
 	 * it may not be signaled through this method call.
 	 */
 	void initialize(String resource_uri) throws RepositoryException;
-
-	/**
-	 * This method is called by data source bean watchdog mechanism to ensure that there is proper connectivity to
-	 * underlying data storage.
-	 *
-	 * @param watchdogTime time which should pass between checks
-	 */
-	default void checkConnectivity(Duration watchdogTime) {
-
-	}
 
 }

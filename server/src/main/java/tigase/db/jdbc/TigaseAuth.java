@@ -24,6 +24,7 @@ package tigase.db.jdbc;
 
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.util.Base64;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.jid.BareJID;
@@ -56,7 +57,7 @@ import static tigase.db.AuthRepository.Meta;
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
 public class TigaseAuth
-		implements AuthRepository, DataSourceAware<DataRepository> {
+		implements AuthRepository, DataSourceAware<DataRepository>, RepositoryVersionAware {
 
 	/**
 	 * Private logger for class instances.
@@ -205,7 +206,10 @@ public class TigaseAuth
 	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
 			if (data_repo == null) {
-				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+				final DataRepository dataRepository = RepositoryFactory.getDataRepository(null, connection_str, params);
+				dataRepository.checkSchemaVersion(this, true);
+
+				setDataSource(dataRepository);
 			}
 		} catch (Exception e) {
 			data_repo = null;

@@ -24,10 +24,12 @@ import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.Repository;
+import tigase.util.Version;
 import tigase.xml.db.XMLDB;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +44,11 @@ public class XMLDataSource
 
 	private String resource_uri;
 	private XMLDB xmldb;
+
+	@Override
+	public Optional<Version> getSchemaVersion(String component) {
+		return Optional.empty();
+	}
 
 	@Override
 	public String getResourceUri() {

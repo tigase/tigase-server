@@ -103,6 +103,7 @@ public class CompSQLRepository
 		this.dataSourceBean = dataSourceBean;
 		DataSource ds = dataSourceBean.getRepository(dataSourceName);
 		if (ds != null && ds instanceof DataRepository) {
+			ds.checkSchemaVersion(this, true);
 			setDataSource((DataRepository) ds);
 		} else {
 			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
@@ -126,6 +127,7 @@ public class CompSQLRepository
 
 		DataSource ds = event.getNewDataSource();
 		if (ds != null && ds instanceof DataRepository) {
+			ds.checkSchemaVersion(this, true);
 			setDataSource((DataRepository) ds);
 		} else {
 			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
@@ -310,6 +312,7 @@ public class CompSQLRepository
 	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
+			data_repo.checkSchemaVersion(this, true);
 			setDataSource(data_repo);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem initializing database: ", e);

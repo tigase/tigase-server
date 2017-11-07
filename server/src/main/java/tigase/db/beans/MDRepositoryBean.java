@@ -31,10 +31,7 @@ import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -302,6 +299,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 			if (dataSourceAware != null) {
 				this.mdRepositoryBean.initializeRepository(name, dataSourceAware);
 				try {
+					dataSource.checkSchemaVersion(dataSourceAware, true);
 					dataSourceAware.setDataSource(dataSource);
 				} catch (RepositoryException ex) {
 					throw new RuntimeException("Failed to initialize repository", ex);

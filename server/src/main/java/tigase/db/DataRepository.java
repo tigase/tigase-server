@@ -60,30 +60,6 @@ public interface DataRepository
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Methods acts as {@link #checkSchemaVersion(DataSourceAware, boolean)} executed with parameter {@code
-	 * shutdownServer} set to {@code true}
-	 *
-	 * @param datasource implementation of {@link DataSourceAware} interface
-	 */
-	void checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource);
-
-	/**
-	 * Method checks version of the particular DataSource stored in the defined source.
-	 *
-	 * @param datasource implementation of {@link DataSourceAware} interface
-	 * @param shutdownServer specifies whether server should be shutdown automatically if the version in the database
-	 * doesn't match required version.
-	 *
-	 * @return a {@code false} when the version doesn't match or there is no version information in the repository. if
-	 * {@code shutdownServer} is set to {@code true} and the component version is final it would force shutting down of
-	 * the server, otherwise (for non-final version) only a warning would be printed.
-	 *
-	 * @throws SQLException when there is a problem accessing the DataSource
-	 */
-	boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer)
-			throws SQLException;
-
-	/**
 	 * The method checks whether a table for the given name exists in the database.
 	 *
 	 * @param tableName is a <code>String</code> value of the table name to check

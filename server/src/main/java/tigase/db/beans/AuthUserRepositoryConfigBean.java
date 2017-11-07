@@ -119,7 +119,9 @@ public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserReposito
 			}
 		}
 		if (!initialized && repository instanceof DataSourceAware) {
-			((DataSourceAware) repository).setDataSource(dataSource);
+			final DataSourceAware dsAwareRepository = (DataSourceAware) repository;
+			dataSource.checkSchemaVersion(dsAwareRepository, true);
+			dsAwareRepository.setDataSource(dataSource);
 		}
 	}
 

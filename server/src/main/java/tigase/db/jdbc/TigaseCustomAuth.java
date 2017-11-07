@@ -25,6 +25,7 @@ package tigase.db.jdbc;
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.credentials.Credentials;
 import tigase.db.*;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
@@ -89,7 +90,7 @@ import static tigase.db.AuthRepository.Meta;
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class TigaseCustomAuth
 		extends AbstractAuthRepositoryWithCredentials
-		implements DataSourceAware<DataRepository> {
+		implements DataSourceAware<DataRepository>, RepositoryVersionAware {
 
 	/**
 	 * Query executing periodically to ensure active connection with the database.
@@ -604,6 +605,7 @@ public class TigaseCustomAuth
 
 			if (data_repo == null) {
 				DataRepository dataRepo = RepositoryFactory.getDataRepository(null, connection_str, params);
+				dataRepo.checkSchemaVersion(this, true);
 				setDataSource(dataRepo);
 			}
 

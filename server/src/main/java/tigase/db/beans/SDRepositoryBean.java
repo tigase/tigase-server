@@ -138,6 +138,7 @@ public abstract class SDRepositoryBean<A extends DataSourceAware>
 		if (repository != null) {
 			initializeRepository(repository);
 			try {
+				dataSource.checkSchemaVersion(repository, true);
 				repository.setDataSource(dataSource);
 			} catch (RepositoryException ex) {
 				throw new RuntimeException("Failed to initialize repository", ex);

@@ -22,6 +22,7 @@ package tigase.server.amp.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.*;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.util.ExceptionUtilities;
@@ -49,7 +50,8 @@ import java.util.logging.Logger;
 @Repository.Meta(isDefault = true, supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCMsgRepository
-		extends MsgRepository<Long, DataRepository> {
+		extends MsgRepository<Long, DataRepository>
+		implements RepositoryVersionAware {
 
 	private static final Logger log = Logger.getLogger(JDBCMsgRepository.class.getName());
 	protected DataRepository data_repo = null;
@@ -117,6 +119,7 @@ public class JDBCMsgRepository
 
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
+			data_repo.checkSchemaVersion(this, true);
 			setDataSource(data_repo);
 
 		} catch (Exception e) {

@@ -25,6 +25,7 @@ package tigase.cluster.repo;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.sys.TigaseRuntime;
 
 import java.sql.PreparedStatement;
@@ -46,7 +47,8 @@ import java.util.logging.Logger;
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class ClConSQLRepository
 		extends ClConConfigRepository
-		implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem, DataRepository> {
+		implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem, DataRepository>,
+		           RepositoryVersionAware {
 
 	/**
 	 * Private logger for class instances.
@@ -130,6 +132,7 @@ public class ClConSQLRepository
 		super.initRepository(conn_str, params);
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
+			data_repo.checkSchemaVersion(this, true);
 			setDataSource(data_repo);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem initializing database: ", e);

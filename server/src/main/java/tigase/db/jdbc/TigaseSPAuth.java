@@ -21,6 +21,7 @@ package tigase.db.jdbc;
 
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.*;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
 
@@ -37,7 +38,8 @@ import java.util.logging.Logger;
  */
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class TigaseSPAuth
-		extends TigaseCustomAuth {
+		extends TigaseCustomAuth
+		implements RepositoryVersionAware {
 
 	private static final Logger log = Logger.getLogger(TigaseSPAuth.class.getName());
 

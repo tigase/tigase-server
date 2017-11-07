@@ -23,6 +23,7 @@ package tigase.db.jdbc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.*;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
 
@@ -42,7 +43,7 @@ import java.util.logging.Logger;
 @Repository.Meta(supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCRepository
-		implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
+		implements AuthRepository, UserRepository, DataSourceAware<DataRepository>, RepositoryVersionAware {
 
 	/** Field description */
 	public static final String CURRENT_DB_SCHEMA_VER = "8.0.0";
@@ -480,7 +481,9 @@ public class JDBCRepository
 	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
 			if (data_repo == null) {
-				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+				final DataRepository dataRepository = RepositoryFactory.getDataRepository(null, connection_str, params);
+				dataRepository.checkSchemaVersion(this, true);
+				setDataSource(dataRepository);
 			}
 		} catch (Exception e) {
 			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);

@@ -72,6 +72,7 @@ public class SchemaManager {
 
 	protected static final Class[] SUPPORTED_CLASSES = {MDPoolBean.class, MDRepositoryBean.class,
 														SDRepositoryBean.class};
+	public static final String COMMON_SCHEMA_ID = "common";
 	private static final Logger log = Logger.getLogger(SchemaManager.class.getCanonicalName());
 	private static final Comparator<SchemaInfo> SCHEMA_INFO_COMPARATOR = (o1, o2) -> {
 		if (o1.getId().equals("<unknown>") || o2.getId().equals(Schema.SERVER_SCHEMA_ID)) {
@@ -155,7 +156,7 @@ public class SchemaManager {
 			SchemaManager schemaManager = new SchemaManager();
 			schemaManager.execute(args);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.log(Level.SEVERE, "Error while loading schema", ex);
 		} finally {
 			System.exit(0);
 		}
@@ -422,27 +423,31 @@ public class SchemaManager {
 			log.log(Level.FINER, "loading schemas for data source " + ds);
 			schemas.sort(SCHEMA_INFO_COMPARATOR);
 
-			results.add(
-					new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema("common", null), handler));
+			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema(COMMON_SCHEMA_ID, null), handler));
 
 			for (SchemaInfo schema : validSchemas) {
+				// we filter validSchemas at the beginning of the method to only include Valid Schemas
 				Version version = schema.getVersion().get();
-				Version versionInDb = schemaLoader.getComponentVersionFromDb(schema.getId());
+
+				final Optional<Version> componentVersionFromDb = schemaLoader.getComponentVersionFromDb(schema.getId());
+
+				String dbVersionMsg = " (database version: " +
+						(componentVersionFromDb.isPresent() ? componentVersionFromDb.get() : "none") + ")";
 
 				ResultEntry schemaLoadResultEntry;
 				if (!Version.TYPE.FINAL.equals(version.getVersionType()) ||
-						(!versionInDb.getBaseVersion().equals(version.getBaseVersion()))) {
+						(!componentVersionFromDb.isPresent()
+								|| !version.getBaseVersion().equals(componentVersionFromDb.get().getBaseVersion()))) {
 					log.log(Level.FINER, "loading schema with id ='" + schema + "'");
 					schemaLoadResultEntry = new ResultEntry(
 							"Loading schema: " + schema.getName() + ", version: " + version +
-									" (had database schema: " + versionInDb + ")",
+									dbVersionMsg,
 							schemaLoader.loadSchema(schema.getId(), version.getBaseVersion().toString()), handler);
 				} else {
 					log.log(Level.FINER, "Skipped loading schema with id ='" + schema + "'");
 					schemaLoadResultEntry = new ResultEntry(
-							"Skipping schema: " + schema.getName() + ", version: " + version +
-									" (had database schema: " + versionInDb + ")", SchemaLoader.Result.skipped,
-							handler);
+							"Skipping schema: " + schema.getName() + ", version: " + version + dbVersionMsg,
+							SchemaLoader.Result.skipped, handler);
 				}
 				results.add(schemaLoadResultEntry);
 			}
@@ -494,9 +499,9 @@ public class SchemaManager {
 			setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
 
-		log.info("beginning upgrade...");
+		log.info("beginning loading schema files...");
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
-		log.info("schema upgrade finished!");
+		log.info("schema loading finished!");
 		return results;
 	}
 
@@ -792,6 +797,7 @@ public class SchemaManager {
 		return results;
 	}
 
+	@FunctionalInterface
 	public interface SchemaLoaderExecutor {
 
 		List<ResultEntry> execute(SchemaLoader schemaLoader, SchemaManagerLogHandler handler);
@@ -810,6 +816,11 @@ public class SchemaManager {
 
 		public String getName() {
 			return name;
+		}
+
+		@Override
+		public Optional<Version> getSchemaVersion(String component) {
+			return Optional.empty();
 		}
 
 		@Override
@@ -964,14 +975,21 @@ public class SchemaManager {
 		}
 
 		public Optional<Version> getVersion() {
-			return repositories.stream()
+			Map<Version, List<Version>> versions = repositories.stream()
 					.map(RepoInfo::getImplementation)
-					.map(Class::getPackage)
-					.map(Package::getImplementationVersion)
+					.filter(RepositoryVersionAware.class::isAssignableFrom)
+					.map(SchemaManager::getInstance)
+					.map(RepositoryVersionAware.class::cast)
 					.filter(Objects::nonNull)
-					.map(Version::of)
-					.findAny();
+					.map(RepositoryVersionAware::getVersion)
+					.collect(Collectors.groupingBy(Function.identity()));
+			if (versions.size() == 1) {
+				return Optional.of(versions.keySet().iterator().next());
+			} else {
+				return Optional.empty();
+			}
 		}
+
 
 		public boolean isValid() {
 			return schema != null && getVersion().isPresent();
@@ -982,5 +1000,14 @@ public class SchemaManager {
 			return "SchemaInfo[id=" + (schema == null ? "<unknown>" : schema.id()) + ", repositories=" + repositories +
 					"]";
 		}
+	}
+
+	private static <T> T getInstance(Class<T> clazz) {
+		try {
+			return clazz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

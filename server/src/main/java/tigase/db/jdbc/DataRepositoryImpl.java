@@ -19,10 +19,8 @@
  */
 package tigase.db.jdbc;
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.DataSourceAware;
-import tigase.db.Repository;
+import tigase.db.*;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
@@ -35,6 +33,7 @@ import java.lang.reflect.Proxy;
 import java.sql.*;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +46,7 @@ import java.util.logging.Logger;
  */
 @Repository.Meta(isDefault = true, supportedUris = {"jdbc:[^:]+:.*"})
 public class DataRepositoryImpl
-		implements DataRepository, StatisticsProviderIfc {
+		implements DataRepository, StatisticsProviderIfc, RepositoryVersionAware {
 
 	/** Field description */
 	public static final String DERBY_CONNVALID_QUERY = "values 1";
@@ -91,80 +90,25 @@ public class DataRepositoryImpl
 	private CounterValue reconnectionFailedCounter = null;
 	private String table_schema = null;
 
-	public void checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource) {
-		checkSchemaVersion(datasource, true);
-	}
-
 	@Override
-	public boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer) {
-		boolean result = false;
-
+	public Optional<Version> getSchemaVersion(String component) {
 		try {
 			PreparedStatement ps = getPreparedStatement(null, JDBC_SCHEMA_VERSION_QUERY);
-			final Class<? extends DataSourceAware> datasourceClass = datasource.getClass();
-			if (datasourceClass.isAnnotationPresent(SchemaId.class)) {
-				final String dataSourceID = datasourceClass.getAnnotation(SchemaId.class).id();
-				ps.setString(1, dataSourceID);
-				final ResultSet rs = ps.executeQuery();
-				String dbVersionStr = null;
-				if (rs.next()) {
-					dbVersionStr = rs.getString(1);
-				}
-				final Version implementationVersion = Version.of(
-						datasourceClass.getPackage().getImplementationVersion());
-
-				if (dbVersionStr != null) {
-					Version dbVersion = Version.of(dbVersionStr);
-
-					if (!implementationVersion.getBaseVersion().equals(dbVersion.getBaseVersion())) {
-						result = false;
-						String[] errorMsg = new String[]{
-								"ERROR! Component " + dataSourceID + " schema version loaded in the database is old!",
-								"Version in database: " + dbVersion.getBaseVersion() + ". Required version: " +
-										implementationVersion.getBaseVersion(),
-								"Please upgrade the installation by running:",
-								"\t$ ./scripts.sh upgrade-schema etc/tigase.conf"};
-
-						if (shutdownServer) {
-							TigaseRuntime.getTigaseRuntime().shutdownTigase(errorMsg);
-						}
-					} else if (implementationVersion.getBaseVersion().equals(dbVersion.getBaseVersion()) &&
-							!Version.TYPE.FINAL.equals(implementationVersion.getVersionType())) {
-						result = false;
-						log.log(Level.WARNING, "Warning!" + "\n\n\t\tIt's possible that '" + dataSourceID +
-								"' component schema version loaded in the database is out of date!" +
-								"\n\t\tVersion in database: " + dbVersion + ", current component version: " +
-								implementationVersion + "." + "\n\t\tPlease upgrade the installation by running:" +
-								"\n\t\t\t$ ./scripts.sh upgrade-schema etc/tigase.conf" + "\n" +
-								"\n\t\t(this warning is printed each time SNAPSHOT version is started, you can ignore this" +
-								"\n\t\t message if you've just run above command)" + "\n\n");
-
-					} else {
-						// schema version present in DB and matches component version
-						result = true;
-					}
-				} else {
-					result = false;
-					String[] errorMsg = new String[]{
-							"ERROR! Component " + dataSourceID + " schema is not loaded in the database!",
-							"Required version: " + implementationVersion.getBaseVersion(),
-							"Please install the schema by running:", "\t$ ./scripts.sh upgrade-schema etc/tigase.conf"};
-
-					if (shutdownServer) {
-						TigaseRuntime.getTigaseRuntime().shutdownTigase(errorMsg);
-					}
-				}
-
-			} else {
-				// there is no annotation so we assume schema version is correct;
-				result = true;
+			ps.setString(1, component);
+			final ResultSet rs = ps.executeQuery();
+			String dbVersionStr = null;
+			if (rs.next()) {
+				dbVersionStr = rs.getString(1);
 			}
-		} catch (SQLException ex) {
-			log.log(Level.WARNING, "Problem checking schema version", ex);
+			if (dbVersionStr != null) {
+				return Optional.of(Version.of(dbVersionStr));
+			} else {
+				return Optional.empty();
+			}
+		} catch (SQLException e) {
+			log.log(Level.FINE, "Error getting schema version from the DB", e);
+			return Optional.empty();
 		}
-
-		return result;
-
 	}
 
 	@Override

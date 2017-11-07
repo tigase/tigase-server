@@ -22,6 +22,7 @@ package tigase.server.amp.db;
 import tigase.db.DataRepository;
 import tigase.db.Repository;
 import tigase.db.Schema;
+import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -46,7 +47,8 @@ import static tigase.server.amp.db.JDBCMsgRepository.Meta;
 @Meta(isDefault = true, supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCMsgBroadcastRepository
-		extends MsgBroadcastRepository<Long, DataRepository> {
+		extends MsgBroadcastRepository<Long, DataRepository>
+		implements RepositoryVersionAware {
 
 	private static final Logger log = Logger.getLogger(JDBCMsgBroadcastRepository.class.getCanonicalName());
 

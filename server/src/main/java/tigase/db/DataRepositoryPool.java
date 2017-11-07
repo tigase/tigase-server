@@ -23,6 +23,7 @@ package tigase.db;
 
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
+import tigase.util.Version;
 import tigase.xmpp.jid.BareJID;
 
 import java.sql.PreparedStatement;
@@ -31,6 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,28 +100,27 @@ public class DataRepositoryPool
 	}
 
 	@Override
-	public void checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource) {
+	public boolean checkSchemaVersion(DataSourceAware<? extends DataSource> datasource, boolean shutdownServer) {
 		DataRepository repo = takeRepo(null);
 
 		if (repo != null) {
-			repo.checkSchemaVersion(datasource);
+			return repo.checkSchemaVersion(datasource, shutdownServer);
 		} else {
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+			return false;
 		}
 	}
 
 	@Override
-	public boolean checkSchemaVersion(DataSourceAware<? extends DataRepository> datasource, boolean shutdownServer)
-			throws SQLException {
+	public Optional<Version> getSchemaVersion(String component) {
 		DataRepository repo = takeRepo(null);
 
 		if (repo != null) {
-			return repo.checkSchemaVersion(datasource, true);
+			return repo.getSchemaVersion(component);
 		} else {
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+			return Optional.empty();
 		}
-
-		return false;
 	}
 
 	@Override

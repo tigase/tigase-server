@@ -185,7 +185,9 @@ public class DrupalWPAuth
 	public void initRepository(final String connection_str, Map<String, String> params) throws DBInitException {
 		try {
 			if (data_repo == null) {
-				setDataSource(RepositoryFactory.getDataRepository(null, connection_str, params));
+				final DataRepository dataRepository = RepositoryFactory.getDataRepository(null, connection_str, params);
+				dataRepository.checkSchemaVersion(this, true);
+				setDataSource(dataRepository);
 			}
 
 		} catch (Exception e) {

@@ -487,7 +487,7 @@ public class DBSchemaLoader
 	}
 
 	@Override
-	public Version getComponentVersionFromDb(String component) {
+	public Optional<Version> getComponentVersionFromDb(String component) {
 		if (component == null || component.trim().isEmpty()) {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			throw new IllegalArgumentException("Wrong component name");
@@ -509,11 +509,10 @@ public class DBSchemaLoader
 					log.log(Level.WARNING,
 							"Getting version failed: " + JDBC_SCHEMA_VERSION_QUERY + ", " + ex.getMessage());
 				}
-				return Version.ZERO;
+				return null;
 			};
 
-			final Optional<Version> r = withConnectionGeneric(db_conn, versionCommand, null);
-			return r.orElse(Version.ZERO);
+			return withConnectionGeneric(db_conn, versionCommand, null);
 		}
 	}
 
@@ -626,18 +625,6 @@ public class DBSchemaLoader
 							.defaultValue(PARAMETERS_ENUM.DATABASE_TYPE.getDefaultValue())
 							.required(true)
 							.build());
-//			parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS_ENUM.SCHEMA_VERSION.getName()).description(
-//					"Intended version of the schema to be loaded")
-//									 .options("4", "5", "5-1", "7-1", "7-2")
-//									 .required(true)
-//									 .defaultValue(PARAMETERS_ENUM.SCHEMA_VERSION.getDefaultValue())
-//									 .build());
-//		parser.addOption(new CommandlineParameter.Builder("V", PARAMETERS_ENUM.COMPONENTS.getName()).description(
-//				"Comma-separated list of components for which schema should be loaded")
-//				                 .options("message-archiving","pubsub","muc","sock5","unified-archive")
-//				                 .defaultValue(PARAMETERS_ENUM.COMPONENTS.getDefaultValue())
-//				                 .build());
-
 		options.addAll(getSetupOptions());
 
 		options.add(new CommandlineParameter.Builder("F", PARAMETERS_ENUM.FILE.getName()).description(
@@ -874,7 +861,7 @@ public class DBSchemaLoader
 				return Optional.empty();
 			}
 		}
-		return Optional.of(result);
+		return Optional.ofNullable(result);
 	}
 
 	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd,

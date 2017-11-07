@@ -83,6 +83,7 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 		dataSource = prepareDataSource();
 		repo = DataSourceHelper.getDefaultClass(MsgBroadcastRepository.class, uri).newInstance();
 		try {
+			dataSource.checkSchemaVersion(repo, true);
 			repo.setDataSource(dataSource);
 		} catch (RuntimeException ex) {
 			throw new RepositoryException(ex);

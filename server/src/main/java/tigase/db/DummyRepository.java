@@ -23,10 +23,12 @@ package tigase.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.component.exceptions.RepositoryException;
+import tigase.util.Version;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -111,6 +113,11 @@ public class DummyRepository
 	@Override
 	public String[] getKeys(BareJID user) {
 		return null;
+	}
+
+	@Override
+	public Optional<Version> getSchemaVersion(String component) {
+		return Optional.empty();
 	}
 
 	@Override
