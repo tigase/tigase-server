@@ -626,6 +626,7 @@ public abstract class AbstractBeanConfigurator
 		Set<BeanConfig> toRemove = kernel.getDependencyManager()
 				.getBeanConfigs()
 				.stream()
+				.filter(bc -> bc.getSource() != BeanConfig.Source.hardcoded)
 				.filter(bc -> !classes.contains(bc.getClazz()))
 				.filter(bc -> {
 					String name = bc.getClazz().getCanonicalName();
