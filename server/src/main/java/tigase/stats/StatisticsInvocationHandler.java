@@ -28,7 +28,7 @@ import java.util.logging.Level;
 
 /**
  * Generic class used by MD connection pools and repositories to wrap and measure method execution times.
- * <p>
+ * <br>
  * Created by andrzej on 15.12.2016.
  */
 public class StatisticsInvocationHandler<S>

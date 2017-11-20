@@ -32,8 +32,7 @@ import java.util.Queue;
 
 /**
  * Describe interface XMPPStopListener here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Oct 14 16:14:18 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

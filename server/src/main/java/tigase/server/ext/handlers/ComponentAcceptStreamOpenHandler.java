@@ -46,7 +46,6 @@ import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
 public class ComponentAcceptStreamOpenHandler
 		implements StreamOpenHandler {
 
-	/** Field description */
 	public static final String XMLNS = "jabber:component:accept";
 	/**
 	 * Variable <code>log</code> is a class logger.

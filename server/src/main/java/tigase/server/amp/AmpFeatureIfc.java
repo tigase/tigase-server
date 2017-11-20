@@ -31,45 +31,32 @@ package tigase.server.amp;
  */
 public interface AmpFeatureIfc {
 
-	/** Field description */
 	public static final String AMP_MSG_REPO_CLASS_PROP_KEY = "amp-repo-class";
 
-	/** Field description */
 	public static final String AMP_MSG_REPO_CLASS_PARAM = "--amp-repo-class";
 
-	/** Field description */
 	public static final String AMP_MSG_REPO_URI_PARAM = "--amp-repo-uri";
 
-	/** Field description */
 	public static final String AMP_MSG_REPO_URI_PROP_KEY = "amp-repo-uri";
 
-	/** Field description */
 	public static final String AMP_XMLNS = "http://jabber.org/protocol/amp";
 
-	/** Field description */
 	public static final String FROM_CONN_ID = "from-conn-id";
 
 	public static final String SESSION_JID = "from-session-jid";
 
-	/** Field description */
 	public static final String TO_CONN_ID = "to-conn-id";
 
-	/** Field description */
 	public static final String TO_RES = "to-res";
 
-	/** Field description */
 	public static final String EXPIRED = "expired";
 
-	/** Field description */
 	public static final String OFFLINE = "offline";
 
-	/** Field description */
 	public static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
 
-	/** Field description */
 	public static final String CONDITION_ATT = "condition";
 
-	/** Field description */
 	public static final String ACTION_ATT = "action";
 
 	//~--- get methods ----------------------------------------------------------

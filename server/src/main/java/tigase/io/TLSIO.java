@@ -39,8 +39,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class TLSIO here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat May 14 07:43:30 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -49,7 +48,6 @@ import java.util.logging.Logger;
 public class TLSIO
 		implements IOInterface {
 
-	/** Field description */
 	public static final String TLS_CAPS = "tls-caps";
 
 	/**
@@ -83,14 +81,6 @@ public class TLSIO
 	// tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
 	// }
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param ioi
-	 * @param wrapper
-	 *
-	 * @throws IOException
-	 */
 	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper, final ByteOrder order) throws IOException {
 		io = ioi;
 		tlsWrapper = wrapper;

@@ -44,7 +44,7 @@ import static tigase.db.beans.MDPoolBean.*;
 /**
  * Base class for configuration beans of {@link tigase.db.beans.DataSourceBean}, {@link
  * tigase.db.beans.AuthRepositoryMDPoolBean} and {@link tigase.db.beans.UserRepositoryMDPoolBean}
- * <p>
+ * <br>
  * Created by andrzej on 08.03.2016.
  */
 public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>

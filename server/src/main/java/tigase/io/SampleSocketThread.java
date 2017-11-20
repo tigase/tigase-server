@@ -32,8 +32,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SampleSocketThread here.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Aug  6 22:34:40 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

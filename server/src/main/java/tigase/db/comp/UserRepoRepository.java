@@ -49,10 +49,8 @@ import java.util.logging.Logger;
 public abstract class UserRepoRepository<Item extends RepositoryItem>
 		extends ConfigRepository<Item> {
 
-	/** Field description */
 	public static final String REPO_CLASS_PROP_KEY = "repo-class";
 
-	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 	private static final Logger log = Logger.getLogger(UserRepoRepository.class.getName());
 

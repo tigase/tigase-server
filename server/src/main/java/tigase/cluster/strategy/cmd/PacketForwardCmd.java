@@ -69,13 +69,7 @@ public class PacketForwardCmd
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param name
-	 * @param strategy
-	 */
-	public PacketForwardCmd(String name, DefaultClusteringStrategyAbstract strategy) {
+		public PacketForwardCmd(String name, DefaultClusteringStrategyAbstract strategy) {
 		super(name, Priority.HIGH);
 		this.strategy = strategy;
 	}

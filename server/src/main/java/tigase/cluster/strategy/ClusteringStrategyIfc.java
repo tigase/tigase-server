@@ -121,7 +121,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * This method is used for configuration purpose. Following the convention used in the Tigase project this method is
 	 * supposed to provide configuration defaults. All parameters which exist in configuration file overwrite
 	 * corresponding default parameters. If some parameters are missing in configuration file defaults are used then.
-	 * <p>
+	 * <br>
 	 * A compiled set of parameters is then passed to <code>setProperties</code> method.
 	 *
 	 * @param params a <code>Map</code> with properties loaded from init.properties file which should be used for
@@ -160,7 +160,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	/**
 	 * Method used to pass configuration parameters to the class. Parameters are stored in <code>Map</code> which
 	 * contains compiles set of defaults overwritten by parameters loaded from configuration file.
-	 * <p>
+	 * <br>
 	 * If he implementation took a good care of providing defaults for all parameters no parameter should be missing.
 	 *
 	 * @param props a <code>Map</code> with all configuration parameters for the class.

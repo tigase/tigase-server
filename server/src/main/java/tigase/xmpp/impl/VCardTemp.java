@@ -51,8 +51,7 @@ import static tigase.xmpp.impl.VCardTemp.*;
 
 /**
  * Describe class VCardTemp here.
- * <p>
- * <p>
+ * <br>
  * Created: Thu Oct 19 23:37:23 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -65,7 +64,6 @@ import static tigase.xmpp.impl.VCardTemp.*;
 public class VCardTemp
 		extends VCardXMPPProcessorAbstract {
 
-	/** Field description */
 	public static final String VCARD_KEY = "vCard";
 	// VCARD element is added to support old vCard protocol where element
 	// name was all upper cases. Now the plugin should catch both cases.

@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 /**
  * Class <code>ConfigXMLRepository</code> provides access to configuration settings.
- * <p>
+ * <br>
  * <p> Created: Sat Nov 13 18:53:21 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -46,16 +46,12 @@ import java.util.logging.Logger;
 public class ConfigXMLRepository
 		extends ConfigurationCache {
 
-	/** Field description */
 	public static final String COMPONENT_NODE = "component";
 
-	/** Field description */
 	public static final String ROOT_NODE = "tigase-config";
 
-	/** Field description */
 	public static final String XMPP_CONFIG_FILE_PROPERTY_KEY = "xmpp.config.file";
 
-	/** Field description */
 	public static final String XMPP_CONFIG_FILE_PROPERTY_VAL = "xmpp_server.xml";
 	private static final Logger log = Logger.getLogger("tigase.conf.ConfigRepository");
 	private static Map<String, ConfigXMLRepository> configs = new LinkedHashMap<String, ConfigXMLRepository>();

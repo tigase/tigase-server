@@ -41,8 +41,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SocketThread here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Jan 30 12:01:17 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -51,7 +50,6 @@ import java.util.logging.Logger;
 public class SocketThread
 		implements Runnable {
 
-	/** Field description */
 	public static final int DEF_MAX_THREADS_PER_CPU = 8;
 	private static final Logger log = Logger.getLogger(SocketThread.class.getName());
 	private static final int MAX_EMPTY_SELECTIONS = 10;

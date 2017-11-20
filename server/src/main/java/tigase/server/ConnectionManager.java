@@ -58,8 +58,7 @@ import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
 
 /**
  * Describe class ConnectionManager here.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Jan 22 22:52:58 2006
  *
  * @param <IO>
@@ -71,104 +70,66 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		extends AbstractMessageReceiver
 		implements XMPPIOServiceListener<IO>, RegistrarBean {
 
-	/** Field description */
 	public static final String HT_TRAFFIC_THROTTLING_PROP_KEY = "--cm-ht-traffic-throttling";
 
-	/** Field description */
 	public static final String HT_TRAFFIC_THROTTLING_PROP_VAL = "xmpp:50k:0:disc,bin:400m:0:disc";
 
-	/** Field description. */
 	public static final String NET_BUFFER_HT_PROP_KEY = "--net-buff-high-throughput";
 
-	/** Field description. */
 	public static final String NET_BUFFER_ST_PROP_KEY = "--net-buff-standard";
 
-	/** Field description. */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 
-	/** Field description */
 	public static final String ST_TRAFFIC_THROTTLING_PROP_KEY = "--cm-traffic-throttling";
 
-	/** Field description */
 	public static final String ST_TRAFFIC_THROTTLING_PROP_VAL = "xmpp:2500:0:disc,bin:20m:0:disc";
 
-	/** Field description */
 	public static final String TRAFFIC_THROTTLING_PROP_KEY = "traffic-throttling";
 	/**
 	 * Key name of the system property for configuration protection from system overload and DOS attack.
 	 */
 	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY = "elements-number-limit";
-	/** Field description */
 	protected static final long LAST_MINUTE_BIN_LIMIT_PROP_VAL = 20000000L;
-	/** Field description */
 	protected static final long LAST_MINUTE_PACKETS_LIMIT_PROP_VAL = 2500L;
-	/** Field description */
 	protected static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
-	/** Field description */
 	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
-	/** Field description */
 	protected static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
-	/** Field description */
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
-	/** Field description */
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
-	/** Field description */
 	protected static final int NET_BUFFER_LIMIT_HT_PROP_VAL = 20 * 1024 * 1024;
-	/** Field description */
 	protected static final String NET_BUFFER_LIMIT_PROP_KEY = "net-buffer-limit";
-	/** Field description */
 	protected static final int NET_BUFFER_LIMIT_ST_PROP_VAL = 2 * 1024 * 1024;
-	/** Field description */
 	protected static final String PORT_CLASS_PROP_KEY = "class";
-	/** Field description */
 	protected static final String PORT_IFC_PROP_KEY = "ifc";
 	protected static final String PORT_LISTENING_DELAY_KEY = "port-delay-listening";
 	protected static final boolean PORT_LISTENING_DELAY_DEF = false;
-	/** Field description */
 	protected static final String PORT_KEY = "port-no";
 	protected static final String PORT_NEW_CONNECTIONS_THROTTLING_KEY = "new-connections-throttling";
-	/** Field description */
 	protected static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
-	/** Field description */
 	protected static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
-	/** Field description */
 	protected static final String PORT_SOCKET_PROP_KEY = "socket";
-	/** Field description */
 	protected static final String PORT_TYPE_PROP_KEY = "type";
-	/** Field description */
 	protected static final String PROP_KEY = "connections/";
-	/** Field description */
 	protected static final long TOTAL_BIN_LIMIT_PROP_VAL = 0L;
-	/** Field description */
 	protected static final long TOTAL_PACKETS_LIMIT_PROP_VAL = 0L;
-	/** Field description */
 	protected static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
-	/** Field description */
 	protected static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
-	/** Field description */
 	protected static final boolean XMPP_ACK_PROP_VAL = false;
-	/** Field description */
 	protected static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
-	/** Field description */
 	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
 	protected static final String WATCHDOG_DELAY = "watchdog_delay";
 	protected static final String WATCHDOG_TIMEOUT = "watchdog_timeout";
 	protected static final String WATCHDOG_PING_TYPE_KEY = "watchdog_ping_type";
 
-//	/** Field description */
-//	protected static final boolean TLS_USE_PROP_VAL = true;
+////	protected static final boolean TLS_USE_PROP_VAL = true;
 //	//J-
-//	/** Field description */
-//	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
+////	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
 //
-//	/** Field description */
-//	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
+////	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
 //
-//	/** Field description */
-//	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
+////	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
 //
-//	/** Field description */
-//	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
+////	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 	protected static final Element pingElement = new Element("iq", new Element[]{
 			new Element("ping", new String[]{"xmlns"}, new String[]{"urn:xmpp:ping"})}, new String[]{"type", "id"},
 															 new String[]{"get", "tigase-ping"});
@@ -195,10 +156,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 */
 	public static int ELEMENTS_NUMBER_LIMIT_PROP_VAL = 1000;
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
-	/** Field description. */
 	@ConfigField(desc = "Interfaces to listen on", alias = PORT_IFC_PROP_KEY)
 	public String[] PORT_IFC_PROP_VAL = {"*"};
-	/** Field description */
 	@ConfigField(desc = "Delay before connection is established")
 	protected long connectionDelay = 2 * SECOND;
 	protected boolean delayPortListening = PORT_LISTENING_DELAY_DEF;
@@ -209,7 +168,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@ConfigField(desc = "Limit of elements for single XMPP stanza", alias = ELEMENTS_NUMBER_LIMIT_PROP_KEY)
 	protected int elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
 	protected Kernel kernel;
-	/** Field description */
 	@ConfigField(desc = "Default size of a network buffer", alias = "net-buffer")
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 	@Inject(nullAllowed = true)

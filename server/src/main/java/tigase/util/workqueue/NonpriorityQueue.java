@@ -41,9 +41,7 @@ public class NonpriorityQueue<E>
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public NonpriorityQueue() {
 	}
 

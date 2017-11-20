@@ -42,8 +42,7 @@ import java.util.logging.Logger;
 
 /**
  * Implementation of JEP-030.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Mar 27 20:45:36 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

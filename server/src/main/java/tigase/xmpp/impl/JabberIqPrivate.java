@@ -44,8 +44,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class JabberIqPrivate here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Apr 16 08:28:18 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

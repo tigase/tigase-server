@@ -38,7 +38,7 @@ import java.util.Optional;
  * DummyRepository is a class with all methods empty. They don't return anything and they don't throw exception.
  * SessionManager requires a user repository to work properly but in some installations there is no need for user
  * repository as authentication is done through external data source and user roster is pulled dynamically.
- * <p>
+ * <br>
  * Created: Sat Nov  3 16:17:03 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -66,7 +66,7 @@ public class DummyRepository
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
 	 *
 	 * @return a <code>String</code> value of null always.
@@ -78,7 +78,7 @@ public class DummyRepository
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
 	 *
 	 * @return a <code>String</code> value of null always.
@@ -90,7 +90,7 @@ public class DummyRepository
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
 	 *
 	 * @return a <code>String</code> value of null always.

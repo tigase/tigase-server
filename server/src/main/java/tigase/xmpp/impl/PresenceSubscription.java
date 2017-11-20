@@ -86,9 +86,9 @@ public class PresenceSubscription
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * Performs processing of <em>presence</em> packets and calls different methods for particular {@link PresenceType}
 	 */
 	@SuppressWarnings({"unchecked", "fallthrough"})
@@ -243,7 +243,7 @@ public class PresenceSubscription
 
 	/**
 	 * Method is responsible for processing incoming subscription request (i.e. in the receivers session manager).
-	 * <p>
+	 * <br>
 	 * If the contact is already subscribed the an auto-reply with type='subscribded' is sent, otherwise contact is
 	 * added to the roster (if it's missing/there is no current subscription), sets the subscription type to {@code
 	 * PresenceType.in_subscribe} and subsequently broadcast presence update to all connected resources.
@@ -304,7 +304,7 @@ public class PresenceSubscription
 
 	/**
 	 * Method is responsible for processing incoming subscribed presence (i.e. in the receivers session manager).
-	 * <p>
+	 * <br>
 	 * Contact is added to the roster (if it's missing/there is no current subscription), sets the subscription type to
 	 * {@code PresenceType.in_subscribed} and subsequently, if subscription has changed,forwards the presence to user
 	 * resource connection as well as broadcast presence update to all connected resources.
@@ -354,7 +354,7 @@ public class PresenceSubscription
 
 	/**
 	 * Method is responsible for processing incoming unsubscribe presence (i.e. in the receivers session manager).
-	 * <p>
+	 * <br>
 	 * First method performs update of subscription of the given contact and subsequently the request is forwarded to
 	 * the client to make sure it says in synch with the server (in case there was actual change in subscription).
 	 * Lastly a roster push is generated to all connected resources to update them with current state of the roster and
@@ -406,7 +406,7 @@ public class PresenceSubscription
 
 	/**
 	 * Method is responsible for processing incoming unsubscribed presence (i.e. in the receivers session manager).
-	 * <p>
+	 * <br>
 	 * First method checks for the current subscription of the contact and if this verifies performs subsequent actions
 	 * such as forwarding presence to the user connection to make sure it says in synch with the server, updates contact
 	 * subscription with {@code PresenceType.in_unsubscribed} and in case that there was a change in user subscription
@@ -465,11 +465,11 @@ public class PresenceSubscription
 	/**
 	 * Method is responsible for processing outgoing subscribe and unsubscribe presence (i.e. in the sender session
 	 * manager).
-	 * <p>
+	 * <br>
 	 * Presence packet is forwarded to the destination with the JID stripped from the resource. <p>In case of {@code
 	 * PresenceType.out_subscribe} packet type contact is added to the roster (in case it was missing), a subscription
 	 * state is being updated and, in case there was a change, a roster push is being sent to all user resources.
-	 * <p>
+	 * <br>
 	 * In case of {@code PresenceType.out_unsubscribe} method updates contact subscription (and generates roster push if
 	 * there was a change) and if the resulting contact subscription is NONE then contact is removed from the roster.
 	 *
@@ -532,7 +532,7 @@ public class PresenceSubscription
 	/**
 	 * Method is responsible for processing outgoing subscribed and unsubscribed presence (i.e. in the sender session
 	 * manager).
-	 * <p>
+	 * <br>
 	 * Presence packet is forwarded to the destination with the JID stripped from the resource, a subscription state is
 	 * being updated and, in case there was a change, a roster push is being sent to all user resources. Also, in case
 	 * of presence type out_subscribed server send current presence to the user from each of the contact's available

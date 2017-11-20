@@ -58,8 +58,6 @@ public abstract class ConfiguratorAbstract
 		implements RepositoryChangeListenerIfc<ConfigItem>, StatisticsContainer {
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -67,40 +65,30 @@ public abstract class ConfiguratorAbstract
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--tigase-config-repo-class";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
 
-	/** Field description */
 	public static final String INIT_PROPERTIES_MAP_BIND = "initProperties";
-	/** Field description */
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
 	public static final String PROPERTY_FILENAME_PROP_DEF = "etc/init.properties";
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = RepositoryFactory.USER_DOMAIN_POOL_CLASS_PROP_KEY;
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -108,7 +96,6 @@ public abstract class ConfiguratorAbstract
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory.USER_DOMAIN_POOL_CLASS_PROP_VAL;
 	public static final String LOGGING_KEY = "logging/";
 	private static final Logger log = Logger.getLogger(ConfiguratorAbstract.class.getName());
-	/** Field description */
 	public static String logManagerConfiguration = null;
 	private static MonitoringSetupIfc monitoring = null;
 

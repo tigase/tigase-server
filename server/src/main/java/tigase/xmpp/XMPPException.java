@@ -22,7 +22,7 @@ package tigase.xmpp;
 /**
  * Base exception type used for other eceptions defined for <em>XMPP</em> protocol. This type and all descendants are
  * thrown by this package runtime.
- * <p>
+ * <br>
  * <p> Created: Sat Oct 30 08:38:18 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

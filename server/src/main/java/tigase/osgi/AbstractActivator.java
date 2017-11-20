@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 /**
  * Common activator which should be extended by any OSGi module which will be used by Tigase XMPP Server in OSGi mode.
- * <p>
+ * <br>
  * Created by andrzej on 08.09.2016.
  */
 public abstract class AbstractActivator

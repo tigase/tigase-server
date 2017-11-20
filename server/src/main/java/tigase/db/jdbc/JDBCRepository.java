@@ -45,38 +45,29 @@ import java.util.logging.Logger;
 public class JDBCRepository
 		implements AuthRepository, UserRepository, DataSourceAware<DataRepository>, RepositoryVersionAware {
 
-	/** Field description */
 	public static final String CURRENT_DB_SCHEMA_VER = "8.0.0";
 
-	/** Field description */
 	public static final String DEF_MAXIDS_TBL = "tig_max_ids";
 
-	/** Field description */
 	public static final String DEF_NODES_TBL = "tig_nodes";
 
-	/** Field description */
 	public static final String DEF_PAIRS_TBL = "tig_pairs";
 
-	/** Field description */
 	public static final String DEF_ROOT_NODE = "root";
 
-	/** Field description */
 	public static final String DEF_USERS_TBL = "tig_users";
 
-	/** Field description */
 	public static final String DERBY_GETSCHEMAVER_QUERY = "values TigGetDBProperty('schema-version')";
 
 	/**
 	 * Stored procedure used to check version of the schema
-	 * <p>
+	 * <br>
 	 * neither MS SQL Server JDBC driver supports default schema prefix in connection string for stored functions
 	 */
 	public static final String SQLSERVER_GETSCHEMAVER_QUERY = "select dbo.TigGetDBProperty('schema-version')";
 
-	/** Field description */
 	public static final String JDBC_GETSCHEMAVER_QUERY = "select TigGetDBProperty('schema-version')";
 
-	/** Field description */
 	public static final String SCHEMA_UPGRADE_LINK = "Administration Guide > Tigase Server Schema v8.0 Updates (available locally in docs directory and online http://docs.tigase.org)";
 	private static final String ADD_NODE_QUERY = "{ call TigAddNode(?, ?, ?) }";
 	private static final String ADD_USER_PLAIN_PW_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
@@ -1207,13 +1198,7 @@ public class JDBCRepository
 	private class RepoCache
 			extends SimpleCache<String, Object> {
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param maxsize
-		 * @param cache_time
-		 */
-		public RepoCache(int maxsize, long cache_time) {
+				public RepoCache(int maxsize, long cache_time) {
 			super(maxsize, cache_time);
 		}
 

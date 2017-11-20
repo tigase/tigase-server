@@ -45,32 +45,32 @@ import java.util.logging.Logger;
  * string is not enough to deal with the virtual host. VHost can be enabled/disabled. Can be available to selected
  * server components only and so on. Therefore every time there is a detailed information needed for a vhost this
  * classed must be used.
- * <p>
+ * <br>
  * This class has it's own XML representation which can be used for creating an instance of the class or can be exported
  * to the XML form for permanent storage:
- * <p>
+ * <br>
  * {@code <vhost hostname="vhost.something.com" enabled="true" anon="true" register="true" max-users="99999999999L">
  * <comps/> <other/> }
- * <p>
+ * <br>
  * From the init.property file it is also possible to set additional parameters for the vhost. By default everything is
  * enabled and max accounts set to unlimited. In the example below we configure 2 domains:
  * <strong>devel.tigase.org</strong> and <strong>test.tigase.org</strong>. For the first domain there are no additional
  * settings, hence the domain has everything on by default, whereas the second has everything switched off and max user
  * accounts set to 100.
- * <p>
+ * <br>
  * <pre>
  * --virt-hosts = devel.tigase.org,test.tigase.org:-anon:-register:max-users=100
  * </pre>
- * <p>
+ * <br>
  * It also possible to set forwarding for the domain:
- * <p>
+ * <br>
  * <pre>
  * --virt-hosts = test.tigase.org:pres-forw=lpart@domain/res:mess-forw=lpart@domain/res
  * </pre>
- * <p>
+ * <br>
  * Please note, forwarding address set this way cannot contain any of characters: [,:=] The order features are set for
  * domain is unimportant.
- * <p>
+ * <br>
  * Created: 22 Nov 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -84,14 +84,12 @@ public class VHostItem
 	 * This is an attribute name for storing information whether anonymous user can login for this domain.
 	 */
 	public static final String ANONYMOUS_ENABLED_ATT = "anon";
-	/** Field description */
 	public static final String ANONYMOUS_ENABLED_LABEL = "Anonymous enabled";
 	/**
 	 * List of SASL mechanisms allowed for domain
 	 */
 	public static final String SASL_MECHANISM_ATT = "sasl-mechanisms";
 	public static final String SASL_MECHANISM_LABEL = "Allowed SASL mechanisms";
-	/** Field description */
 	public static final String COMPONENTS_ATT = "comps";
 	/**
 	 * Element name for the VHostItem XML child keeping list of the server component which can handle packets for this
@@ -102,104 +100,67 @@ public class VHostItem
 	 * This is an attribute name for storing information on which ports VHost should be enabled.
 	 */
 	public static final String C2S_PORTS_ALLOWED_ATT = "c2s-ports-allowed";
-	/** Field description */
 	public static final String C2S_PORTS_ALLOWED_LABEL = "Allowed C2S,BOSH,WebSocket ports";
-	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_ATT = "domain-filter";
-	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_DOMAINS_ATT = "domain-filter-domains";
-	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_LABEL = "Domain filter policy";
-	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_DOMAINS_LABEL = "Domain filter domains (only LIST and BLACKLIST)";
 	/**
 	 * This is an attribute name for storing information whether the VHost is enabled or disabled.
 	 */
 	public static final String ENABLED_ATT = "enabled";
-	/** Field description */
 	public static final String ENABLED_LABEL = "Enabled";
 	/**
 	 * This is an attribute name for storing the VHost name.
 	 */
 	public static final String HOSTNAME_ATT = "hostname";
-	/** Field description */
 	public static final String HOSTNAME_LABEL = "Domain name";
 	/**
 	 * This is an attribute name for storing the maximum number of users for this virtual domain.
 	 */
 	public static final String MAX_USERS_NUMBER_ATT = "max-users";
-	/** Field description */
 	public static final String MAX_USERS_NUMBER_LABEL = "Max users";
-	/** Field description */
 	public static final String MESSAGE_FORWARD_ADDRESS_ATT = "mess-forw";
-	/** Field description */
 	public static final String MESSAGE_FORWARD_ADDRESS_LABEL = "Message forward address";
 	/**
 	 * Element name for the VHostItem XML child keeping all the extra parameters for the domain. This is a container for
 	 * future extensions and parameters which are not defined yet.
 	 */
 	public static final String OTHER_PARAMS_ELEM = "other";
-	/** Field description */
 	public static final String OTHER_PARAMS_LABEL = "Other parameters";
-	/** Field description */
 	public static final String PRESENCE_FORWARD_ADDRESS_ATT = "pres-forw";
-	/** Field description */
 	public static final String PRESENCE_FORWARD_ADDRESS_LABEL = "Presence forward address";
 	/**
 	 * This is an attribute name for storing information whether user registration is allowed for this domain.
 	 */
 	public static final String REGISTER_ENABLED_ATT = "register";
-	/** Field description */
 	public static final String REGISTER_ENABLED_LABEL = "In-band registration";
-	/** Field description */
 	public static final String S2S_SECRET_ATT = "s2s-secret";
-	/** Field description */
 	public static final String S2S_SECRET_LABEL = "S2S secret";
-	/** Field description */
 	public static final String TLS_REQUIRED_ATT = "tls-required";
-	/** Field description */
 	public static final String TLS_REQUIRED_LABEL = "TLS required";
-	/** Field description */
 	public static final String TRUSTED_JIDS_ATT = "trusted-jids";
 	/**
 	 * Element name to for the VHostItem XML storage.
 	 */
 	public static final String VHOST_ELEM = "vhost";
-	/** Field description */
 	protected static final String DOMAIN_FILTER_POLICY_PROP_KEY = "domain-filter-policy";
-	/** Field description */
 	protected static final String S2S_SECRET_PROP_DEF = null;
-	/** Field description */
 	protected static final String S2S_SECRET_PROP_KEY = "s2s-secret";
-	/** Field description */
 	protected static final String VHOST_ANONYMOUS_ENABLED_PROP_KEY = "vhost-anonymous-enabled";
-	/** Field description */
 	protected static final Boolean VHOST_ANONYMOUS_ENABLED_PROP_DEF = Boolean.TRUE;
-	/** Field description */
 	protected static final String VHOST_MAX_USERS_PROP_KEY = "vhost-max-users";
-	/** Field description */
 	protected static final Long VHOST_MAX_USERS_PROP_DEF = Long.valueOf(0l);
-	/** Field description */
 	protected static final String VHOST_MESSAGE_FORWARD_PROP_DEF = null;
-	/** Field description */
 	protected static final String VHOST_MESSAGE_FORWARD_PROP_KEY = "vhost-message-forward-jid";
-	/** Field description */
 	protected static final String VHOST_PRESENCE_FORWARD_PROP_DEF = null;
-	/** Field description */
 	protected static final String VHOST_PRESENCE_FORWARD_PROP_KEY = "vhost-presence-forward-jid";
-	/** Field description */
 	protected static final String VHOST_REGISTER_ENABLED_PROP_KEY = "vhost-register-enabled";
-	/** Field description */
 	protected static final Boolean VHOST_REGISTER_ENABLED_PROP_DEF = Boolean.TRUE;
-	/** Field description */
 	protected static final String VHOST_TLS_REQUIRED_PROP_KEY = "vhost-tls-required";
-	/** Field description */
 	protected static final Boolean VHOST_TLS_REQUIRED_PROP_DEF = Boolean.FALSE;
-	/** Field description */
 	protected static final DomainFilterPolicy DOMAIN_FILTER_POLICY_PROP_DEF = DomainFilterPolicy.ALL;
-	/** Field description */
 	protected static final String[] VHOST_OTHER_PARAMS_PATH = {VHOST_ELEM, OTHER_PARAMS_ELEM};
-	/** Field description */
 	protected static final String[] VHOST_COMPONENTS_PATH = {VHOST_ELEM, COMPONENTS_ELEM};
 	protected static final Map<String, DataType> dataTypes = new ConcurrentHashMap<String, DataType>();
 	private static final Logger log = Logger.getLogger(VHostItem.class.getName());
@@ -659,9 +620,9 @@ public class VHostItem
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * The method exports the <code>VHostItem</code> object to XML representation.
 	 *
 	 * @return an <code>Element</code> object with VHost information.

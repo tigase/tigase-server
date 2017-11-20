@@ -68,13 +68,10 @@ public class PresenceState
 
 	public static final String EXTENDED_PRESENCE_PROCESSORS_KEY = "extended-presence-processors";
 
-	/** Field description */
 	public static final String OFFLINE_BUD_SENT = "offline-bud-sent";
 
-	/** Field description */
 	public static final String OFFLINE_RES_SENT = "offline-res-sent";
 
-	/** Field description */
 	public static final String OFFLINE_ROSTER_LAST_SEEN_PROP_KEY = "offline-roster-last-seen";
 
 	/**
@@ -341,9 +338,9 @@ public class PresenceState
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * Performs processing of <em>presence</em> packets and calls different methods for particular {@link PresenceType}
 	 */
 	@SuppressWarnings({"unchecked", "fallthrough"})
@@ -593,7 +590,7 @@ public class PresenceState
 
 	/**
 	 * Method is responsible for processing incoming initial presence (i.e. in the receivers session manager).
-	 * <p>
+	 * <br>
 	 * It validates the packet (whether from is present or if it's a direct presence to existing resource) and
 	 * subsequently set received presence for the contact that sent it.
 	 *
@@ -685,7 +682,7 @@ public class PresenceState
 
 	/**
 	 * Method is responsible for processing incoming presence probe (i.e. in the receivers session manager).
-	 * <p>
+	 * <br>
 	 * It validates whether the packet comes from a contact that has correct subscription and responds with presence of
 	 * all user's resources presences.
 	 *
@@ -791,14 +788,14 @@ public class PresenceState
 
 	/**
 	 * Method is responsible for processing outgoing initial presence (i.e. in the sender session manager).
-	 * <p>
+	 * <br>
 	 * Process packet accordingly whether it's a direct presence (forward it, add to proper collection of JIDs to which
 	 * a direct presence has been sent) or regular presence. THe latter causes properly address the packet, store
 	 * presence within session data for subsequent use, and for the first availability presence (in case there is no
 	 * prior presence stored in user session data) server sends probes to all contacts and pushes out all pending
 	 * subscription request or (if there i already presence stored in session data) broadcast presence update to
 	 * contacts.
-	 * <p>
+	 * <br>
 	 * If there is a JID forwarding set up, presence is also forwarded to configured JID.
 	 *
 	 * @param packet packet is which being processed.

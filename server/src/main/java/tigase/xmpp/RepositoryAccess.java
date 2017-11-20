@@ -42,8 +42,7 @@ import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
 
 /**
  * Describe class RepositoryAccess here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Oct 24 10:38:41 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -51,10 +50,8 @@ import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
  */
 public abstract class RepositoryAccess {
 
-	/** Field description */
 	protected static final String NO_ACCESS_TO_REP_MSG = "Can not access user repository.";
 
-	/** Field description */
 	protected static final String NOT_AUTHORIZED_MSG = "Session has not been yet authorised.";
 	private static final String ANONYMOUS_MECH = "ANONYMOUS";
 
@@ -67,17 +64,14 @@ public abstract class RepositoryAccess {
 
 	// ~--- fields ---------------------------------------------------------------
 
-	/** Field description */
 	protected AuthRepository authRepo = null;
 	/**
 	 * Current authorization state - initialy session i <code>NOT_AUTHORIZED</code>. It becomes <code>AUTHORIZED</code>
 	 */
 	protected Authorization authState = Authorization.NOT_AUTHORIZED;
-	/** Field description */
 	protected VHostItem domain = null;
 
 	// private boolean anon_allowed = false;
-	/** Field description */
 	protected boolean is_anonymous = false;
 	/**
 	 * Handle to user repository - permanent data base for storing user data.
@@ -654,17 +648,17 @@ public abstract class RepositoryAccess {
 	 * stored in root user node. This has exactly the same effect as you call <code>setData(String, String)</code>. If
 	 * you want to store data in different node you must just specify node path like you do it to directory on most file
 	 * systems:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * /roster
 	 * </pre>
-	 * <p>
+	 * <br>
 	 * Or, if you need access deeper node:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * /just/like/path/to/file
 	 * </pre>
-	 * <p>
+	 * <br>
 	 * <br> If given node does not yet exist it will be automaticaly created with all nodes in given path so there is no
 	 * need for developer to perform additional action to create node. There is, however method
 	 * <code>removeDataGroup(String)</code> for deleting specified node as nodes are not automaticaly deleted.

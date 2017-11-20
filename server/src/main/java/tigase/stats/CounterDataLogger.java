@@ -64,7 +64,6 @@ public class CounterDataLogger
 	 */
 	public static final String CPU_USAGE_COL = "cpu_usage";
 
-	/** Field description */
 	public static final String DB_URL_PROP_KEY = "db-url";
 
 	/**
@@ -122,7 +121,6 @@ public class CounterDataLogger
 	 */
 	public static final String SM_PACKETS_COL = "sm_packets";
 
-	/** Field description */
 	public static final String STATS_TABLE = "tig_stats_log";
 
 	/**

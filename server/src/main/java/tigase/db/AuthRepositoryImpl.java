@@ -41,8 +41,7 @@ import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 
 /**
  * Describe class AuthRepositoryImpl here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Nov 11 21:46:50 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -52,9 +51,7 @@ public class AuthRepositoryImpl
 		implements AuthRepository {
 
 	public static final String ACCOUNT_STATUS_KEY = "account_status";
-	/** Field description */
 	protected static final Logger log = Logger.getLogger("tigase.db.UserAuthRepositoryImpl");
-	/** Field description */
 	protected static final String DISABLED_KEY = "disabled";
 	protected static final String PASSWORD_KEY = "password";
 	private static final String[] non_sasl_mechs = {"password", "digest"};

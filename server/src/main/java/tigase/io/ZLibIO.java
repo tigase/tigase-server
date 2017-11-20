@@ -45,7 +45,6 @@ import java.util.logging.Logger;
 public class ZLibIO
 		implements IOInterface {
 
-	/** Field description */
 	public static final String ZLIB_CAPS = "zlib-caps";
 
 	/**
@@ -60,12 +59,6 @@ public class ZLibIO
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param ioi
-	 * @param level
-	 */
 	public ZLibIO(final IOInterface ioi, final int level) {
 		this.io = ioi;
 		zlib = new ZLibWrapper();

@@ -28,10 +28,10 @@ import java.util.List;
 
 /**
  * Interface XMPPService
- * <p>
+ * <br>
  * Objects which implement this interface can respond to "ServiceDiscovery" requests. All such requests are managed by
  * MessageRouter instance.
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

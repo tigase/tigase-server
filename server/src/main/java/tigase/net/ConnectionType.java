@@ -21,8 +21,7 @@ package tigase.net;
 
 /**
  * Describe class ConnectionType here.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Feb  5 09:26:44 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

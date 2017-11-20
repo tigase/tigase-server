@@ -24,8 +24,7 @@ import java.nio.channels.SocketChannel;
 
 /**
  * Describe interface Accept here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat May 14 07:00:16 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -58,8 +58,7 @@ import static tigase.server.MessageRouterConfig.DISCO_SHOW_VERSION_PROP_VAL;
 
 /**
  * Class MessageRouter
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

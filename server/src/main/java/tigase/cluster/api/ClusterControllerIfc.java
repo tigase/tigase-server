@@ -36,7 +36,6 @@ import java.util.Set;
  */
 public interface ClusterControllerIfc {
 
-	/** Field description */
 	public static final String DELIVER_CLUSTER_PACKET_CMD = "deliver-cluster-packet-cmd";
 
 	//~--- methods --------------------------------------------------------------

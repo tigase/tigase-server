@@ -61,14 +61,7 @@ public class NonAuthUserRepositoryImpl
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param userRep
-	 * @param defDomain
-	 * @param autoCreateOffline
-	 */
-	public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain, boolean autoCreateOffline) {
+		public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain, boolean autoCreateOffline) {
 		rep = userRep;
 		this.defDomain = defDomain;
 		this.autoCreateOffline = autoCreateOffline;

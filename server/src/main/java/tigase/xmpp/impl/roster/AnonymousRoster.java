@@ -34,8 +34,7 @@ import java.util.Set;
 
 /**
  * Describe class AnonymousRoster here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Apr 22 21:41:46 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -26,7 +26,7 @@ import tigase.kernel.core.Kernel;
 
 /**
  * Abstract class providing base part for implementation of pool for multiple domains.
- * <p>
+ * <br>
  * Created by andrzej on 08.03.2016.
  */
 public abstract class MDPoolBean<S, T extends MDPoolConfigBean<S, T>>

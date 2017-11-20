@@ -22,8 +22,7 @@ package tigase.xmpp;
 
 /**
  * Describe class PacketErrorTypeException here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -45,12 +44,6 @@ public class PacketErrorTypeException
 		super(message);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param message
-	 * @param cause
-	 */
 	public PacketErrorTypeException(String message, Throwable cause) {
 		super(message, cause);
 	}

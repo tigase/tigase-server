@@ -44,10 +44,8 @@ import java.util.logging.Logger;
 public class ConfigurationCache
 		implements ConfigRepositoryIfc {
 
-	/** Field description */
 	public static final String CONFIG_DUMP_FILE_PROP_DEF = "etc/config-dump.properties";
 
-	/** Field description */
 	public static final String CONFIG_DUMP_FILE_PROP_KEY = "config-dump-file";
 
 	/**

@@ -47,7 +47,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public interface SessionManagerClusteredIfc
 		extends SessionManagerHandler {
 
-	/** Field description */
 	public static final String SESSION_FOUND_KEY = "user-session-found-key";
 
 	//~--- methods --------------------------------------------------------------

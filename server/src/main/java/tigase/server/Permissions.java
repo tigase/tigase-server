@@ -21,8 +21,7 @@ package tigase.server;
 
 /**
  * Describe class Permissions here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Jan 23 22:52:45 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

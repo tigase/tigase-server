@@ -34,8 +34,7 @@ import java.nio.channels.SocketChannel;
 
 /**
  * Describe interface IOInterface here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat May 14 08:07:38 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

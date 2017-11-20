@@ -48,25 +48,25 @@ import java.util.logging.Logger;
  * component on one of the cluster nodes and put the virtual component on all other nodes. With proper configuration
  * they pretend to be the component returning a correct service disco information and forward all packets for this
  * component to a cluster node with real component running.
- * <p>
+ * <br>
  * This is a very lightweight implementation which doesn't use much resources either memory or CPU.
- * <p>
+ * <br>
  * It can work well for any kind of a component: MUC, PubSub, transport either native Tigase components or third-party
  * components connected via XEP-0114 - external protocol component.
- * <p>
+ * <br>
  * Basic configuration parameters are actually the same as for a real component. You set a real component name as a name
  * for the virtual component and a vritual component class name to load. Let's say we want to deploy MUC component this
  * way. The MUC component is visible as <code>muc.domain.our</code> in our installation. Thus the name of the component
  * is: <code>muc</code>:
- * <p>
+ * <br>
  * <pre>
  * --comp-name-1=muc
  * --comp-class-1=tigase.cluster.VirtualComponent
  * </pre>
- * <p>
+ * <br>
  * This is pretty much all you need to load a virtual component. A few other options are needed to point to correct
  * destination addresses for forwarded packets and to set correct service discovery parameters:
- * <p>
+ * <br>
  * <pre>
  * muc/redirect-to=muc@cluster-node-with-real-muc.domain.our
  * muc/disco-name=Multi User Chat
@@ -76,7 +76,7 @@ import java.util.logging.Logger;
  * muc/disco-features=http://jabber.org/protocol/muc
  * muc/fixed-domain=example.com
  * </pre>
- * <p>
+ * <br>
  * Above options set all possible parameters to setup virtual MUC component. Created: Dec 13, 2008 7:44:35 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -90,7 +90,6 @@ public class VirtualComponent
 	 */
 	public static final String DISCO_CATEGORY_PROP_KEY = "disco-category";
 
-	/** Field description */
 	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
 
 	/**
@@ -99,7 +98,6 @@ public class VirtualComponent
 	 */
 	public static final String DISCO_FEATURES_PROP_KEY = "disco-features";
 
-	/** Field description */
 	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
 
 	/**
@@ -108,7 +106,6 @@ public class VirtualComponent
 	 */
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";
 
-	/** Field description */
 	public static final String DISCO_NAME_PROP_VAL = "Multi User Chat";
 
 	/**
@@ -117,7 +114,6 @@ public class VirtualComponent
 	 */
 	public static final String DISCO_NODE_PROP_KEY = "disco-node";
 
-	/** Field description */
 	public static final String DISCO_NODE_PROP_VAL = "";
 
 	/**

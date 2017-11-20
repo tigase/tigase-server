@@ -54,8 +54,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class VHostManager here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Nov 21 14:28:20 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -67,7 +66,6 @@ public class VHostManager
 		extends AbstractComponentRegistrator<VHostListener>
 		implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
 
-	/** Field description */
 	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

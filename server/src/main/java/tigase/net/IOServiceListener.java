@@ -28,8 +28,7 @@ import java.io.IOException;
 
 /**
  * Describe interface IOServiceListener here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Jan 30 22:37:51 2006
  *
  * @param <IO>

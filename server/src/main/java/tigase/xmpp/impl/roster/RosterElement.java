@@ -35,14 +35,13 @@ import java.util.logging.Logger;
 
 /**
  * Describe class RosterElement here.
- * <p>
+ * <br>
  * Created: Wed Oct 29 14:21:16 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class RosterElement {
 
-	/** Field description */
 	protected static final long INITIAL_LAST_SEEN_VAL = 1000l;
 	private static final String ACTIVITY_ATT = "activity";
 	private static final String ELEM_NAME = "contact";

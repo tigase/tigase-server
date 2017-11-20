@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * XEP-0191: Blocking Command. Based on privacy lists.
  *
  * @author Andrzej Wójcik
- * <p>
+ * <br>
  * Originally submitted by:
  * @author Daniele Ricci
  * @author Behnam Hatami

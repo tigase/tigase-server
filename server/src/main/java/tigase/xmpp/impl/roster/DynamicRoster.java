@@ -39,8 +39,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class DynamicRoster here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 6 11:28:10 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

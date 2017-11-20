@@ -27,7 +27,7 @@ import java.util.Date;
 /**
  * Class implements Query interface and is base implementation of query holder used by implementation of XEP-0313:
  * Message Archive Management
- * <p>
+ * <br>
  * Created by andrzej on 21.07.2016.
  */
 public class QueryImpl

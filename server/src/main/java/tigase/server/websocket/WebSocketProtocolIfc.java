@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Interface which needs to be implemented by any implemention of version of WebSocket protocol.
- * <p>
+ * <br>
  * Currently we have stable version but there were older not compatible with current so it may be that new will come in
  * future - also not compatible.
  *

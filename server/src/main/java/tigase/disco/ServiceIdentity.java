@@ -23,8 +23,7 @@ import tigase.xml.Element;
 
 /**
  * Describe class ServiceIdentity here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Feb 10 13:34:54 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

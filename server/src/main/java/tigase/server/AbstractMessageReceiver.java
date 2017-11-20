@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
  * may lead to packets reordering. When this happens and it is unacceptable for the deployment non-priority queues can
  * be used. The queues size is limited and depends on the available memory size. <br> Packets are processed by
  * <code>processPacket(Packet packet)</code> method which is concurrently called from multiple threads.
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -262,11 +262,11 @@ public abstract class AbstractMessageReceiver
 	 * same exact queue. You can tweak the packets distribution among threads by overwriting
 	 * <code>hashCodeForPacket(Packet)</code> method.<br> If there is <code>N</code> threads the packets are distributed
 	 * among thread using following logic:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * int threadNo = Math.abs(hashCodeForPacket(packet) % N);
 	 * </pre>
-	 * <p>
+	 * <br>
 	 * This is a preferred method to be used by most Tigase components. If the queues are full the component should stop
 	 * and wait for more room. The blocking methods aim to prevent from the system overloading or wasting resources for
 	 * generating packets which can't be processed anyway.
@@ -386,17 +386,17 @@ public abstract class AbstractMessageReceiver
 	 * to calculate packet's destination. If the packet's destination address matches one of the component's routing
 	 * addresses the packet is added to the component's internal input queue. <br> By default all components accept
 	 * packets addressed to the componentId and to:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * component.getName() + '@' + any virtual domain
 	 * </pre>
-	 * <p>
+	 * <br>
 	 * TODO: The future implementation most likely accept packets addressed to:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * any virtual domain + '/' + component.getName()
 	 * </pre>
-	 * <p>
+	 * <br>
 	 * instead. <br> The routings are passed as Java regular expression strings are the extra addresses accepted by the
 	 * component. In most cases this is used by the external component protocol implementations which can dynamically
 	 * change accepted addresses depending on the connected external components.
@@ -551,11 +551,11 @@ public abstract class AbstractMessageReceiver
 	 * This method decides how incoming packets are distributed among processing threads. Different components needs
 	 * different distribution to efficient use all threads and avoid packets re-ordering. <br> If there are N processing
 	 * threads, packets are distributed among threads using following code:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * int threadNo = Math.abs(hashCodeForPacket(packet) % N);
 	 * </pre>
-	 * <p>
+	 * <br>
 	 * For a PubSub component, for example, a better packets distribution would be based on the PubSub channel name, for
 	 * SM a better distribution is based on the destination address, etc....
 	 *
@@ -721,7 +721,7 @@ public abstract class AbstractMessageReceiver
 	 * operations like database access they must have <code>Level.FINEST</code> assigned and must be put inside the
 	 * level guard to prevent generating them by the system monitor. The system monitor does not collect
 	 * <code>FINEST</code> statistics. <br> Level guard code looks like the example below:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * if (list.checkLevel(Level.FINEST)) {
 	 *   // Some CPU intensive calculations or lengthy operations

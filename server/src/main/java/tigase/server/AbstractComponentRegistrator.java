@@ -35,8 +35,7 @@ import java.util.Map;
  * processed from <code>MessageRouter</code> threads via <code>processPacket(Packet packet, Queue&lt;Packet&gt;
  * results)</code> method. Hence this is important that processing implemented in extensions to the class does not take
  * long time. In particular no DB processing is expected.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 22 22:57:44 2005
  *
  * @param <E>

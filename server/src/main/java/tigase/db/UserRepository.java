@@ -31,7 +31,7 @@ import java.util.List;
  * repository on different levels like files in file systems. Instead, however of working with directories you work with
  * nodes. You can create many levels of nodes and store data on any level. It helps to organize data in more logical
  * order.
- * <p>
+ * <br>
  * <p> Created: Tue Oct 26 15:09:28 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -380,12 +380,12 @@ public interface UserRepository
 	 * Method <code>userExists</code> checks whether the user (or repository top node) exists in the database. The
 	 * method doesn't throw any exception nor it creates the user in case it is missing. It just checks whether the user
 	 * is already in the database.
-	 * <p>
+	 * <br>
 	 * Please don't overuse this method. All other methods throw <code>UserNotFoundException</code> exception in case
 	 * the user is missing for which you executed the method. The exception is thrown unless <code>userAutoCreate</code>
 	 * property is set to true. In such case the exception is never thrown and the methods are executed for given
 	 * parameters prior to creating user entry if it is missing.
-	 * <p>
+	 * <br>
 	 * Therefore this method should be used only to check whether the account exists without creating it.
 	 *
 	 * @param user a <code>BareJID</code> value

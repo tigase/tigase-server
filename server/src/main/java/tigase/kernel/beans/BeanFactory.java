@@ -24,7 +24,7 @@ import tigase.kernel.KernelException;
 
 /**
  * Interface to create factories of beans.
- * <p>
+ * <br>
  * Factory is responsible to create instance of bean and inject all dependencies!
  *
  * @param <T> type of created bean.

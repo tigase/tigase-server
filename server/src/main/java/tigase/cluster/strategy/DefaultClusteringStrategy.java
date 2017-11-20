@@ -54,19 +54,14 @@ import java.util.logging.Logger;
 public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		extends DefaultClusteringStrategyAbstract<E> {
 
-	/** Field description */
 	public static final String CONNECTION_ID = "connectionId";
 
-	/** Field description */
 	public static final String RESOURCE = "resource";
 
-	/** Field description */
 	public static final String SM_ID = "smId";
 
-	/** Field description */
 	public static final String USER_ID = "userId";
 
-	/** Field description */
 	public static final String XMPP_SESSION_ID = "xmppSessionId";
 	private static final String AUTH_TIME = "auth-time";
 	private static final String INITIAL_PRESENCE_KEY = "cluster-initial-presence";
@@ -89,9 +84,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public DefaultClusteringStrategy() {
 		super();
 		addCommandListener(new UserPresenceCommand(USER_PRESENCE_CMD));
@@ -378,11 +371,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	private class UserConnectedCommand
 			extends CommandListenerAbstract {
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param name
-		 */
 		public UserConnectedCommand(String name) {
 			super(name, Priority.CLUSTER);
 		}
@@ -442,11 +430,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	private class UserPresenceCommand
 			extends CommandListenerAbstract {
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param name
-		 */
+
 		public UserPresenceCommand(String name) {
 			super(name, Priority.CLUSTER);
 		}

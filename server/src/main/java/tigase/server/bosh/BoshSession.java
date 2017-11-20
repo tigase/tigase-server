@@ -49,8 +49,7 @@ import static tigase.server.bosh.Constants.*;
 
 /**
  * Describe class BoshSession here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Jun 5 18:07:23 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

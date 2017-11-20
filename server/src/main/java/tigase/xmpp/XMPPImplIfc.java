@@ -37,8 +37,7 @@ import java.util.Set;
 /**
  * This is a base interface for all session manager plugins. There are packet processing plugins, pre-processing,
  * post-processing and packet filters. They all have a common basic methods which are defined here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Oct 14 16:11:22 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -47,7 +46,6 @@ import java.util.Set;
 public interface XMPPImplIfc
 		extends Comparable<XMPPImplIfc> {
 
-	/** Field description */
 	public static final String CLIENT_XMLNS = "jabber:client";
 
 	//~--- methods --------------------------------------------------------------

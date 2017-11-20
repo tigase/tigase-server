@@ -36,8 +36,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshSessionCache here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Feb 25 23:54:57 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -45,16 +44,12 @@ import java.util.logging.Logger;
  */
 public class BoshSessionCache {
 
-	/** Field description */
 	public static final String DEF_ID = "";
 
-	/** Field description */
 	public static final String MESSAGE_ID = "bosh-message";
 
-	/** Field description */
 	public static final String RESOURCE_BIND_ID = "bosh-resource-bind";
 
-	/** Field description */
 	public static final String ROSTER_ID = "bosh-roster";
 	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshSessionCache");
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");

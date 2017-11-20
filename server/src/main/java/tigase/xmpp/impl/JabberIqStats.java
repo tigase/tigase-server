@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 
 /**
  * XEP-0039: Statistics Gathering. http://www.xmpp.org/extensions/xep-0039.html
- * <p>
+ * <br>
  * Created: Sat Mar 25 06:45:00 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

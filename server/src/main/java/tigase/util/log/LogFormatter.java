@@ -30,8 +30,7 @@ import java.util.logging.LogRecord;
 
 /**
  * Describe class LogFormatter here.
- * <p>
- * <p>
+ * <br>
  * Created: Thu Jan  5 22:58:02 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -40,7 +39,6 @@ import java.util.logging.LogRecord;
 public class LogFormatter
 		extends Formatter {
 
-	/** Field description */
 	public static final Map<Integer, LogWithStackTraceEntry> errors = new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
 	private static int DATE_TIME_LEN = 24;
 	private static int LEVEL_OFFSET = 12;

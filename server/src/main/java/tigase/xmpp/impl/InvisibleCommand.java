@@ -62,7 +62,6 @@ public class InvisibleCommand
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description */
 	protected RosterAbstract roster_util = getRosterUtil();
 
 	//~--- methods --------------------------------------------------------------

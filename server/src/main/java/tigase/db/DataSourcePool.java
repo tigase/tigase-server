@@ -21,11 +21,11 @@ package tigase.db;
 
 /**
  * Generic interface for all implementations of a pool of data sources.
- * <p>
+ * <br>
  * It is not required to implement and provide pool implementation. However, if underlying connection driver does not
  * contain internal connection pool and uses single connection to data storage it is highly recommended to provide
  * pooling implementation for data source to improve performance of access to data source.
- * <p>
+ * <br>
  * Created by andrzej on 09.03.2016.
  */
 public interface DataSourcePool<T extends DataSource>

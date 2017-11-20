@@ -35,8 +35,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SimpleForwarder here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Jan 13 16:58:41 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

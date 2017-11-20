@@ -43,12 +43,6 @@ public class RosterRetrievingException
 		super(message);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param message
-	 * @param cause
-	 */
 	public RosterRetrievingException(String message, Throwable cause) {
 		super(message, cause);
 	}

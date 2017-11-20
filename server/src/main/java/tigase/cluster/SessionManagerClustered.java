@@ -61,8 +61,7 @@ import java.util.logging.Logger;
 
 /**
  * Class SessionManagerClusteredOld
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -74,22 +73,16 @@ public class SessionManagerClustered
 		extends SessionManager
 		implements ClusteredComponentIfc, SessionManagerClusteredIfc {
 
-	/** Field description */
 	public static final String CLUSTER_STRATEGY_VAR = "clusterStrategy";
 
-	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 
-	/** Field description */
 	public static final String STRATEGY_CLASS_PROP_KEY = "sm-cluster-strategy-class";
 
-	/** Field description */
 	public static final String STRATEGY_CLASS_PROP_VAL = "tigase.cluster.strategy.DefaultClusteringStrategy";
 
-	/** Field description */
 	public static final String STRATEGY_CLASS_PROPERTY = "--sm-cluster-strategy-class";
 
-	/** Field description */
 	public static final int SYNC_MAX_BATCH_SIZE = 1000;
 
 	/**
@@ -240,9 +233,9 @@ public class SessionManagerClustered
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
 	 * <br>
-	 * <p>
+	 * <br>
+	 * <br>
 	 * This is a standard component method for processing packets. The method takes care of cases where the packet
 	 * cannot be processed locally, in such a case it is forwarded to another node.
 	 *
@@ -312,9 +305,9 @@ public class SessionManagerClustered
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * If the installation knows about user's JID, that he is connected to the system, then this method returns all
 	 * user's connection IDs. As an optimization we can forward packets to all user's connections directly from a single
 	 * node.

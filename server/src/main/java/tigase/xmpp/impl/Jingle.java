@@ -40,8 +40,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class Jingle here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Feb 21 23:05:34 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

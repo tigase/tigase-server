@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * consist of instances of <code>Element</code> class or instances of class extending <code>Element</code> class. To
  * receive trees built with instances of proper class user must provide <code>ElementFactory</code> implementation
  * creating instances of required <code>ELement</code> extension.
- * <p>
+ * <br>
  * <p> Created: Sat Oct  2 22:01:34 2004 </p>
  *
  * @param <RefObject>

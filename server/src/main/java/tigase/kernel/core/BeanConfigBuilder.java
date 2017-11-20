@@ -21,6 +21,7 @@
 package tigase.kernel.core;
 
 import tigase.kernel.KernelException;
+import tigase.kernel.beans.BeanFactory;
 
 import java.util.logging.Logger;
 
@@ -42,7 +43,6 @@ import java.util.logging.Logger;
  *  krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
  * }
  * </pre>
- * </p>
  */
 public class BeanConfigBuilder {
 
@@ -178,7 +178,7 @@ public class BeanConfigBuilder {
 	 *
 	 * @return {@link BeanConfigBuilder}.
 	 */
-	public BeanConfigBuilder withFactory(Class<?> beanFactoryClass) {
+	public BeanConfigBuilder withFactory(Class<? extends BeanFactory> beanFactoryClass) {
 		if (beanInstance != null) {
 			throwException(
 					new KernelException("Cannot register factory to bean '" + beanName + "' registered as instance."));

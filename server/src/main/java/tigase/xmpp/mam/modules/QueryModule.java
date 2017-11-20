@@ -37,7 +37,7 @@ import tigase.xmpp.mam.QueryParser;
 
 /**
  * Implementation of module processing requests to retrieve items using XEP-0313: Message Archive Management
- * <p>
+ * <br>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamQueryModule", active = true)

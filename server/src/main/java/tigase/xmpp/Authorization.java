@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * also by other features implementation accessing session data.<br> All defined errors comes directly from
  * <em>XMPP</em> core RFC. For each error has assigned error code - from old <em>Jabber</em> spec. and error condition -
  * <em>XMPP</em> error spec.
- * <p>
+ * <br>
  * <p> Created: Thu Oct 14 22:19:11 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

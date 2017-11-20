@@ -44,57 +44,39 @@ import java.util.logging.Logger;
 public class CompRepoItem
 		extends RepositoryItemAbstract {
 
-	/** Field description */
 	public static final String CONN_TYPE_ATTR = "type";
 
-	/** Field description */
 	public static final String CONNECTION_TYPE_LABEL = "Connection type";
 
-	/** Field description */
 	public static final String DOMAIN_ATTR = "domain";
 
-	/** Field description */
 	public static final String DOMAIN_NAME_LABEL = "Domain name";
 
-	/** Field description */
 	public static final String DOMAIN_PASS_LABEL = "Domain password";
 
-	/** Field description */
 	public static final String LB_CLASS_LABEL = "Load balancer class";
 
-	/** Field description */
 	public static final String LB_NAME_ATTR = "lb-class";
 
-	/** Field description */
 	public static final String PASSWORD_ATTR = "pass";
 
-	/** Field description */
 	public static final String PORT_NO_ATTR = "port";
 
-	/** Field description */
 	public static final String PORT_NO_LABEL = "Port number";
 
-	/** Field description */
 	public static final String PROTO_XMLNS_ATTR = "proto-xmlns";
 
-	/** Field description */
 	public static final String PROTO_XMLNS_LABEL = "Protocol";
 
-	/** Field description */
 	public static final String REMOTE_HOST_ATTR = "remote";
 
-	/** Field description */
 	public static final String REMOTE_HOST_LABEL = "Remote host";
 
-	/** Field description */
 	public static final String REPO_ITEM_ELEM_NAME = "item";
 
-	/** Field description */
 	public static final String ROUTINGS_ATTR = "routings";
 
-	/** Field description */
 	public static final String ROUTINGS_LABEL = "(Optional) Routings";
-	/** Field description */
 	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
 	/**
 	 * Variable <code>log</code> is a class logger.

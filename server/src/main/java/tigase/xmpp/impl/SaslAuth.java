@@ -52,8 +52,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SaslAuth here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Feb 20 16:28:13 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -64,7 +63,6 @@ public class SaslAuth
 		extends AbstractAuthPreprocessor
 		implements XMPPProcessorIfc {
 
-	/** Field description */
 	public static final String ID = "urn:ietf:params:xml:ns:xmpp-sasl";
 	private static final String _XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
 	private final static String ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";

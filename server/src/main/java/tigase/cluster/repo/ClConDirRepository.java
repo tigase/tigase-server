@@ -45,10 +45,8 @@ public class ClConDirRepository
 		extends ClConConfigRepository
 		implements ClusterRepoConstants {
 
-	/** Field description */
 	public static final String REPO_FILE_EXTENSION = ".rep";
 
-	/** Field description */
 	public static final String REPO_URI_DB_DEF_VAL = "etc/";
 
 	/**

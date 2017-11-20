@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination address.
- * <p>
+ * <br>
  * Created: Tue Feb 21 15:49:08 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

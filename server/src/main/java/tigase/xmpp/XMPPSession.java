@@ -76,7 +76,7 @@ public class XMPPSession {
 
 	/**
 	 * This method is called each time the resource is set for connection.
-	 * <p>
+	 * <br>
 	 * Method performs checking whether there is no collision of the resources.
 	 *
 	 * @param conn {@link XMPPResourceConnection} that is being added.
@@ -215,7 +215,7 @@ public class XMPPSession {
 	/**
 	 * Method returns a data for particular {@code key} which is common to all resource connections within this {@link
 	 * XMPPSession}
-	 * <p>
+	 * <br>
 	 * related to this {@link XMPPSession} object
 	 *
 	 * @param key for which data should be returned

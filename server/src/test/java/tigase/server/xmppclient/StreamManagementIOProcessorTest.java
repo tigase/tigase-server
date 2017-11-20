@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 /**
  * Test class for StreamManagementIOProcessor class.
- * <p>
+ * <br>
  * Currently tests if acking works correctly for overflow in OutQueue counter.
  *
  * @author andrzej

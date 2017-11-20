@@ -21,8 +21,7 @@ package tigase.xmpp;
 
 /**
  * Describe class XMPPParserException here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

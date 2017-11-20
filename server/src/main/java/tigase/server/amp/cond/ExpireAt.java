@@ -43,7 +43,6 @@ import java.util.logging.Logger;
 public class ExpireAt
 		implements ConditionIfc {
 
-	/** Field description */
 	public static final String NAME = "expire-at";
 
 	/**

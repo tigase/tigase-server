@@ -36,14 +36,14 @@ import java.util.logging.Logger;
 /**
  * Helper enum to make it easier to operate on packets with ad-hoc commands. It allows to create a packet with command,
  * add and retrieve command data field values, set actions and so on.
- * <p>
+ * <br>
  * It contains predefined set of commands used internally by the Tigase server and also 'OTHER' command which refers all
  * other not predefined commands.
- * <p>
+ * <br>
  * Most of the implementation details, constants and parameters is based on the <a
  * href="http://xmpp.org/extensions/xep-0050.html">XEP-0050</a> for ad-hoc commands protocol. Please refer to the XEP
  * for more details.
- * <p>
+ * <br>
  * Created: Thu Feb 9 20:52:02 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -163,23 +163,18 @@ public enum Command {
 	 */
 	OTHER(Priority.NORMAL);
 
-	/** Field description */
 	public static final String COMMAND_EL = "command";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	public static final String FIELD_EL = DataForm.FIELD_EL;
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	public static final String VALUE_EL = DataForm.VALUE_EL;
 
-	/** Field description */
 	public static final String XMLNS = "http://jabber.org/protocol/commands";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	protected static final String[] FIELD_VALUE_PATH = DataForm.FIELD_VALUE_PATH;

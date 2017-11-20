@@ -50,10 +50,8 @@ import java.util.logging.Logger;
 public class ConfigSQLRepository
 		extends ConfigurationCache {
 
-	/** Field description */
 	public static final String CONFIG_REPO_URI_PROP_KEY = "tigase-config-repo-uri";
 
-	/** Field description */
 	public static final String CONFIG_REPO_URI_INIT_KEY = "--tigase-config-repo-uri";
 
 	/**
@@ -149,8 +147,7 @@ public class ConfigSQLRepository
 
 	private class JDBCAccess {
 
-		/** Field description */
-		public static final String TABLE_NAME = "tigase_configuration";
+			public static final String TABLE_NAME = "tigase_configuration";
 		private static final String CLUSTER_NODE_COLUMN = "cluster_node";
 		private static final String COMPONENT_NAME_COLUMN = "component_name";
 		private static final String NODE_NAME_COLUMN = "key_node";

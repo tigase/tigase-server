@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * Class <code>XMLRepository</code> is a <em>XML</em> implementation of <code>UserRepository</code>. It uses
  * <code>tigase.xml.db</code> package as repository backend and uses <em>Bridge</em> design pattern to translate
  * <code>XMLDB</code> calls to <code>UserRepository</code> functions.
- * <p>
+ * <br>
  * <p> Created: Tue Oct 26 15:27:33 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

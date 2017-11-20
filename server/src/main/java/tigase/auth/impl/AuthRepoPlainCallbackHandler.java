@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 
 /**
  * This is implementation of {@linkplain CallbackHandler} to use with old {@linkplain AuthRepository AuthRepositories}.
- * Callback {@linkplain VerifyPasswordCallback} uses method {@linkplain AuthRepository#plainAuth(BareJID, String)} to
+ * Callback {@linkplain VerifyPasswordCallback} uses method {@linkplain tigase.db.AuthRepositoryImpl#plainAuth(BareJID, String)} to
  * password verification.
  */
 @Deprecated

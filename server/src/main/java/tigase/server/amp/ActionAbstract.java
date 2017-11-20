@@ -55,23 +55,19 @@ import java.util.logging.Logger;
 public abstract class ActionAbstract
 		implements ActionIfc {
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String AMP_SECURITY_LEVEL = "--amp-security-level";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String AMP_SECURITY_LEVEL_DEFAULT = "STRICT";
 
-	/** Field description */
 	public static final String SECURITY_PROP_KEY = "security-level";
 	private static Logger log = Logger.getLogger(ActionAbstract.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description */
 	protected ActionResultsHandlerIfc resultsHandler = null;
 	RosterFlat rosterUtil = new RosterFlat();
 	@ConfigField(alias = "security", desc = "Security level")

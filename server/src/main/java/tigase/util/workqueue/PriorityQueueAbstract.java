@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  * Works like a LinkedBlockingQueue using the put() and take() methods but with an additional priority integer
  * parameter. The elemnt returned from take() will honor the priority in such a way that all elements of a lower
  * priority will be returned before any elemens of a higher priority.
- * <p>
+ * <br>
  * Modified proposition taken from Noa Resare: http://resare.com/noa/ref/MultiPrioQueue.java
  *
  * @param <E>
@@ -42,9 +42,7 @@ import java.util.logging.Logger;
  */
 public abstract class PriorityQueueAbstract<E> {
 
-	/** Field description */
 	public static final String NONPRIORITY_QUEUE = "nonpriority-queue";
-	/** Field description */
 	public static final String QUEUE_IMPLEMENTATION = "queue-implementation";
 	private static final Logger log = Logger.getLogger(PriorityQueueAbstract.class.getName());
 

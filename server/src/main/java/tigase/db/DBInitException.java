@@ -21,8 +21,7 @@ package tigase.db;
 
 /**
  * Describe class DBInitException here.
- * <p>
- * <p>
+ * <br>
  * Created: Thu Oct 26 12:18:05 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

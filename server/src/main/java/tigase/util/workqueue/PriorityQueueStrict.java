@@ -48,18 +48,10 @@ public class PriorityQueueStrict<E>
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public PriorityQueueStrict() {
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 */
 	@SuppressWarnings({"unchecked"})
 	protected PriorityQueueStrict(int maxPriority, int maxSize) {
 		init(maxPriority, maxSize);

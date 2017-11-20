@@ -32,8 +32,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class ServiceEntity here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Feb 10 13:11:34 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

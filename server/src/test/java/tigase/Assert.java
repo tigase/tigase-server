@@ -31,14 +31,14 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Class implementing assertions for custom classes.
- * <p>
+ * <br>
  * Created by andrzej on 04.01.2017.
  */
 public class Assert {
 
 	/**
 	 * Method compares if actual element matches expected one.
-	 * <p>
+	 * <br>
 	 * Warning: Actual element must have attributes and children which are part of expected element, however may contain
 	 * addition elements or attributes and assertion will not fail.
 	 *

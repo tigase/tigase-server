@@ -39,7 +39,6 @@ import java.util.logging.Logger;
  */
 public class DataTypes {
 
-	/** Field description */
 	public static final Map<String, Character> typesMap = new LinkedHashMap<String, Character>();
 
 	private static final Logger log = Logger.getLogger(DataTypes.class.getName());

@@ -34,8 +34,7 @@ import java.util.Map;
 
 /**
  * Describe interface XMPPIOServiceListener here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Feb  8 10:19:41 2006
  *
  * @param <IO>

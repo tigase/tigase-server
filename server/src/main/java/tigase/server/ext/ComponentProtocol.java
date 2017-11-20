@@ -56,39 +56,27 @@ public class ComponentProtocol
 		extends ConnectionManager<ComponentIOService>
 		implements ComponentProtocolHandler {
 
-	/** Field description */
 	public static final String AUTHENTICATION_TIMEOUT_PROP_KEY = "auth-timeout";
 
-	/** Field description */
 	public static final String CLOSE_ON_SEQUENCE_ERROR_PROP_KEY = "close-on-seq-error";
 
-	/** Field description */
 	public static final String EXTCOMP_BIND_HOSTNAMES = "--bind-ext-hostnames";
 
-	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 
-	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROP_VAL = "tigase.server.ext.CompDBRepository";
 
-	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROPERTY = "--extcomp-repo-class";
 
-	/** Field description */
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 
-	/** Field description */
 	public static final String IDENTITY_TYPE_VAL = "generic";
 
-	/** Field description */
 	public static final String MAX_AUTH_ATTEMPTS_PROP_KEY = "max-auth-attempts";
 
-	/** Field description */
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 
-	/** Field description */
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
-	/** Field description */
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -127,9 +115,7 @@ public class ComponentProtocol
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public ComponentProtocol() {
 		super();
 

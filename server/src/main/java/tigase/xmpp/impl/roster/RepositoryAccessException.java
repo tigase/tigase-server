@@ -43,12 +43,6 @@ public class RepositoryAccessException
 		super(message);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param message
-	 * @param cause
-	 */
 	public RepositoryAccessException(String message, Throwable cause) {
 		super(message, cause);
 	}

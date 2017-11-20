@@ -35,7 +35,7 @@ import java.util.List;
  * can be normally only one instance of this interface implementation loaded on the server at any given time. The
  * instance is responsible for managing all virtual hosts and assigning correct component to each of the virtual hosts
  * or non-local domains.
- * <p>
+ * <br>
  * Created: 22 Nov 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

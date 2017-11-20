@@ -27,8 +27,7 @@ import tigase.xmpp.jid.JID;
 
 /**
  * Describe interface BoshSessionTaskHandler here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Aug  4 10:39:21 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

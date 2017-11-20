@@ -56,31 +56,31 @@ import static tigase.db.AuthRepository.Meta;
 /**
  * The user authentication connector allows for customized SQL queries to be used. Queries are defined in the
  * configuration file and they can be either plain SQL queries or stored procedures.
- * <p>
+ * <br>
  * If the query starts with characters: <code>{ call</code> then the server assumes this is a stored procedure call,
  * otherwise it is executed as a plain SQL query. Each configuration value is stripped from white characters on both
  * ends before processing.
- * <p>
+ * <br>
  * Please don't use semicolon <code>';'</code> at the end of the query as many JDBC drivers get confused and the query
  * may not work for unknown obvious reason.
- * <p>
+ * <br>
  * Some queries take arguments. Arguments are marked by question marks <code>'?'</code> in the query. Refer to the
  * configuration parameters description for more details about what parameters are expected in each query.
- * <p>
+ * <br>
  * Example configuration.
- * <p>
+ * <br>
  * The first example shows how to put a stored procedure as a query with 2 required parameters.
- * <p>
+ * <br>
  * <pre>
  * add-user-query={ call TigAddUserPlainPw(?, ?) }
  * </pre>
- * <p>
+ * <br>
  * The same query with plain SQL parameters instead:
- * <p>
+ * <br>
  * <pre>
  * add-user-query=insert into users (user_id, password) values (?, ?)
  * </pre>
- * <p>
+ * <br>
  * Created: Sat Nov 11 22:22:04 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -94,11 +94,11 @@ public class TigaseCustomAuth
 
 	/**
 	 * Query executing periodically to ensure active connection with the database.
-	 * <p>
+	 * <br>
 	 * Takes no arguments.
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * select 1
 	 * </pre>
@@ -106,11 +106,11 @@ public class TigaseCustomAuth
 	public static final String DEF_CONNVALID_KEY = "conn-valid-query";
 	/**
 	 * Database initialization query which is run after the server is started.
-	 * <p>
+	 * <br>
 	 * Takes no arguments.
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * update tig_users set online_status = 0
 	 * </pre>
@@ -118,11 +118,11 @@ public class TigaseCustomAuth
 	public static final String DEF_INITDB_KEY = "init-db-query";
 	/**
 	 * Query adding a new user to the database.
-	 * <p>
+	 * <br>
 	 * Takes 2 arguments: <code>(user_id (JID), password)</code>
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * insert into tig_users (user_id, user_pw) values (?, ?)
 	 * </pre>
@@ -130,11 +130,11 @@ public class TigaseCustomAuth
 	public static final String DEF_ADDUSER_KEY = "add-user-query";
 	/**
 	 * Removes a user from the database.
-	 * <p>
+	 * <br>
 	 * Takes 1 argument: <code>(user_id (JID))</code>
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * delete from tig_users where user_id = ?
 	 * </pre>
@@ -142,11 +142,11 @@ public class TigaseCustomAuth
 	public static final String DEF_DELUSER_KEY = "del-user-query";
 	/**
 	 * Retrieves user password from the database for given user_id (JID).
-	 * <p>
+	 * <br>
 	 * Takes 1 argument: <code>(user_id (JID))</code>
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * select user_pw from tig_users where user_id = ?
 	 * </pre>
@@ -154,11 +154,11 @@ public class TigaseCustomAuth
 	public static final String DEF_GETPASSWORD_KEY = "get-password-query";
 	/**
 	 * Updates (changes) password for a given user_id (JID).
-	 * <p>
+	 * <br>
 	 * Takes 2 arguments: <code>(password, user_id (JID))</code>
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * update tig_users set user_pw = ? where user_id = ?
 	 * </pre>
@@ -168,17 +168,17 @@ public class TigaseCustomAuth
 	 * Performs user login. Normally used when there is a special SP used for this purpose. This is an alternative way
 	 * to a method requiring retrieving user password. Therefore at least one of those queries must be defined:
 	 * <code>user-login-query</code> or <code>get-password-query</code>.
-	 * <p>
+	 * <br>
 	 * If both queries are defined then <code>user-login-query</code> is used. Normally this method should be only used
 	 * with plain text password authentication or sasl-plain.
-	 * <p>
+	 * <br>
 	 * The Tigase server expects a result set with user_id to be returned from the query if login is successful and
 	 * empty results set if the login is unsuccessful.
-	 * <p>
+	 * <br>
 	 * Takes 2 arguments: <code>(user_id (JID), password)</code>
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * select user_id from tig_users where (user_id = ?) AND (user_pw = ?)
 	 * </pre>
@@ -186,20 +186,18 @@ public class TigaseCustomAuth
 	public static final String DEF_USERLOGIN_KEY = "user-login-query";
 	/**
 	 * This query is called when user logs out or disconnects. It can record that event in the database.
-	 * <p>
+	 * <br>
 	 * Takes 1 argument: <code>(user_id (JID))</code>
-	 * <p>
+	 * <br>
 	 * Example query:
-	 * <p>
+	 * <br>
 	 * <pre>
 	 * update tig_users, set online_status = online_status - 1 where user_id = ?
 	 * </pre>
 	 */
 	public static final String DEF_USERLOGOUT_KEY = "user-logout-query";
 	public static final String DEF_UPDATELOGINTIME_KEY = "update-login-time-query";
-	/** Field description */
 	public static final String DEF_USERS_COUNT_KEY = "users-count-query";
-	/** Field description */
 	public static final String DEF_USERS_DOMAIN_COUNT_KEY = "" + "users-domain-count-query";
 	public static final String DEF_LISTDISABLEDACCOUNTS_KEY = "users-list-disabled-accounts-query";
 	@Deprecated
@@ -219,39 +217,27 @@ public class TigaseCustomAuth
 	/**
 	 * Comma separated list of SASL authentication mechanisms. Possible mechanisms are all mechanisms supported by Java
 	 * implementation. The most common are: <code>PLAIN</code>, <code>DIGEST-MD5</code>, <code>CRAM-MD5</code>.
-	 * <p>
+	 * <br>
 	 * "Non-PLAIN" mechanisms will work only with the <code>get-password-query</code> active and only when passwords are
 	 * stored in plain text format in the database.
 	 */
 	public static final String DEF_SASL_MECHS_KEY = "sasl-mechs";
 	public static final String NO_QUERY = "none";
-	/** Field description */
 	public static final String DEF_INITDB_QUERY = "{ call TigInitdb() }";
-	/** Field description */
 	public static final String DEF_ADDUSER_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
-	/** Field description */
 	public static final String DEF_DELUSER_QUERY = "{ call TigRemoveUser(?) }";
-	/** Field description */
 	public static final String DEF_GETPASSWORD_QUERY = "{ call TigGetPassword(?) }";
-	/** Field description */
 	public static final String DEF_UPDATEPASSWORD_QUERY = "{ call TigUpdatePasswordPlainPwRev(?, ?) }";
-	/** Field description */
 	public static final String DEF_USERLOGIN_QUERY = "{ call TigUserLoginPlainPw(?, ?) }";
-	/** Field description */
 	public static final String DEF_USERLOGOUT_QUERY = "{ call TigUserLogout(?) }";
-	/** Field description */
 	public static final String DEF_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
-	/** Field description */
 	public static final String DEF_USERS_DOMAIN_COUNT_QUERY =
 			"" + "select count(*) from tig_users where user_id like ?";
 	public static final String DEF_LISTDISABLEDACCOUNTS_QUERY = "{ call TigDisabledAccounts() }";
 	public static final String DEF_UPDATEACCOUNTSTATUS_QUERY = "{ call TigUpdateAccountStatus(?, ?) }";
 	public static final String DEF_ACCOUNTSTATUS_QUERY = "{ call TigAccountStatus(?) }";
-	/** Field description */
 	public static final String DEF_NONSASL_MECHS = "password";
-	/** Field description */
 	public static final String DEF_SASL_MECHS = "PLAIN";
-	/** Field description */
 	public static final String SP_STARTS_WITH = "{ call";
 	/**
 	 * Private logger for class instances.

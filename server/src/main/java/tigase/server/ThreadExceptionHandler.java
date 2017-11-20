@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * This is default handler which sends exception stack trace to log system. If necessary other server packages can use
  * own custom handlers and do something else with unhandled exceptions. This handler is only implemented to avoid hidden
  * exception causing bugs.
- * <p>
+ * <br>
  * <p> Created: Thu Sep 30 22:24:24 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

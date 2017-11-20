@@ -296,7 +296,7 @@ public class DataSourceBean
 		}
 
 		/**
-		 * Finds and retrieves repository pool class name for data source defined in this config bean. <br/> Name of a
+		 * Finds and retrieves repository pool class name for data source defined in this config bean. * <br> Name of a
 		 * pool class will be retrieved from <code>poolCls</code> field or looked for instances of
 		 * <code>DataSourcePool</code> class annotated with {@link tigase.db.Repository.Meta} which supported uri
 		 * matches (regexp) of data source URI.

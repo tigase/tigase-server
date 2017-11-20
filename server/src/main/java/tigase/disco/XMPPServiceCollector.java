@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 /**
  * Class XMPPServiceCollector
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -31,7 +31,7 @@ import tigase.stats.StatisticsList;
 
 /**
  * Class implements bean for multi domain pool for user repositories.
- * <p>
+ * <br>
  * Created by andrzej on 07.03.2016.
  */
 @Bean(name = "userRepository", parent = Kernel.class, exportable = true, active = true)

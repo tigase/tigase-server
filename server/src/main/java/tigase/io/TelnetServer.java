@@ -46,8 +46,7 @@ import static tigase.io.SSLContextContainerIfc.*;
 /**
  * This is sample class demonstrating how to use <code>tigase.io</code> library for TLS/SSL server connection. This is
  * simple telnet server class which can be run to receive plain connections or SSL connections.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Aug  6 22:27:13 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

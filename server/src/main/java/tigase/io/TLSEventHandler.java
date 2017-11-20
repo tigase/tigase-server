@@ -24,8 +24,7 @@ package tigase.io;
 
 /**
  * Describe interface TLSEventHandler here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Feb  7 23:20:14 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

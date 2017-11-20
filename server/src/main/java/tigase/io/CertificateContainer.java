@@ -45,7 +45,7 @@ import static tigase.io.SSLContextContainerIfc.*;
 
 /**
  * Class used to keep SSL certificates loaded in memory. To get instance use getter from TLSUtil class.
- * <p>
+ * <br>
  * Created by andrzej on 29.02.2016.
  */
 @Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true)
@@ -445,18 +445,12 @@ public class CertificateContainer
 		// ~--- constructors
 		// -------------------------------------------------------
 
-		/**
-		 * Constructs ...
-		 */
+
 		FakeTrustManager() {
 			this(new X509Certificate[0]);
 		}
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param ai
-		 */
+
 		FakeTrustManager(X509Certificate[] ai) {
 			issuers = ai;
 		}

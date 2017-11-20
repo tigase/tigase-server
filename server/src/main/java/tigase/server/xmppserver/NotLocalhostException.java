@@ -38,37 +38,21 @@ public class NotLocalhostException
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public NotLocalhostException() {
 		super();
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param msg
-	 */
+
 	public NotLocalhostException(String msg) {
 		super(msg);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param cause
-	 */
+
 	public NotLocalhostException(Throwable cause) {
 		super(cause);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param msg
-	 * @param cause
-	 */
 	public NotLocalhostException(String msg, Throwable cause) {
 		super(msg, cause);
 	}

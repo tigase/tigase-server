@@ -42,7 +42,7 @@ import static tigase.db.beans.MDPoolBean.REPO_CLASS;
 /**
  * Abstract class implementing bean to which can be used to create name unaware repository pool. This class is
  * resposible for creation of correct repository instance for single specified data source.
- * <p>
+ * <br>
  * Created by andrzej on 17.08.2016.
  */
 public abstract class SDRepositoryBean<A extends DataSourceAware>

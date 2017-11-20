@@ -48,8 +48,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class ClusterController here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Jun 9 20:03:28 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -63,10 +62,8 @@ public class ClusterController
 		extends AbstractComponentRegistrator<ClusteredComponentIfc>
 		implements Configurable, ClusterControllerIfc {
 
-	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 
-	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_VAL = "localhost";
 	private static final Logger log = Logger.getLogger(ClusterController.class.getName());
 

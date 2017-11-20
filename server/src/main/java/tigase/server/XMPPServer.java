@@ -42,8 +42,7 @@ import java.util.stream.Stream;
 
 /**
  * Describe class XMPPServer here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Nov 23 07:04:18 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -55,7 +54,6 @@ public final class XMPPServer {
 	/** property allowing setting up configurator implementation of
 	 * {@link tigase.conf.ConfiguratorAbstract} used in Tigase.
 	 */ public static final String CONFIGURATOR_PROP_KEY = "tigase-configurator";
-	/** Field description */
 	public static final String NAME = "Tigase";
 	/**
 	 * default configurator implementation of {@link tigase.conf.ConfiguratorAbstract} used in Tigase, which is

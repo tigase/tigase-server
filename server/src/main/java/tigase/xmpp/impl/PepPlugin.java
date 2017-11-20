@@ -75,9 +75,7 @@ public class PepPlugin
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public PepPlugin() {
 		this.supportedNodes.add("http://jabber.org/protocol/tune");
 		this.supportedNodes.add("http://jabber.org/protocol/mood");

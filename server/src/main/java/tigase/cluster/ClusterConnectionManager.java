@@ -78,7 +78,7 @@ import java.util.zip.Deflater;
 
 /**
  * Class ClusterConnectionManager
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -92,43 +92,28 @@ public class ClusterConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>>
 		implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
 
-	/** Field description */
 	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-connections-per-node";
 
-	/** Field description */
 	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 5;
 
-	/** Field description */
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
 
-	/** Field description */
 	public static final String COMPRESS_STREAM_PROP_KEY = "compress-stream";
 
-	/** Field description */
 	public static final String CONNECT_ALL_PAR = "--cluster-connect-all";
 
-	/** Field description */
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 
 	public static final String NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY = "non-cluster-traffic-allowed";
 	public static final boolean NON_CLUSTER_TRAFFIC_ALLOWED_PROP_VAL = true;
-	/** Field description */
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
-	/** Field description */
 	public static final String IDENTITY_TYPE_VAL = "generic";
-	/** Field description */
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
-	/** Field description */
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
-	/** Field description */
 	public static final String SECRET_PROP_KEY = "secret";
-	/** Field description */
 	public static final String XMLNS = "tigase:cluster";
-	/** Field description */
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
-	/** Field description */
 	public static final boolean CONNECT_ALL_PROP_VAL = false;
-	/** Field description */
 	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
 	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
 	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
@@ -149,7 +134,6 @@ public class ClusterConnectionManager
 	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
 
 	//~--- fields ---------------------------------------------------------------
-	/** Field description */
 	@Inject
 	private ClusterControllerIfc clusterController = null;
 	private tigase.eventbus.EventListener<ClusterInitializedEvent> clusterEventHandler = null;

@@ -44,8 +44,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class ClientConnectionClustered here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Jun 21 22:23:18 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -38,37 +38,21 @@ public class LocalhostException
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public LocalhostException() {
 		super();
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param msg
-	 */
+
 	public LocalhostException(String msg) {
 		super(msg);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param cause
-	 */
+
 	public LocalhostException(Throwable cause) {
 		super(cause);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param msg
-	 * @param cause
-	 */
 	public LocalhostException(String msg, Throwable cause) {
 		super(msg, cause);
 	}

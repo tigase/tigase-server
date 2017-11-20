@@ -42,8 +42,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class JabberIqIq here.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Feb 25 23:37:48 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

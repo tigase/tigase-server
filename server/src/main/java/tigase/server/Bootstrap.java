@@ -53,7 +53,7 @@ import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
 
 /**
  * Bootstrap class is responsible for initialization of Kernel to start Tigase XMPP Server.
- * <p>
+ * <br>
  * Created by andrzej on 05.03.2016.
  */
 public class Bootstrap {

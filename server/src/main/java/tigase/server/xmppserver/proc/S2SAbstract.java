@@ -33,68 +33,47 @@ import java.util.logging.Logger;
  */
 public class S2SAbstract {
 
-	/** Field description */
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 
-	/** Field description */
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
 
-	/** Field description */
 	protected static final String DIALBACK_EL = "dialback";
 
-	/** Field description */
 	protected static final String DIALBACK_NS = "urn:xmpp:features:dialback";
 
-	/** Field description */
 	protected static final String FEATURES_EL = "features";
 
-	/** Field description */
 	protected static final String FEATURES_NS = "http://etherx.jabber.org/streams";
 
-	/** Field description */
 	protected static final String PROCEED_TLS_EL = "proceed";
 
-	/** Field description */
 	protected static final String RESULT_EL_NAME = "result";
 
-	/** Field description */
 	protected static final String START_TLS_EL = "starttls";
 
-	/** Field description */
 	protected static final String START_TLS_NS = "urn:ietf:params:xml:ns:xmpp-tls";
 
-	/** Field description */
 	protected static final String STREAM_FEATURES_EL = "stream:features";
 
-	/** Field description */
 	protected static final String VERIFY_EL_NAME = "verify";
 
-	/** Field description */
 	protected static final String VERSION_ATT_NAME = "version";
 
-	/** Field description */
 	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
 
-	/** Field description */
 	protected static final String XMLNS_DB_ATT = "xmlns:db";
 
-	/** Field description */
 	protected static final String XMLNS_DB_VAL = "jabber:server:dialback";
 
-	/** Field description */
 	protected static final String XMLNS_SERVER_VAL = "jabber:server";
 
-	/** Field description */
 	protected static final String[] FEATURES_STARTTLS_PATH = {FEATURES_EL, START_TLS_EL};
 
-	/** Field description */
 	protected static final String[] FEATURES_DIALBACK_PATH = {FEATURES_EL, DIALBACK_EL};
 	private static final Logger log = Logger.getLogger(S2SAbstract.class.getName());
-	/** Field description */
 	public static boolean FORCE_VERSION = false;
 
 	//~--- fields ---------------------------------------------------------------
-	/** Field description */
 	@Inject(nullAllowed = true)
 	protected S2SConnectionHandlerIfc<S2SIOService> handler = null;
 

@@ -42,46 +42,32 @@ import java.util.Queue;
 public interface CommandIfc
 		extends StatisticHolder {
 
-	/** Field description */
 	public static final String VHOST_MANAGER = "vhostMan";
 
-	/** Field description */
 	public static final String ADMINS_SET = "adminsSet";
 
-	/** Field description */
 	public static final String COMMANDS_ACL = "cmdsAcl";
 
-	/** Field description */
 	public static final String ADMN_CMDS = "adminCommands";
 
-	/** Field description */
 	public static final String USER_REPO = "userRepository";
 
-	/** Field description */
 	public static final String AUTH_REPO = "authRepository";
 
-	/** Field description */
 	public static final String USER_SESS = "userSessions";
 
-	/** Field description */
 	public static final String USER_CONN = "userConnections";
 
-	/** Field description */
 	public static final String ADMN_DISC = "adminDisco";
 
-	/** Field description */
 	public static final String SCRI_MANA = "scriptManager";
 
-	/** Field description */
 	public static final String SCRIPT_BASE_DIR = "scriptBaseDir";
 
-	/** Field description */
 	public static final String SCRIPT_COMP_DIR = "scriptCompDir";
 
-	/** Field description */
 	public static final String COMPONENT_NAME = "componentName";
 
-	/** Field description */
 	public static final String COMPONENT = "component";
 
 	public static final String CONNECTED_NODES = "connectedNodes";
@@ -90,55 +76,38 @@ public interface CommandIfc
 
 	public static final String EVENTBUS = "eventBus";
 
-	/** Field description */
 	public static final String SERVICES_MAP = "servicesMap";
 
-	/** Field description */
 	public static final String SCRIPT_DESCRIPTION = "AS:Description:";
 
-	/** Field description */
 	public static final String SCRIPT_ID = "AS:CommandId:";
 
-	/** Field description */
 	public static final String SCRIPT_COMPONENT = "AS:Component:";
 
-	/** Field description */
 	public static final String SCRIPT_CLASS = "AS:ComponentClass:";
 
-	/** Field description */
 	public static final String SCRIPT_GROUP = "AS:Group:";
 
-	/** Field description */
 	public static final String LANGUAGE = "Language";
 
-	/** Field description */
 	public static final String COMMAND_ID = "Command Id";
 
-	/** Field description */
 	public static final String SCRIPT_TEXT = "Script text";
 
-	/** Field description */
 	public static final String SCRIPT_RESULT = "Script result";
 
-	/** Field description */
 	public static final String DESCRIPT = "Description";
 
-	/** Field description */
 	public static final String GROUP = "Group";
 
-	/** Field description */
 	public static final String SAVE_TO_DISK = "Save to disk";
 
-	/** Field description */
 	public static final String REMOVE_FROM_DISK = "Remove from disk";
 
-	/** Field description */
 	public static final String PACKET = "packet";
 
-	/** Field description */
 	public static final String ADD_SCRIPT_CMD = "add-script";
 
-	/** Field description */
 	public static final String DEL_SCRIPT_CMD = "del-script";
 
 	//~--- get methods ----------------------------------------------------------

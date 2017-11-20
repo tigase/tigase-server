@@ -35,8 +35,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class PacketDefaultHandler here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Feb 2 15:08:58 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

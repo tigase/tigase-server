@@ -34,7 +34,6 @@ import java.util.Map;
  */
 public interface StreamOpenHandler {
 
-	/** Field description */
 	public static final String XMLNS_KEY = "xmlns";
 
 	//~--- get methods ----------------------------------------------------------

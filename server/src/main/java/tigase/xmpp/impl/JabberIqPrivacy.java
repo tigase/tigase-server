@@ -58,8 +58,7 @@ import static tigase.xmpp.impl.Privacy.*;
 
 /**
  * Describe class JabberIqPrivacy here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Oct  9 18:18:11 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -252,9 +251,9 @@ public class JabberIqPrivacy
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * <code>preProcess</code> method checks only incoming stanzas so it doesn't check for presence-out at all.
 	 */
 	@Override

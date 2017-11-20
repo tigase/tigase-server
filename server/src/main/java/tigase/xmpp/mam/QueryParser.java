@@ -25,7 +25,7 @@ import tigase.xml.Element;
 
 /**
  * Interface of which class instance is used by QueryModule to process incoming stanzas into query.
- * <p>
+ * <br>
  * Created by andrzej on 19.07.2016.
  */
 public interface QueryParser<Q extends Query> {

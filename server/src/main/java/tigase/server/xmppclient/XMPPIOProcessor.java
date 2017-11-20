@@ -101,7 +101,7 @@ public interface XMPPIOProcessor {
 	 * Method called when XMPP stream error is about to be sent
 	 *
 	 * @param service
-	 * @param streamErrorName
+	 * @param streamError
 	 */
 	void streamError(XMPPIOService service, StreamError streamError);
 }

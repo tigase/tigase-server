@@ -34,7 +34,7 @@ import java.util.Queue;
 
 /**
  * Interface for storing and restoring offline Elements.
- * <p>
+ * <br>
  * Created: May 11, 2010 6:56:14 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

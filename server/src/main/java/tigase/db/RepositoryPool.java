@@ -21,7 +21,7 @@ package tigase.db;
 
 /**
  * Generic interface of repository pool implementations.
- * <p>
+ * <br>
  * Created by andrzej on 08.03.2016.
  */
 public interface RepositoryPool<T>

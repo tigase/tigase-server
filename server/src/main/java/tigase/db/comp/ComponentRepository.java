@@ -47,7 +47,6 @@ import java.util.Map;
 public interface ComponentRepository<Item extends RepositoryItem>
 		extends Iterable<Item>, Repository {
 
-	/** Field description */
 	public static final String COMP_REPO_BIND = "comp_repo";
 
 	//~--- methods --------------------------------------------------------------

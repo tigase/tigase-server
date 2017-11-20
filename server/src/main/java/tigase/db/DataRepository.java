@@ -34,7 +34,7 @@ import java.util.TimeZone;
  * The interface defines a generic data repository for storing arbitrary data in any application specific form. This
  * interface unifies database (repository) access allowing for easier way to create database connections pools or
  * database fail-over mechanisms.
- * <p>
+ * <br>
  * Created: Jun 16, 2010 3:34:32 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -272,7 +272,7 @@ public interface DataRepository
 	 * they are stored in the database in proper time zone.
 	 *
 	 * @param rs
-	 * @param pos
+	 * @param field
 	 *
 	 * @return
 	 *

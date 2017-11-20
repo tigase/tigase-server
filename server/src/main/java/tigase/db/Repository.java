@@ -36,7 +36,7 @@ public interface Repository {
 
 	/**
 	 * Method is deprecated and should not be user any more.
-	 * <p>
+	 * <br>
 	 * The method is called to initialize the data repository. Depending on the implementation all the initialization
 	 * parameters can be passed either via <code>resource_uri</code> parameter as the database connection string or via
 	 * <code>params</code> map if the required repository parameters are more complex or both.
@@ -93,7 +93,7 @@ public interface Repository {
 		String id();
 
 		/**
-		 * Method returns name of a schema required by annotated class. <br/> Result of this method is intended to be
+		 * Method returns name of a schema required by annotated class. * <br> Result of this method is intended to be
 		 * displayed to the user.
 		 *
 		 * @return name of a schema

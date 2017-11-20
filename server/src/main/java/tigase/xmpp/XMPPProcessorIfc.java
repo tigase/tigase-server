@@ -27,8 +27,7 @@ import java.util.Queue;
 
 /**
  * Describe interface XMPPProcessorIfc here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Feb 8 13:47:56 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class RosterFlat here.
- * <p>
+ * <br>
  * Created: Tue Feb 21 18:05:53 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

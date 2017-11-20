@@ -43,8 +43,7 @@ import java.util.List;
 
 /**
  * Describe class RepositoryUtils here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Oct 28 13:09:26 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

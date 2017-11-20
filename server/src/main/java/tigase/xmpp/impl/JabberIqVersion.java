@@ -43,8 +43,7 @@ import java.util.logging.Logger;
 
 /**
  * XEP-0092: Software Version
- * <p>
- * <p>
+ * <br>
  * Created: Tue Mar 21 06:45:51 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -22,7 +22,7 @@ package tigase.xmpp;
 /**
  * This exception is usually trown when there is kind of access violation error. If some code try to access data to
  * which it doesn't have permission to or if try to access data before successful authorization process.
- * <p>
+ * <br>
  * <p> Created: Sat Oct 30 08:44:37 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

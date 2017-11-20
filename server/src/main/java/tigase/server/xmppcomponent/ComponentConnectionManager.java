@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 
 /**
  * Class ComponentConnectionManager
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -64,25 +64,18 @@ public class ComponentConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>>
 		implements XMPPService {
 
-	/** Field description */
 	public static final String SECRET_PROP_KEY = "secret";
 
-	/** Field description */
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 
-	/** Field description */
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 
-	/** Field description */
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 
-	/** Field description */
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 
-	/** Field description */
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 
-	/** Field description */
 	public static final String IDENTITY_TYPE_VAL = "generic";
 
 	/**
@@ -91,22 +84,14 @@ public class ComponentConnectionManager
 	private static final Logger log = Logger.getLogger(ComponentConnectionManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-	/** Field description */
 	public boolean PACK_ROUTED_VAL = false;
-	/** Field description */
 	public int[] PORTS = {5555};
-	/** Field description */
 	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
-	/** Field description */
 	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
-	/** Field description */
 	public String[] PORT_ROUTING_TABLE_PROP_VAL = {PORT_REMOTE_HOST_PROP_VAL, ".*@" + PORT_REMOTE_HOST_PROP_VAL,
 												   ".*\\." + PORT_REMOTE_HOST_PROP_VAL};
-	/** Field description */
 	public SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
-	/** Field description */
 	public ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
-	/** Field description */
 	public String SECRET_PROP_VAL = "someSecret";
 	// private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
@@ -499,9 +484,9 @@ public class ComponentConnectionManager
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * We should not really close external component connection at all, so let's say something like: 1000 days...
 	 */
 	@Override

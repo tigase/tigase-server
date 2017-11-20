@@ -32,10 +32,10 @@ import java.util.Queue;
 
 /**
  * Interface MessageReceiver
- * <p>
+ * <br>
  * Objects of this type can receive messages. They can be in fact routing destination depending on target address.
  * Message are routed to proper destination in MessageRouter class.
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

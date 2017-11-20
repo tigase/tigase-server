@@ -35,19 +35,19 @@ import java.util.logging.Logger;
  * This class acts as a delegate for all the available ScriptEngineManagers. Unluckily, the standard did not define it
  * as an interface, so we need to extend it to allow polymorphism. However, no calls to super are used. It wraps all
  * available ScriptEngineManagers in the OSGi ServicePlatform into a merged ScriptEngineManager.
- * <p>
+ * <br>
  * Internally, what this class does is creating ScriptEngineManagers for each bundle that contains a ScriptEngineFactory
  * and includes a META-INF/services/javax.script.ScriptEngineFactory file. It assumes that the file contains a list of
- * @link ScriptEngineFactory classes. For each bundle, it creates a ScriptEngineManager, then merges them. @link
+ * {@link} ScriptEngineFactory classes. For each bundle, it creates a ScriptEngineManager, then merges them. @link
  * ScriptEngineFactory objects are wrapped into @link OSGiScriptEngineFactory objects to deal with problems of context
  * class loader: Those scripting engines that rely on the ContextClassloader for finding resources need to use this
  * wrapper and the @link OSGiScriptFactory. Mainly, jruby does.
- * <p>
+ * <br>
  * Note that even if no context classloader issues arose, it would still be needed to search manually for the factories
  * and either use them directly (losing the mimeType/extension/shortName mechanisms for finding engines or manually
  * registering them) or still use this class, which would be smarter. In the latter case, it would only be needed to
  * remove the hack that temporarily sets the context classloader to the appropriate, bundle-related, class loader.
- * <p>
+ * <br>
  * Caveats: <ul><li> All factories are wrapped with an {@link OSGiScriptEngineFactory}. As Engines are not wrapped,
  * calls like <code> ScriptEngineManager osgiManager=new OSGiScriptEngineManager(context);<br> ScriptEngine
  * engine=osgiManager.getEngineByName("ruby"); ScriptEngineFactory factory=engine.getFactory() //this does not return
@@ -80,9 +80,9 @@ public class OSGiScriptEngineManager
 	 * bindings you can either get a fresh instance of OSGiScriptManager or setting up a new bindings object. This can
 	 * be done with: <code> ScriptEngineManager manager=new OSGiScriptEngineManager(context); (...)//do stuff
 	 * osgiManager=(OSGiScriptEngineManager)manager;//cast to ease reading osgiManager.reloadManagers();
-	 * <p>
+	 * <br>
 	 * manager.setBindings(new OSGiBindings());//or you can use your own bindings implementation
-	 * <p>
+	 * <br>
 	 * </code>
 	 */
 	public void reloadManagers() {

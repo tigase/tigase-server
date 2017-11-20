@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 /**
  * Annotation allows to add multiple {@link tigase.kernel.beans.config.ConfigAlias} aliases for multiple configuration
  * fields
- * <p>
+ * <br>
  * Created by andrzej on 05.08.2016.
  */
 @Target({ElementType.TYPE})

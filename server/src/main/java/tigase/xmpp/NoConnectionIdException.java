@@ -31,37 +31,21 @@ public class NoConnectionIdException
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public NoConnectionIdException() {
 		super();
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param message
-	 */
+
 	public NoConnectionIdException(String message) {
 		super(message);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param cause
-	 */
+
 	public NoConnectionIdException(Throwable cause) {
 		super(cause);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param message
-	 * @param cause
-	 */
 	public NoConnectionIdException(String message, Throwable cause) {
 		super(message, cause);
 	}

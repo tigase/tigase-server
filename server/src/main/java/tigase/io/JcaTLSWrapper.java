@@ -34,8 +34,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class TLSWrapper here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Mar 5 09:13:29 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

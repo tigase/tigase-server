@@ -46,9 +46,7 @@ public class ConnectionRecord
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public ConnectionRecord() {
 		super();
 	}

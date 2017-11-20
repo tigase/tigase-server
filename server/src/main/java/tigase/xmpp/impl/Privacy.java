@@ -46,47 +46,35 @@ import java.util.stream.Collectors;
  * name="1"> <map> <entry value="jid" type="String" key="type"/> <entry value="user%40domain.com/res" type="String"
  * key="value"/> <entry value="deny" type="String" key="action"/> <entry type="String[]" key="stanzas"> <item
  * value="message"/> <item value="iq"/> </entry> </map> </node> </node> }
- * <p>
+ * <br>
  * Created: Mon Oct  9 20:50:09 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class Privacy {
 
-	/** Field description */
 	public static final String ACTION = "action";
 
-	/** Field description */
 	public static final String ACTIVE = "active-list";
 
-	/** Field description */
 	public static final String DEFAULT = "default-list";
 
-	/** Field description */
 	public static final String ITEM = "item";
 
-	/** Field description */
 	public static final String LIST = "list";
 
-	/** Field description */
 	public static final String NAME = "name";
 
-	/** Field description */
 	public static final String ORDER = "order";
 
-	/** Field description */
 	public static final String PRIVACY = "privacy";
 
-	/** Field description */
 	public static final String PRIVACY_LIST = "privacy-list";
 
-	/** Field description */
 	public static final String STANZAS = "stanzas";
 
-	/** Field description */
 	public static final String TYPE = "type";
 
-	/** Field description */
 	public static final String VALUE = "value";
 
 	public static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";

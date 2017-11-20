@@ -60,61 +60,41 @@ public class S2SConnectionManager
 		extends ConnectionManager<S2SIOService>
 		implements S2SConnectionHandlerIfc<S2SIOService> {
 
-	/** Field description */
 	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
-	/** Field description */
 	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY = "cid-connections-tasks-threads";
 
-	/** Field description */
 	public static final String MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY = "max-inactivity-time";
 
-	/** Field description */
 	public static final String MAX_INCOMING_CONNECTIONS_PROP_KEY = "max-in-conns";
 
-	/** Field description */
 	public static final int MAX_INCOMING_CONNECTIONS_PROP_VAL = 4;
 
-	/** Field description */
 	public static final String MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY = "max-out-per-ip-conns";
 
-	/** Field description */
 	public static final int MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL = 1;
 
-	/** Field description */
 	public static final String MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY = "max-out-total-conns";
 
-	/** Field description */
 	public static final int MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL = 1;
 
-	/** Field description */
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY = "max-packet-waiting-time";
 
-	/** Field description */
 	public static final String S2S_CONNECTION_SELECTOR_PROP_KEY = "s2s-conn-selector";
 
-	/** Field description */
 	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL = "tigase.server.xmppserver.S2SRandomSelector";
 
-	/** Field description */
 	public static final String S2S_DOMAIN_MAPPING_PROP_KEY = "s2s-domain-mapping";
 
-	/** Field description */
 	public static final String S2S_DOMAIN_MAPPING_PROP_VAL = "";
 
-	/** Field description */
 	public static final String S2S_HT_TRAFFIC_THROTTLING_PROP_VAL = "xmpp:15k:0:disc,bin:120m:0:disc";
-	/** Field description */
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
-	/** Field description */
 	public static final long MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL = 15 * MINUTE;
-	/** Field description */
 
 	// TODO: #1195 - estimate proper default value
 	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
-	/** Field description */
 	protected static final String DB_RESULT_EL_NAME = "db:result";
-	/** Field description */
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -151,7 +131,7 @@ public class S2SConnectionManager
 	 * Packets are put in the queue only when connection to remote server is not established so effectively this timeout
 	 * specifies the maximum time for connecting to remote server. If this time is exceeded then no more reconnecting
 	 * attempts are performed and packets are sent back with error information.
-	 * <p>
+	 * <br>
 	 * Default TCP/IP timeout is 300 seconds so we can follow this convention but administrator can set different
 	 * timeout in server configuration.
 	 */
@@ -552,9 +532,9 @@ public class S2SConnectionManager
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * Secret is used in generation of dialback key
 	 */
 	@Override

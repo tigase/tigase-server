@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * This implementation stores virtual domains in the UserRepository database. It loads initial settings and virtual
  * hosts from the configuration file and then loads more vhosts from the database. Virtual domains from the database can
  * overwrite (disable) vhosts loaded from the configuration file.
- * <p>
+ * <br>
  * This implementation keeps all virtual hosts and their parameters in a single database field. This might not be very
  * efficient if you want to manager big number of virtual domains. It is sufficient for hundreds of vhosts. If you need
  * thousands of VHosts support I advice to implement this storage in more efficient way using separate database tables

@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * server authentication logic. Important thing about the authentication repository is that it not only stores login
  * credentials but also performs actual user authentication. This is because available authentication mechanisms depend
  * on the way data are stored in the repository (database).
- * <p>
+ * <br>
  * Created: Sun Nov  5 21:15:46 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -60,10 +60,8 @@ public interface AuthRepository
 	 */
 	public static final String DATA_KEY = "data";
 
-	/** Field description */
 	public static final String DIGEST_ID_KEY = "digest-id";
 
-	/** Field description */
 	public static final String DIGEST_KEY = "digest";
 
 	/**
@@ -72,7 +70,6 @@ public interface AuthRepository
 	 */
 	public static final String MACHANISM_KEY = "mechanism";
 
-	/** Field description */
 	public static final String PASSWORD_KEY = "password";
 
 	// Query params (and otherAuth)
@@ -121,7 +118,6 @@ public interface AuthRepository
 	 */
 	public static final String USER_ID_KEY = "user-id";
 
-	/** Field description */
 	public static final String USERNAME_KEY = "username";
 
 	//~--- methods --------------------------------------------------------------

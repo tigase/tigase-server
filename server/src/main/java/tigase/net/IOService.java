@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  * <code>IOService</code> class all this basic operation are implemented and you have only to take care about parsing
  * data received from network socket. Parsing data is expected to be implemented in <code>parseData(char[] data)</code>
  * method. </p>
- * <p>
+ * <br>
  * <p> Created: Tue Sep 28 23:00:34 2004 </p>
  *
  * @param <RefObject> is a reference object stored by this service. This is e reference to higher level data object
@@ -71,24 +71,12 @@ import java.util.logging.Logger;
 public abstract class IOService<RefObject>
 		implements Callable<IOService<?>>, TLSEventHandler, IOListener {
 
-	/**
-	 * Field description
-	 */
 	public static final String CERT_CHECK_RESULT = "cert-check-result";
 
-	/**
-	 * Field description
-	 */
 	public static final String CERT_REQUIRED_DOMAIN = "cert-required-domain";
 
-	/**
-	 * Field description
-	 */
 	public static final String HOSTNAME_KEY = "hostname-key";
 
-	/**
-	 * Field description
-	 */
 	public static final String PORT_TYPE_PROP_KEY = "type";
 
 	/**
@@ -97,7 +85,6 @@ public abstract class IOService<RefObject>
 	 */
 	public static final String SESSION_ID_KEY = "sessionID";
 
-	/** Field description */
 	public static final String SSL_PROTOCOLS_KEY = "ssl-protocols";
 
 	/**
@@ -109,11 +96,8 @@ public abstract class IOService<RefObject>
 	//~--- fields ---------------------------------------------------------------
 	private final ReentrantLock readInProgress = new ReentrantLock();
 	private final ReentrantLock writeInProgress = new ReentrantLock();
-	/** Field description */
 	protected CharBuffer cb = CharBuffer.allocate(2048);
-	/** Field description */
 	protected CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-	/** Field description */
 	protected CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
 	/**
 	 * The saved partial bytes for multi-byte UTF-8 characters between reads
@@ -124,9 +108,6 @@ public abstract class IOService<RefObject>
 	private JID connectionId = null;
 	private ConnectionType connectionType = null;
 	private JID dataReceiver = null;
-	/**
-	 * Field description
-	 */
 	private long empty_read_call_count = 0;
 	private String id = null;
 	/**

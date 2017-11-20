@@ -24,9 +24,9 @@ import java.lang.annotation.*;
 
 /**
  * Annotation to mark method as event handler. <br>
- * <p>
+ * <br>
  * Example:
- * <p>
+ * <br>
  * <pre>
  * <code>
  * public class Consumer {
@@ -39,7 +39,7 @@ import java.lang.annotation.*;
  * }
  * </code>
  * </pre>
- * <p>
+ * <br>
  * Handler method must have only one argument with type equals to expected event.
  */
 @Target({ElementType.METHOD})

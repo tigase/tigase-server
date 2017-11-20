@@ -21,8 +21,7 @@ package tigase.db;
 
 /**
  * Describe class AuthorizationException here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Nov 10 18:07:21 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

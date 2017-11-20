@@ -62,8 +62,7 @@ import java.util.Set;
  * because the Tigase server tries always to deliver and process the <code>Packet</code> using PacketFrom/To addresses
  * if they are null then Stanza addresses are used instead. So these are just convenience methods which allow avoiding
  * extra <code>IFs</code> in the program code and also save some CPU cycles.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -71,28 +70,20 @@ import java.util.Set;
  */
 public class Packet {
 
-	/** Field description */
 	public static final String CLIENT_XMLNS = "jabber:client";
 
-	/** Field description */
 	public static final String FROM_ATT = "from";
 
-	/** Field description */
 	public static final String ID_ATT = "id";
 
-	/** Field description */
 	public static final String PERM_ATT = "perm";
 
-	/** Field description */
 	public static final String PRIORITY_ATT = "pr";
 
-	/** Field description */
 	public static final String TO_ATT = "to";
 
-	/** Field description */
 	public static final String TYPE_ATT = "type";
 
-	/** Field description */
 	public static final String XMLNS_ATT = "xmlns";
 
 	/**
@@ -111,7 +102,6 @@ public class Packet {
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description */
 	protected Element elem;
 	private JID packetFrom = null;
 	private JID packetTo = null;
@@ -417,7 +407,7 @@ public class Packet {
 	 * </pre>
 	 * <strong>Please note! This method can only be used with static strings or with strings processed through
 	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons. If you pass
-	 * dynamically built <code>String[]</code> to the method call, use {@link #getAttribute(java.lang.String[], * java.lang.String) } instead.</strong>
+	 * dynamically built <code>String[]</code> to the method call, use {@link #getAttribute(java.lang.String[], java.lang.String) } instead.</strong>
 	 *
 	 * @param path is XML path for the stanza element or stanza child for which attribute is retrieved.
 	 * @param key is an attribute key.
@@ -434,7 +424,7 @@ public class Packet {
 	 * <pre>
 	 * packet.getElement().getAttribute(xmlPath, key);
 	 * </pre>
-	 * <strong>For performance reasons please consider using {@link #getAttributeStaticStr(java.lang.String[], * java.lang.String) } instead.</strong>
+	 * <strong>For performance reasons please consider using {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) } instead.</strong>
 	 *
 	 * @param path
 	 * @param key
@@ -1071,7 +1061,7 @@ public class Packet {
 	 * @return a <code>true</code> is element given in parameters is found in the packet stanza, otherwise
 	 * <code>false</code>
 	 *
-	 * @deprecated use {@link #isXMLNSStaticStr(String[], String)} instead, if possible, or {@link #isXMLNS(String[], * String)}
+	 * @deprecated use {@link #isXMLNSStaticStr(String[], String)} instead, if possible, or {@link #isXMLNS(String[], String)}
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")

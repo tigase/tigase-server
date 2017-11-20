@@ -64,7 +64,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	 */
 	private static final Logger log = Logger.getLogger(DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-	/** Field description */
 	@Inject
 	protected ClusterControllerIfc cluster = null;
 	protected String comp = "sess-man";
@@ -73,17 +72,13 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	@Inject
 	protected EventBus eventBus = null;
 	protected String prefix = "strategy/" + this.getClass().getSimpleName() + "/";
-	/** Field description */
 	@Inject
 	protected SessionManagerClusteredIfc sm = null;
 	private JID ampJID = JID.jidInstanceNS("amp", DNSResolverFactory.getInstance().getDefaultHost());
-	/** Field description */
 	private Set<CommandListener> commands = new CopyOnWriteArraySet<CommandListener>();
 	private ErrorForwarding errorForwarding = ErrorForwarding.drop;
 
-	/**
-	 * Constructs ...
-	 */
+
 	public DefaultClusteringStrategyAbstract() {
 		super();
 		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));

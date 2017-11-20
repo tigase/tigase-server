@@ -36,19 +36,14 @@ import tigase.xmpp.jid.JID;
 public class Message
 		extends Packet {
 
-	/** Field description */
 	public static final String ELEM_NAME = "message";
 
-	/** Field description */
 	public static final String[] MESSAGE_BODY_PATH = {ELEM_NAME, "body"};
 
-	/** Field description */
 	public static final String[] MESSAGE_SUBJECT_PATH = {ELEM_NAME, "subject"};
 
-	/** Field description */
 	public static final String[] MESSAGE_ERROR_PATH = {ELEM_NAME, "error"};
 
-	/** Field description */
 	public static final String[] MESSAGE_DELAY_PATH = {ELEM_NAME, "delay"};
 
 	//~--- constructors ---------------------------------------------------------
@@ -98,26 +93,12 @@ public class Message
 		return packetInstance(message, from, to);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param elem
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public Message(Element elem) throws TigaseStringprepException {
 		super(elem);
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param elem
-	 * @param stanzaFrom
-	 * @param stanzaTo
-	 */
 	public Message(Element elem, JID stanzaFrom, JID stanzaTo) {
 		super(elem, stanzaFrom, stanzaTo);
 	}

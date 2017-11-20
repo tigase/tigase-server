@@ -26,8 +26,7 @@ import tigase.xmpp.jid.JID;
 
 /**
  * Describe interface SessionManagerHandler here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Feb 18 13:27:58 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -35,7 +34,6 @@ import tigase.xmpp.jid.JID;
  */
 public interface SessionManagerHandler {
 
-	/** Field description */
 	public static final String COMMIT_HANDLER_KEY = "LoginHandlerKey";
 
 	JID getComponentId();

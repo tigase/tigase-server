@@ -32,11 +32,11 @@ import java.util.Map;
 
 /**
  * Interface Configurable
- * <p>
+ * <br>
  * Objects inheriting this interface can be configured. In Tigase system object can't request configuration properties.
  * Configuration of the object is passed to it at some time. Actually it can be passed at any time. This allows dynamic
  * system reconfiguration at runtime.
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -45,57 +45,46 @@ import java.util.Map;
 public interface Configurable
 		extends ServerComponent {
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String ADMINS_PROP_KEY = "admins";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String AMP_CLASS_NAME = "tigase.server.amp.AmpComponent";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String AMP_CLUST_CLASS_NAME = "tigase.cluster.AmpComponentClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String BOSH_CLUST_COMP_CLASS_NAME = "tigase.cluster.BoshConnectionClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String BOSH_COMP_CLASS_NAME = "tigase.server.bosh.BoshConnectionManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String C2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.ClientConnectionClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String C2S_COMP_CLASS_NAME = "tigase.server.xmppclient.ClientConnectionManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CL_COMP_CLASS_NAME = "tigase.cluster.ClusterConnectionManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CLUSTER_CONECT = "cluster-connect";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CLUSTER_CONTR_CLASS_NAME = "tigase.cluster.ClusterController";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CLUSTER_LISTEN = "cluster-listen";
@@ -115,118 +104,94 @@ public interface Configurable
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CLUSTER_NODES = "--cluster-nodes";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String CLUSTER_NODES_PROP_KEY = "cluster-nodes";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String COMP_PROT_CLASS_NAME = "tigase.server.ext.ComponentProtocol";
 
-	/** Field description */
 	public static final String COMPONENT_ID_PROP_KEY = "component-id";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_AMP_NAME = "amp";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_BOSH_NAME = "bosh";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_C2S_NAME = "c2s";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_CL_COMP_NAME = "cl-comp";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_CLUST_CONTR_NAME = "cluster-contr";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_COMP_PROT_NAME = "ext";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_EVENTBUS_NAME = "eventbus";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_EXT_COMP_NAME = "ext-comp";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_MONITOR_NAME = "monitor";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_S2S_NAME = "s2s";
 
-	/** Field description */
 	public static final String DEF_SM_NAME = "sess-man";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_STATS_NAME = "stats";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_VHOST_MAN_NAME = "vhost-man";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String DEF_WS2S_NAME = "ws2s";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String EVENTBUS_CLASS_NAME = "tigase.disteventbus.component.EventBusComponent";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String EXT_COMP_CLASS_NAME = "tigase.server.xmppcomponent.ComponentConnectionManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_ADMINS = "--admins";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_COMP_CLASS = "--comp-class";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_COMP_NAME = "--comp-name";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_CONF = "--gen-";
@@ -279,136 +244,106 @@ public interface Configurable
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_CONFIG_COMP = GEN_CONFIG + "-comp";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_DEBUG = "--debug";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_DEBUG_PACKAGES = "--debug-packages";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_EXT_COMP = "--ext-comp";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_MAX_QUEUE_SIZE = "--max-queue-size";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_SCRIPT_DIR = "--script-dir";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_SM_PLUGINS = "--sm-plugins";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_SREC_ADMINS = "--gen-srec-admins";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_SREC_DB = "--gen-srec-db";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_SREC_DB_URI = "--gen-srec-db-uri";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_TEST = "--test";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_TRUSTED = "--trusted";
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_USER_DB = RepositoryFactory.GEN_USER_DB;
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String GEN_VIRT_HOSTS = "--virt-hosts";
 
-	/** Field description */
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String MONITOR_CLASS_NAME = "tigase.monitor.MonitorComponent";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String MONITOR_CLUST_CLASS_NAME = "tigase.cluster.MonitorClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String MONITORING = "--monitoring";
 
-	/** Field description */
 	public static final String ROUTER_COMP_CLASS_NAME = "tigase.server.MessageRouter";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String S2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.S2SConnectionClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String S2S_COMP_CLASS_NAME = "tigase.server.xmppserver.S2SConnectionManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String SM_CLUST_COMP_CLASS_NAME = "tigase.cluster.SessionManagerClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String SM_COMP_CLASS_NAME = "tigase.server.xmppsession.SessionManager";
 
-	/** Field description */
 	public static final String STANZA_WHITE_CHAR_ACK = "white-char";
 
-	/** Field description */
 	public static final String STANZA_XMPP_ACK = "xmpp";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String STATS_CLASS_NAME = "tigase.stats.StatisticsCollector";
 
-	/** Field description */
 	public static final String STRINGPREP_PROCESSOR = "--stringprep-processor";
 
-	/** Field description */
 	public static final String TRUSTED_PROP_KEY = "trusted";
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -416,8 +351,6 @@ public interface Configurable
 	public static final String USER_REPO_POOL_CLASS = RepositoryFactory.USER_REPO_POOL_CLASS;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -425,8 +358,6 @@ public interface Configurable
 	public static final String USER_DOMAIN_POOL_CLASS = RepositoryFactory.USER_DOMAIN_POOL_CLASS;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -434,8 +365,6 @@ public interface Configurable
 	public static final String GEN_USER_DB_URI_PROP_KEY = RepositoryFactory.GEN_USER_DB_URI_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -443,8 +372,6 @@ public interface Configurable
 	public static final String GEN_USER_DB_URI = "--" + RepositoryFactory.GEN_USER_DB_URI_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -452,8 +379,6 @@ public interface Configurable
 	public static final String GEN_AUTH_DB_URI = RepositoryFactory.GEN_AUTH_DB_URI;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -461,8 +386,6 @@ public interface Configurable
 	public static final String GEN_AUTH_DB = RepositoryFactory.GEN_AUTH_DB;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -470,8 +393,6 @@ public interface Configurable
 	public static final String AUTH_REPO_POOL_CLASS = RepositoryFactory.AUTH_REPO_POOL_CLASS;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -479,42 +400,33 @@ public interface Configurable
 	public static final String AUTH_DOMAIN_POOL_CLASS = RepositoryFactory.AUTH_DOMAIN_POOL_CLASS;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String USER_REPO_POOL_SIZE = RepositoryFactory.USER_REPO_POOL_SIZE;
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String VHOST_MAN_CLASS_NAME = "tigase.vhosts.VHostManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String VHOST_MAN_CLUST_CLASS_NAME = "tigase.cluster.VHostManagerClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String WS2S_CLASS_NAME = "tigase.server.websocket.WebSocketClientConnectionManager";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String WS2S_CLUST_CLASS_NAME = "tigase.cluster.WebSocketClientConnectionClustered";
 
-	/** Field description */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String XMPP_STANZA_ACK = "--stanza-ack";
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -522,8 +434,6 @@ public interface Configurable
 	public static final String XML_REPO_URL_PROP_VAL = RepositoryFactory.XML_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -531,8 +441,6 @@ public interface Configurable
 	public static final String XML_REPO_CLASS_PROP_VAL = RepositoryFactory.XML_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -540,8 +448,6 @@ public interface Configurable
 	public static final String USER_REPO_URL_PROP_KEY = RepositoryFactory.USER_REPO_URL_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -549,8 +455,6 @@ public interface Configurable
 	public static final String USER_REPO_POOL_SIZE_PROP_KEY = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -558,8 +462,6 @@ public interface Configurable
 	public static final String USER_REPO_PARAMS_NODE = RepositoryFactory.USER_REPO_PARAMS_NODE;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -567,8 +469,6 @@ public interface Configurable
 	public static final String USER_REPO_DOMAINS_PROP_KEY = RepositoryFactory.USER_REPO_DOMAINS_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -576,8 +476,6 @@ public interface Configurable
 	public static final String TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL = RepositoryFactory.TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -585,8 +483,6 @@ public interface Configurable
 	public static final String TIGASE_AUTH_REPO_URL_PROP_VAL = RepositoryFactory.TIGASE_AUTH_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -594,8 +490,6 @@ public interface Configurable
 	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL = RepositoryFactory.TIGASE_AUTH_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -603,8 +497,6 @@ public interface Configurable
 	public static final String SHARED_USER_REPO_PROP_KEY = RepositoryFactory.SHARED_USER_REPO_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -612,8 +504,6 @@ public interface Configurable
 	public static final String SHARED_USER_REPO_PARAMS_PROP_KEY = RepositoryFactory.SHARED_USER_REPO_PARAMS_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated
 	 */
 	@Deprecated
@@ -621,8 +511,6 @@ public interface Configurable
 	public static final String SHARED_AUTH_REPO_PROP_KEY = RepositoryFactory.SHARED_AUTH_REPO_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -630,8 +518,6 @@ public interface Configurable
 	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY = RepositoryFactory.SHARED_AUTH_REPO_PARAMS_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -639,8 +525,6 @@ public interface Configurable
 	public static final String PGSQL_REPO_URL_PROP_VAL = RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -648,8 +532,6 @@ public interface Configurable
 	public static final String PGSQL_REPO_CLASS_PROP_VAL = RepositoryFactory.PGSQL_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -657,8 +539,6 @@ public interface Configurable
 	public static final String MYSQL_REPO_URL_PROP_VAL = RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -666,8 +546,6 @@ public interface Configurable
 	public static final String MYSQL_REPO_CLASS_PROP_VAL = RepositoryFactory.MYSQL_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -675,8 +553,6 @@ public interface Configurable
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL = RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -684,8 +560,6 @@ public interface Configurable
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = RepositoryFactory.LIBRESOURCE_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -693,8 +567,6 @@ public interface Configurable
 	public static final String DUMMY_REPO_CLASS_PROP_VAL = RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -702,8 +574,6 @@ public interface Configurable
 	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = RepositoryFactory.DRUPALWP_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -711,8 +581,6 @@ public interface Configurable
 	public static final String DRUPAL_REPO_URL_PROP_VAL = RepositoryFactory.DRUPAL_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -720,8 +588,6 @@ public interface Configurable
 	public static final String DERBY_REPO_URL_PROP_VAL = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -729,8 +595,6 @@ public interface Configurable
 	public static final String DERBY_REPO_CLASS_PROP_VAL = RepositoryFactory.DERBY_REPO_CLASS_PROP_VAL;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -738,8 +602,6 @@ public interface Configurable
 	public static final String AUTH_REPO_URL_PROP_KEY = RepositoryFactory.AUTH_REPO_URL_PROP_KEY;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated
@@ -747,8 +609,6 @@ public interface Configurable
 	public static final String AUTH_REPO_PARAMS_NODE = RepositoryFactory.AUTH_REPO_PARAMS_NODE;
 
 	/**
-	 * Field description
-	 *
 	 * @deprecated moved to RepositoryFactory
 	 */
 	@Deprecated

@@ -37,18 +37,17 @@ import java.util.logging.Logger;
 /**
  * Class ClusterElement is a utility class for handling tigase cluster specific packets. The cluster packet has the
  * following form:
- * <p>
+ * <br>
  * {@code <cluster xmlns="tigase:cluster" from="source" to="dest" type="set"> <data> <message xmlns="jabber:client"
  * from="source-u" to="dest-x" type="chat"> <body>Hello world!</body> </message> </data> <control> <first-node>node1 JID
  * address</first-node> <visited-nodes> <node-id>node1 JID address</node-id> <node-id>node2 JID address</node-id>
  * </visited-nodes> <method-call name="method name"> <par name="param1 name">value</par> <par name="param2
  * name">value</par> <results> <val name="val1 name">value</var> <val name="val2 name">value</var> </results>
  * </method-call> </control> </cluster> }
- * <p>
+ * <br>
  * If none of nodes could process the packet it goes back to the first node as this node is the most likely to process
  * the packet correctly.
- * <p>
- * <p>
+ * <br>
  * Created: Fri May 2 09:40:40 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -56,56 +55,38 @@ import java.util.logging.Logger;
  */
 public class ClusterElement {
 
-	/** Field description */
 	public static final String CLUSTER_CONTROL_EL_NAME = "control";
 
-	/** Field description */
 	public static final String CLUSTER_DATA_EL_NAME = "data";
 
-	/** Field description */
 	public static final String CLUSTER_EL_NAME = "cluster";
 
-	/** Field description */
 	public static final String CLUSTER_METHOD_EL_NAME = "method-call";
 
-	/** Field description */
 	public static final String CLUSTER_METHOD_PAR_EL_NAME = "par";
 
-	/** Field description */
 	public static final String CLUSTER_METHOD_RESULTS_EL_NAME = "results";
 
-	/** Field description */
 	public static final String CLUSTER_METHOD_RESULTS_VAL_EL_NAME = "val";
 
-	/** Field description */
 	public static final String CLUSTER_NAME_ATTR = "name";
 
-	/** Field description */
 	public static final String FIRST_NODE_EL_NAME = "first-node";
 
-	/** Field description */
 	public static final String NODE_ID_EL_NAME = "node-id";
 
-	/** Field description */
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
 
-	/** Field description */
 	public static final String XMLNS = "tigase:cluster";
-	/** Field description */
 	public static final String[] VISITED_NODES_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME, VISITED_NODES_EL_NAME};
-	/** Field description */
 	public static final String[] FIRST_NODE_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME, FIRST_NODE_EL_NAME};
 
 	// public static final String PACKET_FROM_ATTR_NAME = "packet-from";
-	/** Field description */
 	public static final String[] CLUSTER_METHOD_RESULTS_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME,
 																CLUSTER_METHOD_EL_NAME, CLUSTER_METHOD_RESULTS_EL_NAME};
-	/** Field description */
 	public static final String[] CLUSTER_METHOD_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME,
 														CLUSTER_METHOD_EL_NAME};
-	/** Field description */
 	public static final String[] CLUSTER_DATA_PATH = {CLUSTER_EL_NAME, CLUSTER_DATA_EL_NAME};
-	/** Field description */
 	public static final String[] CLUSTER_CONTROL_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME};
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -255,14 +236,6 @@ public class ClusterElement {
 		}
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param from
-	 * @param to
-	 * @param type
-	 * @param packet
-	 */
 	public ClusterElement(JID from, JID to, StanzaType type, Packet packet) {
 		if (packet != null) {
 			packets = new ArrayDeque<Element>();

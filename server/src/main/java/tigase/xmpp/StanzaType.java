@@ -24,8 +24,7 @@ import java.util.Set;
 
 /**
  * Describe class StanzaType here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Feb 10 13:13:50 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

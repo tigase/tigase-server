@@ -32,7 +32,7 @@ import java.util.Collection;
 
 /**
  * Abstract class extending TimerTask which allows easy configuration and usage of TimerTask as a bean
- * <p>
+ * <br>
  * Created by andrzej on 09.08.2016.
  */
 public abstract class ScheduledTask

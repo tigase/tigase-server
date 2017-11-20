@@ -48,28 +48,18 @@ import java.util.logging.Logger;
 public class DataRepositoryImpl
 		implements DataRepository, StatisticsProviderIfc, RepositoryVersionAware {
 
-	/** Field description */
 	public static final String DERBY_CONNVALID_QUERY = "values 1";
-	/** Field description */
 	public static final String JDBC_CONNVALID_QUERY = "select 1";
 	public static final String JDBC_SCHEMA_VERSION_QUERY = "{ call TigGetComponentVersion( ? ) }";
-	/** Field description */
 	public static final String MYSQL_CHECK_TABLE_QUERY = "select * from information_schema.tables where table_name = ? and table_schema = ?";
-	/** Field description */
 	public static final String PGSQL_CHECK_TABLE_QUERY = "select * from pg_tables where tablename = ? and schemaname = ?";
-	/** Field description */
 	public static final String DERBY_CHECK_TABLE_QUERY = "select * from SYS.SYSTABLES where tablename = UPPER(?) and ? is not null";
-	/** Field description */
 	public static final String SQLSERVER_CHECK_TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = ? and TABLE_SCHEMA = ?";
-	/** Field description */
 	public static final String OTHER_CHECK_TABLE_QUERY = "";
-	/** Field description */
 	public static final String SP_STARTS_WITH = "{ call";
 	public static final String QUERY_TIMEOUT_PROP_KEY = "sql-query-timeout";
-	/** Field description */
 	public static final int QUERY_TIMEOUT = 10;
 	public static final String DB_CONN_TIMEOUT_PROP_KEY = "db-conn-timeout";
-	/** Field description */
 	public static final int DB_CONN_TIMEOUT = 15;
 	private static final Logger log = Logger.getLogger(DataRepositoryImpl.class.getName());
 	private String check_table_query = OTHER_CHECK_TABLE_QUERY;

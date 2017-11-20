@@ -51,21 +51,16 @@ public abstract class PresenceAbstract
 		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc {
 
-	/** Field description */
 	public static final String PRESENCE_ELEMENT_NAME = "presence";
 
-	/** Field description */
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
 
 	public static final String PRESENCE_PROBE_FULL_JID_KEY = "probe-full-jid";
 
-	/** Field description */
 	public static final String SKIP_OFFLINE_SYS_PROP_KEY = "skip-offline-sys";
 
-	/** Field description */
 	public static final String USERS_STATUS_CHANGES = "Users status changes";
 
-	/** Field description */
 	protected static final String XMLNS = CLIENT_XMLNS;
 
 	/** Private logger for class instance. */
@@ -80,7 +75,6 @@ public abstract class PresenceAbstract
 	private static boolean skipOfflineSys = true;
 
 	//~--- fields ---------------------------------------------------------------
-	/** Field description */
 	protected RosterAbstract roster_util = getRosterUtil();
 
 	// This is required to make sure that dynamic roster will get initialized

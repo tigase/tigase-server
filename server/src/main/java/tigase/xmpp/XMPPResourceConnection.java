@@ -49,8 +49,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class XMPPResourceConnection here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Feb 8 22:30:37 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -59,22 +58,16 @@ import java.util.logging.Logger;
 public class XMPPResourceConnection
 		extends RepositoryAccess {
 
-	/** Field description */
 	public static final String ALL_RESOURCES_CAPS_KEY = "caps";
 
-	/** Field description */
 	public static final String ALL_RESOURCES_KEY = "all-resources";
 
-	/** Field description */
 	public static final String ALL_RESOURCES_PRIORITY_KEY = "priority";
 
-	/** Field description */
 	public static final String AUTHENTICATION_TIMEOUT_KEY = "authentication-timeout";
 
-	/** Field description */
 	public static final String CLOSING_KEY = "closing-conn";
 
-	/** Field description */
 	public static final String ERROR_KEY = "error-key";
 
 	/**
@@ -744,8 +737,7 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, *
-	 * Queue)}
+	 * @deprecated Code moved to {@link JabberIqRegister#doRemoveAccount(Packet, Element, XMPPResourceConnection, Queue)}
 	 */
 	@Override
 	@Deprecated

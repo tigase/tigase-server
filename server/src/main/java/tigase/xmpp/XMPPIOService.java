@@ -45,8 +45,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class XMPPIOService here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Feb 7 07:15:02 2006
  *
  * @param <RefObject> is a reference object stored by this service. This is e reference to higher level data object
@@ -58,13 +57,10 @@ import java.util.logging.Logger;
 public class XMPPIOService<RefObject>
 		extends IOService<RefObject> {
 
-	/** Field description */
 	public static final String ACK_NAME = "ack";
 
-	/** Field description */
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_KEY = "cross-domain-policy-file";
 
-	/** Field description */
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL = "etc/cross-domain-policy.xml";
 
 	/**
@@ -72,10 +68,8 @@ public class XMPPIOService<RefObject>
 	 */
 	public static final String DOM_HANDLER = "XMPPDomBuilderHandler";
 
-	/** Field description */
 	public static final String ID_ATT = "id";
 
-	/** Field description */
 	public static final String REQ_NAME = "req";
 
 	public static final String STREAM_CLOSING = "stream-closing";
@@ -86,9 +80,7 @@ public class XMPPIOService<RefObject>
 	private static final Logger log = Logger.getLogger(XMPPIOService.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-	/** Field description */
 	public ReentrantLock writeInProgress = new ReentrantLock();
-	/** Field description */
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	protected XMPPIOProcessor[] processors = null;
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;

@@ -34,7 +34,7 @@ import java.text.ParseException;
 
 /**
  * Implementation of parser for XEP-0313: Message Archive Management
- * <p>
+ * <br>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamQueryParser", active = true)

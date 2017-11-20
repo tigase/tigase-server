@@ -37,11 +37,7 @@ public class ConfigurationException
 		super();
 	}
 
-	/**
-	 * Constructs an instance of <code>ConfigurationException</code> with the specified detail message.
-	 *
-	 * @param msg the detail message.
-	 */
+
 	public ConfigurationException(String msg) {
 		super(msg);
 	}

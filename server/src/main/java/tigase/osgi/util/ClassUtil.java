@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * <code>ClassUtil</code> file contains code used for loading all implementations of specified <em>interface</em> or
  * <em>abstract class</em> found in classpath. As a result of calling some functions you can have <code>Set</code>
  * containing all required classes.
- * <p>
+ * <br>
  * <p> Created: Wed Oct  6 08:25:52 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

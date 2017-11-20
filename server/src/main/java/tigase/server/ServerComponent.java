@@ -30,10 +30,10 @@ import java.util.Queue;
 
 /**
  * Interface ServerComponent
- * <p>
+ * <br>
  * Object of this type can be managed by MessageRouter. All classes which are loaded by MessageRouter must inherit this
  * interface.
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

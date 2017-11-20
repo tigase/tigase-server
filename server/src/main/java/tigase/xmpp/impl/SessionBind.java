@@ -41,8 +41,7 @@ import static tigase.xmpp.impl.SessionBind.XMLNS;
 
 /**
  * Describe class SessionBind here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Feb 20 22:43:59 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

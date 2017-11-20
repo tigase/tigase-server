@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  * entities in other networks like <em>SMTP</em> or other implemented by the server. Once this implementation is
  * finished there will be more information available. If you, however, are interested in this particular feature send a
  * question to author.
- * <p>
+ * <br>
  * <p> Created: Tue Oct  5 20:31:23 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -58,10 +58,8 @@ import java.util.logging.Logger;
 public abstract class XMPPProcessor
 		implements XMPPImplIfc, XMPPProcessorConcurrencyAwareIfc {
 
-	/** Field description */
 	protected static final String ALL_NAMES = "*";
 
-	/** Field description */
 	protected static final String[][] ALL_PATHS = {{"*"}};
 	/**
 	 * Variable <code>log</code> is a class logger.

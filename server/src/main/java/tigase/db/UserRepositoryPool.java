@@ -38,10 +38,10 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Pool for user repositories. <br/> This pool should be used if connection to user storage is blocking or synchronized,
- * ie. implemented using single connection.<br/> If implementation of <code>UserRepository</code> uses connection pool
+ * Pool for user repositories. * <br> This pool should be used if connection to user storage is blocking or synchronized,
+ * ie. implemented using single connection.* <br> If implementation of <code>UserRepository</code> uses connection pool
  * or non blocking, concurrent access to user storage (ie. <code>DataSourcePool</code>), then this pool is not need.
- * <p>
+ * <br>
  * Created: Jan 28, 2009 8:46:53 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -490,13 +490,7 @@ public class UserRepositoryPool
 	private class RepoCache
 			extends SimpleCache<String, Object> {
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param maxsize
-		 * @param cache_time
-		 */
-		public RepoCache(int maxsize, long cache_time) {
+				public RepoCache(int maxsize, long cache_time) {
 			super(maxsize, cache_time);
 		}
 

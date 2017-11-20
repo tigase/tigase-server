@@ -93,10 +93,8 @@ public class ClientConnectionManager
 	private final ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	@Inject
 	protected EventBus eventBus;
-	/** Field description */
 	@Inject
 	protected RoutingsContainer.RoutingComputer routings = null;
-	/** Field description */
 	@Inject(nullAllowed = true)
 	protected SeeOtherHostIfc see_other_host_strategy = null;
 	@Inject
@@ -885,9 +883,9 @@ public class ClientConnectionManager
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * Let's assume user should send something at least once every 24 hours....
 	 */
 	@Override

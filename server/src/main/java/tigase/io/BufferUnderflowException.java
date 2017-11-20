@@ -23,8 +23,7 @@ import java.io.IOException;
 
 /**
  * Describe class BufferUnderflowException here.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Sep 24 22:32:37 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

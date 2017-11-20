@@ -33,7 +33,7 @@ import java.util.TimeZone;
 /**
  * Basic implementation of handler processing items found in repository and converting into forward messages for
  * delivery to client as specified in XEP-0313: Message Archive Management
- * <p>
+ * <br>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamItemHandler", parent = QueryModule.class, active = true)

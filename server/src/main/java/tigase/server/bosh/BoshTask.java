@@ -29,8 +29,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshWaitTimer here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Oct 30 16:38:15 2012
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -47,11 +46,7 @@ public class BoshTask
 
 	// ~--- constructors -------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param bs
-	 */
+
 	public BoshTask(BoshSession bs, BoshConnectionManager manager) {
 		this.bs = bs;
 		this.manager = manager;

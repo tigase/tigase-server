@@ -47,8 +47,7 @@ import static tigase.io.SSLContextContainerIfc.JKS_KEYSTORE_PWD_KEY;
 /**
  * This is sample class demonstrating how to use <code>tigase.io</code> library for TLS/SSL client connection. This is
  * simple telnet client class which can connect to remote server using plain connection or SSL.
- * <p>
- * <p>
+ * <br>
  * Created: Sun Aug  6 15:14:49 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

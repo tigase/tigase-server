@@ -54,8 +54,7 @@ import static tigase.server.bosh.Constants.*;
 
 /**
  * Describe class BoshConnectionManager here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Jun 2 12:24:29 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -68,15 +67,10 @@ public class BoshConnectionManager
 		extends ClientConnectionManager
 		implements BoshSessionTaskHandler, BoshIOService.ConfigProvider {
 
-	/** Field description */
 	public static final String BOSH_CLOSE_CONNECTION_PROP_KEY = "bosh-close-connection";
-	/** Field description */
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
-	/** Field description */
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL = "etc/bosh-extra-headers.txt";
-	/** Field description */
 	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_KEY = "client-access-policy-file";
-	/** Field description */
 	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_VAL = "etc/client-access-policy.xml";
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -86,7 +80,6 @@ public class BoshConnectionManager
 
 	//~--- fields ---------------------------------------------------------------
 	private static Handler sidFilehandler;
-	/** Field description */
 	protected final Map<UUID, BoshSession> sessions = new ConcurrentSkipListMap<UUID, BoshSession>();
 	private int[] PORTS = {DEF_PORT_NO};
 	@ConfigField(desc = "Batch queue timeout", alias = BATCH_QUEUE_TIMEOUT_KEY)

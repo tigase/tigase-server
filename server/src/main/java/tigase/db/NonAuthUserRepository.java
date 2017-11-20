@@ -28,8 +28,7 @@ import tigase.xmpp.jid.BareJID;
 
 /**
  * Describe interface WriteOnlyUserRepository here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Oct 14 20:42:30 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -37,10 +36,8 @@ import tigase.xmpp.jid.BareJID;
  */
 public interface NonAuthUserRepository {
 
-	/** Field description */
 	public static final String PUBLIC_DATA_NODE = "public";
 
-	/** Field description */
 	public static final String OFFLINE_DATA_NODE = "offline";
 
 	//~--- methods --------------------------------------------------------------

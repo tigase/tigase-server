@@ -438,7 +438,6 @@ public class Kernel {
 	 *  registerBean(Bean1.class).exec();
 	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param beanClass class of bean to register.
 	 *
@@ -478,7 +477,6 @@ public class Kernel {
 	 *  krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
 	 * }
 	 * </pre>
-	 * </p>
 	 *
 	 * @param beanName name of bean.
 	 *

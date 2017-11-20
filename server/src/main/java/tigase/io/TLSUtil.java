@@ -39,8 +39,7 @@ import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_VAL;
 
 /**
  * Describe class TLSUtil here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Jan 23 14:21:31 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -119,7 +118,7 @@ public abstract class TLSUtil {
 	/**
 	 * Method returns singleton instance of class implementing SSLContextContainerIfc responsible for caching SSLContext
 	 * instances.
-	 * <p>
+	 * <br>
 	 * This instance should be wrapped by new instance of SSLContextContainer if method getSSLContext will be used with
 	 * TrustManager array passed!
 	 *

@@ -26,7 +26,7 @@ import tigase.stats.StatisticsList;
  * An interface for loadable packet filters to the Tigase server. Every Tigase component can have an independent list of
  * packet filters for outgoing and incoming traffic. A filter can make any change to the processed packet or can block
  * the packet from further processing. Please refer to the <code>filter()</code> method for more details.
- * <p>
+ * <br>
  * Created: Jun 8, 2009 1:29:49 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -52,7 +52,7 @@ public interface PacketFilterIfc {
 	 * to the packet it should create a copy of the object, then make any changes on the copy and return the copy as the
 	 * result. It may also optionally block the packet from further processing. This means that the packet is
 	 * effectivelly dropped and forgotten.
-	 * <p>
+	 * <br>
 	 * If the method returns a <code>Packet</code> as a result. It is normally recommended not to modify the existing
 	 * packet as it maybe processed simultanuously by other components/threads at the same time. Modifying packet while
 	 * it is being processed may lead to unpredictable results. Therefore, if the filter wants to modify the packet it
@@ -61,7 +61,7 @@ public interface PacketFilterIfc {
 	 * parameter to method call.
 	 *
 	 * @param packet for the filter processing.
-	 * <p>
+	 * <br>
 	 * Please note, the packet filtering may affect performance significantly therefore this method should be carefully
 	 * tested and optimized under a high load.
 	 *

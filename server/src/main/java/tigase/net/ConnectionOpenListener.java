@@ -27,8 +27,7 @@ import java.nio.channels.SocketChannel;
 
 /**
  * Describe interface ConnectionOpenListener here.
- * <p>
- * <p>
+ * <br>
  * Created: Thu Jan 26 00:00:39 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -42,19 +41,14 @@ public interface ConnectionOpenListener {
 	 */
 	public static final int DEF_RECEIVE_BUFFER_SIZE = 2 * 1024;
 
-	/** Field description */
 	public static final int IPTOS_LOWCOST = 0x02;
 
-	/** Field description */
 	public static final int IPTOS_LOWDELAY = 0x10;
 
-	/** Field description */
 	public static final int IPTOS_RELIABILITY = 0x04;
 
-	/** Field description */
 	public static final int IPTOS_THROUGHPUT = 0x08;
 
-	/** Field description */
 	public static final int DEF_TRAFFIC_CLASS = IPTOS_LOWCOST;
 
 	//~--- methods --------------------------------------------------------------

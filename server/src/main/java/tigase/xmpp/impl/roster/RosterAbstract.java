@@ -45,81 +45,60 @@ import java.util.stream.Stream;
 
 /**
  * Describe class RosterAbstract here.
- * <p>
- * <p>
+ * <br>
  * Created: Thu Sep 4 18:09:52 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public abstract class RosterAbstract {
 
-	/** Field description */
 	public static final String CLIENT_XMLNS = "jabber:client";
 
-	/** Field description */
 	public static final String GROUP = "group";
 
-	/** Field description */
 	public static final String GROUPS = "groups";
 
-	/** Field description */
 	public static final String NAME = "name";
 
-	/** Field description */
 	public static final String ROSTER = "roster";
 
-	/** Field description */
 	public static final String ROSTER_XMLNS = "jabber:iq:roster";
 
-	/** Field description */
 	public static final String ROSTERHASH = "rosterhash";
 
-	/** Field description */
 	public static final String SUBSCRIPTION = "subscription";
 
-	/** Field description */
 	public static final String VER_ATT = "ver";
 
-	/** Field description */
 	public static final String XMLNS = "jabber:iq:roster";
 
-	/** Field description */
 	public static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
 
-	/** Field description */
 	public static final String XMLNS_LOAD = XMLNS + "-load";
 
 	// ~--- static fields --------------------------------------------------------
-	/** Field description */
 	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED = EnumSet.of(SubscriptionType.to,
 																			 SubscriptionType.to_pending_in,
 																			 SubscriptionType.both,
 																			 SubscriptionType.to_pre_approved);
-	/** Field description */
 	public static final EnumSet<SubscriptionType> SUB_TO = EnumSet.of(SubscriptionType.to,
 																	  SubscriptionType.to_pending_in,
 																	  SubscriptionType.to_pre_approved);
-	/** Field description */
 	public static final EnumSet<SubscriptionType> SUB_NONE = EnumSet.of(SubscriptionType.none,
 																		SubscriptionType.none_pending_out,
 																		SubscriptionType.none_pending_in,
 																		SubscriptionType.none_pending_out_in,
 																		SubscriptionType.none_pending_out_pre_approved);
-	/** Field description */
 	public static final EnumSet<SubscriptionType> SUB_FROM = EnumSet.of(SubscriptionType.from,
 																		SubscriptionType.from_pending_out);
-	/** Field description */
 	public static final EnumSet<SubscriptionType> SUB_BOTH = EnumSet.of(SubscriptionType.both);
-	/** Field description */
 	public static final EnumSet<SubscriptionType> PENDING_OUT = EnumSet.of(SubscriptionType.none_pending_out,
 																		   SubscriptionType.none_pending_out_in,
 																		   SubscriptionType.from_pending_out,
 																		   SubscriptionType.none_pending_out_pre_approved);
-	/** Field description */
 	public static final EnumSet<SubscriptionType> PENDING_IN = EnumSet.of(SubscriptionType.none_pending_in,
 																		  SubscriptionType.none_pending_out_in,
 																		  SubscriptionType.to_pending_in);
-	/** Field description */
 	public static final EnumSet<StanzaType> INITIAL_PRESENCES = EnumSet.of(StanzaType.available,
 																		   StanzaType.unavailable);
 	/** Holds all {link @SubscriptionType} elements that can be perceived as <em>FROM</em> subscription */
@@ -130,11 +109,9 @@ public abstract class RosterAbstract {
 	public static final EnumSet<SubscriptionType> PRE_APPROVED = EnumSet.of(SubscriptionType.none_pre_approved,
 																			SubscriptionType.none_pending_out_pre_approved,
 																			SubscriptionType.to_pre_approved);
-	/** Field description */
 	public static final Element[] FEATURES = {
 			new Element("ver", new String[]{"xmlns"}, new String[]{"urn:xmpp:features:rosterver"}),
 			new Element("sub", new String[]{"xmlns"}, new String[]{"urn:xmpp:features:pre-approval"})};
-	/** Field description */
 	public static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS}),
 													new Element("feature", new String[]{"var"},
 																new String[]{XMLNS_DYNAMIC})};

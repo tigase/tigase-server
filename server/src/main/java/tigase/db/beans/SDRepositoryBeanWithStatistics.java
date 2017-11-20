@@ -29,7 +29,7 @@ import java.lang.reflect.Proxy;
 
 /**
  * Extended version of SDRepositoryBean class with support for statistics gathering.
- * <p>
+ * <br>
  * Created by andrzej on 15.12.2016.
  */
 public abstract class SDRepositoryBeanWithStatistics<T extends DataSourceAware>

@@ -35,16 +35,12 @@ import tigase.xml.Element;
 public abstract class RepositoryItemAbstract
 		implements RepositoryItem {
 
-	/** Field description */
 	public static final String ADMINS_ATT = "admins";
 
-	/** Field description */
 	public static final String ADMINS_LABEL = "Administrators";
 
-	/** Field description */
 	public static final String OWNER_ATT = "owner";
 
-	/** Field description */
 	public static final String OWNER_LABEL = "Owner";
 
 	//~--- fields ---------------------------------------------------------------

@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * <strong>'to'</strong> the user is being processed, the plugin forwards the message to all connected resources.<br>
  * The idea behind this implementation is to keep all connected resources synchronized with a complete chat content.
  * User should be able to switch between connections and continue the chat.
- * <p>
+ * <br>
  * Created: Feb 14, 2010 4:35:45 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

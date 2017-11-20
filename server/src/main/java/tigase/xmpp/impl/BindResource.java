@@ -41,8 +41,7 @@ import static tigase.xmpp.impl.BindResource.ID;
 
 /**
  * RFC-3920, 7. Resource Binding
- * <p>
- * <p>
+ * <br>
  * Created: Mon Feb 20 21:07:29 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -54,7 +53,6 @@ public class BindResource
 		implements XMPPProcessorIfc, XMPPPreprocessorIfc {
 
 	public static final String DEF_RESOURCE_PREFIX_PROP_KEY = "def-resource-prefix";
-	/** Field description */
 	private static final String[] COMPRESS_PATH = {"compress"};
 	private static final String EL_NAME = "bind";
 	private static final String[][] ELEMENTS = {Iq.IQ_BIND_PATH};

@@ -23,8 +23,7 @@ import tigase.server.ServerComponent;
 
 /**
  * Describe interface ClusteredComponent here.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Jun  9 20:00:46 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -47,8 +47,7 @@ import static tigase.xmpp.impl.PresenceSubscription.AUTO_AUTHORIZE_PROP_KEY;
 /**
  * Class <code>JabberIqRoster</code> implements part of <em>RFC-3921</em> - <em>XMPP Instant Messaging</em>
  * specification describing roster management. 7. Roster Management
- * <p>
- * <p>
+ * <br>
  * Created: Tue Feb 21 17:42:53 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -59,7 +58,6 @@ public class JabberIqRoster
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {
 
-	/** Field description */
 	public static final String ANON = "anon";
 	/** unique ID of the plugin */
 	protected static final String ID = RosterAbstract.XMLNS;
@@ -208,9 +206,9 @@ public class JabberIqRoster
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * Performs processing of <em>IQ</em> packets with <em>jabber:iq:roster</em> xmlns with the regard whether it's
 	 * roster <em>set</em> or <em>get</em> request or possibly dynamic-roster is involved. request.
 	 */

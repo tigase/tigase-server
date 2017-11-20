@@ -37,8 +37,7 @@ import java.util.Map;
 
 /**
  * Describe interface SSLContextContainerIfc here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 20 11:43:32 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -73,10 +72,8 @@ public interface SSLContextContainerIfc
 	 */
 	String ALLOW_SELF_SIGNED_CERTS_VAL = "true";
 
-	/** Field description */
 	String CERT_ALIAS_KEY = "cert-alias";
 
-	/** Field description */
 	String CERT_SAVE_TO_DISK_KEY = "cert-save-to-disk";
 
 	/**
@@ -109,7 +106,6 @@ public interface SSLContextContainerIfc
 	 */
 	String JKS_KEYSTORE_PWD_VAL = "keystore";
 
-	/** Field description */
 	String PEM_CERTIFICATE_KEY = "pem-certificate";
 
 	/**

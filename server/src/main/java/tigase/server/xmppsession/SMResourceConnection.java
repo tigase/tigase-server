@@ -45,14 +45,6 @@ import java.util.logging.Logger;
 public class SMResourceConnection
 		extends XMPPResourceConnection {
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param connectionId
-	 * @param rep
-	 * @param authRepo
-	 * @param loginHandler
-	 */
 	public SMResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
 								SessionManagerHandler loginHandler) {
 		super(connectionId, rep, authRepo, loginHandler);

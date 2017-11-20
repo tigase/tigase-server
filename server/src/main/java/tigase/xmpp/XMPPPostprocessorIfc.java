@@ -33,8 +33,7 @@ import java.util.Queue;
 
 /**
  * Describe interface XMPPPostprocessorIfc here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Oct 14 17:41:09 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

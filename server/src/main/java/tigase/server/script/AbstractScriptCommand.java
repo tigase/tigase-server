@@ -39,7 +39,6 @@ public abstract class AbstractScriptCommand
 		extends StatisticHolderImpl
 		implements CommandIfc {
 
-	/** Field description */
 	public static final Map<String, String> lineCommentStart = new LinkedHashMap<String, String>(20);
 
 	//~--- static initializers --------------------------------------------------

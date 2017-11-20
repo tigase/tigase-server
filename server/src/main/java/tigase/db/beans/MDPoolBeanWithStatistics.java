@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 
 /**
  * Class extends MDPoolBean class by adding support for statistics gathering for every managed repository.
- * <p>
+ * <br>
  * Created by andrzej on 14.12.2016.
  */
 public abstract class MDPoolBeanWithStatistics<S extends Repository, T extends MDPoolConfigBean<S, T>>

@@ -35,7 +35,7 @@ import tigase.xmpp.mam.QueryParser;
 /**
  * Implementation of module responsible for handling request to retrive form used in XEP-0313: Message Archive
  * Management
- * <p>
+ * <br>
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamGetFormModule", active = true)

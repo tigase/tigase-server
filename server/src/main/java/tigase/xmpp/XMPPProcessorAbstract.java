@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 /**
  * Utility abstract class detecting what kind of packet is processed. Releases developers from checking whether the
  * packet is addressed to the user of the session or from the user of the sesion or packet to the server itself.
- * <p>
+ * <br>
  * Created: Mar 1, 2010 10:21:29 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

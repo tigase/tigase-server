@@ -23,6 +23,7 @@ import tigase.db.AuthRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.Schema;
 import tigase.db.TigaseDBException;
+import tigase.kernel.core.Kernel;
 import tigase.server.XMPPServer;
 import tigase.util.Version;
 import tigase.util.log.LogFormatter;
@@ -50,16 +51,16 @@ import static tigase.db.jdbc.DataRepositoryImpl.JDBC_SCHEMA_VERSION_QUERY;
 /**
  * Simple utility class allowing various Database operations, including executing simple queries, loading specific
  * schema files or performing complete load of all Tigase schema required to run the server.
- * <p>
+ * <br>
  * Following set of {@link Properties} is accepted: <ul> <li>{@code dbType} - type of the database, possible values are:
- * {@code mysql}, {@code postgresql}, {@code derby}, {@code sqlserver}; <li>{@code schemaVersion} - schema version to be
- * loaded, , possible values are: {@code 7-2}, {@code 7-1}, {@code 5-1}, {@code 5}, {@code 4}; <li>{@code dbName} - name
- * of the database to be created/used; <li>{@code dbHostname} - hostname of the database; <li>{@code dbUser} - username
- * of the regular user; <li>{@code dbPass} - password of the regular user; <li>{@code rootUser} - username of the
- * database administrator user; <li>{@code rootPass} - password of the database administrator user; <li>{@code query} -
- * simple, single query to be executed; <li>{@code file} - path to the single schema file to be loaded to the database;
- * <li>{@code adminJID} - JID address of the XMPP administrator account; <li>{@code adminJIDpass} - password of the XMPP
- * administrator account.
+ * {@code mysql}, {@code postgresql}, {@code derby}, {@code sqlserver}; </li><li>{@code schemaVersion} - schema version to be
+ * loaded, , possible values are: {@code 7-2}, {@code 7-1}, {@code 5-1}, {@code 5}, {@code 4}; </li><li>{@code dbName} - name
+ * of the database to be created/used; </li><li>{@code dbHostname} - hostname of the database; </li><li>{@code dbUser} - username
+ * of the regular user; </li><li>{@code dbPass} - password of the regular user; </li><li>{@code rootUser} - username of the
+ * database administrator user; </li><li>{@code rootPass} - password of the database administrator user; </li><li>{@code query} -
+ * simple, single query to be executed; </li><li>{@code file} - path to the single schema file to be loaded to the database;
+ * </li><li>{@code adminJID} - JID address of the XMPP administrator account; </li><li>{@code adminJIDpass} - password of the XMPP
+ * administrator account.</li></ul>
  *
  * @author wojtek
  */

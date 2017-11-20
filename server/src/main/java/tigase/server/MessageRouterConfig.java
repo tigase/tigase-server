@@ -26,8 +26,7 @@ import java.util.Map;
 
 /**
  * Describe class MessageRouterConfig here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Jan  6 14:54:21 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -35,41 +34,28 @@ import java.util.Map;
  */
 public class MessageRouterConfig {
 
-	/** Field description */
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";
 
-	/** Field description */
 	public static final String DISCO_SHOW_VERSION_PROP_KEY = "disco-show-version";
 
-	/** Field description */
 	public static final String LOCAL_ADDRESSES_PROP_KEY = "hostnames";
 
-	/** Field description */
 	public static final String MSG_RECEIVERS_PROP_KEY = "components/msg-receivers/";
 
-	/** Field description */
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 
-	/** Field description */
 	public static final String UPDATES_CHECKING_INTERVAL_PROP_KEY = "updates-checking-interval";
 
-	/** Field description */
 	public static final long UPDATES_CHECKING_INTERVAL_PROP_VAL = 7;
 
-	/** Field description */
 	public static final String UPDATES_CHECKING_PROP_KEY = "updates-checking";
-	/** Field description */
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY = MSG_RECEIVERS_PROP_KEY + "id-names";
-	/** Field description */
 	public static final Boolean UPDATES_CHECKING_PROP_VAL = true;
 
-	/** Field description */
 	public static final String REGISTRATOR_NAMES_PROP_KEY = REGISTRATOR_PROP_KEY + "id-names";
 
-	/** Field description */
 	public static final boolean DISCO_SHOW_VERSION_PROP_VAL = true;
 
-	/** Field description */
 	public static final String DISCO_NAME_PROP_VAL = tigase.server.XMPPServer.NAME;
 
 	//~--- static initializers --------------------------------------------------
@@ -92,11 +78,7 @@ public class MessageRouterConfig {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param props
-	 */
+
 	public MessageRouterConfig(Map<String, Object> props) {
 		this.props = props;
 

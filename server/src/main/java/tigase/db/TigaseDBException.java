@@ -23,8 +23,7 @@ import tigase.component.exceptions.RepositoryException;
 
 /**
  * Describe class TigaseDBException here.
- * <p>
- * <p>
+ * <br>
  * Created: Thu Oct 26 12:15:36 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

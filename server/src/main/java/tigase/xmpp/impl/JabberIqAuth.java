@@ -48,8 +48,7 @@ import java.util.logging.Logger;
 
 /**
  * JEP-0078: Non-SASL Authentication
- * <p>
- * <p>
+ * <br>
  * Created: Thu Feb 16 17:46:16 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

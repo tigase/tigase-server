@@ -77,9 +77,7 @@ public class Dialback
 
 	// ~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public Dialback() {
 		super();
 	}

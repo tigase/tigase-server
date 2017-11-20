@@ -28,7 +28,7 @@ import tigase.kernel.beans.config.ConfigField;
 /**
  * {@link RosterFactory} is an factory that is responsible for creation appropriate instance of {@link RosterAbstract}
  * class
- * <p>
+ * <br>
  * Created: Thu Sep 4 18:33:11 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

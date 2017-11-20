@@ -49,18 +49,10 @@ public class PriorityQueueRelaxed<E>
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public PriorityQueueRelaxed() {
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 */
 	@SuppressWarnings({"unchecked"})
 	protected PriorityQueueRelaxed(int maxPriority, int maxSize) {
 		init(maxPriority, maxSize);

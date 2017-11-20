@@ -21,8 +21,7 @@ package tigase.io;
 
 /**
  * Describe class TLSStatus here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Mar  5 09:28:45 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

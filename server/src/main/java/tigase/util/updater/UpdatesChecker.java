@@ -51,8 +51,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class UpdatesChecker here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Apr 18 09:35:32 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

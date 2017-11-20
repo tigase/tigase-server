@@ -24,8 +24,7 @@ import java.util.logging.Level;
 
 /**
  * Describe class StatRecord here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Nov 23 21:28:53 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

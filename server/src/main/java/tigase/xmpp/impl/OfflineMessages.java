@@ -54,8 +54,7 @@ import static tigase.server.Message.ELEM_NAME;
  * Practices for Handling Offline Messages</a> specification. Responsible for storing messages send to offline users -
  * either as a standalone plugin or as a processor for other plugins (e.g. AMP). Is registered to handle packets of type
  * {@code <presence>}.
- * <p>
- * <p>
+ * <br>
  * Created: Mon Oct 16 13:28:53 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -144,9 +143,9 @@ public class OfflineMessages
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * OfflineMessages postprocessor simply calls {@code savePacketForOffLineUser} method to store packet to offline
 	 * repository.
 	 */
@@ -198,9 +197,9 @@ public class OfflineMessages
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * {@code OfflineMessages} processor is triggered by {@code <presence>} stanza. Upon receiving it plugin tries to
 	 * load messages from repository and, if the result is not empty, sends them to the user
 	 */

@@ -53,10 +53,8 @@ import java.util.logging.Logger;
 public class CompSQLRepository
 		implements ComponentRepository<CompRepoItem>, DataSourceAware<DataRepository>, Initializable, UnregisterAware {
 
-	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 
-	/** Field description */
 	public static final String TABLE_NAME = "external_component";
 	private static final String CONNECTION_TYPE_COLUMN = "connection_type";
 	private static final String DOMAIN_COLUMN = "domain";

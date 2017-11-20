@@ -82,8 +82,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 /**
  * Class SessionManager
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -96,7 +95,6 @@ public class SessionManager
 		extends AbstractMessageReceiver
 		implements Configurable, SessionManagerHandler, OnlineJidsReporter, RegistrarBean {
 
-	/** Field description */
 	protected static final String ADMIN_COMMAND_NODE = "http://jabber.org/protocol/admin";
 
 	/**
@@ -2579,11 +2577,9 @@ public class SessionManager
 	private class StaleConnectionCloser
 			extends TimerTask {
 
-		/** Field description */
-		public static final int DEF_QUEUE_SIZE = 1000;
+			public static final int DEF_QUEUE_SIZE = 1000;
 
-		/** Field description */
-		public static final long DEF_TIMEOUT = 30 * 1000;
+			public static final long DEF_TIMEOUT = 30 * 1000;
 
 		//~--- fields -------------------------------------------------------------
 

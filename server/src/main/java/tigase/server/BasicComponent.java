@@ -79,16 +79,12 @@ public class BasicComponent
 				   Initializable,
 				   ConfigurationChangedAware {
 
-	/** Field description */
 	public static final String ALL_PROP_KEY = "ALL";
 
-	/** Field description */
 	public static final String COMMAND_PROP_NODE = "command";
 
-	/** Field description */
 	public static final String SCRIPTS_DIR_PROP_DEF = "scripts/admin";
 
-	/** Field description */
 	public static final String SCRIPTS_DIR_PROP_KEY = "scripts-dir";
 
 	private static final Logger log = Logger.getLogger(BasicComponent.class.getName());
@@ -100,10 +96,8 @@ public class BasicComponent
 	private final List<JID> connectedNodes_ro = Collections.unmodifiableList(connectedNodes);
 	@ConfigField(desc = "List of admins JIDs", alias = "admins")
 	protected ConcurrentSkipListSet<BareJID> admins = new ConcurrentSkipListSet<BareJID>();
-	/** Field description */
 	protected Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String, CommandIfc>(20);
 	protected ConcurrentSkipListSet<String> trusted = new ConcurrentSkipListSet<String>();
-	/** Field description */
 	@Inject(nullAllowed = true)
 	protected VHostManagerIfc vHostManager = null;
 	private String DEF_HOSTNAME_PROP_VAL = null;

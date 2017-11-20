@@ -35,36 +35,19 @@ import tigase.xmpp.jid.JID;
 public class Presence
 		extends Packet {
 
-	/** Field description */
 	public static final String ELEM_NAME = "presence";
 
-	/** Field description */
 	public static final String[] PRESENCE_ERROR_PATH = {ELEM_NAME, "error"};
 
-	/** Field description */
 	public static final String[] PRESENCE_PRIORITY_PATH = {ELEM_NAME, "priority"};
 	public static final String[] PRESENCE_SHOW_PATH = {ELEM_NAME, "show"};
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param elem
-	 *
-	 * @throws TigaseStringprepException
-	 */
 	public Presence(Element elem) throws TigaseStringprepException {
 		super(elem);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param elem
-	 * @param stanzaFrom
-	 * @param stanzaTo
-	 */
 	public Presence(Element elem, JID stanzaFrom, JID stanzaTo) {
 		super(elem, stanzaFrom, stanzaTo);
 	}

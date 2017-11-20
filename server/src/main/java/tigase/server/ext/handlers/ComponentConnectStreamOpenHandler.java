@@ -41,7 +41,6 @@ import java.util.Map;
 public class ComponentConnectStreamOpenHandler
 		implements StreamOpenHandler {
 
-	/** Field description */
 	public static final String XMLNS = "jabber:component:connect";
 
 	//~--- fields ---------------------------------------------------------------

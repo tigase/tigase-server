@@ -38,8 +38,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshIOService here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Jun 5 22:33:18 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

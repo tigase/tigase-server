@@ -38,10 +38,8 @@ import java.util.Set;
 public interface ConfigRepositoryIfc
 		extends ComponentRepository<ConfigItem> {
 
-	/** Field description */
 	public static final String RELOAD_DELAY = "--reload-delay";
 
-	/** Field description */
 	public static final String RESOURCE_URI = "--resource-uri";
 
 	//~--- get methods ----------------------------------------------------------

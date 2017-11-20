@@ -47,8 +47,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class DrupalWPAuth here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Nov 11 22:22:04 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -58,25 +57,15 @@ import java.util.logging.Logger;
 public class DrupalWPAuth
 		implements AuthRepository, DataSourceAware<DataRepository> {
 
-	/** Field description */
 	public static final String DRUPAL_USERS_TBL = "users";
-	/** Field description */
 	public static final String DRUPAL_NAME_FLD = "name";
-	/** Field description */
 	public static final String DRUPAL_PASS_FLD = "pass";
-	/** Field description */
 	public static final String DRUPAL_STATUS_FLD = "status";
-	/** Field description */
 	public static final int DRUPAL_OK_STATUS_VAL = 1;
-	/** Field description */
 	public static final String WP_USERS_TBL = "wp_users";
-	/** Field description */
 	public static final String WP_NAME_FLD = "user_login";
-	/** Field description */
 	public static final String WP_PASS_FLD = "user_pass";
-	/** Field description */
 	public static final String WP_STATUS_FLD = "user_status";
-	/** Field description */
 	public static final int WP_OK_STATUS_VAL = 0;
 	/**
 	 * Private logger for class instances.

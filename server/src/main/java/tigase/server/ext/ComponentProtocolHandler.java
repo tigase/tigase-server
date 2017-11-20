@@ -39,12 +39,10 @@ import java.util.List;
  */
 public interface ComponentProtocolHandler {
 
-	/** Field description */
 	public static final String REPO_ITEM_KEY = "repo-item";
 
 //public static final String AUTHENTICATED_KEY = "authenticated";
 
-	/** Field description */
 	public static final String EXTCOMP_BIND_HOSTNAMES_PROP_KEY = "bind-ext-hostnames";
 
 	//~--- methods --------------------------------------------------------------

@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
 
 /**
  * Test class for JabberIqPrivacyTest
- * <p>
+ * <br>
  * Currently class tests validateList method checking validation of type, subscription and action. Other cases are not
  * tested due to missing instance of XMPPResourceConnection
  */

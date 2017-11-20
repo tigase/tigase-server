@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 
 /**
  * Extended version of MDRepositoryBean class with support for statistics gathering.
- * <p>
+ * <br>
  * Created by andrzej on 15.12.2016.
  */
 public abstract class MDRepositoryBeanWithStatistics<T extends DataSourceAware>

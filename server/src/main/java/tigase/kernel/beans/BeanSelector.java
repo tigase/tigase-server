@@ -23,7 +23,7 @@ import tigase.kernel.core.Kernel;
 
 /**
  * Interface used by bean configurators to detect is additional beans should be registered
- * <p>
+ * <br>
  * Created by andrzej on 10.03.2016.
  */
 public interface BeanSelector {

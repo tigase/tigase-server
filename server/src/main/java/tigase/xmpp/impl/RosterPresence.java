@@ -41,8 +41,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class RosterPresence here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Jan 30 19:25:25 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

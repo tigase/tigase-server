@@ -41,42 +41,30 @@ import java.util.logging.Logger;
 public class ConfigItem
 		extends RepositoryItemAbstract {
 
-	/** Field description */
 	public static final String CLUSTER_NODE_ATTR = "cluster-node";
 
-	/** Field description */
 	public static final String COMPONENT_NAME_ATTR = "comp-name";
 
 	// public static final String CLUSTER_NODE_LABEL = "Cluster node";
 
-	/** Field description */
 	public static final String COMPONENT_NAME_LABEL = "Component name";
 
-	/** Field description */
 	public static final String FLAG_ATTR = "flag";
 
-	/** Field description */
 	public static final String KEY_NAME_ATTR = "key-name";
 
-	/** Field description */
 	public static final String KEY_NAME_LABEL = "Property key name";
 
-	/** Field description */
 	public static final String NODE_NAME_ATTR = "node-name";
 
-	/** Field description */
 	public static final String NODE_NAME_LABEL = "Property node name";
 
-	/** Field description */
 	public static final String REPO_ITEM_ELEM_NAME = "prop";
 
-	/** Field description */
 	public static final String VALUE_ATTR = "value";
 
-	/** Field description */
 	public static final String VALUE_LABEL = "Propety value";
 
-	/** Field description */
 	public static final String VALUE_TYPE_ATTR = "value-type";
 
 	/**
@@ -171,9 +159,9 @@ public class ConfigItem
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * Returns ConfigItem key which is constructed in a following way: {@code compName + "/" + nodeName + "/" +
 	 * keyName}
 	 */

@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 /**
  * Interface implemented by every class providing access to data storage, ie. databases, files, key-value stores.
- * <p>
+ * <br>
  * Created by andrzej on 09.03.2016.
  */
 public interface DataSource
@@ -59,7 +59,6 @@ public interface DataSource
 	 * {@code shutdownServer} is set to {@code true} and the component version is final it would force shutting down of
 	 * the server, otherwise (for non-final version) only a warning would be printed.
 	 *
-	 * @throws SQLException when there is a problem accessing the DataSource
 	 */
 	default public boolean checkSchemaVersion(DataSourceAware<? extends DataSource> datasource, boolean shutdownServer) {
 		boolean result = false;

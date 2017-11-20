@@ -39,8 +39,7 @@ import java.util.regex.Pattern;
 
 /**
  * Describe class RepositoryFactory here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Oct 24 22:13:52 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -50,177 +49,114 @@ import java.util.regex.Pattern;
 @TigaseDeprecated(since = "8.0.0")
 public abstract class RepositoryFactory {
 
-	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";
 
-	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
 
-	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.AuthRepositoryMDImpl";
 
-	/** Field description */
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 
-	/** Field description */
 	@Deprecated
 	public static final String AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseCustomAuth";
 
-	/** Field description */
 	public static final String AUTH_REPO_DOMAINS_PROP_KEY = "auth-repo-domains";
 
-	/** Field description */
 	public static final String AUTH_REPO_PARAMS_NODE = "auth-repo-params";
 
-	/** Field description */
 	public static final String AUTH_REPO_POOL_CLASS = "--auth-repo-pool";
 
-	/** Field description */
 	public static final String AUTH_REPO_POOL_CLASS_PROP_DEF = "tigase.db.AuthRepositoryPool";
 
-	/** Field description */
 	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
 
-	/** Field description */
 	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = null;
 
-	/** Field description */
 	public static final String AUTH_REPO_POOL_SIZE = "--auth-repo-pool-size";
 
-	/** Field description */
 	public static final String AUTH_REPO_POOL_SIZE_PROP_KEY = "auth-repo-pool-size";
 
 	public static final int REPO_POOL_SIZE_FACTOR_PROP_VAL = 4;
 
 	// AuthRepository properties
 
-	/** Field description */
 	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = Math.max(10, Runtime.getRuntime().availableProcessors() *
 			REPO_POOL_SIZE_FACTOR_PROP_VAL);
 
-	/** Field description */
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
 
-	/** Field description */
 	public static final String DATA_REPO_CLASS_PROP_KEY = "data-repo";
 
-	/** Field description */
 	@Deprecated
 	public static final String DATA_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DataRepositoryImpl";
 
-	/** Field description */
 	public static final String DATA_REPO_POOL_CLASS_PROP_KEY = "data-repo-pool";
 
-	/** Field description */
 	public static final String DATA_REPO_POOL_CLASS_PROP_VAL = "tigase.db.DataRepositoryPool";
 
-	/** Field description */
 	public static final String DATA_REPO_POOL_SIZE = "--data-repo-pool-size";
 
-	/** Field description */
 	public static final String DATA_REPO_POOL_SIZE_PROP_KEY = "data-repo-pool-size";
-	/** Field description */
 	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = Math.max(10, Runtime.getRuntime().availableProcessors() *
 			REPO_POOL_SIZE_FACTOR_PROP_VAL);
-	/** Field description */
 	public static final String DERBY_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 
 	// DataRepository properties
-	/** Field description */
 	public static final String DERBY_REPO_URL_PROP_VAL = "jdbc:derby:tigase-derbydb;create=true";
 
 	// repositories classes and URLs
-	/** Field description */
 	public static final String DRUPAL_REPO_URL_PROP_VAL = "jdbc:mysql://localhost/drupal?user=root&password=mypass";
-	/** Field description */
 	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
-	/** Field description */
 	public static final String DUMMY_REPO_CLASS_PROP_VAL = "tigase.db.DummyRepository";
-	/** Field description */
 	public static final String GEN_AUTH_DB = "--auth-db";
-	/** Field description */
 	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
-	/** Field description */
 	public static final String GEN_USER_DB_PROP_KEY = "user-db";
 	public static final String GEN_USER_DB = "--" + GEN_USER_DB_PROP_KEY;
-	/** Field description */
 	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
 	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
-	/** Field description */
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
-	/** Field description */
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL = "jdbc:postgresql://localhost/libresource?user=demo";
 	/** Default MS SQL Server JDBC class */
 	public static final String SQLSERVER_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 	/** Default MS SQL Server JDBC connection string */
 	public static final String SQLSERVER_REPO_URL_PROP_VAL = "jdbc:sqlserver://localhost:1433;databaseName=tigasedb;user=tigase;password=tigase;schema=dbo";
-	/** Field description */
 	public static final String MYSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
-	/** Field description */
 	public static final String MYSQL_REPO_URL_PROP_VAL = "jdbc:mysql://localhost/tigase?user=root&password=mypass";
-	/** Field description */
 	public static final String PGSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
-	/** Field description */
 	public static final String PGSQL_REPO_URL_PROP_VAL = "jdbc:postgresql://localhost/tigase?user=tigase";
-	/** Field description */
 	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY = "shared-auth-repo-params";
-	/** Field description */
 	public static final String SHARED_AUTH_REPO_PROP_KEY = "shared-auth-repo";
-	/** Field description */
 	public static final String SHARED_USER_REPO_PARAMS_PROP_KEY = "shared-user-repo-params";
-	/** Field description */
 	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
-	/** Field description */
 	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseAuth";
-	/** Field description */
 	public static final String TIGASE_AUTH_REPO_URL_PROP_VAL = "jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass";
-	/** Field description */
 	public static final String TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseCustomAuth";
-	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS = "--user-domain-repo-pool";
-	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = "user-domain-repo-pool";
-	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserRepositoryMDImpl";
-	/** Field description */
 	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
-	/** Field description */
 	@Deprecated
 	public static final String USER_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
-	/** Field description */
 	public static final String USER_REPO_DOMAINS_PROP_KEY = "user-repo-domains";
-	/** Field description */
 	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
-	/** Field description */
 	public static final String USER_REPO_POOL_CLASS = "--user-repo-pool";
-	/** Field description */
 	public static final String USER_REPO_POOL_CLASS_PROP_DEF = "tigase.db.UserRepositoryPool";
-	/** Field description */
 	public static final String USER_REPO_POOL_CLASS_PROP_KEY = "user-repo-pool";
-	/** Field description */
 	public static final String USER_REPO_POOL_CLASS_PROP_VAL = null;
-	/** Field description */
 	public static final String USER_REPO_POOL_SIZE = "--user-repo-pool-size";
-	/** Field description */
 	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
-	/** Field description */
 	public static final int USER_REPO_POOL_SIZE_PROP_VAL = Math.max(10, Runtime.getRuntime().availableProcessors() *
 			REPO_POOL_SIZE_FACTOR_PROP_VAL);
-	/** Field description */
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
 
 	// UserRepository properties
-	/** Field description */
 	public static final String XML_REPO_CLASS_PROP_VAL = "tigase.db.xml.XMLRepository";
-	/** Field description */
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
-	/** Field description */
 	public static final String DATABASE_TYPE_PROP_KEY = "database-type";
 	private static final String REPO_POOL_SIZE_PROP_KEY = "repo-pool-size";
 	private static final String DEF_REPO_POOL_SIZE_PROP_KEY = "def-repo-pool-size";
 	private static final Logger log = Logger.getLogger(RepositoryFactory.class.getCanonicalName());
 
-	/** Field description */
 	private static final ConcurrentMap<String, UserRepository> user_repos = new ConcurrentHashMap<String, UserRepository>(
 			USER_REPO_POOL_SIZE_PROP_VAL);
 	private static final ConcurrentMap<String, DataRepository> data_repos = new ConcurrentHashMap<String, DataRepository>(

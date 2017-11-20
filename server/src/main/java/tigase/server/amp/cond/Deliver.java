@@ -50,9 +50,7 @@ public class Deliver
 
 	//~--- constant enums -------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 */
+
 	public Deliver() {
 		String off_val = System.getProperty(MSG_OFFLINE_PROP_KEY);
 

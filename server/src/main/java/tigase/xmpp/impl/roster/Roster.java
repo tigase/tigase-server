@@ -36,8 +36,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class Roster here.
- * <p>
- * <p>
+ * <br>
  * Created: Tue Feb 21 18:05:53 2006
  *
  * @deprecated RosterFlat should be used instead

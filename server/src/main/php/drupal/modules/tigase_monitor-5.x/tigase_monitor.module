@@ -116,7 +116,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		//		$block_content .= '<tr><td>Registered:</td><td>' . $users_cnt->count . '</td></tr>';
 		//		$block_content .= '<tr><td>Jabber Online:</td><td>' . $online_cnt->count . '</td></tr>';
 // 		print_r( $jabber_stats );
-// 		print_r( '<br/>' );
+// 		print_r( '* <br>' );
 		foreach ($jabber_stats as $name => $description) {
 			$block_content .= "<tr><td>{$name}</td><td>{$description}</td></tr>";
 		}
@@ -318,6 +318,6 @@ function tigase_monitor_stats($stats = NULL) {
 
   }
 //  	print_r( $statsinfo );
-//  	print_r( '<br/>' );
+//  	print_r( '* <br>' );
   return $statsinfo;
 }

@@ -28,8 +28,7 @@ import tigase.xmpp.XMPPIOService;
 
 /**
  * Describe interface ServiceChecker here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Jun 21 22:45:52 2008
  *
  * @param <IO>

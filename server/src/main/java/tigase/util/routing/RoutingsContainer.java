@@ -34,8 +34,7 @@ import static tigase.conf.Configurable.DEF_SM_NAME;
 
 /**
  * Describe class RoutingsContainer here.
- * <p>
- * <p>
+ * <br>
  * Created: Sat Feb 11 16:30:42 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

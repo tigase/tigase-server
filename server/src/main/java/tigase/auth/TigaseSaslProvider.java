@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 /**
  * Describe class TigaseSaslProvider here.
- * <p>
+ * <br>
  * Created: Sun Nov 5 22:31:20 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

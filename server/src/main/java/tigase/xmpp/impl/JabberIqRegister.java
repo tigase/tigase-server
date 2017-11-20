@@ -49,8 +49,7 @@ import java.util.stream.Collectors;
 
 /**
  * JEP-0077: In-Band Registration
- * <p>
- * <p>
+ * <br>
  * Created: Thu Feb 16 13:14:06 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -244,9 +243,9 @@ public class JabberIqRegister
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <br>
 	 * <br><br>
-	 * <p>
+	 * <br>
 	 * TODO: Implement registration form configurable and loading all the fields from the registration form TODO:
 	 * rewrite the plugin using the XMPPProcessorAbstract API
 	 */

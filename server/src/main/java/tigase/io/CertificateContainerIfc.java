@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  * Interface implemented by classes responsible for keeping SSL certificates in memory
- * <p>
+ * <br>
  * Created by andrzej on 29.02.2016.
  */
 public interface CertificateContainerIfc {

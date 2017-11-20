@@ -50,8 +50,7 @@ import java.util.logging.Logger;
 
 /**
  * Class StatisticsCollector
- * <p>
- * <p>
+ * <br>
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -75,7 +74,6 @@ public class StatisticsCollector
 
 	public static final String STATS_HIGH_MEMORY_LEVEL_KEY = "stats-high-memory-level";
 
-	/** Field description */
 	private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
 	private static final Logger log = Logger.getLogger(StatisticsCollector.class.getName());
 

@@ -40,8 +40,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class StartTLS here.
- * <p>
- * <p>
+ * <br>
  * Created: Fri Mar 24 07:22:57 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -53,10 +52,8 @@ public class StartTLS
 		implements XMPPProcessorIfc, XMPPPreprocessorIfc {
 	// private static final String TLS_STARTED_KEY = "TLS-Started";
 
-	/** Field description */
 	public static final String EL_NAME = "starttls";
 
-	/** Field description */
 	protected static final String ID = EL_NAME;
 	private static final String[][] ELEMENTS = {{EL_NAME}, {"proceed"}, {"failure"}};
 	private static final Logger log = Logger.getLogger(StartTLS.class.getName());

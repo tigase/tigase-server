@@ -36,8 +36,7 @@ import java.util.logging.Logger;
 
 /**
  * Describe class ConnectionOpenThread here.
- * <p>
- * <p>
+ * <br>
  * Created: Wed Jan 25 23:51:28 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -51,21 +50,16 @@ public class ConnectionOpenThread
 	 */
 	public static final long def_5222_throttling = 200;
 
-	/** Field description */
 	public static final long def_5223_throttling = 50;
 
-	/** Field description */
 	public static final long def_5269_throttling = 100;
 
-	/** Field description */
 	public static final long def_5280_throttling = 1000;
 	private static final Logger log = Logger.getLogger(ConnectionOpenThread.class.getName());
-	/** Field description */
 	public static Map<Integer, PortThrottlingData> throttling = new ConcurrentHashMap<Integer, PortThrottlingData>(10);
 	private static ConnectionOpenThread acceptThread = null;
 
 	//~--- fields ---------------------------------------------------------------
-	/** Field description */
 	protected long accept_counter = 0;
 	private Selector selector = null;
 	private boolean stopping = false;
@@ -335,19 +329,13 @@ public class ConnectionOpenThread
 
 	private class PortThrottlingData {
 
-		/** Field description */
-		protected long lastSecondConnections = 0;
+			protected long lastSecondConnections = 0;
 
-		/** Field description */
-		protected long throttling;
+			protected long throttling;
 
 		//~--- constructors -------------------------------------------------------
 
-		/**
-		 * Constructs ...
-		 *
-		 * @param throttling_prop
-		 */
+
 		private PortThrottlingData(long throttling_prop) {
 			throttling = throttling_prop;
 		}

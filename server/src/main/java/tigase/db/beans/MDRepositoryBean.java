@@ -41,7 +41,7 @@ import static tigase.db.beans.MDPoolBean.REPO_CLASS;
 /**
  * Abstract class implementing bean to which should be used to create name aware repository pool. This class is
  * responsible for creation of correct repository instances for every DataSource configured.
- * <p>
+ * <br>
  * Created by andrzej on 15.03.2016.
  */
 public abstract class MDRepositoryBean<T extends DataSourceAware>
@@ -213,7 +213,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 	}
 
 	/**
-	 * Method called to initialized passed repository instance for passed domain. <br/> Should be empty if no custom
+	 * Method called to initialized passed repository instance for passed domain. <br> Should be empty if no custom
 	 * initialization is required.
 	 *
 	 * @param domain

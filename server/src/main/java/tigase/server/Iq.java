@@ -42,31 +42,22 @@ import java.util.List;
 public class Iq
 		extends Packet {
 
-	/** Field description */
 	public static final String ELEM_NAME = "iq";
 
-	/** Field description */
 	public static final String QUERY_NAME = "query";
 
-	/** Field description */
 	public static final String[] IQ_QUERY_PATH = {ELEM_NAME, QUERY_NAME};
 
-	/** Field description */
 	public static final String[] IQ_PUBSUB_PATH = {ELEM_NAME, "pubsub"};
 
-	/** Field description */
 	public static final String[] IQ_ERROR_PATH = {ELEM_NAME, "error"};
 
-	/** Field description */
 	public static final String[] IQ_COMMAND_PATH = {ELEM_NAME, "command"};
 
-	/** Field description */
 	public static final String[] IQ_CHAT_PATH = {ELEM_NAME, "chat"};
 
-	/** Field description */
 	public static final String[] IQ_BIND_RESOURCE_PATH = {ELEM_NAME, "bind", "resource"};
 
-	/** Field description */
 	public static final String[] IQ_BIND_PATH = {ELEM_NAME, "bind"};
 
 	//~--- fields ---------------------------------------------------------------
