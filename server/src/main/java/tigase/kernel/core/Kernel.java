@@ -1098,7 +1098,7 @@ public class Kernel {
 				if (beanToInject == null) {
 					try {
 						initBean(b, createdBeansConfig, deep + 1);
-					} catch (InvocationTargetException | KernelException | InstantiationException ex) {
+					} catch (InvocationTargetException | RuntimeException | InstantiationException ex) {
 						log.log(Level.WARNING,
 								"Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" +
 										", skipping injection of this bean" +
