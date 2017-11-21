@@ -62,7 +62,7 @@ The process ID may sometimes come in a different format such as `[in_14-muc]` wh
 
 tigase.log can get very large in size rather quickly reaching it's maximum size.  To prevent the loss of information, we have implemented a rotating file system.  The server begins writing to tigase.log.0 when it is first run, and continues to dump information until the log size limit is hit. At this point, Tigase renames tigase.log.0 as tigase.log.1. A new tigase.log.0 will be created, and Tigase will begin logging to this file.  When this file is full, tigase.log.1 will be renamed tigase.log.2 and tigase.log.0 will be renamed tigase.log.1.  Using this scheme, tigase.log.0 will *always* be your most recent log.
 
-By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of 10 files. You can edit these values by editing the init.tdsl file and adding the following lines.
+By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of 10 files. You can edit these values by editing the config.tdsl file and adding the following lines.
 
 [source,dsl]
 -----
@@ -73,7 +73,7 @@ logging {
     }
 }
 -----
-This code, if entered into the init.tdsl file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
+This code, if entered into the config.tdsl file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
 
 _You may see a tigase.log.0.ick file in the directory while the server is running.  This is a temporary file only and is deleted once Tigase is cleanly shut down._
 
@@ -104,7 +104,7 @@ This file can be handy if you are tracking issues in the server.
 tigase-console.log is appended during each run session of the server.
 
 == Log File Location
-You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following lines in your init.tdsl file:
+You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following lines in your config.tdsl file:
 [source,dsl]
 -----
 logging {
