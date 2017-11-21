@@ -1,7 +1,7 @@
 [[manualconfig]]
 = Startup File for tigase.sh - tigase.conf
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0 August 2017. Reformatted for v7.2.0.
+:version: v2.0 August 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -30,6 +30,6 @@ TIGASE_CONFIG="tigase-pgsql.xml"
 TIGASE_OPTIONS=" --property-file etc/config.tdsl "
 -----
 
-Please note encoding settings. JVM by default uses encoding set in operating system environment. XMPP protocol, however uses +UTF-8+ for all data processing. So the ENC settings enforces +UTF-8+ encoding for all operations.
+Please note encoding settings. JVM by default uses encoding set in operating system environment. XMPP protocol, however uses `UTF-8` for all data processing. So the ENC settings enforces `UTF-8` encoding for all operations.
 
 Another significant setting is \'*CLASSPATH*'. It is intentionally set to an empty string. The *tigase.sh* startup script builds the *CLASSPATH* on it's own from files found in *jars/* and *libs/* directories. It is advised to set the *CLASSPATH* to the empty string because the Tigase server scans all available classes to find all components and plugins implementation. If the *CLASSPATH* contains lots of libraries which are not used anyway it can cause a long startup time and high system loads.

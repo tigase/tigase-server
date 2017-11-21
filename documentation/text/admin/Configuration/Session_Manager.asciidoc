@@ -1,7 +1,11 @@
 [[sessMan]]
 = Session Manager
 :author: Daniel Wisnewski
-:version: v2.0 June 2017: Reformatted for v7.2
+:version: v2.0 June 2017: Reformatted for v8.0.0
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
 
 Tigase Session Manager is where most of Tigase basic options can be configured, and where many operations are controlled from.
 Changes to session manager can effect operations throughout an entire XMPP installation, so care must be made when changing settings here.
@@ -36,7 +40,7 @@ Keeps the same presence logic as MobileV2, but also queues Message Carbons.
 *Currently not supported by CSI processor, will cause issues*.
 
 === Disabling CSI
-If you wish to not use the +ClientStateIndication+ processor, set the following in your config.tdsl file:
+If you wish to not use the `ClientStateIndication` processor, set the following in your config.tdsl file:
 [source,dsl]
 -----
 'sess-man' () {
@@ -45,7 +49,7 @@ If you wish to not use the +ClientStateIndication+ processor, set the following 
 -----
 
 === A note about Mobile Plugins
-Previously, you could enable Mobile optimization logic using +--sm-plugins=+Mobile_V1+.
+Previously, you could enable Mobile optimization logic using ``--sm-plugins=+Mobile_V1`.
 
 If you have used these in the past, it is recommended you change your system to use the CSI processor with the appropriate mobile processing logic.
 

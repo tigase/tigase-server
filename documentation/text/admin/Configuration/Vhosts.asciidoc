@@ -1,7 +1,7 @@
 [[tigase41virtualHosts]]
 = Virtual Hosts in Tigase Server
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0 August 2017. Reformatted for v7.2.0.
+:version: v2.0 August 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -17,5 +17,5 @@ Virtual hosts may also be managed using ad-hoc commands, visit xref:ad-hocComman
 
 If you have components that may not be able to handle multiple vhosts or cluster mode, we have developed a virtual component solution as well, details in the xref:virtualComponents[Virtual Components for the Tigase Cluster] section.
 
-You may also want to reference the Vhosts API for additonal information:
+You may also want to reference the Vhosts API for additional information:
 - xref:addManageDomain[API Description for Virtual Domains Management in Tigase Server].

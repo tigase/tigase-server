@@ -1,14 +1,14 @@
 [[dslConfig]]
 = DSL file format
 :author: Andrzej Wójcik
-:version: v1.2 August 2017. Reformatted for v7.2.0.
+:version: v1.2 August 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net
 
 In previous Tigase XMPP Server releases configuration was stored in properties based configuration file.
-From Tigase XMPP Server 7.2.0 release it will be required to use new DSL based configuration file format. This file format was inspired by Groovy language syntax and new core feature of Tigase XMPP Server - Tigase Kernel Framework.
+From Tigase XMPP Server 8.0.0 release it will be required to use new DSL based configuration file format. This file format was inspired by Groovy language syntax and new core feature of Tigase XMPP Server - Tigase Kernel Framework.
 
 == Why new format?
 In properties configuration format each line contained key and value with optional definition of type of stored value:
@@ -66,10 +66,10 @@ DSL configuration format provides a number of advantages over the old system of 
 . No longer need to escape certain characters, making settings far more readable at a glance.
 . Values may be set using basic calculations, such as `100 * 200 * 2` rather than `40000`.
 . Parameter type values are no longer necessary, no more [i], [S], [B] etc..
-. Comma seperated values can now be simplified lists with seperate entries being able to be in multiple lines.
+. Comma separated values can now be simplified lists with separate entries being able to be in multiple lines.
 
-Although the format may seem more complex, looking like a section of java code, the formatting is consistant and can be far more readable.
-After some experience with DSL format, you'll find it's far more intuiative and user friendly than it may appear.  Of course if there's any real confusion, Tigase can automatically convert old style properties files to the DSL format using the following command:
+Although the format may seem more complex, looking like a section of java code, the formatting is consistent and can be far more readable.
+After some experience with DSL format, you'll find it's far more intuitive and user friendly than it may appear.  Of course if there's any real confusion, Tigase can automatically convert old style properties files to the DSL format using the following command:
 [source,bash]
 -----
 ./scripts/tigase.sh upgrade-config etc/tigase.conf
@@ -151,6 +151,7 @@ You can write it in multiple lines if you want:
     'gamma'
 ]
 ----
+
 | map | Maps can be written as a block of properties wrapped in `{}`.
   This format of map is the same as used for passing configuration to bean properties.
 Keys and values can be written in separate lines _(recommended)_:
@@ -296,7 +297,7 @@ pubsub-2 (class: tigase.pubsub.cluster.PubSubComponentClustered) {
 
 # Configure Session Manager
 sess-man {
-    # Here we enable pep, urn:xmpp:mam:1 processors and disable message-archive-xep-0136 procesor
+    # Here we enable pep, urn:xmpp:mam:1 processors and disable message-archive-xep-0136 processor
     pep () {}
     'urn:xmpp:mam:1' () {}
     message-archive-xep-0136 (active: false) {}
