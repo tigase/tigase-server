@@ -20,8 +20,6 @@
 
 package tigase.cluster.repo;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
@@ -74,8 +72,6 @@ public class ClConSQLRepository
 	/* @formatter:on */
 	//J+
 
-	//~--- fields ---------------------------------------------------------------
-
 	private DataRepository data_repo = null;
 
 	@Override
@@ -85,8 +81,6 @@ public class ClConSQLRepository
 		// in other places, so we can not destroy it.
 		super.destroy();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
@@ -101,8 +95,6 @@ public class ClConSQLRepository
 		}
 		defs.put(REPO_URI_PROP_KEY, repo_uri);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void setDataSource(DataRepository data_repo) {
@@ -240,16 +232,12 @@ public class ClConSQLRepository
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void store() {

@@ -20,8 +20,6 @@
 
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.S2SIOService;
@@ -51,8 +49,6 @@ public abstract class S2SAbstractProcessor
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		return false;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void serviceStarted(S2SIOService serv) {

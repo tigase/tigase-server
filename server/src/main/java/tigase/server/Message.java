@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -45,8 +43,6 @@ public class Message
 	public static final String[] MESSAGE_ERROR_PATH = {ELEM_NAME, "error"};
 
 	public static final String[] MESSAGE_DELAY_PATH = {ELEM_NAME, "delay"};
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a packet with message stanza.
@@ -96,8 +92,6 @@ public class Message
 	public Message(Element elem) throws TigaseStringprepException {
 		super(elem);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public Message(Element elem, JID stanzaFrom, JID stanzaTo) {
 		super(elem, stanzaFrom, stanzaTo);

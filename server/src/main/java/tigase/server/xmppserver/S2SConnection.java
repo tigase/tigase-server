@@ -19,18 +19,12 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jun 14, 2010 1:19:55 PM
@@ -43,7 +37,6 @@ public class S2SConnection
 
 	private static final Logger log = Logger.getLogger(S2SConnection.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private OutgoingState conn_state = OutgoingState.NULL;
 	private S2SConnectionHandlerIfc<S2SIOService> handler = null;
 	private String ipAddress = null;
@@ -53,14 +46,10 @@ public class S2SConnection
 	 */
 	private ConcurrentLinkedQueue<Packet> waitingControlPackets = new ConcurrentLinkedQueue<Packet>();
 
-	//~--- constructors ---------------------------------------------------------
-
 	public S2SConnection(S2SConnectionHandlerIfc<S2SIOService> handler, String ip) {
 		this.handler = handler;
 		this.ipAddress = ip;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addControlPacket(Packet packet) {
 		waitingControlPackets.add(packet);
@@ -70,8 +59,6 @@ public class S2SConnection
 	public int compareTo(S2SConnection o) {
 		return hashCode() - o.hashCode();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public String getIPAddress() {
 		return ipAddress;
@@ -89,8 +76,6 @@ public class S2SConnection
 		return waitingControlPackets.size();
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public boolean isConnected() {
 		return (service != null) && service.isConnected();
 	}
@@ -105,13 +90,9 @@ public class S2SConnection
 		handler.writePacketsToSocket(service, waitingControlPackets);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public boolean sendPacket(Packet packet) throws IOException {
 		return handler.writePacketToSocket(service, packet);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String toString() {

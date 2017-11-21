@@ -26,8 +26,6 @@ import tigase.xmpp.jid.BareJID;
 import static tigase.conf.Configurable.GEN_VIRT_HOSTS;
 import static tigase.conf.Configurable.HOSTNAMES_PROP_KEY;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Oct 3, 2009 4:26:09 PM
  *
@@ -38,8 +36,6 @@ public abstract class VHostRepoDefaults {
 
 	private static final BareJID vhost_user = BareJID.bareJIDInstanceNS("vhost-manager");
 	private static final String vhost_list_pkey = "vhosts-lists";
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static String getConfigKey() {
 		return HOSTNAMES_PROP_KEY;
@@ -66,6 +62,3 @@ public abstract class VHostRepoDefaults {
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

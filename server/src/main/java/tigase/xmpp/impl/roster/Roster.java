@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -31,8 +29,6 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.JID;
 
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class Roster here.
@@ -47,8 +43,6 @@ public class Roster
 		extends RosterAbstract {
 
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Roster");
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups, String otherData)
@@ -79,8 +73,6 @@ public class Roster
 			throws NotAuthorizedException, TigaseDBException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public JID[] getBuddies(final XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
@@ -140,8 +132,6 @@ public class Roster
 		return true;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean presenceSent(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
@@ -155,8 +145,6 @@ public class Roster
 
 		return true;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setBuddyName(final XMPPResourceConnection session, JID buddy, final String name)

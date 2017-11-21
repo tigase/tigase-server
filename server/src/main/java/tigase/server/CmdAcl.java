@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- enums ------------------------------------------------------------------
-
 import tigase.xmpp.jid.BareJID;
 
 import java.util.Objects;
@@ -124,6 +122,3 @@ public class CmdAcl {
 
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

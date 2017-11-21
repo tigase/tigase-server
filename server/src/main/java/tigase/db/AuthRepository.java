@@ -20,8 +20,6 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.CredentialsDecoderBean;
 import tigase.auth.CredentialsEncoderBean;
@@ -35,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface <code>AuthRepository</code> defines a proxy bridge between user authentication data storage and the Tigase
@@ -120,8 +116,6 @@ public interface AuthRepository
 
 	public static final String USERNAME_KEY = "username";
 
-	//~--- methods --------------------------------------------------------------
-
 	enum AccountStatus {
 		active(1),
 		disabled(0),
@@ -153,8 +147,6 @@ public interface AuthRepository
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException;
 
 	/**
@@ -180,8 +172,6 @@ public interface AuthRepository
 	 * @return a <code>long</code> number of registered users in the repository.
 	 */
 	long getUsersCount(String domain);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Do some actions on repository, when user logs in. (for example update <code>last_login_time</code>)
@@ -375,4 +365,3 @@ public interface AuthRepository
 
 }    // AuthRepository
 
-//~ Formatted in Tigase Code Convention on 13/02/20

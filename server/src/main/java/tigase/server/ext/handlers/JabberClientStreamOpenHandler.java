@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.ext.CompRepoItem;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
@@ -35,10 +33,6 @@ import java.util.logging.Logger;
 
 import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
 
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Oct 7, 2009 3:17:09 PM
  *
@@ -51,17 +45,12 @@ public class JabberClientStreamOpenHandler
 	public static final String XMLNS = "jabber:client";
 	private static final Logger log = Logger.getLogger(JabberClientStreamOpenHandler.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private String[] xmlnss = new String[]{XMLNS};
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getXMLNSs() {
 		return xmlnss;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String serviceStarted(ComponentIOService serv) {
@@ -148,6 +137,3 @@ public class JabberClientStreamOpenHandler
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

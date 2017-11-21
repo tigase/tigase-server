@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
@@ -35,8 +33,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class StartTLS here.
@@ -65,11 +61,8 @@ public class StartTLS
 	private static final Element[] F_NOT_REQUIRED = {
 			new Element(EL_NAME, new String[]{Packet.XMLNS_ATT}, new String[]{XMLNS})};
 
-	//~--- fields ---------------------------------------------------------------
 	private Element failure = new Element("failure", new String[]{Packet.XMLNS_ATT}, new String[]{XMLNS});
 	private Element proceed = new Element("proceed", new String[]{Packet.XMLNS_ATT}, new String[]{XMLNS});
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -166,4 +159,3 @@ public class StartTLS
 	}
 }    // StartTLS
 
-//~ Formatted in Tigase Code Convention on 13/03/12

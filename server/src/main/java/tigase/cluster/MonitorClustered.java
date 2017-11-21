@@ -19,12 +19,8 @@
  */
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.server.monitor.MonitorComponent;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jul 4, 2010 7:18:46 PM

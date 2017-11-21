@@ -20,17 +20,11 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.StreamOpenHandler;
 
 import java.util.Map;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 2, 2009 5:18:44 PM
@@ -45,8 +39,6 @@ public class UnknownXMLNSStreamOpenHandler
 	public String[] getXMLNSs() {
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String serviceStarted(ComponentIOService s) {
@@ -83,6 +75,3 @@ public class UnknownXMLNSStreamOpenHandler
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

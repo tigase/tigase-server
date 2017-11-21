@@ -20,13 +20,9 @@
 
 package tigase.util.processing;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 21, 2009 9:02:57 PM
@@ -39,8 +35,6 @@ public abstract class WorkerThread
 
 	protected static final Logger log = Logger.getLogger(WorkerThread.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private long averageProcessingTime = 0;
 
 	//private PriorityQueueAbstract<QueueItem> queue = null;
@@ -48,15 +42,9 @@ public abstract class WorkerThread
 	private long runsCnt = 0;
 	private boolean stopped = false;
 
-	//~--- get methods ----------------------------------------------------------
-
 	public abstract WorkerThread getNewInstance();
 
-	//~--- methods --------------------------------------------------------------
-
 	public abstract void process(QueueItem item);
-
-	//~--- get methods ----------------------------------------------------------
 
 	public long getAverageProcessingTime() {
 		return averageProcessingTime;
@@ -65,8 +53,6 @@ public abstract class WorkerThread
 	public long getRunsCounter() {
 		return runsCnt;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public boolean offer(QueueItem item) {
 		return queue.offer(item);
@@ -101,8 +87,6 @@ public abstract class WorkerThread
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setQueueMaxSize(int maxSize) {
 		LinkedBlockingQueue<QueueItem> oldQueue = queue;
 
@@ -112,8 +96,6 @@ public abstract class WorkerThread
 			queue.addAll(oldQueue);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public int size() {
 		return queue.size();
@@ -129,6 +111,3 @@ public abstract class WorkerThread
 
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

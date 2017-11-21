@@ -19,8 +19,6 @@
  */
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.auth.credentials.Credentials;
 import tigase.xmpp.jid.BareJID;
 
@@ -28,10 +26,6 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Pool for authentication repositories. * <br> This pool should be used if connection to authentication storage is
@@ -49,11 +43,7 @@ public class AuthRepositoryPool
 
 	private static final Logger log = Logger.getLogger(AuthRepositoryPool.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private LinkedBlockingQueue<AuthRepository> repoPool = new LinkedBlockingQueue<AuthRepository>();
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addRepo(AuthRepository repo) {
 		repoPool.offer(repo);
@@ -73,8 +63,6 @@ public class AuthRepositoryPool
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
@@ -142,8 +130,6 @@ public class AuthRepositoryPool
 
 		return -1;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean isMechanismSupported(String domain, String mechanism) {

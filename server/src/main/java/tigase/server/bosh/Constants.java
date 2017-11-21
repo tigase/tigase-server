@@ -146,8 +146,6 @@ public abstract class Constants {
 	protected static final String SID_LOGGER_KEY = "sid-logger-level";
 	protected static final String SID_LOGGER_VAL = Level.OFF.toString();
 
-	//~--- constant enums -------------------------------------------------------
-
 	protected enum CacheAction {
 		on,
 		off,
@@ -167,4 +165,3 @@ public abstract class Constants {
 //protected static final String CACHE_REMOVE = "remove";
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/16

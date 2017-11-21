@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.net.ConnectionOpenListener;
 import tigase.net.IOUtil;
 import tigase.stats.StatisticsList;
@@ -34,8 +32,6 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class SocketIO here.
@@ -54,8 +50,6 @@ public class SocketIO
 	// ~--- fields ---------------------------------------------------------------
 	private static final String MAX_USER_IO_QUEUE_SIZE_PROP_KEY = "max-user-io-queue-size";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private long buffOverflow = 0;
 	private int bytesRead = 0;
 	private long bytesReceived = 0;
@@ -67,8 +61,6 @@ public class SocketIO
 	private long totalBuffOverflow = 0;
 	private long totalBytesReceived = 0;
 	private long totalBytesSent = 0;
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>SocketIO</code> instance.
@@ -93,8 +85,6 @@ public class SocketIO
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public int bytesRead() {
 		return bytesRead;
@@ -104,8 +94,6 @@ public class SocketIO
 	public boolean checkCapabilities(String caps) {
 		return false;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public int getInputPacketSize() throws IOException {
@@ -189,8 +177,6 @@ public class SocketIO
 	public boolean isRemoteAddress(String addr) {
 		return remoteAddress.equals(addr);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public ByteBuffer read(final ByteBuffer buff) throws IOException {
@@ -324,8 +310,6 @@ public class SocketIO
 
 		return result;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setLogId(String logId) {

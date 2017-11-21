@@ -19,17 +19,11 @@
  */
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 
 import java.util.Map;
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPPostprocessorIfc here.
@@ -65,6 +59,3 @@ public interface XMPPPostprocessorIfc
 	void postProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
 					 Map<String, Object> settings);
 }    // XMPPPostprocessorIfc
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

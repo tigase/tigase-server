@@ -20,15 +20,11 @@
 
 package tigase.server.amp.cond;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.amp.ConditionIfc;
 import tigase.xml.Element;
 
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:36:27 PM
@@ -42,10 +38,7 @@ public class Deliver
 	private static final String name = "deliver";
 	private static Logger log = Logger.getLogger(Deliver.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private boolean offline_storage = true;
-
-	//~--- constant enums -------------------------------------------------------
 
 
 	public Deliver() {
@@ -54,14 +47,10 @@ public class Deliver
 		offline_storage = (off_val == null) || Boolean.parseBoolean(off_val);
 	}
 
-	//~--- constructors ---------------------------------------------------------
-
 	@Override
 	public String getName() {
 		return name;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public boolean match(Packet packet, Element rule) {
@@ -109,8 +98,6 @@ public class Deliver
 		return result;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private enum MatchValue {
 		direct,
 		forward,
@@ -120,4 +107,3 @@ public class Deliver
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

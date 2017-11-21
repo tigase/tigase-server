@@ -20,8 +20,6 @@
 
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.xmppserver.CID;
@@ -34,8 +32,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 2:01:01 PM
@@ -56,8 +52,6 @@ public class StartTLS
 														   new String[]{START_TLS_NS});
 	private static final Element proceed_el = new Element(PROCEED_TLS_EL, new String[]{"xmlns"},
 														  new String[]{START_TLS_NS});
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {

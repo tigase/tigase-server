@@ -20,8 +20,6 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.Algorithms;
 import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
@@ -36,8 +34,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class AuthRepositoryImpl here.
@@ -57,14 +53,8 @@ public class AuthRepositoryImpl
 	private static final String[] non_sasl_mechs = {"password", "digest"};
 	private static final String[] sasl_mechs = {"PLAIN", "DIGEST-MD5", "CRAM-MD5"};
 
-	//~--- fields ---------------------------------------------------------------
-
 	// ~--- fields ---------------------------------------------------------------
 	private UserRepository repo = null;
-
-	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>AuthRepositoryImpl</code> instance.
@@ -187,8 +177,6 @@ public class AuthRepositoryImpl
 		return value == null ? null : AccountStatus.valueOf(value);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AccountStatus st = getAccountStatus(user);
@@ -285,14 +273,10 @@ public class AuthRepositoryImpl
 		}      // end of try-catch
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class SaslCallbackHandler
 			implements CallbackHandler {
 
 		private Map<String, Object> options = null;
-
-		//~--- constructors -------------------------------------------------------
 
 		private SaslCallbackHandler(final Map<String, Object> options) {
 			this.options = options;

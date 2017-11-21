@@ -455,8 +455,6 @@ public class CertificateContainer
 			issuers = ai;
 		}
 
-		// ~--- methods
-
 		// Implementation of javax.net.ssl.X509TrustManager
 
 		@Override
@@ -468,8 +466,6 @@ public class CertificateContainer
 		public void checkServerTrusted(final X509Certificate[] x509CertificateArray, final String string)
 				throws CertificateException {
 		}
-
-		// ~--- get methods
 
 		@Override
 		public X509Certificate[] getAcceptedIssuers() {

@@ -19,8 +19,6 @@
  */
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -31,10 +29,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: May 3, 2010 1:23:45 PM
@@ -48,15 +42,12 @@ public class NonAuthUserRepositoryImpl
 
 	private static final Logger log = Logger.getLogger(NonAuthUserRepositoryImpl.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private final Set<BareJID> existing_domains = new ConcurrentSkipListSet<BareJID>();
 	@ConfigField(alias = "offline-user-autocreate", desc = "Autocreate offline users")
 	private boolean autoCreateOffline = false;
 	private BareJID defDomain = null;
 	@Inject
 	private UserRepository rep;
-
-	//~--- constructors ---------------------------------------------------------
 
 		public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain, boolean autoCreateOffline) {
 		rep = userRep;
@@ -70,8 +61,6 @@ public class NonAuthUserRepositoryImpl
 	public NonAuthUserRepositoryImpl() {
 
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addOfflineData(BareJID user, String subnode, String key, String value)
@@ -109,8 +98,6 @@ public class NonAuthUserRepositoryImpl
 		}    // end of try-catch
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getDomainTempData(BareJID domain, String subnode, String key, String def) throws TigaseDBException {
 		checkDomain(domain);
@@ -146,8 +133,6 @@ public class NonAuthUserRepositoryImpl
 
 		return rep.getData(defDomain, subnode, key, def);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void putDomainTempData(BareJID domain, String subnode, String key, String value) throws TigaseDBException {

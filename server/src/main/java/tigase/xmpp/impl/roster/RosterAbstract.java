@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
@@ -235,8 +233,6 @@ public abstract class RosterAbstract {
 		private EnumMap<PresenceType, SubscriptionType> stateTransition = new EnumMap<PresenceType, SubscriptionType>(
 				PresenceType.class);
 
-		//~--- constructors -------------------------------------------------------
-
 		// ~--- constructors -------------------------------------------------------
 		private StateTransition(SubscriptionType out_subscribed, SubscriptionType out_unsubscribed,
 								SubscriptionType in_subscribe, SubscriptionType in_unsubscribe,
@@ -302,15 +298,10 @@ public abstract class RosterAbstract {
 		}
 	}
 
-	//~--- static initializers --------------------------------------------------
 	protected static boolean emptyNameAllowed = false;
-
-	//~--- constant enums -------------------------------------------------------
 
 	// ~--- constant enums -------------------------------------------------------
 	protected static int maxRosterSize = new Long(Runtime.getRuntime().maxMemory() / 250000L).intValue();
-
-	//~--- enums ----------------------------------------------------------------
 
 	// Below StateTransition enum is implementation of all below tables
 	// coming from RFC-3921

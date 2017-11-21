@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.*;
 import tigase.kernel.core.Kernel;
 import tigase.server.xmppsession.SessionManager;
@@ -34,8 +32,6 @@ import tigase.xmpp.jid.JID;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class DynamicRoster here.
@@ -54,8 +50,6 @@ public class DynamicRoster
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRoster");
 	@Inject(nullAllowed = true)
 	private DynamicRosterIfc[] dynamicRosters;
-	//~--- methods --------------------------------------------------------------
-
 	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String, Object> settings,
 								   JID[] buddies)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
@@ -106,8 +100,6 @@ public class DynamicRoster
 			}
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String, Object> settings)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException {
@@ -206,8 +198,6 @@ public class DynamicRoster
 		return null;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public static void setItemExtraData(XMPPResourceConnection session, Map<String, Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
@@ -241,4 +231,3 @@ public class DynamicRoster
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

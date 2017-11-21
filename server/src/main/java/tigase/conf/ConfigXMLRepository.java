@@ -19,8 +19,6 @@
  */
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
 import tigase.xml.db.NodeNotFoundException;
@@ -32,8 +30,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class <code>ConfigXMLRepository</code> provides access to configuration settings.
@@ -57,11 +53,8 @@ public class ConfigXMLRepository
 	private static Map<String, ConfigXMLRepository> configs = new LinkedHashMap<String, ConfigXMLRepository>();
 	private static ConfigXMLRepository def_config = null;
 
-	//~--- fields ---------------------------------------------------------------
 	private String config_file = null;
 	private XMLDB xmldb = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static ConfigXMLRepository getConfigRepository() throws XMLDBException {
 		return getConfigRepository(null);
@@ -94,8 +87,6 @@ public class ConfigXMLRepository
 		return config;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public ConfigXMLRepository() {
 	}
 
@@ -109,8 +100,6 @@ public class ConfigXMLRepository
 		config_file = file;
 		init();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addItem(String compName, ConfigItem item) {
@@ -145,8 +134,6 @@ public class ConfigXMLRepository
 
 		return result;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getCompNames() {
@@ -207,8 +194,6 @@ public class ConfigXMLRepository
 		}    // end of try-catch
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void initRepository(String repo_uri, Map<String, String> params) throws DBInitException {
 		config_file = (String) params.get("-c");
@@ -267,8 +252,6 @@ public class ConfigXMLRepository
 		}      // end of if (keys != null)
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private void getSubnodes(List<String> result, String root, String node) {
 		String[] subnodes = getSubnodes(root, node);
 		String node_tmp = (node.equals("") ? node : node + "/");
@@ -290,8 +273,6 @@ public class ConfigXMLRepository
 		}    // end of try-catch
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private void init() throws XMLDBException {
 		try {
 			if (new File(config_file).exists()) {
@@ -308,6 +289,3 @@ public class ConfigXMLRepository
 	}
 }    // ConfigXMLRepository
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

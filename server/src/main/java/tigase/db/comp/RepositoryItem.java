@@ -20,12 +20,8 @@
 
 package tigase.db.comp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xml.Element;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * The interface defines a contract for a repository item handled by ComponentRepository implementation. Created: Oct 3,
@@ -42,8 +38,6 @@ public interface RepositoryItem {
 	 * @param packet with empty ad-hoc command to fill with fields
 	 */
 	void addCommandFields(Packet packet);
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns an array with the Item administrators, that is people IDs who can manage, configure and control less
@@ -70,8 +64,6 @@ public interface RepositoryItem {
 	 * @return an Item key.
 	 */
 	String getKey();
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Returns the owner ID of the item.  This is used for a management to allow fine tuned service administration with
@@ -100,8 +92,6 @@ public interface RepositoryItem {
 	 */
 	void initFromCommand(Packet packet);
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * The item can be also initialized from a more complex repositories: XML repository or SQL database. In such a case
 	 * more complex representation is prefered, possibly carrying more information about the item. The method is called
@@ -121,8 +111,6 @@ public interface RepositoryItem {
 	 */
 	void initFromPropertyString(String propString);
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * The method checks whether the given id is one of the administrators set for the Item.
 	 *
@@ -140,8 +128,6 @@ public interface RepositoryItem {
 	 * @return true of the given ID is on the Item owner and false otherwise.
 	 */
 	boolean isOwner(String id);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Item data can be stored in a more complex form than a simple property string. The XML Element can contain much
@@ -164,6 +150,3 @@ public interface RepositoryItem {
 	String toPropertyString();
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -43,8 +43,6 @@ public abstract class RosterFactory {
 	public static String defaultRosterImplementation = ROSTER_IMPL_PROP_VAL;
 	/** Holds shared implementation of {@link RosterAbstract} */
 	private static RosterAbstract shared = null;
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Creates new instance of class implementing {@link RosterAbstract} - either default one ({@link RosterFlat}) or
 	 * the one configured with <em>"roster-implementation"</em> property.
@@ -131,4 +129,3 @@ public abstract class RosterFactory {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/04/24

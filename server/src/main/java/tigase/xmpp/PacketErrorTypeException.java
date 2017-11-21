@@ -33,8 +33,6 @@ public class PacketErrorTypeException
 
 	private static final long serialVersionUID = 1L;
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>PacketErrorTypeException</code> instance.
 	 *
@@ -49,4 +47,3 @@ public class PacketErrorTypeException
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

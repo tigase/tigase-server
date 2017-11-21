@@ -19,15 +19,11 @@
  */
 package tigase.server.amp.action;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.AmpComponent;
 import tigase.xml.Element;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:35:33 PM
@@ -41,14 +37,10 @@ public class Drop
 
 	private static final String name = "drop";
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		return false;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getName() {

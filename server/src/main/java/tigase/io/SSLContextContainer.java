@@ -19,8 +19,6 @@
  */
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
@@ -46,8 +44,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 15, 2010 2:40:49 PM
@@ -354,6 +350,3 @@ public class SSLContextContainer
 	}
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

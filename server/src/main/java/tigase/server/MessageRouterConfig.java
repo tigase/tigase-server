@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import java.util.Map;
 
 /**
@@ -58,13 +56,7 @@ public class MessageRouterConfig {
 
 	public static final String DISCO_NAME_PROP_VAL = tigase.server.XMPPServer.NAME;
 
-	//~--- static initializers --------------------------------------------------
-
-	//~--- fields ---------------------------------------------------------------
-
 	private Map<String, Object> props = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	private static boolean isTrue(String val) {
 		if (val == null) {
@@ -76,8 +68,6 @@ public class MessageRouterConfig {
 		return (value.equals("true") || value.equals("yes") || value.equals("on") || value.equals("1"));
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 
 	public MessageRouterConfig(Map<String, Object> props) {
 		this.props = props;
@@ -86,4 +76,3 @@ public class MessageRouterConfig {
 	}
 }    // MessageRouterConfig
 
-//~ Formatted in Tigase Code Convention on 13/10/15

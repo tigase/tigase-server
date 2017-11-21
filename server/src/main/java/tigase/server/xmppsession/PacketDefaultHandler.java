@@ -20,8 +20,6 @@
 
 package tigase.server.xmppsession;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xmpp.*;
@@ -30,8 +28,6 @@ import tigase.xmpp.jid.JID;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class PacketDefaultHandler here.
@@ -45,23 +41,17 @@ public class PacketDefaultHandler {
 
 	private static final Logger log = Logger.getLogger(PacketDefaultHandler.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	// private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
 	// private RosterAbstract roster_util =
 	// RosterFactory.getRosterImplementation(true);
 	private String[] IGNORE_PACKETS = {"stream:features"};
 	private StanzaType[] IGNORE_TYPES = {StanzaType.error};
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>PacketDefaultHandler</code> instance.
 	 */
 	public PacketDefaultHandler() {
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method checks if packet can be processed by this handler
@@ -220,4 +210,3 @@ public class PacketDefaultHandler {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/05/24

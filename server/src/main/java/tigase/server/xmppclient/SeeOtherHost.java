@@ -36,8 +36,6 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the initial one
  *

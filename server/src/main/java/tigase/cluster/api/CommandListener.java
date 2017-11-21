@@ -20,8 +20,6 @@
 
 package tigase.cluster.api;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Priority;
 import tigase.stats.StatisticsList;
 import tigase.xml.Element;
@@ -30,8 +28,6 @@ import tigase.xmpp.jid.JID;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * @author Artur Hefczyc Created Mar 16, 2011
@@ -51,8 +47,6 @@ public interface CommandListener
 	 */
 	void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data, Queue<Element> packets)
 			throws ClusterCommandException;
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method allows retrieval name of the particular command
@@ -75,8 +69,6 @@ public interface CommandListener
 	 * @return
 	 */
 	Priority getPriority();
-
-	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method allows retrieval possible statistics for particular command

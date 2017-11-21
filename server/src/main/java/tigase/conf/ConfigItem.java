@@ -20,8 +20,6 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -29,8 +27,6 @@ import tigase.util.repository.DataTypes;
 import tigase.xml.Element;
 
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2009 2:40:26 PM
@@ -69,8 +65,6 @@ public class ConfigItem
 
 	private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	public enum FLAGS {
 		INITIAL,
 		DEFAULT,
@@ -83,10 +77,7 @@ public class ConfigItem
 	private long lastModificationTime = -1;
 	private String nodeName = null;
 
-	//~--- constant enums -------------------------------------------------------
 	private Object value = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addCommandFields(Packet packet) {
@@ -112,8 +103,6 @@ public class ConfigItem
 		Command.addFieldValue(packet, value_label, value_str);
 		super.addCommandFields(packet);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public String getClusterNode() {
 		return clusterNode;
@@ -172,8 +161,6 @@ public class ConfigItem
 	public String getNodeName() {
 		return nodeName;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initFromCommand(Packet packet) {
@@ -242,13 +229,9 @@ public class ConfigItem
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean equals(Object o) {
@@ -263,8 +246,6 @@ public class ConfigItem
 	public int hashCode() {
 		return getKey().hashCode();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Checks if the given component name is equal to this item compName.
@@ -314,8 +295,6 @@ public class ConfigItem
 	public boolean isNodeKey(String node, String key) {
 		return isNode(node) && isKey(key);
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	public void set(String clusterNode_m, String compName_m, String nodeName_m, String key_m, String value_str_m,
 					char val_type_m, String flag_str_m) {
@@ -379,8 +358,6 @@ public class ConfigItem
 		set(clusterNode, compName, method_node, method_key, value);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	// public static final String REPO_ITEM_ELEM_NAME = "prop";
 	// public static final String CLUSTER_NODE_ATTR = "cluster-node";
 	// public static final String COMPONENT_NAME_ATTR = "comp-name";
@@ -433,4 +410,3 @@ public class ConfigItem
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/25

@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.net.IOService;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -40,8 +38,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class XMPPIOService here.
@@ -76,7 +72,6 @@ public class XMPPIOService<RefObject>
 
 	private static final Logger log = Logger.getLogger(XMPPIOService.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	public ReentrantLock writeInProgress = new ReentrantLock();
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	protected XMPPIOProcessor[] processors = null;
@@ -109,8 +104,6 @@ public class XMPPIOService<RefObject>
 	private String xmlns = null;
 	private boolean xmpp_ack = false;
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>XMPPIOService</code> instance.
 	 */
@@ -119,8 +112,6 @@ public class XMPPIOService<RefObject>
 		domHandler = new XMPPDomBuilderHandler<>(this);
 		getSessionData().put(DOM_HANDLER, domHandler);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method <code>addPacketToSend</code> adds new data which will be processed during next run. Data are kept in
@@ -305,8 +296,6 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public long getPacketsReceived(boolean reset) {
 		long tmp = packetsReceived;
 
@@ -391,8 +380,6 @@ public class XMPPIOService<RefObject>
 	public void setProcessors(XMPPIOProcessor[] processors) {
 		this.processors = processors;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method returns the time when the last XMPP packet was received, it is used to help detect dead connections.
@@ -700,4 +687,3 @@ public class XMPPIOService<RefObject>
 	}
 }    // XMPPIOService
 
-//~ Formatted in Tigase Code Convention on 13/09/21

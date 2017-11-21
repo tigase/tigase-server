@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.ext.*;
 
@@ -32,10 +30,6 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 7, 2009 5:51:47 PM
@@ -49,17 +43,12 @@ public class ComponentAcceptStreamOpenHandler
 	public static final String XMLNS = "jabber:component:accept";
 	private static final Logger log = Logger.getLogger(ComponentAcceptStreamOpenHandler.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private String[] xmlnss = new String[]{XMLNS};
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getXMLNSs() {
 		return xmlnss;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String serviceStarted(ComponentIOService serv) {
@@ -163,6 +152,3 @@ public class ComponentAcceptStreamOpenHandler
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

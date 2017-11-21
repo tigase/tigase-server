@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.XMPPException;
 
 /**
@@ -31,8 +29,6 @@ public class RosterRetrievingException
 		extends XMPPException {
 
 	private static final long serialVersionUID = 1L;
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>PacketErrorTypeException</code> instance.
@@ -48,4 +44,3 @@ public class RosterRetrievingException
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/27

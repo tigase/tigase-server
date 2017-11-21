@@ -20,8 +20,6 @@
 
 package tigase.db.derby;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.auth.credentials.Credentials;
 import tigase.util.Algorithms;
 
@@ -31,10 +29,6 @@ import java.sql.*;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Artur Hefczyc
@@ -49,8 +43,6 @@ public class StoredProcedures {
 	private static final String DEFAULT_USERNAME_SHA1 = sha1(Credentials.DEFAULT_USERNAME);
 
 	private static final String GET_VERSION = "select version from tig_schema_versions where (component = ?)";
-
-	//~--- methods --------------------------------------------------------------
 
 	private static String encodePassword(String encMethod, String userId, String userPw) {
 		if ((encMethod != null) && "MD5-PASSWORD".equals(encMethod)) {
@@ -905,6 +897,3 @@ public class StoredProcedures {
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

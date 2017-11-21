@@ -57,7 +57,6 @@ public class RosterElement {
 	private static final String SUBS_ATT = "subs";
 	private static final String WEIGHT_ATT = "weight";
 
-	//~--- fields ---------------------------------------------------------------
 	private double activity = INITIAL_ACTIVITY_VAL;
 	private String[] groups = null;
 	private JID jid = null;
@@ -73,8 +72,6 @@ public class RosterElement {
 	private String stringpreped = null;
 	private SubscriptionType subscription = null;
 	private double weight = INITIAL_WEIGHT_VAL;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public RosterElement(Element roster_el) throws TigaseStringprepException {
 		if (roster_el.getName() == ELEM_NAME) {

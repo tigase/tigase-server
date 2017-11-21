@@ -20,8 +20,6 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.RepositoryFactory;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -44,8 +42,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * Class ConfiguratorOld
  * <br>
@@ -66,7 +62,6 @@ public class ConfiguratorOld
 	private static boolean set = false;
 	private static String value = null;
 
-	//~--- fields ---------------------------------------------------------------
 	private String config_file_name = null;
 	private ServiceEntity config_list = null;
 	private ServiceEntity config_set = null;
@@ -80,8 +75,6 @@ public class ConfiguratorOld
 	private String routerCompName = null;
 	private ServiceEntity serviceEntity = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
 			return monitoring.getMXBean(objName);
@@ -89,8 +82,6 @@ public class ConfiguratorOld
 			return null;
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private static String help() {
 		return "\n" + "Parameters:\n" + " -h             this help message\n" + " -c file        configuration file\n" +
@@ -326,8 +317,6 @@ public class ConfiguratorOld
 		// and maybe change it later.
 		initMonitoring((String) defConfigParams.get(MONITORING), new File(config_file_name).getParent());
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public void initializationCompleted() {
@@ -662,8 +651,6 @@ public class ConfiguratorOld
 		return defConfigParams;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return null;
@@ -718,8 +705,6 @@ public class ConfiguratorOld
 		config_set.addItems(item);
 		serviceEntity.addItems(config_list, config_set);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void setProperties(final Map<String, Object> props) throws ConfigurationException {
@@ -1220,4 +1205,3 @@ public class ConfiguratorOld
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/06/08

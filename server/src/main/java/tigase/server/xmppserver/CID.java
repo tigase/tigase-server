@@ -20,11 +20,7 @@
 
 package tigase.server.xmppserver;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jan 7, 2010 12:51:33 PM
@@ -36,14 +32,10 @@ public class CID {
 
 	private static final Logger log = Logger.getLogger(CID.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private int hash = 3;
 	private String localHost = null;
 	private String remoteHost = null;
 	private String to_string = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public CID(String cid) {
 		String[] cid_a = cid.split("@");
@@ -59,8 +51,6 @@ public class CID {
 		updateToString();
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof CID) {
@@ -70,8 +60,6 @@ public class CID {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public String getLocalHost() {
 		return localHost;
 	}
@@ -79,8 +67,6 @@ public class CID {
 	public String getRemoteHost() {
 		return remoteHost;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int hashCode() {

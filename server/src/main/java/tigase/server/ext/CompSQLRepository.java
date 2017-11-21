@@ -20,8 +20,6 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.*;
 import tigase.db.beans.DataSourceBean;
 import tigase.db.comp.ComponentRepository;
@@ -82,7 +80,6 @@ public class CompSQLRepository
 					OTHER_DATA_COLUMN + ") " + " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME + " where " +
 					DOMAIN_COLUMN + " = ? HAVING count(*)=0) ";
 
-	//~--- fields ---------------------------------------------------------------
 	private CompConfigRepository configRepo = new CompConfigRepository();
 	@Inject
 	private DataSourceBean dataSourceBean;
@@ -127,8 +124,6 @@ public class CompSQLRepository
 			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addRepoChangeListener(RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
@@ -238,8 +233,6 @@ public class CompSQLRepository
 		// in other places, so we can not destroy it.
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
@@ -285,8 +278,6 @@ public class CompSQLRepository
 	public CompRepoItem getItemInstance() {
 		return configRepo.getItemInstance();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void setDataSource(DataRepository data_repo) {
 		try {
@@ -342,8 +333,6 @@ public class CompSQLRepository
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
@@ -357,8 +346,6 @@ public class CompSQLRepository
 			log.log(Level.WARNING, "Problem initializing database.", ex);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int size() {
@@ -442,8 +429,6 @@ public class CompSQLRepository
 
 		return result;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private Element parseElement(String data) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();

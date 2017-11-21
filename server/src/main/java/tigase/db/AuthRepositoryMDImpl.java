@@ -19,8 +19,6 @@
  */
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.auth.credentials.Credentials;
 import tigase.db.beans.AuthRepositoryMDPoolBean;
 import tigase.db.beans.MDPoolBeanWithStatistics;
@@ -31,10 +29,6 @@ import tigase.xmpp.jid.BareJID;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Implementation of multi domain pool for authentication repositories. Created: Mar 27, 2010 9:10:21 PM
@@ -48,15 +42,11 @@ public abstract class AuthRepositoryMDImpl
 
 	private static final Logger log = Logger.getLogger(AuthRepositoryMDImpl.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private EventBus eventBus = EventBusFactory.getInstance();
 
 	public AuthRepositoryMDImpl() {
 		super(AuthRepository.class);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addUser(BareJID user, String password) throws TigaseDBException {
@@ -69,8 +59,6 @@ public abstract class AuthRepositoryMDImpl
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {

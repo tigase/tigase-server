@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.form.Field;
@@ -37,8 +35,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * @author andrzej
  */
@@ -51,8 +47,6 @@ public class RemoteRosterManagement
 	private static final Logger log = Logger.getLogger("eu.hilow.xtigase.server.xmpp.RemoteRosterManagement");
 	private static final String XMLNS = "http://spectrum.im/protocol/remote-roster";
 	private static final String[] XMLNSS = {XMLNS, "jabber:x:data"};
-
-	//~--- methods --------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
 	private static Set<JID> getAllowed(XMPPResourceConnection session)
@@ -190,21 +184,15 @@ public class RemoteRosterManagement
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENT_PATHS;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	private void processIq(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 						   Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
@@ -248,8 +236,6 @@ public class RemoteRosterManagement
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Bad request", true));
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void processMessageFormResponse(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 											Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
@@ -298,4 +284,3 @@ public class RemoteRosterManagement
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

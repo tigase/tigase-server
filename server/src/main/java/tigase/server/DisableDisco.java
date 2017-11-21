@@ -30,4 +30,3 @@ public interface DisableDisco {
 
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/04

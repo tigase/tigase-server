@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.DefaultElementFactory;
 import tigase.xml.Element;
 import tigase.xml.ElementFactory;
@@ -30,10 +28,6 @@ import tigase.xml.SimpleHandler;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>XMPPDomBuilderHandler</code> - implementation of <code>SimpleHandler</code> building <em>DOM</em> strctures
@@ -59,7 +53,6 @@ public class XMPPDomBuilderHandler<RefObject>
 	private static final String ELEM_STREAM_STREAM = "stream:stream";
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
 
-	//~--- fields ---------------------------------------------------------------
 	private ArrayDeque<Element> all_roots = new ArrayDeque<>(1);
 	private ElementFactory customFactory = null;
 	private ArrayDeque<Element> el_stack = new ArrayDeque<>(10);
@@ -76,8 +69,6 @@ public class XMPPDomBuilderHandler<RefObject>
 	private boolean streamClosed = false;
 	private String top_xmlns = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv) {
 		customFactory = defaultFactory;
 		service = ioserv;
@@ -89,8 +80,6 @@ public class XMPPDomBuilderHandler<RefObject>
 		service = ioserv;
 //		elements_number_limit = (int)service.getSessionData().get( ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void elementCData(StringBuilder cdata) {
@@ -171,13 +160,9 @@ public class XMPPDomBuilderHandler<RefObject>
 		error = true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public Queue<Element> getParsedElements() {
 		return all_roots;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public boolean isStreamClosed() {
 		return streamClosed;
@@ -330,6 +315,3 @@ public class XMPPDomBuilderHandler<RefObject>
 	}
 }    // XMPPDomBuilderHandler
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

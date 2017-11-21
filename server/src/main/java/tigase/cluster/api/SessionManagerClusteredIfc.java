@@ -26,8 +26,6 @@
  */
 package tigase.cluster.api;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.xml.Element;
@@ -39,8 +37,6 @@ import tigase.xmpp.jid.JID;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * @author kobit
  */
@@ -49,15 +45,11 @@ public interface SessionManagerClusteredIfc
 
 	public static final String SESSION_FOUND_KEY = "user-session-found-key";
 
-	//~--- methods --------------------------------------------------------------
-
 	boolean fastAddOutPacket(Packet packet);
 
 	void processPacket(Packet el_packet, XMPPResourceConnection conn);
 
 	void processPresenceUpdate(XMPPSession session, Element element);
-
-	//~--- get methods ----------------------------------------------------------
 
 	XMPPResourceConnection getXMPPResourceConnection(Packet el_packet);
 
@@ -79,4 +71,3 @@ public interface SessionManagerClusteredIfc
 	List<JID> getNodesConnected();
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

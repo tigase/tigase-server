@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
 import tigase.server.ComponentInfo;
@@ -31,8 +29,6 @@ import tigase.xml.Element;
 
 import java.util.Map;
 import java.util.Set;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * This is a base interface for all session manager plugins. There are packet processing plugins, pre-processing,
@@ -47,8 +43,6 @@ public interface XMPPImplIfc
 		extends Comparable<XMPPImplIfc> {
 
 	public static final String CLIENT_XMLNS = "jabber:client";
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * By default the method uses {@link #supElementNamePaths() } and {@link #supTypes() } method results to determine
@@ -172,8 +166,6 @@ public interface XMPPImplIfc
 	 */
 	Set<StanzaType> supTypes();
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Allows to obtain various informations about components
 	 *
@@ -202,4 +194,3 @@ public interface XMPPImplIfc
 	boolean isSupporting(String elem, String ns);
 }    // XMPPImplIfc
 
-//~ Formatted in Tigase Code Convention on 13/09/21

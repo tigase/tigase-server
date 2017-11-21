@@ -20,15 +20,11 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.RepositoryFactory;
 import tigase.server.ServerComponent;
 
 import java.util.Map;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface Configurable
@@ -615,8 +611,6 @@ public interface Configurable
 	@TigaseDeprecated(since = "8.0.0")
 	public static final String AUTH_REPO_DOMAINS_PROP_KEY = RepositoryFactory.AUTH_REPO_DOMAINS_PROP_KEY;
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Returns default configuration settings for the component as a <code>Map</code> with keys as configuration
 	 * property IDs and values as the configuration property values. All the default parameters returned from this
@@ -632,8 +626,6 @@ public interface Configurable
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	Map<String, Object> getDefaults(Map<String, Object> params);
-
-	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Sets all configuration properties for the object.

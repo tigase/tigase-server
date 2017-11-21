@@ -20,15 +20,11 @@
 
 package tigase.server.ext.lb;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 
 import java.util.List;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * @author Artur Hefczyc Created Jul 9, 2011

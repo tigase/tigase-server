@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -34,8 +32,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Utility abstract class detecting what kind of packet is processed. Releases developers from checking whether the
@@ -51,8 +47,6 @@ public abstract class XMPPProcessorAbstract
 		implements XMPPProcessorIfc {
 
 	private static final Logger log = Logger.getLogger(XMPPProcessorAbstract.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
@@ -295,4 +289,3 @@ public abstract class XMPPProcessorAbstract
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/05/24

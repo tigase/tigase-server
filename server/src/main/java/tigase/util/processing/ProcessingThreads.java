@@ -20,8 +20,6 @@
 
 package tigase.util.processing;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -29,10 +27,6 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 21, 2009 8:50:50 PM
@@ -45,8 +39,6 @@ import java.util.logging.Logger;
 public class ProcessingThreads<E extends WorkerThread> {
 
 	private static final Logger log = Logger.getLogger(ProcessingThreads.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
 
 	private long droppedPackets = 0;
 
@@ -62,8 +54,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 	// private int numQueues = 2;
 	private int numWorkerThreads = 1;
 	private ArrayList<E> workerThreads = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	@SuppressWarnings({"unchecked"})
 	public ProcessingThreads(E worker, int numWorkerThreads, int maxQueueSize, String name)
@@ -92,8 +82,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 //  }
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		boolean ret = false;
@@ -157,8 +145,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public long getAverageProcessingTime() {
 		long average = 0;
 		int counters = 0;
@@ -212,6 +198,3 @@ public class ProcessingThreads<E extends WorkerThread> {
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

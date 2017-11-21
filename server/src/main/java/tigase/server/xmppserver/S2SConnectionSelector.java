@@ -19,15 +19,9 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 
 import java.util.Set;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Jun 26, 2010 9:38:19 AM
@@ -40,6 +34,3 @@ public interface S2SConnectionSelector {
 	S2SConnection selectConnection(Packet packet, Set<S2SConnection> outgoing);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

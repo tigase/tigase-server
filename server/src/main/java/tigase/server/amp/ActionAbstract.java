@@ -20,8 +20,6 @@
 
 package tigase.server.amp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.UserRepository;
 import tigase.kernel.beans.Inject;
@@ -42,8 +40,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 1, 2010 7:44:17 PM
@@ -66,8 +62,6 @@ public abstract class ActionAbstract
 	public static final String SECURITY_PROP_KEY = "security-level";
 	private static Logger log = Logger.getLogger(ActionAbstract.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	protected ActionResultsHandlerIfc resultsHandler = null;
 	RosterFlat rosterUtil = new RosterFlat();
 	@ConfigField(alias = "security", desc = "Security level")
@@ -75,14 +69,10 @@ public abstract class ActionAbstract
 	@Inject
 	private UserRepository user_repository = null;
 
-	//~--- constant enums -------------------------------------------------------
-
 	@Override
 	public void setActionResultsHandler(ActionResultsHandlerIfc resultsHandler) {
 		this.resultsHandler = resultsHandler;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	protected Packet prepareAmpPacket(Packet packet, Element rule) throws PacketErrorTypeException {
 		boolean error_result = false;
@@ -138,8 +128,6 @@ public abstract class ActionAbstract
 		return result;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	protected void removeTigasePayload(Packet packet) {
 		packet.getElement().removeAttribute(TO_CONN_ID);
 		packet.getElement().removeAttribute(TO_RES);
@@ -185,4 +173,3 @@ public abstract class ActionAbstract
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

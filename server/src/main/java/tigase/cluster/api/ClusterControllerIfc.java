@@ -20,8 +20,6 @@
 
 package tigase.cluster.api;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
@@ -29,16 +27,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * @author Artur Hefczyc Created Mar 16, 2011
  */
 public interface ClusterControllerIfc {
 
 	public static final String DELIVER_CLUSTER_PACKET_CMD = "deliver-cluster-packet-cmd";
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method handles cluster packet received from cluster connection.
@@ -142,8 +136,6 @@ public interface ClusterControllerIfc {
 	 */
 	void sendToNodes(String command, Map<String, String> data, Element packet, JID fromNode, Set<JID> visitedNodes,
 					 JID... toNodes);
-
-	//~--- set methods ----------------------------------------------------------
 
 	void setCommandListener(CommandListener listener);
 }

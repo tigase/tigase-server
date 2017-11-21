@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 import tigase.server.PolicyViolationException;
 import tigase.xml.DomBuilderHandler;
@@ -38,8 +36,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class RosterFlat here.

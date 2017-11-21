@@ -20,12 +20,8 @@
 
 package tigase.util.workqueue;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Feb 9, 2010 11:12:56 AM
@@ -40,11 +36,8 @@ public class PriorityQueueRelaxed<E>
 
 	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private int lowestNonEmpty = Integer.MAX_VALUE;
 	private LinkedBlockingQueue<E>[] qs = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 
 	public PriorityQueueRelaxed() {
@@ -54,8 +47,6 @@ public class PriorityQueueRelaxed<E>
 	protected PriorityQueueRelaxed(int maxPriority, int maxSize) {
 		init(maxPriority, maxSize);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -93,8 +84,6 @@ public class PriorityQueueRelaxed<E>
 		add(element, priority, true);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setMaxSize(int maxSize) {
 		for (int i = 0; i < qs.length; i++) {
@@ -108,8 +97,6 @@ public class PriorityQueueRelaxed<E>
 			oldQueue.drainTo(qs[i]);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int[] size() {
@@ -235,6 +222,3 @@ public class PriorityQueueRelaxed<E>
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

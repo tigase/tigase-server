@@ -20,16 +20,10 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xml.Element;
 
 import java.util.List;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Oct 7, 2009 5:54:56 PM
@@ -45,15 +39,11 @@ public interface ComponentProtocolHandler {
 
 	public static final String EXTCOMP_BIND_HOSTNAMES_PROP_KEY = "bind-ext-hostnames";
 
-	//~--- methods --------------------------------------------------------------
-
 	void authenticated(ComponentIOService serv);
 
 	void authenticationFailed(ComponentIOService serv, Packet packet);
 
 	void bindHostname(String hostname, ComponentIOService serv);
-
-	//~--- get methods ----------------------------------------------------------
 
 	CompRepoItem getCompRepoItem(String hostname);
 
@@ -63,13 +53,8 @@ public interface ComponentProtocolHandler {
 
 	StreamOpenHandler getStreamOpenHandler(String xmlns);
 
-	//~--- methods --------------------------------------------------------------
-
 	String newPacketId(String prefix);
 
 	void unbindHostname(String hostname, ComponentIOService serv);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

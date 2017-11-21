@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
@@ -36,8 +34,6 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 import static tigase.xmpp.impl.SessionBind.XMLNS;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class SessionBind here.
@@ -59,8 +55,6 @@ public class SessionBind
 	protected static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-session";
 	private static final String SESSION_KEY = "Session-Set";
 	private static final Logger log = Logger.getLogger(SessionBind.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,

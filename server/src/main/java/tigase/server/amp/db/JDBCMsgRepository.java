@@ -19,8 +19,6 @@
  */
 package tigase.server.amp.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.*;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
@@ -38,8 +36,6 @@ import java.util.Date;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: May 3, 2010 5:28:02 PM
@@ -472,8 +468,6 @@ public class JDBCMsgRepository
 			log.log(Level.WARNING, "Problem removing entry from DB: ", e);
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	protected void loadExpiredQueue(int min_elements) {

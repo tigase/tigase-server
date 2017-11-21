@@ -20,8 +20,6 @@
 
 package tigase.db.comp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.Repository;
 import tigase.db.TigaseDBException;
@@ -48,8 +46,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 		extends Iterable<Item>, Repository {
 
 	public static final String COMP_REPO_BIND = "comp_repo";
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Adds a listener for repository Item change.
@@ -104,8 +100,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 */
 	void destroy();
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * The method is called to obtain default configuration settings if there are any for this repository implementation
 	 * The configuration settings are implementation dependent and there are no defaults set by the server. Default
@@ -138,8 +132,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 */
 	Item getItemInstance();
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * This method is called to reload items from the database or other permanent storage. It is possible that items
 	 * list is modified externally by third-party system. When all modifications are done this method is called to
@@ -158,8 +150,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 */
 	void removeItem(String key) throws TigaseDBException;
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * The method is called to set configuration for this repository implementation. The configuration is repository
 	 * implementation dependent. There are no default settings for the repository.
@@ -170,8 +160,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	void setProperties(Map<String, Object> properties);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * The method returns number of items in the repository.
@@ -196,8 +184,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 */
 	String validateItem(Item item);
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Sets autoload task to periodically reload data from database.
 	 *
@@ -206,4 +192,3 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	void setAutoloadTimer(long delay);
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/09

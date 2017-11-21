@@ -54,11 +54,8 @@ public class WebSocketClientConnectionClustered
 
 	private static final Logger log = Logger.getLogger(WebSocketClientConnectionClustered.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
 	private SeeOtherHostIfc see_other_host_strategy = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	public WebSocketClientConnectionClustered() {
 		delayPortListening = true;
@@ -98,8 +95,6 @@ public class WebSocketClientConnectionClustered
 	public String getDiscoDescription() {
 		return super.getDiscoDescription() + " clustered";
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {

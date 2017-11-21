@@ -19,8 +19,6 @@
  */
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.kernel.KernelException;
@@ -37,8 +35,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class XMPPServer here.
@@ -64,8 +60,6 @@ public final class XMPPServer {
 	private static boolean inOSGi = false;
 	private static String serverName = "message-router";
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Allows obtaining {@link tigase.conf.ConfiguratorAbstract} implementation used by Tigase to handle all
 	 * configuration of the server.
@@ -86,8 +80,6 @@ public final class XMPPServer {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public static <T> T getComponent(Class<T> clazz) {
 		try {
 			return bootstrap.getInstance(clazz);
@@ -106,8 +98,6 @@ public final class XMPPServer {
 				.filter(bc -> clazz.isAssignableFrom(bc.getClazz()) && bc.getState() == BeanConfig.State.initialized)
 				.map(bc -> (T) bootstrap.getInstance(bc.getBeanName()));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public static String getImplementationVersion() {
 		String version = ComponentInfo.getImplementationVersion(XMPPServer.class);
@@ -228,6 +218,3 @@ public final class XMPPServer {
 	}
 }    // XMPPServer
 
-//~ Formatted in Sun Code Convention on 2010.01.15 at 08:51:06 PST
-
-//~ Formatted by Jindent --- http://www.jindent.com

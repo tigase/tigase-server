@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.ext.CompRepoItem;
 import tigase.server.ext.ComponentIOService;
@@ -36,10 +34,6 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 31, 2009 11:06:57 PM
@@ -57,8 +51,6 @@ public class SASLProcessor
 														new String[]{"xmlns"},
 														new String[]{"urn:ietf:params:xml:ns:xmpp-sasl"});
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getId() {
 		return ID;
@@ -72,8 +64,6 @@ public class SASLProcessor
 			return Arrays.asList(FEATURES);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
@@ -211,6 +201,3 @@ public class SASLProcessor
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

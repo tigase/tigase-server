@@ -20,8 +20,6 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.*;
 import tigase.cluster.repo.ClusterRepoItem;
 import tigase.cluster.repo.ClusterRepoItemEvent;
@@ -130,7 +128,6 @@ public class ClusterConnectionManager
 	 */
 	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
 
-	//~--- fields ---------------------------------------------------------------
 	@Inject
 	private ClusterControllerIfc clusterController = null;
 	private tigase.eventbus.EventListener<ClusterInitializedEvent> clusterEventHandler = null;
@@ -200,8 +197,6 @@ public class ClusterConnectionManager
 		watchdogDelay = 30 * SECOND;
 		watchdogTimeout = -1 * SECOND;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -669,8 +664,6 @@ public class ClusterConnectionManager
 		return identity_type;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getDiscoDescription() {
 		return "Cluster connection manager";
@@ -712,8 +705,6 @@ public class ClusterConnectionManager
 		clusterController.removeCommandListener(sendPacket);
 		clusterController.setCommandListener(sendPacket);
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void start() {
@@ -829,8 +820,6 @@ public class ClusterConnectionManager
 		return new int[]{item.getPortNo()};
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected String getDefTrafficThrottling() {
 		return "xmpp:25m:0:disc,bin:20000m:0:disc";
@@ -867,7 +856,6 @@ public class ClusterConnectionManager
 		return true;
 	}
 
-	//~--- methods --------------------------------------------------------------
 	private void sendEvent(REPO_ITEM_UPDATE_TYPE action, ClusterRepoItem item) {
 
 		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
@@ -878,8 +866,6 @@ public class ClusterConnectionManager
 		ClusterRepoItemEvent event = new ClusterRepoItemEvent(item, action);
 		eventBus.fire(event);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 
@@ -994,8 +980,6 @@ public class ClusterConnectionManager
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	public static class ClusterInitializedEvent {
 
 		public ClusterInitializedEvent() {
@@ -1034,8 +1018,6 @@ public class ClusterConnectionManager
 		private float decompressionRatio = 0f;
 		private StatisticsList list = new StatisticsList(Level.ALL);
 
-		//~--- methods ------------------------------------------------------------
-
 		@Override
 		public void check(XMPPIOService<Object> service) {
 			service.getStatistics(list, true);
@@ -1058,8 +1040,6 @@ public class ClusterConnectionManager
 			decompressionRatio = 0f;
 		}
 
-		//~--- get methods --------------------------------------------------------
-
 		public float getAverageCompressionRatio() {
 			return compressionRatio / counter;
 		}
@@ -1079,8 +1059,6 @@ public class ClusterConnectionManager
 		private SendPacket(String name) {
 			super(name, null);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
@@ -1106,13 +1084,9 @@ public class ClusterConnectionManager
 
 		private XMPPIOService<Object> serv = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private ServiceConnectedTimerTask(XMPPIOService<Object> serv) {
 			this.serv = serv;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {

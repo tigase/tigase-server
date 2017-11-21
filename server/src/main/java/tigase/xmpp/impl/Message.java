@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
@@ -69,8 +67,6 @@ public class Message
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
 	@ConfigField(desc = "Silently ignore errors", alias = SILENTLY_IGNORE_ERROR_KEY)
 	private boolean silentlyIgnoreError = false;
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 					   Queue<Packet> results) {

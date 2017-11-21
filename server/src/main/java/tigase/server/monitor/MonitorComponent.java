@@ -19,8 +19,6 @@
  */
 package tigase.server.monitor;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.conf.ConfigurationException;
 import tigase.server.AbstractMessageReceiver;
@@ -30,10 +28,6 @@ import tigase.stats.StatisticsList;
 import javax.script.Bindings;
 import java.util.Map;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jun 17, 2010 10:14:23 AM
@@ -48,8 +42,6 @@ public class MonitorComponent
 		extends AbstractMessageReceiver {
 
 	private static final Logger log = Logger.getLogger(MonitorComponent.class.getName());
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -72,8 +64,6 @@ public class MonitorComponent
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initBindings(Bindings binds) {

@@ -20,8 +20,6 @@
 
 package tigase.db.comp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -43,16 +41,10 @@ public abstract class RepositoryItemAbstract
 
 	public static final String OWNER_LABEL = "Owner";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String[] admins = null;
 	private String owner = null;
 
-	//~--- get methods ----------------------------------------------------------
-
 	public abstract String getElemName();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addCommandFields(Packet packet) {
@@ -60,8 +52,6 @@ public abstract class RepositoryItemAbstract
 							  (owner != null) ? owner : packet.getStanzaTo().getBareJID().toString());
 		Command.addFieldValue(packet, ADMINS_LABEL, adminsToString(admins));
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getAdmins() {
@@ -73,8 +63,6 @@ public abstract class RepositoryItemAbstract
 		this.admins = admins;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public String getOwner() {
 		return owner;
@@ -84,8 +72,6 @@ public abstract class RepositoryItemAbstract
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public void initFromCommand(Packet packet) {
@@ -101,8 +87,6 @@ public abstract class RepositoryItemAbstract
 		owner = elem.getAttributeStaticStr(OWNER_ATT);
 		admins = adminsFromString(elem.getAttributeStaticStr(ADMINS_ATT));
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public boolean isAdmin(String id) {
@@ -122,8 +106,6 @@ public abstract class RepositoryItemAbstract
 	public boolean isOwner(String id) {
 		return ((owner == null) ? false : owner.equals(id));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Element toElement() {

@@ -20,8 +20,6 @@
 
 package tigase.util.repository;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.AuthRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.UserExistsException;
@@ -36,10 +34,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.List;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class RepositoryUtils here.
@@ -79,8 +73,7 @@ public class RepositoryUtils {
 	private static BareJID user3 = BareJID.bareJIDInstanceNS("user333@hostname");
 	private static String value = null;
 
-	//~--- methods --------------------------------------------------------------
-	
+
 	public static boolean checkContact(BareJID user, UserRepository repo, String cont) throws Exception {
 
 		// String[] keys = repo.getKeys(user, "roster/"+contact);
@@ -786,6 +779,3 @@ public class RepositoryUtils {
 	}
 }    // RepositoryUtils
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

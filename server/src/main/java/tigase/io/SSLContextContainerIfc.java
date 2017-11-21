@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.server.Lifecycle;
 
 import javax.net.ssl.SSLContext;
@@ -32,8 +30,6 @@ import java.nio.ByteOrder;
 import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
 import java.util.Map;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface SSLContextContainerIfc here.
@@ -232,6 +228,3 @@ public interface SSLContextContainerIfc
 	String[] getEnabledProtocols();
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

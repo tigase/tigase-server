@@ -20,15 +20,9 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.jid.BareJID;
 
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Interface MessageReceiver
@@ -50,8 +44,6 @@ public interface MessageReceiver
 
 	boolean addPackets(Queue<Packet> packets);
 
-	//~--- get methods ----------------------------------------------------------
-
 	BareJID getDefHostName();
 
 	///**
@@ -65,11 +57,7 @@ public interface MessageReceiver
 	// Set<String> getRoutings();
 	boolean isInRegexRoutings(String address);
 
-	//~--- set methods ----------------------------------------------------------
-
 	void setParent(MessageReceiver msg_rec);
-
-	//~--- methods --------------------------------------------------------------
 
 	void start();
 

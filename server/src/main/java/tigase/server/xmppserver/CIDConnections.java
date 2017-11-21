@@ -20,8 +20,6 @@
 
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.net.ConnectionType;
@@ -54,7 +52,6 @@ public class CIDConnections {
 //	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
 //																									 true);
 
-	//~--- fields ---------------------------------------------------------------
 	private CID cid = null;
 	private S2SConnectionSelector connectionSelector = null;
 	private CIDConnectionsOpenerService connectionsOpenerService = null;
@@ -76,8 +73,6 @@ public class CIDConnections {
 	private boolean testMode = Boolean.getBoolean("test");
 	private ConcurrentLinkedQueue<Packet> waitingPackets = new ConcurrentLinkedQueue<Packet>();
 
-	//~--- constructors ---------------------------------------------------------
-
 	public CIDConnections(CID cid, S2SConnectionHandlerIfc<S2SIOService> handler, S2SConnectionSelector selector,
 						  int maxInConns, int maxOutConns, int maxOutConnsPerIP, long max_waiting_time) {
 		this.cid = cid;
@@ -90,19 +85,13 @@ public class CIDConnections {
 		this.max_waiting_time = max_waiting_time;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public void resetOutgoingInProgress() {
 		outgoingOpenInProgress.set(false);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public boolean getOutgoingInProgress() {
 		return outgoingOpenInProgress.get();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addDBKey(String sessId, String key) {
 		dbKeys.put(sessId, key);
@@ -187,8 +176,6 @@ public class CIDConnections {
 			default:
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public String getDBKey(String key_sessionId) {
 		return dbKeys.get(key_sessionId);
@@ -321,8 +308,6 @@ public class CIDConnections {
 	public int getWaitingCount() {
 		return waitingPackets.size();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		S2SConnection s2s_conn = (S2SConnection) port_props.get(S2SIOService.S2S_CONNECTION_KEY);
@@ -506,8 +491,6 @@ public class CIDConnections {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private int getOpenForIP(String ip) {
 		int result = 0;
 
@@ -528,8 +511,6 @@ public class CIDConnections {
 	private S2SConnection getOutgoingConnection(Packet packet) {
 		return connectionSelector.selectConnection(packet, outgoing);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void initNewConnection(String ip, int port, S2SConnection s2s_conn, Map<String, Object> port_props) {
 		outgoing_handshaking.add(s2s_conn);
@@ -681,4 +662,3 @@ public class CIDConnections {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/18

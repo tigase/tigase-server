@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -29,8 +27,6 @@ import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Map;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface <code>DynamicRosterIfc</code> is to dynamically generate user roster entries when the user requests the
@@ -80,8 +76,6 @@ public interface DynamicRosterIfc {
 	 * @param par a <code>String</code> value of the configuration string.
 	 */
 	void init(String par);
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * <code>getBuddies</code> method returns <code>String</code> array with all roster buddies JIDs. Normally they are
@@ -163,9 +157,6 @@ public interface DynamicRosterIfc {
 	List<Element> getRosterItems(XMPPResourceConnection session)
 			throws NotAuthorizedException, RosterRetrievingException, RepositoryAccessException;
 
-	//~--- set methods ----------------------------------------------------------
-
 	void setItemExtraData(Element item);
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

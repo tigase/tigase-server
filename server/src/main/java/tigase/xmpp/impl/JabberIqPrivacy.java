@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -188,8 +186,6 @@ public class JabberIqPrivacy
 		return result;
 	}
 
-	//~--- constant enums -------------------------------------------------------
-
 	@Override
 	public void register(Kernel kernel) {
 
@@ -243,8 +239,6 @@ public class JabberIqPrivacy
 	public String id() {
 		return ID;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
@@ -797,4 +791,3 @@ public class JabberIqPrivacy
 	}
 }    // JabberIqPrivacy
 
-//~ Formatted in Tigase Code Convention on 13/03/12

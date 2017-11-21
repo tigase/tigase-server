@@ -19,14 +19,8 @@
  */
 package tigase.server.amp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Apr 26, 2010 5:05:58 PM
@@ -39,12 +33,6 @@ public interface ActionIfc
 
 	boolean execute(Packet packet, Element rule);
 
-	//~--- get methods ----------------------------------------------------------
-
-	//~--- set methods ----------------------------------------------------------
 	void setActionResultsHandler(ActionResultsHandlerIfc resultsHandler);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

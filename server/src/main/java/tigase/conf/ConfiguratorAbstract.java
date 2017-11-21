@@ -20,8 +20,6 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.comp.ComponentRepository;
@@ -44,8 +42,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static tigase.io.SSLContextContainerIfc.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 7, 2009 4:15:31 PM
@@ -99,8 +95,6 @@ public abstract class ConfiguratorAbstract
 	public static String logManagerConfiguration = null;
 	private static MonitoringSetupIfc monitoring = null;
 
-	//~--- fields ---------------------------------------------------------------
-
 	private AuthRepositoryMDImpl auth_repo_impl = null;
 	private Map<String, String> auth_repo_params = null;
 	private AuthRepository auth_repository = null;
@@ -123,8 +117,6 @@ public abstract class ConfiguratorAbstract
 	private Map<String, String> user_repo_params = null;
 	// Default user repository instance which can be shared among components
 	private UserRepository user_repository = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
@@ -417,8 +409,6 @@ public abstract class ConfiguratorAbstract
 		configRepo.putProperties(compId, props);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public void setup(Configurable component) throws ConfigurationException {
 
 		// Try to avoid recursive execution of the method
@@ -652,8 +642,6 @@ public abstract class ConfiguratorAbstract
 		return component instanceof Configurable;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (props.size() == 0) {
@@ -733,8 +721,6 @@ public abstract class ConfiguratorAbstract
 			}
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void addAuthRepo(Map<String, Object> props, String domain)
 			throws DBInitException, ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -888,8 +874,6 @@ public abstract class ConfiguratorAbstract
 		log.config("DONE");
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type, String domain) {
 		Map<String, String> result = new LinkedHashMap<String, String>(10);
 		String prop_start = repo_type + ((domain == null) ? "" : "/" + domain);
@@ -915,4 +899,3 @@ public abstract class ConfiguratorAbstract
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/06/08

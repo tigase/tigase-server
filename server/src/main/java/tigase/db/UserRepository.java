@@ -259,8 +259,6 @@ public interface UserRepository
 	 */
 	long getUsersCount(String domain);
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * <code>removeData</code> method removes pair (key, value) from user repository in given subnode. If the key exists
 	 * in user repository there is always a value associated with this key - even empty <code>String</code>. If key does
@@ -373,8 +371,6 @@ public interface UserRepository
 	 */
 	void setDataList(BareJID user, String subnode, String key, String[] list)
 			throws UserNotFoundException, TigaseDBException;
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method <code>userExists</code> checks whether the user (or repository top node) exists in the database. The

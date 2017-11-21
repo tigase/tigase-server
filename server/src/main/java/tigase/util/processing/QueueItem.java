@@ -20,13 +20,9 @@
 
 package tigase.util.processing;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 21, 2009 9:05:23 PM
@@ -39,8 +35,6 @@ public class QueueItem {
 	private XMPPResourceConnection conn;
 	private Packet packet;
 	private XMPPProcessorIfc processor;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public QueueItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		if (processor == null) {
@@ -56,8 +50,6 @@ public class QueueItem {
 		this.conn = conn;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public XMPPResourceConnection getConn() {
 		return conn;
 	}
@@ -71,6 +63,3 @@ public class QueueItem {
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

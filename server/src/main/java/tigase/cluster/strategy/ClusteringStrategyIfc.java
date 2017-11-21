@@ -20,8 +20,6 @@
 
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.server.Packet;
@@ -35,8 +33,6 @@ import tigase.xmpp.jid.JID;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 2, 2009 4:36:03 PM
@@ -59,11 +55,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 
 	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId);
 
-	//~--- get methods ----------------------------------------------------------
-
 	public String getInfo();
-
-	//~--- methods --------------------------------------------------------------
 
 	void handleLocalPacket(Packet packet, XMPPResourceConnection conn);
 
@@ -82,8 +74,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	void nodeDisconnected(JID node);
 
 	boolean processPacket(Packet packet, XMPPResourceConnection conn);
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * The method returns all cluster nodes currently connected to the cluster node.
@@ -151,8 +141,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	void getStatistics(StatisticsList list);
 
-	//~--- set methods ----------------------------------------------------------
-
 	void setClusterController(ClusterControllerIfc clComp);
 
 	/**
@@ -167,4 +155,3 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

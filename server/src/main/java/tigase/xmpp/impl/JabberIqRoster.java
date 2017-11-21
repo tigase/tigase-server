@@ -19,8 +19,6 @@
  */
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
@@ -76,7 +74,6 @@ public class JabberIqRoster
 	// This is required to make sure that dynamic roster will get initialized
 	@Inject(nullAllowed = true)
 	private DynamicRoster dynamicRoster;
-	//~--- fields ---------------------------------------------------------------
 	@ConfigField(desc = "Allow empty names in roster", alias = "empty_name_enabled")
 	private boolean emptyNameAllowed = false;
 	@ConfigField(desc = "Max roster size", alias = "max_roster_size")
@@ -175,7 +172,6 @@ public class JabberIqRoster
 		return null;
 	}
 
-	//~--- methods --------------------------------------------------------------
 	@Override
 	public int concurrentQueuesNo() {
 		return super.concurrentQueuesNo() * 4;
@@ -364,14 +360,10 @@ public class JabberIqRoster
 		return RosterAbstract.DISCO_FEATURES;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String[] supNamespaces() {
@@ -720,8 +712,6 @@ public class JabberIqRoster
 		roster_util.updateRosterHash(roster_str.toString(), session);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Returns shared instance of class implementing {@link RosterAbstract} - either default one ({@link RosterFlat}) or
 	 * the one configured with <em>"roster-implementation"</em> property.
@@ -731,8 +721,6 @@ public class JabberIqRoster
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Performs processing of remote roster management requests as described in <a href="http://xmpp.org/extensions/xep-0321.html">XEP-0321:

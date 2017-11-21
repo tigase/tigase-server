@@ -19,8 +19,6 @@
  */
 package tigase.db;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.util.Version;
@@ -36,8 +34,6 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Sep 4, 2010 2:13:22 PM
@@ -55,8 +51,6 @@ public class DataRepositoryPool
 	private dbTypes database = null;
 	private CopyOnWriteArrayList<DataRepository> repoPool = new CopyOnWriteArrayList<DataRepository>();
 	private String resource_uri = null;
-
-	// ~--- methods --------------------------------------------------------------
 
 	public void addRepo(DataRepository repo) {
 		repoPool.addIfAbsent(repo);
@@ -211,8 +205,6 @@ public class DataRepositoryPool
 			}
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initPreparedStatement(String stIdKey, String query) throws SQLException {

@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
@@ -37,8 +35,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class JabberIqCommand here.
@@ -59,8 +55,6 @@ public class JabberIqCommand
 	private static final String XMLNS = Command.XMLNS;
 	protected static final String ID = XMLNS;
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {

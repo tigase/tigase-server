@@ -20,8 +20,6 @@
 
 package tigase.server.script;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.*;
 
 import javax.script.Bindings;
@@ -35,8 +33,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Jan 2, 2009 2:29:48 PM
  *
@@ -47,8 +43,6 @@ public class AddScriptCommand
 		extends AbstractScriptCommand {
 
 	private static final Logger log = Logger.getLogger(AddScriptCommand.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@SuppressWarnings({"unchecked"})
 	public Script addAdminScript(String cmdId, String cmdDescr, String cmdGroup, String script, String lang, String ext,
@@ -77,14 +71,10 @@ public class AddScriptCommand
 		return as;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public Bindings getBindings() {
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	@SuppressWarnings({"unchecked"})
@@ -219,6 +209,3 @@ public class AddScriptCommand
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

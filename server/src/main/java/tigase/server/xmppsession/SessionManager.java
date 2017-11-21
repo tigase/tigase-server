@@ -20,8 +20,6 @@
 
 package tigase.server.xmppsession;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslEXTERNAL;
@@ -78,8 +76,6 @@ import java.util.logging.Logger;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * Class SessionManager
  * <br>
@@ -101,7 +97,6 @@ public class SessionManager
 
 	private static final String SESSION_CLOSE_TIMER_KEY = "session-close-timer";
 
-	//~--- fields ---------------------------------------------------------------
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection data as a value
 	 */
@@ -181,7 +176,6 @@ public class SessionManager
 	@Inject
 	private UserRepository user_repository = null;
 
-	//~--- methods --------------------------------------------------------------
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads = new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(
 			32);
 
@@ -523,8 +517,6 @@ public class SessionManager
 		eventBus.registerAll(this);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public void stop() {
 		eventBus.unregisterAll(this);
@@ -705,8 +697,6 @@ public class SessionManager
 		return true;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public boolean isLocalDomain(String domain, boolean includeComponents) {
 		if (includeComponents) {
@@ -776,8 +766,6 @@ public class SessionManager
 		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository, this);
 		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void setSchedulerThreads_size(int size) {
@@ -1129,8 +1117,6 @@ public class SessionManager
 
 		return null;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
@@ -2020,8 +2006,6 @@ public class SessionManager
 		return def * 10;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	protected XMPPSession getSession(BareJID jid) {
 		return sessionsByNodeId.get(jid);
 	}
@@ -2029,8 +2013,6 @@ public class SessionManager
 	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
 		return connectionsByFrom.get(connId);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
@@ -2194,8 +2176,6 @@ public class SessionManager
 		return results;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	private Map<String, Object> getPluginSettings(String plug_id, Map<String, Object> props) {
 		Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);
 
@@ -2262,8 +2242,6 @@ public class SessionManager
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private Permissions getPermissionForConnection(XMPPResourceConnection conn) {
 		Permissions perms = Permissions.NONE;
 		if (conn != null) {
@@ -2303,14 +2281,10 @@ public class SessionManager
 		private final SessionManager sm;
 		private JID connId = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private AuthenticationTimer(SessionManager sm, JID connId) {
 			this.sm = sm;
 			this.connId = connId;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {
@@ -2505,8 +2479,6 @@ public class SessionManager
 
 		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>(100);
 
-		//~--- methods ------------------------------------------------------------
-
 		@Override
 		public void process(QueueItem item) {
 			XMPPProcessorIfc processor = item.getProcessor();
@@ -2524,8 +2496,6 @@ public class SessionManager
 				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket().toStringSecure(), e);
 			}
 		}
-
-		//~--- get methods --------------------------------------------------------
 
 		@Override
 		public WorkerThread getNewInstance() {
@@ -2545,14 +2515,10 @@ public class SessionManager
 		private JID connId = null;
 		private String sessId = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private SessionCloseTimer(JID connId, String sessId) {
 			this.connId = connId;
 			this.sessId = sessId;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {
@@ -2578,15 +2544,11 @@ public class SessionManager
 
 			public static final long DEF_TIMEOUT = 30 * 1000;
 
-		//~--- fields -------------------------------------------------------------
-
 		private int maxQueueSize;
 		private Set<JID> queueSet;
 		private Thread thread;
 		private long timeout;
 		private Set<JID> workingSet;
-
-		//~--- constructors -------------------------------------------------------
 
 		public StaleConnectionCloser() {
 			this(DEF_QUEUE_SIZE, DEF_TIMEOUT);
@@ -2598,8 +2560,6 @@ public class SessionManager
 			workingSet = new HashSet<JID>(queueSize);
 			queueSet = new HashSet<JID>(queueSize);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		public void closeConnections() {
 
@@ -2680,8 +2640,6 @@ public class SessionManager
 			thread.start();
 		}
 
-		//~--- get methods --------------------------------------------------------
-
 		public int getMaxQueueSize() {
 			return maxQueueSize;
 		}
@@ -2690,13 +2648,9 @@ public class SessionManager
 			this.maxQueueSize = queueSize;
 		}
 
-		//~--- set methods --------------------------------------------------------
-
 		public long getTimeout() {
 			return timeout;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		private void process() {
 			try {

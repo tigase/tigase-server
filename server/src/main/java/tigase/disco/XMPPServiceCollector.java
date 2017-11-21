@@ -20,8 +20,6 @@
 
 package tigase.disco;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -32,8 +30,6 @@ import tigase.xmpp.jid.JID;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class XMPPServiceCollector
@@ -49,11 +45,7 @@ public abstract class XMPPServiceCollector
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(XMPPServiceCollector.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private ServiceEntity serviceEntity = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public XMPPServiceCollector() {
 		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
@@ -61,8 +53,6 @@ public abstract class XMPPServiceCollector
 																			  tigase.server.XMPPServer.NAME + " ver. " +
 																					  tigase.server.XMPPServer.getImplementationVersion())});
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void componentAdded(XMPPService component) {
@@ -72,14 +62,10 @@ public abstract class XMPPServiceCollector
 	public void componentRemoved(XMPPService component) {
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof XMPPService;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
@@ -115,4 +101,3 @@ public abstract class XMPPServiceCollector
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/16

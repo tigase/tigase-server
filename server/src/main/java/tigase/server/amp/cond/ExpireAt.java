@@ -20,8 +20,6 @@
 
 package tigase.server.amp.cond;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.amp.ConditionIfc;
 import tigase.xml.Element;
@@ -31,8 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:36:39 PM
@@ -46,8 +42,6 @@ public class ExpireAt
 	public static final String NAME = "expire-at";
 	private static Logger log = Logger.getLogger(ExpireAt.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
 
@@ -57,14 +51,10 @@ public class ExpireAt
 		formatter2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter2.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getName() {
 		return NAME;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean match(Packet packet, Element rule) {
@@ -96,4 +86,3 @@ public class ExpireAt
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

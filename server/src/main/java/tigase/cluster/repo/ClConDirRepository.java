@@ -26,8 +26,6 @@
  */
 package tigase.cluster.repo;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.Repository;
@@ -51,7 +49,6 @@ public class ClConDirRepository
 
 	private static final Logger log = Logger.getLogger(ClConDirRepository.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private DirFilter dirFilter = new DirFilter();
 	private File repo_dir = new File(REPO_URI_DB_DEF_VAL);
 
@@ -60,8 +57,6 @@ public class ClConDirRepository
 		// Nothing to do here
 		super.destroy();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
@@ -77,15 +72,11 @@ public class ClConDirRepository
 		super.initRepository(conn_str, params);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);
 		repo_dir = new File((String) properties.get(REPO_URI_PROP_KEY));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void storeItem(ClusterRepoItem item) {
@@ -123,8 +114,6 @@ public class ClConDirRepository
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class DirFilter
 			implements FileFilter {
 
@@ -135,4 +124,3 @@ public class ClConDirRepository
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/11

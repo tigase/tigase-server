@@ -20,11 +20,7 @@
 
 package tigase.net;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface IOServiceListener here.
@@ -45,6 +41,3 @@ public interface IOServiceListener<IO extends IOService<?>> {
 	void tlsHandshakeCompleted(IO service);
 }    // IOServiceListener
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

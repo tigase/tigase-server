@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
@@ -33,10 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 31, 2009 4:54:39 PM
@@ -54,8 +48,6 @@ public class StartTLSProcessor
 														new String[]{"xmlns"},
 														new String[]{"urn:ietf:params:xml:ns:xmpp-tls"});
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getId() {
 		return ID;
@@ -69,8 +61,6 @@ public class StartTLSProcessor
 			return Arrays.asList(FEATURES);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
@@ -128,6 +118,3 @@ public class StartTLSProcessor
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

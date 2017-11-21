@@ -20,8 +20,6 @@
 
 package tigase.server.websocket;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xmpp.XMPPIOService;
 
@@ -75,7 +73,6 @@ public class WebSocketXMPPIOService<RefObject>
 
 	/* static variables used by WebSocket protocol */
 
-	//~--- fields ---------------------------------------------------------------
 	private final WebSocketProtocolIfc[] protocols;
 	protected long frameLength = -1;
 	protected byte[] maskingKey = null;
@@ -115,8 +112,6 @@ public class WebSocketXMPPIOService<RefObject>
 	protected State getState() {
 		return state;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	protected void setState(State state) {
 		this.state = state;
@@ -487,4 +482,3 @@ public class WebSocketXMPPIOService<RefObject>
 
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/19

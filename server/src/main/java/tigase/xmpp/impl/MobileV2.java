@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
@@ -38,8 +36,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for queuing packets (usable in connections from mobile clients - power usage optimization) version
@@ -67,12 +63,8 @@ public class MobileV2
 			new Element(MOBILE_EL_NAME, new String[]{"xmlns"}, new String[]{XMLNS})};
 	private static final String QUEUE_KEY = ID + "-queue";
 
-	//~--- fields ---------------------------------------------------------------
-
 	@ConfigField(desc = "Max queue size", alias = MAX_QUEUE_SIZE_KEY)
 	private int maxQueueSize = DEF_MAX_QUEUE_SIZE_VAL;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -273,8 +265,6 @@ public class MobileV2
 		return true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected void flushQueue(XMPPResourceConnection session, Queue<Packet> results) {
 		Map<JID, Packet> queue = (Map<JID, Packet>) session.getSessionData(QUEUE_KEY);
 
@@ -308,4 +298,3 @@ public class MobileV2
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/16

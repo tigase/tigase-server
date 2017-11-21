@@ -20,8 +20,6 @@
 
 package tigase.server.xmppsession;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 /**
  * Describe class SessionManagerConfig here.
  * <br>
@@ -63,4 +61,3 @@ public abstract class SessionManagerConfig {
 
 }    // SessionManagerConfig
 
-//~ Formatted in Tigase Code Convention on 13/10/16

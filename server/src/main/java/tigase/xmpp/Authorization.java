@@ -19,14 +19,10 @@
  */
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-//~--- enums ------------------------------------------------------------------
 
 /**
  * <code>Authorization</code> enumeration type defines authorization error codes. It has also capability to build error
@@ -447,8 +443,6 @@ public enum Authorization {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public static Authorization getByCondition(String condition) {
 		if (condition == null) {
 			return null;
@@ -488,6 +482,3 @@ public enum Authorization {
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

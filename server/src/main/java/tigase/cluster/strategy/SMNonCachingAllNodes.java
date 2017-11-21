@@ -20,8 +20,6 @@
 
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
@@ -33,8 +31,6 @@ import tigase.xmpp.jid.JID;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -49,11 +45,8 @@ public abstract class SMNonCachingAllNodes
 	// Simple random generator, we do not need a strong randomization here.
 	// Just enough to ensure better traffic distribution
 	private Random rand = new Random();
-	//~--- fields ---------------------------------------------------------------
 	@Inject
 	private SessionManagerClusteredIfc sm = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -67,8 +60,6 @@ public abstract class SMNonCachingAllNodes
 	@Override
 	public void nodeDisconnected(JID jid) {
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public List<JID> getNodesConnected() {
@@ -158,13 +149,9 @@ public abstract class SMNonCachingAllNodes
 		return false;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setProperties(Map<String, Object> props) {
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	protected boolean isSuitableForForward(Packet packet) {
 
@@ -203,8 +190,6 @@ public abstract class SMNonCachingAllNodes
 
 		return true;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * @param fromNode

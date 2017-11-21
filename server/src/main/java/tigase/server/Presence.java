@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
@@ -42,8 +40,6 @@ public class Presence
 	public static final String[] PRESENCE_PRIORITY_PATH = {ELEM_NAME, "priority"};
 	public static final String[] PRESENCE_SHOW_PATH = {ELEM_NAME, "show"};
 
-	//~--- constructors ---------------------------------------------------------
-
 	public Presence(Element elem) throws TigaseStringprepException {
 		super(elem);
 	}
@@ -52,12 +48,9 @@ public class Presence
 		super(elem, stanzaFrom, stanzaTo);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected String[] getElNameErrorPath() {
 		return PRESENCE_ERROR_PATH;
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/15

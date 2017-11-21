@@ -20,8 +20,6 @@
 
 package tigase.net;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TODO;
 
 import java.io.IOException;
@@ -34,10 +32,6 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class SocketThread here.
@@ -63,8 +57,6 @@ public class SocketThread
 	private static ThreadPoolExecutor executor = null;
 	private static SocketThread[] socketReadThread = null;
 	private static SocketThread[] socketWriteThread = null;
-
-	//~--- static initializers --------------------------------------------------
 
 	//private static int threadNo = 0;
 //private static final int READ_ONLY = SelectionKey.OP_READ;
@@ -105,8 +97,6 @@ public class SocketThread
 		}    // end of if (acceptThread == null)
 	}
 
-	//~--- fields ---------------------------------------------------------------
-
 	private Selector clientsSel = null;
 
 	// private boolean selecting = false;
@@ -122,8 +112,6 @@ public class SocketThread
 	private ConcurrentSkipListSet<IOService<?>> waiting = new ConcurrentSkipListSet<IOService<?>>(
 			new IOServiceComparator());
 	private boolean writing = false;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static void addSocketService(IOService<?> s) {
 		s.setSocketServiceReady(true);
@@ -141,8 +129,7 @@ public class SocketThread
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-	
+
 	public static void removeSocketService(IOService<Object> s) {
 		s.setSocketServiceReady(false);
 		socketReadThread[s.hashCode() % socketReadThread.length].removeSocketServicePriv(s);
@@ -332,8 +319,6 @@ public class SocketThread
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setMaxThread(int threads) {
 		executor.setCorePoolSize(threads);
 		executor.setMaximumPoolSize(threads);
@@ -342,8 +327,6 @@ public class SocketThread
 	public void setMaxThreadPerCPU(int threads) {
 		setMaxThread(threads * cpus);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void addAllWaiting() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -472,8 +455,6 @@ public class SocketThread
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class IOServiceComparator
 			implements Comparator<IOService<?>> {
 
@@ -491,8 +472,6 @@ public class SocketThread
 			super();
 			setName(name);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {
@@ -529,6 +508,3 @@ public class SocketThread
 	}
 }    // SocketThread
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

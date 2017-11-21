@@ -20,17 +20,11 @@
 
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.stats.StatisticsList;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface IOInterface here.
@@ -44,8 +38,6 @@ public interface IOInterface {
 	int bytesRead();
 
 	boolean checkCapabilities(String caps);
-
-	//~--- get methods ----------------------------------------------------------
 
 	int getInputPacketSize() throws IOException;
 
@@ -69,8 +61,6 @@ public interface IOInterface {
 
 	boolean isRemoteAddress(String addr);
 
-	//~--- methods --------------------------------------------------------------
-
 	ByteBuffer read(final ByteBuffer buff) throws IOException;
 
 	void stop() throws IOException;
@@ -85,6 +75,3 @@ public interface IOInterface {
 
 }    // IOInterface
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

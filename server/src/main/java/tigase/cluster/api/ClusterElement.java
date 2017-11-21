@@ -20,8 +20,6 @@
 
 package tigase.cluster.api;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.xml.Element;
@@ -31,8 +29,6 @@ import tigase.xmpp.jid.JID;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class ClusterElement is a utility class for handling tigase cluster specific packets. The cluster packet has the
@@ -90,7 +86,6 @@ public class ClusterElement {
 	public static final String[] CLUSTER_CONTROL_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME};
 	private static final Logger log = Logger.getLogger("tigase.cluster.ClusterElement");
 
-	//~--- fields ---------------------------------------------------------------
 	private Element elem = null;
 	private JID first_node = null;
 	private String method_name = null;
@@ -99,8 +94,6 @@ public class ClusterElement {
 	private Queue<Element> packets = null;
 	private Priority priority = null;
 	private Set<JID> visited_nodes = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static Element clusterElement(JID from, JID to, StanzaType type) {
 		Element cluster_el = new Element(CLUSTER_EL_NAME, new String[]{"from", "to", "type"},
@@ -121,8 +114,6 @@ public class ClusterElement {
 		// new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
 		return cluster_el;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public static ClusterElement createClusterMethodCall(JID from, JID to, StanzaType type, String method_name,
 														 Map<String, String> params) {
@@ -327,8 +318,6 @@ public class ClusterElement {
 		return result_cl;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public Map<String, String> getAllMethodParams() {
 		return method_params;
 	}
@@ -408,8 +397,6 @@ public class ClusterElement {
 		return visited_nodes.contains(node_id);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public ClusterElement nextClusterNode(JID node_id) {
 		Element next_el = elem.clone();
 		String from = elem.getAttributeStaticStr(Packet.TO_ATT);
@@ -461,4 +448,3 @@ public class ClusterElement {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

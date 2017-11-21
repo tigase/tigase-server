@@ -20,8 +20,6 @@
 
 package tigase.db;
 
-//~--- classes ----------------------------------------------------------------
-
 import tigase.xmpp.jid.BareJID;
 
 /**
@@ -37,8 +35,6 @@ public class UserExistsException
 
 	private static final long serialVersionUID = 1L;
 	private BareJID userId = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public UserExistsException(String message) {
 		super(message);

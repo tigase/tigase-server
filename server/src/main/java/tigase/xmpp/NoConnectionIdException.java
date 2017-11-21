@@ -19,8 +19,6 @@
  */
 package tigase.xmpp;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * @author kobit
  */
@@ -28,8 +26,6 @@ public class NoConnectionIdException
 		extends XMPPException {
 
 	private static final long serialVersionUID = 1L;
-
-	//~--- constructors ---------------------------------------------------------
 
 
 	public NoConnectionIdException() {
@@ -51,6 +47,3 @@ public class NoConnectionIdException
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

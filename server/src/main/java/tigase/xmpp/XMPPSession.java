@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.jid.JID;
 
@@ -46,8 +44,6 @@ public class XMPPSession {
 	 */
 	private static final Logger log = Logger.getLogger(XMPPSession.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private CopyOnWriteArrayList<XMPPResourceConnection> activeResources = null;
 	private long creationTime = 0;
 	private long packets_counter = 0;
@@ -57,8 +53,6 @@ public class XMPPSession {
 	 * User name - localpart of user's JID
 	 */
 	private String username = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
@@ -71,8 +65,6 @@ public class XMPPSession {
 		this.username = username;
 		this.creationTime = System.currentTimeMillis();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method is called each time the resource is set for connection.
@@ -186,8 +178,6 @@ public class XMPPSession {
 
 		return sb.toString();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method returns a List of all {@link XMPPResourceConnection} objects related to this {@link XMPPSession} object
@@ -426,8 +416,6 @@ public class XMPPSession {
 	public String getUserName() {
 		return username;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public Object computeCommonSessionDataIfAbsent(String key, Function<String, Object> valueFactory) {
 		return sessionData.computeIfAbsent(key, valueFactory);

@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
@@ -39,8 +37,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2010 5:53:57 PM
@@ -63,8 +59,6 @@ public class PacketChecker
 	private Map<String, String[]> allowedOtherDomainsMap = new ConcurrentHashMap<String, String[]>();
 	@ConfigField(desc = "Whitelist to allow packets from other domains with same IP")
 	private String[] allowedOtherDomainsWithSameIpWhitelist = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props) {
@@ -191,6 +185,3 @@ public class PacketChecker
 
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

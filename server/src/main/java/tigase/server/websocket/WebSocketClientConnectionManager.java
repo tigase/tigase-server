@@ -20,8 +20,6 @@
 
 package tigase.server.websocket;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.selector.ClusterModeRequired;
@@ -149,4 +147,3 @@ public class WebSocketClientConnectionManager
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/10/15

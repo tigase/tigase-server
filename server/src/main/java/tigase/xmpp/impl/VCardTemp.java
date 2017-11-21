@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
@@ -46,8 +44,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.xmpp.impl.VCardTemp.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class VCardTemp here.

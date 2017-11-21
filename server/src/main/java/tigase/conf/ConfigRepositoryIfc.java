@@ -20,14 +20,10 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.comp.ComponentRepository;
 
 import java.util.Map;
 import java.util.Set;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2009 2:04:20 PM
@@ -42,8 +38,6 @@ public interface ConfigRepositoryIfc
 
 	public static final String RESOURCE_URI = "--resource-uri";
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Returns all known settings for the given component name.
 	 */
@@ -51,14 +45,10 @@ public interface ConfigRepositoryIfc
 
 	Set<ConfigItem> getItemsForComponent(String compName);
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Sets/adds properties for the given component name.
 	 */
 	void putProperties(String compName, Map<String, Object> props) throws ConfigurationException;
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns a configuration setting for a given component, node and key. If the configuration parameters is not
@@ -66,14 +56,10 @@ public interface ConfigRepositoryIfc
 	 */
 	Object get(String compName, String node, String key, Object def);
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Puts/sets/adds/updates a configuration setting to the configuration repository.
 	 */
 	void set(String compName, String node, String key, Object value);
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns all component names for which there are some configuration settings available.
@@ -84,8 +70,6 @@ public interface ConfigRepositoryIfc
 	 * Returns an array of all configuration keys for a given component and configuration node.
 	 */
 	String[] getKeys(String compName, String node);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Removes a configuration setting from the configuration repository.
@@ -98,16 +82,12 @@ public interface ConfigRepositoryIfc
 	 */
 	void addItem(String key, Object value) throws ConfigurationException;
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * This is used to load a configuration for a selected cluster node. The configuration repository (file or database)
 	 * may contain settings for all cluster nodes, some of the settings may be exclusive to one or another cluster node.
 	 * This method informs the repository what node name (hostname) it is running on.
 	 */
 	void setDefHostname(String hostname);
-
-	//~--- get methods ----------------------------------------------------------
 
 	Map<String, Object> getInitProperties();
 }

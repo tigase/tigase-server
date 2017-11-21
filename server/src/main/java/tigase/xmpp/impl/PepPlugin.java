@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
@@ -39,8 +37,6 @@ import tigase.xmpp.jid.JID;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * @author Artur Hefczyc
@@ -68,10 +64,7 @@ public class PepPlugin
 	private static final String[] XMLNSS = {_XMLNS};
 	private static RosterAbstract roster = RosterFactory.getRosterImplementation(true);
 
-	//~--- fields ---------------------------------------------------------------
 	private final HashSet<String> supportedNodes = new HashSet<String>();
-
-	//~--- constructors ---------------------------------------------------------
 
 
 	public PepPlugin() {
@@ -82,8 +75,6 @@ public class PepPlugin
 		this.supportedNodes.add("urn:xmpp:avatar:data");
 		this.supportedNodes.add("urn:xmpp:avatar:metadata");
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -240,4 +231,3 @@ public class PepPlugin
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/12

@@ -20,8 +20,6 @@
 
 package tigase.db.comp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
@@ -35,8 +33,6 @@ import tigase.xmpp.jid.BareJID;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Oct 3, 2009 3:55:27 PM
@@ -54,21 +50,15 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 	private static final Logger log = Logger.getLogger(UserRepoRepository.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String items_list_pkey = "items-lists";
 	@Inject
 	private UserRepository repo = null;
-
-	//~--- get methods ----------------------------------------------------------
 
 	public abstract BareJID getRepoUser();
 
 	public String getItemsListPKey() {
 		return items_list_pkey;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void reload() {
@@ -111,8 +101,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setRepo(UserRepository userRepository) {
 		this.repo = userRepository;
 		try {
@@ -132,8 +120,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		reload();
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void store() {
 		super.store();
@@ -152,4 +138,3 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/09

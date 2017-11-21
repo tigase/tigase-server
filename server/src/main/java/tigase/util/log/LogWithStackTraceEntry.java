@@ -20,24 +20,16 @@
 
 package tigase.util.log;
 
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
-
 public class LogWithStackTraceEntry {
 
 	private long counter = 0;
 	private String msg = null;
 	private String record = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public LogWithStackTraceEntry(String msg, String record) {
 		this.msg = msg;
 		this.record = record;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public long getCounter() {
 		return counter;
@@ -51,13 +43,8 @@ public class LogWithStackTraceEntry {
 		return record;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public long increment() {
 		return ++counter;
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

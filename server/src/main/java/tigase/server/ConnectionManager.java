@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TODO;
 import tigase.io.CertificateContainerIfc;
 import tigase.io.SSLContextContainerIfc;
@@ -150,7 +148,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		XMPP
 	}
 
-	//~--- fields ---------------------------------------------------------------
 	/**
 	 * Default value for the system property for configuration protection from system overload and DOS attack.
 	 */
@@ -217,12 +214,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private long watchdogTests = 0;
 	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
 
-	//~--- constant enums -------------------------------------------------------
 	@ConfigField(desc = "Action taken if XMPP limit is exceeded")
 	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
 	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
@@ -658,8 +652,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public IO getXMPPIOService(String serviceId) {
 		return services.get(serviceId);
 	}
@@ -668,8 +660,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public void setName(String name) {
 		super.setName(name);
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	public String getFlashCrossDomainPolicy() {
 		return flassCrossDomainPolicy;
@@ -792,8 +782,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return new Watchdog();
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	protected void addWaitingTask(Map<String, Object> conn) {
 
 		if (log.isLoggable(Level.FINER)) {
@@ -895,8 +883,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected int[] getDefPlainPorts() {
 		return null;
 	}
@@ -948,8 +934,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected boolean isHighThroughput() {
 		return false;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	protected void socketAccepted(IO serv, SocketType type) {
 	}
@@ -1010,8 +994,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		connectThread.addConnectionOpenListener(cli);
 		return cli;
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	public static class PortConfigBean
 			implements ConfigurationChangedAware, Initializable, UnregisterAware {
@@ -1186,13 +1168,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		private Map<String, Object> port_props = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private ConnectionListenerImpl(Map<String, Object> port_props) {
 			this.port_props = port_props;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void accept(SocketChannel sc) {
@@ -1264,8 +1242,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		public String toString() {
 			return port_props.toString();
 		}
-
-		//~--- get methods --------------------------------------------------------
 
 		@Override
 		public ConnectionType getConnectionType() {
@@ -1345,8 +1321,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			implements ServiceChecker<IO> {
 
 		private StatisticsList list = new StatisticsList(Level.ALL);
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public synchronized void check(IO service) {
@@ -1492,4 +1466,3 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 }    // ConnectionManager
 
-//~ Formatted in Tigase Code Convention on 13/10/15

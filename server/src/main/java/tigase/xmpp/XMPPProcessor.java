@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.ComponentInfo;
@@ -34,8 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for <em>XMPP</em> processor. To create new
@@ -72,12 +68,8 @@ public abstract class XMPPProcessor
 		cmpInfo = new ComponentInfo(id(), this.getClass());
 	}
 
-	//~--- constructors ---------------------------------------------------------
-
 	protected XMPPProcessor() {
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
@@ -154,8 +146,6 @@ public abstract class XMPPProcessor
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public XMPPProcessor getInstance() {
 		return this;
 	}
@@ -211,8 +201,6 @@ public abstract class XMPPProcessor
 		return queueSize;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private Authorization checkPacket(Packet packet, String[][] elemPaths, String[] elemXMLNS, Set<StanzaType> types) {
 		Authorization result = null;
 		boolean names_ok = elemPaths == ALL_PATHS;
@@ -255,4 +243,3 @@ public abstract class XMPPProcessor
 	}
 }    // XMPPProcessor
 
-//~ Formatted in Tigase Code Convention on 13/04/24

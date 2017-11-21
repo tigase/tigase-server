@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
@@ -33,8 +31,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Variant of the <code>Message</code> forwarder class. This implementation forwards messages to all connected
@@ -59,8 +55,6 @@ public class MessageAll
 	private static final Logger log = Logger.getLogger(MessageAll.class.getName());
 	private static final String XMLNS = "jabber:client";
 	private static final String[] XMLNSS = {XMLNS};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

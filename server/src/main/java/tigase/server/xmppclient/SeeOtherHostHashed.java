@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppclient;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.selector.ClusterModeRequired;
@@ -34,10 +32,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Default implementation for cluster environment of SeeOtherHostIfc returning redirect host based on the hash value of

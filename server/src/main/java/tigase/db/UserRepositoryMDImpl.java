@@ -19,8 +19,6 @@
  */
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.db.beans.UserRepositoryMDPoolBean;
 import tigase.eventbus.EventBus;
@@ -32,10 +30,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Mar 27, 2010 6:43:02 PM
@@ -52,13 +46,9 @@ public abstract class UserRepositoryMDImpl
 	@Inject
 	private EventBus eventBus;
 
-	//~--- fields ---------------------------------------------------------------
-
 	public UserRepositoryMDImpl() {
 		super(UserRepository.class);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addDataList(BareJID user, String subnode, String key, String[] list)
@@ -84,8 +74,6 @@ public abstract class UserRepositoryMDImpl
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getData(BareJID user, String subnode, String key, String def)
@@ -257,8 +245,6 @@ public abstract class UserRepositoryMDImpl
 		return -1;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	@Deprecated
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
@@ -315,8 +301,6 @@ public abstract class UserRepositoryMDImpl
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, TigaseDBException {
@@ -354,8 +338,6 @@ public abstract class UserRepositoryMDImpl
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean userExists(BareJID user) {

@@ -188,7 +188,6 @@ public class CounterDataLogger
 					") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	protected static String defaultHostname;
 
-	//~--- fields ---------------------------------------------------------------
 	private DataRepository data_repo = null;
 	@ConfigField(desc = "Database URL", alias = DB_URL_PROP_KEY)
 	private String databaseUrl = null;

@@ -26,8 +26,6 @@
  */
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
@@ -38,8 +36,6 @@ public interface ConnectionRecordIfc {
 
 	Element toElement();
 
-	//~--- get methods ----------------------------------------------------------
-
 	JID getConnectionId();
 
 	JID getNode();
@@ -48,11 +44,8 @@ public interface ConnectionRecordIfc {
 
 	JID getUserJid();
 
-	//~--- set methods ----------------------------------------------------------
-
 	void setElement(Element elem);
 
 	void setRecordFields(JID node, JID userJid, String sessionId, JID connectionId);
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/01

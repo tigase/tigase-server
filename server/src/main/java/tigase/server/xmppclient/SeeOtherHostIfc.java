@@ -55,8 +55,6 @@ public interface SeeOtherHostIfc
 		OTHER
 	}
 
-	// ~--- methods -------------------------------------------------------------
-
 	/**
 	 * Finds an appropriate host for a given JID
 	 *
@@ -73,8 +71,6 @@ public interface SeeOtherHostIfc
 	 * @param nodes current list of nodes
 	 */
 	void setNodes(List<JID> nodes);
-
-	// ~--- properties ----------------------------------------------------------
 
 	/**
 	 * Returns Element object containing stream:error message

@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
@@ -39,8 +37,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class JabberIqPrivate here.
@@ -63,8 +59,6 @@ public class JabberIqPrivate
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 	private static Logger log = Logger.getLogger(JabberIqPrivate.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

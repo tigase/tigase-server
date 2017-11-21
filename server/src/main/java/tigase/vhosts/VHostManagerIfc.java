@@ -20,15 +20,11 @@
 
 package tigase.vhosts;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.ServerComponent;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.List;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * This is VHostManagerIfc interface which allows to access data for virtual domains server by this installation. There
@@ -118,8 +114,6 @@ public interface VHostManagerIfc {
 	 */
 	VHostItem getVHostItemDomainOrComponent(String domain);
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Adds a component domain to the collection of local component domains. This is mainly needed/used by an external
 	 * components connecting to the server and binding hostnames. Normally the s2s component have no way of knowing
@@ -137,8 +131,6 @@ public interface VHostManagerIfc {
 	 */
 	void removeComponentDomain(String domain);
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method <code>getDefVHostItem</code> returns a default VHost for the installation. In most cases this is the first
 	 * VHost defined in the server configuration.
@@ -154,4 +146,3 @@ public interface VHostManagerIfc {
 	List<JID> getAllVHosts();
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/19

@@ -20,17 +20,11 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.StreamOpenHandler;
 
 import java.util.Map;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 7, 2009 5:50:34 PM
@@ -43,18 +37,12 @@ public class ComponentConnectStreamOpenHandler
 
 	public static final String XMLNS = "jabber:component:connect";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String[] xmlnss = new String[]{XMLNS};
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getXMLNSs() {
 		return xmlnss;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String serviceStarted(ComponentIOService s) {

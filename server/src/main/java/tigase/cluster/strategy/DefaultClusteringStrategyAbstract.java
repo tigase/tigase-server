@@ -20,8 +20,6 @@
 
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.SessionManagerClusteredIfc;
@@ -65,7 +63,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	protected ClusterControllerIfc cluster = null;
 	protected String comp = "sess-man";
 
-	//~--- fields ---------------------------------------------------------------
 	@Inject
 	protected EventBus eventBus = null;
 	protected String prefix = "strategy/" + this.getClass().getSimpleName() + "/";
@@ -108,20 +105,14 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 	}
 
-	//~--- constant enums -------------------------------------------------------
-
 	@Override
 	public void setStatisticsPrefix(String prefix) {
 		this.prefix = prefix;
 	}
 
-	//~--- constructors ---------------------------------------------------------
-
 	public final void addCommandListener(CommandListener cmd) {
 		commands.add(cmd);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -242,8 +233,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		return sm.getNodesConnected();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
 		return null;
@@ -338,8 +327,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setProperties(Map<String, Object> props) {
 
@@ -363,8 +350,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	public SessionManagerClusteredIfc getSM() {
 		return this.sm;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public void fireEvent(Object event) {
 		eventBus.fire(event);
@@ -447,4 +432,3 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

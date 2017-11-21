@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
@@ -38,8 +36,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * XEP-0092: Software Version
@@ -81,8 +77,6 @@ public class JabberIqVersion
 																										"java.vm.vendor"))},
 															  new String[]{"xmlns"}, new String[]{XMLNS});
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

@@ -20,8 +20,6 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.eventbus.EventListener;
 import tigase.kernel.beans.Bean;

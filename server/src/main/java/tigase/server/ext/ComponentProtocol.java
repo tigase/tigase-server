@@ -20,8 +20,6 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.comp.ComponentRepository;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -80,7 +78,6 @@ public class ComponentProtocol
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	private static final Logger log = Logger.getLogger(ComponentProtocol.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	// In seconds
 	@ConfigField(desc = "Authentication timeout", alias = AUTHENTICATION_TIMEOUT_PROP_KEY)
 	private long authenticationTimeOut = 15;
@@ -109,8 +106,6 @@ public class ComponentProtocol
 	private ComponentRepository<CompRepoItem> repo = null;
 	private Map<String, StreamOpenHandler> streamOpenHandlers = new LinkedHashMap<String, StreamOpenHandler>();
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler = new UnknownXMLNSStreamOpenHandler();
-
-	//~--- constructors ---------------------------------------------------------
 
 
 	public ComponentProtocol() {
@@ -151,8 +146,6 @@ public class ComponentProtocol
 		processors.put(proc.getId(), proc);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void authenticated(ComponentIOService serv) {
 		serv.setAuthenticated(true);
@@ -190,8 +183,6 @@ public class ComponentProtocol
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public void bindHostname(String hostname, ComponentIOService serv) {
 		String[] routings = new String[]{hostname, ".*@" + hostname, ".*\\." + hostname};
@@ -219,8 +210,6 @@ public class ComponentProtocol
 		addComponentDomain(hostname);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public CompRepoItem getCompRepoItem(String hostname) {
 		return repo.getItem(hostname);
@@ -230,8 +219,6 @@ public class ComponentProtocol
 	public String getDiscoCategoryType() {
 		return identity_type;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getDiscoDescription() {
@@ -346,8 +333,6 @@ public class ComponentProtocol
 
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
@@ -493,8 +478,6 @@ public class ComponentProtocol
 	public void tlsHandshakeCompleted(ComponentIOService service) {
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void unbindHostname(String hostname, ComponentIOService serv) {
 		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
@@ -568,8 +551,6 @@ public class ComponentProtocol
 	protected long getMaxInactiveTime() {
 		return 1000 * 24 * HOUR;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -684,8 +665,6 @@ public class ComponentProtocol
 			// We don't do the trick because this would break stuff
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private synchronized void addComponentConnection(String hostname, ComponentIOService s) {
 		ComponentConnection conn = new ComponentConnection(hostname, s);
@@ -807,20 +786,14 @@ public class ComponentProtocol
 		log.finest("All regex routings: " + getRegexRoutings().toString());
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class AuthenticationTimerTask
 			extends TimerTask {
 
 		private ComponentIOService serv = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private AuthenticationTimerTask(ComponentIOService serv) {
 			this.serv = serv;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {

@@ -20,8 +20,6 @@
 
 package tigase.server.amp.action;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.UserNotFoundException;
@@ -57,7 +55,6 @@ public class Store
 	private static final Logger log = Logger.getLogger(Store.class.getName());
 	private static final String name = "store";
 
-	//~--- fields ---------------------------------------------------------------
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
 	// ~--- fields ---------------------------------------------------------------
@@ -73,8 +70,6 @@ public class Store
 		formatter2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter2.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean execute(Packet packet, Element rule) {
@@ -131,8 +126,6 @@ public class Store
 		return false;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getName() {
 		return name;
@@ -174,8 +167,6 @@ public class Store
 		}
 
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void beforeUnregister() {
@@ -228,8 +219,3 @@ public class Store
 	}
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-//~ Formatted in Tigase Code Convention on 13/02/20

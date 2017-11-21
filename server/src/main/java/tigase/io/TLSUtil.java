@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.osgi.ModulesManagerImpl;
 
 import java.security.KeyStore;
@@ -34,8 +32,6 @@ import static tigase.io.CertificateContainerIfc.CERTIFICATE_CONTAINER_CLASS_KEY;
 import static tigase.io.CertificateContainerIfc.CERTIFICATE_CONTAINER_CLASS_VAL;
 import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_KEY;
 import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_VAL;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TLSUtil here.
@@ -52,8 +48,6 @@ public abstract class TLSUtil {
 	//private static Map<String, SSLContextContainerIfc> sslContexts =
 //  new HashMap<String, SSLContextContainerIfc>();
 	private static SSLContextContainerIfc sslContextContainer = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	public static void addCertificate(Map<String, String> params) throws CertificateParsingException {
 		sslContextContainer.addCertificates(params);
@@ -128,13 +122,8 @@ public abstract class TLSUtil {
 		return sslContextContainer;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public static KeyStore getTrustStore() {
 		return sslContextContainer.getTrustStore();
 	}
 }    // TLSUtil
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

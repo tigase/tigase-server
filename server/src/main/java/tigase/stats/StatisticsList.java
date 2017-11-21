@@ -40,13 +40,9 @@ public class StatisticsList
 	private final LinkedHashMap<String, LinkedHashMap<String, StatRecord>> stats = new LinkedHashMap<String, LinkedHashMap<String, StatRecord>>();
 	private Level statLevel = Level.ALL;
 
-	// ~--- constructors ---------------------------------------------------------
-
 	public StatisticsList(Level level) {
 		this.statLevel = level;
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	public boolean add(String comp, String description, long value, Level recordLevel) {
 		return addEntry(comp, description, recordLevel, new StatRecord(comp, description, value, recordLevel));
@@ -97,8 +93,6 @@ public class StatisticsList
 	public int getCompConnections(String comp) {
 		return getValue(comp, "Open connections", 0);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	public long getCompIq(String comp) {
 		return getCompIqSent(comp) + getCompIqReceived(comp);
@@ -287,8 +281,6 @@ public class StatisticsList
 		return new StatsIterator();
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public String toString() {
 		return stats.toString();
@@ -311,15 +303,11 @@ public class StatisticsList
 		return false;
 	}
 
-	// ~--- inner classes --------------------------------------------------------
-
 	private class StatsIterator
 			implements Iterator<StatRecord> {
 
 		Iterator<LinkedHashMap<String, StatRecord>> compsIt = stats.values().iterator();
 		Iterator<StatRecord> recIt = null;
-
-		// ~--- get methods --------------------------------------------------------
 
 		@Override
 		public boolean hasNext() {
@@ -333,8 +321,6 @@ public class StatisticsList
 
 			return recIt.hasNext();
 		}
-
-		// ~--- methods ------------------------------------------------------------
 
 		@Override
 		public StatRecord next() throws NoSuchElementException {

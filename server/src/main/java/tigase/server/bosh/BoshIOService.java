@@ -20,8 +20,6 @@
 
 package tigase.server.bosh;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.xmpp.Authorization;
@@ -33,8 +31,6 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class BoshIOService here.
@@ -56,7 +52,6 @@ public class BoshIOService
 	private static final String SERVER = "Server: Tigase Bosh/" + tigase.server.XMPPServer.getImplementationVersion();
 	private static final char[] HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER = "GET /clientaccesspolicy.xml".toCharArray();
 
-	//~--- fields ---------------------------------------------------------------
 	private final ConfigProvider configProvider;
 	private String content_type = "text/xml; charset=utf-8";
 	private boolean firstPassCORS = true;
@@ -65,14 +60,10 @@ public class BoshIOService
 	private UUID sid = null;
 	private BoshTask waitTimer = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public BoshIOService(ConfigProvider configProvider) {
 		super();
 		this.configProvider = configProvider;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public long getRid() {
 		return this.rid;
@@ -82,25 +73,17 @@ public class BoshIOService
 		this.rid = rid;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public UUID getSid() {
 		return this.sid;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public void setSid(UUID sid) {
 		this.sid = sid;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public BoshTask getWaitTimer() {
 		return waitTimer;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	public void setWaitTimer(BoshTask timer) {
 		waitTimer = timer;
@@ -150,8 +133,6 @@ public class BoshIOService
 	public void setContentType(String ct) {
 		this.content_type = ct;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public StringBuilder prepareHeaders(String data) {
 		StringBuilder sb = new StringBuilder(200);
@@ -250,4 +231,3 @@ public class BoshIOService
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/19

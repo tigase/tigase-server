@@ -20,8 +20,6 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.*;
 import tigase.conf.Configurable;
 import tigase.kernel.beans.Bean;
@@ -67,12 +65,8 @@ public class ClusterController
 	public static final String MY_DOMAIN_NAME_PROP_VAL = "localhost";
 	private static final Logger log = Logger.getLogger(ClusterController.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private ConcurrentSkipListMap<String, CommandListener> commandListeners = new ConcurrentSkipListMap<String, CommandListener>();
 	private AtomicLong currId = new AtomicLong(1L);
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void componentAdded(ClusteredComponentIfc component) {
@@ -250,8 +244,6 @@ public class ClusterController
 		super.setName(name);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private String nextId() {
 		return "cl-" + currId.incrementAndGet();
 	}
@@ -353,4 +345,3 @@ public class ClusterController
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/10/15

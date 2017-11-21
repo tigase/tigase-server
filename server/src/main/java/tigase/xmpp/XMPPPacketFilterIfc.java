@@ -20,16 +20,10 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Dec 30, 2008 12:53:16 PM
@@ -43,6 +37,3 @@ public interface XMPPPacketFilterIfc
 	void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

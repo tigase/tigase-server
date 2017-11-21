@@ -20,8 +20,6 @@
 
 package tigase.server.bosh;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Message;
@@ -65,7 +63,6 @@ public class BoshSession {
 	private static final long SECOND = 1000;
 	private static final TimerTaskComparator timerTaskComparator = new TimerTaskComparator();
 
-	//~--- fields ---------------------------------------------------------------
 	private long batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
 	// ~--- fields ---------------------------------------------------------------
 	private BoshSessionCache cache = null;
@@ -118,8 +115,6 @@ public class BoshSession {
 	private Set<BoshTask> waitTimerSet = new ConcurrentSkipListSet<BoshTask>(timerTaskComparator);
 	private Queue<Element> waiting_packets = null;//new ConcurrentLinkedQueue<Element>();
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
 	 */
@@ -133,8 +128,6 @@ public class BoshSession {
 		this.hostname = hostname;
 		this.waiting_packets = new LinkedBlockingQueue(maxWaitingPackets);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void close() {
 		terminate = true;
@@ -530,8 +523,6 @@ public class BoshSession {
 		return dataReceiver;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public void setDataReceiver(JID dataReceiver) {
 		this.dataReceiver = dataReceiver;
 	}
@@ -547,8 +538,6 @@ public class BoshSession {
 	public UUID getSid() {
 		return sid;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	public void setUserJid(String jid) {
 		userJid = JID.jidInstanceNS(jid);
@@ -702,8 +691,6 @@ public class BoshSession {
 
 		// out_results.offer(streamOpen);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private Element applyFilters(Element packet) {
 		Element result = packet.clone();
@@ -981,8 +968,6 @@ public class BoshSession {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private Element getBodyElem() {
 		Element body = new Element(BODY_EL_NAME,
 								   new String[]{FROM_ATTR, SECURE_ATTR, "xmpp:version", "xmlns:xmpp", "xmlns:stream"},
@@ -1050,8 +1035,6 @@ public class BoshSession {
 
 		return false;
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	private static class TimerTaskComparator
 			implements Comparator<BoshTask> {

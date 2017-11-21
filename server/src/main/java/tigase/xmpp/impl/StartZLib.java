@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
@@ -34,8 +32,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Jul 29, 2009 4:03:44 PM
@@ -57,11 +53,8 @@ public class StartZLib
 						new String[]{"http://jabber.org/features/compress"})};
 	private static Logger log = Logger.getLogger(StartZLib.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private Element compressed = new Element("compressed", new String[]{"xmlns"}, new String[]{XMLNS});
 	private Element failure = new Element("failure", new String[]{"xmlns"}, new String[]{XMLNS});
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -130,4 +123,3 @@ public class StartZLib
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/12

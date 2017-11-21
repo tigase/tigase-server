@@ -20,8 +20,6 @@
 
 package tigase.vhosts;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -179,7 +177,6 @@ public class VHostItem
 	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
 	private int[] c2sPortsAllowed = null;
 
-	//~--- fields ---------------------------------------------------------------
 	private String[] comps = null;
 	private Map<String, Object> data = new ConcurrentHashMap<String, Object>();
 	private VHostItemDefaults defaults;
@@ -210,8 +207,6 @@ public class VHostItem
 			s2sSecret = UUID.randomUUID().toString();
 		}
 	}
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * The constructor creates the <code>VHostItem</code> instance from a given XML element. Please refer to the class
@@ -303,8 +298,6 @@ public class VHostItem
 			}
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int compareTo(VHostItem o) {
@@ -789,8 +782,6 @@ public class VHostItem
 		this.comps = comps;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Returns an array with ports on which C2S connections for this VHosts are allowed.
 	 *
@@ -952,8 +943,6 @@ public class VHostItem
 	public void setTrustedJIDs(JID[] trustedJids) {
 		setData(TRUSTED_JIDS_ATT, trustedJids);
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	public VHostItem getUnmodifiableVHostItem() {
 		if (unmodifiableItem == null) {
@@ -1207,8 +1196,6 @@ public class VHostItem
 		return buf.toString();
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private String stringArrayToString(String[] arr, String separator) {
 		if (arr == null) {
 			return null;
@@ -1367,8 +1354,6 @@ public class VHostItem
 			return VHostItem.this.getComps();
 		}
 
-		//~--- get methods --------------------------------------------------------
-
 		@Override
 		public void setComps(String[] comps) {
 			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
@@ -1468,8 +1453,6 @@ public class VHostItem
 		public VHostItem getUnmodifiableVHostItem() {
 			return this;
 		}
-
-		//~--- set methods --------------------------------------------------------
 
 		@Override
 		public JID getVhost() {

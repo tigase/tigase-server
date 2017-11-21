@@ -20,8 +20,6 @@
 
 package tigase.vhosts;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.DataSourceHelper;
@@ -50,8 +48,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * Describe class VHostManager here.
  * <br>
@@ -68,7 +64,6 @@ public class VHostManager
 
 	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	@Inject
 	protected ComponentRepository<VHostItem> repo = null;
 	private long getComponentsForLocalDomainCalls = 0;
@@ -83,15 +78,11 @@ public class VHostManager
 	private LinkedHashSet<VHostListener> nonLocalDomainsHandlers = new LinkedHashSet<VHostListener>(10);
 	private ConcurrentSkipListSet<String> registeredComponentDomains = new ConcurrentSkipListSet<String>();
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>VHostManager</code> instance.
 	 */
 	public VHostManager() {
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addComponentDomain(String domain) {
@@ -140,8 +131,6 @@ public class VHostManager
 	public void unregister(Kernel kernel) {
 
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public List<JID> getAllVHosts() {
@@ -330,8 +319,6 @@ public class VHostManager
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setName(String name) {
 		super.setName(name);
@@ -382,4 +369,3 @@ public class VHostManager
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/10/05

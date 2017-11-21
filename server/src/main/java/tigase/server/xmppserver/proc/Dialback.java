@@ -20,8 +20,6 @@
 
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cert.CertCheckResult;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
@@ -43,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * Created: Dec 9, 2010 2:00:52 PM
  *
@@ -63,8 +59,6 @@ public class Dialback
 														new String[]{"urn:xmpp:features:dialback"});
 	private static final String REQUESTED_RESULT_DOMAINS_KEY = "requested-result-domains-key";
 
-	//~--- fields ---------------------------------------------------------------
-
 	// ~--- fields ---------------------------------------------------------------
 	@ConfigField(desc = "Authentication timeout for S2S connections")
 	private long authenticationTimeOut = 30;
@@ -73,16 +67,10 @@ public class Dialback
 	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd", alias = "ejabberd-bug-workaround")
 	private boolean ejabberd_bug_workaround_active = true;
 
-	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
-
 
 	public Dialback() {
 		super();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {
@@ -429,20 +417,14 @@ public class Dialback
 		requested.add(domain);
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class AuthenticationTimer
 			extends TimerTask {
 
 		private S2SIOService serv = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private AuthenticationTimer(S2SIOService serv) {
 			this.serv = serv;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {

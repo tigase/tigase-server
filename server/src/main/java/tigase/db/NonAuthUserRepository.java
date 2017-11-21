@@ -20,11 +20,7 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.jid.BareJID;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface WriteOnlyUserRepository here.
@@ -39,8 +35,6 @@ public interface NonAuthUserRepository {
 	public static final String PUBLIC_DATA_NODE = "public";
 
 	public static final String OFFLINE_DATA_NODE = "offline";
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * <code>addDataList</code> method adds mode entries to existing data list associated with given key in repository
@@ -77,8 +71,6 @@ public interface NonAuthUserRepository {
 	 * @throws UserNotFoundException if user id hasn't been found in reository.
 	 */
 	void addOfflineDataList(BareJID user, String subnode, String key, String[] list) throws UserNotFoundException;
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Retrieves and returns a value associated with given subnode and key from a publicly available space. The space is
@@ -154,8 +146,6 @@ public interface NonAuthUserRepository {
 	 */
 	String getTempData(String subnode, String key, String def) throws TigaseDBException;
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * The method allows to store some temporary data by the plugin in publicly available space. The space is specific
 	 * to given virtual domain and is shared among all running cluster nodes. The data is stored in some place outside
@@ -216,6 +206,3 @@ public interface NonAuthUserRepository {
 	void removeTempData(String subnode, String key) throws TigaseDBException;
 }    // WriteOnlyUserRepository
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

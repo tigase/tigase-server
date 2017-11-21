@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
@@ -37,8 +35,6 @@ import tigase.xmpp.jid.BareJID;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class JabberIqIq here.
@@ -65,8 +61,6 @@ public class JabberIqIq
 	 */
 	private static String[] not_so_smart_words = {"ZnVjaw==", "c2hpdA==", "d2hvcmU=", "ZGljaw==", "YXNz", "YW51cw==",
 												  "YXJzZQ==", "dmFnaW5h", "cG9ybg==", "cGVuaXM=", "cGlzcw==", "c3V4"};
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * IQ range table: Number Range   Descriptive Label 140+   genius 120-139  very superior 110-119  superior 90-109
@@ -289,8 +283,6 @@ public class JabberIqIq
 		session.setPublicData(ID, LEVEL, curr);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private double getIq(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
 		String iq_level = session.getPublicData(ID, LEVEL, "100");
 		double iq = 100;
@@ -317,4 +309,3 @@ public class JabberIqIq
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/12

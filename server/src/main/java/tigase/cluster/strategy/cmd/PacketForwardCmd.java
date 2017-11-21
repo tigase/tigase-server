@@ -26,8 +26,6 @@
  */
 package tigase.cluster.strategy.cmd;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.SessionManagerClustered;
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.CommandListenerAbstract;
@@ -47,8 +45,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version 5.2.0, 13/06/22
@@ -59,17 +55,12 @@ public class PacketForwardCmd
 	public static final String PACKET_FROM_KEY = "packet-from";
 	private static final Logger log = Logger.getLogger(PacketForwardCmd.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private DefaultClusteringStrategyAbstract strategy;
-
-	//~--- constructors ---------------------------------------------------------
 
 		public PacketForwardCmd(String name, DefaultClusteringStrategyAbstract strategy) {
 		super(name, Priority.HIGH);
 		this.strategy = strategy;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data, Queue<Element> packets)
@@ -148,4 +139,3 @@ public class PacketForwardCmd
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

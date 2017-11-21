@@ -20,8 +20,6 @@
 
 package tigase.db.xml;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.*;
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
@@ -34,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class <code>XMLRepository</code> is a <em>XML</em> implementation of <code>UserRepository</code>. It uses
@@ -56,8 +52,6 @@ public class XMLRepository
 	private AuthRepository auth = null;
 	private boolean autoCreateUser = false;
 	private XMLDB xmldb = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public synchronized void addDataList(BareJID user, final String subnode, final String key, final String[] list)
@@ -326,8 +320,6 @@ public class XMLRepository
 			throw new UserNotFoundException(USER_STR + user + NOT_FOUND_STR, e);
 		}    // end of try-catch
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public synchronized void setData(BareJID user, final String subnode, final String key, final String value)

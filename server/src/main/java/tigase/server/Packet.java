@@ -97,8 +97,6 @@ public class Packet {
 	 */
 	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
 
-	//~--- fields ---------------------------------------------------------------
-
 	protected Element elem;
 	private JID packetFrom = null;
 	private JID packetTo = null;
@@ -113,8 +111,6 @@ public class Packet {
 	private String stanzaId = null;
 	private JID stanzaTo = null;
 	private StanzaType type;
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Method trims {@link Element} stanza to 1024 characters and returns String representation of the element
@@ -820,8 +816,6 @@ public class Packet {
 		return stanzaTo;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Returns the packet destination address. The method works as a following code:
 	 * <pre>
@@ -844,8 +838,6 @@ public class Packet {
 	public StanzaType getType() {
 		return type;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns the enclosed stanza top element XMLNS. This call is equal to the call:
@@ -1000,8 +992,6 @@ public class Packet {
 		return false;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * The method checks whether the enclosed stanza contains an XML element and XML child element for a given element
 	 * path and XMLNS. The <code>elementPath</code> is directory path like string. <strong>Please note! This method can
@@ -1021,8 +1011,6 @@ public class Packet {
 
 		return (this_xmlns == xmlns);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * The method checks whether the enclosed stanza contains an XML element and XML child element for a given element
@@ -1128,8 +1116,6 @@ public class Packet {
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method returns a modified copy of the <code>Packet</code> with its stanza as stanza <code>result</code> used for
 	 * reporting <em>IQ</em> stanza results. The method preserves all the attributes of the original stanza, swaps
@@ -1218,8 +1204,6 @@ public class Packet {
 	public Packet swapElemFromTo() {
 		return swapStanzaFromTo();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * The method left for compatibility with an old API reasons. Use <code>swapStanzaFromTo()</code> instead.
@@ -1460,8 +1444,6 @@ public class Packet {
 		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS=" + elem.getXMLNS() +
 				", PRIORITY=" + priority + ", PERMISSION=" + permissions + ", TYPE=" + type;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private void setElem(Element elem) {
 		if (elem == null) {

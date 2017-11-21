@@ -31,8 +31,6 @@ public abstract class ClConRepoDefaults {
 
 	private static final BareJID clcon_user = BareJID.bareJIDInstanceNS("cl-conn-manager");
 
-	//~--- get methods ----------------------------------------------------------
-
 	static String getConfigKey() {
 		return "cluster-nodes";
 	}
@@ -54,4 +52,3 @@ public abstract class ClConRepoDefaults {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/09

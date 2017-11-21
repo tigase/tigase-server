@@ -20,8 +20,6 @@
 
 package tigase.db.jdbc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.credentials.Credentials;
 import tigase.db.*;
@@ -48,10 +46,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.db.AuthRepository.Meta;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * The user authentication connector allows for customized SQL queries to be used. Queries are defined in the
@@ -282,8 +276,6 @@ public class TigaseCustomAuth
 	@ConfigField(desc = "Counts users", alias = DEF_USERS_COUNT_KEY)
 	private String userscount_query = DEF_USERS_COUNT_QUERY;
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		if (adduser_query == null) {
@@ -334,8 +326,6 @@ public class TigaseCustomAuth
 		}
 		return super.isMechanismSupported(domain, mechanism);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getResourceUri() {
@@ -472,8 +462,6 @@ public class TigaseCustomAuth
 			throw new DBInitException("Could not initialize TigaseCustomAuth instance", ex);
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
@@ -774,8 +762,6 @@ public class TigaseCustomAuth
 		}
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	protected String getParamWithDef(Map<String, String> params, String key, String def) {
 		if (params == null) {
 			return def;
@@ -833,8 +819,6 @@ public class TigaseCustomAuth
 			return (password != null) && (db_password != null) && db_password.equals(password);
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	private void initDb() throws SQLException {
 		if (initdb_query == null) {
@@ -989,8 +973,6 @@ public class TigaseCustomAuth
 		} // end of catch
 	}
 
-	// ~--- inner classes --------------------------------------------------------
-
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	private class SaslCallbackHandler
@@ -998,13 +980,9 @@ public class TigaseCustomAuth
 
 		private Map<String, Object> options = null;
 
-		// ~--- constructors -------------------------------------------------------
-
 		private SaslCallbackHandler(final Map<String, Object> options) {
 			this.options = options;
 		}
-
-		// ~--- methods ------------------------------------------------------------
 
 		// Implementation of javax.security.auth.callback.CallbackHandler
 
@@ -1087,6 +1065,3 @@ public class TigaseCustomAuth
 	}
 } // TigaseCustomAuth
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

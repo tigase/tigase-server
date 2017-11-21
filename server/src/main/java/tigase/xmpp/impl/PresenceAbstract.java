@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -73,7 +71,6 @@ public abstract class PresenceAbstract
 	@ConfigField(desc = "Skip offline sys", alias = SKIP_OFFLINE_SYS_PROP_KEY)
 	private static boolean skipOfflineSys = true;
 
-	//~--- fields ---------------------------------------------------------------
 	protected RosterAbstract roster_util = getRosterUtil();
 
 	// This is required to make sure that dynamic roster will get initialized
@@ -375,8 +372,6 @@ public abstract class PresenceAbstract
 		return probeFullJID;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public void setProbeFullJID(boolean probeFullJID) {
 		PresenceAbstract.probeFullJID = probeFullJID;
 	}
@@ -439,8 +434,6 @@ public abstract class PresenceAbstract
 //			}
 //		}
 //	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all buddies from roster and to all users
@@ -544,8 +537,6 @@ public abstract class PresenceAbstract
 			}    // end of for (String buddy: buddies)
 		}      // end of if (buddies == null)
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int concurrentQueuesNo() {

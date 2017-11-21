@@ -20,8 +20,6 @@
 
 package tigase.stats;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.repository.DataTypes;
 
 import javax.management.*;
@@ -34,8 +32,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * @author Artur Hefczyc Created Jun 3, 2011
  */
@@ -43,8 +39,6 @@ public class JavaJMXProxyOpt
 		implements NotificationListener {
 
 	private static final Logger log = Logger.getLogger(JavaJMXProxyOpt.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
 
 	private int cpuNo = 0;
 	private long delay = -1;
@@ -68,8 +62,6 @@ public class JavaJMXProxyOpt
 	private String urlPath = null;
 	private String userName = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public JavaJMXProxyOpt(String id, String hostname, int port, String userName, String password, long delay,
 						   long interval, boolean loadHistory) {
 		this.id = id;
@@ -83,8 +75,6 @@ public class JavaJMXProxyOpt
 		this.loadHistory = loadHistory;
 		System.out.println("Created: " + id + ":" + hostname + ":" + port);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addJMXProxyListener(JMXProxyListenerOpt listener) {
 		listeners.add(listener);
@@ -207,8 +197,6 @@ public class JavaJMXProxyOpt
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public Map<String, String> getAllStats(int level) {
 		if (tigBean != null) {
 			return tigBean.getAllStats(level);
@@ -294,13 +282,9 @@ public class JavaJMXProxyOpt
 		return isConnected() && initialized;
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class StatisticsUpdater {
 
 		private Timer updateTimer = null;
-
-		//~--- constructors -------------------------------------------------------
 
 		private StatisticsUpdater() {
 			updateTimer = new Timer("stats-updater", true);
@@ -345,4 +329,3 @@ public class JavaJMXProxyOpt
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/09/21

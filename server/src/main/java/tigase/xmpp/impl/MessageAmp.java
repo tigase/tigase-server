@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
@@ -71,8 +69,6 @@ public class MessageAmp
 
 //	private static final String STATUS_ATTRIBUTE_NAME = "status";
 
-	//~--- fields ---------------------------------------------------------------
-
 	@ConfigField(desc = "AMP component JID", alias = AMP_JID_PROP_KEY)
 	private JID ampJID = JID.jidInstanceNS("amp@" + defHost);
 	@Inject(nullAllowed = true)
@@ -83,8 +79,6 @@ public class MessageAmp
 	private OfflineMessages offlineProcessor;
 	@ConfigField(desc = "", alias = "quota-exceeded")
 	private QuotaRule quotaExceededRule = QuotaRule.error;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

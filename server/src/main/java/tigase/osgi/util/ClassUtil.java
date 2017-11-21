@@ -19,8 +19,6 @@
  */
 package tigase.osgi.util;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import org.osgi.framework.Bundle;
 import tigase.osgi.Activator;
 import tigase.util.ClassComparator;
@@ -35,8 +33,6 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>ClassUtil</code> file contains code used for loading all implementations of specified <em>interface</em> or
@@ -55,8 +51,6 @@ public class ClassUtil {
 												 "org.apache.xml", "org.postgresql", "com.sun", "groovy",
 												 "org.codehaus.groovy", "org.netbeans", "org.python", "com.google.gwt",
 												 "xtigase.http.client.BasePanel", "org.osgi"};
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static String getClassNameFromFileName(String fileName) {
 		String class_name = null;

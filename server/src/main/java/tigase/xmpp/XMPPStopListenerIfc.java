@@ -19,16 +19,10 @@
  */
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 
 import java.util.Map;
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPStopListener here.

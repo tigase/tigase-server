@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -38,10 +36,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static tigase.io.SSLContextContainerIfc.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * This is sample class demonstrating how to use <code>tigase.io</code> library for TLS/SSL server connection. This is
@@ -65,12 +59,8 @@ public class TelnetServer
 	private static int port = 7777;
 	private static boolean ssl = false;
 
-	//~--- fields ---------------------------------------------------------------
-
 	private IOInterface iosock = null;
 	private SampleSocketThread reader = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static String help() {
 		return "\n" + "Parameters:\n" + " -?                this help message\n" + " -h hostname       host name\n" +
@@ -80,8 +70,6 @@ public class TelnetServer
 				" -t millis         delay between sending file content\n" +
 				" -v                prints server version info\n" + " -d [true|false]   turn on|off debug mode\n";
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public static void main(final String[] args) throws Exception {
 		parseParams(args);
@@ -296,6 +284,3 @@ public class TelnetServer
 	}
 }    // Telnetserver
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -20,11 +20,7 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.XMPPIOService;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface ServiceChecker here.
@@ -41,6 +37,3 @@ public interface ServiceChecker<IO extends XMPPIOService<?>> {
 	void check(IO service);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

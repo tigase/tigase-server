@@ -20,8 +20,6 @@
 
 package tigase.util.log;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -45,16 +43,10 @@ public class LogFormatter
 	private static int MED_LEN = 40;
 	private static int TH_NAME_LEN = 17;
 
-	//~--- fields ---------------------------------------------------------------
-
 	private Calendar cal = Calendar.getInstance();
-
-	//~--- constructors ---------------------------------------------------------
 
 	public LogFormatter() {
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public synchronized String format(LogRecord record) {
@@ -118,8 +110,6 @@ public class LogFormatter
 		entry.increment();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private void getStackTrace(StringBuilder sb, Throwable th) {
 		if (sb.length() > 0) {
 			sb.append("\nCaused by: ").append(th.toString());
@@ -141,4 +131,3 @@ public class LogFormatter
 	}
 }    // LogFormatter
 
-//~ Formatted in Tigase Code Convention on 13/05/27

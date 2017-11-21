@@ -20,8 +20,6 @@
 
 package tigase.server.xmppcomponent;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -47,8 +45,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class ComponentConnectionManager
@@ -80,7 +76,6 @@ public class ComponentConnectionManager
 
 	private static final Logger log = Logger.getLogger(ComponentConnectionManager.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	public boolean PACK_ROUTED_VAL = false;
 	public int[] PORTS = {5555};
 	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
@@ -95,8 +90,6 @@ public class ComponentConnectionManager
 	private boolean pack_routed = PACK_ROUTED_VAL;
 	private ServiceEntity serviceEntity = null;
 	private String service_id = "it doesn't matter";
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -244,8 +237,6 @@ public class ComponentConnectionManager
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINER)) {
@@ -392,8 +383,6 @@ public class ComponentConnectionManager
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -406,8 +395,6 @@ public class ComponentConnectionManager
 		serviceEntity = new ServiceEntity("XEP-0114 " + getName(), null, "XEP-0114");
 		serviceEntity.addIdentities(new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {
@@ -472,8 +459,6 @@ public class ComponentConnectionManager
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected int[] getDefPlainPorts() {
 		return PORTS;
@@ -521,8 +506,6 @@ public class ComponentConnectionManager
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new XMPPIOService<Object>();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
@@ -634,6 +617,3 @@ public class ComponentConnectionManager
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

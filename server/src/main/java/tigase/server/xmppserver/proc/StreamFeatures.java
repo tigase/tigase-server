@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.net.ConnectionType;
 import tigase.server.Packet;
@@ -34,10 +32,6 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Dec 9, 2010 2:00:25 PM
  *
@@ -49,8 +43,6 @@ public class StreamFeatures
 		extends S2SAbstractProcessor {
 
 	private static final Logger log = Logger.getLogger(StreamFeatures.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {
@@ -103,6 +95,3 @@ public class StreamFeatures
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

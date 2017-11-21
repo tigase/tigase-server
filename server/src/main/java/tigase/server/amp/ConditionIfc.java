@@ -19,12 +19,8 @@
  */
 package tigase.server.amp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xml.Element;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Apr 26, 2010 5:06:13 PM
@@ -38,6 +34,3 @@ public interface ConditionIfc
 	boolean match(Packet packet, Element rule);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

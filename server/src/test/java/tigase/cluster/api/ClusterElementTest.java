@@ -26,8 +26,6 @@
  */
 package tigase.cluster.api;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import junit.framework.TestCase;
 import org.junit.Test;
 import tigase.xml.DomBuilderHandler;
@@ -63,4 +61,3 @@ public class ClusterElementTest
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

@@ -32,13 +32,9 @@ public class LongHistoryCache {
 	private int count = 0;
 	private int start = 0;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public LongHistoryCache(int limit) {
 		buffer = new long[limit];
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public synchronized void addItem(long item) {
 		int ix = (start + count) % buffer.length;
@@ -51,8 +47,6 @@ public class LongHistoryCache {
 			start %= buffer.length;
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public synchronized long[] getCurrentHistory() {
 		long[] result = new long[count];
@@ -67,4 +61,3 @@ public class LongHistoryCache {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

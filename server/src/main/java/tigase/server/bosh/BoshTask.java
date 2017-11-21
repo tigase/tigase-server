@@ -44,15 +44,11 @@ public class BoshTask
 	private BoshSession bs = null;
 	private BoshConnectionManager manager = null;
 
-	// ~--- constructors -------------------------------------------------------
-
 
 	public BoshTask(BoshSession bs, BoshConnectionManager manager) {
 		this.bs = bs;
 		this.manager = manager;
 	}
-
-	// ~--- methods ------------------------------------------------------------
 
 	@Override
 	public void run() {

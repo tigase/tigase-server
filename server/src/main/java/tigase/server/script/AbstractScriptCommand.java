@@ -20,14 +20,10 @@
 
 package tigase.server.script;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.stats.StatisticHolderImpl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jan 2, 2009 2:32:17 PM
@@ -40,8 +36,6 @@ public abstract class AbstractScriptCommand
 		implements CommandIfc {
 
 	public static final Map<String, String> lineCommentStart = new LinkedHashMap<String, String>(20);
-
-	//~--- static initializers --------------------------------------------------
 
 	static {
 		lineCommentStart.put("groovy", "//");
@@ -62,14 +56,10 @@ public abstract class AbstractScriptCommand
 		lineCommentStart.put("java", "//");
 	}
 
-	//~--- fields ---------------------------------------------------------------
-
 	private boolean adminOnly = true;
 	private String commandId = null;
 	private String description = null;
 	private String group = null;
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getCommandId() {
@@ -86,8 +76,6 @@ public abstract class AbstractScriptCommand
 		return this.group;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void init(String id, String description, String group) {
 		this.commandId = id;
@@ -97,21 +85,15 @@ public abstract class AbstractScriptCommand
 		setStatisticsPrefix("adhoc-command/" + id);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public boolean isAdminOnly() {
 		return adminOnly;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setAdminOnly(boolean adminOnly) {
 		this.adminOnly = adminOnly;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	protected boolean isEmpty(String val) {
 		return (val == null) || val.isEmpty();

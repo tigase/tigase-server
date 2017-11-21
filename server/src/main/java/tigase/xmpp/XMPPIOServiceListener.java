@@ -20,17 +20,11 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.net.IOServiceListener;
 import tigase.xml.Element;
 
 import java.util.List;
 import java.util.Map;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPIOServiceListener here.

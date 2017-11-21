@@ -20,8 +20,6 @@
 
 package tigase.cluster.repo;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.ClusterConnectionManager;
 import tigase.db.DBInitException;
@@ -55,8 +53,6 @@ public class ClConConfigRepository
 
 	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	@ConfigField(desc = "Automatically remove obsolote items", alias = "repo-auto-remove-obsolete-items")
 	protected boolean auto_remove_obsolete_items = true;
 	protected boolean firstLoadDone = false;
@@ -80,8 +76,6 @@ public class ClConConfigRepository
 	public void destroy() {
 		// Nothing to do
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -107,8 +101,6 @@ public class ClConConfigRepository
 	public ClusterRepoItem getItemInstance() {
 		return ClConRepoDefaults.getItemInstance();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
@@ -208,8 +200,6 @@ public class ClConConfigRepository
 		removeItem(host);
 		return "== " + "Removing cluster_nodes item: " + host + "\n";
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void storeItem(ClusterRepoItem item) {
 	}

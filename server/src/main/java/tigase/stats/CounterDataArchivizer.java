@@ -20,8 +20,6 @@
 
 package tigase.stats;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
@@ -42,8 +40,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.db.RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Mar 25, 2010 8:55:11 PM
@@ -71,8 +67,6 @@ public class CounterDataArchivizer
 	private static final String VERSION_TEXT = "Version: ";
 	private static final String VHOSTS_TEXT = "VHosts: ";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String create_table_query = null;
 	private DataRepository data_repo = null;
 	@ConfigField(desc = "Database URL", alias = DB_URL_PROP_KEY)
@@ -89,8 +83,6 @@ public class CounterDataArchivizer
 	// private PreparedStatement updateEntry = null;
 	@ConfigField(desc = "Value field", alias = VAL_FIELD_PROP_KEY)
 	private String valueField = DEF_VALUE_FIELD_NAME;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void execute(StatisticsProvider sp) {
@@ -198,4 +190,3 @@ public class CounterDataArchivizer
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/02

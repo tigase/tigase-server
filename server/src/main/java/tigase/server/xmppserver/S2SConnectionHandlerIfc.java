@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.util.common.TimerTask;
 import tigase.xml.Element;
@@ -31,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 11:40:28 PM
@@ -53,13 +49,9 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	 */
 	public List<Element> getStreamFeatures(S2SIOService serv);
 
-	//~--- methods --------------------------------------------------------------
-
 	boolean addOutPacket(Packet packet);
 
 	void addTimerTask(TimerTask task, long delay, TimeUnit unit);
-
-	//~--- get methods ----------------------------------------------------------
 
 	CIDConnections getCIDConnections(CID cid, boolean createNew) throws NotLocalhostException, LocalhostException;
 
@@ -79,8 +71,6 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	String getSecretForDomain(String domain) throws NotLocalhostException;
 
 	String getServerNameForDomain(String domain);
-
-	//~--- methods --------------------------------------------------------------
 
 	void initNewConnection(Map<String, Object> port_props);
 
@@ -111,6 +101,3 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

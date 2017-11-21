@@ -20,8 +20,6 @@
 
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
@@ -37,21 +35,15 @@ public class ConnectionRecord
 	private static final String SESSION_ID_ELEMENT = "session-id";
 	private static final String TOP_ELEMENT = "conn-rec";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private JID connectionId;
 	private JID node;
 	private String sessionId;
 	private JID userJid;
 
-	//~--- constructors ---------------------------------------------------------
-
 
 	public ConnectionRecord() {
 		super();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int compareTo(ConnectionRecord rec) {
@@ -100,8 +92,6 @@ public class ConnectionRecord
 		return sb.toString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public JID getConnectionId() {
 		return connectionId;
@@ -120,8 +110,6 @@ public class ConnectionRecord
 	public String getSessionId() {
 		return sessionId;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public JID getUserJid() {

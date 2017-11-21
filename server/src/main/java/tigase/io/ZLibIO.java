@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.stats.StatisticsList;
 import tigase.util.IOListener;
 import tigase.util.ZLibWrapper;
@@ -31,10 +29,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jul 29, 2009 11:58:02 AM
@@ -49,19 +43,13 @@ public class ZLibIO
 
 	private static Logger log = Logger.getLogger(ZLibIO.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private IOInterface io = null;
 	private ZLibWrapper zlib = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public ZLibIO(final IOInterface ioi, final int level) {
 		this.io = ioi;
 		zlib = new ZLibWrapper();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int bytesRead() {
@@ -103,8 +91,6 @@ public class ZLibIO
 		return caps.contains(ZLIB_CAPS) || io.checkCapabilities(caps);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public int getInputPacketSize() throws IOException {
 		return io.getInputPacketSize();
@@ -136,8 +122,6 @@ public class ZLibIO
 	public boolean isRemoteAddress(String addr) {
 		return io.isRemoteAddress(addr);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {

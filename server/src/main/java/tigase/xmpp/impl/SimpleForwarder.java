@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xmpp.*;
@@ -30,8 +28,6 @@ import tigase.xmpp.jid.BareJID;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class SimpleForwarder here.
@@ -46,8 +42,6 @@ public abstract class SimpleForwarder
 		implements XMPPProcessorIfc {
 
 	private static Logger log = Logger.getLogger(SimpleForwarder.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
@@ -79,4 +73,3 @@ public abstract class SimpleForwarder
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/12

@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.credentials.Credentials;
 import tigase.db.*;
@@ -37,8 +35,6 @@ import java.util.logging.Logger;
 import static tigase.db.AuthRepository.*;
 import static tigase.db.NonAuthUserRepository.OFFLINE_DATA_NODE;
 import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class RepositoryAccess here.
@@ -71,10 +67,6 @@ public abstract class RepositoryAccess {
 	 */
 	private UserRepository repo = null;
 
-	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>RepositoryAccess</code> instance.
 	 */
@@ -84,8 +76,6 @@ public abstract class RepositoryAccess {
 
 		// this.anon_allowed = anon_allowed;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addDataList(final String subnode, final String key, final String[] list)
 			throws NotAuthorizedException, TigaseDBException {
@@ -116,8 +106,6 @@ public abstract class RepositoryAccess {
 			throws NotAuthorizedException, TigaseDBException {
 		addDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
@@ -333,8 +321,6 @@ public abstract class RepositoryAccess {
 		removeDataGroup(calcNode(PUBLIC_DATA_NODE, subnode));
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
 	public Authorization register(String name_param, String pass_param, Map<String, String> reg_params)
@@ -392,8 +378,6 @@ public abstract class RepositoryAccess {
 		}    // end of try-catch
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public String getAuthenticationToken(String xmpp_sessionId) throws NotAuthorizedException, TigaseDBException {
 		UUID token = UUID.randomUUID();
 
@@ -401,8 +385,6 @@ public abstract class RepositoryAccess {
 
 		return token.toString();
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Gets the value of authState
@@ -412,8 +394,6 @@ public abstract class RepositoryAccess {
 	public final Authorization getAuthState() {
 		return this.authState;
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns user JID but without <em>resource</em> part. This is real user ID not session ID. To retrieve session ID
@@ -732,8 +712,6 @@ public abstract class RepositoryAccess {
 		setDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	// ~--- set methods ----------------------------------------------------------
 	public void setRegistration(final String name_param, final String pass_param,
 								final Map<String, String> registr_params)
@@ -805,8 +783,6 @@ public abstract class RepositoryAccess {
 
 	protected abstract void login();
 
-	//~--- get methods ----------------------------------------------------------
-
 	private String calcNode(String base, String subnode) {
 		if (subnode == null) {
 			return base;
@@ -814,8 +790,6 @@ public abstract class RepositoryAccess {
 
 		return base + "/" + subnode;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private boolean isLoginAllowed() throws AuthorizationException {
 		if (isAuthorized()) {
@@ -827,4 +801,3 @@ public abstract class RepositoryAccess {
 	}
 }    // RepositoryAccess
 
-//~ Formatted in Tigase Code Convention on 13/11/02

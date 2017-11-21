@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
@@ -40,8 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.xmpp.impl.MobileV3.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for queuing packets (usable in connections from mobile clients - power usage optimization) version
@@ -74,7 +70,6 @@ public class MobileV3
 	private static final ThreadLocal<StateHolder> threadState = new ThreadLocal<StateHolder>();
 	private SimpleDateFormat formatter;
 
-	//~--- fields ---------------------------------------------------------------
 	@ConfigField(desc = "Max queue size", alias = MAX_QUEUE_SIZE_KEY)
 	private int maxQueueSize = DEF_MAX_QUEUE_SIZE_VAL;
 
@@ -93,8 +88,6 @@ public class MobileV3
 
 		return (enabled != null) && enabled;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
@@ -448,8 +441,6 @@ public class MobileV3
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private static enum QueueState {
 		none(0),
 		queued(1),
@@ -496,4 +487,3 @@ public class MobileV3
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/16

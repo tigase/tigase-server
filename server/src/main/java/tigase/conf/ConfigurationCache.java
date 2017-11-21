@@ -20,8 +20,6 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
@@ -32,8 +30,6 @@ import java.io.FileWriter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2009 2:02:41 PM
@@ -50,8 +46,6 @@ public class ConfigurationCache
 
 	private static final Logger log = Logger.getLogger(ConfigurationCache.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	/**
 	 * Even though every element has a component name field the whole configuration is grouped by the component name
 	 * anyway to improve access time to the configuration. Very rarely we need access to whole configuration, in most
@@ -62,8 +56,6 @@ public class ConfigurationCache
 	private String configDumpFileName = CONFIG_DUMP_FILE_PROP_DEF;
 	private String hostname = null;
 	private RepositoryChangeListenerIfc<ConfigItem> repoChangeList = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addRepoChangeListener(RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
@@ -153,8 +145,6 @@ public class ConfigurationCache
 		// implementing support for autodiscovery based on URI and adding
 		// more flexibility in use of repositories
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Object get(String compName, String node, String key, Object def) {
@@ -254,8 +244,6 @@ public class ConfigurationCache
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public Map<String, Object> getProperties(String compName) throws ConfigurationException {
@@ -337,8 +325,6 @@ public class ConfigurationCache
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void removeItem(String key) throws TigaseDBException {
 		ConfigItem item = getItem(key);
@@ -365,8 +351,6 @@ public class ConfigurationCache
 	public void setProperties(Map<String, Object> properties) {
 		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int size() {
@@ -401,20 +385,14 @@ public class ConfigurationCache
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String validateItem(ConfigItem item) {
 		return null;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void setAutoloadTimer(long delay) {
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private boolean isOff(String str) {
 		return (str == null) || str.trim().isEmpty() || str.equalsIgnoreCase("off") || str.equalsIgnoreCase("none") ||
@@ -422,4 +400,3 @@ public class ConfigurationCache
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/09

@@ -19,16 +19,10 @@
  */
 package tigase.server.monitor;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Jun 17, 2010 11:59:13 AM
@@ -59,6 +53,3 @@ public interface MonitorPluginIfc {
 	void getStatistics(StatisticsList list);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

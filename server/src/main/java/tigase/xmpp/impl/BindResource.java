@@ -66,11 +66,8 @@ public class BindResource
 	private static final String RESOURCE_PREFIX_DEF = "tigase-";
 	private static int resGenerator = 0;
 	private String resourceDefPrefix = RESOURCE_PREFIX_DEF;
-	//~--- fields ---------------------------------------------------------------
 	@ConfigField(desc = "Automatic resource assignment prefix", alias = DEF_RESOURCE_PREFIX_PROP_KEY)
 	private String resourcePrefix = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	public BindResource() {
 		setResourcePrefix(RESOURCE_PREFIX_DEF);

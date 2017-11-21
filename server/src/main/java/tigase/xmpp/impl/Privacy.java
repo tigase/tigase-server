@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -37,8 +35,6 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class defining data structure for privacy lists. Sample data storage: {@code <node name="privacy"> <map> <entry
@@ -81,8 +77,6 @@ public class Privacy {
 
 	private static Logger log = Logger.getLogger(Privacy.class.getName());
 
-	//~--- methods --------------------------------------------------------------
-
 	public static void addList(XMPPResourceConnection session, Element list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -122,8 +116,6 @@ public class Privacy {
 		updateList(session, name, list_new);
 		return true;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static PrivacyList getActiveList(XMPPResourceConnection session) throws NotAuthorizedException {
 		return (PrivacyList) session.getSessionData(ACTIVE);
@@ -247,13 +239,9 @@ public class Privacy {
 		return null;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public static String[] getLists(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
 		return session.getDataGroups(PRIVACY);
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private static boolean isBlockItem(Element item) {
 		return "jid".equals(item.getAttributeStaticStr(TYPE)) && "deny".equals(item.getAttributeStaticStr(ACTION)) &&
@@ -372,4 +360,3 @@ public class Privacy {
 
 }    // Privacy
 
-//~ Formatted in Tigase Code Convention on 13/02/20

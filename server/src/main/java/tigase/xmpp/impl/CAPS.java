@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -39,8 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * @author andrzej
  */
@@ -54,8 +50,6 @@ public class CAPS
 	private static final String XMLNS_DISCO = "http://jabber.org/protocol/disco#info";
 	private static final String[] XMLNSS = {"jabber:client", XMLNS_DISCO};
 	private static final RosterAbstract roster_impl = RosterFactory.getRosterImplementation(true);
-
-	//~--- methods --------------------------------------------------------------
 
 	public static Set<JID> getJidsWithFeature(XMPPResourceConnection session, String feature) {
 		Set<JID> jids = new HashSet<JID>();
@@ -102,8 +96,6 @@ public class CAPS
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -176,4 +168,3 @@ public class CAPS
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/12

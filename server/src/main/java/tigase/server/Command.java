@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
@@ -30,8 +28,6 @@ import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Helper enum to make it easier to operate on packets with ad-hoc commands. It allows to create a packet with command,
@@ -181,8 +177,6 @@ public enum Command {
 
 	private static final Logger log = Logger.getLogger("tigase.server.Command");
 
-	//~--- fields ---------------------------------------------------------------
-
 	/**
 	 * Ad-hoc command actions ad defined in the XEP-0050.
 	 */
@@ -218,8 +212,6 @@ public enum Command {
 		 */
 		other;
 	}
-
-	//~--- constant enums -------------------------------------------------------
 
 	/**
 	 * Data form-types as defined in the XEP-0050.
@@ -269,13 +261,9 @@ public enum Command {
 	}
 	private Priority priority = Priority.NORMAL;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public static void addAction(final Packet packet, final Action action) {
 		addActionEl(packet.getElement(), action);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private static void addActionEl(Element iq, Action action) {
 		Element command = iq.getChild(COMMAND_EL);
@@ -650,8 +638,6 @@ public enum Command {
 			return OTHER;
 		}    // end of try-catch
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private Command(Priority priority) {
 		this.priority = priority;

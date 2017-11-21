@@ -20,16 +20,12 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.DBInitException;
 import tigase.db.comp.UserRepoRepository;
 import tigase.kernel.beans.Bean;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.Map;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 24, 2009 3:55:41 PM

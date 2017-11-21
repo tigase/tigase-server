@@ -19,11 +19,7 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.XMPPException;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Sep 2, 2010 4:11:34 PM
@@ -35,8 +31,6 @@ public class NotLocalhostException
 		extends XMPPException {
 
 	private static final long serialVersionUID = 1L;
-
-	//~--- constructors ---------------------------------------------------------
 
 
 	public NotLocalhostException() {
@@ -58,6 +52,3 @@ public class NotLocalhostException
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

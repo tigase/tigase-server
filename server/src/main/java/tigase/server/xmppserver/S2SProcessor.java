@@ -19,18 +19,12 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.xml.Element;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 1:50:09 PM
@@ -67,6 +61,3 @@ public interface S2SProcessor
 	String streamOpened(S2SIOService serv, Map<String, String> attribs);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

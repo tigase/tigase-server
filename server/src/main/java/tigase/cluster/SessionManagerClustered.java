@@ -20,8 +20,6 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
@@ -90,7 +88,6 @@ public class SessionManagerClustered
 
 	;
 
-	//~--- fields ---------------------------------------------------------------
 	private ComponentInfo cmpInfo = null;
 	@ConfigField(desc = "Component own internal JID")
 	private JID my_address;
@@ -112,8 +109,6 @@ public class SessionManagerClustered
 					new Object[]{getName(), my_hostname});
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -297,8 +292,6 @@ public class SessionManagerClustered
 
 		return cmpInfo;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
@@ -498,8 +491,6 @@ public class SessionManagerClustered
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {

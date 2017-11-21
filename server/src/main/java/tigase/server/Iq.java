@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.disco.XMPPService;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
@@ -30,8 +28,6 @@ import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.jid.JID;
 
 import java.util.List;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 31, 2009 8:43:21 PM
@@ -60,14 +56,11 @@ public class Iq
 
 	public static final String[] IQ_BIND_PATH = {ELEM_NAME, "bind"};
 
-	//~--- fields ---------------------------------------------------------------
 	private boolean cmd = false;
 	private Command command = null;
 	private String iqQueryXMLNS = null;
 	private boolean serviceDisco = false;
 	private String strCommand = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static Packet commandResultForm(Iq packet) throws TigaseStringprepException {
 		Packet result = packet.commandResult(Command.DataType.form);
@@ -80,8 +73,6 @@ public class Iq
 
 		return result;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method creates a new <code>Packet</code> instance or <code>Iq</code> instance more specificly with a
@@ -165,8 +156,6 @@ public class Iq
 		return result;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public Command getCommand() {
 		return command;
@@ -209,8 +198,6 @@ public class Iq
 		return IQ_ERROR_PATH;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private void init() {
 		Element child = elem.getChild("command", Command.XMLNS);
 
@@ -224,4 +211,3 @@ public class Iq
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

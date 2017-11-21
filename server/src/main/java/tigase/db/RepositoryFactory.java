@@ -20,8 +20,6 @@
 
 package tigase.db;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.reflection.ClassUtilBean;
@@ -163,8 +161,6 @@ public abstract class RepositoryFactory {
 			DATA_REPO_POOL_SIZE_PROP_VAL);
 	private static final ConcurrentMap<String, AuthRepository> auth_repos = new ConcurrentHashMap<String, AuthRepository>(
 			AUTH_REPO_POOL_SIZE_PROP_VAL);
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static AuthRepository getAuthRepository(String class_name, String resource, Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, DBInitException {
@@ -490,4 +486,3 @@ public abstract class RepositoryFactory {
 
 }    // RepositoryFactory
 
-//~ Formatted in Tigase Code Convention on 13/05/27

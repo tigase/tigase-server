@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Iq;
@@ -36,8 +34,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class RosterPresence here.
@@ -62,11 +58,8 @@ public class RosterPresence
 	private static final Element[] DISCO_FEATURES = RosterAbstract.DISCO_FEATURES;
 	private static Logger log = Logger.getLogger(RosterPresence.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private PresenceState presenceProc = new PresenceState();
 	private JabberIqRoster rosterProc = new JabberIqRoster();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int concurrentQueuesNo() {

@@ -20,16 +20,12 @@
 
 package tigase.server.amp.cond;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.amp.ConditionIfc;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:36:54 PM
@@ -43,14 +39,10 @@ public class MatchResource
 	private static final String name = "match-resource";
 	private static Logger log = Logger.getLogger(MatchResource.class.getName());
 
-	//~--- constant enums -------------------------------------------------------
-
 	@Override
 	public String getName() {
 		return name;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public boolean match(Packet packet, Element rule) {
@@ -94,8 +86,6 @@ public class MatchResource
 
 		return result;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private enum MatchValue {
 		any,

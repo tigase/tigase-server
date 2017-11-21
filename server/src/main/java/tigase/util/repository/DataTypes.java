@@ -20,8 +20,6 @@
 
 package tigase.util.repository;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Array;
@@ -42,8 +40,6 @@ public class DataTypes {
 	public static final Map<String, Character> typesMap = new LinkedHashMap<String, Character>();
 
 	private static final Logger log = Logger.getLogger(DataTypes.class.getName());
-	//~--- static initializers --------------------------------------------------
-
 	static {
 		typesMap.put(String.class.getName(), 'S');
 		typesMap.put(Long.class.getName(), 'L');
@@ -65,8 +61,6 @@ public class DataTypes {
 		typesMap.put(double[].class.getName(), 'd');
 		typesMap.put(JID[].class.getName(), 'j');
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
 
@@ -332,8 +326,6 @@ public class DataTypes {
 		return result;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public static int parseSizeInt(String size, int def) {
 		return parseNum(size, Integer.class, def);
 	}
@@ -396,4 +388,3 @@ public class DataTypes {
 		return value.toString();
 	}
 }
-//~ Formatted in Tigase Code Convention on 13/03/04

@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.ext.CompRepoItem;
 import tigase.server.ext.ComponentIOService;
@@ -38,10 +36,6 @@ import java.util.logging.Logger;
 
 import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
 
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Oct 21, 2009 1:58:56 PM
  *
@@ -55,8 +49,6 @@ public class HandshakeProcessor
 	private static final String EL_NAME = "handshake";
 	private static final String ID = EL_NAME;
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getId() {
 		return ID;
@@ -66,8 +58,6 @@ public class HandshakeProcessor
 	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {

@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.conf.MonitoringBeanIfc;
@@ -80,7 +78,6 @@ public class MessageRouter
 	private static final String JVM_STATS_HEAP_TOTAL = "JVM/HEAP Total ";
 	private static final String JVM_STATS_HEAP_POOLS = "JVM/MemoryPools/HeapMemory/";
 
-	//~--- fields ---------------------------------------------------------------
 	private Map<String, ServerComponent> components = new ConcurrentHashMap<>();
 	@Inject
 	private Set<ServerComponent> componentsAll;
@@ -160,8 +157,6 @@ public class MessageRouter
 			}
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addComponent(ServerComponent component) throws ConfigurationException {
 		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
@@ -270,8 +265,6 @@ public class MessageRouter
 	public int processingOutThreads() {
 		return 1;
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public void processPacket(Packet packet) {
@@ -569,8 +562,6 @@ public class MessageRouter
 		super.stop();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getDiscoCategoryType() {
 		return "im";
@@ -668,8 +659,6 @@ public class MessageRouter
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setConfig(ConfiguratorAbstract config) throws ConfigurationException {
 		components.put(getName(), this);
@@ -677,14 +666,10 @@ public class MessageRouter
 		addRegistrator(config);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void processDiscoQuery(final Packet packet, final Queue<Packet> results) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -793,8 +778,6 @@ public class MessageRouter
 		}
 		results.offer(packet.okResult(query, 0));
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	private ServerComponent[] getComponentsForLocalDomain(String domain) {
 		return vHostManager.getComponentsForLocalDomain(domain);
@@ -923,4 +906,3 @@ public class MessageRouter
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/10/16

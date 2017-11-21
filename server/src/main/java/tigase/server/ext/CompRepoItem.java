@@ -20,8 +20,6 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.net.ConnectionType;
 import tigase.server.Command;
@@ -32,8 +30,6 @@ import tigase.xml.Element;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Oct 3, 2009 4:39:51 PM
@@ -80,7 +76,6 @@ public class CompRepoItem
 	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	// ~--- fields ---------------------------------------------------------------
 	private String auth_pass = null;
 
@@ -93,8 +88,6 @@ public class CompRepoItem
 	private String[] routings = null;
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addCommandFields(Packet packet) {
@@ -115,10 +108,6 @@ public class CompRepoItem
 		Command.addFieldValue(packet, ROUTINGS_LABEL, "");
 		super.addCommandFields(packet);
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	public String getAuthPasswd() {
 		return auth_pass;
@@ -162,8 +151,6 @@ public class CompRepoItem
 	void setPort(int port) {
 		this.port = port;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public String getRemoteHost() {
 		return remoteHost;
@@ -212,10 +199,6 @@ public class CompRepoItem
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void initFromElement(Element elem) {
 		if (elem.getName() != REPO_ITEM_ELEM_NAME) {
@@ -248,8 +231,6 @@ public class CompRepoItem
 			routings = tmp.split(",");
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initFromPropertyString(String propString) {
@@ -315,8 +296,6 @@ public class CompRepoItem
 				lb.getClass().getName();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public String toString() {
 		return toPropertyString();
@@ -379,8 +358,6 @@ public class CompRepoItem
 		return result;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	// ~--- methods --------------------------------------------------------------
 	private ConnectionType parseConnectionType(String input) {
 		ConnectionType result = ConnectionType.accept;
@@ -425,8 +402,3 @@ public class CompRepoItem
 	}
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-//~ Formatted in Tigase Code Convention on 13/02/20

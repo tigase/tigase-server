@@ -96,8 +96,6 @@ public class PresenceState
 	private boolean rosterLazyLoading = true;
 	private long usersStatusChanges = 0;
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Add JID to collection of JIDs to which direct presence was sent. To all these addresses unavailable presence must
 	 * be sent when user disconnects.
@@ -185,8 +183,6 @@ public class PresenceState
 			broadcastDirectPresences(StanzaType.unavailable, session, results, pres);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Remove JID from collection of JIDs to which direct presence was sent.

@@ -20,11 +20,7 @@
 
 package tigase.server.ext;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Map;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Oct 2, 2009 12:15:43 AM
@@ -36,17 +32,10 @@ public interface StreamOpenHandler {
 
 	public static final String XMLNS_KEY = "xmlns";
 
-	//~--- get methods ----------------------------------------------------------
-
 	String[] getXMLNSs();
-
-	//~--- methods --------------------------------------------------------------
 
 	String serviceStarted(ComponentIOService s);
 
 	String streamOpened(ComponentIOService s, Map<String, String> attribs, ComponentProtocolHandler handler);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

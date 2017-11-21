@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Command;
@@ -37,8 +35,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * XEP-0039: Statistics Gathering. http://www.xmpp.org/extensions/xep-0039.html
@@ -59,8 +55,6 @@ public class JabberIqStats
 	protected static final String ID = XMLNS;
 	private static final String[] XMLNSS = {XMLNS, Command.XMLNS};
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {

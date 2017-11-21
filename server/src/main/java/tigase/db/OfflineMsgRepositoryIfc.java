@@ -19,18 +19,12 @@
  */
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.JID;
 
 import java.util.Date;
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Interface for storing and restoring offline Elements.
@@ -55,8 +49,6 @@ public interface OfflineMsgRepositoryIfc
 	 * delete them from repository after being retrieved.
 	 */
 	Element getMessageExpired(long time, boolean delete);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Loads all payloads for the given user's {@link JID} from repository.

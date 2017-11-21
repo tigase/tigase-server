@@ -20,8 +20,6 @@
 
 package tigase.net;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
@@ -51,11 +49,7 @@ public interface ConnectionOpenListener {
 
 	public static final int DEF_TRAFFIC_CLASS = IPTOS_LOWCOST;
 
-	//~--- methods --------------------------------------------------------------
-
 	void accept(SocketChannel sc);
-
-	//~--- get methods ----------------------------------------------------------
 
 	int getPort();
 
@@ -80,4 +74,3 @@ public interface ConnectionOpenListener {
 	}
 }    // ConnectionOpenListener
 
-//~ Formatted in Tigase Code Convention on 13/03/11

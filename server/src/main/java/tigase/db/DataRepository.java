@@ -20,15 +20,11 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.jid.BareJID;
 
 import java.sql.*;
 import java.util.Calendar;
 import java.util.TimeZone;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * The interface defines a generic data repository for storing arbitrary data in any application specific form. This
@@ -56,8 +52,6 @@ public interface DataRepository
 		sqlserver,
 		other
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * The method checks whether a table for the given name exists in the database.
@@ -113,8 +107,6 @@ public interface DataRepository
 	 * @throws SQLException
 	 */
 	void endTransaction() throws SQLException;
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Initializes a prepared statement for a given query and stores it internally under the given id key. It can be
@@ -178,8 +170,6 @@ public interface DataRepository
 	 */
 	DataRepository takeRepoHandle(BareJID user_id);
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Returns type of DataRepository database
 	 *
@@ -188,8 +178,6 @@ public interface DataRepository
 	dbTypes getDatabaseType();
 
 	int getPoolSize();
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns a prepared statement for a given key.
@@ -290,4 +278,3 @@ public interface DataRepository
 
 }
 
-//~ Formatted in Tigase Code Convention on 13/09/21

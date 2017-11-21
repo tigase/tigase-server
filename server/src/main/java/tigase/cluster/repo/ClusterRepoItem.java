@@ -81,7 +81,6 @@ public class ClusterRepoItem
 	private int portNo = PORT_NO_PROP_VAL;
 	private String secondaryHostname = null;
 
-	//~--- methods --------------------------------------------------------------
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, HOSTNAME_LABEL, ((hostname != null) ? hostname : ""));

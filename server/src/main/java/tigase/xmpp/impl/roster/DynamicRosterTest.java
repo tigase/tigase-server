@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl.roster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -30,8 +28,6 @@ import tigase.xmpp.jid.JID;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Nov 28, 2008 10:27:55 PM
@@ -44,11 +40,7 @@ public class DynamicRosterTest
 
 	private static Logger log = Logger.getLogger(DynamicRosterTest.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private Map<String, Element> memStorage = new LinkedHashMap<String, Element>();
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException {
@@ -81,8 +73,6 @@ public class DynamicRosterTest
 		return new ArrayList<Element>(Arrays.asList(getBuddy()));
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void init(Map<String, Object> props) {
 	}
@@ -90,8 +80,6 @@ public class DynamicRosterTest
 	@Override
 	public void init(String par) {
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Override
 	public void setItemExtraData(Element item) {
@@ -102,8 +90,6 @@ public class DynamicRosterTest
 		}
 		memStorage.put(jid, item);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	private Element getBuddy() {
 		return new Element("item", new Element[]{new Element("group", "test group")},

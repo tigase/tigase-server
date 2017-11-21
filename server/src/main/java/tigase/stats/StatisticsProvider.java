@@ -20,8 +20,6 @@
 
 package tigase.stats;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.QueueType;
 import tigase.sys.TigaseRuntime;
 import tigase.util.historyCache.AllHistoryCache;
@@ -34,8 +32,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- JDK imports ------------------------------------------------------------
-
 /**
  * Class StatisticsProvider
  *
@@ -47,15 +43,9 @@ public class StatisticsProvider
 
 	private static final Logger log = Logger.getLogger(StatisticsProvider.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	// ~--- fields ---------------------------------------------------------------
 	private StatisticsCache cache = null;
 	private StatisticsCollector theRef;
-
-	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
 
 	public StatisticsProvider(StatisticsCollector theRef, int historySize, long updateInterval, int highMemoryLevel)
 			throws NotCompliantMBeanException {
@@ -67,15 +57,11 @@ public class StatisticsProvider
 		cache = new StatisticsCache(historySize, updateInterval, highMemoryLevel);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public void stop() {
 		if (cache != null) {
 			cache.stop();
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Map<String, String> getAllStats(int level) {
@@ -537,8 +523,6 @@ public class StatisticsProvider
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	// ~--- inner classes --------------------------------------------------------
 	private class StatisticsCache {
 
@@ -554,8 +538,6 @@ public class StatisticsProvider
 		private static final String SM_COMP = "sess-man";
 		private static final long MINUTE = 60 * SECOND;
 		private static final long HOUR = 60 * MINUTE;
-
-		//~--- fields -------------------------------------------------------------
 
 		private AllHistoryCache allHistory = null;
 		// ~--- fields -------------------------------------------------------------
@@ -622,8 +604,6 @@ public class StatisticsProvider
 		private String systemDetails = "";
 		private Timer updateTimer = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		// ~--- constructors -------------------------------------------------------
 		private StatisticsCache(int historySize, long cacheUpdate, int highMemoryLevel) {
 			if (historySize > 0) {
@@ -650,8 +630,6 @@ public class StatisticsProvider
 				}
 			}, 10 * 1000, cacheUpdate * 1000);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		public void stop() {
 			updateTimer.cancel();
@@ -869,4 +847,3 @@ public class StatisticsProvider
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

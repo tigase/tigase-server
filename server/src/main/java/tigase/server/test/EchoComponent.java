@@ -19,17 +19,11 @@
  */
 package tigase.server.test;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Sep 30, 2010 1:07:13 PM
@@ -41,8 +35,6 @@ public class EchoComponent
 		extends AbstractMessageReceiver {
 
 	private static final Logger log = Logger.getLogger(EchoComponent.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void processPacket(Packet packet) {

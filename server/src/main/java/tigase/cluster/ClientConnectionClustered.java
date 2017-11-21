@@ -20,8 +20,6 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.eventbus.EventListener;
 import tigase.kernel.beans.Bean;
@@ -59,7 +57,6 @@ public class ClientConnectionClustered
 
 	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
 	//	private SeeOtherHostIfc see_other_host_strategy = null;
 	@SuppressWarnings("serial")
@@ -72,8 +69,6 @@ public class ClientConnectionClustered
 	public ClientConnectionClustered() {
 		delayPortListening = true;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void onNodeDisconnected(JID jid) {

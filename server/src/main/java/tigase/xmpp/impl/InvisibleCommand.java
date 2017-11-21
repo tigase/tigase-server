@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
@@ -37,8 +35,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class InvisibleCommand implements XEP-0186 Invisible Command support
@@ -60,11 +56,7 @@ public class InvisibleCommand
 	private static final String[] XMLNSS = {XMLNS, XMLNS};
 	private static final String ACTIVE_KEY = ID + "-active";
 
-	//~--- fields ---------------------------------------------------------------
-
 	protected RosterAbstract roster_util = getRosterUtil();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -166,11 +158,8 @@ public class InvisibleCommand
 		return XMLNSS;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/09/21

@@ -20,10 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.component.ScheduledTask;
 import tigase.kernel.beans.Inject;
@@ -130,7 +126,6 @@ public abstract class AbstractMessageReceiver
 
 	private static final Logger log = Logger.getLogger("tigase.debug.AbstractMessageReceiver");
 
-	//~--- fields ---------------------------------------------------------------
 	// PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 	@ConfigField(desc = "Incoming filters", alias = INCOMING_FILTERS_PROP_KEY)
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters = new CopyOnWriteArrayList<>();
@@ -240,8 +235,6 @@ public abstract class AbstractMessageReceiver
 		return "mean: " + mean + ", deviation: " + deviation +
 				(!outliers.isEmpty() ? ", outliers: " + outliers.toString() : "");
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public AbstractMessageReceiver() {
 		// initializing default value for incoming filters
@@ -639,8 +632,6 @@ public abstract class AbstractMessageReceiver
 		}    // end of else
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * This is the main <code>Packet</code> processing method. It is called concurrently from many threads so
 	 * implementing it in thread save manner is essential. The method is called for each packet addressed to the
@@ -697,10 +688,6 @@ public abstract class AbstractMessageReceiver
 		}
 		stopThreads();
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method returns a <code>Set</code> with all component's routings as a compiled regular expression patterns. The
@@ -839,10 +826,6 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
 	public void setIncomingFilters(List<PacketFilterIfc> filters) {
 		for (PacketFilterIfc filter : filters) {
 			filter.init(getName(), QueueType.IN_QUEUE);
@@ -936,8 +919,6 @@ public abstract class AbstractMessageReceiver
 			scheduler.shutdown();
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public boolean addOutPacketWithTimeout(Packet packet, ReceiverTimeoutHandler handler, long delay, TimeUnit unit) {
 
@@ -1046,13 +1027,9 @@ public abstract class AbstractMessageReceiver
 		receiverTasks.schedule(task, unit.toMillis(delay));
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected Integer getMaxQueueSize(int def) {
 		return def;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private Packet filterPacket(Packet packet, CopyOnWriteArrayList<PacketFilterIfc> filters) {
 		Packet result = packet;
@@ -1162,8 +1139,6 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class PacketReceiverTask
 			extends tigase.util.common.TimerTask {
 
@@ -1171,8 +1146,6 @@ public abstract class AbstractMessageReceiver
 		private String id = null;
 		private Packet packet = null;
 		private int retryCount = packetDeliveryRetryCount;
-
-		//~--- constructors -------------------------------------------------------
 
 		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay, TimeUnit unit, Packet packet) {
 			super();
@@ -1221,8 +1194,6 @@ public abstract class AbstractMessageReceiver
 			}
 		}
 
-		//~--- methods ------------------------------------------------------------
-
 		public void handleResponse(Packet response) {
 			this.cancel();
 
@@ -1256,14 +1227,11 @@ public abstract class AbstractMessageReceiver
 		private boolean threadStopped = false;
 		private QueueType type = null;
 
-		//~--- constructors -------------------------------------------------------
 		private QueueListener(PriorityQueueAbstract<Packet> q, QueueType type) {
 			this.queue = q;
 			this.type = type;
 			compName = AbstractMessageReceiver.this.getName();
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {

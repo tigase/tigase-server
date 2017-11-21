@@ -20,8 +20,6 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.component.exceptions.RepositoryException;
 import tigase.util.Version;
 import tigase.xmpp.jid.BareJID;
@@ -29,10 +27,6 @@ import tigase.xmpp.jid.BareJID;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * DummyRepository is a class with all methods empty. They don't return anything and they don't throw exception.
@@ -59,8 +53,6 @@ public class DummyRepository
 	@Override
 	public void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException {
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	// Implementation of tigase.db.UserRepository
 
@@ -150,8 +142,6 @@ public class DummyRepository
 		return 0;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void initialize(String connStr) throws RepositoryException {
 		// nothing to do
@@ -196,8 +186,6 @@ public class DummyRepository
 	public void removeUser(BareJID user) {
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setData(BareJID user, String subnode, String key, String value) {
 	}
@@ -209,8 +197,6 @@ public class DummyRepository
 	@Override
 	public void setDataList(BareJID user, String subnode, String key, String[] list) {
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void updatePassword(BareJID user, String password) throws UserNotFoundException, TigaseDBException {

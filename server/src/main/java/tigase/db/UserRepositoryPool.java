@@ -20,8 +20,6 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
 
@@ -32,10 +30,6 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Pool for user repositories. * <br> This pool should be used if connection to user storage is blocking or synchronized,
@@ -52,12 +46,8 @@ public class UserRepositoryPool
 
 	private static final Logger log = Logger.getLogger(UserRepositoryPool.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private Map<String, Object> cache = null;
 	private LinkedBlockingQueue<UserRepository> repoPool = new LinkedBlockingQueue<UserRepository>();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addDataList(BareJID user, String subnode, String key, String[] list)
@@ -93,8 +83,6 @@ public class UserRepositoryPool
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getData(BareJID user, String subnode, String key, String def)
@@ -325,8 +313,6 @@ public class UserRepositoryPool
 		return 0;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		if (resource_uri.contains("cacheRepo=off")) {
@@ -403,8 +389,6 @@ public class UserRepositoryPool
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, TigaseDBException {
@@ -456,8 +440,6 @@ public class UserRepositoryPool
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public UserRepository takeRepo() {
 		try {
 			return repoPool.take();
@@ -485,16 +467,12 @@ public class UserRepositoryPool
 		return false;
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class RepoCache
 			extends SimpleCache<String, Object> {
 
 				public RepoCache(int maxsize, long cache_time) {
 			super(maxsize, cache_time);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public Object remove(Object key) {
@@ -519,6 +497,3 @@ public class UserRepositoryPool
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

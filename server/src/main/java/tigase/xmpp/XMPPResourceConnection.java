@@ -20,8 +20,6 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
@@ -44,8 +42,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -77,8 +73,6 @@ public class XMPPResourceConnection
 	public static final String PRESENCE_KEY = "user-presence";
 
 	private static final Logger log = Logger.getLogger(XMPPResourceConnection.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
 
 	private long authenticationTime = 0;
 
@@ -117,8 +111,6 @@ public class XMPPResourceConnection
 	private boolean tmpSession = false;
 	private JID userJid = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public XMPPResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
 								  SessionManagerHandler loginHandler) {
 		super(rep, authRepo);
@@ -131,8 +123,6 @@ public class XMPPResourceConnection
 		this.lastAccessed = currTime;
 		sessionData = new ConcurrentHashMap<String, Object>(4, 0.9f);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void authorizeJID(BareJID jid, boolean anonymous) throws TigaseStringprepException {
 		authState = Authorization.AUTHORIZED;
@@ -161,8 +151,6 @@ public class XMPPResourceConnection
 //		}
 		login();
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method checks if in {@code parentSession} in session data there is value for passed {@code key} and returns it if
@@ -210,8 +198,6 @@ public class XMPPResourceConnection
 	public void incPacketsCounter() {
 		++packets_counter;
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Deprecated
 	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
@@ -385,8 +371,6 @@ public class XMPPResourceConnection
 
 		return parentSession.getActiveResources();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method returns list of jids of all connections for the same <code>XMPPSession</code> (same user).
@@ -590,8 +574,6 @@ public class XMPPResourceConnection
 		return this.resource;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Sets the connection resource
 	 *
@@ -674,8 +656,6 @@ public class XMPPResourceConnection
 		return this.getBareJID();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public final String getUserName() throws NotAuthorizedException {
 		if (!isAuthorized()) {
@@ -738,8 +718,6 @@ public class XMPPResourceConnection
 		return auth_res;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public boolean isEncrypted() {
 		String tls = (String) getSessionData("starttls");
 		return tls != null && "true".equals(tls);
@@ -769,4 +747,3 @@ public class XMPPResourceConnection
 
 }    // XMPPResourceConnection
 
-//~ Formatted in Tigase Code Convention on 13/11/02

@@ -19,18 +19,12 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jun 26, 2010 9:40:04 AM
@@ -44,11 +38,7 @@ public class S2SRandomSelector
 
 	private static final Logger log = Logger.getLogger(S2SRandomSelector.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private Random rand = new Random();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public S2SConnection selectConnection(Packet packet, Set<S2SConnection> outgoing) {
@@ -74,6 +64,3 @@ public class S2SRandomSelector
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

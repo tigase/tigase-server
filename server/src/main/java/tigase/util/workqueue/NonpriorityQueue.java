@@ -20,11 +20,7 @@
 
 package tigase.util.workqueue;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.concurrent.LinkedBlockingQueue;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Feb 9, 2010 11:32:30 AM
@@ -39,8 +35,6 @@ public class NonpriorityQueue<E>
 
 	private LinkedBlockingQueue<E> queue = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 
 	public NonpriorityQueue() {
 	}
@@ -48,8 +42,6 @@ public class NonpriorityQueue<E>
 	protected NonpriorityQueue(int maxSize) {
 		init(0, maxSize);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public final void init(int maxPriority, int maxSize) {
@@ -66,8 +58,6 @@ public class NonpriorityQueue<E>
 		queue.put(element);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setMaxSize(int maxSize) {
 
@@ -81,8 +71,6 @@ public class NonpriorityQueue<E>
 //     queue = new LinkedBlockingQueue<E>(newSize);
 //     oldQueue.drainTo(queue);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int[] size() {

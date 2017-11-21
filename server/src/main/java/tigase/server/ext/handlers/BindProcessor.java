@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ext.ComponentIOService;
@@ -36,8 +34,6 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 import static tigase.server.ext.ComponentProtocolHandler.EXTCOMP_BIND_HOSTNAMES_PROP_KEY;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Nov 2, 2009 2:37:18 PM
@@ -57,8 +53,6 @@ public class BindProcessor
 	private static final String ID = EL_NAME;
 	private static final Element FEATURES = new Element(EL_NAME, new String[]{"xmlns"}, new String[]{XMLNS});
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getId() {
 		return ID;
@@ -68,8 +62,6 @@ public class BindProcessor
 	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		return Arrays.asList(FEATURES);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {
@@ -140,4 +132,3 @@ public class BindProcessor
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/16

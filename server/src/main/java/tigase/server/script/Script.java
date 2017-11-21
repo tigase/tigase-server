@@ -20,8 +20,6 @@
 
 package tigase.server.script;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -32,10 +30,6 @@ import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jan 2, 2009 1:21:55 PM
@@ -48,15 +42,11 @@ public class Script
 
 	private static final Logger log = Logger.getLogger(Script.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private CompiledScript compiledScript = null;
 	private String ext = null;
 	private String language = null;
 	private String script = null;
 	private ScriptEngine scriptEngine = null;
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Bindings getBindings() {
@@ -70,8 +60,6 @@ public class Script
 	public String getLanguageName() {
 		return language;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void init(String id, String description, String group, String script, String lang, String ext,
 					 Bindings binds) throws ScriptException {
@@ -212,6 +200,3 @@ public class Script
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

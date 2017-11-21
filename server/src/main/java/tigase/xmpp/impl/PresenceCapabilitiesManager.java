@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -43,13 +41,9 @@ public class PresenceCapabilitiesManager {
 	private static long idCounter = 0;
 	private static Logger log = Logger.getLogger(PresenceCapabilitiesManager.class.getName());
 
-	//~--- set methods ----------------------------------------------------------
-
 	public static String[] getNodeFeatures(String capsNode) {
 		return nodeFeatures.get(capsNode);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static Set<String> getNodesWithFeature(String feature) {
 		Set<String> nodes = featureNodes.get(feature);
@@ -71,8 +65,6 @@ public class PresenceCapabilitiesManager {
 			handler.handlePresence(owner, from, capsNodes, results);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public static void prepareCapsQueries(JID compJid, JID to, String[] caps_nodes, Queue<Packet> results) {
 		if (caps_nodes != null) {
@@ -231,12 +223,9 @@ public class PresenceCapabilitiesManager {
 		handlers.remove(handler);
 	}
 
-	//~--- inner interfaces -----------------------------------------------------
-
 	public static interface PresenceCapabilitiesListener {
 
 		void handlePresence(JID owner, JID sender, String[] capsNodes, Queue<Packet> results);
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

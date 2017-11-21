@@ -19,18 +19,12 @@
  */
 package tigase.server.amp.action;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.AmpComponent;
 import tigase.xml.Element;
 import tigase.xmpp.PacketErrorTypeException;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 27, 2010 5:35:45 PM
@@ -52,8 +46,6 @@ public class Error
 															  new String[]{"type", "code"},
 															  new String[]{"modify", "500"});
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		try {
@@ -72,8 +64,6 @@ public class Error
 
 		return false;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getName() {

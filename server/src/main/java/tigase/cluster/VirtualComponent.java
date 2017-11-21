@@ -139,8 +139,6 @@ public class VirtualComponent
 
 	private static final Logger log = Logger.getLogger("tigase.cluster.VirtualComponent");
 
-	//~--- fields ---------------------------------------------------------------
-
 	protected VHostManagerIfc vHostManager = null;
 	private ComponentInfo cmpInfo = null;
 	private JID componentId = null;
@@ -161,8 +159,6 @@ public class VirtualComponent
 	@ConfigField(desc = "Redirect to")
 	private JID redirectTo = null;
 	private ServiceEntity serviceEntity = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean handlesLocalDomains() {

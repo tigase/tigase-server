@@ -20,8 +20,6 @@
 
 package tigase.server.bosh;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -31,8 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class BoshSessionCache here.
@@ -54,8 +50,6 @@ public class BoshSessionCache {
 	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshSessionCache");
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-	//~--- fields ---------------------------------------------------------------
-
 	/**
 	 * Cached time of the first message to/from some jid to speedup message caching processing
 	 */
@@ -73,8 +67,6 @@ public class BoshSessionCache {
 	 */
 	private Map<String, Element> jid_presence = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>BoshSessionCache</code> instance.
 	 */
@@ -83,8 +75,6 @@ public class BoshSessionCache {
 		jid_presence = new LinkedHashMap<String, Element>();
 		jid_msg_start = new LinkedHashMap<String, Long>();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void add(String id, List<Element> data) {
 		if (id == null) {
@@ -148,8 +138,6 @@ public class BoshSessionCache {
 		addMsgBody(jid, Packet.TO_ATT, body);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public List<Element> get(String id) {
 		if (id == null) {
 			id = DEF_ID;
@@ -196,8 +184,6 @@ public class BoshSessionCache {
 		return result;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public List<Element> remove(String id) {
 		if (id == null) {
 			id = DEF_ID;
@@ -212,8 +198,6 @@ public class BoshSessionCache {
 		return data;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void set(String id, List<Element> data) {
 		if (id == null) {
 			id = DEF_ID;
@@ -227,8 +211,6 @@ public class BoshSessionCache {
 			log.finest("SET, id = " + id + ", DATA: " + data.toString());
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void addMsgBody(String jid, String direction, Element body) {
 		long start_time = getMsgStartTime(jid);
@@ -261,8 +243,6 @@ public class BoshSessionCache {
 						   new String[]{"type", "id"}, new String[]{"set", "" + System.currentTimeMillis()});
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	private long getMsgStartTime(String jid) {
 		Long start_time = jid_msg_start.get(jid);
 
@@ -275,4 +255,3 @@ public class BoshSessionCache {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20

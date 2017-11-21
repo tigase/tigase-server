@@ -20,8 +20,6 @@
 
 package tigase.server.amp.action;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
@@ -40,8 +38,6 @@ public class Deliver
 
 	private static final String name = "deliver";
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		Packet result = packet.copyElementOnly();
@@ -52,8 +48,6 @@ public class Deliver
 		resultsHandler.addOutPacket(result);
 		return true;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getName() {

@@ -20,8 +20,6 @@
 
 package tigase.db.jdbc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.*;
 import tigase.db.Repository.Meta;
 import tigase.util.Algorithms;
@@ -41,10 +39,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Describe class DrupalWPAuth here.
  * <br>
@@ -76,8 +70,6 @@ public class DrupalWPAuth
 	private static final String UPDATE_LAST_LOGIN_QUERY_KEY = "update-last-login-drupal-wp-query-key";
 	private static final String UPDATE_ONLINE_STATUS_QUERY_KEY = "update-online-status-drupal-wp-query-key";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private DataRepository data_repo = null;
 	private boolean last_login = true;
 	private String name_fld = DRUPAL_NAME_FLD;
@@ -86,8 +78,6 @@ public class DrupalWPAuth
 	private String status_fld = DRUPAL_STATUS_FLD;
 	private int status_val = DRUPAL_OK_STATUS_VAL;
 	private String users_tbl = DRUPAL_USERS_TBL;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
@@ -106,8 +96,6 @@ public class DrupalWPAuth
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
@@ -123,7 +111,6 @@ public class DrupalWPAuth
 		return -1;
 	}
 
-	//~--- methods --------------------------------------------------------------
 	@Override
 	public void setDataSource(DataRepository dataSource) throws DBInitException {
 		try {
@@ -334,8 +321,6 @@ public class DrupalWPAuth
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return false;
@@ -408,8 +393,6 @@ public class DrupalWPAuth
 			}
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private boolean saslAuth(final Map<String, Object> props) throws AuthorizationException {
 		try {
@@ -495,20 +478,14 @@ public class DrupalWPAuth
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class SaslCallbackHandler
 			implements CallbackHandler {
 
 		private Map<String, Object> options = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private SaslCallbackHandler(final Map<String, Object> options) {
 			this.options = options;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		// Implementation of javax.security.auth.callback.CallbackHandler
 
@@ -588,6 +565,3 @@ public class DrupalWPAuth
 	}
 }    // DrupalWPAuth
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

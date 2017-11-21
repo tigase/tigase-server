@@ -20,8 +20,6 @@
 
 package tigase.net;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
 import tigase.io.*;
@@ -90,7 +88,6 @@ public abstract class IOService<RefObject>
 	private static final Logger log = Logger.getLogger(IOService.class.getName());
 	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
 
-	//~--- fields ---------------------------------------------------------------
 	private final ReentrantLock readInProgress = new ReentrantLock();
 	private final ReentrantLock writeInProgress = new ReentrantLock();
 	protected CharBuffer cb = CharBuffer.allocate(2048);
@@ -134,7 +131,6 @@ public abstract class IOService<RefObject>
 	private byte[] tlsUniqueId;
 	private long[] wrData = new long[60];
 
-	//~--- methods --------------------------------------------------------------
 	private TrustManager[] x509TrustManagers;
 
 	public void accept(final SocketChannel socketChannel) throws IOException {
@@ -456,8 +452,6 @@ public abstract class IOService<RefObject>
 		return socketIO.waitingToSendSize();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public long getBuffOverflow(boolean reset) {
 		return socketIO.getBuffOverflow(reset);
 	}
@@ -574,8 +568,6 @@ public abstract class IOService<RefObject>
 		return socketIO.getTotalBytesReceived();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public long getTotalBytesSent() {
 		return socketIO.getTotalBytesSent();
 	}
@@ -621,8 +613,6 @@ public abstract class IOService<RefObject>
 	public void setX509TrustManagers(TrustManager[] trustManager) {
 		this.x509TrustManagers = trustManager;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public Certificate getPeerCertificate() {
 		return peerCertificate;
@@ -1013,19 +1003,13 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected boolean isSocketServiceReady() {
 		return socketServiceReady;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	protected void setSocketServiceReady(boolean value) {
 		this.socketServiceReady = value;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	protected boolean isInputBufferEmpty() {
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
@@ -1094,4 +1078,3 @@ public abstract class IOService<RefObject>
 
 }    // IOService
 
-//~ Formatted in Tigase Code Convention on 13/05/29

@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.stats.StatisticsList;
 
 import javax.net.ssl.SSLEngineResult;
@@ -32,10 +30,6 @@ import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TLSIO here.
@@ -52,8 +46,6 @@ public class TLSIO
 
 	private static final Logger log = Logger.getLogger(TLSIO.class.getName());
 
-	// ~--- fields ---------------------------------------------------------------
-
 	private IOInterface io = null;
 
 	/**
@@ -65,8 +57,6 @@ public class TLSIO
 	 * <code>tlsWrapper</code> is a TLS wrapper for connections requiring TLS protocol.
 	 */
 	private TLSWrapper tlsWrapper = null;
-
-	// ~--- constructors ---------------------------------------------------------
 
 	// /**
 	// * Creates a new <code>TLSIO</code> instance.
@@ -97,8 +87,6 @@ public class TLSIO
 			write(ByteBuffer.allocate(0));
 		} // end of if (tlsWrapper.isClientMode())
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public int bytesRead() {
@@ -140,8 +128,6 @@ public class TLSIO
 		return caps.contains(TLS_CAPS) || io.checkCapabilities(caps);
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	@Override
 	public int getInputPacketSize() throws IOException {
 		return tlsWrapper.getPacketBuffSize();
@@ -168,8 +154,6 @@ public class TLSIO
 	public boolean isRemoteAddress(String addr) {
 		return io.isRemoteAddress(addr);
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {

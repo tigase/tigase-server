@@ -20,8 +20,6 @@
 
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.SessionManagerClustered;
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.CommandListenerAbstract;
@@ -39,8 +37,6 @@ import tigase.xmpp.jid.JID;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -73,13 +69,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	private static final String USER_CONNECTED_CMD = "user-connected-sm-cmd";
 	private static final String USER_PRESENCE_CMD = "user-presence-sm-cmd";
 
-	//~--- fields ---------------------------------------------------------------
-
 	// Simple random generator, we do not need a strong randomization here.
 	// Just enough to ensure better traffic distribution
 	private Random rand = new Random();
-
-	//~--- constructors ---------------------------------------------------------
 
 
 	public DefaultClusteringStrategy() {
@@ -87,8 +79,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		addCommandListener(new UserPresenceCommand(USER_PRESENCE_CMD));
 		addCommandListener(new UserConnectedCommand(USER_CONNECTED_CMD));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void nodeConnected(JID node) {
@@ -191,8 +181,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 		if (visitedNodes != null) {
@@ -236,8 +224,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * A utility method used to prepare a Map of data with user session data before it can be sent over to another
 	 * cluster node. This is supposed to contain all the user's session essential information which directly identify
@@ -267,8 +253,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		return params;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method takes the data received from other cluster node and creates a ConnectionRecord with all essential
 	 * connection information. This might be used later to identify user's XMPPResourceConnection or use the clustering
@@ -294,8 +278,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 		return rec;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
@@ -359,16 +341,12 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		return result;
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class UserConnectedCommand
 			extends CommandListenerAbstract {
 
 		public UserConnectedCommand(String name) {
 			super(name, Priority.CLUSTER);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
@@ -427,8 +405,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		public UserPresenceCommand(String name) {
 			super(name, Priority.CLUSTER);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
@@ -493,4 +469,3 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

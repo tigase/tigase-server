@@ -45,15 +45,12 @@ public abstract class TigaseRuntime {
 	protected static final long HOUR = 60 * MINUTE;
 	private static final Logger log = Logger.getLogger(TigaseRuntime.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private float cpuUsage = 0F;
 	private int cpus = Runtime.getRuntime().availableProcessors();
 	private Map<String, MemoryPoolMXBean> memoryPoolMXBeans = null;
 	private MemoryPoolMXBean oldMemPool = null;
 	private long prevCputime = 0;
 	private long prevUptime = 0;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static TigaseRuntime getTigaseRuntime() {
 		return MonitorRuntime.getMonitorRuntime();
@@ -90,8 +87,6 @@ public abstract class TigaseRuntime {
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	public Map<String, MemoryPoolMXBean> getMemoryPoolMXBeans() {
 		return memoryPoolMXBeans;
 	}
@@ -103,8 +98,6 @@ public abstract class TigaseRuntime {
 	public abstract void addCPULoadListener(CPULoadListener cpuListener);
 
 	public abstract void addMemoryChangeListener(MemoryChangeListener memListener);
-
-	//~--- get methods ----------------------------------------------------------
 
 	public abstract void addOnlineJidsReporter(OnlineJidsReporter onlineReporter);
 

@@ -20,15 +20,11 @@
 
 package tigase.auth;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.XMPPResourceConnection;
 
 import javax.security.sasl.SaslServerFactory;
 import java.util.Collection;
 import java.util.Enumeration;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface for implementing selectors of SASL mechanisms.
@@ -48,4 +44,3 @@ public interface MechanismSelector {
 
 }
 
-//~ Formatted in Tigase Code Convention on 13/09/21

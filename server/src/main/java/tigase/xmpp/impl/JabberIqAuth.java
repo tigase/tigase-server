@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.auth.TigaseSaslProvider;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
@@ -43,8 +41,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * JEP-0078: Non-SASL Authentication
@@ -74,8 +70,6 @@ public class JabberIqAuth
 
 	@Inject
 	private TigaseSaslProvider saslProvider;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.net.ConnectionType;
 import tigase.server.xmppserver.*;
@@ -29,10 +27,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 1:59:56 PM
@@ -45,8 +39,6 @@ public class StreamOpen
 		extends S2SAbstractProcessor {
 
 	private static final Logger log = Logger.getLogger(StreamOpen.class.getName());
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {
@@ -236,6 +228,3 @@ public class StreamOpen
 	}
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

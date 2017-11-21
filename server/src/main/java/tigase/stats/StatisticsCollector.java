@@ -20,8 +20,6 @@
 
 package tigase.stats;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -77,7 +75,6 @@ public class StatisticsCollector
 	private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
 	private static final Logger log = Logger.getLogger(StatisticsCollector.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
 	private final Timer everyX = new Timer("stats-timer", true);
 	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
@@ -96,8 +93,6 @@ public class StatisticsCollector
 	private Level statsLevel = Level.INFO;
 	@ConfigField(desc = "Update interval", alias = STATS_UPDATE_INTERVAL_PROP_KEY)
 	private long updateInterval = 10;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void componentAdded(StatisticsContainer component) {
@@ -311,8 +306,6 @@ public class StatisticsCollector
 		return sb.toString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public StatisticsList getAllStats() {
 		StatisticsList list = new StatisticsList(Level.ALL);
 
@@ -413,8 +406,6 @@ public class StatisticsCollector
 		serviceEntity.addFeatures(CMD_FEATURES);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof StatisticsContainer;
@@ -429,8 +420,6 @@ public class StatisticsCollector
 	public void unregister(Kernel kernel) {
 
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void setArchivizers(StatisticsArchivizerIfc[] archivizers) {
 		if (archivizers == null) {
@@ -467,24 +456,16 @@ public class StatisticsCollector
 		esp.update(sp);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	//~--- inner classes --------------------------------------------------------
-
 	private class ArchivizerRunner
 			extends Thread {
 
 		private boolean stopped = false;
-
-		//~--- constructors -------------------------------------------------------
 
 		private ArchivizerRunner() {
 			super("stats-archivizer");
 			setDaemon(true);
 			start();
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {
@@ -505,4 +486,3 @@ public class StatisticsCollector
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/11/29

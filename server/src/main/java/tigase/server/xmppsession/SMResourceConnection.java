@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppsession;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -31,10 +29,6 @@ import tigase.xmpp.jid.JID;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Feb 27, 2010 8:02:11 PM
@@ -55,8 +49,6 @@ public class SMResourceConnection
 			Logger.getLogger(SMResourceConnection.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public boolean isServerSession() {

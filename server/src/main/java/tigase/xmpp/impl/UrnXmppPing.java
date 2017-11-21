@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
@@ -37,8 +35,6 @@ import tigase.xmpp.jid.JID;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * XEP-0199: XMPP Ping
@@ -56,8 +52,6 @@ public class UrnXmppPing
 	protected static final String ID = XMLNS;
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 	private static final String[] XMLNSS = {XMLNS};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

@@ -20,8 +20,6 @@
 
 package tigase.db.jdbc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.*;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.util.cache.SimpleCache;
@@ -93,8 +91,6 @@ public class JDBCRepository
 	private static final String UPDATE_LAST_LOGIN_QUERY =
 			"update " + DEF_USERS_TBL + " set last_login=? where user_id=?";
 
-	//~--- fields ---------------------------------------------------------------
-
 	// ~--- fields ---------------------------------------------------------------
 	private AuthRepository auth = null;
 	private boolean autoCreateUser = false;
@@ -102,8 +98,6 @@ public class JDBCRepository
 	private Map<String, Object> cache = null;
 	private DataRepository data_repo = null;
 	private String get_users_query = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addDataList(BareJID user_id, final String subnode, final String key, final String[] list)
@@ -173,8 +167,6 @@ public class JDBCRepository
 			throw new TigaseDBException("Error getting user data for: " + user_id + "/" + subnode + "/" + key, e);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getData(BareJID user_id, final String subnode, final String key)
@@ -416,7 +408,6 @@ public class JDBCRepository
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
 	@Override
 	public void setDataSource(DataRepository dataSource) throws DBInitException {
 		data_repo = dataSource;
@@ -670,8 +661,6 @@ public class JDBCRepository
 
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void updatePassword(BareJID user, final String password) throws TigaseDBException {
 		auth.updatePassword(user, password);
@@ -693,8 +682,6 @@ public class JDBCRepository
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
@@ -876,8 +863,6 @@ public class JDBCRepository
 		// return new_nid;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * <code>addUserRepo</code> method is thread safe. It uses local variable for storing <code>Statement</code>.
 	 *
@@ -1058,8 +1043,6 @@ public class JDBCRepository
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private long getNodeNID(DataRepository repo, long uid, String node_path)
 			throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
@@ -1201,8 +1184,6 @@ public class JDBCRepository
 				public RepoCache(int maxsize, long cache_time) {
 			super(maxsize, cache_time);
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public Object remove(Object key) {

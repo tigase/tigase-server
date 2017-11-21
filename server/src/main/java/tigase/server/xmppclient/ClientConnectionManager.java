@@ -20,8 +20,6 @@
 
 package tigase.server.xmppclient;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
@@ -82,7 +80,6 @@ public class ClientConnectionManager
 	private static final boolean TLS_WANT_CLIENT_AUTH_ENABLED_DEF = false;
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
 
-	//~--- fields ---------------------------------------------------------------
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 	private final ReceiverTimeoutHandler startedHandler = newStartedHandler();
 	//private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
@@ -106,8 +103,6 @@ public class ClientConnectionManager
 	@Inject(bean = RegistrationThrottling.ID, nullAllowed = true)
 	private RegistrationThrottling registrationThrottling;
 	private long socket_close_wait_time = SOCKET_CLOSE_WAIT_PROP_DEF;
-
-	//~--- methods --------------------------------------------------------------
 
 	public ClientConnectionManager() {
 
@@ -494,8 +489,6 @@ public class ClientConnectionManager
 		return "c2s";
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getDiscoDescription() {
 		return "Client connection manager";
@@ -535,14 +528,10 @@ public class ClientConnectionManager
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public int schedulerThreads() {
 		return 2;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public ClientTrustManagerFactory getClientTrustManagerFactory() {
 		return clientTrustManagerFactory;
@@ -866,8 +855,6 @@ public class ClientConnectionManager
 		}    // end of switch (pc.getCommand())
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[]{5222};
@@ -1017,8 +1004,6 @@ public class ClientConnectionManager
 	private JID getFromAddress(String id) {
 		return JID.jidInstanceNS(getName(), getDefHostName().getDomain(), id);
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {
 		XMPPIOService<Object> serv = getXMPPIOService(p);

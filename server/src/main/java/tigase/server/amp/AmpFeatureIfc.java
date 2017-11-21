@@ -19,10 +19,6 @@
  */
 package tigase.server.amp;
 
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
-
 /**
  * Created: Apr 28, 2010 5:38:24 PM
  *
@@ -59,11 +55,6 @@ public interface AmpFeatureIfc {
 
 	public static final String ACTION_ATT = "action";
 
-	//~--- get methods ----------------------------------------------------------
-
 	String getName();
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

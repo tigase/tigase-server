@@ -20,11 +20,7 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.jid.BareJID;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 24, 2009 3:57:36 PM
@@ -36,8 +32,6 @@ public abstract class CompRepoDefaults {
 
 	private static final BareJID comp_user = BareJID.bareJIDInstanceNS("ext-comp-manager");
 	private static final String comp_list_pkey = "ext-comp-lists";
-
-	//~--- get methods ----------------------------------------------------------
 
 	public static String getConfigKey() {
 		return "comp-items";
@@ -64,6 +58,3 @@ public abstract class CompRepoDefaults {
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

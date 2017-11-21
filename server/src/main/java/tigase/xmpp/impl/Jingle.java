@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
@@ -35,8 +33,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class Jingle here.
@@ -59,8 +55,6 @@ public class Jingle
 											"http://www.xmpp.org/extensions/xep-0166.html#ns",
 											"http://www.xmpp.org/extensions/xep-0167.html#ns",
 											"http://www.google.com/session"};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

@@ -20,8 +20,6 @@
 
 package tigase.conf;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
@@ -36,8 +34,6 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 15, 2009 10:44:00 PM
@@ -56,11 +52,7 @@ public class ConfigSQLRepository
 
 	private static final Logger log = Logger.getLogger(ConfigSQLRepository.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private JDBCAccess dbAccess = new JDBCAccess();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addItem(String compName, ConfigItem item) {
@@ -71,8 +63,6 @@ public class ConfigSQLRepository
 	public Collection<ConfigItem> allItems() throws TigaseDBException {
 		return dbAccess.getAllItems();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String[] getCompNames() {
@@ -93,8 +83,6 @@ public class ConfigSQLRepository
 	public String[] getKeys(String compName, String node) {
 		return dbAccess.getKeys(compName, node);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initRepository(String repo_uri, Map<String, String> params) throws DBInitException {
@@ -139,8 +127,6 @@ public class ConfigSQLRepository
 	public int size() {
 		return dbAccess.getPropertiesCount();
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	private class JDBCAccess {
 
@@ -194,11 +180,7 @@ public class ConfigSQLRepository
 				"select " + KEY_NAME_COLUMN + " from " + TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART + " AND (" +
 						COMPONENT_NAME_COLUMN + " = ?)" + " AND (" + NODE_NAME_COLUMN + " = ?)";
 
-		//~--- fields -------------------------------------------------------------
-
 		private DataRepository data_repo = null;
-
-		//~--- methods ------------------------------------------------------------
 
 		public void initRepository(String conn_str, Map<String, String> params) throws SQLException {
 			try {
@@ -289,8 +271,6 @@ public class ConfigSQLRepository
 
 			return result;
 		}
-
-		//~--- get methods --------------------------------------------------------
 
 		private Collection<ConfigItem> getAllItems() {
 			List<ConfigItem> result = new ArrayList<ConfigItem>();
@@ -469,8 +449,6 @@ public class ConfigSQLRepository
 			return result;
 		}
 
-		//~--- methods ------------------------------------------------------------
-
 		private void removeItem(ConfigItem item) {
 			try {
 				PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
@@ -489,6 +467,3 @@ public class ConfigSQLRepository
 	}
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

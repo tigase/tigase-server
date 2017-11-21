@@ -20,8 +20,6 @@
 
 package tigase.server.ext.handlers;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
@@ -31,10 +29,6 @@ import tigase.xml.Element;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 31, 2009 3:51:09 PM
@@ -51,8 +45,6 @@ public class StreamFeaturesProcessor
 	private static final String STARTTLS = "starttls";
 	private static final String SASL = "sasl";
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public String getId() {
 		return ID;
@@ -62,8 +54,6 @@ public class StreamFeaturesProcessor
 	public List<Element> getStreamFeatures(ComponentIOService serv, ComponentProtocolHandler handler) {
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler, Queue<Packet> results) {

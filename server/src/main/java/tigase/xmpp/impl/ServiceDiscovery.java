@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.disco.XMPPServiceCollector;
 import tigase.kernel.beans.Bean;
@@ -37,8 +35,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Implementation of JEP-030.
@@ -59,8 +55,6 @@ public class ServiceDiscovery
 	private static final Element[] DISCO_FEATURES = {
 			new Element("feature", new String[]{"var"}, new String[]{XMPPServiceCollector.INFO_XMLNS}),
 			new Element("feature", new String[]{"var"}, new String[]{XMPPServiceCollector.ITEMS_XMLNS})};
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {

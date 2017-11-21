@@ -20,8 +20,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.conf.Configurable;
@@ -89,7 +87,6 @@ public class BasicComponent
 
 	private static final Logger log = Logger.getLogger(BasicComponent.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private final CopyOnWriteArrayList<JID> connectedNodes = new CopyOnWriteArrayList<JID>();
 	private final CopyOnWriteArrayList<JID> connectedNodesWithLocal = new CopyOnWriteArrayList<JID>();
 	private final List<JID> connectedNodesWithLocal_ro = Collections.unmodifiableList(connectedNodesWithLocal);
@@ -128,8 +125,6 @@ public class BasicComponent
 		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
 		defHostname = BareJID.bareJIDInstanceNS(DEF_HOSTNAME_PROP_VAL);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addComponentDomain(String domain) {
 		vHostManager.addComponentDomain(domain);
@@ -422,8 +417,6 @@ public class BasicComponent
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public JID getComponentId() {
 		return compId;
@@ -678,8 +671,6 @@ public class BasicComponent
 		return trusted.contains(jid);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setAdmins(Set<BareJID> admins) {
 		this.admins.addAll(admins);
 		this.admins.retainAll(admins);
@@ -715,8 +706,6 @@ public class BasicComponent
 	public List<JID> getNodesConnected() {
 		return connectedNodes_ro;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public List<JID> getNodesConnectedWithLocal() {
 		return connectedNodesWithLocal_ro;
@@ -822,8 +811,6 @@ public class BasicComponent
 
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected void onNodeDisconnected(JID jid) {
 
 	}
@@ -835,8 +822,6 @@ public class BasicComponent
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	protected boolean isNonAdminCommands() {
 		return nonAdminCommands;
@@ -1039,4 +1024,3 @@ public class BasicComponent
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/12/09

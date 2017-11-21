@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
@@ -28,10 +26,6 @@ import tigase.xml.Element;
 
 import java.util.List;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 2:01:12 PM
@@ -47,8 +41,6 @@ public class StartZlib
 	private static final Element features = new Element("compression", new Element[]{new Element("method", "zlib")},
 														new String[]{"xmlns"},
 														new String[]{"http://jabber.org/features/compress"});
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {

@@ -26,12 +26,8 @@
  */
 package tigase.cluster.api;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Priority;
 import tigase.stats.StatisticsList;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * @author kobit
@@ -42,18 +38,12 @@ public abstract class CommandListenerAbstract
 	private static long syncInTraffic = 0;
 	private static long syncOutTraffic = 0;
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String commandName;
 	private Priority priority;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static long getSyncInTraffic() {
 		return syncInTraffic;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public static long getSyncOutTraffic() {
 		return syncOutTraffic;
@@ -84,8 +74,6 @@ public abstract class CommandListenerAbstract
 		return hash;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public synchronized void incSyncInTraffic() {
 		++syncInTraffic;
 	}
@@ -108,8 +96,6 @@ public abstract class CommandListenerAbstract
 	public Priority getPriority() {
 		return priority;
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	public void setPriority(Priority priority) {
 		this.priority = priority;

@@ -20,8 +20,6 @@
 
 package tigase.server.amp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -65,7 +63,6 @@ public class AmpComponent
 	private static final String AMP_XMLNS = AMP_NODE;
 	private static final Element top_feature = new Element("feature", new String[]{"var"}, new String[]{AMP_NODE});
 
-	//~--- fields ---------------------------------------------------------------
 	@Inject
 	protected Broadcast broadcast = null;
 	// ~--- fields ---------------------------------------------------------------
@@ -84,10 +81,6 @@ public class AmpComponent
 
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
@@ -97,8 +90,6 @@ public class AmpComponent
 	public boolean addOutPackets(Queue<Packet> packets) {
 		return super.addOutPackets(packets);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getDiscoCategoryType() {
@@ -148,8 +139,6 @@ public class AmpComponent
 
 		return query;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void processPacket(Packet packet) {
@@ -212,8 +201,6 @@ public class AmpComponent
 		this.actions = map;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void register(Kernel kernel) {
 
@@ -275,8 +262,3 @@ public class AmpComponent
 	}
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-//~ Formatted in Tigase Code Convention on 13/02/20

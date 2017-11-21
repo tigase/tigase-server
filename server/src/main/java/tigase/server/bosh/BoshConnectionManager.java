@@ -20,8 +20,6 @@
 
 package tigase.server.bosh;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ClusterModeRequired;
@@ -75,7 +73,6 @@ public class BoshConnectionManager
 	private static final Logger log = Logger.getLogger(BoshConnectionManager.class.getName());
 	private static final int DEF_PORT_NO = 5280;
 
-	//~--- fields ---------------------------------------------------------------
 	private static Handler sidFilehandler;
 	protected final Map<UUID, BoshSession> sessions = new ConcurrentSkipListMap<UUID, BoshSession>();
 	private int[] PORTS = {DEF_PORT_NO};
@@ -149,8 +146,6 @@ public class BoshConnectionManager
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs, boolean withTimeout) {
 		packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
@@ -195,8 +190,6 @@ public class BoshConnectionManager
 		}
 		super.processPacket(packet);
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
@@ -371,8 +364,6 @@ public class BoshConnectionManager
 				"</stream:stream>";
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public String getDiscoCategoryType() {
 		return "c2s";
@@ -394,8 +385,6 @@ public class BoshConnectionManager
 	public JID getJidForBoshSession(BoshSession bs) {
 		return getFromAddress(bs.getSid().toString());
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public Element getSeeOtherHostError(Packet packet, BareJID destination) {
@@ -482,14 +471,10 @@ public class BoshConnectionManager
 		super.initialize();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public boolean isCloseConnections() {
 		return closeConnections;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String getClientAccessPolicy() {
@@ -541,8 +526,6 @@ public class BoshConnectionManager
 	protected void setupWatchdogThread() {
 		// having watchdog for bosh connections is not needed
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	protected Map<String, String> preBindSession(Map<String, String> attr) {
 		String hostname = attr.get(TO_ATTR);
@@ -861,8 +844,6 @@ public class BoshConnectionManager
 		}
 
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	// ~--- inner classes --------------------------------------------------------
 	private class StartedHandler

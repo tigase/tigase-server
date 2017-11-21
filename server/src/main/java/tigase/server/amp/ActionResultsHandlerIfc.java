@@ -19,15 +19,9 @@
  */
 package tigase.server.amp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: May 1, 2010 3:26:50 PM
@@ -42,6 +36,3 @@ public interface ActionResultsHandlerIfc {
 	boolean addOutPackets(Queue<Packet> packets);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

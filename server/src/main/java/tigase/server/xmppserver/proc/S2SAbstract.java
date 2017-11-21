@@ -73,7 +73,6 @@ public class S2SAbstract {
 	private static final Logger log = Logger.getLogger(S2SAbstract.class.getName());
 	public static boolean FORCE_VERSION = false;
 
-	//~--- fields ---------------------------------------------------------------
 	@Inject(nullAllowed = true)
 	protected S2SConnectionHandlerIfc<S2SIOService> handler = null;
 

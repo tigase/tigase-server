@@ -20,8 +20,6 @@
 
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
@@ -101,7 +99,6 @@ public class S2SConnectionManager
 	private static final String XMLNS_CLIENT_VAL = "jabber:client";
 	private static final String XMLNS_SERVER_VAL = "jabber:server";
 
-	//~--- fields ---------------------------------------------------------------
 	/**
 	 * Outgoing and incoming connections for a given domains pair (localdomain, remotedomain)
 	 */
@@ -140,8 +137,6 @@ public class S2SConnectionManager
 	@Inject
 	private List<S2SProcessor> processors = Collections.emptyList();
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
@@ -158,8 +153,6 @@ public class S2SConnectionManager
 	public void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		super.addTimerTask(task, delay, unit);
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -181,8 +174,6 @@ public class S2SConnectionManager
 		// thread
 		return 1;
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initBindings(Bindings binds) {
@@ -452,8 +443,6 @@ public class S2SConnectionManager
 		return result;
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public void tlsHandshakeCompleted(S2SIOService serv) {
 		for (S2SProcessor proc : processors) {
@@ -497,8 +486,6 @@ public class S2SConnectionManager
 
 		return (sb.length() == 0) ? null : sb.toString();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public CIDConnections getCIDConnections(CID cid, boolean createNew)
@@ -643,15 +630,11 @@ public class S2SConnectionManager
 		return false;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setProcessors(List<S2SProcessor> processors) {
 		List<S2SProcessor> tmp_processors = new ArrayList<>(processors);
 		Collections.sort(tmp_processors);
 		this.processors = Collections.unmodifiableList(tmp_processors);
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -689,8 +672,6 @@ public class S2SConnectionManager
 		return true;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	protected CIDConnections createNewCIDConnections(CID cid) throws NotLocalhostException, LocalhostException {
 		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
 			throw new NotLocalhostException("This is not a valid localhost: " + cid.getLocalHost());
@@ -706,8 +687,6 @@ public class S2SConnectionManager
 
 		return cid_conns;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
 	private CIDConnections getCIDConnections(CID cid) {
@@ -858,8 +837,3 @@ public class S2SConnectionManager
 	}
 }
 
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-//~ Formatted in Tigase Code Convention on 13/10/15

@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
@@ -38,8 +36,6 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for queuing packets (usable in connections from mobile clients - power usage optimization) version
@@ -71,14 +67,10 @@ public class MobileV1
 	// keys
 	private static final String LAST_TRANSFER_KEY = ID + "-last-transfer";
 
-	//~--- fields ---------------------------------------------------------------
-
 	@ConfigField(desc = "Max queue size", alias = MAX_QUEUE_SIZE_KEY)
 	private int maxQueueSize = DEF_MAX_QUEUE_SIZE_VAL;
 	@ConfigField(desc = "Max timeout", alias = MAX_TIMEOUT_KEY)
 	private long maxTimeout = DEF_MAX_TIMEOUT_VAL;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -285,8 +277,6 @@ public class MobileV1
 		return true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	protected void flushQueue(XMPPResourceConnection session, Queue<Packet> results) {
 		Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
 
@@ -337,8 +327,6 @@ public class MobileV1
 		return false;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Update last send time
 	 *
@@ -347,8 +335,6 @@ public class MobileV1
 	protected void updateLastAccessTime(XMPPResourceConnection session) {
 		session.putSessionData(LAST_TRANSFER_KEY, System.currentTimeMillis());
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Get timeout used for session queue
@@ -365,8 +351,6 @@ public class MobileV1
 		return timeout;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Set timeout for session queue
 	 *
@@ -382,4 +366,3 @@ public class MobileV1
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/16

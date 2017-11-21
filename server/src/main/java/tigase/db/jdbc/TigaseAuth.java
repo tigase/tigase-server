@@ -20,8 +20,6 @@
 
 package tigase.db.jdbc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.util.RepositoryVersionAware;
@@ -38,10 +36,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.db.AuthRepository.Meta;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TigaseAuth here.
@@ -72,11 +66,7 @@ public class TigaseAuth
 	private static final String USERS_DOMAIN_COUNT_QUERY = "select count(*) from tig_users where user_id like ?";
 	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private DataRepository data_repo = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
@@ -100,8 +90,6 @@ public class TigaseAuth
 			throw new TigaseDBException("Problem accessing repository.", e);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getResourceUri() {
@@ -173,8 +161,6 @@ public class TigaseAuth
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void setDataSource(DataRepository dataSource) throws DBInitException {
@@ -347,8 +333,6 @@ public class TigaseAuth
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return false;
@@ -425,8 +409,6 @@ public class TigaseAuth
 		}    // end of catch
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private boolean saslAuth(final Map<String, Object> props)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException, TigaseStringprepException {
 		String data_str = (String) props.get(DATA_KEY);
@@ -468,6 +450,3 @@ public class TigaseAuth
 	}
 }    // TigaseAuth
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

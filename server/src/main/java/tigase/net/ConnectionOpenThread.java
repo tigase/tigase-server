@@ -20,8 +20,6 @@
 
 package tigase.net;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
@@ -56,14 +54,11 @@ public class ConnectionOpenThread
 	public static Map<Integer, PortThrottlingData> throttling = new ConcurrentHashMap<Integer, PortThrottlingData>(10);
 	private static ConnectionOpenThread acceptThread = null;
 
-	//~--- fields ---------------------------------------------------------------
 	protected long accept_counter = 0;
 	private Selector selector = null;
 	private boolean stopping = false;
 	private Timer timer = null;
 	private ConcurrentLinkedQueue<ConnectionOpenListener> waiting = new ConcurrentLinkedQueue<ConnectionOpenListener>();
-
-	//~--- constructors ---------------------------------------------------------
 
 	public static ConnectionOpenThread getInstance() {
 
@@ -86,8 +81,6 @@ public class ConnectionOpenThread
 
 		return acceptThread;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private ConnectionOpenThread() {
 		timer = new Timer("Connections open timer", true);
@@ -237,14 +230,10 @@ public class ConnectionOpenThread
 		t.start();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public void stop() {
 		stopping = true;
 		selector.wakeup();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void addAllWaiting() throws IOException {
 		ConnectionOpenListener al = null;
@@ -319,15 +308,11 @@ public class ConnectionOpenThread
 		}      // end of if (ip == null || ip.equals("")) else
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class PortThrottlingData {
 
 			protected long lastSecondConnections = 0;
 
 			protected long throttling;
-
-		//~--- constructors -------------------------------------------------------
 
 
 		private PortThrottlingData(long throttling_prop) {
@@ -336,4 +321,3 @@ public class ConnectionOpenThread
 	}
 }    // ConnectionOpenThread
 
-//~ Formatted in Tigase Code Convention on 13/07/06

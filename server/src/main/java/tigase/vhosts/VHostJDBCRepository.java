@@ -20,8 +20,6 @@
 
 package tigase.vhosts;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.Repository;
@@ -62,7 +60,6 @@ public class VHostJDBCRepository
 
 	private static final Logger log = Logger.getLogger(VHostJDBCRepository.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	@ConfigField(desc = "Default IP to which VHost should resolve", alias = "dns-def-ip")
 	private String def_ip_address = null;
 	@ConfigField(desc = "Default hostname to which VHost should resolve", alias = "dns-srv-def-addr")
@@ -90,8 +87,6 @@ public class VHostJDBCRepository
 	public void destroy() {
 		// Nothing to do
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getConfigKey() {
@@ -139,16 +134,12 @@ public class VHostJDBCRepository
 		super.reload();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setDef_srv_address(String address) {
 		def_srv_address = address;
 		if (def_srv_address != null && !def_srv_address.endsWith(".")) {
 			def_srv_address = def_srv_address + ".";
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String validateItem(VHostItem item) {
@@ -242,4 +233,3 @@ public class VHostJDBCRepository
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/09

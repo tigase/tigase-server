@@ -34,14 +34,10 @@ public class ComponentConnection
 	//private List<String> resources     = new ArrayList<String>();
 	private ComponentIOService service = null;
 
-	//~--- constructors ---------------------------------------------------------
-
 	public ComponentConnection(String domain, ComponentIOService service) {
 		this.domain = domain;
 		this.service = service;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int compareTo(ComponentConnection o) {
@@ -54,8 +50,6 @@ public class ComponentConnection
 		// return service.getUniqueId().compareTo(o.service.getUniqueId());
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public String getDomain() {
 		return domain;
 	}
@@ -65,4 +59,3 @@ public class ComponentConnection
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/03/16

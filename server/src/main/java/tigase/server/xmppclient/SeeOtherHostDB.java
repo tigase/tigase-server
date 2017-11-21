@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppclient;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.*;
 import tigase.db.beans.SDRepositoryBean;
@@ -38,10 +36,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Extended implementation of SeeOtherHost using redirect information from database

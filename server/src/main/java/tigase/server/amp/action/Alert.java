@@ -19,18 +19,12 @@
  */
 package tigase.server.amp.action;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.AmpComponent;
 import tigase.xml.Element;
 import tigase.xmpp.PacketErrorTypeException;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: May 1, 2010 1:39:07 PM
@@ -43,8 +37,6 @@ public class Alert
 		extends ActionAbstract {
 
 	private static final String name = "alert";
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public boolean execute(Packet packet, Element rule) {
@@ -59,8 +51,6 @@ public class Alert
 
 		return false;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public String getName() {

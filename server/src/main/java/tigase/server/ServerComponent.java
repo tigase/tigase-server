@@ -20,13 +20,9 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.jid.JID;
 
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Interface ServerComponent
@@ -62,8 +58,6 @@ public interface ServerComponent {
 	 */
 	void release();
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method returns component jid in form of the component name followed by server hostname as a domain.
 	 * 
@@ -92,8 +86,6 @@ public interface ServerComponent {
 	 */
 	void setName(String name);
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method returns information about whether the initialization process (initializationCompleted()) method has been
 	 * called.
@@ -103,4 +95,3 @@ public interface ServerComponent {
 	boolean isInitializationComplete();
 }
 
-//~ Formatted in Tigase Code Convention on 13/06/08

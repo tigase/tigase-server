@@ -20,8 +20,6 @@
 
 package tigase.io;
 
-//~--- interfaces -------------------------------------------------------------
-
 /**
  * Describe interface TLSEventHandler here.
  * <br>
@@ -36,6 +34,3 @@ public interface TLSEventHandler {
 	int getSocketInputSize();
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

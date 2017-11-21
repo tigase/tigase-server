@@ -20,15 +20,11 @@
 
 package tigase.disco;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class ServiceEntity here.
@@ -42,7 +38,6 @@ public class ServiceEntity {
 
 	private static Logger log = Logger.getLogger(ServiceEntity.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	private boolean adminOnly = false;
 	private Set<String> features = null;
 	private List<ServiceIdentity> identities = null;
@@ -50,8 +45,6 @@ public class ServiceEntity {
 	private String jid = null;
 	private String name = null;
 	private String node = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public ServiceEntity(String jid, String node, String name) {
 		this.jid = jid;
@@ -65,8 +58,6 @@ public class ServiceEntity {
 		this.name = name;
 		this.adminOnly = adminOnly;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public void addFeatures(String... features) {
 		if (this.features == null) {
@@ -185,8 +176,6 @@ public class ServiceEntity {
 	public String toString() {
 		return getDiscoItem(null, null).toString();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public Element[] getDiscoFeatures(String node) {
 		ArrayList<Element> elFeatures = new ArrayList<Element>();
@@ -346,8 +335,6 @@ public class ServiceEntity {
 		return adminOnly;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	public void setAdminOnly(boolean adminOnly) {
 		this.adminOnly = adminOnly;
 	}
@@ -367,4 +354,3 @@ public class ServiceEntity {
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/10/16

@@ -20,8 +20,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
@@ -35,8 +33,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination address.
@@ -60,8 +56,6 @@ public class MessageForwarding
 	private static final String[] XMLNSS = {XMLNS};
 	private static final String[] MESSAGE_FORWARD_PATH = {tigase.server.Message.ELEM_NAME, FORWARD_EL};
 	private static final Element forw_el = new Element(FORWARD_EL, new String[]{"xmlns"}, new String[]{FORWARD_XMLNS});
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {

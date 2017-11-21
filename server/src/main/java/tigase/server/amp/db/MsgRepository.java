@@ -235,8 +235,6 @@ public abstract class MsgRepository<T, S extends DataSource>
 		return msgs_store_limit;
 	}
 
-	// ~--- inner classes --------------------------------------------------------
-
 	public interface OfflineMessagesProcessor {
 
 		public void stamp(Element msg, String msgID);
@@ -249,22 +247,16 @@ public abstract class MsgRepository<T, S extends DataSource>
 		public final Date expired;
 		public final Element msg;
 
-		// ~--- constructors -------------------------------------------------------
-
 		public MsgDBItem(T db_id, Element msg, Date expired) {
 			this.db_id = db_id;
 			this.msg = msg;
 			this.expired = expired;
 		}
 
-		// ~--- methods ------------------------------------------------------------
-
 		@Override
 		public int compareTo(Delayed o) {
 			return (int) (getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS));
 		}
-
-		// ~--- get methods --------------------------------------------------------
 
 		@Override
 		public long getDelay(TimeUnit unit) {

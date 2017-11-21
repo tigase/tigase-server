@@ -19,8 +19,6 @@
  */
 package tigase.server.xmppserver.proc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.xmppserver.S2SConnectionManager;
@@ -28,10 +26,6 @@ import tigase.server.xmppserver.S2SIOService;
 
 import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 2:00:08 PM
@@ -44,8 +38,6 @@ public class StreamError
 		extends S2SAbstractProcessor {
 
 	private static final Logger log = Logger.getLogger(StreamError.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public int order() {

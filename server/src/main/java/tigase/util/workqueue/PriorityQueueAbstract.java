@@ -20,8 +20,6 @@
 
 package tigase.util.workqueue;
 
-//~--- classes ----------------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.sys.TigaseRuntime;
 
@@ -45,8 +43,6 @@ public abstract class PriorityQueueAbstract<E> {
 	public static final String NONPRIORITY_QUEUE = "nonpriority-queue";
 	public static final String QUEUE_IMPLEMENTATION = "queue-implementation";
 	private static final Logger log = Logger.getLogger(PriorityQueueAbstract.class.getName());
-
-	//~--- methods --------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
 	@Deprecated
@@ -95,19 +91,13 @@ public abstract class PriorityQueueAbstract<E> {
 
 	public abstract void init(int maxPriority, int maxSize);
 
-	//~--- set methods ----------------------------------------------------------
-
 	public abstract boolean offer(E element, int priority);
-
-	//~--- methods --------------------------------------------------------------
 
 	public abstract void put(E element, int priority) throws InterruptedException;
 
 	public abstract void setMaxSize(int maxSize);
 
 	public abstract int[] size();
-
-	//~--- get methods ----------------------------------------------------------
 
 	public abstract E take() throws InterruptedException;
 

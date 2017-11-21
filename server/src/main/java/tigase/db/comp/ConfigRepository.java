@@ -20,8 +20,6 @@
 
 package tigase.db.comp;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import tigase.annotations.TigaseDeprecated;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.UnregisterAware;
@@ -44,8 +42,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		implements ComponentRepository<Item>, Initializable, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
 
 	@ConfigField(desc = "Automatic items load interval", alias = "repo-autoreload-interval")
 	protected long autoReloadInterval = 0;
@@ -76,8 +72,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	public void setAutoloadTimer(long delay) {
 		long interval = delay * 1000;
@@ -106,8 +100,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		setAutoloadTimer(autoLoadInterval);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void addRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -126,8 +118,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		return items.toString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public abstract String getConfigKey();
 
 	public abstract String[] getDefaultPropetyItems();
@@ -135,8 +125,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public abstract String getPropertyKey();
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addItem(Item item) {
@@ -199,8 +187,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		defs.put(getConfigKey(), items_arr);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	public Item getItem(String key) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -236,8 +222,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public Iterator<Item> iterator() {
 		return items.values().iterator();
@@ -262,8 +246,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
@@ -281,8 +263,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	public int size() {
 		return items.size();
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void store() {

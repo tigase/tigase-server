@@ -20,18 +20,12 @@
 
 package tigase.server.script;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.stats.StatisticHolder;
 
 import javax.script.Bindings;
 import java.util.Queue;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Created: Jan 2, 2009 1:20:16 PM
@@ -110,8 +104,6 @@ public interface CommandIfc
 
 	public static final String DEL_SCRIPT_CMD = "del-script";
 
-	//~--- get methods ----------------------------------------------------------
-
 	Bindings getBindings();
 
 	String getCommandId();
@@ -120,23 +112,12 @@ public interface CommandIfc
 
 	String getGroup();
 
-	//~--- methods --------------------------------------------------------------
-
 	void init(String id, String description, String group);
-
-	//~--- get methods ----------------------------------------------------------
 
 	boolean isAdminOnly();
 
-	//~--- methods --------------------------------------------------------------
-
 	void setAdminOnly(boolean adminOnly);
-
-	//~--- set methods ----------------------------------------------------------
 
 	void runCommand(Iq packet, Bindings binds, Queue<Packet> results);
 }
 
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

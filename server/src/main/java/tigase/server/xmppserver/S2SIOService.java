@@ -19,18 +19,12 @@
  */
 package tigase.server.xmppserver;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.XMPPIOService;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jun 14, 2010 12:30:53 PM
@@ -46,7 +40,6 @@ public class S2SIOService
 	protected static final String HANDSHAKING_ONLY_KEY = "handshaking-only-key";
 	private static final Logger log = Logger.getLogger(S2SIOService.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
 	/**
 	 * This structure keeps a set of all CIDs reusing this connection. If the connection goes down all CIDs must be
 	 * notified.
@@ -57,8 +50,6 @@ public class S2SIOService
 	private S2SConnection s2s_conn = null;
 
 	private String session_id = null;
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Adds another connection id (CID) to the authenticated list for this connection

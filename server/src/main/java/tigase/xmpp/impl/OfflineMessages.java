@@ -19,8 +19,6 @@
  */
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -114,7 +112,6 @@ public class OfflineMessages
 	/** Field holds the default hostname of the machine. */
 	private static String defHost = DNSResolverFactory.getInstance().getDefaultHost();
 
-	//~--- fields ---------------------------------------------------------------
 	/**
 	 * Field holds class for formatting and parsing dates in a locale-sensitive manner
 	 */
@@ -132,8 +129,6 @@ public class OfflineMessages
 		this.formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		this.formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String id() {
@@ -431,8 +426,6 @@ public class OfflineMessages
 		return XMLNSS;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method allows obtaining instance of {@link MsgRepositoryIfc} interface implementation.
 	 *
@@ -457,8 +450,6 @@ public class OfflineMessages
 			}
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method determines whether packet sent to offline user should be stored in offline storage or not
@@ -596,8 +587,6 @@ public class OfflineMessages
 		}
 
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	public static interface OfflineMsgRepositoryIfc
 			extends tigase.db.OfflineMsgRepositoryIfc {
@@ -741,8 +730,6 @@ public class OfflineMessages
 		 */
 		private NonAuthUserRepository repo = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		/**
 		 * Constructs {@code MsgRepositoryImpl} object referencing user session and having handle to user repository.
 		 *
@@ -766,13 +753,11 @@ public class OfflineMessages
 			// nothing to do here as we base on UserRepository which is already initialized
 		}
 
-		//~--- get methods --------------------------------------------------------
 		@Override
 		public Element getMessageExpired(long time, boolean delete) {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 
-		//~--- methods ------------------------------------------------------------
 		@Override
 		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete)
 				throws UserNotFoundException {
