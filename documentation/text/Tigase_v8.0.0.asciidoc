@@ -9,12 +9,12 @@ Tigase v8.0.0 Changenotes and announcement
 
 == Major Changes
 
-=== Kernel and beans configureation
+=== Kernel and beans configuration
 Tigase now operates using a Kernel and Beans style of programming.  What does this mean for Tigase and You?  Good news, really.
 Tigase XMPP Server is now working as a Kernel program, which will operate on it's own and handle all the core functionality of the server.  Component, and non-essential functionality will now be loaded as Beans.  As a user, your experience will not change all that much.  However, beans can be loaded and unloaded without having to restart Tigase, meaning that the program will behave more dynamically.  This means a smaller footprint on memory on resources when components are not needed, and longer uptimes without having to restart the program!  This also allows for greater flexibility for Tigase XMPP Server to be better customized for unique solutions.
 
 === New Configuration File Format
-With the change of Tigase to a Kernal and Beans style of programming, we have also changed how the configuration file is managed.  Although you will still edit the init.properties file like a plaintext file, a new style of formatting will be used known as DSL.
+With the change of Tigase to a Kernel and Beans style of programming, we have also changed how the configuration file is managed.  Although you will still edit the init.properties file like a plaintext file, a new style of formatting will be used known as DSL.
 Domain Specific Language may add more lines, but is a cleaner format, and provides a more secure configuration design since validation of the configuration is done at the domain level.
 For more information on this format and how to configure Tigase, visit xref:dslConfig[DSL Configuration Guide].
 
@@ -28,7 +28,7 @@ If the command is being sent to shut down the whole cluster, no `see-other-host`
 The script may be activated by an ad-hoc command, or sent using REST from remote or Tigase Admin UI.
 
 === BouncyCastle being used for StartTLS
-link:https://www.bouncycastle.org/java.html[BouncyCastle] Crypto API has now been employed to handle StartTLS negioation.  By doing this, Tigase now supports `tls-unique` within the SCRAM PLUS authentication implementation.
+link:https://www.bouncycastle.org/java.html[BouncyCastle] Crypto API has now been employed to handle StartTLS negotiation.  By doing this, Tigase now supports `tls-unique` within the SCRAM PLUS authentication implementation.
 This API is may be employed by calling the class in your configuration file:
 [source,dsl]
 -----
@@ -43,7 +43,7 @@ Since work began on v8.0.0 Tigase has required that all changes to Tigase XMPP S
 
 === Scaled Down Installation Methods
 We have cleaned up installation methods for Tigase and now recommend the use of web-installer method.  Binary and .jar installation methods have been removed and will no longer be produced for v8.0.0 and later.
-Manual installtion is still available for those unable to use HTTP or browser access.  Visit our xref:quickstart[Quick Start] guide for instructions on these other methods.
+Manual installation is still available for those unable to use HTTP or browser access.  Visit our xref:quickstart[Quick Start] guide for instructions on these other methods.
 
 === Emojis now supported on Tigase XMPP Servers
 Emojis are now supported on MySQL databases, however some settings may be need to be changed, although they won't affect existing databases.  xref:emojisupportSQL[Visit this section] for details.
@@ -52,14 +52,14 @@ Emojis are now supported on MySQL databases, however some settings may be need t
 Tigase now supports link:https://xmpp.org/extensions/xep-0215.html[XEP-0215 - External Service Discovery] allowing Tigase to discover services that are not available VIA the XMPP Protocol.  For setup and configuration information visit xref:_tigase_external_service_discovery[External Service Discovery Component] documentation.
 
 === XEP-0313 Message Archive Management now supported
-link:https://xmpp.org/extensions/xep-0313.html[XEP-0313 - Message Archive Management] is now supported by Tigase featuring custom enhancements like full-text search & seaching by tags.  MAM requires Tigase's message archive to be enabled in the init.properties file, and the schema (XEP-0136 or XEP-0313) must be configured in session manager settings.
+link:https://xmpp.org/extensions/xep-0313.html[XEP-0313 - Message Archive Management] is now supported by Tigase featuring custom enhancements like full-text search & searching by tags.  MAM requires Tigase's message archive to be enabled in the init.properties file, and the schema (XEP-0136 or XEP-0313) must be configured in session manager settings.
 To turn on MAM, see configuration guide xref:_support_for_mam[located here].
 
 === XEP-0363 HTTP File Upload now supported
 link:https://xmpp.org/extensions/xep-0363.html[XEP-0363 - HTTP File Upload] is now supported using Tigase HTTP API component now allowing for a more robust one-to-many file uploading option.  Configuration details are available at the xref:XEP0363[HTTP File Upload Component] section of documentation.
 
 === Startup now uses bootstrapping
-Tigase now uses bootstrapping to startup, which will load configuration from init.properties file like before.  The file will be scanned, and properties that can be setup in DSL style will be converted and will be saved.  Then Tigase will begin it's normal operations with the configuration options.
+Tigase now uses bootstrapping to startup, which will load configuration from init.tdsl file like before.  Then Tigase will begin it's normal operations with the configuration options.  All startup functions for Tigase will now run under the `bootstrap` bean.
 
 === CAPTCHA system now available for in-band registration
 link:https://xmpp.org/extensions/xep-0077.html[XEP-0077 In band registration] can use Data Forms as an option to process new registrations.  Now you can secure these registrations by employing a CAPTCHA solution.  By enabling this option you can reduce the number of potential spammers and bots on your server.
@@ -68,19 +68,26 @@ link:https://xmpp.org/extensions/xep-0077.html[XEP-0077 In band registration] ca
 Statistics history can now be automatically made smaller if a systems memory resources are above a certain amount.  By default this is enabled and will trigger when over 95% of memory is in use.  Half of all existing entries will be removed at this time.
 The same pattern will continue to halve the available records every time the threshold is met.  A hard-set minimum of 5 entries is set, so you will always have the last 5 entries.
 This setting may be adjusted by adding the following setting to your init.properties file and adjusting the integer value:
-[source,properties]
+[source,dsl]
 -----
 stats/stats-high-memory-level[I]=95
 -----
 
+=== Statistics now available for all modules
+For any bean, you may enable statistics by using the following
+[source,dsl]
+-----
+statistics = true
+-----
+
 === Spam Protection
-Tigase XMPP Server v7.2.0 now includes some efforts to prevent spam bot accounts from running on servers.
+Tigase XMPP Server v8.0.0 now includes some efforts to prevent spam bot accounts from running on servers.
 
 ==== Account Registration Limits Expanded
-Account registration limits have been expanded and now you can set seperate counters, or configure components individually for thier own limits. Visit xref:accountRegLimit[this section] for configuration details.
+Account registration limits have been expanded and now you can set separate counters, or configure components individually for their own limits. Visit xref:accountRegLimit[this section] for configuration details.
 
 ==== Accounts created using in-band registration now will use confirmation E-mail
-In an effort to create a more secure method for implementing `JabberIqRegister` Tigase XMPP Server will now require the use of a confirmation E-mail by default in the process. The E-mail must be vaild, and accounts will be made into pending status until a user clicks the generated URI in the E-mail and activates the account.
+In an effort to create a more secure method for implementing `JabberIqRegister` Tigase XMPP Server will now require the use of a confirmation E-mail by default in the process. The E-mail must be valid, and accounts will be made into pending status until a user clicks the generated URI in the E-mail and activates the account.
 This is a plugin and must be enabled in the init properties file by using the following code:
 [source,properties]
 -----
@@ -100,8 +107,11 @@ The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tiga
 === Dynamic TLS Buffer
 Memory Buffer for TLS no longer remains at highest buffer size needed for the server session. Buffer will now free memory during idle connections.  Thus drastically improving program footprint.
 
+=== Database Timestamps
+Timestamps in database will be stored using UTC time.
+
 === Config-type properties have changed
-Config-type is now configured using DSL format.  Visit xref:configType[this section] for more infomration.
+Config-type is now configured using DSL format.  Visit xref:configType[this section] for more information.
 The names of different config-type properties have changed:
 `default` replaces `--gen-config-def`, `--gen=config-all`, and `--gen-config-default` configuration types.
 `session-manager` replaces `--gen-config-sm`.
@@ -114,58 +124,127 @@ NOTE: Old versions are no longer supported, you HAVE to replace old versions wit
 === Database Watchdog implemented
 It is now possible to set connection testing to databases when connections are idle and customize the frequency with which this is done.  Visit xref:databaseWatchdog[this section] for more details.
 
+=== Packet statistics expanded
+Packet statistics both retrieved VIA XMPP and during graceful shutdown have now been separated to a per-XMLNS basis.  This may be disabled by adding the following line to `config.tdsl` file:
+`'detailed-other-statistics' = false `
+
+=== XEP-0016 Behavior changes
+XEP states that Privacy lists should be used when no user session exists in addition to when there is.  Previously, Tigase would only filter results when retrieving messages, allowing blocked users to store offline messages.  This has now been changed to reflect the XEP properly, and messages will be filtered while there is no user session.  If however, you wish to use the previous version, where offline messages are cached first and then filtered, you may use the following configuration:
+[source,dsl]
+-----
+'sess-man' {
+    'jabber:iq:privacy' () {
+        privacyListOfflineCache (active: true) {
+          size = 20000
+        }
+    }
+}
+-----
+By default, the cache has a limit of 10000 entries, that may be set by using size bean as seen above.
+
 == New Minor Features & Behavior Changes
-- link:https://projects.tigase.org/issues/611[#611] Support for Message of the Day is now enabled in Tigase XMPP Server and can be administed using link:http://xmpp.org/extensions/xep-0133.html#set-motd[XEP-0133 Service Administration].
+- link:https://projects.tigase.org/issues/611[#611] Support for Message of the Day is now enabled in Tigase XMPP Server and can be administered using link:http://xmpp.org/extensions/xep-0133.html#set-motd[XEP-0133 Service Administration].
+- link:https://projects.tigase.org/issues/1569[#1569] Re-implemented XEP-0133 Service Administration Scripts `4.3 Disable User` and `4.4 Re-enable User`.
 - link:https://projects.tigase.org/issues/1449[#1449] Monitoring modules now works in OSGi mode.
+- link:https://projects.tigase.org/issues/1968[#1968] Added a Proxy Wrapper to handle reconnections to database connection pool to help prevent deadlocking threads.
+- link:https://projects.tigase.org/issues/3511[#3511] Mechanism responsible for closing XMPP in SessionManager has been changed to process all packets from TCP connection before closing connection.
 - link:https://projects.tigase.org/issues/3802[#3802] Implementation and API of LocalEventBus and ClusteredEventBus has been unified and is now available as EventBus.
+- link:https://projects.tigase.org/issues/3918[#3918] Session Establishment Advertisement is now optional, bringing session establishment in line with link:https://tools.ietf.org/html/rfc6121[RFC 6121].
+- link:https://projects.tigase.org/issues/4111[#4111] Changed input buffer sizing to use a ratio of 2 to 1 based on input capacity.  No longer using a constant value.
+- link:https://projects.tigase.org/issues/4212[#4212] Database schema files have been flattened and made for better organization.
+- link:https://projects.tigase.org/issues/4501[#4501] `CounterDataFileLogger` now has an upper limit and will be default be shrunk to 75% if available disk space is 5% or less than 100MB.
 - link:https://projects.tigase.org/issues/4654[#4654] PubSub component has been updated and new schema uses UTF-8 encoding when hashing database lookup.
 - link:https://projects.tigase.org/issues/4776[#4776] Tigase `DbSchemaLoader` now prompts for password if one is missing from command line.
+- link:https://projects.tigase.org/issues/4788[#4788] Push component added to dist-max archive.
+- link:https://projects.tigase.org/issues/4814[#4814] SASL-SCRAM will now be automatically disabled if auth database uses encoded passwords.
 - link:https://projects.tigase.org/issues/4859[#4859] Tigase `DbSchemaLoader` now can support using SSL when connecting to databases.
-- link:https://projects.tigase.org/issues/4874[#4874] Tigase Test Suite has been uppdated to correspond to all changes for v7.2.0.
+- link:https://projects.tigase.org/issues/4874[#4874] Tigase Test Suite has been updated to correspond to all changes for v7.2.0.
+- link:https://projects.tigase.org/issues/4877[#4877] In-memory repository implemented for *testing ONLY*.
+- link:https://projects.tigase.org/issues/4880[#4880] Tigase config-type settings have been reduced and changed. See xref:configType[this section] for more details.
+- #4908 Limited Ad-hoc execution to admin only within monitor component.
 - #5005 Detailed logging configuration is now available in DSL format. See xref:[customLogging] for more details.
-- link:https://projects.tigase.org/issues/5069[#5069] Packet processed statistics now seperates results based on XML Namespaces.
-- link:https://projects.tigase.org/issues/5079[#5079] Tigase `DbSchemaLoader` can now process multiple .sql files in one command by using a comma seperated list when calling.
+- link:https://projects.tigase.org/issues/5069[#5069] Packet processed statistics now separates results based on XML Namespaces.
+- link:https://projects.tigase.org/issues/5079[#5079] Tigase `DbSchemaLoader` can now process multiple .sql files in one command by using a comma separated list when calling.
 - link:https://projects.tigase.org/issues/5086[#5086] Tigase server monitor is loaded after delay to prevent NPE during startup.
-- link:https://projects.tigase.org/issues/5149[#5149] `StanzaReceiver` and `StanzaSender` Components have been depereciated and are no longer part of Tigase XMPP Server.
+- link:https://projects.tigase.org/issues/5149[#5149] `StanzaReceiver` and `StanzaSender` Components have been deprecated and are no longer part of Tigase XMPP Server.  Related SQL tables `xmpp_stanza` and `short_news` have also been removed from schemas.
 - link:https://projects.tigase.org/issues/5150[#5150] All TigaseDB tables now use the `tig_` prefix.
+- link:https://projects.tigase.org/issues/5214[#5214] Check has been added if recipient exists before storing offline messages for local jid.
 - link:https://projects.tigase.org/issues/5293[#5293] `DbSchemaLoader` now will fail execution instead of skipping when encountering missing files.
-- link:https://projects.tigase.org/issues/5397[#5397] Webhelp Documenation will no longer be built.
+- link:https://projects.tigase.org/issues/5397[#5397] Webhelp Documentation will no longer be built.
 - link:https://projects.tigase.org/issues/5422[#5422] Errors with Beans will now result in compact and more readable StackTrace print in console log.
 - link:https://projects.tigase.org/issues/5423[#5423] System configuration will now be printed to log file as `ConfigHolder.loadConfiguration` output.
-- link:https://projects.tigase.org/issues/5429[#5429] Adjusted settings for Dynamic Rostering now can use seperate beans for multiple implementations.
+- link:https://projects.tigase.org/issues/5425[#5425] `GetAnyFile` and `GetConfigFile` scripts moved to message-router instead of basic-conf.
+- link:https://projects.tigase.org/issues/5429[#5429] Adjusted settings for Dynamic Rostering now can use separate beans for multiple implementations.
 - link:https://projects.tigase.org/issues/5430[#5430] `BindResource` is now set to FINER log level to reduce console output verbosity.
 - link:https://projects.tigase.org/issues/5475[#5475] Setting default environment variables is now possible in init.properties file using `env('env-1', 'def-value')` lines. Details available xref:dslEnv[in DSL Configuration] section.
+- link:https://projects.tigase.org/issues/5496[#5496] `Destroy Schema` task now added to schema manager.
+- link:https://projects.tigase.org/issues/5583[#5583] Error messages now properly sent when offline message storage is full.
+- link:https://projects.tigase.org/issues/5964[#5964] Server version is now added to JMX statistics.
+- link:https://projects.tigase.org/issues/5982[#5982] Remote JVM debugging configuration added to tigase.conf file, commented by default.
+- link:https://projects.tigase.org/issues/6038[#6038] Data Source pool connections are now initialized concurrently instead of one at a time, dropping initializing time.
+- link:https://projects.tigase.org/issues/6103[#6103] `RosterElement`no longer keeps `XMPPResourceConnection` instance as it is cached elsewhere.  Removal results in net improvement in memory footprint.
+- link:https://projects.tigase.org/issues/6133[#6133] Tigase now checks components against server version to ensure compatibility.
+- link:https://projects.tigase.org/issues/6163[#6163] Groovy plugin updated to v2.4.12.
+- link:https://projects.tigase.org/issues/6206[#6206] Separated TigaseXMLTools and TigaseUtil packages for better compatibility with JDK v9.
+- link:https://projects.tigase.org/issues/6216[#6216] MongoDB Driver now updated to v3.5.0.
+
 
 
 == Fixes
+- #2750 Multiple artifact and depreciated file cleanup.
+- #3582 Schema files streamlined, and no longer embedded in code.
 - #3611 Fixed TheadExceptionHandler caused by ACS unable to read PubSub schema changes.
 - #3686 Issues with processing XHTML-IM have been fixed, and now render correctly messages with multiple CData items.
 - link:https://projects.tigase.org/issues/3689[#3689] Packets returned from CM no longer bear the original senders' jid.
 - link:https://projects.tigase.org/issues/3803[#3803] New call `RouteEvent` has been added to check to list and check events and determine which should be forwarded to other nodes.
-- link:https://projects.tigase.org/issues/3822[#3822] Error is now thrown if listner is registered for an event that is not found in EventBus.
+- link:https://projects.tigase.org/issues/3822[#3822] Error is now thrown if listener is registered for an event that is not found in EventBus.
 - #3910 Fixed NPE in SessionManager when session is closed during execution of everyMinute method.
 - #3911 Fixed issue of dropping connections during thread load distribution.
 - link:https://projects.tigase.org/issues/4185[#4185] Fixed an error where messages would be duplicated on stream resumption due to a counter being reset upon reconnection.
 - link:https://projects.tigase.org/issues/4447[#4447] Fixed condition where expired messages in offline store would cause locks.
-- link:https://projects.tigase.org/issues/4672[#4672] Fixed `UnsupportedOperationException` occuring during configuration of `WebSocketConnectionClustered`.
+- link:https://projects.tigase.org/issues/4672[#4672] Fixed `UnsupportedOperationException` occurring during configuration of `WebSocketConnectionClustered`.
 - link:https://projects.tigase.org/issues/4776[#4776] `DBSchemaLoader` now asks for user credentials if parameter is missing.  Exceptions are no longer thrown if file specified is not found.
 - link:https://projects.tigase.org/issues/4885[#4885] `client-port-delay-listening` no longer causes exception when called.
+- link:https://projects.tigase.org/issues/4973[#4973] Changed Message History query to now include a limit when selecting items, preventing an SQLTimeoutException.
 - #5005 Fixed an issue where disabling components would result in server shutdown.
 - link:https://projects.tigase.org/issues/5042[#5042] Fixed issue when implementing custom SASL providers, mechanisms and callback handler factories.
 - link:https://projects.tigase.org/issues/5066[#5066] Fixed issue initializing databases using MongoDB.
 - link:https://projects.tigase.org/issues/5076[#5076] last_login and last_logout values are now properly updated while using SASL SCRAM authentication.
-- link:https://projects.tigase.org/issues/5084[#5084] SCRAM now checks to see if account is disabled before retriving password.
+- link:https://projects.tigase.org/issues/5084[#5084] SCRAM now checks to see if account is disabled before retrieving password.
 - link:https://projects.tigase.org/issues/5085[#5085] Fixed `too many beans implemented` error in Monitor Component.
 - link:https://projects.tigase.org/issues/5088[#5088] Removed unnecessary SASL request processing after session is closed.
 - #5118 Fixed NPE during query of privacy lists then `type` is missing.
-- link:https://projects.tigase.org/issues/5303[#5303] Fixed beans not being overriden by configuration if they were registered in `RegistrarBean` or `AbstractKernelBasedComponent`.
+- link:https://projects.tigase.org/issues/5303[#5303] Fixed beans not being overridden by configuration if they were registered in `RegistrarBean` or `AbstractKernelBasedComponent`.
 - link:https://projects.tigase.org/issues/5311[#5311] Offline messages are no longer dumped from MongoDB when restarting server.
 - link:https://projects.tigase.org/issues/5394[#5394] Loading main Derby schema no longer throws exceptions.
+- link:https://projects.tigase.org/issues/5428[#5428] Fixed parsing of v-host per domain limit property.
 - link:https://projects.tigase.org/issues/5450[#5450] Server no longer automatically shuts down when default or other db can not be found or accessed.
+- #5458 Fixed potential timeout arising from `XMPPIOService::xmppStreamOpened()` method.
 - link:https://projects.tigase.org/issues/5480[#5480] Fixed issue in Derby DB where obtaining offline messages results in SQLException.
 - link:https://projects.tigase.org/issues/5525[#5525] Fixed S2S `invalid-namespace` error being returned during connection establishment.
+- link:https://projects.tigase.org/issues/5587[#5587] Fixed unclosed `ResultSet` when storing a message to AMP-offline database in Derby causing deadlock.
+- link:https://projects.tigase.org/issues/5645[#5645] Added fix for possible NPE when failing to retrieve beans.
+- link:https://projects.tigase.org/issues/5670[#5670] config-dump now prints configuration for inactive components and beans to log.
+- link:https://projects.tigase.org/issues/5692[#5692] Messages sent with negative priority were being occasionally dropped and not processed to `OfflineMessageHandler`.
+- #5727 Fixed potential issue with MySQL procedures not being killed properly.
+- link:https://projects.tigase.org/issues/5750[#5750] Statistics now filter out zero-value results unless FINEST level is requested.
+- link:https://projects.tigase.org/issues/5831[#5831] Fixed occurrence of `OutOfMemory` error.
+- link:https://projects.tigase.org/issues/5864[#5864] Fixed NPE when executing BOSH pre-bind script.
+- #5867 Fixed NPE occurring during configuration dump.
+- link:https://projects.tigase.org/issues/6006[#6006] Improved configuration file and DB Schema handling.
+- link:https://projects.tigase.org/issues/6041[#6041] Fixed potential issue where vhosts DB could be overwritten by vhosts configuration in `init.config`.
+- link:https://projects.tigase.org/issues/6078[#6078] Fixed `ClusterConnectionManager` to use custom_elements_limit instead of a fixed value.
+- link:https://projects.tigase.org/issues/6080[#6080] Fixed Packet Filtering to not filter cluster node information requests.
+- link:https://projects.tigase.org/issues/6083[#6083] Fixed clustered mode shutting down server when certain components are disabled.
+- link:https://projects.tigase.org/issues/6135[#6135] Tigase now properly enabled selective TLS if not enabled globally.
+- link:https://projects.tigase.org/issues/6140[#6140] Fixed issue while sending server welcome message.
+- link:https://projects.tigase.org/issues/6141[#6141] Fixed NPE at startup.
+- link:https://projects.tigase.org/issues/6234[#6234] Fixed an error where an error message would repeat unnecessarily.
+- link:https://projects.tigase.org/issues/6284[#6284] Ad-hoc commands now refresh SSL Certificate, and restart is no longer required.
+- link:https://projects.tigase.org/issues/6293[#6293] Server no longer sends no response upon setting empty photo in Vcard.
+
 
 == Component Changes
 
 === PubSub
-- link:https://projects.tigase.org/issues/5033[#5033] PubSub now compatable with using emojis in pubsub items.
+- link:https://projects.tigase.org/issues/5033[#5033] PubSub now compatible with using emojis in pubsub items.
