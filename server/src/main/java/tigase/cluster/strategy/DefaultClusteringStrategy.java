@@ -66,9 +66,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	private static final String AUTH_TIME = "auth-time";
 	private static final String INITIAL_PRESENCE_KEY = "cluster-initial-presence";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(DefaultClusteringStrategy.class.getName());
 	private static final String PRESENCE_TYPE_INITIAL = "initial";
 	private static final String PRESENCE_TYPE_KEY = "presence-type";

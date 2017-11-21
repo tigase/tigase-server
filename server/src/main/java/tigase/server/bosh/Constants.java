@@ -148,9 +148,6 @@ public abstract class Constants {
 
 	//~--- constant enums -------------------------------------------------------
 
-	/**
-	 * Enum description
-	 */
 	protected enum CacheAction {
 		on,
 		off,

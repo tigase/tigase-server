@@ -51,9 +51,6 @@ public class BoshIOService
 	private static final String CONNECTION = "Connection: ";
 	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
 	private static final String CONTENT_TYPE_LENGTH = "Content-Length: ";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(BoshIOService.class.getName());
 	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
 	private static final String SERVER = "Server: Tigase Bosh/" + tigase.server.XMPPServer.getImplementationVersion();

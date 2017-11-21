@@ -97,9 +97,6 @@ public class SessionManager
 
 	protected static final String ADMIN_COMMAND_NODE = "http://jabber.org/protocol/admin";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(SessionManager.class.getName());
 
 	private static final String SESSION_CLOSE_TIMER_KEY = "session-close-timer";

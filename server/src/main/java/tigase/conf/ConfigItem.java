@@ -74,9 +74,6 @@ public class ConfigItem
 
 	//~--- fields ---------------------------------------------------------------
 
-	/**
-	 * Enum description
-	 */
 	public enum FLAGS {
 		INITIAL,
 		DEFAULT,

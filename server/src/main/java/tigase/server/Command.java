@@ -179,9 +179,6 @@ public enum Command {
 	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
 	protected static final String[] FIELD_VALUE_PATH = DataForm.FIELD_VALUE_PATH;
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger("tigase.server.Command");
 
 	//~--- fields ---------------------------------------------------------------

@@ -87,9 +87,6 @@ public abstract class IOService<RefObject>
 
 	public static final String SSL_PROTOCOLS_KEY = "ssl-protocols";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(IOService.class.getName());
 	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
 

@@ -47,9 +47,6 @@ public class ComponentAcceptStreamOpenHandler
 		implements StreamOpenHandler {
 
 	public static final String XMLNS = "jabber:component:accept";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ComponentAcceptStreamOpenHandler.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

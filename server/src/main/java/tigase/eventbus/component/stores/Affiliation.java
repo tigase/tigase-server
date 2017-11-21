@@ -21,9 +21,7 @@
 package tigase.eventbus.component.stores;
 
 public enum Affiliation {
-	/** */
 	member(2, true, true, false, false, false, false, false),
-	/** */
 	none(1, false, false, false, false, false, false, false),
 	/**
 	 * An entity that is disallowed from subscribing or publishing to a node.

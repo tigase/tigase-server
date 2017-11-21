@@ -50,20 +50,11 @@ import java.util.logging.Logger;
 public class XMLRepository
 		implements Repository, DataSourceAware<XMLDataSource>, AuthRepository, UserRepository {
 
-	/** Log filed */
 	private static final String USER_STR = "User: ";
-
-	/** Log filed */
 	private static final String NOT_FOUND_STR = " has not been found in repository.";
-
-	/** Logger instance */
 	private static final Logger log = Logger.getLogger("tigase.db.xml.XMLRepository");
-
-	/** AuthRepository filed */
 	private AuthRepository auth = null;
-	/** autoCreateUser filed */
 	private boolean autoCreateUser = false;
-	/** XML database filed */
 	private XMLDB xmldb = null;
 
 	//~--- methods --------------------------------------------------------------

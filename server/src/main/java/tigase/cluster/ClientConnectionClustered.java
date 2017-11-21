@@ -57,9 +57,6 @@ public class ClientConnectionClustered
 		extends ClientConnectionManager
 		implements ClusteredComponentIfc {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

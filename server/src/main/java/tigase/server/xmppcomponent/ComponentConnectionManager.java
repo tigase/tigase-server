@@ -78,9 +78,6 @@ public class ComponentConnectionManager
 
 	public static final String IDENTITY_TYPE_VAL = "generic";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ComponentConnectionManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

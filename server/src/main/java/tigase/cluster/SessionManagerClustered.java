@@ -85,9 +85,6 @@ public class SessionManagerClustered
 
 	public static final int SYNC_MAX_BATCH_SIZE = 1000;
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(SessionManagerClustered.class.getName());
 	private ClusterControllerIfc clusterController = null;
 

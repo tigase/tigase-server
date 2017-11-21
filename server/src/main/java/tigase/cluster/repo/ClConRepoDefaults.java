@@ -24,8 +24,6 @@ import tigase.util.dns.DNSResolverFactory;
 import tigase.xmpp.jid.BareJID;
 
 /**
- * Class description
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version 5.2.0, 13/03/09
  */

@@ -50,9 +50,6 @@ public class BoshConnectionClustered
 		extends BoshConnectionManager
 		implements ClusteredComponentIfc {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(BoshConnectionClustered.class.getName());
 
 	private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;

@@ -47,9 +47,6 @@ public class ZLibIO
 
 	public static final String ZLIB_CAPS = "zlib-caps";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static Logger log = Logger.getLogger(ZLibIO.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

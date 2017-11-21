@@ -34,8 +34,6 @@ public interface EventRoutingSelector {
 
 	/**
 	 * Returns class of event for which it modifies delivery
-	 *
-	 * @return
 	 */
 	Class getEventClass();
 

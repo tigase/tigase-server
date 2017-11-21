@@ -96,9 +96,6 @@ public class S2SConnectionManager
 	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(S2SConnectionManager.class.getName());
 	private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
 	private static final String XMLNS_CLIENT_VAL = "jabber:client";

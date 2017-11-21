@@ -45,8 +45,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Class description
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version 5.2.0, 13/03/09
  */

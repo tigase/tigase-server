@@ -78,9 +78,6 @@ public class CompRepoItem
 
 	public static final String ROUTINGS_LABEL = "(Optional) Routings";
 	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

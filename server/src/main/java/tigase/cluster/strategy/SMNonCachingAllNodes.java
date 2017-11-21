@@ -45,9 +45,6 @@ import java.util.logging.Logger;
 public abstract class SMNonCachingAllNodes
 		implements ClusteringStrategyIfc<ConnectionRecord> {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(SMNonCachingAllNodes.class.getName());
 	// Simple random generator, we do not need a strong randomization here.
 	// Just enough to ensure better traffic distribution

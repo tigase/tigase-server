@@ -148,8 +148,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 
 	/**
 	 * Add the strategy statistics to the List.
-	 *
-	 * @param list
 	 */
 	void getStatistics(StatisticsList list);
 

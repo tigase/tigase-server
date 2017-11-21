@@ -78,9 +78,6 @@ public class ComponentProtocol
 
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ComponentProtocol.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

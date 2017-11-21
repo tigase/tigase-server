@@ -47,9 +47,6 @@ public abstract class AbstractKernelBasedComponent
 		implements XMPPService, DisableDisco, RegistrarBean {
 
 	protected final EventBus eventBus = EventBusFactory.getInstance();
-	/**
-	 * Logger
-	 */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	protected Kernel kernel = null;
 	@Inject

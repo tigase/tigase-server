@@ -184,7 +184,7 @@ public interface AuthRepository
 	 * This method is only used by the server statistics component to report number of registered users for given
 	 * domain.
 	 *
-	 * @param domain
+	 * @param domain for which get the statistics
 	 *
 	 * @return a <code>long</code> number of registered users in the repository.
 	 */

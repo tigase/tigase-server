@@ -51,9 +51,6 @@ import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
 public class HandshakeProcessor
 		implements ExtProcessor {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(HandshakeProcessor.class.getName());
 	private static final String EL_NAME = "handshake";
 	private static final String ID = EL_NAME;

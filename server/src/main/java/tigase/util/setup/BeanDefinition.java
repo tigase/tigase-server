@@ -38,13 +38,13 @@ import java.util.List;
 public class BeanDefinition {
 
 	public static final List<Class<? extends ServerComponent>> CORE_COMPONENTS = Arrays.asList(SessionManager.class,
-																							   VHostManager.class,
-																							   MessageRouter.class,
-																							   ClusterConnectionManager.class,
-																							   ClusterController.class,
-																							   EventBusComponent.class,
-																							   EventBusComponent.class,
-																							   StatisticsCollector.class);
+	                                                                                           VHostManager.class,
+	                                                                                           MessageRouter.class,
+	                                                                                           ClusterConnectionManager.class,
+	                                                                                           ClusterController.class,
+	                                                                                           EventBusComponent.class,
+	                                                                                           EventBusComponent.class,
+	                                                                                           StatisticsCollector.class);
 	private final boolean active;
 	private final Class<?> clazz;
 	private final String name;

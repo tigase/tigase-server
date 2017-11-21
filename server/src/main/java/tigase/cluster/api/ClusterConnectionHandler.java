@@ -31,10 +31,6 @@ public interface ClusterConnectionHandler {
 
 	/**
 	 * Generates hashCode for particular packet used to spread processing between thread or connections
-	 *
-	 * @param packet
-	 *
-	 * @return
 	 */
 	int hashCodeForPacket(Packet packet);
 

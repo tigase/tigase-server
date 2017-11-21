@@ -68,8 +68,6 @@ public class AuthRepositoryImpl
 
 	/**
 	 * Creates a new <code>AuthRepositoryImpl</code> instance.
-	 *
-	 * @param repo
 	 */
 	public AuthRepositoryImpl(UserRepository repo) {
 		this.repo = repo;

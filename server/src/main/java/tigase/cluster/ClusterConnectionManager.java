@@ -117,9 +117,6 @@ public class ClusterConnectionManager
 	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
 	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
 	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class.getName());
 	private static final String SERVICE_CONNECTED_TASK_FUTURE = "service-connected-task-future";
 

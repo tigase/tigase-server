@@ -47,9 +47,6 @@ import java.util.logging.Logger;
 public class StartTLSProcessor
 		implements ExtProcessor {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(StartTLSProcessor.class.getName());
 	private static final String EL_NAME = "starttls";
 	private static final String ID = EL_NAME;

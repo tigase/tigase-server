@@ -52,9 +52,6 @@ public class BindProcessor
 	private static final String[] IQ_BIND_HOSTNAME_PATH = {"iq", "bind", "hostname"};
 	private static final String[] IQ_UNBIND_PATH = {"iq", "unbind"};
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(BindProcessor.class.getName());
 	private static final String XMLNS = "urn:xmpp:component:0";
 	private static final String ID = EL_NAME;

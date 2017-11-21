@@ -137,9 +137,6 @@ public class VirtualComponent
 	 */
 	public static final String REDIRECT_TO_PROP_KEY = "redirect-to";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger("tigase.cluster.VirtualComponent");
 
 	//~--- fields ---------------------------------------------------------------

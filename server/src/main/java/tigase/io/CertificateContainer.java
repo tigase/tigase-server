@@ -540,10 +540,6 @@ public class CertificateContainer
 
 		/**
 		 * Using passed alias method searches for proper KeyManagerFactory to return proper certificate chain for alias
-		 *
-		 * @param alias
-		 *
-		 * @return
 		 */
 		@Override
 		public X509Certificate[] getCertificateChain(String alias) {
@@ -570,10 +566,6 @@ public class CertificateContainer
 
 		/**
 		 * Using passed alias method searches for proper KeyManagerFactory to return proper private key for alias
-		 *
-		 * @param alias
-		 *
-		 * @return
 		 */
 		@Override
 		public PrivateKey getPrivateKey(String alias) {
@@ -601,10 +593,6 @@ public class CertificateContainer
 		/**
 		 * Method retrieves requested server name from ExtendedSSLSession and uses it to return proper alias for server
 		 * certificate
-		 *
-		 * @param session
-		 *
-		 * @return
 		 */
 		private String chooseServerAlias(ExtendedSSLSession session) {
 			// Pick first SNIHostName in the list of SNI names.

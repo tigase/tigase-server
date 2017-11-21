@@ -119,9 +119,6 @@ public abstract class RosterAbstract {
 	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger(RosterAbstract.class.getName());
-	/**
-	 * Enum description
-	 */
 	public enum PresenceType {
 		out_initial,
 		out_subscribe,
@@ -138,9 +135,6 @@ public abstract class RosterAbstract {
 		error;
 	}
 
-	/**
-	 * Enum description
-	 */
 	public enum StateTransition {
 		none(SubscriptionType.none_pre_approved,                              // Table 1.
 			 SubscriptionType.none,                                       // Table 2.

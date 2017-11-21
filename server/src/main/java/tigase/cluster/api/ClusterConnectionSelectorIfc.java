@@ -35,11 +35,6 @@ public interface ClusterConnectionSelectorIfc {
 
 	/**
 	 * Method returns XMPPIOService instances which should be used to send packet between cluster nodes
-	 *
-	 * @param packet
-	 * @param conn
-	 *
-	 * @return
 	 */
 	XMPPIOService<Object> selectConnection(Packet packet, ClusterConnection conn);
 

@@ -43,9 +43,6 @@ import java.util.logging.Logger;
  */
 public class PacketDefaultHandler {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(PacketDefaultHandler.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

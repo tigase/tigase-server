@@ -436,9 +436,6 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Method queues and executes all timer tasks on Timer SINGLE thread.
 	 *
-	 * @param task
-	 * @param delay
-	 *
 	 * @deprecated
 	 */
 	@Deprecated
@@ -1040,10 +1037,6 @@ public abstract class AbstractMessageReceiver
 
 	/**
 	 * Method queues and executes all timer tasks on Timer SINGLE thread.
-	 *
-	 * @param task
-	 * @param delay
-	 * @param unit
 	 *
 	 * @deprecated
 	 */

@@ -50,9 +50,6 @@ public class TLSIO
 
 	public static final String TLS_CAPS = "tls-caps";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(TLSIO.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------

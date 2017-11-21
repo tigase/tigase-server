@@ -22,9 +22,6 @@ package tigase.component.adhoc;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 
-/**
- * Class description
- */
 public class AdHocCommandException
 		extends Exception {
 

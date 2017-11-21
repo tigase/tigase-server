@@ -50,9 +50,6 @@ import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
 public class SASLProcessor
 		implements ExtProcessor {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(SASLProcessor.class.getName());
 	private static final String ID = "sasl";
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";

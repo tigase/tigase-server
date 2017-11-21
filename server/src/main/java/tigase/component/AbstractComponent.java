@@ -55,11 +55,7 @@ public abstract class AbstractComponent
 		implements XMPPService, DisableDisco {
 
 	protected static final String COMPONENT = "component";
-	/** Logger */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
-	/**
-	 * Context of component.
-	 */
 
 	@Inject(bean = "eventBus")
 	protected EventBus eventBus;

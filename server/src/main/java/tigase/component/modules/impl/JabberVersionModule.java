@@ -29,9 +29,6 @@ import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
-/**
- * Class description
- */
 @Bean(name = JabberVersionModule.ID, active = true)
 public class JabberVersionModule
 		extends AbstractModule {

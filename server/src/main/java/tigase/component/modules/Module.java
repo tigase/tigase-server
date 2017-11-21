@@ -52,10 +52,6 @@ public interface Module {
 
 	/**
 	 * Returns true if Packet can be procesed by module. Default implementation uses Criteria.
-	 *
-	 * @param packet
-	 *
-	 * @return
 	 */
 	default boolean canHandle(Packet packet) {
 		Criteria criteria = getModuleCriteria();

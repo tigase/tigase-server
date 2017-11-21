@@ -43,8 +43,6 @@ import java.util.logging.Logger;
 //~--- JDK imports ------------------------------------------------------------
 
 /**
- * Class description
- *
  * @author Artur Hefczyc
  * @version 5.0.0, 2010.03.01 at 03:12:30 GMT
  */

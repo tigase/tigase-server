@@ -49,9 +49,6 @@ public class JabberClientStreamOpenHandler
 		implements StreamOpenHandler {
 
 	public static final String XMLNS = "jabber:client";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(JabberClientStreamOpenHandler.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

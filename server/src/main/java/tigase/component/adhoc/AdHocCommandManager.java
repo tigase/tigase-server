@@ -31,9 +31,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Class description
- */
 @Bean(name = "adHocCommandManager", active = true)
 public class AdHocCommandManager {
 
@@ -63,7 +60,7 @@ public class AdHocCommandManager {
 	/**
 	 * Method checks if exists implementation for this command in this CommandManager
 	 *
-	 * @param node
+	 * @param node name for which perform the check
 	 *
 	 * @return true - if command exists for this node
 	 */

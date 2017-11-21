@@ -89,10 +89,6 @@ public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserReposito
 
 	/**
 	 * Returns class name of a repository to initialize for domain
-	 *
-	 * @return
-	 *
-	 * @throws DBInitException
 	 */
 	@Override
 	protected String getRepositoryClassName() throws DBInitException {
@@ -127,8 +123,6 @@ public abstract class AuthUserRepositoryConfigBean<T, U extends AuthUserReposito
 
 	/**
 	 * Returns class name of repository pool for domain
-	 *
-	 * @return
 	 */
 	@Override
 	protected String getRepositoryPoolClassName() {

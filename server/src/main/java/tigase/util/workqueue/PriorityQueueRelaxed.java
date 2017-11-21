@@ -38,9 +38,6 @@ import java.util.logging.Logger;
 public class PriorityQueueRelaxed<E>
 		extends PriorityQueueAbstract<E> {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

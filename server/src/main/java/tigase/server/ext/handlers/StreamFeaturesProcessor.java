@@ -45,9 +45,6 @@ import java.util.logging.Logger;
 public class StreamFeaturesProcessor
 		implements ExtProcessor {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(StreamFeaturesProcessor.class.getName());
 	private static final String EL_NAME = "stream:features";
 	private static final String ID = EL_NAME;

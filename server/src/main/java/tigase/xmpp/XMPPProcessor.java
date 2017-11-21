@@ -61,9 +61,6 @@ public abstract class XMPPProcessor
 	protected static final String ALL_NAMES = "*";
 
 	protected static final String[][] ALL_PATHS = {{"*"}};
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(XMPPProcessor.class.getName());
 	protected static ComponentInfo cmpInfo = null;
 	@ConfigField(desc = "Queue size which should be used by processor")

@@ -72,9 +72,6 @@ public class BoshConnectionManager
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL = "etc/bosh-extra-headers.txt";
 	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_KEY = "client-access-policy-file";
 	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_VAL = "etc/client-access-policy.xml";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(BoshConnectionManager.class.getName());
 	private static final int DEF_PORT_NO = 5280;
 

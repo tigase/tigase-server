@@ -74,9 +74,6 @@ public class XMPPIOService<RefObject>
 
 	public static final String STREAM_CLOSING = "stream-closing";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(XMPPIOService.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

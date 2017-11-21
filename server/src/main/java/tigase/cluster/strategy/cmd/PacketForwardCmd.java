@@ -50,8 +50,6 @@ import java.util.logging.Logger;
 //~--- JDK imports ------------------------------------------------------------
 
 /**
- * Class description
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version 5.2.0, 13/06/22
  */
@@ -59,9 +57,6 @@ public class PacketForwardCmd
 		extends CommandListenerAbstract {
 
 	public static final String PACKET_FROM_KEY = "packet-from";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(PacketForwardCmd.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

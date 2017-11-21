@@ -37,8 +37,6 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Class description
- *
  * @author Artur Hefczyc
  * @version 5.1.0, 2010.09.11 at 02:08:58 BST
  */

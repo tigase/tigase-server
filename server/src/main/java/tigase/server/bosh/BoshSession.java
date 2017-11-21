@@ -59,9 +59,6 @@ public class BoshSession {
 
 	private static final String IQ_ELEMENT_NAME = "iq";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(BoshSession.class.getName());
 	private static final String MESSAGE_ELEMENT_NAME = "message";
 	private static final String PRESENCE_ELEMENT_NAME = "presence";
@@ -125,10 +122,6 @@ public class BoshSession {
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
-	 *
-	 * @param def_domain
-	 * @param dataReceiver
-	 * @param handler
 	 */
 	public BoshSession(String def_domain, JID dataReceiver, BoshSessionTaskHandler handler, String hostname,
 					   int maxWaitingPackets) {

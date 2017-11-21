@@ -37,9 +37,6 @@ import java.util.logging.Logger;
 public abstract class WorkerThread
 		extends Thread {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	protected static final Logger log = Logger.getLogger(WorkerThread.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

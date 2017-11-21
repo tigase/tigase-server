@@ -49,12 +49,6 @@ public class C2SDeliveryErrorProcessor {
 
 	/**
 	 * Filters packets created by processors to remove delivery-error payload
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param toIgnore
 	 */
 	public static void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 							  Queue<Packet> results, JID toIgnore) {
@@ -86,8 +80,6 @@ public class C2SDeliveryErrorProcessor {
 	/**
 	 * Finds delivery-error element in packet and returns it
 	 *
-	 * @param packet
-	 *
 	 * @return true - if packet is delivery-error
 	 */
 	public static Element getDeliveryError(Packet packet) {
@@ -99,8 +91,6 @@ public class C2SDeliveryErrorProcessor {
 	/**
 	 * Checks if packet is delivery-error packet
 	 *
-	 * @param packet
-	 *
 	 * @return true - if packet is delivery-error
 	 */
 	public static boolean isDeliveryError(Packet packet) {
@@ -111,10 +101,6 @@ public class C2SDeliveryErrorProcessor {
 
 	/**
 	 * Creates delivery-error packets to send to session manager to reprocess undelivered packets
-	 *
-	 * @param packet
-	 *
-	 * @return
 	 */
 	public static Packet makeDeliveryError(Packet packet, Long stamp) {
 		Packet result = packet.copyElementOnly();
@@ -130,14 +116,6 @@ public class C2SDeliveryErrorProcessor {
 	/**
 	 * Filters packets before they are processed by processors to filter out delivery-error packets sent to bare jid if
 	 * other connection is available
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @return
 	 */
 	public static boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 									 Queue<Packet> results, Map<String, Object> settings, Message messageProcessor) {

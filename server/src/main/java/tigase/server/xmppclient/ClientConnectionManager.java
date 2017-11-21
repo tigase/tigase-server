@@ -71,9 +71,6 @@ public class ClientConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>> {
 
 	protected static final String FORCE_REDIRECT_TO_KEY = "force-redirect-to";
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ClientConnectionManager.class.getName());
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
@@ -883,8 +880,6 @@ public class ClientConnectionManager
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 * <br>
 	 * Let's assume user should send something at least once every 24 hours....
 	 */

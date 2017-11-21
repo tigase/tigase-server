@@ -38,8 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Class description
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version 5.2.0, 13/03/09
  */
@@ -50,9 +48,6 @@ public class ClConSQLRepository
 		implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem, DataRepository>,
 		           RepositoryVersionAware {
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(ClConSQLRepository.class.getName());
 
 	//J-

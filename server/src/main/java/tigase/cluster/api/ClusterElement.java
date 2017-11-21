@@ -88,9 +88,6 @@ public class ClusterElement {
 														CLUSTER_METHOD_EL_NAME};
 	public static final String[] CLUSTER_DATA_PATH = {CLUSTER_EL_NAME, CLUSTER_DATA_EL_NAME};
 	public static final String[] CLUSTER_CONTROL_PATH = {CLUSTER_EL_NAME, CLUSTER_CONTROL_EL_NAME};
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger("tigase.cluster.ClusterElement");
 
 	//~--- fields ---------------------------------------------------------------

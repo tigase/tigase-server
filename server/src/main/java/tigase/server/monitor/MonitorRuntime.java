@@ -43,9 +43,6 @@ import java.util.logging.*;
 public class MonitorRuntime
 		extends TigaseRuntime {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(MonitorRuntime.class.getName());
 
 	private static MonitorRuntime runtime = null;

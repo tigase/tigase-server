@@ -46,9 +46,6 @@ import java.util.logging.Logger;
 public abstract class XMPPServiceCollector
 		extends AbstractComponentRegistrator<XMPPService> {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(XMPPServiceCollector.class.getName());
 

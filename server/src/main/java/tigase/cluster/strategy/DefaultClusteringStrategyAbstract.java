@@ -59,9 +59,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
 	@Inject

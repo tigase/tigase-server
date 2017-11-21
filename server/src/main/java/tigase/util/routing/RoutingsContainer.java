@@ -42,9 +42,6 @@ import static tigase.conf.Configurable.DEF_SM_NAME;
  */
 public class RoutingsContainer {
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger("tigase.util.RoutingsContainer");
 
 	private RoutingComputer comp = null;

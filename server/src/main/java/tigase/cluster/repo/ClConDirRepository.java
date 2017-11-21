@@ -49,9 +49,6 @@ public class ClConDirRepository
 
 	public static final String REPO_URI_DB_DEF_VAL = "etc/";
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(ClConDirRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
