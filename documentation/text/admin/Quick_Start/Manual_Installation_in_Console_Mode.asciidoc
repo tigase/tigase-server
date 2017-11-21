@@ -1,7 +1,7 @@
 [[manualinstall]]
 = Manual Installation in Console Mode
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
-:version: v3.0, October 2017: Reformatted for v7.2.0.
+:version: v3.0, October 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -92,7 +92,7 @@ total 36
 -----
 
 === Configure tigase.conf
-Tigase.conf is a file that contains general program operating parameters, and jave settings for Tigase to run.  For now, the only setting we need to set is the *JAVA_HOME* directory.
+Tigase.conf is a file that contains general program operating parameters, and java settings for Tigase to run.  For now, the only setting we need to set is the *JAVA_HOME* directory.
 
 [source,sh]
 -----
@@ -171,7 +171,7 @@ Creating the database is the next step.  Previously, we had scripts to handle th
 -----
 ./scripts/tigase.sh install-schema etc/tigase.conf -T derby -D tigasedb -H localhost -U tigase_user -P tigase_pass -R root -A rootpass -J admin@jabber.your-great.net -N pass
 -----
-This command will install tigase using a Derby database on one named tigasedb hosted on localhost.  The username and password editing the database is tigase_pass and root.  Note that -J explicetly adds the administrator, this is highly recommended with the -N passing the password.
+This command will install tigase using a Derby database on one named tigasedb hosted on localhost.  The username and password editing the database is tigase_pass and root.  Note that -J explicitly adds the administrator, this is highly recommended with the -N passing the password.
 You may customize this command as needed, refer to the xref:install-schema[install-schema] section of the documentation for more information.
 
 On a windows system, you need to call the program directly:

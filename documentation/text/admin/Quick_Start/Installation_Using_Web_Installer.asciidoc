@@ -1,7 +1,7 @@
 [[webinstall]]
 = Installation Using Web Installer
 :author: Eric Dziewa
-:version: v1.0, January 2015: Reformatted for v7.2.0.
+:version: v1.0, January 2015: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -57,7 +57,7 @@ This setup page is restricted access, however for first setup there is a default
 Username: admin
 Password: tigase
 
-This combination will only be valid once as it will be removed from init.properties file on compleation of setup process.  After this point the setup page will only be accessable using the following:
+This combination will only be valid once as it will be removed from config.tdsl file on completion of setup process.  After this point the setup page will only be accessible using the following:
 
 . JID accounts listed as administrators in admins line in config.tdsl file.
 . Username and password combinations added to config.tdsl file manually, or at the last page in this process.
@@ -85,7 +85,7 @@ If you do not specify an administrator and password, one is made for you, which 
 
 image:images/admin/web-install-04.png[]
 
-The Advanced configuration page. Select what components and configurations you need.  Some may be hilighted red to indicate conflicts or unmet requirements.
+The Advanced configuration page. Select what components and configurations you need.  Some may be highlighted red to indicate conflicts or unmet requirements.
 
 image:images/admin/web-install-05.png[]
 
@@ -110,7 +110,7 @@ The Setup Access Page will be locked from the admin/tigase user as specified abo
 image:images/admin/web-install-10.png[]
 
 The installation is complete and this is what the *config.tdsl* file will look like.
-If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current init.properties file.
+If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current config.tdsl file.
 Click "Save" to write the file to disk.
 
 image:images/admin/web-install-11.png[]

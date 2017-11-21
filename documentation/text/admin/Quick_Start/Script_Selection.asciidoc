@@ -1,7 +1,7 @@
 [[tigaseScriptStart]]
 = Tigase Script Selection
 :author: Daniel Wisnewski <daniel@mail.tigase.org>
-:version: v2.0, May 2016: Reformatted for v7.2.0.
+:version: v2.0, May 2016: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -107,7 +107,7 @@ TIGASE_CONSOLE_LOG=
 - `TIGASE_HOME` - The location of your Tigase Server installation directory.
 - `TIGASE_LIB` - The location of your Tigase Jars folder, you should not need to adjust this if you set `TIGASE_HOME` properly, and maintain the default file structure.
 - `TIGASE_CONFIG` - The location of your tigase.conf file relative to `TIGASE_HOME`
-- `TIGASE_OPTIONS` - Legacy options for Tigase, most are now handled in init.properties or tigase.conf.
+- `TIGASE_OPTIONS` - Legacy options for Tigase, most are now handled in config.tdsl or tigase.conf.
 - `TIGASE_PARAMS` - Parameters passed to command line when launching Tigase.
 
 - `PIDFILE` - Location of Tigase PID file if you wish to use custom directory.  Default will be located in /logs or /var/temp directory.
@@ -153,7 +153,7 @@ TIGASE_CONSOLE_LOG=
 
 - `TIGASE_HOME` - The location of your Tigase Server installation directory.
 - `TIGASE_CONFIG` - The location of your tigase-server.xml file relative (old configuration format)
-- `TIGASE_OPTIONS` - command line arguments passed to Tigase server (which may include path to `init.properies` (if correct `tigase.conf` configuration will be found then it will translate to `TIGASE_OPTIONS=" --property-file etc/init.properties "`
+- `TIGASE_OPTIONS` - command line arguments passed to Tigase server (which may include path to `init.properies` (if correct `tigase.conf` configuration will be found then it will translate to `TIGASE_OPTIONS=" --property-file etc/config.tdsl "`
 - `TIGASE_PARAMS` - Parameters passed to command line when launching Tigase.
 
 - `PIDFILE` - Location of Tigase PID file if you wish to use custom directory.  Default will be located in `/var/run/tigase/tigase.pid` or under (in this case relative to tigase home directory)`logs/tigase.pid`.

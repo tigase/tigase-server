@@ -1,7 +1,7 @@
 [[windowsInstallation]]
 = Windows Installation
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2014: Reformatted for v7.2.0.
+:version: v2.1, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -16,7 +16,7 @@ Make sure that you have Java JDK v8 installed on your system prior to installing
 == Step 1: Initial Setup
 Download the Tigase XMPP Server archive from link:https://projects.tigase.org/projects/tigase-server/files[our repository] and extract it to a directory of your choice.
 
-Once thiat is completed, enter the directory `win-stuff` and run the setup.bat program.  This program when run, will extract the necessary files to appropiate places on your computer.  The bat file should look like the following:
+Once that is completed, enter the directory `win-stuff` and run the setup.bat program.  This program when run, will extract the necessary files to appropriate places on your computer.  The bat file should look like the following:
 
 [source,bat]
 -----
@@ -44,7 +44,7 @@ Or you may run wrapper.exe or tigase.bat from the GUI.
 === 2A: Installing as a service
 The cleanest way to operate Tigase in a Windows environment is to install Tigase as a Service by running the InstallTigaseService.bat program.  This will install Tigase as a system service, and now the server can be controlled from the services.msc panel.  This allows for stopping, starting, and pausing of Tigase XMPP Server and allowing for graceful shutdowns.
 
-For a basic installation, MySQL is recommended over Derby DB.  For that putpose, we have included a basic installation guide for MySQL on Windows systems here:
+For a basic installation, MySQL is recommended over Derby DB.  For that purpose, we have included a basic installation guide for MySQL on Windows systems here:
 
 == MySQL Database Installation
 
@@ -66,7 +66,7 @@ On the next screen select option: 'Server Machine' and press 'Next' (pic. 3)
 
 image:images/admin/sql3.JPG[]
 
-On the forth windows leave the default" 'Multifunctional Database' and press 'Next' (pic. 4)
+On the forth windows leave the default" 'Multi-functional Database' and press 'Next' (pic. 4)
 
 image:images/admin/sql4.JPG[]
 

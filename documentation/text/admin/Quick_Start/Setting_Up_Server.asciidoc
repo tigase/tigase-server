@@ -1,7 +1,7 @@
 [[setupTigaseServer]]
 = Tigase Server Network Instructions
 :author: Daniel Wisnewski <daniel@mail.tigase.org>
-:version: v1.0, May 2016: Reformatted for v7.2.0.
+:version: v1.0, May 2016: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
