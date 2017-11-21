@@ -1,7 +1,7 @@
 [[statsticsDescription]]
 = Appendix I - Statistics description
 :author: Daniel Wisnewski (daniel@tigase.org)
-:version: v2.0, April 2017: Reformatted for 7.2.0.
+:version: v2.0, April 2017: Reformatted for 8.0.0.
 
 
 :toc:
@@ -13,14 +13,14 @@ Note that statistics are defined by {$component}/statistic so if you wanted Max 
 Statistics will not be provided by components that are not enabled.
 
 == Data source statistics
-Data sources used to access data storages such as JDBC (databases) or MongoDB provide statistcs related to stability of connections to data storage and number of open connections.
+Data sources used to access data storages such as JDBC (databases) or MongoDB provide statistics related to stability of connections to data storage and number of open connections.
 
 [width="100%",options="header"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 
 |Number of active data sources |
-Number of defined and active data sources (ie. connection pools). This is not a number of connections to data sources as it varies and is listed separately for every defined data source. |FINE |Integer |
+Number of defined and active data sources (i.e. connection pools). This is not a number of connections to data sources as it varies and is listed separately for every defined data source. |FINE |Integer |
 `dataSource/Number of data sources`
 
 |Number of connections for `{dataSourceName}` |
@@ -43,7 +43,7 @@ For every {method} declared in `UserRepository` we gather execution statistics. 
 
 [width="100%,options="header"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 
 |Average processing time of {method} |
 Average time taken by call of {method} for this data source since creation of data source (most likely from server startup). It includes time taken by calls which thrown exception, etc. |FINE |Integer |`userRepository/{repo}/{method}/Average processing time`
@@ -52,7 +52,7 @@ Average time taken by call of {method} for this data source since creation of da
 Number of exceptions the specified method has caused |FINE |Integer |`userRepository/{repo}/{method}/Exceptions during execution`
 
 |Number of exceptions of a {method} in last {interval} |
-Number of exceptions the specified method has caused within the specified interval |FINEST |Integer |`userRepository/{repo}/{method}/Excutions last {interval}`
+Number of exceptions the specified method has caused within the specified interval |FINEST |Integer |`userRepository/{repo}/{method}/Executions last {interval}`
 
 |Number of executions of a {method} |
 Number of times specified method has been executed |FINE |Integer |`userRepository/{repo}/{method}/Executions`
@@ -64,7 +64,7 @@ For every {method} declared in `AuthRepository` we gather execution statistics. 
 
 [width="100%,options="header"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 
 |Average processing time of {method} |
 Average time it takes to process {method}. |FINE |Integer |`authRepository/{repo}/{method}/Average processing time`
@@ -73,7 +73,7 @@ Average time it takes to process {method}. |FINE |Integer |`authRepository/{repo
 Number of times {method} has caused an exception. |FINE |Integer |`authRepository/{repo}/{method}/Exceptions during execution`
 
 |Number of exceptions of {method} in last {interval} |
-Number of times {method} has caused an exception within the specified interval. |FINEST |Integer |`authRepository/{repo}/{method}/Excutions last {interval}`
+Number of times {method} has caused an exception within the specified interval. |FINEST |Integer |`authRepository/{repo}/{method}/Executions last {interval}`
 
 |Number of executions of {method} |
 Number of times {method} has been executed. |FINE |Integer |`authRepository/{repo}/{method}/Executions`
@@ -94,7 +94,7 @@ For custom component repositories we gather statistics in a same way as we do fo
 Statistics are collected on per {method} basis separately for every data source ({dataSourceName}) for which repository is defined.
 [width="100%,options="header",cols="d,d,d,d,m"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 
 |Average processing time of {method} |
 Average time it takes to process {method}. |FINE |Integer |{compname}/{repo}/{dataSourceName}/{method}/Average processing time
@@ -106,7 +106,7 @@ Number of exceptions {method} has caused. |FINE |Integer |{compname}/{repo}/{dat
 Number of times {method} has been executed. |FINE |Integer |{compname}/{repo}/{dataSourceName}/{method}/Executions
 
 |Number of executions of a {method} in last {interval}.
-Number of times {method} has been executed within the last interval.  Available intervals are hour, minute, second. |FINEST  |Integer |{compname}/{repo}/{dataSourceName}/{method}/Excutions last {interval}
+Number of times {method} has been executed within the last interval.  Available intervals are hour, minute, second. |FINEST  |Integer |{compname}/{repo}/{dataSourceName}/{method}/Executions last {interval}
 |===================================================================================================
 
 == *Statistics common to components*
@@ -121,7 +121,7 @@ c2s/Bytes received
 
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 
 |add-script last {interval}
 |The number of times that `add-script` adhoc command has been run within the last interval. |FINEST |Integer |
@@ -351,7 +351,7 @@ No exclusive amp specific statistics
 == *bosh*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |Bosh sessions
 |The number of currently open and running BOSH sessions to the server. |FINEST |Integer | |`bosh/Bosh sessions`
 
@@ -376,7 +376,7 @@ No exclusive c2s specific statistics.
 == *cl-comp*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |adhoc-command/cluster-nodes-list last {interval}
 |The number of times per interval that the cluster-nodes-list command has been executed. |FINEST |Integer |
 hour
@@ -442,7 +442,7 @@ second
 |`cl-comp/Known cluster nodes`
 
 |Last {interval} disconnects
-|The number of cluster disconnections within the specified interval. |FINE |Comma Seperated Array |
+|The number of cluster disconnections within the specified interval. |FINE |Comma Separated Array |
 day
 hour
 |`cl-comp/Last day disconnects`
@@ -465,7 +465,7 @@ No exclusive eventbus specific statistics.
 == *message-archive*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |Removal time of expired messages (avg)
 |The average amount of time in milliseconds it takes to remove expired messages from the repository. This includes manual and automatic removal of messages. |FINE |Integer |
 |`message-archive/Removal time of expired messages (avg)`
@@ -474,7 +474,7 @@ No exclusive eventbus specific statistics.
 == *message-router*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |CPUs no
 |The number of CPUs available on the host machine. |FINEST |Integer |
 |`message-router/CPUs no`
@@ -539,7 +539,7 @@ No exclusive eventbus specific statistics.
 
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |adhoc-command/load-errors last {interval}
 |The number of times per interval that the load-errors command has been executed. |FINEST |Integer |
 hour
@@ -558,7 +558,7 @@ second
 
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |adhoc-command/remove-room last {interval}
 |The number of times per interval that the remove-room command has been executed. |FINEST |Integer |
 hour
@@ -589,7 +589,7 @@ second
 == *proxy*
 [width="100%,options="header",cols="d,d,d,d,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 |Average transfer size in KB
 |Average size of packets sent through the proxy component during the current session. |FINEST |Integer
 |`proxy/Average transfer size in KB`
@@ -610,7 +610,7 @@ second
 == *pubsub*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |Added new nodes
 |The total number of new nodes that has been added in the current server instance.  This statistic is reset when the server resets. |FINEST |Integer |
 |`pubsub/Added new nodes`
@@ -702,7 +702,7 @@ second
 |`pubsub/Affiliations count (in cache)`
 
 |Average DB write time [ms]
-|The average time of all DB writes from PubSub component.  Average is calculated using two other statistics: (Total writing time / Database writes) |FIENST |Integer |
+|The average time of all DB writes from PubSub component.  Average is calculated using two other statistics: (Total writing time / Database writes) |FINEST |Integer |
 |`pubsub/Average DB write time [ms]`
 
 |cache/hits last {interval}
@@ -976,7 +976,7 @@ second
 `pubsub/RetrieveItemsModule last second`
 
 |RetrieveItemsModule/Average processing time
-|The average time in ms, returned as an integer, it takes for `RetrieveItemsModule` to execute. |FIENST |Integer |
+|The average time in ms, returned as an integer, it takes for `RetrieveItemsModule` to execute. |FINEST |Integer |
 |`pubsub/RetrieveItemsModule/Average processing time`
 
 |RetrieveSubscriptionsModule last {interval}
@@ -1048,7 +1048,7 @@ second
 == *repo-factory*
 [width="100%,options="header",cols="d,d,d,d,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 |Number of data repositories
 |The number of data repositories setup for this XMPP server. |FINE |Integer
 |`repo-factory/Number of data repositories`
@@ -1073,7 +1073,7 @@ No exclusive rest specific statistics
 == *s2s*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 
 |CIDs number
 |ConnectionID for the server.  This may include multiple CIDs if server is running multiple vhosts. |FINEST |String |
@@ -1148,10 +1148,10 @@ second
 == *sess-man*
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |Available {field} |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 
 |Active user connections
-|Number of user connections that are considered active.  An active user is a user that has sent stanzas to the server or through the server within the last 5 minutes. |FINER |Iterger |
+|Number of user connections that are considered active.  An active user is a user that has sent stanzas to the server or through the server within the last 5 minutes. |FINER |Integer |
 |`sess-man/Active user connections`
 
 |adhoc-command/connection-time last {interval}
@@ -1572,7 +1572,7 @@ Lost: Number of packets lost during processing. +
 == *vhost-man*
 [width="100%,options="header",cols="d,d,d,d,v"]
 |===================================================================================================
-|Statistics Name |Description |Stastics Level |Format |List of Possible Stastics
+|Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
 
 |Checks is anonymous domain
 |Number of anonymous domain checks that have been run within vhost-man. |FINEST |Integer
