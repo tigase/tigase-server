@@ -60,9 +60,6 @@ public class RosterPresence
 	private static final RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 	private static final Element[] FEATURES = RosterAbstract.FEATURES;
 	private static final Element[] DISCO_FEATURES = RosterAbstract.DISCO_FEATURES;
-	/**
-	 * Private logger for class instance.
-	 */
 	private static Logger log = Logger.getLogger(RosterPresence.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

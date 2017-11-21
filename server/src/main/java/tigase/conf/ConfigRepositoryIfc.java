@@ -46,10 +46,6 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Returns all known settings for the given component name.
-	 *
-	 * @param compName
-	 *
-	 * @throws ConfigurationException
 	 */
 	Map<String, Object> getProperties(String compName) throws ConfigurationException;
 
@@ -59,11 +55,6 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Sets/adds properties for the given component name.
-	 *
-	 * @param compName
-	 * @param props
-	 *
-	 * @throws ConfigurationException
 	 */
 	void putProperties(String compName, Map<String, Object> props) throws ConfigurationException;
 
@@ -72,11 +63,6 @@ public interface ConfigRepositoryIfc
 	/**
 	 * Returns a configuration setting for a given component, node and key. If the configuration parameters is not
 	 * found, returns given default value.
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 * @param def
 	 */
 	Object get(String compName, String node, String key, Object def);
 
@@ -84,11 +70,6 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Puts/sets/adds/updates a configuration setting to the configuration repository.
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 * @param value
 	 */
 	void set(String compName, String node, String key, Object value);
 
@@ -101,9 +82,6 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Returns an array of all configuration keys for a given component and configuration node.
-	 *
-	 * @param compName
-	 * @param node
 	 */
 	String[] getKeys(String compName, String node);
 
@@ -111,21 +89,12 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Removes a configuration setting from the configuration repository.
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
 	 */
 	void remove(String compName, String node, String key);
 
 	/**
 	 * Method adds an Item to the configuration repository where the key is the item key constructed of component name,
 	 * node name and property key name.
-	 *
-	 * @param key
-	 * @param value
-	 *
-	 * @throws ConfigurationException
 	 */
 	void addItem(String key, Object value) throws ConfigurationException;
 
@@ -135,8 +104,6 @@ public interface ConfigRepositoryIfc
 	 * This is used to load a configuration for a selected cluster node. The configuration repository (file or database)
 	 * may contain settings for all cluster nodes, some of the settings may be exclusive to one or another cluster node.
 	 * This method informs the repository what node name (hostname) it is running on.
-	 *
-	 * @param hostname
 	 */
 	void setDefHostname(String hostname);
 
@@ -144,5 +111,3 @@ public interface ConfigRepositoryIfc
 
 	Map<String, Object> getInitProperties();
 }
-
-//~ Formatted in Tigase Code Convention on 13/03/04

@@ -303,8 +303,6 @@ public class SessionManagerClustered
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * If the installation knows about user's JID, that he is connected to the system, then this method returns all
 	 * user's connection IDs. As an optimization we can forward packets to all user's connections directly from a single
 	 * node.

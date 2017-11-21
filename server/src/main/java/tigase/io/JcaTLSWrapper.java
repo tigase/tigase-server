@@ -311,7 +311,7 @@ public class JcaTLSWrapper
 	}
 
 	/**
-	 * Method <code>resizeApplicationBuffer</code> is used to perform
+	 * Method <code>resizeApplicationBuffer</code> is used to perform buffer resizing
 	 */
 	private ByteBuffer resizeApplicationBuffer(ByteBuffer net, ByteBuffer app) {
 

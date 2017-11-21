@@ -621,8 +621,6 @@ public class VHostItem
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * The method exports the <code>VHostItem</code> object to XML representation.
 	 *
 	 * @return an <code>Element</code> object with VHost information.

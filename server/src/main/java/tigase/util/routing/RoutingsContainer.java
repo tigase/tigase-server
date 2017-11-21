@@ -46,9 +46,6 @@ public class RoutingsContainer {
 
 	private RoutingComputer comp = null;
 
-	/**
-	 * Creates a new <code>RoutingsContainer</code> instance.
-	 */
 	public RoutingsContainer(boolean multiMode) {
 		if (multiMode) {
 			comp = new MultiMode();

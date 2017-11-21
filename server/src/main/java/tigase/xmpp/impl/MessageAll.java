@@ -56,7 +56,6 @@ public class MessageAll
 
 	protected static final String ID = "message-all";
 	private static final String[][] ELEMENTS = {{"message"}};
-	/** Class logger */
 	private static final Logger log = Logger.getLogger(MessageAll.class.getName());
 	private static final String XMLNS = "jabber:client";
 	private static final String[] XMLNSS = {XMLNS};

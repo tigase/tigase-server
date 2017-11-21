@@ -109,13 +109,6 @@ public class ConfiguratorOld
 				"      option as it prints set value afterwards.\n";
 	}
 
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 *
-	 * @throws Exception
-	 */
 	public static void main(final String[] args) throws Exception {
 		force = false;
 		if ((args != null) && (args.length > 0)) {

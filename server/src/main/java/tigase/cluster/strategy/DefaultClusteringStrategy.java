@@ -297,10 +297,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * @param fromNode
-	 * @param visitedNodes
-	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
 		List<JID> cl_nodes_list = getNodesConnected();

@@ -239,9 +239,6 @@ public class TigaseCustomAuth
 	public static final String DEF_NONSASL_MECHS = "password";
 	public static final String DEF_SASL_MECHS = "PLAIN";
 	public static final String SP_STARTS_WITH = "{ call";
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(TigaseCustomAuth.class.getName());
 	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
 

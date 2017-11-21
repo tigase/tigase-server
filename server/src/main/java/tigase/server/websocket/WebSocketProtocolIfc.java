@@ -46,23 +46,14 @@ public interface WebSocketProtocolIfc {
 
 	/**
 	 * Method to retrieve string identifier of implementation of protcol version
-	 *
-	 * @return
 	 */
 	String getId();
 
 	/**
 	 * Method responsible for handshaking of WebSocket using proper version of protocol.
 	 *
-	 * @param service
-	 * @param headers
-	 * @param buf
-	 *
 	 * @return false - if implementation is not able to handshake using this version of protocol, in other case return
 	 * true
-	 *
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
 	 */
 	boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
 			throws NoSuchAlgorithmException, IOException;
@@ -71,27 +62,17 @@ public interface WebSocketProtocolIfc {
 	 * Method responsible for decoding data received from socket and returning data after extracting it from WebSocket
 	 * frame.
 	 *
-	 * @param service
-	 * @param buf
-	 *
 	 * @return decoded data or null if not full frame is available in input buffer
 	 */
 	ByteBuffer decodeFrame(WebSocketXMPPIOService service, ByteBuffer buf);
 
 	/**
 	 * Method encodes data into WebSocket frame and writes it to passed service
-	 *
-	 * @param service
-	 * @param buf
-	 *
-	 * @throws IOException
 	 */
 	void encodeFrameAndWrite(WebSocketXMPPIOService service, ByteBuffer buf) throws IOException;
 
 	/**
 	 * Method closes connection by sending close frame
-	 *
-	 * @param service
 	 */
 	void closeConnection(WebSocketXMPPIOService service);
 

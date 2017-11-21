@@ -33,7 +33,7 @@ public interface Credentials {
 	/**
 	 * Returns bare jid of an account
 	 *
-	 * @return
+	 * @return bare jid of an account
 	 */
 	BareJID getUser();
 
@@ -45,8 +45,6 @@ public interface Credentials {
 	/**
 	 * Find a credential for specified mechanism
 	 *
-	 * @param mechanism
-	 *
 	 * @return instance of an entry if available or null
 	 */
 	Entry getEntryForMechanism(String mechanism);
@@ -54,7 +52,7 @@ public interface Credentials {
 	/**
 	 * Returns first available instance of credentials entry
 	 *
-	 * @return
+	 * @return first available instance of credentials entry
 	 */
 	Entry getFirst();
 
@@ -67,17 +65,14 @@ public interface Credentials {
 		/**
 		 * Name of mechanism for which decoder works
 		 *
-		 * @return
+		 * @return name of mechanism for which decoder works
 		 */
 		String getName();
 
 		/**
 		 * Decode password stored in database to more suitable form.
 		 *
-		 * @param user
-		 * @param value to decode
-		 *
-		 * @return
+		 * @return password stored in database in more suitable form
 		 */
 		Entry decode(BareJID user, String value);
 
@@ -92,17 +87,17 @@ public interface Credentials {
 		/**
 		 * Name of mechanism for which encoder works
 		 *
-		 * @return
+		 * @return name of mechanism for which encoder works
 		 */
 		String getName();
 
 		/**
 		 * Encrypt plaintext password for user
 		 *
-		 * @param user
+		 * @param user for which encrypt
 		 * @param password to encode
 		 *
-		 * @return
+		 * @return encrypted plaintext password for user
 		 */
 		String encode(BareJID user, String password);
 

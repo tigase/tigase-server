@@ -40,9 +40,6 @@ public class Deliver
 		implements ConditionIfc {
 
 	private static final String name = "deliver";
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger(Deliver.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

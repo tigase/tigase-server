@@ -87,8 +87,6 @@ public class PresenceSubscription
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * Performs processing of <em>presence</em> packets and calls different methods for particular {@link PresenceType}
 	 */
 	@SuppressWarnings({"unchecked", "fallthrough"})

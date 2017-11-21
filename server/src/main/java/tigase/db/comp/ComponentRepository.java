@@ -53,15 +53,11 @@ public interface ComponentRepository<Item extends RepositoryItem>
 
 	/**
 	 * Adds a listener for repository Item change.
-	 *
-	 * @param repoChangeListener
 	 */
 	void addRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener);
 
 	/**
 	 * Removes a listener for repository Item change.
-	 *
-	 * @param repoChangeListener
 	 */
 	void removeRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener);
 
@@ -159,8 +155,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * completed the item should no longer be available in the component repository.
 	 *
 	 * @param key a <code>String</code> with domain name to remove.
-	 *
-	 * @throws TigaseDBException
 	 */
 	void removeItem(String key) throws TigaseDBException;
 
@@ -189,8 +183,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	/**
 	 * The method is called to store all data in the database. It is used when the repository has been changed in some
 	 * way and the changes have to be put to a permanent storage for later retrieval.
-	 *
-	 * @throws TigaseDBException
 	 */
 	void store() throws TigaseDBException;
 

@@ -79,9 +79,6 @@ public class Privacy {
 
 	public static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger(Privacy.class.getName());
 
 	//~--- methods --------------------------------------------------------------

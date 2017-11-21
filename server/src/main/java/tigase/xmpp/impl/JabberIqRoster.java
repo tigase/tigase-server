@@ -59,11 +59,9 @@ public class JabberIqRoster
 		implements XMPPProcessorIfc {
 
 	public static final String ANON = "anon";
-	/** unique ID of the plugin */
 	protected static final String ID = RosterAbstract.XMLNS;
 	private static final String[][] ELEMENTS = {{Iq.ELEM_NAME, Iq.QUERY_NAME}, {Iq.ELEM_NAME, Iq.QUERY_NAME},
 												{Iq.ELEM_NAME, Iq.QUERY_NAME}};
-	/** Private logger for class instance. */
 	private static final Logger log = Logger.getLogger(JabberIqRoster.class.getName());
 	private static final String[] XMLNSS = {RosterAbstract.XMLNS, RosterAbstract.XMLNS_DYNAMIC,
 											RosterAbstract.XMLNS_LOAD};
@@ -206,8 +204,6 @@ public class JabberIqRoster
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 * <br>
 	 * Performs processing of <em>IQ</em> packets with <em>jabber:iq:roster</em> xmlns with the regard whether it's
 	 * roster <em>set</em> or <em>get</em> request or possibly dynamic-roster is involved. request.

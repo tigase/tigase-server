@@ -59,9 +59,6 @@ public class JabberIqIq
 	protected static final String ID = XMLNS;
 	private static final String[] XMLNSS = {XMLNS};
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger(JabberIqIq.class.getName());
 	/**
 	 * I don't want to have any offensive texts in my code so let's encode them with Base64....

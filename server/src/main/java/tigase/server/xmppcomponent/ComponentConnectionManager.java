@@ -482,8 +482,6 @@ public class ComponentConnectionManager
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * We should not really close external component connection at all, so let's say something like: 1000 days...
 	 */
 	@Override

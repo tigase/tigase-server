@@ -51,9 +51,6 @@ public class DynamicRoster
 
 	private static final EnumSet<SubscriptionType> subs = EnumSet.noneOf(SubscriptionType.class);
 	private static DynamicRoster instance;
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRoster");
 	@Inject(nullAllowed = true)
 	private DynamicRosterIfc[] dynamicRosters;

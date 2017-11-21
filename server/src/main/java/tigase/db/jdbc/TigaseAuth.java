@@ -58,9 +58,6 @@ import static tigase.db.AuthRepository.Meta;
 public class TigaseAuth
 		implements AuthRepository, DataSourceAware<DataRepository>, RepositoryVersionAware {
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger("tigase.db.jdbc.TigaseAuth");
 	private static final String[] non_sasl_mechs = {"password"};
 	private static final String[] sasl_mechs = {"PLAIN"};

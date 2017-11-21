@@ -67,9 +67,6 @@ public class DrupalWPAuth
 	public static final String WP_PASS_FLD = "user_pass";
 	public static final String WP_STATUS_FLD = "user_status";
 	public static final int WP_OK_STATUS_VAL = 0;
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(DrupalWPAuth.class.getName());
 	private static final String[] non_sasl_mechs = {"password"};
 	private static final String[] sasl_mechs = {"PLAIN"};

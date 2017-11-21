@@ -30,10 +30,6 @@ import java.util.List;
  */
 public interface LoadBalancerIfc {
 
-	/**
-	 * @param p
-	 * @param conns
-	 */
 	ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns);
 
 }

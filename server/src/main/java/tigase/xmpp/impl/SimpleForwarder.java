@@ -45,9 +45,6 @@ public abstract class SimpleForwarder
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger(SimpleForwarder.class.getName());
 
 	//~--- methods --------------------------------------------------------------

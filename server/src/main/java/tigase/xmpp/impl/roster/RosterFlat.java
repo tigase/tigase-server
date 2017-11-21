@@ -51,9 +51,6 @@ import java.util.logging.Logger;
 public class RosterFlat
 		extends RosterAbstract {
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(RosterFlat.class.getName());
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 

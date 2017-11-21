@@ -54,15 +54,8 @@ public abstract class RepositoryAccess {
 
 	protected static final String NOT_AUTHORIZED_MSG = "Session has not been yet authorised.";
 	private static final String ANONYMOUS_MECH = "ANONYMOUS";
-
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger("tigase.xmpp.RepositoryAccess");
 
-	//~--- fields ---------------------------------------------------------------
-
-	// ~--- fields ---------------------------------------------------------------
 
 	protected AuthRepository authRepo = null;
 	/**
@@ -84,9 +77,6 @@ public abstract class RepositoryAccess {
 
 	/**
 	 * Creates a new <code>RepositoryAccess</code> instance.
-	 *
-	 * @param rep
-	 * @param auth
 	 */
 	public RepositoryAccess(UserRepository rep, AuthRepository auth) {
 		repo = rep;

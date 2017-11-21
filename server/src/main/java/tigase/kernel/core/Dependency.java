@@ -23,9 +23,6 @@ package tigase.kernel.core;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
-/**
- * Class describing dependency.
- */
 public class Dependency {
 
 	private BeanConfig beanConfig;

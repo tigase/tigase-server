@@ -58,10 +58,6 @@ public class CompSQLRepository
 	public static final String TABLE_NAME = "external_component";
 	private static final String CONNECTION_TYPE_COLUMN = "connection_type";
 	private static final String DOMAIN_COLUMN = "domain";
-
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(CompSQLRepository.class.getName());
 	private static final String OTHER_DATA_COLUMN = "other_data";
 	private static final String PASSWORD_COLUMN = "password";
@@ -388,8 +384,6 @@ public class CompSQLRepository
 
 	/**
 	 * Performs database check, creates missing schema if necessary
-	 *
-	 * @throws SQLException
 	 */
 	private void checkDB() throws SQLException {
 		data_repo.checkTable(tableName, CREATE_TABLE_QUERY);

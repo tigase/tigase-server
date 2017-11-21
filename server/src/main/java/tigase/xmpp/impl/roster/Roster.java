@@ -46,9 +46,6 @@ import java.util.logging.Logger;
 public class Roster
 		extends RosterAbstract {
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Roster");
 
 	//~--- methods --------------------------------------------------------------

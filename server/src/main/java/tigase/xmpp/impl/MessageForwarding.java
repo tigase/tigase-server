@@ -54,7 +54,6 @@ public class MessageForwarding
 	protected static final String ID = "message-vhost-forward";
 	private static final String FORWARD_EL = "forward";
 	private static final String FORWARD_XMLNS = "http://tigase.org/protocol/forward#v1";
-	/** Class logger */
 	private static final Logger log = Logger.getLogger(MessageForwarding.class.getName());
 	private static final String XMLNS = "jabber:client";
 	private static final String[][] ELEMENTS = {{tigase.server.Message.ELEM_NAME}};

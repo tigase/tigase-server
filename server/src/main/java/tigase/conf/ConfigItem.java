@@ -67,9 +67,6 @@ public class ConfigItem
 
 	public static final String VALUE_TYPE_ATTR = "value-type";
 
-	/**
-	 * Private logger for class instance.
-	 */
 	private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -156,8 +153,6 @@ public class ConfigItem
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 * <br>
 	 * Returns ConfigItem key which is constructed in a following way: {@code compName + "/" + nodeName + "/" +
 	 * keyName}
@@ -315,9 +310,6 @@ public class ConfigItem
 	/**
 	 * Checks if the given node and key are equal to this item nodeName and keyName. This method call works the same way
 	 * as following statement: {@code isNode(node) && isKey(key) }
-	 *
-	 * @param node
-	 * @param key
 	 */
 	public boolean isNodeKey(String node, String key) {
 		return isNode(node) && isKey(key);

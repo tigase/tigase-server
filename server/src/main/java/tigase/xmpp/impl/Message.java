@@ -61,7 +61,6 @@ public class Message
 
 	protected static final String ELEM_NAME = tigase.server.Message.ELEM_NAME;
 	protected static final String XMLNS = "jabber:client";
-	/** Class logger */
 	private static final Logger log = Logger.getLogger(Message.class.getName());
 	private static final String DELIVERY_RULES_KEY = "delivery-rules";
 	private static final String SILENTLY_IGNORE_ERROR_KEY = "silently-ignore-message";
@@ -231,12 +230,6 @@ public class Message
 	/**
 	 * Method returns list of XMPPResourceConnections to which message should be delivered for session passes as
 	 * parameter if message was sent to bare JID
-	 *
-	 * @param session
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getConnectionsForMessageDelivery(XMPPResourceConnection session)
 			throws NotAuthorizedException {
@@ -257,12 +250,6 @@ public class Message
 	/**
 	 * Method returns list of JIDs to which message should be delivered for session passes as parameter if message was
 	 * sent to bare JID
-	 *
-	 * @param session
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
 	 */
 	public Set<JID> getJIDsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
 		Set<JID> jids = new HashSet<JID>();
@@ -277,10 +264,6 @@ public class Message
 	/**
 	 * Method returns true if there is at least one XMPPResourceConnection which is allowed to receive message for
 	 * XMPPResourceConnection
-	 *
-	 * @param session
-	 *
-	 * @return
 	 */
 	public boolean hasConnectionForMessageDelivery(XMPPResourceConnection session) {
 		try {

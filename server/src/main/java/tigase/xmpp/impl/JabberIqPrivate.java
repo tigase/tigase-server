@@ -62,9 +62,6 @@ public class JabberIqPrivate
 	private static final String[] XMLNSS = {XMLNS};
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-	/**
-	 * Private logger for class instancess.
-	 */
 	private static Logger log = Logger.getLogger(JabberIqPrivate.class.getName());
 
 	//~--- methods --------------------------------------------------------------

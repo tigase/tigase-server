@@ -60,10 +60,6 @@ public class JabberIqAuth
 		implements XMPPProcessorIfc {
 
 	private static final String[][] ELEMENT_PATHS = {Iq.IQ_QUERY_PATH};
-
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(JabberIqAuth.class.getName());
 	private static final String XMLNS = "jabber:iq:auth";
 	protected static final String ID = XMLNS;

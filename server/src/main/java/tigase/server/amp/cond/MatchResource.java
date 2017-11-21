@@ -41,9 +41,6 @@ public class MatchResource
 		implements ConditionIfc {
 
 	private static final String name = "match-resource";
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger(MatchResource.class.getName());
 
 	//~--- constant enums -------------------------------------------------------

@@ -215,10 +215,6 @@ public class DataSourceBean
 
 		/**
 		 * Check if event was emitted by provided instance of <code>DataSourceBean</code>
-		 *
-		 * @param bean
-		 *
-		 * @return
 		 */
 		public boolean isCorrectSender(DataSourceBean bean) {
 			return this.bean == bean;

@@ -66,8 +66,6 @@ public class DummyRepository
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 *
 	 * @return a <code>String</code> value of null always.
 	 */
@@ -78,8 +76,6 @@ public class DummyRepository
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 *
 	 * @return a <code>String</code> value of null always.
 	 */
@@ -91,7 +87,6 @@ public class DummyRepository
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
 	 *
 	 * @return a <code>String</code> value of null always.
 	 */

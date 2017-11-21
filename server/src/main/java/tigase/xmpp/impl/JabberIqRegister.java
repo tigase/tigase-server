@@ -244,8 +244,6 @@ public class JabberIqRegister
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * TODO: Implement registration form configurable and loading all the fields from the registration form TODO:
 	 * rewrite the plugin using the XMPPProcessorAbstract API
 	 */

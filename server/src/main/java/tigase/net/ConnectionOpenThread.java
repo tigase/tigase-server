@@ -45,9 +45,6 @@ import java.util.logging.Logger;
 public class ConnectionOpenThread
 		implements Runnable {
 
-	/**
-	 *
-	 */
 	public static final long def_5222_throttling = 200;
 
 	public static final long def_5223_throttling = 50;
@@ -92,9 +89,6 @@ public class ConnectionOpenThread
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Creates a new <code>ConnectionOpenThread</code> instance.
-	 */
 	private ConnectionOpenThread() {
 		timer = new Timer("Connections open timer", true);
 		timer.scheduleAtFixedRate(new TimerTask() {

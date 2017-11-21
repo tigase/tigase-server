@@ -51,9 +51,6 @@ public class LogFormatter
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Creates a new <code>LogFormatter</code> instance.
-	 */
 	public LogFormatter() {
 	}
 

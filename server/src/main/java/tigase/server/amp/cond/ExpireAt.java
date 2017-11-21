@@ -44,10 +44,6 @@ public class ExpireAt
 		implements ConditionIfc {
 
 	public static final String NAME = "expire-at";
-
-	/**
-	 * Private logger for class instances.
-	 */
 	private static Logger log = Logger.getLogger(ExpireAt.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

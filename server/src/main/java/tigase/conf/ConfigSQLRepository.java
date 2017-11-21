@@ -54,9 +54,6 @@ public class ConfigSQLRepository
 
 	public static final String CONFIG_REPO_URI_INIT_KEY = "--tigase-config-repo-uri";
 
-	/**
-	 * Private logger for class instancess.
-	 */
 	private static final Logger log = Logger.getLogger(ConfigSQLRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

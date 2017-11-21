@@ -96,9 +96,6 @@ public class JabberIqPrivacy
 			return or1.compareTo(or2);
 		}
 	};
-	/**
-	 * Private logger for class instances.
-	 */
 	protected static Logger log = Logger.getLogger(JabberIqPrivacy.class.getName());
 	protected static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 	@Inject(nullAllowed = true)
@@ -251,8 +248,6 @@ public class JabberIqPrivacy
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 * <br>
 	 * <code>preProcess</code> method checks only incoming stanzas so it doesn't check for presence-out at all.
 	 */
@@ -665,11 +660,6 @@ public class JabberIqPrivacy
 
 		/**
 		 * Creates a new <code>XMPPResourceConnection</code> instance.
-		 *
-		 * @param connectionId
-		 * @param rep
-		 * @param authRepo
-		 * @param loginHandler
 		 */
 		public OfflineResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
 										 SessionManagerHandler loginHandler) {

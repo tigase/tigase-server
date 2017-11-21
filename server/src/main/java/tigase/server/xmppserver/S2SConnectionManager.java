@@ -530,8 +530,6 @@ public class S2SConnectionManager
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * Secret is used in generation of dialback key
 	 */
 	@Override

@@ -224,9 +224,6 @@ public final class XMPPServer {
 				"Author:  Artur Hefczyc <artur.hefczyc@tigase.org>\n" + "-- \n";
 	}
 
-	/**
-	 * Creates a new <code>XMPPServer</code> instance.
-	 */
 	private XMPPServer() {
 	}
 }    // XMPPServer

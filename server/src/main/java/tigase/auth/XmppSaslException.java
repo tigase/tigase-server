@@ -95,26 +95,16 @@ public class XmppSaslException
 	}
 	private SaslError saslError;
 
-	/**
-	 * @param saslError
-	 */
 	public XmppSaslException(SaslError saslError) {
 		super();
 		this.saslError = saslError;
 	}
 
-	/**
-	 * @param saslError
-	 * @param detail
-	 */
 	public XmppSaslException(SaslError saslError, String detail) {
 		super(detail);
 		this.saslError = saslError;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getSaslErrorElementName() {
 		return saslError == null ? null : saslError.getElementName();
 	}

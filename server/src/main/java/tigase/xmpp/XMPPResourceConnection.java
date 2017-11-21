@@ -76,9 +76,6 @@ public class XMPPResourceConnection
 	 */
 	public static final String PRESENCE_KEY = "user-presence";
 
-	/**
-	 * Private logger for class instances.
-	 */
 	private static final Logger log = Logger.getLogger(XMPPResourceConnection.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -122,14 +119,6 @@ public class XMPPResourceConnection
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Creates a new <code>XMPPResourceConnection</code> instance.
-	 *
-	 * @param connectionId
-	 * @param rep
-	 * @param authRepo
-	 * @param loginHandler
-	 */
 	public XMPPResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
 								  SessionManagerHandler loginHandler) {
 		super(rep, authRepo);

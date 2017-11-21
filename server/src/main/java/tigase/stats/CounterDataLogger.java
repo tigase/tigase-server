@@ -276,12 +276,6 @@ public class CounterDataLogger
 	 *
 	 * @param conn_str database connection URI
 	 * @param map map of the additional parameters
-	 *
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws DBInitException
 	 */
 	public void initRepository(String conn_str, Map<String, String> map)
 			throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException,

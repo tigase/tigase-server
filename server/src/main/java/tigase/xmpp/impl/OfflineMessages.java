@@ -89,7 +89,6 @@ public class OfflineMessages
 	 * Field holds identification string for the plugin. In case of {@code msgoffline} plugin it is <em>msgoffline</em>
 	 */
 	protected static final String ID = "msgoffline";
-	/** Private logger for class instances. */
 	private static final Logger log = Logger.getLogger(OfflineMessages.class.getName());
 	/**
 	 * Field holds an array for element paths for which the plugin offers processing capabilities. In case of {@code
@@ -144,8 +143,6 @@ public class OfflineMessages
 	/**
 	 * {@inheritDoc}
 	 * <br>
-	 * <br><br>
-	 * <br>
 	 * OfflineMessages postprocessor simply calls {@code savePacketForOffLineUser} method to store packet to offline
 	 * repository.
 	 */
@@ -197,8 +194,6 @@ public class OfflineMessages
 
 	/**
 	 * {@inheritDoc}
-	 * <br>
-	 * <br><br>
 	 * <br>
 	 * {@code OfflineMessages} processor is triggered by {@code <presence>} stanza. Upon receiving it plugin tries to
 	 * load messages from repository and, if the result is not empty, sends them to the user
@@ -467,10 +462,6 @@ public class OfflineMessages
 
 	/**
 	 * Method determines whether packet sent to offline user should be stored in offline storage or not
-	 *
-	 * @param pac
-	 *
-	 * @return
 	 */
 	protected boolean isAllowedForOfflineStorage(Packet pac) {
 		// custom element matchers override default values so let's check

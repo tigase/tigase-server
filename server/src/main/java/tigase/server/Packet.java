@@ -86,9 +86,6 @@ public class Packet {
 
 	public static final String XMLNS_ATT = "xmlns";
 
-	/**
-	 *
-	 */
 	public static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**

@@ -155,15 +155,6 @@ public interface AuthRepository
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Describe <code>addUser</code> method here.
-	 *
-	 * @param user a <code>BareJID</code> value
-	 * @param password a <code>String</code> value
-	 *
-	 * @throws UserExistsException if an error occurs
-	 * @throws TigaseDBException if an error occurs
-	 */
 	void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException;
 
 	/**
@@ -201,27 +192,8 @@ public interface AuthRepository
 	 */
 	void loggedIn(BareJID jid) throws TigaseDBException;
 
-	/**
-	 * Describe <code>logout</code> method here.
-	 *
-	 * @param user a <code>BareJID</code> value
-	 *
-	 * @throws UserNotFoundException if an error occurs
-	 * @throws TigaseDBException if an error occurs
-	 */
 	void logout(BareJID user) throws UserNotFoundException, TigaseDBException;
 
-	/**
-	 * Describe <code>otherAuth</code> method here.
-	 *
-	 * @param authProps a <code>Map</code> value
-	 *
-	 * @return a <code>boolean</code> value
-	 *
-	 * @throws UserNotFoundException if an error occurs
-	 * @throws TigaseDBException if an error occurs
-	 * @throws AuthorizationException if an error occurs
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	boolean otherAuth(Map<String, Object> authProps)
@@ -236,29 +208,12 @@ public interface AuthRepository
 	@TigaseDeprecated(since = "8.0.0")
 	void queryAuth(Map<String, Object> authProps);
 
-	/**
-	 * Describe <code>removeUser</code> method here.
-	 *
-	 * @param user a <code>BareJID</code> value
-	 *
-	 * @throws UserNotFoundException if an error occurs
-	 * @throws TigaseDBException if an error occurs
-	 */
 	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException;
 
-	/**
-	 * Describe <code>updatePassword</code> method here.
-	 *
-	 * @param user a <code>BareJID</code> value
-	 * @param password a <code>String</code> value
-	 *
-	 * @throws UserNotFoundException
-	 * @throws TigaseDBException if an error occurs
-	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	void updatePassword(BareJID user, String password) throws UserNotFoundException, TigaseDBException;

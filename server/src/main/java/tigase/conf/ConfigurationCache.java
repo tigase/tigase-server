@@ -48,9 +48,6 @@ public class ConfigurationCache
 
 	public static final String CONFIG_DUMP_FILE_PROP_KEY = "config-dump-file";
 
-	/**
-	 * Private logger for class instance.
-	 */
 	private static final Logger log = Logger.getLogger(ConfigurationCache.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

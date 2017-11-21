@@ -26,9 +26,6 @@ import tigase.xmpp.jid.BareJID;
 
 import java.util.Objects;
 
-/**
- *
- */
 public class CmdAcl {
 
 	public static final CmdAcl ADMIN = new CmdAcl(Type.ADMIN.name());

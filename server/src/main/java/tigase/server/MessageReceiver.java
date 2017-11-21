@@ -44,25 +44,10 @@ import java.util.Queue;
 public interface MessageReceiver
 		extends ServerComponent {
 
-	/**
-	 * Describe <code>addPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 *
-	 * @return a <code>boolean</code> value <code>true</code> if packet has been successfully added, <code>false</code>
-	 * otherwise.
-	 */
 	boolean addPacket(Packet packet);
 
 	boolean addPacketNB(Packet packet);
 
-	/**
-	 * Describe <code>addPackets</code> method here.
-	 *
-	 * @param packets
-	 *
-	 * @return a <code>boolean</code> value
-	 */
 	boolean addPackets(Queue<Packet> packets);
 
 	//~--- get methods ----------------------------------------------------------
@@ -82,11 +67,6 @@ public interface MessageReceiver
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Describe <code>setParent</code> method here.
-	 *
-	 * @param msg_rec a <code>MessageReceiver</code> value
-	 */
 	void setParent(MessageReceiver msg_rec);
 
 	//~--- methods --------------------------------------------------------------
@@ -94,7 +74,3 @@ public interface MessageReceiver
 	void start();
 
 }
-
-//~ Formatted in Sun Code Convention
-
-//~ Formatted by Jindent --- http://www.jindent.com

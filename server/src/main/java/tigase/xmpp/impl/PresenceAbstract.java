@@ -63,7 +63,6 @@ public abstract class PresenceAbstract
 
 	protected static final String XMLNS = CLIENT_XMLNS;
 
-	/** Private logger for class instance. */
 	private static final Logger log = Logger.getLogger(PresenceAbstract.class.getName());
 	//private static final String[]   PRESENCE_PRIORITY_PATH  = { "presence", "priority" };
 	//private static final String[]   XMLNSS                  = { XMLNS, RosterAbstract.XMLNS_LOAD };
