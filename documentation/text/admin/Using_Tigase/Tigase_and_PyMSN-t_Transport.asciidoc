@@ -1,7 +1,7 @@
 [[Pymsn-t]]
 = Tigase and PyMSN-t Transport
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for v7.2.0.
+:version: v2.0, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -28,7 +28,7 @@ Here is side by side configuration for both applications: PyMSN-t and Tigase to 
 
 Tigase server connects to MySQL database (or built-in XMLBD for simpler configuration variant).
 
-I am not going to setup *PyMSN-t* to run in background as a system service. This is specific to the system you use and is covered in transport documentation and your operating system. Most systems have their own scripts to start services so I would recommend to use them. Here howeevr, it is run in the foreground with full logging switched on to the console to make it easier track what happens.
+I am not going to setup *PyMSN-t* to run in background as a system service. This is specific to the system you use and is covered in transport documentation and your operating system. Most systems have their own scripts to start services so I would recommend to use them. Here however, it is run in the foreground with full logging switched on to the console to make it easier track what happens.
 
 == PyMSN-t - /etc/jabber/pymsn-t.xml file
 

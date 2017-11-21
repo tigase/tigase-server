@@ -1,7 +1,7 @@
 [[logs]]
 = Tigase Log Guide
 :author: Daniel Wisnewski
-:version: v1.0, August 2015: Reformatted for v7.2.0.
+:version: v1.0, August 2015: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -30,7 +30,7 @@ tigase-console.log
 This log file is a basic list of files that are made on install of Tigase server.  Although you may not need to use it, it can provide a handy list to see if any files were not written to your hard drive upon installation.
 
 == derby.log
-If you are using the derby database installed with Tigase, this is the startup log for the database itself.  Issues that might be related to the database, can be found in this file.  Typically, if everything works okay, it's a very small file with only 10 lines.  It is overwritten on startup of the datbase.
+If you are using the derby database installed with Tigase, this is the startup log for the database itself.  Issues that might be related to the database, can be found in this file.  Typically, if everything works okay, it's a very small file with only 10 lines.  It is overwritten on startup of the database.
 
 == config-dump.properties
 The config-dump.properties is dump file of all your properties listed for every option within Tigase and components.  The structure of the log lines is as follows.
@@ -62,7 +62,7 @@ The process ID may sometimes come in a different format such as `[in_14-muc]` wh
 
 tigase.log can get very large in size rather quickly reaching it's maximum size.  To prevent the loss of information, we have implemented a rotating file system.  The server begins writing to tigase.log.0 when it is first run, and continues to dump information until the log size limit is hit. At this point, Tigase renames tigase.log.0 as tigase.log.1. A new tigase.log.0 will be created, and Tigase will begin logging to this file.  When this file is full, tigase.log.1 will be renamed tigase.log.2 and tigase.log.0 will be renamed tigase.log.1.  Using this scheme, tigase.log.0 will *always* be your most recent log.
 
-By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of 10 files. You can edit these values by editing the init.properties guide and adding the following lines.
+By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of 10 files. You can edit these values by editing the init.tdsl file and adding the following lines.
 
 [source,dsl]
 -----
@@ -73,12 +73,12 @@ logging {
     }
 }
 -----
-This code, if entered into the init.properties file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
+This code, if entered into the init.tdsl file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
 
 _You may see a tigase.log.0.ick file in the directory while the server is running.  This is a temporary file only and is deleted once Tigase is cleanly shut down._
 
 == statistics.log.#
-Statistics log will duplicate any information that is related to sending of statistics to Tigase if you are using an unlicenced copy of Tigase XMPP server.  Mainly it will consist output of +LicenceChecker+.  The numbering logic will be the same as tigase.log.# files.
+Statistics log will duplicate any information that is related to sending of statistics to Tigase if you are using an unlicensed copy of Tigase XMPP server.  Mainly it will consist output of +LicenceChecker+.  The numbering logic will be the same as tigase.log.# files.
 
 == tigase.pid
 tigase.pid is a file that just contains the Process ID or PID for the current run of Tigase. It is only valid for the current or most recent run cycle and is overwritten every time Tigase starts.
@@ -91,7 +91,7 @@ You may see tags such as INFO or WARNING in the logs. Although they may contain 
 
 ERROR flags are issues you will want to pay attention as they may list problems that prevent Tigase or components from properly functioning.
 
-*NOTE* Windows does not create this file, rather the output is shown in the commandline and is not dumped to a file.
+*NOTE* Windows does not create this file, rather the output is shown in the command line and is not dumped to a file.
 
 If Tigase is gracefully shut down, tigase-console.log will add statistics from the server's operation life in the following format.
 -----
@@ -104,7 +104,7 @@ This file can be handy if you are tracking issues in the server.
 tigase-console.log is appended during each run session of the server.
 
 == Log File Location
-You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following lines in your init.properties file:
+You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following lines in your init.tdsl file:
 [source,dsl]
 -----
 logging {

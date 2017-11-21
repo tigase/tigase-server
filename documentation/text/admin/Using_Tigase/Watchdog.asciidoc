@@ -1,7 +1,7 @@
 [[watchdog]]
 = Watchdog
 :author: Wojciech Kapcia
-:version: v2.0, October 2017: Reformatted for v7.2.0.
+:version: v2.0, October 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:

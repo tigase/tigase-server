@@ -1,17 +1,17 @@
 [[licenseserver]]
 = Licensing
 :author: Daniel Wisnewski
-:version: v2.0, March 2016: Reformatted for v7.2.0.
+:version: v2.0, March 2016: Reformatted for v8.0.0.
 
 :numbered:
 :website: http://tigase.net
 :toc:
 
 With the release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
-This process makes it easier for everyone to obtain valid licence file when needed.
+This process makes it easier for everyone to obtain valid license file when needed.
 Users who do not wish to register will not be required to register.  However, If you are using Tigase ACS or other commercial pieces of software, you will be required to register.
 
-WARNING: Tigase XMPP Server will shut down during license check if no installation-id or licence is received within a given period of time.
+WARNING: Tigase XMPP Server will shut down during license check if no installation-id or license is received within a given period of time.
 
 *Again, Tigase XMPP Server will still be available free under AGPLv3, and free users will not need to register.*
 
@@ -26,12 +26,12 @@ There are currently two ways for registering for a license with Tigase commercia
 === Automatic Registration
 
 Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve an _Installation ID_ from our servers, and make a file called `installation-id` in your `etc/` directory including the _Installation ID_ for your instance.  An installation ID is generated using the complete cluster map and all machines within the same cluster should have the same _Installation ID_.
-This _Installation ID_ will then be sent along with server details to a license server, and appropriate licence files will be made in your _tigasedir/etc_ directory. When the licence is due to be expired, this mechanism will update your licence file automatically.
+This _Installation ID_ will then be sent along with server details to a license server, and appropriate license files will be made in your _tigasedir/etc_ directory. When the license is due to be expired, this mechanism will update your license file automatically.
 
 === Web Portal
 
-If you do not wish to use the automatic method, you may decide to generate a licence file using our web portal.
-Offline installation may obtain _Installation IDs_ from our web portal in a three-step process: registration, generating hash, and obtaining licence file.
+If you do not wish to use the automatic method, you may decide to generate a license file using our web portal.
+Offline installation may obtain _Installation IDs_ from our web portal in a three-step process: registration, generating hash, and obtaining license file.
 
 ==== Generating Installation ID
 
@@ -41,7 +41,7 @@ Data Fields:
 
 - `Customer name`: Company or user name used to identify machines.  Multiple clusters or servers can have the same customer name.
 - `VHosts`: Comma separated list of VHosts you will be using on this node.  NOTE: these fields are case sensitive!
-- `Legacy license hashes`: Copy the digest hash generated for all legacy licences - it's available in the `etc/tigase-console.log` after startup (if such licences are present).
+- `Legacy license hashes`: Copy the digest hash generated for all legacy licenses - it's available in the `etc/tigase-console.log` after startup (if such licenses are present).
 - `Captcha question`: Enter the basic math answer for this form to prove you are not a robot.
 
 The next page will provide you with an installation ID like the following:
@@ -58,7 +58,7 @@ Note that the `installation-id` file will be made automatically once the license
 
 ==== Obtaining a Server Code
 
-Once you have the _Installation ID_, you will need to generate a server code.  This can be done by accessing the admin UI page and navigating to the Licence section. Once there, click on Retrieve code for licence. Select the component you wish to generate a code for and click Submit.  You will see a fields with installation-id, module, VHosts filled out based on your server's configuration.  Copy the contents of the Code field and proceed to the next section.
+Once you have the _Installation ID_, you will need to generate a server code.  This can be done by accessing the admin UI page and navigating to the License section. Once there, click on Retrieve code for license. Select the component you wish to generate a code for and click Submit.  You will see a fields with installation-id, module, VHosts filled out based on your server's configuration.  Copy the contents of the Code field and proceed to the next section.
 
 ==== Obtaining license file
 
@@ -74,7 +74,7 @@ Communications will be made to license.tigase.net over https (port 443) to verif
 
 == Demo mode
 If no valid license can be found, Tigase will revert to a demonstration mode.  Most functions will be available and usable, but with a caveat.  Statistics from that server will be sent to stats.tigase.net over port 8080 about your server and it's usage.  Details are in the next section.
-If this information cannot be sent, the server will assume unathorized use and will shut down.
+If this information cannot be sent, the server will assume unauthorized use and will shut down.
 
 === Statistics Sent
 Statistics of your server may be sent to Tigase server's if the all of following happens:
@@ -236,7 +236,7 @@ NOTE: The text below has been better formatted for readability, but does not ref
 
 == Unauthorized use
 Tigase will consider itself unauthorized if the following conditions are met:
-- If Tigase XMPP server does not have a valid license file and cannot contact the licensing server to obtain installation id and attached licences.
+- If Tigase XMPP server does not have a valid license file and cannot contact the licensing server to obtain installation id and attached licenses.
 
 Then the program will then attempt to send statistics.
 

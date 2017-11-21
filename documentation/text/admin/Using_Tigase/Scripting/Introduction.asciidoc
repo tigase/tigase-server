@@ -1,7 +1,7 @@
 [[scriptingintro]]
 = Scripting Introduction - Hello World!
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2014: Reformatted for v7.2.0.
+:version: v2.1, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:

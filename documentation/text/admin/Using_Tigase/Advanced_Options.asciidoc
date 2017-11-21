@@ -1,7 +1,7 @@
 [[tigaseAdvancedOptions]]
 = Tigase Advanced Options
 :author: Daniel Wisnewski
-:version: v2.0 June 2017. Reformatted for v7.2.0.
+:version: v2.0 June 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -11,7 +11,7 @@ This section is designed to include a number of advanced configuration options a
 
 [[XEP0077CAPCHA]]
 == Using CAPTCHA for in-band registration
-To reduce false or spam registrations to Tigase XMPP Server, there is now the ability to add CAPTCHA forms as a part of the in-band registration.  The CAPTCHA will generate a random math equation and ask the user registering a new account to answer it.  This may be enabled as a sub-option of enabling registration in init.properties:
+To reduce false or spam registrations to Tigase XMPP Server, there is now the ability to add CAPTCHA forms as a part of the in-band registration.  The CAPTCHA will generate a random math equation and ask the user registering a new account to answer it.  This may be enabled as a sub-option of enabling registration in init.tdsl:
 [source,dsl]
 -----
 'sess-man' {
@@ -21,14 +21,14 @@ To reduce false or spam registrations to Tigase XMPP Server, there is now the ab
 }
 -----
 
-NOTE: Because some clients do not refresh a registration form after an uncessfull attempt, this option allows 3 retries with the same CAPTCHA.
+NOTE: Because some clients do not refresh a registration form after an unsuccessful attempt, this option allows 3 retries with the same CAPTCHA.
 
-3 unsucessful attempts will result in the captcha being invalidated and a client will recieve an error message.
+3 unsuccessful attempts will result in the captcha being invalidated and a client will receive an error message.
 
 [[emptyNicks]]
 == Enabling Empty Nicknames
 
-Tigase can now support users with empty nicknames.  This can be enabled by adding the following code in init.properties.
+Tigase can now support users with empty nicknames.  This can be enabled by adding the following code in init.tdsl.
 [source,dsl]
 ------
 'sess-man' {
@@ -83,7 +83,7 @@ To enable counting of these errors, you must ensure the processor is included in
 === Including stream errors
 
 Stream `ERROR` packets are not included in the above counter by default as they are processed separately.
-To enable this to be added to the counter, the following line must be in your init.properties file.
+To enable this to be added to the counter, the following line must be in your init.tdsl file.
 [source,dsl]
 -----
 c2s {
@@ -106,7 +106,7 @@ c2s {
     }
 }
 -----
-The above setting in init.properties file will change the default timeout period to 90 seconds.
+The above setting in init.tdsl file will change the default timeout period to 90 seconds.
 
 [source,dsl]
 -----

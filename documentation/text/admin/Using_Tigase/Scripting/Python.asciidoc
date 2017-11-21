@@ -1,11 +1,12 @@
 [[tigaseandPython]]
 = Tigase and Python
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2014: Reformatted for v7.2.0.
+:version: v2.1, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net
+
 //below line moved since page is not available
 //Looking in the link:http://www.tigase.org/content/what-scripting-language-you-would-use-admin-commands-tigase[last poll] it is clear that the most people are mainly interested in Python support in the Tigase server.
 //link below needs updating
@@ -70,6 +71,6 @@ Except this minor difference, the rest part of scripting in Python for the Tigas
 
 link:http://docs.tigase.org/tigase-server/snapshot/Development_Guide/html_chunk/cil6.html[In another article], I am going to present the Tigase server API available for scripting framework. My main language is Groovy as it offers the best integration with JVM and Tigase API, however I will try to include Python example code as well.
 
-I hope this article encourages you to try the scripting support in the Tigase server. If you have any suggestions or questions please do not hesitate to send me your comments. I have also created a new link:http://www.tigase.org/forums/tigase-scripts[tigase scripts] forum on the website. If you have an interesting script to share or want to discuss some aspects of this functionality do not hesitate to add your post.
+//I hope this article encourages you to try the scripting support in the Tigase server. If you have any suggestions or questions please do not hesitate to send me your comments. I have also created a new link:http://www.tigase.org/forums/tigase-scripts[tigase scripts] forum on the website. If you have an interesting script to share or want to discuss some aspects of this functionality do not hesitate to add your post.
 
 - link:files/jython-2.5.1.jar[jython-2.5.1.jar] 6.44 MB

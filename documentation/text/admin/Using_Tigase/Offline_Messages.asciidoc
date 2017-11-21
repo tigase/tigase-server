@@ -1,7 +1,7 @@
 [[offlineMessages]]
 = Offline Messages
 :author: Daniel Wisnewski
-:version: v2.0, June 2017. Reformatted for v7.2.0.
+:version: v2.0, June 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -180,7 +180,7 @@ For example, if you wanted to store messages with <received> element, but not on
 -----
 However....
 
-NOTE: THE ABOVE STATEMENT WILL NOT WORK As it will just store all messages with <receieved> subelement.
+NOTE: THE ABOVE STATEMENT WILL NOT WORK As it will just store all messages with <received> subelement.
 
 The below statement will properly filter your results.
 
