@@ -171,7 +171,7 @@ public class CounterDataFileLogger
 							pathsQueue.addAll(existingFilesPaths);
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.log(Level.WARNING, "Reading statistics files list", e);
 					}
 					log.log(Level.CONFIG, "Statistics files collection finished in: {0}s ",
 							new Object[]{(System.currentTimeMillis() - start) / 1000});

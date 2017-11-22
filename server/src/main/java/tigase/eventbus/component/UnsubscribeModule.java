@@ -147,7 +147,7 @@ public class UnsubscribeModule
 				}
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error creating packet instance", e);
 		}
 	}
 

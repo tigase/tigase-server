@@ -41,6 +41,8 @@ import java.util.stream.Stream;
  */
 public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
+	protected static final Logger log = Logger.getLogger(SchemaLoader.class.getName());
+
 	public static enum Result {
 		ok,
 		error,
@@ -81,7 +83,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 			try {
 				loader = (SchemaLoader) clazz.newInstance();
 			} catch (IllegalAccessException | InstantiationException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, "Error creating instance", e);
 			}
 			return loader;
 		}).filter(Objects::nonNull);

@@ -75,7 +75,7 @@ public interface DataSource
 				final RepositoryVersionAware repositoryVersionAware = (RepositoryVersionAware) datasourceClass.newInstance();
 				implementationVersion = repositoryVersionAware.getVersion();
 			} catch (InstantiationException | IllegalAccessException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, "Error creating instance", e);
 				implementationVersion = Version.of(datasourceClass.getPackage().getImplementationVersion());
 			}
 

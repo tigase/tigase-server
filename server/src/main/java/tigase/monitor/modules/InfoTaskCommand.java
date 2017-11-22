@@ -33,12 +33,16 @@ import tigase.monitor.MonitorComponent;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static tigase.monitor.modules.InfoTaskCommand.NODE;
 
 @Bean(name = NODE, parent = MonitorComponent.class, active = true)
 public class InfoTaskCommand
 		implements AdHocCommand {
 
+	private final static Logger log = Logger.getLogger(InfoTaskCommand.class.getName());
 	public static final String NODE = "x-info";
 
 	@Inject
@@ -62,7 +66,7 @@ public class InfoTaskCommand
 				response.getElements().add(form.getElement());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "Error executing script", e);
 			throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

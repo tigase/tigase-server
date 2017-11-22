@@ -139,7 +139,7 @@ public class JavaJMXProxyOpt
 				}
 				start();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, "Error handling notification", e);
 			}
 
 			return;

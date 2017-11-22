@@ -167,7 +167,7 @@ public class OldConfigHolder {
 						}
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.log(Level.FINEST, "Error detecting paths script", e);
 				}
 			}
 		}

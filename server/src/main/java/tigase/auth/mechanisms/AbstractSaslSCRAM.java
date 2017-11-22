@@ -174,7 +174,7 @@ public abstract class AbstractSaslSCRAM
 		} catch (SaslException e) {
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "Error evaluating response", e);
 			throw new SaslException("SASL Failed", e);
 		}
 	}

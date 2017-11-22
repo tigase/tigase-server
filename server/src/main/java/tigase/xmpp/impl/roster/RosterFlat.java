@@ -495,14 +495,8 @@ public class RosterFlat
 				saveUserRoster(session);
 				// notify that roster element was changed!
 			}
-		} catch (NotAuthorizedException ex) {
-
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
-		} catch (TigaseDBException ex) {
-
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
+		} catch (NotAuthorizedException | TigaseDBException ex) {
+			log.log(Level.WARNING, "Error logging out user", ex);
 		}
 	}
 

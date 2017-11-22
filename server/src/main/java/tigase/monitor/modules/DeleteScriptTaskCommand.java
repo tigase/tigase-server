@@ -37,11 +37,14 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
 
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Bean(name = "x-delete-task", parent = MonitorComponent.class, active = true)
 public class DeleteScriptTaskCommand
 		implements AdHocCommand {
 
+	private final static Logger log = Logger.getLogger(DeleteScriptTaskCommand.class.getName());
 	@Inject
 	private MonitorComponent component;
 	@Inject
@@ -90,7 +93,7 @@ public class DeleteScriptTaskCommand
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "Error executing script", e);
 			throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

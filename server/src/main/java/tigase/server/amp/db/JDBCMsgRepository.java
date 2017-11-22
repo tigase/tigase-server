@@ -188,7 +188,6 @@ public class JDBCMsgRepository
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
 			log.log(Level.WARNING, "Problem getting offline messages for user: " + to, e);
 		}
 		return result;

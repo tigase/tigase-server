@@ -39,11 +39,14 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Bean(name = "x-add-timer-task", parent = MonitorComponent.class, active = true)
 public class AddTimerScriptTaskCommand
 		implements AdHocCommand {
 
+	private final static Logger log = Logger.getLogger(AddTimerScriptTaskCommand.class.getName());
 	@Inject
 	private MonitorComponent component;
 	@Inject
@@ -102,7 +105,7 @@ public class AddTimerScriptTaskCommand
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "Error adding script", e);
 			throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

@@ -606,13 +606,13 @@ public class SchemaManager {
 																						  bc);
 									return new RepoInfo(bc1, dataSource, implementation);
 								} catch (Exception ex) {
-									ex.printStackTrace();
+									log.log(Level.WARNING, "Error getting repository implementation", ex);
 									return null;
 								}
 							});
 				}
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				log.log(Level.WARNING, "Error getting repository implementation", ex);
 				return Stream.empty();
 			}
 		}).filter(Objects::nonNull).collect(Collectors.toList());
@@ -1006,7 +1006,7 @@ public class SchemaManager {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error creating instance", e);
 		}
 		return null;
 	}

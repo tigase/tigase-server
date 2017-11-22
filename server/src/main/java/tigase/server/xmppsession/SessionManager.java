@@ -1466,7 +1466,7 @@ public class SessionManager
 																						  "Unexpected error occured during the request: " +
 																								  e, true));
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						log.log(Level.WARNING, "Error creating response packet", ex);
 					}
 					log.log(Level.WARNING, "USER_STATUS session creation error: ", e);
 				}
@@ -1653,7 +1653,7 @@ public class SessionManager
 																							  "There is no implementation for such command on the server.",
 																							  true));
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						log.log(Level.WARNING, "Error creating instance", ex);
 					}
 					log.log(Level.WARNING, "There is no implementation for such command on the server: " + iqc);
 					processing_result = true;

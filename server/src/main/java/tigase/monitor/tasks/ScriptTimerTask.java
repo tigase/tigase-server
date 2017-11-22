@@ -26,10 +26,14 @@ import tigase.monitor.ConfigurableTask;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ScriptTimerTask
 		extends AbstractConfigurableTimerTask
 		implements ConfigurableTask {
+
+	private static final Logger log = Logger.getLogger(ScriptTimerTask.class.getName());
 
 	@Inject
 	protected Bindings bindings;
@@ -74,7 +78,7 @@ public class ScriptTimerTask
 		try {
 			engine.eval(script, bindings);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error while executing SimpleTimerTask", e);
 		}
 	}
 

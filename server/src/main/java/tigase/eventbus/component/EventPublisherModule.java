@@ -152,7 +152,7 @@ public class EventPublisherModule
 				publishEvent(eventElem, from, toJID);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "Error publishing event", e);
 		}
 	}
 

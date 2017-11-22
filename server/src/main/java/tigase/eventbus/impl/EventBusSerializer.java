@@ -29,10 +29,13 @@ import tigase.xml.XMLUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EventBusSerializer
 		implements Serializer {
 
+	private static final Logger log = Logger.getLogger(EventBusSerializer.class.getName());
 	private TypesConverter typesConverter = new DefaultTypesConverter();
 
 	public <T> T deserialize(final Element element) {
@@ -71,12 +74,12 @@ public class EventBusSerializer
 					}
 					BeanUtils.setValue(result, f, value);
 				} catch (IllegalAccessException | InvocationTargetException caught) {
-					caught.printStackTrace();
+					log.log(Level.WARNING, "Error while deserializing", caught);
 				}
 			}
 			return (T) result;
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error while deserializing", e);
 			return null;
 		}
 	}
@@ -113,7 +116,7 @@ public class EventBusSerializer
 				}
 				e.addChild(v);
 			} catch (IllegalAccessException | InvocationTargetException caught) {
-				caught.printStackTrace();
+				log.log(Level.WARNING, "Error while serializing", e);
 			}
 		}
 

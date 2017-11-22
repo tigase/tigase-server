@@ -49,7 +49,7 @@ public class TasksScriptRegistrar {
 		try {
 			repo.removeItem(taskName);
 		} catch (TigaseDBException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error accessing repository", e);
 		}
 	}
 
@@ -108,14 +108,9 @@ public class TasksScriptRegistrar {
 			for (TaskConfigItem item : repo.allItems()) {
 				initTaskFromTaskConfig(item);
 			}
-		} catch (TigaseDBException e) {
-			e.printStackTrace();
-		} catch (ScriptException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error loading task", e);
 		}
-
 	}
 
 	public void registerScript(String scriptName, String scriptExtension, String scriptContent) throws ScriptException {
@@ -154,7 +149,7 @@ public class TasksScriptRegistrar {
 		try {
 			repo.addItem(item);
 		} catch (TigaseDBException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error accessing repository", e);
 		}
 	}
 

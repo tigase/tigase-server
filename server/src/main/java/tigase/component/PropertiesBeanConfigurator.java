@@ -298,7 +298,7 @@ public class PropertiesBeanConfigurator
 
 						result.add(entry);
 					} catch (IllegalAccessException | InvocationTargetException e) {
-						e.printStackTrace();
+						log.log(Level.WARNING, "Error getting bean configuration value", e);
 					}
 				}
 			}

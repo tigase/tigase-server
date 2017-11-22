@@ -88,14 +88,14 @@ public class JDBCMsgBroadcastRepository
 			synchronized (stmt) {
 				try {
 					Timestamp ts = new Timestamp(System.currentTimeMillis());
-					System.out.println("loading expiring after " + ts);
+					log.log(Level.FINEST, "loading expiring after " + ts);
 					data_repo.setTimestamp(stmt, 1, ts);
 					rs = stmt.executeQuery();
 
 					DomBuilderHandler domHandler = new DomBuilderHandler();
 					while (rs.next()) {
 						String msgId = rs.getString(1);
-						System.out.println("loaded msg with id = " + msgId);
+						log.log(Level.FINEST, "loaded msg with id = " + msgId);
 						oldMessages.remove(msgId);
 						if (broadcastMessages.containsKey(msgId)) {
 							continue;
@@ -109,13 +109,13 @@ public class JDBCMsgBroadcastRepository
 						Queue<Element> elems = domHandler.getParsedElements();
 						Element msg = elems.poll();
 						if (msg == null) {
-							System.out.println("not adding - msg is null!");
+							log.log(Level.FINEST, "not adding - msg is null!");
 							continue;
 						}
 
 						broadcastMessages.put(msgId, new BroadcastMsg(null, msg, expire));
 					}
-					System.out.println("message loading finished!");
+					log.log(Level.FINEST, "message loading finished!");
 				} finally {
 					data_repo.release(null, rs);
 				}

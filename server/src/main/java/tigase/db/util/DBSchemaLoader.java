@@ -169,8 +169,6 @@ public class DBSchemaLoader
 		// configure logger
 		Level lvl = params.logLevel;
 
-		System.out.println("LogLevel: " + lvl);
-
 		log.setUseParentHandlers(false);
 		log.setLevel(lvl);
 

@@ -41,6 +41,8 @@ public class LoggerTask
 		extends AbstractConfigurableTask
 		implements Initializable {
 
+	public static final Logger log = Logger.getLogger(LoggerTask.class.getName());
+
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
 	private static final String LOGGER_MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoggerMonitorEvent";
 	@Inject
@@ -90,7 +92,7 @@ public class LoggerTask
 			registerHandler();
 		}
 
-		System.out.println("HAAAAA " + this.levelTreshold);
+		log.log(Level.FINEST, "HAAAAA " + this.levelTreshold);
 	}
 
 	@Override

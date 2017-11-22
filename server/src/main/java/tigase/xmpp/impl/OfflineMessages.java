@@ -656,7 +656,6 @@ public class OfflineMessages
 					}
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Problem during publish packet in pubsub", e);
-					e.printStackTrace();
 				}
 			}
 		}

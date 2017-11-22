@@ -25,6 +25,9 @@ import tigase.form.Form;
 import tigase.util.Base64;
 import tigase.xml.Element;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class TaskConfigItem
 		extends RepositoryItemAbstract
 		implements Comparable<TaskConfigItem> {
@@ -38,6 +41,8 @@ public class TaskConfigItem
 	public static final String TASK_TYPE_ATT = "type";
 	protected static final String[] TASK_CLASS_PATH = {ELEM_NAME, CLASS_ELEM};
 	protected static final String[] TASK_SCRIPT_PATH = {ELEM_NAME, SCRIPT_ELEM};
+
+	private static final Logger log = Logger.getLogger(TaskConfigItem.class.getName());
 
 	public static enum Type {
 		scriptTask,
@@ -111,7 +116,7 @@ public class TaskConfigItem
 		try {
 			this.taskClass = (Class<? extends MonitorTask>) Class.forName(tmp);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Error creating instance", e);
 		}
 	}
 

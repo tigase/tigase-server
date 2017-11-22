@@ -36,12 +36,16 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static tigase.monitor.modules.ConfigureTaskCommand.NODE;
 
 @Bean(name = NODE, parent = MonitorComponent.class, active = true)
 public class ConfigureTaskCommand
 		implements AdHocCommand {
 
+	private final static Logger log = Logger.getLogger(ConfigureTaskCommand.class.getName());
 	public static final String NODE = "x-config";
 
 	@Inject
@@ -82,7 +86,7 @@ public class ConfigureTaskCommand
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "Error configuring task", e);
 			throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

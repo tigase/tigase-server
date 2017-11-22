@@ -757,7 +757,7 @@ public class TigaseCustomAuth
 				changeState.execute();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.log(Level.FINEST, "problem with changing user account state", e);
 			throw new TigaseDBException("Problem with changing user account state", e);
 		}
 	}

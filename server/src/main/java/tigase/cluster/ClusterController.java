@@ -104,7 +104,9 @@ public class ClusterController
 			} catch (ClusterCommandException ex) {
 
 				// TODO Send error back
-				ex.printStackTrace();
+//				ex.printStackTrace();
+				log.log(Level.WARNING, "Error handling cluster packet", ex);
+
 			}
 		} else {
 			log.log(Level.WARNING, "Missing CommandListener for cluster method: {0}", clel.getMethodName());
@@ -177,9 +179,8 @@ public class ClusterController
 		try {
 			packetSender.executeCommand(null, null, null, results);
 		} catch (ClusterCommandException ex) {
-
+			log.log(Level.WARNING, "Error sending packet to nodes", ex);
 			// TODO Auto-generated catch block
-			ex.printStackTrace();
 		}
 	}
 

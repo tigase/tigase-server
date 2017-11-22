@@ -386,7 +386,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 					} catch (Exception ex) {
 
 						// TODO Auto-generated catch block
-						ex.printStackTrace();
+						log.log(Level.WARNING, "Error executing cluster command", ex);
 					}
 				}
 			} else {
@@ -448,9 +448,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 								sm.fastAddOutPacket(presence);
 							}
 						} catch (Exception ex) {
-
-							// TODO Auto-generated catch block
-							ex.printStackTrace();
+							log.log(Level.FINEST, "Error executing command", ex);
 						}
 					}
 				}
