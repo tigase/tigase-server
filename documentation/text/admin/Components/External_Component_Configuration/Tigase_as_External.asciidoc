@@ -1,7 +1,7 @@
 [[tigaseasExternal]]
 = Tigase as an External Component
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, August 2017: Reformatted for 7.2.0.
+:version: v2.0, August 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -82,7 +82,7 @@ ext () {
 }
 -----
 
-Please note however that we are opening two connections to the same server. This can waste resources and overcomplicate the system. For example, what if we want to run even more components? Opening a separate connection for each component is a tad overkill.
+Please note however that we are opening two connections to the same server. This can waste resources and over-complicate the system. For example, what if we want to run even more components? Opening a separate connection for each component is a tad overkill.
 
 In fact there is a way to reuse the same connection for all component domains running as an external component. The property '--bind-ext-hostnames' contains a comma separated list of all hostnames (external domains) which should reuse the existing connection.
 

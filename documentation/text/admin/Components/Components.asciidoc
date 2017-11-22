@@ -1,7 +1,7 @@
 [[loadComponent]]
 = Components
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2017: Reformatted for v7.2.0.
+:version: v2.1, June 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -22,7 +22,7 @@ Normally, this is not necessary since pubsub is loaded by default, however this 
 -----
 'pubsub-priv' (class: tigase.pubsub.PubSubComponent) {}
 -----
-As you can see, we can customize the name of a component in the decleration, here we are using pubsub-priv.
+As you can see, we can customize the name of a component in the deceleration, here we are using pubsub-priv.
 
 Although this may be rare, it allows for wide compatibility and platform stability.
 

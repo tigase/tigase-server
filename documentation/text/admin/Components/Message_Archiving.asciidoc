@@ -1,7 +1,7 @@
 [[messageArchiving]]
 = Message Archiving Component
 :author: Daniel Wisnewski
-:version: v2.0 June 2017. Reformatted for v7.2.0.
+:version: v2.0 June 2017. Reformatted for v8.0.0.
 
 :source: https://projects.tigase.org/projects/message-archiving/wiki/Wiki
 
@@ -33,7 +33,7 @@ The next line turns on the message archive plugin. While this is not always nece
 Finally, the last line specifies the name for the component, if left blank the component's JID will be message-archive@local-machine-name.
 
 *NOTE: Message tagging can take up considerable resources!*
-There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experince an increase in resource use with the archive turned on. It is recommended to drecrease the repository connection pool to help balance server load from this component using the xref:dataRepoPoolSize[Pool Size] property:
+There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experience an increase in resource use with the archive turned on. It is recommended to decrease the repository connection pool to help balance server load from this component using the xref:dataRepoPoolSize[Pool Size] property:
 
 [source,dsl]
 -----
@@ -94,7 +94,7 @@ See below for what these settings mean.
 
 <default/>::
   Default element sets default settings for OTR and save modes, includes an option for archive expiration.
-  - *Required Attribures*
+  - *Required Attributes*
   * `otr=` Specifies setting for Off The Record mode. Available settings are:
     ** `approve` The user MUST explicitly approve OTR communication.
     ** `concede` Communications MAY be OTR if requested by another user.
@@ -174,7 +174,7 @@ Once this is turned on, incoming and outgoing messages from the user will be sto
 
 == Automatic Activation of MUC messages
 
-Enabling this feature allows MUC messages to be stored in the Message Archive repository and are added in the same way as for any other message. For this setting consider the MUC room JID, this will be the "user" that the messages will be archived with.  This is the same JID used for retrevial as well as sending to storage.   Archived MUC messages will be in the same format as normal archival messages with one exception, each message will have a `<name>` attribute attached which will be the room nick for the user that sent the message.
+Enabling this feature allows MUC messages to be stored in the Message Archive repository and are added in the same way as for any other message. For this setting consider the MUC room JID, this will be the "user" that the messages will be archived with.  This is the same JID used for retrieval as well as sending to storage.   Archived MUC messages will be in the same format as normal archival messages with one exception, each message will have a `<name>` attribute attached which will be the room nick for the user that sent the message.
 This feature is disabled by default.
 
 *NOTE:* It is worth it to mention that even if more than on user resources joins the same room and each resource will receive the same messages, then only a single message will be stored in Message Archiving repository.
@@ -257,7 +257,7 @@ Retrieving collections containing messages with "test failed" string with user j
 
 == Message Tagging Support
 
-Tigase now is able to support querying message archives based on tags created for the query.  Currently, Tigase can support the following tags to help seach through message archives:
+Tigase now is able to support querying message archives based on tags created for the query.  Currently, Tigase can support the following tags to help search through message archives:
 - `hashtag` Words prefixed by a hash (#) are stored with a prefix and used as a tag, for example #Tigase
 - `mention` Words prefixed by an at (@) are stored with a prefix and used as a tag, for example @Tigase
 
@@ -369,7 +369,7 @@ This setting sets how long MA purging will wait between passes to check for and 
 VHost holds a setting that determines how long a message needs to be in archive for it to be considered old and removed.  This can be set independently per Vhost.  This setting can be modified by either using the HTTP admin, or the update item execution in adhoc command.
 
 Command-line utility
-Sets after how many days message should be removed - by default we use 24 hours. So if entry is older than 24 hours then it will be removed, ie. entry from yesterday from 10:11 will be removed after 10:11 after next execution of purge.
+Sets after how many days message should be removed - by default we use 24 hours. So if entry is older than 24 hours then it will be removed, i.e. entry from yesterday from 10:11 will be removed after 10:11 after next execution of purge.
 This configuration is done by execution of Update item configuration adhoc command of vhost-man component, where you should select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
 
 In adhoc select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.

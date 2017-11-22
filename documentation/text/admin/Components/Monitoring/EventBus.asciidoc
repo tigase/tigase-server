@@ -1,13 +1,13 @@
 [[eventBus]]
 = Eventbus
 :author: Bartosz Malkowski
-:version: v2.0 September 2015. Reformatted for v7.2.0.
+:version: v2.0 September 2015. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://www.tigase.org
 
-Tigase includes an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know an event has occured!
+Tigase includes an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know an event has occurred!
 Lets begin with setup and requirements.
 
 Eventbus is based on a limited http://www.xmpp.org/extensions/xep-0060.html[PubSub] specification. Events are delivered to subscribers as a normal PubSub notification.
@@ -128,7 +128,7 @@ eventbus {
 If this is not specified, all users can subscribe.
 
 === Configuration via XMPP
-We can also configure the eventbus monitor component using XMPP stanzas. This allows us to set and change configurations during server runtime. This is done using a series of +iq+ stanzas send to the monitor component.
+We can also configure the eventbus monitor component using XMPP stanzas. This allows us to set and change configurations during server runtime. This is done using a series of `iq` stanzas send to the monitor component.
 
 We can query each component for its current settings using the following stanza.
 [source,xml]
@@ -275,7 +275,7 @@ For versions older than 7.1.0 TSMME requires two files to operate:
 
 === Configuration
 
-Tigase Mailer Extention may be configured via the config.tdsl file in the following manner:
+Tigase Mailer Extension may be configured via the config.tdsl file in the following manner:
 
 [source,dsl]
 -----
@@ -289,7 +289,7 @@ monitor {
 }
 -----
 
-Here is an explination of those variables.
+Here is an explanation of those variables.
 
 - `mailer-smtp-host` - SMTP Server hostname.
 - `mailer-smtp-port` - SMTP Server port.

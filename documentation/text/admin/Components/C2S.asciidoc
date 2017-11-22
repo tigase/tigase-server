@@ -1,7 +1,7 @@
 [[c2scomponent]]
 = Client to Server Communication
 :author: Daniel Wisnewski (daniel@tigase.org)
-:version: v2.0 June 2017. Reformatted for v7.2.0.
+:version: v2.0 June 2017. Reformatted for v8.0.0.
 
 Client to server communication is an integral part of XMPP communication.  C2S handles all client communication to the server, and is responsible for filtering and handling remote communications.
 C2S CAN be disabled, however doing so will only allow communication of internal components, and S2S communications.
@@ -47,7 +47,7 @@ c2s {
     }
 }
 -----
-Here, this limits the number to 150 connections per second before connection attemps are dropped.
+Here, this limits the number to 150 connections per second before connection attempts are dropped.
 
 This replaces the old `--new-connections-throttling` property.
 
@@ -63,7 +63,7 @@ c2s {
     }
 }
 -----
-This sets the default timeout to 90 seconds.  You may, if you choose, specify a maximum timout time, which will allow the server to wait between the default and maximum before a connection is closed.
+This sets the default timeout to 90 seconds.  You may, if you choose, specify a maximum timeout time, which will allow the server to wait between the default and maximum before a connection is closed.
 [source,dsl]
 -----
 c2s {

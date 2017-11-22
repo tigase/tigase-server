@@ -2,7 +2,7 @@
 = Tigase Load Balancing
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 //incomplete
-:version: v2.1, August 2017: Reformatted for 7.2.0.
+:version: v2.1, August 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -166,7 +166,7 @@ c2s {
 ----
 
 === Configuring hostnames
-To fully utilize `SeeOtherHostDualIP` setup in automated fashion it's now possible to provide both primary (_internal_) and secondary (_external_) hostname/IP (they need to be correct, `InetAddress.getByName( property );` will be used to verify correctnes). It can be done via JVM properties `tigase-primary-address` and `tigase-secondary-address`. You can also utilize different implementation of DNS resolver by providing class implementing `tigase.util.DNSResolverIfc` interface as value to `resolver-class` property.
+To fully utilize `SeeOtherHostDualIP` setup in automated fashion it's now possible to provide both primary (_internal_) and secondary (_external_) hostname/IP (they need to be correct, `InetAddress.getByName( property );` will be used to verify correctness). It can be done via JVM properties `tigase-primary-address` and `tigase-secondary-address`. You can also utilize different implementation of DNS resolver by providing class implementing `tigase.util.DNSResolverIfc` interface as value to `resolver-class` property.
 Those properties can be set via `etc/tigase.conf` (uncommenting following lines, or manually exposing in environment):
 [source,bash]
 ----

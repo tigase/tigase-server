@@ -1,13 +1,13 @@
 [[tigaseExternalComponent]]
 = External Component Configuration
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, August 2017: Reformatted for 7.2.0.
+:version: v2.0, August 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net
 
-As for all Tigase components you can load and configure external components via the `init.tdsl` file described in details in the xref:dslConfig[DSL configuration] section. This document describes how to load the component and set the initial configuration to accept or initiate connections for an external component.
+As for all Tigase components you can load and configure external components via the `config.tdsl` file described in details in the xref:dslConfig[DSL configuration] section. This document describes how to load the component and set the initial configuration to accept or initiate connections for an external component.
 
 First thing to do is to specify the component class and the component name which must be unique within the Tigase installation. The most commonly name used is `ext` and the class is `tigase.server.ext.ComponentProtocol` which does not need to be specified.
 
@@ -77,7 +77,7 @@ These settings set three TCP/IP ports to listen on: 5270, 5271 and 5272. They al
 == Outgoing Connections
 Tigase server can not only accept connections from external components, it can also open connections to external components.
 
-To make Tigase connect to an external component you have to change 'listen' parameter to 'connect' and of course you have to tell where to connect - the address of the external component:
+To make Tigase connect to an external component you have to change `listen` parameter to `connect` and of course you have to tell where to connect - the address of the external component:
 
 [source,dsl]
 -----
@@ -106,14 +106,14 @@ If external components run on a separate machines you can use the same port numb
 == Specifying Protocol
 One of the last parameters you can set for the external component/domain is a protocol which should be used for the connection. At the moment the Tigase server supports two protocols defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] and link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] and possibly further protocols.
 
-You don't have to specify a protocol if you setup a connection in 'listen' mode as the server automatically detects a protocol which is used in incoming connections.
+You don't have to specify a protocol if you setup a connection in `listen` mode as the server automatically detects a protocol which is used in incoming connections.
 
 You can specify the protocol which is used for outgoing connections but you have to add one more parameters to the connection string.
 
 There are two possibilities:
 
-. 'accept' which is an identifier for protocol defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] (and is default if you do not specify anything)
-. 'client' which is identifier for protocol defined in link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] and is based on the client-to-server protocol.
+. `accept` which is an identifier for protocol defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] (and is default if you do not specify anything).
+. `client` which is identifier for protocol defined in link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] and is based on the client-to-server protocol.
 
 An example configuration with protocol specified:
 

@@ -1,9 +1,9 @@
 [[statLoggerConfig]]
 = Configuration of statistics loggers
-:version: v2.0, August 2017: Reformatted for 7.2.0.
+:version: v2.0, August 2017: Reformatted for v8.0.0.
 
 It is possible to enable and configure automatic storage of statistics information. To do that you need to configure any of following statistics loggers
-as a `StatisticsCollector` component subbeans:
+as a `StatisticsCollector` component sub-beans:
 
 tigase.stats.CounterDataArchivizer:: every execution put current basic server metrics (CPU usage, memory usage, number of user connections, uptime) into database (overwrites previous entry).
 tigase.stats.CounterDataLogger:: every execution insert new row with new set of number of server statistics (CPU usage, memory usage, number of user connections per connector, number of processed packets of different types, uptime, etc) into the database.

@@ -1,7 +1,7 @@
 [[retrievingStatisticsFromTheServer]]
 = Retrieving statistics from the server
 :author: Daniel Wisnewski
-:version: v2.0, April 2017: Reformatted for 7.2.0.
+:version: v2.0, April 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -27,7 +27,7 @@ We can either access statistics for all components or select particular componen
 
 image:images/admin/monitoring_xmpp_3.png[caption="Figure 3: ", title="Server statistics", alt="server-stats", width="456"]
 
-In this window, in addition to see the statistics, we can adjust _Stats level_ by selecting desired level from the list and confim by clicking _Finish_.
+In this window, in addition to see the statistics, we can adjust _Stats level_ by selecting desired level from the list and confirm by clicking _Finish_.
 
 
 == Retrieving statistics using JMX

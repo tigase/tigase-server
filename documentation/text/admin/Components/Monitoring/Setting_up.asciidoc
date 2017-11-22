@@ -1,7 +1,7 @@
 [[setUpRemoteMonitoring]]
 = Setting Up Remote Monitoring in the Server
 :author: unknown
-:version: v2.0, April 2017: Reformatted for 7.2.0.
+:version: v2.0, April 2017: Reformatted for v8.0.0.
 
 
 Tigase server can be remotely monitored over following protocols: *JMX/RMI*, *SNMP* and *HTTP*. Even though JMX offers the biggest control and visibility to the server states, all of the monitoring services give the same basic set of the server statistics:
@@ -63,7 +63,7 @@ Both JMX and SNMP offer security protection to limit access to monitoring data. 
 After the server installation or in the SVN repository you can find 2 files in the *etc/* directory: *jmx.access* and *jmx.password*.
 
 - *jmx.access* is a user permission file. You can use it to specify whether the user can access the monitoring data for reading only `readonly` or with read-write `readwrite` access. There are example entries in the file already and the content may simply look like:
-+
+`
 [source,bash]
 -----
 monitor readonly
