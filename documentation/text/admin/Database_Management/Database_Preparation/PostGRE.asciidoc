@@ -1,7 +1,7 @@
 [[preparePostgresql]]
 = Prepare the PostgreSQL Database for the Tigase Server
 :author: Andrzej Wojcik <andrzejw@tigase.org>
-:version: v2.0, June 2014: Reformatted for v7.2.0.
+:version: v2.0, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -21,19 +21,19 @@ The PostgreSQL database can be prepared in many ways. Below are presented two po
 
 Run the PostgreSQL command line client and enter following instructions:
 
-. Add the +tigase_user+:
+. Add the `tigase_user`:
 +
 [source,sql]
 -----
 psql=# create role tigase_user with login password 'tigase123';
 -----
-. Create the database for the Tigase server with +tigase_user+ as owner of database:
+. Create the database for the Tigase server with `tigase_user` as owner of database:
 +
 [source,sql]
 -----
 psql=# create database tigasedb owner tigase_user;
 -----
-. Load database schema to initialize the Tigase server from the file that corresponds to the version of Tigase you want to use. First you need to switch to +tigasedb+.
+. Load database schema to initialize the Tigase server from the file that corresponds to the version of Tigase you want to use. First you need to switch to `tigasedb`.
 +
 [source,sql]
 -----
@@ -64,7 +64,7 @@ psql=# \i database/postgresql-socks5-schema.sql
 
 Follow steps below to prepare the PostgreSQL database:
 
-. Add the +tigase_user+:
+. Add the `tigase_user`:
 +
 [source,sql]
 -----

@@ -1,7 +1,7 @@
 [[prepareMysql]]
 = Prepare the MySQL Database for the Tigase Server
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for v7.2.0.
+:version: v2.0, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -23,7 +23,7 @@ Run the MySQL command line client in either Linux or MS Windows environment and 
 -----
 mysql> create database tigasedb;
 -----
-. Add the +tigase_user+ user and grant him access to the +tigasedb+ database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+. Add the `tigase_user` user and grant him access to the `tigasedb` database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
 +
 *Grant access to tigase_user connecting from any network address.*
 +
@@ -112,7 +112,7 @@ Follow steps below to prepare the MySQL database:
 -----
 mysqladmin -p create tigasedb
 -----
-. Add the +tigase_user+ user and grant access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+. Add the `tigase_user` user and grant access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
 *Grant access to tigase_user connecting from any network address.*
 [source,sql]
 -----
@@ -205,7 +205,7 @@ export LOCALE=UTF-8
 export LESSCHARSET='utf-8'
 -----
 
-It seems that MySQL 5.0.x also needs extra parameters in the connection string: '&amp;useUnicode=true&amp;characterEncoding=UTF-8' while MySQL 5.1.x seems to not need it but it doesn't hurt to have it for both versions. You have to edit 'etc/init.properties' file and append this to the database connection string.
+It seems that MySQL 5.0.x also needs extra parameters in the connection string: '&amp;useUnicode=true&amp;characterEncoding=UTF-8' while MySQL 5.1.x seems to not need it but it doesn't hurt to have it for both versions. You have to edit `etc/config.tdsl` file and append this to the database connection string.
 
 For MySQL 5.1.x, however, you need to also update code for all database stored procedures and functions used by the Tigase. They are updated for Tigase version 4.4.x and up, however if you use an older version of the Tigase server, you can reload stored procedures using the file from SVN.
 

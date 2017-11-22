@@ -1,7 +1,7 @@
 [[connectingTigaseToMysql]]
 = Connecting the Tigase Server to MySQL Database
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, June 2017: Reformatted for 7.2.0.
+:version: v2.1, June 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -11,7 +11,7 @@ Please before continuing reading of this manual have a look at the xref:prepareM
 
 The easiest way to setup Tigase server for connecting with MySQL database is to use the xref:tigase3xconfiguration[configuration wizards] (configuration generators) which release you from manually editing the XML configuration file and allow you quickly regenerate the XML configuration file in case of problems.
 
-The article describes an older way for using configuration generators which is a bit more difficult and doesn't work on Windows systems. The guide below describes a new way to use them which is simpler and can be applied to Windows systems as well. It is using the +init.properties+ file where you can put all your initial configuration parameters.
+The article describes an older way for using configuration generators which is a bit more difficult and doesn't work on Windows systems. The guide below describes a new way to use them which is simpler and can be applied to Windows systems as well. It is using the `config.tdsl` file where you can put all your initial configuration parameters.
 
 This guide describes MySQL database connection parameters.
 
@@ -32,11 +32,11 @@ authRepository {
 }
 -----
 
-This is the basic setup for setting up an SQL repository for Tigase.  dataSource contains the uri for 'default' which is the mysql database.
+This is the basic setup for setting up an SQL repository for Tigase.  dataSource contains the uri for `default` which is the mysql database.
 MySQL connector requires connection string in the following format:
 `jdbc:mysql://[hostname]/[database name]?user=[user name]&password=[user password]`
 
-Edit the `init.properties` file for your environment.
+Edit the `config.tdsl` file for your environment.
 
 Start the server using following command:
 

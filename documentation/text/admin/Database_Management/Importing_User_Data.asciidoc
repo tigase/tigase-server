@@ -1,7 +1,7 @@
 [[dbImportingData]]
 = Importing User Data
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for v7.2.0.
+:version: v2.0, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -9,9 +9,9 @@
 
 You can easily copy data between Tigase compatible repositories that is repositories for which there is a database connector. However, it is not that easy to import data from an external source. Therefore a simple data import functionality has been added to repository utilities package.
 
-You can access repository utilities through command +./bin/repo.sh+ or +./scripts/repo.sh+ depending on whether you use a binary package or source distribution.
+You can access repository utilities through command `./bin/repo.sh` or `./scripts/repo.sh` depending on whether you use a binary package or source distribution.
 
-+-h+ parameter gives you a list of all possible parameters:
+`-h` parameter gives you a list of all possible parameters:
 
 [source,sh]
 -------------
@@ -50,7 +50,7 @@ Note! If you put UserAuthRepository implementation as a class name
       Alternatively look for admin tools guide on web site.
 -------------
 
-The most critical parameters are the source repository class name and the initialization string. Therefore there are a few example preset parameters which you can use and adjust for your system. If you look inside the +repo.sh+ script you can find at the end of the script following lines:
+The most critical parameters are the source repository class name and the initialization string. Therefore there are a few example preset parameters which you can use and adjust for your system. If you look inside the `repo.sh` script you can find at the end of the script following lines:
 
 [source,sh]
 -----
@@ -61,7 +61,7 @@ PGSQL_REP="-sc tigase.db.jdbc.JDBCRepository -su jdbc:postgresql://localhost/tig
 java $D -cp $CP tigase.util.RepositoryUtils $MYSQL_REP $*
 -----
 
-You can see that the source repository has been set to MySQL database with +tigase+ as the database name, +root+ the database user and +mypass+ the user password.
+You can see that the source repository has been set to MySQL database with `tigase` as the database name, `root` the database user and `mypass` the user password.
 
 You can adjust these settings for your system.
 

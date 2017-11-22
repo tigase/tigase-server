@@ -1,7 +1,7 @@
 [[prepareMssql]]
 = Prepare the MS SQL Server Database for the Tigase Server
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.1, June 2017: Reformatted for 7.2.0.
+:version: v2.1, June 2017: Reformatted for 8.0.0.
 
 :toc:
 :numbered:
@@ -96,7 +96,7 @@ If no parameters are provided then the following defaults are used:
 %root_password%=root
 -----
 
-== Tigase configuration - init.properties
+== Tigase configuration - config.tdsl
 
 Configuration of the MS SQL Server follows general database convention.
 

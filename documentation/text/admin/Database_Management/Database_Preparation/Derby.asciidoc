@@ -1,7 +1,7 @@
 [[prepareDerby]]
 = Prepare the Derby Database for the Tigase Server
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.0, June 2014: Reformatted for v7.2.0.
+:version: v2.0, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -13,9 +13,9 @@ This guide describes how to prepare Derby database for connecting the Tigase ser
 
 Preparation of Derby database is quite simple, but the following assumptions are made
 
-- +DerbyDB+ - Derby database name
-- +database/+ directory contains all necessary schema files
-- +jars/+ and +libs/+ directories contains Tigase and Derby binaries
+- `DerbyDB` - Derby database name
+- `database/` directory contains all necessary schema files
+- `jars/` and `libs/` directories contains Tigase and Derby binaries
 
 === General Approach
 
@@ -65,7 +65,7 @@ java -Dij.protocol=jdbc:derby: -Dij.database="DerbyDB;create=true" -cp libs\derb
 
 == Connecting Tigase to database
 
-Once the database is setup, configure the init.properties file in Tigase and add the following configuration:
+Once the database is setup, configure the config.tdsl file in Tigase and add the following configuration:
 [source,properties]
 -----
 jdbc:derby:{location of derby database};

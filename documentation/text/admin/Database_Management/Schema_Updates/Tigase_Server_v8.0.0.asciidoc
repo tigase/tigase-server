@@ -142,3 +142,50 @@ NOTE: Additionally this mechanism need to be enabled in the configuration file. 
 Assuming that HTTP API component is configured to run on port 8080 _(default)_, then after accessing address http://localhost:8080/rest/user/resetPassword in the web browser it will present a web form.
 By filling and submitting this form, the user will initiate a password reset process.
 During this process, Tigase XMPP Server will send an email to the user's email address (provided during registration) with a link to the password change form.
+
+
+== Upgrading from v7.1.x
+When upgrading from previous versions of Tigase, it is recommended that you first backup the database.  Refer to the documentation of your database software to find out how to export a copy.
+Once the backup is made, it will be time to run the schema upgrade.  Be sure that your schema is up to date, and should be v7.1.0 Schema.
+
+To upgrade, use the new 'upgrade-schema' task of SchemaManager:
+
+In linux
+[source,bash]
+-----
+./scripts/tigase.sh install-schema etc/tigase.conf
+-----
+
+In Windows
+[source,bash]
+-----
+java -cp "jars/*" tigase.db.util.SchemaManager "install-schema"
+-----
+
+You will need to configure the following switches:
+
+- *-T* Specifies Database Type +
+  Possible values are: `mysql`, `derby`, `sqlserver`, `postgresql`, `mongodb`
+
+- *-D* Specifies Databse Name +
+  The explicit name of the database you wish to upgrade.
+
+- *-H* Specifies Host address +
+  By default, this is localhost, but may be set to IP address or FQDNS address.
+
+- *-U* Specifies Username +
+  This is the username that is authorized to make changes to the database defined in -D.
+
+- *-P* Specifies Password +
+  The password for username specified in -U.
+
+- *-R* Password for Administrator or Root DB account.
+
+- *-A* Password for Administrator or Root DB account.
+
+- *-J* Jid of user authorized as admin user from Tigase.
+
+- *-N* Password for user specified in -J.
+
+- *-F* Points to the file that will perform the upgrade. +
+  Will follow this form database/{dbname}-server-schema-8.0.0.sql

@@ -1,7 +1,7 @@
 [[dbSchemaLoader]]
 = +dbSchemaLoader+ Utility
 :author: Daniel Wisnewski
-:author: v1.0, March 2016: Reformatted for v7.2.0.
+:author: v1.0, March 2016: Reformatted for v8.0.0.
 
 :numbered:
 :toc:
@@ -81,7 +81,7 @@ Database init.properties configuration:
 --user-db-uri=jdbc:mysql://localhost/tigasedb user=tigase_user&password=tigase_pass&useUnicode=true&characterEncoding=UTF-8
 -----
 
-TIP: The utility will automatically generate the lines you need to add to your init.properties file to use this database!
+TIP: The utility will automatically generate the lines you need to add to your config.tdsl file to use this database!
 
 At this time, it is suggested to load the PubSub schema since you will have to change very little of the command:
 
