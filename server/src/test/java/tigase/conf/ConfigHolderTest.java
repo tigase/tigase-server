@@ -31,6 +31,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -248,6 +249,20 @@ public class ConfigHolderTest {
 		assertEquals(2, items.size());
 		assertEquals("muc1.devel.tigase.org:passwd1", items.get(0));
 		assertEquals("muc2.devel.tigase.org:passwd2", items.get(1));
+	}
+
+
+	@Test
+	public void testConversionOfPriorityQueue() throws ConfigReader.ConfigException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String,Object> props = holder.loadFromPropertyStrings(
+				Collections.singletonList("--queue-implementation=tigase.util.PriorityQueueStrict")
+		);
+
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		assertEquals("tigase.util.workqueue.PriorityQueueStrict", result.get("priority-queue-implementation"));
 	}
 
 }

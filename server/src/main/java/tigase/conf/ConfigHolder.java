@@ -53,6 +53,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static tigase.conf.Configurable.CLUSTER_NODES_PROP_KEY;
@@ -191,7 +193,7 @@ public class ConfigHolder {
 		}
 	}
 
-	private static boolean upgradeDSL(Map<String, Object> props) {
+	protected static boolean upgradeDSL(Map<String, Object> props) {
 		String before = props.toString();
 		props.remove("--config-file");
 		renameIfExists(props, "--cluster-mode", "cluster-mode", Function.identity());
@@ -218,7 +220,21 @@ public class ConfigHolder {
 		});
 		renameIfExists(props, "--packet.debug.full", "logging/packet-debug-full", Function.identity());
 		renameIfExists(props, "--" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION,
-					   "priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, Function.identity());
+					   "priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, value -> {
+					if (value instanceof String) {
+						String str = ((String) value);
+						final Pattern compile = Pattern.compile("tigase\\.util\\.(.*Queue.*)");
+						final Matcher matcher = compile.matcher(str);
+
+						if (matcher.matches()) {
+							return "tigase.util.workqueue." + matcher.group(1);
+						} else {
+							return value;
+						}
+					} else {
+						return value;
+					}
+				});
 		if (Boolean.parseBoolean("" + props.remove("--nonpriority-queue"))) {
 			props.putIfAbsent("priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION,
 							  NonpriorityQueue.class.getCanonicalName());
