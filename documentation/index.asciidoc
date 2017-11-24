@@ -187,7 +187,9 @@ include::text/components/http-api/documentation/doclink.asciidoc[]
 
 :leveloffset: 2
 
-include::text/admin/Components/Message_Archiving.asciidoc[]
+include::text/components/tigase-message-archiving/documentation/doclink.asciidoc[]
+
+:leveloffset: 2
 
 include::text/admin/Components/Advanced_Message_Processing.asciidoc[]
 
