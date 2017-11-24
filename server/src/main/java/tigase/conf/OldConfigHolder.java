@@ -180,16 +180,20 @@ public class OldConfigHolder {
 
 			// String key = prop[0].trim();
 			// Object val = prop[1];
-			String key = propString.substring(0, idx_eq);
-			Object val = propString.substring(idx_eq + 1);
+			String key = propString.substring(0, idx_eq).trim();
+			String valStr = propString.substring(idx_eq + 1);
+			if (valStr != null) {
+				valStr = valStr.trim();
+			}
 
+			Object val = valStr;
 			if (key.matches(".*\\[[LISBlisb]\\]$")) {
 				char c = key.charAt(key.length() - 2);
 
 				key = key.substring(0, key.length() - 3);
 				// decoding value for basckward compatibility
 				if (val != null) {
-					val = DataTypes.decodeValueType(c, val.toString());
+					val = DataTypes.decodeValueType(c, valStr);
 				}
 			}
 

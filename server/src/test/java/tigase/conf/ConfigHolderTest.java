@@ -256,7 +256,7 @@ public class ConfigHolderTest {
 	public void testConversionOfPriorityQueue() throws ConfigReader.ConfigException {
 		OldConfigHolder holder = new OldConfigHolder();
 		Map<String,Object> props = holder.loadFromPropertyStrings(
-				Collections.singletonList("--queue-implementation=tigase.util.PriorityQueueStrict")
+				Collections.singletonList("--queue-implementation = tigase.util.PriorityQueueStrict")
 		);
 
 		Map<String,Object> result = ConfigWriter.buildTree(props);
