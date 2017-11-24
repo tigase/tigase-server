@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -178,8 +179,9 @@ public class MonitorRuntime
 
 		@Override
 		public void run() {
-			System.out.println("ShutdownThread started...");
-			log.warning("ShutdownThread started...");
+			final String shutMsg = "ShutdownThread started... " + LocalDateTime.now();
+			System.out.println(shutMsg);
+			log.warning(shutMsg);
 			LinkedList<ShutdownHandlerThread> thlist = new LinkedList<ShutdownHandlerThread>();
 			ThreadGroup threads = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Tigase Shutdown");
 			for (ShutdownHook shutdownHook : shutdownHooks) {
