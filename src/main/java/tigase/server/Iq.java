@@ -222,14 +222,7 @@ public class Iq
 	 * 
 	 */
 	public Packet commandResult(Command.DataType cmd_type) {
-		Packet result = packetInstance(command.createIqCommand(getStanzaTo(),
-											getStanzaFrom(), StanzaType.result, getStanzaId(), strCommand,
-											cmd_type), getStanzaTo(), getStanzaFrom());
-
-		result.setPacketFrom(getTo());
-		result.setPacketTo(getFrom());
-
-		return result;
+		return okResult(command.createCommandEl(strCommand, cmd_type), 0);
 	}
 
 	//~--- get methods ----------------------------------------------------------
