@@ -27,17 +27,13 @@ package tigase.server.ext;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.comp.RepositoryItemAbstract;
-
 import tigase.net.ConnectionType;
-
+import tigase.net.SocketType;
 import tigase.server.Command;
+import tigase.server.Packet;
 import tigase.server.ext.lb.LoadBalancerIfc;
 import tigase.server.ext.lb.ReceiverBareJidLB;
-import tigase.server.Packet;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,6 +80,10 @@ public class CompRepoItem
 
 	public static final String ROUTINGS_LABEL = "(Optional) Routings";
 
+	public static final String SOCKET_ATTR = "socket";
+
+	public static final String SOCKET_LABEL = "(Optional) Socket type";
+
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
 	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
@@ -99,6 +99,7 @@ public class CompRepoItem
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns        = null;
 	private LoadBalancerIfc lb  = DEF_LB_CLASS;
+	private SocketType socket  = SocketType.plain;
 
 	@Override
 	public void addCommandFields(Packet packet) {
@@ -109,14 +110,8 @@ public class CompRepoItem
 						? auth_pass
 						: ""));
 
-		String[] types = new String[ConnectionType.values().length];
-		int i          = 0;
-
-		for (ConnectionType t : ConnectionType.values()) {
-			types[i++] = t.name();
-		}
 		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(),
-													CONNECTION_TYPE_LABEL, types, types);
+													CONNECTION_TYPE_LABEL, ConnectionType.names(), ConnectionType.names());
 		Command.addFieldValue(packet, PORT_NO_LABEL, ((port > 0)
 						? "" + port
 						: ""));
@@ -130,6 +125,8 @@ public class CompRepoItem
 						? lb.getClass().getName()
 						: ""));
 		Command.addFieldValue(packet, ROUTINGS_LABEL, "");
+		Command.addFieldValue(packet, SOCKET_LABEL, socket.name(), SOCKET_LABEL, SocketType.names(),
+		                      SocketType.names());
 		super.addCommandFields(packet);
 	}
 
@@ -147,6 +144,10 @@ public class CompRepoItem
 
 	public String getDomain() {
 		return domain;
+	}
+
+	public SocketType getSocket() {
+		return socket;
 	}
 
 	@Override
@@ -208,12 +209,12 @@ public class CompRepoItem
 		if ((tmp != null) &&!tmp.isEmpty()) {
 			routings = tmp.split(",");
 		}
+		tmp = Command.getFieldValue(packet, SOCKET_LABEL);
+		if ((tmp != null) &&!tmp.isEmpty()) {
+			socket = parseSocket(tmp);
+		}
 	}
 
-	/**
-	 * @param tmp
-	 * 
-	 */
 	private LoadBalancerIfc lbInstance(String cls_name) {
 		String class_name = cls_name;
 
@@ -284,6 +285,10 @@ public class CompRepoItem
 		if (tmp != null) {
 			routings = tmp.split(",");
 		}
+		tmp = elem.getAttributeStaticStr(SOCKET_ATTR);
+		if (tmp != null) {
+			socket = parseSocket(tmp);
+		}
 	}
 
 	@Override
@@ -296,21 +301,35 @@ public class CompRepoItem
 		if (props.length > 1) {
 			auth_pass = props[1];
 		}
-		if (props.length > 2) {
+		if (props.length > 2 && !props[2].trim().isEmpty()) {
 			setConnectionType(props[2]);
 		}
-		if (props.length > 3) {
+		if (props.length > 3 && !props[3].trim().isEmpty()) {
 			port = parsePortNo(props[3]);
 		}
-		if (props.length > 4) {
+		if (props.length > 4 && !props[4].trim().isEmpty()) {
 			remoteHost = props[4];
 		}
-		if (props.length > 5) {
+		if (props.length > 5 && !props[5].trim().isEmpty()) {
 			setProtocol(props[5]);
 		}
-		if (props.length > 6) {
+		if (props.length > 6 && !props[6].trim().isEmpty()) {
 			lb = lbInstance(props[6]);
 		}
+		if (props.length > 7 && !props[7].trim().isEmpty()) {
+			socket = parseSocket(props[7]);
+		}
+	}
+
+	private SocketType parseSocket(String socket) {
+		SocketType result = SocketType.plain;
+		try {
+			return SocketType.valueOf(socket.trim().toLowerCase());
+		} catch (Exception e) {
+			log.log(Level.WARNING,
+			        "Error parsing external connection type: " + socket + ", using default: " + SocketType.plain, e);
+		}
+		return result;
 	}
 
 	public void setDomain(String domain) {
@@ -344,14 +363,14 @@ public class CompRepoItem
 			route.append(r);
 		}
 		elem.addAttribute(ROUTINGS_ATTR, route.toString());
-
+		elem.addAttribute(SOCKET_ATTR, socket.toString());
 		return elem;
 	}
 
 	@Override
 	public String toPropertyString() {
 		return domain + ":" + auth_pass + ":" + type.name() + ":" + port + ":" + remoteHost +
-					 ":" + prop_xmlns + ":" + lb.getClass().getName();
+					 ":" + prop_xmlns + ":" + lb.getClass().getName() + ":" + socket.toString();
 	}
 
 	@Override
@@ -379,7 +398,11 @@ public class CompRepoItem
 	void setRemoteDomain(String remote_domain) {
 		this.remoteHost = remote_domain;
 	}
-	
+
+	void setSocket(String socket) {
+		this.socket = parseSocket(socket);
+	}
+
 	String validate() {
 		if (domain == null)
 			return "Domain name is required";

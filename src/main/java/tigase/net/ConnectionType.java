@@ -21,6 +21,8 @@
  */
 package tigase.net;
 
+import java.util.Arrays;
+
 /**
  * Describe class ConnectionType here.
  *
@@ -34,4 +36,10 @@ public enum ConnectionType {
 
 	accept, connect;
 
-} // ConnectionType
+	public static String[] names() {
+		String[] names = new String[values().length];
+		ConnectionType[] values = values();
+		Arrays.setAll(names, i -> values[i].toString());
+		return names;
+	}
+}

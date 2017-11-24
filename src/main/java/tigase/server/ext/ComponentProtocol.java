@@ -45,6 +45,7 @@ import tigase.conf.ConfigurationException;
 
 import tigase.db.comp.ComponentRepository;
 
+import tigase.db.comp.RepositoryItem;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 
@@ -574,7 +575,7 @@ public class ComponentProtocol
 					}
 					port_props.put(PORT_REMOTE_HOST_PROP_KEY, remote_domain);
 					port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
-					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
+					port_props.put(PORT_SOCKET_PROP_KEY, repoItem.getSocket());
 					port_props.put(PORT_IFC_PROP_KEY, new String[] { r_host });
 					port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
 					port_props.put(REPO_ITEM_KEY, repoItem);

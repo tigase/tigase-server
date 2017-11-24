@@ -129,7 +129,7 @@ An example configuration with protocol specified:
 It defines two outgoing connections to external protocols, the first uses the link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] protocol and the second uses the link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] protocol.
 
 == Load Balancer Plugin
-The last option you can set for external component connections is load balancer class.
+With the penultimate option you can set for external component connections is load balancer class.
 
 The load balancer plugin is used if you have multiple connections for the same component (external domain name) and you want to spread the load over all connections. Perhaps you have an installation with huge number of MUC rooms and you want to spread the load over all MUC instances.
 
@@ -148,3 +148,24 @@ It defines two listeners for external component with different load balancer plu
 For the PubSub component we use a different load balancer plugin which distributes load by the sender BareJID instead. This is because for the PubSub destination BareJID is always the same so we cannot use it to distribute the load.
 
 Either the *ReceiverBareJidLB* or *SenderBareJidLB* are class names from package: *tigase.server.ext.lb* however, you can use any class name as a plugin, you just have to provide a full class name and the class name must implement *LoadBalancerIfc* interface.
+
+
+== Encrypting connection
+With the last option you can set type of the socket connection.
+
+Following options are available:
+. `plain` - will create a plain socket (accepting unencrypted or TLS connections)
+. `tls` - will create a plain type socket, which enforces performing StartTLS
+. `ssl` - will create an SSL socket (only accepting SSL connections)
+
+An example configuration with socket type specified:
+
+[source,bash]
+-----
+--comp-name-1 = ext
+--comp-class-1 = tigase.server.ext.ComponentProtocol
+--external = muc.devel.tigase.org:mucsecret:listen:5270:devel.tigase.org:accept:ReceiverBareJidLB:plain, \
+  pubsub.devel.tigase.org:pubsub_pass:listen:5270:devel.tigase.org:accept:SenderBareJidLB:ssl
+-----
+
+for the MUC component it will be possible to establish plain socket connection (with possibility to perform StartTLS) and for the PubSub component an encrypted, SSL connection will be required.

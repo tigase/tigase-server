@@ -176,7 +176,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 					if (comp_params.length >= idx + 1) {
 						if (comp_params[idx++].equals("ssl")) {
-							PORT_SOCKET_PROP_VAL = SocketType.plain;
+							PORT_SOCKET_PROP_VAL = SocketType.ssl;
 						}
 
 						log.config("Setting PORT_SOCKET_PROP_VAL to " + PORT_SOCKET_PROP_VAL);

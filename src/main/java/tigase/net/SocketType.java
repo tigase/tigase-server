@@ -21,6 +21,8 @@
  */
 package tigase.net;
 
+import java.util.Arrays;
+
 /**
  * Describe class SocketType here.
  *
@@ -34,4 +36,10 @@ public enum SocketType {
 
 	plain, ssl, tls;
 
-} // SocketType
+	public static String[] names() {
+		String[] names = new String[values().length];
+		SocketType[] values = values();
+		Arrays.setAll(names, i -> values[i].toString());
+		return names;
+	}
+}
