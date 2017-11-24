@@ -265,8 +265,7 @@ public enum Command {
 		addActionEl(packet.getElement(), action);
 	}
 
-	private static void addActionEl(Element iq, Action action) {
-		Element command = iq.getChild(COMMAND_EL);
+	private static void addActionElToCommand(final Element command, Action action) {
 		Element actions = command.getChild("actions");
 
 		if (actions == null) {
@@ -274,6 +273,11 @@ public enum Command {
 			command.addChild(actions);
 		}
 		actions.addChild(new Element(action.toString()));
+	}
+
+	private static void addActionEl(Element iq, Action action) {
+		Element command = iq.getChild(COMMAND_EL);
+		addActionElToCommand(command, action);
 	}
 
 	public static void addCheckBoxField(Packet packet, String f_name, boolean f_value) {
@@ -444,9 +448,29 @@ public enum Command {
 		DataForm.addTitle(command, title);
 	}
 
-	private static Element createCommandEl(JID from, JID to, StanzaType type, String id, String node,
-										   DataType data_type) {
+	protected static Element createCommandEl(String node, DataType data_type) {
+		Element command = new Element(COMMAND_EL, new String[]{"xmlns", "node"}, new String[]{XMLNS, node});
+
+		if (data_type != null) {
+			addDataForm(command, data_type);
+			if (data_type == DataType.result) {
+				command.setAttribute("status", Status.completed.name());
+			}
+			if (data_type == DataType.form) {
+				command.setAttribute("status", Status.executing.name());
+				addActionElToCommand(command, Action.complete);
+			}
+		}
+		return command;
+	}
+
+	private static Element createIqCommandEl(JID from, JID to, StanzaType type, String id, String node,
+										   DataType data_type, String xmlns) {
 		Element iq = new Element("iq", new String[]{"type"}, new String[]{type.toString()});
+
+		if (xmlns != null) {
+			iq.setAttribute("xmlns", xmlns);
+		}
 
 		if (from != null) {
 			iq.setAttribute("from", from.toString());
@@ -462,26 +486,21 @@ public enum Command {
 			iq.setAttribute("to", to.toString());
 		}
 
-		Element command = new Element(COMMAND_EL, new String[]{"xmlns", "node"}, new String[]{XMLNS, node});
-
-		iq.addChild(command);
-		if (data_type != null) {
-			addDataForm(command, data_type);
-			if (data_type == DataType.result) {
-				setStatusEl(iq, Status.completed);
-			}
-			if (data_type == DataType.form) {
-				setStatusEl(iq, Status.executing);
-				addActionEl(iq, Action.complete);
-			}
-		}
+		iq.addChild(createCommandEl(node, data_type));
 
 		return iq;
 	}
 
 	public static Element createIqCommand(JID from, JID to, final StanzaType type, final String id, final String node,
 										  final DataType data_type) {
-		Element iq = createCommandEl(from, to, type, id, node, data_type);
+		Element iq = createIqCommand(from, to, type, id, node, data_type, Iq.CLIENT_XMLNS);
+
+		return iq;
+	}
+
+	private static Element createIqCommand(JID from, JID to, final StanzaType type, final String id, final String node,
+										  final DataType data_type, String xmlns) {
+		Element iq = createIqCommandEl(from, to, type, id, node, data_type, xmlns);
 
 		return iq;
 	}
@@ -643,8 +662,19 @@ public enum Command {
 		this.priority = priority;
 	}
 
+	/**
+	 * Method returns instance of a Packet with command element added.
+	 *
+	 * WARNING: Returned packet will not have any XMLNS set!
+	 *
+	 * @param from
+	 * @param to
+	 * @param type
+	 * @param id
+	 * @return
+	 */
 	public Packet getPacket(JID from, JID to, final StanzaType type, final String id) {
-		Element elem = createIqCommand(from, to, type, id, this.toString(), null);
+		Element elem = createIqCommand(from, to, type, id, this.toString(), null, null);
 		Packet result = Packet.packetInstance(elem, from, to);
 
 		// Added to ensure that command will be executed in proper thread
@@ -658,8 +688,20 @@ public enum Command {
 		return result;
 	}
 
+	/**
+	 * Method returns instance of a Packet with command element added.
+	 *
+	 * WARNING: Returned packet will not have any XMLNS set!
+	 * 
+	 * @param from
+	 * @param to
+	 * @param type
+	 * @param id
+	 * @param data_type
+	 * @return
+	 */
 	public Packet getPacket(JID from, JID to, StanzaType type, String id, DataType data_type) {
-		Element elem = createIqCommand(from, to, type, id, this.toString(), data_type);
+		Element elem = createIqCommand(from, to, type, id, this.toString(), data_type, null);
 		Packet result = Packet.packetInstance(elem, from, to);
 
 		result.setPriority(priority);
