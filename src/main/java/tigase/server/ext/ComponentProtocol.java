@@ -24,8 +24,6 @@
 
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -81,38 +79,27 @@ import java.text.MessageFormat;
 public class ComponentProtocol
 				extends ConnectionManager<ComponentIOService>
 				implements ComponentProtocolHandler {
-	/** Field description */
 	public static final String AUTHENTICATION_TIMEOUT_PROP_KEY = "auth-timeout";
 
-	/** Field description */
 	public static final String CLOSE_ON_SEQUENCE_ERROR_PROP_KEY = "close-on-seq-error";
 
-	/** Field description */
 	public static final String EXTCOMP_BIND_HOSTNAMES = "--bind-ext-hostnames";
 
-	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 
-	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROP_VAL =
 			"tigase.server.ext.CompDBRepository";
 
-	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROPERTY = "--extcomp-repo-class";
 
-	/** Field description */
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 
-	/** Field description */
 	public static final String IDENTITY_TYPE_VAL = "generic";
 
-	/** Field description */
 	public static final String MAX_AUTH_ATTEMPTS_PROP_KEY = "max-auth-attempts";
 
-	/** Field description */
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 
-	/** Field description */
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 
 	/**
@@ -120,12 +107,8 @@ public class ComponentProtocol
 	 */
 	private static final Logger log = Logger.getLogger(ComponentProtocol.class.getName());
 
-	/** Field description */
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 
-	//~--- fields ---------------------------------------------------------------
-
-	/** Field description */
 	public boolean PACK_ROUTED_VAL = false;
 
 	// In seconds
@@ -159,8 +142,6 @@ public class ComponentProtocol
 	// private ServiceEntity serviceEntity = null;
 	private boolean closeOnSequenceError = true;
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Constructs ...
 	 *
@@ -188,8 +169,6 @@ public class ComponentProtocol
 			}
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void authenticated(ComponentIOService serv) {
@@ -228,14 +207,10 @@ public class ComponentProtocol
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	@Override
 	protected String getDefTrafficThrottling() {
 		return "xmpp:25m:0:disc,bin:20000m:0:disc";
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void bindHostname(String hostname, ComponentIOService serv) {
@@ -277,8 +252,6 @@ public class ComponentProtocol
 			// We don't do the trick because this would break stuff
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	public CompRepoItem getCompRepoItem(String hostname) {
@@ -374,8 +347,6 @@ public class ComponentProtocol
 	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
 		return streamOpenHandlers.get(xmlns);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initBindings(Bindings binds) {
@@ -536,8 +507,6 @@ public class ComponentProtocol
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
@@ -634,8 +603,6 @@ public class ComponentProtocol
 		processors.put(proc.getId(), proc);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
 	public void tlsHandshakeCompleted(ComponentIOService service) {}
 
@@ -701,8 +668,6 @@ public class ComponentProtocol
 
 		return result;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected long getMaxInactiveTime() {
@@ -808,8 +773,6 @@ public class ComponentProtocol
 	protected boolean isHighThroughput() {
 		return true;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private synchronized void addComponentConnection(String hostname,
 			ComponentIOService s) {
@@ -936,19 +899,13 @@ public class ComponentProtocol
 		log.finest("All regex routings: " + getRegexRoutings().toString());
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	private class AuthenticationTimerTask
 					extends tigase.util.TimerTask {
 		private ComponentIOService serv = null;
 
-		//~--- constructors -------------------------------------------------------
-
 		private AuthenticationTimerTask(ComponentIOService serv) {
 			this.serv = serv;
 		}
-
-		//~--- methods ------------------------------------------------------------
 
 		@Override
 		public void run() {

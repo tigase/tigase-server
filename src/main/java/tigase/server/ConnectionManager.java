@@ -61,61 +61,43 @@ import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
 public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				extends AbstractMessageReceiver
 				implements XMPPIOServiceListener<IO> {
-	/** Field description */
 	public static final String HT_TRAFFIC_THROTTLING_PROP_KEY =
 			"--cm-ht-traffic-throttling";
 
-	/** Field description */
 	public static final String HT_TRAFFIC_THROTTLING_PROP_VAL =
 			"xmpp:50k:0:disc,bin:400m:0:disc";
 
-	/** Field description. */
 	public static final String NET_BUFFER_HT_PROP_KEY = "--net-buff-high-throughput";
 
-	/** Field description. */
 	public static final String NET_BUFFER_ST_PROP_KEY = "--net-buff-standard";
 
-	/** Field description. */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 
-	/** Field description */
 	public static final String ST_TRAFFIC_THROTTLING_PROP_KEY = "--cm-traffic-throttling";
 
-	/** Field description */
 	public static final String ST_TRAFFIC_THROTTLING_PROP_VAL =
 			"xmpp:2500:0:disc,bin:20m:0:disc";
 
-	/** Field description */
 	public static final String TRAFFIC_THROTTLING_PROP_KEY = "traffic-throttling";
 
-	/** Field description */
 	protected static final long LAST_MINUTE_BIN_LIMIT_PROP_VAL = 20000000L;
 
-	/** Field description */
 	protected static final long LAST_MINUTE_PACKETS_LIMIT_PROP_VAL = 2500L;
 
-	/** Field description */
 	protected static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
 
-	/** Field description */
 	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 
-	/** Field description */
 	protected static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
 
-	/** Field description */
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
 
-	/** Field description */
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
 
-	/** Field description */
 	protected static final int NET_BUFFER_LIMIT_HT_PROP_VAL = 20*1024*1024;
 
-	/** Field description */
 	protected static final String NET_BUFFER_LIMIT_PROP_KEY= "net-buffer-limit";
 
-	/** Field description */
 	protected static final int NET_BUFFER_LIMIT_ST_PROP_VAL = 2*1024*1024;
 	/**
 	 * Key name of the system property for configuration protection
@@ -129,70 +111,50 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 */
 	public static int ELEMENTS_NUMBER_LIMIT_PROP_VAL = 1000;
 
-	/** Field description */
 	protected static final String PORT_CLASS_PROP_KEY = "class";
 
-	/** Field description */
 	protected static final String PORT_IFC_PROP_KEY = "ifc";
 
 	protected static final String PORT_LISTENING_DELAY_KEY = "port-delay-listening";
 	protected static final boolean PORT_LISTENING_DELAY_DEF = false;
 
-	/** Field description */
 	protected static final String PORT_KEY = "port-no";
 
-	/** Field description */
 	protected static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
 
-	/** Field description */
 	protected static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
 
-	/** Field description */
 	protected static final String PORT_SOCKET_PROP_KEY = "socket";
 
-	/** Field description */
 	protected static final String PORT_TYPE_PROP_KEY = "type";
 
-	/** Field description */
 	protected static final String PROP_KEY = "connections/";
 
-	/** Field description */
 	protected static final long TOTAL_BIN_LIMIT_PROP_VAL = 0L;
 
-	/** Field description */
 	protected static final long TOTAL_PACKETS_LIMIT_PROP_VAL = 0L;
 
-	/** Field description */
 	protected static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
 
-	/** Field description */
 	protected static final String       XMPP_ACK_PROP_KEY = "xmpp-ack";
 	private static final Logger         log = Logger.getLogger(ConnectionManager.class
 			.getName());
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
-	/** Field description */
 	protected static final boolean XMPP_ACK_PROP_VAL = false;
 
-	/** Field description */
 	protected static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
 
-	/** Field description */
 	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
 
-	/** Field description */
 	protected static final boolean TLS_USE_PROP_VAL = true;
 	//J-
-	/** Field description */
 	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
 
-	/** Field description */
 	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
 
-	/** Field description */
 	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
 
-	/** Field description */
 	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 
 	protected static final String WATCHDOG_DELAY = "watchdog_delay";
@@ -206,7 +168,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description. */
 	public String[]                         PORT_IFC_PROP_VAL = { "*" };
 	private long                            bytesReceived     = 0;
 	private long                            bytesSent         = 0;
@@ -244,10 +205,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private boolean                   initializationCompleted = false;
 	protected XMPPIOProcessor[]       processors              = new XMPPIOProcessor[0];
 
-	/** Field description */
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 
-	/** Field description */
     protected long connectionDelay = 2 * SECOND;
     private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
     protected WATCHDOG_PING_TYPE watchdogPingType = WATCHDOG_PING_TYPE.WHITESPACE;
@@ -267,16 +226,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean checkTrafficLimits(IO serv) {
 		boolean xmppLimitHit = false;
 
@@ -446,16 +395,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		writePacketToSocket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 *
-	 *
-	 * @return a value of {@code Queue<Packet>}
-	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
 	/**
@@ -466,12 +405,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 */
 	public abstract boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	public abstract void reconnectionFailed(Map<String, Object> port_props);
 
 	@Override
@@ -482,12 +415,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		super.release();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
 	@TODO(note = "Do something if service with the same unique ID is already started, " +
 			"possibly kill the old one...")
 	public void serviceStarted(final IO service) {
@@ -586,21 +513,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		super.stop();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	public void updateConnectionDetails(Map<String, Object> port_props) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param packets
-	 */
 	public void writePacketsToSocket(IO serv, Queue<Packet> packets) {
 		if (serv != null) {
 
@@ -1009,12 +923,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 */
 	protected void addWaitingTask(Map<String, Object> conn) {
 
         if (log.isLoggable(Level.FINER)) {
@@ -1136,13 +1044,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ios
-	 * @param data
-	 */
 	protected void writeRawData(IO ios, String data) {
 		try {
 			ios.writeRawData(data);

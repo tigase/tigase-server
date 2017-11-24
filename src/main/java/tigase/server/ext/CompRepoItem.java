@@ -50,68 +50,44 @@ import java.util.logging.Logger;
  */
 public class CompRepoItem
 				extends RepositoryItemAbstract {
-	/** Field description */
 	public static final String CONN_TYPE_ATTR = "type";
 
-	/** Field description */
 	public static final String CONNECTION_TYPE_LABEL = "Connection type";
 
-	/** Field description */
 	public static final String DOMAIN_ATTR = "domain";
 
-	/** Field description */
 	public static final String DOMAIN_NAME_LABEL = "Domain name";
 
-	/** Field description */
 	public static final String DOMAIN_PASS_LABEL = "Domain password";
 
-	/** Field description */
 	public static final String LB_CLASS_LABEL = "Load balancer class";
 
-	/** Field description */
 	public static final String LB_NAME_ATTR = "lb-class";
 
-	/** Field description */
 	public static final String PASSWORD_ATTR = "pass";
 
-	/** Field description */
 	public static final String PORT_NO_ATTR = "port";
 
-	/** Field description */
 	public static final String PORT_NO_LABEL = "Port number";
 
-	/** Field description */
 	public static final String PROTO_XMLNS_ATTR = "proto-xmlns";
 
-	/** Field description */
 	public static final String PROTO_XMLNS_LABEL = "Protocol";
 
-	/** Field description */
 	public static final String REMOTE_HOST_ATTR = "remote";
 
-	/** Field description */
 	public static final String REMOTE_HOST_LABEL = "Remote host";
 
-	/** Field description */
 	public static final String REPO_ITEM_ELEM_NAME = "item";
 
-	/** Field description */
 	public static final String ROUTINGS_ATTR = "routings";
 
-	/** Field description */
 	public static final String ROUTINGS_LABEL = "(Optional) Routings";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
-	/** Field description */
 	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
 
-	//~--- fields ---------------------------------------------------------------
-
-	// ~--- fields ---------------------------------------------------------------
 	private String auth_pass = null;
 
 	// "accept:muc.domain.tld:5277:user:passwd"
@@ -123,8 +99,6 @@ public class CompRepoItem
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns        = null;
 	private LoadBalancerIfc lb  = DEF_LB_CLASS;
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void addCommandFields(Packet packet) {
@@ -159,46 +133,18 @@ public class CompRepoItem
 		super.addCommandFields(packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getAuthPasswd() {
 		return auth_pass;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public ConnectionType getConnectionType() {
 		return type;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public LoadBalancerIfc getLoadBalancer() {
 		return lb;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getDomain() {
 		return domain;
 	}
@@ -213,47 +159,21 @@ public class CompRepoItem
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public int getPort() {
 		return port;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getRemoteHost() {
 		return remoteHost;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String[] getRoutings() {
 		return routings;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getXMLNS() {
 		return xmlns;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void initFromCommand(Packet packet) {
@@ -393,22 +313,10 @@ public class CompRepoItem
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
 	public void setDomain(String domain) {
 		this.domain = domain;
 		routings    = new String[] { domain, ".*@" + domain, ".*\\." + domain };
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public Element toElement() {
@@ -451,55 +359,23 @@ public class CompRepoItem
 		return toPropertyString();
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param connection_type
-	 */
 	void setConnectionType(String connection_type) {
 		this.type = parseConnectionType(connection_type);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param password
-	 */
 	void setPassword(String password) {
 		this.auth_pass = password;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port
-	 */
 	void setPort(int port) {
 		this.port = port;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param protocol
-	 */
 	void setProtocol(String protocol) {
 		this.prop_xmlns = protocol;
 		this.xmlns      = parseProtoXMLNS(protocol);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param remote_domain
-	 */
 	void setRemoteDomain(String remote_domain) {
 		this.remoteHost = remote_domain;
 	}
@@ -514,9 +390,6 @@ public class CompRepoItem
 		return null;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 	private ConnectionType parseConnectionType(String input) {
 		ConnectionType result = ConnectionType.accept;
 
@@ -559,12 +432,3 @@ public class CompRepoItem
 		return result;
 	}
 }
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20
