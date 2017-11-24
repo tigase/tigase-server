@@ -22,6 +22,7 @@ package tigase.server.ext;
 
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.net.ConnectionType;
+import tigase.net.SocketType;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ext.lb.LoadBalancerIfc;
@@ -73,6 +74,11 @@ public class CompRepoItem
 	public static final String ROUTINGS_ATTR = "routings";
 
 	public static final String ROUTINGS_LABEL = "(Optional) Routings";
+
+	public static final String SOCKET_ATTR = "socket";
+
+	public static final String SOCKET_LABEL = "(Optional) Socket type";
+
 	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
@@ -88,24 +94,22 @@ public class CompRepoItem
 	private String[] routings = null;
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns = null;
+	private SocketType socket  = SocketType.plain;
 
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, DOMAIN_NAME_LABEL, ((domain != null) ? domain : ""));
 		Command.addFieldValue(packet, DOMAIN_PASS_LABEL, ((auth_pass != null) ? auth_pass : ""));
 
-		String[] types = new String[ConnectionType.values().length];
-		int i = 0;
-
-		for (ConnectionType t : ConnectionType.values()) {
-			types[i++] = t.name();
-		}
-		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(), CONNECTION_TYPE_LABEL, types, types);
+		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(), CONNECTION_TYPE_LABEL, ConnectionType.names(),
+		                      ConnectionType.names());
 		Command.addFieldValue(packet, PORT_NO_LABEL, ((port > 0) ? "" + port : ""));
 		Command.addFieldValue(packet, REMOTE_HOST_LABEL, ((remoteHost != null) ? remoteHost : ""));
 		Command.addFieldValue(packet, PROTO_XMLNS_LABEL, ((prop_xmlns != null) ? prop_xmlns : ""));
 		Command.addFieldValue(packet, LB_CLASS_LABEL, ((lb != null) ? lb.getClass().getName() : ""));
 		Command.addFieldValue(packet, ROUTINGS_LABEL, "");
+		Command.addFieldValue(packet, SOCKET_LABEL, socket.name(), SOCKET_LABEL, SocketType.names(),
+		                      SocketType.names());
 		super.addCommandFields(packet);
 	}
 
@@ -164,6 +168,10 @@ public class CompRepoItem
 		return xmlns;
 	}
 
+	public SocketType getSocket() {
+		return socket;
+	}
+
 	@Override
 	public void initFromCommand(Packet packet) {
 		super.initFromCommand(packet);
@@ -196,6 +204,10 @@ public class CompRepoItem
 		tmp = Command.getFieldValue(packet, ROUTINGS_LABEL);
 		if ((tmp != null) && !tmp.isEmpty()) {
 			routings = tmp.split(",");
+		}
+		tmp = Command.getFieldValue(packet, SOCKET_LABEL);
+		if ((tmp != null) &&!tmp.isEmpty()) {
+			socket = parseSocket(tmp);
 		}
 	}
 
@@ -230,6 +242,10 @@ public class CompRepoItem
 		if (tmp != null) {
 			routings = tmp.split(",");
 		}
+		tmp = elem.getAttributeStaticStr(SOCKET_ATTR);
+		if (tmp != null) {
+			socket = parseSocket(tmp);
+		}
 	}
 
 	@Override
@@ -242,20 +258,23 @@ public class CompRepoItem
 		if (props.length > 1) {
 			auth_pass = props[1];
 		}
-		if (props.length > 2) {
+		if (props.length > 2 && !props[2].trim().isEmpty()) {
 			setConnectionType(props[2]);
 		}
-		if (props.length > 3) {
+		if (props.length > 3 && !props[3].trim().isEmpty()) {
 			port = parsePortNo(props[3]);
 		}
-		if (props.length > 4) {
+		if (props.length > 4 && !props[4].trim().isEmpty()) {
 			remoteHost = props[4];
 		}
-		if (props.length > 5) {
+		if (props.length > 5 && !props[5].trim().isEmpty()) {
 			setProtocol(props[5]);
 		}
-		if (props.length > 6) {
+		if (props.length > 6 && !props[6].trim().isEmpty()) {
 			lb = lbInstance(props[6]);
+		}
+		if (props.length > 7 && !props[7].trim().isEmpty()) {
+			socket = parseSocket(props[7]);
 		}
 	}
 
@@ -400,5 +419,17 @@ public class CompRepoItem
 
 		return result;
 	}
+
+	private SocketType parseSocket(String socket) {
+		SocketType result = SocketType.plain;
+		try {
+			return SocketType.valueOf(socket.trim().toLowerCase());
+		} catch (Exception e) {
+			log.log(Level.WARNING,
+			        "Error parsing external connection type: " + socket + ", using default: " + SocketType.plain, e);
+		}
+		return result;
+	}
+
 }
 

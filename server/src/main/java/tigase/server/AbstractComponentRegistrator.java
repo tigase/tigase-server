@@ -24,6 +24,7 @@ import tigase.conf.ConfigurationException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is an archetype of a special types of classes which collect some data from Tigase components or provide these
@@ -51,7 +52,7 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 * A collection of server components which implement special interface, related to the functionality provided by
 	 * extension of the class.
 	 */
-	protected Map<String, E> components = new LinkedHashMap<String, E>();
+	protected Map<String, E> components = new ConcurrentHashMap<>();
 	private long packetId = 0;
 
 	/**

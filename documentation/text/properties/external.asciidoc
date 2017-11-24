@@ -48,6 +48,15 @@ ext (class: tigase.server.ext.ComponentProtocol) {
     }
 }
 -----
+or
+[source,dsl]
+-----
+ext (class: tigase.server.ext.ComponentProtocol) {
+    repository {
+        items = [ 'muc1.devel.tigase.org:passwd1:connect:5270:devel.tigase.org:accept:lb-class:ssl' ]
+    }
+}
+-----
 
 Definition of each colon separated part:
 
@@ -58,6 +67,7 @@ Definition of each colon separated part:
 . *remote hostname address(es)* - if the connection type is `connect` then the the remote hostname address should be here. For `listen` connection type this parameter can be skipped. The first item on the list is always the remote domain name, if there are more entries, the rest is just addresses to connect to for this domain separated by a semicolon (;).
 . *protocol* - if the connection type is `connect` then the protorol is defined here - `accept` for XEP-0114, `client` for XEP-0225, possibly others in the future. It can be skipped for `listen` connection types.
 . *lb-class* - is a class name for a load-balancer plugin. This is used only where there are multiple connections from the external component and you want to spread the resource load among them.
+. *socket* - it's possible to specify whether this should be a `plain` socket (accepting unencrypted or TLS connections), `ssl` socket (accepting SSL connections) or `tls` (enforcing TLS connection)
 
 Only the first 2 parts are mandatory, the rest is optional. The simplified form is used to provide a list of domains:password elements for external components connections.
 

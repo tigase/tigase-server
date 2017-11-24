@@ -20,6 +20,7 @@
 
 package tigase.server.ext.handlers;
 
+import tigase.net.SocketType;
 import tigase.server.Packet;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
@@ -28,6 +29,7 @@ import tigase.server.ext.StreamOpenHandler;
 import tigase.xml.Element;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -44,9 +46,11 @@ public class StartTLSProcessor
 	private static final Logger log = Logger.getLogger(StartTLSProcessor.class.getName());
 	private static final String EL_NAME = "starttls";
 	private static final String ID = EL_NAME;
-	private static final Element FEATURES = new Element(EL_NAME, new Element[]{new Element("required")},
-														new String[]{"xmlns"},
-														new String[]{"urn:ietf:params:xml:ns:xmpp-tls"});
+	private static final Element FEATURES = new Element(EL_NAME, new String[] { "xmlns" },
+	                                                    new String[] { "urn:ietf:params:xml:ns:xmpp-tls" });
+	private static final Element FEATURES_REQUIRED = new Element(EL_NAME,
+	                                                             new Element[] { new Element("required") }, new String[] { "xmlns" },
+	                                                             new String[] { "urn:ietf:params:xml:ns:xmpp-tls" });
 
 	@Override
 	public String getId() {
@@ -58,7 +62,15 @@ public class StartTLSProcessor
 		if (serv.getSessionData().get(ID) != null) {
 			return null;
 		} else {
-			return Arrays.asList(FEATURES);
+			switch ((SocketType) serv.getSessionData().get("socket")) {
+				case ssl:
+					return null;
+				case plain:
+					return Collections.singletonList(FEATURES);
+				case tls:
+					return Collections.singletonList(FEATURES_REQUIRED);
+			}
+			return null;
 		}
 	}
 
