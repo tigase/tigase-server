@@ -116,9 +116,9 @@ public class PlainCallbackHandler
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
-		username = nc.getDefaultName();
+		username = DEFAULT_USERNAME;//nc.getDefaultName();
 
-		jid = BareJID.bareJIDInstanceNS(username, domain);
+		jid = BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain);
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "NameCallback: {0}", username);
@@ -159,6 +159,7 @@ public class PlainCallbackHandler
 		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
 				!callback.getAuthzId().equals(jid.toString())) {
 			try {
+				username = jid.getLocalpart();
 				jid = BareJID.bareJIDInstance(callback.getAuthzId());
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
