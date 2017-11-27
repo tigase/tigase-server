@@ -37,6 +37,6 @@ exec dbo.TigPutDBProperty 'schema-version', '7.1';
 GO
 
 -- QUERY START:
-exec TigSetComponentVersion('server', '7.1');
+exec TigSetComponentVersion 'server', '7.1';
 -- QUERY END:
 GO
