@@ -20,11 +20,16 @@
 package tigase.server.amp.db;
 
 import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import tigase.db.DBInitException;
 import tigase.db.DataRepository;
+import tigase.db.Schema;
+
+import java.util.Collections;
 
 /**
  * Created by andrzej on 22.03.2017.
@@ -36,7 +41,7 @@ public class JDBCMsgRepositoryTest
 	public static TestRule rule = new TestRule() {
 		@Override
 		public Statement apply(Statement stmnt, Description d) {
-			if (uri == null) {
+			if (uri == null || !uri.startsWith("jdbc:")) {
 				return new Statement() {
 					@Override
 					public void evaluate() throws Throwable {
@@ -47,6 +52,11 @@ public class JDBCMsgRepositoryTest
 			return stmnt;
 		}
 	};
+	
+	@BeforeClass
+	public static void loadSchema() throws DBInitException {
+		loadSchema(Schema.SERVER_SCHEMA_ID, "8.0.0", Collections.emptySet());
+	}
 
 	@Override
 	protected Long getMsgId(String msgIdStr) {

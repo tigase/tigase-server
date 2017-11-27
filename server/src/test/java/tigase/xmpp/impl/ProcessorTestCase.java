@@ -19,11 +19,10 @@
  */
 package tigase.xmpp.impl;
 
+import org.junit.After;
+import org.junit.Before;
 import tigase.TestLogger;
-import tigase.db.AuthRepository;
-import tigase.db.UserRepository;
-import tigase.db.xml.XMLRepository;
-import tigase.kernel.core.Kernel;
+import tigase.kernel.AbstractKernelWithUserRepositoryTestCase;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
@@ -41,48 +40,35 @@ import java.util.logging.Logger;
 /**
  * @author andrzej
  */
-public abstract class ProcessorTestCase {
+public abstract class ProcessorTestCase extends AbstractKernelWithUserRepositoryTestCase {
 
 	private static final Logger log = TestLogger.getLogger(ProcessorTestCase.class);
-	private Kernel kernel;
 	private SessionManagerHandler loginHandler;
-	private XMLRepository repository;
 
-	//@Override
-	public void setUp() throws Exception {
-		kernel = new Kernel();
-		String xmlRepositoryURI = "memory://xmlRepo?autoCreateUser=true";
-		repository = new XMLRepository();
-		repository.initRepository(xmlRepositoryURI, null);
-		registerBeans(kernel);
+	@Before
+	public void setSessionManager() throws Exception {
 		loginHandler = new SessionManagerHandlerImpl();
 	}
 
-	//@Override
-	public void tearDown() throws Exception {
+	@After
+	public void tearDownSessionManager() throws Exception {
 		loginHandler = null;
 	}
 
-	protected <T> T getInstance(Class<T> clazz) {
-		return kernel.getInstance(clazz);
+	@Deprecated
+	public void setUp() throws Exception {
+
 	}
 
-	protected <T> T getInstance(String name) {
-		return kernel.getInstance(name);
-	}
-
-	protected XMLRepository getRepository() {
-		return repository;
-	}
-
-	protected void registerBeans(Kernel kernel) {
-		kernel.registerBean("repository").asInstance(repository).exec();
+	@Deprecated
+	public void tearDown() throws Exception {
+		
 	}
 
 	protected XMPPResourceConnection getSession(JID connId, JID userJid)
 			throws NotAuthorizedException, TigaseStringprepException {
-		XMPPResourceConnection conn = new XMPPResourceConnection(connId, (UserRepository) repository,
-																 (AuthRepository) repository, loginHandler);
+		XMPPResourceConnection conn = new XMPPResourceConnection(connId, getUserRepository(),
+																 getAuthRepository(), loginHandler);
 		VHostItem vhost = new VHostItem();
 		vhost.setVHost(userJid.getDomain());
 		conn.setDomain(vhost);

@@ -20,22 +20,18 @@
 
 package tigase.server.amp.db;
 
-import org.junit.*;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.junit.runners.model.Statement;
-import tigase.component.exceptions.RepositoryException;
-import tigase.db.DBInitException;
+import tigase.db.AbstractDataSourceAwareTestCase;
 import tigase.db.DataSource;
-import tigase.db.DataSourceHelper;
-import tigase.db.RepositoryFactory;
+import tigase.db.DataSourceAware;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -44,31 +40,13 @@ import static org.junit.Assert.*;
  * Created by andrzej on 24.03.2017.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> {
+public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> extends AbstractDataSourceAwareTestCase<DS, MsgBroadcastRepository> {
 
 	protected static boolean checkEmoji = true;
 	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
-	protected static String uri = System.getProperty("testDbUri");
-	@ClassRule
-	public static TestRule rule = new TestRule() {
-		@Override
-		public Statement apply(Statement stmnt, Description d) {
-			if (uri == null) {
-				return new Statement() {
-					@Override
-					public void evaluate() throws Throwable {
-						Assume.assumeTrue("Ignored due to not passed DB URI!", false);
-					}
-				};
-			}
-			return stmnt;
-		}
-	};
 	private static BareJID jid;
 	private static Element msg;
 	private static String msgId;
-	protected DS dataSource;
-	protected MsgBroadcastRepository repo;
 
 	@BeforeClass
 	public static void init() throws TigaseStringprepException {
@@ -77,24 +55,7 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 		msg = new Element("message");
 		msg.addChild(new Element("body", "Testing broadcast messages" + (checkEmoji ? emoji : "")));
 	}
-
-	@Before
-	public void setup() throws Exception {
-		dataSource = prepareDataSource();
-		repo = DataSourceHelper.getDefaultClass(MsgBroadcastRepository.class, uri).newInstance();
-		try {
-			dataSource.checkSchemaVersion(repo, true);
-			repo.setDataSource(dataSource);
-		} catch (RuntimeException ex) {
-			throw new RepositoryException(ex);
-		}
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		repo = null;
-	}
-
+	
 	@Test
 	public void test1_addingBroadcastMessage() throws InterruptedException {
 		Date expire = new Date(System.currentTimeMillis() + (60 * 1000 * 5));
@@ -113,11 +74,9 @@ public abstract class AbstractMsgBroadcastRepositoryTest<DS extends DataSource> 
 		assertFalse("Added message instead of adding message recipient!",
 					repo.updateBroadcastMessage(msgId, null, null, jid));
 	}
-
-	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
-		DataSource dataSource = RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
-		dataSource.initRepository(uri, new HashMap<>());
-		return (DS) dataSource;
+	
+	@Override
+	protected Class<? extends DataSourceAware> getDataSourceAwareIfc() {
+		return MsgBroadcastRepository.class;
 	}
-
 }

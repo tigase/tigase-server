@@ -19,12 +19,10 @@
  */
 package tigase.db.util;
 
-import tigase.db.AuthRepository;
-import tigase.db.RepositoryFactory;
+import tigase.component.exceptions.RepositoryException;
+import tigase.db.DataRepository;
 import tigase.db.Schema;
-import tigase.db.TigaseDBException;
-import tigase.kernel.core.Kernel;
-import tigase.server.XMPPServer;
+import tigase.db.jdbc.DataRepositoryImpl;
 import tigase.util.Version;
 import tigase.util.log.LogFormatter;
 import tigase.util.ui.console.CommandlineParameter;
@@ -393,7 +391,7 @@ public class DBSchemaLoader
 	}
 
 	@Override
-	public Result addXmppAdminAccount() {
+	public Result addXmppAdminAccount(SchemaManager.SchemaInfo schemaInfo) {
 		// part 1, check db preconditions
 		if (!connection_ok) {
 			log.log(Level.WARNING, "Connection not validated");
@@ -426,18 +424,15 @@ public class DBSchemaLoader
 		log.log(Level.INFO, "Adding XMPP Admin Account, URI: " + dbUri);
 
 		try {
-			Map<String, String> params = new HashMap<>();
-			params.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf(1));
+			DataRepository dataSource = new DataRepositoryImpl();
+			dataSource.initialize(dbUri);
 
-			log.log(Level.CONFIG, "RepositoryFactory.getAuthRepository(" + null + ", " + dbUri + "," + params + ")");
-			AuthRepository repo = RepositoryFactory.getAuthRepository(null, dbUri, params);
-			for (BareJID jid : jids) {
-				repo.addUser(jid, pwd);
+			Result result = addUsersToRepository(schemaInfo, dataSource, DataRepository.class, jids, pwd, log);
+			if (result == Result.ok) {
+				log.log(Level.INFO, "All users added");
 			}
-
-			log.log(Level.INFO, "All users added");
-			return Result.ok;
-		} catch (TigaseDBException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			return result;
+		} catch (RepositoryException e) {
 			log.log(Level.WARNING, "Error initializing DB" + e);
 			return Result.error;
 		}
@@ -516,7 +511,11 @@ public class DBSchemaLoader
 	}
 
 	@Override
-	public Result loadSchema(String schemaId, String version) {
+	public Result loadSchema(SchemaManager.SchemaInfo schema, String version) {
+		return loadSchema(schema.getId(), version);
+	}
+
+	private Result loadSchema(String schemaId, String version) {
 		if (!connection_ok) {
 			log.log(Level.INFO, "Connection not validated");
 			return Result.error;
@@ -991,13 +990,17 @@ public class DBSchemaLoader
 		VALIDATE_DB_SCHEMA("Checking the database schema") {
 			@Override
 			public void execute(DBSchemaLoader helper, Parameters params) {
-				helper.loadSchema(Schema.SERVER_SCHEMA_ID, XMPPServer.class.getPackage().getImplementationVersion());
+				SchemaManager.getDefaultDataSourceAndSchemas(helper.getDBUri()).values().stream().findAny().ifPresent( schemas -> {
+					schemas.forEach(schema -> helper.loadSchema(schema, schema.getVersion().get().toString()));
+				});
 			}
 		},
 		ADD_ADMIN_XMPP_ACCOUNT("Adding XMPP admin accounts") {
 			@Override
 			public void execute(DBSchemaLoader helper, Parameters params) {
-				helper.addXmppAdminAccount();
+				SchemaManager.getDefaultDataSourceAndSchemas(helper.getDBUri()).values().stream().findAny().ifPresent( schemas -> {
+					schemas.stream().filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId())).findAny().ifPresent(helper::addXmppAdminAccount);
+				});
 			}
 		},
 		EXECUTE_SIMPLE_QUERY("Executing simple single query") {
@@ -1095,6 +1098,10 @@ public class DBSchemaLoader
 		private Boolean useSSL = null;
 
 		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
+			return props.getProperty(param.getName(), null); //param.getDefaultValue());
+		}
+
+		private static String getPropertyWithDefault(Properties props, DBSchemaLoader.PARAMETERS_ENUM param) {
 			return props.getProperty(param.getName(), param.getDefaultValue());
 		}
 
@@ -1106,6 +1113,14 @@ public class DBSchemaLoader
 			return converter.apply(tmp);
 		}
 
+		private static <T> T getPropertyWithDefault(Properties props, DBSchemaLoader.PARAMETERS_ENUM param, Function<String, T> converter) {
+			String tmp = getPropertyWithDefault(props, param);
+			if (tmp == null) {
+				return null;
+			}
+			return converter.apply(tmp);
+		}
+		
 		@Override
 		public String getAdminPassword() {
 			return adminPassword;
@@ -1241,7 +1256,7 @@ public class DBSchemaLoader
 
 		@Override
 		public void setProperties(Properties props) {
-			logLevel = getProperty(props, PARAMETERS_ENUM.LOG_LEVEL, Level::parse);
+			logLevel = getPropertyWithDefault(props, PARAMETERS_ENUM.LOG_LEVEL, Level::parse);
 			ingoreMissingFiles = getProperty(props, PARAMETERS_ENUM.IGNORE_MISSING_FILES, val -> Boolean.valueOf(val));
 			admins = getProperty(props, PARAMETERS_ENUM.ADMIN_JID, tmp -> Arrays.stream(tmp.split(","))
 					.map(str -> BareJID.bareJIDInstanceNS(str))

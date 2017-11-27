@@ -83,7 +83,6 @@ public class SchemaManager {
 		}
 		return o1.getId().compareTo(o2.getId());
 	};
-	private final List<Class<?>> repositoryClasses;
 	private CommandlineParameter COMPONENTS = new CommandlineParameter.Builder("C", "components").description(
 			"List of enabled components identifiers (+/-)")
 			.defaultValue(getActiveNonCoreComponentNames().sorted().collect(Collectors.joining(",")))
@@ -151,6 +150,20 @@ public class SchemaManager {
 		return Optional.ofNullable(result);
 	}
 
+	public static List<Class<?>> getRepositoryClasses() {
+		return ClassUtilBean.getInstance()
+				.getAllClasses()
+				.stream()
+				.filter(clazz -> Arrays.stream(SUPPORTED_CLASSES)
+						.anyMatch(supClazz -> supClazz.isAssignableFrom(clazz)))
+				.filter(clazz -> {
+					Bean bean = clazz.getAnnotation(Bean.class);
+					return bean != null && (bean.parent() != Object.class || bean.parents().length > 0);
+				})
+				.filter(clazz -> !DataSourceBean.class.isAssignableFrom(clazz))
+				.collect(Collectors.toList());
+	}
+
 	public static void main(String args[]) throws IOException, ConfigReader.ConfigException {
 		try {
 			SchemaManager schemaManager = new SchemaManager();
@@ -163,18 +176,7 @@ public class SchemaManager {
 	}
 
 	public SchemaManager() {
-		repositoryClasses = ClassUtilBean.getInstance()
-				.getAllClasses()
-				.stream()
-				.filter(clazz -> Arrays.stream(SUPPORTED_CLASSES)
-						.anyMatch(supClazz -> supClazz.isAssignableFrom(clazz)))
-				.filter(clazz -> {
-					Bean bean = clazz.getAnnotation(Bean.class);
-					return bean != null && (bean.parent() != Object.class || bean.parents().length > 0);
-				})
-				.filter(clazz -> !DataSourceBean.class.isAssignableFrom(clazz))
-				.collect(Collectors.toList());
-
+		List<Class<?>> repositoryClasses = getRepositoryClasses();
 		log.log(Level.FINE, "found following data source related classes: {0}", repositoryClasses);
 	}
 
@@ -259,7 +261,7 @@ public class SchemaManager {
 			setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
 
-		Map<String, DataSourceInfo> result = getDataSources();
+		Map<String, DataSourceInfo> result = getDataSources(config);
 		log.info("found " + result.size() + " data sources to destroy...");
 		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
 		log.info("data sources  destruction finished!");
@@ -303,16 +305,17 @@ public class SchemaManager {
 			}
 		});
 
+		admins = params.getAdmins();
+		adminPass = params.getAdminPassword();
+		logLevel = params.getLogLevel();
+
 		String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
 		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
 																 Optional.ofNullable(components),
 																 Optional.ofNullable(changes.get("+")),
-																 Optional.empty(), vhosts, Optional.empty(),
+																 Optional.empty(), vhosts, Optional.of(params.getAdmins().toArray(new BareJID[params.getAdmins().size()])),
 																 Optional.empty());
 
-		admins = params.getAdmins();
-		adminPass = params.getAdminPassword();
-		logLevel = params.getLogLevel();
 
 		Map<String, Object> config = configBuilder.build();
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
@@ -375,10 +378,30 @@ public class SchemaManager {
 		rootCredentialsCache.set(null, new RootCredentials(user, pass));
 	}
 
-	public Map<DataSourceInfo, List<SchemaInfo>> getDataSourcesAndSchemas() {
-		Kernel kernel = prepareKernel();
-		List<BeanConfig> repoBeans = getRepositoryBeans(kernel);
-		List<RepoInfo> repositories = getRepositories(kernel, repoBeans);
+	public static Map<DataSourceInfo, List<SchemaInfo>> getDefaultDataSourceAndSchemas(String dbUri) {
+		return getDefaultDataSourceAndSchemas(dbUri, getActiveNonCoreComponentNames().collect(Collectors.toSet()));
+	}
+
+	private static Map<DataSourceInfo, List<SchemaInfo>> getDefaultDataSourceAndSchemas(String dbUri, Set<String> components) {
+		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
+																 Optional.ofNullable(components),
+																 Optional.empty(),
+																 Optional.empty(), new String[] { "example.com" }, Optional.empty(),
+																 Optional.empty());
+
+
+		Map<String, Object> config = configBuilder.build();
+		return getDataSourcesAndSchemas(config);
+	}
+
+	public static Optional<SchemaInfo> getDefaultSchemaFor(String dbUri, String schemaId, Set<String> components) {
+		return getDefaultDataSourceAndSchemas(dbUri, components).values().stream().flatMap(value -> value.stream()).filter(schema -> schemaId.equals(schema.getId())).findFirst();
+	}
+
+	public static Map<DataSourceInfo, List<SchemaInfo>> getDataSourcesAndSchemas(Map<String, Object> config) {
+		Kernel kernel = prepareKernel(config);
+		List<BeanConfig> repoBeans = getRepositoryBeans(kernel, getRepositoryClasses(), config);
+		List<RepoInfo> repositories = getRepositories(kernel, repoBeans, config);
 		Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource = repositories.stream()
 				.collect(Collectors.groupingBy(RepoInfo::getDataSource, Collectors.toList()));
 
@@ -401,7 +424,7 @@ public class SchemaManager {
 	}
 
 	public Map<DataSourceInfo, List<ResultEntry>> loadSchemas() {
-		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas();
+		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas(config);
 		return dataSourceSchemas.entrySet()
 				.stream()
 				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(),
@@ -423,7 +446,8 @@ public class SchemaManager {
 			log.log(Level.FINER, "loading schemas for data source " + ds);
 			schemas.sort(SCHEMA_INFO_COMPARATOR);
 
-			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema(COMMON_SCHEMA_ID, null), handler));
+			SchemaInfo commonSchemaInfo = new SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", Collections.emptyList());
+			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema(commonSchemaInfo, null), handler));
 
 			for (SchemaInfo schema : validSchemas) {
 				// we filter validSchemas at the beginning of the method to only include Valid Schemas
@@ -442,7 +466,7 @@ public class SchemaManager {
 					schemaLoadResultEntry = new ResultEntry(
 							"Loading schema: " + schema.getName() + ", version: " + version +
 									dbVersionMsg,
-							schemaLoader.loadSchema(schema.getId(), version.getBaseVersion().toString()), handler);
+							schemaLoader.loadSchema(schema, version.getBaseVersion().toString()), handler);
 				} else {
 					log.log(Level.FINER, "Skipped loading schema with id ='" + schema + "'");
 					schemaLoadResultEntry = new ResultEntry(
@@ -452,9 +476,12 @@ public class SchemaManager {
 				results.add(schemaLoadResultEntry);
 			}
 
-			if (schemas.stream().anyMatch(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId()))) {
-				results.add(new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(), handler));
-			}
+			schemas.stream()
+					.filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId()))
+					.findAny()
+					.ifPresent(schemaInfo -> results.add(
+							new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(schemaInfo),
+											handler)));
 
 			results.add(new ResultEntry("Post installation action", schemaLoader.postInstallation(), handler));
 			return results;
@@ -563,27 +590,27 @@ public class SchemaManager {
 		return results;
 	}
 
-	private Map<String, DataSourceInfo> getDataSources() {
+	private static Map<String, DataSourceInfo> getDataSources(Map<String, Object> config) {
 		Map<String, DataSourceInfo> dataSources = ((Map<String, Object>) config.get("dataSource")).values()
 				.stream()
 				.filter(v -> v instanceof AbstractBeanConfigurator.BeanDefinition)
 				.map(v -> (AbstractBeanConfigurator.BeanDefinition) v)
 				.filter(AbstractBeanConfigurator.BeanDefinition::isActive)
-				.map(this::createDataSourceInfo)
+				.map(SchemaManager::createDataSourceInfo)
 				.collect(Collectors.toMap(DataSourceInfo::getName, Function.identity()));
 		return dataSources;
 	}
 
-	private DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def) {
+	private static DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def) {
 		Object v = def.getOrDefault("uri", def.get("repo-uri"));
 		return new DataSourceInfo(def.getBeanName(),
 								  v instanceof ConfigReader.Variable ? ((ConfigReader.Variable) v).calculateValue()
 										  .toString() : v.toString());
 	}
 
-	private List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans) {
+	private static List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans, Map<String, Object> config) {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
-		Map<String, DataSourceInfo> dataSources = getDataSources();
+		Map<String, DataSourceInfo> dataSources = getDataSources(config);
 		return repoBeans.stream().flatMap(bc -> {
 			try {
 				if (SDRepositoryBean.class.isAssignableFrom(bc.getClazz())) {
@@ -618,14 +645,14 @@ public class SchemaManager {
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	private Map<DataSourceInfo, List<SchemaInfo>> collectSchemasByDataSource(
+	private static Map<DataSourceInfo, List<SchemaInfo>> collectSchemasByDataSource(
 			Map<DataSourceInfo, List<RepoInfo>> repositoriesByDataSource) {
 		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = new HashMap<>();
 		for (Map.Entry<DataSourceInfo, List<RepoInfo>> entry : repositoriesByDataSource.entrySet()) {
 
 			List<SchemaInfo> schemas = entry.getValue()
 					.stream()
-					.collect(Collectors.groupingBy(this::getSchemaId, Collectors.toList()))
+					.collect(Collectors.groupingBy(SchemaManager::getSchemaId, Collectors.toList()))
 					.entrySet()
 					.stream()
 					.map(e -> {
@@ -644,17 +671,17 @@ public class SchemaManager {
 		return dataSourceSchemas;
 	}
 
-	private String getSchemaId(RepoInfo repoInfo) {
+	private static String getSchemaId(RepoInfo repoInfo) {
 		Repository.SchemaId schemaId = repoInfo.getImplementation().getAnnotation(Repository.SchemaId.class);
 		return schemaId == null ? "<unknown>" : schemaId.id();
 	}
 
-	private String getDataSourceNameOr(DSLBeanConfigurator configurator, BeanConfig bc, String defValue) {
+	private static String getDataSourceNameOr(DSLBeanConfigurator configurator, BeanConfig bc, String defValue) {
 		Map<String, Object> cfg = configurator.getConfiguration(bc);
 		return (String) cfg.getOrDefault("dataSourceName", cfg.getOrDefault("data-source", defValue));
 	}
 
-	private Class<?> getRepositoryImplementation(DSLBeanConfigurator configurator, DataSourceInfo dataSource,
+	private static Class<?> getRepositoryImplementation(DSLBeanConfigurator configurator, DataSourceInfo dataSource,
 												 BeanConfig beanConfig, BeanConfig mdRepoBeanConfig)
 			throws ClassNotFoundException, DBInitException, IllegalAccessException, InstantiationException,
 				   NoSuchMethodException, InvocationTargetException {
@@ -686,7 +713,7 @@ public class SchemaManager {
 		throw new RuntimeException("Unknown repository!");
 	}
 
-	private Kernel prepareKernel() {
+	private static Kernel prepareKernel(Map<String, Object> config) {
 		Kernel kernel = new Kernel("root");
 		try {
 			if (XMPPServer.isOSGi()) {
@@ -718,7 +745,7 @@ public class SchemaManager {
 		return kernel;
 	}
 
-	private List<BeanConfig> getRepositoryBeans(Kernel kernel) {
+	private static List<BeanConfig> getRepositoryBeans(Kernel kernel, List<Class<?>> repositoryClasses, Map<String, Object> config) {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
 		configurator.registerBeans(null, null, config);
 
@@ -727,7 +754,7 @@ public class SchemaManager {
 		return repoBeans;
 	}
 
-	private void fixShutdownThreadIssue() {
+	private static void fixShutdownThreadIssue() {
 		MonitorRuntime.getMonitorRuntime();
 		try {
 			Field f = MonitorRuntime.class.getDeclaredField("mainShutdownThread");
@@ -739,7 +766,7 @@ public class SchemaManager {
 		}
 	}
 
-	private List<BeanConfig> crawlKernel(List<Class<?>> repositoryClasses, Kernel kernel,
+	private static List<BeanConfig> crawlKernel(List<Class<?>> repositoryClasses, Kernel kernel,
 										 DSLBeanConfigurator configurator, Map<String, Object> config) {
 		List<BeanConfig> results = new ArrayList<>();
 		kernel.getDependencyManager()
@@ -955,19 +982,25 @@ public class SchemaManager {
 	public static class SchemaInfo {
 
 		private final List<RepoInfo> repositories;
-		private final Repository.SchemaId schema;
+		private final Optional<String> id;
+		private final Optional<String> name;
 
 		public SchemaInfo(Repository.SchemaId schema, List<RepoInfo> repositories) {
-			this.schema = schema;
+			this(schema == null ? null : schema.id(), schema == null ? null : schema.name(), repositories);
+		}
+
+		public SchemaInfo(String id, String name, List<RepoInfo> repositories) {
+			this.id = Optional.ofNullable(id);
+			this.name = Optional.ofNullable(name);
 			this.repositories = repositories;
 		}
 
 		public String getId() {
-			return (schema == null ? "<unknown>" : schema.id());
+			return id.orElse("<unknown>");
 		}
 
 		public String getName() {
-			return (schema != null ? schema.name() : "");
+			return name.orElse("");
 		}
 
 		public List<RepoInfo> getRepositories() {
@@ -992,12 +1025,12 @@ public class SchemaManager {
 
 
 		public boolean isValid() {
-			return schema != null && getVersion().isPresent();
+			return id.isPresent() && getVersion().isPresent();
 		}
 
 		@Override
 		public String toString() {
-			return "SchemaInfo[id=" + (schema == null ? "<unknown>" : schema.id()) + ", repositories=" + repositories +
+			return "SchemaInfo[id=" + getId() + ", repositories=" + repositories +
 					"]";
 		}
 	}

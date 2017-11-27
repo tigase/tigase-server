@@ -19,11 +19,18 @@
  */
 package tigase.db.util;
 
+import tigase.auth.CredentialsDecoderBean;
+import tigase.auth.CredentialsEncoderBean;
+import tigase.component.DSLBeanConfigurator;
 import tigase.conf.ConfigBuilder;
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
+import tigase.db.*;
+import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.core.Kernel;
 import tigase.osgi.util.ClassUtilBean;
 import tigase.util.Version;
+import tigase.util.reflection.ReflectionHelper;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.jid.BareJID;
@@ -31,10 +38,14 @@ import tigase.xmpp.jid.BareJID;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
+import static tigase.db.util.SchemaManager.COMMON_SCHEMA_ID;
 
 /**
  * @author andrzej
@@ -174,16 +185,22 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	public abstract Result postInstallation();
 
-	public Result printInfo() {
+	protected String getConfigString() throws IOException {
 		String dataSourceUri = getDBUri();
 
 		ConfigBuilder builder = new ConfigBuilder();
 		builder.withBean(ds -> ds.name("dataSource").withBean(def -> def.name("default").with("uri", dataSourceUri)));
 
-		String configStr = null;
 		try (StringWriter writer = new StringWriter()) {
 			new ConfigWriter().write(writer, builder.build());
-			configStr = writer.toString();
+			return writer.toString();
+		}
+	}
+
+	public Result printInfo() {
+		String configStr = null;
+		try {
+			configStr = getConfigString();
 		} catch (IOException ex) {
 			// should not happen
 			configStr = "Failure: " + ex.getMessage();
@@ -197,7 +214,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	/**
 	 * Method attempts to add XMPP admin user account to the database using {@code AuthRepository}.
 	 */
-	public abstract Result addXmppAdminAccount();
+	public abstract Result addXmppAdminAccount(SchemaManager.SchemaInfo schemaInfo);
 
 	/**
 	 * Methods attempt to write to database loaded schema version for particular component
@@ -221,9 +238,119 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	public abstract Result shutdown();
 
-	public abstract Result loadSchema(String schemaId, String version);
+	public Result loadCommonSchema() {
+		return loadSchema(new SchemaManager.SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", Collections.emptyList()),
+						  null);
+	}
 
+	public abstract Result loadSchema(SchemaManager.SchemaInfo schemaInfo, String version);
+	
 	public abstract Result destroyDataSource();
+
+	protected <T extends DataSource> Result addUsersToRepository(SchemaManager.SchemaInfo schemaInfo, T dataSource, Class<T> dataSourceClass, List<BareJID> jids, String password, Logger log) {
+		return getDataSourceAwareClassesForSchemaInfo(schemaInfo, dataSourceClass).filter(
+				AuthRepository.class::isAssignableFrom)
+				.map(this::instantiateClass)
+				.map(initializeDataSourceAwareFunction(dataSource, log))
+				.map(this::castToAuthRepository)
+				.map(this::initializeAuthRepository)
+				.filter(Objects::nonNull)
+				.findAny()
+				.map(addUsersToRepositoryFunction(jids, password, log))
+				.orElse(Result.error);
+	}
+
+	protected <DS extends DataSource> Stream<Class<DataSourceAware<DS>>> getDataSourceAwareClassesForSchemaInfo(
+			SchemaManager.SchemaInfo schema, Class<DS> dataSourceIfc) {
+		Stream<Class<DataSourceAware<DS>>> classes = schema.getRepositories()
+				.stream()
+				.map(repoInfo -> repoInfo.getImplementation())
+				.filter(clazz -> DataSourceAware.class.isAssignableFrom(clazz))
+				.filter(clazz -> ReflectionHelper.classMatchesClassWithParameters(clazz, DataSourceAware.class,
+																				  new Type[]{dataSourceIfc}))
+				.map(clazz -> (Class<DataSourceAware<DS>>) clazz);
+
+		return classes;
+	}
+
+	protected <DSIFC extends DataSource, DS extends DSIFC> Stream<DataSourceAware> getInitializedDataSourceAwareForSchemaInfo(
+			SchemaManager.SchemaInfo schema, Class<DSIFC> dataSourceIfc, DS dataSource, Logger log) {
+		return getDataSourceAwareClassesForSchemaInfo(schema, dataSourceIfc).map(this::instantiateClass)
+				.map(initializeDataSourceAwareFunction(dataSource, log));
+	}
+
+	protected AuthRepository castToAuthRepository(DataSourceAware dataSourceAware) {
+		if (dataSourceAware instanceof AuthRepository) {
+			return (AuthRepository) dataSourceAware;
+		} else {
+			log.log(Level.WARNING, "DataSourceAware does not implement AuthRepository interface");
+			return null;
+		}
+	}
+
+	protected AuthRepository initializeAuthRepository(AuthRepository authRepository) {
+		if (authRepository instanceof AbstractAuthRepositoryWithCredentials) {
+			AbstractAuthRepositoryWithCredentials repo = (AbstractAuthRepositoryWithCredentials) authRepository;
+			Kernel kernel = new Kernel();
+			kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
+			kernel.registerBean(DSLBeanConfigurator.class).exportable().exec();
+			kernel.getInstance(DSLBeanConfigurator.class).setProperties(new HashMap<>());
+			kernel.registerBean(CredentialsEncoderBean.class).exec();
+			kernel.registerBean(CredentialsDecoderBean.class).exec();
+			CredentialsEncoderBean encoderBean = kernel.getInstance(CredentialsEncoderBean.class);
+			CredentialsDecoderBean decoderBean = kernel.getInstance(CredentialsDecoderBean.class);
+			repo.setCredentialsCodecs(encoderBean, decoderBean);
+		}
+		return authRepository;
+	}
+
+	protected <T extends DataSource> Function<DataSourceAware<T>, DataSourceAware<T>> initializeDataSourceAwareFunction(T dataSource, Logger log) {
+		return repo -> {
+			try {
+				repo.setDataSource(dataSource);
+				return repo;
+			} catch (Exception ex) {
+				log.log(Level.WARNING, ex.getMessage());
+				return null;
+			}
+		};
+	}
+
+	protected Function<AuthRepository, Result> addUsersToRepositoryFunction(List<BareJID> jids, String pwd,
+																			Logger log) {
+		return authRepository -> {
+			if (authRepository == null) {
+				return Result.error;
+			}
+			return jids.stream().map(jid -> {
+				try {
+					authRepository.addUser(jid, pwd);
+					return Result.ok;
+				} catch (TigaseDBException ex) {
+					log.log(Level.WARNING, ex.getMessage());
+					return Result.warning;
+				}
+			}).anyMatch(result -> result == Result.warning) ? Result.warning : Result.ok;
+		};
+	}
+
+	protected <T> T instantiateClass(Class<T> clazz) {
+		try {
+			return (T) clazz.newInstance();
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "Failed to create instance of " + clazz.getCanonicalName());
+			return null;
+		}
+	}
+
+	private <T extends DataSource> DataSourceAware<T> instantiateDataSourceAware(Class<?> clazz) {
+		try {
+			return (DataSourceAware<T>) clazz.newInstance();
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "Failed to create instance of " + clazz.getCanonicalName());
+			return null;
+		}
+	}
 
 	protected String getType() {
 		return type;

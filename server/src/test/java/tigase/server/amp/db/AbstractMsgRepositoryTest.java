@@ -21,13 +21,8 @@
 package tigase.server.amp.db;
 
 import org.junit.*;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
-import org.junit.runners.model.Statement;
-import tigase.component.exceptions.RepositoryException;
 import tigase.db.*;
-import tigase.db.util.SchemaLoader;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -35,10 +30,9 @@ import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.ProcessorTestCase;
+import tigase.xmpp.impl.AbstractProcessorWithDataSourceAwareTestCase;
 import tigase.xmpp.jid.JID;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -50,91 +44,24 @@ import static org.junit.Assert.*;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
-		extends ProcessorTestCase {
+		extends AbstractProcessorWithDataSourceAwareTestCase<DS,MsgRepository> {
 
 	protected static String emoji = "\uD83D\uDE97\uD83D\uDCA9\uD83D\uDE21";
-	protected static String uri = System.getProperty("testDbUri");
-	@ClassRule
-	public static TestRule rule = new TestRule() {
-		@Override
-		public Statement apply(Statement stmnt, Description d) {
-			if (uri == null) {
-				return new Statement() {
-					@Override
-					public void evaluate() throws Throwable {
-						Assume.assumeTrue("Ignored due to not passed DB URI!", false);
-					}
-				};
-			}
-			return stmnt;
-		}
-	};
 	protected boolean checkEmoji = true;
-	protected DS dataSource;
-	protected MsgRepository repo;
 	private JID recipient;
 	private XMPPResourceConnection recipientSession;
 	private JID sender;
-
-	@AfterClass
-	public static void cleanDerby() {
-		if (uri.contains("jdbc:derby:")) {
-			File f = new File("derby_test");
-			if (f.exists()) {
-				if (f.listFiles() != null) {
-					Arrays.asList(f.listFiles()).forEach(f2 -> {
-						if (f2.listFiles() != null) {
-							Arrays.asList(f2.listFiles()).forEach(f3 -> f3.delete());
-						}
-						f2.delete();
-					});
-				}
-				f.delete();
-			}
-		}
-	}
-
-	@BeforeClass
-	public static void loadSchema() {
-		if (uri.startsWith("jdbc:")) {
-			SchemaLoader loader = SchemaLoader.newInstance("jdbc");
-			SchemaLoader.Parameters params = loader.createParameters();
-			params.parseUri(uri);
-			params.setDbRootCredentials(null, null);
-			loader.init(params, Optional.empty());
-			loader.validateDBConnection();
-			loader.validateDBExists();
-			Assert.assertEquals(SchemaLoader.Result.ok, loader.loadSchema(Schema.SERVER_SCHEMA_ID, "8.0.0"));
-			loader.postInstallation();
-			loader.shutdown();
-		}
-	}
-
+	
 	@Before
 	public void setup() throws Exception {
-		super.setUp();
-		dataSource = prepareDataSource();
-		repo = (MsgRepository) DataSourceHelper.getDefaultClass(MsgRepositoryIfc.class, uri).newInstance();
-		try {
-			dataSource.checkSchemaVersion(repo, true);
-			repo.setDataSource(dataSource);
-		} catch (RuntimeException ex) {
-			throw new RepositoryException(ex);
-		}
-		ReentrantLock lock = new ReentrantLock();
-		repo.setCondition(lock, lock.newCondition());
 		sender = JID.jidInstance("sender-" + UUID.randomUUID(), "example.com", "resource-1");
+		getUserRepository().addUser(sender.getBareJID());
 		recipient = JID.jidInstance("recipient-" + UUID.randomUUID(), "example.com", "resource-1");
+		getUserRepository().addUser(recipient.getBareJID());
+
 		recipientSession = getSession(recipient, recipient);
 	}
-
-	@After
-	public void tearDown() throws Exception {
-		repo.deleteMessagesToJID(null, recipientSession);
-		repo = null;
-		super.tearDown();
-	}
-
+	
 	@Test
 	public void testStorageOfOfflineMessage()
 			throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
@@ -255,15 +182,21 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
 			throw ex;
 		}
 	}
+	
+	protected abstract <T> T getMsgId(String msgIdStr);
 
-	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {
-		DataSource dataSource = DataSourceHelper.getDefaultClass(DataSource.class, uri)
-				.newInstance();//RepositoryFactory.getRepoClass(DataSource.class, uri).newInstance();
-		dataSource.initRepository(uri, new HashMap<>());
-		return (DS) dataSource;
+	@Override
+	protected Class getDataSourceAwareIfc() {
+		return MsgRepositoryIfc.class;
 	}
 
-	protected abstract <T> T getMsgId(String msgIdStr);
+	@Override
+	protected MsgRepository prepareDataSourceAware() throws Exception {
+		MsgRepository repository =  super.prepareDataSourceAware();
+		ReentrantLock lock = new ReentrantLock();
+		repository.setCondition(lock, lock.newCondition());
+		return repository;
+	}
 
 	protected String generateRandomBody() {
 		String body = "Body " + UUID.randomUUID().toString();
@@ -272,5 +205,5 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
 		}
 		return body;
 	}
-
+	
 }

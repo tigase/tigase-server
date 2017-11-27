@@ -52,16 +52,13 @@ public class BindResourceTest
 	}
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		bindResource = new BindResource();
-		super.setUp();
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		bindResource = null;
-		super.tearDown();
 	}
 
 	@Test

@@ -26,7 +26,6 @@ import org.junit.Test;
 import tigase.TestLogger;
 import tigase.db.TigaseDBException;
 import tigase.eventbus.EventBusFactory;
-import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -57,18 +56,17 @@ public class JabberIqPrivacyTest
 
 	private static final Logger log = TestLogger.getLogger(JabberIqPrivacyTest.class);
 
-	private Kernel kernel;
-
 	private JabberIqPrivacy privacyFilter;
 	private ArrayDeque<Packet> results;
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
-		super.setUp();
 		try {
+			getKernel().registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
+			getKernel().registerBean(JabberIqPrivacy.class).exec();
+
 			privacyFilter = getInstance(JabberIqPrivacy.class);
-			kernel.getDependencyManager()
+			getKernel().getDependencyManager()
 					.getBeanConfig("jabber:iq:privacy")
 					.getKernel()
 					.setBeanActive("privacyListOfflineCache", true);
@@ -80,9 +78,7 @@ public class JabberIqPrivacyTest
 	}
 
 	@After
-	@Override
 	public void tearDown() throws Exception {
-		super.tearDown();
 		privacyFilter = null;
 	}
 
@@ -391,16 +387,7 @@ public class JabberIqPrivacyTest
 		testList(session, "test.domain.com", "test2.domain.com", true);
 
 	}
-
-	@Override
-	protected void registerBeans(Kernel kernel) {
-		super.registerBeans(kernel);
-		kernel.registerBean("userAuthRepository").asInstance(getRepository()).exportable().exec();
-		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
-		kernel.registerBean(JabberIqPrivacy.class).exec();
-		this.kernel = kernel;
-	}
-
+	
 	private void checkStanzaType(XMPPResourceConnection session, String type, Element additionalChild,
 								 int expectedResultSize, StanzaType expectedStanzaType)
 			throws TigaseStringprepException, XMPPException {
@@ -438,8 +425,8 @@ public class JabberIqPrivacyTest
 		if (session != null) {
 			session.putSessionData("active-list", PrivacyList.create(null, list));
 		} else {
-			this.getRepository().setData(jid.getBareJID(), "privacy", "default-list", "default");
-			this.getRepository().setData(jid.getBareJID(), "privacy/default", "privacy-list", list.toString());
+			this.getUserRepository().setData(jid.getBareJID(), "privacy", "default-list", "default");
+			this.getUserRepository().setData(jid.getBareJID(), "privacy/default", "privacy-list", list.toString());
 			this.privacyFilter.cache.clear();
 		}
 
