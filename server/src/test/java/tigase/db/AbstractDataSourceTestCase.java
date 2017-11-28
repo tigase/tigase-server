@@ -98,7 +98,7 @@ public class AbstractDataSourceTestCase<DS extends DataSource> extends AbstractK
 	@Before
 	public void setupDataSource() throws Exception {
 		dataSource = prepareDataSource();
-		getKernel().registerBean("dataSource").asInstance(dataSource).exportable().exec();
+		getKernel().registerBean("dataSource").asInstance(dataSource).setPinned(false).exportable().exec();
 	}
 	
 	protected DS prepareDataSource() throws DBInitException, IllegalAccessException, InstantiationException {

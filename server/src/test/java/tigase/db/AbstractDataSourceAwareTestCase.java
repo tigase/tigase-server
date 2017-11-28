@@ -51,7 +51,7 @@ public abstract class AbstractDataSourceAwareTestCase<DS extends DataSource, R e
 
 	protected R prepareDataSourceAware() throws Exception {
 		Class dataSourceAwareClassForUri = DataSourceHelper.getDefaultClass(getDataSourceAwareIfc(), uri);
-		getKernel().registerBean("repository").asClass(dataSourceAwareClassForUri).setActive(true).exec();
+		getKernel().registerBean("repository").asClass(dataSourceAwareClassForUri).setPinned(false).setActive(true).exec();
 		R repo = getInstance((Class<R>) getDataSourceAwareIfc());
 		try {
 			// we do not check schema version as we are updating schema in loadSchema() method!!

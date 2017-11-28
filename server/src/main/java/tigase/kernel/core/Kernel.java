@@ -189,7 +189,7 @@ public class Kernel {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Removing instance of unused bean " + beanConfig.getBeanName());
 					}
-					beanConfig.getKernel().beanInstances.remove(beanConfig);
+					beanConfig.getKernel().beanInstances.remove(beanConfig.getBeanInstanceName());
 					beanConfig.setState(State.registered);
 				});
 
@@ -204,7 +204,7 @@ public class Kernel {
 						log.log(Level.FINEST, "Removing instance of unused bean " + bc.getBeanName());
 					}
 					bc.setState(State.registered);
-					Object i = bc.getKernel().beanInstances.remove(bc);
+					Object i = bc.getKernel().beanInstances.remove(bc.getBeanInstanceName());
 					fireUnregisterAware(i);
 					if (i instanceof RegistrarBean) {
 						((RegistrarBean) i).unregister(bc.getKernel());

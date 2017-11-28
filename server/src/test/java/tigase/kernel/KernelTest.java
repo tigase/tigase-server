@@ -343,7 +343,7 @@ public class KernelTest {
 
 		krnl.getInstance(Bean5.class);
 
-		Assert.assertEquals(3, krnl.getDependencyManager()
+		Assert.assertEquals(8, krnl.getDependencyManager()
 				.getBeanConfigs()
 				.stream()
 				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
@@ -362,7 +362,7 @@ public class KernelTest {
 		krnl.getInstance(Bean1.class);
 		krnl.getInstance(Bean10.class);
 
-		Assert.assertEquals(3, krnl.getDependencyManager()
+		Assert.assertEquals(7, krnl.getDependencyManager()
 				.getBeanConfigs()
 				.stream()
 				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
@@ -370,7 +370,7 @@ public class KernelTest {
 
 		krnl.gc();
 
-		Assert.assertEquals(2, krnl.getDependencyManager()
+		Assert.assertEquals(5, krnl.getDependencyManager()
 				.getBeanConfigs()
 				.stream()
 				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
