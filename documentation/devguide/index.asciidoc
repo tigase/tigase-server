@@ -18,12 +18,6 @@ include::text/CodeStyleGuide.asciidoc[]
 //writing for Tigase
 include::text/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
 
-:leveloffset: 2
-
-include::text/API_Changes_in_Tigase_Server_5.x.asciidoc[]
-
-:leveloffset: 1
-
 include::text/Server_Compilation.asciidoc[]
 
 :leveloffset: 1
@@ -141,3 +135,5 @@ include::text/Old_Stuff/Why_the_Most_Recent_JDK.asciidoc[]
 include::text/Old_Stuff/Virtual_Domains_Management_API.asciidoc[]
 
 include::text/Old_Stuff/Stanza_Limitations.asciidoc[]
+
+include::text/API_Changes_in_Tigase_Server_5.x.asciidoc[]

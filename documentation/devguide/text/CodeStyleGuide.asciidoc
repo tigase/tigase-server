@@ -1,6 +1,6 @@
 = Tigase Code Style
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
-:version: v2.1 August 2014. Reformatted for v7.2.0.
+:version: v2.1 August 2014. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -19,8 +19,7 @@ Examples should be considered as *non-normative*, that is formatting choices sho
 [[file-name]]
 === Technicals details
 
-* File name consists of the case-sensitive, camel-cased name of the
-top-level class it contains plus the `.java` extension.
+* File name consists of the case-sensitive, camel-cased name of the top-level class it contains plus the `.java` extension.
 * Source files are encoded in *UTF-8*.
 
 [[filestructure]]
@@ -131,7 +130,7 @@ Defined column limit is 120 characters and must be line-wrapped as described bel
 [[line-wrapping]]
 === Line-wrapping
 
-_line-wrapping_ is a process of divinging long lines that would otherwise go over the defined Column Limit (above). It's recommended to wrap lines whenever it's possible even if they are not longer than defined limit.
+_line-wrapping_ is a process of dividing long lines that would otherwise go over the defined Column Limit (above). It's recommended to wrap lines whenever it's possible even if they are not longer than defined limit.
 
 [[whitespace]]
 === Whitespace
@@ -224,7 +223,7 @@ Identifiers use only ASCII letters and digits, and, in a small number of cases n
 [[programming-practices]]
 == Programming Practices
 
-* A method is marked with the `@Override` annotation whenever it is legal. This includes a class method overriding a superclass method, a class method implementing an interface method, and an interface method respecifying a superinterface method.
+* A method is marked with the `@Override` annotation whenever it is legal. This includes a class method overriding a superclass method, a class method implementing an interface method, and an interface method re-specifying a super-interface method.
 * Caught exceptions should not be ignored (and if this is a must then a log entry is required).
 
 [[javadoc]]

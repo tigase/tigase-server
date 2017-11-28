@@ -1,13 +1,14 @@
 [[eventBusAPI]]
 = EventBus API in Tigase
 :author: Bartosz Małkowski <bmalkowski@tigase.pl>
-:version: v1.0 August 2015. Reformatted for v7.2.0.
+:version: v1.0 August 2015. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
-EventBus is a custom publish-subscribe mechanism which allows for the use of Event Listener within Tigase Server.  EventBus consists of two separated parts: Distributed EventBus and Local EventBus.
+EventBus is a custom publish-subscribe mechanism which allows for the use of Event Listener within Tigase Server.
+EventBus consists of two separated parts: Distributed EventBus and Local EventBus.
 Local EventBus is only concerned with local event listener, and will operate events locally.  Distributed EventBus is designed to distribute events among cluster nodes.
 For a more detailed overview of EventBus and it's features, please visit link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#eventBus[The Administration Guide].
 
@@ -49,7 +50,7 @@ eventBus.addHandler("EventName", "tigase:demo", handler);
 
 -------
 
-It is possible to register handler for all events with a specific xmlns such as tigase:demo below:
+It is possible to register handler for all events with a specific xmlns such as `tigase:demo` below:
 
 [source, java]
 -------
@@ -77,7 +78,7 @@ event.addChild(new Element("sample_value", "1"));
 eventBus.fire(event);
 -------
 
-This event will be received by all handlers that are registered for exactly this event, or all events usint the *tigase:demo* namespace on all cluster nodes. It is possible to limit event delivery only to the current Tigase instance (current cluster node), by setting the attribute `local`:
+This event will be received by all handlers that are registered for exactly this event, or all events using the *tigase:demo* namespace on all cluster nodes. It is possible to limit event delivery only to the current Tigase instance (current cluster node), by setting the attribute `local`:
 
 [source, java]
 -------

@@ -1,7 +1,7 @@
 [[hackingTigase]]
 = Hack Tigase XMPP Server in Eclipse
 :author: Daniel Wisnewski
-:version: v1.0 August 2015. Reformatted for v7.2.0.
+:version: v1.0 August 2015. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -10,13 +10,13 @@
 If you want to write code for *Tigase* server we recommend using link://https://eclipse.org/downloads/[Eclipse IDE].  Either the IDE for Java or Java EE developers will work.
 
 == Requirements
-Eclipse IDE currently requires the use of link:http://www.oracle.com/technetwork/java/javase/downloads/jre7-downloads-1880261.html[Java Runtime Environment 7].  Although this is an outdated version of Java (and Tigase requires JDK version 8) Eclipse has not yet moved to the latest Java Build so you will need both versions installed.
+Eclipse IDE currently requires the use of link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[Java Development Kit 8].
 
-You will also need the M2E plugin for Maven integration, however this can be done inside Elcipse now, so refer to the xref:m2EPlugin[Plugin Installation] section for that.
+You will also need the M2E plugin for Maven integration, however this can be done inside Eclipse now, so refer to the xref:m2EPlugin[Plugin Installation] section for that.
 
 == Installation
 Eclipse does not come as an installer, but rather an archive.  Extract the directory to a working location wherever you would like.
-Now install the JRE 7 software, location is not important as Eclipse will find it autmoatically.
+Now install the JDK software, location is not important as Eclipse will find it automatically.
 
 Before we begin, we will need to clone the repository from git.
 

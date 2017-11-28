@@ -1,11 +1,13 @@
 [[apiChanges]]
 = API changes in the Tigase Server 5.x
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:version: v2.0, June 2014: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
+
+*THIS INFORMATION IS FOR OLDER VERSIONS OF TIGASE*
 
 The API changes can effect you only if you develop own code to run inside Tigase server. The changes are not extensive but in some circumstances may require many simple changes in a few files.
 
