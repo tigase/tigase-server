@@ -25,7 +25,6 @@
 				<include>**/tigase-utils*</include>
 				<include>**/tigase-xmltools*</include>
                 <include>**/tigase-http-api*</include>
-                <include>**/tigase-web-ui*</include>
             </includes>
         </fileSet>
 		<fileSet>
@@ -50,17 +49,6 @@
             <outputDirectory>./</outputDirectory>
             <includes>
                 <include>**/*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../distribution-docs</directory>
-            <outputDirectory>docs</outputDirectory>
-            <includes>
-                <include>Development_Guide/html_chunk/**/*</include>
-                <include>Development_Guide/pdf/**/*</include>
-				<include>Administration_Guide/html_chunk/**/*</include>
-				<include>Administration_Guide/pdf/**/*</include>
-                <include>javadoc/**/*</include>
             </includes>
         </fileSet>
 		<fileSet>
@@ -124,19 +112,14 @@
 			<!--<scope>runtime</scope>-->
 			<includes>
 				<!--database libraries-->
-				<include>org.apache.derby:derby</include>
-				<include>org.apache.derby:derbytools</include>
 				<include>mysql:mysql-connector-java</include>
 				<include>org.postgresql:postgresql</include>
 				<!-- other libraries-->
 				<include>org.codehaus.groovy:groovy-all</include>
-				<include>openDMK:jdmkrt</include>
-				<include>net.sourceforge.jtds:jtds</include>
 
 				<!--HTTP API component dependencies-->
 				<include>javax.servlet:javax.servlet-api</include>
 				<include>tigase-http-api-jetty</include>
-
 			</includes>
 		</dependencySet>
 	</dependencySets>
