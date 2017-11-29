@@ -28,6 +28,7 @@ import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
 import tigase.util.routing.PatternComparator;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.workqueue.PriorityQueueAbstract;
@@ -863,6 +864,16 @@ public abstract class AbstractMessageReceiver
 			this.maxOutQueueSize = (maxQueueSize / processingOutThreads()) * 2;
 			log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
 					new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
+
+			if (maxInQueueSize <= 15 || maxQueueSize <= 15) {
+				TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
+						"You configured component of class " + getClass().getCanonicalName() + " with packet queues total size set to " + maxQueueSize,
+						"Component uses " + Math.max(processingInThreads(), processingOutThreads()) + " queues which would give a limit of " + Math.min(maxInQueueSize,maxOutQueueSize) + " packets per queue.",
+						"This value is too low for Tigase XMPP Server to run properly. Please adjust the configuration of the server.",
+						"max-queue-size should be set to at least " + (Math.max(processingInThreads(), processingOutThreads())/2) * 16
+				});
+			}
+
 			if (in_queues.size() == 0) {
 				for (int i = 0; i < in_queues_size; i++) {
 					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
