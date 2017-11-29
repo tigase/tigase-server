@@ -154,7 +154,7 @@ public abstract class AbstractMessageReceiver
 			16, 0.75f, 4);
 	protected int maxInQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int maxOutQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
-	@ConfigField(desc = "Maximal size of internal queues", alias = "max-queue-size")
+	@ConfigField(desc = "Maximum size of internal queues", alias = "max-queue-size")
 	protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	// ~--- fields ---------------------------------------------------------------
 	// private static final TigaseTracer tracer =
@@ -845,13 +845,14 @@ public abstract class AbstractMessageReceiver
 	public void setPriorityQueueClass(Class<? extends PriorityQueueAbstract> priorityQueueClass) {
 		if (!this.priorityQueueClass.equals(priorityQueueClass)) {
 			this.priorityQueueClass = priorityQueueClass;
+			this.in_queues.clear();
+			this.out_queues.clear();
 			this.setMaxQueueSize(maxQueueSize);
 		}
 	}
 
 	public void setMaxQueueSize(int maxQueueSize) {
-		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0) ||
-				(!this.priorityQueueClass.equals(in_queues.get(0).getClass()) && this.threadsQueueIn == null)) {
+		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0) || this.threadsQueueIn == null) {
 			this.maxQueueSize = maxQueueSize;
 
 			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
