@@ -43,6 +43,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static tigase.db.util.SchemaManager.COMMON_SCHEMA_ID;
@@ -68,8 +69,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	public static List<CommandlineParameter> getMainCommandlineParameters(boolean forceNotRequired) {
-		String[] supportedTypes = (String[]) getSchemaLoaderInstances().flatMap(
-				loader -> loader.getSupportedTypes().stream()).map(x -> (String) x).sorted().toArray(String[]::new);
+		String[] supportedTypes = getAllSupportedTypesStream().map(TypeInfo::getName).sorted().toArray(String[]::new);
 		return Arrays.asList(new CommandlineParameter.Builder("T",
 															  DBSchemaLoader.PARAMETERS_ENUM.DATABASE_TYPE.getName()).description(
 				"Database server type")
@@ -78,6 +78,15 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 									 .valueDependentParametersProvider(SchemaLoader::getDbTypeDependentParameters)
 									 .required(!forceNotRequired)
 									 .build());
+	}
+
+	public static Stream<TypeInfo> getAllSupportedTypesStream() {
+		return getSchemaLoaderInstances().map(SchemaLoader::getSupportedTypes)
+				.flatMap(List::stream);
+	}
+
+	public static List<TypeInfo> getAllSupportedTypes() {
+		return getAllSupportedTypesStream().collect(Collectors.toList());
 	}
 
 	private static Stream<Class<?>> getSchemaLoaderClasses() {
@@ -146,6 +155,9 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 			throw new RuntimeException("Unsupported URI");
 		}
 		String type = uri.substring(0, idx);
+		if ("jdbc".equals(type) || "jtds".equals(type)) {
+			return newInstanceForURI(uri.substring(idx+1));
+		}
 		return newInstance(type);
 	}
 
@@ -159,10 +171,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		init(props, Optional.empty());
 	}
 
-	public abstract List<String> getSupportedTypes();
+	public abstract List<TypeInfo> getSupportedTypes();
 
 	public boolean isSupported(String dbType) {
-		return getSupportedTypes().contains(dbType);
+		return getSupportedTypes().stream().map(TypeInfo::getName).anyMatch(typeName -> typeName.equals(dbType));
 	}
 
 	public abstract String getDBUri();
@@ -357,6 +369,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	private void setType(String type) {
+		TypeInfo info = getAllSupportedTypesStream().filter(typeInfo -> type.equals(typeInfo.getName())).findFirst().get();
+		if (!info.isAvailable()) {
+			throw new RuntimeException("Driver for " + info.getLabel() + " (" + info.getName() + ") is missing due to missing class: " + info.getDriverClassName());
+		}
 		this.type = type;
 	}
 
@@ -377,5 +393,50 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		Level getLogLevel();
 
 		void setLogLevel(Level level);
+	}
+
+	public static class TypeInfo {
+
+		private final String name;
+		private final String label;
+		private final String driverClassName;
+		private final String warning;
+
+		public TypeInfo(String name, String label, String driverClassName) {
+			this(name, label, driverClassName, null);
+		}
+
+		public TypeInfo(String name, String label, String driverClassName, String warning) {
+			this.name = name;
+			this.label = label;
+			this.driverClassName = driverClassName;
+			this.warning = warning;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public String getWarning() {
+			return warning;
+		}
+
+		public boolean isAvailable() {
+			try {
+				this.getClass().getClassLoader().loadClass(driverClassName);
+			} catch (Exception ex) {
+				return false;
+			}
+			return true;
+		}
+
+		protected String getDriverClassName() {
+			return driverClassName;
+		}
+		
 	}
 }

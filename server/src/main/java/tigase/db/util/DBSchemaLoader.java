@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static tigase.db.jdbc.DataRepositoryImpl.JDBC_SCHEMA_VERSION_QUERY;
 
@@ -125,6 +126,14 @@ public class DBSchemaLoader
 		SchemaLoader.main(args);
 	}
 
+	private static final List<TypeInfo> suppertedTypes = Stream.of(
+			new TypeInfo("debry", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver"),
+			new TypeInfo("mysql", "MySQL", "com.mysql.jdbc.Driver"),
+			new TypeInfo("postgresql", "PostgreSQL", "org.postgresql.Driver"),
+			new TypeInfo("sqlserver", "SQLServer", "net.sourceforge.jtds.jdbc.Driver",
+						 "You have selected MS SQL Server as your database. While we provide you, for easy install, with open-source jTDS JDBC driver allowing to connect to MS SQL Server, we recommend using JDBC driver from Microsoft."))
+			.collect(Collectors.toList());
+
 	public DBSchemaLoader() {
 
 	}
@@ -185,8 +194,8 @@ public class DBSchemaLoader
 		this.params = params;
 	}
 
-	public List<String> getSupportedTypes() {
-		return Arrays.asList("derby", "mysql", "postgresql", "sqlserver", "jdbc");
+	public List<TypeInfo> getSupportedTypes() {
+		return suppertedTypes;
 	}
 
 	public String getSchemaFileName(String schemaId, String version) {
