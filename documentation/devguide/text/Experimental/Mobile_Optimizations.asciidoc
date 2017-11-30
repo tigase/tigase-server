@@ -1,7 +1,7 @@
 [[mobileoptimizations]]
 = Mobile Optimizations
 :author: Andrzej Wojcik <andrzejw@tigase.org>
-:version: v2.2, August 2017: Reformatted for v7.2.0.
+:version: v2.2, August 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -24,7 +24,7 @@ When mobile client is entering inactive state it notifies server about it by sen
 </iq>
 -----
 
-After receiving stanza server starts queuing stanza which should be send to mobile client. What kind of queued stanzas depends on the plugins used and in case of *Mobile v3* presence stanzas are queued as well as message stanzas which are Message Carbons. Any other stanza (such as iq or plain messenge) is sent immediately to the client and every stanza from queue is also sent at this time.
+After receiving stanza server starts queuing stanza which should be send to mobile client. What kind of queued stanzas depends on the plugins used and in case of *Mobile v3* presence stanzas are queued as well as message stanzas which are Message Carbons. Any other stanza (such as iq or plain message) is sent immediately to the client and every stanza from queue is also sent at this time.
 
 When mobile client is entering active state it notifies server by sending following stanza:
 
@@ -63,6 +63,6 @@ Mobile plugins are not activated by default thus additional entry in the config.
 }
 -----
 
-You may substitute `mobile_v1` with `mobile_v2` or `mobile_v3` depending on which algorithim you wish to use.
+You may substitute `mobile_v1` with `mobile_v2` or `mobile_v3` depending on which algorithm you wish to use.
 
 NOTE: USE ONLY ONE PLUGIN AT A TIME!

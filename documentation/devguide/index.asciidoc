@@ -92,8 +92,6 @@ include::text/Using_Maven/Maven_In_Windows.asciidoc[]
 
 include::text/Using_Maven/A_Very_Short_Maven_Guide.asciidoc[]
 
-include::text/Using_Maven/Maven_2.x_Support.asciidoc[]
-
 :leveloffset: 1
 
 //Tests

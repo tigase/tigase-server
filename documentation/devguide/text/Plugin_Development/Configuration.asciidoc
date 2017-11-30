@@ -1,7 +1,7 @@
 [[pluginconf]]
 = Plugin Configuration
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1 September 2017. Reformatted for v7.2.0.
+:version: v2.1 September 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -79,7 +79,7 @@ Again *config.tdsl* is the place to put the stuff. These kind of properties star
 }
 -----
 
-NOTE: From v7.2.0 you will no longer be able to specify one value for multiple keys, you must individually set each one.
+NOTE: From v8.0.0 you will no longer be able to specify one value for multiple keys, you must set each one individually.
 
 Last but not least - in case you have *omitted plugin ID*:
 

@@ -2,7 +2,7 @@
 = Component Implementation - Lesson 1 - Basics
 :author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.2, March 2017: Reformatted for v7.2.0.
+:version: v2.2, March 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -51,7 +51,7 @@ As you can see we have 3 mandatory methods when we extends *AbstractKernelBasedC
 * *boolean isDiscoNonAdmin()* which decides if component will be visible for users other that server administrators
 * *void registerModules(Kernel kernel)* which allows you to register component modules responsible for actual processing of packets
 
-TIP: If you decide you do not want to use modules for processing packets (even though we strongly suggest to use them, as thanks to modules components are easily extendable) you can implement one more method *void processPacket(Packet packet)* which will be called for every packet sent to a component.
+TIP: If you decide you do not want to use modules for processing packets (even though we strongly suggest to use them, as thanks to modules components are easily extendible) you can implement one more method *void processPacket(Packet packet)* which will be called for every packet sent to a component.
 This method is actually logical as the main task for your component is processing packets.
 
 Class name for our new component is *TestComponent* and we have also initialized a separated logger for this class. Doing This is very useful as it allows us to easily find log entries created by our class.

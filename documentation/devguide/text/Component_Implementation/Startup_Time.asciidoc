@@ -2,7 +2,7 @@
 = Component Implementation - Lesson 8 - Lifecycle of a component
 :author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1, March 2017: Reformatted for v7.2.0.
+:version: v2.1, March 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:

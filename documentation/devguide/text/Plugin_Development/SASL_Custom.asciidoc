@@ -1,7 +1,7 @@
 [[saslcmac]]
 = SASL Custom Mechanisms and Configuration
 :author: Bartosz Malkowski <bmalkowski@tigase.pl>
-:version: v2.1 September 2017. Reformatted for v7.2.0.
+:version: v2.1 September 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -94,7 +94,7 @@ It is possible to use a custom selector by specifying it's class int the `config
 -----
 
 == Logging/Authentication
-After the XMPP stream is opened by a client, the server checks which SASL mechanisms are available for the XMPP session. Depending on whether the stream is encrypted or not, depending on the domain, the server can present different available authentication mechanisms. MechanismSelector is responsible for choosing mechanisms. List of allowed mechanisms is stored in the XMPP session object.
+After the XMPP stream is opened by a client, the server checks which SASL mechanisms are available for the XMPP session. Depending on whether the stream is encrypted or not, depending on the domain, the server can present different available authentication mechanisms. `MechanismSelector` is responsible for choosing mechanisms. List of allowed mechanisms is stored in the XMPP session object.
 
 When the client/user begins the authentication procedure it uses one particular mechanism. It must use one of the mechanisms provided by the server as available for this session. The server checks whether mechanisms used by the client is on the list of allowed mechanisms. It the check is successful, the server creates `SaslServer` class instance and proceeds with exchanging authentication information. Authentication data is different depending on the mechanism used.
 

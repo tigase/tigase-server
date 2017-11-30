@@ -1,7 +1,7 @@
 [[cil7]]
 = Component Implementation - Lesson 7 - Data Repository
 :author: not known
-:version: v2.0, July 2015: Reformatted for v7.2.0.
+:version: v2.0, July 2015: Reformatted for v8.0.0.
 
 == ConfigRepository
 There are cases when you want to store some data permanently by your component. You can of course use the component configuration to provide some database connection settings, implement your own database connector and store records you need. There is, however, a very simple and useful framework which allows you to read and store some data transparently in either a database or a disk file. The framework also supports ad-hoc command interface straight away so you can manipulate your component data using an XMPP client.
@@ -77,7 +77,7 @@ public static class JDBCTestRepository implements TestRepositoryIfc<DataReposito
 
 As you can see we defined type of a data source generic parameter for interface `TestRepositoryIfc`. With that we make sure that only instance implementing `DataRepository` interface will be provided and thanks to that we do not need to cast provided instance of `DataSource` to this interface before any access to data source.
 
-With that in place we need to create class which will take care of adding support for multi-database setup. In our case it will be *TestRepositoryMDBean*, which will take care of discovery of repository class, initialization and reinjection of data source.
+With that in place we need to create class which will take care of adding support for multi-database setup. In our case it will be *TestRepositoryMDBean*, which will take care of discovery of repository class, initialization and re-injection of data source.
 It is required to do so, as it was just mentioned our `TestRepositoryMDBean` will be responsible for initialization of `JDBCTestRepository` (actually this will be done by `MDRepositoryBean` which is extended by `TestRepositoryMDBean`.
 
 [source,java]
@@ -121,8 +121,8 @@ This retrieval of actual repository instance for a domain will need to be done f
 
 TIP: It is also possible to extend `MDRepositoryBean` or `SDRepositoryBean` instead of `MDRepositoryBeanWithStatistics`. However, if you decide to extend abstract repository bean classes without `withStatistics` suffix, then no statistics data related to usage of this repository will be gathered. The only change, will be that you will not need to pass interface class to constructor of a superclass as it is not needed.
 
-NOTE: As menitoned above, it is also possible to extend `SDRepostioryBean` and `SDRepositoryBeanWithStatistics`. Methods which you would need to implement are the same is in case of extending `MDRepositoryBeanWithStatistics`, however internally `SDRepositoryBean` will not have support for using different repository for different domain. In fact `SDRepositoryBeanWithStatistics` has only one repository instance and uses only one data source for all domains.
-The same behaviour is presented by `MDRepositoryBeanWithStatistics` if only single `default` instance of repository is configured. However, `MDRepositoryBeanWithStatistics` gives better flexibility and due to that usage of `SDRepositoryBean` and `SDRepositoryBeanWithStatistics` is discouraged.
+NOTE: As mentioned above, it is also possible to extend `SDRepostioryBean` and `SDRepositoryBeanWithStatistics`. Methods which you would need to implement are the same is in case of extending `MDRepositoryBeanWithStatistics`, however internally `SDRepositoryBean` will not have support for using different repository for different domain. In fact `SDRepositoryBeanWithStatistics` has only one repository instance and uses only one data source for all domains.
+The same behavior is presented by `MDRepositoryBeanWithStatistics` if only single `default` instance of repository is configured. However, `MDRepositoryBeanWithStatistics` gives better flexibility and due to that usage of `SDRepositoryBean` and `SDRepositoryBeanWithStatistics` is discouraged.
 
 While this is more difficult to implement than in previous version, it gives you support for multi database setup and provides you with statistics of database query times which may be used for diagnosis.
 

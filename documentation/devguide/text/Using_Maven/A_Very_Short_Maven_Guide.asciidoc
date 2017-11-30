@@ -1,7 +1,7 @@
 [[mavenguide]]
 = A Very Short Maven Guide
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.1 September 2017. Reformatted for v7.2.0.
+:version: v2.1 September 2017. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -12,7 +12,7 @@ If you don't use link:http://maven.apache.org/[Maven] at all or use it once a ye
 == Snapshot Compilation and Snapshot Package Generation
 - `mvn compile` - compilation of the snapshot package
 - `mvn package` - create snapshot jar file
-- `mvn install` - install in local repository shanpshot jar file
+- `mvn install` - install in local repository snapshot jar file
 - `mvn deploy` - deploy to the remote repository snapshot jar file
 
 == Release Compilation, Generation
@@ -25,3 +25,9 @@ If you don't use link:http://maven.apache.org/[Maven] at all or use it once a ye
 - `mvn -DdescriptorId=src assembly:assembly`
 
 Any of these commands will work when your commandline is in a directory with a pom.xml file.  This file will instruct what Maven will do.
+
+== Profiles
+Maven uses profiles with the -P switch to tell what to compile and build.  Tigase uses two different profiles:
+
+- -Pdist - creates distribution archives
+- -Pdoc - creates documentation

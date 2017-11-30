@@ -2,7 +2,7 @@
 = Component Implementation - Lesson 2 - Configuration
 :author: Andrzej Wójcik <andrzej.wojcik@tigase.net>
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
-:version: v2.2, March 2017: Reformatted for v7.2.0.
+:version: v2.2, March 2017: Reformatted for v8.0.0.
 
 :toc:
 :numbered:
@@ -39,7 +39,7 @@ test-module {
 }
 -----
 
-The square brackets are used to mark that we set a list consisting of a few elemente, have a look at the _Admin Guide_ documentation for more details.
+The square brackets are used to mark that we set a list consisting of a few elements, have a look at the _Admin Guide_ documentation for more details.
 
 And this is the complete code of the new component module with a modified `process(...)` method taking advantage of configuration settings:
 
