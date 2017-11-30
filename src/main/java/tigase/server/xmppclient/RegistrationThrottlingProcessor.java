@@ -102,7 +102,9 @@ public class RegistrationThrottlingProcessor
 			Element streamError = new Element("policy-violation");
 			streamError.setXMLNS("urn:ietf:params:xml:ns:xmpp-stanzas");
 			String result = connectionManager.xmppStreamError(service, Arrays.asList(streamError));
-			service.writeRawData(errorPacket.getElement().toString() + result + "</stream:stream>");
+			service.writeRawData(errorPacket.getElement().toString());
+			service.writeRawData(result);
+			service.writeRawData("</stream:stream>");
 		} catch (PacketErrorTypeException | IOException ex) {
 			log.log(Level.FINEST, "Exception while registration request to check policy violation");
 		}

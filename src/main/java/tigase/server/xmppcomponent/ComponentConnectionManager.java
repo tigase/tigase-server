@@ -24,15 +24,6 @@ package tigase.server.xmppcomponent;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -44,11 +35,12 @@ import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.*;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -435,7 +427,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream opened: " + attribs.toString());
 		}
@@ -456,7 +448,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 								+ digest);
 					}
 
-					return "<handshake>" + digest + "</handshake>";
+					return new String[] { "<handshake>" + digest + "</handshake>" };
 				} catch (NoSuchAlgorithmException e) {
 					log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
 
@@ -473,9 +465,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
-				return "<stream:stream" + " xmlns='jabber:component:accept'"
+				return new String[] { "<stream:stream" + " xmlns='jabber:component:accept'"
 						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
-							+ " id='" + id + "'" + ">";
+							+ " id='" + id + "'" + ">" };
 			}
 
 			default :

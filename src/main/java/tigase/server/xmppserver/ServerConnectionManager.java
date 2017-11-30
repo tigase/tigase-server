@@ -791,7 +791,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer(serv + ", Stream opened: " + attribs.toString());
 		}
@@ -870,9 +870,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 				incoming.put(id, serv);
 
-				return "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
+				return new String[] { "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
 						+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'" + " id='" + id + "'"
-							+ ">"
+							+ ">" }
 				;
 			}
 

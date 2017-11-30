@@ -24,52 +24,26 @@
 
 package tigase.server.ext;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
+import tigase.conf.ConfigurationException;
+import tigase.db.comp.ComponentRepository;
+import tigase.net.ConnectionType;
+import tigase.server.ConnectionManager;
+import tigase.server.Packet;
+import tigase.server.ext.handlers.*;
+import tigase.server.ext.lb.LoadBalancerIfc;
+import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
+import javax.script.Bindings;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.script.Bindings;
-
-import tigase.conf.ConfigurationException;
-
-import tigase.db.comp.ComponentRepository;
-
-import tigase.db.comp.RepositoryItem;
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
-
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-import tigase.server.ext.handlers.BindProcessor;
-import tigase.server.ext.handlers.ComponentAcceptStreamOpenHandler;
-import tigase.server.ext.handlers.ComponentConnectStreamOpenHandler;
-import tigase.server.ext.handlers.HandshakeProcessor;
-import tigase.server.ext.handlers.JabberClientStreamOpenHandler;
-import tigase.server.ext.handlers.SASLProcessor;
-import tigase.server.ext.handlers.StartTLSProcessor;
-import tigase.server.ext.handlers.StreamFeaturesProcessor;
-import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
-import tigase.server.ext.lb.LoadBalancerIfc;
-
-import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.PacketErrorTypeException;
-
-import java.text.MessageFormat;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
@@ -645,7 +619,7 @@ public class ComponentProtocol
 	public void xmppStreamClosed(ComponentIOService serv) {}
 
 	@Override
-	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get(
 					"xmlns") + ", type: " + serv.connectionType().toString() + ", uniqueId=" + serv
@@ -667,7 +641,7 @@ public class ComponentProtocol
 			log.finest("Sending back: " + result);
 		}
 
-		return result;
+		return result == null ? null : new String[] { result };
 	}
 
 	@Override

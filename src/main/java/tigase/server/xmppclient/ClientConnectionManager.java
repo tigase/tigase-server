@@ -314,23 +314,21 @@ public class ClientConnectionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
+	protected String[] prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, StreamError.SeeOtherHost);
 		}
 
 		Integer redirect_port = (Integer) serv.getSessionData().get(FORCE_REDIRECT_TO_KEY);
 
-		return "<stream:stream" + " xmlns='" + XMLNS + "'"
+		return new String[] { "<stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
 				+ " version='1.0' xml:lang='en'>"
 				+ see_other_host_strategy.getStreamError("urn:ietf:params:xml:ns:xmpp-streams",
 				see_other_host, redirect_port).toString()
-				+ "</stream:stream>";
+				+ "</stream:stream>" };
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	protected String prepareStreamClose(XMPPIOService<Object> serv) {
 		return "</stream:stream>";
@@ -345,16 +343,16 @@ public class ClientConnectionManager
 		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
 	}
 
-	protected String prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {
+	protected String[] prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, streamError);
 		}
-		return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+		return new String[] { "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
 				+ " version='1.0' xml:lang='en'>" + "<stream:error>"
 				+ "<" + streamError.getCondition() + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-				+ "</stream:error>" + "</stream:stream>";
+				+ "</stream:error>" + "</stream:stream>" };
 	}
 
 	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname) {
@@ -429,11 +427,13 @@ public class ClientConnectionManager
 													see_other_host, serv});
 								}
 
-								String redirectMessage = prepareSeeOtherHost(serv, fromJID.getDomain(), see_other_host);
+								String[] redirectMessages = prepareSeeOtherHost(serv, fromJID.getDomain(), see_other_host);
 
 								try {
 									SocketThread.removeSocketService(serv);
-									serv.writeRawData(redirectMessage);
+									for (String redirectMessage : redirectMessages) {
+										serv.writeRawData(redirectMessage);
+									}
 									serv.processWaitingPackets();
 									Thread.sleep(socket_close_wait_time);
 									serv.stop();
@@ -578,8 +578,9 @@ public class ClientConnectionManager
 							.IQ_COMMAND_PATH);
 					boolean moreToSend = false;
 
+					String streamError = null;
 					if ((err_el != null) && (err_el.size() > 0)) {
-						streamClose = prepareStreamError(serv, err_el) + streamClose;
+						streamError = prepareStreamError(serv, err_el);
 						moreToSend = true;
 					}
 					try {
@@ -587,6 +588,9 @@ public class ClientConnectionManager
 							log.log(Level.FINEST, "Sending stream close to the client: {0}", streamClose);
 						}
 						serv.getSessionData().put(XMPPIOService.STREAM_CLOSING, true);
+						if (streamError != null) {
+							serv.writeRawData(streamError);
+						}
 						serv.writeRawData(streamClose);
 						if (moreToSend) {
 
@@ -1009,7 +1013,7 @@ public class ClientConnectionManager
 	//~--- inner classes --------------------------------------------------------
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String,
+	public String[] xmppStreamOpened(XMPPIOService<Object> serv, Map<String,
 			String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Stream opened: {0}", attribs);

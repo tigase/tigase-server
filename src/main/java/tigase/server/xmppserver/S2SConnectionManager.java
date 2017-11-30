@@ -26,34 +26,12 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.script.Bindings;
 import tigase.cert.CertificateUtil;
 import tigase.conf.ConfigurationException;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.server.xmppserver.proc.Dialback;
-import tigase.server.xmppserver.proc.PacketChecker;
-import tigase.server.xmppserver.proc.StartTLS;
-import tigase.server.xmppserver.proc.StartZlib;
-import tigase.server.xmppserver.proc.StreamError;
-import tigase.server.xmppserver.proc.StreamFeatures;
-import tigase.server.xmppserver.proc.StreamOpen;
+import tigase.server.xmppserver.proc.*;
 import tigase.stats.StatisticsList;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
@@ -61,6 +39,13 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+
+import javax.script.Bindings;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: Jun 14, 2010 11:59:38 AM
@@ -535,7 +520,7 @@ public class S2SConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, Stream opened: {1}", new Object[] { serv, attribs });
 		}
@@ -555,7 +540,7 @@ public class S2SConnectionManager
 
 		return (sb.length() == 0)
 				? null
-				: sb.toString();
+				: new String[] { sb.toString() };
 	}
 
 	//~--- get methods ----------------------------------------------------------

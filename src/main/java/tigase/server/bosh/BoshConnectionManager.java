@@ -26,45 +26,26 @@ package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.conf.ConfigurationException;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPIOService;
-
-import tigase.conf.ConfigurationException;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Filter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.xmpp.*;
 
 import javax.script.Bindings;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.*;
 
 import static tigase.server.bosh.Constants.*;
-import tigase.xmpp.StreamError;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -430,21 +411,21 @@ public class BoshConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
 			log.fine(
 					"Ups, what just happened? Stream open. Hey, this is a Bosh connection manager." +
 					" c2s and s2s are not supported on the same port as Bosh yet.");
 		}
 
-		return "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'" +
+		return new String[] { "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'" +
 				" xmlns:stream='http://etherx.jabber.org/streams'" + " id='1'" + " from='" +
 				getDefVHostItem() + "'" + " version='1.0' xml:lang='en'>" + "<stream:error>" +
 				"<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 				"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>" +
 				"Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. " +
 				"c2s and s2s are not supported on the same port... yet." + "</text>" +
-				"</stream:error>" + "</stream:stream>";
+				"</stream:error>" + "</stream:stream>" };
 	}
 
 	//~--- get methods ----------------------------------------------------------

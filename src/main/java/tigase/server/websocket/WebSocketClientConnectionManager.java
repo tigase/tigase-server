@@ -26,9 +26,6 @@ package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import tigase.conf.ConfigurationException;
 import tigase.net.SocketType;
 import tigase.server.xmppclient.XMPPIOProcessor;
@@ -36,6 +33,10 @@ import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class implements basic support allowing clients to connect using WebSocket
@@ -130,22 +131,23 @@ public class WebSocketClientConnectionManager
 	}
 	
 	@Override
-	protected String prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {
+	protected String[] prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {
 		if (isPreRFC(serv)) {
 			return super.prepareStreamError(serv, streamError, hostname);
 		}	
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, streamError);
-		}		
-		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + hostname + "'" 
-				+ " id='tigase-error-tigase'" + " version='1.0' xml:lang='en' />" 
-				+ "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">"
-				+ "<" + streamError.getCondition() + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-				+ "</stream:error>" + "<close xmlns='" + XMLNS_FRAMING + "'/>";
+		}
+		return new String[]{
+				"<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + hostname + "'" + " id='tigase-error-tigase'" +
+						" version='1.0' xml:lang='en' />",
+				"<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + "<" + streamError.getCondition() +
+						" xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>",
+				"<close xmlns='" + XMLNS_FRAMING + "'/>" };
 	}
 	
 	@Override
-	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
+	protected String[] prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
 		if (isPreRFC(serv)) {
 			return super.prepareSeeOtherHost(serv, hostname, see_other_host);
 		}		
@@ -155,9 +157,11 @@ public class WebSocketClientConnectionManager
 		boolean ssl = SocketType.ssl == ((SocketType) serv.getSessionData().get("socket"));
 		int localPort = serv.getLocalPort();
 		String see_other_uri = (ssl ? "wss://" : "ws://") + see_other_host + ":" + localPort + "/";
-		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" +  (hostname != null ? hostname : getDefVHostItem()) + "'"
-				+ " id='tigase-error-tigase'" + " version='1.0' xml:lang='en' />"
-				+ "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' see-other-uri='" + see_other_uri + "' />";
+		return new String[]{"<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" +
+									(hostname != null ? hostname : getDefVHostItem()) + "'" +
+									" id='tigase-error-tigase'" + " version='1.0' xml:lang='en' />",
+							"<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' see-other-uri='" + see_other_uri +
+									"' />"};
 	}	
 	
 	@Override

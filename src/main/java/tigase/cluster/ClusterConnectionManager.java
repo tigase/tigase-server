@@ -635,7 +635,7 @@ public class ClusterConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
+	public String[] xmppStreamOpened(XMPPIOService<Object> service, Map<String,
 			String> attribs) {
 		log.log(Level.INFO, "Stream opened: {0}, service: {1}", new Object[] {attribs, service});
 		switch (service.connectionType()) {
@@ -655,7 +655,7 @@ public class ClusterConnectionManager
 							new Object[] { id, secret, digest, item });
 				}
 
-				return "<handshake>" + digest + "</handshake>";
+				return new String[] { "<handshake>" + digest + "</handshake>" };
 			} catch (NoSuchAlgorithmException e) {
 				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
 
@@ -677,9 +677,9 @@ public class ClusterConnectionManager
 			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			updateConnectionDetails(service.getSessionData());
 
-			return "<stream:stream" + " xmlns='" + XMLNS + "'" +
+			return new String[] { "<stream:stream" + " xmlns='" + XMLNS + "'" +
 					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">";
+					getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">" };
 		}
 
 		default :
