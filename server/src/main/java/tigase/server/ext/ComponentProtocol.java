@@ -24,7 +24,6 @@ import tigase.db.comp.ComponentRepository;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.net.ConnectionType;
-import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ext.handlers.*;
@@ -517,7 +516,7 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get("xmlns") + ", type: " +
 							   serv.connectionType().toString() + ", uniqueId=" + serv.getUniqueId() + ", to=" +
@@ -539,7 +538,7 @@ public class ComponentProtocol
 			log.finest("Sending back: " + result);
 		}
 
-		return result;
+		return result == null ? null : new String[] { result };
 	}
 
 	@Override

@@ -605,16 +605,16 @@ public class XMPPIOService<RefObject>
 	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamOpened(Map<String, String> attribs) {
 		if (serviceListener != null) {
-			String response = serviceListener.xmppStreamOpened(this, attribs);
+			String[] responses = serviceListener.xmppStreamOpened(this, attribs);
 
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), response});
+					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), responses});
 				}
-				if (response == null) {
+				if (responses == null) {
 					if (writeInProgress.tryLock()) {
 						try {
-							writeRawData(response);
+							writeRawData(null);
 							processWaitingPackets();
 						} finally {
 							writeInProgress.unlock();
@@ -623,13 +623,15 @@ public class XMPPIOService<RefObject>
 				} else {
 					writeInProgress.lock();
 					try {
-						writeRawData(response);
+						for (String response : responses) {
+							writeRawData(response);
+						}
 						processWaitingPackets();
 					} finally {
 						writeInProgress.unlock();
 					}
 				}
-				if ((response != null) && response.endsWith("</stream:stream>")) {
+				if ((responses != null) && responses[responses.length-1].endsWith("</stream:stream>")) {
 					stop();
 				}    // end of if (response.endsWith())
 			} catch (IOException e) {

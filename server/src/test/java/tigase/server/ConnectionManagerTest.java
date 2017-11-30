@@ -86,7 +86,7 @@ public class ConnectionManagerTest {
 			}
 
 			@Override
-			public String xmppStreamOpened(XMPPIOService serv, Map attribs) {
+			public String[] xmppStreamOpened(XMPPIOService serv, Map attribs) {
 				return null;
 			}
 

@@ -348,20 +348,20 @@ public class BoshConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
 			log.fine("Ups, what just happened? Stream open. Hey, this is a Bosh connection manager." +
 							 " c2s and s2s are not supported on the same port as Bosh yet.");
 		}
 
-		return "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'" +
+		return new String[] { "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'" +
 				" xmlns:stream='http://etherx.jabber.org/streams'" + " id='1'" + " from='" + getDefVHostItem() + "'" +
 				" version='1.0' xml:lang='en'>" + "<stream:error>" +
 				"<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 				"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>" +
 				"Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. " +
 				"c2s and s2s are not supported on the same port... yet." + "</text>" + "</stream:error>" +
-				"</stream:stream>";
+				"</stream:stream>" };
 	}
 
 	@Override

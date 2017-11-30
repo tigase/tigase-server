@@ -408,7 +408,7 @@ public class ComponentConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream opened: " + attribs.toString());
 		}
@@ -428,7 +428,7 @@ public class ComponentConnectionManager
 						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest=" + digest);
 					}
 
-					return "<handshake>" + digest + "</handshake>";
+					return new String[] { "<handshake>" + digest + "</handshake>" };
 				} catch (NoSuchAlgorithmException e) {
 					log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
 
@@ -445,9 +445,9 @@ public class ComponentConnectionManager
 
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
-				return "<stream:stream" + " xmlns='jabber:component:accept'" +
+				return new String[] { "<stream:stream" + " xmlns='jabber:component:accept'" +
 						" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'" + " id='" + id +
-						"'" + ">";
+						"'" + ">" };
 			}
 
 			default:

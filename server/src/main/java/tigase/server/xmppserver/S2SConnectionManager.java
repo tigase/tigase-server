@@ -466,7 +466,7 @@ public class S2SConnectionManager
 	}
 
 	@Override
-	public String xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
+	public String[] xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, Stream opened: {1}", new Object[]{serv, attribs});
 		}
@@ -484,7 +484,7 @@ public class S2SConnectionManager
 			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[]{serv, sb});
 		}
 
-		return (sb.length() == 0) ? null : sb.toString();
+		return (sb.length() == 0) ? null : new String[] { sb.toString() };
 	}
 
 	@Override

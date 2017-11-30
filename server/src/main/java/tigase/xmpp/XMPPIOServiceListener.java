@@ -40,7 +40,7 @@ public interface XMPPIOServiceListener<IO extends XMPPIOService<?>>
 
 	void xmppStreamClosed(IO serv);
 
-	String xmppStreamOpened(IO serv, Map<String, String> attribs);
+	String[] xmppStreamOpened(IO serv, Map<String, String> attribs);
 
 	String xmppStreamError(IO serv, List<Element> err_el);
 }    // XMPPIOServiceListener
