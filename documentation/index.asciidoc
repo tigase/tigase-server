@@ -235,6 +235,8 @@ include::text/admin/Components/C2S.asciidoc[]
 
 include::text/components/socks5/documentation/index.asciidoc[]
 
+:leveloffset: 2
+
 include::text/admin/Components/External_Service_Discovery_Component.asciidoc[]
 
 :leveloffset: 2
