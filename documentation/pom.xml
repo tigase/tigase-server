@@ -316,6 +316,16 @@
 										<outputDirectory>text/components/tigase-stun/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
+								
+								<artifactItem>
+									<groupId>tigase</groupId>
+									<artifactId>tigase-socks5</artifactId>
+									<version>2.0.0-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>text/components/socks5</outputDirectory>
+									<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
 
 							</artifactItems>
 						</configuration>
@@ -446,6 +456,11 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-http-api</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-socks5</artifactId>
 			<version>2.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
