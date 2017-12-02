@@ -20,6 +20,7 @@
 package tigase.db.util;
 
 import tigase.component.exceptions.RepositoryException;
+import tigase.db.AuthRepository;
 import tigase.db.DataRepository;
 import tigase.db.Schema;
 import tigase.db.jdbc.DataRepositoryImpl;
@@ -35,6 +36,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -521,7 +523,38 @@ public class DBSchemaLoader
 
 	@Override
 	public Result loadSchema(SchemaManager.SchemaInfo schema, String version) {
-		return loadSchema(schema.getId(), version);
+		Result result = loadSchema(schema.getId(), version);
+		Optional<String> passwordEncoding = schema.getRepositories()
+				.stream()
+				.filter(info -> AuthRepository.class.isAssignableFrom(info.getImplementation()))
+				.map(this::getDataSourcePasswordEncoding)
+				.filter(Objects::nonNull)
+				.findFirst();
+
+		passwordEncoding.ifPresent(encoding -> {
+			log.log(Level.WARNING, "You have 'password-encoding' property set to " + encoding + ".");
+			log.log(Level.WARNING, "This setting will no longer work out of the box with this version of Tigase XMPP Server.");
+			log.log(Level.WARNING, "Please check Tigase XMPP Server Administration Guide, section \"Changes to Schema in v8.0.0\"" +
+					" at http://docs.tigase.org/ for more details.");
+		});
+
+		return passwordEncoding.isPresent()
+			   ? (result == Result.ok ? Result.warning : result)
+			   : result;
+	}
+
+	private String getDataSourcePasswordEncoding(SchemaManager.RepoInfo repoInfo) {
+		AtomicReference<String> passwordEncoding = new AtomicReference<>();
+		withStatement(repoInfo.getDataSource().getResourceUri(), stmt -> {
+			ResultSet rs = stmt.executeQuery("select TigGetDBProperty('password-encoding')");
+			if (rs.next()) {
+				passwordEncoding.set(rs.getString(1));
+			}
+			rs.close();
+			return Result.ok;
+		});
+
+		return passwordEncoding.get();
 	}
 
 	private Result loadSchema(String schemaId, String version) {
