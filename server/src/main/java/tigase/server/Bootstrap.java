@@ -268,11 +268,11 @@ public class Bootstrap {
 		defaults.put(LOGGING_KEY + levelStr, "CONFIG");
 //		}
 		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", "tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", "tigase.util.log.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", "tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", "tigase.util.log.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");

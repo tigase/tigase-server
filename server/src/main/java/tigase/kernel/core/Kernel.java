@@ -168,8 +168,6 @@ public class Kernel {
 	public Kernel(String name) {
 		this.name = name;
 
-		log.setLevel(Level.CONFIG);
-
 		BeanConfig bc = dependencyManager.createBeanConfig(this, "kernel", Kernel.class);
 		bc.setPinned(true);
 		dependencyManager.register(bc);
