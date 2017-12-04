@@ -62,7 +62,13 @@ public class LoggingBean
 	private boolean shutdownThreadDump = true;
 
 	public LoggingBean() {
-		setLoggers(new HashMap<>());
+		HashMap<String, HashMap<String, Object>> loggers = new HashMap<>();
+		loggers.computeIfAbsent("tigase.kernel.core.Kernel", (name) -> {
+			HashMap<String, Object> props = new HashMap<>();
+			props.put("level", "CONFIG");
+			return props;
+		});
+		setLoggers(loggers);
 		setHandlers(new HashMap<>());
 
 		rootHandlers = new String[]{ConsoleHandler.class.getCanonicalName(), FileHandler.class.getCanonicalName()};

@@ -277,6 +277,7 @@ public class Bootstrap {
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+		defaults.put(LOGGING_KEY + "tigase.kernel.core.Kernel.level", "CONFIG");
 		if (params.get(GEN_DEBUG) != null) {
 			String[] packs = ((String) params.get(GEN_DEBUG)).split(",");
 
