@@ -129,7 +129,7 @@ public class DBSchemaLoader
 	}
 
 	private static final List<TypeInfo> suppertedTypes = Stream.of(
-			new TypeInfo("debry", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver"),
+			new TypeInfo("derby", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver"),
 			new TypeInfo("mysql", "MySQL", "com.mysql.jdbc.Driver"),
 			new TypeInfo("postgresql", "PostgreSQL", "org.postgresql.Driver"),
 			new TypeInfo("sqlserver", "SQLServer", "net.sourceforge.jtds.jdbc.Driver",
