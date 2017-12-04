@@ -25,7 +25,6 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
-import tigase.sys.TigaseRuntime;
 import tigase.util.Version;
 import tigase.xmpp.jid.BareJID;
 
@@ -241,17 +240,7 @@ public class DataRepositoryImpl
 	public void initialize(String resource_uri) throws DBInitException {
 		String driverClass = null;
 
-		if (resource_uri.startsWith("jdbc:postgresql")) {
-			database = dbTypes.postgresql;
-		} else if (resource_uri.startsWith("jdbc:mysql")) {
-			database = dbTypes.mysql;
-		} else if (resource_uri.startsWith("jdbc:derby")) {
-			database = dbTypes.derby;
-		} else if (resource_uri.startsWith("jdbc:jtds:sqlserver")) {
-			database = dbTypes.jtds;
-		} else if (resource_uri.startsWith("jdbc:sqlserver")) {
-			database = dbTypes.sqlserver;
-		}
+		database = parseDatabaseType(resource_uri);
 
 		if (database == null) {
 			throw new DBInitException("Database not supported");
@@ -324,6 +313,22 @@ public class DataRepositoryImpl
 		}
 
 		log.log(Level.INFO, "Initialized database connection: {0}", resource_uri);
+	}
+
+	public static dbTypes parseDatabaseType(String resource_uri) {
+		dbTypes db = null;
+		if (resource_uri.startsWith("jdbc:postgresql")) {
+			db = dbTypes.postgresql;
+		} else if (resource_uri.startsWith("jdbc:mysql")) {
+			db = dbTypes.mysql;
+		} else if (resource_uri.startsWith("jdbc:derby")) {
+			db = dbTypes.derby;
+		} else if (resource_uri.startsWith("jdbc:jtds:sqlserver")) {
+			db = dbTypes.jtds;
+		} else if (resource_uri.startsWith("jdbc:sqlserver")) {
+			db = dbTypes.sqlserver;
+		}
+		return db;
 	}
 
 	@Override

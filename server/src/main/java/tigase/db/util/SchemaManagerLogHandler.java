@@ -20,8 +20,8 @@
 package tigase.db.util;
 
 import java.util.ArrayDeque;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+import java.util.Optional;
+import java.util.logging.*;
 
 /**
  * @author andrzej
@@ -30,6 +30,8 @@ public class SchemaManagerLogHandler
 		extends Handler {
 
 	private final ArrayDeque<LogRecord> queue = new ArrayDeque<LogRecord>();
+
+	private static Formatter simpleLogFormatter = new SchemaLogFormatter();
 
 	public SchemaManagerLogHandler() {
 	}
@@ -53,4 +55,31 @@ public class SchemaManagerLogHandler
 		return queue.poll();
 	}
 
+	public Optional<String> getMessage() {
+		LogRecord rec;
+		StringBuilder sb = null;
+		while ((rec = poll()) != null) {
+			if (rec.getLevel().intValue() <= Level.CONFIG.intValue()) {
+				continue;
+			}
+			if (rec.getMessage() == null) {
+				continue;
+			}
+			if (sb == null) {
+				sb = new StringBuilder();
+			} else {
+				sb.append("\n");
+			}
+			sb.append(simpleLogFormatter.format(rec));
+		}
+		return (sb == null ? Optional.empty() : Optional.of(sb.toString()));
+	}
+
+	private static class SchemaLogFormatter extends Formatter {
+
+		@Override
+		public String format(LogRecord record) {
+			return formatMessage(record);
+		}
+	}
 }

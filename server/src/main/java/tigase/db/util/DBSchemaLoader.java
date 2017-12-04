@@ -22,6 +22,7 @@ package tigase.db.util;
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.AuthRepository;
 import tigase.db.DataRepository;
+import tigase.db.DataSource;
 import tigase.db.Schema;
 import tigase.db.jdbc.DataRepositoryImpl;
 import tigase.util.Version;
@@ -37,6 +38,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -47,6 +49,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.AbstractMap.SimpleImmutableEntry;
+import static tigase.db.DataRepository.dbTypes;
 import static tigase.db.jdbc.DataRepositoryImpl.JDBC_SCHEMA_VERSION_QUERY;
 
 /**
@@ -72,7 +76,6 @@ public class DBSchemaLoader
 	public enum PARAMETERS_ENUM {
 		DATABASE_TYPE("dbType", "mysql"),
 		SCHEMA_VERSION("schemaVersion", "8-0"),
-		//		COMPONENTS("components","message-archiving,pubsub,muc,sock5"),
 		DATABASE_NAME("dbName", "tigasedb"),
 		DATABASE_HOSTNAME("dbHostname", "localhost"),
 		TIGASE_USERNAME("dbUser", "tigase_user"),
@@ -87,6 +90,7 @@ public class DBSchemaLoader
 		ADMIN_JID("adminJID", null),
 		ADMIN_JID_PASS("adminJIDpass", null),
 		IGNORE_MISSING_FILES("ignoreMissingFiles", "false"),
+		FORCE_RELOAD_ALL_SCHEMA_FILES("forceReloadAllSchemaFiles", "false"),
 		DATABASE_OPTIONS("dbOptions", null),
 		USE_LEGACY_DATETIME_CODE("useLegacyDatetimeCode", "false"),
 		SERVER_TIMEZONE("serverTimezone", null);
@@ -200,10 +204,56 @@ public class DBSchemaLoader
 		return suppertedTypes;
 	}
 
-	public String getSchemaFileName(String schemaId, String version) {
-		String path = "database/";
-		String dbType = params.getDbType();
-		return path + dbType + "-" + schemaId + "-schema" + (version != null ? "-" + version : "") + ".sql";
+	public Map<Version,Path> getSchemaFileNames(String schemaId) {
+		Path databaseDirectory = Paths.get("database/");
+		String databaseType = params.getDbType();
+
+		final BiPredicate<Path, BasicFileAttributes> predicate = (path, attributes) -> {
+			final String regex = databaseType + "-" + schemaId + "(-\\d+\\.\\d+\\.\\d+)(-b\\d+)?\\.sql";
+			return path.getFileName().toString().matches(regex);
+		};
+
+		try (final Stream<Path> pathStream = Files.find(databaseDirectory, 1, predicate, FileVisitOption.FOLLOW_LINKS)) {
+			return pathStream.map(Path::getFileName)
+					.map(filename -> new AbstractMap.SimpleImmutableEntry<>(
+							getVersionFromSchemaFilename(filename, databaseType, schemaId), filename))
+					.sorted(Comparator.comparing(SimpleImmutableEntry::getKey, Version.VERSION_COMPARATOR))
+					.collect(Collectors.toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
+		} catch (IOException e) {
+			log.log(Level.WARNING, "Error while getting schema file list: {0}", e.getMessage());
+		}
+
+		return Collections.emptyMap();
+	}
+
+	static Map<Version, Path> getSchemaFileNamesInRange(Map<Version, Path> paths, Optional<Version> currentVersion,
+	                                                    Version requiredVersion) {
+
+		boolean isRequiredFinal = Version.TYPE.FINAL.equals(requiredVersion.getVersionType());
+		boolean isCurrentFinal =
+				currentVersion.isPresent() && Version.TYPE.FINAL.equals(currentVersion.get().getVersionType());
+
+		boolean startInclusive = !isCurrentFinal || !isRequiredFinal;
+		boolean endInclusive = !isCurrentFinal || !isRequiredFinal;
+
+		return paths.entrySet()
+				.stream()
+				.sorted(Comparator.comparing(Map.Entry::getKey, Version.VERSION_COMPARATOR))
+				.filter(entry -> !currentVersion.isPresent()
+						|| (startInclusive
+						    ? entry.getKey().compareTo(currentVersion.get()) >= 0
+						    : entry.getKey().compareTo(currentVersion.get()) > 0))
+				.filter(entry -> endInclusive
+				                 ? entry.getKey().compareTo(requiredVersion.getBaseVersion()) <= 0
+				                 : entry.getKey().compareTo(requiredVersion) < 0)
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> null, TreeMap::new));
+	}
+
+	private static Version getVersionFromSchemaFilename(Path v, String dbType, String component) {
+		String filename = v.getFileName().toString();
+		int start = (dbType + "-" + component + "-").length();
+		int end = filename.length()-4;
+		return Version.of(filename.substring(start,end));
 	}
 
 	@Override
@@ -246,12 +296,7 @@ public class DBSchemaLoader
 			return Result.ok;
 		} else {
 			try (Connection conn = DriverManager.getConnection(db_conn)) {
-				Enumeration<Driver> drivers = DriverManager.getDrivers();
-				ArrayList<String> availableDrivers = new ArrayList<>();
-				while (drivers.hasMoreElements()) {
-					availableDrivers.add(drivers.nextElement().toString());
-				}
-				log.log(Level.FINE, "DriverManager (available drivers): " + availableDrivers);
+				logAvailableDrivers();
 				conn.close();
 				connection_ok = true;
 				log.log(Level.INFO, "Connection OK");
@@ -476,8 +521,8 @@ public class DBSchemaLoader
 			return Result.error;
 		} else {
 			return withConnection(db_conn, cmd -> {
-				String procedure = "call TigSetComponentVersion(?,?)";
-				try (PreparedStatement ps = cmd.prepareStatement(procedure)) {
+				String procedure = "{ call TigSetComponentVersion(?,?) }";
+				try (PreparedStatement ps = cmd.prepareCall(procedure)) {
 					ps.setString(1, component);
 					ps.setString(2, version);
 					ps.executeUpdate();
@@ -523,7 +568,39 @@ public class DBSchemaLoader
 
 	@Override
 	public Result loadSchema(SchemaManager.SchemaInfo schema, String version) {
-		Result result = loadSchema(schema.getId(), version);
+
+		log.log(Level.CONFIG, "SchemaInfo:: id: {0}, repositories: {1}; version: {2}",
+		        new Object[]{schema.getId(), schema.getRepositories().size(), version});
+
+		if (!connection_ok) {
+			log.log(Level.CONFIG, "Connection not validated");
+			return Result.error;
+		}
+
+		Result result;
+		Optional<Version> currentVersion = getComponentVersionFromDb(schema.getId());
+		Version requiredVersion = Version.of(version);
+
+		if (schema.isExternal()) {
+			result = loadSchemaFromSQLFiles(schema, currentVersion, requiredVersion);
+		} else {
+			result = loadSchemaFromClass(schema, currentVersion, requiredVersion);
+		}
+
+		// particular repository is version aware therefore we store version:
+		// * if no version was yet stored and the update was skipped (because no logic
+		//   was yet defined to perform any update
+		// * version was set and the update was correctly performed
+		if (!currentVersion.isPresent() && Result.skipped.equals(result) || Result.ok.equals(result)) {
+			Version build = requiredVersion.getBaseVersion();
+			setComponentVersion(schema.getId(), build.toString() );
+		}
+		if (Result.skipped.equals(result)) {
+			log.log(Level.INFO, "Required schema is already loaded in correct version");
+		}
+
+		// logic to check if the schema version was correctly loaded
+
 		Optional<String> passwordEncoding = schema.getRepositories()
 				.stream()
 				.filter(info -> AuthRepository.class.isAssignableFrom(info.getImplementation()))
@@ -532,9 +609,9 @@ public class DBSchemaLoader
 				.findFirst();
 
 		passwordEncoding.ifPresent(encoding -> {
-			log.log(Level.WARNING, "You have 'password-encoding' property set to " + encoding + ".");
-			log.log(Level.WARNING, "This setting will no longer work out of the box with this version of Tigase XMPP Server.");
-			log.log(Level.WARNING, "Please check Tigase XMPP Server Administration Guide, section \"Changes to Schema in v8.0.0\"" +
+			log.log(Level.WARNING, "You have 'password-encoding' property set to " + encoding + "."
+			        + "\n" + "This setting will no longer work out of the box with this version of Tigase XMPP Server."
+					+ "\n" + "Please check Tigase XMPP Server Administration Guide, section \"Changes to Schema in v8.0.0\"" +
 					" at http://docs.tigase.org/ for more details.");
 		});
 
@@ -543,10 +620,116 @@ public class DBSchemaLoader
 			   : result;
 	}
 
+	private Result loadSchemaFromClass(SchemaManager.SchemaInfo schema, Optional<Version> currentVersion,
+	                                   Version requiredVersion) {
+		Result result;
+		try {
+			String dbUri = getDBUri(true, true);
+			log.log(Level.CONFIG, "Loading schema {0}, version: {1} into repo: {2}",
+			        new Object[]{schema.getId(), requiredVersion, dbUri});
+			DataRepository dataSource = new DataRepositoryImpl();
+			dataSource.initialize(dbUri);
+
+			final Set<Result> collect = getInitializedDataSourceAwareForSchemaInfo(schema, DataSource.class,
+			                                                                       dataSource, log).filter(
+					clazz -> RepositoryVersionAware.class.isAssignableFrom(clazz.getClass()))
+					.map(RepositoryVersionAware.class::cast)
+					.map(updateSchemaFunction(currentVersion, requiredVersion))
+					.collect(Collectors.toSet());
+			result = parseResultsSet(collect);
+
+		} catch (RepositoryException e) {
+			log.log(Level.WARNING, e.getMessage());
+			result = Result.warning;
+		}
+		return result;
+	}
+
+	private Result loadSchemaFromSQLFiles(SchemaManager.SchemaInfo schema, Optional<Version> currentVersion,
+	                                      Version requiredVersion) {
+		Result result;
+		log.log(Level.CONFIG, "Loading schema {0}, version: {1} from files, current: {2}",
+		        new Object[]{schema.getId(), requiredVersion, currentVersion.orElse(Version.ZERO)});
+
+		Map<Version, Path> schemaFileNames = getSchemaFileNames(schema.getId());
+
+		if (!params.isForceReloadSchema()) {
+			schemaFileNames = getSchemaFileNamesInRange(schemaFileNames, currentVersion, requiredVersion);
+		}
+
+		Collection<Path> schemaFiles = schemaFileNames.values();
+
+		if (schemaFiles.isEmpty()) {
+			log.log(Level.FINEST, "Empty schema list");
+			result = Result.skipped;
+		} else {
+			log.log(Level.INFO, "Schema files to load: {0}", new Object[]{schemaFiles});
+			final Set<Result> collect = schemaFiles.stream()
+					.map(file -> loadSchemaFile(file.toString()))
+					.collect(Collectors.toSet());
+
+			result = parseResultsSet(collect);
+		}
+		return result;
+	}
+
+	/**
+	 * Method parses provided collection and based on the collection items returns
+	 * single result. If there is single item then it will be return, otherwise
+	 * collection will be checked and if either {@code Result.error} or {@code Result.warning}
+	 * is present then it will be return. Otherwise {@code Result.ok} will be returned
+	 *
+	 * @param collect Collection of the {@link tigase.db.util.SchemaLoader.Result} to be processed
+	 *
+	 * @return single {@link tigase.db.util.SchemaLoader.Result} appropriate for the whole collection
+	 */
+	private Result parseResultsSet(Set<Result> collect) {
+		Result result;
+		if (collect.size() == 1) {
+			result = collect.iterator().next();
+		} else {
+			result = collect.contains(Result.error)
+			         ? Result.error
+			         : (collect.contains(Result.warning) ? Result.warning : Result.ok);
+		}
+		return result;
+	}
+
+	private Function<RepositoryVersionAware, Result> updateSchemaFunction(Optional<Version> currentVersion,
+	                                                                      Version requiredVersion) {
+		return versionAware -> {
+			try {
+				return versionAware.updateSchema(currentVersion, requiredVersion);
+			} catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage());
+				return Result.warning;
+			}
+		};
+	}
+
 	private String getDataSourcePasswordEncoding(SchemaManager.RepoInfo repoInfo) {
 		AtomicReference<String> passwordEncoding = new AtomicReference<>();
 		withStatement(repoInfo.getDataSource().getResourceUri(), stmt -> {
-			ResultSet rs = stmt.executeQuery("select TigGetDBProperty('password-encoding')");
+
+			String query = null;
+
+			final dbTypes dbTypes = DataRepositoryImpl.parseDatabaseType(
+					repoInfo.getDataSource().getResourceUri());
+
+			switch (dbTypes) {
+				case derby:
+					query = "values TigGetDBProperty('password-encoding')";
+					break;
+				case jtds:
+				case sqlserver:
+					query = "select dbo.TigGetDBProperty('password-encoding')";
+					break;
+				default:
+					query = "select TigGetDBProperty('password-encoding')";
+					break;
+			}
+
+			ResultSet rs = stmt.executeQuery(query);
 			if (rs.next()) {
 				passwordEncoding.set(rs.getString(1));
 			}
@@ -558,13 +741,8 @@ public class DBSchemaLoader
 	}
 
 	private Result loadSchema(String schemaId, String version) {
-		if (!connection_ok) {
-			log.log(Level.INFO, "Connection not validated");
-			return Result.error;
-		}
 
-		String fileName = getSchemaFileName(schemaId, version);
-		return loadSchemaFile(fileName);
+		return Result.error;
 	}
 
 	@Override
@@ -588,8 +766,7 @@ public class DBSchemaLoader
 		log.log(Level.INFO, String.format("Loading schema from file(s): %1$s, URI: %2$s", fileName, db_conn));
 
 		return withStatement(db_conn, stmt -> {
-			ArrayList<String> queries = new ArrayList<>();
-			queries.addAll(loadSQLQueries(fileName));
+			ArrayList<String> queries = new ArrayList<>(loadSQLQueries("database/" + fileName));
 			for (String query : queries) {
 				if (!query.isEmpty()) {
 					log.log(Level.FINEST, "Executing query: " + query);
@@ -671,10 +848,6 @@ public class DBSchemaLoader
 				"Comma separated list of SQL files that will be processed").build());
 		options.add(new CommandlineParameter.Builder("Q", PARAMETERS_ENUM.QUERY.getName()).description(
 				"Custom query to be executed").build());
-		options.add(new CommandlineParameter.Builder("L", PARAMETERS_ENUM.LOG_LEVEL.getName()).description(
-				"Java Logger level during loading process")
-							.defaultValue(PARAMETERS_ENUM.LOG_LEVEL.getDefaultValue())
-							.build());
 		options.add(new CommandlineParameter.Builder("J", PARAMETERS_ENUM.ADMIN_JID.getName()).description(
 				"Comma separated list of administrator JID(s)").build());
 		options.add(new CommandlineParameter.Builder("N", PARAMETERS_ENUM.ADMIN_JID_PASS.getName()).description(
@@ -799,8 +972,7 @@ public class DBSchemaLoader
 	 * the file, i.e. each query enclosed in {@code "-- QUERY START:"} and {@code "-- QUERY END:"}. If the file
 	 * references/sources/import another schema file then it will also be read and parsed.
 	 *
-	 * @param resource name of the resource for which an {@link InputStream} should be created, either excerpt of the
-	 * name or a full/relative path to the schema {@code .sql} file.
+	 * @param resource name of the resource for which an {@link InputStream} should be created.
 	 *
 	 * @return
 	 *
@@ -834,9 +1006,6 @@ public class DBSchemaLoader
 						sql_query = "";
 						state = SQL_LOAD_STATE.IN_SQL;
 					}
-//					if ( line.startsWith( "-- LOAD SCHEMA:" ) ){
-//						results.addAll( loadSchemaQueries( variables ) );
-//					}
 					if (line.startsWith("-- LOAD FILE:") && line.trim().contains("sql")) {
 						Matcher matcher = Pattern.compile("-- LOAD FILE:\\s*(.*\\.sql)").matcher(line);
 						if (matcher.find()) {
@@ -881,15 +1050,22 @@ public class DBSchemaLoader
 												  ExceptionHandler<Exception, R> exceptionHandler) {
 		R result = null;
 		try (Connection conn = DriverManager.getConnection(db_conn)) {
-			Enumeration<Driver> drivers = DriverManager.getDrivers();
-			ArrayList<String> availableDrivers = new ArrayList<>();
-			while (drivers.hasMoreElements()) {
-				availableDrivers.add(drivers.nextElement().toString());
-			}
-			log.log(Level.FINE, "DriverManager (available drivers): " + availableDrivers);
+			logAvailableDrivers();
 			result = cmd.execute(conn);
 			conn.close();
 		} catch (SQLException | IOException e) {
+
+			// Handle Derby shutdown - it throws exception even if the shutdown was correct…
+			if (e instanceof SQLException) {
+				SQLException se = (SQLException) e;
+				if (((se.getErrorCode() == 50000) && ("XJ015".equals(se.getSQLState()))) ||
+						((se.getErrorCode() == 45000) && ("08006".equals(se.getSQLState())))) {
+					System.out.println("Derby shut down normally");
+					log.log(Level.INFO, "Derby shut down normally");
+					return Optional.empty();
+				}
+			}
+
 			if (exceptionHandler != null) {
 				return Optional.of(exceptionHandler.handleException(e));
 			} else {
@@ -902,6 +1078,15 @@ public class DBSchemaLoader
 			}
 		}
 		return Optional.ofNullable(result);
+	}
+
+	private void logAvailableDrivers() {
+		String availableDrivers = Collections.list(DriverManager.getDrivers())
+				.stream()
+				.map(driver -> driver.getClass().getName() + "[" + driver.getMajorVersion() + "." +
+						driver.getMinorVersion() + "]")
+				.collect(Collectors.joining(" ,"));
+		log.log(Level.FINE, "DriverManager (available drivers): {0}", availableDrivers);
 	}
 
 	private Result withConnection(String db_conn, SQLCommand<Connection, Result> cmd,
@@ -1138,6 +1323,7 @@ public class DBSchemaLoader
 		private String serverTimezone = null;
 		private Boolean useLegacyDatetimeCode = false;
 		private Boolean useSSL = null;
+		private boolean forceReloadSchema = false;
 
 		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
 			return props.getProperty(param.getName(), null); //param.getDefaultValue());
@@ -1162,7 +1348,7 @@ public class DBSchemaLoader
 			}
 			return converter.apply(tmp);
 		}
-		
+
 		@Override
 		public String getAdminPassword() {
 			return adminPassword;
@@ -1199,6 +1385,15 @@ public class DBSchemaLoader
 
 		public String getDbPass() {
 			return dbPass;
+		}
+
+		public boolean isForceReloadSchema() {
+			return forceReloadSchema;
+		}
+
+		@Override
+		public void setForceReloadSchema(boolean forceReloadSchema) {
+			this.forceReloadSchema = forceReloadSchema;
 		}
 
 		public boolean isIgnoreMissingFiles() {
@@ -1299,9 +1494,9 @@ public class DBSchemaLoader
 		@Override
 		public void setProperties(Properties props) {
 			logLevel = getPropertyWithDefault(props, PARAMETERS_ENUM.LOG_LEVEL, Level::parse);
-			ingoreMissingFiles = getProperty(props, PARAMETERS_ENUM.IGNORE_MISSING_FILES, val -> Boolean.valueOf(val));
+			ingoreMissingFiles = getProperty(props, PARAMETERS_ENUM.IGNORE_MISSING_FILES, Boolean::valueOf);
 			admins = getProperty(props, PARAMETERS_ENUM.ADMIN_JID, tmp -> Arrays.stream(tmp.split(","))
-					.map(str -> BareJID.bareJIDInstanceNS(str))
+					.map(BareJID::bareJIDInstanceNS)
 					.collect(Collectors.toList()));
 			adminPassword = getProperty(props, PARAMETERS_ENUM.ADMIN_JID_PASS);
 
@@ -1310,7 +1505,7 @@ public class DBSchemaLoader
 			dbHostname = getProperty(props, PARAMETERS_ENUM.DATABASE_HOSTNAME);
 			dbUser = getProperty(props, PARAMETERS_ENUM.TIGASE_USERNAME);
 			dbPass = getProperty(props, PARAMETERS_ENUM.TIGASE_PASSWORD);
-			useSSL = getProperty(props, PARAMETERS_ENUM.USE_SSL, tmp -> Boolean.parseBoolean(tmp));
+			useSSL = getProperty(props, PARAMETERS_ENUM.USE_SSL, Boolean::parseBoolean);
 			useLegacyDatetimeCode = getProperty(props, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE,
 												tmp -> Boolean.parseBoolean(tmp));
 			serverTimezone = getProperty(props, PARAMETERS_ENUM.SERVER_TIMEZONE);
@@ -1320,6 +1515,7 @@ public class DBSchemaLoader
 
 			file = getProperty(props, PARAMETERS_ENUM.FILE);
 			query = getProperty(props, PARAMETERS_ENUM.QUERY);
+			forceReloadSchema = getPropertyWithDefault(props, PARAMETERS_ENUM.FORCE_RELOAD_ALL_SCHEMA_FILES, Boolean::valueOf);
 		}
 
 		@Override

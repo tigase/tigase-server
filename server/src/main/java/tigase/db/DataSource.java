@@ -21,10 +21,10 @@ package tigase.db;
 
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.util.RepositoryVersionAware;
+import tigase.db.util.SchemaVersionCheckerLogger;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Version;
 
-import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -79,15 +79,19 @@ public interface DataSource
 				implementationVersion = Version.of(datasourceClass.getPackage().getImplementationVersion());
 			}
 
-			if (!dbVer.isPresent() || !implementationVersion.getBaseVersion().equals(dbVer.get().getBaseVersion())) {
-					result = false;
+			implementationVersion = new Version.Builder(implementationVersion).setCommit(null).build();
 
-					String[] errorMsg = new String[]{
+			if (!dbVer.isPresent() || !implementationVersion.getBaseVersion().equals(dbVer.get().getBaseVersion()) ||
+					(!Version.TYPE.FINAL.equals(dbVer.get().getVersionType()) &&
+							Version.TYPE.FINAL.equals(implementationVersion.getVersionType()))) {
+				result = false;
+
+				String[] errorMsg = new String[]{
 							"ERROR! Component " + dataSourceID + " (" + datasourceClass.getSimpleName() + ") " +  "schema version is not loaded in the database or it is old!",
-							(dbVer.isPresent() ? ("Version in database: " + dbVer.get().getBaseVersion() + ". ") : "")
-									+ "Required version: " + implementationVersion.getBaseVersion(),
+							(dbVer.isPresent() ? ("Version in database: " + dbVer.get() + ". ") : "")
+									+ "Required version: " + implementationVersion,
 							"Please upgrade the installation by running:",
-							"\t$ ./scripts.sh upgrade-schema etc/tigase.conf"};
+							"\t$ ./scripts/tigase.sh upgrade-schema etc/tigase.conf"};
 
 					if (shutdownServer) {
 						TigaseRuntime.getTigaseRuntime().shutdownTigase(errorMsg);
@@ -96,15 +100,11 @@ public interface DataSource
 						!Version.TYPE.FINAL.equals(implementationVersion.getVersionType())) {
 					result = false;
 
-					log.log(Level.WARNING, "Warning!" + "\n\n\tIt's possible that '" + dataSourceID +
-							"' " + " (" + datasourceClass.getSimpleName() + ") " + "component schema version loaded in the database is out of date!" +
-							"\n\tVersion in database: " + dbVer.get() + ", current component version: " +
-							implementationVersion + "." + "\n\tPlease upgrade the installation by running:" +
-							"\n\t\t$ ./scripts.sh upgrade-schema etc/tigase.conf" + "\n" +
-							"\n\t(this warning is printed each time SNAPSHOT version is started, you can ignore this" +
-							"message if you've just run above command)" + "\n");
+				final SchemaVersionCheckerLogger.VersionCheckerSchemaInfo versionInfo = new SchemaVersionCheckerLogger.VersionCheckerSchemaInfo(
+						datasourceClass, dbVer, implementationVersion);
+				SchemaVersionCheckerLogger.getInstance().logVersion(versionInfo);
 
-				} else {
+			} else {
 					// schema version present in DB and matches component version
 					result = true;
 				}

@@ -21,6 +21,8 @@ package tigase.server;
 
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.events.StartupFinishedEvent;
 import tigase.kernel.KernelException;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.beans.selector.ServerBeanSelector;
@@ -28,6 +30,7 @@ import tigase.kernel.core.BeanConfig;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtil;
 import tigase.util.Version;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.XMLUtils;
 
 import java.text.SimpleDateFormat;
@@ -186,6 +189,7 @@ public final class XMPPServer {
 				System.out.println("== " + sdf.format(new Date()) +
 										   " Server finished starting up and (if there wasn't any error) is ready to use\n");
 			}
+			EventBusFactory.getInstance().fire(new StartupFinishedEvent(DNSResolverFactory.getInstance().getDefaultHost()));
 		} catch (ConfigReader.UnsupportedOperationException e) {
 			TigaseRuntime.getTigaseRuntime()
 					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",

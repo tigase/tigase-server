@@ -99,6 +99,13 @@ public interface Repository {
 		 * @return name of a schema
 		 */
 		String name();
+
+		/**
+		 * Method indicates whether schema definition is stored externally to the class (for example in {@code .sql} files.
+		 *
+		 * @return true if the schema definitions are stored in {@code .sql} files.
+		 */
+		boolean external() default true;
 	}
 
 }

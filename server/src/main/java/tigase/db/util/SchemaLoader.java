@@ -30,7 +30,6 @@ import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.util.ClassUtilBean;
 import tigase.util.Version;
-import tigase.util.reflection.ReflectionHelper;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.xmpp.jid.BareJID;
@@ -43,10 +42,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static tigase.db.util.SchemaManager.COMMON_SCHEMA_ID;
+import static tigase.util.reflection.ReflectionHelper.classMatchesClassWithParameters;
 
 /**
  * @author andrzej
@@ -85,15 +84,11 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 				.flatMap(List::stream);
 	}
 
-	public static List<TypeInfo> getAllSupportedTypes() {
-		return getAllSupportedTypesStream().collect(Collectors.toList());
-	}
-
 	private static Stream<Class<?>> getSchemaLoaderClasses() {
 		return ClassUtilBean.getInstance()
 				.getAllClasses()
 				.stream()
-				.filter(clazz -> SchemaLoader.class.isAssignableFrom(clazz))
+				.filter(SchemaLoader.class::isAssignableFrom)
 				.filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()));
 	}
 
@@ -251,8 +246,9 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public abstract Result shutdown();
 
 	public Result loadCommonSchema() {
-		return loadSchema(new SchemaManager.SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", Collections.emptyList()),
-						  null);
+		return loadSchema(
+				new SchemaManager.SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", true, Collections.emptyList()),
+				"0.0.1");
 	}
 
 	public abstract Result loadSchema(SchemaManager.SchemaInfo schemaInfo, String version);
@@ -260,11 +256,11 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public abstract Result destroyDataSource();
 
 	protected <T extends DataSource> Result addUsersToRepository(SchemaManager.SchemaInfo schemaInfo, T dataSource, Class<T> dataSourceClass, List<BareJID> jids, String password, Logger log) {
-		return getDataSourceAwareClassesForSchemaInfo(schemaInfo, dataSourceClass).filter(
-				AuthRepository.class::isAssignableFrom)
+		return getDataSourceAwareClassesForSchemaInfo(schemaInfo, dataSourceClass)
+				.filter(AuthRepository.class::isAssignableFrom)
 				.map(this::instantiateClass)
 				.map(initializeDataSourceAwareFunction(dataSource, log))
-				.map(this::castToAuthRepository)
+				.map(AuthRepository.class::cast)
 				.map(this::initializeAuthRepository)
 				.filter(Objects::nonNull)
 				.findAny()
@@ -274,30 +270,19 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	protected <DS extends DataSource> Stream<Class<DataSourceAware<DS>>> getDataSourceAwareClassesForSchemaInfo(
 			SchemaManager.SchemaInfo schema, Class<DS> dataSourceIfc) {
-		Stream<Class<DataSourceAware<DS>>> classes = schema.getRepositories()
+		return schema.getRepositories()
 				.stream()
-				.map(repoInfo -> repoInfo.getImplementation())
-				.filter(clazz -> DataSourceAware.class.isAssignableFrom(clazz))
-				.filter(clazz -> ReflectionHelper.classMatchesClassWithParameters(clazz, DataSourceAware.class,
-																				  new Type[]{dataSourceIfc}))
+				.map(SchemaManager.RepoInfo::getImplementation)
+				.filter(DataSourceAware.class::isAssignableFrom)
+				.filter(clazz -> classMatchesClassWithParameters(clazz, DataSourceAware.class,
+				                                                 new Type[]{dataSourceIfc}))
 				.map(clazz -> (Class<DataSourceAware<DS>>) clazz);
-
-		return classes;
 	}
 
 	protected <DSIFC extends DataSource, DS extends DSIFC> Stream<DataSourceAware> getInitializedDataSourceAwareForSchemaInfo(
 			SchemaManager.SchemaInfo schema, Class<DSIFC> dataSourceIfc, DS dataSource, Logger log) {
 		return getDataSourceAwareClassesForSchemaInfo(schema, dataSourceIfc).map(this::instantiateClass)
 				.map(initializeDataSourceAwareFunction(dataSource, log));
-	}
-
-	protected AuthRepository castToAuthRepository(DataSourceAware dataSourceAware) {
-		if (dataSourceAware instanceof AuthRepository) {
-			return (AuthRepository) dataSourceAware;
-		} else {
-			log.log(Level.WARNING, "DataSourceAware does not implement AuthRepository interface");
-			return null;
-		}
 	}
 
 	protected AuthRepository initializeAuthRepository(AuthRepository authRepository) {
@@ -329,7 +314,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	protected Function<AuthRepository, Result> addUsersToRepositoryFunction(List<BareJID> jids, String pwd,
-																			Logger log) {
+	                                                                        Logger log) {
 		return authRepository -> {
 			if (authRepository == null) {
 				return Result.error;
@@ -348,16 +333,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	protected <T> T instantiateClass(Class<T> clazz) {
 		try {
-			return (T) clazz.newInstance();
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "Failed to create instance of " + clazz.getCanonicalName());
-			return null;
-		}
-	}
-
-	private <T extends DataSource> DataSourceAware<T> instantiateDataSourceAware(Class<?> clazz) {
-		try {
-			return (DataSourceAware<T>) clazz.newInstance();
+			return clazz.newInstance();
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "Failed to create instance of " + clazz.getCanonicalName());
 			return null;
@@ -393,6 +369,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		Level getLogLevel();
 
 		void setLogLevel(Level level);
+
+		boolean isForceReloadSchema();
+
+		void setForceReloadSchema(boolean forceReloadSchema);
 	}
 
 	public static class TypeInfo {

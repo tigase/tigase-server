@@ -19,6 +19,7 @@
  */
 package tigase.db;
 
+import tigase.db.jdbc.DataRepositoryImpl;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.util.Version;
@@ -225,17 +226,7 @@ public class DataRepositoryPool
 		this.resource_uri = resource_uri;
 
 		if (this.database == null) {
-			if (resource_uri.startsWith("jdbc:postgresql")) {
-				database = dbTypes.postgresql;
-			} else if (resource_uri.startsWith("jdbc:mysql")) {
-				database = dbTypes.mysql;
-			} else if (resource_uri.startsWith("jdbc:derby")) {
-				database = dbTypes.derby;
-			} else if (resource_uri.startsWith("jdbc:jtds:sqlserver")) {
-				database = dbTypes.jtds;
-			} else if (resource_uri.startsWith("jdbc:sqlserver")) {
-				database = dbTypes.sqlserver;
-			}
+			database = DataRepositoryImpl.parseDatabaseType(resource_uri);
 		}
 	}
 

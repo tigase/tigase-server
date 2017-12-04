@@ -60,7 +60,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -111,10 +110,24 @@ public class SchemaManager {
 			.description("Path to DSL configuration file")
 			.requireArguments(true)
 			.build();
+
+	private CommandlineParameter LOG_LEVEL = new CommandlineParameter.Builder("L",
+	                                                                          DBSchemaLoader.PARAMETERS_ENUM.LOG_LEVEL.getName())
+			.description("Java Logger level during loading process")
+			.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.LOG_LEVEL.getDefaultValue())
+			.build();
+
+	private CommandlineParameter FORCE_RELOAD_SCHEMA = new CommandlineParameter.Builder(null, DBSchemaLoader.PARAMETERS_ENUM.FORCE_RELOAD_ALL_SCHEMA_FILES.getName()).description(
+				"Force reloading all schema files")
+							.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.FORCE_RELOAD_ALL_SCHEMA_FILES.getDefaultValue())
+			.build();
+
+
 	private String adminPass = null;
 	private List<BareJID> admins = null;
 	private Map<String, Object> config;
 	private Level logLevel = Level.CONFIG;
+	private boolean forceReloadSchema = false;
 	private RootCredentialsCache rootCredentialsCache = new RootCredentialsCache();
 
 	private static Stream<String> getActiveNonCoreComponentNames() {
@@ -261,6 +274,8 @@ public class SchemaManager {
 			setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
 
+		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
+
 		Map<String, DataSourceInfo> result = getDataSources(config);
 		log.info("found " + result.size() + " data sources to destroy...");
 		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
@@ -341,6 +356,10 @@ public class SchemaManager {
 							 ConfigHolder.TDSL_CONFIG_FILE_KEY, TDSL_CONFIG_FILE.getValue().get()});
 
 		Map<String, Object> config = holder.getProperties();
+
+		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
+		getProperty(props, FORCE_RELOAD_SCHEMA, Boolean::parseBoolean).ifPresent(result -> forceReloadSchema = result);
+
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas(config, props);
 		List<String> output = prepareOutput("Schema upgrade finished", results, conversionMessages);
 
@@ -446,8 +465,7 @@ public class SchemaManager {
 			log.log(Level.FINER, "loading schemas for data source " + ds);
 			schemas.sort(SCHEMA_INFO_COMPARATOR);
 
-			SchemaInfo commonSchemaInfo = new SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", Collections.emptyList());
-			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadSchema(commonSchemaInfo, null), handler));
+			results.add(new ResultEntry("Loading Common Schema Files", schemaLoader.loadCommonSchema(), handler));
 
 			for (SchemaInfo schema : validSchemas) {
 				// we filter validSchemas at the beginning of the method to only include Valid Schemas
@@ -459,16 +477,19 @@ public class SchemaManager {
 						(componentVersionFromDb.isPresent() ? componentVersionFromDb.get() : "none") + ")";
 
 				ResultEntry schemaLoadResultEntry;
-				if (!Version.TYPE.FINAL.equals(version.getVersionType()) ||
-						(!componentVersionFromDb.isPresent()
-								|| !version.getBaseVersion().equals(componentVersionFromDb.get().getBaseVersion()))) {
+				if (!Version.TYPE.FINAL.equals(version.getVersionType())
+						|| (!componentVersionFromDb.isPresent()
+						|| (version.getBaseVersion().equals(componentVersionFromDb.get().getBaseVersion()) &&
+								!Version.TYPE.FINAL.equals(componentVersionFromDb.get().getVersionType()))
+						|| !version.getBaseVersion().equals(componentVersionFromDb.get().getBaseVersion()))) {
 					log.log(Level.FINER, "loading schema with id ='" + schema + "'");
 					schemaLoadResultEntry = new ResultEntry(
 							"Loading schema: " + schema.getName() + ", version: " + version +
 									dbVersionMsg,
-							schemaLoader.loadSchema(schema, version.getBaseVersion().toString()), handler);
+							schemaLoader.loadSchema(schema, version.toString()), handler);
 				} else {
 					log.log(Level.FINER, "Skipped loading schema with id ='" + schema + "'");
+					log.log(Level.INFO, "Required schema is already loaded in correct version");
 					schemaLoadResultEntry = new ResultEntry(
 							"Skipping schema: " + schema.getName() + ", version: " + version + dbVersionMsg,
 							SchemaLoader.Result.skipped, handler);
@@ -490,7 +511,7 @@ public class SchemaManager {
 
 	private List<CommandlineParameter> destroySchemaParametersSupplier() {
 		List<CommandlineParameter> options = new ArrayList<>();
-		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE));
+		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL));
 		options.addAll(SchemaLoader.getMainCommandlineParameters(true));
 		return options;
 	}
@@ -499,12 +520,13 @@ public class SchemaManager {
 
 		List<CommandlineParameter> options = new ArrayList<>();
 		options.add(COMPONENTS);
+		options.add(LOG_LEVEL);
 		options.addAll(SchemaLoader.getMainCommandlineParameters(false));
 		return options;
 	}
 
 	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
-		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE);
+		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL, FORCE_RELOAD_SCHEMA);
 	}
 
 	private boolean isErrorPresent(Map<DataSourceInfo, List<ResultEntry>> results) {
@@ -525,6 +547,8 @@ public class SchemaManager {
 		if (rootUser.isPresent() && rootPass.isPresent()) {
 			setDbRootCredentials(rootUser.get(), rootPass.get());
 		}
+
+		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
 
 		log.info("beginning loading schema files...");
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
@@ -580,6 +604,7 @@ public class SchemaManager {
 		params.parseUri(ds.getResourceUri());
 		params.setAdmins(admins, adminPass);
 		params.setLogLevel(logLevel);
+		params.setForceReloadSchema(forceReloadSchema);
 		schemaLoader.init(params, Optional.ofNullable(rootCredentialsCache));
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));
@@ -926,23 +951,7 @@ public class SchemaManager {
 		private ResultEntry(String name, SchemaLoader.Result result, SchemaManagerLogHandler logHandler) {
 			this.name = name;
 			this.result = result;
-			LogRecord rec;
-			StringBuilder sb = null;
-			while ((rec = logHandler.poll()) != null) {
-				if (rec.getLevel().intValue() <= Level.FINE.intValue()) {
-					continue;
-				}
-				if (rec.getMessage() == null) {
-					continue;
-				}
-				if (sb == null) {
-					sb = new StringBuilder();
-				} else {
-					sb.append("\n");
-				}
-				sb.append(String.format(rec.getMessage(), rec.getParameters()));
-			}
-			this.message = sb == null ? null : sb.toString();
+			this.message = logHandler.getMessage().orElse(null);
 		}
 
 	}
@@ -984,14 +993,19 @@ public class SchemaManager {
 		private final List<RepoInfo> repositories;
 		private final Optional<String> id;
 		private final Optional<String> name;
+		private final boolean external;
 
 		public SchemaInfo(Repository.SchemaId schema, List<RepoInfo> repositories) {
-			this(schema == null ? null : schema.id(), schema == null ? null : schema.name(), repositories);
+			this(schema == null ? null : schema.id(),
+			     schema == null ? null : schema.name(),
+			     schema == null || schema.external(),
+			     repositories);
 		}
 
-		public SchemaInfo(String id, String name, List<RepoInfo> repositories) {
+		public SchemaInfo(String id, String name, boolean external, List<RepoInfo> repositories) {
 			this.id = Optional.ofNullable(id);
 			this.name = Optional.ofNullable(name);
+			this.external = external;
 			this.repositories = repositories;
 		}
 
@@ -1015,6 +1029,7 @@ public class SchemaManager {
 					.map(RepositoryVersionAware.class::cast)
 					.filter(Objects::nonNull)
 					.map(RepositoryVersionAware::getVersion)
+					.filter(Objects::nonNull)
 					.collect(Collectors.groupingBy(Function.identity()));
 			if (versions.size() == 1) {
 				return Optional.of(versions.keySet().iterator().next());
@@ -1023,6 +1038,9 @@ public class SchemaManager {
 			}
 		}
 
+		public boolean isExternal() {
+			return this.external;
+		}
 
 		public boolean isValid() {
 			return id.isPresent() && getVersion().isPresent();
