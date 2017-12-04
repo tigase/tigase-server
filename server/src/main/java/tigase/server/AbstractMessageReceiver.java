@@ -177,6 +177,7 @@ public abstract class AbstractMessageReceiver
 	@ConfigField(desc = "Priority queue class", alias = "priority-queue-implementation")
 	private Class<? extends PriorityQueueAbstract> priorityQueueClass = PriorityQueueRelaxed.class;
 	private ScheduledExecutorService receiverScheduler = null;
+	private Queue<Runnable> tasksAwaitingReceiver = new LinkedList<>();
 	private Timer receiverTasks = null;
 	@Inject(nullAllowed = true)
 	private Set<ScheduledTask> scheduledTasks;
@@ -416,12 +417,26 @@ public abstract class AbstractMessageReceiver
 	 * @param delay
 	 */
 	public void addTimerTask(tigase.util.common.TimerTask task, long delay) {
+		if (task.isCancelled()) {
+			return;
+		}
+		if (receiverScheduler == null) {
+			tasksAwaitingReceiver.offer(() ->  this.addTimerTask(task, delay));
+			return;
+		}
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
 
 		task.setScheduledFuture(future);
 	}
 
 	public void addTimerTask(tigase.util.common.TimerTask task, long initialDelay, long period) {
+		if (task.isCancelled()) {
+			return;
+		}
+		if (receiverScheduler == null) {
+			tasksAwaitingReceiver.offer(() ->  this.addTimerTask(task, initialDelay, period));
+			return;
+		}
 		ScheduledFuture<?> future = receiverScheduler.scheduleAtFixedRate(task, initialDelay, period,
 																		  TimeUnit.MILLISECONDS);
 		task.setScheduledFuture(future);
@@ -447,6 +462,13 @@ public abstract class AbstractMessageReceiver
 	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
 	 */
 	public void addTimerTaskWithTimeout(final tigase.util.common.TimerTask task, long delay, long timeout) {
+		if (task.isCancelled()) {
+			return;
+		}
+		if (receiverScheduler == null) {
+			tasksAwaitingReceiver.offer(() ->  this.addTimerTaskWithTimeout(task, delay, timeout));
+			return;
+		}
 		receiverScheduler.schedule(new tigase.util.common.TimerTask() {
 			@Override
 			public void run() {
@@ -475,6 +497,13 @@ public abstract class AbstractMessageReceiver
 	 */
 	public void addTimerTaskWithTimeout(final tigase.util.common.TimerTask task, long delay, long period,
 										long timeout) {
+		if (task.isCancelled()) {
+			return;
+		}
+		if (receiverScheduler == null) {
+			tasksAwaitingReceiver.offer(() ->  this.addTimerTaskWithTimeout(task, delay, period, timeout));
+			return;
+		}
 		receiverScheduler.schedule(new tigase.util.common.TimerTask() {
 			@Override
 			public void run() {
@@ -1019,6 +1048,13 @@ public abstract class AbstractMessageReceiver
 	 * @param unit
 	 */
 	protected void addTimerTask(tigase.util.common.TimerTask task, long delay, TimeUnit unit) {
+		if (task.isCancelled()) {
+			return;
+		}
+		if (receiverScheduler == null) {
+			tasksAwaitingReceiver.offer(() ->  this.addTimerTask(task, delay, unit));
+			return;
+		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "adding timer, task: {0}, delay: {1}, TimeUnit: {2}, receiverScheduler: {3}",
 					new Object[]{task, delay, unit, receiverScheduler});
@@ -1108,6 +1144,11 @@ public abstract class AbstractMessageReceiver
 				everyHour();
 			}
 		}, HOUR, HOUR);
+
+		Runnable task;
+		while ((task = tasksAwaitingReceiver.poll()) != null) {
+			task.run();
+		}
 	}
 
 	private void stopThreads() {

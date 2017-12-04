@@ -32,6 +32,7 @@ public abstract class TimerTask
 
 	private static final Logger log = Logger.getLogger(TimerTask.class.getName());
 	private ScheduledFuture<?> future = null;
+	private boolean cancelled = false;
 
 	public void setScheduledFuture(ScheduledFuture<?> future) {
 		this.future = future;
@@ -41,11 +42,16 @@ public abstract class TimerTask
 		return future != null && !future.isCancelled() && !future.isDone();
 	}
 
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
 	public void cancel() {
 		cancel(false);
 	}
 
 	public void cancel(boolean mayInterruptIfRunning) {
+		cancelled = true;
 		if (future != null && log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
 					"Cancelling tigase task, mayInterruptIfRunning: {0}, done: {1}, cancelled: {2}, future: {3}",
