@@ -305,8 +305,8 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 
 === socks5 Proxy
 - link:https://tigase.tech/issues/2750[#2750] Cleanup of code and removal of empty javadocs.
-#5867 Fixed NPE during configuration dump when component is disabled.
-#6176 version changed to tigase-socks5 v2.0.0.
+- #5867 Fixed NPE during configuration dump when component is disabled.
+- #6176 version changed to tigase-socks5 v2.0.0.
 
 === stats
 - #5206 Fixed exception causing duplicate error entry.
@@ -314,4 +314,4 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - #6161 Removed usage of classes from javax.xml.ws package for JDKv9 compatibility.
 
 === STUN Server
-#6176 version changed to tigase-stun v2.0.0.
+- #6176 version changed to tigase-stun v2.0.0.
