@@ -57,6 +57,8 @@ include::text/components/http-api/documentation/text/REST_API.asciidoc[]
 
 include::text/components/http-api/documentation/text/HTTP_API_Scripting.asciidoc[]
 
+include::text/components/http-api/documentation/text/REST_API_Usage_Examples.asciidoc[]
+
 :leveloffset: 1
 
 include::text/Packet_Filtering_in_Component.asciidoc[]
