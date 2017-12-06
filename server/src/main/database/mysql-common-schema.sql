@@ -48,9 +48,9 @@ create PROCEDURE TigGetComponentVersion(_component varchar(100) CHARSET utf8)
 -- QUERY START:
 create procedure TigSetComponentVersion(_component varchar(255) CHARSET utf8, _version mediumtext CHARSET utf8)
   begin
-    INSERT INTO tig_schema_versions (component, version)
-    VALUES (_component, _version)
+    INSERT INTO tig_schema_versions (component, version, last_update)
+    VALUES (_component, _version, now())
     ON DUPLICATE KEY UPDATE
-      version = _version;
+      version = _version, last_update = now();
   end //
 -- QUERY END:
