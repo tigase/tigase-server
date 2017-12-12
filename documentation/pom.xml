@@ -306,7 +306,27 @@
 										<outputDirectory>text/components/tigase-push/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
-								
+
+								<artifactItem>
+										<groupId>tigase</groupId>
+										<artifactId>tigase-push-apns</artifactId>
+										<version>1.0.0-SNAPSHOT</version>
+										<type>jar</type>
+										<overWrite>false</overWrite>
+										<outputDirectory>text/components/tigase-push-apns/</outputDirectory>
+										<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
+
+								<artifactItem>
+										<groupId>tigase</groupId>
+										<artifactId>tigase-push-fcm</artifactId>
+										<version>1.0.0-SNAPSHOT</version>
+										<type>jar</type>
+										<overWrite>false</overWrite>
+										<outputDirectory>text/components/tigase-push-fcm/</outputDirectory>
+										<includes>**/*.asciidoc,**/*.css</includes>
+								</artifactItem>
+
 								<artifactItem>
 										<groupId>tigase</groupId>
 										<artifactId>tigase-stun</artifactId>
@@ -316,7 +336,7 @@
 										<outputDirectory>text/components/tigase-stun/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
-								
+
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-socks5</artifactId>
@@ -409,7 +429,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.6</version>
