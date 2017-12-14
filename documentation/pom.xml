@@ -253,7 +253,7 @@
 									<version>2.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
-									<outputDirectory>text/components/http-api</outputDirectory>
+									<outputDirectory>../server/target/text/components/http-api</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css,**/*.jpg</includes>
 								</artifactItem>
 
@@ -263,7 +263,7 @@
 									<version>3.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>text/components/muc</outputDirectory>
+									<outputDirectory>../server/target/text/components/muc</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -273,7 +273,7 @@
 										<version>4.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>text/components/pubsub</outputDirectory>
+										<outputDirectory>../server/target/text/components/pubsub</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -283,7 +283,7 @@
 									<version>2.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>text/components/tigase-message-archiving</outputDirectory>
+									<outputDirectory>../server/target/text/components/tigase-message-archiving</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -293,7 +293,7 @@
 									<version>2.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>text/components/tigase-unified-archive</outputDirectory>
+									<outputDirectory>../server/target/text/components/tigase-unified-archive</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -303,7 +303,7 @@
 										<version>1.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>text/components/tigase-push/</outputDirectory>
+										<outputDirectory>../server/target/text/components/tigase-push/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -313,7 +313,7 @@
 										<version>1.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>text/components/tigase-push-apns/</outputDirectory>
+										<outputDirectory>../server/target/text/components/tigase-push-apns/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -323,7 +323,7 @@
 										<version>1.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>text/components/tigase-push-fcm/</outputDirectory>
+										<outputDirectory>../server/target/text/components/tigase-push-fcm/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -333,7 +333,7 @@
 										<version>2.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>text/components/tigase-stun/</outputDirectory>
+										<outputDirectory>../server/target/text/components/tigase-stun/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -343,7 +343,7 @@
 									<version>2.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>text/components/socks5</outputDirectory>
+									<outputDirectory>../server/target/text/components/socks5</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
