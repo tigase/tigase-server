@@ -364,7 +364,7 @@ public class WebSocketXMPPIOService<RefObject>
 		HashMap<String, String> headers = new HashMap<String, String>();
 		int i = parseHttpHeaders(buf, headers);
 
-		if (!headers.containsKey(CONNECTION_KEY) || !headers.get(CONNECTION_KEY).contains("Upgrade")) {
+		if (!headers.containsKey(CONNECTION_KEY) || !"Upgrade".equalsIgnoreCase(headers.get(CONNECTION_KEY).trim())) {
 			writeRawData(BAD_REQUEST);
 
 			dumpHeaders(headers);
