@@ -87,8 +87,6 @@ if (clusterMode && notifyCluster) {
 			forward.setPacketTo(node);
 			forward.setPermissions(Permissions.ADMIN);
 
-			println "forwarding: " + forward
-
 			results.offer(forward)
 		}
 	}

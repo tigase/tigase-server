@@ -208,8 +208,6 @@ class RosterChangesControler {
 		JID jidToAddJID = JID.jidInstance(jidToAdd)
 		List<XMPPResourceConnection> activeConnections = getActiveConnections(ownerJid)
 		if (activeConnections.size() == 0) {
-			println([ "activeConnections.size() == 0" ])
-
 			modifyDbRoster(ownerJid, { roster ->
 				RosterElement userToAdd = roster.get(jidToAdd)
 				if (userToAdd == null) {

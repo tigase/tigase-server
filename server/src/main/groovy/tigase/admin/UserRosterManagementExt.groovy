@@ -46,8 +46,6 @@ import tigase.xmpp.jid.BareJID
 import tigase.xmpp.jid.JID
 
 try {
-	println "=========================="
-
 	def ROSTER_OWNER_JID = "roster-owner-jid"
 	def ROSTER_OWNER_PRESENCE = "roster-owner-presence"
 	def ROSTER_OWNER_NAME = "roster-owner-name"

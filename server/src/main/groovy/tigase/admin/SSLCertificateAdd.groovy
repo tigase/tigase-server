@@ -141,7 +141,6 @@ try {
 			if (certEntry.getPrivateKey() == null) {
 				Command.addTextField(result, "Error", "Missing private key or private key encoded in uknown format.")
 				Command.addTextField(result, "Note", "Private key cannot be encoded with a password.")
-				//println(pemCert);
 			} else {
 				def certCName = CertificateUtil.getCertCName(certEntry.getCertChain()[0])
 				def subjectAltName = CertificateUtil.getCertAltCName(certEntry.getCertChain()[0])
