@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static tigase.conf.ConfigHolder.renameIfExists;
 import static tigase.conf.Configurable.GEN_SM_PLUGINS;
@@ -344,11 +345,11 @@ public class OldConfigHolder {
 				if (k.equals("sess-man/plugins-conf/dynamic-roster-classes")) {
 
 					toAdd.put("sess-man/dynamic-rosters/active", "true");
-					for (String clazzName : v.toString().split(",")) {
+					stringToStreamOfStrings(v.toString()).forEach(clazzName -> {
 						String[] parts = clazzName.split("\\.");
 						toAdd.put("sess-man/dynamic-rosters/" + parts[parts.length - 1] + "/active", "true");
 						toAdd.put("sess-man/dynamic-rosters/" + parts[parts.length - 1] + "/class", clazzName);
-					}
+					});
 					toRemove.add(k);
 				} else {
 					toRemove.add(k);
@@ -364,11 +365,12 @@ public class OldConfigHolder {
 						}
 					} else if (k.equals("/presence-state/extended-presence-processors")) {
 						String k1 = k.replace("presence-state/extended-presence-processors", "");
-						for (String ext : v.toString().split(",")) {
+						final String prefix = k;
+						stringToStreamOfStrings(v.toString()).forEach(ext -> {
 							String[] parts = ext.split(".");
-							toAdd.put(k + "/" + parts[parts.length - 1] + "/class", ext);
-							toAdd.put(k + "/" + parts[parts.length - 1] + "/active", true);
-						}
+							toAdd.put(prefix + "/" + parts[parts.length - 1] + "/class", ext);
+							toAdd.put(prefix + "/" + parts[parts.length - 1] + "/active", true);
+						});
 					} else {
 						toAdd.put(k, v);
 					}
@@ -385,7 +387,7 @@ public class OldConfigHolder {
 					String cmdId = m.group(2).replace("\\:", ":");
 					Map<String, Object> acls = (Map<String, Object>) toAdd.computeIfAbsent(cmp + "/commands",
 																						   (k1) -> new HashMap<>());
-					List<String> values = Arrays.stream(v.toString().split(",")).map(x -> {
+					List<String> values = stringToStreamOfStrings(v.toString()).map(x -> {
 						int idx = x.indexOf(':');
 						if (idx > 0) {
 							return x.substring(idx + 1);
@@ -577,46 +579,44 @@ public class OldConfigHolder {
 							e.getValue().equals(ComponentProtocol.class.getCanonicalName()))
 					.map(e -> e.getKey().replace("/class", ""))
 					.findFirst();
-			extCmpName.ifPresent(
-					cmpName -> toAdd.put(cmpName + "/repository/items", Arrays.asList(external.split(","))));
+			extCmpName.ifPresent(cmpName -> toAdd.put(cmpName + "/repository/items", stringToListOfStrings(external)));
 			renameIfExists(props, ComponentProtocol.EXTCOMP_BIND_HOSTNAMES,
 						   ComponentProtocol.EXTCOMP_BIND_HOSTNAMES_PROP_KEY,
-						   value -> Arrays.asList(((String) value).split(",")));
+						   value -> stringToListOfStrings(value.toString()));
 		} else {
 			props.remove(ComponentProtocol.EXTCOMP_BIND_HOSTNAMES);
 		}
 
 		String admins = (String) props.remove("--admins");
 		if (admins != null) {
-			props.put("admins", admins.split(","));
+			props.put("admins", stringToListOfStrings(admins));
 		}
 
 		String trusted = (String) props.remove("--trusted");
 		if (trusted != null) {
-			props.put("trusted", trusted.split(","));
+			props.put("trusted", stringToListOfStrings(trusted));
 		}
 
 		String maxQueueSize = (String) props.remove("--max-queue-size");
 		if (maxQueueSize != null) {
-			props.put("max-queue-size", Integer.valueOf(maxQueueSize));
+			props.put("max-queue-size", Integer.valueOf(maxQueueSize.trim()));
 		}
 
 		String monitoring = (String) props.remove("--monitoring");
 		if (monitoring != null) {
 			props.put("monitoring/active", "true");
-			String[] entries = monitoring.split(",");
-			for (String e : entries) {
+			stringToStreamOfStrings(monitoring).forEach(e -> {
 				String[] tmp = e.split(":");
 				if (tmp.length == 2) {
 					props.put("monitoring/" + tmp[0] + "/active", "true");
 					props.put("monitoring/" + tmp[0] + "/port", tmp[1]);
 				}
-			}
+			});
 		}
 
 		String statsArchiv = (String) props.remove("--stats-archiv");
 		if (statsArchiv != null) {
-			Arrays.stream(statsArchiv.split(",")).forEach(archiver -> {
+			stringToStreamOfStrings(statsArchiv).forEach(archiver -> {
 				String[] parts = archiver.split(":");
 				String k = "stats/" + parts[1];
 				props.put(k + "/class", parts[0]);
@@ -676,8 +676,7 @@ public class OldConfigHolder {
 					.collect(Collectors.toSet());
 
 			Map<String, String> plugins_concurrency = new HashMap<>();
-			String[] parts = plugins.split(",");
-			for (String part : parts) {
+			stringToStreamOfStrings(plugins).forEach(part -> {
 				String[] tmp = part.split("=");
 				final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-') ? tmp[0].substring(1) : tmp[0];
 				boolean active = !tmp[0].startsWith("-");
@@ -706,14 +705,14 @@ public class OldConfigHolder {
 				} catch (Exception ex) {
 					log.log(Level.WARNING, "not able to get instance of processor " + name, ex);
 				}
-			}
+			});
 
 			String concurrency = (String) props.get(SessionManagerConfig.PLUGINS_CONCURRENCY_PROP_KEY);
 			if (concurrency != null) {
-				for (String part : concurrency.split(",")) {
+				stringToStreamOfStrings(concurrency).forEach(part -> {
 					String[] tmp = part.split("=");
 					plugins_concurrency.put(tmp[0], tmp[1]);
-				}
+				});
 			}
 
 			for (Map.Entry<String, String> e : plugins_concurrency.entrySet()) {
@@ -754,4 +753,11 @@ public class OldConfigHolder {
 		}
 	}
 
+	private Stream<String> stringToStreamOfStrings(String val) {
+		return Arrays.stream(val.split(",")).map(String::trim);
+	}
+
+	private List<String> stringToListOfStrings(String val) {
+		return stringToStreamOfStrings(val).collect(Collectors.toList());
+	}
 }

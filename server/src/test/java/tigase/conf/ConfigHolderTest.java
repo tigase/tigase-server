@@ -142,7 +142,7 @@ public class ConfigHolderTest {
 								  "sess-man/command/http\\://jabber.org/protocol/admin#change-user-password=LOCAL",
 								  "sess-man/command/http\\://jabber.org/protocol/admin#get-user-roster=JID:ala1@test.com",
 								  "sess-man/command/http\\://jabber.org/protocol/admin#user-stats=LOCAL",
-								  "sess-man/command/http\\://jabber.org/protocol/admin#get-active-users-num=LOCAL,DOMAIN:test.com",
+								  "sess-man/command/http\\://jabber.org/protocol/admin#get-active-users-num=LOCAL, DOMAIN:test.com",
 								  "sess-man/command/http\\://jabber.org/protocol/admin#get-idle-users-num=LOCAL",
 								  "sess-man/command/http\\://jabber.org/protocol/admin#get-registered-users-list=JID:ala@test.coms",
 								  "sess-man/command/http\\://jabber.org/protocol/admin#get-online-users-list=LOCAL",
@@ -192,7 +192,7 @@ public class ConfigHolderTest {
 	public void testConversionOfDynamicRosterClasses() throws IOException, ConfigReader.ConfigException {
 		OldConfigHolder holder = new OldConfigHolder();
 		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList(new String[]{
-				"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest,tigase.xmpp.impl.roster.DynamicRosterTest123"}));
+				"sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.roster.DynamicRosterTest, tigase.xmpp.impl.roster.DynamicRosterTest123"}));
 
 		holder.convertFromOldFormat();
 
@@ -234,7 +234,7 @@ public class ConfigHolderTest {
 	public void testConversionOfExtComponentProperties() throws IOException, ConfigReader.ConfigException {
 		OldConfigHolder holder = new OldConfigHolder();
 		Map<String, Object> props = holder.loadFromPropertyStrings(
-				Arrays.asList("--external=muc1.devel.tigase.org:passwd1,muc2.devel.tigase.org:passwd2",
+				Arrays.asList("--external=muc1.devel.tigase.org:passwd1, muc2.devel.tigase.org:passwd2",
 							  "--comp-name-1=ext", "--comp-class-1=" + ComponentProtocol.class.getCanonicalName()));
 
 		holder.convertFromOldFormat();
@@ -263,6 +263,36 @@ public class ConfigHolderTest {
 		ConfigHolder.upgradeDSL(result);
 
 		assertEquals("tigase.util.workqueue.PriorityQueueStrict", result.get("priority-queue-implementation"));
+	}
+
+	@Test
+	public void testConversionOfVHostsList() throws ConfigReader.ConfigException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String,Object> props = holder.loadFromPropertyStrings(
+				Collections.singletonList("--virt-hosts = international.com, dev.com, qa.com, int.com")
+		);
+
+		holder.convertFromOldFormat();
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		assertArrayEquals(new String[]{"international.com", "dev.com", "qa.com", "int.com"},
+						  ((List<String>) result.get("virtual-hosts")).toArray(new String[0]));
+	}
+
+	@Test
+	public void testConversionOfAdmins() throws ConfigReader.ConfigException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String,Object> props = holder.loadFromPropertyStrings(
+				Collections.singletonList("--admins = admin@dev.com, admin@qa.com, admin@int.com")
+		);
+
+		holder.convertFromOldFormat();
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		assertArrayEquals(new String[]{"admin@dev.com", "admin@qa.com", "admin@int.com"},
+						  ((List<String>) result.get("admins")).toArray(new String[0]));
 	}
 
 }

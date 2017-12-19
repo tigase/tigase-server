@@ -55,6 +55,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static tigase.conf.Configurable.CLUSTER_NODES_PROP_KEY;
@@ -197,27 +198,9 @@ public class ConfigHolder {
 		String before = props.toString();
 		props.remove("--config-file");
 		renameIfExists(props, "--cluster-mode", "cluster-mode", Function.identity());
-		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
-		renameIfExists(props, Configurable.GEN_DEBUG, "debug", value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
-		renameIfExists(props, Configurable.GEN_DEBUG_PACKAGES, "debug-packages", value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
+		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", ConfigHolder::convertToListOfStringsIfString);
+		renameIfExists(props, Configurable.GEN_DEBUG, "debug", ConfigHolder::convertToListOfStringsIfString);
+		renameIfExists(props, Configurable.GEN_DEBUG_PACKAGES, "debug-packages", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--packet.debug.full", "logging/packet-debug-full", Function.identity());
 		renameIfExists(props, "--" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION,
 					   "priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION, value -> {
@@ -239,13 +222,7 @@ public class ConfigHolder {
 			props.putIfAbsent("priority-" + PriorityQueueAbstract.QUEUE_IMPLEMENTATION,
 							  NonpriorityQueue.class.getCanonicalName());
 		}
-		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
+		renameIfExists(props, Configurable.CLUSTER_NODES, CLUSTER_NODES_PROP_KEY, ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--client-port-delay-listening", "client-port-delay-listening", Function.identity());
 		renameIfExists(props, "--shutdown-thread-dump", "shutdown-thread-dump", Function.identity());
 		renameIfExists(props, ActionAbstract.AMP_SECURITY_LEVEL, "amp-security-level", Function.identity());
@@ -291,20 +268,8 @@ public class ConfigHolder {
 					   Function.identity());
 		renameIfExists(props, "--tls-jdk-nss-bug-workaround-active", "tls-jdk-nss-bug-workaround-active",
 					   Function.identity());
-		renameIfExists(props, "--tls-enabled-protocols", "tls-enabled-protocols", value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
-		renameIfExists(props, "--tls-enabled-ciphers", "tls-enabled-ciphers", value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
+		renameIfExists(props, "--tls-enabled-protocols", "tls-enabled-protocols", ConfigHolder::convertToListOfStringsIfString);
+		renameIfExists(props, "--tls-enabled-ciphers", "tls-enabled-ciphers", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--hardened-mode", "hardened-mode", Function.identity());
 
 		boolean allowInvalidCerts = Boolean.parseBoolean((String) props.remove(ALLOW_INVALID_CERTS_KEY));
@@ -332,13 +297,7 @@ public class ConfigHolder {
 		renameIfExists(props, "--" + DNSResolverIfc.TIGASE_SECONDARY_ADDRESS,
 					   "dns-resolver/" + DNSResolverIfc.TIGASE_SECONDARY_ADDRESS, Function.identity());
 
-		renameIfExists(props, "--s2s-skip-tls-hostnames", "s2s/skip-tls-hostnames", value -> {
-			if (value instanceof String) {
-				return Arrays.asList(((String) value).split(","));
-			} else {
-				return value;
-			}
-		});
+		renameIfExists(props, "--s2s-skip-tls-hostnames", "s2s/skip-tls-hostnames", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--" + Configurator.SCRIPTS_DIR_PROP_KEY, Configurator.SCRIPTS_DIR_PROP_KEY,
 					   Function.identity());
 
@@ -350,7 +309,7 @@ public class ConfigHolder {
 			String[] all_ports_thr = ((String) value).split(",");
 
 			for (String port_thr : all_ports_thr) {
-				String[] port_thr_ar = port_thr.split(":");
+				String[] port_thr_ar = port_thr.trim().split(":");
 
 				if (port_thr_ar.length == 2) {
 					try {
@@ -472,7 +431,7 @@ public class ConfigHolder {
 		}
 
 		removeIfExistsAnd(props, "--api-keys", (setter, value) -> {
-			putIfAbsent(props, "http/api-keys", Arrays.asList(value.toString().split(",")));
+			putIfAbsent(props, "http/api-keys", stringToListOfStrings(value.toString()));
 		});
 
 		String after = props.toString();
@@ -561,6 +520,22 @@ public class ConfigHolder {
 			Runtime.getRuntime().removeShutdownHook((Thread) f.get(monitorRuntime));
 		} catch (NoSuchFieldException | IllegalAccessException ex) {
 			log.log(Level.FINEST, "There was an error with unregistration of shutdown hook", ex);
+		}
+	}
+
+	private static Stream<String> stringToStreamOfStrings(String val) {
+		return Arrays.stream(val.split(",")).map(String::trim);
+	}
+
+	private static List<String> stringToListOfStrings(String val) {
+		return stringToStreamOfStrings(val).collect(Collectors.toList());
+	}
+
+	private static Object convertToListOfStringsIfString(Object val) {
+		if (val instanceof String) {
+			return stringToListOfStrings((String) val);
+		} else {
+			return val;
 		}
 	}
 
