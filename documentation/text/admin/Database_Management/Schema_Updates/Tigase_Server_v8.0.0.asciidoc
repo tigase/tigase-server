@@ -69,7 +69,7 @@ If you have used a different one, then just replace `MD5-PASSWORD` with `MD5-USE
 ----
 authRepository () {
     default () {
-        credentialsDecoders () {
+        credentialDecoders () {
             'MD5-PASSWORD' () {}
         }
     }
@@ -83,7 +83,7 @@ If you wish to store passwords in MD5 form then use following entries in your co
 ----
 authRepository () {
     default () {
-        credentialsEncoders () {
+        credentialEncoders () {
             'MD5-PASSWORD' () {}
         }
     }
@@ -100,7 +100,7 @@ Those changes may impact which SASL mechanisms may be allowed to use on your ins
 ----
 authRepository () {
     default () {
-        credentialsDecoders () {
+        credentialDecoders () {
             'PLAIN' () {}
         }
     }
@@ -112,7 +112,7 @@ authRepository () {
 ----
 authRepository () {
     default () {
-        credentialsEncoders () {
+        credentialEncoders () {
             'SCRAM-SHA-1' (active: false) {}
         }
     }
