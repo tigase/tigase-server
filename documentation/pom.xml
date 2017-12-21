@@ -313,7 +313,7 @@
 										<version>1.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>../server/target/text/components/tigase-push-apns/</outputDirectory>
+										<outputDirectory>../server/target/text/target/components/tigase-push-apns/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -323,7 +323,7 @@
 										<version>1.0.0-SNAPSHOT</version>
 										<type>jar</type>
 										<overWrite>false</overWrite>
-										<outputDirectory>../server/target/text/components/tigase-push-fcm/</outputDirectory>
+										<outputDirectory>../server/target/text/target/components/tigase-push-fcm/</outputDirectory>
 										<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
