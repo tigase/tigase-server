@@ -119,22 +119,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected static final String WATCHDOG_TIMEOUT = "watchdog_timeout";
 	protected static final String WATCHDOG_PING_TYPE_KEY = "watchdog_ping_type";
 
-////	protected static final boolean TLS_USE_PROP_VAL = true;
-//	//J-
-////	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
-//
-////	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
-//
-////	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
-//
-////	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 	protected static final Element pingElement = new Element("iq", new Element[]{
 			new Element("ping", new String[]{"xmlns"}, new String[]{"urn:xmpp:ping"})}, new String[]{"type", "id"},
 															 new String[]{"get", "tigase-ping"});
 	private static final Logger log = Logger.getLogger(ConnectionManager.class.getName());
-	/**
-	 * Describe class <code>LIMIT_ACTION</code> here.
-	 */
 	public enum LIMIT_ACTION {
 		DISCONNECT,
 		DROP_PACKETS

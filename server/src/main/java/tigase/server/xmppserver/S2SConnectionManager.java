@@ -88,7 +88,6 @@ public class S2SConnectionManager
 
 	public static final String S2S_HT_TRAFFIC_THROTTLING_PROP_VAL = "xmpp:15k:0:disc,bin:120m:0:disc";
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
-	public static final long MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL = 15 * MINUTE;
 
 	// TODO: #1195 - estimate proper default value
 	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
@@ -117,7 +116,6 @@ public class S2SConnectionManager
 	@Inject
 	private List<S2SFilterIfc> filters = Collections.emptyList();
 	private int maxINConnections = MAX_INCOMING_CONNECTIONS_PROP_VAL;
-	private long maxInactivityTime = MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL;
 	private int maxOUTPerIPConnections = MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL;
 	private int maxOUTTotalConnections = MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL;
 	/**
@@ -659,7 +657,7 @@ public class S2SConnectionManager
 
 	@Override
 	protected long getMaxInactiveTime() {
-		return maxInactivityTime;
+		return 15 * MINUTE;
 	}
 
 	@Override
