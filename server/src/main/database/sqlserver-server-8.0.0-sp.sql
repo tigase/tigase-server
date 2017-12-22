@@ -22,7 +22,7 @@ SET QUOTED_IDENTIFIER ON
 -- QUERY END:
 GO
 
--- LOAD FILE: database/sqlserver-server-schema-7.1.0-sp.sql
+-- LOAD FILE: database/sqlserver-server-7.1.0-sp.sql
 
 -- QUERY START:
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUpdateLoginTime')

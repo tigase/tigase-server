@@ -19,9 +19,9 @@
 
 -- Database stored procedures and functions for Tigase schema version 5.1
 
-source database/mysql-server-schema-7.1.0-schema.sql;
+source database/mysql-server-7.1.0-schema.sql;
 
--- LOAD FILE: database/mysql-server-schema-7.1.0-schema.sql
+-- LOAD FILE: database/mysql-server-7.1.0-schema.sql
 
 
 -- QUERY START:

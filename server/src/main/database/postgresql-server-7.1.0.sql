@@ -26,14 +26,14 @@
 --  createdb -U tigase tigase
 --  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
-\i database/postgresql-server-schema-7.1.0-schema.sql
+\i database/postgresql-server-7.1.0-schema.sql
 
-\i database/postgresql-server-schema-7.1.0-sp.sql
+\i database/postgresql-server-7.1.0-sp.sql
 
-\i database/postgresql-server-schema-7.1.0-props.sql
+\i database/postgresql-server-7.1.0-props.sql
 
--- LOAD FILE: database/postgresql-server-schema-7.1.0-schema.sql
+-- LOAD FILE: database/postgresql-server-7.1.0-schema.sql
 
--- LOAD FILE: database/postgresql-server-schema-7.1.0-sp.sql
+-- LOAD FILE: database/postgresql-server-7.1.0-sp.sql
 
--- LOAD FILE: database/postgresql-server-schema-7.1.0-props.sql
+-- LOAD FILE: database/postgresql-server-7.1.0-props.sql

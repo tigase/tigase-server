@@ -24,7 +24,7 @@ SET QUOTED_IDENTIFIER ON
 -- QUERY END:
 GO
 
--- LOAD FILE: database/sqlserver-server-schema-7.0.0-schema.sql
+-- LOAD FILE: database/sqlserver-server-7.0.0-schema.sql
 
 -- QUERY START:
 IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = object_id('dbo.tig_pairs') AND NAME ='IX_clustered_tig_pairs_nid_uid_pkey')

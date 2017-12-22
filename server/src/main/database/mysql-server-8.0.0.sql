@@ -17,14 +17,14 @@
 --
 --
 
-source database/mysql-server-schema-8.0.0-schema.sql;
+source database/mysql-server-8.0.0-schema.sql;
 
-source database/mysql-server-schema-8.0.0-sp.sql;
+source database/mysql-server-8.0.0-sp.sql;
 
-source database/mysql-server-schema-8.0.0-props.sql;
+source database/mysql-server-8.0.0-props.sql;
 
--- LOAD FILE: database/mysql-server-schema-8.0.0-schema.sql;
+-- LOAD FILE: database/mysql-server-8.0.0-schema.sql;
 
--- LOAD FILE: database/mysql-server-schema-8.0.0-sp.sql;
+-- LOAD FILE: database/mysql-server-8.0.0-sp.sql;
 
--- LOAD FILE: database/mysql-server-schema-8.0.0-props.sql;
+-- LOAD FILE: database/mysql-server-8.0.0-props.sql;

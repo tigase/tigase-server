@@ -17,9 +17,9 @@
 --
 --
 
-run 'database/derby-server-schema-7.1.0-schema.sql';
+run 'database/derby-server-7.1.0-schema.sql';
 
--- LOAD FILE: database/derby-server-schema-7.1.0-schema.sql
+-- LOAD FILE: database/derby-server-7.1.0-schema.sql
 
 -- QUERY START:
 create table tig_offline_messages (

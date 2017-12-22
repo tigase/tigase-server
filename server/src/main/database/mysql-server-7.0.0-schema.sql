@@ -15,24 +15,6 @@
 --  along with this program. Look for COPYING file in the top folder.
 --  If not, see http://www.gnu.org/licenses/.
 --
---  $Rev: $
---  Last modified by $Author: $
---  $Date: $
---
-
---  To load schema to MySQL database execute following commands:
---
---  mysqladmin -u root -pdbpass create tigase
---  mysql -u root -pdbpass tigase < database/mysql-schema-4.sql
---  echo "GRANT ALL ON tigase.* TO tigase_user@'%' \
---                  IDENTIFIED BY 'tigase_passwd'; \
---                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
---  echo "GRANT ALL ON tigase.* TO tigase_user@'localhost' \
---                  IDENTIFIED BY 'tigase_passwd'; \
---                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
---  echo "GRANT ALL ON tigase.* TO tigase_user \
---                  IDENTIFIED BY 'tigase_passwd'; \
---                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 
 -- QUERY START:
 

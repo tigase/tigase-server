@@ -17,14 +17,14 @@
 --
 --
 
-run 'database/derby-server-schema-7.1.0-schema.sql';
+run 'database/derby-server-7.1.0-schema.sql';
 
-run 'database/derby-server-schema-7.1.0-sp.sql';
+run 'database/derby-server-7.1.0-sp.sql';
 
-run 'database/derby-server-schema-7.1.0-props.sql';
+run 'database/derby-server-7.1.0-props.sql';
 
--- LOAD FILE: database/derby-server-schema-7.1.0-schema.sql
+-- LOAD FILE: database/derby-server-7.1.0-schema.sql
 
--- LOAD FILE: database/derby-server-schema-7.1.0-sp.sql
+-- LOAD FILE: database/derby-server-7.1.0-sp.sql
 
--- LOAD FILE: database/derby-server-schema-7.1.0-props.sql
+-- LOAD FILE: database/derby-server-7.1.0-props.sql
