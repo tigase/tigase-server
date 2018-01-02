@@ -1,110 +1,118 @@
 [[dbSchemaLoader]]
-= +dbSchemaLoader+ Utility
+= Schema Utility
 :author: Daniel Wisnewski
-:author: v1.0, March 2016: Reformatted for v8.0.0.
+:author: v2.0, March 2016: Reformatted for v8.0.0.
 
 :numbered:
 :toc:
 :website: http://www.tigase.net
 
-Included with Tigase is the *dbSchemaLoader* Utility, which can be used to apply schema files to databases. It is able to operate with Derby, MySQL, SQLServer, and PostgreSQL databases.
-In order to use this utility with any of the databases, you will need to first have the database environment up and running, and have established user credentials. You may use root or an account with administrator write privileges.
+With the release of v8.0.0 calling the Tigase dbSchemaLoader utility now can be done using tasks instead of calling the specific method.  Support for Derby, MySQL, PostgreSQL, MSSQL, and MongoDB is available.
 
-IMPORTANT: All commands in this guide are required to be running from the Tigase installation directory.
+In order to use this utility with any of the databases, you will need to first have the database environment up and running, and have established user credentials. You may use root or an account with administrator write privileges.
 
 == Operation & Variables
 
-First, lets cover the DBSchemaLoader operation and variables:
-
 *Operation*
-The utility is run using the java -cp command from the Tigase installation directory.  Be sure that you have JDK v1.8 or later installed.
-Linux
+Operating the Schema Utility is now a lot easier!  To use it run this command from the installation directory:
 [source,command]
 -----
-java -cp "jars/*" tigase.db.util.DBSchemaLoader
+./scripts/tigase.sh [task] [params_file.conf] [options]
 -----
-or from a Windows environment
------
-java -cp jars/* tigase.db.util.DBSchemaLoader
------
-These commands will be followed by a combination of the following variables
+Operations are now converted to tasks, of which there are now three: `install-schema`, `upgrade-schema`, and `destroy-schema`.
 
-*Variables*
+- `upgrade-schema`: Upgrade the schema of the database specified in your config.tdsl configuration file. (options are ignored for this option)
+- `install-schema`: Install a schema to database.
+- `destroy-schema`: Destroy database and schemas. *DANGEROUS*
+
+*Options*
 
 Use the following options to customize. Options in bold are required, {potential options are in brackets}.::
-* *-dbType database_type {derby, mysql, postgresql, sqlserver}*
-* -schemaVersion schema version {4, 5, 5-1}
-* *-dbName database name*
-* -dbHostname database hostname (default is localhost)
-* -dbUser tigase username
-* -dbPass tigase user password
-* -rootUser database root username
-* -rootPass database root password
-* *-file path to sql schema file* {database/derby-schema-7-1.sql}
-* -query sql query to execute
-* -logLevel java logger Level
-* -adminJID comma separated list of admin JIDs
-* -adminJIDpass password (one for all entered JIDs)
+* --help Prints the help for the task.
+* -I or --interactive enables interactive mode which will prompt for parameters not defined.
+* -T or --dbType database_type {derby, mongodb, mysql, postgresql, sqlserver}.
+* -C or --components= Allows the specification of components for use when installing a schema.
 
-With that out of the way, lets look at some examples.
-Lets say you have a new mysql database server with root user root and password rood (to keep things simple, we do not recommend this).  The MySQL database is hosted locally, your command would be as follows:
-[source,cmd]
+
+== Usage
+
+=== upgrade-schema
+This task will locate any schema versions above your current one, and will install them to the database configured in the config.tdsl file.
+
+NOTE: To use this utility, you must have Tigase XMPP server fully setup with a configured configuration file.
+
+[source,command]
 -----
-java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbType mysql -dbName tigasedb -rootUser root -rootPass root -schemaVersion -adminJID admin@example.com -adminJIDpass password 7.1 -file database/mysql-schema-7-1.sql
------
-This will create the tigasedb database, add an Admin user as admin@example.com with password 'password', and apply the v7.1 schema files. Output will look like this:
-[source,cmd]
------
-LogLevel: CONFIG
-
-tigase.db.util.DBSchemaLoader     	 <init>          	 CONFIG     Properties: [{dbHostname=localhost, logLevel=CONFIG, adminJID=admin@example.com, dbType=mysql, file=database/mysql-schema-7-1.sql, rootUser=root, adminJIDpass=password, dbPass=tigase_pass, dbName=tigasedb, schemaVersion=7.1, rootPass=root, dbUser=tigase_user}]
-
-tigase.db.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Validating DBConnection, URI: jdbc:mysql://localhost/?user=root&password=root
-
-tigase.db.util.DBSchemaLoader     	 validateDBConnection 	 CONFIG     DriverManager (available drivers): [[org.apache.derby.jdbc.AutoloadedDriver@10f87f48, org.postgresql.Driver@1b2c6ec2, com.mysql.jdbc.Driver@50040f0c, jTDS 1.3.1]]
-
-tigase.db.util.DBSchemaLoader     	 validateDBConnection 	 INFO       Connection OK
-tigase.db.util.DBSchemaLoader     	 validateDBExists 	 INFO       Validating whether DB Exists, URI: jdbc:mysql://localhost/tigasedb?user=tigase_user&password=tigase_pass
-
-tigase.db.util.DBSchemaLoader     	 validateDBExists 	 INFO       Doesn't exist, creating...
-
-tigase.db.util.DBSchemaLoader     	 validateDBExists 	 INFO        OK
-
-tigase.db.util.DBSchemaLoader     	 loadSchemaFile  	 INFO       Loading schema from file: database/mysql-schema-7-1.sql, URI: jdbc:mysql://localhost/tigasedb?user=root&password=root
-tigase.db.util.DBSchemaLoader     	 loadSchemaFile  	 INFO        completed OK
-
-tigase.db.util.DBSchemaLoader     	 printInfo       	 INFO
-
-Database init.properties configuration:
-
---user-db=mysql
---user-db-uri=jdbc:mysql://localhost/tigasedb user=tigase_user&password=tigase_pass&useUnicode=true&characterEncoding=UTF-8
+./scripts/tigase.sh upgrade-schema etc/tigase.conf
 -----
 
-TIP: The utility will automatically generate the lines you need to add to your config.tdsl file to use this database!
-
-At this time, it is suggested to load the PubSub schema since you will have to change very little of the command:
-
-[source,cmd]
+Windows users will need to run the command using the following command:
+[source,windows]
 -----
-java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbType mysql -dbName tigasedb -rootUser root -rootPass root -file database/mysql-pubsub-schema-3.2.0.sql
+java -cp "jars/*" tigase.db.util.SchemaManager "upgrade-schema" --config-file=etc/config.tdsl
 -----
 
-Should you wish to use the Socks5 Proxy component, you will need to load that schema as well
-[source,cmd]
+[[install-schema]]
+=== install-schema
+This task will install a schema using the parameters provided.  This will typically be used to manually install and setup a new database.
+
+[source,command]
 -----
-java -cp "jars/*" tigase.db.util.DBSchemaLoader -dbType mysql -dbName tigasedb -rootUser root -rootPass root -file database/mysql-socks5-schema.sql
+./scripts/tigase.sh install-schema [Options]
+-----
+This command will install tigase using a Derby database on one named tigasedb hosted on localhost.  The username and password editing the database is tigase_pass and root.  Note that -J explicitly adds the administrator, this is highly recommended with the -N passing the password.
+
+If you are using a windows system, you need to call the program directly:
+[source,windows]
+-----
+java -cp "jars/*" tigase.db.util.SchemaManager "install-schema" [options]
 -----
 
-At this time you're finished setting up a database for use with Tigase!
-For other databases that are supported, the operations will be very similar with only the -dbType and perhaps the -dbHostname being different.
+*Options*
+Options for schema installation are as follows, required options are in bold
 
-== -Query function
+- --help,  Outputs the help.
 
+- -I, --interactive,  Enables interactive mode, which will result in prompting for any missing parameters.
+
+- -C, --components=,  List of enabled components identifiers (+/-), possible values: [`amp`, `bosh`, `c2s`, `eventbus`, `ext-disco`, `http`, `mdns`, `message-archive`, `monitor`, `muc`, `pubsub`, `push`, `s2s`, `socks5`, `test`, `unified-archive`, `upload`, `ws2s`] (default: amp,bosh,c2s,eventbus,http,message-archive,monitor,muc,pubsub,s2s,ws2s).  *This is required for certain components like socks5.*
+
+- *-T, --dbType=, Database server type, possible values are: [`derby`, `mongodb`, `mysql`, `postgresql`, `sqlserver`]*
+
+- *-D, --dbName=, Name of the database that will be created (by default it is `tigasedb`).*
+
+- *-H, --dbHostname=, Address of the database instance (by default it is `localhost`).*
+
+- *-U, --dbUser=, Name of the user that will be created specifically to access Tigase XMPP Server database (default is `tigase_user`).*
+
+- *-P, --dbPass=, Password of the user that will be created specifically to access Tigase XMPP Server database (default is `tigase_pass`).*
+
+- *-R, --rootUser=, Database root account username used to create user and database (default is `root`).*
+
+- *-A, --rootPass=, Database root account password used to create user and database (default is `root`).*
+
+- -S, --useSSL, Enable SSL support for database connection (if the database supports it) (default is false).
+
+- -F, --file=value, Comma separated list of SQL files that will be processed.
+
+- -Q, --query=, Custom queries to be executed, see <<queryschema>> for details.
+
+- -L, --logLevel=, Logger level used during loading process (default is `CONFIG`).
+
+- -J, --adminJID=,  Comma separated list of administrator JID(s).
+
+- -N value, --adminJIDpass=, Password that will be used for the entered JID(s) - one password for all configured JIDs.
+
+- --getURI=,  Generate database URI (default is `false`).
+
+- --ignoreMissingFiles=, Force ignoring missing files errors (default is `false`).
+
+[[queryschema]]
+==== Query function
 Should you decide to customize your own functions, or have specific information you want to put into the database, you can use the -query function to perform a single query step.
 [source,cmd]
 -----
-java -cp "jars/*" tigase.db.util.DBSchemaLoader -dpType mysql -dbName tigasedb -rootUser root -rootPass root -query "CREATE TABLE tigasedb.EXTRA_TABLE (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(10) NOT NULL)"
+./scripts/tigase.sh install-schema -T mysql -D tigasedb -R root -A root -Q "CREATE TABLE tigasedb.EXTRA_TABLE (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(10) NOT NULL)"
 -----
 Of course this would break the schema for tigasedb by adding an unexpected table,  you will receive the following message:
 -----
@@ -112,3 +120,20 @@ tigase.db.util.DBSchemaLoader       printInfo          WARNING       Database sc
 -----
 
 But this is a demonstration how you may run a query through the database without the need to use another tool.  Note that you will need to select the specific database for each query.
+
+=== destroy-schema
+This will destroy the database specified in the configuration file.
+*WARNING: THIS ACTION IS NOT REVERSIBLE*
+
+[source,cmd]
+-----
+./scripts/tigase.sh destroy-schema etc/config.tdsl
+-----
+
+Only use this if you wish to destroy a database and not have the information recoverable.
+
+Windows users will need to call the method directly:
+[source,cmd]
+-----
+java -cp "jars/*" tigase.db.util.SchemaManager "destroy-schema" etc/config.tdsl
+-----
