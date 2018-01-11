@@ -186,6 +186,8 @@ include::../server/target/text/components/tigase-push/documentation/index.asciid
 
 include::../server/target/text/components/tigase-stun/documentation/index.asciidoc[leveloffset=+2]
 
+include::../server/target/text/components/tigase-spam/documentation/index.asciidoc[leveloffset=+2]
+
 //Using Tigase
 include::text/admin/Using_Tigase/Intro.asciidoc[leveloffset=+1]
 

@@ -124,6 +124,7 @@
                 <include>**/tigase-socks5*</include>
                 <include>**/tigase-stun*</include>
                 <include>**/tigase-mongodb*</include>
+                <include>**/tigase-spam*</include>
                 <include>**/licence-lib*</include>
                 <include>**/tigase-web-ui*</include>
 			</includes>
