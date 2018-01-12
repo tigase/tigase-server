@@ -386,7 +386,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-unified-archive</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
