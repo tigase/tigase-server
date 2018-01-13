@@ -23,8 +23,10 @@ import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 
@@ -50,7 +52,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  */
 @Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true)
 public class CertificateContainer
-		implements CertificateContainerIfc, Initializable {
+		implements CertificateContainerIfc, Initializable, UnregisterAware {
 
 	public final static String PER_DOMAIN_CERTIFICATE_KEY = "virt-hosts-cert-";
 	public final static String SNI_DISABLE_KEY = "sni-disable";
@@ -89,15 +91,7 @@ public class CertificateContainer
 		}
 
 		if (pemCert != null) {
-			try {
-				CertificateEntry entry = CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
-
-				addCertificateEntry(entry, alias, saveToDisk);
-
-				eventBus.fire(new CertificateChanged(alias));
-			} catch (Exception ex) {
-				throw new CertificateParsingException("Problem adding a new certificate.", ex);
-			}
+			addCertificate(alias, pemCert, saveToDisk, true);
 		}
 	}
 
@@ -239,6 +233,7 @@ public class CertificateContainer
 
 	@Override
 	public void initialize() {
+		eventBus.registerAll(this);
 		try {
 			String[] pemDirs = sslCertsLocation;
 			certsDirs = new File[pemDirs.length];
@@ -313,6 +308,39 @@ public class CertificateContainer
 		}
 
 		return kmf;
+	}
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	@HandleEvent
+	public void certificateChange(CertificateChange event) {
+		if (event.isLocal()) {
+			return;
+		}
+
+		try {
+			addCertificate(event.getAlias(), event.getPemCertificate(), event.isSaveToDisk(), false);
+		} catch (CertificateParsingException ex) {
+			log.log(Level.WARNING, "Failed to update certificate for " + event.getAlias(), ex);
+		}
+	}
+
+	private void addCertificate(String alias, String pemCert, boolean saveToDisk, boolean notifyCluster) throws CertificateParsingException {
+		try {
+			CertificateEntry entry = CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
+
+			addCertificateEntry(entry, alias, saveToDisk);
+			if (notifyCluster) {
+				eventBus.fire(new CertificateChange(alias, pemCert, saveToDisk));
+			}
+
+			eventBus.fire(new CertificateChanged(alias));
+		} catch (Exception ex) {
+			throw new CertificateParsingException("Problem adding a new certificate.", ex);
+		}
 	}
 
 	private KeyManagerFactory createCertificateKmf(String alias)
@@ -473,6 +501,44 @@ public class CertificateContainer
 		}
 	}
 
+	public static class CertificateChange
+			implements Serializable {
+
+		private String alias;
+		private String pemCert;
+		private boolean saveToDisk;
+		private transient boolean local = false;
+
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public CertificateChange() {
+		}
+
+		public CertificateChange(String alias, String pemCert, boolean saveToDisk) {
+			this.alias = alias;
+			this.pemCert = pemCert;
+			this.saveToDisk = saveToDisk;
+			this.local = true;
+		}
+
+		public String getAlias() {
+			return alias;
+		}
+
+		public String getPemCertificate() {
+			return pemCert;
+		}
+
+		public boolean isLocal() {
+			return local;
+		}
+
+		public boolean isSaveToDisk() {
+			return saveToDisk;
+		}
+	}
+	
 	public class CertificateChanged {
 
 		private String alias;
