@@ -37,6 +37,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Main class of Kernel.
@@ -59,8 +60,9 @@ public class Kernel {
 
 	private Kernel parent;
 	private Map<String, Link> registeredLinks = new HashMap<>();
-
-	protected static void initBean(BeanConfig tmpBC, Set<BeanConfig> createdBeansConfig, int deep)
+	private boolean shutdown = false;
+	
+	protected void initBean(BeanConfig tmpBC, Set<BeanConfig> createdBeansConfig, int deep)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		final BeanConfig beanConfig = tmpBC instanceof DelegatedBeanConfig
 									  ? ((DelegatedBeanConfig) tmpBC).original
@@ -77,63 +79,82 @@ public class Kernel {
 
 		DelayedDependencyInjectionQueue queue = beanConfig.getKernel().beginDependencyDelayedInjection();
 
-		Object bean;
-		if (beanConfig.getState() == State.registered) {
-			beanConfig.setState(State.instanceCreated);
-			if (beanConfig.getFactory() != null && beanConfig.getFactory().getState() != State.initialized) {
-				initBean(beanConfig.getFactory(), new HashSet<BeanConfig>(), 0);
-			}
-			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
-				RegistrarKernel k = new RegistrarKernel();
-				k.setName(beanConfig.getBeanName());
-				beanConfig.getKernel().registerBean(beanConfig.getBeanName() + "#KERNEL").asInstance(k).exec();
-				beanConfig.setKernel(k);
-				beanConfig.setBeanInstanceName("service");
-			}
-			bean = beanConfig.getKernel().createNewInstance(beanConfig);
-			beanConfig.getKernel().putBeanInstance(beanConfig.getBeanInstanceName(), bean);
-			createdBeansConfig.add(beanConfig);
-			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
-				Kernel parent = beanConfig.getKernel().getParent();
-				// without this line setBeanActive() fails
-				//parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
-				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), "service");
-			}
-		} else {
-			bean = beanConfig.getKernel().getInstance(beanConfig);
-		}
-
-		if (bean instanceof RegistrarBean) {
-			((RegistrarBean) bean).register(beanConfig.getKernel());
-		}
-
-		BeanConfigurator beanConfigurator;
 		try {
-			if (beanConfig.getKernel().isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME) &&
-					!beanConfig.getBeanName().equals(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
-				beanConfigurator = beanConfig.getKernel().getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
+			Object bean;
+			if (beanConfig.getState() == State.registered) {
+				beanConfig.setState(State.instanceCreated);
+				if (beanConfig.getFactory() != null && beanConfig.getFactory().getState() != State.initialized) {
+					initBean(beanConfig.getFactory(), new HashSet<BeanConfig>(), 0);
+				}
+				if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
+					RegistrarKernel k = new RegistrarKernel();
+					k.setName(beanConfig.getBeanName());
+					beanConfig.getKernel().registerBean(beanConfig.getBeanName() + "#KERNEL").asInstance(k).exec();
+					beanConfig.setKernel(k);
+					beanConfig.setBeanInstanceName("service");
+				}
+				bean = beanConfig.getKernel().createNewInstance(beanConfig);
+				beanConfig.getKernel().putBeanInstance(beanConfig.getBeanInstanceName(), bean);
+				createdBeansConfig.add(beanConfig);
+				if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
+					Kernel parent = beanConfig.getKernel().getParent();
+					// without this line setBeanActive() fails
+					//parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
+					parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), "service");
+				}
 			} else {
+				bean = beanConfig.getKernel().getInstance(beanConfig);
+			}
+
+			if (bean instanceof RegistrarBean) {
+				((RegistrarBean) bean).register(beanConfig.getKernel());
+			}
+
+			BeanConfigurator beanConfigurator;
+			try {
+				if (beanConfig.getKernel().isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME) &&
+						!beanConfig.getBeanName().equals(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
+					beanConfigurator = beanConfig.getKernel().getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
+				} else {
+					beanConfigurator = null;
+				}
+			} catch (KernelException e) {
 				beanConfigurator = null;
 			}
-		} catch (KernelException e) {
-			beanConfigurator = null;
-		}
 
-		if (beanConfigurator != null) {
-			beanConfigurator.configure(beanConfig, bean);
-		} else {
-			AbstractBeanConfigurator.registerBeansForBeanOfClass(beanConfig.getKernel(), bean.getClass());
-		}
+			if (beanConfigurator != null) {
+				beanConfigurator.configure(beanConfig, bean);
+			} else {
+				AbstractBeanConfigurator.registerBeansForBeanOfClass(beanConfig.getKernel(), bean.getClass());
+			}
 
-		beanConfig.getKernel().finishDependecyDelayedInjection(queue);
+			beanConfig.getKernel().finishDependecyDelayedInjection(queue);
 
-		for (final Dependency dep : beanConfig.getFieldDependencies().values()) {
-			beanConfig.getKernel().injectDependencies(bean, dep, createdBeansConfig, deep, false);
-		}
+			for (final Dependency dep : beanConfig.getFieldDependencies().values()) {
+				beanConfig.getKernel().injectDependencies(bean, dep, createdBeansConfig, deep, false);
+			}
 
-		// there is no need to wait to initialize parent beans, it there any?
-		if (bean instanceof Initializable && beanConfig.getState() != State.initialized) {
-			((Initializable) bean).initialize();
+			// there is no need to wait to initialize parent beans, it there any?
+			if (bean instanceof Initializable && beanConfig.getState() != State.initialized) {
+				((Initializable) bean).initialize();
+			}
+		} catch (Throwable ex) {
+			if (beanConfig.getState() == State.instanceCreated) {
+				// initialization of a bean failed!!
+				Object i = beanConfig.getKernel().beanInstances.remove(beanConfig.getBeanInstanceName());
+				if (i != null) {
+					fireUnregisterAware(i);
+					if (i instanceof RegistrarBean) {
+						((RegistrarBean) i).unregister(beanConfig.getKernel());
+						Kernel parent = beanConfig.getKernel().getParent();
+						parent.unregister(beanConfig.getBeanName() + "#KERNEL");
+						beanConfig.setKernel(parent);
+						beanConfig.setBeanInstanceName(null);
+					}
+				}
+				beanConfig.setState(State.registered);
+			}
+			throw ex;
 		}
 		tmpBC.setState(State.initialized);
 //		if (deep == 0) {
@@ -523,11 +544,17 @@ public class Kernel {
 			throw new KernelException("Unknown bean '" + beanName + "'.");
 		}
 
+		while (beanConfig instanceof DelegatedBeanConfig) {
+			beanConfig = ((DelegatedBeanConfig) beanConfig).getOriginal();
+		}
+
 		if (beanConfig.getKernel() != this) {
-			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
-				beanName = "service";
+			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz()) &&
+					(beanConfig.getState() == State.initialized || beanConfig.getState() == State.instanceCreated)) {
+				beanConfig.getKernel().setBeanActive("service", value);
+			} else {
+				beanConfig.getKernel().setBeanActive(beanConfig.getBeanName(), value);
 			}
-			beanConfig.getKernel().setBeanActive(beanName, value);
 			return;
 		}
 
@@ -563,7 +590,7 @@ public class Kernel {
 					beanConfig.setBeanInstanceName(null);
 				}
 				beanConfig.setState(State.inactive);
-				unloadInjectedBean(beanConfig);
+				beanConfig.getKernel().unloadInjectedBean(beanConfig);
 			} catch (Exception e) {
 				throw new KernelException("Can't unload bean " + beanName + " from depenent beans", e);
 			}
@@ -572,6 +599,63 @@ public class Kernel {
 
 	public void setForceAllowNull(boolean forceAllowNull) {
 		this.forceAllowNull = forceAllowNull;
+	}
+
+	public void shutdown() {
+	    shutdown(null);
+	}
+
+	public void shutdown(Comparator<BeanConfig> shutdownOrder) {
+		initiateShutdown();
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Shutting down kernel and beans...");
+		}
+		Stream<BeanConfig> beanConfigStream = getDependencyManager().getBeanConfigs()
+				.stream()
+				.filter(bc -> !bc.getBeanName().endsWith("#KERNEL"));
+		if (shutdownOrder != null) {
+			beanConfigStream = beanConfigStream.sorted(shutdownOrder);
+		}
+		List<String> beanNames = beanConfigStream
+				.map(bc -> bc.getBeanName())
+				.collect(Collectors.toList());
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "found " + beanNames.size() + " to stop: " + beanNames);
+		}
+		for (String beanName : beanNames) {
+			try {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "disabling bean " + beanName + "...");
+				}
+				BeanConfig bc = getDependencyManager().getBeanConfig(beanName);
+				if (bc != null && bc.getState() != BeanConfig.State.inactive) {
+					setBeanActive(beanName, false);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "bean " + beanName + " stopped.");
+					}
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "bean " + beanName + " was already stopped!");
+					}
+				}
+			} catch (Throwable ex) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "failed to disable bean " + beanName, ex);
+				}
+			}
+		}
+	}
+
+	private void initiateShutdown() {
+		this.shutdown = true;
+		beanInstances.values()
+				.stream()
+				.filter(o -> o instanceof Kernel)
+				.map(o -> (Kernel) o)
+				.filter(o -> o != this)
+				.forEach(Kernel::initiateShutdown);
 	}
 
 	/**
@@ -669,6 +753,37 @@ public class Kernel {
 				}
 			}
 		}
+	}
+
+	public String toPrintable() {
+		StringBuilder sb = new StringBuilder();
+		toPrintable(sb, 0);
+		return sb.toString();
+	}
+
+	private void toPrintable(StringBuilder sb, int level) {
+		dependencyManager.getBeanConfigs().stream().filter(bc -> !bc.getBeanName().endsWith("#KERNEL")).sorted((bc1, bc2) -> {
+			return bc1.getBeanName().compareTo(bc2.getBeanName());
+		}).forEach(bc -> {
+			for (int i=0; i<level; i++) {
+				sb.append(" ");
+			}
+			sb.append(bc.getBeanName());
+			sb.append("(state: ").append(bc.getState()).append(", class: ").append(Optional.ofNullable(bc.getClazz()).map(Class::getCanonicalName).orElse(null)).append(")");
+			if (RegistrarBean.class.isAssignableFrom(bc.getClazz())) {
+				sb.append(" {\n");
+				Kernel k = (Kernel) beanInstances.get(bc.getBeanName()+"#KERNEL");
+				if (k != null) {
+					k.toPrintable(sb, level+1);
+				}
+				for (int i=0; i<level; i++) {
+					sb.append(" ");
+				}
+				sb.append("}\n");
+			} else {
+				sb.append("\n");
+			}
+		});
 	}
 
 	/**
@@ -792,7 +907,8 @@ public class Kernel {
 				}
 			}
 			if (RegistrarBean.class.isAssignableFrom(oldBeanConfig.getClazz())) {
-				if (oldBeanConfig.getKernel().getParent() != null) {
+				if (oldBeanConfig.getKernel().getParent() != null) {         // removing from the wrong kernel???
+					oldBeanConfig.getKernel().getParent().unregister(oldBeanConfig.getBeanName());
 					oldBeanConfig.getKernel().getParent().unregister(oldBeanConfig.getBeanName() + "#KERNEL");
 				}
 			}
@@ -1253,7 +1369,7 @@ public class Kernel {
 					try {
 						BeanConfig[] cbcs = dependencyManager.getBeanConfig(d);
 						if (cbcs.length == 0) {
-							boolean r = inject(null, d, ob, true);
+							boolean r = inject(null, d, ob, false);
 							if (!r) {
 								beansToRemove.add(bc);
 							}
@@ -1268,14 +1384,14 @@ public class Kernel {
 							// dependiency. Like
 							// collections and arrays.
 
-							boolean r = injectDependencies(ob, d, new HashSet<BeanConfig>(), 0, true);
+							boolean r = injectDependencies(ob, d, new HashSet<BeanConfig>(), 0, false);
 							if (!r) {
 								beansToRemove.add(bc);
 							}
 						}
 					} catch (KernelException ex) {
 						log.log(Level.WARNING, "Can't set null to " + d + " unloading bean " + d.getBeanName(), ex);
-						unloadInjectedBean(d.getBeanConfig());
+						beansToRemove.add(bc);
 					}
 				}
 			}
@@ -1288,9 +1404,19 @@ public class Kernel {
 			}
 //			setBeanActive(config.getBeanName(), true);
 		}
-		for (BeanConfig config : beansToRemove) {
-			if (dependencyManager.getBeanConfig(config.getBeanName()) != null) {
-				setBeanActive(config.getBeanName(), true);
+
+		if (!shutdown) {
+			// We reenable beans which were stopped in case they were stopped due to reload of one of dependencies.
+			// However, in case of shutdown there is no point of reenabling beans as they will be stopped anyway.
+			for (BeanConfig config : beansToRemove) {
+				// we need to check if changing state using setState() will be enough, but there should be no need
+				// to reinstantiate bean at this time.
+//				if (dependencyManager.getBeanConfig(config.getBeanName()) != null) {
+//					config.getKernel().setBeanActive(config.getBeanName(), true);
+//				}
+				if (config.getState() == State.inactive) {
+					config.setState(State.registered);
+				}
 			}
 		}
 

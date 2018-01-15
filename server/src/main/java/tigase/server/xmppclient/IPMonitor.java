@@ -44,7 +44,7 @@ public class IPMonitor
 	private LinkedHashSet<String> ips = new LinkedHashSet<String>();
 	private LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 	private boolean stopped = false;
-	private Timer timer = new Timer("IPMonitor Timer");
+	private Timer timer = new Timer("IPMonitor Timer", true);
 
 	public IPMonitor() {
 		super();
@@ -92,6 +92,7 @@ public class IPMonitor
 
 	public void stopThread() {
 		stopped = true;
+		timer.cancel();
 	}
 
 }

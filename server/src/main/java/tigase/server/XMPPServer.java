@@ -206,7 +206,9 @@ public final class XMPPServer {
 	}
 
 	public static void stop() {
-		((AbstractMessageReceiver) bootstrap.getInstance(MessageRouterIfc.class)).stop();
+		if (bootstrap != null) {
+			bootstrap.stop();
+		}
 	}
 
 	public static String version() {

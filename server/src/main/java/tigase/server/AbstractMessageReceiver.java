@@ -1152,7 +1152,6 @@ public abstract class AbstractMessageReceiver
 	}
 
 	private void stopThreads() {
-
 		// stopped = true;
 		try {
 			stopThread(threadsQueueIn);
@@ -1185,6 +1184,8 @@ public abstract class AbstractMessageReceiver
 			for (QueueListener in_thread : threadsQueue) {
 				in_thread.threadStopped = true;
 				in_thread.interrupt();
+			}
+			for (QueueListener in_thread : threadsQueue) {
 				while (in_thread.isAlive()) {
 					Thread.sleep(100);
 				}
@@ -1374,7 +1375,7 @@ public abstract class AbstractMessageReceiver
 							break;
 					}    // end of switch (qel.type)
 				} catch (InterruptedException e) {
-
+					System.out.println("interrupted " + getName());
 					// log.log(Level.SEVERE, "Exception during packet processing: ", e);
 					// stopped = true;
 				} catch (Exception e) {

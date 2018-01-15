@@ -191,7 +191,7 @@ public class MonitorRuntime
 			}
 			// We allow for max 10 secs for the shutdown code to run...
 			long shutdownStart = System.currentTimeMillis();
-			while (threads.activeCount() > 0 && (System.currentTimeMillis() - shutdownStart) < 10000) {
+			while (threads.activeCount() > 0 && (System.currentTimeMillis() - shutdownStart) < 20000) {
 				try {
 					sleep(100);
 				} catch (Exception e) {

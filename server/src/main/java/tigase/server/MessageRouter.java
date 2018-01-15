@@ -27,6 +27,7 @@ import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
@@ -65,7 +66,7 @@ import static tigase.server.MessageRouterConfig.DISCO_SHOW_VERSION_PROP_VAL;
 @Bean(name = "message-router", parent = Kernel.class, active = true)
 public class MessageRouter
 		extends AbstractMessageReceiver
-		implements MessageRouterIfc, RegistrarBean {
+		implements MessageRouterIfc, RegistrarBean, UnregisterAware {
 
 	// implements XMPPService {
 	// public static final String INFO_XMLNS =
@@ -664,6 +665,11 @@ public class MessageRouter
 		components.put(getName(), this);
 		this.config = config;
 		addRegistrator(config);
+	}
+
+	@Override
+	public void beforeUnregister() {
+		stop();
 	}
 
 	@Override

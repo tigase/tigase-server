@@ -29,7 +29,11 @@ public class RegistrarKernel
 	@Override
 	public void beforeUnregister() {
 		for (BeanConfig bc : this.getDependencyManager().getBeanConfigs()) {
-			unregisterInt(bc.getBeanName());
+			BeanConfig bc1 = bc;
+			while (bc1 instanceof DelegatedBeanConfig) {
+				bc1 = ((DelegatedBeanConfig) bc1).getOriginal();
+			}
+			bc1.getKernel().unregister(bc1.getBeanName());
 		}
 	}
 }

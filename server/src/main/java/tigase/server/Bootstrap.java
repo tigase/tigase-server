@@ -27,6 +27,7 @@ import tigase.conf.ConfigReader;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.conf.LoggingBean;
 import tigase.db.beans.DataSourceBean;
+import tigase.db.beans.MDPoolBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.KernelException;
@@ -34,7 +35,10 @@ import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
+import tigase.net.ConnectionOpenThread;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.server.monitor.MonitorRuntime;
+import tigase.sys.ShutdownHook;
 import tigase.util.dns.DNSResolverDefault;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.dns.DNSResolverIfc;
@@ -64,6 +68,8 @@ public class Bootstrap {
 	private ConfigHolder config = new ConfigHolder();
 	// Common logging setup
 	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
+
+	private final ShutdownHook shutdownHook = new BootstrapShutdownHook();
 
 	public Bootstrap() {
 		kernel = new Kernel("root");
@@ -188,11 +194,20 @@ public class Bootstrap {
 		} catch (IOException ex) {
 			log.log(Level.FINE, "failed to dump configuration to file etc/config-dump.properties");
 		}
+
+		MonitorRuntime.getMonitorRuntime().addShutdownHook(shutdownHook);
 	}
 
 	public void stop() {
-		MessageRouter mr = kernel.getInstance("message-router");
-		mr.stop();
+		kernel.shutdown((bc1, bc2) -> {
+			if (MDPoolBean.class.isAssignableFrom(bc1.getClazz())) {
+				return Integer.MIN_VALUE;
+			}
+			if (MDPoolBean.class.isAssignableFrom(bc2.getClazz())) {
+				return Integer.MIN_VALUE;
+			}
+			return 0;
+		});
 	}
 
 	public <T> T getInstance(String beanName) {
@@ -321,5 +336,32 @@ public class Bootstrap {
 		// System.out.println("Setting logging: \n" + buff.toString());
 		ConfiguratorAbstract.loadLogManagerConfig(buff.toString());
 		log.config("DONE");
+	}
+
+	private class BootstrapShutdownHook implements ShutdownHook {
+
+		@Override
+		public String getName() {
+			return "bootstrap-shutdown";
+		}
+
+		@Override
+		public String shutdown() {
+			ConnectionOpenThread.getInstance().stop();
+
+			long start = System.currentTimeMillis();
+			try {
+				Bootstrap.this.stop();
+			} catch (Throwable ex) {
+				System.out.println("Warning: failed to shutdown Tigase Kernel with error: " + ex.getMessage());
+				ex.printStackTrace();
+				return ex.getMessage();
+
+			}
+
+			long end = System.currentTimeMillis();
+
+			return "Tigase Kernel stopped in " + (end - start) + "ms";
+		}
 	}
 }
