@@ -22,6 +22,7 @@ package tigase.cluster;
 
 import tigase.cluster.api.*;
 import tigase.conf.Configurable;
+import tigase.eventbus.component.EventBusComponent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.kernel.beans.selector.ConfigType;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +70,8 @@ public class ClusterController
 	private ConcurrentSkipListMap<String, CommandListener> commandListeners = new ConcurrentSkipListMap<String, CommandListener>();
 	private AtomicLong currId = new AtomicLong(1L);
 
+	private final CopyOnWriteArrayList<ClusteredComponentIfc> clusteredComponents = new CopyOnWriteArrayList<>();
+
 	@Override
 	public void componentAdded(ClusteredComponentIfc component) {
 		// we are not passing wrapper to ClusterConnectionManager as we need to
@@ -79,10 +83,16 @@ public class ClusterController
 			component.setClusterController(wrapper);
 		}
 		updateServiceDiscoveryItem(getName(), component.getName(), "Component: " + component.getName(), true);
+		if (component instanceof EventBusComponent) {
+			clusteredComponents.add(0, component);
+		} else {
+			clusteredComponents.add(component);
+		}
 	}
 
 	@Override
 	public void componentRemoved(ClusteredComponentIfc component) {
+		clusteredComponents.remove(component);
 	}
 
 	@Override
@@ -116,7 +126,7 @@ public class ClusterController
 	@Override
 	public void nodeConnected(String node) {
 		super.nodeConnected(node);
-		for (ClusteredComponentIfc comp : components.values()) {
+		for (ClusteredComponentIfc comp : clusteredComponents) {
 			comp.nodeConnected(node);
 		}
 	}
@@ -124,7 +134,7 @@ public class ClusterController
 	@Override
 	public void nodeDisconnected(String node) {
 		super.nodeDisconnected(node);
-		for (ClusteredComponentIfc comp : components.values()) {
+		for (ClusteredComponentIfc comp : clusteredComponents) {
 			comp.nodeDisconnected(node);
 		}
 	}
