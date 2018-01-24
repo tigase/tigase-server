@@ -27,6 +27,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigAlias;
 import tigase.kernel.beans.config.ConfigAliases;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
@@ -69,6 +70,8 @@ public class ClientConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>> {
 
 	protected static final String FORCE_REDIRECT_TO_KEY = "force-redirect-to";
+	private static final Element FEATURE_PIPELINING = new Element("feature", new String[]{"var"},
+																  new String[]{"urn:xmpp:features:pipelining"});
 	private static final Logger log = Logger.getLogger(ClientConnectionManager.class.getName());
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
@@ -93,6 +96,8 @@ public class ClientConnectionManager
 	protected SeeOtherHostIfc see_other_host_strategy = null;
 	@Inject
 	private ClientTrustManagerFactory clientTrustManagerFactory;
+	@ConfigField(desc = "Support for pipelining")
+	private boolean pipelining = false;
 	/**
 	 * This is mostly for testing purpose. We want to investigate massive (10k per node) connections drops at the same
 	 * time during tests with Tsung. I suspect this might be due to problems with one of the tsung VMs working in the
@@ -461,6 +466,9 @@ public class ClientConnectionManager
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
 			}
+			if (serv instanceof C2SIOService) {
+				((C2SIOService) serv).waitForResponse();
+			}
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
 
 			sendTlsHandshakeCompletedToSessionManager(serv);
@@ -469,11 +477,27 @@ public class ClientConnectionManager
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Session ID is: {0}", id);
 			}
-			writeRawData(serv, prepareStreamOpen(serv, id, hostname));
-			final SocketType socket = (SocketType) serv.getSessionData().get("socket");
-			boolean ssl = socket.equals(SocketType.ssl);
-			addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv.getDataReceiver(), StanzaType.get,
-													   (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
+
+			if (serv instanceof C2SIOService && ((C2SIOService) serv).shouldQueueStreamOpened()) {
+				final String localId = id;
+				((C2SIOService) serv).queueTask(() -> {
+					writeRawData(serv, prepareStreamOpen(serv, localId, hostname));
+					final SocketType socket = (SocketType) serv.getSessionData().get("socket");
+					boolean ssl = socket.equals(SocketType.ssl);
+					((C2SIOService) serv).waitForResponse();
+					addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv.getDataReceiver(), StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
+				});
+			} else {
+				writeRawData(serv, prepareStreamOpen(serv, id, hostname));
+
+				final SocketType socket = (SocketType) serv.getSessionData().get("socket");
+				boolean ssl = socket.equals(SocketType.ssl);
+				if (serv instanceof C2SIOService) {
+					((C2SIOService) serv).waitForResponse();
+				}
+				addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv.getDataReceiver(), StanzaType.get,
+														   (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
+			}
 		}
 
 		return null;
@@ -663,7 +687,6 @@ public class ClientConnectionManager
 				} else {
 					log.log(Level.WARNING, "Missing user-jid for USER_LOGIN command: {0}", iqc);
 				}
-
 				break;
 
 			case STARTZLIB:
@@ -884,6 +907,9 @@ public class ClientConnectionManager
 
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		if (pipelining) {
+			return new C2SIOService<Object>();
+		}
 		return new XMPPIOService<Object>();
 	}
 
@@ -999,6 +1025,10 @@ public class ClientConnectionManager
 				results.addAll(Arrays.asList(features));
 			}    // end of if (features != null)
 		}      // end of for ()
+
+		if (pipelining) {
+			results.add(FEATURE_PIPELINING);
+		}
 
 		return results;
 	}

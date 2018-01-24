@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class TLSIO
-		implements IOInterface {
+		implements IOInterface, TLSIOIfc {
 
 	public static final String TLS_CAPS = "tls-caps";
 
@@ -320,6 +320,10 @@ public class TLSIO
 	@Override
 	public void setLogId(String logId) {
 		io.setLogId(logId);
+	}
+
+	public void processHandshake(byte[] data) throws IOException {
+		decodeData(ByteBuffer.wrap(data));
 	}
 
 	private ByteBuffer decodeData(ByteBuffer input) throws IOException {

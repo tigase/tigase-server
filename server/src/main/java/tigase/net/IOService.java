@@ -790,7 +790,9 @@ public abstract class IOService<RefObject>
 					CoderResult cr = decoder.decode(tmpBuffer, cb, false);
 
 					if (cr.isMalformed()) {
-						throw new MalformedInputException(tmpBuffer.remaining());
+						if (!handleMalformedInput(tmpBuffer, cb)) {
+							throw new MalformedInputException(tmpBuffer.remaining());
+						}
 					}
 					if (cb.remaining() > 0) {
 						cb.flip();
@@ -1011,6 +1013,10 @@ public abstract class IOService<RefObject>
 		this.socketServiceReady = value;
 	}
 
+	protected boolean handleMalformedInput(ByteBuffer buffer, CharBuffer cb) {
+		return false;
+	}
+
 	protected boolean isInputBufferEmpty() {
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
 	}
@@ -1070,6 +1076,10 @@ public abstract class IOService<RefObject>
 			// log.finer("input.position()=" + socketInput.position());
 			// }
 		}
+	}
+
+	protected IOInterface getIO() {
+		return socketIO;
 	}
 
 	private void setLastTransferTime() {

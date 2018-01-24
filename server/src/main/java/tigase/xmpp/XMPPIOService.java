@@ -91,7 +91,7 @@ public class XMPPIOService<RefObject>
 	private ConcurrentLinkedQueue<Packet> receivedPackets = new ConcurrentLinkedQueue<Packet>();
 	private long req_idx = 0;
 	@SuppressWarnings("rawtypes")
-	private XMPPIOServiceListener serviceListener = null;
+	protected XMPPIOServiceListener serviceListener = null;
 	private boolean strict_ack = false;
 	private long totalPacketsReceived = 0;
 	private long totalPacketsSent = 0;
@@ -485,8 +485,6 @@ public class XMPPIOService<RefObject>
 				// in normal mode don't even call below code
 				assert debug(new String(data), "--RECEIVED:");
 
-				Element elem = null;
-
 				try {
 					parser.parse(domHandler, data, 0, data.length);
 					if (domHandler.parseError()) {
@@ -510,28 +508,7 @@ public class XMPPIOService<RefObject>
 						// domHandler = new XMPPDomBuilderHandler<RefObject>(this);
 					}
 
-					Queue<Element> elems = domHandler.getParsedElements();
-
-					if (elems.size() > 0) {
-						readCompleted();
-					}
-					while ((elem = elems.poll()) != null) {
-
-						// assert debug(elem.toString() + "\n");
-						// log.finer("Read element: " + elem.getName());
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[]{toString(), elem});
-						}
-
-						// System.out.print(elem.toString());
-						Packet pack = Packet.packetInstance(elem);
-
-						addReceivedPacket(pack);
-						sendAck(pack);
-					}    // end of while ((elem = elems.poll()) != null)
-				} catch (TigaseStringprepException ex) {
-					log.log(Level.INFO, toString() + ", Incorrect to/from JID format for stanza: " + elem.toString(),
-							ex);
+					moveParsedPacketsToReceived(true);
 				} catch (Exception ex) {
 					log.log(Level.INFO,
 							toString() + ", Incorrect XML data: " + new String(data) + ", stopping connection: " +
@@ -679,6 +656,38 @@ public class XMPPIOService<RefObject>
 				}
 			}
 		}
+	}
+
+	protected boolean hasParsedElements() {
+		return !domHandler.getParsedElements().isEmpty();
+	}
+
+	protected void moveParsedPacketsToReceived(boolean sendAck) {
+		Element elem = null;
+		Queue<Element> elems = domHandler.getParsedElements();
+
+		if (elems.size() > 0 && sendAck) {
+			readCompleted();
+		}
+		while ((elem = elems.poll()) != null) {
+			try {
+				// assert debug(elem.toString() + "\n");
+				// log.finer("Read element: " + elem.getName());
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[]{toString(), elem});
+				}
+
+				// System.out.print(elem.toString());
+				Packet pack = Packet.packetInstance(elem);
+
+				addReceivedPacket(pack);
+				if (sendAck) {
+					sendAck(pack);
+				}
+			} catch (TigaseStringprepException ex) {
+				log.log(Level.INFO, toString() + ", Incorrect to/from JID format for stanza: " + elem.toString(), ex);
+			}
+		}    // end of while ((elem = elems.poll()) != null)
 	}
 
 	/**
