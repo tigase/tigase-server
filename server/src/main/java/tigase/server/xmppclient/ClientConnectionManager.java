@@ -70,7 +70,7 @@ public class ClientConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>> {
 
 	protected static final String FORCE_REDIRECT_TO_KEY = "force-redirect-to";
-	private static final Element FEATURE_PIPELINING = new Element("feature", new String[]{"var"},
+	private static final Element FEATURE_PIPELINING = new Element("pipelining ", new String[]{"xmlns"},
 																  new String[]{"urn:xmpp:features:pipelining"});
 	private static final Logger log = Logger.getLogger(ClientConnectionManager.class.getName());
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
