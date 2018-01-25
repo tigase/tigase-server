@@ -189,13 +189,6 @@ public class StoredProcedures {
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
 		try {
-			// check whether user exists
-			PreparedStatement ps_check = conn.prepareStatement("select uid from tig_users where lower(user_id)=?");
-			ps_check.setString(1, userId.toLowerCase());
-			ResultSet rs_check = ps_check.executeQuery();
-			if (rs_check.next()) {
-				return;
-			}
 			PreparedStatement ps = conn.prepareStatement("insert into tig_users (user_id) values (?)",
 														 Statement.RETURN_GENERATED_KEYS);
 

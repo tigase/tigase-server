@@ -306,7 +306,8 @@ public class TigaseCustomAuth
 			throw new UserExistsException("Error while adding user to repository, user possibly exists: " + user, e);
 		} catch (SQLException e) {
 			if (e.getMessage() != null && (e.getMessage().contains("Violation of UNIQUE KEY") ||
-					e.getMessage().contains("violates unique constraint \"user_id\""))) {
+					e.getMessage().contains("violates unique constraint \"user_id\"")) ||
+					e.getMessage().contains("DerbySQLIntegrityConstraintViolationException")) {
 				// This is a workaround SQL Server which just throws SLQ Exception
 				throw new UserExistsException("Error while adding user to repository, user possibly exists: " + user,
 											  e);
