@@ -16,7 +16,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>7.1.3-SNAPSHOT</version>
+		<version>7.1.3</version>
 		<relativePath>../master</relativePath>
 	</parent>
 	
@@ -56,22 +56,22 @@
 								<configuration>
 									<target>
 										<exec executable="sed" output="README">
-											<arg value="-e"/>
-											<arg value="s/&lt;[^>]*>//g"/>
-											<arg value="-e"/>
-											<arg value="s/&#60;[^>]*>//g"/>
-											<arg value="-e"/>
-											<arg value="s/&amp;[^; ]*;//g"/>
-											<arg value="-e"/>
-											<arg value="s/${APP_VER}/${project.version}/g"/>
-											<arg value="${dist_path}/package.html"/>
+											<arg value="-e" />
+											<arg value="s/&lt;[^&gt;]*&gt;//g" />
+											<arg value="-e" />
+											<arg value="s/&lt;[^&gt;]*&gt;//g" />
+											<arg value="-e" />
+											<arg value="s/&amp;[^; ]*;//g" />
+											<arg value="-e" />
+											<arg value="s/${APP_VER}/${project.version}/g" />
+											<arg value="${dist_path}/package.html" />
 										</exec>
 										<exec executable="sed" output="package.html">
-											<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g"/>
-											<arg value="${dist_path}/package.html"/>
+											<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g" />
+											<arg value="${dist_path}/package.html" />
 										</exec>
-										<copy file="${dist_path}/License.html" tofile="License.html"/>
-										<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog"/>-->
+										<copy file="${dist_path}/License.html" tofile="License.html" />
+										<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog" />-->
 
 									</target>
 								</configuration>
@@ -161,7 +161,7 @@
 							<stripVersion>true</stripVersion>
 							<excludeTransitive>true</excludeTransitive>
 							<overWriteIfNewer>true</overWriteIfNewer>
-							<overWriteReleases>true></overWriteReleases>
+							<overWriteReleases>true&gt;</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
@@ -309,7 +309,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-server</artifactId>
-			<version>7.1.3-SNAPSHOT</version>
+			<version>7.1.3</version>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
@@ -380,13 +380,13 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-message-archiving</artifactId>
-			<version>1.2.2-SNAPSHOT</version>
+			<version>1.2.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-unified-archive</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>1.0.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
