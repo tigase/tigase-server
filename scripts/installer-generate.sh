@@ -58,6 +58,8 @@ fi
 
 if [[ "$(uname -s)" == "Darwin" && -f /usr/local/bin/7za ]] ; then
 	cp /usr/local/bin/7za installer/izpack.patched/utils/wrappers/izpack2exe/
+elif [[ -f /usr/bin/7za ]] ; then
+	cp /usr/bin/7za installer/izpack.patched/utils/wrappers/izpack2exe/
 else
 	MAKE_EXE=false
 fi
