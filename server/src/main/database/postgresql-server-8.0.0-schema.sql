@@ -16,10 +16,6 @@
 --  If not, see http://www.gnu.org/licenses/.
 --
 
-\i database/postgresql-server-7.1.0-schema.sql
-
--- LOAD FILE: database/postgresql-server-7.1.0-schema.sql
-
 -- QUERY START:
 do $$
 begin

@@ -17,10 +17,6 @@
 --
 --
 
-run 'database/derby-server-7.1.0-sp.sql';
-
--- LOAD FILE: database/derby-server-7.1.0-sp.sql
-
 -- QUERY START:
 CREATE procedure TigUpdateLoginTime(userId varchar(2049))
 PARAMETER STYLE JAVA

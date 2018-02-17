@@ -17,10 +17,6 @@
 --
 --
 
-run 'database/derby-server-7.0.0-sp.sql';
-
--- LOAD FILE: database/derby-server-7.0.0-sp.sql
-
 -- QUERY START:
 drop procedure TigPutDBProperty;
 -- QUERY END:

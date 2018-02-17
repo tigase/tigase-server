@@ -19,10 +19,6 @@
 
 -- Database stored procedures and functions for Tigase schema version 5.1
 
-source database/mysql-server-7.1.0-sp.sql;
-
--- LOAD FILE: database/mysql-server-7.1.0-sp.sql
-
 -- QUERY START:
 drop procedure if exists TigUpdateLoginTime;
 -- QUERY END:

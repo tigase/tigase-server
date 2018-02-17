@@ -18,10 +18,6 @@
 
 -- Database stored procedures and fucntions for Tigase schema version 5.1
 
-\i database/postgresql-server-7.1.0-sp.sql
-
--- LOAD FILE: database/postgresql-server-7.1.0-sp.sql
-
 
 -- QUERY START:
 -- It sets last_login time to the current timestamp

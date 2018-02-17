@@ -19,10 +19,6 @@
 
 -- Database stored procedures and functions for Tigase schema version 5.1
 
-source database/mysql-server-7.0.0-schema.sql;
-
--- LOAD FILE: database/mysql-server-7.0.0-schema.sql
-
 
 -- QUERY START:
 call TigExecuteIfNot(

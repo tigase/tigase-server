@@ -18,10 +18,6 @@
 
 -- Database stored procedures and fucntions for Tigase schema version 5.1
 
-\i database/postgresql-server-7.0.0-sp.sql
-
--- LOAD FILE: database/postgresql-server-7.0.0-sp.sql
-
 
 -- QUERY START:
 -- Database properties set - procedure
