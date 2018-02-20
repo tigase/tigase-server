@@ -37,27 +37,6 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 	private LocalDate lastDailyStatsReset = LocalDate.now();
 	private String toString = "[]";
 
-	public static void main(String[] args) {
-
-		MaxDailyCounterQueue<Integer> lq = new MaxDailyCounterQueue<Integer>(15) {
-			int i = 0;
-
-			@Override
-			protected boolean isNextItem() {
-				return (i++) % 4 == 0;
-			}
-		};
-
-		for (int i = 0; i < 200; i++) {
-			final int rand = ThreadLocalRandom.current().nextInt(0, 100);
-			lq.add(rand);
-			System.out.print(lq.toString());
-			System.out.print("       max: " + lq.getMaxValueInRange(3));
-			System.out.print("       sup-limit: " + lq.isLimitSurpassedAllItems(3, 50));
-			System.out.println();
-		}
-	}
-
 	public MaxDailyCounterQueue(int limit) {
 		this.limit = limit;
 	}
@@ -77,6 +56,10 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		return true;
 	}
 
+	public E getMaxValue() {
+		return getMaxValueInRange(limit);
+	}
+
 	public E getMaxValueInRange(int range) {
 		range = Math.min(range, this.limit);
 
@@ -93,7 +76,19 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		return result;
 	}
 
-	public boolean isLimitSurpassedAllItems(int range, long limit) {
+	public boolean isLimitSurpassed(E limit) {
+		return isLimitSurpassed(this.limit, limit);
+	}
+
+	public boolean isLimitSurpassed(int range, E limit) {
+		return getMaxValueInRange(range).compareTo(limit) > 0;
+	}
+
+	public boolean isLimitSurpassedAllItems(E limit) {
+		return isLimitSurpassedAllItems(this.limit, limit);
+	}
+
+	public boolean isLimitSurpassedAllItems(int range, E limit) {
 		boolean result = true;
 		range = Math.min(range, this.limit);
 
@@ -102,7 +97,7 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 			range--;
 
 			final E next = iter.next();
-			if (next.longValue() <= limit) {
+			if (next.compareTo(limit) <= 0) {
 				result &= false;
 			}
 		}
