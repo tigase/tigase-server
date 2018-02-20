@@ -14,13 +14,13 @@ If you are installing Tigase in a Windows environment, please see the xref:winWe
 
 == Download and Extract
 
-First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.xmpp-test.net/nightlies/dists/[nightly builds].
+First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.tigase.org/nightlies/dists/[nightly builds].
 
 [source,bash]
 -----
-$ wget http://build.xmpp-test.net/nightlies/dists/2015-01-12/tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
-$ tar -xf tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
-$ cd tigase-server-7.0.0-SNAPSHOT-b3752
+$ wget http://build.tigase.org/nightlies/dists/latest/tigase-server-dist-max.tar.gz
+$ tar -xf tigase-server-dist-max.tar.gz
+$ cd tigase-server-<version>
 -----
 
 Please do not run as root.

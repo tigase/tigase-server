@@ -19,7 +19,7 @@ Should you choose to use the nighly builds, a few things you should consider:
 - Changes may be made to the code that can negatively affect security.
 We *highly* recommend testing these builds in your environments before upgrading.
 
-With these considerations in mind, we provide nightly builds at link:http://build.xmpp-test.net/nightlies/dists/[this link] which provides directories by date.
+With these considerations in mind, we provide nightly builds at link:http://build.tigase.org/nightlies/dists/[this link] which provides directories by date.
 
 Standard naming format is tigase-server-x.x.x-SNAPSHOT-byyyy.*
 x.x.x is the major version the builds are working towards, with yyyy being the specific build.
@@ -34,6 +34,6 @@ Just like the standard distributions, the builds are available with the followin
 . -dist-max.zip - Compressed binaries with all dependencies.
 . -dist-max.tar.gz - tarball compressed binaries with all dependencies.
 
-We also provide automated testing of each of our nightly builds for each supported databases.  Tests are done with both functional and low memory parameters in mind, and are available link:http://build.xmpp-test.net/nightlies/tests/[at this link].  These tests can provide a quick examination of function before upgrading your current build.
+We also provide automated testing of each of our nightly builds for each supported databases.  Tests are done with both functional and low memory parameters in mind, and are available link:http://build.tigase.org/nightlies/tests/[at this link].  These tests can provide a quick examination of function before upgrading your current build.
 
 The latest Cluster tests are available at link:http://graph.cluster-c.xmpp-test.net/latest/[this link] which shows performance and traffic use under strain using the latest available build of Tigase.
