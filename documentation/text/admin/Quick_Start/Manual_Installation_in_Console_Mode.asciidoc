@@ -23,7 +23,7 @@ Alternatively, you may use wget
 
 [source,bash]
 -----
-wget http://build.xmpp-test.net/nightlies/dists/latest/tigase-server-dist.tar.gz
+wget http://build.tigase.org/nightlies/dists/latest/tigase-server-dist-max.tar.gz
 -----
 
 == Unpack the Package
