@@ -40,6 +40,8 @@ import java.util.Map;
 public class CallbackHandlerFactory
 		implements CallbackHandlerFactoryIfc {
 
+	public static final String AUTH_JID = "authentication-jid";
+
 	private static final String CALLBACK_HANDLER_KEY = "callbackhandler";
 
 	@Override

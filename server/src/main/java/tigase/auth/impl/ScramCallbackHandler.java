@@ -45,6 +45,7 @@ import java.security.cert.Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.auth.CallbackHandlerFactory.AUTH_JID;
 import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 
 /**
@@ -119,6 +120,7 @@ public class ScramCallbackHandler
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
 		authCallback.setAuthorized(true);
+		session.removeSessionData(AUTH_JID);
 	}
 
 	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
@@ -145,7 +147,7 @@ public class ScramCallbackHandler
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		username = DEFAULT_USERNAME;//nc.getDefaultName();
-		jid = BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain);
+		setJid(BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain));
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "NameCallback: {0}", username);
@@ -193,7 +195,7 @@ public class ScramCallbackHandler
 				!callback.getAuthzId().equals(jid.toString())) {
 			try {
 				username = jid.getLocalpart();
-				jid = BareJID.bareJIDInstance(callback.getAuthzId());
+				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
@@ -263,6 +265,13 @@ public class ScramCallbackHandler
 			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with username " + username, ex);
 		}
 		credentialsFetched = true;
+	}
+
+	private void setJid(BareJID jid) {
+		this.jid = jid;
+		if (jid != null) {
+			this.session.putSessionData(AUTH_JID, jid);
+		}
 	}
 
 }

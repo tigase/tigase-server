@@ -21,11 +21,13 @@ package tigase.auth.impl;
 
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
+import tigase.auth.SessionAware;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.Callback;
@@ -38,19 +40,21 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.auth.CallbackHandlerFactory.AUTH_JID;
 import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
 
 /**
  * Implementation of CallbackHandler for authentication with SASL PLAIN or using plaintext password.
  */
 public class PlainCallbackHandler
-		implements CallbackHandler, AuthRepositoryAware, DomainAware {
+		implements CallbackHandler, AuthRepositoryAware, DomainAware, SessionAware {
 
 	protected String domain;
 
 	protected BareJID jid = null;
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 	protected AuthRepository repo;
+	private XMPPResourceConnection session;
 	private boolean accountDisabled = false;
 	private String username;
 
@@ -72,6 +76,11 @@ public class PlainCallbackHandler
 	@Override
 	public void setDomain(String domain) {
 		this.domain = domain;
+	}
+
+	@Override
+	public void setSession(XMPPResourceConnection session) {
+		this.session = session;
 	}
 
 	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
@@ -96,6 +105,7 @@ public class PlainCallbackHandler
 		}
 
 		authCallback.setAuthorized(true);
+		session.removeSessionData(AUTH_JID);
 	}
 
 	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
@@ -118,7 +128,7 @@ public class PlainCallbackHandler
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		username = DEFAULT_USERNAME;//nc.getDefaultName();
 
-		jid = BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain);
+		setJid(BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain));
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "NameCallback: {0}", username);
@@ -160,13 +170,20 @@ public class PlainCallbackHandler
 				!callback.getAuthzId().equals(jid.toString())) {
 			try {
 				username = jid.getLocalpart();
-				jid = BareJID.bareJIDInstance(callback.getAuthzId());
+				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
 		} else {
 			username = DEFAULT_USERNAME;
 			callback.setAuthzId(jid.toString());
+		}
+	}
+
+	private void setJid(BareJID jid) {
+		this.jid = jid;
+		if (jid != null) {
+			this.session.putSessionData(AUTH_JID, jid);
 		}
 	}
 
