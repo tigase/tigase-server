@@ -345,7 +345,7 @@ public class XMPPResourceConnection
 			}
 		}    // end of if (parentSession != null)
 		resource = null;
-		sessionId = null;
+		//sessionId = null;
 	}
 
 	@Override
