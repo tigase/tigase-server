@@ -125,6 +125,7 @@
                 <include>**/tigase-stun*</include>
                 <include>**/tigase-mongodb*</include>
                 <include>**/tigase-spam*</include>
+				<include>**/tigase-auditlog*</include>
                 <include>**/licence-lib*</include>
                 <include>**/tigase-web-ui*</include>
 			</includes>
