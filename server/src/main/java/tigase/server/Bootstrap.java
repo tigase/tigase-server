@@ -338,7 +338,7 @@ public class Bootstrap {
 		log.config("DONE");
 	}
 
-	private class BootstrapShutdownHook implements ShutdownHook {
+	public class BootstrapShutdownHook implements ShutdownHook {
 
 		@Override
 		public String getName() {

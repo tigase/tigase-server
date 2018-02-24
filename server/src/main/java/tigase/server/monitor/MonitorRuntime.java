@@ -20,6 +20,7 @@
 
 package tigase.server.monitor;
 
+import tigase.server.Bootstrap;
 import tigase.sys.*;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -182,27 +183,56 @@ public class MonitorRuntime
 			final String shutMsg = "ShutdownThread started... " + LocalDateTime.now();
 			System.out.println(shutMsg);
 			log.warning(shutMsg);
-			LinkedList<ShutdownHandlerThread> thlist = new LinkedList<ShutdownHandlerThread>();
-			ThreadGroup threads = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Tigase Shutdown");
-			for (ShutdownHook shutdownHook : shutdownHooks) {
-				ShutdownHandlerThread thr = new ShutdownHandlerThread(threads, shutdownHook);
-				thr.start();
-				thlist.add(thr);
-			}
-			// We allow for max 10 secs for the shutdown code to run...
-			long shutdownStart = System.currentTimeMillis();
-			while (threads.activeCount() > 0 && (System.currentTimeMillis() - shutdownStart) < 20000) {
+
+			detectThreadLocks();
+
+			if (shutdownThreadDump) {
 				try {
-					sleep(100);
-				} catch (Exception e) {
+					createThreadDump();
+				} catch (IOException e) {
+					System.out.println("exception while initialization");
+					e.printStackTrace();
+					log.log(Level.WARNING, "Failed creating thread dumper logger");
 				}
 			}
+
+			executeShutdownHooks();
+
+			System.out.println("ShutdownThread finished...");
+			log.warning("ShutdownThread finished...");
+		}
+
+		private void createThreadDump() throws IOException {
+			// we have to configure logger here
+			Logger THREAD_DUMP_LOGGER = Logger.getLogger("ThreadDumpLogger");
+			String threadDumpPath = "logs/thread-dump.log";
+			FileHandler fileHandler = new FileHandler(threadDumpPath, 10000000, 5, true);
+			fileHandler.setLevel(Level.ALL);
+			fileHandler.setFormatter(new Formatter() {
+				@Override
+				public String format(LogRecord record) {
+					return (new Date(record.getMillis()) + ": " + record.getMessage());
+				}
+			});
+
+			THREAD_DUMP_LOGGER.addHandler(fileHandler);
+			THREAD_DUMP_LOGGER.setLevel(Level.ALL);
+			THREAD_DUMP_LOGGER.setUseParentHandlers(false);
+
+			StringBuilder threadDumpBuilder = new StringBuilder("All threads information:\n");
+			for (ThreadInfo threadInfo : ManagementFactory.getThreadMXBean().dumpAllThreads(true, true)) {
+				threadDumpBuilder.append(threadInfo);
+			}
+			threadDumpBuilder.append("\n===========\n\n");
+			THREAD_DUMP_LOGGER.log(Level.INFO, threadDumpBuilder.toString());
+
+			String msg = "Save thread-dump to file: " + threadDumpPath + ", size: " + threadDumpBuilder.length();
+			System.out.println(msg);
+			log.warning(msg);
+		}
+
+		private void detectThreadLocks() {
 			StringBuilder sb = new StringBuilder();
-			for (ShutdownHandlerThread shutdownHandlerThread : thlist) {
-				if (shutdownHandlerThread.getResultMessage() != null) {
-					sb.append(shutdownHandlerThread.getResultMessage());
-				}
-			}
 			ThreadMXBean thBean = ManagementFactory.getThreadMXBean();
 			sb.append("\nTotal number of threads: " + thBean.getThreadCount()).append('\n');
 			long[] tids = thBean.findDeadlockedThreads();
@@ -235,47 +265,44 @@ public class MonitorRuntime
 				System.out.println(sb.toString());
 				log.warning(sb.toString());
 			}
+		}
 
-			if (shutdownThreadDump) {
-
+		private void executeShutdownHooks() {
+			StringBuilder sb = new StringBuilder();
+			LinkedList<ShutdownHandlerThread> thlist = new LinkedList<>();
+			ThreadGroup threads = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Tigase Shutdown");
+			shutdownHooks.stream().sorted((o1, o2) -> {
+				if (o1 instanceof Bootstrap.BootstrapShutdownHook) {
+					return Integer.MAX_VALUE;
+				}
+				if (o2 instanceof Bootstrap.BootstrapShutdownHook) {
+					return Integer.MIN_VALUE;
+				}
+				return 0;
+			}).forEach(shutdownHook -> {
+				ShutdownHandlerThread thr = new ShutdownHandlerThread(threads, shutdownHook);
+				thr.start();
+				thlist.add(thr);
+			});
+			// We allow for max 20 secs for the shutdown code to run...
+			long shutdownStart = System.currentTimeMillis();
+			while (threads.activeCount() > 0 && (System.currentTimeMillis() - shutdownStart) < 20000) {
 				try {
-					// we have to configure logger here
-					Logger THREAD_DUMP_LOGGER = Logger.getLogger("ThreadDumpLogger");
-					String threadDumpPath = "logs/thread-dump.log";
-					FileHandler fileHandler = new FileHandler(threadDumpPath, 10000000, 5, true);
-					fileHandler.setLevel(Level.ALL);
-					fileHandler.setFormatter(new Formatter() {
-						@Override
-						public String format(LogRecord record) {
-							return (new Date(record.getMillis()) + ": " + record.getMessage());
-						}
-					});
-
-					THREAD_DUMP_LOGGER.addHandler(fileHandler);
-					THREAD_DUMP_LOGGER.setLevel(Level.ALL);
-					THREAD_DUMP_LOGGER.setUseParentHandlers(false);
-
-					StringBuilder threadDumpBuilder = new StringBuilder("All threads information:\n");
-					for (ThreadInfo threadInfo : ManagementFactory.getThreadMXBean().dumpAllThreads(true, true)) {
-						threadDumpBuilder.append(threadInfo);
-					}
-					threadDumpBuilder.append("\n===========\n\n");
-					THREAD_DUMP_LOGGER.log(Level.INFO, threadDumpBuilder.toString());
-
-					String msg =
-							"Save thread-dump to file: " + threadDumpPath + ", size: " + threadDumpBuilder.length();
-					System.out.println(msg);
-					log.warning(msg);
-				} catch (IOException e) {
-					System.out.println("exception while initialization");
-					e.printStackTrace();
-					log.log(Level.WARNING, "Failed creating thread dumper logger");
+					sleep(100);
+				} catch (Exception e) {
 				}
 			}
-
-			System.out.println("ShutdownThread finished...");
-			log.warning("ShutdownThread finished...");
+			for (ShutdownHandlerThread shutdownHandlerThread : thlist) {
+				if (shutdownHandlerThread.getResultMessage() != null) {
+					sb.append(shutdownHandlerThread.getResultMessage());
+				}
+			}
+			if (sb.length() > 0) {
+				System.out.println(sb.toString());
+				log.warning(sb.toString());
+			}
 		}
+
 	}
 
 	private class ShutdownHandlerThread
