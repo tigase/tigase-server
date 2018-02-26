@@ -230,6 +230,11 @@ public class ClConSQLRepository
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
 		}
+		// make sure we remove items which are gone from the database after timeout (those have last update not updated)
+		// and are not removed from in-memory cache by above query
+		if (auto_remove_obsolete_items) {
+			removeObsoloteItems(5000);
+		}
 	}
 
 	@Deprecated

@@ -155,14 +155,9 @@ public class ClConConfigRepository
 		storeItem(item);
 
 		if (auto_remove_obsolete_items) {
-			Iterator<ClusterRepoItem> iterator = iterator();
-			while (iterator.hasNext()) {
-				ClusterRepoItem next = iterator.next();
-				if ((next.getLastUpdate() > 0) &&
-						System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoReloadInterval) {
-					removeItem(next.getHostname());
-				}
-			}
+			// we remove item after 6 * autoreload * 1000, because it may happen that we loaded an item
+			// which would be removed on the next execution but it could be updated in the mean while
+			removeObsoloteItems(6000);
 		}
 
 	}
@@ -214,6 +209,17 @@ public class ClConConfigRepository
 	public void beforeUnregister() {
 		TigaseRuntime.getTigaseRuntime().removeShutdownHook(this);
 		super.beforeUnregister();
+	}
+
+	protected void removeObsoloteItems(long factor) {
+		Iterator<ClusterRepoItem> iterator = iterator();
+		while (iterator.hasNext()) {
+			ClusterRepoItem next = iterator.next();
+			if ((next.getLastUpdate() > 0) &&
+					System.currentTimeMillis() - next.getLastUpdate() > factor * autoReloadInterval) {
+				removeItem(next.getHostname());
+			}
+		}
 	}
 
 	private boolean clusterRecordValid(ClusterRepoItem item) {

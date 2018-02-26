@@ -112,6 +112,9 @@ public class ClConDirRepository
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
 		}
+		if (auto_remove_obsolete_items) {
+			removeObsoloteItems(5000);
+		}
 	}
 
 	private class DirFilter

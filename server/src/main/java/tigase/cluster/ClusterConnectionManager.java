@@ -304,6 +304,15 @@ public class ClusterConnectionManager
 
 	@Override
 	public void itemRemoved(ClusterRepoItem item) {
+		// remove and close all cluster connections to item which is now gone
+		ClusterConnection clusterConnection = connectionsPool.get(item.getHostname());
+		if (clusterConnection != null && clusterConnection.size() > 0) {
+			for (XMPPIOService service : clusterConnection.getConnections()) {
+				clusterConnection.removeConn(service);
+				// in most cases those connections should already be closed
+				service.stop();
+			}
+		}
 		sendEvent(REPO_ITEM_UPDATE_TYPE.REMOVED, item);
 	}
 
@@ -547,7 +556,11 @@ public class ClusterConnectionManager
 			ConnectionType type = service.connectionType();
 
 			if (type == ConnectionType.connect) {
-				addWaitingTask(sessionData);
+				// make sure that item exists, as in other case there is no point to reconnect
+				ClusterRepoItem item = repo.getItem(addr);
+				if (item != null) {
+					addWaitingTask(sessionData);
+				}
 			}    // end of if (type == ConnectionType.connect)
 			++totalNodeDisconnects;
 
