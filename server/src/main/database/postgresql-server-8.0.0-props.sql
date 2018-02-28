@@ -19,16 +19,6 @@
 --  Last modified by $Author: $
 --  $Date: $
 
--- QUERY START:
--- This is a dummy user who keeps all the database-properties
-do $$
-begin
-if not exists( select 1 from tig_users where user_id = 'db-properties' ) then
-    perform TigAddUserPlainPw('db-properties', NULL);
-end if;
-end$$;
--- QUERY END:
-
 select now(), ' - Setting schema version to 8.0.0';
 
 -- QUERY START:

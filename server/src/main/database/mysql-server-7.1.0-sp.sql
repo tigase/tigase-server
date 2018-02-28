@@ -31,7 +31,6 @@ drop procedure if exists TigPutDBProperty;
 drop procedure if exists TigUserLogout;
 -- QUERY END:
  
- 
 delimiter //
 
 -- QUERY START:
@@ -61,6 +60,9 @@ begin
     where (tu.sha1_user_id = sha1(lower('db-properties'))) AND (tu.uid = tp.uid)
       AND (tp.pkey = _tkey) AND (tn.node = 'root');
   else
+    if not exists (select 1 from tig_users where sha1_user_id = sha1(lower('db-properties'))) then
+        call TigAddUser('db-properties', null);
+    end if;
     insert into tig_pairs (pkey, pval, uid, nid)
           select _tkey, _tval, tu.uid, tn.nid from tig_users tu left join tig_nodes tn on tn.uid=tu.uid
         where (tu.sha1_user_id = sha1(lower('db-properties')) and tn.node='root');

@@ -248,7 +248,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public Result loadCommonSchema() {
 		return loadSchema(
 				new SchemaManager.SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", true, Collections.emptyList()),
-				"0.0.1");
+				"0.0.2");
 	}
 
 	public abstract Result loadSchema(SchemaManager.SchemaInfo schemaInfo, String version);

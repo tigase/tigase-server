@@ -523,6 +523,15 @@ public class StoredProcedures {
 				ps.setString(2, key);
 				result = ps.executeUpdate();
 			} else {
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery("select uid from tig_users where lower(user_id) = lower('db-properties')");
+				if (!rs.next()) {
+					rs.close();
+					tigAddUser("db-properties", null, new ResultSet[1]);
+				} else {
+					rs.close();
+				}
+
 				PreparedStatement ps = conn.prepareStatement(
 						"insert into tig_pairs (pkey, pval, uid, nid) select ?, ?, tu.uid, tn.nid from tig_users tu left join tig_nodes tn on tn.uid=tu.uid where (user_id = 'db-properties' and tn.node='root' ) ");
 

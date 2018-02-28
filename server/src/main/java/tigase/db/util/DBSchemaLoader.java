@@ -233,8 +233,8 @@ public class DBSchemaLoader
 		boolean isCurrentFinal =
 				currentVersion.isPresent() && Version.TYPE.FINAL.equals(currentVersion.get().getVersionType());
 
-		boolean startInclusive = !isCurrentFinal || !isRequiredFinal;
-		boolean endInclusive = !isCurrentFinal || !isRequiredFinal;
+		boolean startInclusive = !isCurrentFinal;// || !isRequiredFinal;
+		boolean endInclusive = true; //isCurrentFinal;// || !isRequiredFinal;
 
 		return paths.entrySet()
 				.stream()
@@ -592,7 +592,7 @@ public class DBSchemaLoader
 		//   was yet defined to perform any update
 		// * version was set and the update was correctly performed
 		if (!currentVersion.isPresent() && Result.skipped.equals(result) || Result.ok.equals(result)) {
-			Version build = requiredVersion.getBaseVersion();
+			Version build = new Version.Builder(requiredVersion).setCommit(null).build();
 			setComponentVersion(schema.getId(), build.toString() );
 		}
 		if (Result.skipped.equals(result)) {

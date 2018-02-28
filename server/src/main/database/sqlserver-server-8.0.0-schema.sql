@@ -17,8 +17,6 @@
 --
 -- Database stored procedures and functions for Tigase schema version 7.2.0
 
--- LOAD FILE: database/sqlserver-server-7.1.0-schema.sql
-
 -- QUERY START:
 SET QUOTED_IDENTIFIER ON
 -- QUERY END:

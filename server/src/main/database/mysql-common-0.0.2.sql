@@ -1,6 +1,6 @@
 --
 --  Tigase Jabber/XMPP Server
---  Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+--  Copyright (C) 2004-2018 "Tigase, Inc." <office@tigase.com>
 --
 --  This program is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU Affero General Public License as published by
@@ -15,14 +15,16 @@
 --  along with this program. Look for COPYING file in the top folder.
 --  If not, see http://www.gnu.org/licenses/.
 --
---
 
-select NOW(), ' - Setting schema version to 8.0.0';
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '8.0.0');
--- QUERY END:
-
--- QUERY START:
-call TigSetComponentVersion('server', '8.0.0');
+update tig_schema_versions
+set version = concat(version, '-SNAPSHOT')
+where exists (
+    select 1
+    from (select * from tig_schema_versions) sv
+    where
+        sv.component = 'common'
+        and sv.version = '0.0.1'
+) and version not like '%-SNAPSHOT%';
 -- QUERY END:

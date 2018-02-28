@@ -45,7 +45,7 @@ CREATE procedure TigInitdb()
 -- QUERY END:
 
 -- QUERY START:
-CREATE procedure TigAddUser(userId varchar(2049), userPw varchar(255)) 
+CREATE procedure TigAddUser(userId varchar(2049), userPw varchar(255))
 	PARAMETER STYLE JAVA
 	LANGUAGE JAVA
 	MODIFIES SQL DATA

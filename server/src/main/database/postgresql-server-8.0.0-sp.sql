@@ -537,3 +537,31 @@ begin
 end;
 $$ language 'plpgsql';
 -- QUERY END:
+
+-- QUERY START:
+-- Database properties set - procedure
+create or replace function TigPutDBProperty(varchar(255), text) returns void as '
+declare
+  _tkey alias for $1;
+  _tval alias for $2;
+begin
+  if exists( select pval from tig_pairs, tig_users where
+		(lower(user_id) = lower(''db-properties'')) AND (tig_users.uid = tig_pairs.uid)
+		AND (pkey = _tkey))
+  then
+	  update tig_pairs set pval = _tval from tig_users
+      where (lower(tig_users.user_id) = lower(''db-properties''))
+        AND (tig_users.uid = tig_pairs.uid)
+        AND (pkey = _tkey);
+  else
+    if not exists( select 1 from tig_users where user_id = ''db-properties'' ) then
+      perform TigAddUserPlainPw(''db-properties'', NULL);
+    end if;
+    insert into tig_pairs (pkey, pval, uid, nid)
+		  select _tkey, _tval, tu.uid, tn.nid from tig_users tu  left join tig_nodes tn on tn.uid=tu.uid
+			  where (lower(user_id) = lower(''db-properties'')  and tn.node=''root'' );
+  end if;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+-- QUERY END:

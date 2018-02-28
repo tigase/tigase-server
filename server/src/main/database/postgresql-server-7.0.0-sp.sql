@@ -76,6 +76,9 @@ begin
         AND (tig_users.uid = tig_pairs.uid)
         AND (pkey = _tkey);
   else
+    if not exists( select 1 from tig_users where user_id = ''db-properties'' ) then
+        perform TigAddUserPlainPw(''db-properties'', NULL);
+    end if;
     insert into tig_pairs (pkey, pval, uid)
 		  select _tkey, _tval, uid from tig_users
 			  where (lower(user_id) = lower(''db-properties''));

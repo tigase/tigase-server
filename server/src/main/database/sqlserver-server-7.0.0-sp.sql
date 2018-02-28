@@ -239,6 +239,9 @@ create procedure dbo.TigPutDBProperty
 			end
 		else
 			begin
+    			if not exists (select 1 from tig_users where user_id = 'db-properties')
+                    exec dbo.TigAddUserPlainPw 'db-properties', NULL;
+
 				select @_nid = dbo.tig_pairs.nid, @_uid = dbo.tig_pairs.uid from dbo.tig_pairs, dbo.tig_users
 					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (dbo.tig_users.uid = dbo.tig_pairs.uid)  AND (pkey = @_tkey);

@@ -130,6 +130,9 @@ begin
     where (sha1_user_id = sha1(lower('db-properties'))) AND (tig_users.uid = tig_pairs.uid)
       AND (pkey = _tkey);
   else
+    if not exists (select 1 from tig_users where sha1_user_id = sha1(lower('db-properties'))) then
+        call TigAddUser('db-properties', null);
+    end if;
     insert into tig_pairs (pkey, pval, uid)
       select _tkey, _tval, uid from tig_users
         where (sha1_user_id = sha1(lower('db-properties')));

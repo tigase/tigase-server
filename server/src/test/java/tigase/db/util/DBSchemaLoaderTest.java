@@ -90,7 +90,7 @@ public class DBSchemaLoaderTest {
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 
 		Assert.assertEquals("Should contain only latest version (same as required)",
-		                    result.keySet(), new TreeSet<>(Arrays.asList(Version.of("4.0.0"))));
+		                    result.keySet(), new TreeSet<>(Arrays.asList()));
 	}
 
 	@Test

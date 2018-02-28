@@ -17,11 +17,6 @@
 --
 --
 
--- This is a dummy user who keeps all the database-properties
--- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
--- QUERY END:
-
 -- QUERY START:
 call TigPutDBProperty('schema-version', '8.0.0');
 -- QUERY END:
