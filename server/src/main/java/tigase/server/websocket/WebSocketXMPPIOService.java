@@ -364,12 +364,23 @@ public class WebSocketXMPPIOService<RefObject>
 		HashMap<String, String> headers = new HashMap<String, String>();
 		int i = parseHttpHeaders(buf, headers);
 
-		if (!headers.containsKey(CONNECTION_KEY) || !"Upgrade".equalsIgnoreCase(headers.get(CONNECTION_KEY).trim())) {
-			writeRawData(BAD_REQUEST);
+		String connectionHeader = headers.get(CONNECTION_KEY);
+		if (connectionHeader != null) {
+			String[] values = connectionHeader.split(",");
+			boolean contains = false;
+			for (String value : values) {
+				contains |= "Upgrade".equalsIgnoreCase(value.trim());
+				if (contains) {
+					break;
+				}
+			}
+			if (!contains) {
+				writeRawData(BAD_REQUEST);
 
-			dumpHeaders(headers);
-			forceStop();
-			return;
+				dumpHeaders(headers);
+				forceStop();
+				return;
+			}
 		}
 		if (!headers.containsKey(WebSocketProtocolIfc.WS_PROTOCOL_KEY) ||
 				!headers.get(WebSocketProtocolIfc.WS_PROTOCOL_KEY).contains("xmpp")) {
