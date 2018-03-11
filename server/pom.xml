@@ -149,10 +149,10 @@
                             <value>src/test/resources/logging.properties</value>
                         </property>
                     </systemProperties>
-                    <environmentVariables>
+                    <systemPropertyVariables>
                         <project.target>${project.build.outputDirectory}</project.target>
                         <project.version>${project.version}</project.version>
-                    </environmentVariables>
+                    </systemPropertyVariables>
                     <dependenciesToScan>
                         <dependency>tigase:tigase-utils</dependency>
                     </dependenciesToScan>
