@@ -9,11 +9,11 @@
 
 *Default value:* `ALL`
 
-*Example:* `'domain-filter-policy' = 'LOCAL'`
+*Example:* `domain-filter-policy' = 'LOCAL`
 
 *Possible values:* `ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2`
 
-*Description:* The `domain-filter-policy`property is a global setting for setting communication filtering for vhosts. This function is kind of an extension of the same property which could be set on a single user level. However, in many cases it is desired to control users communication not on per user-level but on the domain level. Domain filtering (communication filtering) allows you to specify with whom users can communicate for a particular domain. It enables restriction of communications for a selected domain or for the entire installation. A default value `ALL` renders users for the domain (by default for all domains) able to communicate with any user on any other domains. Other possible values are:
+*Description:* The `domain-filter-policy` property is a global setting for setting communication filtering for vhosts. This function is kind of an extension of the same property which could be set on a single user level. However, in many cases it is desired to control users communication not on per user-level but on the domain level. Domain filtering (communication filtering) allows you to specify with whom users can communicate for a particular domain. It enables restriction of communications for a selected domain or for the entire installation. A default value `ALL` renders users for the domain (by default for all domains) able to communicate with any user on any other domains. Other possible values are:
 
 . `ALL` a default value allowing users to communicate with anybody on any other domain, including external servers.
 . `LOCAL` allows users to communicate with all users on the same installation on any domain. It only blocks communication with external servers.
