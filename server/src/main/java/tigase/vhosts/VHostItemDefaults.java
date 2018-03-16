@@ -22,6 +22,7 @@ package tigase.vhosts;
 
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.util.StringUtilities;
 import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xmpp.jid.JID;
 
@@ -39,8 +40,10 @@ public class VHostItemDefaults {
 	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
 	@ConfigField(desc = "Check DNS for domain", alias = "vhost-disable-dns-check")
 	private boolean disableDnsCheck = false;
-	@ConfigField(desc = "Domain filter policy", alias = DOMAIN_FILTER_POLICY_PROP_KEY)
 	private DomainFilterPolicy domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
+	private String[] domainFilterDomains = null;
+	@ConfigField(desc = "Domain filter policy", alias = DOMAIN_FILTER_POLICY_PROP_KEY)
+	private String domainFilterStr = null;
 	@ConfigField(desc = "Hardened mode", alias = "hardened-mode")
 	private boolean hardenedMode = false;
 	@ConfigField(desc = "Maximal number of users", alias = VHOST_MAX_USERS_PROP_KEY)
@@ -58,6 +61,14 @@ public class VHostItemDefaults {
 	@ConfigField(desc = "Global trusted jids", alias = "trusted")
 	private ConcurrentSkipListSet<String> trusted = null;
 
+	public DomainFilterPolicy getDomainFilter() {
+		return domainFilter;
+	}
+
+	public String[] getDomainFilterDomains() {
+		return domainFilterDomains;
+	}
+
 	public long getMaxUsersNumber() {
 		return maxUsersNumber;
 	}
@@ -70,28 +81,16 @@ public class VHostItemDefaults {
 		return presenceForward;
 	}
 
-	public boolean isTlsRequired() {
-		return tlsRequired;
-	}
-
 	public String getS2sSecret() {
 		return s2sSecret;
 	}
 
-	public boolean isRegisterEnabled() {
-		return registerEnabled;
-	}
-
-	public DomainFilterPolicy getDomainFilter() {
-		return domainFilter;
+	public ConcurrentSkipListSet<String> getTrusted() {
+		return trusted;
 	}
 
 	public boolean isAnonymousEnabled() {
 		return anonymousEnabled;
-	}
-
-	public ConcurrentSkipListSet<String> getTrusted() {
-		return trusted;
 	}
 
 	public boolean isCheckDns() {
@@ -100,5 +99,18 @@ public class VHostItemDefaults {
 
 	public boolean isHardenedMode() {
 		return hardenedMode;
+	}
+
+	public boolean isRegisterEnabled() {
+		return registerEnabled;
+	}
+
+	public boolean isTlsRequired() {
+		return tlsRequired;
+	}
+
+	public void setDomainFilterStr(String value) {
+		domainFilter = getPolicyFromConfString(value);
+		domainFilterDomains = getDomainsFromConfString(value);
 	}
 }

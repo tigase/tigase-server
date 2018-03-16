@@ -194,6 +194,33 @@ public class VHostItem
 	private VHostItem unmodifiableItem = null;
 	private JID vhost = null;
 
+	static DomainFilterPolicy getPolicyFromConfString(String configuration) {
+		String[] df = configuration.split("=");
+
+		try {
+			if (df.length == 1 || df.length == 2) {
+				return DomainFilterPolicy.valueof(df[0]);
+			} else {
+				return DomainFilterPolicy.ALL;
+			}
+		} catch (Exception e) {
+			return DomainFilterPolicy.ALL;
+		}
+	}
+
+	static String[] getDomainsFromConfString(String configuration) {
+		String[] df = configuration.split("=");
+
+		try {
+			if (df.length == 2 && df[1] != null && !df[1].trim().isEmpty()) {
+				return StringUtilities.stringToArrayOfString(df[1], ";");
+			}
+		} catch (Exception e) {
+			// just return default for non-existing configuration
+		}
+		return new String[0];
+	}
+
 	public static void registerData(List<DataType> types) {
 		for (DataType type : types) {
 			dataTypes.put(type.getKey(), type);
@@ -345,8 +372,7 @@ public class VHostItem
 			domainFilter = DomainFilterPolicy.valueof(tmp);
 			if (domainFilter == null) {
 				domainFilter = defaults.getDomainFilter();
-			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST ||
-					domainFilter == DomainFilterPolicy.CUSTOM) {
+			} else if (domainFilter.isDomainListRequired()) {
 				tmp = Command.getFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL);
 				if (tmp != null && !tmp.trim().isEmpty()) {
 					domainFilterDomains = StringUtilities.stringToArrayOfString(tmp, ";");
@@ -433,8 +459,7 @@ public class VHostItem
 			domainFilter = DomainFilterPolicy.valueof(elem.getAttributeStaticStr(DOMAIN_FILTER_POLICY_ATT));
 			if (domainFilter == null) {
 				domainFilter = defaults.getDomainFilter();
-			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST ||
-					domainFilter == DomainFilterPolicy.CUSTOM) {
+			} else if (domainFilter.isDomainListRequired()) {
 				String tmp = elem.getAttributeStaticStr(DOMAIN_FILTER_POLICY_DOMAINS_ATT);
 				if (tmp != null && !tmp.trim().isEmpty()) {
 					domainFilterDomains = StringUtilities.stringToArrayOfString(tmp, ";");
@@ -542,23 +567,12 @@ public class VHostItem
 				}
 			}
 			if (tmp.startsWith(DOMAIN_FILTER_POLICY_ATT)) {
-				String[] df = tmp.split("=");
-				String[] domains;
-
-				try {
-					if (df.length == 2) {
-						domainFilter = DomainFilterPolicy.valueof(df[1]);
-					} else if (df.length == 3) {
-						domainFilter = DomainFilterPolicy.valueof(df[1]);
-						if (df[2] != null && !df[2].trim().isEmpty()) {
-							domainFilterDomains = StringUtilities.stringToArrayOfString(df[2], ";");
-						}
+				domainFilter = getPolicyFromConfString(tmp);
+				if (domainFilter == null) {
+					domainFilter = defaults.getDomainFilter();
+					if (domainFilter.isDomainListRequired()) {
+						domainFilterDomains = defaults.getDomainFilterDomains();
 					}
-					if (domainFilter == null) {
-						domainFilter = defaults.getDomainFilter();
-					}
-				} catch (Exception e) {
-					domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
 				}
 			}
 			if (tmp.startsWith(MAX_USERS_NUMBER_ATT)) {
@@ -1147,6 +1161,7 @@ public class VHostItem
 		s2sSecret = vhostDefaults.getS2sSecret();
 		registerEnabled = vhostDefaults.isRegisterEnabled();
 		domainFilter = vhostDefaults.getDomainFilter();
+		domainFilterDomains = vhostDefaults.getDomainFilterDomains();
 		anonymousEnabled = vhostDefaults.isAnonymousEnabled();
 
 		if (s2sSecret == null) {
