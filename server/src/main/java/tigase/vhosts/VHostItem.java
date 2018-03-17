@@ -198,8 +198,8 @@ public class VHostItem
 		String[] df = configuration.split("=");
 
 		try {
-			if (df.length == 1 || df.length == 2) {
-				return DomainFilterPolicy.valueof(df[0]);
+			if (df.length >= 2) {
+				return DomainFilterPolicy.valueof(df[1]);
 			} else {
 				return DomainFilterPolicy.ALL;
 			}
@@ -212,8 +212,8 @@ public class VHostItem
 		String[] df = configuration.split("=");
 
 		try {
-			if (df.length == 2 && df[1] != null && !df[1].trim().isEmpty()) {
-				return StringUtilities.stringToArrayOfString(df[1], ";");
+			if (df.length >= 3 && df[2] != null && !df[2].trim().isEmpty()) {
+				return StringUtilities.stringToArrayOfString(df[2], ";");
 			}
 		} catch (Exception e) {
 			// just return default for non-existing configuration
@@ -573,6 +573,8 @@ public class VHostItem
 					if (domainFilter.isDomainListRequired()) {
 						domainFilterDomains = defaults.getDomainFilterDomains();
 					}
+				} else if (domainFilter.isDomainListRequired()) {
+					domainFilterDomains = getDomainsFromConfString(tmp);
 				}
 			}
 			if (tmp.startsWith(MAX_USERS_NUMBER_ATT)) {
