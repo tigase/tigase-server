@@ -37,4 +37,4 @@ All related configuration options:
 - watchdog_delay
 - xref:watchdog_Timeout[watchdog_timeout]
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

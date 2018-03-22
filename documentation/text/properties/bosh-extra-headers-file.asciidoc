@@ -27,4 +27,4 @@ Access-Control-Max-Age: 86400
 
 This can be modified, removed or replaced with a different content on your installation.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

@@ -34,4 +34,4 @@ This replaces the --cluster-connect-all property.
 
 
 
-Available Since: v7.2.0
+*Available since:* 8.0.0

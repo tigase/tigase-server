@@ -15,4 +15,4 @@
 
 *Description:* The `trusted` property allows users to specify a list of accounts which are considered as trusted, thus whom can perform some specific actions on the server. They can execute some commands, send a broadcast message, set MOTD and so on. The configuration is similar to xref:admins[`admins`] setting.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

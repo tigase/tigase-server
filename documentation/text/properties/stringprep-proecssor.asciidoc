@@ -21,4 +21,4 @@ Other possible values are:
 
 *Possible values:* `simple|libidn|empty`
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

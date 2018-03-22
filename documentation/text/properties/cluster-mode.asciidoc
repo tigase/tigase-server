@@ -16,4 +16,4 @@ You can run the server in the cluster mode even if there is only one node runnin
 
 *Possible values:* `true|false`
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

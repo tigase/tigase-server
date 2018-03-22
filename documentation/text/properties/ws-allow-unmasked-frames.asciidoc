@@ -16,4 +16,4 @@
 
 *Description:* RFC 6455 specifies that all clients must mask frames that it sends to the server over Websocket connections.  If unmasked frames are sent, regardless of any encryption, the server must close the connection.  Some clients however, may not support masking frames, or you may wish to bypass this security measure for development purposes. This setting, when enabled true, will allow connections over websocket to be unmasked to the server, and may operate without Tigase closing that connection.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

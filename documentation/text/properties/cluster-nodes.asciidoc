@@ -20,4 +20,4 @@ All cluster nodes must be connected with each other to maintain user session syn
 
 NOTE: Cluster nodes are not required to be configured, as they can automatically find/add/remove cluster nodes.  This is for installations where nodes will be limited and static!
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

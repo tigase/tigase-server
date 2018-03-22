@@ -28,4 +28,4 @@ This may be used on a per-vhost basis
 'virtual-hosts' = [ 'domain3:vhost-presence-forward-jid = presence-collector@domain.com' ]
 -----
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

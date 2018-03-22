@@ -137,4 +137,4 @@ stats {
 }
 -----
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

@@ -23,4 +23,4 @@
 
 *Description:* Allows you to specify a load balancing mechanism by specifying SeeOtherHostIfc implementation. More details about functionality and implementation details can be found in Tigase Load Balancing documentation.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

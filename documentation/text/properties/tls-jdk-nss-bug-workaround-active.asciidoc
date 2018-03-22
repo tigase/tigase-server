@@ -22,4 +22,4 @@ This caused a number of problems with Tigase installed on systems with JDK7 and 
 
 Note, while this setting is still supported, the issues mentioned above are fixed in v8 JDK.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

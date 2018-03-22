@@ -81,4 +81,4 @@ Typically if a bean is called, it is automatically active.  Session manager plug
 
 *Possible values:* DSL format plugins list and configurations.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

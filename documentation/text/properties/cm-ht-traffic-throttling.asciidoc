@@ -15,4 +15,4 @@
 
 *Description:* This property is used to specify traffic limit of non-user connections, that is s2s, external components and other high traffic server connections. The meaning of the property and values encoded are in the same way as for the xref:cmTrafficThrottling[cm-traffic-throttling property].
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

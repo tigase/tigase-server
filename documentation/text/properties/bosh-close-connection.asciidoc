@@ -17,4 +17,4 @@
 
 This setting is rarely required but on installations where the client cannot control/disable keep-alive Bosh connections and keep-alive does not work correctly for some reason.
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0

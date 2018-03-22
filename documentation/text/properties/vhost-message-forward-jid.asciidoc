@@ -26,4 +26,4 @@ This is a global property which is overridden by settings for particular vhost.
 'virtual-hosts' = [ 'domain3:vhost-message-forward-jid = archive@domain.com' ]
 -----
 
-*Available since:* 7.2.0
+*Available since:* 8.0.0
