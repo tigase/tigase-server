@@ -31,6 +31,7 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +59,9 @@ public class SetupHelper {
 		if (clusterMode) {
 			builder.with("cluster-mode", "true");
 		}
-		builder.with("virtual-hosts", Arrays.asList(virtualDomains))
+		builder.with("virtual-hosts", Arrays.asList(virtualDomains)
+				.stream()
+				.collect(Collectors.toMap(Function.identity(), it -> new HashMap())))
 				.with("admins", admins)
 				.with("debug", Arrays.asList("server"));
 
@@ -96,7 +99,7 @@ public class SetupHelper {
 			if (optionalComponents.contains(def.getName())) {
 				return def.isActive() == false || (ct != null && !Arrays.asList(ct.value()).contains(configType)) ||
 						(forceEnabledComponentsOptions.isPresent() &&
-								forceEnabledComponentsOptions.get().contains(def.getName()));
+								forceEnabledComponentsOptions.get().contains(def.getName())) || ("http".equals(def.getName()) && httpSecurity.isPresent());
 			} else {
 				return def.isActive() == true && (ct != null && Arrays.asList(ct.value()).contains(configType));
 			}
@@ -109,14 +112,19 @@ public class SetupHelper {
 						.clazz((ct != null && !Arrays.asList(ct.value()).contains(configType)) ? def.getClazz() : null);
 				if ("http".equals(def.getName())) {
 					httpSecurity.ifPresent(sec -> {
+						Map<String, Object> val = new HashMap<>();
 						switch (sec.restApiSecurity) {
 							case forbidden:
 								break;
 							case api_keys:
-								b.with("api-keys", sec.restApiKeys);
+								Arrays.asList(sec.restApiKeys).forEach(k -> {
+									val.put(k, new HashMap<>());
+								});
+								b.with("api-keys", val);
 								break;
 							case open_access:
-								b.with("api-keys", "open_access");
+								val.put("open_access", new HashMap<>());
+								b.with("api-keys", val);
 						}
 						if (sec.setupUser != null && !sec.setupUser.isEmpty() && sec.setupPassword != null &&
 								!sec.setupPassword.isEmpty()) {

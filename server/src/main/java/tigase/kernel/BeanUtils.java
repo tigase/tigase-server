@@ -23,9 +23,7 @@ package tigase.kernel;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +59,7 @@ public class BeanUtils {
 		return null;
 	}
 
-	public static Class getGetterSetterMethodsParameterType(Field f) {
+	public static Type getGetterSetterMethodsParameterType(Field f) {
 		Method getter = prepareGetterMethod(f);
 		if (getter == null) {
 			return null;
@@ -69,7 +67,7 @@ public class BeanUtils {
 		Class rt = getter.getReturnType();
 		Method setter = prepareSetterMethod(f, rt);
 
-		return (setter == null) ? null : rt;
+		return (setter == null) ? null : getter.getGenericReturnType();
 	}
 
 	public static Object getValue(Object fromBean, Field field)

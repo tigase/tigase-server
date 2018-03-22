@@ -68,7 +68,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 					items[i] = items[i].trim();
 				}
 			}
-			this.setItems(items);
+			this.setItemsOld(items);
 		}
 	}
 
@@ -120,7 +120,15 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	public abstract String getConfigKey();
 
-	public abstract String[] getDefaultPropetyItems();
+	public Item[] getDefaultItems() {
+		return null;
+	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	public String[] getDefaultPropetyItems() {
+		return null;
+	}
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
@@ -196,15 +204,43 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		return items.get(key);
 	}
 
-	public String[] getItems() {
+	public Map<String, Map<String,Object>> getItems() {
+		Map<String, Map<String, Object>> map = new HashMap<>();
+		items.forEach((k,v) -> map.put(k, v.toMap()));
+		return map;
+	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	public String[] getItemsOld() {
 		List<String> itemsStrs = new ArrayList<>();
 		for (Item item : items.values()) {
 			itemsStrs.add(item.toPropertyString());
 		}
 		return itemsStrs.toArray(new String[itemsStrs.size()]);
 	}
+	
+	public void setItems(Map<String, Map<String, Object>> items) {
+		if (items != null) {
+			items.forEach((k,v) -> {
+				log.log(Level.CONFIG, "Loading config item: {0}", k);
 
-	public void setItems(String[] items_arr) {
+				Item item = getItemInstance();
+
+				item.initFromMap(k, v);
+				if (!items.containsKey(item.getKey())) {
+					addItem(item);
+					log.log(Level.CONFIG, "Loaded config item: {0}", item);
+				} else {
+					log.log(Level.CONFIG, "Config item already loaded, skipping: {0}", item);
+				}
+						  });
+		}
+	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	public void setItemsOld(String[] items_arr) {
 		if (items_arr != null) {
 			for (String it : items_arr) {
 				log.log(Level.CONFIG, "Loading config item: {0}", it);
@@ -253,7 +289,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		String[] items_arr = (String[]) properties.get(getConfigKey());
 
 		if ((items_arr != null) && (items_arr.length > 0)) {
-			setItems(items_arr);
+			setItemsOld(items_arr);
 		} else {
 			log.warning("Items list is not set in the configuration file!!");
 		}
@@ -282,7 +318,12 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	public void initialize() {
 		this.initialized = true;
 		if (items.isEmpty()) {
-			setItems(getDefaultPropetyItems());
+			String[] itemsStr = getDefaultPropetyItems();
+			if (itemsStr != null) {
+				setItemsOld(itemsStr);
+			} else {
+				Optional.ofNullable(getDefaultItems()).ifPresent(items -> Arrays.stream(items).forEach(this::addItem));
+			}
 		} else {
 			store();
 		}

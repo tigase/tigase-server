@@ -272,22 +272,27 @@ public class DefaultTypesConverter
 				// this is additional support for convertion to type of Map, however value needs to be instance of Map
 				// Added mainly for BeanConfigurators to be able to configure Map fields
 				int mod = expectedType.getModifiers();
+				Map result = null;
 				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod)) {
-					ParameterizedType pt = (ParameterizedType) genericType;
-					Type[] actualTypes = pt.getActualTypeArguments();
 					try {
-						Map result = (Map) expectedType.newInstance();
-						for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
-							Object k = convert(unescape(e.getKey()), actualTypes[0]);
-							Object v = e.getValue() instanceof String
-									   ? convert(unescape((String) e.getValue()), actualTypes[1])
-									   : convert(e.getValue(), actualTypes[1]);
-							result.put(k, v);
-						}
-						return (T) result;
+						result = (Map) expectedType.newInstance();
 					} catch (InstantiationException | IllegalAccessException ex) {
 						throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
 					}
+				} else if (value instanceof Map) {
+					result = new HashMap<>();
+				}
+				if (result != null) {
+					ParameterizedType pt = (ParameterizedType) genericType;
+					Type[] actualTypes = pt.getActualTypeArguments();
+					for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
+						Object k = convert(unescape(e.getKey()), actualTypes[0]);
+						Object v = e.getValue() instanceof String
+								   ? convert(unescape((String) e.getValue()), actualTypes[1])
+								   : convert(e.getValue(), actualTypes[1]);
+						result.put(k, v);
+					}
+					return (T) result;
 				}
 			} else {
 				// here we try to assign instances of class passed as paramter if possible

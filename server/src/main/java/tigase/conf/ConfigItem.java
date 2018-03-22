@@ -151,6 +151,10 @@ public class ConfigItem
 		return ((compName != null) ? compName + "/" : "") + ((nodeName != null) ? nodeName + "/" : "") + keyName;
 	}
 
+	protected void setKey(String key) {
+		// nothing to do..
+	}
+
 	/**
 	 * Returns a property key which is constructed in a following way: {@code keyName}
 	 */

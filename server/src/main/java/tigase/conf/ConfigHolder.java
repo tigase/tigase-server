@@ -27,6 +27,8 @@ import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.ConnectionManager;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.bosh.BoshConnectionManager;
+import tigase.server.ext.CompRepoItem;
+import tigase.server.ext.ComponentProtocol;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.server.xmppsession.SessionManagerConfig;
 import tigase.sys.TigaseRuntime;
@@ -37,6 +39,7 @@ import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
 import tigase.util.workqueue.NonpriorityQueue;
 import tigase.util.workqueue.PriorityQueueAbstract;
+import tigase.vhosts.VHostItem;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -50,6 +53,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -199,6 +203,9 @@ public class ConfigHolder {
 		props.remove("--config-file");
 		renameIfExists(props, "--cluster-mode", "cluster-mode", Function.identity());
 		renameIfExists(props, Configurable.GEN_VIRT_HOSTS, "virtual-hosts", ConfigHolder::convertToListOfStringsIfString);
+		if (!(props.get("virtual-hosts") instanceof Map)) {
+			renameIfExists(props, "virtual-hosts", "virtual-hosts", ConfigHolder::convertVHostsToMap);
+		}
 		renameIfExists(props, Configurable.GEN_DEBUG, "debug", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, Configurable.GEN_DEBUG_PACKAGES, "debug-packages", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--packet.debug.full", "logging/packet-debug-full", Function.identity());
@@ -434,6 +441,65 @@ public class ConfigHolder {
 			putIfAbsent(props, "http/api-keys", stringToListOfStrings(value.toString()));
 		});
 
+		BiFunction<String, Object, Object> convertHttpApiKeys = (X, http) -> {
+			if (http instanceof List) {
+				Map<String, Object> results = new HashMap<>();
+				((List<String>) http).stream().forEach(itemStr -> {
+					String[] parts = itemStr.split(":");
+					String key = parts[0];
+					Map<String, Object> values = new HashMap<>();
+					for (String part : parts) {
+						if (part.startsWith("domain")) {
+							values.put("domains", Arrays.asList(part.substring("domain=".length()).split(";")));
+						}
+						if (part.startsWith("regex")) {
+							values.put("regexs", Arrays.asList(part.substring("regex=".length()).split(";")));
+						}
+					}
+					results.put(key, values);
+				});
+				return results;
+			}
+			return http;
+		};
+
+		props.computeIfPresent("http", (k, v) -> {
+			if (v instanceof Map) {
+				((Map<String, Object>) v).computeIfPresent("api-keys", convertHttpApiKeys);
+				((Map<String, Object>) v).computeIfPresent("rest", (k1, v1) -> {
+					if (v1 instanceof Map) {
+						((Map<String, Object>) v1).computeIfPresent("api-keys", convertHttpApiKeys);
+					}
+					return  v1;
+				});
+			}
+			return v;
+		});
+
+		props.values()
+				.stream()
+				.filter(it -> it instanceof AbstractBeanConfigurator.BeanDefinition)
+				.map(it -> (AbstractBeanConfigurator.BeanDefinition) it)
+				.filter(it -> ComponentProtocol.class.getName().equals(it.getClazzName())).forEach(it -> {
+					it.computeIfPresent("repository", (k,v) -> {
+						if (v instanceof Map) {
+							((Map)v).computeIfPresent("items", (k1,v1) -> {
+								if (v1 instanceof List) {
+									Map<String, Object> results = new HashMap<>();
+									((List<String>)v1).forEach(str -> {
+										CompRepoItem item = new CompRepoItem();
+										item.initFromPropertyString(str);
+										results.put(item.getKey(), item.toMap());
+									});
+									return results;
+								}
+								return v1;
+							});
+						}
+						return v;
+					});
+		});
+
 		String after = props.toString();
 		return !before.equals(after);
 	}
@@ -529,6 +595,16 @@ public class ConfigHolder {
 
 	private static List<String> stringToListOfStrings(String val) {
 		return stringToStreamOfStrings(val).collect(Collectors.toList());
+	}
+
+	private static Object convertVHostsToMap(Object val) {
+		return ((List<String>) ((val instanceof String) ? convertToListOfStringsIfString(val) : val)).stream()
+				.map(str -> {
+					VHostItem item = new VHostItem();
+					item.initFromPropertyString(str);
+					return item;
+				})
+				.collect(Collectors.toMap(VHostItem::getKey, VHostItem::toMap));
 	}
 
 	private static Object convertToListOfStringsIfString(Object val) {

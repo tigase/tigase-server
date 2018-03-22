@@ -21,6 +21,7 @@
 package tigase.server.ext;
 
 import tigase.db.comp.RepositoryItemAbstract;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.Command;
@@ -83,17 +84,25 @@ public class CompRepoItem
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------
+	@ConfigField(desc = DOMAIN_PASS_LABEL, alias = "password")
 	private String auth_pass = null;
 
 	// "accept:muc.domain.tld:5277:user:passwd"
 	private String domain = null;
+	@ConfigField(desc = LB_CLASS_LABEL, alias = LB_NAME_ATTR)
 	private LoadBalancerIfc lb = DEF_LB_CLASS;
+	@ConfigField(desc = PORT_NO_LABEL, alias = PORT_NO_ATTR)
 	private int port = -1;
+	@ConfigField(desc = PROTO_XMLNS_LABEL, alias = PROTO_XMLNS_ATTR)
 	private String prop_xmlns = null;
+	@ConfigField(desc = REMOTE_HOST_LABEL, alias = REMOTE_HOST_ATTR)
 	private String remoteHost = null;
+	@ConfigField(desc = ROUTINGS_LABEL, alias = ROUTINGS_ATTR)
 	private String[] routings = null;
+	@ConfigField(desc = CONNECTION_TYPE_LABEL, alias = CONN_TYPE_ATTR)
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns = null;
+	@ConfigField(desc = SOCKET_LABEL, alias = SOCKET_ATTR)
 	private SocketType socket  = SocketType.plain;
 
 	@Override
@@ -129,6 +138,19 @@ public class CompRepoItem
 		return lb;
 	}
 
+	public String getLb() {
+		if (lb != null) {
+			return lb.getClass().getCanonicalName();
+		}
+		return null;
+	}
+
+	public void setLb(String clazz) {
+		if (clazz != null) {
+			lb = lbInstance(clazz);
+		}
+	}
+
 	public String getDomain() {
 		return domain;
 	}
@@ -146,6 +168,11 @@ public class CompRepoItem
 	@Override
 	public String getKey() {
 		return domain;
+	}
+
+	@Override
+	protected void setKey(String key) {
+		setDomain(key);
 	}
 
 	public int getPort() {

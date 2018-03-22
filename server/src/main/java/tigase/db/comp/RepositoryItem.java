@@ -20,8 +20,11 @@
 
 package tigase.db.comp;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.Packet;
 import tigase.xml.Element;
+
+import java.util.Map;
 
 /**
  * The interface defines a contract for a repository item handled by ComponentRepository implementation. Created: Oct 3,
@@ -109,7 +112,11 @@ public interface RepositoryItem {
 	 *
 	 * @param propString is a property string to initialize the RepositoryItem.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
 	void initFromPropertyString(String propString);
+
+	void initFromMap(String key, Map<String, Object> props);
 
 	/**
 	 * The method checks whether the given id is one of the administrators set for the Item.
@@ -147,6 +154,10 @@ public interface RepositoryItem {
 	 *
 	 * @return a property string representing the repository item in a simplified form.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
 	String toPropertyString();
+
+	Map<String, Object> toMap();
 }
 

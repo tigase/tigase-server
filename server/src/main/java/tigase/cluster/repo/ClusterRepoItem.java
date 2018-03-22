@@ -217,6 +217,11 @@ public class ClusterRepoItem
 		return hostname;
 	}
 
+	@Override
+	protected void setKey(String key) {
+		setHostname(key);
+	}
+
 	public long getLastUpdate() {
 		return lastUpdate;
 	}

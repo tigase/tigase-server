@@ -19,7 +19,7 @@
  */
 package tigase.server.extdisco;
 
-import tigase.db.comp.RepositoryItem;
+import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -28,7 +28,7 @@ import tigase.xml.Element;
  * Created by andrzej on 06.09.2016.
  */
 public class ExtServiceDiscoItem
-		implements RepositoryItem {
+		extends RepositoryItemAbstract {
 
 	private static final String KEY_LABEL = "Service";
 	private static final String HOST_LABEL = "Host";
@@ -73,10 +73,20 @@ public class ExtServiceDiscoItem
 	}
 
 	@Override
+	public String getElemName() {
+		return "service";
+	}
+	
+	@Override
 	public String getKey() {
 		return key;
 	}
 
+	@Override
+	protected void setKey(String key) {
+		this.key = key;
+	}
+	
 	@Override
 	public String getOwner() {
 		return null;

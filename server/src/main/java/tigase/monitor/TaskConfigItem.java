@@ -96,6 +96,11 @@ public class TaskConfigItem
 		return taskName;
 	}
 
+	@Override
+	protected void setKey(String key) {
+		setTaskName(key);
+	}
+
 	public String getScriptExtension() {
 		return scriptExtension;
 	}

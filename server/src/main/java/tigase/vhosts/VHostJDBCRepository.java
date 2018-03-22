@@ -66,7 +66,8 @@ public class VHostJDBCRepository
 	private String def_srv_address = null;
 	@ConfigField(desc = "Max allowed number of domains per user", alias = "domains-per-user-limit")
 	private int max_domains_per_user = 25;
-	private String[] pendingItemsToSet = null;
+	private Map<String, Map<String, Object>> pendingItemsToSet = null;
+	private String[] pendingItemsToSetOld = null;
 
 	@Inject
 	private VHostItemDefaults vhostDefaults;
@@ -215,17 +216,31 @@ public class VHostJDBCRepository
 	}
 
 	@Override
-	public void setItems(String[] items_arr) {
+	public void setItems(Map<String, Map<String, Object>> items) {
 		if (vhostDefaults == null) {
-			this.pendingItemsToSet = items_arr;
+			this.pendingItemsToSet = items;
 		} else {
-			super.setItems(items_arr);
+			super.setItems(items);
+			super.reload();
+		}
+	}
+
+	@Override
+	public void setItemsOld(String[] items_arr) {
+		if (vhostDefaults == null) {
+			this.pendingItemsToSetOld = items_arr;
+		} else {
+			super.setItemsOld(items_arr);
 			super.reload();
 		}
 	}
 
 	public void setVhostDefaults(VHostItemDefaults vhostDefaults) {
 		this.vhostDefaults = vhostDefaults;
+		if (pendingItemsToSetOld != null) {
+			setItemsOld(pendingItemsToSetOld);
+			pendingItemsToSetOld = null;
+		}
 		if (pendingItemsToSet != null) {
 			setItems(pendingItemsToSet);
 			pendingItemsToSet = null;

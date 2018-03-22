@@ -276,8 +276,13 @@ public class ConfigHolderTest {
 		Map<String,Object> result = ConfigWriter.buildTree(props);
 		ConfigHolder.upgradeDSL(result);
 
-		assertArrayEquals(new String[]{"international.com", "dev.com", "qa.com", "int.com"},
-						  ((List<String>) result.get("virtual-hosts")).toArray(new String[0]));
+		Map<String, Map<String, Object>> vhosts = ((Map<String, Map<String, Object>>) result.get("virtual-hosts"));
+
+		Stream.of("international.com", "dev.com", "qa.com", "int.com").forEach(vhost -> {
+			assertTrue(vhosts.containsKey(vhost));
+		});
+//		assertArrayEquals(new String[]{},
+//						  ((List<String>) result.get("virtual-hosts")).toArray(new String[0]));
 	}
 
 	@Test

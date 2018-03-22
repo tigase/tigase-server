@@ -33,6 +33,8 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.util.ClassUtilBean;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -292,10 +294,25 @@ public abstract class AbstractBeanConfigurator
 					converter = kernel.getInstance(cAnn.converter());
 				}
 
-				Class expType = BeanUtils.getGetterSetterMethodsParameterType(field);
+				Type expType = BeanUtils.getGetterSetterMethodsParameterType(field);
+				Class clazz = null;
+				if (expType != null) {
+					if (expType instanceof Class) {
+						clazz = (Class) expType;
+					} else if (expType instanceof ParameterizedType) {
+						Type type = ((ParameterizedType) expType).getRawType();
+						if (type instanceof Class) {
+							clazz = (Class) type;
+						} else {
+							expType = null;
+						}
+					} else{
+						expType = null;
+					}
+				}
 
 				if (expType != null) {
-					Object v = converter.convert(value, expType);
+					Object v = converter.convert(value, clazz, expType);
 					valuesToSet.put(field, v);
 				} else {
 					Object v = converter.convert(value, field.getType(), field.getGenericType());
