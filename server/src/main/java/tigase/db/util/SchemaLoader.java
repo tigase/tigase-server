@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static tigase.db.util.SchemaManager.COMMON_SCHEMA_ID;
@@ -82,6 +83,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	public static Stream<TypeInfo> getAllSupportedTypesStream() {
 		return getSchemaLoaderInstances().map(SchemaLoader::getSupportedTypes)
 				.flatMap(List::stream);
+	}
+
+	public static List<TypeInfo> getAllSupportedTypes() {
+		return getAllSupportedTypesStream().collect(Collectors.toList());
 	}
 
 	private static Stream<Class<?>> getSchemaLoaderClasses() {
