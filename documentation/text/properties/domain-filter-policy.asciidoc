@@ -1,7 +1,7 @@
 [[domainFilterPolicy]]
 = domain-filter-policy
 :author: not known
-:version: v2.0, August 2017: Formatted for v7.2.0.
+:version: v2.0, August 2017: Reformatted for Kernel/DSL
 
 :toc:
 :numbered:

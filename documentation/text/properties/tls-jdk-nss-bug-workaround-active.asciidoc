@@ -1,7 +1,7 @@
 [[tlsJdkNssBugWorkaroundActive]]
 = tls-jdk-nss-bug-workaround-active
 :author: Andrzej Wojcik <andrzejw@tigase.org>
-:version: v2.1, August 2017: Reformatted for v7.2.0.
+:version: v2.1, August 2017: Reformatted for Kernel/DSL
 
 :toc:
 :numbered:

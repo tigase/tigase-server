@@ -1,7 +1,7 @@
 [[wsAllowUnmaskedFrames]]
 = ws-allow-unmasked-frames
 :author: Daniel Wisnewski (Daniel@tigase.net)
-:version: v2.0, April 2016 Reformatted for v7.2.0
+:version: v2.0, April 2016: Reformatted for Kernel/DSL
 :date: 2016-04-04 10:03
 
 :toc:

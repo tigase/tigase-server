@@ -1,7 +1,7 @@
 [[security]]
 = Security
 :author: Daniel Wisnewski
-:version: v2.0, October 2015: Reformatted for v7.2.0.
+:version: v2.0, October 2015: Reformatted for Kernel/DSL
 
 The articles here cover advanced security features built into to Tigase Server, and some options for adding your own levels of security.
 

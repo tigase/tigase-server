@@ -1,7 +1,7 @@
 [[accessControlList]]
 = Access Control Lists in Tigase
 :author: Artur Hefczyc
-:version: v2.0, October 2015: Reformatted for v7.2.0.
+:version: v2.0, October 2015: Reformatted for Kernel/DSL
 
 :toc:
 :numbered:
