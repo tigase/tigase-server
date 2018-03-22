@@ -7,7 +7,7 @@
 :website: http://www.tigase.org
 
 [[v710notice]]
-== *FOR ALL USERS UPGRADING TO v7.2.0 FROM A v7.0.2 INSTALLATION*
+== *FOR ALL USERS UPGRADING TO v8.0.0 FROM A v7.0.2 INSTALLATION*
 The schema has changed for the main database, and the pubsub repository.  In order to upgrade to the new schemas, you will need to do the following: +
 
 1. Upgrade the Main database schema to v7.1 using the database/${DB_TYPE}-schema-upgrade-to-7-1.sql file
@@ -28,7 +28,7 @@ Tigase has made changes to its database to include primary keys in the tig_pairs
 
 _This change will affect all users of Tigase using v7.1.0 and newer._
 
-If you are installing a new version of v7.2.0 on a new database, the schema should automatically be installed.
+If you are installing a new version of v8.0.0 on a new database, the schema should automatically be installed.
 
 First, shut down any running instances of Tigase to prevent conflicts with database editing.  Then from command line use the DBSchemaLoader class to run the -schema-upgrade-to-7.1.sql file to the database.  The command is as follows:
 
@@ -85,7 +85,7 @@ The Derby schema can be found link:https://projects.tigase.org/projects/tigase-p
 
 The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/postgresql-pubsub-schema-3.3.0.sql[Here].
 
-The same files are also included in all distributions of v7.2.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
+The same files are also included in all distributions of v8.0.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
 
 
 You can use a utility in Tigase to update the schema using the following command from the Tigase root:
