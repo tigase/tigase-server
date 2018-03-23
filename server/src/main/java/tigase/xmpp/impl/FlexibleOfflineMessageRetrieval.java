@@ -19,6 +19,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
@@ -75,7 +76,7 @@ public class FlexibleOfflineMessageRetrieval
 	private final MsgRepository.OfflineMessagesProcessor offlineMessagesStamper = new MsgStamper();
 	private final OfflineMessages offlineProcessor = new OfflineMessages();
 	@Inject
-	private MsgRepository msg_repo = null;
+	private MsgRepositoryIfc msg_repo = null;
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
@@ -221,7 +222,7 @@ public class FlexibleOfflineMessageRetrieval
 	}
 
 	public Queue<Packet> restorePacketForOffLineUser(List<String> db_ids, XMPPResourceConnection conn,
-													 MsgRepository repo)
+													 MsgRepositoryIfc repo)
 			throws UserNotFoundException, NotAuthorizedException {
 		Queue<Element> elems = repo.loadMessagesToJID(db_ids, conn, false, offlineMessagesStamper);
 

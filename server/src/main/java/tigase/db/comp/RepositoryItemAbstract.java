@@ -31,7 +31,10 @@ import tigase.xml.Element;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -112,10 +115,11 @@ public abstract class RepositoryItemAbstract
 
 	protected void initFromMap(String key, Map<String, Object> props, BiConsumer<String, Object> additionalOptionsConsumer) {
 		setKey(key);
-		Map<String, Field> propToField = streamConfigFields()
-				.collect(Collectors.toMap(field -> Optional.ofNullable(field.getAnnotation(ConfigField.class))
-				.map(ConfigField::alias)
-				.orElse(field.getName()), Function.identity()));
+		Map<String, Field> propToField = streamConfigFields().collect(Collectors.toMap(
+				field -> Optional.ofNullable(field.getAnnotation(ConfigField.class))
+						.map(ConfigField::alias)
+						.map(alias -> alias.isEmpty() ? null : alias)
+						.orElse(field.getName()), Function.identity()));
 
 		propToField.entrySet().stream().filter(e -> props.containsKey(e.getKey())).forEach(e -> {
 			try {
@@ -197,7 +201,10 @@ public abstract class RepositoryItemAbstract
 		Map<String, Object> props = new HashMap<>();
 		streamConfigFields().forEach(field -> {
 			try {
-				String key = Optional.ofNullable(field.getAnnotation(ConfigField.class)).map(ConfigField::alias).orElse(field.getName());
+				String key = Optional.ofNullable(field.getAnnotation(ConfigField.class))
+						.map(ConfigField::alias)
+						.map(alias -> alias.isEmpty() ? null : alias)
+						.orElse(field.getName());
 				Object value = BeanUtils.getValue(this, field);
 				props.put(key, value);
 			} catch (Exception ex) {

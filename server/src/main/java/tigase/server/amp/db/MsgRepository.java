@@ -350,6 +350,17 @@ public abstract class MsgRepository<T, S extends DataSource>
 		}
 
 		@Override
+		public int deleteMessagesToJID(List db_ids, XMPPResourceConnection session) throws UserNotFoundException {
+			return getRepository(session.getDomainAsJID().getDomain()).deleteMessagesToJID(db_ids, session);
+		}
+
+		@Override
+		public Queue<Element> loadMessagesToJID(List db_ids, XMPPResourceConnection session, boolean delete,
+												OfflineMessagesProcessor proc) throws UserNotFoundException {
+			return getRepository(session.getDomainAsJID().getDomain()).loadMessagesToJID(db_ids, session, delete, proc);
+		}
+
+		@Override
 		public void setDataSource(DataSource dataSource) {
 
 		}

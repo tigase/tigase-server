@@ -19,11 +19,14 @@
  */
 package tigase.db;
 
+import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -38,5 +41,12 @@ public interface MsgRepositoryIfc<T extends DataSource>
 	List<Element> getMessagesList(JID to) throws UserNotFoundException;
 
 	void setCondition(ReentrantLock lock, Condition condition);
+
+	Queue<Element> loadMessagesToJID(List<String> db_ids, XMPPResourceConnection session,
+													 boolean delete, MsgRepository.OfflineMessagesProcessor proc)
+			throws UserNotFoundException;
+
+	int deleteMessagesToJID(List<String> db_ids, XMPPResourceConnection session)
+			throws UserNotFoundException;
 
 }
