@@ -31,7 +31,7 @@ stats {
 -----
 
 == stats-history-interval
-Sets the interval for which statsistics will be gathered from the server.
+Sets the interval for which statistics will be gathered from the server.
 [source,dsl]
 -----
 stats {
@@ -40,7 +40,7 @@ stats {
 -----
 
 == stats-logger
-Allow enabling and configuring components responsible for storing statistic information.  Note that this controls the logging system for retriving using JMX, clients, or ad-hoc commands.
+Allow enabling and configuring components responsible for storing statistic information.  Note that this controls the logging system for retrieving using JMX, clients, or ad-hoc commands.
 
 [source,dsl]
 -----
@@ -69,7 +69,7 @@ stats {
 -----
 
 == stats-file-logger
-This allows configuring of statsitcs gathering to an external file.  This only has one class, and may be controlled independently from the internal statistics.
+This allows configuring of statistics gathering to an external file.  This only has one class, and may be controlled independently from the internal statistics.
 [source,dsl]
 -----
 stats {
@@ -109,7 +109,7 @@ stats {
 
 - *'stats-datetime'* - Whether to include date & time timestamp.
 - *'stats-datetime-format'* - Specifies the formatting of datetime timestamp.
-- *'stats-directory'* - The directory to which the statsitics file should be saved.
+- *'stats-directory'* - The directory to which the statistics file should be saved.
 - *'stats-filename'* - The filename prefix to name the output statistics file.
 - *'stats-level'* - Sets the level of statistics to be gathered.
 - *'stats-unixtime'* - Control the format of the timestamp to use java DateFormat pattern.

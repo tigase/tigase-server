@@ -11,7 +11,7 @@
 
 *Example:* `'scripts-dir' = ''/opt/admin-scripts'`
 
-*Possible values:* path to a directory on the filesystem.
+*Possible values:* path to a directory on the file system.
 
 *Description:* This property sets the directory where all administrator scripts for ad-hoc commands are stored.
 

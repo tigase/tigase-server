@@ -29,7 +29,7 @@ TIP: Do not run as root user!
 
 [source,bash]
 -----
-scripts/tigase.sh start
+scripts/tigase.sh start etc/tigase.conf
 -----
 
 == Verify Tigase is Running

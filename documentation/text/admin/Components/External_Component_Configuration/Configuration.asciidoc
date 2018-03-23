@@ -162,10 +162,10 @@ An example configuration with socket type specified:
 
 [source,bash]
 -----
---comp-name-1 = ext
---comp-class-1 = tigase.server.ext.ComponentProtocol
---external = muc.devel.tigase.org:mucsecret:listen:5270:devel.tigase.org:accept:ReceiverBareJidLB:plain, \
-  pubsub.devel.tigase.org:pubsub_pass:listen:5270:devel.tigase.org:accept:SenderBareJidLB:ssl
+ext (class: tigase.server.ext.ComponentProtocol) {
+    repository {
+        items = [ 'muc.devel.tigase.org:mucsecret:listen:5270:devel.tigase.org:accept:ReceiverBareJidLB:plain', 'pubsub.devel.tigase.org:pubsub_pass:listen:5270:devel.tigase.org:accept:SenderBareJidLB:ssl' ]
+    }
 -----
 
 for the MUC component it will be possible to establish plain socket connection (with possibility to perform StartTLS) and for the PubSub component an encrypted, SSL connection will be required.

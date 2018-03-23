@@ -16,9 +16,9 @@ Let's look at the examples...
 == A Simple Case - MUC as an External Component
 A few assumptions:
 
-. We want to run a MUC component for a domain: 'muc.devel.tigase.org' and password 'muc-pass'
+. We want to run a MUC component for a domain: `muc.devel.tigase.org` and password `muc-pass`
 . The main server works at an address: devel.tigase.org and for the same virtual domain
-. We want to connect to the server using link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] protocol and port '5270'.
+. We want to connect to the server using link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] protocol and port `5270`.
 
 There is a special configuration type for this case which simplifies setting needed to run Tigase as an external component:
 
@@ -84,7 +84,7 @@ ext () {
 
 Please note however that we are opening two connections to the same server. This can waste resources and over-complicate the system. For example, what if we want to run even more components? Opening a separate connection for each component is a tad overkill.
 
-In fact there is a way to reuse the same connection for all component domains running as an external component. The property '--bind-ext-hostnames' contains a comma separated list of all hostnames (external domains) which should reuse the existing connection.
+In fact there is a way to reuse the same connection for all component domains running as an external component. The property `bind-ext-hostnames` contains a comma separated list of all hostnames (external domains) which should reuse the existing connection.
 
 There is one catch however. Since you are reusing connections (hostname binding is defined in link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] only), you must use this protocol for the functionality.
 

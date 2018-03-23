@@ -11,13 +11,13 @@
 
 *Example:* `'cross-domain-policy-file' = ''/path/to/cross-domain-policy.xml'`
 
-*Possible values:* path to a file on the filesystem.
+*Possible values:* path to a file on the file system.
 
 *Description:* This property allows you to set a path to a file with cross domain access policy for flash based clients. This is a standard XML file which is sent to the flash client upon request.
 
 A default file distributed with Tigase installations allows for full access for all. This is good enough for most use cases but it can be changed by simply editing the file.
 
-This is a global property that can also be overidden by configuring connection managers [ c2s, s2s, ws2s, bosh, ext, etc] and they may all have thier own policies.
+This is a global property that can also be overridden by configuring connection managers [ c2s, s2s, ws2s, bosh, ext, etc] and they may all have their own policies.
 
 [source,dsl]
 -----

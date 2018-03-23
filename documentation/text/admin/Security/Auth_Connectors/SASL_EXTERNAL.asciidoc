@@ -7,7 +7,7 @@
 :numbered:
 :website: http://tigase.net
 
-In order to enable SASL External add following line to the  +init.properties+ file
+In order to enable SASL External add following line to the  `config.tdsl` file
 
 [source,dsl]
 -----

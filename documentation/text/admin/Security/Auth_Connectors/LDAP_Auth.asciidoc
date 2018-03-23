@@ -9,7 +9,7 @@
 
 Tigase XMPP Server offers support for authenticating users against an LDAP server in *Bind* *Authentication* mode.
 
-Configuration for the LDAP support is really simple you just have to add a few lines to your `init.properties` file.
+Configuration for the LDAP support is really simple you just have to add a few lines to your `config.tdsl` file.
 
 [source,java]
 -----

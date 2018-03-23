@@ -30,8 +30,6 @@ The `cluster-connect-all` property is used to open active connections to all nod
 }
 -----
 
-This replaces the --cluster-connect-all property.
-
-
+This replaces the `--cluster-connect-all` property.
 
 *Available since:* 8.0.0

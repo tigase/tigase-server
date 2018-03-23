@@ -25,7 +25,7 @@ Pure XMPP client. Although it supports only Jabber networks it is a very user fr
 - http://www.gajim.org/[Gajim]
 This is another Jabber only client. Very user friendly and works on most of Linux distributions, FreeBSD, and MS Windows.
 - http://www.pidgin.im/[Pidgin] (previously http://gaim.sourceforge.net/[Gaim])
-This is not just a Jabber client. This type of application is called multicommunicator as apart from Jabber it supports many other instant messagin networks/protocols such as: AIM/ICQ, MSN, Yahoo, Gadu-Gadu, IRC, and a few others. So it is especially convenient if you have friends using other messaging networks. Pidgin works on most Linux distributions, and on MS Windows.
+This is not just a Jabber client. This type of application is called multicommunicator as apart from Jabber it supports many other instant messaging networks/protocols such as: AIM/ICQ, MSN, Yahoo, Gadu-Gadu, IRC, and a few others. So it is especially convenient if you have friends using other messaging networks. Pidgin works on most Linux distributions, and on MS Windows.
 - http://kopete.kde.org/[Kopete]
 This is a http://www.kde.org/[KDE] component and although it only works on Linux based system it also supports many of the most popular instant messaging protocols apart from Jabber like: AIM, Gadu-Gadu, ICQ, IRC, MSN, Yahoo.
 

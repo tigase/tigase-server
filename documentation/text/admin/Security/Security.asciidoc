@@ -85,7 +85,7 @@ You may also opt to unblock all contacts and essentially clear out your blocked 
 [[accountRegLimit]]
 == Account Registration Limits
 
-In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  This may be configured by adding the following line in the init.properties file:
+In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  This may be configured by adding the following line in the config.tdsl file:
 [source,dsl]
 -----
 'registration-throttling' () {
@@ -93,7 +93,7 @@ In order to protect Tigase servers from DOS attacks, a limit on number of accoun
 -----
 This setting allows for 10 registrations from a single IP per second.  If the limit is exceeded, a `NOT_ALLOWED` error will be returned.
 
-It is possible to create two seperate counters as well:
+It is possible to create two separate counters as well:
 [source,dsl]
 -----
 'registration-throttling' () {

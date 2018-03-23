@@ -37,7 +37,7 @@ Jeti is described as the first client because it might be needed for users of so
 Due to the number of images used in the Jeti guide it has been moved to a xref:jetiMSN[separate page].
 
 == Pidgin
-As mentioned earlier, Pidgin doesn't support all XMPP extensions needed for registering to MSN transport. So unfortunately you have to use a different client to add this transport to your roster. Ideally you should use one of the native XMPP stand-alone clients like link:http://psi-im.org/[Psi], or link:http://coccinella.im/[Coccinella]. However, If you don't want to install any other clients you can use http://jeti-im.org/[Jeti] which is available on Tigase's website preinstalled and preconfigured for use. Please refer to separate guide for details on how to use xref:jetiMSN[Jeti client] to get MSN transport working.
+As mentioned earlier, Pidgin doesn't support all XMPP extensions needed for registering to MSN transport. So unfortunately you have to use a different client to add this transport to your roster. Ideally you should use one of the native XMPP stand-alone clients like link:http://psi-im.org/[Psi], or link:http://coccinella.im/[Coccinella]. However, If you don't want to install any other clients you can use http://jeti-im.org/[Jeti] which is available on Tigase's website pre-installed and pre-configured for use. Please refer to separate guide for details on how to use xref:jetiMSN[Jeti client] to get MSN transport working.
 
 Ok, now as you probably have MSN transport activated for you account you can start using link:http://www.pidgin.im/[Pidgin] to communicate with either Jabber users or MSN users.
 
@@ -67,7 +67,7 @@ image:images/user/pidgin-add-hotmail-budy-m.png[Pidgin add Hotmail]
 
 The whole MSN account address is a user name for Jabber identifier purposes and you have to replace @ with %. Then you add @ and MSN transport address. As an *alias* you can use anything. I have used a real Hotmail address to make it easier later on to see what the account is.
 
-Enter everything carefuly and click *Add*.
+Enter everything carefully and click *Add*.
 
 After you click the *Add* button the contact you are adding should receive a subscription request as well receiving a subscription request yourself. The Pidgin window should look similar to the example below.
 

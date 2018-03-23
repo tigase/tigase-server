@@ -14,7 +14,7 @@ This means that Tigase's source code is available to the public to see how Tigas
 In addition, we have the benefit of many talented people working with Tigase to constantly improve Tigase server and related projects.  These people not only include the Tigase development team, but other members of the community who submit code improvements, patches, enhancements, or other changes to Tigase.
 
 *Does this mean that the binaries are open to malicious code?* +
-Although we accept patches from contributors, our repository does not accept them directly. Code may be submitted through our projects.tigase.org page and our developers will review the code before it is added.  All builds are tested for functionality and security when they are built.
+Although we accept patches from contributors, our repository does not accept them directly. Code may be submitted through our http://tigase.tech[tigase.tech] page and our developers will review the code before it is added.  All builds are tested for functionality and security when they are built.
 
 *Does this mean it is less secure?* +
 Not at all.  Although anybody can see the source code, and know how Tigase works; your installation, connections, and settings are uniquely yours.  Tigase is regularly tested and written to be as secure as possible using the latest encryption and secure connection protocols.

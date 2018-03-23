@@ -27,7 +27,7 @@ That's it.
 
 The connector loads correctly and starts working using predefined, default list of queries.
 In most cases you also might want to define your own queries in the configuration file.
-The shortest possible description is the following example of the content from the `init.properties` file:
+The shortest possible description is the following example of the content from the `config.tdsl` file:
 
 This query is used to check connection to the database, whether it is still alive or not
 [source,dsl]
@@ -91,7 +91,7 @@ Below query is used to remove existing account with all user's data from the dat
 }
 -----
 
-This query is used for the user authentication if "user-login-query" is not defined, that is if there is no database level user authentication algorithm available.
+This query is used for the user authentication if `user-login-query` is not defined, that is if there is no database level user authentication algorithm available.
 In such a case the Tigase server loads user's password from the database and compares it  with data received from the client.
 [source,dsl]
 -----

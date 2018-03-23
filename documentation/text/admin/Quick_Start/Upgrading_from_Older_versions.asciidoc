@@ -39,7 +39,7 @@ mysql -h 198.27.120.213 tigase_tpub -u USERNAME -p <../tpub.2017-05-30.sql
 Enter password:
 -----
 
-== Upgrade init.properties file
+== Upgrade configuration file
 Tigase XMPP Server has a utility that can be called using `upgrade-config` that will update your old init.properties file and create a new file using DSL.
 
 [source,bash]

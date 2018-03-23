@@ -8,8 +8,8 @@
 :numbered:
 :website: http://tigase.net/
 
-*Description:* Add stream-error-counter to comma seperated processors of components for which you wish to count the number of stream errors made.  Without enabling this, statistics will return 0.
-This setting turns on strea-error-counter for both c2s and ws2s:
+*Description:* Add stream-error-counter to comma separated processors of components for which you wish to count the number of stream errors made.  Without enabling this, statistics will return 0.
+This setting turns on stream-error-counter for both c2s and ws2s:
 
 [source,dsl]
 -----

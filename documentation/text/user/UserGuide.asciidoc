@@ -105,7 +105,7 @@ Pure Jabber client. Although it supports only Jabber network it is a very user f
 - http://www.gajim.org/[Gajim]
 This is another Jabber only client. Very user friendly and works on most of Linux distributions, FreeBSD, and MS Windows.
 - http://www.pidgin.im/[Pidgin] (previously http://gaim.sourceforge.net/[Gaim])
-This is not just a Jabber client. This type of application is called multicommunicator as apart from Jabber it supports many other instant messagin networks/protocols such as: AIM/ICQ, MSN, Yahoo, Gadu-Gadu, IRC, and a few others. So it is especially convenient if you have friends using other messaging networks. Pidgin works on most Linux distributions, and on MS Windows.
+This is not just a Jabber client. This type of application is called multicommunicator as apart from Jabber it supports many other instant messaging networks/protocols such as: AIM/ICQ, MSN, Yahoo, Gadu-Gadu, IRC, and a few others. So it is especially convenient if you have friends using other messaging networks. Pidgin works on most Linux distributions, and on MS Windows.
 - http://kopete.kde.org/[Kopete]
 This is a http://www.kde.org/[KDE] component and although it only works on Linux based system it also supports many of the most popular instant messaging protocols apart from Jabber like: AIM, Gadu-Gadu, ICQ, IRC, MSN, Yahoo.
 
@@ -156,7 +156,7 @@ image:images/user/psi-connected.png[PSI Connected]
 Now you are connected!
 
 
-Well, you are now connected but how to talk to other people? How to add friends to the contact list?  You can send a message to your friends stright away using the *Psi menu* option *New blank message*. It is much more convenient however, if you could see which of your friends is online and available for chatting and if you could start talking to your friend just by clicking on his name.
+Well, you are now connected but how to talk to other people? How to add friends to the contact list?  You can send a message to your friends straight away using the *Psi menu* option *New blank message*. It is much more convenient however, if you could see which of your friends is online and available for chatting and if you could start talking to your friend just by clicking on his name.
 
 === Short Instructions How to Add Your First Contact
 1. Click on Psi menu - the button next to the *Online* text. You will see something like this:
@@ -255,7 +255,7 @@ Please enter all your login details as on the example screenshot. Your user name
 
 image:images/user/pidgin-no-hotmail-budy-m.png[Pidgin no Hotmail]
 
-Ok. Assuming everything was enterred correctly and you have configured Pidgin to login automatically, your main window should look like the one on the left hand side. Your buddy list might be empty if you didn't add anybody to your list yet or, if you didn't register to MSN transport yet.
+Ok. Assuming everything was entered correctly and you have configured Pidgin to login automatically, your main window should look like the one on the left hand side. Your buddy list might be empty if you didn't add anybody to your list yet or, if you didn't register to MSN transport yet.
 
 If MSN transport is not activated yet, please disconnect Pidgin from *tigase.org* server and use a different client as described above.
 
@@ -273,7 +273,7 @@ image:images/user/pidgin-add-hotmail-budy-m.png[Pidgin add Hotmail]
 
 The whole MSN account address is a user name for Jabber identifier purposes and you have to replace @ with %. Then you add @ and MSN transport address. As an *alias* you can use anything. I have used a real Hotmail address to make it easier later on to see what the account is.
 
-Enter everything carefuly and press *Add*.
+Enter everything carefully and press *Add*.
 
 After you press the *Add* button the contact you are adding should receive a subscription request as well receiving a subscription request yourself. The Pidgin window should look similar to the example below.
 

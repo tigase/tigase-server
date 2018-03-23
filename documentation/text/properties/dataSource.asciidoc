@@ -70,7 +70,7 @@ dataSource () {
 `DataSource` is an abstraction layer between any higher level data access repositories such as `userRepository` or `authRepository` and SQL database or JDBC driver to be more specific.
 Many implementations use `DataSource` for DB connections and in fact on many installations they also share the same DataRepository instance if they connect to the same DB. In this case it is desired to use a specific connection pool on this level to an avoid excessive number of connections to the database.
 
-To do so, specify the number of number of database connection as an interger:
+To do so, specify the number of number of database connection as an integer:
 
 [source,dsl]
 -----
@@ -83,7 +83,5 @@ dataSource {
 -----
 
 By default, the number of connections is 10.
-
-
 
 *Available since:* 8.0.0
