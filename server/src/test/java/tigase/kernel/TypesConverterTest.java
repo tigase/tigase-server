@@ -117,6 +117,22 @@ public class TypesConverterTest {
 		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
 		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
 
+		values = new HashMap<>();
+		values.put("t1", "A1,B2");
+		values.put("t2", "B2,C3");
+		mapEnumSetField = converter.convert(values, HashMap.class,
+											this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
+		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
+		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
+
+		values = new HashMap<>();
+		values.put("t1", "A1,b2");
+		values.put("t2", "b2,C3");
+		mapEnumSetField = converter.convert(values, HashMap.class,
+											this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
+		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
+		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
+		
 		assertEquals(System.getProperty("java.home"),
 					 converter.convert(new ConfigReader.PropertyVariable("java.home", null), String.class));
 

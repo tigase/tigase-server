@@ -128,9 +128,22 @@ public class DefaultTypesConverter
 			} else if (expectedType.equals(Level.class)) {
 				return expectedType.cast(Level.parse(value.toString().trim()));
 			} else if (expectedType.isEnum()) {
+				String trimmedValue = value.toString().trim();
 				final Class<? extends Enum> enumType = (Class<? extends Enum>) expectedType;
-				final Enum<?> theOneAndOnly = Enum.valueOf(enumType, value.toString().trim());
-				return expectedType.cast(theOneAndOnly);
+				try {
+					final Enum<?> theOneAndOnly = Enum.valueOf(enumType, trimmedValue);
+					return expectedType.cast(theOneAndOnly);
+				} catch (IllegalArgumentException ex) {
+					// if there is no value for the exact type let's make case insensitive lookup
+					Optional<Enum<?>> theOneAndOnly = EnumSet.allOf(enumType)
+							.stream()
+							.filter(val -> trimmedValue.equalsIgnoreCase(((Enum) val).name()))
+							.findFirst();
+					if (theOneAndOnly.isPresent()) {
+						return expectedType.cast(theOneAndOnly.get());
+					}
+					throw new RuntimeException("Cannot convert to " + expectedType, ex);
+				}
 			} else if (expectedType.equals(JID.class)) {
 				return expectedType.cast(JID.jidInstance(value.toString().trim()));
 			} else if (expectedType.equals(BareJID.class)) {
