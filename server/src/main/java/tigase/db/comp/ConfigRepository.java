@@ -228,7 +228,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 				Item item = getItemInstance();
 
 				item.initFromMap(k, v);
-				if (!items.containsKey(item.getKey())) {
+				if (!this.items.containsKey(item.getKey())) {
 					addItem(item);
 					log.log(Level.CONFIG, "Loaded config item: {0}", item);
 				} else {

@@ -602,7 +602,18 @@ public class ConfigReader {
 					.map(val -> (val instanceof Variable) ? ((Variable) val).calculateValue() : val)
 					.collect(Collectors.toList());
 
-			Object first = values.get(0);
+			int j=0;
+			Object first = values.get(j);
+			j++;
+			while (first == null && j<values.size()) {
+				first = values.get(j);
+				j++;
+			}
+			if (first instanceof EnvironmentVariable || first instanceof PropertyVariable) {
+				first = "String";
+			} else if (first instanceof CompositeVariable) {
+				first = calculateValue();
+			}
 			if (first instanceof String) {
 				if (!operations.stream().allMatch(o -> o == Operation.add)) {
 					throw new java.lang.UnsupportedOperationException("Invalid operation for String!");
