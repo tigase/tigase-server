@@ -206,7 +206,9 @@ public abstract class RepositoryItemAbstract
 						.map(alias -> alias.isEmpty() ? null : alias)
 						.orElse(field.getName());
 				Object value = BeanUtils.getValue(this, field);
-				props.put(key, value);
+				if (value != null) {
+					props.put(key, value);
+				}
 			} catch (Exception ex) {
 				if (ex instanceof NullPointerException || ex.getCause() instanceof NullPointerException) {
 					// if there is a NPE it may be caused by value being not set.

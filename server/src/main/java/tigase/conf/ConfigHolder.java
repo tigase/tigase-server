@@ -500,6 +500,55 @@ public class ConfigHolder {
 					});
 		});
 
+		// move handlers from basic-conf to logging/handlers
+		Optional.ofNullable(props.get("basic-conf"))
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.map(v -> v.remove("logging"))
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.map(v -> v.get("handlers"))
+				.filter(String.class::isInstance)
+				.map(String.class::cast)
+				.map(v -> v.split(" "))
+				.map(Arrays::asList)
+				.ifPresent(handlers -> {
+					((Map) props.computeIfAbsent("logging", k -> new HashMap<>())).putIfAbsent(
+							"rootHandlers", handlers);
+				});
+
+		Optional.ofNullable(props.get("logging")).filter(Map.class::isInstance).map(Map.class::cast).ifPresent(logging -> {
+			Collection<String> handlers = Optional.ofNullable(logging.get("rootHandlers"))
+					.filter(Map.class::isInstance)
+					.map(Map.class::cast)
+					.map(map -> (Collection<String>) map.keySet())
+					.orElseGet(
+							() -> Arrays.asList("java.util.logging.ConsoleHandler", "java.util.logging.FileHandler"));
+			for (String handler : handlers) {
+				Optional.ofNullable(logging.remove(handler))
+						.ifPresent(cfg -> ((Map) logging.computeIfAbsent("handlers", k -> new HashMap<>())).put(handler,
+																												cfg));
+			}
+
+			for (String key : new ArrayList<>((Set<String>) logging.keySet())) {
+				Object value = logging.get(key);
+				if (value instanceof Map) {
+					Map map = (Map) value;
+					if (map.containsKey("level") || map.containsKey("useParentHandlers")) {
+						logging.remove(key);
+						((Map) logging.computeIfAbsent("loggers", k -> new HashMap<>())).putIfAbsent(key, value);
+					}
+				}
+			}
+		});
+
+		// remove basic-conf if it is empty
+		Optional.ofNullable(props.get("basic-conf"))
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.filter(Map::isEmpty)
+				.ifPresent(v -> props.remove("basic-conf"));
+
 		String after = props.toString();
 		return !before.equals(after);
 	}

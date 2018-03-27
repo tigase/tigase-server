@@ -26,10 +26,7 @@ import tigase.server.ext.ComponentProtocol;
 import tigase.xmpp.impl.roster.DynamicRosterTest;
 import tigase.xmpp.impl.roster.DynamicRosterTest123;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -298,6 +295,65 @@ public class ConfigHolderTest {
 
 		assertArrayEquals(new String[]{"admin@dev.com", "admin@qa.com", "admin@int.com"},
 						  ((List<String>) result.get("admins")).toArray(new String[0]));
+	}
+
+	@Test
+	public void testConversionOfLogging1() throws ConfigReader.ConfigException, IOException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList(
+				"basic-conf/logging/handlers=java.util.logging.ConsoleHandler java.util.logging.FileHandler",
+				"basic-conf/logging/java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter",
+				"basic-conf/logging/java.util.logging.ConsoleHandler.level=WARNING",
+				"basic-conf/logging/tigase.useParentHandlers=true",
+				"basic-conf/logging/tigase.server.level=FINEST",
+				"basic-conf/logging/java.util.logging.FileHandler.limit=100000000",
+				"basic-conf/logging/java.util.logging.FileHandler.count=10",
+				"basic-conf/logging/java.util.logging.FileHandler.pattern=/data/logs/tigase.log"
+		));
+
+		holder.convertFromOldFormat();
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		assertEquals(Arrays.asList("java.util.logging.ConsoleHandler", "java.util.logging.FileHandler"), ((Map) result.get("logging")).get("rootHandlers"));
+		assertEquals("tigase.util.LogFormatter", ((Map) ((Map) ((Map) result.get("logging")).get("handlers")).get(
+				"java.util.logging.ConsoleHandler")).get("formatter"));
+		assertEquals("/data/logs/tigase.log", ((Map) ((Map) ((Map) result.get("logging")).get("handlers")).get(
+				"java.util.logging.FileHandler")).get("pattern"));
+		assertEquals("FINEST", ((Map) ((Map) ((Map) result.get("logging")).get("loggers")).get(
+				"tigase.server")).get("level"));
+	}
+
+	@Test
+	public void testConversionOfLogging2() throws ConfigReader.ConfigException, IOException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(Arrays.asList(
+				"basic-conf/logging/java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter",
+				"basic-conf/logging/tigase.server.level=FINEST",
+				"basic-conf/logging/java.util.logging.FileHandler.pattern=/data/logs/tigase.log"
+		));
+
+		holder.convertFromOldFormat();
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		assertNull(((Map) result.get("logging")).get("rootHandlers"));
+		assertEquals("tigase.util.LogFormatter", ((Map) ((Map) ((Map) result.get("logging")).get("handlers")).get(
+				"java.util.logging.ConsoleHandler")).get("formatter"));
+		assertEquals("/data/logs/tigase.log", ((Map) ((Map) ((Map) result.get("logging")).get("handlers")).get(
+				"java.util.logging.FileHandler")).get("pattern"));
+		assertEquals("FINEST", ((Map) ((Map) ((Map) result.get("logging")).get("loggers")).get(
+				"tigase.server")).get("level"));
+	}
+
+	private static final void dumpConfig(Map result) {
+		try {
+			StringWriter sw = new StringWriter();
+			new ConfigWriter().write(sw, result);
+			System.out.println("\n" + sw.toString());
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 }
