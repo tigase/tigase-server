@@ -141,17 +141,21 @@ By default, each virtual hosts will require it's own certificate.  However, if y
 For example, if you have host1.example.net, host2.example.net, and host3.example.net each vhost will need some configuration:
 [source,dsl]
 -----
-'basic-conf' {
-    'virtual-hosts-cert-host1.example.net' = '/home/tigase/certs/host1.pem'
-    'virtual-hosts-cert-host2.example.net' = '/home/tigase/certs/host2.pem'
-    'virtual-hosts-cert-host3.example.net' = '/home/tigase/certs/host3.pem'
+'certificate-container' {
+    'custom-certificates' {
+        'host1.example.net' = '/home/tigase/certs/host1.pem'
+        'host2.example.net' = '/home/tigase/certs/host2.pem'
+        'host3.example.net' = '/home/tigase/certs/host3.pem'
+    }
 }
 -----
 This may be time consuming if you have many Vhosts, or expect to generate many more.  The good news is, now one certificate can be used for ALL Vhosts using the following configuration line:
 [source,dsl]
 -----
-'basic-conf' {
-    'virt-hosts-cert-*.example.net' = '/home/tigase/certs/certificate.pem'
+'certificate-container' {
+    'custom-certificates' {
+        '*.example.net' = '/home/tigase/certs/certificate.pem'
+    }
 }
 -----
 

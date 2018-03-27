@@ -60,7 +60,7 @@ public class CertificateContainer
 	private static final EventBus eventBus = EventBusFactory.getInstance();
 	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<String, CertificateEntry>();
 	private File[] certsDirs = null;
-	@ConfigField(desc = "Custom certificates")
+	@ConfigField(desc = "Custom certificates", alias = "custom-certificates")
 	private Map<String, String> customCerts = new HashMap<>();
 	@ConfigField(desc = "Alias for default certificate", alias = DEFAULT_DOMAIN_CERT_KEY)
 	private String def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;

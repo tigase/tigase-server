@@ -542,6 +542,28 @@ public class ConfigHolder {
 			}
 		});
 
+		Optional.ofNullable(props.get("basic-conf"))
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.ifPresent(basicConf -> {
+			        new ArrayList<String>(basicConf.keySet()).stream().filter(key -> key.startsWith(CertificateContainer.PER_DOMAIN_CERTIFICATE_KEY)).forEach(key -> {
+			        	Object value = basicConf.remove(key);
+						Map<String, Object> customCerts = (Map<String, Object>) ((Map) props.computeIfAbsent("certificate-container",
+																					   k -> new HashMap<>())).computeIfAbsent(
+								"custom-certificates", k -> new HashMap<>());
+
+						customCerts.putIfAbsent(key.replace(CertificateContainer.PER_DOMAIN_CERTIFICATE_KEY, ""), value);
+					});
+					new ArrayList<String>(basicConf.keySet()).stream().filter(key -> key.startsWith("virtual-hosts-cert-")).forEach(key -> {
+						Object value = basicConf.remove(key);
+						Map<String, Object> customCerts = (Map<String, Object>) ((Map) props.computeIfAbsent("certificate-container",
+																											 k -> new HashMap<>())).computeIfAbsent(
+								"custom-certificates", k -> new HashMap<>());
+
+						customCerts.putIfAbsent(key.replace("virtual-hosts-cert-", ""), value);
+					});
+		});
+
 		// remove basic-conf if it is empty
 		Optional.ofNullable(props.get("basic-conf"))
 				.filter(Map.class::isInstance)

@@ -346,6 +346,32 @@ public class ConfigHolderTest {
 				"tigase.server")).get("level"));
 	}
 
+	@Test
+	public void testConversionOfCustomVirtHostsCerts() throws ConfigReader.ConfigException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(
+				Arrays.asList("basic-conf/virtual-hosts-cert-host1.example.net=/home/tigase/certs/host1.pem",
+							  "basic-conf/virt-hosts-cert-host2.example.net=/home/tigase/certs/host2.pem",
+							  "basic-conf/virtual-hosts-cert-host3.example.net=/home/tigase/certs/host3.pem",
+							  "basic-conf/virtual-hosts-cert-*.hostx.example.net=/home/tigase/certs/hostx.pem"));
+
+		holder.convertFromOldFormat();
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		dumpConfig(result);
+
+		assertNotNull(((Map) result.get("certificate-container")));
+		assertEquals("/home/tigase/certs/host1.pem", ((Map) ((Map) result.get("certificate-container")).get("custom-certificates")).get(
+				"host1.example.net"));
+		assertEquals("/home/tigase/certs/host2.pem", ((Map) ((Map) result.get("certificate-container")).get("custom-certificates")).get(
+				"host2.example.net"));
+		assertEquals("/home/tigase/certs/host3.pem", ((Map) ((Map) result.get("certificate-container")).get("custom-certificates")).get(
+				"host3.example.net"));
+		assertEquals("/home/tigase/certs/hostx.pem", ((Map) ((Map) result.get("certificate-container")).get("custom-certificates")).get(
+				"*.hostx.example.net"));
+	}
+
 	private static final void dumpConfig(Map result) {
 		try {
 			StringWriter sw = new StringWriter();
