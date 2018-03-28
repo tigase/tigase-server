@@ -1087,6 +1087,13 @@ public class ClientConnectionManager
 			// We are now ready to ask for features....
 			XMPPIOService<Object> serv = getXMPPIOService(response);
 			if (serv != null) {
+				if (packet.getType() == StanzaType.error && Authorization.SERVICE_UNAVAILABLE.getCondition().equals(packet.getErrorCondition())) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "could not contact SessionManager, stopping client connection {0}...", serv);
+					}
+					serv.forceStop();
+					return;
+				}
 				SocketType socket = (SocketType) serv.getSessionData().get("socket");
 				boolean ssl = socket.equals(SocketType.ssl);
 				addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,

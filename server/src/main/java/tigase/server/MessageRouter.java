@@ -161,6 +161,11 @@ public class MessageRouter
 
 	public void addComponent(ServerComponent component) throws ConfigurationException {
 		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
+		components.put(component.getName(), component);
+		components_byId.put(component.getComponentId(), component);
+		if (component instanceof XMPPService) {
+			xmppServices.put(component.getName(), (XMPPService) component);
+		}
 		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
 				if (log.isLoggable(Level.FINER)) {
@@ -170,11 +175,6 @@ public class MessageRouter
 				registr.addComponent(component);
 			}    // end of if (reg != component)
 		}      // end of for ()
-		components.put(component.getName(), component);
-		components_byId.put(component.getComponentId(), component);
-		if (component instanceof XMPPService) {
-			xmppServices.put(component.getName(), (XMPPService) component);
-		}
 	}
 
 	public void addRegistrator(ComponentRegistrator registr) throws ConfigurationException {
