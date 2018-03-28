@@ -137,3 +137,20 @@ Windows users will need to call the method directly:
 -----
 java -cp "jars/*" tigase.db.util.SchemaManager "destroy-schema" etc/config.tdsl
 -----
+
+
+=== A note about MySQL
+If you are using these commands, you may result in the following error:
+
+[source,bash]
+-----
+tigase.util.DBSchemaLoader       validateDBConnection    WARNING    Table 'performance_schema.session_variables' does not exist
+-----
+
+If this occurs, you will need to upgrade your version of MySQL using the following command:
+[source,bash]
+-----
+mysql_upgrade -u root -p --force
+-----
+
+After entering the password and upgrading MySQL the schema error should no longer show when working with Tigase databases.
