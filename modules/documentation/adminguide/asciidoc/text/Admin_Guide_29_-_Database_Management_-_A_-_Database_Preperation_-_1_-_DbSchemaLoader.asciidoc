@@ -112,4 +112,20 @@ Of course this would break the schema for tigasedb by adding an unexpected table
 tigase.util.DBSchemaLoader       printInfo          WARNING       Database schema is invalid
 -----
 
+=== A note about MySQL
+If you are using these commands, you may result in the following error:
+
+[source,bash]
+-----
+tigase.util.DBSchemaLoader       validateDBConnection    WARNING    Table 'performance_schema.session_variables' does not exist
+-----
+
+If this occurs, you will need to upgrade your version of MySQL using the following command:
+[source,bash]
+-----
+mysql_upgrade -u root -p --force
+-----
+
+After entering the password and upgrading MySQL the schema error should no longer show when working with Tigase databases.
+
 But this is a demonstration how you may run a query through the database without the need to use another tool.  Note that you will need to select the specific database for each query.
