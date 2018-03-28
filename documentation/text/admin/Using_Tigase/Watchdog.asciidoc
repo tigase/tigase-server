@@ -14,7 +14,7 @@ This can not only slow down performance, but can lead to security issues as well
 No extra setup is necessary, Watchdog is already included with your build of Tigase (as long as it's 7.1.0 or newer).  Follow the steps in the configuration section.
 
 == Watchdog Configuration
-To configure watchdog, the following lines need to be present or edited in init.properties file:
+To configure watchdog, the following lines need to be present or edited in config.tdsl file:
 [source,dsl]
 -----
 'watchdog-timeout' = 70000
@@ -27,7 +27,7 @@ The three settings are as follows:
 - `'watchdog-delay' = 60000` This setting sets how often the watchdog should conduct the check, the default delay at 60000ms or 60 seconds.
 - `'watchdog-ping-type'` This setting determines the type of ping sent to components when watchdog is testing for activity.
 
-You may, if you choose, to specify individual watchdog settings for specific components by adding them to the component settings, for example if we wanted to change the Client2Server settings to include watchdog, use the following lines in init.properties:
+You may, if you choose, to specify individual watchdog settings for specific components by adding them to the component settings, for example if we wanted to change the Client2Server settings to include watchdog, use the following lines in config.tdsl:
 [source,dsl]
 -----
 c2s {
@@ -38,7 +38,7 @@ c2s {
 
 If any settings are not set, the global or settings will be used.
 `watchdog-delay` default is set to 10 min
-`watchdog-ping-type` default is set to xmpp
+`watchdog-ping-type` default is set to XMPP
 
 == Logic
 Watchdog compares it's own pings, and records the time it takes for a round trip to different components, clustered connections, and if one variable is larger than the other, watchdog will commence closing that stale connection.
@@ -48,9 +48,9 @@ Here is a breakdown:
 . During this check two things occur
   * If the last transfer time exceeds `max-inactivity-time` a stop service command is given to terminate and broadcast unavailable presence.
   * If the last transfer time is lower than `max-inactivity-time` but exceeds `watchdog-timeout` watchdog will try to send a ping (of `watchdog-ping-type`).
-  This ping may be one of two varieties (set in init.properties)
-    - `whitespace` ping which will yield the time of the last data transfer in any direction.
-    - `xmpp` ping which will yield the time of the last received xmpp stanza.
+  This ping may be one of two varieties (set in config.tdsl)
+    - `WHITESPACE` ping which will yield the time of the last data transfer in any direction.
+    - `XMPP` ping which will yield the time of the last received xmpp stanza.
 . If the 2nd option is true, the connection will remain open, and another check will begin after the +watchdog-delay+ time has expired.
 
 For example, lets draw this out and get a visual representation
