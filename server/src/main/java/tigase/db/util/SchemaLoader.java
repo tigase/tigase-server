@@ -257,6 +257,8 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	public abstract Result loadSchema(SchemaManager.SchemaInfo schemaInfo, String version);
+
+	public abstract Optional<Version> getMinimalRequiredComponentVersionForUpgrade(SchemaManager.SchemaInfo schema);
 	
 	public abstract Result destroyDataSource();
 

@@ -567,6 +567,14 @@ public class DBSchemaLoader
 	}
 
 	@Override
+	public Optional<Version> getMinimalRequiredComponentVersionForUpgrade(SchemaManager.SchemaInfo schema) {
+		if (params.isForceReloadSchema()) {
+			return Optional.of(Version.ZERO);
+		}
+		return getSchemaFileNames(schema.getId()).keySet().stream().sorted().findFirst();
+	}
+
+	@Override
 	public Result loadSchema(SchemaManager.SchemaInfo schema, String version) {
 
 		log.log(Level.CONFIG, "SchemaInfo:: id: {0}, repositories: {1}; version: {2}",
@@ -619,7 +627,7 @@ public class DBSchemaLoader
 			   ? (result == Result.ok ? Result.warning : result)
 			   : result;
 	}
-
+	
 	private Result loadSchemaFromClass(SchemaManager.SchemaInfo schema, Optional<Version> currentVersion,
 	                                   Version requiredVersion) {
 		Result result;

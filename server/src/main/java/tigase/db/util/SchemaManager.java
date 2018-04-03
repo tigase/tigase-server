@@ -444,11 +444,68 @@ public class SchemaManager {
 
 	public Map<DataSourceInfo, List<ResultEntry>> loadSchemas() {
 		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas(config);
+		Map<DataSourceInfo, List<ResultEntry>> upgradeSupportResults = dataSourceSchemas.entrySet()
+				.stream()
+				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(),
+																	  checkUpgradeSupport(e.getKey(), e.getValue())))
+				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+		if (upgradeSupportResults.values()
+				.stream()
+				.flatMap(List::stream)
+				.filter(re -> re.result != SchemaLoader.Result.ok)
+				.findAny()
+				.isPresent()) {
+			// we need to stop here!!
+			return upgradeSupportResults.entrySet()
+					.stream()
+					.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(), e.getValue().stream().map(re -> {
+						if (re.result == SchemaLoader.Result.ok && !"Checking connection to database".equals(re.name)) {
+							return new ResultEntry(re.name, SchemaLoader.Result.skipped, "Skipped due to other errors");
+						} else {
+							return re;
+						}
+					}).collect(Collectors.toList())))
+					.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+		}
 		return dataSourceSchemas.entrySet()
 				.stream()
 				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(),
 																	  loadSchemas(e.getKey(), e.getValue())))
 				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+	}
+
+	public List<ResultEntry> checkUpgradeSupport(DataSource ds, List<SchemaInfo> schemas) {
+		final List<SchemaInfo> validSchemas = schemas.stream().filter(SchemaInfo::isValid).collect(Collectors.toList());
+
+		if (validSchemas.isEmpty()) {
+			log.log(Level.FINER, "no known schemas for data source " + ds + ", skipping schema loading...");
+			return Collections.emptyList();
+		}
+
+		return executeWithSchemaLoader(ds, (schemaLoader, handler) -> {
+			if (schemaLoader.validateDBExists() == SchemaLoader.Result.ok) {
+				return validSchemas.stream().map(schema -> {
+					Optional<Version> versionFromDB = schemaLoader.getComponentVersionFromDb(schema.getId());
+					Optional<Version> minimalSchemaVersionForUpgrade = schemaLoader.getMinimalRequiredComponentVersionForUpgrade(
+							schema);
+					if (!versionFromDB.isPresent() ||
+							minimalSchemaVersionForUpgrade.map(version -> versionFromDB.get().compareTo(version) >= 0)
+									.orElse(false)) {
+						return new ResultEntry(schema.getName(), SchemaLoader.Result.ok, "Upgrade supported");
+					} else {
+						return new ResultEntry(schema.getName(), SchemaLoader.Result.error,
+											   minimalSchemaVersionForUpgrade.map(
+													   version -> "Upgrade supported only from version " + version + " or higher")
+													   .orElse("Upgrade not supported!"));
+					}
+				}).collect(Collectors.toList());
+			} else {
+				return validSchemas.stream()
+						.map(schema -> new ResultEntry(schema.getName(), SchemaLoader.Result.ok,
+													   "Database do not exist"))
+						.collect(Collectors.toList());
+			}
+		});
 	}
 
 	public List<ResultEntry> loadSchemas(DataSource ds, List<SchemaInfo> schemas) {
@@ -954,6 +1011,11 @@ public class SchemaManager {
 			this.message = logHandler.getMessage().orElse(null);
 		}
 
+		private ResultEntry(String name, SchemaLoader.Result result, String message) {
+			this.name = name;
+			this.result = result;
+			this.message = message;
+		}
 	}
 
 	public static class RootCredentials {
