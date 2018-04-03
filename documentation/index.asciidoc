@@ -101,17 +101,9 @@ include::text/admin/Database_Management/Database_Preparation/Database_Preparatio
 
 include::text/admin/Database_Management/Database_Preparation/DbSchemaLoader.asciidoc[leveloffset=+3]
 
-include::text/admin/Database_Management/Database_Preparation/MySQL.asciidoc[leveloffset=+3]
-
-include::text/admin/Database_Management/Database_Preparation/Derby.asciidoc[leveloffset=+3]
-
-include::text/admin/Database_Management/Database_Preparation/MSSQL.asciidoc[leveloffset=+3]
-
-include::text/admin/Database_Management/Database_Preparation/PostGRE.asciidoc[leveloffset=+3]
-
-include::text/admin/Database_Management/Database_Preparation/MongoDB.asciidoc[leveloffset=+3]
-
 include::text/admin/Database_Management/Hashed_User_Passwords_in_Database.asciidoc[leveloffset=+2]
+
+include::text/admin/Database_Management/Database_Preparation/MongoDB.asciidoc[leveloffset=+2]
 
 include::text/admin/Database_Management/Multiple_Databases.asciidoc[leveloffset=+2]
 
@@ -235,7 +227,17 @@ include::text/admin/Using_Tigase/Scripting/Python.asciidoc[leveloffset=+3]
 
 include::text/admin/Addendum/Statistics_Descriptions.asciidoc[leveloffset=+1]
 
-== Appendix II - Properties Guide
+== Appendix II - Database Manual Entry
+
+include::text/admin/Database_Management/Database_Preparation/MySQL.asciidoc[leveloffset=+2]
+
+include::text/admin/Database_Management/Database_Preparation/Derby.asciidoc[leveloffset=+2]
+
+include::text/admin/Database_Management/Database_Preparation/MSSQL.asciidoc[leveloffset=+2]
+
+include::text/admin/Database_Management/Database_Preparation/PostGRE.asciidoc[leveloffset=+2]
+
+== Appendix III - Properties Guide
 
 include::text/properties/admins.asciidoc[leveloffset=+2]
 

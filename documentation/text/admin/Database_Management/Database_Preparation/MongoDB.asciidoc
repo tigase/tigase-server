@@ -17,6 +17,7 @@ To run Tigase MongoDB support library requires drivers for MongoDB for Java whic
 
 Note that fresh installations of MongoDB do not come with users or databases installed.  Once you have setup MongoDB you will need to create a user to be used with Tigase.  To do this, bring up the mongo console by running mongo.exe in a cmd window for windows, or run mongo in linux.
 Once connected, enter then following:
+
 [source,bash]
 -----
 >use admin
@@ -32,8 +33,6 @@ switched to admin
 
 Press shift + Enter to create new lines in the command and the shell will automatically add the three ellipses.  Be sure to give this user a `root` role in order to properly write to the database.
 Once you receive a `user successfully created` message, you are ready to install tigase on MongoDB.
-
-
 
 === Configuration of user repository for Tigase XMPP Server
 
@@ -55,7 +54,9 @@ authRepository {
     default () {}
 }
 -----
+
 If Tigase Server is not able to detect a proper storage layer implementation, it can be forced to use one provided by Tigase using the following lines in `etc/config.tdsl` file:
+
 [source,dsl]
 -----
 userRepository {
@@ -69,9 +70,11 @@ authRepository {
     }
 }
 -----
+
 Every component should be able to use proper implementation to support MongoDB using this URI. Also MongoDB URI can be passed as any URI in configuration of any component.
 
 === Configuration for MUC
+
 By default, MUC component will use MongoDB to store data if Tigase is configured to use it as a default store. However, if you would like to use a different MongoDB database to store MUC message archive, you can do this by adding the following lines to `etc/config.tdsl` file:
 [source,dsl]
 -----
@@ -88,7 +91,9 @@ muc {
 -----
 
 === Configuration for PubSub
+
 By default, PubSub component will use MongoDB to store data if Tigase is configured to use it as a default store. However, if you would like to use a different MongoDB database to store PubSub component data, you can do this by adding the following lines to `etc/config.tdsl` file:
+
 [source,dsl]
 -----
 pubsub {
@@ -96,6 +101,7 @@ pubsub {
 }
 -----
 If the PubSub components fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the `config.tdsl` file:
+
 [source,dsl]
 -----
 pubsub {
@@ -105,6 +111,7 @@ pubsub {
 
 === Configuration for Message Archiving
 By default, the Message Archiving component will use MongoDB to store data if Tigase is configured to use it as a default store. However, if you would like to use a different MongoDB database to store message archives, you can do this by adding the following lines to `etc/config.tdsl` file:
+
 [source,dsl]
 -----
 'message-archive' {
@@ -112,6 +119,7 @@ By default, the Message Archiving component will use MongoDB to store data if Ti
 }
 -----
 If Message Archiving component fails to detect and use a proper storage layer for MongoDB, you can force it to use one provided by Tigase by using the following line in the `config.tdsl` file:
+
 [source,dsl]
 -----
 'message-archive' {
@@ -120,6 +128,7 @@ If Message Archiving component fails to detect and use a proper storage layer fo
 -----
 
 == Schema Description
+
 This description contains only basic description of schema and only basic part of it. More collections may be created if additional components of Tigase XMPP Server are loaded and configured to use MongoDB.
 
 === Tigase XMPP Server Schema

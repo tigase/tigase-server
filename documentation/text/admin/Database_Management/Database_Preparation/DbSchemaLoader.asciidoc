@@ -14,7 +14,7 @@ In order to use this utility with any of the databases, you will need to first h
 == Operation & Variables
 
 *Operation*
-Operating the Schema Utility is now a lot easier!  To use it run this command from the installation directory:
+Operating the schema utility is quite easy!  To use it run this command from the installation directory:
 [source,command]
 -----
 ./scripts/tigase.sh [task] [params_file.conf] [options]
@@ -54,7 +54,9 @@ java -cp "jars/*" tigase.db.util.SchemaManager "upgrade-schema" --config-file=et
 
 [[install-schema]]
 === install-schema
-This task will install a schema using the parameters provided.  This will typically be used to manually install and setup a new database.
+This task will install a schema using the parameters provided.
+
+*If you are setting up a server manually, we HIGHLY recommend using this method*
 
 [source,command]
 -----

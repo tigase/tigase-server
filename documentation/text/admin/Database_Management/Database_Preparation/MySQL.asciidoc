@@ -9,142 +9,191 @@
 
 This guide describes how to prepare MySQL database for connecting Tigase server.
 
-== Basic Setup
-
 The MySQL database can be prepared in many ways. Most Linux distributions contain tools which allow you to go through all steps from the shell command line. To make sure it works on all platforms in the same way, we will first show how to do it under MySQL command line client.
 
-=== Configuring from MySQL command line tool
+== Configuring from MySQL command line tool
 
-Run the MySQL command line client in either Linux or MS Windows environment and enter following instructions:
+Run the MySQL command line client in either Linux or MS Windows environment and enter following instructions from the Tigase installation directory:
 
-. Create the database for the Tigase server:
-+
+[source,sql]
+-----
+mysql -u root -p
+-----
+
+Once logged in, create the database for the Tigase server:
+
 [source,sql]
 -----
 mysql> create database tigasedb;
 -----
-. Add the `tigase_user` user and grant him access to the `tigasedb` database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
-+
+
+ Add the `tigase_user` user and grant him access to the `tigasedb` database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+
 *Grant access to tigase_user connecting from any network address.*
-+
+
 [source,sql]
 -----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user@'%'
             IDENTIFIED BY 'tigase_passwd';
 -----
-+
+
 *Grant access to tigase_user connecting from localhost.*
-+
+
 [source,sql]
 -----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user@'localhost'
             IDENTIFIED BY 'tigase_passwd';
 -----
-+
+
 *Grant access to tigase_user connecting from local machine only.*
-+
+
 [source,sql]
 -----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user
             IDENTIFIED BY 'tigase_passwd';
 -----
-+
+
 For the Tigase server version 4.x additional permissions must be granted for the database user:
-+
+
 [source,sql]
 -----
 mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user'@'localhost';
 mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user'@'%';
 mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user';
 -----
-+
+
 And now you can update user permission changes in the database:
-+
+
 [source,sql]
 -----
 mysql> FLUSH PRIVILEGES;
 -----
-. Load the proper mysql schema into the database.  Full installations of Tigase will have all the SQL file you need to create and update the database. First, switch to the database you have just created:
-+
+
+=== Installing Schemas
+Starting with v8.0.0 the Schemas are no longer linked, and will need to manually be installed in the following order.
+Switch to the database you have created:
+
 [source,sql]
 -----
 mysql> use tigasedb;
 -----
-+
-We are assuming you run the mysql client in Linux from the Tigase installation directory.
-+
-[source,sql]
------
-mysql> source database/mysql-7-1-schema.sql;
------
-+
-For the Tigase server version v7.1.0 you have to use proper schema version which is 5.1.  You will also need to manually load the PubSub schema as well, current version is v3.2.0.  All modern versions will load previous schemas first so no need to do a manual upgrade.
-+
-[source,sql]
------
-mysql> source database/mysql-pubsub-schema-3.2.0.sql;
------
-+
-If you plan to use the Socks5 component, you will also need to add that schema as well.
-+
-[source,sql]
------
-mysql> source database/mysql-socks5-schema.sql;
------
-+
-On Windows you have probably to enter the full path, assuming Tigase is installed in C:\Program Files\Tigase:
-+
-[source,sql]
------
-mysql> source c:/Program Files/Tigase/database/mysql-7-1-schema.sql;
-mysql> source c:/Program Files/Tigase/database/mysql-pubsub-schema-3.2.0.sql;
-mysql> source c:/Program Files/Tigase/database/mysql-socks5-schema.sql;
------
-+
 
+NOTE: We are assuming you run the mysql client in Linux from the Tigase installation directory, so all file links will be relative.
+
+Next install the schema files:
+
+[source,sql]
+-----
+mysql> source database/mysql-common-0.0.1.sql;
+-----
+
+You will need to repeat this process for the following files:
+[source,list]
+-----
+mysql-common-0.0.1.sql
+mysql-common-0.0.2.sql
+mysql-server-7.0.0.sql
+mysql-server-7.1.0.sql
+mysql-server-8.0.0.sql
+mysql-muc-3.0.0.sql
+mysql-pubsub-3.1.0.sql
+mysql-pubsub-3.2.0.sql
+mysql-pubsub-4.0.0.sql
+mysql-http-api-2.0.0.sql
+-----
+
+Other components may require installation such as:
+
+[source,list]
+-----
+mysql-socks5-2.0.0.sql
+mysql-push-1.0.0.sql
+mysql-message-archiving-2.0.0.sql
+mysql-unified-archive-2.0.0.sql
+-----
+
+
+==== Windows instructions:
+On Windows you have probably to enter the full path, assuming Tigase is installed in C:\Program Files\Tigase:
+[source,sql]
+-----
+mysql> source c:/Program Files/Tigase/database/mysql-common-0.0.1.sql;
+mysql> source c:/Program Files/Tigase/database/mysql-common-0.0.2.sql;
+mysql> source c:/Program Files/Tigase/database/mysql-server-7.0.0.sql;
+and so on...
+-----
 
 == Configuring From the Linux Shell Command Line
 
 Follow steps below to prepare the MySQL database:
 
-. Create the database space for the Tigase server:
+Create the database space for the Tigase server:
 [source,sql]
 -----
 mysqladmin -p create tigasedb
 -----
-. Add the `tigase_user` user and grant access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
-*Grant access to tigase_user connecting from any network address.*
+Add the `tigase_user` user and grant access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+
+=== Selective access configuration
+==== Grant access to tigase_user connecting from any network address.
+
 [source,sql]
 -----
 echo "GRANT ALL ON tigasedb.* TO tigase_user@'%' \
             IDENTIFIED BY 'tigase_passwd'; \
             FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 -----
-*Grant access to tigase_user connecting from localhost.*
+
+==== Grant access to tigase_user connecting from localhost.
+
 [source,sql]
 -----
 echo "GRANT ALL ON tigasedb.* TO tigase_user@'localhost' \
             IDENTIFIED BY 'tigase_passwd'; \
             FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 -----
-*Grant access to tigase_user connecting from local machine only.*
+
+==== Grant access to tigase_user connecting from local machine only.
+
 [source,sql]
 -----
 echo "GRANT ALL ON tigasedb.* TO tigase_user \
             IDENTIFIED BY 'tigase_passwd'; \
             FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 -----
-. Load the proper mysql schema into the database.  Full installations of Tigase will have all the SQL file you need to create and update the database.
+
+=== Schema Installation
+Load the proper mysql schemas into the database.
 [source,sql]
 -----
-mysql -u dbuser -p tigasedb < mysql-schema-7-1.sql
-mysql -u dbuser -p tigasedb < mysql-pubsub-schema-3.2.0.sql
+mysql -u dbuser -p tigasedb < mysql-common-0.0.1.sql
+mysql -u dbuser -p tigasedb < mysql-common-0.0.2.sql
+etc..
 -----
 
-If you want to use the socks5 component, then oyu will need to include the following line as well:
-[source,sql]
+You will need to repeat this process for the following files:
+[source,list]
 -----
-mysql -u dbuser -p tigasedb < mysql-socks5-schema.sql
+mysql-common-0.0.1.sql
+mysql-common-0.0.2.sql
+mysql-server-7.0.0.sql
+mysql-server-7.1.0.sql
+mysql-server-8.0.0.sql
+mysql-muc-3.0.0.sql
+mysql-pubsub-3.1.0.sql
+mysql-pubsub-3.2.0.sql
+mysql-pubsub-4.0.0.sql
+mysql-http-api-2.0.0.sql
+-----
+
+Other components may require installation such as:
+
+[source,list]
+-----
+mysql-socks5-2.0.0.sql
+mysql-push-1.0.0.sql
+mysql-message-archiving-2.0.0.sql
+mysql-unified-archive-2.0.0.sql
 -----
 
 == Configuring MySQL for UTF-8 Support

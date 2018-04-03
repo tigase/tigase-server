@@ -9,11 +9,17 @@
 
 Tigase uses generally the same database schema and the same set of stored procedures and functions on every database. However, the schema creation scripts and code for stored procedures is different for each database. Therefore the manual process to prepare database is different for each database system.
 
-Of course the simplest and easiest way to prepare database is to use Tigase web installer which automates the whole process. Sometimes this is not possible. A second option is to use the `DBSchemaLoader` utility in Tigase. If either of those won't work, or won't suit your needs,  provided are set of guides describing initialization and preparation process for each supported database.
+Starting with v8.0.0, most of the database tasks have been automated and can be called using simple text, or using interactive question and answer style.  We DO NOT RECOMMEND going through manual operation, however we have kept manual activation of different databases to the Appendix.
+If you are interested in how we manage and update our database schemas, you may visit the link:https://tigase.tech/projects/tigase-server/wiki/Schema_files_maintenance[Schema Maintenance] section of our Redmine installation for more detailed information.
 
 - xref:dbSchemaLoader[The DBSchemaLoader Utility]
-- xref:prepareMysql[Prepare the MySQL Database for the Tigase Server]
 - xref:hashedPasswords[Hashed User Passwords in Database]
-- xref:prepareDerby[Prepare the Derby Database for the Tigase Server]
-- xref:prepareMssql[Prepare the MS SQL Server Database for the Tigase Server]
-- xref:preparePostgresql[Prepare the PostgreSQL Database for the Tigase Server]
+- xref:mongoDBSupport[Support for MongoDB]
+
+
+Appendix entries
+
+- xref:prepareMysql[Manual installtion for MySQL]
+- xref:prepareDerby[Manual installtion for Derby]
+- xref:prepareMssql[Manual installtion for SQLServer]
+- xref:preparePostgresql[Manual installtion for PostGRESQL]
