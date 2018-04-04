@@ -32,8 +32,8 @@ The shortest possible description is the following example of the content from t
 This query is used to check connection to the database, whether it is still alive or not
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'conn-valid-query' = 'select 1'
     }
 }
@@ -42,8 +42,8 @@ This query is used to check connection to the database, whether it is still aliv
 This is database initialization query, normally we do not use it, especially in clustered environment
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'init-db-query' = 'update tig_users set online_status = 0'
     }
 }
@@ -54,8 +54,8 @@ The Tigase server does not need to know authentication algorithm or password enc
 If the authentication was successful the procedure returns user bare JID or null otherwise. Tigase checks whether the JID returned from the query matches JID passed as a parameter. If they match, the authentication is successful.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'user-login-query' = '{ call TigUserLoginPlainPw(?, ?) }'
     }
 }
@@ -64,8 +64,8 @@ If the authentication was successful the procedure returns user bare JID or null
 Below query returns number of user accounts in the database, this is mainly used for the server metrics and monitoring components.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
       'users-count-query' = '{ call TigAllUsersCount() }'
     }
 }
@@ -74,8 +74,8 @@ Below query returns number of user accounts in the database, this is mainly used
 The Below query is used to add a new user account to the database.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'add-user-query' = '{call TigAddUserPlainPw(?, ?) }'
     }
 }
@@ -84,8 +84,8 @@ The Below query is used to add a new user account to the database.
 Below query is used to remove existing account with all user's data from the database.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'del-user-query' = '{ call TigRemoveUser(?) }'
     }
 }
@@ -95,8 +95,8 @@ This query is used for the user authentication if `user-login-query` is not defi
 In such a case the Tigase server loads user's password from the database and compares it  with data received from the client.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'get-password-query' = 'select user_pw from tig_users where user_id = ?'
     }
 }
@@ -105,8 +105,8 @@ In such a case the Tigase server loads user's password from the database and com
 Below query is used for user password update in case user decides to change his password.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'update-password-query' = 'update tig_users set user_pw = ? where user_id = ?'
     }
 }
@@ -115,8 +115,8 @@ Below query is used for user password update in case user decides to change his 
 This query is called on user logout event. Usually we use a stored procedure which records user logout time and marks user as offline in the database.
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'update-logout-query' = 'update tig_users, set online_status = online_status - 1 where user_id = ?'
     }
 }
@@ -124,9 +124,9 @@ This query is called on user logout event. Usually we use a stored procedure whi
 This configuration specifies what non-sasl authentication mechanisms to expose to the client
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
-        'non-sasl-mechs' = 'password,digest'
+authRepository {
+    default () {
+        'non-sasl-mechs' = [ 'password', 'digest' ]
     }
 }
 -----
@@ -134,8 +134,8 @@ This configuration specifies what non-sasl authentication mechanisms to expose t
 This setting to specify what sasl authentication mechanisms expose to the client
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'sasl-mechs' = 'PLAIN,DIGEST-MD5'
     }
 }
@@ -151,8 +151,8 @@ This example shows how to use a stored procedure to add a user as a query with 2
 
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
+authRepository {
+    default () {
         'add-user-query' = '{call TigAddUserPlainPw(?, ?) }'
     }
 }

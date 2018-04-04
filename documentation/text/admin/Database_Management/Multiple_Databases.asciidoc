@@ -92,18 +92,14 @@ userRepository {
 -----
 
 Next VHost: domain2.com
-User authentication is in LDAP server
+User authentication is in LDAP server but all other user data is stored in Tigase's standard database
 [source,dsl]
 -----
-dataSource {
-    'domain2.com-auth' () {
-        uri = 'ldap://ldap.domain2.com:389'
-    }
-}
 authRepository {
     domain2.com () {
         cls = 'tigase.db.ldap.LdapAuthProvider'
-        'data-source' = 'domain2.com-auth'
+        uri = 'ldap://ldap.domain2.com:389'
+        'data-source' = 'default'
     }
 }
 -----
@@ -112,11 +108,9 @@ Now is something new, we have a custom authentication repository and separate us
 Please note how we define the VHost for which we set custom parameters
 [source,dsl]
 -----
-'basic-conf' {
-    'auth-repo-params' {
-        domain2.com {
-            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
-        }
+authRepository {
+    domain2.com {
+        'user-dn-pattern' = 'cn=,ou=,dc=,dc='
     }
 }
 -----
@@ -141,9 +135,6 @@ dataSource {
     domain2.com () {
         uri = 'jdbc:mysql://db2.tigase/dbname?user&password'
     }
-    'domain2.com-auth' () {
-        uri = 'ldap://ldap.domain2.com:389'
-    }
 }
 userRepository {
     domain2.com () {}
@@ -151,14 +142,8 @@ userRepository {
 authRepository {
     domain2.com () {
         cls = 'tigase.db.ldap.LdapAuthProvider'
-        'data-source' = 'domain2.com-auth'
-    }
-}
-'basic-conf' {
-    'auth-repo-params' {
-        domain2.com {
-            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
-        }
+        uri = 'ldap://ldap.domain2.com:389'
+        'user-dn-pattern' = 'cn=,ou=,dc=,dc='
     }
 }
 -----
@@ -171,9 +156,6 @@ dataSource {
     domain3.com () {
         uri = 'jdbc:pgsql://db.domain3.com/dbname?user&password'
     }
-    'domain3.com-auth' () {
-        uri = 'ldap://ldap.domain3.com:389'
-    }
 }
 userRepository {
     domain3.com () {}
@@ -181,14 +163,8 @@ userRepository {
 authRepository {
     domain3.com () {
         cls = 'tigase.db.ldap.LdapAuthProvider'
-        'data-source' = 'domain3.com-auth'
-    }
-}
-'basic-conf' {
-    'auth-repo-params' {
-        domain3.com {
-            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
-        }
+        uri = 'ldap://ldap.domain3.com:389'
+        'user-dn-pattern' = 'cn=,ou=,dc=,dc='
     }
 }
 -----
@@ -207,15 +183,9 @@ userRepository {
 authRepository {
     domain4.com () {
         cls = 'tigase.db.jdbc.TigaseCustomAuth'
-    }
-}
-'basic-conf' {
-    'auth-repo-params' {
-        domain4.com {
-            'user-login-query' = '{ call UserLogin(?, ?) }'
-            'user-logout-query' = '{ call UserLogout(?) }'
-            'sasl-mechs' = 'PLAIN,DIGEST-MD5'
-        }
+        'user-login-query' = '{ call UserLogin(?, ?) }'
+        'user-logout-query' = '{ call UserLogout(?) }'
+        'sasl-mechs' = [ 'PLAIN', 'DIGEST-MD5' ]
     }
 }
 -----

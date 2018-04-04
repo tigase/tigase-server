@@ -22,7 +22,7 @@
 Script executes graceful shutdown of cluster node
 AS:Description: Shutdown
 AS:CommandId: http://jabber.org/protocol/admin#shutdown
-AS:Component: basic-conf
+AS:Component: message-router
 AS:Group: Configuration
  */
 

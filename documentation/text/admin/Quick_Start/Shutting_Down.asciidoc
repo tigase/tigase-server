@@ -46,4 +46,4 @@ This feature is enabled by default, however you may disable this by adding the f
 == Shutting Down Cluster Nodes
 Starting with v8.0.0 you can now shut down individual cluster nodes without shutting down the whole server.  This command will use the _SeeOtherHost_ strategy to direct traffic to other nodes and update the cluster map to gracefully shut down the single node
 
-Shutting down individual nodes can be done VIA Ad-hoc command and fill out the response forms.  The command is available from basic-conf as http://jabber.org/protocol/admin#shutdown.
+Shutting down individual nodes can be done VIA Ad-hoc command and fill out the response forms.  The command is available from message-router as http://jabber.org/protocol/admin#shutdown.

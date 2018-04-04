@@ -33,15 +33,12 @@ This log file is a basic list of files that are made on install of Tigase server
 If you are using the derby database installed with Tigase, this is the startup log for the database itself.  Issues that might be related to the database, can be found in this file.  Typically, if everything works okay, it's a very small file with only 10 lines.  It is overwritten on startup of the database.
 
 == config-dump.properties
-The config-dump.properties is dump file of all your properties listed for every option within Tigase and components.  The structure of the log lines is as follows.
--------
-modulename/settingformodulename[Data type]=value(s)
--------
+The config-dump.properties is dump file of all your properties listed for every option within Tigase and components.  The structure of the log lines is the same as the structure of Tigase XMPP Server config file - TDSL.
 Lets take the value for admins, listing who is administrator for the server.
 -----
-basic-conf/admins[s]=admin@jabber.freehost.org, administrator@jabber.freehost.org, fJones@jabber.freehost.org
+admins = [ 'admin@jabber.freehost.org', 'administrator@jabber.freehost.org', 'fJones@jabber.freehost.org' ]
 -----
-The admin parameter which is an array of strings noted by the s, has 3 users listed.
+The admin parameter which is an array of strings and has 3 users listed.
 
 This file is re-written every time tigase starts.
 

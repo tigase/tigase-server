@@ -13,19 +13,10 @@ Configuration for the LDAP support is really simple you just have to add a few l
 
 [source,java]
 -----
-dataSource {
-    'default-auth' () {
-        uri = 'ldap://ldap.tigase.com:389'
-    }
-}
 authRepository {
     default () {
         cls = 'tigase.db.ldap.LdapAuthProvider'
-        'data-source' = 'default-auth'
-    }
-}
-'basic-conf' {
-    'auth-repo-params' {
+        uri = 'ldap://ldap.tigase.com:389'
         'user-dn-pattern' = 'cn=USER_ID,ou=people,dc=tigase,dc=org'
     }
 }
