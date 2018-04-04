@@ -48,6 +48,8 @@ derby-server-7.1.0.sql
 derby-server-8.0.0.sql
 derby-muc-3.0.0.sql
 derby-pubsub-3.1.0.sql
+derby-pubsub-3.2.0.sql
+derby-pubsub-4.0.0.sql
 derby-http-api-2.0.0.sql
 -----
 
