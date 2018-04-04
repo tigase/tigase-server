@@ -44,8 +44,8 @@ public class ConfigReader {
 		ENVIRONMENT,
 		PROPERTY
 	}
-	private static Pattern DOUBLE_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+)([dDfF]*)");
-	private static Pattern INTEGER_PATTERN = Pattern.compile("([0-9]+)([lL]*)");
+	private static Pattern DOUBLE_PATTERN = Pattern.compile("(\\-?[0-9]+\\.[0-9]+)([dDfF]*)");
+	private static Pattern INTEGER_PATTERN = Pattern.compile("(\\-?[0-9]+)([lL]*)");
 	private static double x = 2.1f;
 	private StateHolder holder = new StateHolder();
 
@@ -417,21 +417,32 @@ public class ConfigReader {
 					case '/':
 					case '*':
 						if (holder.state == State.LIST) {
-							if (holder.value != null) {
-								Object value = holder.value;
-								holder.value = null;
-								holder.sb = new StringBuilder();
-								if (holder.variable == null) {
-									CompositeVariable var = new CompositeVariable();
-									holder.variable = var;
+							Object value = holder.value;
+							if (value == null) {
+								if (c == '-' && holder.sb.toString().trim().isEmpty()) {
+									holder.sb.append(c);
+									break;
+								} else {
+									value = decodeValue(holder.sb.toString());
 								}
-								((CompositeVariable) holder.variable).add(c, value);
-								break;
 							}
+							holder.value = null;
+							holder.sb = new StringBuilder();
+							if (holder.variable == null) {
+								CompositeVariable var = new CompositeVariable();
+								holder.variable = var;
+							}
+							((CompositeVariable) holder.variable).add(c, value);
+							break;
 						} else {
 							Object value = holder.value;
 							if (value == null) {
-								value = decodeValue(holder.sb.toString());
+								if (c == '-' && holder.sb.toString().trim().isEmpty()) {
+									holder.sb.append(c);
+									break;
+								} else {
+									value = decodeValue(holder.sb.toString());
+								}
 							}
 							if (holder.key != null && value != null) {
 								holder.value = null;

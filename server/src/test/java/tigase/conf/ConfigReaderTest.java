@@ -28,6 +28,8 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -223,6 +225,28 @@ public class ConfigReaderTest {
 		assertEquals("admin@localhost", paths.get(0).toString());
 		assertEquals("" + System.getenv("USER") + "@localhost",
 					 ((ConfigReader.Variable) paths.get(1)).calculateValue());
+	}
+
+	@Test
+	public void testReadingNegativeValues() throws IOException, ConfigReader.ConfigException {
+		String tmp = Stream.of("sub = 10 - 15",
+							   "sub2 = [ 20 - 25 ]",
+							   "negative1 = -10",
+							   "negative2 = -10l",
+							   "negative3 = -10.9d",
+							   "negative4 = [ -10 ]").collect(Collectors.joining("\n"));
+		Map<String, Object> data = new ConfigReader().read(new StringReader(tmp));
+		int negative1 = (Integer) data.get("negative1");
+		assertEquals(-10, negative1);
+		long negative2 = (Long) data.get("negative2");
+		assertEquals(-10, negative2);
+		double negative3 = (Double) data.get("negative3");
+		assertEquals(-10.9, negative3, 0.2);
+		List<Integer> negative4 = (List<Integer>) data.get("negative4");
+		assertEquals(-10, (int) negative4.get(0));
+		assertEquals(-5, ((ConfigReader.CompositeVariable) data.get("sub")).calculateValue());
+		assertEquals(-5, ((ConfigReader.CompositeVariable) ((List<ConfigReader.CompositeVariable>) data.get("sub2")).get(
+				0)).calculateValue());
 	}
 
 	private void displayFile(File f) throws IOException {
