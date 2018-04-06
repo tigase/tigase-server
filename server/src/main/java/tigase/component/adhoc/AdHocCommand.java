@@ -21,6 +21,8 @@ package tigase.component.adhoc;
 
 import tigase.xmpp.jid.JID;
 
+import java.util.Optional;
+
 public interface AdHocCommand {
 
 	void execute(final AdhHocRequest request, AdHocResponse response) throws AdHocCommandException;
@@ -28,6 +30,10 @@ public interface AdHocCommand {
 	String getName();
 
 	String getNode();
+
+	default Optional<String> getGroup() {
+		return Optional.empty();
+	}
 
 	boolean isAllowedFor(JID jid);
 
