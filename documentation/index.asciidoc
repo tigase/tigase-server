@@ -65,6 +65,8 @@ include::text/admin/Configuration/Logging.asciidoc[leveloffset=+2]
 
 include::text/admin/Using_Tigase/Advanced_Options.asciidoc[leveloffset=+2]
 
+include::../server/target/text/components/tigase-extras/documentation/index.asciidoc[leveloffset=+2]
+
 // Security
 include::text/admin/Security/Security.asciidoc[leveloffset=+1]
 
