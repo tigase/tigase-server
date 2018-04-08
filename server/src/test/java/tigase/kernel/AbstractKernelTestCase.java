@@ -23,6 +23,7 @@ package tigase.kernel;
 import org.junit.After;
 import org.junit.Before;
 import tigase.kernel.core.Kernel;
+import tigase.util.reflection.ClassUtilBean;
 
 /**
  * Class is a base class for tests requiring usage of Kernel instances.
@@ -44,7 +45,11 @@ public class AbstractKernelTestCase {
 	}
 
 	protected void registerBeans(Kernel kernel) {
-
+		kernel.registerBean("classUtilBean")
+				.asInstance(ClassUtilBean.getInstance())
+				.exportable()
+				.setActive(true)
+				.exec();
 	}
 
 	protected <T> T getInstance(Class<T> clazz) {

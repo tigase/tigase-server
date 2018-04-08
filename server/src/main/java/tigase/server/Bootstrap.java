@@ -42,6 +42,7 @@ import tigase.sys.ShutdownHook;
 import tigase.util.dns.DNSResolverDefault;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.dns.DNSResolverIfc;
+import tigase.util.reflection.ClassUtilBean;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.BareJID;
 
@@ -118,17 +119,18 @@ public class Bootstrap {
 		}
 
 		try {
+			ClassUtilBean classUtilBean = null;
 			if (XMPPServer.isOSGi()) {
-				kernel.registerBean("classUtilBean")
-						.asInstance(Class.forName("tigase.osgi.util.ClassUtilBean").newInstance())
-						.exportable()
-						.exec();
+				classUtilBean = (ClassUtilBean) Class.forName("tigase.osgi.util.ClassUtilBean").newInstance();
 			} else {
-				kernel.registerBean("classUtilBean")
-						.asInstance(Class.forName("tigase.util.reflection.ClassUtilBean").newInstance())
-						.exportable()
-						.exec();
+				classUtilBean = (ClassUtilBean) Class.forName("tigase.util.reflection.ClassUtilBean").newInstance();
 			}
+
+			classUtilBean.initialize(ClassUtilBean.getPackagesToSkip(null));
+			kernel.registerBean("classUtilBean")
+					.asInstance(classUtilBean)
+					.exportable()
+					.exec();
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}

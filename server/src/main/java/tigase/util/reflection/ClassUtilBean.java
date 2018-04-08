@@ -25,35 +25,80 @@ import tigase.util.ClassUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by andrzej on 08.09.2016.
  */
 public class ClassUtilBean {
 
+	private static final String[] DEFAULT_PACKAGES_TO_SKIP = {"com.fasterxml.jackson", "com.mongodb", "org.bson",
+															  "com.mysql", "com.notnoop", "javax.jmdns", "javax.mail",
+															  "javax.servlet", "org.apache.commons", "org.apache.derby",
+															  "org.apache.felix", "org.apache.http.client",
+															  "org.apache.xml", "org.bouncycastle", "org.eclipse.jetty",
+															  "org.hamcrest.core", "org.postgresql", "org.slf4j",
+															  "ch.qos.logback", "com.sun", "groovy",
+															  "org.codehaus.groovy", "org.netbeans", "org.python",
+															  "tigase.jaxmpp", "tigase.pubsub.Utils"};
+
 	private static ClassUtilBean instance;
 	private static Logger log = Logger.getLogger(ClassUtilBean.class.getCanonicalName());
 	protected HashSet<Class<?>> classes = new HashSet<>();
 
-	public static ClassUtilBean getInstance() {
-		if (instance == null) {
-			instance = new ClassUtilBean();
+	public static List<String> getPackagesToSkip(String[] packagesToSkip) {
+		if (packagesToSkip == null) {
+			return Arrays.asList(DEFAULT_PACKAGES_TO_SKIP);
+		} else {
+			return Stream.concat(Arrays.stream(DEFAULT_PACKAGES_TO_SKIP), Arrays.stream(packagesToSkip))
+					.distinct()
+					.collect(Collectors.toList());
 		}
-		return instance;
+	}
+
+	public static ClassUtilBean getInstance() {
+		synchronized (ClassUtilBean.class) {
+			if (instance == null) {
+				ClassUtilBean instance = new ClassUtilBean();
+				instance.initialize(null);
+			}
+			return instance;
+		}
 	}
 
 	public ClassUtilBean() {
+	}
+
+	public void initialize(Collection<String> skipPackages) {
 		try {
-			classes.addAll(ClassUtil.getClassesFromClassPath());
+			Predicate<String> filter = null;
+			if (skipPackages == null) {
+				filter = className -> true;
+			} else {
+				List<String> packages = skipPackages.stream().map(packageName -> packageName + ".").collect(Collectors.toList());
+				filter = className -> {
+					for (String packageName : packages) {
+						if (className.startsWith(packageName)) {
+							return false;
+						}
+					}
+					return true;
+				};
+			}
+			classes.addAll(ClassUtil.getClassesFromClassPath(filter));
 			// support for handling debugging test cases started by Maven Surefire Plugin
 			// as without it Tigase Kernel is not able to see annotated beans
 			classes.addAll(getClassesFromSurefireClassLoader());
 		} catch (IOException | ClassNotFoundException e) {
 			log.log(Level.SEVERE, "Could not initialize list of classes", e);
 		}
-		instance = this;
+		synchronized (ClassUtilBean.class) {
+			instance = this;
+		}
 	}
 
 	public Set<Class<?>> getAllClasses() {

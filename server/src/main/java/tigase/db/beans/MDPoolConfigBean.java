@@ -162,7 +162,6 @@ public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
 			for (A repo : toInitialize) {
 				tasks.offer(pool.submit(() -> {
 					try {
-						Thread.sleep(1000);
 						initRepository(repo);
 					} catch (RepositoryException ex) {
 						if (skipInitializationErrors) {
