@@ -39,6 +39,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +48,8 @@ public class AddScriptTaskCommand
 		implements AdHocCommand {
 
 	private final static Logger log = Logger.getLogger(AddScriptTaskCommand.class.getName());
+	private static final Optional<String> GROUP = Optional.of("Monitor");
+
 	@Inject
 	private MonitorComponent component;
 	@Inject
@@ -115,6 +118,11 @@ public class AddScriptTaskCommand
 	@Override
 	public String getNode() {
 		return "x-add-task";
+	}
+
+	@Override
+	public Optional<String> getGroup() {
+		return GROUP;
 	}
 
 	@Override

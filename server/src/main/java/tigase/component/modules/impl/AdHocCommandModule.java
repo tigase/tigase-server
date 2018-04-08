@@ -62,8 +62,10 @@ public class AdHocCommandModule
 		ArrayList<Element> commandsList = new ArrayList<Element>();
 		for (AdHocCommand command : this.commandsManager.getAllCommands()) {
 			if (command.isAllowedFor(senderJid)) {
-				commandsList.add(new Element("item", new String[]{"jid", "node", "name"},
-											 new String[]{toJid.toString(), command.getNode(), command.getName()}));
+				Element cmdEl = new Element("item", new String[]{"jid", "node", "name"},
+											new String[]{toJid.toString(), command.getNode(), command.getName()});
+				command.getGroup().ifPresent(group -> cmdEl.setAttribute("group", group));
+				commandsList.add(cmdEl);
 			}
 		}
 
@@ -99,6 +101,7 @@ public class AdHocCommandModule
 			if (c.isAllowedFor(stanzaFrom)) {
 				Element i = new Element("item", new String[]{"jid", "node", "name"},
 										new String[]{stanzaTo.toString(), c.getNode(), c.getName()});
+				c.getGroup().ifPresent(group -> i.setAttribute("group", group));
 				result.add(i);
 			}
 		}
