@@ -158,7 +158,7 @@ public class PlainCallbackHandler
 
 			accountDisabled = credentials.isAccountDisabled();
 
-			pc.setVerified(entry.verifyPlainPassword(password));
+			pc.setVerified(entry != null && entry.verifyPlainPassword(password));
 		} catch (Exception e) {
 			pc.setVerified(false);
 			throw new IOException("Password verification problem.", e);

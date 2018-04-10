@@ -265,6 +265,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	protected <T extends DataSource> Result addUsersToRepository(SchemaManager.SchemaInfo schemaInfo, T dataSource, Class<T> dataSourceClass, List<BareJID> jids, String password, Logger log) {
 		return getDataSourceAwareClassesForSchemaInfo(schemaInfo, dataSourceClass)
 				.filter(AuthRepository.class::isAssignableFrom)
+				.filter(AbstractAuthRepositoryWithCredentials.class::isAssignableFrom)
 				.map(this::instantiateClass)
 				.map(initializeDataSourceAwareFunction(dataSource, log))
 				.map(AuthRepository.class::cast)

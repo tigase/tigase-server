@@ -295,6 +295,9 @@ public interface AuthRepository
 
 		@Override
 		public Credentials.Entry getFirst() {
+			if (entries.isEmpty()) {
+				return null;
+			}
 			RawEntry entry = entries.get(0);
 			try {
 				return decoder.decode(user, entry.getMechanism(), entry.getValue());
