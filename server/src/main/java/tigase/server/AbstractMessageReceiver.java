@@ -160,10 +160,14 @@ public abstract class AbstractMessageReceiver
 	// ~--- fields ---------------------------------------------------------------
 	// private static final TigaseTracer tracer =
 	// TigaseTracer.getTracer("abstract");
+	@ConfigField(desc = "Number of threads processing incoming packages", alias = "processing-in-threads")
+	private int processingInThreads = processingInThreads();
 	private int in_queues_size = processingInThreads();
 	private long last_hour_packets = 0;
 	private long last_minute_packets = 0;
 	private long last_second_packets = 0;
+	@ConfigField(desc = "Number of threads processing outgoing packages", alias = "processing-out-threads")
+	private int processingOutThreads = processingOutThreads();
 	private int out_queues_size = processingOutThreads();
 	private QueueListener out_thread = null;
 	@ConfigField(desc = "Packet delivery retry count", alias = PACKET_DELIVERY_RETRY_COUNT_PROP_KEY)
@@ -871,67 +875,84 @@ public abstract class AbstractMessageReceiver
 		outgoing_filters.clear();
 		outgoing_filters.addAll(filters);
 	}
+	
+	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		super.beanConfigurationChanged(changedFields);
 
-	public void setPriorityQueueClass(Class<? extends PriorityQueueAbstract> priorityQueueClass) {
-		if (!this.priorityQueueClass.equals(priorityQueueClass)) {
-			this.priorityQueueClass = priorityQueueClass;
+		boolean recreate = ((maxInQueueSize != (maxQueueSize / processingInThreads) * 2) ||
+				(maxOutQueueSize != (maxQueueSize / processingOutThreads) * 2));
+
+		if (in_queues.isEmpty() || !priorityQueueClass.equals(in_queues.get(0).getClass())) {
+			recreate = true;
 			this.in_queues.clear();
 			this.out_queues.clear();
-			this.setMaxQueueSize(maxQueueSize);
+		}
+
+		if (processingInThreads != in_queues_size || processingOutThreads == out_queues_size) {
+			recreate = true;
+			this.in_queues_size = processingInThreads;
+			this.out_queues_size = processingOutThreads;
+			this.in_queues.clear();
+			this.out_queues.clear();
+		}
+
+		if (recreate) {
+			recreateProcessingQueues(maxQueueSize);
 		}
 	}
 
-	public void setMaxQueueSize(int maxQueueSize) {
-		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0) || this.threadsQueueIn == null) {
-			this.maxQueueSize = maxQueueSize;
+	private void recreateProcessingQueues(int maxQueueSize) {
+		// Processing threads number is split to incoming and outgoing queues...
+		// So real processing threads number of in_queues is processingThreads()/2
+		this.maxInQueueSize = (maxQueueSize / processingInThreads) * 2;
+		this.maxOutQueueSize = (maxQueueSize / processingOutThreads) * 2;
+		log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
+				new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
+		log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
+				new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
 
-			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
-			// maxQueueSize);
-			// Processing threads number is split to incoming and outgoing queues...
-			// So real processing threads number of in_queues is processingThreads()/2
-			this.maxInQueueSize = (maxQueueSize / processingInThreads()) * 2;
-			this.maxOutQueueSize = (maxQueueSize / processingOutThreads()) * 2;
-			log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
-					new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
+		if (maxInQueueSize <= 15 || maxQueueSize <= 15) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"You configured component of class " + getClass().getCanonicalName() +
+														 " with packet queues total size set to " + maxQueueSize,
+												 "Component uses " +
+														 Math.max(processingInThreads, processingOutThreads) +
+														 " queues which would give a limit of " +
+														 Math.min(maxInQueueSize, maxOutQueueSize) +
+														 " packets per queue.",
+												 "This value is too low for Tigase XMPP Server to run properly. Please adjust the configuration of the server.",
+												 "max-queue-size should be set to at least " +
+														 (Math.max(processingInThreads, processingOutThreads) / 2) *
+																 16});
+		}
 
-			if (maxInQueueSize <= 15 || maxQueueSize <= 15) {
-				TigaseRuntime.getTigaseRuntime().shutdownTigase(new String[] {
-						"You configured component of class " + getClass().getCanonicalName() + " with packet queues total size set to " + maxQueueSize,
-						"Component uses " + Math.max(processingInThreads(), processingOutThreads()) + " queues which would give a limit of " + Math.min(maxInQueueSize,maxOutQueueSize) + " packets per queue.",
-						"This value is too low for Tigase XMPP Server to run properly. Please adjust the configuration of the server.",
-						"max-queue-size should be set to at least " + (Math.max(processingInThreads(), processingOutThreads())/2) * 16
-				});
+		if (in_queues.size() == 0) {
+			for (int i = 0; i < in_queues_size; i++) {
+				PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
+																							 maxInQueueSize,
+																							 priorityQueueClass);
+
+				in_queues.add(queue);
 			}
-
-			if (in_queues.size() == 0) {
-				for (int i = 0; i < in_queues_size; i++) {
-					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
-																								 maxInQueueSize,
-																								 priorityQueueClass);
-
-					in_queues.add(queue);
-				}
-			} else {
-				for (int i = 0; i < in_queues.size(); i++) {
-					in_queues.get(i).setMaxSize(maxInQueueSize);
-				}
+		} else {
+			for (int i = 0; i < in_queues.size(); i++) {
+				in_queues.get(i).setMaxSize(maxInQueueSize);
 			}
-			if (out_queues.size() == 0) {
-				for (int i = 0; i < out_queues_size; i++) {
-					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
-																								 maxOutQueueSize,
-																								 priorityQueueClass);
+		}
+		if (out_queues.size() == 0) {
+			for (int i = 0; i < out_queues_size; i++) {
+				PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
+																							 maxOutQueueSize,
+																							 priorityQueueClass);
 
-					out_queues.add(queue);
-				}
-			} else {
-				for (int i = 0; i < out_queues.size(); i++) {
-					out_queues.get(i).setMaxSize(maxOutQueueSize);
-				}
+				out_queues.add(queue);
 			}
-
-			// out_queue.setMaxSize(maxQueueSize);
-		}    // end of if (this.maxQueueSize != maxQueueSize)
+		} else {
+			for (int i = 0; i < out_queues.size(); i++) {
+				out_queues.get(i).setMaxSize(maxOutQueueSize);
+			}
+		}
 	}
 
 	@Override
@@ -940,7 +961,6 @@ public abstract class AbstractMessageReceiver
 		in_queues_size = processingInThreads();
 		out_queues_size = processingOutThreads();
 		schedulerThreads_size = schedulerThreads();
-		setMaxQueueSize(maxQueueSize);
 		setIncomingFilters(new ArrayList<>(incoming_filters));
 		setOutogingFilters(new ArrayList<>(outgoing_filters));
 	}
