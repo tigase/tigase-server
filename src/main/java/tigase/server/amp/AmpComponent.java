@@ -49,6 +49,7 @@ import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.SessionManagerHandler;
+import tigase.sys.TigaseRuntime;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
@@ -190,6 +191,16 @@ public class AmpComponent
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	@Override
+	public int processingInThreads() {
+		return TigaseRuntime.getTigaseRuntime().getCPUsNumber() * 4;
+	}
+
+	@Override
+	public int processingOutThreads() {
+		return TigaseRuntime.getTigaseRuntime().getCPUsNumber() * 4;
+	}
 
 	@Override
 	public void processPacket(Packet packet) {
