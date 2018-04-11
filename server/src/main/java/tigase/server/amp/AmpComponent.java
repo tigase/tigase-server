@@ -34,6 +34,7 @@ import tigase.server.amp.action.Broadcast;
 import tigase.server.amp.cond.Deliver;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
+import tigase.sys.TigaseRuntime;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
@@ -138,6 +139,16 @@ public class AmpComponent
 		}
 
 		return query;
+	}
+
+	@Override
+	public int processingInThreads() {
+		return TigaseRuntime.getTigaseRuntime().getCPUsNumber() * 4;
+	}
+
+	@Override
+	public int processingOutThreads() {
+		return TigaseRuntime.getTigaseRuntime().getCPUsNumber() * 4;
 	}
 
 	@Override
