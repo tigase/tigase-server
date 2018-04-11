@@ -47,8 +47,12 @@ public class DataForm {
 		DataForm.addFieldValue(el, f_name, Boolean.toString(f_value), "boolean");
 	}
 
+	public static Element createDataForm(DataType data_type) {
+		return new Element("x", new String[]{"xmlns", "type"}, new String[]{"jabber:x:data", data_type.name()});
+	}
+
 	public static Element addDataForm(Element el, DataType data_type) {
-		Element x = new Element("x", new String[]{"xmlns", "type"}, new String[]{"jabber:x:data", data_type.name()});
+		Element x = createDataForm(data_type);
 
 		el.addChild(x);
 

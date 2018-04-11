@@ -23,6 +23,12 @@ package tigase.server.xmppsession;
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslEXTERNAL;
+import tigase.component.ComponenScriptCommandProcessor;
+import tigase.component.PacketWriter;
+import tigase.component.adhoc.AdHocCommandManager;
+import tigase.component.exceptions.ComponentException;
+import tigase.component.modules.impl.AdHocCommandModule;
+import tigase.component.responses.AsyncCallback;
 import tigase.conf.Configurable;
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
@@ -108,6 +114,8 @@ public class SessionManager
 	protected ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId = new ConcurrentHashMap<BareJID, XMPPSession>(
 			100000);
 	private int activeUserNumber = 0;
+	@Inject
+	private AdHocCommandModule adHocCommandModule;
 	@Inject
 	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins = new ConcurrentSkipListSet<XMPPImplIfc>();
 	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
@@ -593,6 +601,15 @@ public class SessionManager
 		return null;
 	}
 
+	@Override
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
+		if ("http://jabber.org/protocol/commands".equals(node)) {
+			return adHocCommandModule.getScriptItems(node, jid, from);
+		} else {
+			return super.getDiscoItems(node, jid, from);
+		}
+	}
+
 	public XMPPResourceConnection getResourceConnection(JID jid) {
 		XMPPSession session = getSession(jid.getBareJID());
 
@@ -770,6 +787,10 @@ public class SessionManager
 
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
+		kernel.registerBean("writer").asClass(SMPacketWriter.class).exec();
+		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
+		kernel.registerBean("scriptCommandProcessor").asClass(ComponenScriptCommandProcessor.class).exec();
+		kernel.registerBean("adHocCommandModule").asClass(AdHocCommandModule.class).exec();
 	}
 
 	public void unregister(Kernel kernel) {
@@ -1146,7 +1167,7 @@ public class SessionManager
 
 	protected boolean processCommand(Packet pc) {
 		if ((pc.getStanzaTo() == null) ||
-				!(getComponentId().equals(pc.getStanzaTo()) || isLocalDomain(pc.getStanzaTo().toString()))) {
+				!(getComponentId().equals(pc.getStanzaTo()) || (isLocalDomain(pc.getStanzaTo().getDomain()) && (pc.getStanzaTo().getLocalpart() == null || getName().equals(pc.getStanzaTo().getLocalpart()))))) {
 			return false;
 		}
 
@@ -1465,9 +1486,21 @@ public class SessionManager
 			case OTHER:
 				//#2682: Commands addressed to domain should be processed by sess-man
 				if (iqc.isCommand() && isLocalDomain(iqc.getStanzaTo().getDomain())) {
-					Queue<Packet> results = new ArrayDeque<Packet>();
-					processing_result = processScriptCommand(iqc, results);
-					addOutPackets(results);
+					try {
+						if (iqc.getStanzaFrom() == null && connection != null) {
+							iqc.initVars(connection.getjid(), iqc.getStanzaTo());
+						}
+						adHocCommandModule.process(iqc);
+					} catch (ComponentException ex) {
+						 try {
+						 	addOutPacket(ex.makeElement(iqc, true));
+						 } catch (PacketErrorTypeException ex1) {
+						 	if (log.isLoggable(Level.FINEST)) {
+						 		log.log(Level.FINEST, "packet already of type = error, " + iqc);
+							}
+						 }
+					}
+					processing_result = true;
 				}
 
 				if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc.getPacketFrom())) {
@@ -2661,6 +2694,30 @@ public class SessionManager
 
 				return !workingSet.isEmpty();
 			}
+		}
+	}
+
+	@Bean(name = "writer", active = true)
+	public static class SMPacketWriter implements PacketWriter {
+
+		@Inject(bean = "service", nullAllowed = false)
+		private SessionManager component;
+		
+		@Override
+		public void write(Collection<Packet> packets) {
+			if (packets != null) {
+				packets.forEach(this::write);
+			}
+		}
+
+		@Override
+		public void write(Packet packet) {
+			component.addOutPacket(packet);
+		}
+
+		@Override
+		public void write(Packet packet, AsyncCallback callback) {
+			throw new UnsupportedOperationException("writing packets with AsyncCallback is not supported in SM!");
 		}
 	}
 }

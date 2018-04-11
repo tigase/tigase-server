@@ -19,11 +19,14 @@
  */
 package tigase.component.adhoc;
 
+import tigase.server.Command;
+import tigase.server.DataForm;
 import tigase.xml.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class AdHocResponse {
 
@@ -49,6 +52,18 @@ public class AdHocResponse {
 		return elements;
 	}
 
+	public Element addDataForm(Command.DataType dataType) {
+		Element data = DataForm.createDataForm(dataType);
+		elements.add(data);
+		return data;
+	}
+
+	public Element addDataForm(Command.DataType dataType, Consumer<Element> consumer) {
+		Element data = addDataForm(dataType);
+		consumer.accept(data);
+		return data;
+	}
+
 	public void startSession() {
 		this.newState = State.executing;
 		this.sessionid = UUID.randomUUID().toString();
@@ -58,11 +73,11 @@ public class AdHocResponse {
 		return currentState;
 	}
 
-	State getNewState() {
+	public State getNewState() {
 		return newState;
 	}
 
-	void setNewState(State newState) {
+	public void setNewState(State newState) {
 		this.newState = newState;
 	}
 
@@ -74,7 +89,7 @@ public class AdHocResponse {
 		this.sessionid = sessionid;
 	}
 
-	static enum State {
+	public static enum State {
 		canceled,
 		completed,
 		executing

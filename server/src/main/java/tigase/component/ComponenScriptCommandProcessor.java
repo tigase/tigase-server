@@ -48,4 +48,8 @@ public class ComponenScriptCommandProcessor
 		return component.processScriptCommand(pc, results);
 	}
 
+	@Override
+	public boolean isAllowed(String node, JID from) {
+		return component.canCallCommand(from, node);
+	}
 }

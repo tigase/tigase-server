@@ -38,6 +38,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.Consumer;
 
 @Bean(name = AdHocCommandModule.ID, active = true)
 public class AdHocCommandModule
@@ -60,19 +61,7 @@ public class AdHocCommandModule
 
 	public List<Element> getCommandListItems(final JID senderJid, final JID toJid) {
 		ArrayList<Element> commandsList = new ArrayList<Element>();
-		for (AdHocCommand command : this.commandsManager.getAllCommands()) {
-			if (command.isAllowedFor(senderJid)) {
-				Element cmdEl = new Element("item", new String[]{"jid", "node", "name"},
-											new String[]{toJid.toString(), command.getNode(), command.getName()});
-				command.getGroup().ifPresent(group -> cmdEl.setAttribute("group", group));
-				commandsList.add(cmdEl);
-			}
-		}
-
-		List<Element> scriptCommandsList = scriptProcessor.getScriptItems(Command.XMLNS, toJid, senderJid);
-		if (scriptCommandsList != null) {
-			commandsList.addAll(scriptCommandsList);
-		}
+		addCommandListItemsElements(Command.XMLNS, toJid, senderJid, commandsList::add);
 		return commandsList;
 	}
 
@@ -97,21 +86,24 @@ public class AdHocCommandModule
 	public List<Element> getScriptItems(String node, JID stanzaTo, JID stanzaFrom) {
 		ArrayList<Element> result = new ArrayList<Element>();
 
+		addCommandListItemsElements(node, stanzaTo, stanzaFrom, result::add);
+
+		return result;
+	}
+
+	public void addCommandListItemsElements(String node, final JID stanzaTo, final JID stanzaFrom, Consumer<Element> collector) {
 		for (AdHocCommand c : commandsManager.getAllCommands()) {
 			if (c.isAllowedFor(stanzaFrom)) {
 				Element i = new Element("item", new String[]{"jid", "node", "name"},
 										new String[]{stanzaTo.toString(), c.getNode(), c.getName()});
 				c.getGroup().ifPresent(group -> i.setAttribute("group", group));
-				result.add(i);
+				collector.accept(i);
 			}
 		}
-
 		List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
 		if (scripts != null) {
-			result.addAll(scripts);
+			scripts.forEach(collector);
 		}
-
-		return result;
 	}
 
 	public ScriptCommandProcessor getScriptProcessor() {
@@ -162,6 +154,8 @@ public class AdHocCommandModule
 		List<Element> getScriptItems(String node, JID jid, JID from);
 
 		boolean processScriptCommand(Packet pc, Queue<Packet> results);
+
+		boolean isAllowed(String node, JID from);
 
 	}
 
