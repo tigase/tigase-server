@@ -205,7 +205,7 @@ public class DBSchemaLoader
 	}
 
 	public Map<Version,Path> getSchemaFileNames(String schemaId) {
-		Path databaseDirectory = Paths.get("database/");
+		Path databaseDirectory = Paths.get(params.getSchemaDirectory());
 		String databaseType = params.getDbType();
 
 		final BiPredicate<Path, BasicFileAttributes> predicate = (path, attributes) -> {
@@ -1332,6 +1332,7 @@ public class DBSchemaLoader
 		private Boolean useLegacyDatetimeCode = false;
 		private Boolean useSSL = null;
 		private boolean forceReloadSchema = false;
+		private String schemaDirectory = "database/";
 
 		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
 			return props.getProperty(param.getName(), null); //param.getDefaultValue());
@@ -1418,6 +1419,15 @@ public class DBSchemaLoader
 
 		public String getServerTimezone() {
 			return serverTimezone;
+		}
+
+		public String getSchemaDirectory() {
+			return schemaDirectory;
+		}
+
+		@Override
+		public void setSchemaDirectory(String schemaDirectory) {
+			this.schemaDirectory = schemaDirectory;
 		}
 
 		@Override

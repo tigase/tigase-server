@@ -125,7 +125,7 @@ public abstract class AbstractKernelBasedComponent
 			implements PacketWriter {
 
 		protected final Logger log = Logger.getLogger(this.getClass().getName());
-		@Inject(nullAllowed = false)
+		@Inject(nullAllowed = false, bean = "service")
 		private AbstractKernelBasedComponent component;
 		@Inject(nullAllowed = false)
 		private ResponseManager responseManager;

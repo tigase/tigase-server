@@ -374,6 +374,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 		void setDbRootCredentials(String username, String password);
 
+		default void setSchemaDirectory(String schemaDirectory) {
+
+		}
+
 		Level getLogLevel();
 
 		void setLogLevel(Level level);

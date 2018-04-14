@@ -82,6 +82,7 @@ public class AbstractDataSourceTestCase<DS extends DataSource> extends AbstractK
 		SchemaLoader.Parameters params = loader.createParameters();
 		params.parseUri(uri);
 		params.setDbRootCredentials(null, null);
+		params.setSchemaDirectory("src/main/database/");
 		loader.init(params, Optional.empty());
 		loader.validateDBConnection();
 		loader.validateDBExists();
