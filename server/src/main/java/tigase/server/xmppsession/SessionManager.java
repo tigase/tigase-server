@@ -1487,6 +1487,7 @@ public class SessionManager
 				//#2682: Commands addressed to domain should be processed by sess-man
 				if (iqc.isCommand() && isLocalDomain(iqc.getStanzaTo().getDomain())) {
 					try {
+						setPermissions(connection, iqc);
 						if (iqc.getStanzaFrom() == null && connection != null) {
 							iqc.initVars(connection.getjid(), iqc.getStanzaTo());
 						}

@@ -514,18 +514,7 @@ public class BasicComponent
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
 			if (node != null) {
 				if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || nonAdminCommands)) {
-					result = new LinkedList<Element>();
-					for (CommandIfc comm : scriptCommands.values()) {
-						if (!comm.isAdminOnly() || isAdminFrom) {
-							Element item = new Element("item", new String[]{"node", "name", "jid"},
-													   new String[]{comm.getCommandId(), comm.getDescription(),
-																	jid.toString()});
-							if (comm.getGroup() != null) {
-								item.setAttribute("group", comm.getGroup());
-							}
-							result.add(item);
-						}
-					}
+					result = getScriptItems(node, jid, from);
 				} else {
 					result = serviceEntity.getDiscoItems(node, jid.toString(), (isAdminFrom || nonAdminCommands));
 				}
@@ -625,8 +614,13 @@ public class BasicComponent
 			result = new LinkedList<Element>();
 			for (CommandIfc comm : scriptCommands.values()) {
 				if (!comm.isAdminOnly() || isAdminFrom) {
-					result.add(new Element("item", new String[]{"node", "name", "jid"},
-										   new String[]{comm.getCommandId(), comm.getDescription(), jid.toString()}));
+					Element item = new Element("item", new String[]{"node", "name", "jid"},
+											   new String[]{comm.getCommandId(), comm.getDescription(), jid.toString()});
+					if (comm.getGroup() != null) {
+						item.setAttribute("group", comm.getGroup());
+					}
+
+					result.add(item);
 				}
 			}
 		}
