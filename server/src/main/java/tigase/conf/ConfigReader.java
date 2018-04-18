@@ -287,6 +287,9 @@ public class ConfigReader {
 					}
 					case '}': {
 						Map val = holder.map;
+						if (holder.parent == null) {
+							throw new java.lang.UnsupportedOperationException("Unexpected char: '}'");
+						}
 						holder = holder.parent;
 						// special use case to convert maps with active or class into bean definition
 						if (val != null && (val.containsKey("active") || val.containsKey("class"))) {
