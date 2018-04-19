@@ -64,7 +64,7 @@ public class ClassUtilBean {
 		synchronized (ClassUtilBean.class) {
 			if (instance == null) {
 				ClassUtilBean instance = new ClassUtilBean();
-				instance.initialize(null);
+				instance.initialize(getPackagesToSkip(null));
 			}
 			return instance;
 		}
