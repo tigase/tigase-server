@@ -99,7 +99,7 @@ for j in ${TIGASE_HOME}/${JAR_FILE} ; do
 done
 
 if [ -z ${TIGASE_JAR} ] ; then
-	echo "TIGASE_HOME is not set."
+	echo "TIGASE_HOME is not set or main binary (${JAR_FILE}) was missing in ${TIGASE_HOME} location"
 	echo "Please set it to correct value before starting the sever."
 	exit 1
 fi

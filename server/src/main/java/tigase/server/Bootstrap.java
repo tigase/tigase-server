@@ -263,12 +263,20 @@ public class Bootstrap {
 			}
 			DNSResolverIfc resolver = DNSResolverFactory.getInstance();
 			if (resolver instanceof DNSResolverDefault) {
-				String host = (String) resolverConfig.get(DNSResolverIfc.TIGASE_PRIMARY_ADDRESS);
-				if (host != null) {
+				Object config = resolverConfig.get(DNSResolverIfc.TIGASE_PRIMARY_ADDRESS);
+				if (config instanceof ConfigReader.AbstractEnvironmentPropertyVariable) {
+					config = ((ConfigReader.AbstractEnvironmentPropertyVariable) config).calculateValue();
+				}
+				String host = (String) config;
+				if (host != null && !host.isEmpty()) {
 					((DNSResolverDefault) resolver).setPrimaryHost(host);
 				}
-				host = (String) resolverConfig.get(DNSResolverIfc.TIGASE_SECONDARY_ADDRESS);
-				if (host != null) {
+				config = resolverConfig.get(DNSResolverIfc.TIGASE_SECONDARY_ADDRESS);
+				if (config instanceof ConfigReader.AbstractEnvironmentPropertyVariable) {
+					config = ((ConfigReader.AbstractEnvironmentPropertyVariable) config).calculateValue();
+				}
+				host = (String) config;
+				if (host != null && !host.isEmpty()) {
 					((DNSResolverDefault) resolver).setSecondaryHost(host);
 				}
 			}
