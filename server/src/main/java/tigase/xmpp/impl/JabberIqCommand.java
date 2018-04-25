@@ -25,15 +25,13 @@ import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.xmppsession.PacketDefaultHandler;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -56,6 +54,8 @@ public class JabberIqCommand
 	protected static final String ID = XMLNS;
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 
+	private PacketDefaultHandler defaultHandler = new PacketDefaultHandler();
+
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
 		if (conn == null) {
@@ -76,75 +76,7 @@ public class JabberIqCommand
 			return;
 		}
 
-		// Processing only commands (that should be guaranteed by name space)
-		// and only unknown commands. All known commands are processed elsewhere
-//  if (!packet.isCommand() || packet.getCommand() != Command.OTHER) {
-//    return;
-//  }
-		try {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Received packet: {0}", packet);
-			}
-
-			// Not needed anymore. Packet filter does it for all stanzas.
-//    // For all messages coming from the owner of this account set
-//    // proper 'from' attribute. This is actually needed for the case
-//    // when the user sends a message to himself.
-//    if (packet.getFrom().equals(session.getConnectionId())) {
-//      packet.getElement().setAttribute("from", session.getJID());
-//    } // end of if (packet.getFrom().equals(session.getConnectionId()))
-			if (packet.getStanzaTo() == null) {
-
-				// No need for that, initVars(...) takes care of that
-				// packet.getElement().setAttribute("to", session.getSMComponentId().toString());
-				packet.initVars(packet.getStanzaFrom(), session.getSMComponentId());
-
-				// TODO: Code below prevents from executing commands sent to vhost set to
-				// the same value as the machine hostname. Not sure why it was implemented
-				// that way. Maybe it caused internal, infinite loop in some cases.
-				// More testing is needed....
-//      } else {
-//        if (packet.getStanzaTo().equals(session.getSMComponentId())) {
-//          // This should be handled by SM, if it is not then drop it here.
-//          if (log.isLoggable(Level.FINEST)) {
-//            log.log(Level.FINEST, "Dropping unhandled packet addressed to SM: {0}", packet);
-//          }
-//          return;
-//        }
-			}
-
-			BareJID id = packet.getStanzaTo().getBareJID();
-
-			if (session.isUserId(id)) {
-
-				// Yes this is message to 'this' client
-				Packet result = packet.copyElementOnly();
-				JID conId = session.getConnectionId(packet.getStanzaTo());
-
-				if (conId != null) {
-					result.setPacketTo(conId);
-					result.setPacketFrom(packet.getTo());
-					results.offer(result);
-				} else {
-					result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-																					"The recipient is no longer available.",
-																					true);
-					result.setPacketFrom(null);
-					result.setPacketTo(null);
-					results.offer(result);
-				}
-			} else {
-
-				// This is message to some other client
-				Packet result = packet.copyElementOnly();
-
-				results.offer(result);
-			}    // end of else
-		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING, "NotAuthorizedException for packet: {0}", packet);
-			results.offer(
-					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
-		}    // end of try-catch
+		defaultHandler.process(packet, session, repo, results);
 	}
 
 	@Override

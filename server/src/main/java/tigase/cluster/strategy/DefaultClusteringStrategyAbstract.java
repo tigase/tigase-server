@@ -26,6 +26,7 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -70,6 +71,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	protected SessionManagerClusteredIfc sm = null;
 	private JID ampJID = JID.jidInstanceNS("amp", DNSResolverFactory.getInstance().getDefaultHost());
 	private Set<CommandListener> commands = new CopyOnWriteArraySet<CommandListener>();
+	@ConfigField(desc="Forward error packets within cluster", alias = "error-forwarding")
 	private ErrorForwarding errorForwarding = ErrorForwarding.drop;
 
 
