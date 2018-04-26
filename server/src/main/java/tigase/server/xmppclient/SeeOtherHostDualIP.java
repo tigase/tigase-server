@@ -31,6 +31,7 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.kernel.core.Kernel;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -43,6 +44,8 @@ import java.util.logging.Logger;
 /**
  * Extended implementation of SeeOtherHost using redirect information from database based on cluster_nodes table.
  */
+@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, active = true)
+@ClusterModeRequired(active = true)
 public class SeeOtherHostDualIP
 		extends SeeOtherHostHashed
 		implements Initializable, RegistrarBean, UnregisterAware {
@@ -90,6 +93,10 @@ public class SeeOtherHostDualIP
 
 		if (log.isLoggable(Level.FINE)) {
 			log.log(Level.FINE, "Procesing ClusterRepoItemEvent: {0}", new Object[]{event});
+		}
+
+		if (event.getItem() == null || event.getAction() == null) {
+			return;
 		}
 
 		REPO_ITEM_UPDATE_TYPE action = event.getAction();

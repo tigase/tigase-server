@@ -33,6 +33,9 @@ public class StartupFinishedEvent
 
 	String node;
 
+	public StartupFinishedEvent() {
+	}
+
 	public StartupFinishedEvent(String node) {
 		this.node = node;
 	}

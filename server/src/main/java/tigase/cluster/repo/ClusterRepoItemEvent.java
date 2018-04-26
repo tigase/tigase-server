@@ -31,10 +31,10 @@ public class ClusterRepoItemEvent
 		implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private final REPO_ITEM_UPDATE_TYPE action;
-	private final ClusterRepoItem item;
+	private REPO_ITEM_UPDATE_TYPE action;
+	private ClusterRepoItem item;
 
-//	public ClusterRepoItemEvent() {}
+	public ClusterRepoItemEvent() {}
 
 	public ClusterRepoItemEvent(ClusterRepoItem item, REPO_ITEM_UPDATE_TYPE action) {
 		this.item = item;

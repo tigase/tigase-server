@@ -27,6 +27,7 @@ import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.StartupFinishedEvent;
 import tigase.util.Version;
+import tigase.util.dns.DNSResolverFactory;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -57,6 +58,12 @@ public class SchemaVersionCheckerLogger {
 
 	@HandleEvent
 	public void printErrorMessage(StartupFinishedEvent event) {
+
+		// if not this node is being shutdown then do nothing
+		if (event.getNode() == null || !DNSResolverFactory.getInstance().getDefaultHost().equals(event.getNode())) {
+			return;
+		}
+
 		if (!components.isEmpty()) {
 
 			StringBuilder sb = new StringBuilder();
