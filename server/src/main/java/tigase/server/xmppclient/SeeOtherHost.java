@@ -54,7 +54,7 @@ public class SeeOtherHost
 	protected EventBus eventBus;
 	@Inject
 	protected VHostManagerIfc vHostManager = null;
-	@ConfigField(desc = "Active phases")
+	@ConfigField(desc = "Active phases", alias = "phases")
 	private ArrayList<Phase> active = new ArrayList<Phase>(Arrays.asList(Phase.OPEN));
 	private Set<String> shutdownNodes = new CopyOnWriteArraySet<String>();
 

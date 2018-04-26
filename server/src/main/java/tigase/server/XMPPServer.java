@@ -29,6 +29,7 @@ import tigase.kernel.beans.selector.ServerBeanSelector;
 import tigase.kernel.core.BeanConfig;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ClassUtil;
+import tigase.util.ExceptionUtilities;
 import tigase.util.Version;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.XMLUtils;
@@ -202,9 +203,10 @@ public final class XMPPServer {
 												 "Issue with configuration file: " + e,
 												 "Please fix the problem and start the server again."});
 		} catch (Exception e) {
+			String cause = ExceptionUtilities.getExceptionRootCause(e, true);
 			TigaseRuntime.getTigaseRuntime()
 					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
-												 "Problem initializing the server: " + e,
+												 "Problem initializing the server: " + cause,
 												 "Please fix the problem and start the server again."});
 		}
 	}

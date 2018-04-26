@@ -50,13 +50,13 @@ All options are configured on a per-connection-manager basis, thus all options n
 c2s {
     'cm-see-other-host' {
         'default-host' = 'host1;host2;host3'
-        'active' = LOGIN
+        'phases' = [ 'OPEN', 'LOGIN' ]
     }
 }
 -----
 
 - `'default-host' = 'host1;host2;host3'` - a semicolon separated list of hosts to be used for redirection.
-- `'active' =`  - a semicolon separated list of phases in which redirection should be active, currently possible values are:
+- `'phases' =`  - a semicolon separated list of phases in which redirection should be active, currently possible values are:
   * `OPEN` which enables redirection during opening of the XMPP stream;
   * `LOGIN` which enables redirection upon authenticating user session;
 
