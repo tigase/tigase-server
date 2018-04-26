@@ -102,7 +102,7 @@ public class SeeOtherHostDualIPSQLRepository
 	 */
 	private void checkDB() throws SQLException {
 		if (!data_repo.checkTable(CLUSTER_NODES_TABLE)) {
-			throw new SQLException("Nodes redirection table doesn't exits!");
+			throw new SQLException("Nodes redirection table: " + CLUSTER_NODES_TABLE + " doesn't exits!");
 		}
 	}
 
