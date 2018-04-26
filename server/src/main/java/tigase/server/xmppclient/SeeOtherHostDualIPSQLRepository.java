@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public class SeeOtherHostDualIPSQLRepository
 		implements SeeOtherHostDualIP.DualIPRepository<DataRepository> {
 
-	public static final String CLUSTER_NODES_TABLE = "cluster_nodes";
+	public static final String CLUSTER_NODES_TABLE = "tig_cluster_nodes";
 	public static final String DB_GET_ALL_DATA_DB_QUERY_KEY =
 			SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-data-query";
 	public static final String GET_ALL_QUERY_TIMEOUT_QUERY_KEY =
