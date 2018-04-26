@@ -23,7 +23,7 @@ package tigase.kernel;
 import org.junit.Assert;
 import org.junit.Test;
 import tigase.TestLogger;
-import tigase.component.PropertiesBeanConfigurator;
+import tigase.component.DSLBeanConfigurator;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
@@ -51,7 +51,7 @@ public class RegistrarBeanKernelTest {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
 		krnl.registerBean(DefaultTypesConverter.class).exec();
-		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
+		krnl.registerBean(DSLBeanConfigurator.class).exec();
 		krnl.registerBean(RegistrarBeanImpl.class).exec();
 
 		//krnl.startSubKernels();
@@ -89,7 +89,7 @@ public class RegistrarBeanKernelTest {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
 		krnl.registerBean(DefaultTypesConverter.class).exec();
-		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
+		krnl.registerBean(DSLBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink.class).exec();
 
@@ -133,7 +133,7 @@ public class RegistrarBeanKernelTest {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
 		krnl.registerBean(DefaultTypesConverter.class).exec();
-		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
+		krnl.registerBean(DSLBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean2.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink2.class).exec();
 
@@ -173,7 +173,7 @@ public class RegistrarBeanKernelTest {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
 		krnl.registerBean(DefaultTypesConverter.class).exec();
-		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
+		krnl.registerBean(DSLBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean3.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink3.class).exec();
 
@@ -232,7 +232,7 @@ public class RegistrarBeanKernelTest {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.registerBean(DefaultTypesConverter.class).exportable().exec();
 		krnl.setName("root");
-		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
+		krnl.registerBean(DSLBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean4.class).exec();
 		krnl.registerBean(RegistrarBeanImplWithLink4.class).exec();
 

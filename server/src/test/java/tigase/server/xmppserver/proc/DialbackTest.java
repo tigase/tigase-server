@@ -21,7 +21,7 @@ package tigase.server.xmppserver.proc;
 
 import junit.framework.TestCase;
 import org.junit.Test;
-import tigase.component.PropertiesBeanConfiguratorWithBackwardCompatibility;
+import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.eventbus.EventBusFactory;
 import tigase.io.CertificateContainer;
 import tigase.kernel.DefaultTypesConverter;
@@ -268,8 +268,8 @@ public class DialbackTest
 		kernel.setName("s2s");
 		kernel.setForceAllowNull(true);
 		kernel.registerBean(DefaultTypesConverter.class).exec();
-		kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
-		kernel.getInstance(PropertiesBeanConfiguratorWithBackwardCompatibility.class).setProperties(props);
+		kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
+		kernel.getInstance(DSLBeanConfiguratorWithBackwardCompatibility.class).setProperties(props);
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean(ConnectionManager.PortsConfigBean.class).exec();
 		kernel.registerBean(CIDConnections.CIDConnectionsOpenerService.class).exportable().exec();

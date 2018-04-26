@@ -292,22 +292,7 @@ public class ConfigReader {
 						}
 						holder = holder.parent;
 						// special use case to convert maps with active or class into bean definition
-						if (val != null && (val.containsKey("active") || val.containsKey("class"))) {
-							AbstractBeanConfigurator.BeanDefinition bean = new AbstractBeanConfigurator.BeanDefinition();
-							bean.setBeanName(holder.key);
-							Object v = val.remove("class");
-							if (v != null) {
-								bean.setClazzName((String) v);
-							}
-							v = val.remove("active");
-							if (v != null) {
-								bean.setActive((Boolean) v);
-							}
-							bean.putAll(val);
-							holder.value = bean;
-						} else {
-							holder.value = val;
-						}
+						holder.value = val;
 						break;
 					}
 					case '(': {

@@ -266,7 +266,7 @@ public class ConfigReaderTest {
 				assertNull(value);
 				continue;
 			}
-			assertEquals(e.getValue().getClass(), value.getClass());
+			assertEquals("for key " + prefix + e.getKey(), e.getValue().getClass(), value.getClass());
 			if (value instanceof AbstractBeanConfigurator.BeanDefinition) {
 				AbstractBeanConfigurator.BeanDefinition av = (AbstractBeanConfigurator.BeanDefinition) value;
 				AbstractBeanConfigurator.BeanDefinition ev = (AbstractBeanConfigurator.BeanDefinition) e.getValue();

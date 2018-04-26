@@ -23,7 +23,7 @@ package tigase.kernel.modular;
 import org.junit.Assert;
 import org.junit.Test;
 import tigase.TestLogger;
-import tigase.component.PropertiesBeanConfigurator;
+import tigase.component.DSLBeanConfigurator;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.RegistrarKernel;
 import tigase.kernel.modular.c1.Component1Registrar;
@@ -44,7 +44,7 @@ public class ApplicationTest {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
 		krnl.registerBean(DefaultTypesConverter.class).exportable().exec();
-		krnl.registerBean(PropertiesBeanConfigurator.class).exportable().exec();
+		krnl.registerBean(DSLBeanConfigurator.class).exportable().exec();
 
 		// registering our main class of application
 		krnl.registerBean(ComponentsManager.class).exec();

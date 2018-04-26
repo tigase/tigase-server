@@ -20,7 +20,7 @@
 
 package tigase.kernel.modular.c2;
 
-import tigase.component.PropertiesBeanConfigurator;
+import tigase.component.DSLBeanConfigurator;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.modular.Component;
@@ -30,7 +30,7 @@ public class Component2
 		implements Component {
 
 	@Inject
-	private PropertiesBeanConfigurator propertiesBeanConfigurator;
+	private DSLBeanConfigurator dslBeanConfigurator;
 
 	@Override
 	public String execute(String request) {
