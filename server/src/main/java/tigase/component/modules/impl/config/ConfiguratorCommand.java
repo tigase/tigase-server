@@ -24,6 +24,7 @@ import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
+import tigase.component.modules.impl.AdHocCommandModule;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.BeanUtils;
@@ -59,6 +60,8 @@ public class ConfiguratorCommand
 	private AbstractBeanConfigurator beanConfigurator;
 	@Inject(bean = "kernel")
 	private Kernel kernel;
+	@Inject
+	private AdHocCommandModule.ScriptCommandProcessor scriptCommandProcessor;
 
 	@Override
 	public void execute(AdhHocRequest request, AdHocResponse response) throws AdHocCommandException {
@@ -162,7 +165,7 @@ public class ConfiguratorCommand
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return scriptCommandProcessor.isAllowed(getNode(), jid);
 	}
 
 	private ArrayList<ConfigFieldItem> getConfigItems(final String beanName) {
