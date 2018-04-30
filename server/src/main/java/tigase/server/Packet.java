@@ -360,6 +360,14 @@ public class Packet {
 		return swapFromTo(reply, getStanzaTo(), getStanzaFrom());
 	}
 
+	public Element getElemChild(String name) {
+		return elem.getChild(name);
+	}
+
+	public Element getElemChild(String name, String xmlns) {
+		return elem.getChild(name, xmlns);
+	}
+
 	/**
 	 * A convenience method for accessing stanza top element attributes. This call is equal to the call:
 	 * <pre>
