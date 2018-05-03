@@ -72,7 +72,8 @@ The above commands let the system remember new settings until the next system re
 [source,sh]
 -----
 fs.file-max=360000
-net.ipv4.ip_local_port_range=1024 65000net.ipv4.tcp_keepalive_time=60
+net.ipv4.ip_local_port_range=1024 65000
+net.ipv4.tcp_keepalive_time=60
 net.ipv4.tcp_keepalive_probes=3
 net.ipv4.tcp_keepalive_intvl=90
 -----

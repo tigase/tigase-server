@@ -11,6 +11,10 @@
 ##
 ## to install: update-rc.d tigase defaults
 ##
+## on machines with NFS mounted it's essential to 
+##   * NOT use 'noauto' option
+##   * add '$remote_fs' to Required-Start and Required-Stop
+##
 ### END INIT INFO
 
 # Enable Tigase as OSGi bundle
