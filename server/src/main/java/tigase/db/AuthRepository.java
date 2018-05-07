@@ -28,9 +28,7 @@ import tigase.auth.credentials.entries.PlainCredentialsEntry;
 import tigase.xmpp.jid.BareJID;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,19 +52,19 @@ public interface AuthRepository
 	 * authentication data from the server to the client. This property is used to provide authentication data from the
 	 * client to the server.
 	 */
-	public static final String DATA_KEY = "data";
+	String DATA_KEY = "data";
 
-	public static final String DIGEST_ID_KEY = "digest-id";
+	String DIGEST_ID_KEY = "digest-id";
 
-	public static final String DIGEST_KEY = "digest";
+	String DIGEST_KEY = "digest";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide desired authentication mechanism
 	 * to the authentication logic.
 	 */
-	public static final String MACHANISM_KEY = "mechanism";
+	String MACHANISM_KEY = "mechanism";
 
-	public static final String PASSWORD_KEY = "password";
+	String PASSWORD_KEY = "password";
 
 	// Query params (and otherAuth)
 
@@ -74,47 +72,47 @@ public interface AuthRepository
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide desired authentication protocol
 	 * to the authentication logic.
 	 */
-	public static final String PROTOCOL_KEY = "protocol";
+	String PROTOCOL_KEY = "protocol";
 
 	/**
 	 * Property value for <code>otherAuth</code> method call. It is used to provide desired authentication NON-SASL
 	 * protocol to the authentication logic.
 	 */
-	public static final String PROTOCOL_VAL_NONSASL = "nonsasl";
+	String PROTOCOL_VAL_NONSASL = "nonsasl";
 
 	/**
 	 * Property value for <code>otherAuth</code> method call. It is used to provide desired authentication SASL protocol
 	 * to the authentication logic.
 	 */
-	public static final String PROTOCOL_VAL_SASL = "sasl";
+	String PROTOCOL_VAL_SASL = "sasl";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide authentication realm to the
 	 * authentication logic. In most cases, the realm is just a domain name.
 	 */
-	public static final String REALM_KEY = "realm";
+	String REALM_KEY = "realm";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide authentication handshaking data
 	 * during login process. Some authentication mechanisms require exchanging requests between the client and the
 	 * server. This property key points back to the data which need to be sent back to the client.
 	 */
-	public static final String RESULT_KEY = "result";
+	String RESULT_KEY = "result";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide authentication domain to the
 	 * authentication logic. It is highly recommended that this property is always set, even if the authentication
 	 * protocol/mechanism does not need it strictly.
 	 */
-	public static final String SERVER_NAME_KEY = "server-name";
+	String SERVER_NAME_KEY = "server-name";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide a user ID on successful user
 	 * login. Please note, the key points to the object of <code>BareJID</code> type.
 	 */
-	public static final String USER_ID_KEY = "user-id";
+	String USER_ID_KEY = "user-id";
 
-	public static final String USERNAME_KEY = "username";
+	String USERNAME_KEY = "username";
 
 	enum AccountStatus {
 		active(1),
@@ -147,7 +145,21 @@ public interface AuthRepository
 		}
 	}
 
-	void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException;
+	void addUser(BareJID user, String password) throws TigaseDBException;
+
+	AccountStatus getAccountStatus(BareJID user) throws TigaseDBException;
+
+	default Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+		String password = getPassword(user);
+		if (password != null) {
+			return new SingleCredential(user, getAccountStatus(user), new PlainCredentialsEntry(password));
+		}
+		return null;
+	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	String getPassword(BareJID user) throws TigaseDBException;
 
 	/**
 	 * <code>getResourceUri</code> method returns database connection string.
@@ -155,6 +167,10 @@ public interface AuthRepository
 	 * @return a <code>String</code> value of database connection string.
 	 */
 	String getResourceUri();
+
+	default Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+		return Collections.emptyList();
+	}
 
 	/**
 	 * This method is only used by the server statistics component to report number of registered users.
@@ -173,6 +189,17 @@ public interface AuthRepository
 	 */
 	long getUsersCount(String domain);
 
+	default boolean isMechanismSupported(String domain, String mechanism) {
+		return "PLAIN".equals(mechanism);
+	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	default boolean isUserDisabled(BareJID user) throws TigaseDBException {
+		AccountStatus s = getAccountStatus(user);
+		return s == AccountStatus.disabled;
+	}
+
 	/**
 	 * Do some actions on repository, when user logs in. (for example update <code>last_login_time</code>)
 	 *
@@ -182,12 +209,12 @@ public interface AuthRepository
 	 */
 	void loggedIn(BareJID jid) throws TigaseDBException;
 
-	void logout(BareJID user) throws UserNotFoundException, TigaseDBException;
+	void logout(BareJID user) throws TigaseDBException;
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	boolean otherAuth(Map<String, Object> authProps)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException;
+			throws TigaseDBException, AuthorizationException;
 
 	/**
 	 * <code>queryAuth</code> returns mechanisms available for authentication.
@@ -198,60 +225,35 @@ public interface AuthRepository
 	@TigaseDeprecated(since = "8.0.0")
 	void queryAuth(Map<String, Object> authProps);
 
-	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
-
-	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
-	String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException;
-
-	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
-	void updatePassword(BareJID user, String password) throws UserNotFoundException, TigaseDBException;
-
-	default Credentials getCredentials(BareJID user, String username) throws UserNotFoundException, TigaseDBException {
-		String password = getPassword(user);
-		if (password != null) {
-			return new SingleCredential(user, getAccountStatus(user), new PlainCredentialsEntry(password));
-		}
-		return null;
-	}
-
-	default void removeCredential(BareJID user, String username) throws UserNotFoundException, TigaseDBException {
+	default void removeCredential(BareJID user, String username) throws TigaseDBException {
 
 	}
 
-	default void updateCredential(BareJID user, String username, String password)
-			throws UserNotFoundException, TigaseDBException {
-		updatePassword(user, password);
-	}
+	void removeUser(BareJID user) throws TigaseDBException;
+
+	void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException;
 
 	default void setCredentialsCodecs(CredentialsEncoderBean encoder, CredentialsDecoderBean decoder) {
 
 	}
 
-	AccountStatus getAccountStatus(BareJID user) throws TigaseDBException;
-
-	void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException;
-
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
-	default boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		AccountStatus s = getAccountStatus(user);
-		return s == AccountStatus.disabled;
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
-	default void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+	default void setUserDisabled(BareJID user, Boolean value) throws TigaseDBException {
 		AccountStatus status = getAccountStatus(user);
 		if (status == AccountStatus.active || status == AccountStatus.disabled) {
 			setAccountStatus(user, value ? AccountStatus.disabled : AccountStatus.active);
 		}
 	}
 
-	default boolean isMechanismSupported(String domain, String mechanism) {
-		return "PLAIN".equals(mechanism);
+	default void updateCredential(BareJID user, String username, String password)
+			throws TigaseDBException {
+		updatePassword(user, password);
 	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
+	void updatePassword(BareJID user, String password) throws TigaseDBException;
 
 	class DefaultCredentials
 			implements Credentials {
@@ -268,15 +270,6 @@ public interface AuthRepository
 			this.user = user;
 			this.entries = entries;
 			this.decoder = decoderBean;
-		}
-
-		@Override
-		public BareJID getUser() {
-			return user;
-		}
-
-		public boolean isAccountDisabled() {
-			return accountStatus == AccountStatus.disabled;
 		}
 
 		@Override
@@ -305,6 +298,15 @@ public interface AuthRepository
 				log.log(Level.WARNING, "Could not decode credentials for " + entry.getMechanism(), ex);
 				return null;
 			}
+		}
+
+		@Override
+		public BareJID getUser() {
+			return user;
+		}
+
+		public boolean isAccountDisabled() {
+			return accountStatus == AccountStatus.disabled;
 		}
 
 		public static class RawEntry
@@ -343,16 +345,6 @@ public interface AuthRepository
 		}
 
 		@Override
-		public BareJID getUser() {
-			return user;
-		}
-
-		@Override
-		public boolean isAccountDisabled() {
-			return accountStatus == AccountStatus.disabled;
-		}
-
-		@Override
 		public Entry getEntryForMechanism(String mechanism) {
 			if (mechanism.equals(entry.getMechanism())) {
 				return entry;
@@ -363,6 +355,16 @@ public interface AuthRepository
 		@Override
 		public Entry getFirst() {
 			return entry;
+		}
+
+		@Override
+		public BareJID getUser() {
+			return user;
+		}
+
+		@Override
+		public boolean isAccountDisabled() {
+			return accountStatus == AccountStatus.disabled;
 		}
 	}
 

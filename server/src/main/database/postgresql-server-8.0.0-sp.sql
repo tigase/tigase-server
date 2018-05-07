@@ -389,6 +389,20 @@ $$ language 'plpgsql';
 -- QUERY END:
 
 -- QUERY START:
+create or replace function TigUserUsernames_Get(_user_id varchar(2049)) returns table (
+    username varchar(2049)
+) as $$
+begin
+    return query select distinct c.username
+        from tig_users u
+        inner join tig_user_credentials c on c.uid = u.uid
+        where
+            lower(u.user_id) = lower(_user_id);
+end;
+$$ language 'plpgsql';
+-- QUERY END:
+
+-- QUERY START:
 create or replace function TigUserCredential_Remove(_user_id varchar(2049), _username varchar(2049)) returns void
 as $$
 declare _uid bigint;

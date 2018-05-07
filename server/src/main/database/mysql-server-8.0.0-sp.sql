@@ -339,8 +339,28 @@ drop procedure if exists TigUpdatePasswordPlainPw;
 -- QUERY START:
 drop procedure if exists TigRemoveUser;
 -- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserUsernames_Get;
+-- QUERY END:
 
 delimiter //
+
+-- QUERY START:
+create procedure TigUserUsernames_Get(_user_id varchar(2049) CHARSET utf8)
+  begin
+    declare _user_id_sha1 char(128);
+
+    select sha1(lower(_user_id))
+    into _user_id_sha1;
+
+    select distinct
+      c.username
+    from tig_users u
+      inner join tig_user_credentials c on u.uid = c.uid
+    where
+      u.sha1_user_id = _user_id_sha1;
+  end
+-- QUERY END:
 
 -- QUERY START:
 create procedure TigUserCredential_Update(_user_id varchar(2049) CHARSET utf8, _username varchar(2049) CHARSET utf8, _mechanism varchar(128) CHARSET utf8, _value mediumtext CHARSET utf8)

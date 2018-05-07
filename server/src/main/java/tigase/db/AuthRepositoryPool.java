@@ -22,6 +22,7 @@ package tigase.db;
 import tigase.auth.credentials.Credentials;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -50,7 +51,7 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, String password) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -61,6 +62,22 @@ public class AuthRepositoryPool
 			}
 		} else {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}
+
+	@Override
+	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getAccountStatus(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			return null;
 		}
 	}
 
@@ -81,6 +98,22 @@ public class AuthRepositoryPool
 	}
 
 	@Override
+	public String getPassword(BareJID user) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getPassword(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			return null;
+		}
+	}
+
+	@Override
 	public String getResourceUri() {
 		AuthRepository repo = takeRepo();
 
@@ -94,6 +127,22 @@ public class AuthRepositoryPool
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
 
+		return null;
+	}
+
+	@Override
+	public Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUsernames(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
 		return null;
 	}
 
@@ -132,6 +181,11 @@ public class AuthRepositoryPool
 	}
 
 	@Override
+	@Deprecated
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+	}
+
+	@Override
 	public boolean isMechanismSupported(String domain, String mechanism) {
 		AuthRepository repo = takeRepo();
 
@@ -148,8 +202,19 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	@Deprecated
-	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+	public boolean isUserDisabled(BareJID user) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.isUserDisabled(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			return false;
+		}
 	}
 
 	@Override
@@ -168,7 +233,7 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
+	public void logout(BareJID user) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -184,7 +249,7 @@ public class AuthRepositoryPool
 
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+			throws TigaseDBException, AuthorizationException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -231,12 +296,42 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
+	public void removeUser(BareJID user) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
 				repo.removeUser(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}
+
+	@Override
+	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.setAccountStatus(user, status);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}
+
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.setUserDisabled(user, value);
 			} finally {
 				addRepo(repo);
 			}
@@ -271,90 +366,12 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public void updatePassword(BareJID user, String password) throws UserNotFoundException, TigaseDBException {
+	public void updatePassword(BareJID user, String password) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
 				repo.updatePassword(user, password);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-	}
-
-	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getPassword(user);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-			return null;
-		}
-	}
-
-	@Override
-	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.isUserDisabled(user);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-			return false;
-		}
-	}
-
-	@Override
-	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				repo.setAccountStatus(user, status);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-	}
-
-	@Override
-	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getAccountStatus(user);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-			return null;
-		}
-	}
-
-	@Override
-	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				repo.setUserDisabled(user, value);
 			} finally {
 				addRepo(repo);
 			}

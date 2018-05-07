@@ -185,6 +185,14 @@ EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUserCredentialsGet';
 -- QUERY END:
 
 -- QUERY START:
+CREATE PROCEDURE TigUserUsernames_Get(userId varchar(2049))
+PARAMETER STYLE JAVA
+LANGUAGE JAVA
+DYNAMIC RESULT SETS 1
+EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUserUsernamesGet';
+-- QUERY END:
+
+-- QUERY START:
 CREATE PROCEDURE TigUserCredential_Remove(userId varchar(2049), username varchar(2049))
 PARAMETER STYLE JAVA
 LANGUAGE JAVA

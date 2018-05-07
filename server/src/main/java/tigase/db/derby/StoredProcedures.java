@@ -524,7 +524,8 @@ public class StoredProcedures {
 				result = ps.executeUpdate();
 			} else {
 				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery("select uid from tig_users where lower(user_id) = lower('db-properties')");
+				ResultSet rs = stmt.executeQuery(
+						"select uid from tig_users where lower(user_id) = lower('db-properties')");
 				if (!rs.next()) {
 					rs.close();
 					tigAddUser("db-properties", null, new ResultSet[1]);
@@ -893,6 +894,23 @@ public class StoredProcedures {
 			// e.printStackTrace();
 			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static void tigUserUsernamesGet(String userId, ResultSet[] data) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps = conn.prepareStatement("select distinct c.username from tig_users u " +
+																 " inner join tig_user_credentials c on c.uid = u.uid " +
+																 " where lower(u.user_id) = ?");
+			ps.setString(1, userId.toLowerCase());
+
+			data[0] = ps.executeQuery();
 		} finally {
 			conn.close();
 		}

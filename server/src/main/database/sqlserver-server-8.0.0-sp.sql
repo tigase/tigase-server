@@ -550,6 +550,27 @@ end
 GO
 
 -- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserUsernames_Get')
+DROP PROCEDURE TigUserUsernames_Get
+-- QUERY END:
+GO
+
+-- QUERY START:
+create procedure dbo.TigUserUsernames_Get
+	@_user_id nvarchar(2049)
+AS
+begin
+    select distinct
+        c.username
+    from tig_users u
+    inner join tig_user_credentials c on c.uid = u.uid
+    where
+        u.sha1_user_id = HASHBYTES('SHA1', lower(@_user_id));
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserCredential_Remove')
 DROP PROCEDURE TigUserCredential_Remove
 -- QUERY END:
