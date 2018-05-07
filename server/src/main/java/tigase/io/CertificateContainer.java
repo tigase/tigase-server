@@ -182,7 +182,10 @@ public class CertificateContainer
 					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
 							new Object[]{alias, entry.getValue()});
 				} catch (Exception ex) {
-					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue(), ex);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Cannot load certficate from file: " + entry.getValue(), ex);
+					}
+					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue());
 				}
 			}
 
@@ -206,12 +209,18 @@ public class CertificateContainer
 						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
 								new Object[]{alias, file});
 					} catch (Exception ex) {
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
+						}
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file);
 					}
 				}
 			}
 		} catch (Exception ex) {
-			log.log(Level.WARNING, "There was a problem initializing SSL certificates.", ex);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
+			}
+			log.log(Level.WARNING, "There was a problem initializing SSL certificates.");
 		}
 
 		String trustLoc = (String) params.get(TRUSTED_CERTS_DIR_KEY);
@@ -251,7 +260,10 @@ public class CertificateContainer
 					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
 							new Object[]{alias, entry.getValue()});
 				} catch (Exception ex) {
-					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue(), ex);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "" + " from file: " + entry.getValue(), ex);
+					}
+					log.log(Level.WARNING, "" + " from file: " + entry.getValue());
 				}
 			}
 
@@ -271,12 +283,18 @@ public class CertificateContainer
 						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
 								new Object[]{alias, file});
 					} catch (Exception ex) {
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
+						}
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file);
 					}
 				}
 			}
 		} catch (Exception ex) {
-			log.log(Level.WARNING, "There was a problem initializing SSL certificates.", ex);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
+			}
+			log.log(Level.WARNING, "There was a problem initializing SSL certificates.");
 		}
 
 		// It may take a while, let's do it in background
@@ -324,7 +342,10 @@ public class CertificateContainer
 		try {
 			addCertificate(event.getAlias(), event.getPemCertificate(), event.isSaveToDisk(), false);
 		} catch (CertificateParsingException ex) {
-			log.log(Level.WARNING, "Failed to update certificate for " + event.getAlias(), ex);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Failed to update certificate for " + event.getAlias(), ex);
+			}
+			log.log(Level.WARNING, "Failed to update certificate for " + event.getAlias());
 		}
 	}
 
@@ -433,6 +454,9 @@ public class CertificateContainer
 								}
 							}
 						} catch (Exception e) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Problem loading certificate from file: " + file, e);
+							}
 							log.log(Level.WARNING, "Problem loading certificate from file: {0}", file);
 						}
 					}
@@ -440,7 +464,10 @@ public class CertificateContainer
 			}
 
 		} catch (Exception ex) {
-			log.log(Level.WARNING, "An error loading trusted certificates", ex);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "An error loading trusted certificates", ex);
+			}
+			log.log(Level.WARNING, "An error loading trusted certificates");
 		}
 
 		try {
@@ -454,7 +481,10 @@ public class CertificateContainer
 				trustKeyStore.setCertificateEntry("generated fake CA", entry.getCertChain()[0]);
 			}
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Can't generate fake trusted CA certificate", e);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Can't generate fake trusted CA certificate", e);
+			}
+			log.log(Level.WARNING, "Can't generate fake trusted CA certificate");
 		}
 
 		tms = new X509TrustManager[]{
@@ -619,7 +649,10 @@ public class CertificateContainer
 				try {
 					kmf = createCertificateKmf(alias);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Failed to create certificate for alias: " + alias, e);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Failed to create certificate for alias: " + alias, e);
+					}
+					log.log(Level.WARNING, "Failed to create certificate for alias: " + alias);
 				}
 			}
 
@@ -645,7 +678,10 @@ public class CertificateContainer
 				try {
 					kmf = createCertificateKmf(alias);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Failed to create certificate for alias: " + alias, e);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Failed to create certificate for alias: " + alias, e);
+					}
+					log.log(Level.WARNING, "Failed to create certificate for alias: " + alias);
 				}
 			}
 
