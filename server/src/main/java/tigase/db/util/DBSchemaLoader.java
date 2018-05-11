@@ -571,7 +571,12 @@ public class DBSchemaLoader
 		if (params.isForceReloadSchema()) {
 			return Optional.of(Version.ZERO);
 		}
-		return getSchemaFileNames(schema.getId()).keySet().stream().sorted().findFirst();
+		Map<Version, Path> versions = getSchemaFileNames(schema.getId());
+		if (versions.size() > 1) {
+			return versions.keySet().stream().sorted().findFirst();
+		} else {
+			return Optional.ofNullable(Version.ZERO);
+		}
 	}
 
 	@Override
