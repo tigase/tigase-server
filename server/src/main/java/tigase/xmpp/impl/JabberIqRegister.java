@@ -88,6 +88,8 @@ public class JabberIqRegister
 	private CaptchaProvider captchaProvider;
 	@ConfigField(desc = "CAPTCHA Required")
 	private boolean captchaRequired = false;
+	@ConfigField(desc = "Email Required")
+	private boolean emailRequired = true;
 	@Inject
 	private EventBus eventBus;
 	@ConfigField(desc = "Maximum CAPTCHA repetition in session")
@@ -493,11 +495,15 @@ public class JabberIqRegister
 			results.offer(packet.okResult(prepareCaptchaRegistrationForm(session), 0));
 		} else if (signedFormRequired) {
 			results.offer(packet.okResult(prepareSignedRegistrationForm(session), 0));
-		} else {
+		} else if (emailRequired) {
 			results.offer(packet.okResult(
 					"<instructions>" + "Choose a user name and password for use with this service." +
 							"Please provide also your e-mail address." + "</instructions>" + "<username/>" +
 							"<password/>" + "<email/>", 1));
+		} else {
+			results.offer(packet.okResult(
+					"<instructions>" + "Choose a user name and password for use with this service." +
+							"</instructions>" + "<username/>" + "<password/>", 1));
 		}
 
 	}
