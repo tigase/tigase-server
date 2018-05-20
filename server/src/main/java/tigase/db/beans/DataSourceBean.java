@@ -284,7 +284,7 @@ public class DataSourceBean
 		/**
 		 * Get interface to which all instances in this pool must conform.
 		 *
-		 * @return interface
+		 * @return interface    `
 		 */
 		@Override
 		protected Class<? extends DataSource> getRepositoryIfc() {

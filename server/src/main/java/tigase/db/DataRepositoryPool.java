@@ -58,6 +58,14 @@ public class DataRepositoryPool
 	}
 
 	@Override
+	public boolean automaticSchemaManagement() {
+		if (repoPool.isEmpty()) {
+			return true;
+		}
+		return repoPool.get(0).automaticSchemaManagement();
+	}
+
+	@Override
 	public void checkConnectivity(Duration watchdogTime) {
 		repoPool.forEach(repo -> repo.checkConnectivity(watchdogTime));
 	}

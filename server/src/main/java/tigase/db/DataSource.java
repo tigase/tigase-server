@@ -68,6 +68,15 @@ public interface DataSource
 				&& RepositoryVersionAware.class.isAssignableFrom(datasourceClass)) {
 			final String dataSourceID = datasourceClass.getAnnotation(SchemaId.class).id();
 
+			if (!automaticSchemaManagement()) {
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING, "Automatic schema management is disabled for " + this.getResourceUri() +
+							", skipping version check for " + dataSourceID + "(" + datasourceClass.getSimpleName() +
+							")");
+					return true;
+				}
+			}
+
 			Optional<Version> dbVer = getSchemaVersion(dataSourceID);
 
 			Version implementationVersion;
@@ -113,6 +122,10 @@ public interface DataSource
 			result = true;
 		}
 		return result;
+	}
+
+	default boolean automaticSchemaManagement() {
+		return true;
 	}
 
 	/**

@@ -61,6 +61,8 @@ public class DataRepositoryImpl
 	public static final String DB_CONN_TIMEOUT_PROP_KEY = "db-conn-timeout";
 	public static final int DB_CONN_TIMEOUT = 15;
 	private static final Logger log = Logger.getLogger(DataRepositoryImpl.class.getName());
+	@ConfigField(desc = "Automatic schema management", alias = "schema-management")
+	private boolean automaticSchemaManagement = true;
 	private String check_table_query = OTHER_CHECK_TABLE_QUERY;
 	private Connection conn = null;
 	private PreparedStatement conn_valid_st = null;
@@ -78,6 +80,11 @@ public class DataRepositoryImpl
 	private CounterValue reconnectionCounter = null;
 	private CounterValue reconnectionFailedCounter = null;
 	private String table_schema = null;
+
+	@Override
+	public boolean automaticSchemaManagement() {
+		return automaticSchemaManagement;
+	}
 
 	@Override
 	public Optional<Version> getSchemaVersion(String component) {

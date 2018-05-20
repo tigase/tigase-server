@@ -429,7 +429,12 @@ public class SchemaManager {
 
 	public Map<DataSourceInfo, List<ResultEntry>> destroySchemas(Collection<DataSourceInfo> dataSources) {
 		return dataSources.stream()
-				.map(e -> new Pair<>(e, destroySchemas(e)))
+				.map(e -> new Pair<>(e, e.automaticSchemaManagement()
+										? destroySchemas(e)
+										: Collections.singletonList(
+												new ResultEntry("Destroying data source",
+																SchemaLoader.Result.skipped,
+																"Automatic schema management is disabled for this data source!"))))
 				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 	}
 
@@ -446,6 +451,7 @@ public class SchemaManager {
 		Map<DataSourceInfo, List<SchemaInfo>> dataSourceSchemas = getDataSourcesAndSchemas(config);
 		Map<DataSourceInfo, List<ResultEntry>> upgradeSupportResults = dataSourceSchemas.entrySet()
 				.stream()
+				.filter(e -> e.getKey().automaticSchemaManagement())
 				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(),
 																	  checkUpgradeSupport(e.getKey(), e.getValue())))
 				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
@@ -469,8 +475,22 @@ public class SchemaManager {
 		}
 		return dataSourceSchemas.entrySet()
 				.stream()
-				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(),
-																	  loadSchemas(e.getKey(), e.getValue())))
+				.map(e -> new Pair<DataSourceInfo, List<ResultEntry>>(e.getKey(), e.getKey().automaticSchemaManagement()
+																				  ? loadSchemas(e.getKey(),
+																								e.getValue())
+																				  : e.getValue()
+																						  .stream()
+																						  .map(schema -> new ResultEntry(
+																								  "Loading schema: " +
+																										  schema.getName() +
+																										  ", version: " +
+																										  schema.getVersion()
+																												  .map(Version::toString)
+																												  .orElse("0.0.0"),
+																								  SchemaLoader.Result.skipped,
+																								  "Automatic schema management is disabled for this data source!"))
+																						  .collect(
+																								  Collectors.toList())))
 				.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 	}
 
@@ -673,21 +693,30 @@ public class SchemaManager {
 	}
 
 	private static Map<String, DataSourceInfo> getDataSources(Map<String, Object> config) {
+		boolean automaticSchemaManagement = Optional.ofNullable(config.get("dataSource"))
+				.map(Map.class::cast)
+				.map(map -> map.getOrDefault("automaticSchemaManagement", map.get("schema-management")))
+				.map(Boolean.class::cast)
+				.orElseGet(() -> (Boolean) config.getOrDefault("automaticSchemaManagement",
+														 config.getOrDefault("schema-management", true)));
 		Map<String, DataSourceInfo> dataSources = ((Map<String, Object>) config.get("dataSource")).values()
 				.stream()
 				.filter(v -> v instanceof AbstractBeanConfigurator.BeanDefinition)
 				.map(v -> (AbstractBeanConfigurator.BeanDefinition) v)
 				.filter(AbstractBeanConfigurator.BeanDefinition::isActive)
-				.map(SchemaManager::createDataSourceInfo)
+				.map(v -> SchemaManager.createDataSourceInfo(v, automaticSchemaManagement))
 				.collect(Collectors.toMap(DataSourceInfo::getName, Function.identity()));
 		return dataSources;
 	}
 
-	private static DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def) {
+	private static DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def, boolean automaticSchemaManagement) {
 		Object v = def.getOrDefault("uri", def.get("repo-uri"));
-		return new DataSourceInfo(def.getBeanName(),
+		DataSourceInfo info = new DataSourceInfo(def.getBeanName(),
 								  v instanceof ConfigReader.Variable ? ((ConfigReader.Variable) v).calculateValue()
 										  .toString() : v.toString());
+		boolean schemaManagement = (Boolean) def.getOrDefault("automaticSchemaManagement", def.getOrDefault("schema-management", automaticSchemaManagement));
+		info.setAutomaticSchemaManagement(schemaManagement);
+		return info;
 	}
 
 	private static List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans, Map<String, Object> config) {
@@ -917,6 +946,7 @@ public class SchemaManager {
 
 		private final String name;
 		private final String uri;
+		private boolean automaticSchemaManagement = true;
 
 		private DataSourceInfo(String name, String uri) {
 			this.name = name;
@@ -946,6 +976,14 @@ public class SchemaManager {
 		@Deprecated
 		public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 			// nothing to do
+		}
+
+		public boolean automaticSchemaManagement() {
+			return automaticSchemaManagement;
+		}
+
+		protected void setAutomaticSchemaManagement(boolean value) {
+			this.automaticSchemaManagement = value;
 		}
 
 		@Override
