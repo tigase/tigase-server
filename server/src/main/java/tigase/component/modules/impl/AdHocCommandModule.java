@@ -157,6 +157,8 @@ public class AdHocCommandModule
 
 		boolean isAllowed(String node, JID from);
 
+		boolean isAllowed(String node, String domain, JID from);
+
 	}
 
 }

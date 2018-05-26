@@ -42,6 +42,7 @@ import tigase.server.Packet
 import tigase.vhosts.VHostItem
 
 import java.security.cert.X509Certificate
+import java.util.function.Function
 
 Kernel kernel = (Kernel) kernel;
 def repo = (ComponentRepository) comp_repo
@@ -49,7 +50,7 @@ def p = (Packet) packet
 def admins = (Set) adminsSet
 
 @CompileStatic
-Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Set admins) {
+Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Set admins, Function<String,Boolean> isAllowedForDomain) {
 	def MARKER = "command-marker"
 
 	try {
@@ -69,7 +70,7 @@ Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Se
 // The first step - provide a list of all vhosts for the user
 		if (itemKey == null) {
 			Collection<VHostItem> items = repo.allItems()
-			List<String> itemsStr = items.findAll { isServiceAdmin || it.isOwner(stanzaFromBare.toString()) }.collect { it.getKey() };
+			List<String> itemsStr = items.findAll { isAllowedForDomain.apply(it.getKey()) }.collect { it.getKey() };
 			if (itemsStr.size() > 0) {
 				String[] itemsStrArray = itemsStr.toArray(new String[itemsStr.size()]);
 				def result = packet.commandResult(Command.DataType.form)
@@ -91,7 +92,7 @@ Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Se
 				Command.addTextField(result, "Error", "No such VHost, adding SSL Certificate impossible.");
 				return result;
 			} else {
-				if (isServiceAdmin || item.isOwner(stanzaFromBare.toString()) || item.isAdmin(stanzaFromBare.toString())) {
+				if (isAllowedForDomain.apply(itemKey)) {
 					def result = packet.commandResult(Command.DataType.form)
 					Command.addFieldValue(result, VHOST, itemKey, "text-single")
 					Command.addFieldMultiValue(result, CERTIFICATE, [ "" ])
@@ -113,7 +114,7 @@ Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Se
 		if (item == null) {
 			Command.addTextField(result, "Error", "No such VHost, loading SSL certificate impossible.")
 		} else {
-			if (isServiceAdmin || item.isOwner(stanzaFromBare.toString())) {
+			if (isAllowedForDomain.apply(itemKey)) {
 				def pemCert = pemCertVals.join('\n')
 				// Basic certificate checks
 				// For XMPP service nonAdmins (domain owners) the alias must match CN name in the certificate
@@ -153,4 +154,4 @@ Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Se
 	}
 }
 
-return process(kernel, repo, p, admins);
+return process(kernel, repo, p, admins, (Function<String,Boolean>) isAllowedForDomain);

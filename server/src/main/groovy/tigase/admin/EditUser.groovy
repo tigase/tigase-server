@@ -34,7 +34,6 @@ import tigase.db.TigaseDBException
 import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Iq
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
@@ -68,9 +67,7 @@ if (userJid == null) {
 def result = null;
 try {
 	def bareJID = BareJID.bareJIDInstance(userJid)
-	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-	if (isServiceAdmin ||
-			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 		if (Command.getFieldValue(packet, "FORM_TYPE") == null ||
 				Command.getFieldValue(packet, "FORM_TYPE").isEmpty()) {

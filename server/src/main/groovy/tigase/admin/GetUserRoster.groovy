@@ -33,7 +33,6 @@ package tigase.admin
 import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Packet
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xml.Element
 import tigase.xmpp.XMPPSession
@@ -71,11 +70,9 @@ if (userJid == null) {
 }
 
 def bareJID = BareJID.bareJIDInstance(userJid)
-VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def result = p.commandResult(Command.DataType.result)
 
-if (isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single", "The Jabber ID for which to retrieve roster")
 

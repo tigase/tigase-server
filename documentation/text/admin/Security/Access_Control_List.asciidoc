@@ -19,6 +19,8 @@ The following is a list of possible ACL modifiers for administrator command acce
 - *ADMIN* - Local server administrators can execute the command, this is a default setting if no ACL is set for a command.
 - *LOCAL* - All users with accounts on the local server can execute the command. Users from other, federated servers will not be able to execute the command.
 - *NONE* - No one will be allowed to execute this command
+- *DOMAIN_OWNER* - Only user which is owner of the domain which items are being manipulated is allowed to execute the comment. If script is not checking permissions for the manipulated item, this value will behave in the same way as **LOCAL**.
+- *DOMAIN_ADMIN* - Only user which is one of the domain administrators will be able to execute the command manipulating items related to the domain. If script is not checking permissions for the manipulated item, this value will behave in the same way as **LOCAL**.
 - *exampl.com* - Only users with accounts on the selected domain will be able to execute the command.  It may be useful to setup a domain specifically for admin accounts, and automatically all users within that domain would be able to run the command.
 - *user@example.com* - Comma separated list of JIDs of users who can execute the command.
 

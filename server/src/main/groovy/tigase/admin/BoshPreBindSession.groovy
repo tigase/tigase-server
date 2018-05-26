@@ -75,8 +75,7 @@ try {
 
 	if (vhost == null) {
 		Command.addTextField(result, "Error", "Domain of the JID doesn't exists");
-	} else if (isServiceAdmin ||
-			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	} else if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 		Map args = new HashMap();
 		if (userJid != null && !userJid.isEmpty()) {

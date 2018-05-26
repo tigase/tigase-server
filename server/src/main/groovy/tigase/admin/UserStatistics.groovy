@@ -64,8 +64,7 @@ bareJID = BareJID.bareJIDInstance(userJid)
 VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def result = p.commandResult(Command.DataType.result)
 
-if (isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+if (vhost != null && isAllowedForDomain.apply(bareJID.getDomain())) {
 	XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
 
 	if (session == null) {

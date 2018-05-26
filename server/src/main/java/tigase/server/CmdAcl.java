@@ -46,6 +46,14 @@ public class CmdAcl {
 		 */
 		DOMAIN,
 		/**
+		 * Only user who is an admin of the given domain can execute the command.
+		 */
+		DOMAIN_ADMIN,
+		/**
+		 * Only user who is an owner of the given domain can execute the command.
+		 */
+		DOMAIN_OWNER,
+		/**
 		 * Comma separated list of JIDs of users who can execute the command.
 		 */
 		JID,
@@ -69,6 +77,14 @@ public class CmdAcl {
 				break;
 			case "LOCAL":
 				type = Type.LOCAL;
+				jid = null;
+				break;
+			case "DOMAIN_OWNER":
+				type = Type.DOMAIN_OWNER;
+				jid = null;
+				break;
+			case "DOMAIN_ADMIN":
+				type = Type.DOMAIN_ADMIN;
 				jid = null;
 				break;
 			case "NONE":
@@ -113,6 +129,8 @@ public class CmdAcl {
 		switch (type) {
 			case ALL:
 			case ADMIN:
+			case DOMAIN_OWNER:
+			case DOMAIN_ADMIN:
 			case LOCAL:
 				return type.name();
 			default:

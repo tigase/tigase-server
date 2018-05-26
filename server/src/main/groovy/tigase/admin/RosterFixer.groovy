@@ -171,7 +171,7 @@ def jidRosterOwnerJid = JID.jidInstanceNS(rosterOwnerJid);
 Packet result = p.commandResult(Command.DataType.result)
 def vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
 if (vhost == null ||
-		(!isServiceAdmin && !vhost.isOwner(stanzaFromBare.toString()) && !vhost.isAdmin(stanzaFromBare.toString()))) {
+		(!isAllowedForDomain.apply(jidRosterOwnerJid.getDomain()))) {
 	Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of " + rosterOwnerJid);
 	results.add(result);
 	return results;

@@ -33,7 +33,6 @@ import tigase.db.TigaseDBException
 import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Packet
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
@@ -64,7 +63,7 @@ if (domainJid == null) {
 //	else {
 	def vhosts = [ ];
 	vhost_man.repo.allItems().each {
-		if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
+		if (isAllowedForDomain.apply(it.getVhost().toString())) {
 			vhosts += it.getVhost().toString()
 		}
 	}
@@ -76,9 +75,7 @@ if (domainJid == null) {
 def result = p.commandResult(Command.DataType.result)
 try {
 	bareJID = BareJID.bareJIDInstance(domainJid)
-	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-	if (isServiceAdmin ||
-			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		def users_list = [ ];
 		users_sessions.entrySet().each {
 			if (!it.getKey().toString().startsWith("sess-man") && it.getKey().getDomain().equals(bareJID.getDomain())) {

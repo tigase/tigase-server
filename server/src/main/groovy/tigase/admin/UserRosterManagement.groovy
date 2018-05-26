@@ -32,7 +32,6 @@ package tigase.admin
 import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Packet
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xml.Element
 import tigase.xmpp.XMPPResourceConnection
@@ -105,15 +104,11 @@ class RosterChangesControler {
 			Packet result = p.commandResult(Command.DataType.result)
 
 			BareJID stanzaFromBare = p.getStanzaFrom().getBareJID();
-			boolean isServiceAdmin = admins.contains(stanzaFromBare);
 
 			JID jidRosterOwnerJid = JID.jidInstanceNS(ownerJidStr);
 			JID jidRosterItemJid = JID.jidInstanceNS(jidToManipulate);
 
-			VHostItem vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
-
-			if (!isServiceAdmin && vhost != null && !(vhost.isOwner(stanzaFromBare.toString())) &&
-					!(vhost.isAdmin(stanzaFromBare.toString()))) {
+			if (!isAllowedForDomain.apply(jidRosterOwnerJid.getDomain())) {
 
 				//if ( !(isServiceAdmin || (vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) ) {
 				Command.addTextField(result, "Error",
@@ -121,10 +116,7 @@ class RosterChangesControler {
 				return result;
 			}
 
-			vhost = vhost_man.getVHostItem(jidRosterItemJid.getDomain());
-
-			if (!isServiceAdmin && vhost != null && !(vhost.isOwner(stanzaFromBare.toString())) &&
-					!(vhost.isAdmin(stanzaFromBare.toString()))) {
+			if (!isAllowedForDomain.apply(jidRosterItemJid.getDomain())) {
 
 				//if ( !(isServiceAdmin || (vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) ) {
 

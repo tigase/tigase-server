@@ -32,7 +32,6 @@ package tigase.admin
 import tigase.server.Command
 import tigase.server.Packet
 import tigase.server.Permissions
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.StanzaType
 import tigase.xmpp.XMPPResourceConnection
@@ -101,9 +100,7 @@ for (userJid in userJids) {
 
 		JID userFullJID = JID.jidInstance(userJid)
 		def sess = user_sessions.get(userFullJID.getBareJID());
-		VHostItem vhost = vhost_man.getVHostItem(userFullJID.getDomain())
-		if (isServiceAdmin || (vhost != null &&
-				(vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		if (isAllowedForDomain.apply(userFullJID.getDomain())) {
 
 			if (sess != null) {
 				def conns = sess.getConnectionIds();

@@ -31,7 +31,6 @@ package tigase.admin
 import tigase.cluster.strategy.ClusteringStrategyIfc
 import tigase.server.Command
 import tigase.server.Packet
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xml.Element
 import tigase.xmpp.XMPPResourceConnection
@@ -63,12 +62,10 @@ if (userJid == null) {
 }
 
 def bareJID = BareJID.bareJIDInstance(userJid)
-VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def resourcesAsTable = Command.getCheckBoxFieldValue(p, "Show connected resources in table");
 def result = p.commandResult(Command.DataType.result)
 
-if (isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 	Command.addTextField(result, "JID", "JID: " + userJid)
 	def userRes = [ ];

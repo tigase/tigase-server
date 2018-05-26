@@ -31,7 +31,6 @@ import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Iq
 import tigase.util.JIDUtils
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.vhosts.filter.CustomDomainFilter
 import tigase.vhosts.filter.DomainFilterPolicy
@@ -71,10 +70,7 @@ def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
-VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-
-if (!(isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString()))))) {
+if (!isAllowedForDomain.apply(bareJID.getDomain())) {
 	def result = p.commandResult(Command.DataType.result);
 	Command.addTextField(result, "Error", "You do not have enough permissions to manage this domain");
 	return result

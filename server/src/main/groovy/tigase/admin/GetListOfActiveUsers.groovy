@@ -66,7 +66,7 @@ if (domainJid == null || maxItemsStr == null) {
 //	else {
 	def vhosts = [ ];
 	vhost_man.repo.allItems().each {
-		if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
+		if (isAllowedForDomain.apply(it.getVhost().toString())) {
 			vhosts += it.getVhost().toString()
 		}
 	}
@@ -83,8 +83,7 @@ try {
 	def maxItems = maxItemsStr ? (maxItemsStr == "None" ? null : Integer.parseInt(maxItemsStr)) : 25;
 	bareJID = BareJID.bareJIDInstance(domainJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-	if (isServiceAdmin ||
-			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		def users_list = [ ];
 		users_sessions.entrySet().each {
 			if (!it.getKey().toString().startsWith("sess-man") && it.getKey().getDomain().equals(bareJID.getDomain())) {

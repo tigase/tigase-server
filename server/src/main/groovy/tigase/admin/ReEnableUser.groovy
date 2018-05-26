@@ -35,7 +35,6 @@ import tigase.db.UserNotFoundException
 import tigase.server.Command
 import tigase.server.Packet
 import tigase.server.Permissions
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.StanzaType
 import tigase.xmpp.jid.BareJID
@@ -126,9 +125,7 @@ def errors = [ ]
 for (userJid in userJids) {
 	try {
 		def bareJID = BareJID.bareJIDInstance(userJid)
-		VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-		if (isServiceAdmin || (vhost != null &&
-				(vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		if (isAllowedForDomain.apply(bareJID.getDomain())) {
 			try {
 				auth_repo.setAccountStatus(bareJID, AuthRepository.AccountStatus.active)
 			} catch (TigaseDBException ex) {

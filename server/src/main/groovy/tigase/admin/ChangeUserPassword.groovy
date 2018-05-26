@@ -35,7 +35,6 @@ import tigase.db.UserNotFoundException
 import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Packet
-import tigase.vhosts.VHostItem
 import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
@@ -76,9 +75,7 @@ if (userJid == null || userPass == null /*|| userPassVer == null*/) {
 def result = p.commandResult(Command.DataType.result)
 try {
 	bareJID = BareJID.bareJIDInstance(userJid)
-	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-	if (isServiceAdmin ||
-			(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		if (user_repo.userExists(bareJID)) {
 			auth_repo.updatePassword(bareJID, userPass)
 			Command.addTextField(result, "Note", "Operation successful");

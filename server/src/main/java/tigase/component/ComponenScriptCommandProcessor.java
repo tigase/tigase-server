@@ -52,4 +52,9 @@ public class ComponenScriptCommandProcessor
 	public boolean isAllowed(String node, JID from) {
 		return component.canCallCommand(from, node);
 	}
+
+	@Override
+	public boolean isAllowed(String node, String domain, JID from) {
+		return component.canCallCommand(from, domain, node);
+	}
 }

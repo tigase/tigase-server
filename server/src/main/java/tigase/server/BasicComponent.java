@@ -60,6 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,6 +147,10 @@ public class BasicComponent
 	 * @return a value of <code>boolean</code>
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
+		return canCallCommand(jid, null, commandId);
+	}
+
+	public boolean canCallCommand(JID jid, String domain, String commandId) {
 		boolean result = isAdmin(jid) || isTrusted(jid);
 
 		if (result) {
@@ -155,12 +160,12 @@ public class BasicComponent
 		Set<CmdAcl> acl = commandsACL.get(ALL_PROP_KEY);
 
 		if (acl != null) {
-			result = checkCommandAcl(jid, acl);
+			result = checkCommandAcl(jid, domain, acl);
 		}
 		if (!result) {
 			acl = commandsACL.get(commandId);
 			if (acl != null) {
-				result = checkCommandAcl(jid, acl);
+				result = checkCommandAcl(jid, domain, acl);
 			}
 		}
 
@@ -176,6 +181,19 @@ public class BasicComponent
 	 * @return a value of <code>boolean</code>
 	 */
 	public boolean checkCommandAcl(JID jid, Set<CmdAcl> acl) {
+		return checkCommandAcl(jid, null, acl);
+	}
+	
+	/**
+	 * Check if entity with JID is allowed ot execute command with passed access control list.
+	 *
+	 * @param jid - entity JID
+	 * @param domain - domain for which check permission
+	 * @param acl - access control list
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	public boolean checkCommandAcl(JID jid, String domain, Set<CmdAcl> acl) {
 		for (CmdAcl cmdAcl : acl) {
 			switch (cmdAcl.getType()) {
 				case ALL:
@@ -198,13 +216,43 @@ public class BasicComponent
 				case NONE:
 					return false;
 
+				case DOMAIN_ADMIN:
+					if (isLocalDomain(jid.getDomain())) {
+						if (domain == null) {
+							return true;
+						}
+						VHostItem vHostItem = getVHostItem(domain);
+						if (vHostItem == null) {
+							break;
+						}
+						if (vHostItem.isAdmin(jid.getBareJID().toString())) {
+							return true;
+						}
+					}
+					break;
+
+				case DOMAIN_OWNER:
+					if (isLocalDomain(jid.getDomain())) {
+						if (domain == null) {
+							return true;
+						}
+						VHostItem vHostItem = getVHostItem(domain);
+						if (vHostItem == null) {
+							break;
+						}
+						if (vHostItem.isOwner(jid.getBareJID().toString())) {
+							return true;
+						}
+					}
+					break;
+
 				case DOMAIN:
 					if (cmdAcl.isDomainAllowed(jid.getDomain())) {
 						return true;
 					}
 
 					break;
-
+					
 				case JID:
 				default:
 					if (cmdAcl.isJIDAllowed(jid.getBareJID())) {
@@ -739,11 +787,11 @@ public class BasicComponent
 		CommandIfc com = scriptCommands.get(strCommand);
 
 		if ((strCommand != null) && (com != null)) {
-			boolean admin = false;
+			boolean allowed = false;
 
 			try {
-				admin = canCallCommand(iqc.getStanzaFrom(), strCommand);
-				if (admin) {
+				allowed = canCallCommand(iqc.getStanzaFrom(), strCommand);
+				if (allowed) {
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "Processing admin command: {0}", pc);
 					}
@@ -756,6 +804,10 @@ public class BasicComponent
 
 					// Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
+					
+					Function<String,Boolean> isAllowedForDomain = (domain) -> canCallCommand(iqc.getStanzaFrom(), domain, strCommand);
+					binds.put("isAllowedForDomain", isAllowedForDomain);
+
 					com.runCommand(iqc, binds, results);
 				} else {
 					if (log.isLoggable(Level.FINER)) {
