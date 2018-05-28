@@ -46,9 +46,6 @@ public class TestComponent
 	@Inject(nullAllowed = true)
 	private TestSpamModule spamTestModule;
 
-	@ConfigField(desc = "Number of processing threads", alias = "processing-threads-count")
-	private int threadsNumber = Runtime.getRuntime().availableProcessors();
-
 	@Override
 	public String getDiscoCategoryType() {
 		return "spam";
@@ -103,12 +100,12 @@ public class TestComponent
 
 	@Override
 	public int processingInThreads() {
-		return threadsNumber;
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	@Override
 	public int processingOutThreads() {
-		return threadsNumber;
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	@Override

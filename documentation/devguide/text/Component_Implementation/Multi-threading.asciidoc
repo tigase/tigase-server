@@ -7,11 +7,13 @@
 :numbered:
 :website: http://tigase.net/
 
-Multi core and multi CPU machines very common nowadays, especially for an application like the XMPP server you most likely deployed your service on. Your new custom component however, processes all packets in a single thread.
+Multi core and multi CPU machines are very common nowadays. Your new custom component however, processes all packets in a single thread.
 
 This is especially important if the packet processing is CPU expensive like, for example, SPAM checking. In such a case you could experience single Core/CPU usage at 100% while other Cores/CPUs are idling. Ideally, you want your component to use all available CPUs.
 
 Tigase API offers a very simple way to execute component's `processPacket(Packet packet)` method in multiple threads. Methods `int processingOutThreads()` and `int processingInThreads()` returns number of threads assigned to the component. By default it returns just '1' as not all component implementations are prepared to process packets concurrently. By overwriting the method you can return any value you think is appropriate for the implementation. Please note, there are two methods, one is for a number of threads for incoming packets to the component and another for outgoing packets from the component. It used to be a single method but different components have different needs and the best performance can be achieved when the outgoing queues have a separate threads pool from incoming queues. Also some components only receive packets while other only send, therefore assigning an equal number of threads for both that could be a waste of resources.
+
+NOTE: Due to how Kernel works you MUST avoid using variables in those methods. If you would like to have this configurable at startup time you could simply set `processing-in-threads` and `processing-out-threads` in your component's bean configuration.
 
 If the packet processing is CPU bound only, you normally want to have as many threads as there are CPUs available:
 
