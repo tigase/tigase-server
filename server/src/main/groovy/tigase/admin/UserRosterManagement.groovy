@@ -43,6 +43,8 @@ import tigase.xmpp.impl.roster.RosterFlat
 import tigase.xmpp.jid.BareJID
 import tigase.xmpp.jid.JID
 
+import java.util.function.Function
+
 class Field {
 
 	String name;
@@ -58,6 +60,8 @@ class RosterChangesControler {
 	Set<BareJID> admins
 
 	Map<String, XMPPSession> sessions
+
+	Function<String,Boolean> isAllowedForDomain
 
 	Field addOperation = new Field(name: "addJid", label: "Add")
 	Field removeOperation = new Field(name: "removeJid", label: "Remove")
@@ -232,5 +236,9 @@ class RosterChangesControler {
 	}
 }
 
-new RosterChangesControler(repository: userRepository, admins: adminsSet, vhost_man: vhostMan,
-						   sessions: userSessions).processPacket((Packet) packet)
+def changesControler = new RosterChangesControler(repository: userRepository,
+												  admins: adminsSet,
+												  vhost_man: vhostMan,
+												  sessions: userSessions,
+												  isAllowedForDomain: (Function<String, Boolean>) isAllowedForDomain)
+changesControler.processPacket((Packet) packet)
