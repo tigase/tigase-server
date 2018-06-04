@@ -136,6 +136,8 @@ private TestRepositoryIfc testRepository;
 
 TIP: In *testRepository* field instance of *TestRepositoryMDBean* will be injected.
 
+NOTE: If the class in which we intend to use our repository is deeply nested within Kernel dependencies and we want to leverage automatic schema versioning we have to implement `tigase.kernel.beans.RegistrarBean` in our class!
+
 === Configuration
 
 Our class `TestRepositoryMDBean` is annotated with `@Bean` which sets its name as `repository` and sets parent as `TestComponent`. Instance of this component was configured by use under name of `test` in Tigase XMPP Server configuration file.

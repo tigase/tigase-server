@@ -63,6 +63,11 @@ stats-logger may also be controlled using frequency, which is the time interval 
 -----
 stats {
     'stats-logger' (class: tigase.stats.CounterDataLogger) {
+    	repository() {
+    		'default'() {
+    			'data-source' = 'default';
+    		}
+    	}
         frequency = '60'
     }
 }
@@ -116,6 +121,26 @@ stats {
 
 which configures accordingly: directory to which files should be saved, filename prefix, whether to include or not unix timestamp in filename, whether to include or not datetime timestamp, control format of timestamp (using java DateFormat pattern) and also set level of the statistics we want to save (using java Logger.Level)
 
+
+== Database logger
+This allows configuring of statistics gathering to a database. Without additional configuration `default` data source will be used but it's possible to store statistics in any database - simply define new data source and configure logger with it's name.
+
+NOTE: After enabling the component it's database schema should be loaded by executing `./scripts/tigase.sh upgrade-schema etc/tigase.conf` from the main Tigase directory
+
+[source,dsl]
+-----
+stats {
+    'stats-logger' (class: tigase.stats.CounterDataLogger) {
+    	repository() {
+    		'default'() {
+    			'data-source' = 'customDataSourceName';
+    		}
+    	}
+        frequency = '60'
+    }
+}
+-----
+
 == Example configuration block
 [source,dsl]
 -----
@@ -132,6 +157,11 @@ stats {
         'stats-unixtime' = 'true'
     }
     'stats-logger' (class: tigase.stats.CounterDataLogger) {
+    	repository() {
+    		'default'() {
+    			'data-source' = 'default';
+    		}
+    	}
         frequency = '60'
     }
 }
