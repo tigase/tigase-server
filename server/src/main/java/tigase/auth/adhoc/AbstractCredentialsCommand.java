@@ -4,10 +4,12 @@ import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
+import tigase.component.modules.impl.AdHocCommandModule;
 import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.form.Form;
 import tigase.kernel.beans.Inject;
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
@@ -25,6 +27,9 @@ public abstract class AbstractCredentialsCommand
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	@Inject
 	protected AuthRepository authRepository;
+
+	@Inject
+	private AdHocCommandModule.ScriptCommandProcessor scriptCommandProcessor;
 
 	protected void checkIfCanModifyJID(final AdhHocRequest request, final BareJID jidToModify)
 			throws AdHocCommandException {
@@ -55,7 +60,7 @@ public abstract class AbstractCredentialsCommand
 
 	@Override
 	public boolean isAllowedFor(JID jid) {
-		return true;
+		return scriptCommandProcessor.isAllowed(getNode(), jid);
 	}
 
 	protected abstract void processForm(Form form, AdhHocRequest request, AdHocResponse response)
