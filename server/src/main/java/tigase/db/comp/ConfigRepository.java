@@ -115,7 +115,13 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	@Override
 	public String toString() {
-		return items.toString();
+		final StringBuilder sb = new StringBuilder("RepoItems");
+		sb.append(", size=").append(items.size());
+		sb.append(", items=").append(items.keySet().toString().substring(0, 1024));
+		if (items.keySet().toString().length() > 1024) {
+			sb.append("...");
+		}
+		return sb.toString();
 	}
 
 	public abstract String getConfigKey();

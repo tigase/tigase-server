@@ -25,6 +25,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.beans.SDRepositoryBean;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -146,4 +147,23 @@ public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryI
 		getRepository().initRepository(resource_uri, params);
 	}
 
+	@Override
+	public String toString() {
+		Collection<Item> items;
+		try {
+			items = allItems();
+		} catch (TigaseDBException ex) {
+			items = Collections.emptyList();
+			// don't need to log anything
+		}
+		final StringBuilder sb = new StringBuilder("RepoItems");
+		if (!items.isEmpty()) {
+			sb.append(", size=").append(items.size());
+			sb.append(", items=").append(items.toString().substring(0, 1024));
+			if (items.toString().length() > 1024) {
+				sb.append("...");
+			}
+		}
+		return sb.toString();
+	}
 }
