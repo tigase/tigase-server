@@ -121,7 +121,7 @@ public class CounterDataFileLogger
 			String result = stats.entrySet()
 					.stream()
 					.map((e) -> e.getKey() + "\t" + e.getValue())
-					.collect(Collectors.joining("'n"));
+					.collect(Collectors.joining("\n"));
 			writer.write(result);
 		} catch (IOException ex) {
 			log.log(Level.SEVERE, "Error dumping server statistics to file", ex);

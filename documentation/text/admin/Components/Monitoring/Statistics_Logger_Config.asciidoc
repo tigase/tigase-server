@@ -19,7 +19,7 @@ stats() {
         'stats-unixtime' = false
         'stats-datetime' = true
         'stats-datetime-format' = 'HH:mm:ss'
-        'stats-level' = 'FINE'
+        'stats-level' = 'FINEST'
     }
 }
 ----

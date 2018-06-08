@@ -108,7 +108,7 @@ stats {
         'stats-datetime-format' = 'HH:mm:ss'
         'stats-directory' = 'logs/server_statistics'
         'stats-filename' = 'stat'
-        'stats-level' = 'FINE'
+        'stats-level' = 'FINEST'
         'stats-unixtime' = 'false'
 -----
 
