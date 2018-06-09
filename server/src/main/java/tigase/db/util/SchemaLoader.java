@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static tigase.db.util.SchemaManager.COMMON_SCHEMA_ID;
+import static tigase.db.util.SchemaManager.COMMON_SCHEMA_VERSION;
 import static tigase.util.reflection.ReflectionHelper.classMatchesClassWithParameters;
 
 /**
@@ -252,8 +253,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	public Result loadCommonSchema() {
 		return loadSchema(
-				new SchemaManager.SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", true, Collections.emptyList()),
-				"0.0.2");
+				new SchemaManager.SchemaInfo(COMMON_SCHEMA_ID, "Common Schema", true, Collections.emptyList()), COMMON_SCHEMA_VERSION);
 	}
 
 	public abstract Result loadSchema(SchemaManager.SchemaInfo schemaInfo, String version);

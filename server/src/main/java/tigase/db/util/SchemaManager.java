@@ -72,6 +72,7 @@ public class SchemaManager {
 	protected static final Class[] SUPPORTED_CLASSES = {MDPoolBean.class, MDRepositoryBean.class,
 														SDRepositoryBean.class};
 	public static final String COMMON_SCHEMA_ID = "common";
+	public static final String COMMON_SCHEMA_VERSION = "0.0.3";
 	private static final Logger log = Logger.getLogger(SchemaManager.class.getCanonicalName());
 	private static final Comparator<SchemaInfo> SCHEMA_INFO_COMPARATOR = (o1, o2) -> {
 		if (o1.getId().equals("<unknown>") || o2.getId().equals(Schema.SERVER_SCHEMA_ID)) {
