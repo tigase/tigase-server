@@ -151,6 +151,9 @@ public class BasicComponent
 	}
 
 	public boolean canCallCommand(JID jid, String domain, String commandId) {
+		if (jid == null) {
+			return false;
+		}
 		boolean result = isAdmin(jid) || isTrusted(jid);
 
 		if (result) {

@@ -1487,11 +1487,38 @@ public class SessionManager
 				//#2682: Commands addressed to domain should be processed by sess-man
 				if (iqc.isCommand() && isLocalDomain(iqc.getStanzaTo().getDomain())) {
 					try {
-						setPermissions(connection, iqc);
-						if (iqc.getStanzaFrom() == null && connection != null) {
+						if (iqc.getStanzaFrom() == null && connection != null && connection.getConnectionId().equals(iqc.getPacketFrom())) {
 							iqc.initVars(connection.getjid(), iqc.getStanzaTo());
 						}
-						adHocCommandModule.process(iqc);
+						if (iqc.getPermissions() == Permissions.NONE || iqc.getPermissions() == Permissions.REMOTE) {
+							setPermissions(connection, iqc);
+						}
+						switch (iqc.getPermissions()) {
+							case AUTH:
+							case LOCAL:
+							case ADMIN:
+							case TRUSTED:
+								adHocCommandModule.process(iqc);
+								break;
+							default:
+								try {
+									addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized",
+																								 false));
+								} catch (PacketErrorTypeException ex1) {
+									if (log.isLoggable(Level.FINEST)) {
+										log.log(Level.FINEST, "packet already of type = error, " + iqc);
+									}
+								}
+								break;
+						}
+					} catch (NoConnectionIdException ex) {
+						try {
+							addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(iqc, null, true));
+						} catch (PacketErrorTypeException ex1) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "packet already of type = error, " + iqc);
+							}
+						}
 					} catch (ComponentException ex) {
 						 try {
 						 	addOutPacket(ex.makeElement(iqc, true));
@@ -1578,7 +1605,7 @@ public class SessionManager
 				processing_result = true;
 				break;
 			case STREAM_MOVED:
-				if (connection != null) {
+				if (connection != null && connection.isAuthorized()) {
 					String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
 					JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
 
@@ -1601,65 +1628,93 @@ public class SessionManager
 						log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid +
 								" with new connection id = " + pc.getPacketFrom().toString(), ex);
 					}
+				} else {
+					try {
+						if (pc.getType() != StanzaType.error) {
+							addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized", false));
+						}
+					} catch (PacketErrorTypeException e) {
+						log.log(Level.FINEST,"could not send not-authorized error, packet already of type error", e);
+					}
 				}
 				processing_result = true;
 
 				break;
 
 			case BROADCAST_TO_ONLINE: {
-				Element packetToBroadcast = null;
-				for (Element elem : pc.getElement().getChildren()) {
-					if (elem.getXMLNS() == "http://tigase.org/protocol/broadcast") {
-						packetToBroadcast = elem;
-						packetToBroadcast.setAttribute("xmlns", Packet.CLIENT_XMLNS);
-					}
-				}
-				String to = Command.getFieldValue(pc, "to");
-				if (to == null) {
-					for (XMPPSession session : sessionsByNodeId.values()) {
-						JID[] jids = session.getJIDs();
-
-						if (jids == null) {
-							continue;
-						}
-
-						for (JID jid : jids) {
-							Element msg = packetToBroadcast.clone();
-							msg.setAttribute("to", jid.toString());
-							try {
-								Packet toSend = Packet.packetInstance(msg);
-								// it is better to send by addOutPacket as in other case results
-								// collection could be very large!!
-								addOutPacket(toSend);
-							} catch (TigaseStringprepException ex) {
-								log.log(Level.FINEST, "could not create packet for message to broadcast", ex);
+				try {
+					if ((connection != null && connection.isAuthorized() && isAdmin(connection.getJID())) ||
+							(iqc.getStanzaTo() != null && getName().equals(iqc.getStanzaTo().getLocalpart()))) {
+						Element packetToBroadcast = null;
+						for (Element elem : pc.getElement().getChildren()) {
+							if (elem.getXMLNS() == "http://tigase.org/protocol/broadcast") {
+								packetToBroadcast = elem;
+								packetToBroadcast.setAttribute("xmlns", Packet.CLIENT_XMLNS);
 							}
 						}
-					}
-				} else {
-					BareJID userJid = BareJID.bareJIDInstanceNS(to);
-					XMPPSession session = sessionsByNodeId.get(userJid);
-					if (session != null) {
-						JID[] jids = session.getJIDs();
+						String to = Command.getFieldValue(pc, "to");
+						if (to == null) {
+							for (XMPPSession session : sessionsByNodeId.values()) {
+								JID[] jids = session.getJIDs();
 
-						if (jids != null) {
-							for (JID jid : jids) {
-								if (log.isLoggable(Level.FINEST)) {
-									log.log(Level.FINEST, "broadcasting packet to {0}", jid);
+								if (jids == null) {
+									continue;
 								}
-								Element msg = packetToBroadcast.clone();
-								msg.setAttribute("to", jid.toString());
-								try {
-									Packet toSend = Packet.packetInstance(msg);
-									// it is better to send by addOutPacket as in other case results
-									// collection could be very large!!
-									addOutPacket(toSend);
-								} catch (TigaseStringprepException ex) {
-									log.log(Level.FINEST, "could not create packet for message to broadcast", ex);
+
+								for (JID jid : jids) {
+									Element msg = packetToBroadcast.clone();
+									msg.setAttribute("to", jid.toString());
+									try {
+										Packet toSend = Packet.packetInstance(msg);
+										// it is better to send by addOutPacket as in other case results
+										// collection could be very large!!
+										addOutPacket(toSend);
+									} catch (TigaseStringprepException ex) {
+										log.log(Level.FINEST, "could not create packet for message to broadcast", ex);
+									}
+								}
+							}
+						} else {
+							BareJID userJid = BareJID.bareJIDInstanceNS(to);
+							XMPPSession session = sessionsByNodeId.get(userJid);
+							if (session != null) {
+								JID[] jids = session.getJIDs();
+
+								if (jids != null) {
+									for (JID jid : jids) {
+										if (log.isLoggable(Level.FINEST)) {
+											log.log(Level.FINEST, "broadcasting packet to {0}", jid);
+										}
+										Element msg = packetToBroadcast.clone();
+										msg.setAttribute("to", jid.toString());
+										try {
+											Packet toSend = Packet.packetInstance(msg);
+											// it is better to send by addOutPacket as in other case results
+											// collection could be very large!!
+											addOutPacket(toSend);
+										} catch (TigaseStringprepException ex) {
+											log.log(Level.FINEST, "could not create packet for message to broadcast",
+													ex);
+										}
+									}
 								}
 							}
 						}
+					} else {
+						if (pc.getType() != StanzaType.error) {
+							addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized", false));
+						}
 					}
+				} catch (NotAuthorizedException e) {
+					if (pc.getType() != StanzaType.error) {
+						try {
+							addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized", false));
+						} catch (PacketErrorTypeException ex) {
+							log.log(Level.FINEST, "could not send not-authorized error, packet already of type error", ex);
+						}
+					}
+				} catch (PacketErrorTypeException e) {
+					log.log(Level.FINEST, "could not send not-authorized error, packet already of type error", e);
 				}
 			}
 			processing_result = true;
