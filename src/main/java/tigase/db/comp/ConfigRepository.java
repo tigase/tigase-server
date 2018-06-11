@@ -101,8 +101,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("RepoItems");
 		sb.append(", size=").append(items.size());
-		sb.append(", items=").append(items.keySet().toString().substring(0, 1024));
-		if (items.keySet().toString().length() > 1024) {
+		final String str = items.keySet().toString();
+		sb.append(", items=").append(str.substring(0, Math.min(str.length(), 1024 )));
+		if (str.length() > 1024) {
 			sb.append("...");
 		}
 		return sb.toString();
