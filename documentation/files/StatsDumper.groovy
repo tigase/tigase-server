@@ -1,5 +1,5 @@
 //CLASSPATH=/home/tigase/tigase-server/jars/tigase-server.jar
-import tigase.stats.JavaJMXProxy
+import tigase.stats.JavaJMXProxyOpt
 import tigase.stats.JMXProxyListener
 import tigase.stats.StatisticsProviderMBean
 
@@ -24,7 +24,7 @@ if (!new File(dir).exists()) {
   new File(dir).mkdir()
 }
 
-def proxy = new JavaJMXProxy(hostname, hostname, port, username, password, delay, interval, loadHistory)
+def proxy = new JavaJMXProxyOpt(hostname, hostname, port, username, password, delay, interval, loadHistory)
 proxy.start()
 
 sleep delay
