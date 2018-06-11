@@ -1493,6 +1493,22 @@ public class SessionManager
 						if (iqc.getPermissions() == Permissions.NONE || iqc.getPermissions() == Permissions.REMOTE) {
 							setPermissions(connection, iqc);
 						}
+						if (connection != null && connection.isAuthorized()) {
+							ArrayDeque<Packet> results = new ArrayDeque<>();
+							for (XMPPPreprocessorIfc preproc : preProcessors.values()) {
+								if (preproc.preProcess(pc, connection, naUserRepository, results, plugin_config.get(preproc.id()))) {
+									addOutPackets(pc, connection, results);
+									if (log.isLoggable(Level.FINEST)) {
+										log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}",
+												new Object[]{preproc.id(), pc});
+
+										return true;
+									}
+								} else {
+									addOutPackets(pc, connection, results);
+								}
+							}    // end of for (XMPPPreprocessorIfc preproc: preProcessors)
+						}
 						switch (iqc.getPermissions()) {
 							case AUTH:
 							case LOCAL:
