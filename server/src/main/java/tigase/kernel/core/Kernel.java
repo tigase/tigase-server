@@ -145,6 +145,7 @@ public class Kernel {
 				if (i != null) {
 					fireUnregisterAware(i);
 					if (i instanceof RegistrarBean) {
+						beanConfig.getKernel().shutdown = true;
 						((RegistrarBean) i).unregister(beanConfig.getKernel());
 						Kernel parent = beanConfig.getKernel().getParent();
 						parent.unregister(beanConfig.getBeanName() + "#KERNEL");
@@ -1390,7 +1391,7 @@ public class Kernel {
 							}
 						}
 					} catch (KernelException ex) {
-						log.log(Level.WARNING, "Can't set null to " + d + " unloading bean " + d.getBeanName(), ex);
+						log.log(Level.FINEST, "Can't set null to " + d + " unloading bean " + d.getBeanName(), ex);
 						beansToRemove.add(bc);
 					}
 				}
