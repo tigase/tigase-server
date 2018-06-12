@@ -1213,9 +1213,12 @@ public class Kernel {
 						initBean(b, createdBeansConfig, deep + 1);
 					} catch (InvocationTargetException | RuntimeException | InstantiationException ex) {
 						log.log(Level.WARNING,
-								"Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" +
+								"\n\n\n=====================\n"
+								+ "Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" +
 										", skipping injection of this bean" +
-										ExceptionUtilities.getExceptionRootCause(ex, true));
+										ExceptionUtilities.getExceptionRootCause(ex, true)
+								+ "\n=====================\n\n\n"
+						);
 						log.log(Level.CONFIG,
 								"Could not initialize bean " + b.getBeanName() + " (class: " + b.getClazz() + ")" +
 										", skipping injection of this bean", ex);
