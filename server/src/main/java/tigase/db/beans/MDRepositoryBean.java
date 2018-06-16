@@ -33,6 +33,7 @@ import tigase.osgi.ModulesManagerImpl;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -288,6 +289,10 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 				if (kernel.isBeanClassRegistered("instance")) {
 					kernel.unregister("instance");
 				}
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING, "There is no data source named '" + Optional.ofNullable(dataSourceName)
+							.orElse(name) +  "'");
+				}
 			}
 		}
 
@@ -327,6 +332,10 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 		public void initialize() {
 			eventBus.registerAll(this);
 			beanConfigurationChanged(Collections.singleton("uri"));
+			if (dataSource == null) {
+				throw new RuntimeException("There is no data source named '" + Optional.ofNullable(dataSourceName)
+						.orElse(name) + "'");
+			}
 			setDataSourceAware(kernel.getInstance("instance"));
 		}
 

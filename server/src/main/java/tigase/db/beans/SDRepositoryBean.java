@@ -36,6 +36,9 @@ import tigase.osgi.ModulesManagerImpl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.db.beans.MDPoolBean.REPO_CLASS;
 
@@ -47,6 +50,8 @@ import static tigase.db.beans.MDPoolBean.REPO_CLASS;
  */
 public abstract class SDRepositoryBean<A extends DataSourceAware>
 		implements Initializable, UnregisterAware, ConfigurationChangedAware, RegistrarBean {
+
+	private static final Logger log = Logger.getLogger(SDRepositoryBean.class.getCanonicalName());
 
 	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
 	private String cls;
@@ -99,6 +104,10 @@ public abstract class SDRepositoryBean<A extends DataSourceAware>
 			if (kernel.isBeanClassRegistered("instance")) {
 				kernel.unregister("instance");
 			}
+			if (log.isLoggable(Level.WARNING)) {
+				log.log(Level.WARNING, "There is no data source named '" + Optional.ofNullable(dataSourceName)
+						.orElse(name) +  "'");
+			}
 		}
 	}
 
@@ -116,6 +125,10 @@ public abstract class SDRepositoryBean<A extends DataSourceAware>
 	public void initialize() {
 		eventBus.registerAll(this);
 		beanConfigurationChanged(Collections.singleton("uri"));
+		if (dataSource == null) {
+			throw new RuntimeException("There is no data source named '" + Optional.ofNullable(dataSourceName)
+					.orElse("default") + "'");
+		}
 		setRepository(kernel.getInstance("instance"));
 	}
 
