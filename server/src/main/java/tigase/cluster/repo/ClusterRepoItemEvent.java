@@ -27,14 +27,10 @@ import java.io.Serializable;
 /**
  * @author andrzej
  */
-public class ClusterRepoItemEvent
-		implements Serializable {
+public class ClusterRepoItemEvent {
 
-	private static final long serialVersionUID = 1L;
-	private REPO_ITEM_UPDATE_TYPE action;
-	private ClusterRepoItem item;
-
-	public ClusterRepoItemEvent() {}
+	private final REPO_ITEM_UPDATE_TYPE action;
+	private final ClusterRepoItem item;
 
 	public ClusterRepoItemEvent(ClusterRepoItem item, REPO_ITEM_UPDATE_TYPE action) {
 		this.item = item;
