@@ -22,6 +22,7 @@ package tigase.stats;
 import java.time.LocalDate;
 import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * A queue implementation which stores highest added value on a given day
@@ -55,11 +56,11 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		return true;
 	}
 
-	public E getMaxValue() {
+	public Optional<E> getMaxValue() {
 		return getMaxValueInRange(maxQueueLength);
 	}
 
-	public E getMaxValueInRange(int range) {
+	public Optional<E> getMaxValueInRange(int range) {
 		range = Math.min(range, this.maxQueueLength);
 
 		E result = null;
@@ -72,7 +73,7 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 				result = next;
 			}
 		}
-		return result;
+		return Optional.ofNullable(result);
 	}
 
 	/**
@@ -95,7 +96,7 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 	 * @return indicating whether <b>any</b> item within range surpass the limit
 	 */
 	public boolean isLimitSurpassed(int range, E limit) {
-		return getMaxValueInRange(range).compareTo(limit) > 0;
+		return getMaxValueInRange(range).filter(e -> e.compareTo(limit) > 0).isPresent();
 	}
 
 	/**
