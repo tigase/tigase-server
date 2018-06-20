@@ -102,6 +102,9 @@ public abstract class SessionManagerConfig {
 	protected static final String AUTH_TIMEOUT_PROP_KEY = "auth-timeout";
 	protected static final long AUTH_TIMEOUT_PROP_VAL = 120;
 
+	protected static final String ACTIVE_USER_TIMEFRAME_KEY = "active-user-timeframe";
+	protected static final long ACTIVE_USER_TIMEFRAME_VAL = 5 * 60 * 1000;
+
 	/** Field description */
 	protected static final String STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY =
 			"stale-connection-closer-queue-size";

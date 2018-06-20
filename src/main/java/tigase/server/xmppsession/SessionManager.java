@@ -113,6 +113,7 @@ public class SessionManager
 	private int          pluginsThreadFactor = 1;
 	private Set<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
 	private long authTimeout = 120;
+	private long activeUserTimeframe = 5 * 60 * 1000;
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
@@ -562,6 +563,7 @@ public class SessionManager
 				.DEF_QUEUE_SIZE);
 		props.put(AUTH_TIMEOUT_PROP_KEY, AUTH_TIMEOUT_PROP_VAL);
 		props.put(SM_THREADS_FACTOR_PROP_KEY, SM_THREADS_FACTOR_PROP_VAL);
+		props.put(ACTIVE_USER_TIMEFRAME_KEY, ACTIVE_USER_TIMEFRAME_VAL);
 
 		return props;
 	}
@@ -771,6 +773,10 @@ public class SessionManager
 
 		if (props.get(AUTH_TIMEOUT_PROP_KEY) != null) {
 			authTimeout = (Long)props.get(AUTH_TIMEOUT_PROP_KEY);
+		}
+
+		if (props.get(ACTIVE_USER_TIMEFRAME_KEY) != null) {
+			activeUserTimeframe = (Long)props.get(ACTIVE_USER_TIMEFRAME_KEY);
 		}
 
 		if (props.size() == 1) {
@@ -2303,6 +2309,22 @@ public class SessionManager
 	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
+		calculateActiveUsers();
+
+		final Calendar now = Calendar.getInstance();
+		if (now.get(Calendar.YEAR) != lastDailyStatsReset.get(Calendar.YEAR)
+				|| now.get(Calendar.DAY_OF_YEAR) != lastDailyStatsReset.get(Calendar.DAY_OF_YEAR)) {
+			lastDailyStatsReset = Calendar.getInstance();
+
+			maxUserSessionsYesterday = maxUserSessionsDaily;
+			maxUserSessionsDaily = sessionsByNodeId.size();
+		}
+
+        maxDailyUsersSessions.add(maxUserSessionsDaily-1);
+        maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7).orElse(0);
+	}
+
+	private void calculateActiveUsers() {
 		int count = 0;
 
 		for (BareJID bareJID : sessionsByNodeId.keySet()) {
@@ -2313,8 +2335,7 @@ public class SessionManager
 				if (session != null) {
 					for (XMPPResourceConnection xMPPResourceConnection : session
 							.getActiveResources()) {
-						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5
-								* 60 * 1000) {
+						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < activeUserTimeframe) {
 							count++;
 						}
 					}
