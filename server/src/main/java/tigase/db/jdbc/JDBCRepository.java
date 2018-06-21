@@ -25,6 +25,7 @@ import tigase.db.util.RepositoryVersionAware;
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
 
+import java.io.StringReader;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -614,9 +615,12 @@ public class JDBCRepository
 				update_pairs_sp.setString(3, key);
 				switch (data_repo.getDatabaseType()) {
 					case derby:
-						Clob c = update_pairs_sp.getConnection().createClob();
-						c.setString(1, value);
-						update_pairs_sp.setClob(4, c);
+						// When commit() is called on the connection all CLOB instances are freed so each next request
+						// to them may throw NPE!!! Instead, if we set character stream, then CLOB is created inside
+						// executeUpdate() by DerbyDB, which is inside block which is synchronized on the internal
+						// connection instance.
+
+						update_pairs_sp.setCharacterStream(4, new StringReader(value));
 						break;
 					default:
 						update_pairs_sp.setString(4, value);
