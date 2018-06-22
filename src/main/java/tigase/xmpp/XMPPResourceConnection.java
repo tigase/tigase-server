@@ -605,7 +605,13 @@ public class XMPPResourceConnection
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId() throws NoConnectionIdException {
-		setLastAccessed(System.currentTimeMillis());
+		return getConnectionId(true);
+	}
+
+	public JID getConnectionId(boolean updateLastAccessed) throws NoConnectionIdException {
+		if (updateLastAccessed) {
+			setLastAccessed(System.currentTimeMillis());
+		}
 		if (this.connectionId == null) {
 			throw new NoConnectionIdException("Connection ID not set for this session. " +
 					"This is probably the SM session to handle traffic " +

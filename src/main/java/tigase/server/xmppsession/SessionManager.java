@@ -2765,7 +2765,7 @@ public class SessionManager
 
 				for (XMPPResourceConnection connection : connections) {
 					try {
-						JID connectionId = connection.getConnectionId();
+						JID connectionId = connection.getConnectionId(false);
 
 						if (workingSet.contains(connectionId)) {
 
