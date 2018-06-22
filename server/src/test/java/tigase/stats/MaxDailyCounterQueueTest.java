@@ -22,7 +22,18 @@ package tigase.stats;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class MaxDailyCounterQueueTest {
+
+	@Test
+	public void getValueOfEmptyQueue() {
+		MaxDailyCounterQueue<Integer> lq = new MaxDailyCounterQueue<>(5);
+		Assert.assertEquals(Optional.empty(), lq.getMaxValue());
+
+		lq.add(5);
+		Assert.assertNotEquals(Optional.empty(), lq.getMaxValue());
+	}
 
 	@Test
 	public void getMaxValueInRange() {
@@ -31,27 +42,27 @@ public class MaxDailyCounterQueueTest {
 		MaxDailyCounterQueue<Integer> lq = new MaxDailyCounterQueueEveryXItems<>(limit, 1);
 
 		lq.add(1);
-		Assert.assertEquals(1, lq.getMaxValueInRange(limit).intValue());
+		Assert.assertEquals(1, lq.getMaxValueInRange(limit).get().intValue());
 
 		lq.add(2);
-		Assert.assertEquals(2, lq.getMaxValueInRange(limit).intValue());
+		Assert.assertEquals(2, lq.getMaxValueInRange(limit).get().intValue());
 
 		lq.add(4);
-		Assert.assertEquals(4, lq.getMaxValueInRange(limit).intValue());
+		Assert.assertEquals(4, lq.getMaxValueInRange(limit).get().intValue());
 
 		lq.add(5);
-		Assert.assertEquals(5, lq.getMaxValueInRange(limit).intValue());
+		Assert.assertEquals(5, lq.getMaxValueInRange(limit).get().intValue());
 
 		lq.add(6);
-		Assert.assertEquals(6, lq.getMaxValueInRange(limit).intValue());
+		Assert.assertEquals(6, lq.getMaxValueInRange(limit).get().intValue());
 
 		lq.add(1);
-		Assert.assertEquals(6, lq.getMaxValueInRange(3).intValue());
+		Assert.assertEquals(6, lq.getMaxValueInRange(3).get().intValue());
 
-		Assert.assertEquals(1, lq.getMaxValueInRange(1).intValue());
+		Assert.assertEquals(1, lq.getMaxValueInRange(1).get().intValue());
 		lq.add(1);
 		lq.add(1);
-		Assert.assertEquals(1, lq.getMaxValueInRange(3).intValue());
+		Assert.assertEquals(1, lq.getMaxValueInRange(3).get().intValue());
 
 		MaxDailyCounterQueue<Integer> lq2 = new MaxDailyCounterQueueEveryXItems<>(1, 4);
 		lq2.add(4);

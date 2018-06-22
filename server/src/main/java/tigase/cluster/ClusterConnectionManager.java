@@ -326,7 +326,7 @@ public class ClusterConnectionManager
 		super.nodeConnected(node);
 
 		maxNodes.add(getNodesConnectedWithLocal().size());
-		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7).orElse(-1);
 	}
 
 	@Override
@@ -334,7 +334,7 @@ public class ClusterConnectionManager
 		super.everyHour();
 
 		maxNodes.add(getNodesConnectedWithLocal().size());
-		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7).orElse(-1);
 	}
 
 	@Override
@@ -342,7 +342,7 @@ public class ClusterConnectionManager
 		super.nodeDisconnected(node);
 
 		maxNodes.add(getNodesConnectedWithLocal().size());
-		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+		maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7).orElse(-1);
 	}
 
 	@Override

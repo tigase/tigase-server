@@ -816,8 +816,6 @@ public class SessionManager
 	@Override
 	public synchronized void everySecond() {
 		super.everySecond();
-		maxDailyUsersSessions.add(maxUserSessionsDaily - 1);
-		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
 	}
 
 	@Override
@@ -852,7 +850,7 @@ public class SessionManager
 		}
 
 		maxDailyUsersSessions.add(maxUserSessionsDaily - 1);
-		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
+		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7).orElse(-1);
 	}
 
 	@Override

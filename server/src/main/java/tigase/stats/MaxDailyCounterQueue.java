@@ -1,8 +1,6 @@
 /*
- * MaxDailyCounterQueue.java
- *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2018 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,22 +21,23 @@ package tigase.stats;
 import java.time.LocalDate;
 import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Optional;
 
 /**
- * A queue implementation which stores highest added value on a given day and has limited size.
+ * A queue implementation which stores highest added value on a given day
+ * and has limited size.
  *
  * @param <E>
  */
 public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		extends ArrayDeque<E> {
 
-	private final int limit;
+	private final int maxQueueLength;
 	private LocalDate lastDailyStatsReset = LocalDate.now();
 	private String toString = "[]";
 
-	public MaxDailyCounterQueue(int limit) {
-		this.limit = limit;
+	public MaxDailyCounterQueue(int maxQueueLength) {
+		this.maxQueueLength = maxQueueLength;
 	}
 
 	@Override
@@ -49,19 +48,19 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 			this.removeLast();
 			super.add(added);
 		}
-		while (size() > limit) {
+		while (size() > maxQueueLength) {
 			super.remove();
 		}
 		toString = super.toString();
 		return true;
 	}
 
-	public E getMaxValue() {
-		return getMaxValueInRange(limit);
+	public Optional<E> getMaxValue() {
+		return getMaxValueInRange(maxQueueLength);
 	}
 
-	public E getMaxValueInRange(int range) {
-		range = Math.min(range, this.limit);
+	public Optional<E> getMaxValueInRange(int range) {
+		range = Math.min(range, this.maxQueueLength);
 
 		E result = null;
 		final Iterator<E> iterator = this.descendingIterator();
@@ -73,24 +72,54 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 				result = next;
 			}
 		}
-		return result;
+		return Optional.ofNullable(result);
 	}
 
+	/**
+	 * Check if <b>any</b> item in the collection surpass the limit
+	 *
+	 * @param limit against which items should be check
+	 *
+	 * @return indicating whether <b>any</b> item in the collection surpass the limit
+	 */
 	public boolean isLimitSurpassed(E limit) {
-		return isLimitSurpassed(this.limit, limit);
+		return isLimitSurpassed(this.maxQueueLength, limit);
 	}
 
+	/**
+	 * Check if <b>any</b> item within range surpass the limit
+	 *
+	 * @param range number of items to check
+	 * @param limit against which items should be check
+	 *
+	 * @return indicating whether <b>any</b> item within range surpass the limit
+	 */
 	public boolean isLimitSurpassed(int range, E limit) {
-		return getMaxValueInRange(range).compareTo(limit) > 0;
+		return getMaxValueInRange(range).filter(e -> e.compareTo(limit) > 0).isPresent();
 	}
 
+	/**
+	 * Check if all and every item in the collection surpass the limit
+	 *
+	 * @param limit against which items should be check
+	 *
+	 * @return indicating whether all items in the collection surpass the limit
+	 */
 	public boolean isLimitSurpassedAllItems(E limit) {
-		return isLimitSurpassedAllItems(this.limit, limit);
+		return isLimitSurpassedAllItems(this.maxQueueLength, limit);
 	}
 
+	/**
+	 * Check if all and every item within range surpass the limit
+	 *
+	 * @param range number of items to check
+	 * @param limit against which items should be check
+	 *
+	 * @return indicating whether all items <b>within range</b> surpass the limit
+	 */
 	public boolean isLimitSurpassedAllItems(int range, E limit) {
 		boolean result = true;
-		range = Math.min(range, this.limit);
+		range = Math.min(range, this.maxQueueLength);
 
 		final Iterator<E> iter = this.descendingIterator();
 		while (iter.hasNext() && range > 0) {
@@ -106,7 +135,7 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 
 	public ArrayDeque<E> subQueue(int range) {
 		final ArrayDeque<E> result = new ArrayDeque<E>(range);
-		range = Math.min(range, this.limit);
+		range = Math.min(range, this.maxQueueLength);
 
 		final Iterator<E> iter = this.descendingIterator();
 		while (iter.hasNext() && range > 0) {
@@ -114,11 +143,6 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 			result.add(iter.next());
 		}
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		return toString;
 	}
 
 	protected boolean isNextItem() {
@@ -130,6 +154,11 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return toString;
 	}
 
 //	private String toStringReversed() {
