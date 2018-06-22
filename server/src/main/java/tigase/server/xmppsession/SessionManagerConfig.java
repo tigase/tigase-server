@@ -54,6 +54,9 @@ public abstract class SessionManagerConfig {
 	protected static final String SM_THREADS_FACTOR_PROP_KEY = "sm-threads-factor";
 	protected static final int SM_THREADS_FACTOR_PROP_VAL = 1;
 
+	protected static final String ACTIVE_USER_TIMEFRAME_KEY = "active-user-timeframe";
+	protected static final long ACTIVE_USER_TIMEFRAME_VAL = 5 * 60 * 1000;
+
 	protected static final String AUTH_TIMEOUT_PROP_KEY = "auth-timeout";
 	protected static final long AUTH_TIMEOUT_PROP_VAL = 120;
 

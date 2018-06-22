@@ -118,6 +118,8 @@ public class SessionManager
 	private AdHocCommandModule adHocCommandModule;
 	@Inject
 	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins = new ConcurrentSkipListSet<XMPPImplIfc>();
+	@ConfigField(desc = "ActiveUsers timeframe", alias = SessionManagerConfig.ACTIVE_USER_TIMEFRAME_KEY)
+	private long activeUserTimeframe = 5 * 60 * 1000;
 	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
 	private long authTimeout = 120;
 	private long authTimeouts = 0;
@@ -821,24 +823,7 @@ public class SessionManager
 	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
-		int count = 0;
-
-		for (BareJID bareJID : sessionsByNodeId.keySet()) {
-			if (!bareJID.toString().startsWith("sess-man")) {
-				XMPPSession session = sessionsByNodeId.get(bareJID);
-				// check if session is still there as it could be closed
-				// if sessionsByNodeId is big collection
-				if (session != null) {
-					for (XMPPResourceConnection xMPPResourceConnection : session.getActiveResources()) {
-						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 * 60 * 1000) {
-							count++;
-						}
-					}
-				}
-			}
-		}
-
-		activeUserNumber = count;
+		calculateActiveUsers();
 
 		final Calendar now = Calendar.getInstance();
 		if (now.get(Calendar.YEAR) != lastDailyStatsReset.get(Calendar.YEAR) ||
@@ -851,6 +836,27 @@ public class SessionManager
 
 		maxDailyUsersSessions.add(maxUserSessionsDaily - 1);
 		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7).orElse(-1);
+	}
+
+	private void calculateActiveUsers() {
+		int count = 0;
+
+		for (BareJID bareJID : sessionsByNodeId.keySet()) {
+			if (!bareJID.toString().startsWith("sess-man")) {
+				XMPPSession session = sessionsByNodeId.get(bareJID);
+				// check if session is still there as it could be closed
+				// if sessionsByNodeId is big collection
+				if (session != null) {
+					for (XMPPResourceConnection xMPPResourceConnection : session.getActiveResources()) {
+						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < activeUserTimeframe) {
+							count++;
+						}
+					}
+				}
+			}
+		}
+
+		activeUserNumber = count;
 	}
 
 	@Override
@@ -2667,7 +2673,7 @@ public class SessionManager
 
 				for (XMPPResourceConnection connection : connections) {
 					try {
-						JID connectionId = connection.getConnectionId();
+						JID connectionId = connection.getConnectionId(false);
 
 						if (workingSet.contains(connectionId)) {
 

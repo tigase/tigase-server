@@ -180,7 +180,7 @@ public class XMPPResourceConnection
 	 * @return
 	 */
 	public Object computeSessionDataIfAbsent(String key, Function<String, Object> valueFactory) {
-		lastAccessed = System.currentTimeMillis();
+		setLastAccessed(System.currentTimeMillis());
 		return sessionData.computeIfAbsent(key, valueFactory);
 	}
 
@@ -299,7 +299,7 @@ public class XMPPResourceConnection
 	 * @see #getSessionData(String)
 	 */
 	public final void putSessionData(final String key, final Object value) {
-		lastAccessed = System.currentTimeMillis();
+		setLastAccessed(System.currentTimeMillis());
 		sessionData.put(key, value);
 	}
 
@@ -313,7 +313,7 @@ public class XMPPResourceConnection
 	 * @return previous value
 	 */
 	public Object putSessionDataIfAbsent(String key, Object value) {
-		lastAccessed = System.currentTimeMillis();
+		setLastAccessed(System.currentTimeMillis());
 		return sessionData.putIfAbsent(key, value);
 	}
 
@@ -333,7 +333,7 @@ public class XMPPResourceConnection
 	}
 
 	public final void removeSessionData(final String key) {
-		lastAccessed = System.currentTimeMillis();
+		setLastAccessed(System.currentTimeMillis());
 		sessionData.remove(key);
 	}
 
@@ -410,7 +410,14 @@ public class XMPPResourceConnection
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId() throws NoConnectionIdException {
-		lastAccessed = System.currentTimeMillis();
+		return getConnectionId(true);
+	}
+
+	public JID getConnectionId(boolean updateLastAccessed) throws NoConnectionIdException {
+		if (updateLastAccessed) {
+			setLastAccessed(System.currentTimeMillis());
+		}
+		setLastAccessed(System.currentTimeMillis());
 		if (this.connectionId == null) {
 			throw new NoConnectionIdException(
 					"Connection ID not set for this session. " + "This is probably the SM session to handle traffic " +
@@ -612,7 +619,7 @@ public class XMPPResourceConnection
 	 * @see #putSessionData(String, Object)
 	 */
 	public final Object getSessionData(final String key) {
-		lastAccessed = System.currentTimeMillis();
+		setLastAccessed(System.currentTimeMillis());
 
 		return sessionData.get(key);
 	}
