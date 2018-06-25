@@ -22,10 +22,16 @@ package tigase.component.adhoc;
 import tigase.xmpp.jid.JID;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface AdHocCommand {
 
 	void execute(final AdhHocRequest request, AdHocResponse response) throws AdHocCommandException;
+
+	default void execute(final AdhHocRequest request, AdHocResponse response, Runnable completionHandler, Consumer<AdHocCommandException> exceptionHandler) throws AdHocCommandException {
+		execute(request, response);
+		completionHandler.run();
+	}
 
 	String getName();
 

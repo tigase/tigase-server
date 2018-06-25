@@ -126,7 +126,7 @@ public class AdHocCommandModule
 		String node = packet.getAttributeStaticStr(COMMAND_PATH, "node");
 		if (commandsManager.hasCommand(node)) {
 			try {
-				write(this.commandsManager.process(packet));
+				this.commandsManager.process(packet, writer::write);
 			} catch (AdHocCommandException e) {
 				throw new ComponentException(e.getErrorCondition(), e.getMessage());
 			}

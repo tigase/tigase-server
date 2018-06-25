@@ -20,19 +20,26 @@
 package tigase.component.adhoc;
 
 import tigase.component.adhoc.AdHocResponse.State;
+import tigase.component.exceptions.ComponentException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.util.cache.SimpleCache;
 import tigase.xml.Element;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.jid.JID;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Bean(name = "adHocCommandManager", active = true)
 public class AdHocCommandManager {
+
+	private static final Logger log = Logger.getLogger(AdHocCommandManager.class.getCanonicalName());
 
 	private final Map<String, AdHocCommand> commands = new HashMap<String, AdHocCommand>();
 	private final SimpleCache<String, AdHocSession> sessions = new SimpleCache<String, AdHocSession>(100, 10 * 1000);
@@ -68,7 +75,7 @@ public class AdHocCommandManager {
 		return this.commands.containsKey(node);
 	}
 
-	public Packet process(Packet packet) throws AdHocCommandException {
+	public void process(Packet packet, Consumer<Packet> resultConsumer) throws AdHocCommandException {
 		final Element element = packet.getElement();
 		@SuppressWarnings("unused") final JID senderJid = packet.getStanzaFrom();
 		final Element command = element.getChild("command", "http://jabber.org/protocol/commands");
@@ -79,40 +86,46 @@ public class AdHocCommandManager {
 
 		if (adHocCommand == null) {
 		} else {
-			return process(packet, command, node, action, sessionId, adHocCommand);
+			process(packet, command, node, action, sessionId, adHocCommand, resultConsumer);
 		}
-
-		return null;
 	}
 
-	public Packet process(Packet packet, Element commandElement, String node, String action, String sessionId,
-						  AdHocCommand adHocCommand) throws AdHocCommandException {
+	public void process(Packet packet, Element commandElement, String node, String action, String sessionId,
+						  AdHocCommand adHocCommand, Consumer<Packet> resultConsumer) throws AdHocCommandException {
 		State currentState = null;
 		final AdhHocRequest request = new AdhHocRequest(packet, commandElement, node, packet.getStanzaFrom(), action,
 														sessionId);
 		final AdHocResponse response = new AdHocResponse(sessionId, currentState);
 		final AdHocSession session = (sessionId == null) ? new AdHocSession() : this.sessions.get(sessionId);
 
-		adHocCommand.execute(request, response);
+		adHocCommand.execute(request, response, () -> {
+			Element commandResult = new Element("command", new String[]{"xmlns", "node",},
+												new String[]{"http://jabber.org/protocol/commands", node});
 
-		Element commandResult = new Element("command", new String[]{"xmlns", "node",},
-											new String[]{"http://jabber.org/protocol/commands", node});
-
-		commandResult.addAttribute("status", response.getNewState().name());
-		if ((response.getCurrentState() == null) && (response.getNewState() == State.executing)) {
-			this.sessions.put(response.getSessionid(), session);
-		} else if ((response.getSessionid() != null) &&
-				((response.getNewState() == State.canceled) || (response.getNewState() == State.completed))) {
-			this.sessions.remove(response.getSessionid());
-		}
-		if (response.getSessionid() != null) {
-			commandResult.addAttribute("sessionid", response.getSessionid());
-		}
-		for (Element r : response.getElements()) {
-			commandResult.addChild(r);
-		}
-
-		return packet.okResult(commandResult, 0);
+			commandResult.addAttribute("status", response.getNewState().name());
+			if ((response.getCurrentState() == null) && (response.getNewState() == State.executing)) {
+				this.sessions.put(response.getSessionid(), session);
+			} else if ((response.getSessionid() != null) &&
+					((response.getNewState() == State.canceled) || (response.getNewState() == State.completed))) {
+				this.sessions.remove(response.getSessionid());
+			}
+			if (response.getSessionid() != null) {
+				commandResult.addAttribute("sessionid", response.getSessionid());
+			}
+			for (Element r : response.getElements()) {
+				commandResult.addChild(r);
+			}
+			resultConsumer.accept(packet.okResult(commandResult, 0));
+		}, (ex) -> {
+			try {
+				Packet errorResponse = new ComponentException(ex.getErrorCondition(), ex.getMessage()).makeElement(packet, true);
+				resultConsumer.accept(errorResponse);
+			} catch (PacketErrorTypeException e1) {
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING, "Problem during generate error response", e1);
+				}
+			}
+		});
 	}
 
 	public void registerCommand(AdHocCommand command) {

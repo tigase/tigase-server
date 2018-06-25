@@ -96,7 +96,7 @@ public class AdHocCommandMonitorModule
 		AdHocCommand adHocCommand = getCommand(taskInstance, node);
 
 		try {
-			write(customCommandsManager.process(packet, command, node, action, sessionId, adHocCommand));
+			customCommandsManager.process(packet, command, node, action, sessionId, adHocCommand, writer::write);
 		} catch (AdHocCommandException e) {
 			throw new ComponentException(e.getErrorCondition(), e.getMessage());
 		}
