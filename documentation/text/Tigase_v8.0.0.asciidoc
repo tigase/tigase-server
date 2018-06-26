@@ -11,7 +11,7 @@ Tigase v8.0.0 Change notes and announcement
 
 === Kernel and beans configuration
 Tigase now operates using a Kernel and Beans style of programming.  What does this mean for Tigase and You?  Good news, really.
-Tigase XMPP Server is now working as a Kernel program, which will operate on it's own and handle all the core functionality of the server.  Component, and non-essential functionality will now be loaded as Beans.  As a user, your experience will not change all that much.  However, beans can be loaded and unloaded without having to restart Tigase, meaning that the program will behave more dynamically.  This means a smaller footprint on memory on resources when components are not needed, and longer uptimes without having to restart the program!  This also allows for greater flexibility for Tigase XMPP Server to be better customized for unique solutions.
+Tigase XMPP Server is now working as a Kernel program, which will operate on it's own and handle all the core functionality of the server.  Component, and non-essential functionality will now be loaded as Beans.  As a user, your experience will not change all that much.  However, beans can be loaded and unloaded without having to restart Tigase, meaning that the program will behave more dynamically.  This means a smaller footprint on memory on resources when components are not needed, and longer uptimes without having to rest art the program!  This also allows for greater flexibility for Tigase XMPP Server to be better customized for unique solutions.
 
 === New Configuration File Format
 With the change of Tigase to a Kernel and Beans style of programming, we have also changed how the configuration file is managed.  Although you will still edit the config.tdsl file like a plaintext file, a new style of formatting will be used known as DSL.
@@ -27,6 +27,13 @@ If the command is being sent to shut down the whole cluster, no `see-other-host`
 
 The script may be activated by an ad-hoc command, or sent using REST from remote or Tigase Admin UI.
 
+=== Significant cleanup of code and repositories
+Multiple changes have been made to the structure and coding for v8, many related to trimming size of repositories and old calls.  Some of these improvements are listed here:
+- Empty javadocs that do not convey values have been removed.
+- All code is reformatted to be compliant with out xref:tigaseCodeStyle[codestyle guidelines].
+- Calls to System.out.print*() and printStackTrace() have been removed from code.
+- Depreciated and unused classes have been removed.
+
 === BouncyCastle being used for StartTLS
 link:https://www.bouncycastle.org/java.html[BouncyCastle] Crypto API has now been employed to handle StartTLS negotiation.  By doing this, Tigase now supports `tls-unique` within the SCRAM PLUS authentication implementation.
 This API is may be employed by calling the class in your configuration file:
@@ -37,6 +44,9 @@ c2s () {
 }
 -----
 The BouncyCastle classes are included in the dist-max archives.
+
+=== virtual-hosts property changes
+Virtual hosts property is now able to be configured in blocks instead of an ordered list making configurations more readable.  Reference xref:virtHosts[Virtual-Hosts Configuration] for more details.
 
 === All artifacts are signed
 Since work began on v8.0.0 Tigase has required that all changes to Tigase XMPP Server and dependencies be signed with known certificates.  This version marks the first to be totally signed.
@@ -63,6 +73,9 @@ Tigase now uses bootstrapping to startup, which will load configuration from con
 
 === CAPTCHA system now available for in-band registration
 link:https://xmpp.org/extensions/xep-0077.html[XEP-0077 In band registration] can use Data Forms as an option to process new registrations.  Now you can secure these registrations by employing a CAPTCHA solution.  By enabling this option you can reduce the number of potential spammers and bots on your server.
+
+=== Schema changes
+Now each component has it's own schema for databases, they are no longer tied into Tigase XMPP server versions making changes and updates to individual components easier, and may not disrupt all users not using certain components.  See the xref:schemaChangev800[schema update section] for more details.
 
 === Shrinkable Statistics History
 Statistics history can now be automatically made smaller if a systems memory resources are above a certain amount.  By default this is enabled and will trigger when over 95% of memory is in use.  Half of all existing entries will be removed at this time.
@@ -98,6 +111,9 @@ This is a plugin and must be enabled in the config.tdsl file by using the follow
 'account-registration-email-validator'() {}
 -----
 
+==== Further Spam prevention
+Tigase-spam component is now in dist-max, and has a numer of features described here xref:tigase_spam_filter[in this section].
+
 === Changes in password storage
 Before version 8.0.0, user passwords were stored in plaintext in the `user_pw` database field within `tig_users` table, but in plaintext.
 It was possible to enable storage of the MD5 hash of the password instead, however this limited authentication mechanism SASL PLAIN only.
@@ -110,6 +126,16 @@ The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tiga
 
 === Dynamic TLS Buffer
 Memory Buffer for TLS no longer remains at highest buffer size needed for the server session. Buffer will now free memory during idle connections.  Thus drastically improving program footprint.
+
+=== XEP-0305 XMPP Quickstart support for C2S component has been enabled
+link:https://xmpp.org/extensions/xep-0305.html[XEP-0305 XMPP Quickstart] has been enabled to improve connection on our C2S connection manager.  Most improvements will be seen with our mobile clients.
+To enable this, use the following in your config.tdsl file:
+[source,dsl]
+-----
+c2s () {
+  pipelining = true
+}
+-----
 
 === Database Timestamps
 Timestamps in database will be stored using UTC time.
@@ -145,6 +171,26 @@ XEP states that Privacy lists should be used when no user session exists in addi
 }
 -----
 By default, the cache has a limit of 10000 entries, that may be set by using size bean as seen above.
+
+=== Access Control List has new ACL modifiers
+New permissions have been added to ACL including `DOMAIN_OWNER` and `DOMAIN_ADMIN` to reduce permissions checking, and add another level of fine-grained permissions.  For more details, please see xref:accessControlList[Tigase ACL] configuration for more details.
+
+=== Option to ignore schema-version check added
+You can now skip the schema check phase for individual databases.  To do this, add the following do the datasource configuration block:
+[source,dsl]
+-----
+DataSource () {
+  default () {
+    'schema-management' = false
+  }
+}
+-----
+
+This will do the following:
+- Print a warning during repository startup.
+- Skip schema upgrades for the source.
+- Skip schema destruction for the source.
+
 
 == New Minor Features & Behavior Changes
 - link:https://tigase.tech/issues/611[#611] Support for Message of the Day is now enabled in Tigase XMPP Server and can be administered using link:http://xmpp.org/extensions/xep-0133.html#set-motd[XEP-0133 Service Administration].
@@ -196,6 +242,15 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - link:https://tigase.tech/issues/6163[#6163] Groovy plugin updated to v2.4.12.
 - link:https://tigase.tech/issues/6206[#6206] Separated TigaseXMLTools and TigaseUtil packages for better compatibility with JDK v9.
 - link:https://tigase.tech/issues/6216[#6216] MongoDB Driver now updated to v3.5.0.
+- #6560 tigase anti-spam component now included in tigase dist-max archive.
+- link:https://tigase.tech/issues/6821[#6821] Improved error reporting when errors from `ConfigReader`.
+- link:https://tigase.tech/issues/6842[#6842] `DefaultTypesConverter` no longer requires case sensitive enums.
+- link:https://tigase.tech/issues/7082[#7082] `ClassUtilBean` now handles packet filtering for packets part of Tigase Server but not containing beans, other improvements to mDNS.
+- link:https://tigase.tech/issues/7433[#7433] `SeeOtherHost` no longer uses `PropertiesBeanConfigurator` to parse configuration.
+- link:https://tigase.tech/issues/7446[#7446] User credentials can now be managed with Ad-hoc commands.
+- link:https://tigase.tech/issues/7743[#7743] Improved error message when repository is not found.
+- link:https://tigase.tech/issues/7773[#7773] Ad-hoc commands can now by executed asynchronously.
+
 
 
 
@@ -256,9 +311,27 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - link:https://tigase.tech/issues/6263[#6263] Fixed missing namespaces in responses from adhoc commands.
 - link:https://tigase.tech/issues/6400[#6400] Added a proper error when max-queue-size is too small and server cannot start.
 - #6408 Fixed an issue where single WebSocket frames contained multiple XML stanzas instead of one per frame.
+- link:https://tigase.tech/issues/6411[#6411] Main kernel is now called to smooth shutdown.  Further, timeout periods are opened up for large instances.
+- link:https://tigase.tech/issues/6574[#6574] SSL certificate upload handling is now fixed within cluster mode.
+- link:https://tigase.tech/issues/6598[#6598] Fixed EventBus Registration connection issues between cluster nodes.
+- #6658 Cluster connections no longer potentially keep open connection after cluster is no longer connected or available.
+- link:https://tigase.tech/issues/6749[#6749] Fixed schema parsing for DerbyDB.
+- link:https://tigase.tech/issues/6776[#6776] Fixed failing Websocket connections if header contains more than one value.
+- link:https://tigase.tech/issues/6875[#6875] Fixed an issue where C2S connections could be accepted before SessionManager was initialized.
+- link:https://tigase.tech/issues/7037[#7037] Fixed error while parsing negative values from config.tdsl file.
+- #7055 Improvements to metaspace use and other memory use tweaks.
+- link:https://tigase.tech/issues/7304[#7304] Virtual host logs now properly follow log size limits.
+- link:https://tigase.tech/issues/7431[#7431] AdHoc requests between the same user with different resources are no longer dropped with `NoConnectionIdExecption`error.
+- link:https://tigase.tech/issues/7434[#7434] Adjusted `SeeOtherHotDualIP` to use new table name in cluster nodes database.
+- link:https://tigase.tech/issues/7491[#7491] Stacktraces from `CertificateContainer` are no longer printed to tigase-console.log, but will be printed to tigase.log.#.
+- #7687 Fixed an error where connections failed after authentication timeout were marked as active after cleanup.
+- link:https://tigase.tech/issues/7747[#7747] Fixed `ClusterRepoItemEvent` serialization issues causing unsupported conversion error in cluster mode.
 
 
 == Component Changes
+
+=== AMP
+- link:https://tigase.tech/issues/7301[#7301] Tigase AMP component now uses multiple processing threads.
 
 === PubSub
 - link:https://tigase.tech/issues/5033[#5033] PubSub now compatible with using emojis in pubsub items.
@@ -266,8 +339,10 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - link:https://tigase.tech/issues/5766[#5766] PubSub now writes to all databases with UTC timestamp.
 - #5953 Fixed presences not being removed from `presenceByService` collection if client disconnects without `<unavailable/>` presence being sent.
 - #6176 version changed to PubSub v4.0.0.
+- #7707 Fixed potential NPE in PubSub.
 
 === http-api
+- #4873 Support added to display timestamp fields as data, time, and timezone fields.
 - link:https://tigase.tech/issues/4876[#4876] Implemented using XML repository for new setups, and updated default config to use this.
 - link:https://tigase.tech/issues/4888[#4888] `http-api` now is enabled by default.
 - link:https://tigase.tech/issues/5209[#5209] Updated visual styling of pages hosted by component.
@@ -280,6 +355,9 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - link:https://tigase.tech/issues/6159[#6159] Fixed NPE thrown if scripts directory is not present.
 - #6176 version changed to tigase-http-api v2.0.0.
 - #6212 Added mechanism for password changing through HTTP API.
+- #7307 Fixed scripts returning 404 while handling rest/user/ requests even though user exists.
+- link:https://tigase.tech/issues/7178[#7178] Ad-hoc commands are now categorized in groups for better organization.
+- #7568 Added timeout reading for HTTP request headers, added configurable `accept-timeout`.
 
 === message-archive
 - #4867 fixed issue when changing MA jid.
@@ -289,6 +367,7 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - #5604 Modified access to static fields and functions.
 - #5681 Fixed duplication of groupchat messages with different ids by modifying hash algorithm.
 - #6176 version changed to message-archive v2.0.0.
+- link:https://tigase.tech/issues/7615[#7615] `feature-not-implemented` response no longer occurs when removing stored messages.
 
 === MUC
 - link:https://tigase.tech/issues/4888[#4888] `muc` now is enabled by default.
@@ -302,6 +381,8 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 - #5813 Fixed NPE during room creation.
 - #6176 version changed to tigase-muc v3.0.0.
 - link:https://tigase.tech/issues/6395[#6395] Fixed `tigase.db.UserNotFoundException` during retrieval of MUC user.
+- link:https://tigase.tech/issues/6734[#6734] Introduced `muc#roomconfig_maxresources` to allow configuration of max number of resources for a single occupant.
+- link:https://tigase.tech/issues/7443[#7443] Disabled XEP-0091 by default, added history attribute validation.
 
 === socks5 Proxy
 - link:https://tigase.tech/issues/2750[#2750] Cleanup of code and removal of empty javadocs.
@@ -315,3 +396,6 @@ By default, the cache has a limit of 10000 entries, that may be set by using siz
 
 === STUN Server
 - #6176 version changed to tigase-stun v2.0.0.
+
+=== WebSocket
+- link:https://tigase.tech/issues/6481[#6481] Websocket component has been improved to be more compliant with link:https://tools.ietf.org/html/rfc6455[rfc6455]

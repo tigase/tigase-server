@@ -1,3 +1,4 @@
+[[tigaseCodeStyle]]
 = Tigase Code Style
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.1 August 2014. Reformatted for v8.0.0.

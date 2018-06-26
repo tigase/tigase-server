@@ -1,7 +1,7 @@
 [[virtHosts]]
 = virtual-hosts
 :author: not known
-:version: v2.0 June 2017: Reformatted for Kernel/DSL
+:version: v2.1 June 2018: Reformatted for Kernel/DSL
 
 :toc:
 :numbered:
@@ -10,14 +10,32 @@
 *Description:* The `virtual-hosts` property allows setting of virtual hosts that are served by the installation.  This is a list of domains loaded during startup.  Domains can be added, removed, disabled or updated at runtime and all the actual domain metadata are stored in the database.
 
 Some metadata for vhosts can be also provided in the `config.tdsl` configuration file using this property.
-- Domains are separated using `:` from its metadata.
-- For boolean values `-` in front of the parameter means the feature is *off*. `+` or nothing  means it is *on*.
-- If a parameter requires some additional settings it is provided in form: `param=val` with `:` separating each parameter.
 
-*Default value:* `'virtual-hosts' = [ 'hostname' ]`
+- Domains are now configured individually using separate configuration blocks for each domain.
+- For boolean values use true or false after the equal sign.
+- Any parameter with spaces or dashes (-) they must be encapsulated with '' marks.
+- Lists may now be contained as comma seperated values within [] brackets.
+- Any values that are strings must be encapsulated with '' marks.
 
-*Example:* `'virtual-hosts' = [ 'domain1:-anon:register:-tls-required:s2s-secret=s2spasswd:domain-filter=LOCAL:max-users=1000', 'domain2', 'domain3:c2s-ports-allowed=5222;5223;5280;5290', 'domain3:domain-filter=LIST=whitedomain1;whitedomain2;whitedomain3' ]``
-
-*Possible values:* Comma separated list of domains and associated metadata.
+*Example:*
+-----
+`'virtual-hosts' = [
+              'domain1' {
+                anon = false
+                register = true
+                'tls-required' = true
+                's2s-secret' = 's2spasswd'
+                'domain-filter' = LOCAL
+                'max-users' = 1000
+                },
+              'domain2' {},
+              'domain3' {
+                'c2s-ports-allowed' [5222, 5223, 5280, 5290]
+              },
+              'domain3' {
+                'domain-filter' = ['whitedomain1', 'whitedomain2', 'whitedomain3' ]
+              }
+            ]
+-----
 
 *Available since:* 8.0.0
