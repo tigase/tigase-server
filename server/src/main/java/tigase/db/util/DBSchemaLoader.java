@@ -786,6 +786,20 @@ public class DBSchemaLoader
 					try {
 						stmt.execute(query);
 					} catch (SQLException ex) {
+						if ("derby".equals(params.getDbType())) {
+							String lowerQuery = query.toLowerCase().trim();
+							if (("X0Y32".equals(ex.getSQLState()) || "X0Y68".equals(ex.getSQLState())) &&
+									(lowerQuery.startsWith("create ") || lowerQuery.startsWith("alter "))) {
+								// if object already exists then we should not consider creation failure as an error for DerbyDB
+								log.log(Level.FINEST, "Object already exists!");
+								continue;
+							}
+							if ("42Y55".equals(ex.getSQLState()) && lowerQuery.startsWith("drop ")) {
+								// if object does not exists then wen should not consider drop failure as an error for DerbyDB
+								log.log(Level.FINEST, "Object already dropped!");
+								continue;
+							}
+						}
 						log.log(Level.SEVERE, "Failed to execute query: " + query);
 						throw ex;
 					}
