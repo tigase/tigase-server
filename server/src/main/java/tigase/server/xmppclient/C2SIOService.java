@@ -49,11 +49,23 @@ public class C2SIOService<RefObject>
 
 	@Override
 	protected void addReceivedPacket(Packet packet) {
-		if (pipelining && isWaitingForResponse()) {
-			tasks.offer(() -> {
-				waitForResponse.incrementAndGet();
-				super.addReceivedPacket(packet);
-			});
+		if (pipelining) {
+			synchronized (tasks) {
+				if (isWaitingForResponse()) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "queuing received packet as a task " + packet);
+					}
+					boolean result = tasks.offer(() -> {
+						waitForResponse.incrementAndGet();
+						super.addReceivedPacket(packet);
+					});
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "queued (" + result + ") received packet as a task " + packet);
+					}
+				} else {
+					super.addReceivedPacket(packet);
+				}
+			}
 		} else {
 			super.addReceivedPacket(packet);
 		}
@@ -178,8 +190,11 @@ public class C2SIOService<RefObject>
 	}
 
 	private void runQueuedTaskIfExists() {
-		waitForResponse.decrementAndGet();
-		Runnable run = tasks.poll();
+		Runnable run;
+		synchronized (tasks) {
+			waitForResponse.decrementAndGet();
+			run = tasks.poll();
+		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "got task " + run + " to execute");
 		}
