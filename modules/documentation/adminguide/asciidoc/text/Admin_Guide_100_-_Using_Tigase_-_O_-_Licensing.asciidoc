@@ -36,7 +36,7 @@ Offline installation may obtain _Installation IDs_ from our web portal in a thre
 
 ==== Generating Installation ID
 
-For offline installations, you may obtain an _Installation ID_ from this address: link:https://license.tigase.net/register[https://license.tigase.net/register].
+For offline installations, you may obtain an _Installation ID_ from this address: link:https://license.tigase.software/register[https://license.tigase.software/register].
 
 Data Fields:
 
@@ -63,7 +63,7 @@ Once you have the _Installation ID_, you will need to generate a server code.  T
 
 ==== Obtaining license file
 
-Open a new browser and navigate to this address: link:https://license.tigase.net/retrieve[https://license.tigase.net/retrieve] once there, paste the generated code from the last step in the field and click submit.  Afterwards you will be prompted to download a license file, place this file in your _etc/_ folder and restart your server, your license is now activated and installed on your server.
+Open a new browser and navigate to this address: link:https://license.tigase.software/retrieve[https://license.tigase.software/retrieve] once there, paste the generated code from the last step in the field and click submit.  Afterwards you will be prompted to download a license file, place this file in your _etc/_ folder and restart your server, your license is now activated and installed on your server.
 
 *If you are provided a manually produced license, you will need to place it in the same etc/ directory with the name `license.acs`*
 
@@ -71,10 +71,10 @@ Open a new browser and navigate to this address: link:https://license.tigase.net
 Tigase permits commercial products to be used without a license, but a validation process must complete otherwise the server will shutdown.
 Within the first hour of runtime, Tigase will check for the presence and validity of the license file.  If none is found, or it is invalid or expired the server will then contact Tigase master server in order to obtain a valid one.
 
-Communications will be made to license.tigase.net over https (port 443) to verify the license or download a new one.
+Communications will be made to license.tigase.software over https (port 443) to verify the license or download a new one.
 
 == Demo mode
-If no valid license can be found, Tigase will revert to a demonstration mode.  Most functions will be available and usable, but with a caveat.  Statistics from that server will be sent to stats.tigase.net over port 8080 about your server and it's usage.  Details are in the next section.
+If no valid license can be found, Tigase will revert to a demonstration mode.  Most functions will be available and usable, but with a caveat.  Statistics from that server will be sent to stats.tigase.software over port 8080 about your server and it's usage.  Details are in the next section.
 If this information cannot be sent, the server will assume unathorized use and will shut down.
 
 === Statistics Sent
@@ -242,4 +242,4 @@ If these retries are not successful after a random amount of time and 10 tries, 
 If you are experiencing this in error, please contact Tigase.
 
 == Manual mode
-If you cannot open communication to stats.tigase.net or license.tigase.net over the required ports, you may request to use manual mode.  Manual mode requires Tigase to create a license file to be used on your machine locally.  This must be placed in the same folder as the above information, and the license check system will not seek communication unless the license is invalid or expired.
+If you cannot open communication to stats.tigase.software or license.tigase.software over the required ports, you may request to use manual mode.  Manual mode requires Tigase to create a license file to be used on your machine locally.  This must be placed in the same folder as the above information, and the license check system will not seek communication unless the license is invalid or expired.
