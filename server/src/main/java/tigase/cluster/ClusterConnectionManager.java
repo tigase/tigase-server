@@ -698,7 +698,7 @@ public class ClusterConnectionManager
 		list.add(getName(), "Max daily cluster nodes count in last month", maxNodes, Level.INFO);
 		list.add(getName(), "Max nodes count within last week", maxNodesWithinLastWeek, Level.INFO);
 
-		if ((!list.checkLevel(Level.FINEST)) && getNodesConnected().size() > 0) {
+		if ((!list.checkLevel(Level.INFO)) && getNodesConnected().size() > 0) {
 			// in FINEST level every component will provide this data
 			list.add(getName(), "Known cluster nodes", getNodesConnected().size(), Level.INFO);
 		}
