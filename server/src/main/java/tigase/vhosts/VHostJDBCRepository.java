@@ -68,6 +68,8 @@ public class VHostJDBCRepository
 	private int max_domains_per_user = 25;
 	private Map<String, Map<String, Object>> pendingItemsToSet = null;
 	private String[] pendingItemsToSetOld = null;
+	@ConfigField(desc = "Default VHost name", alias = "default-virtual-host")
+	private String defaultVHost;
 
 	@Inject
 	private VHostItemDefaults vhostDefaults;
@@ -215,13 +217,19 @@ public class VHostJDBCRepository
 		// this is needed as it is required by interface
 	}
 
-	@Override
-	public void setItems(Map<String, Map<String, Object>> items) {
-		if (vhostDefaults == null) {
-			this.pendingItemsToSet = items;
-		} else {
-			super.setItems(items);
-			super.reload();
+	public String getDefaultVHost() {
+		return defaultVHost;
+	}
+
+	public void setDefaultVHost(String vhost) {
+		this.defaultVHost = vhost;
+		if (vhostDefaults != null) {
+			reload();
+			VHostItem item = getItemInstance();
+			item.setKey(vhost);
+			if (!contains(vhost)) {
+				addItem(item);
+			}
 		}
 	}
 
@@ -241,10 +249,7 @@ public class VHostJDBCRepository
 			setItemsOld(pendingItemsToSetOld);
 			pendingItemsToSetOld = null;
 		}
-		if (pendingItemsToSet != null) {
-			setItems(pendingItemsToSet);
-			pendingItemsToSet = null;
-		}
+		setDefaultVHost(defaultVHost);
 	}
 }
 

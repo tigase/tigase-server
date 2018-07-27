@@ -31,7 +31,6 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -52,16 +51,14 @@ public class SetupHelper {
 	public static ConfigBuilder generateConfig(ConfigTypeEnum configType, String dbUri, boolean clusterMode,
 											   boolean acs, Optional<Set<String>> optionalComponentsOption,
 											   Optional<Set<String>> forceEnabledComponentsOptions,
-											   Optional<Set<String>> pluginsOption, String[] virtualDomains,
+											   Optional<Set<String>> pluginsOption, String defaultVirtualHost,
 											   Optional<BareJID[]> admins, Optional<HttpSecurity> httpSecurity) {
 		ConfigBuilder builder = new ConfigBuilder().with("config-type", configType.id().toLowerCase());
 
 		if (clusterMode) {
 			builder.with("cluster-mode", "true");
 		}
-		builder.with("virtual-hosts", Arrays.asList(virtualDomains)
-				.stream()
-				.collect(Collectors.toMap(Function.identity(), it -> new HashMap())))
+		builder.with("default-virtual-host", defaultVirtualHost)
 				.with("admins", admins)
 				.with("debug", Arrays.asList("server"));
 
@@ -112,20 +109,6 @@ public class SetupHelper {
 						.clazz((ct != null && !Arrays.asList(ct.value()).contains(configType)) ? def.getClazz() : null);
 				if ("http".equals(def.getName())) {
 					httpSecurity.ifPresent(sec -> {
-						Map<String, Object> val = new HashMap<>();
-						switch (sec.restApiSecurity) {
-							case forbidden:
-								break;
-							case api_keys:
-								Arrays.asList(sec.restApiKeys).forEach(k -> {
-									val.put(k, new HashMap<>());
-								});
-								b.with("api-keys", val);
-								break;
-							case open_access:
-								val.put("open_access", new HashMap<>());
-								b.with("api-keys", val);
-						}
 						if (sec.setupUser != null && !sec.setupUser.isEmpty() && sec.setupPassword != null &&
 								!sec.setupPassword.isEmpty()) {
 							b.withBean(setup -> setup.name("setup")
@@ -166,8 +149,6 @@ public class SetupHelper {
 
 	public static class HttpSecurity {
 
-		public String[] restApiKeys = new String[0];
-		public RestApiSecurity restApiSecurity = RestApiSecurity.forbidden;
 		public String setupPassword;
 		public String setupUser;
 

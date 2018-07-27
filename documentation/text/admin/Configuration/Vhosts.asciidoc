@@ -11,9 +11,9 @@ Tigase server supports multiple virtual hosts in a single server installation.  
 
 This document describes how virtual hosts work in Tigase server and how to get the most out of this feature in your installation.
 
-The xref:virtHosts['virtual-hosts'] property allows for configuration of virtual hosts in your config.tdsl file.
+The xref:virtHosts['default-virtual-host'] property allows to define name of the single vhost domain which will be considered a default vhost domain for this installation. It allows you just to configure the domain name. Any additional configuration needs to be configured using ad-hoc commands.
 
-Virtual hosts may also be managed using ad-hoc commands, visit xref:ad-hocCommands[Specification for ad-hoc Commands Used to Manage Virtual Domains] for more information.
+Virtual hosts should be managed using ad-hoc commands, visit xref:ad-hocCommands[Specification for ad-hoc Commands Used to Manage Virtual Domains] for more information.
 
 If you have components that may not be able to handle multiple vhosts or cluster mode, we have developed a virtual component solution as well, details in the xref:virtualComponents[Virtual Components for the Tigase Cluster] section.
 

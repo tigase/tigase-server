@@ -21,7 +21,6 @@
 package tigase.server.ext;
 
 import tigase.db.comp.RepositoryItemAbstract;
-import tigase.kernel.beans.config.ConfigField;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.Command;
@@ -30,8 +29,11 @@ import tigase.server.ext.lb.LoadBalancerIfc;
 import tigase.server.ext.lb.ReceiverBareJidLB;
 import tigase.xml.Element;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created: Oct 3, 2009 4:39:51 PM
@@ -84,25 +86,17 @@ public class CompRepoItem
 	private static final Logger log = Logger.getLogger(CompRepoItem.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------
-	@ConfigField(desc = DOMAIN_PASS_LABEL, alias = "password")
 	private String auth_pass = null;
 
 	// "accept:muc.domain.tld:5277:user:passwd"
 	private String domain = null;
-	@ConfigField(desc = LB_CLASS_LABEL, alias = LB_NAME_ATTR)
 	private LoadBalancerIfc lb = DEF_LB_CLASS;
-	@ConfigField(desc = PORT_NO_LABEL, alias = PORT_NO_ATTR)
 	private int port = -1;
-	@ConfigField(desc = PROTO_XMLNS_LABEL, alias = PROTO_XMLNS_ATTR)
 	private String prop_xmlns = null;
-	@ConfigField(desc = REMOTE_HOST_LABEL, alias = REMOTE_HOST_ATTR)
 	private String remoteHost = null;
-	@ConfigField(desc = ROUTINGS_LABEL, alias = ROUTINGS_ATTR)
 	private String[] routings = null;
-	@ConfigField(desc = CONNECTION_TYPE_LABEL, alias = CONN_TYPE_ATTR)
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns = null;
-	@ConfigField(desc = SOCKET_LABEL, alias = SOCKET_ATTR)
 	private SocketType socket  = SocketType.plain;
 
 	@Override
@@ -116,7 +110,10 @@ public class CompRepoItem
 		Command.addFieldValue(packet, REMOTE_HOST_LABEL, ((remoteHost != null) ? remoteHost : ""));
 		Command.addFieldValue(packet, PROTO_XMLNS_LABEL, ((prop_xmlns != null) ? prop_xmlns : ""));
 		Command.addFieldValue(packet, LB_CLASS_LABEL, ((lb != null) ? lb.getClass().getName() : ""));
-		Command.addFieldValue(packet, ROUTINGS_LABEL, "");
+		Command.addFieldValue(packet, ROUTINGS_LABEL, Optional.ofNullable(routings)
+				.map(Arrays::stream)
+				.map(stream -> stream.collect(Collectors.joining(",")))
+				.orElse(""));
 		Command.addFieldValue(packet, SOCKET_LABEL, socket.name(), SOCKET_LABEL, SocketType.names(),
 		                      SocketType.names());
 		super.addCommandFields(packet);
@@ -332,6 +329,7 @@ public class CompRepoItem
 			route.append(r);
 		}
 		elem.addAttribute(ROUTINGS_ATTR, route.toString());
+		elem.addAttribute(SOCKET_ATTR, socket.name());
 
 		return elem;
 	}
@@ -367,9 +365,9 @@ public class CompRepoItem
 		if (auth_pass == null) {
 			return "Password is required";
 		}
-		if (prop_xmlns == null) {
-			return "Protocol is required";
-		}
+//		if (prop_xmlns == null) {
+//			return "Protocol is required";
+//		}
 		return null;
 	}
 

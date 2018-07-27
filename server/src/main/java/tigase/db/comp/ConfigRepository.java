@@ -45,7 +45,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	@ConfigField(desc = "Automatic items load interval", alias = "repo-autoreload-interval")
 	protected long autoReloadInterval = 0;
-	@ConfigField(desc = "Items in repository")
 	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>(String.CASE_INSENSITIVE_ORDER);
 	protected int itemsHash = 0;
 
@@ -209,13 +208,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 		return items.get(key);
 	}
-
-	public Map<String, Map<String,Object>> getItems() {
-		Map<String, Map<String, Object>> map = new HashMap<>();
-		items.forEach((k,v) -> map.put(k, v.toMap()));
-		return map;
-	}
-
+	
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	public String[] getItemsOld() {
@@ -224,24 +217,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 			itemsStrs.add(item.toPropertyString());
 		}
 		return itemsStrs.toArray(new String[itemsStrs.size()]);
-	}
-	
-	public void setItems(Map<String, Map<String, Object>> items) {
-		if (items != null) {
-			items.forEach((k,v) -> {
-				log.log(Level.CONFIG, "Loading config item: {0}", k);
-
-				Item item = getItemInstance();
-
-				item.initFromMap(k, v);
-				if (!this.items.containsKey(item.getKey())) {
-					addItem(item);
-					log.log(Level.CONFIG, "Loaded config item: {0}", item);
-				} else {
-					log.log(Level.CONFIG, "Config item already loaded, skipping: {0}", item);
-				}
-						  });
-		}
 	}
 
 	@Deprecated

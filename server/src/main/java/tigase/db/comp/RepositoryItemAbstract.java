@@ -29,15 +29,7 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -109,61 +101,6 @@ public abstract class RepositoryItemAbstract
 	}
 
 	@Override
-	public void initFromMap(String key, Map<String, Object> props) {
-		initFromMap(key, props, null);
-	}
-
-	protected void initFromMap(String key, Map<String, Object> props, BiConsumer<String, Object> additionalOptionsConsumer) {
-		setKey(key);
-		Map<String, Field> propToField = streamConfigFields().collect(Collectors.toMap(
-				field -> Optional.ofNullable(field.getAnnotation(ConfigField.class))
-						.map(ConfigField::alias)
-						.map(alias -> alias.isEmpty() ? null : alias)
-						.orElse(field.getName()), Function.identity()));
-
-		propToField.entrySet().stream().filter(e -> props.containsKey(e.getKey())).forEach(e -> {
-			try {
-				Field field = e.getValue();
-				Object value = props.get(e.getKey());
-
-				Type expType = BeanUtils.getGetterSetterMethodsParameterType(field);
-				Class clazz = null;
-				if (expType != null) {
-					if (expType instanceof Class) {
-						clazz = (Class) expType;
-					} else if (expType instanceof ParameterizedType) {
-						Type type = ((ParameterizedType) expType).getRawType();
-						if (type instanceof Class) {
-							clazz = (Class) type;
-						} else {
-							expType = null;
-						}
-					} else{
-						expType = null;
-					}
-				}
-
-				if (expType != null) {
-					value = typesConverter.convert(value, clazz, expType);
-				} else {
-					value = typesConverter.convert(value, field.getType(), field.getGenericType());
-				}
-
-				BeanUtils.setValue(this, e.getValue(), value);
-			} catch (Exception ex) {
-				throw new RuntimeException("Could not set value for key: " + e.getKey() + " to field: " + e.getValue(), ex);
-			}
-		});
-		
-		if (additionalOptionsConsumer != null) {
-			props.entrySet()
-					.stream()
-					.filter(e -> !propToField.containsKey(e.getKey()))
-					.forEach(e -> additionalOptionsConsumer.accept(e.getKey(), e.getValue()));
-		}
-	}
-
-	@Override
 	public boolean isAdmin(String id) {
 		if (admins == null) {
 			return false;
@@ -194,32 +131,6 @@ public abstract class RepositoryItemAbstract
 		}
 
 		return elem;
-	}
-
-	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> props = new HashMap<>();
-		streamConfigFields().forEach(field -> {
-			try {
-				String key = Optional.ofNullable(field.getAnnotation(ConfigField.class))
-						.map(ConfigField::alias)
-						.map(alias -> alias.isEmpty() ? null : alias)
-						.orElse(field.getName());
-				Object value = BeanUtils.getValue(this, field);
-				if (value != null) {
-					props.put(key, value);
-				}
-			} catch (Exception ex) {
-				if (ex instanceof NullPointerException || ex.getCause() instanceof NullPointerException) {
-					// if there is a NPE it may be caused by value being not set.
-					// Let's assume that it is not set and threat it as a null
-					// (value not set to the other value than default).
-					return;
-				}
-				throw new RuntimeException("Could not read data from field: " + field, ex);
-			}
-		});
-		return props;
 	}
 
 	private String[] adminsFromString(String admins_m) {

@@ -24,8 +24,6 @@ import tigase.annotations.TigaseDeprecated;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
-import java.util.Map;
-
 /**
  * The interface defines a contract for a repository item handled by ComponentRepository implementation. Created: Oct 3,
  * 2009 2:35:58 PM
@@ -116,8 +114,6 @@ public interface RepositoryItem {
 	@TigaseDeprecated(since = "8.0.0")
 	void initFromPropertyString(String propString);
 
-	void initFromMap(String key, Map<String, Object> props);
-
 	/**
 	 * The method checks whether the given id is one of the administrators set for the Item.
 	 *
@@ -158,6 +154,5 @@ public interface RepositoryItem {
 	@TigaseDeprecated(since = "8.0.0")
 	String toPropertyString();
 
-	Map<String, Object> toMap();
 }
 

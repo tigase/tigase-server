@@ -251,10 +251,10 @@ public class SchemaManager {
 			loader.init(params, Optional.ofNullable(rootCredentialsCache));
 			String dbUri = loader.getDBUri();
 
-			String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
+			String vhost = DNSResolverFactory.getInstance().getDefaultHost();
 			ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
 																	 Optional.empty(), Optional.empty(),
-																	 Optional.empty(), vhosts, Optional.empty(),
+																	 Optional.empty(), vhost, Optional.empty(),
 																	 Optional.empty());
 
 			config = configBuilder.build();
@@ -325,11 +325,11 @@ public class SchemaManager {
 		adminPass = params.getAdminPassword();
 		logLevel = params.getLogLevel();
 
-		String[] vhosts = new String[]{DNSResolverFactory.getInstance().getDefaultHost()};
+		String vhost = DNSResolverFactory.getInstance().getDefaultHost();
 		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
 																 Optional.ofNullable(components),
 																 Optional.ofNullable(changes.get("+")),
-																 Optional.empty(), vhosts, Optional.of(params.getAdmins().toArray(new BareJID[params.getAdmins().size()])),
+																 Optional.empty(), vhost, Optional.of(params.getAdmins().toArray(new BareJID[params.getAdmins().size()])),
 																 Optional.empty());
 
 
@@ -406,7 +406,7 @@ public class SchemaManager {
 		ConfigBuilder configBuilder = SetupHelper.generateConfig(ConfigTypeEnum.DefaultMode, dbUri, false, false,
 																 Optional.ofNullable(components),
 																 Optional.empty(),
-																 Optional.empty(), new String[] { "example.com" }, Optional.empty(),
+																 Optional.empty(), "example.com", Optional.empty(),
 																 Optional.empty());
 
 

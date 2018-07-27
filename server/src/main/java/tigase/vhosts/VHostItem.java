@@ -21,7 +21,6 @@
 package tigase.vhosts;
 
 import tigase.db.comp.RepositoryItemAbstract;
-import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.xmppclient.ClientTrustManagerFactory;
@@ -175,36 +174,22 @@ public class VHostItem
 		VHostItem.registerData(types);
 	}
 
-	@ConfigField(desc = "Anonymous authentication", alias = "anonymous")
 	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
-	@ConfigField(desc = "Allowed C2S ports", alias = C2S_PORTS_ALLOWED_ATT)
 	private int[] c2sPortsAllowed = null;
 
-	@ConfigField(desc = "Components", alias = COMPONENTS_ATT)
 	private String[] comps = null;
 	private Map<String, Object> data = new ConcurrentHashMap<String, Object>();
 	private VHostItemDefaults defaults;
-	@ConfigField(desc = DOMAIN_FILTER_POLICY_LABEL, alias = DOMAIN_FILTER_POLICY_ATT)
 	private DomainFilterPolicy domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
-	@ConfigField(desc = DOMAIN_FILTER_POLICY_DOMAINS_LABEL, alias = DOMAIN_FILTER_POLICY_DOMAINS_ATT)
 	private String[] domainFilterDomains = null;
-	@ConfigField(desc = ENABLED_LABEL, alias = ENABLED_ATT)
 	private boolean enabled = true;
-	@ConfigField(desc = MAX_USERS_NUMBER_LABEL, alias = MAX_USERS_NUMBER_ATT)
 	private long maxUsersNumber = VHOST_MAX_USERS_PROP_DEF;
-	@ConfigField(desc = MESSAGE_FORWARD_ADDRESS_LABEL, alias = "message-forward")
 	private JID messageForward = JID.jidInstanceNS(VHOST_MESSAGE_FORWARD_PROP_DEF);
-	@ConfigField(desc = OTHER_PARAMS_LABEL, alias = OTHER_PARAMS_ELEM)
 	private String otherDomainParams = null;
-	@ConfigField(desc = PRESENCE_FORWARD_ADDRESS_LABEL, alias = "presence-forward")
 	private JID presenceForward = JID.jidInstanceNS(VHOST_PRESENCE_FORWARD_PROP_DEF);
-	@ConfigField(desc = REGISTER_ENABLED_LABEL, alias = REGISTER_ENABLED_ATT)
 	private boolean registerEnabled = VHOST_REGISTER_ENABLED_PROP_DEF;
-	@ConfigField(desc = S2S_SECRET_LABEL, alias = S2S_SECRET_ATT)
 	private String s2sSecret = S2S_SECRET_PROP_DEF;
-	@ConfigField(desc = SASL_MECHANISM_LABEL, alias = SASL_MECHANISM_ATT)
 	private String[] saslAllowedMechanisms = null;
-	@ConfigField(desc = TLS_REQUIRED_LABEL, alias = TLS_REQUIRED_ATT)
 	private boolean tlsRequired = VHOST_TLS_REQUIRED_PROP_DEF;
 	private VHostItem unmodifiableItem = null;
 	private JID vhost = null;
@@ -548,12 +533,7 @@ public class VHostItem
 	protected void setKey(String key) {
 		setVHost(JID.jidInstanceNS(key));
 	}
-
-	@Override
-	public void initFromMap(String vhost, Map<String, Object> props) {
-		initFromMap(vhost, props, data::put);
-	}
-
+	
 	@Override
 	public void initFromPropertyString(String propString) {
 		String[] props = propString.split(":");
@@ -730,14 +710,7 @@ public class VHostItem
 
 		return elem;
 	}
-
-	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> props = super.toMap();
-		props.putAll(data);
-		return props;
-	}
-
+	
 	@Override
 	public String toPropertyString() {
 		StringBuilder sb = new StringBuilder();

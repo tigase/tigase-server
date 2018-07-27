@@ -579,7 +579,6 @@ public class OldConfigHolder {
 							e.getValue().equals(ComponentProtocol.class.getCanonicalName()))
 					.map(e -> e.getKey().replace("/class", ""))
 					.findFirst();
-			extCmpName.ifPresent(cmpName -> toAdd.put(cmpName + "/repository/items", stringToListOfStrings(external)));
 			renameIfExists(props, ComponentProtocol.EXTCOMP_BIND_HOSTNAMES,
 						   ComponentProtocol.EXTCOMP_BIND_HOSTNAMES_PROP_KEY,
 						   value -> stringToListOfStrings(value.toString()));

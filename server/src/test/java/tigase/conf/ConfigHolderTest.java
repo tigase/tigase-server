@@ -27,10 +27,7 @@ import tigase.xmpp.impl.roster.DynamicRosterTest;
 import tigase.xmpp.impl.roster.DynamicRosterTest123;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -240,12 +237,7 @@ public class ConfigHolderTest {
 		Map<String, Object> ext = (Map<String, Object>) result.get("ext");
 		assertNotNull(ext);
 		Map<String, Object> repo = (Map<String, Object>) ext.get("repository");
-		assertNotNull(repo);
-		List<String> items = (List<String>) repo.get("items");
-		assertNotNull(items);
-		assertEquals(2, items.size());
-		assertEquals("muc1.devel.tigase.org:passwd1", items.get(0));
-		assertEquals("muc2.devel.tigase.org:passwd2", items.get(1));
+		assertNull(repo);
 	}
 
 
@@ -273,13 +265,9 @@ public class ConfigHolderTest {
 		Map<String,Object> result = ConfigWriter.buildTree(props);
 		ConfigHolder.upgradeDSL(result);
 
-		Map<String, Map<String, Object>> vhosts = ((Map<String, Map<String, Object>>) result.get("virtual-hosts"));
-
-		Stream.of("international.com", "dev.com", "qa.com", "int.com").forEach(vhost -> {
-			assertTrue(vhosts.containsKey(vhost));
-		});
-//		assertArrayEquals(new String[]{},
-//						  ((List<String>) result.get("virtual-hosts")).toArray(new String[0]));
+		Optional<String> defaultVHost = Optional.ofNullable(result.get("default-virtual-host")).filter(String.class::isInstance).map(String.class::cast);
+		assertTrue(defaultVHost.isPresent());
+		assertEquals("international.com", defaultVHost.get());
 	}
 
 	@Test

@@ -45,8 +45,8 @@ c2s () {
 -----
 The BouncyCastle classes are included in the dist-max archives.
 
-=== virtual-hosts property changes
-Virtual hosts property is now able to be configured in blocks instead of an ordered list making configurations more readable.  Reference xref:virtHosts[Virtual-Hosts Configuration] for more details.
+=== default-virtual-host property changes
+Default virtual hosts property is now able to be configured only as a domain name instead of the list of virtual host domains with options. Additional virtual host domains need and their options need to be configured using ad-hoc commands.  Reference xref:virtHosts[Virtual-Hosts Configuration] for more details.
 
 === All artifacts are signed
 Since work began on v8.0.0 Tigase has required that all changes to Tigase XMPP Server and dependencies be signed with known certificates.  This version marks the first to be totally signed.

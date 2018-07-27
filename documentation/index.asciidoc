@@ -279,6 +279,8 @@ include::text/properties/debug.asciidoc[leveloffset=+2]
 
 include::text/properties/debug-packages.asciidoc[leveloffset=+2]
 
+include::text/properties/default-virtual-host.asciidoc[leveloffset=+2]
+
 include::text/properties/domain-filter-policy.asciidoc[leveloffset=+2]
 
 include::text/properties/elements-number-list.asciidoc[leveloffset=+2]
@@ -336,8 +338,6 @@ include::text/properties/vhost-presence-forward-jid.asciidoc[leveloffset=+2]
 include::text/properties/vhost-register-enabled.asciidoc[leveloffset=+2]
 
 include::text/properties/vhost-tls-required.asciidoc[leveloffset=+2]
-
-include::text/properties/virtual-hosts.asciidoc[leveloffset=+2]
 
 include::text/properties/watchdog_delay.asciidoc[leveloffset=+2]
 
