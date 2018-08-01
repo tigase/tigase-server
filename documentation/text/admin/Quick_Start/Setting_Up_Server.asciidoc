@@ -55,10 +55,10 @@ Although SRV records are required by the XMPP specifications we do not require S
 [source,sh]
 -----
 $ host your-domain.tld
-your-domain.tld has address 94.23.164.209
+your-domain.tld has address x.x.x.x
 -----
 
-This displays `94.23.164.209` address or commands:
+This displays `x.x.x.x` IP address associated to your DNS domain or commands:
 
 [source,sh]
 -----
