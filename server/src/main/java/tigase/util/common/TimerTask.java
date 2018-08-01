@@ -31,8 +31,8 @@ public abstract class TimerTask
 		implements Runnable {
 
 	private static final Logger log = Logger.getLogger(TimerTask.class.getName());
-	private ScheduledFuture<?> future = null;
 	private boolean cancelled = false;
+	private ScheduledFuture<?> future = null;
 
 	public void setScheduledFuture(ScheduledFuture<?> future) {
 		this.future = future;
@@ -61,5 +61,12 @@ public abstract class TimerTask
 		if (future != null && !future.isDone()) {
 			future.cancel(mayInterruptIfRunning);
 		}
+	}
+
+	public void reset(boolean mayInterruptIfRunning) {
+		if (future != null && !future.isDone()) {
+			future.cancel(mayInterruptIfRunning);
+		}
+		future = null;
 	}
 }

@@ -60,6 +60,7 @@ public abstract class ScheduledTask
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		if (changedFields.contains("period") || changedFields.contains("delay")) {
+			reset(true);
 			initialize();
 		}
 	}
@@ -69,8 +70,6 @@ public abstract class ScheduledTask
 		if (component == null || !component.isInitializationComplete()) {
 			return;
 		}
-
-		cancel();
 
 		if (delay == null && period == null) {
 			return;

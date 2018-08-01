@@ -133,6 +133,10 @@ public class BasicComponent
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Bean: {0} configuration changed: {1}",
+					new Object[]{this.getClass().getName(), changedFields});
+		}
 		if (changedFields.contains("trusted")) {
 			refreshTrustedJids();
 		}

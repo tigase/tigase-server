@@ -46,6 +46,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,6 +82,12 @@ public class UpdatesChecker
 	private ConcurrentSkipListSet<BareJID> receivers = new ConcurrentSkipListSet<BareJID>();
 
 	public static void main(String[] args) throws InterruptedException {
+
+		Logger log = Logger.getLogger(UpdatesChecker.class.getName());
+		ConsoleHandler ch = new ConsoleHandler();
+		ch.setLevel(Level.ALL);
+		log.addHandler(ch);
+		log.setLevel(Level.ALL);
 
 		final UpdatesChecker checker = new UpdatesChecker();
 
