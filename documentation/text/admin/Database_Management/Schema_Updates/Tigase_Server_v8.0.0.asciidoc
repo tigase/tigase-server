@@ -114,6 +114,7 @@ authRepository () {
     default () {
         credentialEncoders () {
             'SCRAM-SHA-1' (active: false) {}
+            'SCRAM-SHA-256' (active: false) {}
         }
     }
 }
