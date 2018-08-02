@@ -389,14 +389,12 @@ begin
     declare _user_id_sha1 char(128);
     declare _username_sha1 char(128);
 
-    select sha1(lower(_user_id)), sha1(_username) into _user_id_sha1, _username_sha1;
-
     select mechanism, value, account_status
     from tig_users u
     inner join tig_user_credentials c on u.uid = c.uid
     where
-        u.sha1_user_id = _user_id_sha1
-        and c.username_sha1 = _username_sha1;
+        u.sha1_user_id = sha1(lower(_user_id))
+        and c.username_sha1 = sha1(_username);
 end //
 -- QUERY END:
 
