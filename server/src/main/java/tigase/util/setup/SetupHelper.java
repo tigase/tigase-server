@@ -96,7 +96,9 @@ public class SetupHelper {
 			if (optionalComponents.contains(def.getName())) {
 				return def.isActive() == false || (ct != null && !Arrays.asList(ct.value()).contains(configType)) ||
 						(forceEnabledComponentsOptions.isPresent() &&
-								forceEnabledComponentsOptions.get().contains(def.getName())) || ("http".equals(def.getName()) && httpSecurity.isPresent());
+								forceEnabledComponentsOptions.get().contains(def.getName()))
+						|| ("http".equals(def.getName()) && httpSecurity.isPresent())
+						|| ("pubsub".equals(def.getName()) && optionalComponents.contains("http"));
 			} else {
 				return def.isActive() == true && (ct != null && Arrays.asList(ct.value()).contains(configType));
 			}
@@ -116,6 +118,9 @@ public class SetupHelper {
 									.with("admin-password", sec.setupPassword));
 						}
 					});
+				}
+				if ("pubsub".equals(def.getName()) && optionalComponents.contains("http")) {
+					b.with("trusted", Arrays.asList("http@{clusterNode}"));
 				}
 			});
 		});
