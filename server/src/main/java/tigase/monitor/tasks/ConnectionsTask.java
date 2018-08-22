@@ -31,7 +31,7 @@ import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
-import tigase.util.datetime.DateTimeFormatter;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 
 import java.util.Date;
@@ -43,7 +43,7 @@ public class ConnectionsTask
 		extends AbstractConfigurableTimerTask
 		implements InfoTask, Initializable {
 
-	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
+	protected final static TimestampHelper dtf = new TimestampHelper();
 	protected static final Logger log = Logger.getLogger(ConnectionsTask.class.getName());
 	private static final String USERS_DISCONNECTEED_EVENT_NAME = "tigase.monitor.tasks.UsersDisconnected";
 	@Inject
@@ -83,7 +83,7 @@ public class ConnectionsTask
 			}
 
 			Element event = new Element(USERS_DISCONNECTEED_EVENT_NAME);
-			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
 			event.addChild(new Element("disconnections", "" + (-1 * delta)));
 			event.addChild(new Element("disconnectionsPercent", "" + (-1 * percent)));
 
@@ -155,7 +155,7 @@ public class ConnectionsTask
 			log.finest("Running task...");
 		}
 
-		SessionManager sess = (SessionManager) XMPPServer.getComponent(SessionManager.class);
+		SessionManager sess = XMPPServer.getComponent(SessionManager.class);
 
 		final int currentOnlineUsers = sess.getOpenUsersConnectionsAmount();
 

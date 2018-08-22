@@ -29,7 +29,7 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.common.OSUtils;
-import tigase.util.datetime.DateTimeFormatter;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 
 import java.io.BufferedReader;
@@ -49,7 +49,7 @@ public class DiskTask
 
 	public static final String DISK_USAGE_MONITOR_EVENT_NAME = "tigase.monitor.tasks.DiskUsageMonitorEvent";
 
-	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
+	protected final static TimestampHelper dtf = new TimestampHelper();
 
 	private static final Logger log = Logger.getLogger(DiskTask.class.getName());
 	protected final HashSet<String> triggeredEvents = new HashSet<String>();
@@ -99,7 +99,7 @@ public class DiskTask
 
 				Element event = new Element(DISK_USAGE_MONITOR_EVENT_NAME);
 				event.addChild(new Element("hostname", component.getDefHostName().toString()));
-				event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+				event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
 				event.addChild(new Element("hostname", component.getDefHostName().toString()));
 				event.addChild(new Element("root", file.toString()));
 				event.addChild(new Element("usableSpace", "" + file.getUsableSpace()));

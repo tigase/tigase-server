@@ -28,7 +28,7 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
-import tigase.util.datetime.DateTimeFormatter;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 
 import java.io.BufferedReader;
@@ -47,7 +47,7 @@ public class CpuTempTask
 
 	public static final String CPU_TEMP_MONITOR_EVENT_NAME = "tigase.monitor.tasks.CPUTempMonitorEvent";
 
-	private final static DateTimeFormatter dtf = new DateTimeFormatter();
+	private final static TimestampHelper dtf = new TimestampHelper();
 
 	private static final File FREQ_FILE = new File("/proc/cpuinfo");
 
@@ -114,7 +114,7 @@ public class CpuTempTask
 		if (cpu_temp >= cpuTempThreshold) {
 			Element event = new Element(CPU_TEMP_MONITOR_EVENT_NAME);
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
 			event.addChild(new Element("cpuTemp", "" + cpu_temp));
 
 			if (!triggeredEvents.contains(event.getName())) {

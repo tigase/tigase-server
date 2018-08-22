@@ -30,7 +30,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.util.datetime.DateTimeFormatter;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 
 import java.util.Date;
@@ -43,7 +43,7 @@ public class MemoryCheckerTask
 
 	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.HeapMemoryMonitorEvent";
 	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.NonHeapMemoryMonitorEvent";
-	private final static DateTimeFormatter dtf = new DateTimeFormatter();
+	private final static TimestampHelper dtf = new TimestampHelper();
 	private final HashSet<String> triggeredEvents = new HashSet<String>();
 	@Inject
 	private MonitorComponent component;
@@ -138,7 +138,7 @@ public class MemoryCheckerTask
 		if (curHeapMemUsagePercent >= maxHeapMemUsagePercentThreshold) {
 			Element event = new Element(HEAP_MEMORY_MONITOR_EVENT_NAME);
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
 			event.addChild(new Element("heapMemUsage", Float.toString(curHeapMemUsagePercent)));
 			event.addChild(new Element("heapMemMax", Long.toString(runtime.getHeapMemMax())));
 			event.addChild(new Element("heapMemUsed", Long.toString(runtime.getHeapMemUsed())));
@@ -161,7 +161,7 @@ public class MemoryCheckerTask
 		if (curNonHeapMemUsagePercent >= maxNonHeapMemUsagePercentThreshold) {
 			Element event = new Element(NONHEAP_MEMORY_MONITOR_EVENT_NAME);
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
 			event.addChild(new Element("nonHeapMemUsage", Float.toString(curNonHeapMemUsagePercent)));
 			event.addChild(new Element("heapMemMax", Long.toString(runtime.getHeapMemMax())));
 			event.addChild(new Element("heapMemUsed", Long.toString(runtime.getHeapMemUsed())));

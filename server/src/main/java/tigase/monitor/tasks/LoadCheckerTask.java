@@ -30,7 +30,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.util.datetime.DateTimeFormatter;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 
 import java.util.Date;
@@ -42,7 +42,7 @@ public class LoadCheckerTask
 		implements InfoTask, Initializable {
 
 	public static final String MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoadAverageMonitorEvent";
-	private final static DateTimeFormatter dtf = new DateTimeFormatter();
+	private final static TimestampHelper dtf = new TimestampHelper();
 	private final HashSet<String> triggeredEvents = new HashSet<String>();
 	@ConfigField(desc = "Average Load Threshold")
 	private long averageLoadThreshold = 10;
@@ -100,7 +100,7 @@ public class LoadCheckerTask
 		double curAverageLoad = runtime.getLoadAverage();
 		if (curAverageLoad >= averageLoadThreshold) {
 			Element event = new Element(MONITOR_EVENT_NAME);
-			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
 			event.addChild(new Element("message",
