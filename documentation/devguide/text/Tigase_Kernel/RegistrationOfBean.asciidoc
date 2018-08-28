@@ -1,0 +1,105 @@
+
+= Registration of a bean
+:numbered:
+:website: http://tigase.net/
+
+There are few ways to register a bean.
+
+== Using annotation _(recommended but optional)_
+To register a bean using annotation you need to annotate it with `@Bean` annotation and pass values for following properties:
+
+* `name` - name under which item should be registered
+* `active` - `true` if bean should be enabled without enabling it in the configuration _(however it is still possible to disable it using configuration)_
+* `parent` - class of the parent bean which activation should trigger registration of your bean. **In most cases parent class should be implementing `RegistrarBean`**
+* `parents` - array of classes which should be threaten as `parent` classes if more than one parent class is required _(optional)_
+* `exportable` - `true` if bean should be visible in all descendant kernels (in other case default visibility rules will be applied) _(optional)_
+* `selectors` - array of selector classes which will decide whether class should be registered or not _(optional)_
+
+TIP: If `parent` is set to `Kernel.class` it tells kernel to register this bean in the root/main kernel (top-level kernel).
+
+If you want your bean `SomeDependencyBean` to be registered when another bean `ParentBean` is being registered (like a required dependency), you may annotate your bean `SomeDependencyBean` with `@Bean` annotation like this example:
+[source,java]
+----
+@Bean(name = "nameOfSomeDependencyBean", parent = ParentBean.class, active = true)
+public class SomeDependencyBean {
+    ...
+}
+----
+
+WARNING: Works only if bean registered as `defaultBeanConfigurator` supports this feature. By default Tigase XMPP Server uses `DSLBeanConfigurator` which is subclass of `AbstractBeanConfigurator` which provides support for this feature.
+
+=== Setting `parent` to class not implementing `RegistrarBean` interface
+
+If `parent` is set to the class which is not implementing `RegistrarBean` interface, then your bean will be registered in the same kernel scope in which parent bean is registered. If you do so, ie. by setting parent to the class of the bean which is registered in the `kernel1` and your bean will be also registered in `kernel1`.
+As the result it will be exposed to other beans in the same kernel scope. This also means that if you will configure it in the same way as you would set `parent` to the `parent` of annotation of the class to which your `parent` point to.
+
+.Example
+[source,java]
+----
+@Bean(name="bean1", parent=Kernel.class)
+public class Bean1 {
+    @ConfigField(desc="Description")
+    private int field1 = 0;
+    ....
+}
+
+@Bean(name="bean2", parent=Bean1.class)
+public class Bean2 {
+    @ConfigField(desc="Description")
+    private int field2 = 0;
+    ....
+}
+----
+
+In this case it means that `bean1` is registered in the root/main kernel instance. At the same time, `bean2` is also registered to the root/main kernel as its value of `parent` property of annotation points to class not implementing `RegistrarBean`.
+
+To configure value of `field1` in instance of `bean1` and `field2` in instance of `bean2` in DSL (for more information about DSL format please check section `DSL file format` of the `Admin Guide`) you would need to use following entry in the config file:
+[source,dsl]
+----
+bean1 {
+    field1 = 1
+}
+bean2 {
+    field2 = 2
+}
+----
+
+As you can see, this resulted in the `bean2` configuration being on the same level as `bean1` configuration.
+
+== Calling kernel methods
+
+=== As a class
+To register a bean as a class, you need to have an instance of a Tigase Kernel execute it's `registerBean()` method passing your `Bean1` class.
+[source,java]
+----
+kernel.registerBean(Bean1.class).exec();
+----
+
+NOTE: To be able to use this method you will need to annotate `Bean1` class with `@Bean` annotation and provide a bean name which will be used for registration of the bean.
+
+=== As a factory
+To do this you need to have an instance of a Tigase Kernel execute it's `registerBean()` method passing your bean `Bean5` class.
+[source,java]
+----
+kernel.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
+----
+
+=== As an instance
+For this you need to have an instance of a Tigase Kernel execute it's `registerBean()` method passing your bean `Bean41` class instance.
+[source,java]
+----
+Bean41 bean41 = new Bean41();
+kernel.registerBean("bean4_1").asInstance(bean41).exec();
+----
+
+WARNING: Beans registered as an instance will not inject dependencies. As well this bean instances will not be configured by provided bean configurators.
+
+== Using config file _(optional)_
+
+If there is registered a bean `defaultBeanConfigurator` which supports registration in the config file, it is possible to do so. By default Tigase XMPP Server uses `DSLBeanConfigurator` which provides support for that and registration is possible in the config file in DSL.
+As registration of beans using a config file is part of the admin of the Tigase XMPP Server tasks, it is described in explained in the Admin Guide in subsection `Defining bean` of `DSL file format` section.
+
+TIP: This way allows admin to select different class for a bean. This option should be used to provide alternative implementations to the default beans which should be registered using annotations.
+
+WARNING: Works only if bean registered as `defaultBeanConfigurator` supports this feature. By default Tigase XMPP Server uses `DSLBeanConfigurator` which provides support for that.
+

@@ -1,0 +1,42 @@
+
+= Basics
+:numbered:
+:website: http://tigase.net/
+
+== What is kernel?
+Kernel is an instance of the `Kernel` class which is responsible for managing scope and visibility of beans. Kernel handles bean:
+
+* registration of a bean
+* unregistration of a bean
+* initialization of a bean
+* deinitialization of a bean
+* dependency injection to the bean
+* handling of bean lifecycle
+* registration of additional beans based on annotations _(optionally using registered class implementing `BeanConfigurator` as `defaultBeanConfigurator`)_
+* configuration of a bean _(optionally thru registered class implementing `BeanConfigurator` as `defaultBeanConfigurator`)_
+
+Kernel core is responsible for dependency resolution and maintaining lifecycle of beans.
+Other features, like proper configuration of beans are done by additional beans working inside the Kernel.
+
+Kernel identifies beans by their name, so each kernel may have only one bean named `abc`. If more than one bean has the same name, then the last one registered will be used as its registration will override previously registered beans.
+You may use whatever name you want to name a bean inside kernel but it cannot:
+
+* be `service` as this name is used by Tigase Kernel internally when `RegistrarBean`s are in use (see <<registrarBean, RegistrarBean>>
+* end with `#KERNEL` as this names are also used by Tigase Kernel internally
+
+TIP: Kernel initializes beans using lazy initialization.  This means that if a bean is not required by any other beans, or not retrieved from the kernel manually, an instance will not be created.
+
+During registration of a bean, the kernel checks if there is any beans which requires this newly registered bean and if so, then instance of a newly registered bean will be created and injected to fields which require it.
+
+== What is a kernel scope?
+
+Each kernel has its own scope in which it can look for beans. By default kernel while injecting dependencies may look for them only in the same kernel instance in which new instance of a bean is created or in the direct parent kernel.
+This way it is possible to have separate beans named the same in the different kernel scopes.
+
+NOTE: If bean is marked as `exportable`, it is also visible in all descendants kernel scopes.
+
+== What is a bean?
+
+A bean is a named instance of the class which has parameterless constructor and which is registered in the kernel.
+
+WARNING: Parameterless constructor is a required as it will be used by kernel to create an instance of the bean, see <<beanLifecycle,bean lifecycle>>.

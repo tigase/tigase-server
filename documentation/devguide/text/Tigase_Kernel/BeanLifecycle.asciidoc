@@ -1,0 +1,53 @@
+[[beanLifecycle]]
+= Lifecycle of a bean
+:numbered:
+:website: http://tigase.net/
+
+== Creating instance of a bean
+
+=== Instantiation of a bean
+
+During this step, kernel creates instance of the class which was registered for this bean (for more details see **Registration of a bean**). Instance of a bean is created using paremeterless constructor of a class.
+
+[[beanConfiguration]]
+=== Configuring a bean _(optional)_
+
+In this step kernel passes class instance of a bean to the configurator bean (an instance of `BeanConfigurator` if available), for configuring it.
+During this step, `BeanConfigurator` instance, which is aware of the configuration loaded from the file, injects this configuration to the bean fields annotated with `@ConfigField` annotation. By default configurator uses reflections to access those fields. However, if a bean has a corresponding public `setter`/`getter` methods for a field annotated with `@ConfigField` (method parameter/return type matches field type), then configurator will use them instead of accessing a field via reflection.
+
+NOTE: If there is no value for a field specified in the configuration or value is equal to the current value of the field, then configurator will skip setting value for this field (It will also not call `setter` method even if it exists).
+
+At the end of the configuration step, if bean implements `ConfigurationChangedAware` interface, then method `beanConfigurationChanged(Collection<String> changedFields)` is being called, to notify bean about field names which values has changed.
+This is useful, if you need to update bean configuration, when you have all configuration available inside bean.
+
+NOTE: Configuration of the bean may be changed at runtime and it will be applied in the same way as initial configuration is passed to the bean. So please keep in mind that `getter`/`setter` may be called multiple times - even for already configured and initialized bean.
+
+[[beanInjectingDependencies]]
+=== Injecting dependencies
+
+At this point kernel looks for the bean class fields annotated with `@Inject` and looks for a value for each of this fields.
+During this step, kernel checks list of available beans in this kernel, which matches field type and additional constraints specified in the annotation.
+
+When a required value (instance of a bean) is found, then kernel tries to inject it using reflection. However, if there is a matching `getter`/`setter` defined for that field it will be called instead of reflection.
+
+NOTE: If dependency changes, ie. due to reconfiguration, then value of the dependent field will change and `setter` will be called if it exists. So please keep in mind that `getter`/`setter` may be called multiple times - even for already configured and initialized bean.
+
+=== Initialization of a bean
+
+When bean is configured and dependencies are set, then initialization of a bean is almost finished. At this point, if bean implements `Initializable` interface, kernel calls `initialize()` method to allow bean initialize properly if needed.
+
+== Destroying instance of a bean
+
+When bean is being unloaded, then reference to its instance is just dropped. However, if bean class implements `UnregisterAware` interface, then kernel calls `beforeUnregister()` method.
+This is very useful in case which bean acquires some resources during initialization and should release them now.
+
+NOTE: This method will not be called if bean was not initialized fully (bean initialization step was note passed)!
+
+== Reconfiguration of a bean _(optional)_
+
+At any point in time bean may be reconfigured by default bean configurator (instance of `BeanConfigurator`) registered in the kernel. This will happen in the same way as it described in <<beanConfiguration, Configuring a bean>> in **Creating instace of a bean** section.
+
+== Updating dependencies
+
+It may happen, that due to reconfiguration or registration/unregistration or activation/deactivation of some other beans dependencies of a bean will change.
+As a result, Tigase Kernel will inject new dependencies as described in <<beanInjectingDependencies, Injecting dependencies>>

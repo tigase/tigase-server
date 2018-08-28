@@ -1,0 +1,42 @@
+
+= Defining dependencies
+:numbered:
+:website: http://tigase.net/
+
+All dependencies are defined with annotations:
+
+[source,java]
+----
+public class Bean1 {
+  @Inject
+  private Bean2 bean2;
+
+  @Inject(bean = "bean3")
+  private Bean3 bean3;
+
+  @Inject(type = Bean4.class)
+  private Bean4 bean4;
+
+  @Inject
+  private Special[] tableOfSpecial;
+
+  @Inject(type = Special.class)
+  private Set<Special> collectionOfSpecial;
+
+  @Inject(nullAllowed = true)
+  private Bean5 bean5;
+}
+----
+
+Kernel automatically determines type of a required beans based on field type. As a result, there is no need to specify the type of a bean in case of `bean4` field.
+
+When there are more than one bean instances matching required dependency fields, the type needs to be an array or collection.
+If kernel is unable to resolve dependencies, it will throw an exception unless `@Inject` annotation has `nullAllowed` set to `true`. This is useful to make some dependencies optional.
+To help kernel select a single bean instance when more that one bean will match field dependency, you may set name of a required bean as shown in annotation to field `bean3`.
+
+Dependencies are inserted using getters/setters if those methods exist, otherwise they are inserted directly to the fields.
+Thanks to usage of setters, it is possible to detect a change of dependency instance and react as required, i.e. clear internal cache.
+
+WARNING: Kernel is resolving dependencies during injection only using beans visible in its scope. This makes it unable to inject an instance of a class which is not registered in the same kernel as a bean or not visible in this kernel scope (see <<kernelScope, Scope and visibility>>).
+
+WARNING: If two beans have bidirectional dependencies, then it is required to allow at least one of them be `null` (make it an optional dependency). In other case it will create circular dependency which cannot be satisfied and kernel will throw exceptions at runtime.

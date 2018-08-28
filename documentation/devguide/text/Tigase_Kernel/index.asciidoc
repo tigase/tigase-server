@@ -1,0 +1,18 @@
+[[tigasekernel]]
+= Tigase Kernel
+:version: v1.0 June 2016. Reformatted for v8.0.0.
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+Tigase Kernel is an implementation of link:https://en.wikipedia.org/wiki/Inversion_of_control[IoC] created for Tigase XMPP Server.
+It is responsible for maintaining object lifecycle and provides mechanisms for dependency resolutions between beans.
+
+Additionally, as and optional feature, Tigase Kernel is capable of configuring beans using a provided bean configurator.
+
+include::Basics.asciidoc[leveloffset=+1]
+include::BeanLifecycle.asciidoc[leveloffset=+1]
+include::RegistrationOfBean.asciidoc[leveloffset=+1]
+include::Dependencies.asciidoc[leveloffset=+1]
+include::NestedKernels.asciidoc[leveloffset=+1]
+include::Configuration.asciidoc[leveloffset=+1]

@@ -1,0 +1,111 @@
+
+= Configuration
+:numbered:
+:website: http://tigase.net/
+
+The kernel core does not provide any way to configure created beans. Do do that you need to use the `DSLBeanConfigurator` class by providing its instance within configuration and registration of this instances within kernel.
+
+.Example
+[source,java]
+----
+Kernel kernel = new Kernel("root");
+kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
+kernel.registerBean(DSLBeanConfigurator.class).exportable().exec();
+DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+Map<String, Object> cfg = new ConfigReader().read(file);
+configurator.setProperties(cfg);
+// and now register other beans...
+----
+
+== DSL and kernel scopes
+DSL is a structure based format explained in http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#dslConfig[Tigase XMPP Server Administration Guide: DSL file format section].
+*It is important to know that kernel and beans structure have an impact on what the configuration in DSL will look like.*
+
+.Example kernel and beans classes
+[source,java]
+----
+@Bean(name = "bean1", parent = Kernel.class, active = true )
+public class Bean1 implements RegistrarBean {
+  @ConfigField(desc = "V1")
+  private String v1;
+
+  public void register(Kernel kernel) {
+    kernel.registerBean("bean1_1").asClass(Bean11.class).exec();
+  }
+
+  public void unregister(Kernel kernel) {}
+}
+
+public class Bean11 {
+  @ConfigField(desc = "V11")
+  private String v11;
+}
+
+@Bean(name = "bean1_2", parent = Bean1.class, active = true)
+public class Bean12 {
+  @ConfigField(desc = "V12")
+  private String v12;
+}
+
+@Bean(name = "bean2", active = true)
+public class Bean2 {
+  @ConfigField(desc = "V2")
+  private String v2;
+}
+
+public class Bean3 {
+  @ConfigField(desc = "V3")
+  private String v3;
+}
+
+public class Main {
+  public static void main(String[] args) {
+    Kernel kernel = new Kernel("root");
+    kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
+    kernel.registerBean(DSLBeanConfigurator.class).exportable().exec();
+    DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+    Map<String, Object> cfg = new ConfigReader().read(file);
+    configurator.setProperties(cfg);
+
+    configurator.registerBeans(null, null, config.getProperties());
+
+    kernel.registerBean("bean4").asClass(Bean2.class).exec();
+    kernel.registerBean("bean3").asClass(Bean3.class).exec();
+  }
+}
+----
+
+Following classes will produce following structure of beans:
+
+* "bean1" of class `Bean1`
+** "bean1_1" of class `Bean11`
+** "bean1_2" of class `Bean12`
+* "bean4" of class `Bean2`
+* "bean3" of class `Bean3`
+
+NOTE: This is a simplified structure, the actual structure is slightly more complex. However. this version makes it easier to explain structure of beans and impact on configuration file structure.
+
+WARNING: Even though `Bean2` was annotated with name `bean2`, it was registered with name `bean4` as this name was passed during registration of a bean in `main()` method.
+
+TIP: `Bean12` was registered under name `bean1_2` as subbean of `Bean1` as a result of annotation of `Bean12`
+
+As mentioned DSL file structure depends on structure of beans, a file to set a config field in each bean to bean name should look like that:
+[source,dsl]
+----
+'bean1' () {
+    'v1' = 'bean1'
+
+    'bean1_1' () {
+        'v11' = 'bean1_1'
+    }
+    'bean1_2' () {
+        'v12' = 'bean1_2'
+    }
+}
+'bean4' () {
+    'v2' = 'bean4'
+}
+'bean3' () {
+    'v3' = 'bean3'
+}
+----

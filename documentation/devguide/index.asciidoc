@@ -19,7 +19,7 @@ include::text/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[leveloffset=+1]
 
 include::text/Server_Compilation.asciidoc[leveloffset=+1]
 
-include::text/Tigase_Kernel.asciidoc[leveloffset=+1]
+include::text/Tigase_Kernel/index.asciidoc[leveloffset=+1]
 
 include::text/Data_Sources_And_Repositories.asciidoc[leveloffset=+1]
 

@@ -1,0 +1,53 @@
+
+= Nested kernels and exported beans
+:numbered:
+:website: http://tigase.net/
+
+Tigase Kernel allows the usage of nested kernels. This allows you to create complex applications and maintain proper separation and visibility of beans in scopes as each module (subkernel) may work within its own scope.
+
+
+Subkernels may be created using one of two ways:
+
+== Manual registration of new a new kernel
+You can create an instance of a new kernel and register it as a bean within the parent kernel.
+[source,java]
+----
+Kernel parent = new Kernel("parent");
+Kernel child = new Kernel("child");
+parent.registerBean(child.getName()).asInstance(child).exec();
+----
+
+== Usage of RegistrarBean
+You may create a bean which implements the `RegistrarBean` interfaces.
+For all beans that implement this interface, subkernels are created. You can access this new kernel within an instance of `RegistrarBean` class as `register(Kernel)` and `unregister(Kernel)` methods are called once the `RegistrarBean` instance is created or destroyed.
+
+[[kernelScope]]
+== Scope and visibility
+Beans that are registered within a parent kernel are visible to beans registered within the first level of child kernels.
+However, *beans registered within child kernels are not available to beans registered in a parent kernel* with the exception that they are visible to bean that created the subkernel (an instance of `RegistrarBean`).
+
+It is possible to export brans so they can be visible outside the first level of child kernels.
+
+To do so, you need to mark the bean as exportable using annotations or by calling the `exportable()` method.
+
+.Using annotation
+[source,java]
+----
+@Bean(name = "bean1", exportable = true)
+public class Bean1 {
+}
+----
+
+.Calling `exportable()`
+[source,java]
+----
+kernel.registerBean(Bean1.class).exportable().exec();
+----
+
+== Dependency graph
+Kernel allows the creation of a dependency graph. The following lines will generate it in a format supported by http://www.graphviz.org[Graphviz].
+[source,java]
+----
+DependencyGrapher dg = new DependencyGrapher(krnl);
+String dot = dg.getDependencyGraph();
+----
