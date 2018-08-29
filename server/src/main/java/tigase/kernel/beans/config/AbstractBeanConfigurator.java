@@ -53,6 +53,14 @@ public abstract class AbstractBeanConfigurator
 	protected Kernel kernel;
 	private boolean accessToAllFields = false;
 
+	/**
+	 * Method looks for bean classes (classes annotated with <code>@Bean</code> which has <code>parent</code> property
+	 * set to passed class.
+	 *
+	 * @param kernel instance of the Kernel
+	 * @param requiredClass class to look for as <code>parent</code> property value of <code>@Bean</code annotation
+	 * @return map of bean classes in for of "bean name" - "class"
+	 */
 	public static Map<String, Class<?>> getBeanClassesFromAnnotations(Kernel kernel, Class<?> requiredClass) {
 		Set<Class<?>> classes = ClassUtilBean.getInstance().getAllClasses();
 		List<Class<?>> toRegister = registerBeansForBeanOfClassGetBeansToRegister(kernel, requiredClass, classes);
@@ -66,6 +74,13 @@ public abstract class AbstractBeanConfigurator
 		return result;
 	}
 
+	/**
+	 * Method checkes if bean is already registered in parent kernel.
+	 * @param kernel kernel instance to check
+	 * @param name name of the bean
+	 * @param clazz expected class of the bean
+	 * @return
+	 */
 	protected static boolean isBeanClassRegisteredInParentKernel(Kernel kernel, String name, Class<?> clazz) {
 		if (kernel == null) {
 			return false;
@@ -93,7 +108,7 @@ public abstract class AbstractBeanConfigurator
 
 		return false;
 	}
-
+	
 	protected static Map<String, BeanDefinition> mergeWithBeansPropertyValue(
 			Map<String, BeanDefinition> beanPropConfigMap, Map<String, Object> values) {
 		List<String> beansProp = null;
@@ -128,6 +143,12 @@ public abstract class AbstractBeanConfigurator
 		return beanPropConfigMap;
 	}
 
+	/**
+	 * Method registers beans which classes are annotated with <code>@Bean</code> and have <code>parent</code> set to
+	 * the class passed as parameter.
+	 * @param kernel
+	 * @param cls
+	 */
 	public static void registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
 		Set<Class<?>> classes = ClassUtilBean.getInstance().getAllClasses();
 		registerBeansForBeanOfClass(kernel, cls, classes);
@@ -233,8 +254,18 @@ public abstract class AbstractBeanConfigurator
 		return annotation;
 	}
 
+	/**
+	 * Method returns current configuration map.
+	 * @return
+	 */
 	public abstract Map<String, Object> getProperties();
 
+	/**
+	 * Method configures passed bean with provided values.
+	 * @param beanConfig
+	 * @param bean
+	 * @param values
+	 */
 	public void configure(final BeanConfig beanConfig, final Object bean, final Map<String, Object> values) {
 		if (values == null) {
 			return;
@@ -380,6 +411,10 @@ public abstract class AbstractBeanConfigurator
 		}
 	}
 
+	/**
+	 * Method returns default types converter used by bean configurator.
+	 * @return
+	 */
 	public TypesConverter getDefaultTypesConverter() {
 		return defaultTypesConverter;
 	}
@@ -387,7 +422,7 @@ public abstract class AbstractBeanConfigurator
 	public void setDefaultTypesConverter(TypesConverter defaultTypesConverter) {
 		this.defaultTypesConverter = defaultTypesConverter;
 	}
-
+	
 	public Kernel getKernel() {
 		return kernel;
 	}
@@ -404,6 +439,15 @@ public abstract class AbstractBeanConfigurator
 		this.accessToAllFields = accessToAllFields;
 	}
 
+	/**
+	 * Method registers all beans which are annotated by <code>@Bean</code> and which <code>parent</code> property is
+	 * set to class which instance is passed. Additionally this method registers beans which definitions are passed
+	 * in the configuration.
+	 * 
+	 * @param beanConfig bean config of initializing bean
+	 * @param bean instance of initializing bean
+	 * @param values configuration of a bean
+	 */
 	@Override
 	public void registerBeans(BeanConfig beanConfig, Object bean, Map<String, Object> values) {
 		if (beanConfig != null && Kernel.class.isAssignableFrom(beanConfig.getClazz())) {
@@ -516,10 +560,17 @@ public abstract class AbstractBeanConfigurator
 		toUnregister.forEach(beanName -> kernel.unregister(beanName));
 	}
 
+	/**
+	 * Method applies configuration changes to bean. Should be called after configuration is updated.
+	 */
 	public void configurationChanged() {
 		refreshConfiguration(kernel);
 	}
 
+	/**
+	 * Method restors default configuration of a bean
+	 * @param beanName
+	 */
 	public void restoreDefaults(String beanName) {
 		BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(beanName);
 		Object bean = kernel.getInstance(beanName);
@@ -553,6 +604,11 @@ public abstract class AbstractBeanConfigurator
 
 	}
 
+	/**
+	 * Method returns configuration of a bean.
+	 * @param beanConfig
+	 * @return
+	 */
 	protected abstract Map<String, Object> getConfiguration(BeanConfig beanConfig);
 
 	protected Map<Field, Object> grabDefaultConfig(final BeanConfig beanConfig, final Object bean) {
@@ -606,10 +662,21 @@ public abstract class AbstractBeanConfigurator
 		return config;
 	}
 
+	/**
+	 * Method returns map of bean definitions found in the configuration
+	 * @param values configuration map
+	 * @return
+	 */
 	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
 		return new HashMap<>();
 	}
 
+	/**
+	 * Method returns queue of kernel and bean names to find bean config (path to the bean config from root of
+	 * the config).
+	 * @param beanConfig
+	 * @return
+	 */
 	protected ArrayDeque<String> getBeanConfigPath(BeanConfig beanConfig) {
 		Kernel kernel = beanConfig.getKernel();
 		ArrayDeque<String> path = new ArrayDeque<>();

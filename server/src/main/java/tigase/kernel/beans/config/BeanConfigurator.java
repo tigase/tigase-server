@@ -50,6 +50,15 @@ public interface BeanConfigurator {
 	 */
 	void configure(BeanConfig beanConfig, Object bean);
 
+	/**
+	 * Looks for and registers beans which should be registered due to initialization of passed bean.
+	 *
+	 * List of beans to register may come from config (<code>values</code>), annotations, etc.
+	 *
+	 * @param beanConfig bean config of initializing bean
+	 * @param bean instance of initializing bean
+	 * @param valeus configuration for the initializing bean
+	 */
 	void registerBeans(BeanConfig beanConfig, Object bean, Map<String, Object> valeus);
 
 }

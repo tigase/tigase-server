@@ -316,6 +316,17 @@ public class Kernel {
 		return (T) result;
 	}
 
+	/**
+	 * Returns instance of bean if instance exists already or calls passed function.
+	 *
+	 * @param beanName name of bean to be returned.
+	 * @oaram function function to call if instance does not exist.
+	 * @param <T> type of bean to be returned.
+	 *
+	 * @return instance of bean if bean exists and there is only single instance of it or .
+	 *
+	 * @throws KernelException when bean with given name doesn't exists.
+	 */
 	public <T> T getInstanceIfExistsOr(String beanName, Function<BeanConfig, T> function) {
 		BeanConfig bc = dependencyManager.getBeanConfig(beanName);
 
@@ -344,10 +355,18 @@ public class Kernel {
 		return name;
 	}
 
+	/**
+	 * Set name of the Kernel.
+	 * @param name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Register links for bean of the passed name.
+	 * @param beanName
+	 */
 	public void registerLinks(String beanName) {
 		Link l = this.registeredLinks.get(beanName);
 		if (l != null) {
@@ -423,6 +442,13 @@ public class Kernel {
 		return isBeanClassRegistered(beanName, true);
 	}
 
+	/**
+	 * Checks if bean with given name is registered in Kernel.
+	 * @param beanName name of bean to check.
+	 * @param checkInParent should check in parent kernel if not found in the current Kernel.
+	 *
+	 * @return <code>true</code> if bean is registered (it may be not initialized!).
+	 */
 	public boolean isBeanClassRegistered(final String beanName, boolean checkInParent) {
 		boolean x = dependencyManager.isBeanClassRegistered(beanName);
 		if (x == false && parent != null) {
@@ -512,6 +538,12 @@ public class Kernel {
 		return builder;
 	}
 
+	/**
+	 * Calling this method instructs Kernel to delay dependency injection until
+	 * <code>finishDependecyDelayedInjection()</code> method is called.
+	 *
+	 * @return instance of a queue with delayed dependency injections
+	 */
 	public DelayedDependencyInjectionQueue beginDependencyDelayedInjection() {
 		DelayedDependencyInjectionQueue queue = DELAYED_DEPENDENCY_INJECTION.get();
 		if (queue == null) {
@@ -522,6 +554,13 @@ public class Kernel {
 		return null;
 	}
 
+	/**
+	 * Calling this method instructs Kernel to end delaying dependency injection and inject all queued items.
+	 * @param queue
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws InvocationTargetException
+	 */
 	public void finishDependecyDelayedInjection(DelayedDependencyInjectionQueue queue)
 			throws IllegalAccessException, InstantiationException, InvocationTargetException {
 		if (log.isLoggable(Level.CONFIG)) {
@@ -538,6 +577,12 @@ public class Kernel {
 		}
 	}
 
+	/**
+	 * Change state of a bean (activate/deactivate).
+	 *
+	 * @param beanName name of a bean
+	 * @param value new state of a bean
+	 */
 	public void setBeanActive(String beanName, boolean value) {
 		BeanConfig beanConfig = dependencyManager.getBeanConfig(beanName);
 
@@ -598,14 +643,26 @@ public class Kernel {
 		}
 	}
 
+	/**
+	 * Force injection of nulls in all dependency injection fields of all beans if required bean for injections are not
+	 * available.
+	 * @param forceAllowNull
+	 */
 	public void setForceAllowNull(boolean forceAllowNull) {
 		this.forceAllowNull = forceAllowNull;
 	}
 
+	/**
+	 * Shutdown kernel.
+	 */
 	public void shutdown() {
 	    shutdown(null);
 	}
 
+	/**
+	 * Shutdown kernel with passed comparator to define order in which bean will be stopped.
+	 * @param shutdownOrder comparator defining order of beans for shutdown
+	 */
 	public void shutdown(Comparator<BeanConfig> shutdownOrder) {
 		initiateShutdown();
 
@@ -1426,6 +1483,10 @@ public class Kernel {
 
 	}
 
+	/**
+	 * Class used for delegating beans from one kernel to the other kernel.
+	 * It is used internally for exporting/linking bean to the other kernels.
+	 */
 	public static class DelegatedBeanConfig
 			extends BeanConfig {
 
@@ -1503,6 +1564,9 @@ public class Kernel {
 		}
 	}
 
+	/**
+	 * Class implements a queue for delayed dependency injection.
+	 */
 	public class DelayedDependencyInjectionQueue {
 
 		private final ArrayDeque<DelayedDependenciesInjection> queue = new ArrayDeque<>();

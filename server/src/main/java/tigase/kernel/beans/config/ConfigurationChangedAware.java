@@ -22,8 +22,17 @@ package tigase.kernel.beans.config;
 
 import java.util.Collection;
 
+/**
+ * Interface which should be implemented by beans which want to get notified when all configuration changes were applied
+ * and get full list of changed fields in a single place.
+ */
 public interface ConfigurationChangedAware {
 
+	/**
+	 * Method called when configuration was applied to bean.
+	 *
+	 * @param changedFields collection of field names which were changed
+	 */
 	void beanConfigurationChanged(Collection<String> changedFields);
 
 }

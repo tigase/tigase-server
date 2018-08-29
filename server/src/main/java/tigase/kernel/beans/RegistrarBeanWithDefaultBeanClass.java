@@ -26,6 +26,15 @@ package tigase.kernel.beans;
 public interface RegistrarBeanWithDefaultBeanClass
 		extends RegistrarBean {
 
+	/**
+	 * Returns default class for all bean which are defined using configuration as subbeans of bean implementing this
+	 * interface.
+	 *
+	 * This allows users to have more convenient configuration file without the need to specify class for each of
+	 * subbbeans if most of them will have the same class.
+	 *
+	 * @return
+	 */
 	Class<?> getDefaultBeanClass();
 
 }

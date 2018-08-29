@@ -46,5 +46,10 @@ public @interface ConfigField {
 	 */
 	String alias() default "";
 
+	/**
+	 * Allows config to be set on one of parent levels of configuration using alias.
+	 * If not set to <code>true</code>, it is possible to use alias only on the config level of the bean.
+	 * @return
+	 */
 	boolean allowAliasFromParent() default true;
 }

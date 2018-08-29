@@ -187,6 +187,10 @@ public class BeanConfig {
 		this.exportable = value;
 	}
 
+	/**
+	 * Returns information if bean in pinned. If bean is pinned it will not be unloaded even if no other bean uses it.
+	 * @return
+	 */
 	public boolean isPinned() {
 		return pinned;
 	}
@@ -195,6 +199,10 @@ public class BeanConfig {
 		this.pinned = pinned;
 	}
 
+	/**
+	 * Returns information about source of the bean registration (annotation, code, config, etc.)
+	 * @return
+	 */
 	public Source getSource() {
 		return source;
 	}
@@ -218,10 +226,14 @@ public class BeanConfig {
 		return sb.toString();
 	}
 
+	/**
+	 * List of beans registered by registration of this bean - related to <code>Bean::parent</code>.
+	 * @return
+	 */
 	public Set<BeanConfig> getRegisteredBeans() {
 		return registeredBeans;
 	}
-
+	
 	public void addRegisteredBean(BeanConfig beanConfig) {
 		registeredBeans.add(beanConfig);
 	}
@@ -239,6 +251,10 @@ public class BeanConfig {
 		return registeredBy.isEmpty();
 	}
 
+	/**
+	 * Set of beans which caused registration of this bean - related to <code>Bean::parent</code>.
+	 * @return
+	 */
 	public Set<BeanConfig> getRegisteredBy() {
 		return registeredBy;
 	}
