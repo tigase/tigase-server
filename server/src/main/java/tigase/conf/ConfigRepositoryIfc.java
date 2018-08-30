@@ -20,6 +20,7 @@
 
 package tigase.conf;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.comp.ComponentRepository;
 
 import java.util.Map;
@@ -40,19 +41,30 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Returns all known settings for the given component name.
+	 * @return map with configuration
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
 	Map<String, Object> getProperties(String compName) throws ConfigurationException;
 
+	/**
+	 * Get set of config items stored for component
+	 * @param compName
+	 * @return set of component items
+	 */
 	Set<ConfigItem> getItemsForComponent(String compName);
 
 	/**
 	 * Sets/adds properties for the given component name.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0")
 	void putProperties(String compName, Map<String, Object> props) throws ConfigurationException;
 
 	/**
 	 * Returns a configuration setting for a given component, node and key. If the configuration parameters is not
 	 * found, returns given default value.
+	 * @return value
 	 */
 	Object get(String compName, String node, String key, Object def);
 
@@ -63,11 +75,13 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Returns all component names for which there are some configuration settings available.
+	 * @return array of component names
 	 */
 	String[] getCompNames();
 
 	/**
 	 * Returns an array of all configuration keys for a given component and configuration node.
+	 * @return array of keys for component and node
 	 */
 	String[] getKeys(String compName, String node);
 

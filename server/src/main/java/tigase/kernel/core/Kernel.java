@@ -320,7 +320,7 @@ public class Kernel {
 	 * Returns instance of bean if instance exists already or calls passed function.
 	 *
 	 * @param beanName name of bean to be returned.
-	 * @oaram function function to call if instance does not exist.
+	 * @param function function to call if instance does not exist.
 	 * @param <T> type of bean to be returned.
 	 *
 	 * @return instance of bean if bean exists and there is only single instance of it or .
