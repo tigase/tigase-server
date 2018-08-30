@@ -58,7 +58,7 @@ public abstract class AbstractBeanConfigurator
 	 * set to passed class.
 	 *
 	 * @param kernel instance of the Kernel
-	 * @param requiredClass class to look for as <code>parent</code> property value of <code>@Bean</code annotation
+	 * @param requiredClass class to look for as <code>parent</code> property value of <code>@Bean</code> annotation
 	 * @return map of bean classes in for of "bean name" - "class"
 	 */
 	public static Map<String, Class<?>> getBeanClassesFromAnnotations(Kernel kernel, Class<?> requiredClass) {
