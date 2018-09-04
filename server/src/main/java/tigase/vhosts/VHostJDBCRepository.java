@@ -36,8 +36,10 @@ import tigase.xmpp.jid.BareJID;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * This implementation stores virtual domains in the UserRepository database. It loads initial settings and virtual
@@ -70,6 +72,8 @@ public class VHostJDBCRepository
 	private String[] pendingItemsToSetOld = null;
 	@ConfigField(desc = "Default VHost name", alias = "default-virtual-host")
 	private String defaultVHost;
+	@ConfigField(desc = "DNS address under which whole installation is accessible (ie. name pointing to all cluster nodes or to the load balancer)", alias = "installation-dns-address")
+	private String installationDnsAddress = null;
 
 	@Inject
 	private VHostItemDefaults vhostDefaults;
@@ -170,6 +174,60 @@ public class VHostJDBCRepository
 			return null;
 		}
 
+		if (installationDnsAddress != null) {
+			try {
+				String[] installationIpAddresses = DNSResolverFactory.getInstance().getHostIPs(installationDnsAddress);
+				if (installationIpAddresses == null) {
+					return "No DNS settings for load balancer DNS name: " + installationDnsAddress;
+				}
+
+				List<String> installationIpAddressesList = Arrays.asList(installationIpAddresses);
+
+				try {
+					DNSEntry[] entries = DNSResolverFactory.getInstance().getHostSRV_Entries(item.getKey());
+
+					if (entries != null) {
+						List<String> invalidAddresses = Arrays.stream(entries)
+								.flatMap(dnsEntry -> Arrays.stream(dnsEntry.getIps()))
+								.filter(ip -> !installationDnsAddress.equals(ip) && !installationIpAddressesList.contains(ip)).collect(
+										Collectors.toList());
+						if (invalidAddresses.isEmpty()) {
+							return null;
+						}
+
+						return "Incorrect DNS SRV settings" + Arrays.asList(entries) + ", invalid addresses: " +
+								invalidAddresses;
+					}
+				} catch (UnknownHostException ex) {
+
+					// Ignore, maybe simply IP address is set in DNS
+				}
+
+				// verify DNS records
+				try {
+					String[] ipAddress = DNSResolverFactory.getInstance().getHostIPs(item.getKey());
+
+					if (ipAddress != null) {
+						List<String> invalidAddresses = Arrays.stream(ipAddress)
+								.filter(ip -> !installationIpAddressesList.contains(ip))
+								.collect(Collectors.toList());
+						if (invalidAddresses.isEmpty()) {
+	                        return null;
+						}
+
+						return "Incorrect IP address: '" + ipAddress +
+								"' found in DNS for the given host: " + item.getKey();
+					} else {
+						return "No DNS settings found for given host: " + item.getKey();
+					}
+				} catch (UnknownHostException ex1) {
+					return "There is no DNS settings for given host: " + item.getKey();
+				}
+
+			} catch (UnknownHostException ex) {
+				return "There is no DNS settings for load balancer DNS name: " + installationDnsAddress;
+			}
+		}
 		// verify all SRV DNS records
 		try {
 			DNSEntry[] entries = DNSResolverFactory.getInstance().getHostSRV_Entries(item.getKey());
