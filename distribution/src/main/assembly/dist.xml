@@ -115,7 +115,11 @@
 				<include>mysql:mysql-connector-java</include>
 				<include>org.postgresql:postgresql</include>
 				<!-- other libraries-->
-				<include>org.codehaus.groovy:groovy-all</include>
+				<include>org.codehaus.groovy:groovy</include>
+				<include>org.codehaus.groovy:groovy-json</include>
+				<include>org.codehaus.groovy:groovy-jsr223</include>
+				<include>org.codehaus.groovy:groovy-templates</include>
+				<include>org.codehaus.groovy:groovy-xml</include>
 
 				<!--HTTP API component dependencies-->
 				<include>javax.servlet:javax.servlet-api</include>

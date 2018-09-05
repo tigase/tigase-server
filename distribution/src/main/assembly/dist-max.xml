@@ -172,7 +172,11 @@
 				<include>org.mongodb:mongo-java-driver</include>
 				
 				<!-- other libraries-->
-				<include>org.codehaus.groovy:groovy-all</include>
+				<include>org.codehaus.groovy:groovy</include>
+				<include>org.codehaus.groovy:groovy-json</include>
+				<include>org.codehaus.groovy:groovy-jsr223</include>
+				<include>org.codehaus.groovy:groovy-templates</include>
+				<include>org.codehaus.groovy:groovy-xml</include>
 				<include>openDMK:jdmkrt</include>
 				<include>org.hamcrest:hamcrest-core</include>
 				<include>org.slf4j:slf4j-api</include>
