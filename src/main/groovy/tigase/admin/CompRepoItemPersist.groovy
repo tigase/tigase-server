@@ -27,6 +27,7 @@ AS:Description: Persist item configuration
 AS:CommandId: comp-repo-item-persist
 AS:Component: vhost-man,ext,basic-conf
 AS:ComponentClass: tigase.server.ext.ComponentProtocol
+AS:Group: Configuration
 */
 
 package tigase.admin
