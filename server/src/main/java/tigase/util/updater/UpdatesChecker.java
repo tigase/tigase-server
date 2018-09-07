@@ -40,6 +40,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -75,6 +76,8 @@ public class UpdatesChecker
 
 	@Inject
 	private EventBus eventBus;
+	@Inject(nullAllowed = true)
+	private ArrayList<ProductInfoIfc> productInfos = new ArrayList<>();
 	private Version latestCheckedVersion = null;
 	@ConfigField(desc = "Enables sending XMPP notifications about new version")
 	private Boolean notificationsEnabled = true;
@@ -126,6 +129,19 @@ public class UpdatesChecker
 				connection.setRequestProperty("tigase-server-version", serverVersion.toString());
 			}
 
+			for (ProductInfoIfc productInfo : productInfos) {
+				String id = productInfo.getProductId();
+				String name = productInfo.getProductName();
+				String version = productInfo.getProductVersion();
+				if (version == null || !version.equals(
+						Optional.ofNullable(productInfo.getClass().getPackage().getImplementationVersion())
+								.orElse("0.0.0"))) {
+					continue;
+				}
+
+				// here we are add properties to the request
+			}
+
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			final Optional<Version> version = br.lines()
 //					.filter(line -> line.startsWith(FILE_START))
@@ -165,6 +181,14 @@ public class UpdatesChecker
 	private void fire(Object event) {
 		if (eventBus != null) {
 			eventBus.fire(event);
+		}
+	}
+
+	public void setProductInfos(ArrayList<ProductInfoIfc> productInfos) {
+		if (productInfos == null) {
+			this.productInfos = new ArrayList<>();
+		} else {
+			this.productInfos = productInfos;
 		}
 	}
 
@@ -223,5 +247,27 @@ public class UpdatesChecker
 		public Version getVersion() {
 			return version;
 		}
+	}
+
+	public interface ProductInfoIfc {
+
+		/**
+		 * Product identifier
+		 * @return
+		 */
+		String getProductId();
+
+		/**
+		 * Human readable product name
+		 * @return
+		 */
+		String getProductName();
+
+		/**
+		 * Version of the product
+		 * @return
+		 */
+		String getProductVersion();
+
 	}
 }
