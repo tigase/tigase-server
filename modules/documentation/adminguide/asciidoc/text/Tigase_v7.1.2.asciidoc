@@ -1,0 +1,19 @@
+[[tigase712]]
+= Tigase v7.1.2
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+== New Minor Features & Behavior Changes
+
+=== Input Buffer algorithm changed
+The algorithm charged with resizing the input buffer size has been reworked.  The new algorithm now takes less steps to shrink the input buffer to an appropriate size.  This has improved memory usage under operation, and leaves Tigase XMPP Server with a smaller footprint when idle.
+
+=== TLS Buffer size reduced
+As the input buffer has gotten smaller, so has the TLS buffer.  We are now able to utilized 2k per connection instead of an allocated 16k (and 2k thereafter).  This significantly reduces the amount of memory needed to run Tigase, and will benefit both high and low activity servers.
+
+== Fixes
+- link:https://projects.tigase.org/issues/5750[#5750] Statistics retrieved over XMPP now adhere to level rules.
+- link:https://projects.tigase.org/issues/5864[#5864] Fixed NPE on pre-bind Bosh session script.
+- link:https://projects.tigase.org/issues/6000[#6000] Fixed issue with dynamic rosters not being recognised while broadcasting presence.

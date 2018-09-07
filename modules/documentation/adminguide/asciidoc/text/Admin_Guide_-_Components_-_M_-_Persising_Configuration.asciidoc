@@ -1,0 +1,47 @@
+[[persistingComponentsItems]]
+= Persisting component's items configuration
+:author: Wojciech Kapcia
+:date: 2018-09-07
+:version: v1.0 September 2018
+
+Component configuration can be handled via file-based configuration file (`etc/init.properties`) or via admin ad-hoc commands (either via XMPP client or web AdminUI) and persisting it to database. However, file-based configuration wasn't persisted to repository if that was the only method to configure the server. Version 7.1.4 introduces a way to force persisting items configuration to repository by introducing `Persist item configuration` administrative command.
+
+It affects following components:
+
+* VHost Manager (responsible for handling domains available in your installation)
+* External Connection Component (responsible for handling outgoing and incomming connections from external components)
+* HTTP API - API keys (defines access keys to HTTP API endpoints)
+
+It's possible to execute this command in two ways:
+
+IMPORTANT: Next major version of Tigase XMPP Server - 8.0.0 - changes how configuration is handled focusing on ad-hoc configuration of *Items* therefore it's **essential** to persist configuration of repository items (external component connections, vhosts, http-api keys, etc…) before upgrading to version 8.0.0!
+
+== Persisting items using web AdminUI
+
+To persist items to repository using web AdminUI you should navigate to `http://<machine_hostname>:8080/admin/` url. Afterwards open group `Configuration` from the menu on the left. In the list of commands you should click on:
+
+* `Persist API keys items configuration` to store HTTP-API component's api-keys
+* `Persist item configuration` on all remaining components which configuration items should be saved.
+
+After correctly storing items a confirmation screen with `Operation successful` message should appear.
+
+== Persisting items using XMPP Client
+
+XMPP Client supporting service discovery and admin ad-hoc commands should be used. Each client implements user interface related to those functions slightly differently however general idea stays the same - to persist configuration to the database you should:
+
+* connect to the server using admin account (one which credentials match any of the JIDs listed in `--admins=` configuration line)
+* open Service Discovery window, which should list all available components
+* to store HTTP-API component's api-keys you should:
+  ** find `HTTP server integration module` component (it should has address `http.<VHost>`)
+  ** list available ad-hoc commands (either by double-clicking on it or selecting appropriate option from context menu)
+  ** select and execute `Persist API keys items configuration` command
+* to persist data of all remaining components:
+  ** find appropriate component:
+    *** `VHost Manager` (it should has address: `vhost-man@<VHost>`
+    *** `Configuration management` (it should has address: `basic-conf@<VHost>`
+    *** `External component` (it should has address: `ext@<VHost>`
+  ** list available ad-hoc commands for particular component (either by double-clicking on it or selecting appropriate option from context menu)
+  ** select and execute `Persist item configuration`
+
+After correctly storing items a confirmation screen with `Operation successful` message should appear.
+

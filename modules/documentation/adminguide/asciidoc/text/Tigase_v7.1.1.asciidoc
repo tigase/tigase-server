@@ -1,0 +1,21 @@
+[[tigase711]]
+= Tigase v7.1.1
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+== AMP plugin has had some updates
+Offline message retrieval has been slightly changed to use different methods.  If you are using the below configuration:
+[source,properties]
+-----
+sess-man/plugins-conf/http\://jabber.org/protocol/offline/amp-repo-class=tigase.archive.unified.db.JDBCFlexibleOfflineMessageRetrievalRepository
+sess-man/plugins-conf/amp/amp-repo-class=tigase.archive.unified.db.JDBCFlexibleOfflineMessageRetrievalRepository
+-----
+
+Replace it with these settings to use proper retrieval method.
+[source,properties]
+-----
+sess-man/plugins-conf/http\://jabber.org/protocol/offline/amp-repo-class=tigase.archive.unified.db.JDBCFlexibleOfflineMessageRetrievalRepositoryWithRecents
+sess-man/plugins-conf/amp/amp-repo-class=tigase.archive.unified.db.JDBCFlexibleOfflineMessageRetrievalRepositoryWithRecents
+-----

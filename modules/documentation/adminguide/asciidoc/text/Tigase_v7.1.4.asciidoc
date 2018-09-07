@@ -1,0 +1,18 @@
+[[tigase714]]
+= Tigase v7.1.4
+:author: Wojciech Kapcia
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+== New Minor Features & Behavior Changes
+
+- link:https://projects.tigase.org/issues/8061[#8061] allow manual storing persisting configuration items for selected components, please refer to <<persistingComponentsItems>> for more details
+
+IMPORTANT: It's essential to persist items before upgrading to Tigase XMPP Server 8.0.0!
+
+- Improve service reliability (applies to installations with enabled ACS clustering strategy, please see <<licenseserver>> for more details)
+
+== Fixes
+- link:https://projects.tigase.org/issues/8086[#8086] Improve detecting incorrect payload while configuring room affiliation/roles

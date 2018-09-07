@@ -206,8 +206,6 @@ The results will look quite similar to the XML results:
 }
 -----
 
-[we should take another approach, and use something more permanent, like add or delete a user]
-
 === Sending any XMPP Stanza
 XMPP messages or any other XMPP stanza can be sent using this API by sending HTTP POST request on http://localhost:8080/rest/stream/api-key=API_KEY with a serialized XMPP stanza as content, where API_KEY is the API key specified in the init.properties file.
 Each request needs to be authorized by sending a valid administrator JID and password as a user/password of BASIC HTTP authorization method.  The content of the HTTP request should be encoded in UTF-8 and +Content-Type+ should be set to application/xml.
