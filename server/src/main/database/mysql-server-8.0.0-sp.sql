@@ -369,14 +369,12 @@ begin
     declare _user_id_sha1 char(128);
     declare _username_sha1 char(128);
 
-    select sha1(lower(_user_id)), sha1(_username) into _user_id_sha1, _username_sha1;
-
-    select uid into _uid from tig_users where sha1_user_id = _user_id_sha1;
+    select uid into _uid from tig_users where sha1_user_id = sha1(lower(_user_id));
 
     if _uid is not null then
         start transaction;
             insert into tig_user_credentials (uid, username, username_sha1, mechanism, value)
-                values (_uid, _username, _username_sha1, _mechanism, _value)
+                values (_uid, _username, sha1(_username), _mechanism, _value)
                 on duplicate key update value = _value;
         commit;
     end if;
@@ -387,7 +385,6 @@ end //
 create procedure TigUserCredentials_Get(_user_id varchar(2049) CHARSET utf8, _username varchar(2049) CHARSET utf8)
 begin
     declare _user_id_sha1 char(128);
-    declare _username_sha1 char(128);
 
     select mechanism, value, account_status
     from tig_users u
@@ -403,15 +400,12 @@ create procedure TigUserCredential_Remove(_user_id varchar(2049) CHARSET utf8, _
 begin
     declare _uid bigint;
     declare _user_id_sha1 char(128);
-    declare _username_sha1 char(128);
 
-    select sha1(lower(_user_id)), sha1(_username) into _user_id_sha1, _username_sha1;
-
-    select uid into _uid from tig_users where sha1_user_id = _user_id_sha1;
+    select uid into _uid from tig_users where sha1_user_id = sha1(lower(_user_id));
 
     if _uid is not null then
         start transaction;
-            delete from tig_user_credentials where uid = _uid and username_sha1 = _username_sha1;
+            delete from tig_user_credentials where uid = _uid and username_sha1 = sha1(_username);
         commit;
     end if;
 end //
