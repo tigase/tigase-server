@@ -28,6 +28,7 @@ AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
 AS:Component: vhost-man,ext,ext-disco
 AS:ComponentClass: tigase.server.ext.ComponentProtocol
+AS:Group: Configuration
  */
 
 package tigase.admin

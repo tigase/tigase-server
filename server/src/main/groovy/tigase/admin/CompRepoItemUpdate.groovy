@@ -28,6 +28,7 @@ AS:Description: Update item configuration
 AS:CommandId: comp-repo-item-update
 AS:Component: vhost-man,ext,basic-conf,ext-disco
 AS:ComponentClass: tigase.server.ext.ComponentProtocol
+AS:Group: Configuration
  */
 
 package tigase.admin
