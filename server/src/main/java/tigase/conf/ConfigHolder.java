@@ -27,6 +27,7 @@ import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.ConnectionManager;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.bosh.BoshConnectionManager;
+import tigase.server.ext.CompRepoItem;
 import tigase.server.ext.ComponentProtocol;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.server.xmppsession.SessionManagerConfig;
@@ -473,7 +474,40 @@ public class ConfigHolder {
 				.filter(it -> ComponentProtocol.class.getName().equals(it.getClazzName())).forEach(it -> {
 					it.computeIfPresent("repository", (k,v) -> {
 						if (v instanceof Map) {
-							((Map)v).remove("items");
+							Object v1 = ((Map)v).remove("items");
+							if (v1 != null && v1 instanceof List) {
+								List<String> v2 = (List<String>) v1;
+								if (!v2.isEmpty()) {
+									OldConfigHolder.saveOldExternalComponentConfigItems(v2.toArray(new String[v2.size()]));
+								}
+							} else if (v1 instanceof Map) {
+								Map<String, Object> v2 = (Map<String, Object>) v1;
+								if (!v2.isEmpty()) {
+									String[] components = v2.entrySet().stream().map(e -> {
+										Map<String, Object> p = ((Map<String, Object>) e.getValue());
+										StringBuilder sb = new StringBuilder();
+										String[] parts = Stream.of(e.getKey(), p.get("password"),
+														 p.get(CompRepoItem.CONN_TYPE_ATTR),
+														 p.get(CompRepoItem.PORT_NO_ATTR),
+														 p.get(CompRepoItem.REMOTE_HOST_ATTR),
+														 p.get(CompRepoItem.PROTO_XMLNS_ATTR),
+														 p.get(CompRepoItem.LB_NAME_ATTR),
+														 p.get(CompRepoItem.SOCKET_ATTR))
+												.map(String::valueOf).toArray(x -> new String[x]);
+										for (String part : parts) {
+											if ("null".equals(part)) {
+												break;
+											}
+											if (sb.length() > 0) {
+												sb.append(":");
+											}
+											sb.append(part);
+										}
+										return sb.toString();
+									}).toArray(x -> new String[x]);
+									OldConfigHolder.saveOldExternalComponentConfigItems(components);
+								}
+							}
 						}
 						return v;
 					});

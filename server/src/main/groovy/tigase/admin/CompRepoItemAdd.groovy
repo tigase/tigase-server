@@ -27,7 +27,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
 AS:Component: vhost-man,ext,ext-disco
-AS:ComponentClass: tigase.server.ext.ComponentProtocol
+AS:ComponentClass: tigase.server.ext.ComponentProtocol,tigase.server.ext.ComponentProtocolManager
 AS:Group: Configuration
  */
 

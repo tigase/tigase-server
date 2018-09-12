@@ -21,8 +21,13 @@
 package tigase.server.ext;
 
 import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
+import tigase.net.ConnectionOpenListener;
 import tigase.net.ConnectionType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -49,9 +54,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "ext", parent = Kernel.class, active = false)
 public class ComponentProtocol
 		extends ConnectionManager<ComponentIOService>
-		implements ComponentProtocolHandler {
+		implements ComponentProtocolHandler, UnregisterAware, RepositoryChangeListenerIfc<CompRepoItem> {
 
 	public static final String AUTHENTICATION_TIMEOUT_PROP_KEY = "auth-timeout";
 
@@ -61,7 +67,7 @@ public class ComponentProtocol
 
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 
-	public static final String EXTCOMP_REPO_CLASS_PROP_VAL = "tigase.server.ext.CompDBRepository";
+	public static final String EXTCOMP_REPO_CLASS_PROP_VAL = "tigase.server.ext.ServerCompDBRepository";
 
 	public static final String EXTCOMP_REPO_CLASS_PROPERTY = "--extcomp-repo-class";
 
@@ -106,6 +112,7 @@ public class ComponentProtocol
 	private Map<String, StreamOpenHandler> streamOpenHandlers = new LinkedHashMap<String, StreamOpenHandler>();
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler = new UnknownXMLNSStreamOpenHandler();
 
+	private ConcurrentHashMap<String, List<ConnectionOpenListener>> activeConnections = new ConcurrentHashMap<>();
 
 	public ComponentProtocol() {
 		super();
@@ -273,6 +280,23 @@ public class ComponentProtocol
 	}
 
 	@Override
+	public void register(Kernel kernel) {
+		super.register(kernel);
+	//	this.kernel.getParent().setBeanActive("ext-man", true);
+	}
+
+	@Override
+	public void initialize() {
+		super.initialize();
+		//this.kernel.getParent().registerBean(ComponentProtocolManager.class).setActive(true).exec();
+	}
+
+	@Override
+	public void beforeUnregister() {
+	//	this.kernel.getParent().in
+	}
+
+	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
@@ -346,7 +370,7 @@ public class ComponentProtocol
 
 		// TODO: handle this somehow
 	}
-
+	
 	@Override
 	public void serviceStarted(ComponentIOService serv) {
 		super.serviceStarted(serv);
@@ -421,6 +445,11 @@ public class ComponentProtocol
 		return result;
 	}
 
+	public void setRepo(ComponentRepository<CompRepoItem> repo) {
+		this.repo = repo;
+		repo.addRepoChangeListener(this);
+	}
+
 	@Override
 	public void start() {
 		super.start();
@@ -428,47 +457,7 @@ public class ComponentProtocol
 		// Activate all connections for which parameters are defined in the
 		// repository
 		for (CompRepoItem repoItem : repo) {
-			log.log(Level.CONFIG, "Loaded repoItem: {0}", repoItem.toString());
-			if (repoItem.getPort() > 0) {
-				String[] remote_host = PORT_IFC_PROP_VAL;
-				String remote_domain = repoItem.getRemoteHost();
-
-				if (repoItem.getRemoteHost() != null) {
-					remote_host = repoItem.getRemoteHost().split(";");
-
-					// The first item on the list is always the remote domain name, if
-					// there are
-					// more entries, the rest is just addresses to connect to for this
-					// domain
-					remote_domain = remote_host[0];
-					if (remote_host.length > 1) {
-
-						// Remove the first entry as this is domain name, whereas the rest
-						// is the
-						// address to connect to.
-						String[] remote_host_copy = new String[remote_host.length - 1];
-
-						System.arraycopy(remote_host, 1, remote_host_copy, 0, remote_host_copy.length);
-						remote_host = remote_host_copy;
-					}
-				}
-				for (String r_host : remote_host) {
-					Map<String, Object> port_props = new LinkedHashMap<String, Object>();
-
-					port_props.put(PORT_KEY, repoItem.getPort());
-					if (repoItem.getDomain() != null) {
-						port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
-					}
-					port_props.put(PORT_REMOTE_HOST_PROP_KEY, remote_domain);
-					port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
-					port_props.put(PORT_SOCKET_PROP_KEY, repoItem.getSocket());
-					port_props.put(PORT_IFC_PROP_KEY, new String[]{r_host});
-					port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
-					port_props.put(REPO_ITEM_KEY, repoItem);
-					log.config("Starting connection: " + port_props);
-					addWaitingTask(port_props);
-				}
-			}
+			itemAdded(repoItem);
 		}
 
 	}
@@ -541,6 +530,73 @@ public class ComponentProtocol
 		return result == null ? null : new String[] { result };
 	}
 
+	@Override
+	public void itemAdded(CompRepoItem repoItem) {
+		if (repoItem.getPort() > 0) {
+			String[] remote_host = PORT_IFC_PROP_VAL;
+			String remote_domain = repoItem.getRemoteHost();
+
+			if (repoItem.getRemoteHost() != null) {
+				remote_host = repoItem.getRemoteHost().split(";");
+
+				// The first item on the list is always the remote domain name, if
+				// there are
+				// more entries, the rest is just addresses to connect to for this
+				// domain
+				remote_domain = remote_host[0];
+				if (remote_host.length > 1) {
+
+					// Remove the first entry as this is domain name, whereas the rest
+					// is the
+					// address to connect to.
+					String[] remote_host_copy = new String[remote_host.length - 1];
+
+					System.arraycopy(remote_host, 1, remote_host_copy, 0, remote_host_copy.length);
+					remote_host = remote_host_copy;
+				}
+			}
+
+			List<ConnectionOpenListener> listeners = new ArrayList<>();
+			for (String r_host : remote_host) {
+				Map<String, Object> port_props = new LinkedHashMap<String, Object>();
+
+				port_props.put(PORT_KEY, repoItem.getPort());
+				if (repoItem.getDomain() != null) {
+					port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
+				}
+				port_props.put(PORT_REMOTE_HOST_PROP_KEY, remote_domain);
+				port_props.put(ComponentIOService.HOSTNAME_KEY, remote_domain);
+				port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
+				port_props.put(PORT_SOCKET_PROP_KEY, repoItem.getSocket());
+				port_props.put(PORT_IFC_PROP_KEY, new String[]{r_host});
+				port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
+				port_props.put(REPO_ITEM_KEY, repoItem);
+				log.config("Starting connection: " + port_props);
+				ConnectionOpenListener connectionOpenListener = startService(port_props);
+				if (connectionOpenListener != null) {
+					listeners.add(connectionOpenListener);
+				}
+			}
+			activeConnections.put(repoItem.getKey(), listeners);
+		}
+	}
+
+	@Override
+	public void itemUpdated(CompRepoItem item) {
+		itemRemoved(item);
+		itemAdded(item);
+	}
+
+	@Override
+	public void itemRemoved(CompRepoItem item) {
+		List<ConnectionOpenListener> listeners = activeConnections.get(item.getKey());
+		if (listeners != null) {
+			for (ConnectionOpenListener listener : listeners) {
+				releaseListener(listener);
+			}
+		}
+	}
+	
 	@Override
 	protected String getDefTrafficThrottling() {
 		return "xmpp:25m:0:disc,bin:20000m:0:disc";

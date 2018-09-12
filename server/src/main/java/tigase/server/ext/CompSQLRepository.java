@@ -20,6 +20,7 @@
 
 package tigase.server.ext;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.beans.DataSourceBean;
 import tigase.db.comp.ComponentRepository;
@@ -48,6 +49,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Deprecated
+@TigaseDeprecated(since="8.0.0")
 public class CompSQLRepository
 		implements ComponentRepository<CompRepoItem>, DataSourceAware<DataRepository>, Initializable, UnregisterAware {
 

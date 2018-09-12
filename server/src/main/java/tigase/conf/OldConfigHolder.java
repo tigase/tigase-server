@@ -22,6 +22,7 @@ package tigase.conf;
 
 import tigase.db.RepositoryFactory;
 import tigase.kernel.beans.Bean;
+import tigase.server.ext.AbstractCompDBRepository;
 import tigase.server.ext.ComponentProtocol;
 import tigase.server.xmppsession.SessionManagerConfig;
 import tigase.util.reflection.ClassUtilBean;
@@ -29,10 +30,7 @@ import tigase.util.repository.DataTypes;
 import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -579,6 +577,11 @@ public class OldConfigHolder {
 							e.getValue().equals(ComponentProtocol.class.getCanonicalName()))
 					.map(e -> e.getKey().replace("/class", ""))
 					.findFirst();
+
+			extCmpName.ifPresent(cmpName -> {
+				String[] components = external.split(",");
+				saveOldExternalComponentConfigItems(components);
+			});
 			renameIfExists(props, ComponentProtocol.EXTCOMP_BIND_HOSTNAMES,
 						   ComponentProtocol.EXTCOMP_BIND_HOSTNAMES_PROP_KEY,
 						   value -> stringToListOfStrings(value.toString()));
@@ -730,6 +733,23 @@ public class OldConfigHolder {
 					}
 				}
 			}
+		}
+	}
+
+	public static void saveOldExternalComponentConfigItems(String[] components) {
+		File f = new File(AbstractCompDBRepository.ITEMS_IMPORT_FILE);
+		if (f.exists()) {
+			f.delete();
+		}
+		try (FileWriter writer = new FileWriter(f)) {
+			for (int i=0; i<components.length; i++) {
+				if (i > 0) {
+					writer.write('\n');
+				}
+				writer.write(components[i]);
+			}
+		} catch (IOException ex) {
+			// ignoring...
 		}
 	}
 

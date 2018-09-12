@@ -20,6 +20,7 @@
 
 package tigase.server.xmppcomponent;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -54,8 +55,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "ext-comp", parent = Kernel.class, active = true)
+@Bean(name = "ext-comp", parent = Kernel.class, active = false)
 @ConfigType({ConfigTypeEnum.ComponentMode})
+@Deprecated
+@TigaseDeprecated(since = "8.0.0")
 public class ComponentConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>>
 		implements XMPPService {

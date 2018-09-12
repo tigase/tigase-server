@@ -38,7 +38,7 @@ public abstract class CompRepoDefaults {
 	}
 
 	public static String[] getDefaultPropetyItems() {
-		return new String[]{"muc.domain.tld:passwd:listen:5277:accept"};
+		return null;
 	}
 
 	public static CompRepoItem getItemInstance() {

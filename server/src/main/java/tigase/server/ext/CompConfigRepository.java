@@ -20,6 +20,7 @@
 
 package tigase.server.ext;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
 
@@ -31,6 +32,8 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Deprecated
+@TigaseDeprecated(since="8.0.0")
 public class CompConfigRepository
 		extends ConfigRepository<CompRepoItem> {
 

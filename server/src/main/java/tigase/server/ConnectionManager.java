@@ -966,7 +966,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		pending_open.clear();
 	}
 
-	private ConnectionListenerImpl startService(Map<String, Object> port_props) {
+	protected ConnectionListenerImpl startService(Map<String, Object> port_props) {
 		if (log.isLoggable(Level.FINE)) {
 			log.log(Level.FINE, "Starting service: {0}", new Object[]{port_props});
 		}

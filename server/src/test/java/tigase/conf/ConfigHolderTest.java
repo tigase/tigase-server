@@ -22,6 +22,7 @@ package tigase.conf;
 import org.junit.Test;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.CmdAcl;
+import tigase.server.ext.AbstractCompDBRepository;
 import tigase.server.ext.ComponentProtocol;
 import tigase.xmpp.impl.roster.DynamicRosterTest;
 import tigase.xmpp.impl.roster.DynamicRosterTest123;
@@ -238,6 +239,8 @@ public class ConfigHolderTest {
 		assertNotNull(ext);
 		Map<String, Object> repo = (Map<String, Object>) ext.get("repository");
 		assertNull(repo);
+
+		new File(AbstractCompDBRepository.ITEMS_IMPORT_FILE).delete();
 	}
 
 

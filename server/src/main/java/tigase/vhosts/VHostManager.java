@@ -57,7 +57,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Bean(name = "vhost-man", parent = Kernel.class, active = true, exportable = true)
-@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode})
+@ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 public class VHostManager
 		extends AbstractComponentRegistrator<VHostListener>
 		implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
