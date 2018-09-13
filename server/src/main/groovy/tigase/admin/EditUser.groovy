@@ -52,7 +52,7 @@ def userJid = Command.getFieldValue(packet, JID)
 def userEmail = Command.getFieldValue(packet, EMAIL)
 
 if (userJid == null) {
-	def result = p.commandResult(Command.DataType.form);
+	def result = p.commandResult(Command.DataType.form)
 
 	//Command.addFieldValue(result, "FORM_TYPE", "", "hidden")
 	Command.addTitle(result, "Modifying a User")
@@ -64,7 +64,7 @@ if (userJid == null) {
 	return result
 }
 
-def result = null;
+def result = null
 try {
 	def bareJID = BareJID.bareJIDInstance(userJid)
 	if (isAllowedForDomain.apply(bareJID.getDomain())) {
@@ -72,7 +72,7 @@ try {
 		if (Command.getFieldValue(packet, "FORM_TYPE") == null ||
 				Command.getFieldValue(packet, "FORM_TYPE").isEmpty()) {
 			//if (Command.getFieldValue(packet, EMAIL) == null)
-			result = p.commandResult(Command.DataType.form);
+			result = p.commandResult(Command.DataType.form)
 
 			Command.addTitle(result, "Modifying a User")
 			Command.addInstructions(result, "Fill out this form to modify a user " + (userJid ?: ""))
@@ -84,29 +84,29 @@ try {
 								  "Email address")
 
 			Command.addCheckBoxField(result, "Account enabled",
-									 !auth_repo.getAccountStatus(bareJID) == AuthRepository.AccountStatus.active);
+									 auth_repo.getAccountStatus(bareJID) == AuthRepository.AccountStatus.active)
 //			-- add disabled/enabled? vcard? roster?
 		} else {
-			result = p.commandResult(Command.DataType.result);
-			user_repo.setData(bareJID, "email", userEmail);
-			Command.addTextField(result, "Note", "Operation successful");
+			result = p.commandResult(Command.DataType.result)
+			user_repo.setData(bareJID, "email", userEmail)
+			Command.addTextField(result, "Note", "Operation successful")
 			try {
 				auth_repo.setAccountStatus(bareJID, Command.getCheckBoxFieldValue(p,
 																				  "Account enabled") ? AuthRepository.AccountStatus.active :
-													AuthRepository.AccountStatus.disabled);
+													AuthRepository.AccountStatus.disabled)
 			} catch (TigaseDBException ex) {
 				Command.addTextField(result, "Warning",
 									 "Account state was not changed as it is not supported by used auth repository: " +
-											 ex.getMessage());
+											 ex.getMessage())
 			}
 		}
 	} else {
 		result = p.commandResult(Command.DataType.result)
-		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");
+		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.")
 	}
 } catch (TigaseDBException ex) {
 	result = p.commandResult(Command.DataType.result)
-	Command.addTextField(result, "Note", "Problem accessing database, user not added.");
+	Command.addTextField(result, "Note", "Problem accessing database, user not added.")
 }
 
 return result

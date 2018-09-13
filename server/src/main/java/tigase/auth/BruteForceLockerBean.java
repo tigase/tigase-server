@@ -278,7 +278,7 @@ public class BruteForceLockerBean
 		}
 
 		public boolean isJIDPresent() {
-			return jid != null && jid.equals(ANY);
+			return jid != null && !jid.equals(ANY);
 		}
 
 	}
