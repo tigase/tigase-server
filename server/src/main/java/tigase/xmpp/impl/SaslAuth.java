@@ -20,11 +20,13 @@
 
 package tigase.xmpp.impl;
 
-import tigase.auth.TigaseSaslProvider;
-import tigase.auth.XmppSaslException;
+import tigase.auth.*;
 import tigase.auth.XmppSaslException.SaslError;
+import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.SaslANONYMOUS;
+import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Command;
@@ -33,20 +35,14 @@ import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
 import tigase.xml.Element;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,7 +79,8 @@ public class SaslAuth
 	}
 
 	private final Map<String, Object> props = new HashMap<String, Object>();
-
+	@Inject
+	private BruteForceLockerBean bruteForceLocker;
 	@Inject
 	private TigaseSaslProvider saslProvider;
 
@@ -92,9 +89,54 @@ public class SaslAuth
 		return super.concurrentQueuesNo() * 4;
 	}
 
+	private Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.toString());
+
+		reply.setXMLNS(_XMLNS);
+		if (cdata != null) {
+			reply.setCData(cdata);
+		}
+
+		return reply;
+	}
+
+	private void disableUser(final XMPPResourceConnection session, final BareJID userJID) {
+		try {
+			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
+			if (status == AuthRepository.AccountStatus.active) {
+				log.info("Disabling user " + userJID);
+				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
+			}
+		} catch (TigaseDBException e) {
+			log.log(Level.WARNING, "Cannot check status or disable user!", e);
+		}
+	}
+
+	/**
+	 * Tries to extract BareJID of user who try to log in.
+	 */
+	private BareJID extractUserJid(final Exception e, XMPPResourceConnection session) {
+		BareJID jid = null;
+
+		if (e instanceof SaslInvalidLoginExcepion) {
+			String t = ((SaslInvalidLoginExcepion) e).getJid();
+			jid = t == null ? null : BareJID.bareJIDInstanceNS(t);
+		}
+
+		if (jid != null) {
+			jid = (BareJID) session.getSessionData(CallbackHandlerFactory.AUTH_JID);
+		}
+
+		return jid;
+	}
+
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	protected void onAuthFail(final XMPPResourceConnection session) {
+		session.removeSessionData(SASL_SERVER_KEY);
 	}
 
 	@Override
@@ -109,6 +151,7 @@ public class SaslAuth
 			if (session.getSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY) != null) {
 				return;
 			}
+			final String clientIp = BruteForceLockerBean.getClientIp(session);
 			if (session.isAuthorized()) {
 
 				// Multiple authentication attempts....
@@ -210,6 +253,12 @@ public class SaslAuth
 							jid = BareJID.bareJIDInstance(ss.getAuthorizationID(),
 														  session.getDomain().getVhost().getDomain());
 						}
+
+						if (bruteForceLocker.isEnabled(session) &&
+								!bruteForceLocker.isLoginAllowed(session, clientIp, jid)) {
+							throw new BruteForceLockerBean.LoginLockedException();
+						}
+
 						if (log.isLoggable(Level.FINE)) {
 							log.finest("Authorized as " + jid);
 						}
@@ -219,7 +268,7 @@ public class SaslAuth
 						try {
 							Boolean x = (Boolean) ss.getNegotiatedProperty(SaslANONYMOUS.IS_ANONYMOUS_PROPERTY);
 
-							anonymous = x != null && x.booleanValue();
+							anonymous = x != null && x;
 						} catch (Exception e) {
 							anonymous = false;
 						}
@@ -234,52 +283,80 @@ public class SaslAuth
 					} else {
 						throw new XmppSaslException(SaslError.malformed_request);
 					}
+				} catch (BruteForceLockerBean.LoginLockedException e) {
+					onAuthFail(session);
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Account locked by BruteForceLocker.");
+					}
+					sendNotAuthorized(SaslError.not_authorized, AbstractSasl.PASSWORD_NOT_VERIFIED_MSG, packet,
+									  results);
 				} catch (XmppSaslException e) {
+					saveIntoBruteForceLocker(session, e);
 					onAuthFail(session);
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "SASL unsuccessful", e);
 					}
-
-					String el;
-
-					if (e.getSaslErrorElementName() != null) {
-						el = "<" + e.getSaslErrorElementName() + "/>";
-					} else {
-						el = "<not-authorized/>";
-					}
-					if (e.getMessage() != null) {
-						el += "<text xml:lang='en'>" + e.getMessage() + "</text>";
-					}
-
-					Packet response = packet.swapFromTo(createReply(ElementType.failure, el), null, null);
-
-					response.setPriority(Priority.SYSTEM);
-					results.offer(response);
+					sendNotAuthorized(e.getSaslError(), e.getMessage(), packet, results);
 				} catch (SaslException e) {
+					saveIntoBruteForceLocker(session, e);
 					onAuthFail(session);
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "SASL unsuccessful", e);
 					}
-
-					Packet response = packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
-														null);
-
-					response.setPriority(Priority.SYSTEM);
-					results.offer(response);
+					sendNotAuthorized(SaslError.not_authorized, null, packet, results);
 				} catch (Exception e) {
 					onAuthFail(session);
 					if (log.isLoggable(Level.WARNING)) {
 						log.log(Level.WARNING, "Problem with SASL", e);
 					}
-
-					Packet response = packet.swapFromTo(createReply(ElementType.failure, "<temporary-auth-failure/>"),
-														null, null);
-
-					response.setPriority(Priority.SYSTEM);
-					results.offer(response);
+					sendNotAuthorized(SaslError.temporary_auth_failure, null, packet, results);
 				}
 			}
 		}
+	}
+
+	private void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
+		try {
+			if (bruteForceLocker.isEnabled(session)) {
+				final String clientIp = BruteForceLockerBean.getClientIp(session);
+				final BareJID userJid = extractUserJid(e, session);
+
+				if (clientIp == null && log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "There is no client IP. Cannot add entry to BruteForceLocker.");
+				}
+				if (userJid == null && log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "There is no user JID. Cannot add entry to BruteForceLocker.");
+				}
+
+				if (userJid != null && clientIp != null) {
+					bruteForceLocker.addInvalidLogin(session, clientIp, userJid);
+				}
+
+				if (bruteForceLocker.canUserBeDisabled(session, clientIp, userJid)) {
+					disableUser(session, userJid);
+				}
+
+			}
+		} catch (Throwable caught) {
+			log.log(Level.WARNING, "Cannot update BruteForceLocker", caught);
+		}
+	}
+
+	private void sendNotAuthorized(SaslError error, String message, Packet packet, Queue<Packet> results) {
+		String el;
+		if (error.getElementName() != null) {
+			el = "<" + error.getElementName() + "/>";
+		} else {
+			el = "<not-authorized/>";
+		}
+		if (message != null) {
+			el += "<text xml:lang='en'>" + message + "</text>";
+		}
+
+		Packet response = packet.swapFromTo(createReply(ElementType.failure, el), null, null);
+
+		response.setPriority(Priority.SYSTEM);
+		results.offer(response);
 	}
 
 	@Override
@@ -313,21 +390,6 @@ public class SaslAuth
 
 			return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
 		}
-	}
-
-	protected void onAuthFail(final XMPPResourceConnection session) {
-		session.removeSessionData(SASL_SERVER_KEY);
-	}
-
-	private Element createReply(final ElementType type, final String cdata) {
-		Element reply = new Element(type.toString());
-
-		reply.setXMLNS(_XMLNS);
-		if (cdata != null) {
-			reply.setCData(cdata);
-		}
-
-		return reply;
 	}
 
 }

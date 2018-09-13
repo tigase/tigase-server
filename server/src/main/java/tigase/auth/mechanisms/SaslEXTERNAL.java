@@ -19,6 +19,7 @@
  */
 package tigase.auth.mechanisms;
 
+import tigase.auth.SaslInvalidLoginExcepion;
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.callbacks.ValidateCertificateData;
@@ -33,7 +34,7 @@ public class SaslEXTERNAL
 		extends AbstractSasl {
 
 	public static final String PEER_CERTIFICATE_KEY = "PEER_CERTIFICATE_ENTRY_KEY";
-	private static final String MECHANISM = "EXTERNAL";
+	public static final String NAME = "EXTERNAL";
 
 	SaslEXTERNAL(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(props, callbackHandler);
@@ -58,7 +59,7 @@ public class SaslEXTERNAL
 		if (ac.isAuthorized() == true) {
 			authorizedId = ac.getAuthorizedID();
 		} else {
-			throw new XmppSaslException(SaslError.invalid_authzid);
+			throw new SaslInvalidLoginExcepion(SaslError.invalid_authzid,jid.toString());
 		}
 
 		complete = true;
@@ -73,16 +74,16 @@ public class SaslEXTERNAL
 
 	@Override
 	public String getMechanismName() {
-		return MECHANISM;
+		return NAME;
 	}
 
 	@Override
-	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
+	public byte[] unwrap(byte[] incoming, int offset, int len) {
 		return null;
 	}
 
 	@Override
-	public byte[] wrap(byte[] outgoing, int offset, int len) throws SaslException {
+	public byte[] wrap(byte[] outgoing, int offset, int len) {
 		return null;
 	}
 

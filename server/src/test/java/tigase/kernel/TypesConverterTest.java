@@ -41,6 +41,7 @@ public class TypesConverterTest {
 		b2,
 		c3
 	}
+
 	private HashMap<String, EnumSet<XT>> mapEnumSetField;
 
 	@Test
@@ -132,7 +133,7 @@ public class TypesConverterTest {
 											this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
 		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
 		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
-		
+
 		assertEquals(System.getProperty("java.home"),
 					 converter.convert(new ConfigReader.PropertyVariable("java.home", null), String.class));
 
@@ -159,7 +160,30 @@ public class TypesConverterTest {
 	}
 
 	@Test
-	public void testToString() throws Exception {
+	public void testParcelable() {
+		TypesConverter converter = new DefaultTypesConverter();
+
+		ParcelableObject o1 = new ParcelableObject();
+		o1.setIp("1.2.3.4");
+		o1.setTimestamp(123456);
+		o1.setJid(JID.jidInstanceNS("ala@ma.kota"));
+		o1.setDescription("blah bla, blah; blah... :-)");
+
+		String encoded = converter.toString(o1);
+		assertEquals("1.2.3.4,ala@ma.kota,123456,blah bla\\, blah; blah... :-)", encoded);
+
+		ParcelableObject o2 = converter.convert(encoded, ParcelableObject.class);
+
+		assertEquals(o1.getIp(), o2.getIp());
+		assertEquals(o1.getTimestamp(), o2.getTimestamp());
+		assertEquals(o1.getJid(), o2.getJid());
+		assertEquals(o1.getDescription(), o2.getDescription());
+		assertEquals(o1, o2);
+
+	}
+
+	@Test
+	public void testToString() {
 		TypesConverter converter = new DefaultTypesConverter();
 
 		Assert.assertEquals("a1", converter.toString(XT.a1));
@@ -193,5 +217,91 @@ public class TypesConverterTest {
 		compositeVariable.add('*', 60.0);
 		compositeVariable.add('*', 1000);
 		assertEquals("300000.0", converter.toString(compositeVariable));
+	}
+
+	static class ParcelableObject
+			implements TypesConverter.Parcelable {
+
+		private String description;
+		private String ip;
+		private JID jid;
+		private long timestamp;
+
+		@Override
+		public String[] encodeToStrings() {
+			return new String[]{ip, jid.toString(), Long.toString(timestamp), description};
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ParcelableObject that = (ParcelableObject) o;
+
+			if (timestamp != that.timestamp) {
+				return false;
+			}
+			if (!description.equals(that.description)) {
+				return false;
+			}
+			if (!ip.equals(that.ip)) {
+				return false;
+			}
+			return jid.equals(that.jid);
+		}
+
+		@Override
+		public void fillFromString(String[] encoded) {
+			this.ip = encoded[0];
+			this.jid = JID.jidInstanceNS(encoded[1]);
+			this.timestamp = Long.valueOf(encoded[2]);
+			this.description = encoded[3];
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
+		}
+
+		public String getIp() {
+			return ip;
+		}
+
+		public void setIp(String ip) {
+			this.ip = ip;
+		}
+
+		public JID getJid() {
+			return jid;
+		}
+
+		public void setJid(JID jid) {
+			this.jid = jid;
+		}
+
+		public long getTimestamp() {
+			return timestamp;
+		}
+
+		public void setTimestamp(long timestamp) {
+			this.timestamp = timestamp;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = description.hashCode();
+			result = 31 * result + ip.hashCode();
+			result = 31 * result + jid.hashCode();
+			result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
+			return result;
+		}
 	}
 }

@@ -20,6 +20,7 @@
 
 package tigase.xmpp.impl;
 
+import tigase.auth.BruteForceLockerBean;
 import tigase.auth.TigaseSaslProvider;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
@@ -67,9 +68,56 @@ public class JabberIqAuth
 	private static final Element[] FEATURES = {
 			new Element("auth", new String[]{"xmlns"}, new String[]{"http://jabber.org/features/iq-auth"})};
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-
+	@Inject
+	private BruteForceLockerBean bruteForceLocker;
 	@Inject
 	private TigaseSaslProvider saslProvider;
+
+	protected Authorization doAuth(NonAuthUserRepository repo, Map<String, Object> settings,
+								   XMPPResourceConnection session, BareJID user_id, String password, String digest) {
+		try {
+			CallbackHandler cbh = saslProvider.create("PLAIN", session, repo, settings);
+			final NameCallback nc = new NameCallback("Authentication identity", user_id.getLocalpart());
+			final VerifyPasswordCallback vpc = new VerifyPasswordCallback(password);
+			final String clientIp = BruteForceLockerBean.getClientIp(session);
+
+			cbh.handle(new Callback[]{nc});
+			try {
+				cbh.handle(new Callback[]{vpc});
+				if (vpc.isVerified()) {
+					if (!bruteForceLocker.isLoginAllowed(session, clientIp, user_id)) {
+						bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
+						return Authorization.NOT_AUTHORIZED;
+					}
+					session.authorizeJID(user_id, false);
+					return Authorization.AUTHORIZED;
+				}
+			} catch (UnsupportedCallbackException e) {
+				final PasswordCallback pc = new PasswordCallback("Password", false);
+
+				cbh.handle(new Callback[]{pc});
+
+				char[] p = pc.getPassword();
+
+				if ((p != null) && password.equals(new String(p))) {
+					if (!bruteForceLocker.isLoginAllowed(session, clientIp, user_id)) {
+						bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
+						return Authorization.NOT_AUTHORIZED;
+					}
+					session.authorizeJID(user_id, false);
+					return Authorization.AUTHORIZED;
+				}
+			}
+
+			bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
+
+			return Authorization.NOT_AUTHORIZED;
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Can't authenticate with given CallbackHandler", e);
+
+			return Authorization.INTERNAL_SERVER_ERROR;
+		}
+	}
 
 	@Override
 	public String id() {
@@ -245,42 +293,5 @@ public class JabberIqAuth
 		} else {
 			return FEATURES;
 		} // end of if (session.isAuthorized()) else
-	}
-
-	protected Authorization doAuth(NonAuthUserRepository repo, Map<String, Object> settings,
-								   XMPPResourceConnection session, BareJID user_id, String password, String digest) {
-		try {
-			CallbackHandler cbh = saslProvider.create("PLAIN", session, repo, settings);
-			final NameCallback nc = new NameCallback("Authentication identity", user_id.getLocalpart());
-			final VerifyPasswordCallback vpc = new VerifyPasswordCallback(password);
-
-			cbh.handle(new Callback[]{nc});
-			try {
-				cbh.handle(new Callback[]{vpc});
-				if (vpc.isVerified()) {
-					session.authorizeJID(user_id, false);
-
-					return Authorization.AUTHORIZED;
-				}
-			} catch (UnsupportedCallbackException e) {
-				final PasswordCallback pc = new PasswordCallback("Password", false);
-
-				cbh.handle(new Callback[]{pc});
-
-				char[] p = pc.getPassword();
-
-				if ((p != null) && password.equals(new String(p))) {
-					session.authorizeJID(user_id, false);
-
-					return Authorization.AUTHORIZED;
-				}
-			}
-
-			return Authorization.NOT_AUTHORIZED;
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Can't authenticate with given CallbackHandler", e);
-
-			return Authorization.INTERNAL_SERVER_ERROR;
-		}
 	}
 }    // JabberIqAuth

@@ -116,3 +116,19 @@ ws2s {
     }
 }
 -----
+
+[[bruteForcePrevention]]
+== Brute-force attack prevention
+
+
+
+[source,dsl]
+-----
+'sess-man' {
+    'brute-force-locker' {
+        enabled = true
+        lockAfterFails = 3
+        lockTimeSec = 60
+    }
+}
+-----

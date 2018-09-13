@@ -30,4 +30,12 @@ public interface TypesConverter {
 
 	String toString(final Object value);
 
+	interface Parcelable {
+
+		String[] encodeToStrings();
+
+		void fillFromString(String[] encoded);
+
+	}
+
 }

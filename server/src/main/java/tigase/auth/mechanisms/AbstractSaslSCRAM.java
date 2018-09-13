@@ -19,6 +19,7 @@
  */
 package tigase.auth.mechanisms;
 
+import tigase.auth.SaslInvalidLoginExcepion;
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.callbacks.*;
@@ -160,6 +161,40 @@ public abstract class AbstractSaslSCRAM
 		this.serverNonce = serverOnce;
 	}
 
+	protected byte[] calculateC() {
+		try {
+			final ByteArrayOutputStream result = new ByteArrayOutputStream();
+
+			result.write(this.cfmGs2header.getBytes());
+
+			if (this.requestedBindType == BindType.tls_unique ||
+					this.requestedBindType == BindType.tls_server_end_point) {
+				result.write(bindingData);
+			}
+			return result.toByteArray();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected abstract void checkRequestedBindType(BindType requestedBindType) throws SaslException;
+
+	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
+		final char t = cfmGs2header.charAt(0);
+
+		if ('n' == t) {
+			return BindType.n;
+		} else if ('y' == t) {
+			return BindType.y;
+		} else if ("tls-unique".equals(cfmCbname)) {
+			return BindType.tls_unique;
+		} else if ("tls-server-end-point".equals(cfmCbname)) {
+			return BindType.tls_server_end_point;
+		} else {
+			throw new SaslException("Unsupported channel binding type");
+		}
+	}
+
 	@Override
 	public byte[] evaluateResponse(byte[] response) throws SaslException {
 		try {
@@ -188,34 +223,6 @@ public abstract class AbstractSaslSCRAM
 	public String getMechanismName() {
 		return mechanismName;
 	}
-
-	@Override
-	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
-		return null;
-	}
-
-	@Override
-	public byte[] wrap(byte[] outgoing, int offset, int len) throws SaslException {
-		return null;
-	}
-
-	protected byte[] calculateC() {
-		try {
-			final ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-			result.write(this.cfmGs2header.getBytes());
-
-			if (this.requestedBindType == BindType.tls_unique ||
-					this.requestedBindType == BindType.tls_server_end_point) {
-				result.write(bindingData);
-			}
-			return result.toByteArray();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected abstract void checkRequestedBindType(BindType requestedBindType) throws SaslException;
 
 	protected byte[] h(byte[] data) throws NoSuchAlgorithmException {
 		MessageDigest digest = MessageDigest.getInstance(algorithm);
@@ -308,11 +315,11 @@ public abstract class AbstractSaslSCRAM
 				log.log(Level.FINEST, "Channel bindings does not match. expected: {0}; received: {1}",
 						new Object[]{calculatedCb, clmCb});
 			}
-			throw new XmppSaslException(SaslError.not_authorized, "Channel bindings does not match");
+			throw new SaslInvalidLoginExcepion(SaslError.not_authorized, cfmAuthzid, "Channel bindings does not match");
 		}
 
 		if (!clmNonce.equals(sfmNonce)) {
-			throw new XmppSaslException(SaslError.not_authorized, "Wrong nonce");
+			throw new SaslInvalidLoginExcepion(SaslError.not_authorized, cfmAuthzid, "Wrong nonce");
 		}
 
 		final String authMessage = cfmBareMessage + "," + sfmMessage + "," + clmWithoutProof;
@@ -323,7 +330,7 @@ public abstract class AbstractSaslSCRAM
 		boolean proofMatch = Arrays.equals(clientProof, dcp);
 
 		if (proofMatch == false) {
-			throw new XmppSaslException(SaslError.not_authorized, "Password not verified");
+			throw new SaslInvalidLoginExcepion(SaslError.not_authorized, cfmAuthzid, PASSWORD_NOT_VERIFIED_MSG);
 		}
 
 		final AuthorizeCallback ac = new AuthorizeCallback(cfmUsername, cfmAuthzid);
@@ -331,8 +338,8 @@ public abstract class AbstractSaslSCRAM
 		if (ac.isAuthorized() == true) {
 			authorizedId = ac.getAuthorizedID();
 		} else {
-			throw new XmppSaslException(SaslError.invalid_authzid,
-										"SCRAM: " + cfmAuthzid + " is not authorized to act as " + cfmAuthzid);
+			throw new SaslInvalidLoginExcepion(SaslError.invalid_authzid, cfmAuthzid,
+											   "SCRAM: " + cfmAuthzid + " is not authorized to act as " + cfmAuthzid);
 		}
 
 		byte[] serverKey = hmac(key(saltedPassword), serverKeyData);
@@ -345,39 +352,6 @@ public abstract class AbstractSaslSCRAM
 		return serverStringMessage.toString().getBytes();
 	}
 
-	protected void validateBindingsData(BindType requestedBindType, byte[] bindingData) throws SaslException {
-		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
-			throw new RuntimeException("Binding data not found!");
-		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
-			throw new RuntimeException("Binding data not found!");
-		}
-	}
-
-	protected byte[] xor(final byte[] a, final byte[] b) {
-		final int l = a.length;
-		byte[] r = new byte[l];
-		for (int i = 0; i < l; i++) {
-			r[i] = (byte) (a[i] ^ b[i]);
-		}
-		return r;
-	}
-
-	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
-		final char t = cfmGs2header.charAt(0);
-
-		if ('n' == t) {
-			return BindType.n;
-		} else if ('y' == t) {
-			return BindType.y;
-		} else if ("tls-unique".equals(cfmCbname)) {
-			return BindType.tls_unique;
-		} else if ("tls-server-end-point".equals(cfmCbname)) {
-			return BindType.tls_server_end_point;
-		} else {
-			throw new SaslException("Unsupported channel binding type");
-		}
-	}
-
 	private String randomString() {
 		final int length = 20;
 		final int x = ALPHABET.length();
@@ -387,6 +361,33 @@ public abstract class AbstractSaslSCRAM
 			buffer[i] = ALPHABET.charAt(r);
 		}
 		return new String(buffer);
+	}
+
+	@Override
+	public byte[] unwrap(byte[] incoming, int offset, int len) {
+		return null;
+	}
+
+	protected void validateBindingsData(BindType requestedBindType, byte[] bindingData) {
+		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		}
+	}
+
+	@Override
+	public byte[] wrap(byte[] outgoing, int offset, int len) {
+		return null;
+	}
+
+	protected byte[] xor(final byte[] a, final byte[] b) {
+		final int l = a.length;
+		byte[] r = new byte[l];
+		for (int i = 0; i < l; i++) {
+			r[i] = (byte) (a[i] ^ b[i]);
+		}
+		return r;
 	}
 
 	private enum Step {

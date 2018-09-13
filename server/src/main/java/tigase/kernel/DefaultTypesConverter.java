@@ -51,7 +51,7 @@ public class DefaultTypesConverter
 
 	private final static String regex = "(?<!\\\\)" + Pattern.quote(",");
 
-	private static String escape(String input) {
+	public static String escape(String input) {
 		if (input != null) {
 			return XMLUtils.translateAll(input, decoded, encoded);
 		} else {
@@ -59,7 +59,7 @@ public class DefaultTypesConverter
 		}
 	}
 
-	private static String unescape(String input) {
+	public static String unescape(String input) {
 		if (input != null) {
 			return XMLUtils.translateAll(input, encoded_1, decoded_1);
 		} else {
@@ -224,6 +224,15 @@ public class DefaultTypesConverter
 					}
 					return (T) result;
 				}
+			} else if (Parcelable.class.isAssignableFrom(expectedType)) {
+				try {
+					T obj = expectedType.newInstance();
+					String[] v = convert(value, String[].class);
+					((Parcelable) obj).fillFromString(v);
+					return obj;
+				} catch (InstantiationException | IllegalAccessException ex) {
+					throw new RuntimeException("Unsupported conversion (parcel) to " + expectedType, ex);
+				}
 			} else if (EnumSet.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType) {
 				ParameterizedType pt = (ParameterizedType) genericType;
 				Type[] actualTypes = pt.getActualTypeArguments();
@@ -329,6 +338,10 @@ public class DefaultTypesConverter
 		}
 	}
 
+	protected <T> T customConversion(final Object value, final Class<T> expectedType, Type genericType) {
+		return null;
+	}
+
 	/**
 	 * Converts object to String.
 	 *
@@ -340,7 +353,9 @@ public class DefaultTypesConverter
 		if (value == null) {
 			return null;
 		}
-		if (value instanceof Class<?>) {
+		if (value instanceof Parcelable) {
+			return toString(((Parcelable) value).encodeToStrings());
+		} else if (value instanceof Class<?>) {
 			return ((Class<?>) value).getName();
 		} else if (value.getClass().isEnum()) {
 			return ((Enum) value).name();
@@ -371,10 +386,6 @@ public class DefaultTypesConverter
 		} else {
 			return value.toString();
 		}
-	}
-
-	protected <T> T customConversion(final Object value, final Class<T> expectedType, Type genericType) {
-		return null;
 	}
 
 }

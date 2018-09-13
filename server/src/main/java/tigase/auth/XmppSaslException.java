@@ -27,7 +27,7 @@ public class XmppSaslException
 
 	private static final long serialVersionUID = 1L;
 
-	public static enum SaslError {
+	public enum SaslError {
 		/**
 		 * The receiving entity acknowledges that the authentication handshake has been aborted by the initiating
 		 * entity.
@@ -103,6 +103,10 @@ public class XmppSaslException
 	public XmppSaslException(SaslError saslError, String detail) {
 		super(detail);
 		this.saslError = saslError;
+	}
+
+	public SaslError getSaslError() {
+		return saslError;
 	}
 
 	public String getSaslErrorElementName() {

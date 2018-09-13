@@ -50,11 +50,11 @@ public class TigaseSaslServerFactory
 				return new SaslSCRAMSha256(props, callbackHandler);
 			case SaslSCRAMSha256Plus.NAME:
 				return new SaslSCRAMSha256Plus(props, callbackHandler);
-			case "PLAIN":
+			case SaslPLAIN.NAME:
 				return new SaslPLAIN(props, callbackHandler);
-			case "ANONYMOUS":
+			case SaslANONYMOUS.NAME:
 				return new SaslANONYMOUS(props, callbackHandler);
-			case "EXTERNAL":
+			case SaslEXTERNAL.NAME:
 				return new SaslEXTERNAL(props, callbackHandler);
 			default:
 				throw new SaslException("Mechanism not supported yet.");

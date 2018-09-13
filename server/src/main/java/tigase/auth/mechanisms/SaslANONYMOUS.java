@@ -37,8 +37,7 @@ public class SaslANONYMOUS
 		extends AbstractSasl {
 
 	public static final String IS_ANONYMOUS_PROPERTY = "IS_ANONYMOUS";
-
-	private static final String MECHANISM = "ANONYMOUS";
+	public static final String NAME = "ANONYMOUS";
 
 	SaslANONYMOUS(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(props, callbackHandler);
@@ -68,16 +67,16 @@ public class SaslANONYMOUS
 
 	@Override
 	public String getMechanismName() {
-		return MECHANISM;
+		return NAME;
 	}
 
 	@Override
-	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
+	public byte[] unwrap(byte[] incoming, int offset, int len) {
 		return null;
 	}
 
 	@Override
-	public byte[] wrap(byte[] outgoing, int offset, int len) throws SaslException {
+	public byte[] wrap(byte[] outgoing, int offset, int len) {
 		return null;
 	}
 

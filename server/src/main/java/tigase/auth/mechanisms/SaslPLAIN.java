@@ -19,6 +19,7 @@
  */
 package tigase.auth.mechanisms;
 
+import tigase.auth.SaslInvalidLoginExcepion;
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.callbacks.AuthorizationIdCallback;
@@ -38,7 +39,7 @@ import java.util.Map;
 public class SaslPLAIN
 		extends AbstractSasl {
 
-	private static final String MECHANISM = "PLAIN";
+	public static final String NAME = "PLAIN";
 
 	SaslPLAIN(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(props, callbackHandler);
@@ -81,7 +82,7 @@ public class SaslPLAIN
 		handleCallbacks(nc, ai, vpc);
 
 		if (vpc.isVerified() == false) {
-			throw new XmppSaslException(SaslError.not_authorized, "Password not verified");
+			throw new SaslInvalidLoginExcepion(SaslError.not_authorized, nc.getName(), PASSWORD_NOT_VERIFIED_MSG);
 		}
 
 		final String authorizationJID = ai.getAuthzId() == null ? nc.getName() : ai.getAuthzId();
@@ -92,8 +93,9 @@ public class SaslPLAIN
 		if (ac.isAuthorized() == true) {
 			authorizedId = ac.getAuthorizedID();
 		} else {
-			throw new XmppSaslException(SaslError.invalid_authzid,
-										"PLAIN: " + authcid + " is not authorized to act as " + authorizationJID);
+			throw new SaslInvalidLoginExcepion(SaslError.invalid_authzid, nc.getName(),
+											   "PLAIN: " + authcid + " is not authorized to act as " +
+													   authorizationJID);
 		}
 
 		complete = true;
@@ -108,16 +110,16 @@ public class SaslPLAIN
 
 	@Override
 	public String getMechanismName() {
-		return MECHANISM;
+		return NAME;
 	}
 
 	@Override
-	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
+	public byte[] unwrap(byte[] incoming, int offset, int len) {
 		return null;
 	}
 
 	@Override
-	public byte[] wrap(byte[] outgoing, int offset, int len) throws SaslException {
+	public byte[] wrap(byte[] outgoing, int offset, int len) {
 		return null;
 	}
 

@@ -34,6 +34,7 @@ public abstract class AbstractSasl
 		implements SaslServer {
 
 	public static final String SASL_STRICT_MODE_KEY = "sasl-strict";
+	public static String PASSWORD_NOT_VERIFIED_MSG = "Password not verified";
 	protected final CallbackHandler callbackHandler;
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	protected final Map<String, Object> negotiatedProperty = new HashMap<String, Object>();
@@ -56,7 +57,7 @@ public abstract class AbstractSasl
 	}
 
 	@Override
-	public void dispose() throws SaslException {
+	public void dispose() {
 		this.authorizedId = null;
 	}
 
@@ -68,11 +69,6 @@ public abstract class AbstractSasl
 		return negotiatedProperty.get(propName);
 	}
 
-	@Override
-	public boolean isComplete() {
-		return complete;
-	}
-
 	protected void handleCallbacks(Callback... callbacks) throws SaslException {
 		try {
 			callbackHandler.handle(callbacks);
@@ -81,6 +77,11 @@ public abstract class AbstractSasl
 		} catch (UnsupportedCallbackException e) {
 			throw new SaslException("Callback not supported by handler", e);
 		}
+	}
+
+	@Override
+	public boolean isComplete() {
+		return complete;
 	}
 
 	protected String[] split(final byte[] byteArray, final String defaultValue) {
