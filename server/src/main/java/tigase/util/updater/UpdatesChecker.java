@@ -41,15 +41,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Describe class UpdatesChecker here.
@@ -62,51 +61,83 @@ import java.util.logging.Logger;
 public class UpdatesChecker
 		extends ScheduledTask {
 
+	public static final String VERSION_REQUEST_KEY = "tigase-server-version";
+	public static final String PRODUCTS_REQUEST_KEY = "products";
+
 	private static final Logger log = Logger.getLogger(UpdatesChecker.class.getName());
 	private static final String VERSION_URL = "http://update.tigase.net/check/";
-	private static Version serverVersion = null;
 
-	static {
-		try {
-			serverVersion = Version.of(XMPPServer.getImplementationVersion());
-		} catch (IllegalArgumentException e) {
-			log.log(Level.WARNING, "Problem obtaining current version information");
-		}
-	}
+	private final Version serverVersion;
 
 	@Inject
 	private EventBus eventBus;
-	@Inject(nullAllowed = true)
-	private ArrayList<ProductInfoIfc> productInfos = new ArrayList<>();
 	private Version latestCheckedVersion = null;
 	@ConfigField(desc = "Enables sending XMPP notifications about new version")
 	private Boolean notificationsEnabled = true;
+	@Inject(nullAllowed = true)
+	private ArrayList<ProductInfoIfc> productInfos = new ArrayList<>();
 	@ConfigField(desc = "List of receivers JIDs", alias = "admins")
 	private ConcurrentSkipListSet<BareJID> receivers = new ConcurrentSkipListSet<BareJID>();
 
-	public static void main(String[] args) throws InterruptedException {
+	private static Version getVersion(String version) {
+		try {
+			return Version.of(version);
+		} catch (IllegalArgumentException e) {
+			log.log(Level.FINE, "Error parsing version from server");
+			return null;
+		}
+	}
 
-		Logger log = Logger.getLogger(UpdatesChecker.class.getName());
-		ConsoleHandler ch = new ConsoleHandler();
-		ch.setLevel(Level.ALL);
-		log.addHandler(ch);
-		log.setLevel(Level.ALL);
+	public static Optional<Version> retrieveCurrentVersionFromServer(Version currentVersion,
+																	 List<ProductInfoIfc> products, String url,
+																	 int timeoutInSeconds) {
 
-		final UpdatesChecker checker = new UpdatesChecker();
+		Objects.nonNull(currentVersion);
+		Objects.nonNull(url);
 
-		final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-		executorService.schedule(checker, 1, TimeUnit.SECONDS);
+		try {
+			final URL u = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) u.openConnection();
 
-		executorService.shutdown();
-		executorService.awaitTermination(15, TimeUnit.SECONDS);
-		checker.cancel();
+			connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(timeoutInSeconds));
+			connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(timeoutInSeconds));
 
-		System.exit(0);
+			connection.setRequestProperty(VERSION_REQUEST_KEY, currentVersion.toString());
 
+			if (products != null && !products.isEmpty()) {
+				String requestProducts = products.stream()
+						.filter(productInfoIfc -> productInfoIfc.getProductVersion().isPresent())
+						.map(pi -> String.join(":", pi.getProductId(), pi.getProductVersion().get()))
+						.collect(Collectors.joining(";"));
+				connection.setRequestProperty(PRODUCTS_REQUEST_KEY, requestProducts);
+			}
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+			return br.lines()
+					.map(UpdatesChecker::getVersion)
+					.filter(Objects::nonNull)
+					.peek(System.out::println)
+					.filter(e -> e.compareTo(currentVersion) > 0)
+					.findFirst();
+
+		} catch (IOException e) {
+			log.log(Level.WARNING, "Can not check updates for URL: " + url, e);
+		}
+
+		return Optional.empty();
 	}
 
 	public UpdatesChecker() {
 		super(Duration.ofDays(7), Duration.ofDays(7));
+		Version version;
+		try {
+			version = Version.of(XMPPServer.getImplementationVersion());
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING, "Problem obtaining current version information");
+			version = Version.ZERO;
+		}
+		serverVersion = version;
 	}
 
 	@Override
@@ -119,69 +150,9 @@ public class UpdatesChecker
 
 	@Override
 	public void run() {
-		try {
-			final URL url = new URL(VERSION_URL);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-			connection.setConnectTimeout(1000 * 60);
-			connection.setReadTimeout(1000 * 60);
-			if (null != serverVersion) {
-				connection.setRequestProperty("tigase-server-version", serverVersion.toString());
-			}
-
-			for (ProductInfoIfc productInfo : productInfos) {
-				String id = productInfo.getProductId();
-				String name = productInfo.getProductName();
-				String version = productInfo.getProductVersion();
-				if (version == null || !version.equals(
-						Optional.ofNullable(productInfo.getClass().getPackage().getImplementationVersion())
-								.orElse("0.0.0"))) {
-					continue;
-				}
-
-				// here we are add properties to the request
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			final Optional<Version> version = br.lines()
-//					.filter(line -> line.startsWith(FILE_START))
-					.map(this::getVersion).filter(Objects::nonNull)
-//					.filter(e -> !serverVersion.isZero() && e.compareTo(serverVersion) > 0)
-					.filter(e -> e.compareTo(serverVersion) > 0).findFirst();
-
-			version.ifPresent(v -> {
-				log.log(Level.CONFIG, "Update available: " + v + " (current version: " + serverVersion + ")");
-
-				if (notificationsEnabled && isNewerVersion(v)) {
-					receivers.stream()
-							.filter(addr -> !addr.toString().contains("{clusternode}"))
-							.filter(addr -> !component.getNodesConnectedWithLocal()
-									.contains(JID.jidInstanceNS(addr.getDomain())))
-							.map(admin -> prepareMessage(v, admin))
-							.forEach(p -> component.addPacket(p));
-				}
-
-				fire(new UpdatedVersionDiscovered(v));
-			});
-
-		} catch (IOException e) {
-			log.log(Level.WARNING, "Can not check updates for URL: " + VERSION_URL, e);
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Unknown exception for: " + VERSION_URL, e);
-		}
-	}
-
-	@HandleEvent
-	protected void onUpdatedVersionDiscovered(UpdatesChecker.UpdatedVersionDiscovered event) {
-		if ((event.getVersion() != null) && isNewerVersion(event.getVersion())) {
-			log.log(Level.CONFIG, "New version updated from cluster");
-		}
-	}
-
-	private void fire(Object event) {
-		if (eventBus != null) {
-			eventBus.fire(event);
-		}
+		final Optional<Version> version;
+		version = retrieveCurrentVersionFromServer(serverVersion, productInfos, VERSION_URL, 60);
+		version.ifPresent(this::sendNewVersionNotification);
 	}
 
 	public void setProductInfos(ArrayList<ProductInfoIfc> productInfos) {
@@ -192,12 +163,31 @@ public class UpdatesChecker
 		}
 	}
 
-	private Version getVersion(String version) {
-		try {
-			return Version.of(version);
-		} catch (IllegalArgumentException e) {
-			log.log(Level.FINE, "Error parsing version from server");
-			return null;
+	@HandleEvent
+	protected void onUpdatedVersionDiscovered(UpdatesChecker.UpdatedVersionDiscovered event) {
+		if ((event.getVersion() != null) && isNewerVersion(event.getVersion())) {
+			log.log(Level.CONFIG, "New version updated from cluster");
+		}
+	}
+
+	private void sendNewVersionNotification(Version v) {
+		log.log(Level.CONFIG, "Update available: " + v + " (current version: " + serverVersion + ")");
+
+		if (notificationsEnabled && isNewerVersion(v)) {
+			receivers.stream()
+					.filter(addr -> !addr.toString().contains("{clusternode}"))
+					.filter(addr -> !component.getNodesConnectedWithLocal()
+							.contains(JID.jidInstanceNS(addr.getDomain())))
+					.map(admin -> prepareMessage(v, admin))
+					.forEach(p -> component.addPacket(p));
+		}
+
+		fire(new UpdatedVersionDiscovered(v));
+	}
+
+	private void fire(Object event) {
+		if (eventBus != null) {
+			eventBus.fire(event);
 		}
 	}
 
@@ -236,6 +226,26 @@ public class UpdatesChecker
 		return Packet.packetInstance(message, sender, JID.jidInstance(jid));
 	}
 
+	public interface ProductInfoIfc {
+
+		/**
+		 * Product identifier
+		 */
+		String getProductId();
+
+		/**
+		 * Human readable product name
+		 */
+		String getProductName();
+
+		/**
+		 * Version of the product
+		 */
+		default Optional<String> getProductVersion() {
+			return Optional.ofNullable(this.getClass().getPackage().getImplementationVersion());
+		}
+	}
+
 	public static class UpdatedVersionDiscovered {
 
 		private final Version version;
@@ -247,27 +257,5 @@ public class UpdatesChecker
 		public Version getVersion() {
 			return version;
 		}
-	}
-
-	public interface ProductInfoIfc {
-
-		/**
-		 * Product identifier
-		 * @return
-		 */
-		String getProductId();
-
-		/**
-		 * Human readable product name
-		 * @return
-		 */
-		String getProductName();
-
-		/**
-		 * Version of the product
-		 * @return
-		 */
-		String getProductVersion();
-
 	}
 }
