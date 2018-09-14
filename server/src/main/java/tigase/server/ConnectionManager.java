@@ -927,6 +927,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	protected void releaseListener(ConnectionOpenListener toStop) {
+		toStop.release();
 		pending_open.remove(toStop);
 		connectThread.removeConnectionOpenListener(toStop);
 	}
@@ -1302,6 +1303,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		public long getNewConnectionsThrottling() {
 			return (Long) port_props.getOrDefault(PORT_NEW_CONNECTIONS_THROTTLING_KEY,
 												  ConnectionOpenThread.def_5222_throttling);
+		}
+
+		@Override
+		public void release() {
+			port_props.remove(MAX_RECONNECTS_PROP_KEY);
 		}
 	}
 

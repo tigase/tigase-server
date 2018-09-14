@@ -72,5 +72,7 @@ public interface ConnectionOpenListener {
 	default long getNewConnectionsThrottling() {
 		return ConnectionOpenThread.def_5222_throttling;
 	}
+
+	default void release() {}
 }    // ConnectionOpenListener
 
