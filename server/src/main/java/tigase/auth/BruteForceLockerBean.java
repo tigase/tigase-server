@@ -151,7 +151,7 @@ public class BruteForceLockerBean
 	}
 
 	final Key createKey(XMPPResourceConnection session, String ip, BareJID jid) {
-		final Mode mode = valueOf(session.getDomain().getData(LOCK_MODE_KEY));
+		final Mode mode = session == null ? Mode.IpJid : valueOf(session.getDomain().getData(LOCK_MODE_KEY));
 		return createKey(mode, session, ip, jid);
 	}
 
