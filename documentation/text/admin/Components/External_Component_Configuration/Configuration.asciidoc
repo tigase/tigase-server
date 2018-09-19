@@ -9,7 +9,7 @@
 
 As for all Tigase components you can load and configure external components via the `config.tdsl` file described in details in the xref:dslConfig[DSL configuration] section. This document describes how to enable the component and set the initial configuration to accept or initiate connections for an external component.
 
-First thing to do is to specify the component class and the component name which must be unique within the Tigase installation. The most commonly name used is `ext` and the class is `tigase.server.ext.ComponentProtocol` which does not need to be specified.
+First thing to do is to specify the component class and the component name which must be unique within the Tigase installation. The most commonly name used is `ext` and the class is `tigase.server.ext.ComponentProtocol` (class doesn't have to be specified when using default name).
 
 The following line in the `config.tdsl` will load the component during the server startup time:
 
@@ -18,7 +18,7 @@ The following line in the `config.tdsl` will load the component during the serve
 ext (class: tigase.server.ext.ComponentProtocol) {}
 -----
 
-While this would load the component, there are no additional configurations provided to the component would be practically useless.
+While this would load the component, without any additional configurations provided, the component would be practically useless.
 It is necessary to configure the virtual host domains of the external component during run-time via ad-hoc commands to make use of this component.
 
 You may additionally configure the xref:bindExtHostnames[`bind-ext-hostnames`] property.
@@ -26,21 +26,25 @@ You may additionally configure the xref:bindExtHostnames[`bind-ext-hostnames`] p
 To configure external component connections using Admin UI you need to open Admin UI web page (if you are logged in the same computer on which Tigase XMPP Server is running by default it should be available at http://localhost:8080/admin/).
 Then you should click on `Configuration` on the left side of the Admin UI web page and then select `Add new item` on `ext` component or by execution corresponding ad-hoc command on `ext` component using ad-hoc capable XMPP client, ie. http://psi-im.org[Psi].
 
-image:images/adminui_ext_add_item_button.png[]
+image:images/admin/adminui_ext_add_item_button.png[]
 
 You will be presented with a form which you should fill to configure external component connection details:
 
-image:images/adminui_ext_add_item_form.png[]
+image:images/admin/adminui_ext_add_item_form.png[]
 
 * Domain name - external component domain name (`muc.devel.tigase.org`)
 * Domain password - password for authentication of the external component connection (`muc-pass`)
-* Connection type - `accept` to make component wait for connection or `connect` force component to connect to the server (`connect)
+* Connection type - `accept` to make component wait `for connection or `connect` force component to connect to the server (`connect`)
 * Port number - port on which component should wait for connection or on which it try to connect (`5270`)
 * Remote host - host to connect to (`devel.tigase.org`) _(may be left blank if component will only accept connections)_
 * Protocol - id of protocol used for establishing connection
-** `connect` - establish connection using https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol] for connection to the server
-** `accept` - establish connection using https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol] for accepting connection from the server
-** `client` - establish connection with https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
+** if connection type is `connect`:
+*** `Connect` - for https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
+*** `Client` - for https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
+** if connection type is `accept`:
+*** `Autodetect` - for automatic detection of protocol used by incoming connection _(recommended)_
+*** `Accept` - for https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
+*** `Client` - for https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
 
 Additional options may be left with defaults.
 

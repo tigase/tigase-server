@@ -28,7 +28,7 @@ With that in place you can use Admin UI or ad-hoc commands available at `ext-man
 
 In Admin UI you click on `Configuration` section and select `Add new item` at the `ext-man` component, which will present you with a following form to fill in external component connectivity details:
 
-image:images/adminui_extman_add_item_form.png[]
+image:images/admin/adminui_extman_add_item_form.png[]
 
 === A Simple Case - MUC as an External Component
 
@@ -74,7 +74,7 @@ where `master_server_default_database_url` is the same URL as the one used on th
 With that in place we can use ad-hoc commands or Admin UI on the main server to configure Tigase XMPP Server to accept external component connections and to connect from the external component to the master server.
 
 .Adding external component connection settings to the manager (ext-man) using Admin UI
-image:images/adminui_extman_add_item_form_external_muc.png[]
+image:images/admin/adminui_extman_add_item_form_external_muc.png[]
 
 You need to pass:
 
@@ -153,10 +153,6 @@ pubsub (class: tigase.pubsub.PubSubComponent) {}
 
 With this configuration you do not need to configure entries in `ext-man` for PubSub component, only for MUC component but you need to user `client` as the value for protocol field.
 
-###
-FINISHED
-###
-
 == Usage with a separate database
 
 === A Simple Case - MUC as an External Component
@@ -197,12 +193,14 @@ ext () {
 }
 -----
 
-To make this new instance connect to the Tigase XMPP Server, you need to create one more file with external connection configuration which will be loaded to the local database and then removed.
+To make this new instance connect to the Tigase XMPP Server, you need to create one more file with external connection configuration at `etc/externalComponentItems`which will be loaded to the local database and then removed.
 
 [source,text]
 ----
-muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:accept
+muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:connect
 ----
+
+WARNING: While loading configuration from `etc/externalComponentItems` file is supported, we recommend usage of shared database if possible. In future this method may be deprecated.
 
 === More Components
 

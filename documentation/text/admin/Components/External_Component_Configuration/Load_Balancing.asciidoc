@@ -8,7 +8,7 @@
 
 This document describes how to load balance any external components using Tigase XMPP Server and how to make Tigase's components work as external components in a cluster mode.
 
-_Please note, all configuration options described here apply to Tigase XMPP Server version 5.1.0 or later._
+_Please note, all configuration options described here apply to Tigase XMPP Server version 8.0.0 or later._
 
 These are actually 2 separate topics:
 
@@ -28,54 +28,17 @@ image:images/admin/ExternalCompClustering002.png[]
 
 We have a single machine running Tigase XMPP Server and 2 instances of the MUC component connecting to Tigase.
 
-The server configuration
+On the server side we will enable `ComponentProtocol` component as we need to do to enable external component without clustering support.
 
-[source,dsl]
------
-admins = [ 'admin@devel.tigase.org' ]
-'config-type' = 'default'
-'virtual-hosts' = [ 'devel.tigase.org' ]
-dataSource {
-    default () {
-        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
-    }
-}
-userRepository {
-    default () {}
-}
-authRepository {
-    default () {}
-}
-ext (class: tigase.server.ext.ComponentProtocol) {
-    repository {
-        items = [ 'muc.devel.tigase.org:muc-secret:listen:5270:devel.tigase.org:accept:ReceiverBareJidLB' ]
-    }
-}
-'sess-man' () {}
------
+Then using Admin UI we will add a new external component connection settings using `Add item` position for `ext` component in `Configuration` section of the web page just as it is described in <<tigaseExternalComponent,External Component Configuration>> section.
 
-And configuration for both instances of the MUC component (identical for both of them):
+image:images/admin/adminui_ext_add_item_form.png[]
 
-[source,dsl]
------
-admins = [ 'admin@devel.tigase.org' ]
-'config-type' = 'component'
-'virtual-hosts' = [ 'devel.tigase.org' ]
-dataSource {
-    default () {
-        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
-    }
-}
-userRepository {
-    default () {}
-}
-authRepository {
-    default () {}
-}
-muc (class: tigase.muc.MUCComponent) {}
------
+The only change here is that we will specify value for field `Load balancer class` and we will use `ReceiverBareJidLB` as a value.
 
-For those familiar with Tigase's configuration, this should be pretty basic. The difference is one small element in the server configuration. At the end of the component connection we have *ReceiverBareJidLB*.
+The configuration for both instances of the MUC component (identical for both of them) can be done in the same way as it is done for a single instance of the MUC component. There is nothing to change here.
+
+The difference is one small element in the server configuration. At the value of `Load balancer class` field in `Add item` form is set to *ReceiverBareJidLB*.
 
 This is the load balancing plugin class. Load balancing plugin decides how the traffic is distributed among different component connections that is different component instances. For the MUC component it makes sense to distribute the traffic based on the receiver bare JID because this is the MUC room address. This way we just distribute MUC rooms and traffic over different MUC component instances.
 
@@ -90,61 +53,26 @@ Let's say we have Tigase XMPP Server working for domain: *xmpp-test.org* and the
 
 image:images/admin/ExternalCompClustering003_0.png[]
 
-We want to make it possible to connect the MUC component to all nodes, so here is configuration for the server (for each node is the same):
+We want to make it possible to connect the MUC component to all nodes. To do so, we are configuring Tigase XMPP Server to run in the cluster mode and on each of cluster nodes we need to enable `ComponentProtocol` component.
+
+This can be simply done by adding following line to the server configuration file:
 
 [source,dsl]
------
-admins = [ 'admin@xmpp-test.org' ]
-'cluster-mode' = true
-'cluster-nodes' = [ 'red.xmpp-test.org', 'green.xmpp-test.org', 'blue.xmpp-test.org' ]
-'config-type' = 'default'
-'virtual-hosts' = [ 'xmpp-test.org' ]
-dataSource {
-    default () {
-        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
-    }
-}
-userRepository {
-    default () {}
-}
-authRepository {
-    default () {
-        cls = 'tigase.db.jdbc.TigaseAuth'
-    }
-}
-ext (class: tigase.server.ext.ComponentProtocol) {
-    repository {
-        items = [ 'muc.xmpp-test.org:muc-secret:listen:5270:xmpp-test.org:accept:ReceiverBareJidLB' ]
-    }
-}
-'sess-man' () {}
------
+----
+ext () {}
+----
 
-As you can see there is nothing special here. The most interesting part comes on the MUC side.
+After this is done we need to add a new external component connection settings using `Add item` position for `ext` component in `Configuration` section of the web page just as it is described in <<tigaseExternalComponent,External Component Configuration>> section.
 
-[source,dsl]
------
-admins = [ 'admin@xmpp-test.orgg' ]
-'config-type' = 'component'
-'virtual-hosts' = [ 'xmpp-test.org' ]
-dataSource {
-    default () {
-        uri = 'jdbc:mysql://localhost/db?user=tigase&password=tigase'
-    }
-}
-userRepository {
-    default () {}
-}
-authRepository {
-    default () {}
-}
-ext (class: tigase.server.ext.ComponentProtocol) {
-    repository {
-        items = [ 'muc.xmpp-test.org:muc-secret:connect:5270:xmpp-test.org', 'blue.xmpp-test.org', 'green.xmpp-test.org', 'red.xmpp-test.org:accept' ]
-    }
-}
-muc (class: tigase.muc.MUCComponent) {}
------
+As you can see there is nothing special here. The most interesting part comes on the MUC side, but it is only a very small change from the configuration of the component to use with single node Tigase XMPP Server installation.
+
+When you are adding/configuring external component settings using Admin UI (`Add item` or `Update item configuration`  for `ext-man` component) or using separate configuration file (when you are not using shared database) then you need to pass as a value for `Remote host` field a semicolon separated list of all of the cluster nodes to which external component should connect.
+
+In our case it would be:
+
+----
+red.xmpp-test.org;green.xmpp-test.org;blue.xmpp-test.org
+----
 
 As you can see remote host name is not a simple domain but a character string with a few comma separated parts. The first part is our remote domain and the rest are addresses of the host to connect to. This can be a list of domain names or IP addresses.
 
