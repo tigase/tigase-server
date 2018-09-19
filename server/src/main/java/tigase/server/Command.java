@@ -27,6 +27,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.jid.JID;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -707,6 +708,32 @@ public enum Command {
 		result.setPriority(priority);
 
 		return result;
+	}
+
+	public static class Builder {
+
+		private final Element command;
+
+		public Builder(Packet packet) {
+			command = Optional.ofNullable(packet.getElemChild(COMMAND_EL)).orElseGet(() -> createCommandEl(packet));
+		}
+
+		public Builder addAction(Action action) {
+			addActionElToCommand(command, action);
+
+			return this;
+		}
+
+		public DataForm.Builder addDataForm(DataType type) {
+			return new DataForm.Builder(command, type);
+		}
+
+		private static Element createCommandEl(Packet packet) {
+			Element commandEl = new Element(COMMAND_EL, XMLNS);
+			packet.getElement().addChild(commandEl);
+			return commandEl;
+		}
+
 	}
 }    // Command
 

@@ -26,6 +26,9 @@ import tigase.xml.XMLUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
@@ -348,6 +351,316 @@ public class DataForm {
 		}
 
 		return false;
+	}
+
+	public static class Builder {
+
+		private final Element x;
+
+		public Builder(Element parent, DataType type) {
+			x = Optional.ofNullable(parent.getChild("x", "jabber:x:data")).orElseGet(() -> createDataEl(parent));
+			x.setAttribute("type", type.name());
+		}
+
+		public Builder addTitle(String title) {
+			Element old;
+			while ((old = x.getChild("title")) != null) {
+				x.removeChild(old);
+			}
+			if (title != null) {
+				x.addChild(new Element("title", title));
+			}
+			return this;
+		}
+
+		public Builder addInstructions(String[] instructions) {
+			List<Element> oldValues = x.mapChildren(el -> el.getName() == "instructions", Function.identity());
+			if (oldValues != null) {
+				for (Element oldValue : oldValues) {
+					x.removeChild(oldValue);
+				}
+			}
+			if (instructions != null) {
+				for (String instruction : instructions) {
+					x.addChild(new Element("instructions", instruction));
+				}
+			}
+			return this;
+		}
+
+		public Field.Builder addField(FieldType type, String var) {
+			return new Field.Builder(x, type, var);
+		}
+
+		public Builder withFields(Consumer<Builder> consumer) {
+			consumer.accept(this);
+			return this;
+		}
+
+		public Builder withReported(Consumer<Reported.Builder> consumer) {
+			Reported.Builder builder = new Reported.Builder(x);
+			consumer.accept(builder);
+			builder.build();
+			return this;
+		}
+
+		public Builder withItem(Consumer<Item.Builder> consumer) {
+			Item.Builder builder = new Item.Builder(x);
+			consumer.accept(builder);
+			builder.build();
+			return this;
+		}
+
+		public Element build() {
+			return x;
+		}
+
+		private static Element createDataEl(Element parent) {
+			Element dataEl = new Element("x", "jabber:x:data");
+			parent.addChild(dataEl);
+			return dataEl;
+		}
+	}
+
+	public static class Reported {
+
+		public static class Builder {
+
+			private final Element x;
+			private final Element reported;
+
+			public Builder(Element x) {
+				this.x = x;
+				this.reported = new Element("reported");
+			}
+
+			public Field.Builder addField(FieldType type, String var) {
+				return new Field.Builder(reported, type, var);
+			}
+
+			public Builder withFields(Consumer<Reported.Builder> consumer) {
+				consumer.accept(this);
+				return this;
+			}
+
+			public Element build() {
+				if (x != null) {
+					x.addChild(reported);
+				}
+				return reported;
+			}
+		}
+	}
+
+	public static class Item {
+
+		public static class Builder {
+
+			private final Element x;
+			private final Element item;
+
+			public Builder(Element x) {
+				this.x = x;
+				this.item = new Element("item");
+			}
+
+			public Field.Builder addField(String var) {
+				return new Field.Builder(item, null, var);
+			}
+
+			public Builder withFields(Consumer<Item.Builder> consumer) {
+				consumer.accept(this);
+				return this;
+			}
+
+			public Element build() {
+				if (x != null) {
+					x.addChild(item);
+				}
+				return item;
+			}
+		}
+	}
+
+	public static class Field {
+
+		public static class Builder {
+
+			private final Element parent;
+			private final Element el;
+			private final FieldType type;
+
+			public Builder(Element form, FieldType type, String var) {
+				this.parent = form;
+				this.type = Optional.ofNullable(type).orElse(FieldType.TextSingle);
+				this.el = new Element("field");
+				el.setAttribute("var", var);
+				if (type != null) {
+					this.el.setAttribute("type", type.value());
+				}
+			}
+			
+			public Builder setLabel(String label) {
+				if (label == null) {
+					el.removeAttribute("label");
+				} else {
+					el.setAttribute("label", label);
+				}
+				return this;
+			}
+
+			public Builder setDesc(String desc) {
+				removeChildren("desc");
+				if (desc != null) {
+					el.addChild(new Element("desc", desc));
+				}
+				return this;
+			}
+
+			public Builder setRequired(boolean required) {
+				removeChildren("required");
+				if (required) {
+					el.addChild(new Element("required"));
+				}
+				return this;
+			}
+
+			public Builder addOption(String value) {
+				this.addOption(value, null);
+				return this;
+			}
+
+			public Builder addOption(String value, String label) {
+				switch (type) {
+					case ListMulti:
+					case ListSingle:
+						break;
+					default:
+						throw new UnsupportedOperationException("Invalid field type!");
+				}
+				Element option = new Element("option");
+				if (label != null) {
+					option.setAttribute("label", label);
+				}
+				option.addChild(new Element("value", value));
+				el.addChild(option);
+				return this;
+			}
+			
+			public Builder setOptions(String[] values) {
+				return setOptions(values, null);
+			}
+
+			public Builder setOptions(String[] values, String[] labels) {
+				for (int i=0; i<values.length; i++) {
+					addOption(values[i], labels == null ? null : labels[i]);
+				}
+				return this;
+			}
+
+			public Builder setValue(Boolean value) {
+				return setValue(value == null ? null : (value ? "true" : "false"));
+			}
+
+			public Builder setValue(String value) {
+				switch (type) {
+					case JidMulti:
+					case ListMulti:
+					case TextMulti:
+						throw new UnsupportedOperationException("Invalid field type!");
+					default:
+						break;
+				}
+				removeOldValues();
+				if (value != null) {
+					el.addChild(new Element("value", value));
+				}
+				return this;
+			}
+
+			public Builder setValues(String[] values) {
+				switch (type) {
+					case Boolean:
+					case Fixed:
+					case Hidden:
+					case JidSingle:
+					case ListSingle:
+					case TextSingle:
+					case TextPrivate:
+						throw new UnsupportedOperationException("Invalid field type!");
+					default:
+						break;
+				}
+				removeOldValues();
+				if (values != null) {
+					for (String value : values) {
+						el.addChild(new Element("value", value));
+					}
+				}
+				return this;
+			}
+
+			public Element build() {
+				if (parent != null) {
+					parent.addChild(el);
+				}
+				return el;
+			}
+
+			private void removeOldValues() {
+				removeChildren(FIELD_EL);
+			}
+
+			private void removeChildren(String name) {
+				List<Element> oldValues = el.mapChildren(el -> el.getName() == name, Function.identity());
+				if (oldValues != null) {
+					for (Element oldValue : oldValues) {
+						el.removeChild(oldValue);
+					}
+				}
+			}
+
+		}
+
+	}
+	
+	public enum FieldType  {
+		Boolean,
+		Fixed,
+		Hidden,
+		JidMulti,
+		JidSingle,
+		ListMulti,
+		ListSingle,
+		TextMulti,
+		TextPrivate,
+		TextSingle;
+
+		public String value() {
+			switch (this) {
+				case Boolean:
+					return "boolean";
+				case Fixed:
+					return "fixed";
+				case Hidden:
+					return "hidden";
+				case JidMulti:
+					return "jid-multi";
+				case JidSingle:
+					return "jid-single";
+				case ListMulti:
+					return "list-multi";
+				case ListSingle:
+					return "list-single";
+				case TextMulti:
+					return "text-multi";
+				case TextPrivate:
+					return "text-private";
+				case TextSingle:
+					return "text-single";
+			}
+			return null;
+		}
 	}
 
 }

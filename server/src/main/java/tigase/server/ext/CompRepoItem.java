@@ -24,6 +24,7 @@ import tigase.db.comp.RepositoryItemAbstract;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.Command;
+import tigase.server.DataForm;
 import tigase.server.Packet;
 import tigase.server.ext.lb.LoadBalancerIfc;
 import tigase.server.ext.lb.ReceiverBareJidLB;
@@ -101,21 +102,47 @@ public class CompRepoItem
 
 	@Override
 	public void addCommandFields(Packet packet) {
-		Command.addFieldValue(packet, DOMAIN_NAME_LABEL, ((domain != null) ? domain : ""));
-		Command.addFieldValue(packet, DOMAIN_PASS_LABEL, ((auth_pass != null) ? auth_pass : ""));
+		new Command.Builder(packet).addDataForm(Command.DataType.form).withFields(builder -> {
+			builder.addField(domain == null ? DataForm.FieldType.TextSingle : DataForm.FieldType.Fixed,
+							 DOMAIN_NAME_LABEL).setRequired(true).setValue(domain).build();
+			builder.addField(DataForm.FieldType.TextSingle, DOMAIN_PASS_LABEL)
+					.setRequired(true)
+					.setValue(auth_pass)
+					.build();
 
-		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(), CONNECTION_TYPE_LABEL, ConnectionType.names(),
-		                      ConnectionType.names());
-		Command.addFieldValue(packet, PORT_NO_LABEL, ((port > 0) ? "" + port : ""));
-		Command.addFieldValue(packet, REMOTE_HOST_LABEL, ((remoteHost != null) ? remoteHost : ""));
-		Command.addFieldValue(packet, PROTO_XMLNS_LABEL, ((prop_xmlns != null) ? prop_xmlns : ""));
-		Command.addFieldValue(packet, LB_CLASS_LABEL, ((lb != null) ? lb.getClass().getName() : ""));
-		Command.addFieldValue(packet, ROUTINGS_LABEL, Optional.ofNullable(routings)
-				.map(Arrays::stream)
-				.map(stream -> stream.collect(Collectors.joining(",")))
-				.orElse(""));
-		Command.addFieldValue(packet, SOCKET_LABEL, socket.name(), SOCKET_LABEL, SocketType.names(),
-		                      SocketType.names());
+			builder.addField(DataForm.FieldType.ListSingle, CONNECTION_TYPE_LABEL)
+					.setLabel(CONNECTION_TYPE_LABEL)
+					.setRequired(true)
+					.setValue(type.name())
+					.setOptions(ConnectionType.names())
+					.build();
+			builder.addField(DataForm.FieldType.TextSingle, PORT_NO_LABEL)
+					.setRequired(true)
+					.setValue(port > 0 ? String.valueOf(port) : null)
+					.build();
+			builder.addField(DataForm.FieldType.TextSingle, REMOTE_HOST_LABEL).setValue(remoteHost).build();
+			builder.addField(DataForm.FieldType.ListSingle, PROTO_XMLNS_LABEL)
+					.addOption("", "Autodetect")
+					.addOption("accept", "Accept")
+					.addOption("connect", "Connect")
+					.addOption("client", "Client")
+					.setValue(prop_xmlns)
+					.setDesc("For 'accept' connection type you may use 'Autodetect' but for 'connect' type you need to select 'Connect' or 'Client'")
+					.build();
+			builder.addField(DataForm.FieldType.TextSingle, LB_CLASS_LABEL)
+					.setValue(lb != null ? lb.getClass().getName() : null)
+					.build();
+			builder.addField(DataForm.FieldType.TextSingle, ROUTINGS_LABEL)
+					.setValue(Optional.ofNullable(routings)
+									  .map(Arrays::stream)
+									  .map(stream -> stream.collect(Collectors.joining(",")))
+									  .orElse(null));
+			builder.addField(DataForm.FieldType.ListSingle, SOCKET_LABEL)
+					.setValue(socket.name())
+					.setLabel(SOCKET_LABEL)
+					.setOptions(SocketType.names())
+					.build();
+		}).build();
 		super.addCommandFields(packet);
 	}
 
@@ -368,6 +395,17 @@ public class CompRepoItem
 //		if (prop_xmlns == null) {
 //			return "Protocol is required";
 //		}
+		if (type == ConnectionType.accept) {
+			if (prop_xmlns != null && "connect".equals(prop_xmlns)) {
+				return "Invalid protocol selected! For accepting socket it is impossible to use 'connect' protocol.";
+			}
+		} else if (type == ConnectionType.connect) {
+			if (prop_xmlns != null && "accept".equals(prop_xmlns)) {
+				return "Invalid protocol selected! For connecting socket it is impossible to use 'accept' protocol.";
+			} else if (prop_xmlns == null) {
+				return "It is required to select protocol for connecting socket!";
+			}
+		}
 		return null;
 	}
 
