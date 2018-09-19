@@ -203,13 +203,13 @@ There are a number of benefits to running Tigase as a service, one of which is t
 Once installation is complete you may start Tigase as a typical systemd service using following command:
 [source,bash]
 -----
-sudo service tigase-server start
+sudo systemctl start tigase-server
 -----
 
 To stop it, you may run following command:
 [source,bash]
 -----
-sudo service tigase-server stop
+sudo systemctl stop tigase-server
 -----
 
 It is also possible to enable service, to make it start during startup of the operating system:

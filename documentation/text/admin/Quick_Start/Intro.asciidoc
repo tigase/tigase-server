@@ -22,4 +22,4 @@ This is a set of documents allowing you to quickly start with our software. Ever
 - xref:manualinstall[Manual installation in console mode]
 - xref:windowsInstallation[Installing Tigase on Windows]
 - xref:setupTigaseServer[Network settings for Tigase]
-- xref:tigaseScriptStart[Using init.d scripts]
+- xref:tigaseScriptStart[Running Tigase XMPP Server as a service]
