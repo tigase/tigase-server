@@ -19,3 +19,6 @@ If you have components that may not be able to handle multiple vhosts or cluster
 
 You may also want to reference the Vhosts API for additional information:
 - xref:addManageDomain[API Description for Virtual Domains Management in Tigase Server].
+
+TIP: If you have a Tigase XMPP Server running in the cluster mode hidden behind some load balancer, or if internal IP or hostname of cluster nodes differ from the DNS name under which it is available from the internet, we would suggest setting a property `installation-dns-address` of `vhost-man` component to the DNS name which allows you to connect to all cluster nodes (ie. to the DNS name of the load balancer).
+This will allow Tigase XMPP Server to do proper DNS lookups to verify that DNS domain name of the virtual host which you will try to add or update points to your XMPP installation.
