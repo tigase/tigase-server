@@ -26,11 +26,11 @@ public class MapCreatedEvent {
 
 	private final Map map;
 	private final String[] parameters;
-	private final String type;
+	private final String uid;
 
-	public MapCreatedEvent(Map map, String type, String... parameters) {
+	public MapCreatedEvent(Map map, String uid, String... parameters) {
 		this.map = map;
-		this.type = type;
+		this.uid = uid;
 		this.parameters = parameters;
 	}
 
@@ -42,7 +42,8 @@ public class MapCreatedEvent {
 		return parameters;
 	}
 
-	public String getType() {
-		return type;
+	public String getUid() {
+		return uid;
 	}
+
 }

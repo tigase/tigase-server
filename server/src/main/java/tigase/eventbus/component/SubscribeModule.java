@@ -138,15 +138,6 @@ public class SubscribeModule
 		localEventBus.addListener(EventBusImplementation.ListenerAddedEvent.class, eventBusHandlerAddedHandler);
 	}
 
-	@Override
-	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		if (packet.getType() == StanzaType.set) {
-			processSet(packet);
-		} else {
-			throw new ComponentException(Authorization.NOT_ALLOWED, "Only type set is allowed.");
-		}
-	}
-
 	protected void onAddHandler(String eventName, String eventPackage) {
 		for (JID node : component.getNodesConnected()) {
 			if (component.getComponentId().equals(node)) {
@@ -156,6 +147,27 @@ public class SubscribeModule
 			Element se = prepareSubscribeElement(new EventName(eventPackage, eventName), component.getComponentId(),
 												 null);
 			sendSubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
+		}
+	}
+
+	private Element prepareSubscribeElement(EventName event, JID jid, String service) {
+		Element subscribeElem = new Element("subscribe");
+		subscribeElem.addAttribute("node", event.toString());
+		subscribeElem.addAttribute("jid", jid.toString());
+
+		if (service != null) {
+			subscribeElem.addChild(new Element("service", service));
+		}
+
+		return subscribeElem;
+	}
+
+	@Override
+	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
+		if (packet.getType() == StanzaType.set) {
+			processSet(packet);
+		} else {
+			throw new ComponentException(Authorization.NOT_ALLOWED, "Only type set is allowed.");
 		}
 	}
 
@@ -187,6 +199,7 @@ public class SubscribeModule
 
 			subscriptionStore.addSubscription(parsedName.getPackage(), parsedName.getName(), subscription);
 
+			localEventBus.fire(new NewRemoteSubscriptionEvent(parsedName, subscription));
 		}
 		return null;
 	}
@@ -229,6 +242,7 @@ public class SubscribeModule
 
 			response.addChild(new Element("subscription", new String[]{"node", "jid", "subscription"},
 										  new String[]{parsedName.toString(), jid.toString(), "subscribed"}));
+			localEventBus.fire(new NewRemoteSubscriptionEvent(parsedName, subscription));
 		}
 
 		if (log.isLoggable(Level.FINER)) {
@@ -243,6 +257,19 @@ public class SubscribeModule
 		}
 
 		return response;
+	}
+
+	private void processSet(final Packet packet) throws TigaseStringprepException, ComponentException {
+		Element subscriptionResponse;
+		if (isClusteredEventBus(packet.getStanzaFrom())) {
+			subscriptionResponse = processClusterSubscription(packet);
+		} else {
+			subscriptionResponse = processNonClusterSubscription(packet);
+		}
+
+		Packet response = packet.okResult(subscriptionResponse, 0);
+		response.setPermissions(Permissions.ADMIN);
+		write(response);
 	}
 
 	protected void sendSubscribeRequest(final String to, Collection<Element> subscriptionElements) {
@@ -297,29 +324,28 @@ public class SubscribeModule
 		}
 	}
 
-	private Element prepareSubscribeElement(EventName event, JID jid, String service) {
-		Element subscribeElem = new Element("subscribe");
-		subscribeElem.addAttribute("node", event.toString());
-		subscribeElem.addAttribute("jid", jid.toString());
+	public static class NewRemoteSubscriptionEvent
+			implements EventBusImplementation.InternalEventbusEvent {
 
-		if (service != null) {
-			subscribeElem.addChild(new Element("service", service));
+		public EventName getParsedName() {
+			return parsedName;
 		}
 
-		return subscribeElem;
-	}
+		private final EventName parsedName;
+		private Subscription subscription;
 
-	private void processSet(final Packet packet) throws TigaseStringprepException, ComponentException {
-		Element subscriptionResponse;
-		if (isClusteredEventBus(packet.getStanzaFrom())) {
-			subscriptionResponse = processClusterSubscription(packet);
-		} else {
-			subscriptionResponse = processNonClusterSubscription(packet);
+		public NewRemoteSubscriptionEvent(EventName parsedName, Subscription subscription) {
+			this.parsedName = parsedName;
+			this.subscription = subscription;
 		}
 
-		Packet response = packet.okResult(subscriptionResponse, 0);
-		response.setPermissions(Permissions.ADMIN);
-		write(response);
+		public Subscription getSubscription() {
+			return subscription;
+		}
+
+		public void setSubscription(Subscription subscription) {
+			this.subscription = subscription;
+		}
 	}
 
 }

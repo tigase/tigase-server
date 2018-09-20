@@ -30,23 +30,20 @@ class DMap<K, V>
 
 	final Class<K> keyClass;
 	final DMapListener listener;
-
 	final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
-	final String mapID;
-	final String type;
+	final String uid;
 	final Class<V> valueClass;
 
-	public DMap(String mapID, String type, DMapListener listener, final Class<K> keyClass, final Class<V> valueClass) {
+	public DMap(String uid, DMapListener listener, final Class<K> keyClass, final Class<V> valueClass) {
 		this.listener = listener;
-		this.mapID = mapID;
-		this.type = type;
+		this.uid = uid;
 		this.keyClass = keyClass;
 		this.valueClass = valueClass;
 	}
 
 	@Override
 	public void clear() {
-		this.listener.onClear(this.mapID);
+		this.listener.onClear(this);
 		map.clear();
 	}
 
@@ -74,6 +71,10 @@ class DMap<K, V>
 		return map.get(key);
 	}
 
+	public String getUid() {
+		return uid;
+	}
+
 	@Override
 	public boolean isEmpty() {
 		return map.isEmpty();
@@ -86,13 +87,13 @@ class DMap<K, V>
 
 	@Override
 	public V put(K key, V value) {
-		this.listener.onPut(this.mapID, key, value);
+		this.listener.onPut(this, key, value);
 		return map.put(key, value);
 	}
 
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
-		this.listener.onPutAll(this.mapID, m);
+		this.listener.onPutAll(this, m);
 		map.putAll(m);
 	}
 
@@ -102,7 +103,7 @@ class DMap<K, V>
 
 	@Override
 	public V remove(Object key) {
-		listener.onRemove(this.mapID, key);
+		listener.onRemove(this, key);
 		return map.remove(key);
 	}
 
@@ -127,13 +128,13 @@ class DMap<K, V>
 
 	interface DMapListener {
 
-		void onClear(String mapID);
+		void onClear(DMap map);
 
-		void onPut(String mapID, Object key, Object value);
+		void onPut(DMap map, Object key, Object value);
 
-		void onPutAll(String mapID, Map<?, ?> m);
+		void onPutAll(DMap map, Map<?, ?> m);
 
-		void onRemove(String mapID, Object key);
+		void onRemove(DMap map, Object key);
 
 	}
 

@@ -27,7 +27,9 @@ import static org.junit.Assert.*;
 public class EventNameTest {
 
 	@Test
-	public void testEquals() throws Exception {
+	public void testEquals() {
+		assertEquals(new EventName(Event1.class), new EventName(Event1.class.getName()));
+
 		assertEquals(new EventName("pl.ttt"), new EventName("pl", "ttt"));
 
 		assertEquals(new EventName("*.ttt"), new EventName(null, "ttt"));
@@ -50,7 +52,7 @@ public class EventNameTest {
 	}
 
 	@Test
-	public void testGetters() throws Exception {
+	public void testGetters() {
 		EventName e = new EventName("net.tigase", "Event");
 		assertEquals("net.tigase", e.getPackage());
 		assertEquals("Event", e.getName());
@@ -69,7 +71,7 @@ public class EventNameTest {
 	}
 
 	@Test
-	public void testToString() throws Exception {
+	public void testToString() {
 		assertEquals("net.tigase.Event", new EventName("net.tigase", "Event").toString());
 		assertEquals("net.tigase.*", new EventName("net.tigase", null).toString());
 		assertEquals("*.Event", new EventName(null, "Event").toString());
@@ -78,7 +80,7 @@ public class EventNameTest {
 	}
 
 	@Test
-	public void testToStringInt() throws Exception {
+	public void testToStringInt() {
 		assertEquals("net.tigase.Event", EventName.toString("net.tigase", "Event"));
 		assertEquals("net.tigase.*", EventName.toString("net.tigase", null));
 		assertEquals("*.Event", EventName.toString(null, "Event"));

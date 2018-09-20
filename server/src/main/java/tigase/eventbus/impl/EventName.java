@@ -47,6 +47,10 @@ public class EventName {
 		return result;
 	}
 
+	public EventName(final Class<?> eventClass) {
+		this(eventClass.getPackage().getName(), eventClass.getSimpleName());
+	}
+
 	public EventName(String eventName) {
 		int i = eventName.lastIndexOf(".");
 		String tmp = i >= 0 ? eventName.substring(0, i) : "";
@@ -82,13 +86,8 @@ public class EventName {
 			return false;
 		}
 		if (eventPackage == null) {
-			if (other.eventPackage != null) {
-				return false;
-			}
-		} else if (!eventPackage.equals(other.eventPackage)) {
-			return false;
-		}
-		return true;
+			return other.eventPackage == null;
+		} else return eventPackage.equals(other.eventPackage);
 	}
 
 	public String getName() {

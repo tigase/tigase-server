@@ -96,7 +96,7 @@ public class ClusterMapFactoryTest {
 									 received[0] = true;
 									 Assert.assertEquals("kluczyk", event.getKey());
 									 Assert.assertEquals("wartosc", event.getValue());
-									 Assert.assertEquals(((DMap) map).mapID, event.getUid());
+									 Assert.assertEquals(((DMap) map).getUid(), event.getUid());
 								 }
 							 });
 
@@ -110,8 +110,7 @@ public class ClusterMapFactoryTest {
 	@Test
 	public void testRemoteCreatedMap() throws Exception {
 		ClusterMapFactory.NewMapCreatedEvent eventCreate = new ClusterMapFactory.NewMapCreatedEvent();
-		eventCreate.setType("test");
-		eventCreate.setUid("1-2-3");
+		eventCreate.setUid("test");
 		eventCreate.setKeyClass(java.lang.String.class);
 		eventCreate.setValueClass(java.lang.String.class);
 		eventCreate.setParams(new String[]{"1", "2"});
@@ -125,7 +124,7 @@ public class ClusterMapFactoryTest {
 			@Override
 			public void onEvent(MapCreatedEvent e) {
 				maps[0] = e.getMap();
-				Assert.assertEquals("test", e.getType());
+				Assert.assertEquals("test", e.getUid());
 				Assert.assertArrayEquals(new String[]{"1", "2"}, e.getParameters());
 			}
 		});
@@ -135,16 +134,16 @@ public class ClusterMapFactoryTest {
 		Thread.sleep(100);
 
 		Assert.assertNotNull("It seems map was not created", maps[0]);
-		Assert.assertEquals("test", ((DMap) maps[0]).type);
+		Assert.assertEquals("test", ((DMap) maps[0]).uid);
 
 		ClusterMapFactory.ElementAddEvent eventAdd = new ClusterMapFactory.ElementAddEvent();
-		eventAdd.setUid("1-2-3");
+		eventAdd.setUid("test");
 		eventAdd.setKey("xKEY");
 		eventAdd.setValue("xVALUE");
 		factory.onMapElementAdd(eventAdd);
 
 		eventAdd = new ClusterMapFactory.ElementAddEvent();
-		eventAdd.setUid("1-2-3");
+		eventAdd.setUid("test");
 		eventAdd.setKey("yKEY");
 		eventAdd.setValue("yVALUE");
 
@@ -155,7 +154,7 @@ public class ClusterMapFactoryTest {
 		Assert.assertEquals(2, maps[0].size());
 
 		ClusterMapFactory.ElementRemoveEvent eventDel = new ClusterMapFactory.ElementRemoveEvent();
-		eventDel.setUid("1-2-3");
+		eventDel.setUid("test");
 		eventDel.setKey("xKEY");
 		factory.onMapElementRemove(eventDel);
 
@@ -163,7 +162,7 @@ public class ClusterMapFactoryTest {
 		Assert.assertEquals(1, maps[0].size());
 
 		ClusterMapFactory.MapClearEvent eventClear = new ClusterMapFactory.MapClearEvent();
-		eventClear.setUid("1-2-3");
+		eventClear.setUid("test");
 		factory.onMapClear(eventClear);
 
 		Assert.assertEquals(0, maps[0].size());
@@ -177,13 +176,13 @@ public class ClusterMapFactoryTest {
 			}
 		});
 
-		Assert.assertNotNull(factory.getMap("1-2-3"));
+		Assert.assertNotNull(factory.getMap("test"));
 
 		ClusterMapFactory.MapDestroyEvent eventDestroy = new ClusterMapFactory.MapDestroyEvent();
-		eventDestroy.setUid("1-2-3");
+		eventDestroy.setUid("test");
 		factory.onMapDestroyed(eventDestroy);
 
-		Assert.assertNull(factory.getMap("1-2-3"));
+		Assert.assertNull(factory.getMap("test"));
 		Thread.sleep(100);
 		Assert.assertTrue(received[0]);
 	}

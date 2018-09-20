@@ -31,29 +31,29 @@ import java.util.*;
 public class DMapTest {
 
 	@Test
-	public void testBasicOperations() throws Exception {
+	public void testBasicOperations() {
 		final Set<String> removedItems = new HashSet<>();
 		final Map<String, String> addedItems = new HashMap<>();
 		final boolean[] cleared = new boolean[]{false};
 
 		final DMap.DMapListener listener = new DMap.DMapListener() {
 			@Override
-			public void onClear(String mapID) {
+			public void onClear(DMap map) {
 				cleared[0] = true;
 			}
 
 			@Override
-			public void onPut(String mapID, Object key, Object value) {
+			public void onPut(DMap map, Object key, Object value) {
 				Assert.assertNull(addedItems.put((String) key, (String) value));
 			}
 
 			@Override
-			public void onPutAll(String mapID, Map m) {
+			public void onPutAll(DMap map, Map m) {
 				addedItems.putAll(m);
 			}
 
 			@Override
-			public void onRemove(String mapID, Object key) {
+			public void onRemove(DMap map, Object key) {
 				Assert.assertTrue(removedItems.add((String) key));
 			}
 		};
@@ -64,7 +64,7 @@ public class DMapTest {
 		tmp.put("9", "nine");
 		tmp.put("A", "ten");
 
-		Map<String, String> map = new DMap<>("1", "test", listener, String.class, String.class);
+		Map<String, String> map = new DMap<>("test", listener, String.class, String.class);
 		map.put("1", "one");
 		map.put("2", "two");
 		map.put("3", "three");

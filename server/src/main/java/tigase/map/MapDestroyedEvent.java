@@ -25,19 +25,19 @@ import java.util.Map;
 public class MapDestroyedEvent {
 
 	private final Map map;
-	private final String type;
+	private final String uid;
 
-	public MapDestroyedEvent(Map map, String type) {
+	public MapDestroyedEvent(Map map, String uid) {
 		this.map = map;
-		this.type = type;
+		this.uid = uid;
 	}
 
 	public Map getMap() {
 		return map;
 	}
 
-	public String getType() {
-		return type;
+	public String getUid() {
+		return uid;
 	}
 
 }

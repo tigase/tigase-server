@@ -6,7 +6,6 @@ import tigase.kernel.beans.Initializable;
 import tigase.map.ClusterMapFactory;
 import tigase.server.xmppsession.SessionManager;
 import tigase.vhosts.VHostItem;
-import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -29,7 +28,6 @@ public class BruteForceLockerBean
 	private static final String LOCK_TIME_KEY = "brute-force-lock-time";
 	private static final String LOCK_PERIOD_TIME_KEY = "brute-force-period-time";
 	private static final String LOCK_MODE_KEY = "brute-force-mode";
-	private static final String MAP_ID = "brute-force-invalid-logins";
 	private static final String MAP_TYPE = "brute-force-invalid-logins";
 
 	public enum Mode {
@@ -62,7 +60,7 @@ public class BruteForceLockerBean
 					.map(JID::getResource)
 					.map(res -> res.split("_")[2])
 					.orElse(null);
-		} catch (NoConnectionIdException e) {
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -72,6 +70,9 @@ public class BruteForceLockerBean
 	}
 
 	public void addInvalidLogin(XMPPResourceConnection session, String ip, BareJID jid, final long currentTime) {
+		if (ip == null) {
+			return;
+		}
 		if (map == null) {
 			log.warning("Brute Force Locker is no initialized yet!");
 			return;
@@ -172,7 +173,7 @@ public class BruteForceLockerBean
 
 	@Override
 	public void initialize() {
-		this.map = ClusterMapFactory.get().createMap(MAP_ID, MAP_TYPE, Key.class, Value.class);
+		this.map = ClusterMapFactory.get().createMap(MAP_TYPE, Key.class, Value.class);
 	}
 
 	public boolean isEnabled(XMPPResourceConnection session) {
@@ -185,6 +186,9 @@ public class BruteForceLockerBean
 
 	public boolean isLoginAllowed(XMPPResourceConnection session, final String ip, final BareJID jid,
 								  final long currentTime) {
+		if (ip == null) {
+			return true;
+		}
 		if (map == null) {
 			log.warning("Brute Force Locker is no initialized yet!");
 			return false;
