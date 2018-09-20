@@ -54,7 +54,7 @@ public abstract class AbstractKernelBasedComponent
 
 	public String getComponentVersion() {
 		String version = this.getClass().getPackage().getImplementationVersion();
-		return version == null ? "8.0.0-SNAPSHOT-b5183" : version;
+		return version == null ? "0.0.0" : version;
 	}
 
 	public Kernel getKernel() {

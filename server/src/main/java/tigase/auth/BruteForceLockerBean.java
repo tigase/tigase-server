@@ -29,6 +29,7 @@ public class BruteForceLockerBean
 	private static final String LOCK_TIME_KEY = "brute-force-lock-time";
 	private static final String LOCK_PERIOD_TIME_KEY = "brute-force-period-time";
 	private static final String LOCK_MODE_KEY = "brute-force-mode";
+	private static final String MAP_ID = "brute-force-invalid-logins";
 	private static final String MAP_TYPE = "brute-force-invalid-logins";
 
 	public enum Mode {
@@ -171,7 +172,7 @@ public class BruteForceLockerBean
 
 	@Override
 	public void initialize() {
-		this.map = ClusterMapFactory.get().createMap(MAP_TYPE, Key.class, Value.class);
+		this.map = ClusterMapFactory.get().createMap(MAP_ID, MAP_TYPE, Key.class, Value.class);
 	}
 
 	public boolean isEnabled(XMPPResourceConnection session) {

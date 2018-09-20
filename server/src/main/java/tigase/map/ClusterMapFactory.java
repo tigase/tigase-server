@@ -89,6 +89,11 @@ public class ClusterMapFactory {
 	public <K, V> Map<K, V> createMap(final String type, final Class<K> keyClass, final Class<V> valueClass,
 									  final String... params) {
 		final String uid = UUID.randomUUID().toString();
+		return createMap(uid, type, keyClass, valueClass, params);
+	}
+
+	public <K, V> Map<K, V> createMap(final String uid, final String type, final Class<K> keyClass, final Class<V> valueClass,
+		final String... params) {
 
 		NewMapCreatedEvent event = new NewMapCreatedEvent();
 		event.setType(type);
