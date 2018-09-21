@@ -23,7 +23,6 @@ package tigase.map;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
-import tigase.eventbus.component.SubscribeModule;
 import tigase.eventbus.impl.EventName;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.TypesConverter;
@@ -31,11 +30,14 @@ import tigase.kernel.TypesConverter;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClusterMapFactory {
 
-	private final static EventName ELEMENT_ADD_EVENT_NAME = new EventName(ElementAddEvent.class);
+	private final static EventName NEWMAP_EVENT_NAME = new EventName(NewMapCreatedEvent.class);
 	private static ClusterMapFactory instance;
+	private final Logger log = Logger.getLogger(this.getClass().getName());
 	private final ConcurrentHashMap<String, DMap> maps = new ConcurrentHashMap<>();
 	private final TypesConverter typesConverter = new DefaultTypesConverter();
 	private EventBus eventBus;
@@ -139,6 +141,10 @@ public class ClusterMapFactory {
 	void onMapClear(MapClearEvent event) {
 		final String uid = event.getUid();
 		DMap map = this.maps.get(uid);
+		if (map == null) {
+			log.log(Level.FINE, "No map '" + uid + "' created on this node! Ignoring MapClear event.");
+			return;
+		}
 		map.clearNoEvent();
 	}
 
@@ -156,6 +162,11 @@ public class ClusterMapFactory {
 		final String uid = event.getUid();
 		final DMap map = this.maps.get(uid);
 
+		if (map == null) {
+			log.log(Level.FINE, "No map '" + uid + "' created on this node! Ignoring ElementAdd item event.");
+			return;
+		}
+
 		String k = event.getKey();
 		String v = event.getValue();
 
@@ -169,6 +180,11 @@ public class ClusterMapFactory {
 	void onMapElementRemove(ElementRemoveEvent event) {
 		final String uid = event.getUid();
 		DMap map = this.maps.get(uid);
+
+		if (map == null) {
+			log.log(Level.FINE, "No map '" + uid + "' created on this node! Ignoring ElementRemove item event.");
+			return;
+		}
 
 		String k = event.getKey();
 		Object key = typesConverter.convert(k, map.keyClass);
@@ -187,16 +203,9 @@ public class ClusterMapFactory {
 			DMap map = new DMap(uid, mapListener, keyClass, valueClass);
 			maps.put(uid, map);
 			fireOnMapCreated(map, uid, parameters);
-		}
-
-	}
-
-	@HandleEvent(filter = HandleEvent.Type.local)
-	void onNewRemoteSubscriptionEvent(SubscribeModule.NewRemoteSubscriptionEvent event) {
-		if (ELEMENT_ADD_EVENT_NAME.equals(event.getParsedName())) {
-			for (DMap value : maps.values()) {
-				mapListener.onPutAll(value, value);
-			}
+		} else {
+			DMap map = this.maps.get(uid);
+			mapListener.onPutAll(map, map);
 		}
 	}
 
