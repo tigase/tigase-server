@@ -28,12 +28,14 @@ import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -469,6 +471,21 @@ public class RosterFlat
 		}
 
 		return roster;
+	}
+
+	public Function<JID, RosterElement> rosterElementProvider(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
+		XMPPSession commonSession = session.getParentSession();
+		if (commonSession == null || !session.isAuthorized()) {
+			throw new NotAuthorizedException("No parent session set!");
+		}
+		getUserRoster(session);
+
+		return (jid) -> {
+			Map<BareJID, RosterElement> roster = (Map<BareJID, RosterElement>) commonSession.getCommonSessionData(
+					ROSTER);
+			return roster == null ? null : roster.get(jid.getBareJID());
+		};
 	}
 
 	@Override

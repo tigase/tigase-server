@@ -28,6 +28,7 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.JID;
 
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
@@ -172,6 +173,11 @@ public class Roster
 	public RosterElement getRosterElement(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Function<JID, RosterElement> rosterElementProvider(XMPPResourceConnection session) {
 		return null;
 	}
 

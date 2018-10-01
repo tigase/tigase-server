@@ -769,7 +769,7 @@ public class JabberIqPrivacy
 			}
 		}
 
-		protected XMPPResourceConnection createXMPPResourceConnection(BareJID userJid) {
+		private XMPPResourceConnection createXMPPResourceConnection(BareJID userJid) {
 			try {
 				XMPPResourceConnection session = new OfflineResourceConnection(offlineConnectionId, userRepository,
 																			   authRepository, this);

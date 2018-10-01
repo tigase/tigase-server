@@ -65,18 +65,13 @@ public class PrivacyList {
 		}, el).getSingletonIfPossible();
 	}
 
-	public static PrivacyList create(XMPPResourceConnection session, RosterAbstract rosterUtil, Element el) {
+	public static PrivacyList create(XMPPResourceConnection session, RosterAbstract rosterUtil, Element el)
+			throws NotAuthorizedException, TigaseDBException {
 		if (el == null) {
 			return null;
 		}
 
-		return new PrivacyList((jid) -> {
-			try {
-				return rosterUtil.getRosterElement(session, jid);
-			} catch (NotAuthorizedException | TigaseDBException ex) {
-				return null;
-			}
-		}, el).getSingletonIfPossible();
+		return new PrivacyList(rosterUtil.rosterElementProvider(session), el).getSingletonIfPossible();
 	}
 
 	public PrivacyList(Function<JID, RosterElement> rosterElementGetter, Element el) {

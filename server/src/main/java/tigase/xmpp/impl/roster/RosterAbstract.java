@@ -37,6 +37,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -733,6 +734,8 @@ public abstract class RosterAbstract {
 
 	public abstract RosterElement getRosterElement(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException;
+
+	public abstract Function<JID, RosterElement> rosterElementProvider(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException;
 
 	public List<Element> getRosterItems(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
