@@ -19,6 +19,7 @@
 
 package tigase.util.updater;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import tigase.util.Version;
 
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 public class UpdatesCheckerTest {
 
 	@Test
-//	@Ignore
+	@Ignore
 	public void retrieveVersion() {
 
 		Logger log = Logger.getLogger(UpdatesChecker.class.getName());
@@ -45,7 +46,6 @@ public class UpdatesCheckerTest {
 		UpdatesChecker.ProductInfoIfc product2 = new TestProduct("iot-hub", "IoT hub", "7.7.7");
 		final List<UpdatesChecker.ProductInfoIfc> products = Arrays.asList(product, product2);
 
-//		String url = "http://atlantiscity.local:1234/rest/update/check/";
 		String url = "http://atlantiscity.local:8080/rest/update/check/";
 
 		final Optional<Version> version = UpdatesChecker.retrieveCurrentVersionFromServer(Version.of("8.0.0"), products,
