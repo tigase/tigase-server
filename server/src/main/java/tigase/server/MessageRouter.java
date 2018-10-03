@@ -475,35 +475,7 @@ public class MessageRouter
 			return;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Command received: " + iq.toString());
-		}
-		switch (iq.getCommand()) {
-			case OTHER:
-				if (iq.getStrCommand() != null) {
-					if (iq.getStrCommand().startsWith("controll/")) {
-						String[] spl = iq.getStrCommand().split("/");
-						String cmd = spl[1];
-
-						if (cmd.equals("stop")) {
-							Packet result = iq.commandResult(Command.DataType.result);
-
-							results.offer(result);
-
-							// processPacket(result);
-							new Timer("Stopping...", true).schedule(new TimerTask() {
-								@Override
-								public void run() {
-									System.exit(0);
-								}
-							}, 2000);
-						}
-					}
-				}
-
-				break;
-
-			default:
-				break;
+			log.finest("Command received: " + iq.toString() + ", but no commands available!");
 		}
 	}
 
