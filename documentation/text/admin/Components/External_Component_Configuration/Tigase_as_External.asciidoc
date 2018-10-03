@@ -84,9 +84,8 @@ You need to pass:
 * Port number - port on which component should wait for connection or on which it try to connect (`5270`)
 * Remote host - host to connect to (`devel.tigase.org`)
 * Protocol - id of protocol used for establishing connection
-** `connect` - establish connection using https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol] for connection to the server
-** `accept` - establish connection using https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol] for accepting connection from the server
-** `client` - establish connection with https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
+** `XEP-0114: Jabber Component Protocol (accept)` - establish connection using https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
+** `XEP-0225: Component Connections` - establish connection using https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
 
 Additional options may be left with defaults.
 
@@ -197,7 +196,7 @@ To make this new instance connect to the Tigase XMPP Server, you need to create 
 
 [source,text]
 ----
-muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:connect
+muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:accept
 ----
 
 WARNING: While loading configuration from `etc/externalComponentItems` file is supported, we recommend usage of shared database if possible. In future this method may be deprecated.

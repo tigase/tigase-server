@@ -39,12 +39,12 @@ image:images/admin/adminui_ext_add_item_form.png[]
 * Remote host - host to connect to (`devel.tigase.org`) _(may be left blank if component will only accept connections)_
 * Protocol - id of protocol used for establishing connection
 ** if connection type is `connect`:
-*** `Connect` - for https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
-*** `Client` - for https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
+*** `XEP-0114: Jabber Component Protocol (accept)` - for https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
+*** `XEP-0225: Component Connections` - for https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
 ** if connection type is `accept`:
 *** `Autodetect` - for automatic detection of protocol used by incoming connection _(recommended)_
-*** `Accept` - for https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
-*** `Client` - for https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
+*** `XEP-0114: Jabber Component Protocol (accept)` - for https://xmpp.org/extensions/xep-0114.html[XEP-0114: Jabber Component Protocol]
+*** `XEP-0225: Component Connections` - for https://xmpp.org/extensions/xep-0225.html[XEP-0225: Component Connections]
 
 Additional options may be left with defaults.
 

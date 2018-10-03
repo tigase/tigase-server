@@ -123,12 +123,11 @@ public class CompRepoItem
 			builder.addField(DataForm.FieldType.TextSingle, REMOTE_HOST_LABEL).setValue(remoteHost).build();
 			builder.addField(DataForm.FieldType.ListSingle, PROTO_XMLNS_LABEL)
 					.addOption("", "Autodetect")
-					.addOption("accept", "Accept")
+					.addOption("accept", "XEP-0114: Jabber Component Protocol (accept)")
 //					.addOption("connect", "Connect")
-					.addOption("client", "Client")
+					.addOption("client", "XEP-0225: Component Connections")
 					.setValue(prop_xmlns)
-					.setDesc("For 'accept' connection type you may use 'Autodetect' but for 'connect' type you need to select 'Accept' or 'Client'")
-//					.setDesc("For 'accept' connection type you may use 'Autodetect' but for 'connect' type you need to select 'Connect' or 'Client'")
+					.setDesc("For 'accept' connection type you may use 'Autodetect' but for 'connect' type you need to select exact protocol")
 					.build();
 			builder.addField(DataForm.FieldType.TextSingle, LB_CLASS_LABEL)
 					.setValue(lb != null ? lb.getClass().getName() : null)
@@ -393,23 +392,12 @@ public class CompRepoItem
 		if (auth_pass == null) {
 			return "Password is required";
 		}
-//		if (prop_xmlns == null) {
-//			return "Protocol is required";
-//		}
 		if (prop_xmlns != null && "connect".equals(prop_xmlns)) {
 			return "Feature not implemented. Please use 'accept' protocol";
 		}
-//		if (type == ConnectionType.accept) {
-//			if (prop_xmlns != null && "connect".equals(prop_xmlns)) {
-//				return "Invalid protocol selected! For accepting socket it is impossible to use 'connect' protocol.";
-//			}
-//		} else if (type == ConnectionType.connect) {
-//			if (prop_xmlns != null && "accept".equals(prop_xmlns)) {
-//				return "Invalid protocol selected! For connecting socket it is impossible to use 'accept' protocol.";
-//			} else if (prop_xmlns == null) {
-//				return "It is required to select protocol for connecting socket!";
-//			}
-//		}
+		if (type == ConnectionType.connect && prop_xmlns == null) {
+			return "It is required to select protocol for connecting socket!";
+		}
 		return null;
 	}
 
