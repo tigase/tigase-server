@@ -32,6 +32,7 @@ import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterElement;
+import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -63,6 +64,8 @@ public class JabberIqPrivacyTest
 	public void setUp() throws Exception {
 		try {
 			getKernel().registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
+			getKernel().registerBean(RosterFactory.Bean.class).setActive(true).exec();
+			getKernel().getInstance(RosterFactory.Bean.class);
 			getKernel().registerBean(JabberIqPrivacy.class).exec();
 
 			privacyFilter = getInstance(JabberIqPrivacy.class);
