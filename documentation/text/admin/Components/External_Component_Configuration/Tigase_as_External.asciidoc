@@ -192,7 +192,7 @@ ext () {
 }
 -----
 
-To make this new instance connect to the Tigase XMPP Server, you need to create one more file with external connection configuration at `etc/externalComponentItems`which will be loaded to the local database and then removed.
+To make this new instance connect to the Tigase XMPP Server, you need to create one more file with external connection configuration at `etc/externalComponentItems` which will be loaded to the local database and then removed.
 
 [source,text]
 ----
