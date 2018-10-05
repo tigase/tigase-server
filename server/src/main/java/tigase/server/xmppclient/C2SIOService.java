@@ -29,6 +29,7 @@ import tigase.xmpp.XMPPIOService;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -159,6 +160,8 @@ public class C2SIOService<RefObject>
 					break;
 			}
 		}
+		log.log(Level.FINER, "Tried Not found SSL/TLS handshake, bb: {0}, contents: {1} , cb: {2}",
+				new String[]{String.valueOf(buffer), Arrays.toString(buffer.array()), String.valueOf(cb.array())});
 		return false;
 	}
 
