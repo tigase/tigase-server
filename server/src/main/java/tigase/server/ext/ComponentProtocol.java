@@ -457,7 +457,7 @@ public class ComponentProtocol
 		// Activate all connections for which parameters are defined in the
 		// repository
 		for (CompRepoItem repoItem : repo) {
-			itemAdded(repoItem);
+			itemUpdated(repoItem);
 		}
 
 	}
