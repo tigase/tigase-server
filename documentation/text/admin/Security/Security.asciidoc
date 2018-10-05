@@ -138,6 +138,8 @@ There is following lis of configuration parameters:
 | `brute-force-mode`                | `string`  | Working mode (see <<bruteForcePrevention_WorkingModes>>)
 |======================================
 
+NOTE: you can specify default brute-force configuration for all VHosts as described in <<defaultVhostConfiguration>>
+
 [[bruteForcePrevention_WorkingModes]]
 ==== Working modes
 
@@ -152,7 +154,7 @@ NOTE: Only in modes `Jid` and `IpJid` account may be permanently disabled.
 
 ==== Permanent ban
 
-In modes Jid` and `IpJid`, when invalid login counter reach threshold `brute-force-disable-after-fails`, account
+In modes `Jid` and `IpJid`, when invalid login counter reach threshold `brute-force-disable-after-fails`, account
 status will be set o `disabled`.
 To enable it again you should use https://xmpp.org/extensions/xep-0133.html#reenable-users[Re-Enable User] Ad-hoc
 Command.

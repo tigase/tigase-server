@@ -22,3 +22,26 @@ You may also want to reference the Vhosts API for additional information:
 
 TIP: If you have a Tigase XMPP Server running in the cluster mode hidden behind some load balancer, or if internal IP or hostname of cluster nodes differ from the DNS name under which it is available from the internet, we would suggest setting a property `installation-dns-address` of `vhost-man` component to the DNS name which allows you to connect to all cluster nodes (ie. to the DNS name of the load balancer).
 This will allow Tigase XMPP Server to do proper DNS lookups to verify that DNS domain name of the virtual host which you will try to add or update points to your XMPP installation.
+
+[[defaultVhostConfiguration]]
+== Default VHost configuration
+
+It's possible to specify default configuration for all Virtual Host in TDSL configuration file (i.e. `etc/config.tdsl`). To do so you should specify each configuration option within `defaults` bean belonging to `vhost-man` bean, for example:
+
+```
+'vhost-man' () {
+    'defaults' () {
+        'domain-filter-policy' = null
+        'hardened-mode' = false
+        's2s-secret' = null
+        trusted = null
+        'vhost-anonymous-enabled' = true
+        'vhost-disable-dns-check' = false
+        'vhost-max-users' = 0L
+        'vhost-message-forward-jid' = null
+        'vhost-presence-forward-jid' = null
+        'vhost-register-enabled' = true
+        'vhost-tls-required' = false
+    }
+}
+```
