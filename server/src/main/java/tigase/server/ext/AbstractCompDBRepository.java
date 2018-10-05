@@ -122,7 +122,6 @@ public class AbstractCompDBRepository
 				reader.lines()
 						.flatMap(list -> Arrays.stream(list.split(",")))
 						.map(this::newItemFromPropertyString)
-						.filter(item -> !this.contains(item.getKey()))
 						.forEach(this::addItemNoStore);
 				f.delete();
 			} catch (IOException ex) {
