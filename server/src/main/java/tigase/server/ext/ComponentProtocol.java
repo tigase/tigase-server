@@ -436,8 +436,15 @@ public class ComponentProtocol
 			ConnectionType type = service.connectionType();
 
 			if (type == ConnectionType.connect) {
-				addWaitingTask(sessionData);
-
+				CompRepoItem connItem = (CompRepoItem) sessionData.get(REPO_ITEM_KEY);
+				if (connItem == null) {
+					addWaitingTask(sessionData);
+				} else {
+					CompRepoItem newItem = repo.getItem(connItem.getKey());
+					if (newItem == connItem) {
+						addWaitingTask(sessionData);
+					}
+				}
 				// reconnectService(sessionData, connectionDelay);
 			}    // end of if (type == ConnectionType.connect)
 		}
@@ -593,6 +600,16 @@ public class ComponentProtocol
 		if (listeners != null) {
 			for (ConnectionOpenListener listener : listeners) {
 				releaseListener(listener);
+			}
+		}
+
+		// key is remote host name! so we need to find connections which are actually related
+		for (List<ComponentConnection> componentConnections : connections.values()) {
+			for (ComponentConnection connection : componentConnections) {
+				CompRepoItem connItem = (CompRepoItem) connection.getService().getSessionData().get(REPO_ITEM_KEY);
+				if (connItem.getKey().equals(item.getKey())) {
+					connection.getService().stop();
+				}
 			}
 		}
 	}

@@ -327,6 +327,11 @@ public class ConfigurationCache
 
 	@Override
 	public void removeItem(String key) throws TigaseDBException {
+		removeItemNoStore(key);
+	}
+
+	@Override
+	public void removeItemNoStore(String key) {
 		ConfigItem item = getItem(key);
 
 		if (item != null) {

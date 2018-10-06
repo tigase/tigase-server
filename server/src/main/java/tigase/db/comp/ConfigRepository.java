@@ -263,6 +263,20 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
+	@Override
+	public void removeItemNoStore(String key) {
+		Item item = items.remove(key);
+
+		if (item != null) {
+			if (repoChangeList != null) {
+				repoChangeList.itemRemoved(item);
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Removing item: {0}", item);
+			}
+		}
+	}
+
 	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {

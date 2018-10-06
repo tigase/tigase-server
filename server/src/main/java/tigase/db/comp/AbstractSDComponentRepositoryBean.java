@@ -111,6 +111,11 @@ public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryI
 		getRepository().removeItem(key);
 	}
 
+	@Override
+	public void removeItemNoStore(String key) {
+		getRepository().removeItemNoStore(key);
+	}
+
 	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {

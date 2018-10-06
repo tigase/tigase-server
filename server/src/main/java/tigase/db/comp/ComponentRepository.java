@@ -150,6 +150,8 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 */
 	void removeItem(String key) throws TigaseDBException;
 
+	void removeItemNoStore(String key);
+
 	/**
 	 * The method is called to set configuration for this repository implementation. The configuration is repository
 	 * implementation dependent. There are no default settings for the repository.

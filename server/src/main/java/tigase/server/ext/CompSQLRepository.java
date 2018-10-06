@@ -336,6 +336,11 @@ public class CompSQLRepository
 		}
 	}
 
+	@Override
+	public void removeItemNoStore(String key) {
+		
+	}
+
 	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {

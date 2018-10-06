@@ -30,7 +30,9 @@ import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.HashSet;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,24 +78,36 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			if (items_list != null) {
 				hashCode = items_list.hashCode();
 
-				if (!items_list.isEmpty() && hashCode != itemsHash) {
-					DomBuilderHandler domHandler = new DomBuilderHandler();
-					SimpleParser parser = SingletonFactory.getParserInstance();
+				if (hashCode != itemsHash) {
+					Set<String> oldKeys = new HashSet<>(super.items.keySet());
 
-					parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
+					if (!items_list.isEmpty()) {
+						DomBuilderHandler domHandler = new DomBuilderHandler();
+						SimpleParser parser = SingletonFactory.getParserInstance();
 
-					Queue<Element> elems = domHandler.getParsedElements();
+						parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
 
-					if ((elems != null) && (elems.size() > 0)) {
-						for (Element elem : elems) {
-							Item item = getItemInstance();
+						Queue<Element> elems = domHandler.getParsedElements();
 
-							item.initFromElement(elem);
-							addItemNoStore(item);
+						if ((elems != null) && (elems.size() > 0)) {
+							for (Element elem : elems) {
+								Item item = getItemInstance();
+
+								item.initFromElement(elem);
+								addItemNoStore(item);
+								oldKeys.remove(item.getKey());
+							}
 						}
+						log.log(Level.CONFIG, "All loaded items: {0}", items);
 					}
-					log.log(Level.CONFIG, "All loaded items: {0}", items);
 					itemsHash = hashCode;
+
+					for (String key : oldKeys) {
+						removeItemNoStore(key);
+					}
+				}
+
+				if (hashCode != itemsHash) {
 				}
 			}
 		} catch (TigaseDBException ex) {
