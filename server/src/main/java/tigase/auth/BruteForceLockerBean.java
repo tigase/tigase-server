@@ -11,6 +11,7 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.auth.BruteForceLockerBean.Mode.IpJid;
@@ -71,6 +72,9 @@ public class BruteForceLockerBean
 
 	public void addInvalidLogin(XMPPResourceConnection session, String ip, BareJID jid, final long currentTime) {
 		if (ip == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("IP is null. Skip adding entry.");
+			}
 			return;
 		}
 		if (map == null) {
@@ -84,9 +88,16 @@ public class BruteForceLockerBean
 		if (value == null) {
 			value = new Value();
 			value.setBadLoginCounter(0);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Entry didn't exists. Create new one.");
+			}
 		}
 
 		if (value.getInvalidateAtTime() < currentTime) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Entry exists and is old, reset counter.");
+			}
 			value.setBadLoginCounter(0);
 		}
 
@@ -95,10 +106,14 @@ public class BruteForceLockerBean
 		final long lockAfterFails = session == null ? 3 : (long) session.getDomain().getData(LOCK_AFTER_FAILS_KEY);
 		if (value.getBadLoginCounter() <= lockAfterFails) {
 			final long periodTime =
-					session == null ? 10 : (long) session.getDomain().getData(LOCK_PERIOD_TIME_KEY) * 1000;
+					(session == null ? 10 : (long) session.getDomain().getData(LOCK_PERIOD_TIME_KEY)) * 1000;
 			value.setInvalidateAtTime(currentTime + periodTime);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("IP is null. Skip adding entry.");
+			}
 		} else {
-			final long lockTime = session == null ? 10 : (long) session.getDomain().getData(LOCK_TIME_KEY) * 1000;
+			final long lockTime = (session == null ? 10 : (long) session.getDomain().getData(LOCK_TIME_KEY)) * 1000;
 			value.setInvalidateAtTime(currentTime + lockTime);
 		}
 
@@ -188,6 +203,9 @@ public class BruteForceLockerBean
 	public boolean isLoginAllowed(XMPPResourceConnection session, final String ip, final BareJID jid,
 								  final long currentTime) {
 		if (ip == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("IP is null. Return true.");
+			}
 			return true;
 		}
 		if (map == null) {
@@ -199,15 +217,26 @@ public class BruteForceLockerBean
 		Value value = map.get(key);
 
 		if (value == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("No entry for " + key + ". Return true.");
+			}
 			return true;
 		}
 
 		if (value.getInvalidateAtTime() < currentTime) {
 			map.remove(key);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Entry existed, but was too old. Entry removed. Return true.");
+			}
 			return true;
 		} else {
 			long lockAfterFails = session == null ? 3 : (long) session.getDomain().getData(LOCK_AFTER_FAILS_KEY);
-			return value.badLoginCounter <= lockAfterFails;
+			boolean r = value.badLoginCounter <= lockAfterFails;
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Entry exist. lockAfterFails=" + lockAfterFails + ", value" + ".badLoginCounter=" +
+								   value.badLoginCounter + ", result=" + r);
+			}
+			return r;
 		}
 	}
 
@@ -285,6 +314,11 @@ public class BruteForceLockerBean
 
 		public boolean isJIDPresent() {
 			return jid != null && !jid.equals(ANY);
+		}
+
+		@Override
+		public String toString() {
+			return "Key[ip=" + ip + ", jid=" + jid + ", domain=" + domain + "]";
 		}
 
 	}
