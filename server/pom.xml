@@ -4,6 +4,8 @@
     <properties>
         <packaging.type>bundle</packaging.type>
         <tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
+        <!--<tests.logger_properties>src/test/resources/logging.properties</tests.logger_properties>-->
+        <tests.logger_properties/>
     </properties>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tigase-server</artifactId>
@@ -146,7 +148,7 @@
                     <systemProperties>
                         <property>
                             <name>java.util.logging.config.file</name>
-                            <value>src/test/resources/logging.properties</value>
+                            <value>${tests.logger_properties}</value>
                         </property>
                     </systemProperties>
                     <systemPropertyVariables>
