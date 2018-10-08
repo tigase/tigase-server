@@ -24,18 +24,20 @@ Get config.tdsl configuration from memory.
 
 AS:Description: Get config.tdsl configuration
 AS:CommandId: get-config-tdsl
-AS:Component: basic-conf
+AS:Component: message-router
+AS:Group: Configuration
 */
 
 package tigase.admin
 
-import tigase.db.comp.ComponentRepository
+import tigase.component.DSLBeanConfigurator
+import tigase.kernel.core.Kernel
 import tigase.server.Command
-import tigase.server.Packet
+import tigase.server.Iq
 
-def repo = (ComponentRepository) comp_repo
-def p = (Packet) packet
-def admins = (Set) adminsSet
+Kernel kernel = (Kernel) kernel;
+Iq p = (Iq) packet
+Set<String> admins = (Set<String>) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
@@ -44,11 +46,11 @@ def result = p.commandResult(Command.DataType.result);
 if (!isServiceAdmin) {
 	Command.addTextField(result, "Error", "You are not service administrator");
 } else {
-	def lines = [ ];
-	initProperties.each { key, value -> lines += key + "=" + value;
-	}
-
-	Command.addFieldMultiValue(result, "config.tdsl", lines);
+	DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+	StringWriter writer = new StringWriter();
+	configurator.dumpConfiguration(writer);
+	
+	Command.addFieldMultiValue(result, "config.tdsl", Arrays.asList(writer.toString().split("\n")));
 }
 
 return result;

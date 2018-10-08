@@ -25,6 +25,7 @@ Get configuration file
 AS:Description: Get configuration file
 AS:CommandId: get-config-file
 AS:Component: message-router
+AS:Group: Configuration
 */
 
 package tigase.admin

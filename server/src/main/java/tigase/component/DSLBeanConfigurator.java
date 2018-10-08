@@ -31,6 +31,7 @@ import tigase.osgi.ModulesManagerImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Level;
@@ -83,6 +84,13 @@ public class DSLBeanConfigurator
 		dumpConfiguration(dump, kernel);
 
 		new ConfigWriter().resolveVariables().write(f, dump);
+	}
+
+	public void dumpConfiguration(Writer writer) throws IOException {
+		Map<String, Object> dump = new LinkedHashMap<>(props);
+		dumpConfiguration(dump, kernel);
+
+		new ConfigWriter().resolveVariables().write(writer, dump);
 	}
 
 	protected boolean hasDirectConfiguration(BeanConfig beanConfig) {
