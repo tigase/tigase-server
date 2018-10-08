@@ -174,6 +174,7 @@ public class BruteForceLockerBean
 	@Override
 	public void initialize() {
 		this.map = ClusterMapFactory.get().createMap(MAP_TYPE, Key.class, Value.class);
+		assert this.map != null : "Distributed Map is NULL!";
 	}
 
 	public boolean isEnabled(XMPPResourceConnection session) {
