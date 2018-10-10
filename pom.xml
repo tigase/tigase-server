@@ -5,7 +5,6 @@
 		<tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
 	<name>Tigase XMPP Server</name>
 	<packaging>${packaging.type}</packaging>

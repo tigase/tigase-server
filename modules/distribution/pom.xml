@@ -7,7 +7,6 @@
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>tigase</groupId>
 	<artifactId>tigase-server-dist</artifactId>
 	<name>Tigase XMPP Server Distribution builder</name>
 
