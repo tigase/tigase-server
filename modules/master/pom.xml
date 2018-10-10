@@ -209,6 +209,8 @@
 							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
 							<destDir>docs/javadoc</destDir>
 							<maxmemory>512m</maxmemory>
+
+							<additionalparam>-Xdoclint:none</additionalparam>
 						</configuration>
 					</execution>
 				</executions>
