@@ -108,13 +108,15 @@ public class BruteForceLockerBean
 			final long periodTime =
 					(session == null ? 10 : (long) session.getDomain().getData(LOCK_PERIOD_TIME_KEY)) * 1000;
 			value.setInvalidateAtTime(currentTime + periodTime);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("IP is null. Skip adding entry.");
-			}
 		} else {
 			final long lockTime = (session == null ? 10 : (long) session.getDomain().getData(LOCK_TIME_KEY)) * 1000;
 			value.setInvalidateAtTime(currentTime + lockTime);
+		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(
+					"New invalidate time for " + key + " == " + value.getInvalidateAtTime() + "; getBadLoginCounter " +
+							"== " + value.getBadLoginCounter());
 		}
 
 		map.put(key, value);

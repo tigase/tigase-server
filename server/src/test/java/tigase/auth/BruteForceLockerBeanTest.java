@@ -10,6 +10,7 @@ public class BruteForceLockerBeanTest {
 	public void test3InvalidLoginsAndWait() {
 		BruteForceLockerBean bean = new BruteForceLockerBean();
 		bean.initialize();
+		bean.clearAll();
 
 		bean.addInvalidLogin(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 100000);
 		Assert.assertTrue(bean.isLoginAllowed(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 100001));
@@ -27,6 +28,7 @@ public class BruteForceLockerBeanTest {
 	public void test4InvalidLogins() {
 		BruteForceLockerBean bean = new BruteForceLockerBean();
 		bean.initialize();
+		bean.clearAll();
 
 		Assert.assertTrue(bean.isLoginAllowed(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 99999));
 		bean.addInvalidLogin(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 100000);
