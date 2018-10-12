@@ -26,7 +26,7 @@ This will allow Tigase XMPP Server to do proper DNS lookups to verify that DNS d
 [[defaultVhostConfiguration]]
 == Default VHost configuration
 
-It's possible to specify default configuration for all Virtual Host in TDSL configuration file (i.e. `etc/config.tdsl`). To do so you should specify each configuration option within `defaults` bean belonging to `vhost-man` bean, for example:
+It's possible to specify default configuration for all Virtual Host in TDSL configuration file (i.e. `etc/config.tdsl`) for selected parameters. To do so you should specify each configuration option within `defaults` bean belonging to `vhost-man` bean:
 
 ```
 'vhost-man' () {
@@ -35,7 +35,6 @@ It's possible to specify default configuration for all Virtual Host in TDSL conf
         'hardened-mode' = false
         's2s-secret' = null
         trusted = null
-        'vhost-anonymous-enabled' = true
         'vhost-disable-dns-check' = false
         'vhost-max-users' = 0L
         'vhost-message-forward-jid' = null

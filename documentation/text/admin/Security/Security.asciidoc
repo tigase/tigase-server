@@ -138,8 +138,6 @@ There is following lis of configuration parameters:
 | `brute-force-mode`                | `string`  | Working mode (see <<bruteForcePrevention_WorkingModes>>)
 |======================================
 
-NOTE: you can specify default brute-force configuration for all VHosts as described in <<defaultVhostConfiguration>>
-
 [[bruteForcePrevention_WorkingModes]]
 ==== Working modes
 
