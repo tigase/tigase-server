@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>7.1.4</version>
+		<version>7.1.5-SNAPSHOT</version>
 		<relativePath>../master</relativePath>
 	</parent>
 	
@@ -308,7 +308,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-server</artifactId>
-			<version>7.1.4</version>
+			<version>7.1.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
