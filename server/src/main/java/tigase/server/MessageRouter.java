@@ -801,7 +801,8 @@ public class MessageRouter
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "No component name matches (VHost lookup against component name): " +
 							"{0}, for map: {1}, for all VHosts: {2}; trying other forms of addressing",
-					new Object[]{jid, components.keySet(), vHostManager.getAllVHosts()});
+					new Object[]{jid, components.keySet(), vHostManager.getAllVHosts().size() > 20 ? "[hosts count: " +
+							vHostManager.getAllVHosts().size() + "]" : String.valueOf(vHostManager.getAllVHosts())});
 		}
 
 		// Instead of a component ID built of: component name + "@" domain name
