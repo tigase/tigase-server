@@ -42,7 +42,7 @@ include::text/Component_Implementation/Data_Repository.asciidoc[leveloffset=+2]
 
 include::text/Component_Implementation/Startup_Time.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/http-api/documentation/devlink.asciidoc[leveloffset=+1]
+include::target/text/components/http-api/documentation/devlink.asciidoc[leveloffset=+1]
 
 include::text/Packet_Filtering_in_Component.asciidoc[leveloffset=+1]
 

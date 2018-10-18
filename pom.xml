@@ -209,22 +209,36 @@
         <groupId>org.commonjava.maven.plugins</groupId>
         <artifactId>directory-maven-plugin</artifactId>
         <version>0.1</version>
-        <executions>
-          <execution>
-            <id>directories</id>
-            <goals>
-              <goal>directory-of</goal>
-            </goals>
-            <phase>initialize</phase>
-            <configuration>
-              <property>myproject.basedir</property>
-              <project>
-                <groupId>tigase</groupId>
-                <artifactId>tigase-server-master</artifactId>
-              </project>
-            </configuration>
-          </execution>
-        </executions>
+          <executions>
+              <execution>
+                  <id>directories-clean</id>
+                  <goals>
+                      <goal>directory-of</goal>
+                  </goals>
+                  <phase>pre-clean</phase>
+                  <configuration>
+                      <property>myproject.basedir</property>
+                      <project>
+                          <groupId>tigase</groupId>
+                          <artifactId>tigase-server-master</artifactId>
+                      </project>
+                  </configuration>
+              </execution>
+              <execution>
+                  <id>directories</id>
+                  <goals>
+                      <goal>directory-of</goal>
+                  </goals>
+                  <phase>validate</phase>
+                  <configuration>
+                      <property>myproject.basedir</property>
+                      <project>
+                          <groupId>tigase</groupId>
+                          <artifactId>tigase-server-master</artifactId>
+                      </project>
+                  </configuration>
+              </execution>
+          </executions>
       </plugin>
     </plugins>
   </build>

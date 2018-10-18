@@ -65,7 +65,7 @@ include::text/admin/Configuration/Logging.asciidoc[leveloffset=+2]
 
 include::text/admin/Using_Tigase/Advanced_Options.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/tigase-extras/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/tigase-extras/documentation/index.asciidoc[leveloffset=+2]
 
 // Security
 include::text/admin/Security/Security.asciidoc[leveloffset=+1]
@@ -132,13 +132,13 @@ include::text/admin/Database_Management/Schema_Updates/Tigase_v5.x.asciidoc[leve
 // Components
 include::text/admin/Components/Components.asciidoc[leveloffset=+1]
 
-include::../server/target/text/components/http-api/documentation/adminlink.asciidoc[leveloffset=+2]
+include::target/text/components/http-api/documentation/adminlink.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/tigase-message-archiving/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/tigase-message-archiving/documentation/index.asciidoc[leveloffset=+2]
 
 include::text/admin/Components/Advanced_Message_Processing.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/pubsub/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/pubsub/documentation/index.asciidoc[leveloffset=+2]
 
 include::text/admin/Components/Monitoring/Monitoring.asciidoc[leveloffset=+2]
 
@@ -168,19 +168,19 @@ include::text/admin/Components/External_Component_Configuration/Load_Balancing.a
 
 include::text/admin/Components/C2S.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/socks5/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/socks5/documentation/index.asciidoc[leveloffset=+2]
 
 include::text/admin/Components/External_Service_Discovery_Component.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/tigase-push/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/tigase-push/documentation/index.asciidoc[leveloffset=+2]
 
 // include::text/components/tigase-push-apns/documentation/index.asciidoc[leveloffset=+3]
 
 // include::text/components/tigase-push-fcm/documentation/index.asciidoc[leveloffset=+3]
 
-include::../server/target/text/components/tigase-stun/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/tigase-stun/documentation/index.asciidoc[leveloffset=+2]
 
-include::../server/target/text/components/tigase-spam/documentation/index.asciidoc[leveloffset=+2]
+include::target/text/components/tigase-spam/documentation/index.asciidoc[leveloffset=+2]
 
 //Using Tigase
 include::text/admin/Using_Tigase/Intro.asciidoc[leveloffset=+1]

@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
 		<packaging.type>pom</packaging.type>
-		<!--<guide_path>${project.build.directory}/docs/Development_Guide</guide_path>-->
         <guide_path>${myproject.basedir}/distribution-docs/Development_Guide</guide_path>
 		<guide_name>Development</guide_name>
 	</properties>
@@ -59,28 +58,8 @@
 				<artifactId>maven-clean-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>Remove *.fo file</id>
-						<phase>package</phase>
-					</execution>
-					<execution>
-						<id>clean build data</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<filesets>
-								<fileset>
-									<directory>${guide_path}/html</directory>
-									<followSymlinks>false</followSymlinks>
-									<includes>
-										<include>**/target/**</include>
-										<include>**/text/**</include>
-									</includes>
-								</fileset>
-							</filesets>
-							<!--<verbose>true</verbose>-->
-						</configuration>
+						<id>clean generated documentation</id>
+						<phase>clean</phase>
 					</execution>
 				</executions>
 			</plugin>			
