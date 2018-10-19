@@ -7,6 +7,20 @@
 :numbered:
 :website: http://tigase.net/
 
+== Tigase Architecture
+
+The most important thing to understand is that Tigase is very modular and you can have multiple components running inside single instance. However one of the most important components is MessageRouter, which sits in the centre and serves as a, as name suggest, packet router directing packets to the appropriate components.
+
+There is also a group of specialised component responsible for handling users connections: `ConnectionManagers` (`c2s`, `s2s`, `ws2s`, `bosh`). They receive packets from the incoming connection, then subsequently they forward processed packet to `MessageRouter`. Most of the time, especially for packets coming from user connections, packet is routed to `SessionManager` component (with the session object referring to appropriate user in case of client to server connection). After processing in `SessionManager` packet goes back to `MessageRouter` and then, based on the stanza addressing` can go to different component (muc, pubsub) or if it's addressed to another user it can go through:
+
+* `SessionManager` (again), `MessageRouter` and then (user) `ConnectionManagers` or,
+* `s2s` (_server to server connection manager_) if the user or component is on the different, federated, xmpp server;
+
+In a very broad view this can be depicted with a following graph:
+
+image:images/tigase-architecture.svg[Tigase architecture]
+
+
 == Tigase Server Elements
 To make it easier to get into the code below are defined basic terms in the Tigase server world and there is a brief explanation how the server is designed and implemented. This document also points you to basic interfaces and implementations which can be used as example code reference.
 
@@ -21,6 +35,7 @@ There is an API defined for each kind of above modules and all you have to do is
 Here is a brief list of all interfaces to look at and for more details you have to refer to the guide for specific kind of module.
 
 === Components
+
 This is list of interfaces to look at when you work on a new component:
 
 . *tigase.server.ServerComponent* - This is the very basic interface for component. All components must implement it.
@@ -32,17 +47,17 @@ This is list of interfaces to look at when you work on a new component:
 Instead of implementing above interfaces directly, it is recommended to extend one of existing abstract classes which take care of the most of "dirty and boring" stuff. Here is a list the most useful abstract classes:
 
 
-- *tigase.server.AbstractMessageReceiver* - Implements 4 basic interfaces:
-
+* *tigase.server.AbstractMessageReceiver* - Implements 4 basic interfaces:
++
 `ServerComponent`, `MessageReceiver`, `Configurable` and `StatisticsContainer`. AbstractMessageReceiver also manages internal data queues using it's own threads which prevents dead-locks from resource starvation. It offers even-driven data processing which means whenever packet arrives the `abstract void processPacket(Packet packet);` method is called to process it. You have to implement this abstract method in your component, if your component wants to send a packet (in response to data it received for example).
-
++
 [source,java]
 -----
 boolean addOutPacket(Packet packet)
 -----
 
-
-- *tigase.server.ConnectionManager* - This is an extension of `AbstractMessageReceiver` abstract class. As the name says this class takes care of all network connection management stuff. If your component needs to send and receive data directly from the network (like c2s connection, s2s connection or external component) you should use this implementation as a basic class. It takes care of all things related to networking, I/O, reconnecting, listening on socket, connecting and so on. If you extend this class you have to expect data coming from to sources:
+* *tigase.server.ConnectionManager* - This is an extension of `AbstractMessageReceiver` abstract class. As the name says this class takes care of all network connection management stuff. If your component needs to send and receive data directly from the network (like c2s connection, s2s connection or external component) you should use this implementation as a basic class. It takes care of all things related to networking, I/O, reconnecting, listening on socket, connecting and so on. If you extend this class you have to expect data coming from to sources:
++
 From the `MessageRouter` and this is when the `abstract void processPacket(Packet packet);` method is called and second, from network connection and then the `abstract Queue processSocketData(XMPPIOService serv);` method is called.
 
 === Plug-ins
