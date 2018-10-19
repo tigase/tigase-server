@@ -177,7 +177,7 @@ public class BlockingCommandTest
 		XMPPResourceConnection sess = getSession(connJid, userJid);
 
 		String blockJid = "block-1@example.com";
-		roster_util.addBuddy(sess, JID.jidInstance(blockJid), "Block-1", null, null);
+		roster_util.addBuddy(sess, JID.jidInstance(blockJid), "Block-1", null, null, null);
 		roster_util.setBuddySubscription(sess, RosterAbstract.SubscriptionType.both, JID.jidInstance(blockJid));
 
 		checkPrivacyJidBlocked(sess, blockJid, false);

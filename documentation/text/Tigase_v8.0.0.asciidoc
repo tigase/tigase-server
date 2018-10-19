@@ -254,6 +254,8 @@ Version 8.0.0 improves security by preventing brute-force attacks. Feature needs
 - https://tigase.tech/issues/7446[#7446] User credentials can now be managed with Ad-hoc commands.
 - https://tigase.tech/issues/7743[#7743] Improved error message when repository is not found.
 - https://tigase.tech/issues/7773[#7773] Ad-hoc commands can now by executed asynchronously.
+- https://tigase.tech/issues/2341[#2341] allow specifying SubscriptionType when adding buddy to avoid calling separately .setBuddySubscription() thus eliminating saving roster twice to database if not needed
+
 
 == Fixes
 - https://tigase.tech/issues/2750[#2750] Multiple artifact and depreciated file cleanup. Massive code cleanup and javadoc cleaning.

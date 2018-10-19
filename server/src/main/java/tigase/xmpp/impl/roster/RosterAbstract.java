@@ -20,6 +20,7 @@
 
 package tigase.xmpp.impl.roster;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
@@ -485,8 +486,16 @@ public abstract class RosterAbstract {
 	}
 
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
-								  String otherData)
+								  SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.0.0", removeIn = "9.0.0")
+	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
+								  String otherData)
+			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
+		addBuddy(session, jid, name, groups, null, otherData);
+	}
 
 	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy, final String[] groups)
 			throws NotAuthorizedException, TigaseDBException;
@@ -540,7 +549,7 @@ public abstract class RosterAbstract {
 			// don't create new roster item for incomming unsubscribe presence #219 /
 			// #210
 			if ((presence != PresenceType.in_unsubscribe) && (presence != PresenceType.out_unsubscribe)) {
-				addBuddy(session, jid, null, null, null);
+				addBuddy(session, jid, null, null, null, null);
 			}
 			current_subscription = SubscriptionType.none;
 		}

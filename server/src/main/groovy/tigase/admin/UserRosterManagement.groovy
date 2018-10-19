@@ -169,8 +169,7 @@ class RosterChangesControler {
 		List<XMPPResourceConnection> activeConnections = getActiveConnections(jid)
 		for (XMPPResourceConnection conn : activeConnections) {
 			if (remove == false) {
-				rosterUtil.addBuddy(conn, jidToChangeJID, jidToChange, groups, null)
-				rosterUtil.setBuddySubscription(conn, subscription(subStr), jidToChangeJID)
+				rosterUtil.addBuddy(conn, jidToChangeJID, jidToChange, groups, subscription(subStr), null)
 				rosterUtil.updateBuddyChange(conn, packets,
 											 rosterUtil.getBuddyItem(conn, jidToChangeJID))
 			} else {

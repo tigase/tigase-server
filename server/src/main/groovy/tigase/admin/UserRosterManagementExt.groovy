@@ -139,9 +139,7 @@ try {
 			if (remove_item) {
 				rosterUtil.removeBuddy(conn, i_jid)
 			} else {
-				rosterUtil.addBuddy(conn, i_jid, i_name ?: i_jid.getLocalpart(), i_groups ? i_groups.split(",") : null,
-									null)
-				rosterUtil.setBuddySubscription(conn, RosterAbstract.SubscriptionType.valueOf(i_subscr), i_jid)
+				rosterUtil.addBuddy(conn, i_jid, i_name ?: i_jid.getLocalpart(), i_groups ? i_groups.split(",") : null, RosterAbstract.SubscriptionType.valueOf(i_subscr), null)
 				item = rosterUtil.getBuddyItem(conn, i_jid)
 			}
 			rosterUtil.updateBuddyChange(conn, results, item)

@@ -587,7 +587,7 @@ public class JabberIqRoster
 
 							// end of for (ElementData group : groups)
 						}
-						roster_util.addBuddy(session, buddy, name, gr, null);
+						roster_util.addBuddy(session, buddy, name, gr, null, null);
 
 						String type = item.getAttributeStaticStr(Packet.TYPE_ATT);
 

@@ -112,7 +112,7 @@ public class RosterFlat
 	}
 
 	@Override
-	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups, String otherData)
+	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups, SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
@@ -137,6 +137,9 @@ public class RosterFlat
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "1. Added buddy to roster: {0}, name: {1}, item: {2}",
 						new Object[]{relem.getJid(), relem.getName(), relem.getRosterItem()});
+			}
+			if (subscription != null) {
+				relem.setSubscription(subscription);
 			}
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
@@ -170,6 +173,9 @@ public class RosterFlat
 
 			// }
 			relem.setPersistent(true);
+			if (subscription != null) {
+				relem.setSubscription(subscription);
+			}
 			saveUserRoster(session);
 			// notify that roster element was changed!
 			if (log.isLoggable(Level.FINEST)) {

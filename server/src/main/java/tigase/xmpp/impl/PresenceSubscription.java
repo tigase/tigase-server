@@ -271,7 +271,7 @@ public class PresenceSubscription
 																						packet.getStanzaFrom());
 
 			if (curr_sub == null) {
-				roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
+				roster_util.addBuddy(session, packet.getStanzaFrom(), null, null,null, null);
 			}    // end of if (curr_sub == null)
 			final boolean preApproved = roster_util.isPreApproved(session, packet.getStanzaFrom());
 			roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
@@ -324,7 +324,7 @@ public class PresenceSubscription
 		RosterAbstract.SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
 
 		if (!isAutoAuthorizeEnabled(session.getJID().getDomain()) && (curr_sub == null)) {
-			roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
+			roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null, null);
 		}    // end of if (curr_sub == null)
 
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
@@ -498,7 +498,7 @@ public class PresenceSubscription
 
 		if (pres_type == RosterAbstract.PresenceType.out_subscribe) {
 			if (current_subscription == null) {
-				roster_util.addBuddy(session, packet.getStanzaTo(), null, null, null);
+				roster_util.addBuddy(session, packet.getStanzaTo(), null, null, null, null);
 			}    // end of if (current_subscription == null)
 			subscr_changed = roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaTo());
 			if (isAutoAuthorizeEnabled(session.getJID().getDomain())) {

@@ -46,7 +46,7 @@ public class Roster
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Roster");
 
 	@Override
-	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups, String otherData)
+	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups, SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException {
 		String nick = name;
 
@@ -59,7 +59,8 @@ public class Roster
 		}
 
 		session.setData(groupNode(jid), NAME, nick);
-		session.setData(groupNode(jid), SUBSCRIPTION, SubscriptionType.none.toString());
+		String subscriptionTypeStr = subscription != null ? subscription.toString() : SubscriptionType.none.toString();
+		session.setData(groupNode(jid), SUBSCRIPTION, subscriptionTypeStr);
 		session.setDataList(groupNode(jid), GROUPS, groups);
 	}
 

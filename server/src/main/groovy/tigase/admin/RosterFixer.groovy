@@ -130,9 +130,7 @@ def updateRoster = { sess, online, jid, i_jid, i_name, i_subscr ->
 			if (rosterUtil.containsBuddy(conn, i_jid)) {
 				res_report += "Buddy: " + i_jid + " already in the roster, skipping"
 			} else {
-				rosterUtil.addBuddy(conn, i_jid, i_name, null, null)
-				rosterUtil.setBuddySubscription(conn,
-												RosterAbstract.SubscriptionType.valueOf(i_subscr), i_jid)
+				rosterUtil.addBuddy(conn, i_jid, i_name, null, RosterAbstract.SubscriptionType.valueOf(i_subscr), null)
 				item = rosterUtil.getBuddyItem(conn, i_jid)
 				rosterUtil.updateBuddyChange(conn, results, item)
 				res_report += "Buddy: " + i_jid + " added to the roster"
