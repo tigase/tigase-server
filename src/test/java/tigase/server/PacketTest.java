@@ -18,6 +18,8 @@
  */
 package tigase.server;
 
+import org.junit.Assert;
+import tigase.util.TigaseStringprepException;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
@@ -122,4 +124,33 @@ public class PacketTest {
 
 	}
 
+	@Test
+	public void testPacketSecure() throws TigaseStringprepException {
+		JID jid1 = JID.jidInstance("user1@example.com/res1");
+		JID jid2 = JID.jidInstance("user1@example.com/res2");
+
+		Element iqEl = new Element("iq", new String[]{"from", "to", "xmlns", "type"},
+								   new String[]{jid1.toString(), jid2.toString(), Iq.CLIENT_XMLNS, "get"});
+		iqEl.addChild(new Element("command", new String[]{"xmlns"}, new String[]{Command.XMLNS}));
+		Packet result = Packet.packetInstance(iqEl);
+
+		Command.addFieldValue(result, "password", "mySuperSecretPassword", "text-private",
+							  "The password for this account");
+
+		Assert.assertTrue("Output secured in default Element.toString()",
+						  iqEl.toString().contains("mySuperSecretPassword"));
+		Assert.assertFalse("Plain output in Element.toStringSecure()",
+						   iqEl.toStringSecure().contains("mySuperSecretPassword"));
+
+		Assert.assertFalse("Plain output in Packet.toString()", result.toString().contains("mySuperSecretPassword"));
+		Assert.assertFalse("Plain output in Packet.toString(true)",
+						   result.toString(true).contains("mySuperSecretPassword"));
+		Assert.assertFalse("Plain output in Packet.toStringSecure(true)",
+						   result.toStringSecure().contains("mySuperSecretPassword"));
+
+		Assert.assertTrue("Output secured in default Packet.toStringFull()",
+						  result.toStringFull().contains("mySuperSecretPassword"));
+		Assert.assertTrue("Output secured in default Packet.toString(false)",
+						  result.toString(false).contains("mySuperSecretPassword"));
+	}
 }

@@ -1481,7 +1481,7 @@ public class Packet {
 	 */
 	@Override
 	public String toString() {
-		return toString(FULL_DEBUG);
+		return toString(!FULL_DEBUG);
 	}
 
 	/**
