@@ -57,6 +57,8 @@ dataSource {
 -----
 This one changes to 15 minutes.
 
+NOTE: see <<periodDurationValues>> for format details
+
 == Using modified database schema
 If you are using Tigase XMPP Server with modified schema (changed procedures or tables) and you do not want Tigase XMPP Server to maintain it and automatically upgrade, you can disable `schema-management` for any data source.
 If `schema-management` is disable for particular data source then Tigase XMPP Server will not update or modify database schema in any way. Moreover it will not check if schema version is correct or not.

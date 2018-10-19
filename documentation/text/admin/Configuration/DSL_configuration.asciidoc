@@ -89,7 +89,9 @@ Format is the same as in case of setting property but they are defined without s
 This properties are global and accessible by any bean but also set as system property in JVM.
 
 === Defining bean
+
 You can configure bean by using following format:
+[code,bash]
 ----
 beanName (class: className, active: activeValue, exportable: exportableValue) {
     # scope of bean properties
@@ -229,6 +231,25 @@ bean {
 
 WARNING: For properties which accepts lists it is not allowed to set value using computed values with comma separated values like `value1,value2` wrapped in `[]`, ie.
 `property = [ env('some-variable') + ',other-value' ]`. It needs to be set in following way `property = env('some-variable') + ',other-value'`.
+
+[[periodDurationValues]]
+=== Period / Duration values
+
+Some configuration options allow control of execution of tasks with particular period or within certain duration. DSL file format accepts strings denoting particular amount of time, which follows Java's native structures (see: https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-java.lang.CharSequence-[Period] and https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-[Duration] for detailed explanation).
+
+* `Duration` formats accepted are based on the ISO-8601 duration format `PnDTnHnMn.nS` with days considered to be exactly 24 hours, for example:
+** `PT20.345S` - 20.345 seconds
+** `PT15M` - 15 minutes (where a minute is 60 seconds)
+** `PT10H` - 10 hours (where an hour is 3600 seconds)
+** `P2D` - 2 days (where a day is 24 hours or 86400 seconds)
+** `P2DT3H4M` - 2 days, 3 hours and 4 minutes
+* `Period` format is based on the ISO-8601 period formats PnYnMnD and PnW, for example, the following are valid inputs:
+** `P2Y` - 2 years
+** `P3M` - 3 months
+** `P4W` - 4 weeks
+** `P5D` - 5 days
+** `P1Y2M3D` - 1 year, 2 months, 3 days
+** `P1Y2M3W4D` - 1 year, 2 months, 3 weeks, 4 days
 
 == Example configuration file in DSL
 [source,dsl]
