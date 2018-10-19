@@ -15,6 +15,7 @@ A `logging` bean has been implemented to allow more fine configuration of each c
 -----
 logging () {
     rootLevel = CONFIG
+    'packet-debug-full' = true
     loggers = {
         'tigase.server' = {
             level = ALL
@@ -41,17 +42,17 @@ logging () {
 -----
 You only need to specify the settings you wish to customize, otherwise they will be left as default.
 
-
-- *rootLevel* - Defines the root level of logging for all components not otherwise defined. Default is CONFIG
-- *loggers* - Defines the level of logging for packages running in tigase server. This is similar to the --debug setting, however you must use `tigase.{package}` format. Default is NONE.
-- *handlers* - Defines the level of logging for File output and Console output.
-. *FileHandler* - is the file output for log files, with the following options:
-.. *level* - specifies the level of logs to be written, default is ALL.
-.. *append* - whether to append to the log or replace it during restart.  Default is true.
-.. *count* - number of individual log files to keep at set limit.  Default is 5. (default settings will continue appending logs until 5 files at 10MB are reached, then the oldest file will be overwritten.)
-.. *formatter* - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
-.. *limit* - Byte limit for each log file.  Default is 10000000 or 10MB.
-.. *pattern* - Directory and filename of the log file with respect to the Tigase installation directory. Default is logs/tigase.log.
-. *ConsoleHandler* - Determines the formatting for Tigase output to console.
-.. *level* - specifies the level of logs to be written, default is WARNING.
-.. *formatter* - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
+- `packet-debug-full` - controls whether log entries should be obfuscated (all CData of all elements will be replaced by `CData size: <length in bytes of the replaced string>`) or not; default: `false`.
+- `rootLevel` - Defines the root level of logging for all components not otherwise defined. Default is CONFIG
+- `loggers` - Defines the level of logging for packages running in tigase server. This is similar to the --debug setting, however you must use `tigase.{package}` format. Default is NONE.
+- `handlers` - Defines the level of logging for File output and Console output.
+. `FileHandler` - is the file output for log files, with the following options:
+.. `level` - specifies the level of logs to be written, default is ALL.
+.. `append` - whether to append to the log or replace it during restart.  Default is true.
+.. `count` - number of individual log files to keep at set limit.  Default is 5. (default settings will continue appending logs until 5 files at 10MB are reached, then the oldest file will be overwritten.)
+.. `formatter` - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
+.. `limit` - Byte limit for each log file.  Default is 10000000 or 10MB.
+.. `pattern` - Directory and filename of the log file with respect to the Tigase installation directory. Default is logs/tigase.log.
+. `ConsoleHandler` - Determines the formatting for Tigase output to console.
+.. `level` - specifies the level of logs to be written, default is WARNING.
+.. `formatter` - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
