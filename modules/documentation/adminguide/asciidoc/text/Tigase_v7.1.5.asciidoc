@@ -1,5 +1,5 @@
-[[tigase714]]
-= Tigase v7.1.4
+[[tigase715]]
+= Tigase v7.1.5
 :author: Wojciech Kapcia
 
 :toc:
