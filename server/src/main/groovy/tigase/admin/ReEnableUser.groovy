@@ -59,7 +59,7 @@ def userJids = Command.getFieldValues(packet, JIDS)
 if (userJids == null) {
 	def result = p.commandResult(Command.DataType.form)
 
-	Command.addTitle(result, "Disabling a User")
+	Command.addTitle(result, "Re-enabling a User")
 	Command.addInstructions(result, "Fill out this form to re-enable a user.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
