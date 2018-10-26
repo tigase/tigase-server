@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -166,6 +167,18 @@ public class SSLContextContainer
 	}
 
 	@Override
+	public IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
+										 boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
+										 TrustManager[] x509TrustManagers, TLSEventHandler eventHandler,
+										 IOInterface socketIO, CertificateContainerIfc certificateContainer)
+			throws IOException {
+		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
+		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
+											   needClientAuth, getEnabledCiphers(), getEnabledProtocols());
+		return new TLSIO(socketIO, wrapper, byteOrder);
+	}
+
+	@Override
 	public String[] getEnabledCiphers() {
 		if (enabledCiphers != null && enabledCiphers.length != 0) {
 			return enabledCiphers;
@@ -202,35 +215,6 @@ public class SSLContextContainer
 		this.enabledProtocols = enabledProtocols;
 	}
 
-	public void setHardenedMode(boolean hardenedMode) {
-		if (log.isLoggable(Level.CONFIG)) {
-			log.config("Hardened mode is " + (hardenedMode ? "enabled" : "disabled"));
-		}
-		if (hardenedMode) {
-			System.setProperty("jdk.tls.ephemeralDHKeySize", "2048");
-		}
-		this.hardenedMode = hardenedMode;
-	}
-
-	public void setTlsJdkNssBugWorkaround(boolean value) {
-		if (log.isLoggable(Level.CONFIG)) {
-			log.config("Workaround for TLS/SSL bug is " + (value ? "enabled" : "disabled"));
-		}
-		this.tlsJdkNssBugWorkaround = value;
-	}
-
-	@Override
-	public IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
-										 boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
-										 TrustManager[] x509TrustManagers, TLSEventHandler eventHandler,
-										 IOInterface socketIO, CertificateContainerIfc certificateContainer)
-			throws IOException {
-		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
-		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
-											   needClientAuth, getEnabledCiphers(), getEnabledProtocols());
-		return new TLSIO(socketIO, wrapper, byteOrder);
-	}
-
 	@Override
 	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager[] tms) {
 		SSLHolder holder = null;
@@ -252,12 +236,20 @@ public class SSLContextContainer
 
 			holder = find(sslContexts, alias);
 
+			if (!validateDomainCertificate(holder, hostname)) {
+				holder = null;
+			}
+
 			if (holder == null || !holder.isValid(tms)) {
-				SSLContext sslContext = createContext(protocol, hostname, alias, clientMode, tms);
+				holder = createContextHolder(protocol, hostname, alias, clientMode, tms);
 				if (clientMode) {
-					return sslContext;
+					return holder.sslContext;
 				}
-				holder = new SSLHolder(tms, sslContext);
+
+				if (!validateDomainCertificate(holder, hostname)) {
+					holder = createContextHolder(protocol, hostname, alias, clientMode, tms);
+				}
+
 				sslContexts.put(alias, holder);
 			}
 
@@ -269,11 +261,6 @@ public class SSLContextContainer
 		return holder != null ? holder.getSSLContext() : null;
 	}
 
-	public void setParent(SSLContextContainerIfc parent) {
-		log.log(Level.FINE, "setting root = " + parent);
-		this.parent = parent;
-	}
-
 	@Override
 	public KeyStore getTrustStore() {
 		KeyStore trustStore = super.getTrustStore();
@@ -283,14 +270,9 @@ public class SSLContextContainer
 		return trustStore;
 	}
 
-	@Override
-	public void start() {
-		eventBus.registerAll(this);
-	}
-
-	@Override
-	public void stop() {
-		eventBus.unregisterAll(this);
+	private void invalidateContextHolder(SSLHolder holder, String hostname) throws Exception {
+		sslContexts.remove(hostname);
+		createCertificate(hostname);
 	}
 
 	/**
@@ -305,6 +287,53 @@ public class SSLContextContainer
 		sslContexts.remove(alias);
 	}
 
+	public void setHardenedMode(boolean hardenedMode) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("Hardened mode is " + (hardenedMode ? "enabled" : "disabled"));
+		}
+		if (hardenedMode) {
+			System.setProperty("jdk.tls.ephemeralDHKeySize", "2048");
+		}
+		this.hardenedMode = hardenedMode;
+	}
+
+	public void setParent(SSLContextContainerIfc parent) {
+		log.log(Level.FINE, "setting root = " + parent);
+		this.parent = parent;
+	}
+
+	public void setTlsJdkNssBugWorkaround(boolean value) {
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("Workaround for TLS/SSL bug is " + (value ? "enabled" : "disabled"));
+		}
+		this.tlsJdkNssBugWorkaround = value;
+	}
+
+	@Override
+	public void start() {
+		eventBus.registerAll(this);
+	}
+
+	@Override
+	public void stop() {
+		eventBus.unregisterAll(this);
+	}
+
+	private boolean validateDomainCertificate(final SSLHolder holder, final String hostname) throws Exception {
+		// for self-signed certificates only
+		if (holder != null && holder.domainCertificate != null &&
+				holder.domainCertificate.getIssuerDN().equals(holder.domainCertificate.getSubjectDN())) {
+			try {
+				holder.domainCertificate.checkValidity();
+			} catch (CertificateException e) {
+				invalidateContextHolder(holder, hostname);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	@Bean(name = "rootSslContextContainer", parent = Kernel.class, active = true, exportable = true)
 	public static class Root
 			extends SSLContextContainer
@@ -314,9 +343,9 @@ public class SSLContextContainer
 			super();
 		}
 
-		// empty method to ensure that parent will not be injected to root instance
-		public void setParent(SSLContextContainerIfc parent) {
-			log.log(Level.FINE, "setting root = " + parent);
+		@Override
+		public void beforeUnregister() {
+			stop();
 		}
 
 		@Override
@@ -324,29 +353,11 @@ public class SSLContextContainer
 			start();
 		}
 
-		@Override
-		public void beforeUnregister() {
-			stop();
+		// empty method to ensure that parent will not be injected to root instance
+		public void setParent(SSLContextContainerIfc parent) {
+			log.log(Level.FINE, "setting root = " + parent);
 		}
 	}
 
-	private class SSLHolder {
-
-		private final SSLContext sslContext;
-		private final TrustManager[] tms;
-
-		public SSLHolder(TrustManager[] tms, SSLContext sslContext) {
-			this.tms = tms;
-			this.sslContext = sslContext;
-		}
-
-		public SSLContext getSSLContext() {
-			return sslContext;
-		}
-
-		public boolean isValid(TrustManager[] tms) {
-			return tms == this.tms;
-		}
-	}
 }
 

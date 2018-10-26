@@ -24,9 +24,11 @@ import tigase.kernel.beans.Inject;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -82,14 +84,8 @@ public abstract class SSLContextContainerAbstract
 		this.certificateContainer.addCertificates(params);
 	}
 
-	@Override
-	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
-		return getSSLContext(protocol, hostname, clientMode, null);
-	}
-
-	@Override
-	public KeyStore getTrustStore() {
-		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
+	protected KeyManager[] createCertificate(String alias) throws Exception {
+		return certificateContainer.createCertificate(alias);
 	}
 
 	/**
@@ -105,8 +101,8 @@ public abstract class SSLContextContainerAbstract
 	 *
 	 * @throws Exception
 	 */
-	protected SSLContext createContext(String protocol, String hostname, String alias, boolean clientMode,
-									   TrustManager[] tms) throws Exception {
+	protected SSLHolder createContextHolder(String protocol, String hostname, String alias, boolean clientMode,
+											TrustManager[] tms) throws Exception {
 		SSLContext sslContext = null;
 
 		KeyManager[] kms = getKeyManagers(hostname);
@@ -116,15 +112,23 @@ public abstract class SSLContextContainerAbstract
 			if (clientMode) {
 				sslContext = SSLContext.getInstance(protocol);
 				sslContext.init(null, tms, secureRandom);
-				return sslContext;
+				return new SSLHolder(tms, sslContext, null);
 			}
 
 			kms = createCertificate(alias);
 		}
 
+		X509Certificate crt = null;
+		if (kms.length > 0 && kms[0] instanceof X509KeyManager) {
+			X509KeyManager km = (X509KeyManager) kms[0];
+			X509Certificate[] zzz = km.getCertificateChain(hostname);
+			crt = zzz.length == 0 ? null : zzz[zzz.length - 1];
+		}
+
 		sslContext = SSLContext.getInstance(protocol);
 		sslContext.init(kms, tms, secureRandom);
-		return sslContext;
+
+		return new SSLHolder(tms, sslContext, crt);
 	}
 
 	protected String getDefCertAlias() {
@@ -135,12 +139,39 @@ public abstract class SSLContextContainerAbstract
 		return certificateContainer.getKeyManagers(hostname);
 	}
 
+	@Override
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+		return getSSLContext(protocol, hostname, clientMode, null);
+	}
+
 	protected TrustManager[] getTrustManagers() {
 		return certificateContainer.getTrustManagers();
 	}
 
-	protected KeyManager[] createCertificate(String alias) throws Exception {
-		return certificateContainer.createCertificate(alias);
+	@Override
+	public KeyStore getTrustStore() {
+		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
+	}
+
+	protected class SSLHolder {
+
+		final X509Certificate domainCertificate;
+		final SSLContext sslContext;
+		final TrustManager[] tms;
+
+		public SSLHolder(TrustManager[] tms, SSLContext sslContext, X509Certificate domainCertificate) {
+			this.tms = tms;
+			this.sslContext = sslContext;
+			this.domainCertificate = domainCertificate;
+		}
+
+		public SSLContext getSSLContext() {
+			return sslContext;
+		}
+
+		public boolean isValid(TrustManager[] tms) {
+			return tms == this.tms;
+		}
 	}
 
 }
