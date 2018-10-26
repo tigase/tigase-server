@@ -30,6 +30,7 @@
 package tigase.admin
 
 import tigase.db.AuthRepository
+import tigase.db.UserRepository
 import tigase.db.TigaseDBException
 import tigase.db.UserNotFoundException
 import tigase.server.Command
@@ -43,6 +44,7 @@ def JIDS = "accountjids"
 
 def p = (Packet) packet
 def auth_repo = (AuthRepository) authRepository
+def user_repo = (UserRepository) userRepository
 def vhost_man = (VHostManagerIfc) vhostMan
 def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
@@ -126,14 +128,18 @@ for (userJid in userJids) {
 	try {
 		def bareJID = BareJID.bareJIDInstance(userJid)
 		if (isAllowedForDomain.apply(bareJID.getDomain())) {
-			try {
-				auth_repo.setAccountStatus(bareJID, AuthRepository.AccountStatus.active)
-			} catch (TigaseDBException ex) {
-				errors.add("Account " + userJid + " was not re-enabled: " + ex.getMessage())
-			}
-			closeUserSessions(userJid)
+			if (user_repo.userExists(bareJID)) {
+				try {
+					auth_repo.setAccountStatus(bareJID, AuthRepository.AccountStatus.active)
+				} catch (TigaseDBException ex) {
+					errors.add("Account " + userJid + " was not re-enabled: " + ex.getMessage())
+				}
+				closeUserSessions(userJid)
 
-			msgs.add("Operation successful for user " + userJid)
+				msgs.add("Operation successful for user " + userJid)
+			} else {
+				msgs.add("User " + userJid + " doesn't exist")
+			}
 		} else {
 			errors.add(
 					"You do not have enough permissions to re-enable accounts for domain " + bareJID.getDomain() + ".")
