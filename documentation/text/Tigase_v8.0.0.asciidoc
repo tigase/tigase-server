@@ -256,7 +256,6 @@ Version 8.0.0 improves security by preventing brute-force attacks. Feature needs
 - https://tigase.tech/issues/7773[#7773] Ad-hoc commands can now by executed asynchronously.
 - https://tigase.tech/issues/2341[#2341] allow specifying SubscriptionType when adding buddy to avoid calling separately .setBuddySubscription() thus eliminating saving roster twice to database if not needed
 
-
 == Fixes
 - https://tigase.tech/issues/2750[#2750] Multiple artifact and depreciated file cleanup. Massive code cleanup and javadoc cleaning.
 - https://tigase.tech/issues/3582[#3582] Schema files streamlined, and no longer embedded in code.
@@ -330,6 +329,7 @@ Version 8.0.0 improves security by preventing brute-force attacks. Feature needs
 - https://tigase.tech/issues/7687[#7687] Fixed an error where connections failed after authentication timeout were marked as active after cleanup.
 - https://tigase.tech/issues/7747[#7747] Fixed `ClusterRepoItemEvent` serialization issues causing unsupported conversion error in cluster mode.
 - https://tigase.tech/issues/7495[#7495] fix issue with not all logs being obfuscated, added testcase, documentation
+- https://tigase.tech/issues/8305[#8305] fix issue with SeeOtherHostDualIP when using MongoDB
 
 == Component Changes
 
