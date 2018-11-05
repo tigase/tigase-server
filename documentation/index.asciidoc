@@ -117,8 +117,6 @@ include::text/admin/Database_Management/Existing_Databases/MySQL.asciidoc[levelo
 
 include::text/admin/Database_Management/Existing_Databases/Drupal.asciidoc[leveloffset=+3]
 
-include::text/admin/Database_Management/Existing_Databases/LibreSource.asciidoc[leveloffset=+3]
-
 include::text/admin/Database_Management/Existing_Databases/PostgreSQL.asciidoc[leveloffset=+3]
 
 include::text/admin/Database_Management/Schema_Updates/Schema_Updates.asciidoc[leveloffset=+2]

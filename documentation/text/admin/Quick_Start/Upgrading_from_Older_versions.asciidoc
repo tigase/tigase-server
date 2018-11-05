@@ -116,3 +116,31 @@ You can also run these commands for help.
 scripts/tigase.sh upgrade-config etc/tigase.conf --help
 scripts/tigase.sh upgrade-schema etc/tigase.conf --help
 -----
+
+== Upgrade/Restore with a script [experimental!]
+
+To make upgrade process easier it's possible to utilize link:files/tigase-upgrade.sh[tigase-upgrade.sh] *nix shell script. It permits upgrading to new version (supports downloading version from provided URL).
+
+It's usage is as follows:
+[source,bash]
+----
+./tigase-upgrade.sh {upgrade|rollback} install_package install_directory [tar|dir]
+----
+Where:
+* `{upgrade|rollback}` - defines whether to perform upgrade or rollback to previous version
+* `install_package` - package to which perform upgrade (can be URL) in case of upgrade or backed-up installation (from which we want to restore) in case of rollback
+* `install_directory` - destination directory (both in upgrade and rollback); can be symlink in which case it will be preserved with upgraded/restored path as target
+* `[tar|dir]` - (optional) type of backup (either simply copy directory or also archive it using `tar` command); by default `dir` is used.
+
+
+To upgrade installation to version `tigase-server-8.0.0-SNAPSHOT-b5285-dist-max.tar.gz` execute the script as follows:
+[source,bash]
+----
+$ ./tigase-upgrade.sh upgrade tigase-server-8.0.0-SNAPSHOT-b5285-dist-max.tar.gz tigase-server
+----
+
+To rollback from `tigase-server-8.0.0-SNAPSHOT-b5264_backup-18-11-05_1712` backup execute script as follows:
+[source,bash]
+----
+bash -x ./tigase-upgrade.sh rollback tigase-server-8.0.0-SNAPSHOT-b5264_backup-18-11-05_1712/ tigase-server
+----
