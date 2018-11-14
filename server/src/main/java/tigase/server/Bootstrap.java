@@ -31,8 +31,10 @@ import tigase.db.beans.MDPoolBean;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.KernelException;
+import tigase.kernel.beans.Autostart;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.beans.selector.ServerBeanSelector;
+import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.net.ConnectionOpenThread;
@@ -66,14 +68,30 @@ public class Bootstrap {
 	private static final Logger log = Logger.getLogger(Bootstrap.class.getCanonicalName());
 
 	private final Kernel kernel;
+	private final ShutdownHook shutdownHook = new BootstrapShutdownHook();
 	private ConfigHolder config = new ConfigHolder();
 	// Common logging setup
 	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
 
-	private final ShutdownHook shutdownHook = new BootstrapShutdownHook();
-
 	public Bootstrap() {
 		kernel = new Kernel("root");
+	}
+
+	private void configureLogManager() {
+		Map<String, Object> cfg = prepareLogManagerConfiguration(config.getProperties());
+		setupLogManager(cfg);
+	}
+
+	public <T> T getInstance(String beanName) {
+		return kernel.getInstance(beanName);
+	}
+
+	public <T> T getInstance(Class<T> clazz) {
+		return kernel.getInstance(clazz);
+	}
+
+	protected Kernel getKernel() {
+		return kernel;
 	}
 
 	public void init(String[] args) throws ConfigReader.ConfigException, IOException {
@@ -81,139 +99,29 @@ public class Bootstrap {
 		configureLogManager();
 	}
 
-	public void setProperties(Map<String, Object> props) {
-		this.config.setProperties(props);
-	}
-
-	public void start() throws ConfigReader.ConfigException {
-		initializeDnsResolver();
-		Object clusterMode = config.getProperties()
-				.getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", Boolean.FALSE));
-		if (clusterMode instanceof ConfigReader.Variable) {
-			clusterMode = ((ConfigReader.Variable) clusterMode).calculateValue();
-			if (clusterMode == null) {
-				clusterMode = Boolean.FALSE;
-			}
-		}
-		if (clusterMode instanceof String) {
-			clusterMode = (Boolean) Boolean.parseBoolean((String) clusterMode);
-		}
-		if ((Boolean) clusterMode) {
-			System.setProperty("tigase.cache", "false");
-			log.log(Level.WARNING, "Tigase cache turned off");
-		}
-		config.getProperties().put("cluster-mode", clusterMode);
-
-		Optional.ofNullable((String) config.getProperties().get("stringprep-processor"))
-				.ifPresent(val -> BareJID.useStringprepProcessor(val));
-
-		for (Map.Entry<String, Object> e : config.getProperties().entrySet()) {
-			if (e.getKey().startsWith("--")) {
-				String key = e.getKey().substring(2);
-				Object value = e.getValue();
-				if (value instanceof ConfigReader.Variable) {
-					value = ((ConfigReader.Variable) value).calculateValue();
+	private void initializeAutostartBeans(Kernel kernel) {
+		log.config("Starting 'autostart' beans in kernel " + kernel.getName());
+		for (BeanConfig bc : kernel.getDependencyManager().getBeanConfigs()) {
+			if (Kernel.class.isAssignableFrom(bc.getClazz())) {
+				Kernel sk = kernel.getInstance(bc.getBeanName());
+				if (sk != kernel) {
+					initializeAutostartBeans(sk);
+					continue;
 				}
-				System.setProperty(key, value.toString());
+			}
+			Autostart autostart = bc.getClazz().getAnnotation(Autostart.class);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Checking for autostart " + bc.getKernel().getName() + "." + bc.getBeanName() + ":: state=" + bc.getState() +
+								   "; " + "autostart=" + (autostart != null));
+			}
+
+			if ((bc.getState() == BeanConfig.State.registered || bc.getState() == BeanConfig.State.initialized) &&
+					autostart != null) {
+				log.config("Autostarting bean " + bc);
+				kernel.getInstance(bc.getBeanName());
 			}
 		}
-
-		try {
-			ClassUtilBean classUtilBean = null;
-			if (XMPPServer.isOSGi()) {
-				classUtilBean = (ClassUtilBean) Class.forName("tigase.osgi.util.ClassUtilBean").newInstance();
-			} else {
-				classUtilBean = (ClassUtilBean) Class.forName("tigase.util.reflection.ClassUtilBean").newInstance();
-			}
-
-			classUtilBean.initialize(ClassUtilBean.getPackagesToSkip(null));
-			kernel.registerBean("classUtilBean")
-					.asInstance(classUtilBean)
-					.exportable()
-					.exec();
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-
-		// register default types converter and properties bean configurator
-		kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
-		kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
-		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
-
-		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
-		configurator.setConfigHolder(config);
-		ModulesManagerImpl.getInstance().setBeanConfigurator(configurator);
-
-		kernel.registerBean("logging").asClass(LoggingBean.class).setActive(true).setPinned(true).exec();
-		kernel.getInstance("logging");
-
-		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
-
-		kernel.registerBean(RosterFactory.Bean.class).setPinned(true).exec();
-		kernel.getInstance(RosterFactory.Bean.class);
-
-		// if null then we register global subbeans
-		configurator.registerBeans(null, null, config.getProperties());
-
-		DependencyGrapher dg = new DependencyGrapher();
-		dg.setKernel(kernel);
-
-		log.log(Level.CONFIG, dg.getDependencyGraph());
-
-		// this is called to make sure that data sources are properly initialized
-		if (ServerBeanSelector.getConfigType(kernel) != ConfigTypeEnum.SetupMode) {
-			DataSourceBean dataSource = kernel.getInstance(DataSourceBean.class);
-			if (dataSource == null || dataSource.getDataSourceNames().isEmpty()) {
-				throw new KernelException("Failed to initialize data sources!");
-			}
-		}
-		MessageRouter mr = kernel.getInstance("message-router");
-		mr.start();
-
-//		StringBuilder sb = new StringBuilder("\n======");
-//		sb.append("\n");
-//		final Collection<BeanConfig> beanConfigs = kernel.getDependencyManager().getBeanConfigs();
-//		for (BeanConfig beanConfig : beanConfigs) {
-//			sb.append("bean config: ").append(beanConfig).append("\n");
-//			final Set<BeanConfig> registeredBeans = beanConfig.getRegisteredBeans();
-//			for (BeanConfig registeredBean : registeredBeans) {
-//				sb.append("  -> registered bean: ").append(registeredBean).append("\n");
-//				final Set<BeanConfig> registeredBeans1 = registeredBean.getRegisteredBeans();
-//				for (BeanConfig beanConfig1 : registeredBeans1) {
-//					sb.append("    -> registered bean1: ").append(beanConfig1).append("\n");
-//				}
-//			}
-//		}
-//		sb.append("======\n");
-//		System.out.println(sb);
-
-		try {
-			File f = new File("etc/config-dump.properties");
-			if (f.exists()) {
-				f.delete();
-			}
-			configurator.dumpConfiguration(f);
-		} catch (IOException ex) {
-			log.log(Level.FINE, "failed to dump configuration to file etc/config-dump.properties");
-		}
-
-		MonitorRuntime.getMonitorRuntime().addShutdownHook(shutdownHook);
-	}
-
-	public void stop() {
-		kernel.shutdown((bc1, bc2) -> {
-			if (MDPoolBean.class.isAssignableFrom(bc1.getClazz())) {
-				return Integer.MIN_VALUE;
-			}
-			if (MDPoolBean.class.isAssignableFrom(bc2.getClazz())) {
-				return Integer.MIN_VALUE;
-			}
-			return 0;
-		});
-	}
-
-	public <T> T getInstance(String beanName) {
-		return kernel.getInstance(beanName);
 	}
 
 	// moved to AbstractBeanConfigurator
@@ -240,19 +148,6 @@ public class Bootstrap {
 //
 //		return parent.isAssignableFrom(requiredClass) ? annotation : null;
 //	}
-
-	public <T> T getInstance(Class<T> clazz) {
-		return kernel.getInstance(clazz);
-	}
-
-	protected Kernel getKernel() {
-		return kernel;
-	}
-
-	private void configureLogManager() {
-		Map<String, Object> cfg = prepareLogManagerConfiguration(config.getProperties());
-		setupLogManager(cfg);
-	}
 
 	private void initializeDnsResolver() {
 		Map<String, Object> resolverConfig = (Map<String, Object>) config.getProperties().get("dns-resolver");
@@ -321,6 +216,10 @@ public class Bootstrap {
 		return defaults;
 	}
 
+	public void setProperties(Map<String, Object> props) {
+		this.config.setProperties(props);
+	}
+
 	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
 		StringBuilder buff = new StringBuilder(200);
@@ -348,7 +247,136 @@ public class Bootstrap {
 		log.config("DONE");
 	}
 
-	public class BootstrapShutdownHook implements ShutdownHook {
+	public void start() {
+		initializeDnsResolver();
+		Object clusterMode = config.getProperties()
+				.getOrDefault("cluster-mode", config.getProperties().getOrDefault("--cluster-mode", Boolean.FALSE));
+		if (clusterMode instanceof ConfigReader.Variable) {
+			clusterMode = ((ConfigReader.Variable) clusterMode).calculateValue();
+			if (clusterMode == null) {
+				clusterMode = Boolean.FALSE;
+			}
+		}
+		if (clusterMode instanceof String) {
+			clusterMode = Boolean.parseBoolean((String) clusterMode);
+		}
+		if ((Boolean) clusterMode) {
+			System.setProperty("tigase.cache", "false");
+			log.log(Level.WARNING, "Tigase cache turned off");
+		}
+		config.getProperties().put("cluster-mode", clusterMode);
+
+		Optional.ofNullable((String) config.getProperties().get("stringprep-processor"))
+				.ifPresent(val -> BareJID.useStringprepProcessor(val));
+
+		for (Map.Entry<String, Object> e : config.getProperties().entrySet()) {
+			if (e.getKey().startsWith("--")) {
+				String key = e.getKey().substring(2);
+				Object value = e.getValue();
+				if (value instanceof ConfigReader.Variable) {
+					value = ((ConfigReader.Variable) value).calculateValue();
+				}
+				System.setProperty(key, value.toString());
+			}
+		}
+
+		try {
+			ClassUtilBean classUtilBean = null;
+			if (XMPPServer.isOSGi()) {
+				classUtilBean = (ClassUtilBean) Class.forName("tigase.osgi.util.ClassUtilBean").newInstance();
+			} else {
+				classUtilBean = (ClassUtilBean) Class.forName("tigase.util.reflection.ClassUtilBean").newInstance();
+			}
+
+			classUtilBean.initialize(ClassUtilBean.getPackagesToSkip(null));
+			kernel.registerBean("classUtilBean").asInstance(classUtilBean).exportable().exec();
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+
+		// register default types converter and properties bean configurator
+		kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
+		kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
+
+		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+		configurator.setConfigHolder(config);
+		ModulesManagerImpl.getInstance().setBeanConfigurator(configurator);
+
+		kernel.registerBean("logging").asClass(LoggingBean.class).setActive(true).setPinned(true).exec();
+		kernel.getInstance("logging");
+
+		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
+
+		kernel.registerBean(RosterFactory.Bean.class).setPinned(true).exec();
+		kernel.getInstance(RosterFactory.Bean.class);
+
+		// if null then we register global subbeans
+		configurator.registerBeans(null, null, config.getProperties());
+
+		DependencyGrapher dg = new DependencyGrapher();
+		dg.setKernel(kernel);
+
+		log.log(Level.CONFIG, dg.getDependencyGraph());
+
+		// this is called to make sure that data sources are properly initialized
+		if (ServerBeanSelector.getConfigType(kernel) != ConfigTypeEnum.SetupMode) {
+			DataSourceBean dataSource = kernel.getInstance(DataSourceBean.class);
+			if (dataSource == null || dataSource.getDataSourceNames().isEmpty()) {
+				throw new KernelException("Failed to initialize data sources!");
+			}
+		}
+		MessageRouter mr = kernel.getInstance("message-router");
+		log.info("Starting MessageRouter");
+		mr.start();
+
+//		StringBuilder sb = new StringBuilder("\n======");
+//		sb.append("\n");
+//		final Collection<BeanConfig> beanConfigs = kernel.getDependencyManager().getBeanConfigs();
+//		for (BeanConfig beanConfig : beanConfigs) {
+//			sb.append("bean config: ").append(beanConfig).append("\n");
+//			final Set<BeanConfig> registeredBeans = beanConfig.getRegisteredBeans();
+//			for (BeanConfig registeredBean : registeredBeans) {
+//				sb.append("  -> registered bean: ").append(registeredBean).append("\n");
+//				final Set<BeanConfig> registeredBeans1 = registeredBean.getRegisteredBeans();
+//				for (BeanConfig beanConfig1 : registeredBeans1) {
+//					sb.append("    -> registered bean1: ").append(beanConfig1).append("\n");
+//				}
+//			}
+//		}
+//		sb.append("======\n");
+//		System.out.println(sb);
+
+		try {
+			log.fine("Dump configuration");
+			File f = new File("etc/config-dump.properties");
+			if (f.exists()) {
+				f.delete();
+			}
+			configurator.dumpConfiguration(f);
+		} catch (IOException ex) {
+			log.log(Level.FINE, "failed to dump configuration to file etc/config-dump.properties");
+		}
+
+		MonitorRuntime.getMonitorRuntime().addShutdownHook(shutdownHook);
+
+		initializeAutostartBeans(kernel);
+	}
+
+	public void stop() {
+		kernel.shutdown((bc1, bc2) -> {
+			if (MDPoolBean.class.isAssignableFrom(bc1.getClazz())) {
+				return Integer.MIN_VALUE;
+			}
+			if (MDPoolBean.class.isAssignableFrom(bc2.getClazz())) {
+				return Integer.MIN_VALUE;
+			}
+			return 0;
+		});
+	}
+
+	public class BootstrapShutdownHook
+			implements ShutdownHook {
 
 		@Override
 		public String getName() {
