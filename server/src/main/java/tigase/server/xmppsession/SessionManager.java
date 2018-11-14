@@ -1446,6 +1446,7 @@ public class SessionManager
 									log.finest("USER_STATUS set to true for user who is already available: " +
 													   iqc.toStringSecure());
 								}
+								fastAddOutPacket(iqc.okResult((String) null, 0));
 							}
 							if (presence != null) {
 								presence.setPacketFrom(iqc.getStanzaFrom());
