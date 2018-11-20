@@ -450,6 +450,17 @@ public class ConfigHolder {
 					putIfAbsent(props, "sess-man/sasl-provider/allowed-mechanisms", saslMechanisms);
 				}
 			}
+
+			final Object jabberIqLast = sessManCfg.remove("jabber:iq:last");
+			if (jabberIqLast != null) {
+				AbstractBeanConfigurator.BeanDefinition.Builder builder = new AbstractBeanConfigurator.BeanDefinition.Builder()
+						.name("jabber:iq:last-marker")
+						.active(true);
+				final AbstractBeanConfigurator.BeanDefinition build = builder.build();
+				sessManCfg.put("jabber:iq:last-marker", build);
+				putIfAbsent(props, "sess-man/jabber:iq:last-marker/jabber:iq:last", jabberIqLast);
+			}
+
 		}
 
 		props.remove("--api-keys");
