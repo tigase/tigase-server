@@ -185,6 +185,8 @@ include::text/admin/Using_Tigase/Intro.asciidoc[leveloffset=+1]
 
 include::text/admin/Using_Tigase/Offline_Messages.asciidoc[leveloffset=+2]
 
+include::text/admin/Using_Tigase/LastActivity.asciidoc[leveloffset=+2]
+
 include::text/admin/Using_Tigase/Log_Guide.asciidoc[leveloffset=+2]
 
 include::text/admin/Using_Tigase/Debugging_Tigase.asciidoc[leveloffset=+2]
