@@ -32,6 +32,7 @@ import tigase.util.ClassUtil;
 import tigase.util.ExceptionUtilities;
 import tigase.util.Version;
 import tigase.util.dns.DNSResolverFactory;
+import tigase.util.log.LogFormatter;
 import tigase.xml.XMLUtils;
 
 import java.text.SimpleDateFormat;
@@ -174,7 +175,7 @@ public final class XMPPServer {
 			String initial_config =
 					"tigase.level=ALL\n" + "tigase.xml.level=INFO\n" + "handlers=java.util.logging.ConsoleHandler\n" +
 							"java.util.logging.ConsoleHandler.level=ALL\n" +
-							"java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n";
+							"java.util.logging.ConsoleHandler.formatter=" + LogFormatter.class.getName() + "\n";
 
 			ConfiguratorAbstract.loadLogManagerConfig(initial_config);
 		}

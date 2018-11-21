@@ -20,6 +20,8 @@
 
 package tigase.io;
 
+import tigase.util.log.LogFormatter;
+
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -174,7 +176,7 @@ public class TelnetServer
 
 		properties.put(".level", "ALL");
 		properties.put("handlers", "java.util.logging.ConsoleHandler");
-		properties.put("java.util.logging.ConsoleHandler.formatter", "tigase.util.LogFormatter");
+		properties.put("java.util.logging.ConsoleHandler.formatter", LogFormatter.class.getName());
 		properties.put("java.util.logging.ConsoleHandler.level", "ALL");
 
 		Set<Map.Entry<String, String>> entries = properties.entrySet();
