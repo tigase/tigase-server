@@ -122,12 +122,16 @@ public abstract class LastActivityAbstract
 			throws UserNotFoundException {
 		final String publicData = repo.getPublicData(requestedJid, XMLNS, LAST_PRESENCE_KEY, null);
 
-		DomBuilderHandler domHandler = new DomBuilderHandler();
-		char[] data = publicData.toCharArray();
-		parser.parse(domHandler, data, 0, data.length);
+		if (publicData != null ) {
+			DomBuilderHandler domHandler = new DomBuilderHandler();
+			char[] data = publicData.toCharArray();
+			parser.parse(domHandler, data, 0, data.length);
 
-		final Queue<Element> parsedElements = domHandler.getParsedElements();
-		return parsedElements.peek() != null ? Optional.of(parsedElements.poll()) : Optional.empty();
+			final Queue<Element> parsedElements = domHandler.getParsedElements();
+			return parsedElements.peek() != null ? Optional.of(parsedElements.poll()) : Optional.empty();
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	protected static String getStatus(NonAuthUserRepository repo, BareJID requestedJid) throws UserNotFoundException {
@@ -139,13 +143,16 @@ public abstract class LastActivityAbstract
 		String status = getStatus(session);
 
 		try {
+			final Element presence = session.getPresence();
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest(
 						"Persiting last:activity of user " + session.getUserName() + " in storage (value=" + last +
-								", " + "presence=" + session.getPresence() + ").");
+								", " + "presence=" + presence + ").");
 			}
 			session.setPublicData(XMLNS, LAST_ACTIVITY_KEY, String.valueOf(last));
-			session.setPublicData(XMLNS, LAST_PRESENCE_KEY, session.getPresence().toString());
+			if (presence != null) {
+				session.setPublicData(XMLNS, LAST_PRESENCE_KEY, String.valueOf(presence));
+			}
 			session.setPublicData(XMLNS, LAST_STATUS_KEY, status);
 		} catch (NotAuthorizedException e) {
 			if (log.isLoggable(Level.FINEST)) {
