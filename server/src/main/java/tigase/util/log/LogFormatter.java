@@ -38,12 +38,12 @@ public class LogFormatter
 		extends Formatter {
 
 	public static final Map<Integer, LogWithStackTraceEntry> errors = new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
-	private static int DATE_TIME_LEN = 24;
+	protected static int DATE_TIME_LEN = 24;
 	private static int LEVEL_OFFSET = 12;
 	private static int MED_LEN = 40;
 	private static int TH_NAME_LEN = 17;
 
-	private Calendar cal = Calendar.getInstance();
+	protected Calendar cal = Calendar.getInstance();
 
 	public LogFormatter() {
 	}
@@ -94,7 +94,7 @@ public class LogFormatter
 		return sb.toString() + "\n";
 	}
 
-	private void addError(Throwable thrown, String stack, String log_msg) {
+	protected void addError(Throwable thrown, String stack, String log_msg) {
 		Integer code = stack.hashCode();
 		LogWithStackTraceEntry entry = errors.get(code);
 
@@ -110,7 +110,7 @@ public class LogFormatter
 		entry.increment();
 	}
 
-	private void getStackTrace(StringBuilder sb, Throwable th) {
+	protected void getStackTrace(StringBuilder sb, Throwable th) {
 		if (sb.length() > 0) {
 			sb.append("\nCaused by: ").append(th.toString());
 		}
