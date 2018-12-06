@@ -139,6 +139,6 @@ There are a few steps involved with setting up Tigase with the web installer in 
 
 First step is to extract the dist-max archive in it's entirety to the intended running directory.  Once there, run the Setup.bat file inside the win-stuff folder.  This will move the necessary files to the correct folders before Tigase begins operation.
 
-From here, you have a few options how to run Tigase; run.bat will operate Tigase using a java command, or run.bat which will start Tigase using the wrapper.  You may also install Tigase and run it as a service.
+From here, you have a few options how to run Tigase; `run.bat` will operate Tigase using a java command, or `tigase.bat` which will start Tigase using the wrapper.  You may also install Tigase and run it as a service.
 
 One this setup is finished, web installer will continue the same from xref:connecttoWebInstall[here].
