@@ -274,13 +274,11 @@ begin
     declare _jid_id bigint;
     declare _jid_sha1 char(128);
 
-    select sha1(lower(_jid)) into _jid_sha1;
-
     start transaction;
-        select jid_id into _jid_id from tig_broadcast_jids where jid_sha1 = _jid_sha1;
+        select jid_id into _jid_id from tig_broadcast_jids where jid_sha1 = sha1(lower(_jid));
         if _jid_id is null then
             insert into tig_broadcast_jids (jid, jid_sha1)
-                values (_jid, _jid_sha1)
+                values (_jid, sha1(lower(_jid)))
                 on duplicate key update jid_id = LAST_INSERTED_ID(jid_id);
             select LAST_INSERTED_ID() into _jid_id;
         end if;
