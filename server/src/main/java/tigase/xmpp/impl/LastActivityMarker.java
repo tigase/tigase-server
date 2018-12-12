@@ -62,17 +62,23 @@ public class LastActivityMarker
 
 	protected final static String ID = XMLNS + "-marker";
 	private static final Logger log = Logger.getLogger(LastActivityMarker.class.getName());
+	private Kernel kernel;
 	@ConfigField(desc = "To persist all updates to repository")
 	private boolean persistAllToRepository = true;
+	@Inject
+	private LastActivityRetriever[] retrievers;
 	@ConfigField(desc = "Whether to update last activity information on message packets", alias = "message")
 	private boolean updateOnMessage = false;
 	@ConfigField(desc = "Whether to update last activity information on presence packets", alias = "presence")
 	private boolean updateOnPresence = true;
 
-	Kernel kernel;
-
-	@Inject
-	private LastActivityRetriever[] retrievers;
+	private static void setLastActivity(XMPPResourceConnection session, Long last, boolean repository) {
+		session.putCommonSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
+		session.putSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
+		if (repository) {
+			persistLastActivity(session);
+		}
+	}
 
 	public void setRetrievers(LastActivityRetriever[] retrievers) {
 		this.retrievers = retrievers;
@@ -83,14 +89,6 @@ public class LastActivityMarker
 					kernel.ln(bean.name(), kernel.getParent(), bean.name());
 				}
 			}
-		}
-	}
-
-	private static void setLastActivity(XMPPResourceConnection session, Long last, boolean repository) {
-		session.putCommonSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
-		session.putSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
-		if (repository) {
-			persistLastActivity(session);
 		}
 	}
 
