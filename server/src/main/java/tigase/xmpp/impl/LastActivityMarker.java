@@ -21,7 +21,10 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Presence;
@@ -55,16 +58,33 @@ import static tigase.xmpp.impl.LastActivityMarker.ID;
 @Bean(name = LastActivityMarker.ID, parent = SessionManager.class, active = false)
 public class LastActivityMarker
 		extends LastActivityAbstract
-		implements XMPPStopListenerIfc {
+		implements XMPPStopListenerIfc, RegistrarBean {
 
 	protected final static String ID = XMLNS + "-marker";
 	private static final Logger log = Logger.getLogger(LastActivityMarker.class.getName());
 	@ConfigField(desc = "To persist all updates to repository")
-	private boolean persistAllToRepository = false;
+	private boolean persistAllToRepository = true;
 	@ConfigField(desc = "Whether to update last activity information on message packets", alias = "message")
 	private boolean updateOnMessage = false;
 	@ConfigField(desc = "Whether to update last activity information on presence packets", alias = "presence")
 	private boolean updateOnPresence = true;
+
+	Kernel kernel;
+
+	@Inject
+	private LastActivityRetriever[] retrievers;
+
+	public void setRetrievers(LastActivityRetriever[] retrievers) {
+		this.retrievers = retrievers;
+		if (kernel != null) {
+			for (LastActivityRetriever retriever : retrievers) {
+				final Bean bean = retriever.getClass().getAnnotation(Bean.class);
+				if (bean != null) {
+					kernel.ln(bean.name(), kernel.getParent(), bean.name());
+				}
+			}
+		}
+	}
 
 	private static void setLastActivity(XMPPResourceConnection session, Long last, boolean repository) {
 		session.putCommonSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
@@ -106,4 +126,13 @@ public class LastActivityMarker
 		}
 	}
 
+	@Override
+	public void register(Kernel kernel) {
+		this.kernel = kernel;
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
+	}
 }

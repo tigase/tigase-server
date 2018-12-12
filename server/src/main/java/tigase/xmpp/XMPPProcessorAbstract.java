@@ -48,6 +48,41 @@ public abstract class XMPPProcessorAbstract
 
 	private static final Logger log = Logger.getLogger(XMPPProcessorAbstract.class.getName());
 
+	public static boolean isFromUserSession(Packet packet, XMPPResourceConnection session) {
+		boolean b = false;
+		try {
+			b = session != null && session.getConnectionId().equals(packet.getPacketFrom());
+		} catch (NoConnectionIdException e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "There is no connectionId for given session: {0}, for packet={1}",
+						new Object[]{session, packet});
+			}
+		}
+		return b;
+	}
+
+	public static boolean isNullSession(Packet packet, XMPPResourceConnection session) {
+		return session == null;
+	}
+
+	public static boolean isServerSession(Packet packet, XMPPResourceConnection session) {
+		return session != null && session.isServerSession();
+	}
+
+	public static boolean isToUserSession(Packet packet, XMPPResourceConnection session) {
+		boolean b = false;
+		try {
+			b = session != null && session.isUserId(packet.getStanzaTo().getBareJID());
+		} catch (NotAuthorizedException e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Use session is not yet authorised: {0}, for packet={1}",
+						new Object[]{session, packet});
+			}
+
+		}
+		return b;
+	}
+
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
