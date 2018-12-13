@@ -29,6 +29,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManager;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPStopListenerIfc;
@@ -72,11 +73,11 @@ public class LastActivityMarker
 	@ConfigField(desc = "Whether to update last activity information on presence packets", alias = "presence")
 	private boolean updateOnPresence = true;
 
-	private static void setLastActivity(XMPPResourceConnection session, Long last, boolean repository) {
+	private static void setLastActivity(XMPPResourceConnection session, Long last, Element presence, boolean repository) {
 		session.putCommonSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
 		session.putSessionData(LastActivityAbstract.LAST_ACTIVITY_KEY, last);
 		if (repository) {
-			persistLastActivity(session);
+			persistLastActivity(session, presence);
 		}
 	}
 
@@ -109,7 +110,7 @@ public class LastActivityMarker
 
 			if ((updateOnMessage && packet.getElemName() == Message.ELEM_NAME) ||
 					(updateOnPresence && packet.getElemName() == Presence.ELEM_NAME)) {
-				setLastActivity(session, time, persistAllToRepository);
+				setLastActivity(session, time, packet.getElement(), persistAllToRepository);
 			}
 		}
 	}
@@ -120,7 +121,8 @@ public class LastActivityMarker
 			log.finest("Session stoppped for " + session.getjid() + ", persisting last activity");
 		}
 		if (session != null && session.isAuthorized()) {
-			persistLastActivity(session);
+			final Element presence = session.getPresence();
+			persistLastActivity(session, presence);
 		}
 	}
 

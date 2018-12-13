@@ -138,12 +138,11 @@ public abstract class LastActivityAbstract
 		return repo.getPublicData(requestedJid, XMLNS, LAST_STATUS_KEY, null);
 	}
 
-	protected static void persistLastActivity(XMPPResourceConnection session) {
+	protected static void persistLastActivity(XMPPResourceConnection session, Element presence) {
 		long last = getLastActivity(session, false);
 		String status = getStatus(session);
 
 		try {
-			final Element presence = session.getPresence();
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest(
 						"Persiting last:activity of user " + session.getUserName() + " in storage (value=" + last +
