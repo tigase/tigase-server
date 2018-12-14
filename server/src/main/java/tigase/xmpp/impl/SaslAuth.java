@@ -33,16 +33,23 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
+import tigase.stats.StatisticsList;
 import tigase.util.Base64;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,54 +96,9 @@ public class SaslAuth
 		return super.concurrentQueuesNo() * 4;
 	}
 
-	private Element createReply(final ElementType type, final String cdata) {
-		Element reply = new Element(type.toString());
-
-		reply.setXMLNS(_XMLNS);
-		if (cdata != null) {
-			reply.setCData(cdata);
-		}
-
-		return reply;
-	}
-
-	private void disableUser(final XMPPResourceConnection session, final BareJID userJID) {
-		try {
-			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
-			if (status == AuthRepository.AccountStatus.active) {
-				log.info("Disabling user " + userJID);
-				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
-			}
-		} catch (TigaseDBException e) {
-			log.log(Level.WARNING, "Cannot check status or disable user!", e);
-		}
-	}
-
-	/**
-	 * Tries to extract BareJID of user who try to log in.
-	 */
-	private BareJID extractUserJid(final Exception e, XMPPResourceConnection session) {
-		BareJID jid = null;
-
-		if (e instanceof SaslInvalidLoginExcepion) {
-			String t = ((SaslInvalidLoginExcepion) e).getJid();
-			jid = t == null ? null : BareJID.bareJIDInstanceNS(t);
-		}
-
-		if (jid != null) {
-			jid = (BareJID) session.getSessionData(CallbackHandlerFactory.AUTH_JID);
-		}
-
-		return jid;
-	}
-
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	protected void onAuthFail(final XMPPResourceConnection session) {
-		session.removeSessionData(SASL_SERVER_KEY);
 	}
 
 	@Override
@@ -315,6 +277,90 @@ public class SaslAuth
 		}
 	}
 
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		this.bruteForceLocker.getStatistics(getComponentInfo().getName(), list);
+	}
+
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	@Override
+	public String[][] supElementNamePaths() {
+		return ELEMENTS;
+	}
+
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		if ((session == null) || session.isAuthorized()) {
+			return null;
+		} else {
+			Collection<String> auth_mechs = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(), session);
+			Element[] mechs = new Element[auth_mechs.size()];
+			int idx = 0;
+
+			session.putSessionData(ALLOWED_SASL_MECHANISMS_KEY, auth_mechs);
+			for (String mech : auth_mechs) {
+				mechs[idx++] = new Element("mechanism", mech);
+			}
+
+			return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
+		}
+	}
+
+	protected void onAuthFail(final XMPPResourceConnection session) {
+		session.removeSessionData(SASL_SERVER_KEY);
+	}
+
+	private Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.toString());
+
+		reply.setXMLNS(_XMLNS);
+		if (cdata != null) {
+			reply.setCData(cdata);
+		}
+
+		return reply;
+	}
+
+	private void disableUser(final XMPPResourceConnection session, final BareJID userJID) {
+		try {
+			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
+			if (status == AuthRepository.AccountStatus.active) {
+				log.info("Disabling user " + userJID);
+				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
+			}
+		} catch (TigaseDBException e) {
+			log.log(Level.WARNING, "Cannot check status or disable user!", e);
+		}
+	}
+
+	/**
+	 * Tries to extract BareJID of user who try to log in.
+	 */
+	private BareJID extractUserJid(final Exception e, XMPPResourceConnection session) {
+		BareJID jid = null;
+
+		if (e instanceof SaslInvalidLoginExcepion) {
+			String t = ((SaslInvalidLoginExcepion) e).getJid();
+			jid = t == null ? null : BareJID.bareJIDInstanceNS(t);
+		}
+
+		if (jid != null) {
+			jid = (BareJID) session.getSessionData(CallbackHandlerFactory.AUTH_JID);
+		}
+
+		return jid;
+	}
+
 	private void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
 		try {
 			if (bruteForceLocker.isEnabled(session)) {
@@ -357,39 +403,6 @@ public class SaslAuth
 
 		response.setPriority(Priority.SYSTEM);
 		results.offer(response);
-	}
-
-	@Override
-	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return DISCO_FEATURES;
-	}
-
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENTS;
-	}
-
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
-	@Override
-	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		if ((session == null) || session.isAuthorized()) {
-			return null;
-		} else {
-			Collection<String> auth_mechs = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(), session);
-			Element[] mechs = new Element[auth_mechs.size()];
-			int idx = 0;
-
-			session.putSessionData(ALLOWED_SASL_MECHANISMS_KEY, auth_mechs);
-			for (String mech : auth_mechs) {
-				mechs[idx++] = new Element("mechanism", mech);
-			}
-
-			return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
-		}
 	}
 
 }

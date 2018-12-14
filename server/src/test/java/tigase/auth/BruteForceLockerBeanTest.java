@@ -2,9 +2,62 @@ package tigase.auth;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.eventbus.impl.EventBusSerializer;
+import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 
 public class BruteForceLockerBeanTest {
+
+	@Test
+	public void testNestedMaps() {
+		EventBusSerializer converter = new EventBusSerializer();
+		Event event = new Event();
+		event.getHolder().addIP("1.2.3.4");
+
+		event.getHolder().addIP("1.2.3.4");
+		event.getHolder().addIP("1.2.3.4");
+		event.getHolder().addIP("1.2.3.4");
+		event.getHolder().addIP("1.2.3.5");
+
+		event.getHolder().addJID(BareJID.bareJIDInstanceNS("a@b.c"));
+		event.getHolder().addJID(BareJID.bareJIDInstanceNS("b@b.c"));
+		event.getHolder().addJID(BareJID.bareJIDInstanceNS("c@b.c"));
+		event.getHolder().addJID(BareJID.bareJIDInstanceNS("c@b.c"));
+		event.getHolder().addJID(BareJID.bareJIDInstanceNS("c@b.c"));
+
+		Element s = converter.serialize(event);
+
+		System.out.println(s.toString());
+
+	}
+
+	@Test
+	public void testStatsSerializer() {
+		BruteForceLockerBean.StatHolder sh1 = new BruteForceLockerBean.StatHolder();
+
+		sh1.addIP("1.2.3.4");
+		sh1.addIP("1.2.3.4");
+		sh1.addIP("1.2.3.4");
+		sh1.addIP("1.2.3.5");
+
+		sh1.addJID(BareJID.bareJIDInstanceNS("a@b.c"));
+		sh1.addJID(BareJID.bareJIDInstanceNS("b@b.c"));
+		sh1.addJID(BareJID.bareJIDInstanceNS("c@b.c"));
+		sh1.addJID(BareJID.bareJIDInstanceNS("c@b.c"));
+		sh1.addJID(BareJID.bareJIDInstanceNS("c@b.c"));
+
+		String[] parcel = sh1.encodeToStrings();
+
+		BruteForceLockerBean.StatHolder sh2 = new BruteForceLockerBean.StatHolder();
+
+		sh2.fillFromString(parcel);
+
+		Assert.assertEquals(sh1.getIps().size(), sh2.getIps().size());
+		Assert.assertEquals(sh1.getJids().size(), sh2.getJids().size());
+
+		sh1.getIps().forEach((ip, count) -> Assert.assertEquals(count, sh2.getIps().get(ip)));
+		sh1.getJids().forEach((jid, count) -> Assert.assertEquals(count, sh2.getJids().get(jid)));
+	}
 
 	@Test
 	public void test3InvalidLoginsAndWait() {
@@ -49,6 +102,28 @@ public class BruteForceLockerBeanTest {
 		// try after lock time
 		Assert.assertTrue(bean.isLoginAllowed(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 100007 + 10_000));
 
+	}
+
+	public class Event {
+
+		private BruteForceLockerBean.StatHolder holder = new BruteForceLockerBean.StatHolder();
+		private String name;
+
+		public BruteForceLockerBean.StatHolder getHolder() {
+			return holder;
+		}
+
+		public void setHolder(BruteForceLockerBean.StatHolder holder) {
+			this.holder = holder;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
 	}
 
 }

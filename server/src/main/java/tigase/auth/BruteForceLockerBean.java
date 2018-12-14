@@ -1,16 +1,26 @@
 package tigase.auth;
 
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
+import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.TypesConverter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.map.ClusterMapFactory;
 import tigase.server.xmppsession.SessionManager;
+import tigase.stats.ComponentStatisticsProvider;
+import tigase.stats.StatisticsList;
 import tigase.vhosts.VHostItem;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
+import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +29,7 @@ import static tigase.auth.BruteForceLockerBean.Mode.valueOf;
 
 @Bean(name = "brute-force-locker", parent = SessionManager.class, active = true)
 public class BruteForceLockerBean
-		implements Initializable {
+		implements Initializable, UnregisterAware, ComponentStatisticsProvider {
 
 	private final static String ANY = "*";
 
@@ -53,7 +63,13 @@ public class BruteForceLockerBean
 	}
 
 	private final Logger log = Logger.getLogger(this.getClass().getName());
+	private final Map<String, StatHolder> otherStatHolders = new ConcurrentHashMap<>();
+	private final StatHolder statHolder = new StatHolder();
+	@Inject
+	private EventBus eventBus;
 	private Map<Key, Value> map;
+	@Inject
+	private SessionManager sessionManager;
 
 	public static String getClientIp(XMPPResourceConnection session) {
 		try {
@@ -86,7 +102,7 @@ public class BruteForceLockerBean
 		Value value = map.get(key);
 
 		if (value == null) {
-			value = new Value();
+			value = new Value(session != null ? session.getDomain().getVhost().toString() : null, ip, jid);
 			value.setBadLoginCounter(0);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -120,6 +136,8 @@ public class BruteForceLockerBean
 		}
 
 		map.put(key, value);
+
+		addToStatistic(value);
 	}
 
 	public boolean canUserBeDisabled(XMPPResourceConnection session, String ip, BareJID jid) {
@@ -169,33 +187,49 @@ public class BruteForceLockerBean
 		toRemove.forEach(key -> map.remove(key));
 	}
 
-	final Key createKey(XMPPResourceConnection session, String ip, BareJID jid) {
-		final Mode mode = session == null ? Mode.IpJid : valueOf(session.getDomain().getData(LOCK_MODE_KEY));
-		return createKey(mode, session, ip, jid);
-	}
-
-	final Key createKey(final Mode mode, XMPPResourceConnection session, String ip, BareJID jid) {
-		final String domain = session == null ? ANY : session.getDomain().getVhost().toString();
-		switch (mode) {
-			case Jid:
-				return new Key(ANY, jid == null ? ANY : jid.toString(), domain);
-			case Ip:
-				return new Key(ip == null ? ANY : ip, ANY, domain);
-			case IpJid:
-				return new Key(ip == null ? ANY : ip, jid == null ? ANY : jid.toString(), domain);
-			default:
-				throw new RuntimeException("Unknown mode " + mode);
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		ArrayList<Value> l = new ArrayList<>(this.map.values());
+		for (Value value : l) {
+			list.add(compName, "Present locks: " + value.jid + " from " + value.ip, value.badLoginCounter, Level.FINER);
 		}
+
+		final StatHolder tmp = new StatHolder();
+
+		this.statHolder.ips.forEach((ip, count) -> tmp.addIP(ip, count));
+		this.statHolder.jids.forEach((jid, count) -> tmp.addJID(jid, count));
+
+		this.otherStatHolders.values().forEach(otherSH -> {
+			otherSH.ips.forEach((ip, count) -> tmp.addIP(ip, count));
+			otherSH.jids.forEach((jid, count) -> tmp.addJID(jid, count));
+		});
+
+		tmp.ips.forEach((ip, count) -> list.add(compName, "From IP: " + ip, count, Level.INFO));
+		tmp.jids.forEach((jid, count) -> list.add(compName, "For JID: " + jid, count, Level.INFO));
 	}
 
 	@Override
 	public void initialize() {
 		this.map = ClusterMapFactory.get().createMap(MAP_TYPE, Key.class, Value.class);
 		assert this.map != null : "Distributed Map is NULL!";
+//		assert this.sessionManager != null : "SessionManager is NULL!";
+
+		if (eventBus != null) {
+			eventBus.registerAll(this);
+		}
 	}
 
 	public boolean isEnabled(XMPPResourceConnection session) {
 		return session == null || (boolean) session.getDomain().getData(LOCK_ENABLED_KEY);
+	}
+
+	@HandleEvent(filter = HandleEvent.Type.remote)
+	public void handleStatisticsEmitEvent(StatisticsEmitEvent event) {
+		if (event.getNodeName() == null) {
+			return;
+		}
+
+		this.otherStatHolders.put(event.getNodeName(), event.getStatHolder());
 	}
 
 	public boolean isLoginAllowed(XMPPResourceConnection session, final String ip, final BareJID jid) {
@@ -225,6 +259,57 @@ public class BruteForceLockerBean
 			return true;
 		}
 
+		return isLoginAllowed(session, key, value, currentTime);
+	}
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	@Override
+	public void everyHour() {
+
+	}
+
+	@Override
+	public void everyMinute() {
+//		String clusterNode = DNSResolverFactory.getInstance().getDefaultHost();
+		String clusterNode = sessionManager.getComponentId().getDomain();
+		eventBus.fire(new StatisticsEmitEvent(clusterNode, this.statHolder));
+	}
+
+	@Override
+	public void everySecond() {
+
+	}
+
+	final Key createKey(XMPPResourceConnection session, String ip, BareJID jid) {
+		final Mode mode = session == null ? Mode.IpJid : valueOf(session.getDomain().getData(LOCK_MODE_KEY));
+		return createKey(mode, session, ip, jid);
+	}
+
+	final Key createKey(final Mode mode, XMPPResourceConnection session, String ip, BareJID jid) {
+		final String domain = session == null ? ANY : session.getDomain().getVhost().toString();
+		switch (mode) {
+			case Jid:
+				return new Key(ANY, jid == null ? ANY : jid.toString(), domain);
+			case Ip:
+				return new Key(ip == null ? ANY : ip, ANY, domain);
+			case IpJid:
+				return new Key(ip == null ? ANY : ip, jid == null ? ANY : jid.toString(), domain);
+			default:
+				throw new RuntimeException("Unknown mode " + mode);
+		}
+	}
+
+	private void addToStatistic(Value v) {
+		this.statHolder.addIP(v.ip);
+		this.statHolder.addJID(v.jid);
+	}
+
+	private boolean isLoginAllowed(final XMPPResourceConnection session, final Key key, final Value value,
+								   final long currentTime) {
 		if (value.getInvalidateAtTime() < currentTime) {
 			map.remove(key);
 			if (log.isLoggable(Level.FINEST)) {
@@ -330,12 +415,144 @@ public class BruteForceLockerBean
 
 	}
 
+	public static class StatHolder
+			implements TypesConverter.Parcelable {
+
+		private final Map<String, Integer> ips = new ConcurrentHashMap<>();
+		private final Map<BareJID, Integer> jids = new ConcurrentHashMap<>();
+		private final DefaultTypesConverter typesConverter = new DefaultTypesConverter();
+
+		public Map<String, Integer> getIps() {
+			return ips;
+		}
+
+		public Map<BareJID, Integer> getJids() {
+			return jids;
+		}
+
+		public void clear() {
+			ips.clear();
+			jids.clear();
+		}
+
+		public int addIP(String ip) {
+			return add(ips, ip, 1);
+		}
+
+		public int addJID(BareJID jid) {
+			return add(jids, jid, 1);
+		}
+
+		public int addIP(String ip, int value) {
+			return add(ips, ip, value);
+		}
+
+		public int addJID(BareJID jid, int value) {
+			return add(jids, jid, value);
+		}
+
+		@Override
+		public String[] encodeToStrings() {
+			String[] r = new String[2 + ips.size() * 2 + jids.size() * 2];
+			r[0] = String.valueOf(ips.size());
+			r[1] = String.valueOf(jids.size());
+
+			fillTab(ips, r, 2);
+			fillTab(jids, r, 2 + ips.size() * 2);
+
+			return r;
+		}
+
+		@Override
+		public void fillFromString(String[] encoded) {
+			final int lenIps = Integer.parseInt(encoded[0]);
+			final int lenJids = Integer.parseInt(encoded[1]);
+
+			ips.clear();
+			ips.putAll(read(encoded, 2, lenIps, key -> key));
+
+			jids.clear();
+			jids.putAll(read(encoded, 4 + lenIps, lenJids, BareJID::bareJIDInstanceNS));
+		}
+
+		private <T> HashMap<T, Integer> read(final String[] src, final int offset, final int len,
+											 Function<String, T> keyCnv) {
+			HashMap<T, Integer> r = new HashMap<>();
+			for (int i = 0; i < len; i++) {
+				r.put(keyCnv.apply(src[offset + 2 * i]), Integer.parseInt(src[offset + 2 * i + 1]));
+			}
+			return r;
+		}
+
+		private <T> void fillTab(Map<T, Integer> src, String[] dst, final int offset) {
+			int idx = offset;
+			for (Map.Entry<T, Integer> x : src.entrySet()) {
+				String key = x.getKey().toString();
+				Integer value = x.getValue();
+				dst[idx] = key;
+				dst[idx + 1] = String.valueOf(value);
+				idx = idx + 2;
+			}
+		}
+
+		private <T> int add(Map<T, Integer> map, T key, int value) {
+			synchronized (map) {
+				Integer v = map.get(key);
+				v = (v == null ? 0 : v) + value;
+				map.put(key, v);
+				return v;
+			}
+		}
+
+	}
+
+	public static class StatisticsEmitEvent
+			implements Serializable {
+
+		private String nodeName;
+
+		private StatHolder statHolder;
+
+		public StatisticsEmitEvent() {
+		}
+
+		public StatisticsEmitEvent(String nodeName, StatHolder statHolder) {
+			this.nodeName = nodeName;
+			this.statHolder = statHolder;
+		}
+
+		public String getNodeName() {
+			return nodeName;
+		}
+
+		public void setNodeName(String nodeName) {
+			this.nodeName = nodeName;
+		}
+
+		public StatHolder getStatHolder() {
+			return statHolder;
+		}
+
+		public void setStatHolder(StatHolder statHolder) {
+			this.statHolder = statHolder;
+		}
+	}
+
 	public static class Value
 			implements TypesConverter.Parcelable {
 
+		private final String domain;
+		private final String ip;
+		private final BareJID jid;
 		private int badLoginCounter;
 		/** Invalidate this value at specific time */
 		private long invalidateAtTime;
+
+		Value(String domain, String ip, BareJID jid) {
+			this.domain = domain;
+			this.ip = ip;
+			this.jid = jid;
+		}
 
 		@Override
 		public String[] encodeToStrings() {
