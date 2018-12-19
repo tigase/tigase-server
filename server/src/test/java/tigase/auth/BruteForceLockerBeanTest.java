@@ -6,6 +6,8 @@ import tigase.eventbus.impl.EventBusSerializer;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.HashMap;
+
 public class BruteForceLockerBeanTest {
 
 	@Test
@@ -62,7 +64,7 @@ public class BruteForceLockerBeanTest {
 	@Test
 	public void test3InvalidLoginsAndWait() {
 		BruteForceLockerBean bean = new BruteForceLockerBean();
-		bean.initialize();
+		bean.setMap(new HashMap<>());
 		bean.clearAll();
 
 		bean.addInvalidLogin(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 100000);

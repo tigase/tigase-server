@@ -212,7 +212,7 @@ public class BruteForceLockerBean
 	public void initialize() {
 		this.map = ClusterMapFactory.get().createMap(MAP_TYPE, Key.class, Value.class);
 		assert this.map != null : "Distributed Map is NULL!";
-//		assert this.sessionManager != null : "SessionManager is NULL!";
+		assert this.sessionManager != null : "SessionManager is NULL!";
 
 		if (eventBus != null) {
 			eventBus.registerAll(this);
@@ -282,6 +282,10 @@ public class BruteForceLockerBean
 	@Override
 	public void everySecond() {
 
+	}
+
+	void setMap(HashMap<Key, Value> map) {
+		this.map = map;
 	}
 
 	final Key createKey(XMPPResourceConnection session, String ip, BareJID jid) {
