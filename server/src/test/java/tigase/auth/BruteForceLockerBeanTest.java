@@ -82,7 +82,7 @@ public class BruteForceLockerBeanTest {
 	@Test
 	public void test4InvalidLogins() {
 		BruteForceLockerBean bean = new BruteForceLockerBean();
-		bean.initialize();
+		bean.setMap(new HashMap<>());
 		bean.clearAll();
 
 		Assert.assertTrue(bean.isLoginAllowed(null, "1.2.3.4", BareJID.bareJIDInstanceNS("a@bc.d"), 99999));
