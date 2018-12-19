@@ -189,9 +189,10 @@ public class BruteForceLockerBean
 
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
+		final String keyName = compName + "/BruteForceLocker";
 		ArrayList<Value> l = new ArrayList<>(this.map.values());
 		for (Value value : l) {
-			list.add(compName, "Present locks: " + value.jid + " from " + value.ip, value.badLoginCounter, Level.FINER);
+			list.add(keyName, "Present locks: " + value.jid + " from " + value.ip, value.badLoginCounter, Level.FINER);
 		}
 
 		final StatHolder tmp = new StatHolder();
@@ -204,8 +205,8 @@ public class BruteForceLockerBean
 			otherSH.jids.forEach((jid, count) -> tmp.addJID(jid, count));
 		});
 
-		tmp.ips.forEach((ip, count) -> list.add(compName, "From IP: " + ip, count, Level.INFO));
-		tmp.jids.forEach((jid, count) -> list.add(compName, "For JID: " + jid, count, Level.INFO));
+		tmp.ips.forEach((ip, count) -> list.add(keyName, "From IP: " + ip, count, Level.INFO));
+		tmp.jids.forEach((jid, count) -> list.add(keyName, "For JID: " + jid, count, Level.INFO));
 	}
 
 	@Override
