@@ -1,3 +1,0 @@
-Specification-Title: Tigase Jabber Server
-Specification-Vendor: tigase.org
-Specification-Version: 1.0.0
