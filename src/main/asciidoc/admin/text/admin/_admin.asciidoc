@@ -1,13 +1,3 @@
-= Tigase Administration Guide
-Tigase Team <team@tigase.com>
-:toc:
-:toclevels: 3
-:numbered:
-:website: http://tigase.net
-
-:no title:
-:no author:
-
 Welcome to the Tigase Administration Guide.
 
 include::About_Tigase_Jabber_XMPP_Server.asciidoc[leveloffset=+1]

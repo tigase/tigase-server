@@ -91,7 +91,7 @@ This properties are global and accessible by any bean but also set as system pro
 === Defining bean
 
 You can configure bean by using following format:
-[code,bash]
+[source,bash]
 ----
 beanName (class: className, active: activeValue, exportable: exportableValue) {
     # scope of bean properties

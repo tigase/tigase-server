@@ -8,7 +8,7 @@ Tigase Team <team@tigase.com>
 :no title:
 :no author:
 
-:leveloffset: +2
+:leveloffset: +1
 
 include::admins.asciidoc[]
 
