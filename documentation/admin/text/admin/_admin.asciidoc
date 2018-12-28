@@ -1,0 +1,47 @@
+= Tigase Administration Guide
+Tigase Team <team@tigase.com>
+:toc:
+:toclevels: 3
+:numbered:
+:website: http://tigase.net
+
+:no title:
+:no author:
+
+Welcome to the Tigase Administration Guide.
+
+include::About_Tigase_Jabber_XMPP_Server.asciidoc[leveloffset=+1]
+
+include::Licensing_and_Open_Source.asciidoc[leveloffset=+1]
+
+include::Latest_and_Nightly_Builds.asciidoc[leveloffset=+1]
+
+//quick start
+include::Quick_Start/_quick_start.asciidoc[leveloffset=+0]
+
+//configuration
+include::Configuration/_configuration.asciidoc[leveloffset=+0]
+
+include::Using_Tigase/Advanced_Options.asciidoc[leveloffset=+2]
+
+include::Security/_security.asciidoc[leveloffset=+0]
+
+include::Database_Management/_database_management.asciidoc[leveloffset=+0]
+
+// Components
+include::Components/_components.asciidoc[leveloffset=+0]
+
+//Using Tigase
+include::Using_Tigase/_using_tigase.asciidoc[leveloffset=+0]
+
+include::Addendum/Statistics_Descriptions.asciidoc[leveloffset=+1]
+
+== Appendix II - Database Manual Entry
+
+include::Database_Management/Database_Preparation/MySQL.asciidoc[leveloffset=+2]
+
+include::Database_Management/Database_Preparation/Derby.asciidoc[leveloffset=+2]
+
+include::Database_Management/Database_Preparation/MSSQL.asciidoc[leveloffset=+2]
+
+include::Database_Management/Database_Preparation/PostGRE.asciidoc[leveloffset=+2]

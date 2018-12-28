@@ -1,0 +1,17 @@
+= Tigase Administration Guide
+Tigase Team <team@tigase.com>
+:toc:
+:toclevels: 3
+:numbered:
+:website: http://tigase.net
+
+:no title:
+:no author:
+
+include::text/Tigase_v8.0.0.asciidoc[leveloffset=+2]
+
+include::text/user/_user.asciidoc[leveloffset=+1]
+
+include::text/admin/_admin.asciidoc[leveloffset=+1]
+
+include::text/properties/_properties.asciidoc[leveloffset=+1]

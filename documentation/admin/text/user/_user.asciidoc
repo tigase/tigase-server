@@ -1,0 +1,16 @@
+= Tigase User Guide
+Tigase Team <team@tigase.com>
+:toc:
+:numbered:
+:website: http://tigase.net
+
+:no title:
+:no author:
+
+include::Jabber_XMPP_Introduction.asciidoc[leveloffset=+2]
+
+include::Installing_Minichat_on_your_Website.asciidoc[leveloffset=+2]
+
+include::How_to_use_Tigase_Service.asciidoc[leveloffset=+2]
+
+include::Psi_Initial_Configuration.asciidoc[leveloffset=+2]
