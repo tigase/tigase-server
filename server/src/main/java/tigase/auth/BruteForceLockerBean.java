@@ -156,7 +156,11 @@ public class BruteForceLockerBean
 		final long disableAfterFails =
 				session == null ? 20 : (long) session.getDomain().getData(LOCK_DISABLE_ACCOUNT_FAILS_KEY);
 
-		return value.getBadLoginCounter() > disableAfterFails;
+		if (disableAfterFails == 0) {
+			return false;
+		} else {
+			return value.getBadLoginCounter() > disableAfterFails;
+		}
 	}
 
 	public void clearAll() {
@@ -189,6 +193,7 @@ public class BruteForceLockerBean
 
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
+		clearOutdated();
 		final String keyName = compName + "/BruteForceLocker";
 		ArrayList<Value> l = new ArrayList<>(this.map.values());
 		for (Value value : l) {
