@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Tigase Jabber/XMPP Server
+  ~ Copyright (C) 2004-2019 "Tigase, Inc." <office@tigase.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License,
+  ~ or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. Look for COPYING file in the top folder.
+  ~ If not, see http://www.gnu.org/licenses/.
+  -->
+
+<assembly>
+	<id>resources</id>
+	<formats>
+		<format>zip</format>
+		<format>tar.gz</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<fileSets>
+		<fileSet>
+			<directory>./</directory>
+			<outputDirectory>./</outputDirectory>
+			<includes>
+				<include>COPYING</include>
+				<include>README</include>
+				<include>ChangeLog</include>
+				<include>License.html</include>
+				<include>package.html</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>certs</directory>
+			<outputDirectory>certs</outputDirectory>
+			<includes>
+				<include>rsa-keystore</include>
+				<include>truststore</include>
+				<include>keystore-letsencrypt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/database</directory>
+			<outputDirectory>database</outputDirectory>
+			<includes>
+				<include>*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/asciidoc</directory>
+			<outputDirectory>documentation</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<excludes>
+				<exclude>**/*pom.xml*</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/resources/win-stuff</directory>
+			<outputDirectory>win-stuff</outputDirectory>
+			<includes>
+				<include>*/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>etc</directory>
+			<outputDirectory>etc</outputDirectory>
+			<includes>
+				<include>bosh-extra-headers.txt</include>
+				<include>cross-domain-policy.xml</include>
+				<include>client-access-policy.xml</include>
+				<include>config.tdsl</include>
+				<include>tigase.conf</include>
+				<include>jmx.access</include>
+				<include>jmx.password</include>
+				<include>logback.xml</include>
+				<include>snmp.acl</include>
+				<include>tigase-http-context.xml</include>
+			</includes>
+		</fileSet>
+		<!-- OSGi configuration file -->
+		<fileSet>
+			<directory>conf</directory>
+			<outputDirectory>conf</outputDirectory>
+			<includes>
+				<include>config.properties</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/groovy/tigase/admin</directory>
+			<outputDirectory>scripts/admin</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+        <fileSet>
+            <directory>scripts</directory>
+            <outputDirectory>scripts</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude></exclude>
+            </excludes>
+            <fileMode>0744</fileMode>
+            <directoryMode>0744</directoryMode>
+        </fileSet>
+	</fileSets>
+</assembly>
