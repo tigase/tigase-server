@@ -1,0 +1,14 @@
+= Tigase Development Guide
+Tigase Team <team@tigase.com>
+:toc:
+:numbered:
+:website: http://tigase.net
+
+:no title:
+:no author:
+
+
+
+include::../../../target/documentation/tigase-server/documentation/devguide/index.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-http-api/documentation/devlink.asciidoc[leveloffset=+1]

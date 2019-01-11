@@ -1,0 +1,1051 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <properties>
+        <dist_path>.</dist_path>
+        <skip-distribution-deploy>true</skip-distribution-deploy>
+        <docu_build_path>${project.build.directory}/documentation</docu_build_path>
+    </properties>
+    <parent>
+        <groupId>tigase</groupId>
+        <artifactId>tigase-projects-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tigase-server-dist</artifactId>
+    <version>8.0.0-SNAPSHOT</version>
+
+    <name>Tigase XMPP Server Distribution Builder</name>
+
+    <packaging>jar</packaging>
+
+    <url>https://www.tigase.net</url>
+    <issueManagement>
+        <system>Redmine</system>
+        <url>https://projects.tigase.org/projects/tigase-server</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>kobit</id>
+            <name>Artur Hefczyc</name>
+            <email>kobit@tigase.net</email>
+            <url>http://www.tigase.net/</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License GPLv3</name>
+            <url>http://www.gnu.org/licenses/agpl.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://repository.tigase.org/git/tigase-server.git</connection>
+        <developerConnection>scm:git:https://repository.tigase.org/git/tigase-server.git</developerConnection>
+        <url>https://projects.tigase.org/projects/tigase-server/repository</url>
+    </scm>
+
+    <organization>
+        <name>"Tigase, Inc."</name>
+        <url>http://www.tigase.net</url>
+    </organization>
+
+    <profiles>
+        <profile>
+            <id>dist</id>
+            <properties>
+                <maven.javadoc.skip>false</maven.javadoc.skip>
+                <tests.excludeGroups></tests.excludeGroups>
+
+                <admin_guide_filename>admin_index</admin_guide_filename>
+                <dev_guide_filename>dev_index</dev_guide_filename>
+
+                <admin_guide_path>${docs_path}/Administration_Guide</admin_guide_path>
+                <dev_guide_path>${docs_path}/Development_Guide</dev_guide_path>
+
+                <guide_name>Tigase_Server</guide_name>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <includeDependencySources>true</includeDependencySources>
+                                    <dependencySourceIncludes>
+                                        <dependencySourceInclude>tigase:*</dependencySourceInclude>
+                                    </dependencySourceIncludes>
+
+                                    <maxmemory>512m</maxmemory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>output-html</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <sourceDocumentName>${admin_guide_filename}.asciidoc</sourceDocumentName>
+                                    <outputDirectory>${admin_guide_path}/html/</outputDirectory>
+                                    <outputFile>${admin_guide_path}/html/index.html</outputFile>
+                                    <backend>html5</backend>
+                                    <resources>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-http-api/documentation/images
+                                            </directory>
+                                            <targetPath>${admin_guide_path}/html/images</targetPath>
+                                        </resource>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-server/documentation/admin/images
+                                            </directory>
+                                            <targetPath>${admin_guide_path}/html/images</targetPath>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>output-html-dev</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDocumentName>${dev_guide_filename}.asciidoc</sourceDocumentName>
+                                    <outputDirectory>${dev_guide_path}/html/</outputDirectory>
+                                    <outputFile>${dev_guide_path}/html/index.html</outputFile>
+                                    <backend>html5</backend>
+                                    <resources>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-http-api/documentation/images
+                                            </directory>
+                                            <targetPath>${dev_guide_path}/html/images</targetPath>
+                                        </resource>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-server/documentation/devguide/images
+                                            </directory>
+                                            <targetPath>${dev_guide_path}/html/images</targetPath>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>output-docbook</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <sourceDocumentName>${admin_guide_filename}.asciidoc</sourceDocumentName>
+                                    <outputFile>${project.build.directory}/docbook-admin/index.xml</outputFile>
+                                    <resources>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-http-api/documentation/images
+                                            </directory>
+                                            <targetPath>${project.build.directory}/docbook-admin/images</targetPath>
+                                        </resource>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-server/documentation/admin/images
+                                            </directory>
+                                            <targetPath>${project.build.directory}/docbook-admin/images</targetPath>
+                                        </resource>
+                                    </resources>
+                                    <doctype>book</doctype>
+                                    <attributes>
+                                        <linkcss>true</linkcss>
+                                        <imagesdir>.</imagesdir>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>output-docbook-dev</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDocumentName>${dev_guide_filename}.asciidoc</sourceDocumentName>
+                                    <outputFile>${project.build.directory}/docbook-devguide/index.xml</outputFile>
+                                    <resources>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-http-api/documentation/images
+                                            </directory>
+                                            <targetPath>${project.build.directory}/docbook-devguide/images</targetPath>
+                                        </resource>
+                                        <resource>
+                                            <directory>${docu_build_path}/tigase-server/documentation/devguide/images
+                                            </directory>
+                                            <targetPath>${project.build.directory}/docbook-devguide/images</targetPath>
+                                        </resource>
+                                    </resources>
+                                    <doctype>book</doctype>
+                                    <attributes>
+                                        <linkcss>true</linkcss>
+                                        <imagesdir>.</imagesdir>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.agilejava.docbkx</groupId>
+                        <artifactId>docbkx-maven-plugin</artifactId>
+                        <executions>
+                            <!--admin guide-->
+                            <execution>
+                                <id>generate-webhelp</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <sourceDirectory>${project.build.directory}/docbook-admin/</sourceDirectory>
+                                    <targetDirectory>${admin_guide_path}/webhelp/</targetDirectory>
+                                    <outputFile>${admin_guide_path}/webhelp/index.xml</outputFile>
+                                    <postProcess>
+                                        <copy todir="${admin_guide_path}/webhelp/css">
+                                            <fileset dir="src/main/asciidoc/css"/>
+                                        </copy>
+                                        <copy todir="${admin_guide_path}/webhelp/images">
+                                            <fileset dir="${docu_build_path}/tigase-server/documentation/admin/images"/>
+                                            <fileset dir="${docu_build_path}/tigase-http-api/documentation/images"/>
+                                        </copy>
+                                    </postProcess>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-pdf</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <targetDirectory>${project.build.directory}/pdf/${admin_guide_filename}/
+                                    </targetDirectory>
+                                    <imgSrcPath>${project.build.directory}/docbook-admin/</imgSrcPath>
+                                    <sourceDirectory>${project.build.directory}/docbook-admin/</sourceDirectory>
+                                    <ignoreImageScaling>true</ignoreImageScaling>
+                                    <!--Values are: OFF,FATAL,ERROR,WARN,INFO,DEBUG,TRACE,ALL Default is: WARN-->
+                                    <fopLogLevel>OFF</fopLogLevel>
+                                    <postProcess>
+                                        <move failonerror="false"
+                                              file="${project.build.directory}/pdf/${admin_guide_filename}/index.pdf"
+                                              tofile="${admin_guide_path}/pdf/${guide_name}_Guide.pdf"></move>
+                                    </postProcess>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-html</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <targetDirectory>${admin_guide_path}/html_chunk/</targetDirectory>
+                                    <outputFile>${admin_guide_path}/html_chunk/index.html</outputFile>
+                                    <sourceDirectory>${project.build.directory}/docbook-admin/</sourceDirectory>
+                                    <postProcess>
+                                        <copy todir="${admin_guide_path}/html_chunk/css">
+                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                        </copy>
+                                        <copy todir="${admin_guide_path}/html_chunk/images">
+                                            <fileset dir="${docu_build_path}/tigase-server/documentation/admin/images"/>
+                                            <fileset dir="${docu_build_path}/tigase-http-api/documentation/images"/>
+                                        </copy>
+                                        <copy todir="${admin_guide_path}/html_chunk/files">
+                                            <fileset dir="${docu_build_path}/tigase-server/documentation/admin/files"/>
+                                        </copy>
+                                    </postProcess>
+                                </configuration>
+                            </execution>
+                            <!--dev guide-->
+                            <execution>
+                                <id>generate-webhelp-devguide</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>generate-webhelp</goal>
+                                </goals>
+                                <configuration>
+                                    <targetDirectory>${dev_guide_path}/webhelp/</targetDirectory>
+                                    <outputFile>${dev_guide_path}/webhelp/index.html</outputFile>
+                                    <sourceDirectory>${project.build.directory}/docbook-devguide/</sourceDirectory>
+                                    <postProcess>
+                                        <copy todir="${dev_guide_path}/webhelp/css">
+                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                        </copy>
+                                        <copy todir="${dev_guide_path}/webhelp/images">
+                                            <fileset
+                                                    dir="${docu_build_path}/tigase-server/documentation/devguide/images"/>
+                                            <fileset dir="${docu_build_path}/tigase-http-api/documentation/images"/>
+                                        </copy>
+                                        <copy todir="${admin_guide_path}/html_chunk/files">
+                                            <fileset
+                                                    dir="${docu_build_path}/tigase-server/documentation/devguide/files"/>
+                                        </copy>
+                                    </postProcess>
+
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-pdf-devguide</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>generate-pdf</goal>
+                                </goals>
+                                <configuration>
+                                    <targetDirectory>${project.build.directory}/pdf/${dev_guide_filename}
+                                    </targetDirectory>
+                                    <imgSrcPath>${project.build.directory}/docbook-devguide/</imgSrcPath>
+                                    <ignoreImageScaling>false</ignoreImageScaling>
+                                    <!--Values are: OFF,FATAL,ERROR,WARN,INFO,DEBUG,TRACE,ALL Default is: WARN-->
+                                    <fopLogLevel>OFF</fopLogLevel>
+                                    <sourceDirectory>${project.build.directory}/docbook-devguide/</sourceDirectory>
+                                    <postProcess>
+                                        <move failonerror="false"
+                                              file="${project.build.directory}/pdf/${dev_guide_filename}/index.pdf"
+                                              tofile="${dev_guide_path}/pdf/${guide_name}_Guide.pdf"></move>
+                                    </postProcess>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-html-devguide</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>generate-html</goal>
+                                </goals>
+                                <configuration>
+                                    <chunkedOutput>true</chunkedOutput>
+                                    <sourceDirectory>${project.build.directory}/docbook-devguide/</sourceDirectory>
+                                    <targetDirectory>${dev_guide_path}/html_chunk/</targetDirectory>
+                                    <outputFile>${dev_guide_path}/html_chunk/index.html</outputFile>
+                                    <targetsFilename>true</targetsFilename>
+                                    <useIdAsFilename>true</useIdAsFilename>
+                                    <cssDecoration>true</cssDecoration>
+                                    <annotationCss>true</annotationCss>
+                                    <htmlStylesheet>css/docbook-xsl.css</htmlStylesheet>
+                                    <postProcess>
+                                        <copy todir="${dev_guide_path}/html_chunk/css">
+                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                        </copy>
+                                        <copy todir="${dev_guide_path}/html_chunk/images">
+                                            <fileset
+                                                    dir="${docu_build_path}/tigase-server/documentation/devguide/images"/>
+                                            <fileset dir="${docu_build_path}/tigase-http-api/documentation/images"/>
+                                        </copy>
+                                    </postProcess>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>generate-readme</id>
+            <activation>
+                <os>
+                    <family>!windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <target>
+                                        <exec executable="sed" output="${project.build.directory}/dist/README">
+                                            <arg value="-e"/>
+                                            <arg value="s/&lt;[^>]*>//g"/>
+                                            <arg value="-e"/>
+                                            <arg value="s/&#60;[^>]*>//g"/>
+                                            <arg value="-e"/>
+                                            <arg value="s/&amp;[^; ]*;//g"/>
+                                            <arg value="-e"/>
+                                            <arg value="s/${APP_VER}/${project.version}/g"/>
+                                            <arg value="${project.build.directory}/dist/package.html"/>
+                                        </exec>
+                                        <exec executable="sed" output="${project.build.directory}/dist/package.html">
+                                            <arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g"/>
+                                            <arg value="${project.build.directory}/dist/package.html"/>
+                                        </exec>
+                                        <!--<copy file="${project.build.directory}/dist/License.html" tofile="License.html"/>-->
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dist.xml</descriptor>
+                                <descriptor>src/main/assembly/dist-max.xml</descriptor>
+                            </descriptors>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <finalName>tigase-server-${project.version}-b${gitVersion}</finalName>
+                            <outputDirectory>${dist-dir}</outputDirectory>
+                            <appendAssemblyId>true</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dist/jars</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                            <excludeTransitive>false</excludeTransitive>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <overWriteReleases>true></overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tigase-docs-resource</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <!--
+                            If the artifact is also listed as a dependency, the version of the artifactItem
+                            will default to the version from the dependencies or dependencyManagement, e.g.
+                            -->
+                            <!--<includes>**/*.asciidoc,**/*.css,**/*.jpg,**/*.png</includes>-->
+                            <includes>documentation/**/*</includes>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-http-api</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-http-api</outputDirectory>
+                                    <!--<excludes>tigase/**/*</excludes>-->
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-muc</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-muc</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-pubsub</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-pubsub</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-message-archiving</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-message-archiving</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-unified-archive</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-unified-archive</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-push</artifactId>
+                                    <!--<outputDirectory>${docu_build_path}/tigase-push/</outputDirectory>-->
+                                    <!--we need to extract it one level up due to it linking to child guides-->
+                                    <outputDirectory>${project.build.directory}/tigase-push/</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-push-apns</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-push-apns/</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-push-fcm</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-push-fcm/</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-stun</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-stun/</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-socks5</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-socks5</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-spam</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-spam</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-extras-mdns</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-extras-mdns</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-extras-mdns</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-extras</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-server</artifactId>
+                                    <outputDirectory>${docu_build_path}/tigase-server</outputDirectory>
+                                    <classifier>resources</classifier>
+                                    <type>tar.gz</type>
+                                </artifactItem>
+
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tigase-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <outputDirectory>${project.build.directory}/dist</outputDirectory>
+
+                            <includes>certs/**/*,database/**/*,etc/**/*,scripts/**/*,*.html,COPYING</includes>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-http-api</artifactId>
+                                    <includes>
+                                        tigase/**/*.html,certs/**/*,database/**/*,etc/**/*,scripts/**/*,*.html,COPYING
+                                    </includes>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-http-api-jetty</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-muc</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-socks5</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-pubsub</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-message-archiving</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-unified-archive</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-push</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-auditlog</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>licence-lib</artifactId>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-server</artifactId>
+                                    <classifier>resources</classifier>
+                                    <type>tar.gz</type>
+                                    <includes>
+                                        logs/**/*,win-stuff/**/*,certs/**/*,database/**/*,etc/**/*,scripts/**/*,*.html,COPYING
+                                    </includes>
+                                </artifactItem>
+
+
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jarsigner-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archiveDirectory>${project.build.directory}/dist</archiveDirectory>
+                    <includes>
+                        <include>target/tigase*.?ar</include>
+                        <include>jars/tigase*.?ar</include>
+                        <include>jars/licence-lib.jar</include>
+                    </includes>
+                    <processMainArtifact>false</processMainArtifact>
+                    <processAttachedArtifacts>true</processAttachedArtifacts>
+                    <tsa>${tsa-uri}</tsa>
+                    <skip>${sign-skip-server}</skip>
+                    <removeExistingSignatures>true</removeExistingSignatures>
+
+                    <keystore>${sign-keystore}</keystore>
+                    <alias>${sign-alias}</alias>
+                    <storepass>${sign-storepass}</storepass>
+                    <keypass>${sign-keypass}</keypass>
+                    <verbose>${verbose-log}</verbose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>${skip-distribution-deploy}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>gitver</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>dist-ver</id>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <providerSelection>2.0</providerSelection>
+                            <source>${project.basedir}/src/main/groovy/buildVersion.groovy</source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <!--tigase dependencies-->
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-server</artifactId>
+            <version>8.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-utils</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-xmltools</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-muc</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-pubsub</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-extras-all</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>licence-lib</artifactId>
+            <version>1.3.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-stats-collector-library</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-stats-collector-provider</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-http-api</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase.sure.web</groupId>
+            <artifactId>tigase-web-ui</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-http-api-jetty</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-message-archiving</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-unified-archive</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-socks5</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-stun</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-push</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-push-apns</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-push-fcm</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-acs</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-acs-muc</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-acs-pubsub</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-mongodb</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-spam</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-auditlog</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-database-migrator</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--databases-->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.12.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <version>10.12.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.40</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1207</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <version>1.3.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.5.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
+        <!-- other libraries-->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>2.5.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-json</artifactId>
+            <version>2.5.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+            <version>2.5.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-templates</artifactId>
+            <version>2.5.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-xml</artifactId>
+            <version>2.5.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>de.javawi</groupId>
+            <artifactId>jstun</artifactId>
+            <version>0.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmdns</groupId>
+            <artifactId>jmdns</artifactId>
+            <version>3.5.4</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tigase</groupId>
+            <artifactId>tigase-extras-mdns</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--OSGi dependencies-->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>1.4.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.bundlerepository</artifactId>
+            <version>2.0.8</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.bundle</artifactId>
+            <version>3.0.0</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.http.bridge</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.http.cometd</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.http.jetty</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin</artifactId>
+            <version>1.8.10</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.main</artifactId>
+            <version>5.4.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.shell</artifactId>
+            <version>1.4.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.shell.remote</artifactId>
+            <version>1.1.2</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.compendium</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.shell</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+

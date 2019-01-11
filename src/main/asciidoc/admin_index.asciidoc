@@ -1,0 +1,36 @@
+= Tigase Administration Guide
+Tigase Team <team@tigase.com>
+:toc:
+:numbered:
+:website: http://tigase.net
+
+:no title:
+:no author:
+
+//include::text/Tigase_v8.0.0.asciidoc[leveloffset=+1]
+//
+//include::text/user/_user.asciidoc[leveloffset=+1]
+//
+//include::text/admin/_admin.asciidoc[]
+//
+//include::text/properties/_properties.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-server/documentation/admin/index.asciidoc[]
+
+include::../../../target/documentation/tigase-extras/documentation/index.asciidoc[leveloffset=+2]
+
+// Components
+
+include::../../../target/documentation/tigase-http-api/documentation/adminlink.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-message-archiving/documentation/index.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-pubsub/documentation/index.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-socks5/documentation/index.asciidoc[leveloffset=+1]
+
+include::../../../target/tigase-push/documentation/index.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-stun/documentation/index.asciidoc[leveloffset=+1]
+
+include::../../../target/documentation/tigase-spam/documentation/index.asciidoc[leveloffset=+1]
