@@ -731,24 +731,91 @@ public class SchemaManager {
 					Class<?> implementation = getRepositoryImplementation(configurator, dataSource, bc, null);
 					return Stream.of(new RepoInfo(bc, dataSource, implementation));
 				} else {
-					return bc.getKernel()
-							.getDependencyManager()
-							.getBeanConfigs()
-							.stream()
-							.filter(bc1 -> !Kernel.class.isAssignableFrom(bc1.getClazz()))
-							.filter(bc1 -> !Kernel.DelegatedBeanConfig.class.isAssignableFrom(bc1.getClass()))
-							.map(bc1 -> {
+					MDRepositoryBean mdRepositoryBean;
+					MDRepositoryBean.SelectorType selectorType = Optional.ofNullable(configurator.getConfiguration(bc))
+							.map(tmpConfig -> tmpConfig.get("dataSourceSelection"))
+							.map(val -> {
+								if (val instanceof MDRepositoryBean.SelectorType) {
+									return (MDRepositoryBean.SelectorType) val;
+								} else {
+									return MDRepositoryBean.SelectorType.valueOf(val.toString());
+								}
+							})
+							.orElseGet(() -> {
 								try {
-									String dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
-									DataSourceInfo dataSource = dataSources.get(dataSourceName);
-									Class<?> implementation = getRepositoryImplementation(configurator, dataSource, bc1,
+									Field f = MDRepositoryBean.class.getDeclaredField("dataSourceSelection");
+									f.setAccessible(true);
+									Object instance = bc.getClazz().newInstance();
+									return (MDRepositoryBean.SelectorType) f.get(instance);
+								} catch (Exception ex) {
+									return MDRepositoryBean.SelectorType.List;
+								}
+							});
+
+					switch (selectorType) {
+						case EveryDataSource:
+							mdRepositoryBean = ((MDRepositoryBean) bc.getClazz().newInstance());
+							mdRepositoryBean.register(bc.getKernel());
+							return getDataSources(config).entrySet().stream().map(e -> {
+								try {
+									DataSourceInfo dataSource = e.getValue();
+									mdRepositoryBean.registerIfNotExists(e.getKey());
+									BeanConfig bc2 = bc.getKernel().getDependencyManager().getBeanConfig(e.getKey());
+									Class<?> implementation = getRepositoryImplementation(configurator, dataSource, bc2,
 																						  bc);
-									return new RepoInfo(bc1, dataSource, implementation);
+									return new RepoInfo(bc2, dataSource, implementation);
 								} catch (Exception ex) {
 									log.log(Level.WARNING, "Error getting repository implementation", ex);
 									return null;
 								}
 							});
+						case EveryUserRepository:
+							mdRepositoryBean = ((MDRepositoryBean) bc.getClazz().newInstance());
+							mdRepositoryBean.register(bc.getKernel());
+							return kernel.getDependencyManager()
+									.getBeanConfigs()
+									.stream()
+									.filter(bc1 -> UserRepositoryMDPoolBean.class.isAssignableFrom(bc1.getClazz()))
+									.map(BeanConfig::getKernel)
+									.flatMap(k1 -> k1.getDependencyManager().getBeanConfigs().stream())
+									.filter(bc1 -> !Kernel.class.isAssignableFrom(bc1.getClazz()))
+									.filter(bc1 -> !Kernel.DelegatedBeanConfig.class.isAssignableFrom(bc1.getClass()))
+									.map(bc1 -> {
+										try {
+											String dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
+											DataSourceInfo dataSource = dataSources.get(dataSourceName);
+
+											mdRepositoryBean.registerIfNotExists(bc1.getBeanName());
+											BeanConfig bc2 = bc.getKernel().getDependencyManager().getBeanConfig(bc1.getBeanName());
+											Class<?> implementation = getRepositoryImplementation(configurator, dataSource, bc2,
+																								  bc);
+											return new RepoInfo(bc2, dataSource, implementation);
+										} catch (Exception ex) {
+											log.log(Level.WARNING, "Error getting repository implementation", ex);
+											return null;
+										}
+									});
+						case List:
+							return bc.getKernel()
+									.getDependencyManager()
+									.getBeanConfigs()
+									.stream()
+									.filter(bc1 -> !Kernel.class.isAssignableFrom(bc1.getClazz()))
+									.filter(bc1 -> !Kernel.DelegatedBeanConfig.class.isAssignableFrom(bc1.getClass()))
+									.map(bc1 -> {
+										try {
+											String dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
+											DataSourceInfo dataSource = dataSources.get(dataSourceName);
+											Class<?> implementation = getRepositoryImplementation(configurator, dataSource, bc1,
+																								  bc);
+											return new RepoInfo(bc1, dataSource, implementation);
+										} catch (Exception ex) {
+											log.log(Level.WARNING, "Error getting repository implementation", ex);
+											return null;
+										}
+									});
+					}
+					return Stream.empty();
 				}
 			} catch (Exception ex) {
 				log.log(Level.WARNING, "Error getting repository implementation", ex);
