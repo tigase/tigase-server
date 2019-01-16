@@ -171,7 +171,7 @@ public abstract class PresenceAbstract
 		JID[] buddies_from = roster_util.getBuddies(session, SUB_FROM);
 
 		try {
-			buddies_from = DynamicRoster.addBuddies(session, settings, buddies_to, SUB_FROM);
+			buddies_from = DynamicRoster.addBuddies(session, settings, buddies_from, SUB_FROM);
 		} catch (RosterRetrievingException | RepositoryAccessException ex) {
 			// Ignore, handled in the JabberIqRoster code
 		}
