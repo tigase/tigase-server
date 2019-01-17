@@ -2,10 +2,6 @@
 = Load Balancing External Components in Cluster Mode
 :version: v2.0, August 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 This document describes how to load balance any external components using Tigase XMPP Server and how to make Tigase's components work as external components in a cluster mode.
 
 _Please note, all configuration options described here apply to Tigase XMPP Server version 8.0.0 or later._

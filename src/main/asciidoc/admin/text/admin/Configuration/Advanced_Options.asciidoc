@@ -3,15 +3,11 @@
 :author: Daniel Wisnewski
 :version: v2.0 June 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://www.tigase.net
-
 This section is designed to include a number of advanced configuration options available within Tigase, but may not have a relevant section yet to house them.
 
 [[XEP0077CAPCHA]]
 == Using CAPTCHA for in-band registration
-To reduce false or spam registrations to Tigase XMPP Server, there is now the ability to add CAPTCHA forms as a part of the in-band registration.  The CAPTCHA will generate a random math equation and ask the user registering a new account to answer it.  This may be enabled as a sub-option of enabling registration in config.tdsl:
+To reduce false or spam registrations to Tigase XMPP Server, there is now the ability to add CAPTCHA forms as a part of the in-band registration. The CAPTCHA will generate a random math equation and ask the user registering a new account to answer it. This may be enabled as a sub-option of enabling registration in config.tdsl:
 [source,dsl]
 -----
 'sess-man' {
@@ -28,7 +24,7 @@ NOTE: Because some clients do not refresh a registration form after an unsuccess
 [[emptyNicks]]
 == Enabling Empty Nicknames
 
-Tigase can now support users with empty nicknames.  This can be enabled by adding the following code in config.tdsl.
+Tigase can now support users with empty nicknames. This can be enabled by adding the following code in config.tdsl.
 [source,dsl]
 ------
 'sess-man' {
@@ -41,7 +37,7 @@ Tigase can now support users with empty nicknames.  This can be enabled by addin
 [[silentIgnore]]
 == Enable Silent Ignore on Packets Delivered to Unavailable Resources
 
-You can now have Tigase ignore packets delivered to unavailable resources to avoid having a packet bounce around and create unnecessary traffic.  You may set this globally, within standard message handling only, or within the AMP component using the following settings:
+You can now have Tigase ignore packets delivered to unavailable resources to avoid having a packet bounce around and create unnecessary traffic. You may set this globally, within standard message handling only, or within the AMP component using the following settings:
 
 Globally:
 [source,dsl]
@@ -71,7 +67,7 @@ AMP Component:
 [[errorCounting]]
 == Mechanism to count errors within Tigase
 
-A new processor within statistics has been added to count the number of errors that Tigase returns. This processor, named `error-counter`, will count all errors returned by Tigase, however by default the number is always zero if it is not enabled.  It can be found as an MBean object in JMX under `ErrorStatistics` and contains values for packets with `ERROR` and grouped by type.
+A new processor within statistics has been added to count the number of errors that Tigase returns. This processor, named `error-counter`, will count all errors returned by Tigase, however by default the number is always zero if it is not enabled. It can be found as an MBean object in JMX under `ErrorStatistics` and contains values for packets with `ERROR` and grouped by type.
 To enable counting of these errors, you must ensure the processor is included in your `sess-man` configuration:
 [source,dsl]
 -----
@@ -83,7 +79,7 @@ To enable counting of these errors, you must ensure the processor is included in
 === Including stream errors
 
 Stream `ERROR` packets are not included in the above counter by default as they are processed separately.
-To enable this to be added to the counter, the following line must be in your config.tdsl file.
+To enable this to be added to the counter, the following line must be in your `config.tdsl` file.
 [source,dsl]
 -----
 c2s {
@@ -96,7 +92,7 @@ c2s {
 [[streamResumptiontimeout]]
 === Stream resumption default & max-timeout
 
-`SteamManagementIOProcessor` now has a setting that can be used to change the maximum timeout time it will wait for reconnection if a client does not send a time to wait.  Two settings are now available:
+`SteamManagementIOProcessor` now has a setting that can be used to change the maximum timeout time it will wait for reconnection if a client does not send a time to wait. Two settings are now available:
 
 [source,dsl]
 -----
@@ -106,7 +102,7 @@ c2s {
     }
 }
 -----
-The above setting in config.tdsl file will change the default timeout period to 90 seconds.
+The above setting in `config.tdsl` file will change the default timeout period to 90 seconds.
 
 [source,dsl]
 -----
@@ -116,10 +112,10 @@ c2s {
     }
 }
 -----
-This setting will set the maximum time allowed for stream resumption to 900 seconds.  This can be handy if you expect a number of mobile phones to connect to your server and want to avoid duplicate messages being sent back and forth.
+This setting will set the maximum time allowed for stream resumption to 900 seconds. This can be handy if you expect a number of mobile phones to connect to your server and want to avoid duplicate messages being sent back and forth.
 
 [[autoSub]]
-You may setup a server to automatically approve presence subscriptions or roster authorizations for all users.  Say you were hosting bots and wanted to automate the process.  This can be done with the following settings:
+You may setup a server to automatically approve presence subscriptions or roster authorizations for all users. Say you were hosting bots and wanted to automate the process. This can be done with the following settings:
 [source,dsl]
 -----
 'sess-man' {
@@ -134,6 +130,6 @@ You may setup a server to automatically approve presence subscriptions or roster
 Both of these settings are false by default, and you may use them together or separately.
 The following behavior is followed when they are both activated:
 
-- Upon sending a subscription request - Both contacts will each others' subscription and be added to each others' roster.  Presence information will immediately be exchanged between both parties.
+- Upon sending a subscription request - Both contacts will each others' subscription and be added to each others' roster. Presence information will immediately be exchanged between both parties.
 - Upon sending presence with type either unsubscribe or unsubscribed follows the rules defined in RFC regarding processing of these stanzas (i.e. adjusting subscription type of user/contact), but without forwarding those stanzas to the receiving entity to avoid any notifications to the client. However, a roster push is generated to reflect changes to presence in user roster in a seamless manner.
 - Simply adding an item to the roster (i.e. with <iq/> stanza with correct semantics) will also cause an automatic subscription between the user and the contact in a matter explained above.

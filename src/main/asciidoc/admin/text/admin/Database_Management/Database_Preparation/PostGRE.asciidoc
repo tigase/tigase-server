@@ -3,10 +3,6 @@
 :author: Andrzej Wojcik <andrzejw@tigase.org>
 :version: v2.0, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 This guide describes how to prepare PostgreSQL database for connecting to Tigase server.
 
 The PostgreSQL database can be prepared in many ways. Below are presented two possible ways. The following assumptions apply to both methods:

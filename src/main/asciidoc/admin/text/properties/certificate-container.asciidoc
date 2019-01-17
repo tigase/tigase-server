@@ -3,11 +3,7 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
-The certificate container houses all configuration related to SSL certificate configuration.  This container replaces a number of former -- properties.
+The certificate container houses all configuration related to SSL certificate configuration. This container replaces a number of former -- properties.
 
 [[sslCertsLocation]]
 == ssl-certs-location

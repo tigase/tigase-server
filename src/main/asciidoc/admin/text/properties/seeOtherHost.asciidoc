@@ -3,10 +3,6 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.1, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 --cmSeeOtherHost has been replaced with using `seeOtherHost` setting, and can be configured for each connection manager (c2s, s2s, etc..)
 
 *Default value:* `tigase.server.xmppclient.SeeOtherHostHashed`

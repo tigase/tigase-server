@@ -3,10 +3,6 @@
 :author: daniel wisnewski
 :version: v2.0 July 2015. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Tigase is coded to perform with multiple database types and numbers.
 Owing to it's versatile nature, there are some tools and procedures that may be of use to certain administrators.
 
@@ -25,11 +21,11 @@ As of v8.0.0 here are the minimum and recommended versions of databases for use 
 |MariaDB    |?                    |10.0.12          |Basic features works with 10.0.12-MariaDB Homebrew, but is not fully tested.
 |=================================
 
-Although Tigase may support other versions of databases, these are the ones we are most familiar with in offering support and advice.  Use of databases outside these guidelines may result in unforeseen errors.
+Although Tigase may support other versions of databases, these are the ones we are most familiar with in offering support and advice. Use of databases outside these guidelines may result in unforeseen errors.
 
 [[databaseWatchdog]]
 == Database Watchdog
-It is possible to have Tigase test availability and existence of database periodically only when db connections are idle.  By default this ping is sent once every 60 minutes to each connected repository.  However this can be overridden as a part of the dataSource property:
+It is possible to have Tigase test availability and existence of database periodically only when db connections are idle. By default this ping is sent once every 60 minutes to each connected repository. However this can be overridden as a part of the dataSource property:
 
 [source,properties]
 -----

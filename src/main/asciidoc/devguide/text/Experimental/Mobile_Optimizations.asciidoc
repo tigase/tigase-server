@@ -54,7 +54,7 @@ If you wish to activate you Mobile v1 plugin you need to send presented above wi
 If you wish to activate you Mobile v2 plugin you need to send presented above with xmlns attribute value replaced with _http://tigase.org/protocol/mobile#v2_
 
 == Configuration
-Mobile plugins are not activated by default thus additional entry in the config.tdsl is required:
+Mobile plugins are not activated by default thus additional entry in the `config.tdsl` is required:
 
 [source,dsl]
 -----

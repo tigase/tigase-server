@@ -3,10 +3,6 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 This guide describes how to prepare Derby database for connecting the Tigase server.
 
 == Basic Setup
@@ -64,7 +60,7 @@ derby-unified-archive-2.0.0.sql
 
 == Connecting Tigase to database
 
-Once the database is setup, configure the config.tdsl file in Tigase and add the following configuration:
+Once the database is setup, configure the `config.tdsl` file in Tigase and add the following configuration:
 [source,properties]
 -----
 dataSource {

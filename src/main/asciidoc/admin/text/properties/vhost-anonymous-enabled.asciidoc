@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Default value:* `true`
 
 *Example:* `'vhost-anonymous-enabled' = 'false'`

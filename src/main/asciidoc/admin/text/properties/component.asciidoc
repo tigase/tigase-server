@@ -3,11 +3,7 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
-*Description:* Container specifying component configuration.  All components if they require configuration must be called in the conf.tdsl file in the following manner:
+*Description:* Container specifying component configuration. All components if they require configuration must be called in the conf.tdsl file in the following manner:
 [source,dsl]
 -----
 componentName (class: value) {
@@ -15,7 +11,7 @@ componentName (class: value) {
 }
 -----
 
-DSL allows for custom naming of the component, and specifying of the class in the same line.  This method replaces the old `comp-class` and `comp-name` style of configuration.
+DSL allows for custom naming of the component, and specifying of the class in the same line. This method replaces the old `comp-class` and `comp-name` style of configuration.
 
 For example, what used to be
 [source,properties]

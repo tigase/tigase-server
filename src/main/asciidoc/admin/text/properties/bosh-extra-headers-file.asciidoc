@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Default value:* `'etc/bosh-extra-headers.txt'`
 
 *Example:* `'bosh-extra-headers-file' = ''/path/to/file.txt'`

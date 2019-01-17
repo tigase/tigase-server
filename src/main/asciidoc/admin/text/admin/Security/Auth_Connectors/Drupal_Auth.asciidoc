@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2014: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Currently, we can only check authentication against a *Drupal* database at the moment. Full *Drupal* authentication is not implemented as of yet.
 
 As *Drupal* keeps encrypted passwords in database the only possible authorization protocols are those based on PLAIN passwords.

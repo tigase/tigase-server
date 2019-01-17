@@ -3,10 +3,6 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Have you ever thought of displaying your users presence status on the website? Or, maybe, you wanted to integrate XMPP service with your own system and share not only users' accounts but also presence status?
 
 Not only is it possible but also very simple. You have a new option in the domain control form.
@@ -31,9 +27,10 @@ The bot/client uses our link:https://projects.tigase.org/projects/jaxmpp2[JaXMPP
 You should be able to find a few more code examples on the wiki page.
 
 
-[source,java]
+[source,groovy]
 -----
 package jaxmppexample
+
 import tigase.jaxmpp.core.client.BareJID
 import tigase.jaxmpp.core.client.SessionObject
 import tigase.jaxmpp.core.client.exceptions.JaxmppException

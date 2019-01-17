@@ -1,12 +1,6 @@
-= Appendix III - Properties Guide
-
+= Appendix II - Properties Guide
 Tigase Team <team@tigase.com>
-:toc:
-:numbered:
-:website: http://tigase.net
-
-:no title:
-:no author:
+v{revnumber}, {localdate}
 
 :leveloffset: +1
 
@@ -116,4 +110,4 @@ include::watchdog-timeout.asciidoc[]
 
 include::ws-allow-unmasked-frames.asciidoc[]
 
-:leveloffset: -2
+:leveloffset: -1

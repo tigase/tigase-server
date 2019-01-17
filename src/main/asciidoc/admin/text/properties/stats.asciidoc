@@ -3,17 +3,13 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.1, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
-The stats block contains settings for statistics collection.  To begin the stats block, use the following:
+The stats block contains settings for statistics collection. To begin the stats block, use the following:
 [source,dsl]
 -----
 stats {}
 -----
 
-*Default value:* 'By default, stats is not listed in the config.tdsl file'
+*Default value:* 'By default, stats is not listed in the `config.tdsl` file'
 
 *Description*
 
@@ -40,7 +36,7 @@ stats {
 -----
 
 == stats-logger
-Allow enabling and configuring components responsible for storing statistic information.  Note that this controls the logging system for retrieving using JMX, clients, or ad-hoc commands.
+Allow enabling and configuring components responsible for storing statistic information. Note that this controls the logging system for retrieving using JMX, clients, or ad-hoc commands.
 
 [source,dsl]
 -----
@@ -74,7 +70,7 @@ stats {
 -----
 
 == stats-file-logger
-This allows configuring of statistics gathering to an external file.  This only has one class, and may be controlled independently from the internal statistics.
+This allows configuring of statistics gathering to an external file. This only has one class, and may be controlled independently from the internal statistics.
 [source,dsl]
 -----
 stats {

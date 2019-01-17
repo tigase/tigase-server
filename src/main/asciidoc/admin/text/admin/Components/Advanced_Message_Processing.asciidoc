@@ -3,11 +3,7 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
-Tigase server offers support for link:http://xmpp.org/extensions/xep-0079.html[Advanced Message Processing], called AMP or XEP-0079.
+Tigase server offers support for link:http://xmpp.org/extensions/xep-0079.html[XEP-0079: Advanced Message Processing] (often abbreviated to AMP).
 
 It is enabled by default but there are several configuration options that you may tweak.
 
@@ -28,7 +24,7 @@ Here is a first, brief overview of the AMP configuration and later detailed expl
 -----
 
 
-== First of all: plugins:
+== First of all: plugins
 
 Even though the whole functionality is implemented inside the component you need a way to forward messages with `AMP` payload to that component. This is what the `amp` plugin does. The `amp` plugin intercepts all `<message/>` packets even without AMP payload, redirecting some of the to the `AMP` component and others processing in a standard way. Therefore you no longer need `message` plugin or `msgoffline` plugin.
 Those are all functions are offered by the `amp` plugin now. Hence you have to switch `message` and `msgoffline` plugins off (the `amp` plugin is loaded by default):
@@ -53,11 +49,11 @@ The `amp` plugin needs to know where to forward all the `AMP` packets. By defaul
 }
 -----
 
-== Secondly: component:
+== Secondly: component
 
 By default Tigase loads the component with the standard name `amp`
 
-== Optional parameters:
+== Optional parameters
 
 There is also one parameter shared between the component and the plugin. Connection to the database where offline messages are stored. The AMP component has a dedicated schema for storing offline messages designed for a high traffic and high load installations. It does not use `UserRepository` for storing messages.
 

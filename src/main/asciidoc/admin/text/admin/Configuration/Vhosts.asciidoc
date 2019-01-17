@@ -3,11 +3,7 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
-Tigase server supports multiple virtual hosts in a single server installation.  Virtual hosts can be added or removed, enabled or disabled during runtime without restarting the service or disrupting normal operation.
+Tigase server supports multiple virtual hosts in a single server installation. Virtual hosts can be added or removed, enabled or disabled during runtime without restarting the service or disrupting normal operation.
 
 This document describes how virtual hosts work in Tigase server and how to get the most out of this feature in your installation.
 

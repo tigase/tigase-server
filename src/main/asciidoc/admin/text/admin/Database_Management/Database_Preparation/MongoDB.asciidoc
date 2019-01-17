@@ -3,35 +3,29 @@
 :author: not known
 :version: v2.0 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://www.tiagse.org
-
 Tigase now supports MongoDB for auth, settings, and storage repositories. If you wish to use MongoDB for Tigase, please use this guide to help you.
 
 == Dependencies
 
-To run Tigase MongoDB support library requires drivers for MongoDB for Java which can be downloaded from link:https://github.com/mongodb/mongo-java-driver/releases[here]. This driver needs to be placed in `/jars` directory located in Tigase XMPP Server installation directory.  If you are using a dist-max distribution, it is already included.
+To run Tigase MongoDB support library requires drivers for MongoDB for Java which can be downloaded from link:https://github.com/mongodb/mongo-java-driver/releases[here]. This driver needs to be placed in `jars/` directory located in Tigase XMPP Server installation directory. If you are using a dist-max distribution, it is already included.
 
 == Configuration
 
-Note that fresh installations of MongoDB do not come with users or databases installed.  Once you have setup MongoDB you will need to create a user to be used with Tigase.  To do this, bring up the mongo console by running mongo.exe in a cmd window for windows, or run mongo in linux.
+Note that fresh installations of MongoDB do not come with users or databases installed. Once you have setup MongoDB you will need to create a user to be used with Tigase. To do this, bring up the mongo console by running mongo.exe in a cmd window for windows, or run mongo in linux.
 Once connected, enter then following:
 
 [source,bash]
 -----
->use admin
-switched to admin
->db.createUser (
-... {
-... user: "tigase"
-... pwd: "password"
-... roles: [ "root" ]
-... }
-... )
+use admin
+db.createUser( { user: "tigase",
+                 pwd: "password",
+                 customData: { employeeId: 12345 },
+                 roles: [ "root" ]
+                }
+              )
 -----
 
-Press shift + Enter to create new lines in the command and the shell will automatically add the three ellipses.  Be sure to give this user a `root` role in order to properly write to the database.
+Be sure to give this user a `root` role in order to properly write to the database.
 Once you receive a `user successfully created` message, you are ready to install tigase on MongoDB.
 
 === Configuration of user repository for Tigase XMPP Server

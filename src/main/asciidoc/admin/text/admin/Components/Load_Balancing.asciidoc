@@ -4,10 +4,6 @@
 //incomplete
 :version: v2.1, August 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Tigase includes load balancing functionality allowing users to be redirected to the most suitable cluster node. Functionality relies on a see-other-host XMPP stream error message. The basic principle behind the mechanism is that user will get redirect if the host returned by the implementation differ from the host to which user currently tries to connect. It is required that the user JID to be known for the redirection to work correctly.
 
 == Available Implementations
@@ -15,9 +11,10 @@ Tigase implementation is, as usual, extensible and allows for different, pluggab
 
 Currently there are three strategies available:
 
-- `SeeOtherHost` - most basic implementation returning either single host configured in config.tdsl file or name of the current host;
+- `SeeOtherHost` - most basic implementation returning either single host configured in `config.tdsl` file or name of the current host;
 - `SeeOtherHostHashed` (default) - default implementation for cluster environment of SeeOtherHostIfc returning redirect host based on the hash value of the user's JID; list of the available nodes from which a selection would be made is by default composed and reflects all connected nodes, alternatively hosts list can be configured in the config.tdsl;
 - `SeeOtherHostDB` - extended implementation of SeeOtherHost using redirect information from database in the form of pairs `user_id` and `node_id` to which given user should be redirected.
+- `SeeOtherHostDualIP` - matches internal Tigase cluster nodes against the lookup table to provide relevant redirection hostname/IP (by default internal Tigase tig_cluster_nodes table will be used)
 
 == Configuration Options
 The most basic configuration is related to the choice of actual redirection implementation by declaring class for each connector:
@@ -56,7 +53,7 @@ c2s {
 -----
 
 - `'default-host' = 'host1;host2;host3'` - a semicolon separated list of hosts to be used for redirection.
-- `'phases' =`  - a semicolon separated list of phases in which redirection should be active, currently possible values are:
+- `'phases' = []` - an array of phases in which redirection should be active, currently possible values are:
   * `OPEN` which enables redirection during opening of the XMPP stream;
   * `LOGIN` which enables redirection upon authenticating user session;
 
@@ -80,9 +77,9 @@ c2s {
 - `get-all-query-timeout` - allows to set timeout for executed queries.
 
 === SeeOtherHostDualIP
-This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `tig_cluster_nodes` table will be used (and appropriate repository implementation will be used).
+This mechanisms matches internal Tigase cluster nodes against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `tig_cluster_nodes` table is used (and appropriate repository implementation will be used).
 
-To enable this redirection mechanism following configuration / class should be used.  Note that for global use, all connection managers must have the same class defined.  You can define each connection manager individually.
+To enable this redirection mechanism following configuration / class should be used. Note that for global use, all connection managers must have the same class defined. You can define each connection manager individually.
 
 [source,dsl]
 ----
@@ -96,7 +93,6 @@ ws2s {
     seeOtherHost (class: tigase.server.xmppclient.SeeOtherHostDualIP) {}
 }
 ----
-
 
 It offers following configuration options:
 
@@ -123,21 +119,19 @@ All options are configured or on per-component basis:
 ----
 
 ==== EventBus as a source of information
-It's possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that `eventbus` should be used as a value of `data-source` configuration option. In addition, EventBus events needs to be enabled in ClusterConnectionManager or on per-component basis:
+It's possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that `eventbus-repository-notifications` needs to be enabled in ClusterConnectionManager:
 
 [source,dsl]
 ----
-<connector> {
-    seeOtherHost (class: {data-source=eventbus}) {}
-    }
-}
 'cl-comp' {
     'eventbus-repository-notifications' = true
 }
 ----
 
 == Auxiliary setup options
+
 === Enforcing redirection
+
 It's possible to enforce redirection of connections on the particular port of connection manager with `force-redirect-to` set to Integer with the following general setting option:
 [source,dsl]
 ----
@@ -180,8 +174,8 @@ or in the `etc/config.tdsl` (they will be converted to JVM properties):
 [source,dsl]
 ----
 'dns-resolver' {
-    'tigase-primary-address' = 'hostname.local'
     'tigase-resolver-class' = 'tigase.util.DNSResolverDefault'
+    'tigase-primary-address' = 'hostname.local'
     'tigase-secondary-address' = 'hostname'
 }
 ----

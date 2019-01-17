@@ -14,8 +14,6 @@ include::Monitoring/Statistics_Logger_Config.asciidoc[leveloffset=+3]
 
 include::Server_to_Server_Protocol.asciidoc[leveloffset=+2]
 
-include::MUC.asciidoc[leveloffset=+2]
-
 include::Load_Balancing.asciidoc[leveloffset=+2]
 
 include::External_Component_Configuration/Intro.asciidoc[leveloffset=+2]

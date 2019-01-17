@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v3.0, October 2017: Reformatted for 8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 If something goes wrong and you can't find out why it is not working as expected, you might want more detailed debugging options switched on.
 
 Tigase is a Java application and it uses Java logging library, this gives you the flexibility to switch logging on for selected Java packages or even for a single Java class.
@@ -15,7 +11,7 @@ Logs files are stored in `logs/` directory. `tigase-console.log` stores basic lo
 
 == Configuration
 
-By default, Tigase has the old `debug=server` setting is turned on and does not need to be added.
+By default, Tigase has the old `debug = ['server']` setting is turned on and does not need to be added.
 
 However, people want to see what is going on the network level. That is what has been sent and what has been received by the server - the actual character data. The class which would print all received and sent character data is: `tigase.xmpp.XMPPIOService`. To enable all debugging info for this class you have to modify the debug line:
 
@@ -33,10 +29,10 @@ debug = [ 'cluster' , 'xmpp.XMPPIOService' ]
 
 Other packages you might be interested in are:
 
-- `tiagse.io` can print out what is going on a very low level network level including TLS/SSL stuff.
-- `tigase.xml` would print the XML parser debugging data.
+- `io` can print out what is going on a very low level network level including TLS/SSL stuff.
+- `xml` would print the XML parser debugging data.
 - `cluster` would print all the clustering related stuff.
-- `tigase.xmpp.impl` would print logs from all plugins loaded to Tigase server.
+- `xmpp.impl` would print logs from all plugins loaded to Tigase server.
 
 === Non-Tigase packages
 

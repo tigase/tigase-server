@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 This guide describes how to configure Tigase server to use link:http://www.postgresql.org/[PostgreSQL] database as a user repository.
 
 If you used an XML based user repository before you can copy all user data to PostgreSQL database using repository management tool. All steps are described below.

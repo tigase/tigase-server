@@ -3,10 +3,6 @@
 :Author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 *Tigase XMPP Server* is an *Open Source and Free (AGPLv3)* Java based server. The goals behind its design and implementation of the server are:
 
 . Make the server robust and reliable.

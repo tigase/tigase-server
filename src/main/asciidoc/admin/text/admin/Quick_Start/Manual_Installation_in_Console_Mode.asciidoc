@@ -3,11 +3,7 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v3.0, October 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
-Our preferred way to install the Tigase server is using xref:webinstall[Web installer] and configuration program which comes with one of the binary packages. Please pick up the latest version of the JAR file in our link:https://projects.tigase.org/projects/tigase-server/files[download section].
+Our preferred way to install the Tigase server is using xref:webinstall[Web installer] and configuration program which comes with one of the binary packages. Please pick up the latest version of the JAR file in our link:https://tigase.tech/projects/tigase-server/files[download section].
 
 In many cases however it is not always possible to use the web installer. In many cases you have just an ssh access or even a direct access in console mode only. We are going to provide a text-only installer in one of the next releases but for the time being you can use our binary packages to install the server manually. Please continue reading to learn how to install and setup the server in a few easy steps...
 
@@ -17,14 +13,7 @@ NOTE: Please note that these instructions are for *nix operating systems, and so
 
 == Get the Binary Package
 
-Have a look at our link:https://projects.tigase.org/projects/tigase-server/files[download area]. Always pick the latest version of the package available. For manual installation either *zip* or *tar.gz* file is available. Pick one of files with filename looking like: *tigase-server-x.y.z-bv.tar.gz* or *tigase-server-x.y.z-bv.zip* where 'x', 'y', 'z' and 'v' are version numbers and they change from a release to release.
-
-Alternatively, you may use wget
-
-[source,bash]
------
-wget http://build.tigase.org/nightlies/dists/latest/tigase-server-dist-max.tar.gz
------
+Have a look at our link:https://projects.tigase.org/projects/tigase-server/files[download area]. Always pick the latest version of the package available. For manual installation either `zip` or `tar.gz` file is available. Pick one of files with filename looking like: `tigase-server-<version>-b<build>-<type>.<archive>`, where `<version>` is in the form of `major.minor.bugfix`, `<type>` can be either `dist` (basic package) or `dist-max` (extended set of components) and archive type can be eitehr `tar.gz` or `zip`.
 
 == Unpack the Package
 
@@ -92,7 +81,7 @@ total 36
 -----
 
 === Configure tigase.conf
-Tigase.conf is a file that contains general program operating parameters, and java settings for Tigase to run.  For now, the only setting we need to set is the *JAVA_HOME* directory.
+Tigase.conf is a file that contains general program operating parameters, and java settings for Tigase to run. For now, the only setting we need to set is the *JAVA_HOME* directory.
 
 [source,sh]
 -----
@@ -103,7 +92,7 @@ Replace *$\{JDKPath}* with a path to Java JDK installation on your system.
 
 === Configure config.tdsl
 
-You need also to edit the config.tdsl file. It contains initial parameters normally set by the configuration program. As this is a manual installation, you will have to edit this document yourself. It contains already a few lines:
+You need also to edit the `config.tdsl` file. It contains initial parameters normally set by the configuration program. As this is a manual installation, you will have to edit this document yourself. It contains already a few lines:
 
 [source,dsl]
 -----
@@ -122,25 +111,26 @@ You will need to set a few things in order to get Tigase up and running.
 ==== Step 1: Change config-type
 Refer to xref:configType[config-type] property description for details, but for most operations, change `setup` to `default`.
 
-==== Step 2: Set virtual hosts
-Without a virtual host, your XMPP server has no domain with which to operate.  To set a virtual host use the following configuration:
+==== Step 2: Set virtual host
+
+Without a virtual host, your XMPP server has no domain with which to operate. To set a virtual host use the following configuration:
 
 [source,dsl]
 -----
-'virtual-hosts' = [ 'hostname' ]
+'default-virtual-host' = 'hostname'
 -----
 
-You have to replace *hostname* with a domain name used for your XMPP installation. Let's say this is *jabber.your-great.net*. Your setting should look like this:
+You have to replace `hostname` with a domain name used for your XMPP installation. Let's say this is *jabber.your-great.net*. Your setting should look like this:
 
 [source,dsl]
 -----
-`'virtual-hosts' = [ 'jabber.your-great.net' ]`
+'default-virtual-host' = 'jabber.your-great.net'`
 -----
 
-There are many other settings that can be configured xref:virtHosts[visit this section for details].
+There are many other settings that can be configured xref:tigase41virtualHosts[visit this section for details].
 
 ==== Step 3: Set Administrators
-At least one administrator is required, and once the database is setup will have the default password of `tigase`.  Be sure to change this once you have finished setting up your server.  To add admins, use the following line in the config.tdsl file:
+At least one administrator is required, and once the database is setup will have the default password of `tigase`. Be sure to change this once you have finished setting up your server. To add admins, use the following line in the `config.tdsl` file:
 
 [source,dsl]
 -----
@@ -149,8 +139,8 @@ At least one administrator is required, and once the database is setup will have
 
 ==== Step 4: Set databases
 
-You will also need to configure connection to the database. First you have to decide what database you want to use: *Derby*, *MySQL*, *PostgreSQL*, *MSSQL*, or *MondoDB*.
-Each database will have slightly different configurations.  If we are using derby, in a directory called tigasedb, your configuration would look like this:
+You will also need to configure connection to the database. First you have to decide what database you want to use: `Derby`, `MySQL`, `PostgreSQL`, `MSSQL`, or `MondoDB`.
+Each database will have slightly different configurations. If we are using derby, in a directory called `tigasedb`, your configuration would look like this:
 [source,dsl]
 -----
 dataSource () {
@@ -165,13 +155,13 @@ This is enough basic configuration to have your Tigase server installation runni
 
 == Install Database
 
-Creating the database is the next step.  Previously, we had scripts to handle this process, but we now have the advantage of functions in the tigase.sh script that can be used.  Setting up the database can now be done using a single command.
+Creating the database is the next step. Previously, we had scripts to handle this process, but we now have the advantage of functions in the `tigase.sh` script that can be used. Setting up the database can now be done using a single command.
 
 [source,dsl]
 -----
 ./scripts/tigase.sh install-schema etc/tigase.conf -T derby -D tigasedb -H localhost -U tigase_user -P tigase_pass -R root -A rootpass -J admin@jabber.your-great.net -N pass
 -----
-This command will install tigase using a Derby database on one named tigasedb hosted on localhost.  The username and password editing the database is tigase_pass and root.  Note that -J explicitly adds the administrator, this is highly recommended with the -N passing the password.
+This command will install tigase using a Derby database on one named `tigasedb` hosted on `localhost`. The username and password editing the database is `tigase_pass` and `root`. Note that `-J` explicitly adds the administrator, this is highly recommended with the `-N` passing the password.
 You may customize this command as needed, refer to the xref:install-schema[install-schema] section of the documentation for more information.
 
 On a windows system, you need to call the program directly:
@@ -274,11 +264,11 @@ INFO: schema upgrade finished!
   =============================================================================
 -----
 
-Note at the end, the script will output a recommended example file. You may use this in conjunction with your written config file, but some settings may not be set using this configuration.  Again, it is only an *EXAMPLE*.
+Note at the end, the script will output a recommended example file. You may use this in conjunction with your written config file, but some settings may not be set using this configuration. Again, it is only an *EXAMPLE*.
 
 == Start the Server
 
-You can start the server using the tigase file found in the scripts sub-directory of Tigase server base directory. There, select the type of linux you have, debian, gentoo, mendriva or redhat.  In the root server directory type the following command:
+You can start the server using the tigase file found in the scripts sub-directory of Tigase server base directory. There, select the type of linux you have, debian, gentoo, mendriva or redhat. In the root server directory type the following command:
 
 [source,bash]
 -----
@@ -297,7 +287,7 @@ Tigase running pid=18103
 
 == Check if it is Working
 
-The server is started already but how do you know if it is really working and there were no problems. Have a look in the *logs/* directory. There should be a few files in there:
+The server is started already but how do you know if it is really working and there were no problems. Have a look in the `logs/` directory. There should be a few files in there:
 
 [source,sh]
 -----

@@ -1,11 +1,7 @@
 [[addManageDomain]]
-= Add and Manage Domains
+= Add and Manage Domains (VHosts)
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for v8.0.0.
-
-:toc:
-:numbered:
-:website: http://tigase.net
 
 Tigase XMPP Server offers an easy to use and very flexible way to add and manage domains hosted on installation (vhosts).
 

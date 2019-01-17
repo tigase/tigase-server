@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 You can use configuration generators to easily and quickly create configuration files for every complex case.
 
 To make it easier for average administrators or people who run the server for the first time or even for those who want to quickly test *Tigase* server in different scenarios configuration generators have been created. For each generator you can have also a few extra options which allows you to create configuration which you don't need to change for some time.

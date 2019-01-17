@@ -3,10 +3,6 @@
 :author: not known
 :version: v2.0, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 *Default value:* `ALL`
 
 *Example:* `domain-filter-policy' = 'LOCAL`

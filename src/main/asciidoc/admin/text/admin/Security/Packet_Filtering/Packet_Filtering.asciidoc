@@ -10,3 +10,5 @@ Tigase offers different ways to filter XMPP packets flying through the server. T
 There are also different possible scenarios: time based filtering, content filtering, volume filtering and so on.
 
 All pages in this section describe different filtering strategies.
+
+include::Domain_Based_Filtering.asciidoc[leveloffset=+1]

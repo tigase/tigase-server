@@ -3,24 +3,20 @@
 :author: Daniel Wisnewski
 :version: v2.0 July 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
 
-
-Tigase SOCKS5 component allows for file transfers to be made over a SOCKS5 proxy in accordance with link:http://xmpp.org/extensions/xep-0065.html[XEP-0065 SOCKS5 Bytestreams].  This allows for some useful features such as:
+Tigase SOCKS5 component allows for file transfers to be made over a SOCKS5 proxy in accordance with link:http://xmpp.org/extensions/xep-0065.html[XEP-0065 SOCKS5 Bytestreams]. This allows for some useful features such as:
 - transfer limits per user, domain, or global
 - recording transfers between users
 - quotas and credits system implementation
 
 == Installation
-Tigase SOCKS5 component comes built into the dist-max archives for Tigase XMPP server, and requires the component to be listed in config.tdsl file:
+Tigase SOCKS5 component comes built into the dist-max archives for Tigase XMPP server, and requires the component to be listed in `config.tdsl` file:
 [source,dsl]
 -----
 proxy {}
 -----
 
-You will also need to decide if you wish to use database-based features or not.  If you wish to simply run the socks5 proxy without features such as quotas, limits add the following line:
+You will also need to decide if you wish to use database-based features or not. If you wish to simply run the socks5 proxy without features such as quotas, limits add the following line:
 [source,dsl]
 -----
 proxy {
@@ -28,7 +24,7 @@ proxy {
 }
 -----
 
-This will enable the SOCKS5 Proxy without any advanced features.  If you wish to use those features, see the configuration section below.
+This will enable the SOCKS5 Proxy without any advanced features. If you wish to use those features, see the configuration section below.
 
 == Database Preparation
 In order to use the more advanced features of the SOCKS5 Proxy Component, your database needs to be prepared with the proper schema prior to running the server.
@@ -36,7 +32,7 @@ In order to use the more advanced features of the SOCKS5 Proxy Component, your d
 You may either edit an existing database, or create a new database for specific use with the Proxy.
 
 === Edit Existing Database
-You can add the proper schema to your existing database using the DBSchemaLoader utility included with Tigase.  The database folder contains the schema file for your type of database.
+You can add the proper schema to your existing database using the DBSchemaLoader utility included with Tigase. The database folder contains the schema file for your type of database.
 
 First, backup your database before performing any actions and shut down Tigase XMPP Server.
 
@@ -66,13 +62,13 @@ One this process is complete, you may begin using SOCKS5 proxy component.
 === Create New Database
 
 If you want to create a new database for the proxy component and use it as a separate socks5 database, create the database using the appropriate schema file in the database folder.
-Once this is created, add the following line to your config.tdsl folder.
+Once this is created, add the following line to your `config.tdsl` folder.
 [source,dsl]
 -----
 proxy {}
 -----
 
-For example, a mysql database will have this type of URL: jdbc:mysql://localhost/SOCKS?user=root&password=root to replace database URL.  For more options, check the database section of xref:databasePreperation[this documentation].
+For example, a mysql database will have this type of URL: jdbc:mysql://localhost/SOCKS?user=root&password=root to replace database URL. For more options, check the database section of xref:databasePreperation[this documentation].
 
 == Configuration
 
@@ -83,12 +79,12 @@ proxy {
     'verifier-class' = '$CLASSNAME'
 }
 -----
-Specifies the class used to verify transfer limits.  The following options are available:
+Specifies the class used to verify transfer limits. The following options are available:
 
 ==== `LimitsVerifier`
 - Class Name: `tigase.socks5.verifiers.LimitsVerifier`
 
-Uses the database to store limits and record the amount of data transferred VIA the proxy. It accepts one parameter, `transfer-update-quantization` which is used to create a value to check if the value of transferred bytes should be updated in the database or not.  By default, this value is 1MB.
+Uses the database to store limits and record the amount of data transferred VIA the proxy. It accepts one parameter, `transfer-update-quantization` which is used to create a value to check if the value of transferred bytes should be updated in the database or not. By default, this value is 1MB.
 
 NOTE: Low values can slow down file transfers, while high values can allow for users to exceed quotas.
 [source,dsl]
@@ -114,7 +110,7 @@ proxy {
 }
 -----
 
-Specifies implementation of repository used to store usage statistics.  Two options are available for this setting:
+Specifies implementation of repository used to store usage statistics. Two options are available for this setting:
 - `tigase.socks5.verirepository.JDBCSocks5Repository` - Uses the database implementation.
 - `tigase.socks5.repository.DummySocks5Repository` - ignores data storage, and is the default implementation.
 
@@ -138,8 +134,8 @@ proxy {
 }
 -----
 
-Parameters for `LimitsVerifier` which will override the defaults.  All of these limits are on a per calendar month basis.
-For example, a user is limited to 10MB for all transfers.  If he transfers 8MB between the 1st and the 22nd, he only has 2MB left in his limit.  On the 1st of the following month, his limit is reset to 10MB.
+Parameters for `LimitsVerifier` which will override the defaults. All of these limits are on a per calendar month basis.
+For example, a user is limited to 10MB for all transfers. If he transfers 8MB between the 1st and the 22nd, he only has 2MB left in his limit. On the 1st of the following month, his limit is reset to 10MB.
 
 Available parameters:
 
@@ -157,7 +153,7 @@ proxy {
 }
 -----
 
-Comma seperated list of IP addresses that will be accessible VIA the Socks5 Proxy.  This can be useful if you want to specify a specific router address to allow external traffic to transfer files using the proxy to users on an internal network.
+Comma seperated list of IP addresses that will be accessible VIA the Socks5 Proxy. This can be useful if you want to specify a specific router address to allow external traffic to transfer files using the proxy to users on an internal network.
 
 === Port settings
 If socks5 is being used as a proxy, you may configure a specific ports for the proxy using the following line in config.tdsl:
@@ -199,8 +195,8 @@ A second database is setup tig_socks5_connections that records the connections a
 
 
 
-== Example config.tdsl block
-Combined, your config.tdsl should look like the below excerpt to run socks5 transfers using a separate database.
+== Example `config.tdsl` block
+Combined, your `config.tdsl` should look like the below excerpt to run socks5 transfers using a separate database.
 
 [source,dsl]
 -----

@@ -3,12 +3,8 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Description:* This property activates monitoring interfaces through selected protocols on selected TCP/IP port numbers. For more details please refer to the xref:serverMonitoring[monitoring guide] in the user guide for details.
-Each monitoring protocol should be called in it's own child bean under `monitoring ()`.  If a protocol is not specified, monitoring under that will not be available.
+Each monitoring protocol should be called in it's own child bean under `monitoring ()`. If a protocol is not specified, monitoring under that will not be available.
 
 *Default value:* By default monitoring is disabled.
 

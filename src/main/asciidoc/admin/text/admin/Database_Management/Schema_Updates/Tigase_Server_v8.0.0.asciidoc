@@ -3,11 +3,7 @@
 :author: Andrzej Wójcik & Daniel Wisnewski
 :version: v1.0 October 2017
 
-:toc:
-:numbered:
-:website: http://www.tigase.net
-
-For version 8.0.0 of Tigase XMPP Server, we decided to improve authentication and security that was provided.  In order to do this, implementation of repository and database schemas needed to be changed to achieve this goal.
+For version 8.0.0 of Tigase XMPP Server, we decided to improve authentication and security that was provided. In order to do this, implementation of repository and database schemas needed to be changed to achieve this goal.
 This document, as well one in the HTTP API, will describe the changes to the schemas in this new version.
 
 == Reasons
@@ -16,7 +12,7 @@ It was possible to enable storage of the MD5 hash of the password instead, howev
 However an MD5 hash of a password is not really a secure method as it is possible to revert this mechanism using rainbow tables.
 
 Therefore, we decided to change this and store only encrypted versions of a password in PBKDF2 form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
-SASL PLAIN mechanism can also used these encrypted passwords.  The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tigase.
+SASL PLAIN mechanism can also used these encrypted passwords. The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tigase.
 
 == Summary of changes
 
@@ -146,18 +142,20 @@ During this process, Tigase XMPP Server will send an email to the user's email a
 
 
 == Upgrading from v7.1.x
-When upgrading from previous versions of Tigase, it is recommended that you first backup the database.  Refer to the documentation of your database software to find out how to export a copy.
-Once the backup is made, it will be time to run the schema upgrade.  Be sure that your schema is up to date, and should be v7.1.0 Schema.
+When upgrading from previous versions of Tigase, it is recommended that you first backup the database. Refer to the documentation of your database software to find out how to export a copy.
+Once the backup is made, it will be time to run the schema upgrade. Be sure that your schema is up to date, and should be v7.1.0 Schema.
 
-To upgrade, use the new 'upgrade-schema' task of SchemaManager:
+To upgrade, use the new `upgrade-schema` task of SchemaManager:
 
-In linux
+* In linux
++
 [source,bash]
 -----
 ./scripts/tigase.sh install-schema etc/tigase.conf
 -----
-
-In Windows
++
+* In Windows
++
 [source,bash]
 -----
 java -cp "jars/*" tigase.db.util.SchemaManager "install-schema"
@@ -165,28 +163,28 @@ java -cp "jars/*" tigase.db.util.SchemaManager "install-schema"
 
 You will need to configure the following switches:
 
-- *-T* Specifies Database Type +
+- `-T` Specifies Database Type +
   Possible values are: `mysql`, `derby`, `sqlserver`, `postgresql`, `mongodb`
 
-- *-D* Specifies Databse Name +
+- `-D` Specifies Databse Name +
   The explicit name of the database you wish to upgrade.
 
-- *-H* Specifies Host address +
+- `-H` Specifies Host address +
   By default, this is localhost, but may be set to IP address or FQDNS address.
 
-- *-U* Specifies Username +
+- `-U` Specifies Username +
   This is the username that is authorized to make changes to the database defined in -D.
 
-- *-P* Specifies Password +
+- `-P` Specifies Password +
   The password for username specified in -U.
 
-- *-R* Password for Administrator or Root DB account.
+- `-R` Password for Administrator or Root DB account.
 
-- *-A* Password for Administrator or Root DB account.
+- `-A` Password for Administrator or Root DB account.
 
-- *-J* Jid of user authorized as admin user from Tigase.
+- `-J` Jid of user authorized as admin user from Tigase.
 
-- *-N* Password for user specified in -J.
+- `-N` Password for user specified in -J.
 
-- *-F* Points to the file that will perform the upgrade. +
+- `-F` Points to the file that will perform the upgrade. +
   Will follow this form database/{dbname}-server-schema-8.0.0.sql

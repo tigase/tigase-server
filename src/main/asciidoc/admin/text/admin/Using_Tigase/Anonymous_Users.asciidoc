@@ -3,32 +3,23 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v3.0, October 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 To support anonymous users, you must first enable anonymous authentication on your server.
 
 == Anonymous Authentication
-Tigase Server can support anonymous logins VIA SASL-ANONYMOUS in certain scenarios.  This can be enabled by using the following setting in config.tdsl file: _'vhost-anonymous-enabled' = true_
+Tigase Server can support anonymous logins via SASL-ANONYMOUS in certain scenarios. This can be enabled on per-VHost basis by adjusting _Anonymous enabled_ option as described in <<addManageDomain>>
 This setting is false by default as SASL-ANONYMOUS may not be totally secure as users can connect without prior permission (username and password).
-This is a *global* setting and will affect all vhosts unless they are set individually.  If you wish to allow only certain hosts to allow anonymous login, then use the virtual-hosts configuration like below:
-[source,dsl]
------
-'virtual-hosts' = [ 'domain1:-anon' , 'domain2:c2s-ports-allowed=5032:-tls-required' ]
------
-Where domain1 now has anonymous access allowed, and domain2 does not.
 
 == Anonymous User Features
-To connect to your server anonymously, you must use a client that supports anonymous authentication and users.  Connect to the server with the name of the server as the username, and no password.
-For example, to connect anonymously to xmpp.example.com use the following credentials,
+To connect to your server anonymously, you must use a client that supports anonymous authentication and users. Connect to the server with the name of the server as the username, and no password.
+For example, to connect anonymously to `xmpp.example.com` use the following credentials,
 
-Username: xmpp.example.com
+Username: `xmpp.example.com`
 Password:
 
 In this mode all login information is stored in memory, and cannot be retrieved at a later date.
 
 Other features of Anonymous Authentication
+
 - Temporary Jid is assigned and destroyed the moment of login/logout.
 - Anonymous users cannot access the database
 - Anonymous users cannot communicate outside the server (use s2s connections)

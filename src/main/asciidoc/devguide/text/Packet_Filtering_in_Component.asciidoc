@@ -100,4 +100,4 @@ s2s {
 }
 -----
 
-The simplest way to apply the new configuration is via the config.tdsl file which is in details described in the _Admin Guide_.
+The simplest way to apply the new configuration is via the `config.tdsl` file which is in details described in the _Admin Guide_.

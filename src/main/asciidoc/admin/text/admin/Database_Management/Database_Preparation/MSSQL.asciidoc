@@ -3,10 +3,6 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.1, June 2017: Reformatted for 8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 This guide describes how to prepare the MS SQL Server database for connecting the Tigase server to it.
 
 It's expected that a working installation of Microsoft SQL Server is present. The following guide will describe the necessary configurations required for using MS SQL Server with Tigase XMPP Server.
@@ -22,11 +18,11 @@ In order to prepare the database you can use either a wizard or execute queries 
 === Using Wizards
 
 - Create Login
-
++
 In the left-hand side panel select Security -> Logins and from context menu choose New Login, in the Wizard window enter desired Login name, select SQL Server authentication and enter desired password subsequently confirming action with OK
-
++
 - Create Database
-
++
 From the Object Explorer select Databases node and from context menu select New Database; in the Wizard window enter desired Database name and enter previously created Login name into Owner field; subsequently confirming action with OK.
 
 === Using Queries
@@ -129,11 +125,11 @@ dataSource {
 
 where any number of additional parameters can (and should) consist of:
 
-- databaseName - name of the database
-- user - username configured to access database
-- password - password for the above username
-- schema - name of the database schema
-- lastUpdateCount - 'false' value causes all update counts to be returned, including those returned by server triggers
+- `databaseName` - name of the database
+- `user` - username configured to access database
+- `password` - password for the above username
+- `schema` - name of the database schema
+- `lastUpdateCount` - 'false' value causes all update counts to be returned, including those returned by server triggers
 
 Example:
 

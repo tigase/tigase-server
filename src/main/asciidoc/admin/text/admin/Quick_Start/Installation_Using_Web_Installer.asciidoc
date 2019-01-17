@@ -3,23 +3,16 @@
 :author: Eric Dziewa
 :version: v1.0, January 2015: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
-When Tigase XMPP Server starts up, it looks for the default configuration file: *etc/config.tdsl*. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
+When Tigase XMPP Server starts up, it looks for the default configuration file: `etc/config.tdsl`. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
 If you are installing Tigase in a Windows environment, please see the xref:winWebInstall[Windows Installation] section.
 
 == Download and Extract
 
-First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.tigase.org/nightlies/dists/[nightly builds].
-
-You may also use wget:
+First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.tigase.org/nightlies/dists/[nightly builds]. Once you have the distribution binary extract it and navigate to the directory:
 
 [source,bash]
 -----
-$ wget http://build.tigase.org/nightlies/dists/latest/tigase-server-dist-max.tar.gz
-$ tar -xf tigase-server-dist-max.tar.gz
+$ tar -xf tigase-server-<version>-dist-max.tar.gz
 $ cd tigase-server-<version>
 -----
 
@@ -54,15 +47,15 @@ java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
 Some points before you can connect:
 
 This setup page is restricted access, however for first setup there is a default account set to setup Tigase:
-Username: admin
-Password: tigase
+Username: `admin`
+Password: `tigase`
 
-This combination will only be valid once as it will be removed from config.tdsl file on completion of setup process.  After this point the setup page will only be accessible using the following:
+This combination will only be valid once as it will be removed from `config.tdsl` file on completion of setup process. After this point the setup page will only be accessible using the following:
 
-. JID accounts listed as administrators in admins line in config.tdsl file.
-. Username and password combinations added to config.tdsl file manually, or at the last page in this process.
+. JID accounts listed as administrators in admins line in `config.tdsl` file.
+. Username and password combinations added to `config.tdsl` file manually, or at the last page in this process.
 
-Point your browser to *http://localhost:8080/setup/* unless you are working remotely. Then you can use the domain name, or IP address. I used http://tpub.xmpp-test.net:8080/setup/ for this guide.
+Point your browser to *http://localhost:8080/setup/* unless you are working remotely. You can also use the domain name, or IP address.
 
 Enter the username and password above to gain access.
 
@@ -80,37 +73,37 @@ Here is some information about our commercial products and licensing. Please rea
 
 image:images/admin/web-install-03.png[]
 
-This page will look over your basic configuration settings, these include the server type, domains you wish to use, and gives you a chance to specify an administrator for the domain.  Also, you will be selecting what type of database Tigase server will be using (configuration comes later).
-If you do not specify an administrator and password, one is made for you, which will be admin@yourdomain and password is tigase.  If you wish to configure your server beyond the basics, check Advanced configuration options.
+This page will look over your basic configuration settings, these include the server type, domains you wish to use, and gives you a chance to specify an administrator for the domain. Also, you will be selecting what type of database Tigase server will be using (configuration comes later).
+If you do not specify an administrator and password, one is made for you, which will be admin@yourdomain and password is tigase. If you wish to configure your server beyond the basics, check Advanced configuration options.
 
 image:images/admin/web-install-04.png[]
 
-The Advanced configuration page. Select what components and configurations you need.  Some may be highlighted red to indicate conflicts or unmet requirements.
+The Advanced configuration page. Select what components and configurations you need. Some may be highlighted red to indicate conflicts or unmet requirements.
 
 image:images/admin/web-install-05.png[]
 
-Plugins which will be loaded by the server, most plugins are enabled by default.  Some may be highlighted red to indicate conflicts or unmet requirements.
+Plugins which will be loaded by the server, most plugins are enabled by default. Some may be highlighted red to indicate conflicts or unmet requirements.
 
 image:images/admin/web-install-06.png[]
 
-This is where the database is setup.  The type of database selected in step 3 will influence available options. *BE SURE TO SPECIFY DATABASE ROOT USER ACCOUNT AND PASSWORD*
+This is where the database is setup. The type of database selected in step 3 will influence available options. *BE SURE TO SPECIFY DATABASE ROOT USER ACCOUNT AND PASSWORD*
 
 image:images/admin/web-install-07.png[]
 
-You should see a page like this after a successful database setup.  This page will reveal any issues with your database setup such as invalid URIs, passwords, and schemas.  You may hit Back on your browser to check credentials and settings and try again.
+You should see a page like this after a successful database setup. This page will reveal any issues with your database setup such as invalid URIs, passwords, and schemas. You may hit Back on your browser to check credentials and settings and try again.
 
 image:images/admin/web-install-08.png[]
 
-Next a page asking if you'd like to provide an API Access Key to access HTTP REST commands.  It is highly recommended that you either specify an API key or block access.  Open API keys allow any REST command to be interpreted by the server.
+Next a page asking if you'd like to provide an API Access Key to access HTTP REST commands. It is highly recommended that you either specify an API key or block access. Open API keys allow any REST command to be interpreted by the server.
 
 image:images/admin/web-install-09.png[]
 
-The Setup Access Page will be locked from the admin/tigase user as specified above.  This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later.  If left blank, only JIDs listed in admin will be allowed to access.
+The Setup Access Page will be locked from the admin/tigase user as specified above. This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later. If left blank, only JIDs listed in admin will be allowed to access.
 
 image:images/admin/web-install-10.png[]
 
-The installation is complete and this is what the *config.tdsl* file will look like.
-If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current config.tdsl file.
+The installation is complete and this is what the `config.tdsl` file will look like.
+If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current `config.tdsl` file.
 Click "Save" to write the file to disk.
 
 image:images/admin/web-install-11.png[]
@@ -128,17 +121,17 @@ From the Tigase base directory enter
 -----
 where {OS} is your type of Linux, gentoo, debian, mandriva, or redhat
 
-To further fine tune the server you should edit etc/tigase.conf. Ensure *JAVA_HOME* path is correct, and increase memory if needed using *JAVA_OPTIONS* -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
+To further fine tune the server you should edit `etc/tigase.conf`. Ensure `JAVA_HOME` path is correct, and increase memory if needed using `JAVA_OPTIONS` -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
 
-Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.
+Everything should be running smooth at this point. Check the logfiles in `logs/` if you experience any problems.
 
 [[winWebInstall]]
 == Windows Instructions for using Web Installer
 
-There are a few steps involved with setting up Tigase with the web installer in a Windows environment.  Please follow this guide.
+There are a few steps involved with setting up Tigase with the web installer in a Windows environment. Please follow this guide.
 
-First step is to extract the dist-max archive in it's entirety to the intended running directory.  Once there, run the Setup.bat file inside the win-stuff folder.  This will move the necessary files to the correct folders before Tigase begins operation.
+First step is to extract the distribution archive in it's entirety to the intended running directory. Once there, run the `Setup.bat` file inside the `win-stuff` folder. This will move the necessary files to the correct folders before Tigase begins operation.
 
-From here, you have a few options how to run Tigase; `run.bat` will operate Tigase using a java command, or `tigase.bat` which will start Tigase using the wrapper.  You may also install Tigase and run it as a service.
+From here, you have a few options how to run Tigase; `run.bat` will operate Tigase using a java command, or `tigase.bat` which will start Tigase using the wrapper. You may also install Tigase and run it as a service.
 
 One this setup is finished, web installer will continue the same from xref:connecttoWebInstall[here].

@@ -3,10 +3,6 @@
 :author: Bartosz Malkowski
 :version: v2.0 September 2015. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://www.tigase.org
-
 Tigase includes an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know an event has occurred!
 Lets begin with setup and requirements.
 
@@ -82,11 +78,11 @@ Available Options
 . `threshold` - Minimal percent of disconnected users required to generate alarm.
 
 == Configuration
-Configuration of the eventbus monitor can be done one of two ways; either by lines in config.tdsl file, or by sending XMPP stanzas to the server.  You may also send XMPP stanzas VIA HTTP REST.
+Configuration of the eventbus monitor can be done one of two ways; either by lines in `config.tdsl` file, or by sending XMPP stanzas to the server. You may also send XMPP stanzas VIA HTTP REST.
 XMPP stanza configurations will override ones in config.tdsl, but they will only last until the server restarts.
 
 === config.tdsl
-Tasks can be configured in the config.tdsl file. See xref:availableTasks[available tasks] for the tasks that can be setup.
+Tasks can be configured in the `config.tdsl` file. See xref:availableTasks[available tasks] for the tasks that can be setup.
 
 To enable a specific monitor task, use the following line:
 [source,dsl]
@@ -100,7 +96,7 @@ monitor {
 
 Where monitor is the component name for `MonitorComponent`, and `$TASKNAME` is one of the xref:availableTasks[available task names].
 
-This format will be the same for other settings for tasks, and it's best to group settings under one heading.  For example:
+This format will be the same for other settings for tasks, and it's best to group settings under one heading. For example:
 [source,dsl]
 -----
 monitor {
@@ -113,7 +109,7 @@ monitor {
 
 sets the check period to 1000 milliseconds and enables `connections-task`.
 
-*NOTE* Once triggers have been activated, they will become dormant.  Think of these as one-shot settings.
+NOTE: Once triggers have been activated, they will become dormant. Think of these as one-shot settings.
 
 ==== Subscription Limitations
 To define list of JIDs allowed to subscribe for events:
@@ -134,7 +130,7 @@ We can query each component for its current settings using the following stanza.
 [source,xml]
 -----
 <iq type="set" to="monitor@$DOMAIN/disk-task" id="aad0a">
-<command xmlns="http://jabber.org/protocol/commands" node="x-config"/>
+    <command xmlns="http://jabber.org/protocol/commands" node="x-config"/>
 </iq>
 -----
 
@@ -142,21 +138,22 @@ The server will return the component current settings which will make things eas
 [source,xml]
 -----
 <iq from="monitor@$DOMAIN/disk-task" type="result" id="aad0a" to="alice@coffeebean.local/Psi+">
-<command xmlns="http://jabber.org/protocol/commands" status="executing" node="x-config" sessionid="0dad3436-a029-4082-b0e0-04d838c6c0da">
-<x xmlns="jabber:x:data" type="">
-<title>Task Configuration</title>
-<instructions/>
-<field type="boolean" label="Enabled" var="x-task#enabled">
-<value>0</value>
-</field>
-<field type="text-single" label="Period [ms]" var="x-task#period">
-<value>60000</value>
-</field>
-<field type="text-single" label="Disk usage ratio threshold" var="threshold">
-<value>0.8</value>
-</field>
-</x>
-</command>
+    <command xmlns="http://jabber.org/protocol/commands" status="executing" node="x-config"
+             sessionid="0dad3436-a029-4082-b0e0-04d838c6c0da">
+        <x xmlns="jabber:x:data" type="">
+            <title>Task Configuration</title>
+            <instructions/>
+            <field type="boolean" label="Enabled" var="x-task#enabled">
+                <value>0</value>
+            </field>
+            <field type="text-single" label="Period [ms]" var="x-task#period">
+                <value>60000</value>
+            </field>
+            <field type="text-single" label="Disk usage ratio threshold" var="threshold">
+                <value>0.8</value>
+            </field>
+        </x>
+    </command>
 </iq>
 -----
 This tells us that the disk-task setting is not active, has a period of 60000ms, and will trigger when disk usage is over 80%.
@@ -166,19 +163,20 @@ To send new settings to the monitor component, we can send a similar stanza back
 [source,xml]
 -----
 <iq type="set" to="monitor@$DOMAIN/disk-task" id="aad1a">
-<command xmlns="http://jabber.org/protocol/commands" node="x-config" sessionid="0dad3436-a029-4082-b0e0-04d838c6c0da">
-<x xmlns="jabber:x:data" type="submit">
-<field type="boolean" var="x-task#enabled">
-<value>0</value>
-</field>
-<field type="text-single" var="x-task#period">
-<value>60000</value>
-</field>
-<field type="text-single" var="threshold">
-<value>0.8</value>
-</field>
-</x>
-</command>
+    <command xmlns="http://jabber.org/protocol/commands" node="x-config"
+             sessionid="0dad3436-a029-4082-b0e0-04d838c6c0da">
+        <x xmlns="jabber:x:data" type="submit">
+            <field type="boolean" var="x-task#enabled">
+                <value>0</value>
+            </field>
+            <field type="text-single" var="x-task#period">
+                <value>60000</value>
+            </field>
+            <field type="text-single" var="threshold">
+                <value>0.8</value>
+            </field>
+        </x>
+    </command>
 </iq>
 -----
 
@@ -189,20 +187,21 @@ Alternatively, you can update specific settings by editing a single field withou
 [source,xml]
 -----
 <iq type="set" to="monitor@$HOSTNAME/disk-task" id="ab53a">
-<command xmlns="http://jabber.org/protocol/commands" node="x-config">
-<x xmlns="jabber:x:data" type="submit">
-<field type="boolean" var="x-task#enabled">
-<value>1</value>
-</field>
-</x>
-</command>
+    <command xmlns="http://jabber.org/protocol/commands" node="x-config">
+        <x xmlns="jabber:x:data" type="submit">
+            <field type="boolean" var="x-task#enabled">
+                <value>1</value>
+            </field>
+        </x>
+    </command>
 </iq>
 -----
 
 To set any other values, do not forget that certain parts may need to be changed, specifically the
-*<field type="boolean" var=x-task#enabled">*  fields. +
-- Your field type will be defined by the type of variable specified in the xref:availableTasks [Available Tasks] section. +
-- `var=x task#` will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section.
+`<field type="boolean" var=x-task#enabled">` fields:
+
+* Your field type will be defined by the type of variable specified in the xref:availableTasks [Available Tasks] section. +
+* `var=x task#` will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section.
 
 == Getting the Message
 Without a place to send messages to, eventbus will just trigger and shut down. There are two different methods that eventbus can deliver alarm messages and relevant data; XMPP messages and using the mailer extension.
@@ -225,7 +224,9 @@ Applied to an XMPP stanza, it will look something like this:
 -----
 
 Don't forget to replace `$USER_JID` with the bare JID of the user you want to receive those messages. You can even have them sent to a MUC or any component with a JID.
+
 Available events are as follows:
+
 - disk-taskEvent for `disk-task`
 - LoggerMonitorEvent for `logger-task`
 - HeapMemoryMonitorEvent for `memory-checker-task`
@@ -263,19 +264,19 @@ Alternatively, you can also subscribe to all events within the eventbus by using
 
 [[monitorMailer]]
 == Mailer Extension
-Tigase Server Monitor Mailer Extension (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.
+
+_Tigase Server Monitor Mailer Extension_ (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.
 
 For v7.1.0 versions and later, TSMME is already included in your distribution package and no extra installation is needed.
 
 For versions older than 7.1.0 TSMME requires two files to operate:
 
-- A compiled build of tigase mailer from link:https://projects.tigase.org/projects/tigase-server-ext-mailer/repository[its repository]. Place the compiled .jar file into /jars directory.
-
-- javax.mail.jar file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the /jars directory.
+- A compiled build of tigase mailer from link:https://projects.tigase.org/projects/tigase-server-ext-mailer/repository[its repository]. Place the compiled `.jar` file into `jars/` directory.
+- `javax.mail.jar` file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the `jars/` directory.
 
 === Configuration
 
-Tigase Mailer Extension may be configured via the config.tdsl file in the following manner:
+Tigase Mailer Extension may be configured via the `config.tdsl` file in the following manner:
 
 [source,dsl]
 -----

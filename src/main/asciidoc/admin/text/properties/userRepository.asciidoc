@@ -2,10 +2,6 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 The `userRepository` property specifies the database that contains the user database for use with Tigase XMPP server.
 
 [source,dsl]
@@ -32,7 +28,7 @@ userRepository {
 }
 -----
 
-Unless specified, the pool class will use the one included with Tigase.  You may configure individual repositories in the same way.
+Unless specified, the pool class will use the one included with Tigase. You may configure individual repositories in the same way.
 This replaces the former `--user-repo-pool` property.
 
 NOTE: File conversion will not remove and convert this property, it *MUST BE DONE MANUALLY*.

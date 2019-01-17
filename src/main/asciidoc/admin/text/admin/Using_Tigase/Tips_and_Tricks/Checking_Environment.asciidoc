@@ -3,18 +3,16 @@
 :author:  not known
 :version: v1.0 inital ver
 
-
-:toc:
-
 It has happened recently that we have tried very hard to fix a few annoying problems on one of the Tigase installations. Whatever we did, the problem still existed after uploading a new version and restarting the server. It worked fine in our development environment and it just didn't on the target system.
 
-It turned out that due to specific environment settings on the target system, an old version of Tigase server was always started regardless of what updates uploaded. We finally located the problem by noticing that the logs were not being generated in the proper locations.  This led us to finding the issue: improper environment settings.
+It turned out that due to specific environment settings on the target system, an old version of Tigase server was always started regardless of what updates uploaded. We finally located the problem by noticing that the logs were not being generated in the proper locations. This led us to finding the issue: improper environment settings.
 
-The best way to check all the environment settings used to start the Tigase server is to use..... *check* command line parameter:
+The best way to check all the environment settings used to start the Tigase server is to use… `check` command line parameter:
 
-[source,sh]
+[source,bash]
 -----
-./scripts/tigase.sh check etc/tigase.conf
+$ ./scripts/tigase.sh check etc/tigase.conf
+
 Checking arguments to Tigase
 TIGASE_HOME = .
 TIGASE_JAR = jars/tigase-server.jar
@@ -42,4 +40,4 @@ TIGASE_CMD = /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/bin/j
 TIGASE_CONSOLE_LOG = ./logs/tigase-console.log
 -----
 
-In our case *TIGASE_HOME* was set to a fixed location pointing to an old version of the server files. The quick *check* command may be a real time saver.
+In our case `TIGASE_HOME` was set to a fixed location pointing to an old version of the server files. The quick `check` command may be a real time saver.

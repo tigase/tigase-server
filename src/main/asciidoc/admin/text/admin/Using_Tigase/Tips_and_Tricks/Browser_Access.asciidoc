@@ -3,16 +3,12 @@
 :author: Andrzej Wojcik <andrzejw@tigase.org>
 :version: v2.1, June 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Currently we have 2 ways to connect to Tigase XMPP Server from web browsers:
 
 . BOSH (Bidirectional-streams Over Synchronous HTTP)
 . WebSocket (XMPP over WebSocket)
 
-You will find more informations about these ways for connecting to Tigase XMPP Server with some useful tips below.
+You will find more information about these ways for connecting to Tigase XMPP Server with some useful tips below.
 
 == BOSH
 BOSH protocol specified in link:http://xmpp.org/extensions/xep-0124.html[XEP-0124] is one of first protocols defined to allow to establish XMPP connection to XMPP servers from web browsers due to this protocol being widely supported and used. It is also easy to use in single server mode. It's enabled by default in Tigase XMPP Server and available at port 5280.
@@ -65,7 +61,7 @@ ws2s {
 In this example we enabled WebSocket endpoint on port 5290 allowing unencrypted connections, and encrypted WebSocket endpoint on port 5291.
 As this is TLS/SSL connection (no STARTTLS) it uses default certificate installed in Tigase XMPP Server instance. This certificate is located in `certs/default.pem`.
 
-*NOTE* There is no default configuration for non-default ports.  All ports outside 443 MUST be configured.
+NOTE: There is no default configuration for non-default ports. All ports outside 443 MUST be configured.
 
 === Tip #2 - Encrypted WebSocket Connection - Dealing With Multiple VHosts
 As mentioned in Tip #1 WebSocket endpoint is plain TLS/SSL port, so it always serves default certificate for Tigase XMPP Server instance. That is ok if we are hosting single domain and if default certificate matches matches our domain. But If we host multiple domain we cannot use `wss://example1.com:5291/` connection URL, if our default certificate is for domain `example2.com`. In this situation it is recommended to use the default certificate for the domain under which the server is accessible from the internet. This domain should identify this server, so this domain would not point to two nodes of a cluster. After we deploy separate certificate for each of cluster nodes, we should follow same tip as Tip #1 for BOSH. Our web-based XMPP client should have knowledge about each node of a cluster and when it needs to connect it should randomly select one node from list of available cluster nodes and try to connect using connection URL that would contain name of server under which it can be identified from internet.

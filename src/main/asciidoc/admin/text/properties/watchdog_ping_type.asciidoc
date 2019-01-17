@@ -3,10 +3,6 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.1, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Default value:* `whitespace`
 
 *Example:* `watchdog_ping_type = 'XMPP'`

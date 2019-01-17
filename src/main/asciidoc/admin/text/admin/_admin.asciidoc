@@ -12,9 +12,7 @@ include::Quick_Start/_quick_start.asciidoc[leveloffset=+0]
 //configuration
 include::Configuration/_configuration.asciidoc[leveloffset=+0]
 
-include::Using_Tigase/Advanced_Options.asciidoc[leveloffset=+2]
-
-include::Security/_security.asciidoc[leveloffset=+0]
+include::Security/_security.asciidoc[leveloffset=+1]
 
 include::Database_Management/_database_management.asciidoc[leveloffset=+0]
 
@@ -25,13 +23,3 @@ include::Components/_components.asciidoc[leveloffset=+0]
 include::Using_Tigase/_using_tigase.asciidoc[leveloffset=+0]
 
 include::Addendum/Statistics_Descriptions.asciidoc[leveloffset=+1]
-
-== Appendix II - Database Manual Entry
-
-include::Database_Management/Database_Preparation/MySQL.asciidoc[leveloffset=+2]
-
-include::Database_Management/Database_Preparation/Derby.asciidoc[leveloffset=+2]
-
-include::Database_Management/Database_Preparation/MSSQL.asciidoc[leveloffset=+2]
-
-include::Database_Management/Database_Preparation/PostGRE.asciidoc[leveloffset=+2]

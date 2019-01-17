@@ -3,12 +3,7 @@
 :author: Daniel Wisnewski (daniel@tigase.org)
 :version: v2.0, April 2017: Reformatted for 8.0.0.
 
-
-:toc:
-:numbered:
-:website: http://www.tigase.org
-
-Statistics are divided between data sources, components and processors.  You may see the same statistics collected for multiple components which are defined in common components section.
+Statistics are divided between data sources, components and processors. You may see the same statistics collected for multiple components which are defined in common components section.
 Note that statistics are defined by {$component}/statistic so if you wanted Max queue size on pubsub, you would look for +pubsub/Max queue size+.
 Statistics will not be provided by components that are not enabled.
 
@@ -106,10 +101,10 @@ Number of exceptions {method} has caused. |FINE |Integer |{compname}/{repo}/{dat
 Number of times {method} has been executed. |FINE |Integer |{compname}/{repo}/{dataSourceName}/{method}/Executions
 
 |Number of executions of a {method} in last {interval}.
-Number of times {method} has been executed within the last interval.  Available intervals are hour, minute, second. |FINEST  |Integer |{compname}/{repo}/{dataSourceName}/{method}/Executions last {interval}
+Number of times {method} has been executed within the last interval. Available intervals are hour, minute, second. |FINEST  |Integer |{compname}/{repo}/{dataSourceName}/{method}/Executions last {interval}
 |===================================================================================================
 
-== *Statistics common to components*
+== Statistics common to components
 
 These statistics may be found in multiple components and may be seen multiple times.
 For example both s2s and c2s will have Bytes received statistic, so each can be found the following way:
@@ -137,7 +132,7 @@ second
 |`add-script/Average processing time`
 
 |Average processing time on last 100 runs [ms]
-|The average processing time in milliseconds for all commands and scripts for this component over the last 100 times component is called.  This number will populate with less than 100 runs, and will continue averaging until 100 runs happens, at that point, it's the most recent 100 instances.
+|The average processing time in milliseconds for all commands and scripts for this component over the last 100 times component is called. This number will populate with less than 100 runs, and will continue averaging until 100 runs happens, at that point, it's the most recent 100 instances.
 This statistic will reset every time the server shuts down or restarts. |FINEST |Integer |
 |`{compname}/Average processing time on last 100 runs [ms]`
 
@@ -185,7 +180,7 @@ second
 |`{compname}/list-commands/Average processing time`
 
 |{IN/OUT/Total} queue overflow
-|The number of times the in or out queue has overflown for this component.  That is there are more packets queues than the max queue size.
+|The number of times the in or out queue has overflown for this component. That is there are more packets queues than the max queue size.
 A total statistic is also available that combines both results. |FINEST |Integer |
 |`{compname}/IN queue overflow`
 `{compname}/OUT queue overflow`
@@ -216,7 +211,7 @@ LOWEST
 `{compname}/Out queue wait: LOWEST`
 
 |{IN/OUT}_QUEUE processed {type}
-|The number of stanzas of different types that have been processed VIA the In or Out Queue of this component.  This number will reset at the end of the server instance.
+|The number of stanzas of different types that have been processed VIA the In or Out Queue of this component. This number will reset at the end of the server instance.
 Each component will have a list of the different types of stanzas it can process. |FINER |Integer |
 #
 messages
@@ -273,11 +268,11 @@ total IQ
 |`{compname}/Open connections`
 
 |Packets received
-|The total number of packets received by the component from external sources in the current instance.  This number resets at server shutdown or restart. |FINE |Integer |
+|The total number of packets received by the component from external sources in the current instance. This number resets at server shutdown or restart. |FINE |Integer |
 |`{compname}/Packets received`
 
 |Packets sent
-|The total number of packets sent by the component in the current instance.  This number resets at server shutdown or restart. |FINE |Integer |
+|The total number of packets sent by the component in the current instance. This number resets at server shutdown or restart. |FINE |Integer |
 |`{compname}/Packets sent`
 
 |Processed packets thread: {in/out}
@@ -299,15 +294,15 @@ Note that the processor arrray will only have as many threads as the component h
 |`{compname}/processing threads`
 
 |stream-error-counter
-|The number of errors counted during the operation of the server for this component.  Will only be available if xref:stream-error-counter[stream-error-counter] is enabled in config.tdsl, otherwise will be 0. |FINE |Integer |
+|The number of errors counted during the operation of the server for this component. Will only be available if xref:stream-error-counter[stream-error-counter] is enabled in config.tdsl, otherwise will be 0. |FINE |Integer |
 |`{compname}/processors/stream-error-counter`
 
 |Socket overflow
-|The number of times that this component has experienced socket overflow and had to drop packets.  This does not include the number of dropped packets. |FINEST |Integer |
+|The number of times that this component has experienced socket overflow and had to drop packets. This does not include the number of dropped packets. |FINEST |Integer |
 |`{compname}/Socket overflow`
 
 |Total {in/out} queues wait
-|The number of packets in the inbound or outbound queue that are currently waiting to be sent.  This includes packets of all types. This is an instant statistics, in that the number in queue is only as many in the queue the moment statistics are gathered. |FINEST |Integer |
+|The number of packets in the inbound or outbound queue that are currently waiting to be sent. This includes packets of all types. This is an instant statistics, in that the number in queue is only as many in the queue the moment statistics are gathered. |FINEST |Integer |
 |`{compname}/Total in queues wait`
 `{compname}/Total out queues wait`
 
@@ -320,7 +315,7 @@ Note that the processor arrray will only have as many threads as the component h
 |`Total queues wait`
 
 |Total queues overflow
-|The number of times the component packet wait queue has overflown and had to drop packets.  This statistic does not keep track of the number of dropped packets. |FINEST |Integer |
+|The number of times the component packet wait queue has overflown and had to drop packets. This statistic does not keep track of the number of dropped packets. |FINEST |Integer |
 |`{compname}/Total queues overflow`
 
 |Total/Total queues overflow
@@ -328,7 +323,7 @@ Note that the processor arrray will only have as many threads as the component h
 |`total/Total queues overflow`
 
 |Waiting to send
-|The number of packets in the component's queue that are waiting to be sent.  This number will usually be 0 however it will grow if a large number of packets are jamming up your system, or your queue sizes are set too low. |FINEST |Integer |
+|The number of packets in the component's queue that are waiting to be sent. This number will usually be 0 however it will grow if a large number of packets are jamming up your system, or your queue sizes are set too low. |FINEST |Integer |
 |`{compname}/Waiting to send`
 
 |Watchdog runs
@@ -336,19 +331,22 @@ Note that the processor arrray will only have as many threads as the component h
 |`{compname}/Watchdog runs`
 
 |Watchdog stopped
-|The number of times watchdog identified and closed a connection it has found to be stale according to the settings in config.tdsl or by the defaults defined xref:watchdog[in this section]. |FINER |Integer |
+|The number of times watchdog identified and closed a connection it has found to be stale according to the settings in `config.tdsl` or by the defaults defined xref:watchdog[in this section]. |FINER |Integer |
 |`{compname}/Watchdog stopped`
 
 |Watchdog tests
-|The number of times watchdog has found a potential stale connection and has conducted a test to determine whether or not to close the connection.  This is per component in the current server instance. |FINER |Integer |
+|The number of times watchdog has found a potential stale connection and has conducted a test to determine whether or not to close the connection. This is per component in the current server instance. |FINER |Integer |
 |`{compname}/Watchdog tests`
 |===================================================================================================
 
-== *AMP*
+== Component statistics
+
+=== AMP
 
 No exclusive amp specific statistics
 
-== *bosh*
+=== bosh
+
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
@@ -369,11 +367,11 @@ second
 |`bosh/adhoc-command/pre-bind-session/Average processing time`
 |===================================================================================================
 
-== *c2s*
+=== c2s
 
 No exclusive c2s specific statistics.
 
-== *cl-comp*
+=== cl-comp
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
@@ -458,11 +456,11 @@ hour
 |The number of clusters that have disconnected during the current session. |FINEST |Integer |
 |`cl-comp/Total disconnects`
 |===================================================================================================
-== *eventbus*
+=== eventbus
 
 No exclusive eventbus specific statistics.
 
-== *message-archive*
+=== message-archive
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
@@ -471,7 +469,7 @@ No exclusive eventbus specific statistics.
 |`message-archive/Removal time of expired messages (avg)`
 |===================================================================================================
 
-== *message-router*
+=== message-router
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
@@ -502,7 +500,7 @@ No exclusive eventbus specific statistics.
 |`message-router/Local hostname`
 
 |Load average
-|The average system load for the previous minute.  The way in which the load average is calculated is operating system specific but is typically a damped time-dependent average. |FINE |Float |
+|The average system load for the previous minute. The way in which the load average is calculated is operating system specific but is typically a damped time-dependent average. |FINE |Float |
 |`message-router/Load average`
 
 |Max Heap mem
@@ -535,7 +533,7 @@ No exclusive eventbus specific statistics.
 
 |===================================================================================================
 
-== *monitor*
+=== monitor
 
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
@@ -554,7 +552,7 @@ second
 |`monitor/adhoc-command/load-errors/Average processing time`
 |===================================================================================================
 
-== *muc*
+=== muc
 
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
@@ -586,7 +584,7 @@ second
 |`muc/adhoc-command/default-room-config/Average processing time`
 |===================================================================================================
 
-== *proxy*
+=== proxy
 [width="100%,options="header",cols="d,d,d,d,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
@@ -607,12 +605,12 @@ second
 |`proxy/Transfers completed`
 |===================================================================================================
 
-== *pubsub*
+=== pubsub
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 |Added new nodes
-|The total number of new nodes that has been added in the current server instance.  This statistic is reset when the server resets. |FINEST |Integer |
+|The total number of new nodes that has been added in the current server instance. This statistic is reset when the server resets. |FINEST |Integer |
 |`pubsub/Added new nodes`
 
 |adhoc-command/delete-item last {interval}
@@ -698,15 +696,15 @@ second
 |`pubsub/AdHocConfigCommandModule/Average processing time`
 
 |Affiliations count (in cache)
-|The total number of pubsub affiliations that are resident in cache memory.  Affiliations include JIDs that are one of the following; Owner, Publisher, Publish-Only, Member, None, Outcast.  This may not reflect total pubsub affiliations in repository. |FINEST |Integer |
+|The total number of pubsub affiliations that are resident in cache memory. Affiliations include JIDs that are one of the following; Owner, Publisher, Publish-Only, Member, None, Outcast. This may not reflect total pubsub affiliations in repository. |FINEST |Integer |
 |`pubsub/Affiliations count (in cache)`
 
 |Average DB write time [ms]
-|The average time of all DB writes from PubSub component.  Average is calculated using two other statistics: (Total writing time / Database writes) |FINEST |Integer |
+|The average time of all DB writes from PubSub component. Average is calculated using two other statistics: (Total writing time / Database writes) |FINEST |Integer |
 |`pubsub/Average DB write time [ms]`
 
 |cache/hits last {interval}
-|The number of times the cache has achieved a hit within the last interval.  A hit is when a request for information is matched to data that is inside the cache memory. |FINEST |Integer |
+|The number of times the cache has achieved a hit within the last interval. A hit is when a request for information is matched to data that is inside the cache memory. |FINEST |Integer |
 hour
 minute
 second
@@ -715,7 +713,7 @@ second
 `pubsub/cache/hits last second`
 
 |cache/hit-miss ratio per {interval}
-|The ratio of cache hits to cache misses over the specified period.  A cache hit is when a request for information from the cache is matched with information in the cache.  A miss is when that information request cannot find a match in cache.  A miss only indicates that that information was not found in the cache, not that it is not in the repository. |FINE |Float |
+|The ratio of cache hits to cache misses over the specified period. A cache hit is when a request for information from the cache is matched with information in the cache. A miss is when that information request cannot find a match in cache. A miss only indicates that that information was not found in the cache, not that it is not in the repository. |FINE |Float |
 hour
 minute
 |`pubsub/cache/hit-miss ratio per hour`
@@ -1006,7 +1004,7 @@ second
 |`pubsub/SubscribeNodeModule/Average processing time`
 
 |Subscription count (in cache)
-|The total number of pubsub subscriptions that are resident in cache memory.  This may not reflect total pubsub subscriptions in repository. |FINEST |Integer |
+|The total number of pubsub subscriptions that are resident in cache memory. This may not reflect total pubsub subscriptions in repository. |FINEST |Integer |
 |`pubsub/Subscription count (in cache)`
 
 |Total writing time
@@ -1045,7 +1043,7 @@ second
 |===================================================================================================
 
 [[repo-factoryStatistics]]
-== *repo-factory*
+=== repo-factory
 [width="100%,options="header",cols="d,d,d,d,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
@@ -1066,17 +1064,17 @@ second
 |`repo-factory/repository {jdbclocation} failed reconnections`
 |===================================================================================================
 
-== *rest*
+=== rest
 
 No exclusive rest specific statistics
 
-== *s2s*
+=== s2s
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 
 |CIDs number
-|ConnectionID for the server.  This may include multiple CIDs if server is running multiple vhosts. |FINEST |String |
+|ConnectionID for the server. This may include multiple CIDs if server is running multiple vhosts. |FINEST |String |
 |`s2s/CIDs number`
 
 |get-cid-connection last {interval}
@@ -1123,12 +1121,12 @@ second
 |`s2s/Total DB keys`
 
 |Total {incoming/outgoing}
-|The total number of server-to-server connections, outgoing is local server connecting to other servers, and incoming is connections from other servers.  The results may or may not be the same. |FINEST |Integer |
+|The total number of server-to-server connections, outgoing is local server connecting to other servers, and incoming is connections from other servers. The results may or may not be the same. |FINEST |Integer |
 |`s2s/Total incoming`
 `s2s/Total outgoing`
 
 |Total {incoming/outgoing} TLS
-|The total number of server-to-server connections using TLS, outgoing is local server connecting to other servers, and incoming is connections from other servers.  The results may or may not be the same. |FINEST |Integer |
+|The total number of server-to-server connections using TLS, outgoing is local server connecting to other servers, and incoming is connections from other servers. The results may or may not be the same. |FINEST |Integer |
 |`s2s/Total incoming TLS`
 `s2s/Total outgoing TLS`
 
@@ -1145,13 +1143,13 @@ second
 |`s2s/Total waiting`
 |===================================================================================================
 
-== *sess-man*
+=== sess-man
 [width="100%,options="header",cols="d,d,d,d,v,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |Available {field} |List of Possible Statistics
 
 |Active user connections
-|Number of user connections that are considered active.  An active user is a user that has sent stanzas to the server or through the server within the last 5 minutes. |FINER |Integer |
+|Number of user connections that are considered active. An active user is a user that has sent stanzas to the server or through the server within the last 5 minutes. |FINER |Integer |
 |`sess-man/Active user connections`
 
 |adhoc-command/connection-time last {interval}
@@ -1477,7 +1475,7 @@ second
 |`sess-man/adhoc-command/user-roster-management-ext/Average processing time`
 
 |Authentication timeouts
-|The number of connections that have timed out during the authentication process.  Default timeout is 2 minutes. |FINEST |Integer |
+|The number of connections that have timed out during the authentication process. Default timeout is 2 minutes. |FINEST |Integer |
 |`sess-man/Authentication timeouts`
 
 |Closed user connections
@@ -1497,7 +1495,7 @@ second
 |`sess-man/Maximum user connections`
 
 |Maximum user sessions {today/yesterday}
-|The number of most simultaneous sessions within the specified interval.  Today = previous 24 hours, Yesterday = 24 hours after previous 24 hours (does not go by calendar date). |INFO/FINEST |Integer |
+|The number of most simultaneous sessions within the specified interval. Today = previous 24 hours, Yesterday = 24 hours after previous 24 hours (does not go by calendar date). |INFO/FINEST |Integer |
 |`sess-man/Maximum user sessions today`
 `sess-man/Maximum user sessions yesterday`
 
@@ -1506,7 +1504,7 @@ second
 |`sess-man/Registered accounts`
 
 |Open user connections
-|The current number of open user connections.  This may be interpreted as number of connections from users, however a user can have more than one connection (connection from mobile and PC for example). |INFO |Integer |
+|The current number of open user connections. This may be interpreted as number of connections from users, however a user can have more than one connection (connection from mobile and PC for example). |INFO |Integer |
 |`sess-man/Open user connections`
 
 |Open user sessions
@@ -1569,7 +1567,7 @@ Runs: Number of times Processor has been run. +
 Lost: Number of packets lost during processing. +
 |===================================================================================================
 
-== *vhost-man*
+=== vhost-man
 [width="100%,options="header",cols="d,d,d,d,v"]
 |===================================================================================================
 |Statistics Name |Description |Statistics Level |Format |List of Possible Statistics
@@ -1596,6 +1594,6 @@ Lost: Number of packets lost during processing. +
 |===================================================================================================
 
 
-== *ws2s*
+=== ws2s
 
 No exclusive ws2s specific statistics.

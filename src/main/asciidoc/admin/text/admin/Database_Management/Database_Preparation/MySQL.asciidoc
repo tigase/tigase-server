@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 This guide describes how to prepare MySQL database for connecting Tigase server.
 
 The MySQL database can be prepared in many ways. Most Linux distributions contain tools which allow you to go through all steps from the shell command line. To make sure it works on all platforms in the same way, we will first show how to do it under MySQL command line client.
@@ -27,26 +23,26 @@ Once logged in, create the database for the Tigase server:
 mysql> create database tigasedb;
 -----
 
- Add the `tigase_user` user and grant him access to the `tigasedb` database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+Add the `tigase_user` user and grant him access to the `tigasedb` database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
 
-*Grant access to tigase_user connecting from any network address.*
-
+* Grant access to tigase_user connecting from any network address.
++
 [source,sql]
 -----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user@'%'
             IDENTIFIED BY 'tigase_passwd';
 -----
-
-*Grant access to tigase_user connecting from localhost.*
-
++
+* Grant access to tigase_user connecting from localhost.
++
 [source,sql]
 -----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user@'localhost'
             IDENTIFIED BY 'tigase_passwd';
 -----
-
-*Grant access to tigase_user connecting from local machine only.*
-
++
+* Grant access to tigase_user connecting from local machine only.
++
 [source,sql]
 -----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user
@@ -70,7 +66,9 @@ mysql> FLUSH PRIVILEGES;
 -----
 
 === Installing Schemas
+
 Starting with v8.0.0 the Schemas are no longer linked, and will need to manually be installed in the following order.
+
 Switch to the database you have created:
 
 [source,sql]
@@ -112,9 +110,10 @@ mysql-message-archiving-2.0.0.sql
 mysql-unified-archive-2.0.0.sql
 -----
 
-
 ==== Windows instructions:
+
 On Windows you have probably to enter the full path, assuming Tigase is installed in C:\Program Files\Tigase:
+
 [source,sql]
 -----
 mysql> source c:/Program Files/Tigase/database/mysql-common-0.0.1.sql;
@@ -314,7 +313,7 @@ These settings may not be fully optimized for your system, and have been only te
 
 [[emojisupportSQL]]
 === Support for emoji and other icons
-Tigase Database Schema can support emojis and other icons, however by using UTF-8 in `mysqld` settings will not allow this.  To employ settings to support emojis and other icons, we recommend you use the following in your MySQL configuration file:
+Tigase Database Schema can support emojis and other icons, however by using UTF-8 in `mysqld` settings will not allow this. To employ settings to support emojis and other icons, we recommend you use the following in your MySQL configuration file:
 
 [source,properties]
 -----

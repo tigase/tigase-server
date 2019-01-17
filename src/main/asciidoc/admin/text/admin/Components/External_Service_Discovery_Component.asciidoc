@@ -3,10 +3,6 @@
 :author: Andrzej Wójcik
 :version: v2.0 June 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://www.tigase.org
-
 Welcome to the Tigase External Service Discovery component user guide.
 Component provides support for http://xmpp.org/extensions/xep-0215.html[XEP-0215: External Service Discovery] which allows discovery of external services which are not accessible using XMPP protocol.
 
@@ -15,6 +11,7 @@ Component (which is implemented in class `tigase.server.extdisco.ExternalService
 Example:
 
 * in DSL format:
++
 [source,DSL]
 ----
 ext-disco () { }
@@ -22,7 +19,8 @@ ext-disco () { }
 
 Additionally you need to activate `urn:xmpp:extdisco:2` XMPP processor in `SessionManager` by:
 
-* in DSL - enable subbean of @sess-man@:
+* in DSL - enable subbean of `sess-man`:
++
 [source,DSL]
 ----
 sess-man {

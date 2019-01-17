@@ -3,10 +3,6 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Default value:* `1000`
 
 *Possible values:* any integer.

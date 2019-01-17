@@ -1,9 +1,9 @@
 [[tigase800]]
-= Tigase v8.0.0 announcement
+= Tigase XMPP Server 8.0.0 announcement
 :author: Daniel Wisnewski
 :date: 2015-25-08 22:09
 
-Tigase v8.0.0 Change notes and announcement
+Tigase XMPP Server {project-version} Change notes and announcement
 
 :toc:
 
@@ -14,21 +14,22 @@ Tigase now operates using a Kernel and Beans style of programming. What does thi
 Tigase XMPP Server is now working as a Kernel program, which will operate on it's own and handle all the core functionality of the server. Component, and non-essential functionality will now be loaded as Beans. As a user, your experience will not change all that much. However, beans can be loaded and unloaded without having to restart Tigase, meaning that the program will behave more dynamically. This means a smaller footprint on memory on resources when components are not needed, and longer uptimes without having to rest art the program! This also allows for greater flexibility for Tigase XMPP Server to be better customized for unique solutions.
 
 === New Configuration File Format
-With the change of Tigase to a Kernel and Beans style of programming, we have also changed how the configuration file is managed. Although you will still edit the config.tdsl file like a plaintext file, a new style of formatting will be used known as DSL.
+With the change of Tigase to a Kernel and Beans style of programming, we have also changed how the configuration file is managed. Although you will still edit the `config.tdsl` file like a plaintext file, a new style of formatting will be used known as DSL.
 Domain Specific Language may add more lines, but is a cleaner format, and provides a more secure configuration design since validation of the configuration is done at the domain level.
 For more information on this format and how to configure Tigase, visit xref:dslConfig[DSL Configuration Guide].
 
 === Cluster Node Shutdown Changes
-Starting with Tigase v8.0.0, users connected on clustered nodes will be able use a `see-other-host` strategy when a node is being shutdown. *Note: This may not be compatible with all clients.*
-The Ad-hoc command is designed for a graceful shutdown of cluster nodes as a groovy script Shutdown.groovy.
+Starting with Tigase XMPP Server 8.0.0, users connected on clustered nodes will be able use a `see-other-host` strategy when a node is being shutdown. *Note: This may not be compatible with all clients.*
+The Ad-hoc command is designed for a graceful shutdown of cluster nodes as a groovy script `Shutdown.groovy`.
 This script also allows for the -timeout setting which will delay shutdown of the node, and alert all users (via a headline message) that the server will be shutdown after a time. User clients that are compatible with the command will then detect other connected clusters and maintain their connections.
 
-If the command is being sent to shut down the whole cluster, no `see-other-host` implementation will be sent, however -timeout settings may still be used.
+If the command is being sent to shut down the whole cluster, no `see-other-host` implementation will be sent, however timeout settings may still be used.
 
 The script may be activated by an ad-hoc command, or sent using REST from remote or Tigase Admin UI.
 
 === Significant cleanup of code and repositories
 Multiple changes have been made to the structure and coding for v8, many related to trimming size of repositories and old calls. Some of these improvements are listed here:
+
 - Empty JavaDocs that do not convey values have been removed.
 - All code is reformatted to be compliant with out xref:tigaseCodeStyle[codestyle guidelines].
 - Calls to `System.out.print*()` and `printStackTrace()` have been removed from code.
@@ -52,7 +53,7 @@ Default virtual hosts property is now able to be configured only as a domain nam
 Since work began on v8.0.0 Tigase has required that all changes to Tigase XMPP Server and dependencies be signed with known certificates. This version marks the first to be totally signed.
 
 === Scaled Down Installation Methods
-We have cleaned up installation methods for Tigase and now recommend the use of web-installer method. Binary and .jar installation methods have been removed and will no longer be produced for v8.0.0 and later.
+We have cleaned up installation methods for Tigase and now recommend the use of web-installer method. IzPack installer (files `tigase-server-<version>-b<build>.jar` installation methods have been removed and will no longer be produced for v8.0.0 and later.
 Manual installation is still available for those unable to use HTTP or browser access. Visit our xref:quickstart[Quick Start] guide for instructions on these other methods.
 
 === Emojis now supported on Tigase XMPP Servers
@@ -62,14 +63,14 @@ Emojis are now supported on MySQL databases, however some settings may be need t
 Tigase now supports link:https://xmpp.org/extensions/xep-0215.html[XEP-0215 - External Service Discovery] allowing Tigase to discover services that are not available VIA the XMPP Protocol. For setup and configuration information visit xref:_tigase_external_service_discovery[External Service Discovery Component] documentation.
 
 === XEP-0313 Message Archive Management now supported
-link:https://xmpp.org/extensions/xep-0313.html[XEP-0313 - Message Archive Management] is now supported by Tigase featuring custom enhancements like full-text search & searching by tags. MAM requires Tigase's message archive to be enabled in the config.tdsl file, and the schema (XEP-0136 or XEP-0313) must be configured in session manager settings.
+link:https://xmpp.org/extensions/xep-0313.html[XEP-0313 - Message Archive Management] is now supported by Tigase featuring custom enhancements like full-text search and searching by tags. MAM requires Tigase's message archive to be enabled in the `config.tdsl` file, and the schema (XEP-0136 or XEP-0313) must be configured in session manager settings.
 To turn on MAM, see configuration guide xref:_support_for_mam[located here].
 
 === XEP-0363 HTTP File Upload now supported
 link:https://xmpp.org/extensions/xep-0363.html[XEP-0363 - HTTP File Upload] is now supported using Tigase HTTP API component now allowing for a more robust one-to-many file uploading option. Configuration details are available at the xref:XEP0363[HTTP File Upload Component] section of documentation.
 
 === Startup now uses bootstrapping
-Tigase now uses bootstrapping to startup, which will load configuration from config.tdsl file like before. Then Tigase will begin it's normal operations with the configuration options. All startup functions for Tigase will now run under the `bootstrap` bean.
+Tigase now uses bootstrapping to startup, which will load configuration from `config.tdsl` file like before. Then Tigase will begin it's normal operations with the configuration options. All startup functions for Tigase will now run under the `bootstrap` bean.
 
 === CAPTCHA system now available for in-band registration
 link:https://xmpp.org/extensions/xep-0077.html[XEP-0077 In band registration] can use Data Forms as an option to process new registrations. Now you can secure these registrations by employing a CAPTCHA solution. By enabling this option you can reduce the number of potential spammers and bots on your server.
@@ -80,7 +81,7 @@ Now each component has it's own schema for databases, they are no longer tied in
 === Shrinkable Statistics History
 Statistics history can now be automatically made smaller if a systems memory resources are above a certain amount. By default this is enabled and will trigger when over 95% of memory is in use. Half of all existing entries will be removed at this time.
 The same pattern will continue to halve the available records every time the threshold is met. A hard-set minimum of 5 entries is set, so you will always have the last 5 entries.
-This setting may be adjusted by adding the following setting to your config.tdsl file and adjusting the integer value:
+This setting may be adjusted by adding the following setting to your `config.tdsl` file and adjusting the integer value:
 [source,dsl]
 -----
 stats() {
@@ -105,22 +106,22 @@ Account registration limits have been expanded and now you can set separate coun
 
 ==== Accounts created using in-band registration now will use confirmation E-mail
 In an effort to create a more secure method for implementing `JabberIqRegister` Tigase XMPP Server will now require the use of a confirmation E-mail by default in the process. The E-mail must be valid, and accounts will be made into pending status until a user clicks the generated URI in the E-mail and activates the account.
-This is a plugin and must be enabled in the config.tdsl file by using the following code:
+This is a plugin and must be enabled in the `config.tdsl` file by using the following code:
 [source,properties]
 -----
 'account-registration-email-validator'() {}
 -----
 
 ==== Further Spam prevention
-Tigase-spam component is now in dist-max, and has a numer of features described here xref:tigase_spam_filter[in this section].
+Tigase-spam component is now in `dist-max` distribution package, and has a number of features described here xref:tigase_spam_filter[in this section].
 
 === Changes in password storage
 Before version 8.0.0, user passwords were stored in plaintext in the `user_pw` database field within `tig_users` table, but in plaintext.
 It was possible to enable storage of the MD5 hash of the password instead, however this limited authentication mechanism SASL PLAIN only.
 However an MD5 hash of a password is not really a secure method as it is possible to revert this mechanism using rainbow tables.
 
-Therefore, we decided to change this and store only encrypted versions of a password in PBKDF2 form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
-SASL PLAIN mechanism can also use these encrypted passwords.
+Therefore, we decided to change this and store only encrypted versions of a password in `PBKDF2 `form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
+`SASL PLAIN` mechanism can also use these encrypted passwords.
 
 The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tigase.
 
@@ -153,11 +154,14 @@ The names of different config-type properties have changed:
 NOTE: Old versions are no longer supported, you HAVE to replace old versions with the new ones manually when upgrading to v8.0.0.
 
 === Database Watchdog implemented
-It is now possible to set connection testing to databases when connections are idle and customize the frequency with which this is done.  Visit xref:databaseWatchdog[this section] for more details.
+It is now possible to set connection testing to databases when connections are idle and customize the frequency with which this is done. Visit xref:databaseWatchdog[this section] for more details.
 
 === Packet statistics expanded
 Packet statistics both retrieved VIA XMPP and during graceful shutdown have now been separated to a per-XMLNS basis. This may be disabled by adding the following line to `config.tdsl` file:
-`'detailed-other-statistics' = false `
+[source,dsl]
+----
+'detailed-other-statistics' = false
+----
 
 === XEP-0016 Behavior changes
 XEP states that Privacy lists should be used when no user session exists in addition to when there is. Previously, Tigase would only filter results when retrieving messages, allowing blocked users to store offline messages. This has now been changed to reflect the XEP properly, and messages will be filtered while there is no user session. If however, you wish to use the previous version, where offline messages are cached first and then filtered, you may use the following configuration:
@@ -188,6 +192,7 @@ DataSource () {
 -----
 
 This will do the following:
+
 - Print a warning during repository startup.
 - Skip schema upgrades for the source.
 - Skip schema destruction for the source.
@@ -233,7 +238,7 @@ Version 8.0.0 improves security by preventing brute-force attacks. Feature needs
 - https://tigase.tech/issues/5425[#5425] `GetAnyFile` and `GetConfigFile` scripts moved to message-router instead of basic-conf.
 - https://tigase.tech/issues/5429[#5429] Adjusted settings for Dynamic Rostering now can use separate beans for multiple implementations.
 - https://tigase.tech/issues/5430[#5430] `BindResource` is now set to FINER log level to reduce console output verbosity.
-- https://tigase.tech/issues/5475[#5475] Setting default environment variables is now possible in config.tdsl file using `env('env-1', 'def-value')` lines. Details available xref:dslEnv[in DSL Configuration] section.
+- https://tigase.tech/issues/5475[#5475] Setting default environment variables is now possible in `config.tdsl` file using `env('env-1', 'def-value')` lines. Details available xref:dslEnv[in DSL Configuration] section.
 - https://tigase.tech/issues/5496[#5496] `Destroy Schema` task now added to schema manager.
 - https://tigase.tech/issues/5583[#5583] Error messages now properly sent when offline message storage is full.
 - https://tigase.tech/issues/5674[#5674] All components now use UTC timestamp when interacting with databases.
@@ -320,7 +325,7 @@ Version 8.0.0 improves security by preventing brute-force attacks. Feature needs
 - https://tigase.tech/issues/6749[#6749] Fixed schema parsing for DerbyDB.
 - https://tigase.tech/issues/6776[#6776] Fixed failing Websocket connections if header contains more than one value.
 - https://tigase.tech/issues/6875[#6875] Fixed an issue where C2S connections could be accepted before SessionManager was initialized.
-- https://tigase.tech/issues/7037[#7037] Fixed error while parsing negative values from config.tdsl file.
+- https://tigase.tech/issues/7037[#7037] Fixed error while parsing negative values from `config.tdsl` file.
 - https://tigase.tech/issues/7055[#7055] Improvements to metaspace use and other memory use tweaks.
 - https://tigase.tech/issues/7304[#7304] Virtual host logs now properly follow log size limits.
 - https://tigase.tech/issues/7431[#7431] AdHoc requests between the same user with different resources are no longer dropped with `NoConnectionIdExecption`error.

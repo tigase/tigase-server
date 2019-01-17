@@ -3,10 +3,6 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v2.0 April 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Logging can be an important tool to monitor your server's health and performance. Logging may be controlled and customized on a per-component basis.
 
 A `logging` bean has been implemented to allow more fine configuration of each component.
@@ -48,11 +44,11 @@ You only need to specify the settings you wish to customize, otherwise they will
 - `handlers` - Defines the level of logging for File output and Console output.
 . `FileHandler` - is the file output for log files, with the following options:
 .. `level` - specifies the level of logs to be written, default is ALL.
-.. `append` - whether to append to the log or replace it during restart.  Default is true.
-.. `count` - number of individual log files to keep at set limit.  Default is 5. (default settings will continue appending logs until 5 files at 10MB are reached, then the oldest file will be overwritten.)
-.. `formatter` - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
-.. `limit` - Byte limit for each log file.  Default is 10000000 or 10MB.
+.. `append` - whether to append to the log or replace it during restart. Default is true.
+.. `count` - number of individual log files to keep at set limit. Default is 5. (default settings will continue appending logs until 5 files at 10MB are reached, then the oldest file will be overwritten.)
+.. `formatter` - specifies the package to format logging output. Default is tigase.util.LogFormatter.
+.. `limit` - Byte limit for each log file. Default is 10000000 or 10MB.
 .. `pattern` - Directory and filename of the log file with respect to the Tigase installation directory. Default is logs/tigase.log.
 . `ConsoleHandler` - Determines the formatting for Tigase output to console.
 .. `level` - specifies the level of logs to be written, default is WARNING.
-.. `formatter` - specifies the package to format logging output.  Default is tigase.util.LogFormatter.
+.. `formatter` - specifies the package to format logging output. Default is tigase.util.LogFormatter.

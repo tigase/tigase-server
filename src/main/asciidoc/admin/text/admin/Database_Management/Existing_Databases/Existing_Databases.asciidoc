@@ -4,3 +4,9 @@
 :version: v1.0, October 2015: Reformatted for v8.0.0.
 
 Information about importing user data from other databases.
+
+include::MySQL.asciidoc[leveloffset=+1]
+
+include::Drupal.asciidoc[leveloffset=+1]
+
+include::PostgreSQL.asciidoc[leveloffset=+1]

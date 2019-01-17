@@ -3,10 +3,6 @@
 :author: Andrzej Wójcik
 :version: v1.2 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 In previous Tigase XMPP Server releases configuration was stored in properties based configuration file.
 From Tigase XMPP Server 8.0.0 release it will be required to use new DSL based configuration file format. This file format was inspired by Groovy language syntax and new core feature of Tigase XMPP Server - Tigase Kernel Framework.
 
@@ -69,7 +65,7 @@ DSL configuration format provides a number of advantages over the old system of 
 . Comma separated values can now be simplified lists with separate entries being able to be in multiple lines.
 
 Although the format may seem more complex, looking like a section of java code, the formatting is consistent and can be far more readable.
-After some experience with DSL format, you'll find it's far more intuitive and user friendly than it may appear.  Of course if there's any real confusion, Tigase can automatically convert old style properties files to the DSL format using the following command:
+After some experience with DSL format, you'll find it's far more intuitive and user friendly than it may appear. Of course if there's any real confusion, Tigase can automatically convert old style properties files to the DSL format using the following command:
 [source,bash]
 -----
 ./scripts/tigase.sh upgrade-config etc/tigase.conf
@@ -329,7 +325,7 @@ sess-man {
 ----
 
 == Default configuration
-Tigase XMPP Server is packaged with a basic config.tdsl file that tells the server to start up in setup mode.
+Tigase XMPP Server is packaged with a basic `config.tdsl` file that tells the server to start up in setup mode.
 
 [source,dsl]
 -----
@@ -343,6 +339,6 @@ http () {
 }
 -----
 
-This tells Tigase to operate in a setup mode, and tells the http component to allow login with the username and password admin/tigase.  With this you can enter the setup process that is covered in xref:webinstall[this section].
+This tells Tigase to operate in a setup mode, and tells the http component to allow login with the username and password admin/tigase. With this you can enter the setup process that is covered in xref:webinstall[this section].
 
-There are other options for config-type: `default`, `session-manager`, `connection-managers`, and `component`.  For more information, visit xref:configType[Config Type] property description.
+There are other options for config-type: `default`, `session-manager`, `connection-managers`, and `component`. For more information, visit xref:configType[Config Type] property description.

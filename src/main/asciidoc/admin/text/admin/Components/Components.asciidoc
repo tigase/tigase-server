@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 The only step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the `config.tdsl` file you use in your installation.
 
 Let's say you want to just add PubSub for now. All you need to do is add the following to the properties file:

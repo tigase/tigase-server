@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 The Tigase Custom Auth connector with shortcut name: *tigase-custom* is implemented in the class: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/db/jdbc/TigaseCustomAuth.java[tigase.db.jdbc.TigaseCustomAuth]. It allows you to connect to any external database to perform user authentication and use a custom queries for all actions.
 
 You can find more details how to setup a custom connector in the Custom Authentication Connectors guide.

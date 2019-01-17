@@ -3,13 +3,9 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Description:* Container specifying cluster component configuration.
 
-*Default value:* By default, the cl-comp container is not listed in the config.tdsl file.
+*Default value:* By default, the cl-comp container is not listed in the `config.tdsl` file.
 
 *Example:*
 [source,dsl]

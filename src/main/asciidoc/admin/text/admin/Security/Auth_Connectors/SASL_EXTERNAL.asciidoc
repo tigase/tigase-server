@@ -3,10 +3,6 @@
 :author: Bartosz Malkowski <bmalkowski@tigase.pl>
 :version: v2.1, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 In order to enable SASL External add following line to the  `config.tdsl` file
 
 [source,dsl]

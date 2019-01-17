@@ -17,3 +17,5 @@ include::Vhosts_Ad-hoc_Commands.asciidoc[leveloffset=+3]
 include::Vhosts_Virtual_Components.asciidoc[leveloffset=+3]
 
 include::Logging.asciidoc[leveloffset=+2]
+
+include::Advanced_Options.asciidoc[leveloffset=+2]

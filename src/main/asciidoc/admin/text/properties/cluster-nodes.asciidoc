@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Default value:* none
 
 *Example:* `'cluster-nodes' = [ 'node1.domain:pass:port' , 'node2.domain:pass:port' , 'node3.domain:pass:port' ]`
@@ -18,6 +14,6 @@ The node is the full DNS name of the machine running the node. Please note the p
 
 All cluster nodes must be connected with each other to maintain user session synchronization and exchange packets between users connected to different nodes. Therefore each cluster node opens a 'cluster port' on which it is listening for connections from different cluster nodes. As there is only one connection between each two nodes Tigase server has to decide which nodes to connect to and which has to accept the connection. If you put the same list of cluster nodes in the configuration for all nodes this is not a problem. Tigase server has a way to find and void any conflicts that are found. If you however want to add a new node later on, without restarting and changing configuration on old nodes, there is no way the old nodes will try to establish a connection to the new node they don't know them. To solve this particular case the next parameter is used.
 
-NOTE: Cluster nodes are not required to be configured, as they can automatically find/add/remove cluster nodes.  This is for installations where nodes will be limited and static!
+NOTE: Cluster nodes are not required to be configured, as they can automatically find/add/remove cluster nodes. This is for installations where nodes will be limited and static!
 
 *Available since:* 8.0.0

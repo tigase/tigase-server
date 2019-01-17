@@ -3,11 +3,11 @@
 :author: Daniel Wisnewski (daniel@tigase.org)
 :version: v2.0 June 2017. Reformatted for v8.0.0.
 
-Client to server communication is an integral part of XMPP communication.  C2S handles all client communication to the server, and is responsible for filtering and handling remote communications.
+Client to server communication is an integral part of XMPP communication. C2S handles all client communication to the server, and is responsible for filtering and handling remote communications.
 C2S CAN be disabled, however doing so will only allow communication of internal components, and S2S communications.
 
 == Configuration
-To disable C2S, use the following line in config.tdsl folder.
+To disable C2S, use the following line in `config.tdsl` folder.
 
 [source,dsl]
 -----
@@ -17,7 +17,7 @@ c2s (active: false) {}
 Otherwise, C2S component is activated by default.
 
 == Connections
-The connections container houses all configuration related to connections with the component.  Each port may be configured individually.
+The connections container houses all configuration related to connections with the component. Each port may be configured individually.
 
 [source,dsl]
 -----
@@ -52,7 +52,7 @@ Here, this limits the number to 150 connections per second before connection att
 This replaces the old `--new-connections-throttling` property.
 
 == Resumption timeout
-It is now possible to set a default stream resumption timeout that the server uses.  This allows control of how long a server will wait for a reconnection from a client.  This can be particularly helpful to manage mobile clients connecting to your server as they may not have complete coverage, and you do not want to close the stream right away.
+It is now possible to set a default stream resumption timeout that the server uses. This allows control of how long a server will wait for a reconnection from a client. This can be particularly helpful to manage mobile clients connecting to your server as they may not have complete coverage, and you do not want to close the stream right away.
 By default, Tigase sets this value to 60 seconds.
 
 [source,dsl]
@@ -63,7 +63,7 @@ c2s {
     }
 }
 -----
-This sets the default timeout to 90 seconds.  You may, if you choose, specify a maximum timeout time, which will allow the server to wait between the default and maximum before a connection is closed.
+This sets the default timeout to 90 seconds. You may, if you choose, specify a maximum timeout time, which will allow the server to wait between the default and maximum before a connection is closed.
 [source,dsl]
 -----
 c2s {
@@ -79,7 +79,7 @@ Available since v7.1.0
 
 [[packetRedelivery]]
 == Packet Redelivery
-Normally packets are handled by C2S and are typically processed in the first run, however if that fails to send, a retry of sending that packet will occur after 60 seconds.  If that second try fails, the delay will increase by a factor of 1.5.  This means that the next retry will occur at 90, 135, and so on until the retry count is reached.  By default this count is 15, however it can be changed by using the following setting:
+Normally packets are handled by C2S and are typically processed in the first run, however if that fails to send, a retry of sending that packet will occur after 60 seconds. If that second try fails, the delay will increase by a factor of 1.5. This means that the next retry will occur at 90, 135, and so on until the retry count is reached. By default this count is 15, however it can be changed by using the following setting:
 [source,dsl]
 -----
 c2s {

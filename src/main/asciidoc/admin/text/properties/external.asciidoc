@@ -3,10 +3,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Description:* This property defines parameters for external component connections.
 
 The component is loaded the same way as all other Tigase components. In your `config.tdsl` file you need to add the external class:

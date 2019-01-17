@@ -3,10 +3,6 @@
 :author: Daniel Wisnewski
 :version: v2.0, April 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://www.tigase.net
-
 By default we can retrieve server statistics using XMPP, no additional setup is necessary.
 
 == Retrieving statistics using XMPP
@@ -53,11 +49,11 @@ It takes following parameters:
 ----
 $ groovy StatsDumper.groovy [hostname] [username] [password] [dir] [port] [delay(ms)] [interval(ms)] [loadhistory(bool)]
 ----
-* hostname - address of the instance
-* username - JMX username
-* password - JMX username
-* dir - directory to which save the files with statistics
-* port - port on which to make the connection
-* delay(ms) - initial delay in milliseconds after which statistics should be saved
-* interval(ms) - interval between each retrieval/saving of statistics
-* loadhistory(bool) - indicates whether or not load statistics history from server (if such is enabled in Tigase)
+* `hostname` - address of the instance
+* `username` - JMX username
+* `password` - JMX username
+* `dir` - directory to which save the files with statistics
+* `port` - port on which to make the connection
+* `delay`(ms) - initial delay in milliseconds after which statistics should be saved
+* `interval`(ms) - interval between each retrieval/saving of statistics
+* `loadhistory`(bool) - indicates whether or not load statistics history from server (if such is enabled in Tigase)

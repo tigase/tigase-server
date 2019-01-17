@@ -3,10 +3,6 @@
 :author: Daniel Wisnewski
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Description:* The property allows to enabled or disable delaying of listening for client connections *in cluster mode* until the cluster is correctly connected.
 
 *Default value:* `true`

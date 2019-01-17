@@ -9,3 +9,7 @@ The section contains some short tricks and tips helping in different kinds of is
 
 - xref:tigaseTip_RuntimeEnvironment[Runtime Environment Tip]
 - xref:bestWebPrax [Best Practices for Connecting to Tigase XMPP server From Web Browser]
+
+include::Checking_Environment.asciidoc[leveloffset=+1]
+
+include::Browser_Access.asciidoc[leveloffset=+1]

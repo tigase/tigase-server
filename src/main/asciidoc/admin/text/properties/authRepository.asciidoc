@@ -3,12 +3,7 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v1.0, June 2017: Reformatted for Kernel/DSL
 
-
-:toc:
-:numbered:
-:website: http://tigase.net/
-
-*Description:* Container specifying authentication repository.  This container replaces the old `auth-db` property types, and may contain some other configuration values.
+*Description:* Container specifying authentication repository. This container replaces the old `auth-db` property types, and may contain some other configuration values.
 
 *Default value:*
 [source,dsl]
@@ -71,9 +66,9 @@ userRepository {
 
 [[authRepoPool]]
 === *cls*
-Defines the class used for repository connection.  You can use this to specify specific drivers for different DB types. +
+Defines the class used for repository connection. You can use this to specify specific drivers for different DB types. +
 
-Unless specified, the pool class will use the one included with Tigase.  You may configure individual repositories in the same way.
+Unless specified, the pool class will use the one included with Tigase. You may configure individual repositories in the same way.
 This replaces the former `--auth-repo-pool` property.
 
 NOTE: File conversion will not remove and convert this property, it *MUST BE DONE MANUALLY*.

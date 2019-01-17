@@ -3,14 +3,9 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v1.0, June 2017: Reformatted for Kernel/DSL
 
-
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Description:* Specifies a list of administrator accounts.
 
-*Default value:* the administration account created when the server is setup.  Typically it would be something like `admins = ['admin@server.com']`.
+*Default value:* the administration account created when the server is setup. Typically it would be something like `admins = ['admin@server.com']`.
 
 *Example:* `admins = [ 'admin@domain.com', 'user2@domain.com' ]`
 

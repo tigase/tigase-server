@@ -3,13 +3,9 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, August 2017: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 There are cases when you want to deploy one or more Tigase components separately from the main server, or perhaps you want to run some Tigase components connecting to a different XMPP server, or perhaps you work on a component and you do not want to restart the main server every time you make a change.
 
-There is a way to run the Tigase server in "external component mode". In fact you can run any of Tigase's components as an external component and connect them to the main XMPP server either via link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] or link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] connection.
+There is a way to run the Tigase server in _external component mode_. In fact you can run any of Tigase's components as an external component and connect them to the main XMPP server either via link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] or link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] connection.
 
 Let's look at the examples...
 
@@ -168,7 +164,7 @@ There is a special configuration type for this case which simplifies setting nee
 'config-type' = 'component'
 -----
 
-This generates a configuration for Tigase with only one component loaded by default - the component used for external component connection. If you use this configuration type, your config.tdsl file may look like this:
+This generates a configuration for Tigase with only one component loaded by default - the component used for external component connection. If you use this configuration type, your `config.tdsl` file may look like this:
 
 [source,dsl]
 -----

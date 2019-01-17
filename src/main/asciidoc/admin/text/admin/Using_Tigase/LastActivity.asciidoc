@@ -2,13 +2,10 @@
 = Last Activity
 :version: v1.0, November 2018
 
-:toc:
-:numbered:
-:website: http://www.tigase.net
-
 Tigase XMPP Server supports https://xmpp.org/extensions/xep-0012.html[XEP-0012: Last Activity] extension, which allows retrieval information when particular contact was active last time. It's not enabled by default.
 
 The functionality itself is split in two plugins:
+
 * `jabber:iq:last-marker` - responsible for updating information about last activity of user
 * `jabber:iq:last` - responsible for handling requests to retrieve last activity information (it depends on `jabber:iq:last-marker` plugin).
 
@@ -20,6 +17,7 @@ In order to enable functionality you should add both plugins to your configurati
     'jabber:iq:last-marker' (active: true) {
     	'jabber:iq:last' (active: true) {}
     }
+}
 -----
 
 == What updates last activity
@@ -33,6 +31,7 @@ By default marker plugin will only update last activity information on presence 
         message = true
         presence = true
     }
+}
 -----
 
 Those settings will cause updating last activity information for both `<message/>` and `<presence/>` stanzas
@@ -47,4 +46,5 @@ To lower impact on performance, by default last activity information is persiste
     'jabber:iq:last-marker' (active: true) {
         persistAllToRepository = true
     }
+}
 -----

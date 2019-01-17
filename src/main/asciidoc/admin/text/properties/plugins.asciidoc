@@ -3,12 +3,8 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
-*Description:* The former `--sm-plugins` property has been replaced by a new style of formatting with DSL.  The former long unbroken string of plusses and minuses have been replaced by a compartmentalized style.
-Plugins controlled under session manager will now be children of the `'sess-man'` bean.  For example, to turn on the personal eventing protocol, the following may be used:
+*Description:* The former `--sm-plugins` property has been replaced by a new style of formatting with DSL. The former long unbroken string of plusses and minuses have been replaced by a compartmentalized style.
+Plugins controlled under session manager will now be children of the `'sess-man'` bean. For example, to turn on the personal eventing protocol, the following may be used:
 [source,dsl]
 -----
 'sess-man' () {
@@ -16,7 +12,7 @@ Plugins controlled under session manager will now be children of the `'sess-man'
 }
 -----
 
-Should any plugin require configuration, those configurations will be under it's own brackets.  For example, this section not only turns on jabber:iq:auth but also sets the treads to 16.
+Should any plugin require configuration, those configurations will be under it's own brackets. For example, this section not only turns on jabber:iq:auth but also sets the treads to 16.
 [source,dsl]
 -----
 'sess-man' () {
@@ -35,7 +31,7 @@ If you need to disable certain plugins, you can do so after declaring the bean.
 }
 -----
 
-Typically if a bean is called, it is automatically active.  Session manager plugins will typically look like a list of plugins without configurations.  The example section will show what one will look like.
+Typically if a bean is called, it is automatically active. Session manager plugins will typically look like a list of plugins without configurations. The example section will show what one will look like.
 
 *Default value:* 'none'
 

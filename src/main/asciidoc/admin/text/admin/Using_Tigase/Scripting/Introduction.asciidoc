@@ -3,13 +3,7 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2014: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
-image:images/admin/tiger3-small.png[]
-
-This document is the first in a series describing scripting support in the Tigase server showing how to load, install, update and call a script. It contains also an introduction to the scripting API with the first "Hello world!" example.
+This document is the first in a series describing scripting support in the Tigase server showing how to load, install, update and call a script. It contains also an introduction to the scripting API with the first _Hello world!_ example.
 
 Since Tigase version 4.3.1 the server supports scripting for administrator commands as well as standard commands.
 
@@ -17,7 +11,7 @@ In theory many different languages can be used to write scripts and the only req
 
 In practice some languages are better supported than others, at the moment we recommend link:http://groovy.codehaus.org/[Groovy]. However the following languages are also confirmed to be working: link:http://www.scala-lang.org/[Scala], link:http://www.python.org/[Python] and link:http://www.ruby-lang.org/en/[Ruby]. The link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main[Tigase SVN] contains a few examples for these languages.
 
-Please note, the default Tigase installation contains only libraries for Groovy. Adding support for a different language is as simple as copying a few JAR files to the Tigase *libs/* directory.
+NOTE: the default Tigase installation contains only libraries for Groovy. Adding support for a different language is as simple as copying a few JAR files to the Tigase `libs/` directory.
 
 All the examples presented in this guide are also available as ready to use scripts in the Tigase SVN repository in directory: link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main/groovy/tigase/admin[src/main/groovy/tigase/admin].
 
@@ -32,20 +26,20 @@ image:images/admin/service-disco.png[]
 
 The first thing to do, therefore, is to browse service discovery on the running server. The result you receive will depend on your installation and installed components.
 
-The most interesting things right now are all items with "*http://jabber.org/protocol/admin*" in their node part. You may have a few scripts loaded already but there are two commands used for scripting management. Their names are descriptive enough: "*New command script*" and "*Remove command script*".
+The most interesting things right now are all items with "*http://jabber.org/protocol/admin*" in their node part. You may have a few scripts loaded already but there are two commands used for scripting management. Their names are descriptive enough: `New command script` and `Remove command script`.
 
 The first is for adding a new script or updating existing and the second is for removing script from the server.
 
-To add a new script you have just to execute "*New command script*". In Psi this is done by double clicking on the element in service discovery list.
+To add a new script you have just to execute `New command script`. In Psi this is done by double clicking on the element in service discovery list.
 
 image:images/admin/hello1-new-script.png[]
 
 The screenshot above shows a couple of options to set for the loaded script:
 
-- *Description* - is what shows as the script name in the service discovery window. There are no special restrictions on what to put there.
-- *Command id* - is a unique ID of the script (admin command). This is what shows after the "http://jabber.org/protocol/admin" in node part. This needs to be unique or existing script is overwritten.
-- *Language* - a drop down list of all supported scripting languages for your installation. Tigase automatically detects all libraries for scripting languages and lists them here. So all you need is to select the correct language for your script.
-- *Script text* - is just your script content.
+Description:: is what shows as the script name in the service discovery window. There are no special restrictions on what to put there.
+Command id:: is a unique ID of the script (admin command). This is what shows after the "http://jabber.org/protocol/admin" in node part. This needs to be unique or existing script is overwritten.
+Language:: a drop down list of all supported scripting languages for your installation. Tigase automatically detects all libraries for scripting languages and lists them here. So all you need is to select the correct language for your script.
+Script text:: is just your script content.
 
 When your script is ready and all fields are correctly set, simply press "*Finish*" button and you should receive a message confirming that the script has been loaded successfully.
 
@@ -56,14 +50,14 @@ In this guide we are creating a simple "Hello world" script written in Groovy. W
 It uses a basic scripting API which is described line by line below:
 
 . It imports basic Tigase classes.
-. Set's a local variable \'`p`'' which points to a \'`packet`' variable with data received from the client.
-. Creates a \'`res`' variable which is response sent back to the client (administrator). The response to the client is of type \'`result`'. Other possible types will be introduced later.
+. Sets a local variable `p` which points to a `packet` variable with data received from the client.
+. Creates a `res` variable which is response sent back to the client (administrator). The response to the client is of type `result. Other possible types will be introduced later.
 . We operate on ad-hoc commands here so the script uses Tigase utility class to set/retrieve command parameters. It sets the window title and a simple message displayed to the user (administrator).
 . The last line returns new packet as a script execution result.
 
 The first, very simple version looks like this:
 
-[source,java]
+[source,groovy]
 -----
 import tigase.server.*
 def p = (Packet)packet
@@ -95,7 +89,7 @@ image:images/admin/hello2-asking-for-name-small.png[]
 
 To ask the user for some more information we have to extend example above with some more code:
 
-[source,java]
+[source,groovy]
 -----
 import tigase.server.*
 
@@ -119,7 +113,7 @@ Command.addInstructions(res, "Hello ${name}, how are you?")
 return res
 -----
 
-If you compare both scripts you see that they are quite similar. Before displaying greeting, however, the script tries to retrieve data from the \'`name`' input field. If the name had been provided the greeting is displayed, otherwise the script asks for the user name.
+If you compare both scripts you see that they are quite similar. Before displaying greeting, however, the script tries to retrieve data from the `name` input field. If the name had been provided the greeting is displayed, otherwise the script asks for the user name.
 
 image:images/admin/hello2-result-small.png[]
 
@@ -159,11 +153,11 @@ Language is simple. It is detected automatically by the script file extension. S
 
 The script description and command id needs a little bit more work. You have to include in your script following lines:
 
-[source,java]
+[source]
 -----
 AS:Description: The command description
 AS:CommandId: command-id
 AS:Component: comp_name
 -----
 
-Please note, there must be at least a single space after the "`AS:Description:`" or "`AS:CommandId:`" string. Everything rest after that, until the end of the line, is treated as either the script description or command id. Put these in your script file and the loader will detect them and set correctly for your script.
+Please note, there must be at least a single space after the `AS:Description:` or `AS:CommandId:` string. Everything rest after that, until the end of the line, is treated as either the script description or command id. Put these in your script file and the loader will detect them and set correctly for your script.

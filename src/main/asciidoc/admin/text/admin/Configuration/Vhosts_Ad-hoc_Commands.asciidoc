@@ -3,24 +3,20 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 There are 3 ad-hoc commands for virtual domains management in the Tigase server:
 
-. *VHOSTS_RELOAD* used to reload virtual domains list from the repository (database).
-. *VHOSTS_UPDATE* used to add a new virtual domain or update information for existing one.
-. *VHOSTS_REMOVE* used to remove an existing virtual host from the running server.
+. `VHOSTS_RELOAD` used to reload virtual domains list from the repository (database).
+. `VHOSTS_UPDATE` used to add a new virtual domain or update information for existing one.
+. `VHOSTS_REMOVE` used to remove an existing virtual host from the running server.
 
 Syntax of the commands follows the specification described in link:http://xmpp.org/extensions/xep-0050.html[XEP-0050]. Extra information required to complete the command is carried as data forms described in link:http://xmpp.org/extensions/xep-0004.html[XEP-0004].
 
-All commands are accepted by the server only when send by the installation administrator. If the command is sent from any other account +&lt;not-authorized /&gt;+ error is returned. To grant administrator rights to an account you have to set `admins` property in the `config.tdsl` configuration file.
+All commands are accepted by the server only when send by the installation administrator. If the command is sent from any other account `<not-authorized />` error is returned. To grant administrator rights to an account you have to set `admins` property in the `config.tdsl` configuration file.
 
 Commands are sent to the 'vhost-man' server component and the 'to' attribute of the stanza must contain a full JID of the VHostManager on the server. The full *JID* consists of the component name: 'vhost-man' and the local domain, that is domain which is already on the list of virtual domains and is active. Assuming 'existing.domain.com' one of domains already activated for the server installation the *JID* is: 'vhost-man@existing.domain.com'.
 
 == Reloading the Domains List from the Database
-In order to reload virtual domains from the permanent repository other than configuration file, you have to send *VHOSTS_RELOAD* ad-hoc command to the VHostManager on the server.
+In order to reload virtual domains from the permanent repository other than configuration file, you have to send `VHOSTS_RELOAD` ad-hoc command to the VHostManager on the server.
 
 The reload command request is of the form:
 
@@ -77,7 +73,7 @@ If the command is sent from an account other than admin, the server returns an e
 The response doesn't have any special meaning other then end-user information. The client may ignore the response as it is sent after the command has been executed.
 
 == Adding a New Domain or Updating Existing One
-In order to add a new domain or update existing one you have to send an ad-hoc command *VHOSTS_UPDATE* with at least one domain name in the command data form. You can also specify whether the domain is enabled or disabled but this is optional. Future releases may allow for setting additional parameters for the domain: maximum number of user accounts for this domain, anonymous login enabled/disabled for the domain, registration via XMPP enabled/disabled for this domain and some more parameters not specified yet.
+In order to add a new domain or update existing one you have to send an ad-hoc command `VHOSTS_UPDATE` with at least one domain name in the command data form. You can also specify whether the domain is enabled or disabled but this is optional. Future releases may allow for setting additional parameters for the domain: maximum number of user accounts for this domain, anonymous login enabled/disabled for the domain, registration via XMPP enabled/disabled for this domain and some more parameters not specified yet.
 
 The domain add/update command request is of the form:
 
@@ -125,7 +121,7 @@ Upon successful completion of the command the server sends a response back to th
 -----
 
 == Removing a Virtual Domain From the Server
-In order to remove a virtual domain you have to send *VHOSTS_REMOVE* command to the server with the domain name.
+In order to remove a virtual domain you have to send `VHOSTS_REMOVE` command to the server with the domain name.
 
 The domain remove command is sent by the client:
 

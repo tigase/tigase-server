@@ -3,10 +3,6 @@
 :author: Daniel Wisnewski <wojte@tigase.org>
 :version: v2.0 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 Tigase configuration file `tigase.conf` (described in more detail in <<manualconfig>>) mentioned a couple of environmental variables which are related to the operation of the JVM. In this guide we would like to expound on those configuration options and provide hints for the optimal settings.
 
 Settings included in the `etc/tigase.conf` are as follows:
@@ -52,6 +48,7 @@ XMPP is quite specific in terms of memory allocation - short-lived objects (vari
 === Minor, Major and Full GC - optimizing
 
 General thinking suggests that:
+
 * *Minor GC* cleans Young generation;
 * *Major GC* cleans Tenured space;
 * *Full GC* cleans all heap.

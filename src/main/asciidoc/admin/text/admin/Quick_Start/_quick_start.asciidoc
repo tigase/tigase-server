@@ -6,7 +6,7 @@ include::Manual_Installation_in_Console_Mode.asciidoc[leveloffset=+2]
 
 include::Windows_Installation.asciidoc[leveloffset=+2]
 
-include::Setting_Up_Server.asciidoc[leveloffset=+2]
+include::Tigase_Server_Network_Instructions.asciidoc[leveloffset=+2]
 
 include::Script_Selection.asciidoc[leveloffset=+2]
 

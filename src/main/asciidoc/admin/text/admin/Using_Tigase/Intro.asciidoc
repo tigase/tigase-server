@@ -2,9 +2,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1, June 2014: Reformatted for v8.0.0.
 
-:numbered:
-:website: http://tigase.net
-
 This section keeps set of documents which apply to all the Tigase server version and contain more generic or introductory information on general use and features.
 
 

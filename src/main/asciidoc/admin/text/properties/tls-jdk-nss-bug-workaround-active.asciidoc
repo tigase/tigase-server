@@ -3,10 +3,6 @@
 :author: Andrzej Wojcik <andrzejw@tigase.org>
 :version: v2.1, August 2017: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net/
-
 *Default value:* `false`
 
 *Example:* `'tls-jdk-nss-bug-workaround-active' = true`

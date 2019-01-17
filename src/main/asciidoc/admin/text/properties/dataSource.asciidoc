@@ -3,12 +3,7 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-
-:toc:
-:numbered:
-:website: http://tigase.net/
-
-*Description:* Container specifying repository URIs.  This container replaces the old `auth-db-uri` and `user-db-uri` property types.
+*Description:* Container specifying repository URIs. This container replaces the old `auth-db-uri` and `user-db-uri` property types.
 
 *Default value:*
 [source,dsl]
@@ -33,14 +28,14 @@ dataSource {
 }
 -----
 
-*Possible values:* Broken down list of customized names for DB URIs.  Each name must have a defined uri property. DB name can be customized by the bean name.
+*Possible values:* Broken down list of customized names for DB URIs. Each name must have a defined uri property. DB name can be customized by the bean name.
 
 NOTE: URI name may be used as shorthand to define DB location URI in other containers, so be sure to name them uniquely.
 
 NOTE: default () URI setting replaces the `user-db-uri` as well as the `auth-repo-uri` property.
 
 == MSSQL
-MSSql support works out of the box, however Tigase provides an open source driver for the database.  We recommend using Microsoft's own driver for better functionality.
+MSSql support works out of the box, however Tigase provides an open source driver for the database. We recommend using Microsoft's own driver for better functionality.
 [source,dsl]
 -----
 dataSource () {

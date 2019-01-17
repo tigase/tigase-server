@@ -3,16 +3,12 @@
 :author: Daniel Wisnewski
 :version: v2.0, June 2016: Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://www.tigase.net
-
 Tigase Clustering allows the use of a number of servers to be unified in delivering, from what a client or user sees, a single unified platform.
 There are two typical reasons why clustering should be employed:
 
 - High Availability
 
-  By using clustering, services can be provided with a high reliability and redundancy.  By using a network of multiple servers, content or services can be served on any of the clustered servers maintaining a consistent uptime without relying on one machine.
+  By using clustering, services can be provided with a high reliability and redundancy. By using a network of multiple servers, content or services can be served on any of the clustered servers maintaining a consistent uptime without relying on one machine.
 
 - Load Balancing
 
@@ -20,12 +16,12 @@ There are two typical reasons why clustering should be employed:
 
 With Tigase, you don't have to choose between either/or!
 
-*Tigase Clustering* offers *Full Redundancy* and *Automatic Load Balancing* allowing addition of new nodes at runtime with a simple configuration.  All without a severe tax on resource consumption.
+*Tigase Clustering* offers *Full Redundancy* and *Automatic Load Balancing* allowing addition of new nodes at runtime with a simple configuration. All without a severe tax on resource consumption.
 
 All basic components support clustering configuration, and some may be turned on or off.
 
 == Configuration
-To enable Clustering on Tigase servers, use the following line in your config.tdsl file:
+To enable Clustering on Tigase servers, use the following line in your `config.tdsl` file:
 [source,dsl]
 -----
 'cluster-mode' = true
@@ -47,7 +43,7 @@ cl-comp {
 You can fine tune each port configuration, however this is not typically needed.
 
 ==== Custom Port Configuration
-Each port has it's own details that can be manipulated VIA the following ports.  Again *THIS IS OPTIONAL*
+Each port has it's own details that can be manipulated via the following ports. Again *THIS IS OPTIONAL*
 [source,dsl]
 -----
 'cl-comp' {
@@ -68,24 +64,24 @@ Each port has it's own details that can be manipulated VIA the following ports. 
 -----
 
 === Multi-node configuration
-Each node should have `'cluster-mode' = true` enabled that you wish to connect to the cluster.  They will automatically discover other nodes to connect to VIA Server to Server traffic.
+Each node should have `'cluster-mode' = true` enabled that you wish to connect to the cluster. They will automatically discover other nodes to connect to VIA Server to Server traffic.
 Nodes that are added or removed will be periodically updated.
 
 === Traffic Control
 You can customize the traffic going between clustered servers with a few options.
 
 ==== cm-ht-traffic-throttling
-This setting will control the number of bytes sent over non-user connections.  Namely, Server to Server or S2S connections.
+This setting will control the number of bytes sent over non-user connections. Namely, Server to Server or S2S connections.
 [source,dsl]
 -----
 'cm-ht-traffic-throttling' = 'xmpp:25k:0:disc,bin:200m:0:disc'
 -----
-The format is as follows: {traffic-type}:{maximum-traffic}:{max-lifespan-traffic}:{action}
+The format is as follows: `{traffic-type}:{maximum-traffic}:{max-lifespan-traffic}:{action}`
 
-- *traffic-type* Specifies the type of traffic controlled.  This can either be *XMPP* or *bin*.  XMPP limits the number of packets transferred, whereas bin limits the number of bytes transferred.
-- *maximum-traffic* Specifies how many bytes or packets may be sent within one minute.
-- *max-lifespan-traffic* Specifies how many bytes or packets may be sent within the lifetime of the connection. 0 means unlimited.
-- *action* Specifies the action to be taken which can be *disc* which disconnects the connection, or *drop* which will drop any data exceeding the thresholds.
+traffic-type:: Specifies the type of traffic controlled. This can either be *XMPP* or *bin*. XMPP limits the number of packets transferred, whereas bin limits the number of bytes transferred.
+maximum-traffic:: Specifies how many bytes or packets may be sent within one minute.
+max-lifespan-traffic:: Specifies how many bytes or packets may be sent within the lifetime of the connection. 0 means unlimited.
+action:: Specifies the action to be taken which can be *disc* which disconnects the connection, or *drop* which will drop any data exceeding the thresholds.
 
 ==== cm-see-other-host
 This allows the specific use of a load balancing mechanism by selecting `SeeOtherHostIfc` implementation.
@@ -93,7 +89,7 @@ For more details, see xref:loadBalanding[Tigase Load Balancing] documentation.
 
 == Old configuration method
 
-While these options are still available these settings CAN be less reliable.  *Use ONLY if you need specific setups that cannot be accommodated by the automatic cluster mode*.
+While these options are still available these settings CAN be less reliable. *Use ONLY if you need specific setups that cannot be accommodated by the automatic cluster mode*.
 
 === Specifying Specific nodes
 You can still use the old method of specifying every node on each server.
@@ -112,7 +108,7 @@ and so on...
 However, we do not recommend this.
 
 ==== Password and Port configuration
-You may specify a password and port to specific cluster servers if that is required.  To do so, you will need to add {password}:{port} to the domain, like this example:
+You may specify a password and port to specific cluster servers if that is required. To do so, you will need to add {password}:{port} to the domain, like this example:
 [source,properties]
 -----
 'cluster-nodes' = [ 'serv1.xmpp-test.org:domainpass:5600' ]
@@ -126,12 +122,14 @@ After setting up clustering you may want to verify that the clusters are operati
 There are number of ways to check for opened connections, simplest one use command line. (Tigase uses port _5277_ for cluster connections)
 
 * Linux
++
 [source,sh]
 -----
 $ lsof -iTCP:5277 -sTCP:ESTABLISHED -P -n
 -----
-
++
 * Windows
++
 [source,sh]
 -----
 C:\WINNT>netstat -anp tcp | find ":5277 "

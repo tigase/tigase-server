@@ -2,10 +2,6 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for Kernel/DSL
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
 == Jabber/XMPP is Instant Messaging Technology
 All federated *XMPP* servers are connected in one global communications network allowing you to send messages to friends who have accounts on other Jabber servers.
 
@@ -13,7 +9,7 @@ This is very much like sending e-mail but the difference between Jabber and e-ma
 
 All messages sent through Jabber are sent instantly and you also receive responses instantly. More over you can see whether your mate is online and available for talking or not.
 
-There exists similar technologies to Jabber like Yahoo, MSN, and ICQ. There are, however, quite a few differences.
+There exists similar technologies to Jabber like WhatsApp Messenger, Facebook Messenger, Signal, Telegram, WeChat, QQ and other. There are, however, quite a few differences.
 
 XMPP is an open standard which means everybody can know how it works, everybody can implement their own software connecting to the network both client and server side.
 

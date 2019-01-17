@@ -14,21 +14,9 @@ include::Virtual_Domains.asciidoc[leveloffset=+2]
 
 include::Presence_Forwarding.asciidoc[leveloffset=+2]
 
-include::Tigase_and_PyMSN-t_Transport.asciidoc[leveloffset=+2]
-
-include::Multiple_SessionManagers.asciidoc[leveloffset=+2]
-
 include::Watchdog.asciidoc[leveloffset=+2]
 
 include::Tips_and_Tricks/Tips_and_Tricks.asciidoc[leveloffset=+2]
-
-include::Tips_and_Tricks/Checking_Environment.asciidoc[leveloffset=+3]
-
-include::Tips_and_Tricks/Browser_Access.asciidoc[leveloffset=+3]
-
-include::Command_Line_Tool/Command_Line_Tools.asciidoc[leveloffset=+2]
-
-include::Command_Line_Tool/Configuration_Tool.asciidoc[leveloffset=+3]
 
 include::Licensing.asciidoc[leveloffset=+2]
 
@@ -37,9 +25,3 @@ include::Clustering.asciidoc[leveloffset=+2]
 include::Anonymous_Users.asciidoc[leveloffset=+2]
 
 include::Scripting/Scripting_Support.asciidoc[leveloffset=+2]
-
-include::Scripting/Introduction.asciidoc[leveloffset=+3]
-
-include::Scripting/v4.4.x_Update.asciidoc[leveloffset=+3]
-
-include::Scripting/Python.asciidoc[leveloffset=+3]

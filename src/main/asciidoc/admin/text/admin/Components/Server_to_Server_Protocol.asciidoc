@@ -3,11 +3,7 @@
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0 August 2017. Reformatted for v8.0.0.
 
-:toc:
-:numbered:
-:website: http://tigase.net
-
-Tigase s2s communication component allows you to tweak it's configuration to get a better performance in your installation.
+Tigase server-to-server communication component facilitates communication with other XMPP servers (federation) and allows you to tweak it's configuration to get a better performance in your installation.
 
 S2S (or server to server) protocol is enabled by default with optimal settings chosen. There are however, a set of configuration parameters you can adjust the server behavior to achieve optimal performance on your installation.
 
@@ -38,7 +34,7 @@ s2s {
 
 - `max-out-per-ip-conns` - this property specifies the maximum outgoing connections Tigase server opens to any remote XMPP server to its single IP address. This too, is *per domain* limit, which means that this limit applies to each of the remote domains Tigase connects to. If it is set to `1`, and the above limit is set to `4`, and the remote server is visible behind 1 IP address, then Tigase opens a maximum of 1 connection to `jabber.org` plus a maximum of 1 connection to `muc.jabber.org` and other subdomains.
 +
-To adjust the limit you have to add following line to the config.tdsl file:
+To adjust the limit you have to add following line to the `config.tdsl` file:
 +
 [source,dsl]
 -----
@@ -91,7 +87,7 @@ The default selector picks connections randomly.
 
 [[s2sSkipTlsHostnames]]
 == skip-tls-hostnames
-The `s2s-skip-tls-hostnames` property disables TLS handshaking for s2s connections to selected remote domains. Unfortunately some servers (certain versions of Openfire - [link:http://community.igniterealtime.org/thread/36206[1]] or [link:http://community.igniterealtime.org/thread/30578[2]]) have problems with TLS handshaking over s2s which prevents establishing a usable connection. This completely blocks any communication to these servers. As a workaround you can disable TLS for these domains to get communication back.  Enabling this can be done on any vhost, but must be configured under the s2s component.
+The `s2s-skip-tls-hostnames` property disables TLS handshaking for s2s connections to selected remote domains. Unfortunately some servers (certain versions of Openfire - [link:http://community.igniterealtime.org/thread/36206[1]] or [link:http://community.igniterealtime.org/thread/30578[2]]) have problems with TLS handshaking over s2s which prevents establishing a usable connection. This completely blocks any communication to these servers. As a workaround you can disable TLS for these domains to get communication back. Enabling this can be done on any vhost, but must be configured under the s2s component.
 
 [source,dsl]
 -----
@@ -102,7 +98,7 @@ s2s {
 
 [[s2sEjabberdBugWorkaroundActive]]
 == ejabberd-bug-workaround
-This property activates a workaround for a bug in EJabberd in it's s2s implementation. EJabberd does not send dialback in stream features after TLS handshaking even if the dialback is expected/needed. This results in unusable connection as EJabberd does not accept any packets on this connection either. The workaround is enabled by default right now until the EJabberd version without the bug is popular enough. A disadvantage of the workaround is that dialback is always performed even if the SSL certificate is fully trusted and in theory this dialback could be avoided.  By default, this is not enabled.
+This property activates a workaround for a bug in EJabberd in it's s2s implementation. EJabberd does not send dialback in stream features after TLS handshaking even if the dialback is expected/needed. This results in unusable connection as EJabberd does not accept any packets on this connection either. The workaround is enabled by default right now until the EJabberd version without the bug is popular enough. A disadvantage of the workaround is that dialback is always performed even if the SSL certificate is fully trusted and in theory this dialback could be avoided. By default, this is not enabled.
 
 [source,dsl]
 -----
