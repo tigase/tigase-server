@@ -1,0 +1,23 @@
+= User connectivity
+
+include::bosh-close-connection.asciidoc[leveloffset=+1]
+
+include::bosh-extra-headers-file.asciidoc[leveloffset=+1]
+
+include::client-access-policy-file.asciidoc[leveloffset=+1]
+
+include::client-port-delay-listening.asciidoc[leveloffset=+1]
+
+include::cross-domain-policy-file.asciidoc[leveloffset=+1]
+
+include::domain-filter-policy.asciidoc[leveloffset=+1]
+
+include::seeOtherHost.asciidoc[leveloffset=+1]
+
+include::watchdog-timeout.asciidoc[leveloffset=+1]
+
+include::watchdog_delay.asciidoc[leveloffset=+1]
+
+include::watchdog_ping_type.asciidoc[leveloffset=+1]
+
+include::ws-allow-unmasked-frames.asciidoc[leveloffset=+1]

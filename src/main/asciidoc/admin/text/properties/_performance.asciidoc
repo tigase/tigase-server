@@ -1,0 +1,17 @@
+= Performance
+
+include::cm-ht-traffic-throttling.asciidoc[leveloffset=+1]
+
+include::cm-traffic-throttling.asciidoc[leveloffset=+1]
+
+include::elements-number-list.asciidoc[leveloffset=+1]
+
+include::hardened-mode.asciidoc[leveloffset=+1]
+
+include::max-queue-size.asciidoc[leveloffset=+1]
+
+include::net-buff-high-throughput.asciidoc[leveloffset=+1]
+
+include::net-buff-standard.asciidoc[leveloffset=+1]
+
+include::nonpriority-queue.asciidoc[leveloffset=+1]

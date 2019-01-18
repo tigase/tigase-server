@@ -1,0 +1,15 @@
+= VHost / domain
+
+include::vhost-anonymous-enabled.asciidoc[leveloffset=+1]
+
+include::vhost-disable-dns-check.asciidoc[leveloffset=+1]
+
+include::vhost-max-users.asciidoc[leveloffset=+1]
+
+include::vhost-message-forward-jid.asciidoc[leveloffset=+1]
+
+include::vhost-presence-forward-jid.asciidoc[leveloffset=+1]
+
+include::vhost-register-enabled.asciidoc[leveloffset=+1]
+
+include::vhost-tls-required.asciidoc[leveloffset=+1]
