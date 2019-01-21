@@ -18,8 +18,7 @@
     If not, see http://www.gnu.org/licenses/.
 
 -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,14 +30,14 @@
     <properties>
         <tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
         <!--<tests.logger_properties>src/test/resources/logging.properties</tests.logger_properties>-->
-        <tests.logger_properties/>
+        <tests.logger_properties />
 
         <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
     </properties>
 
     <artifactId>tigase-server</artifactId>
     <packaging>bundle</packaging>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>8.0.0-RC1</version>
 
     <name>Tigase XMPP Server</name>
     <description>The instant messaging server</description>
@@ -74,7 +73,8 @@
         <connection>scm:git:https://git.tigase.tech/tigase-server.git</connection>
         <developerConnection>scm:git:https://git.tigase.tech/tigase-server.git</developerConnection>
         <url>https://tigase.tech/projects/tigase-server/repository</url>
-    </scm>
+      <tag>tigase-server-8.0.0-RC1</tag>
+  </scm>
 
     <profiles>
         <profile>
@@ -99,7 +99,7 @@
             <properties>
                 <packaging.type>bundle</packaging.type>
                 <maven.javadoc.skip>false</maven.javadoc.skip>
-                <tests.excludeGroups></tests.excludeGroups>
+                <tests.excludeGroups />
 
                 <guide_name>Tigase_Server</guide_name>
             </properties>
@@ -165,10 +165,10 @@
                                     <sourceDirectory>${project.build.directory}/docbook-admin/</sourceDirectory>
                                     <postProcess>
                                         <copy todir="${guide_path}_-_Admin/webhelp/css">
-                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                            <fileset dir="src/main/asciidoc/css" />
                                         </copy>
                                         <copy todir="${guide_path}_-_Admin/webhelp/images">
-                                            <fileset dir="src/main/asciidoc/admin/images"></fileset>
+                                            <fileset dir="src/main/asciidoc/admin/images" />
                                         </copy>
                                     </postProcess>
                                 </configuration>
@@ -181,8 +181,7 @@
                                     <imgSrcPath>${project.build.directory}/docbook-admin/</imgSrcPath>
                                     <sourceDirectory>${project.build.directory}/docbook-admin/</sourceDirectory>
                                     <postProcess>
-                                        <move failonerror="false" file="${guide_path}_-_Admin/pdf/index.pdf"
-                                              tofile="${guide_path}_-_Admin/pdf/${guide_name}_Guide.pdf"></move>
+                                        <move failonerror="false" file="${guide_path}_-_Admin/pdf/index.pdf" tofile="${guide_path}_-_Admin/pdf/${guide_name}_Guide.pdf" />
                                     </postProcess>
                                 </configuration>
                             </execution>
@@ -194,10 +193,10 @@
                                     <sourceDirectory>${project.build.directory}/docbook-admin/</sourceDirectory>
                                     <postProcess>
                                         <copy todir="${guide_path}_-_Admin/html_chunk/css">
-                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                            <fileset dir="src/main/asciidoc/css" />
                                         </copy>
                                         <copy todir="${guide_path}_-_Admin/html_chunk/images">
-                                            <fileset dir="src/main/asciidoc/admin/images"></fileset>
+                                            <fileset dir="src/main/asciidoc/admin/images" />
                                         </copy>
                                     </postProcess>
                                 </configuration>
@@ -214,10 +213,10 @@
                                     <sourceDirectory>${project.build.directory}/docbook-devguide/</sourceDirectory>
                                     <postProcess>
                                         <copy todir="${guide_path}_-_Developer/webhelp/css">
-                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                            <fileset dir="src/main/asciidoc/css" />
                                         </copy>
                                         <copy todir="${guide_path}_-_Developer/webhelp/images">
-                                            <fileset dir="src/main/asciidoc/devguide/images"></fileset>
+                                            <fileset dir="src/main/asciidoc/devguide/images" />
                                         </copy>
                                     </postProcess>
 
@@ -236,8 +235,7 @@
                                     <fopLogLevel>OFF</fopLogLevel>
                                     <sourceDirectory>${project.build.directory}/docbook-devguide/</sourceDirectory>
                                     <postProcess>
-                                        <move failonerror="false" file="${guide_path}_-_Developer/pdf/index.pdf"
-                                              tofile="${guide_path}_-_Developer/pdf/${guide_name}_Guide.pdf"></move>
+                                        <move failonerror="false" file="${guide_path}_-_Developer/pdf/index.pdf" tofile="${guide_path}_-_Developer/pdf/${guide_name}_Guide.pdf" />
                                     </postProcess>
                                 </configuration>
                             </execution>
@@ -258,10 +256,10 @@
                                     <htmlStylesheet>css/docbook-xsl.css</htmlStylesheet>
                                     <postProcess>
                                         <copy todir="${guide_path}_-_Developer/html_chunk/css">
-                                            <fileset dir="src/main/asciidoc/css"></fileset>
+                                            <fileset dir="src/main/asciidoc/css" />
                                         </copy>
                                         <copy todir="${guide_path}_-_Developer/html_chunk/images">
-                                            <fileset dir="src/main/asciidoc/devguide/images"></fileset>
+                                            <fileset dir="src/main/asciidoc/devguide/images" />
                                         </copy>
                                     </postProcess>
                                 </configuration>
@@ -375,20 +373,20 @@
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-utils</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-utils</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <scope>test</scope>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-xmltools</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
