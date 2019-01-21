@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Tigase XMPP Server - The instant messaging server
+    Copyright © 2004 Tigase, Inc. (office@tigase.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. Look for COPYING file in the top folder.
+    If not, see http://www.gnu.org/licenses/.
+
+-->
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <properties>
@@ -6,12 +25,14 @@
         <tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
         <!--<tests.logger_properties>src/test/resources/logging.properties</tests.logger_properties>-->
         <tests.logger_properties/>
+
+        <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
     </properties>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tigase-server</artifactId>
     <name>Tigase XMPP Server</name>
     <packaging>${packaging.type}</packaging>
-    <description>Tigase XMPP Server - OSGi bundle</description>
+    <description>The instant messaging server</description>
     <version>8.0.0-SNAPSHOT</version>
 
     <parent>
