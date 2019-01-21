@@ -1,8 +1,6 @@
-/*
- * AnonymousRoster.java
- *
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+/**
+ * Tigase XMPP Server - The instant messaging server
+ * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by

@@ -1,6 +1,6 @@
-/*
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+/**
+ * Tigase XMPP Server - The instant messaging server
+ * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -14,12 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
- * $Rev: $
- * Last modified by $Author: $
- * $Date: $
  */
-
 package tigase.admin
 
 val num1 = Command getFieldValue (packet, "num1")

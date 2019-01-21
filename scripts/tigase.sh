@@ -1,41 +1,21 @@
 #!/bin/bash
-##
-##  Tigase Jabber/XMPP Server
-##  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-##
-##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU Affero General Public License as published by
-##  the Free Software Foundation, either version 3 of the License.
-##
-##  This program is distributed in the hope that it will be useful,
-##  but WITHOUT ANY WARRANTY; without even the implied warranty of
-##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU Affero General Public License for more details.
-##
-##  You should have received a copy of the GNU Affero General Public License
-##  along with this program. Look for COPYING file in the top folder.
-##  If not, see http://www.gnu.org/licenses/.
-##
-##  $Rev: $
-##  Last modified by $Author: $
-##  $Date: $
-##
 #
-# This is Tigase (http://www.tigase.org) server startup file.
+# Tigase XMPP Server - The instant messaging server
+# Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
 #
-# First parameter is a command (start, stop and so on...),
-# second parameters is parameters file - the file where from
-# environment variables are read like:
-# JAVA_HOME
-# JAVA_OPTIONS
-# CLASSPATH
-# TIGASE_HOME
-# TIGASE_CONSOLE_LOG
-# TIGASE_PID
-# OSGI=true
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, version 3 of the License.
 #
-# If not given the script will try to search for the file and if
-# not found default parameters will be used.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. Look for COPYING file in the top folder.
+# If not, see http://www.gnu.org/licenses/.
+#
 
 function usage()
 {

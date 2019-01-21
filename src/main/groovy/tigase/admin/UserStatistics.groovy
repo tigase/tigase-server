@@ -1,8 +1,6 @@
-/*
- * UserStatistics.groovy
- *
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+/**
+ * Tigase XMPP Server - The instant messaging server
+ * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +15,6 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-
 /*
  Obtaining User Statistics as described in in XEP-0133:
  http://xmpp.org/extensions/xep-0133.html#get-user-stats
