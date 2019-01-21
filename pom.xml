@@ -273,12 +273,6 @@
         </profile>
     </profiles>
 
-    <licenses>
-        <license>
-            <name>GNU Affero General Public License GPLv3</name>
-            <url>http://www.gnu.org/licenses/agpl.txt</url>
-        </license>
-    </licenses>
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
