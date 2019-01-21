@@ -20,26 +20,61 @@
 -->
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <properties>
-        <packaging.type>bundle</packaging.type>
-        <tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
-        <!--<tests.logger_properties>src/test/resources/logging.properties</tests.logger_properties>-->
-        <tests.logger_properties/>
-
-        <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
-    </properties>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>tigase-server</artifactId>
-    <name>Tigase XMPP Server</name>
-    <packaging>${packaging.type}</packaging>
-    <description>The instant messaging server</description>
-    <version>8.0.0-SNAPSHOT</version>
 
     <parent>
         <groupId>tigase</groupId>
         <artifactId>tigase-projects-parent</artifactId>
         <version>1.0.0-RC1</version>
     </parent>
+
+    <properties>
+        <tests.excludeGroups>tigase.tests.SlowTest</tests.excludeGroups>
+        <!--<tests.logger_properties>src/test/resources/logging.properties</tests.logger_properties>-->
+        <tests.logger_properties/>
+
+        <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
+    </properties>
+
+    <artifactId>tigase-server</artifactId>
+    <packaging>bundle</packaging>
+    <version>8.0.0-SNAPSHOT</version>
+
+    <name>Tigase XMPP Server</name>
+    <description>The instant messaging server</description>
+
+    <issueManagement>
+        <system>Redmine</system>
+        <url>https://projects.tigase.org/projects/tigase-server</url>
+    </issueManagement>
+
+    <inceptionYear>2004</inceptionYear>
+
+    <developers>
+        <developer>
+            <id>kobit</id>
+            <name>Artur Hefczyc</name>
+            <email>kobit@tigase.org</email>
+            <url>http://www.tigase.org/</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License GPLv3</name>
+            <url>http://www.gnu.org/licenses/agpl.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://git.tigase.tech/tigase-server.git</connection>
+        <developerConnection>scm:git:https://git.tigase.tech/tigase-server.git</developerConnection>
+        <url>https://tigase.tech/projects/tigase-server/repository</url>
+    </scm>
 
     <profiles>
         <profile>
