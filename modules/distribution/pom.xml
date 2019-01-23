@@ -196,7 +196,6 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-http-api</artifactId>
-									<version>1.2.1</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
@@ -206,7 +205,6 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-http-api-jetty</artifactId>
-									<version>1.1.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
@@ -216,7 +214,6 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-muc</artifactId>
-									<version>2.4.2-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
@@ -226,7 +223,6 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-socks5</artifactId>
-									<version>1.2.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
                                     <outputDirectory>${project.basedir}/../../database</outputDirectory>
@@ -236,7 +232,6 @@
                                 <artifactItem>
                                     <groupId>tigase</groupId>
                                     <artifactId>tigase-pubsub</artifactId>
-                                    <version>3.2.1</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.basedir}/../..</outputDirectory>
@@ -246,7 +241,6 @@
                                 <artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>licence-lib</artifactId>
-									<version>1.2.0</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
