@@ -24,7 +24,7 @@
 
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server-master</artifactId>
-	<version>7.1.5-SNAPSHOT</version>
+	<version>7.1.5</version>
 	
 	<name>Tigase XMPP Server Master project</name>
 
@@ -60,7 +60,7 @@
 		<connection>scm:git:${scm_repo_base}/tigase-server.git</connection>
 		<developerConnection>scm:git:${scm_repo_base}/tigase-server.git</developerConnection>
 		<url>https://tigase.tech/projects/tigase-server/repository</url>
-		<tag>HEAD</tag>
+		<tag>tigase-server-7.1.5</tag>
   </scm>
 
 	<organization>
