@@ -2,11 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <properties>
         <dist_path>.</dist_path>
         <skip-distribution-deploy>true</skip-distribution-deploy>
         <docu_build_path>${project.build.directory}/documentation</docu_build_path>
+
+        <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
     </properties>
+
     <parent>
         <groupId>tigase</groupId>
         <artifactId>tigase-projects-parent</artifactId>
@@ -21,6 +25,7 @@
     <packaging>jar</packaging>
 
     <url>https://www.tigase.net</url>
+
     <issueManagement>
         <system>Redmine</system>
         <url>https://projects.tigase.org/projects/tigase-server</url>
