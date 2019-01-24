@@ -16,6 +16,8 @@
         <sign-skip-server>true</sign-skip-server>
 		<verbose-log>false</verbose-log>
 		<tsa-uri />
+
+		<scm_repo_base>https://git.tigase.tech</scm_repo_base>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -55,10 +57,10 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://git.tigase.tech/tigase-server.git</connection>
-		<developerConnection>scm:git:https://git.tigase.tech/tigase-server.git</developerConnection>
+		<connection>scm:git:${scm_repo_base}/tigase-server.git</connection>
+		<developerConnection>scm:git:${scm_repo_base}/tigase-server.git</developerConnection>
 		<url>https://tigase.tech/projects/tigase-server/repository</url>
-	  <tag>tigase-server-7.1.4</tag>
+		<tag>HEAD</tag>
   </scm>
 
 	<organization>
@@ -112,6 +114,9 @@
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.3</version>
+				<configuration>
+					<tagNameFormat>tigase-server-@{project.version}</tagNameFormat>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

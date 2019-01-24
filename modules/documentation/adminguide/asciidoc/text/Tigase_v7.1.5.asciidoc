@@ -9,7 +9,6 @@
 == Changelog
 
 - https://projects.tigase.org/issues/7495[#7495] fix issue with not all logs being obfuscated, added testcase, documentation
-
-IMPORTANT: It's essential to persist items before upgrading to Tigase XMPP Server 8.0.0!
+- https://projects.tigase.org/issues/8226[#8226] added support for setting XMPP user status using REST API call
 
 - Improve service reliability (applies to installations with enabled ACS clustering strategy, please see <<licenseserver>> for more details)
