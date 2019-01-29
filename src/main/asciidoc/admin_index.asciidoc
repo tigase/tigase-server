@@ -3,7 +3,6 @@ Tigase Team <team@tigase.com>
 :toc:
 :numbered:
 :website: http://tigase.net
-
 :no title:
 :no author:
 
@@ -29,7 +28,7 @@ include::../../../target/documentation/tigase-pubsub/documentation/index.asciido
 
 include::../../../target/documentation/tigase-socks5/documentation/index.asciidoc[leveloffset=+1]
 
-include::../../../target/tigase-push/documentation/index.asciidoc[leveloffset=+1]
+include::../../../target/documentation/tigase-push/documentation/index.asciidoc[leveloffset=+1]
 
 include::../../../target/documentation/tigase-stun/documentation/index.asciidoc[leveloffset=+1]
 

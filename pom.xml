@@ -493,21 +493,8 @@
                                 <artifactItem>
                                     <groupId>tigase</groupId>
                                     <artifactId>tigase-push</artifactId>
-                                    <!--<outputDirectory>${docu_build_path}/tigase-push/</outputDirectory>-->
-                                    <!--we need to extract it one level up due to it linking to child guides-->
-                                    <outputDirectory>${project.build.directory}/tigase-push/</outputDirectory>
-                                </artifactItem>
-
-                                <artifactItem>
-                                    <groupId>tigase</groupId>
-                                    <artifactId>tigase-push-apns</artifactId>
-                                    <outputDirectory>${docu_build_path}/tigase-push-apns/</outputDirectory>
-                                </artifactItem>
-
-                                <artifactItem>
-                                    <groupId>tigase</groupId>
-                                    <artifactId>tigase-push-fcm</artifactId>
-                                    <outputDirectory>${docu_build_path}/tigase-push-fcm/</outputDirectory>
+                                    <outputDirectory>${docu_build_path}/tigase-push/</outputDirectory>
+                                    we need to extract it one level up due to it linking to child guides
                                 </artifactItem>
 
                                 <artifactItem>
@@ -797,18 +784,18 @@
             <version>1.0.0-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>tigase</groupId>
-            <artifactId>tigase-push-apns</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>tigase</groupId>
-            <artifactId>tigase-push-fcm</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>runtime</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>tigase</groupId>-->
+            <!--<artifactId>tigase-push-apns</artifactId>-->
+            <!--<version>1.0.0-SNAPSHOT</version>-->
+            <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>tigase</groupId>-->
+            <!--<artifactId>tigase-push-fcm</artifactId>-->
+            <!--<version>1.0.0-SNAPSHOT</version>-->
+            <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-acs</artifactId>
