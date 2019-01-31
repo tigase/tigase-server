@@ -11,7 +11,7 @@ Before version 8.0.0, user passwords were stored in plaintext in `user_pw` datab
 It was possible to enable storage of the MD5 hash of the password instead, however this limited authentication mechanism SASL PLAIN only.
 However an MD5 hash of a password is not really a secure method as it is possible to revert this mechanism using rainbow tables.
 
-Therefore, we decided to change this and store only encrypted versions of a password in PBKDF2 form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
+Therefore, we decided to change this and store only encrypted versions of a password in `PBKDF2` form which can be easily used for `SCRAM-SHA-1` authentication mechanism or `SCRAM-SHA-256`.
 SASL PLAIN mechanism can also used these encrypted passwords. The storage of encrypted passwords is now enabled *by default* in v8.0.0 of Tigase.
 
 == Summary of changes
