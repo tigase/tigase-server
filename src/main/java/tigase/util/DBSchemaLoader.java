@@ -751,7 +751,7 @@ class DBSchemaLoader extends SchemaLoader {
 
 		switch ( database ) {
 			case "mysql":
-				db_conn += "&useUnicode=true&characterEncoding=UTF-8";
+				db_conn += "&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8_general_ci";
 				break;
 		}
 		log.log( Level.INFO, "\n\nDatabase init.properties configuration:\n"
@@ -985,6 +985,11 @@ class DBSchemaLoader extends SchemaLoader {
 						 && !props.getProperty( PASSWORD ).isEmpty() ){
 					db_uri += "&password=" + props.getProperty( PASSWORD );
 				}
+
+				if (database.equals( "mysql")) {
+					db_uri +=  "&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8_general_ci";
+				}
+
 				break;
 		}
 		return db_uri;
