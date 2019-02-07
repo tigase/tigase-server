@@ -2183,6 +2183,11 @@ public class SessionManager
 				return false;
 			}
 
+			// if this is packet is a response from service disco#info on behalf of the user we need to forward it
+			if (p.isServiceDisco() && p.getStanzaFrom() != null && p.getStanzaFrom().getResource() == null) {
+				return false;
+			}
+
 			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...
