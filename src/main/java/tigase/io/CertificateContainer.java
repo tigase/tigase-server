@@ -284,7 +284,7 @@ public class CertificateContainer
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
 						}
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file);
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file + ": " + ex.getLocalizedMessage());
 					}
 				}
 			}
