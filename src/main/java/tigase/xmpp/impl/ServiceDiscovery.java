@@ -91,43 +91,47 @@ public class ServiceDiscovery
 				Element query = packet.getElement()
 						.findChild(el -> el.getName() == "query" &&
 								el.getXMLNS() == "http://jabber.org/protocol/disco#info");
-				if (serviceProvider != null && !isLocalComponent(to)) {
-					if (query != null && query.getAttributeStaticStr("node") == null) {
-						// custom handling..
-						Packet result = packet.copyElementOnly();
-						result.setPacketTo(serviceProvider.getServiceProviderComponentJid());
-						result.setPacketFrom(sessionManager.getComponentId());
+				if (!isLocalComponent(to)) {
+					if (serviceProvider != null) {
+						if (query != null && query.getAttributeStaticStr("node") == null) {
+							// custom handling..
+							Packet result = packet.copyElementOnly();
+							result.setPacketTo(serviceProvider.getServiceProviderComponentJid());
+							result.setPacketFrom(sessionManager.getComponentId());
+							results.offer(result);
+						} else {
+							// this packet is to local user (offline or not but to bare JID) - just forward to service provider component
+							Packet result = packet.copyElementOnly();
+							if (packet.getStanzaTo() == null && session != null) {
+								// in case if packet is from local user without from/to
+								JID userJid = JID.jidInstance(session.getBareJID());
+								result.initVars(packet.getStanzaFrom() != null ? packet.getStanzaFrom() : session.getJID(),
+												userJid);
+							}
+							if (packet.getStanzaFrom() == null) {
+								// at this point we should already have "from" attribute set
+								// if we do not have it, then we should drop this packet
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST,
+											"received <iq/> packet to forward to service provider component without 'from' attribute, dropping packet = {0}",
+											packet);
+								}
+								return;
+							}
+							result.setPacketFrom(packet.getFrom());
+							result.setPacketTo(serviceProvider.getServiceProviderComponentJid());
+
+							results.offer(result);
+						}
+					} else if (query != null && query.getAttributeStaticStr("node") == null) {
+						query = new Element("query");
+						query.setXMLNS("http://jabber.org/protocol/disco#info");
+						Packet result = packet.okResult(query, 0);
+						addAccountFeatures(result, from.getBareJID().equals(to.getBareJID()));
 						results.offer(result);
 					} else {
-						// this packet is to local user (offline or not but to bare JID) - just forward to service provider component
-						Packet result = packet.copyElementOnly();
-						if (packet.getStanzaTo() == null && session != null) {
-							// in case if packet is from local user without from/to
-							JID userJid = JID.jidInstance(session.getBareJID());
-							result.initVars(packet.getStanzaFrom() != null ? packet.getStanzaFrom() : session.getJID(),
-											userJid);
-						}
-						if (packet.getStanzaFrom() == null) {
-							// at this point we should already have "from" attribute set
-							// if we do not have it, then we should drop this packet
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST,
-										"received <iq/> packet to forward to service provider component without 'from' attribute, dropping packet = {0}",
-										packet);
-							}
-							return;
-						}
-						result.setPacketFrom(packet.getFrom());
-						result.setPacketTo(serviceProvider.getServiceProviderComponentJid());
-
-						results.offer(result);
+						super.process(packet, session, repo, results, settings);
 					}
-				} else if (query != null && query.getAttributeStaticStr("node") == null) {
-					query = new Element("query");
-					query.setXMLNS("http://jabber.org/protocol/disco#info");
-					Packet result = packet.okResult(query, 0);
-					addAccountFeatures(result, from.getBareJID().equals(to.getBareJID()));
-					results.offer(result);
 				} else {
 					super.process(packet, session, repo, results, settings);
 				}
