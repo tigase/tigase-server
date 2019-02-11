@@ -124,7 +124,7 @@ public class UpdatesChecker
 	}
 
 	public UpdatesChecker() {
-		super(Duration.ofSeconds(30), Duration.ofSeconds(30));
+		super(Duration.ofDays(7), Duration.ofDays(7));
 		String[] classCandidates = new String[] {
 				"tigase.dist.XmppServerDist",
 				XMPPServer.class.getCanonicalName()
