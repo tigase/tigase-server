@@ -23,6 +23,7 @@ import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.server.ComponentInfo;
 import tigase.server.MessageRouter;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
@@ -37,10 +38,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -114,7 +112,7 @@ public class UpdatesChecker
 			return br.lines()
 					.map(UpdatesChecker::getVersion)
 					.filter(Objects::nonNull)
-					.peek(System.out::println)
+//					.peek(System.out::println)
 					.filter(e -> e.compareTo(currentVersion) > 0)
 					.findFirst();
 
@@ -126,15 +124,35 @@ public class UpdatesChecker
 	}
 
 	public UpdatesChecker() {
-		super(Duration.ofDays(7), Duration.ofDays(7));
-		Version version;
-		try {
-			version = Version.of(XMPPServer.getImplementationVersion());
-		} catch (IllegalArgumentException e) {
-			log.log(Level.WARNING, "Problem obtaining current version information");
-			version = Version.ZERO;
-		}
-		serverVersion = version;
+		super(Duration.ofSeconds(30), Duration.ofSeconds(30));
+		String[] classCandidates = new String[] {
+				"tigase.dist.XmppServerDist",
+				XMPPServer.class.getCanonicalName()
+		};
+
+		final Optional<Version> ver = Arrays.stream(classCandidates)
+				.map(clz -> {
+					try {
+						return Class.forName(clz);
+					} catch (Exception e) {
+						log.log(Level.INFO, "Problem obtaining version for class: " + clz);
+					}
+					return null;
+				})
+				.filter(Objects::nonNull)
+				.map(clz -> {
+					Version version = null;
+					try {
+						version = Version.of(ComponentInfo.getImplementationVersion(clz));
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Problem obtaining current version information");
+						version = Version.ZERO;
+					}
+					return version;
+				})
+				.max(Version.VERSION_COMPARATOR);
+
+		serverVersion = ver.orElse(Version.ZERO);
 	}
 
 	@Override

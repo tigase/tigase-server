@@ -1223,7 +1223,7 @@ public class SchemaManager {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			log.log(Level.WARNING, "Error creating instance", e);
+			log.log(Level.WARNING, "Error creating instance of: " + clazz.getName(), e);
 		}
 		return null;
 	}
