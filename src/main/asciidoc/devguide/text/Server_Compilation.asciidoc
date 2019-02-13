@@ -18,6 +18,9 @@ Once Compiled, Tigase creates two separate distribution archives:
 They will be available as both zip and tarball.
 
 == Building Server and Generating Packages
+
+=== Server binary and it's documentation
+
 After cloning tigase-server repository:
 
 [source,bash]
@@ -26,8 +29,40 @@ git clone https://repository.tigase.org/git/tigase-server.git
 cd tigase-server
 -----
 
-You compile server with maven using project distribution profile (dist):
+You compile server with maven :
 
+[source,bash]
+-----
+mvn clean install
+-----
+
+This will:
+- Build Tigase XMPP tigase-server jar in tigase-server/target.
+
+If you wish to include compilation of the documentation use _distribution_ profile:
+
+[source,bash]
+-----
+mvn -Pdist clean install
+-----
+
+This will
+- compile server binaries.
+- generate javadoc and manual documentation `tigase-server/target/_docs` directory.
+
+=== Server distribution packages
+
+Distribution building is handled by separate project (https://tigase.tech/projects/tigase-server-distribution/[Tigase Server Distribution])
+
+In order to build distribution packages
+* clone tigase-server-distribution repository:
+[source,bash]
+----
+git clone https://git.tigase.tech/tigase-server-distribution
+tigase-server-distribution
+----
+
+and compile it using maven with _distribution_ profile:
 [source,bash]
 -----
 mvn -Pdist clean install
@@ -35,33 +70,9 @@ mvn -Pdist clean install
 
 This will:
 
-- compile server binaries.
-- generate javadoc documentation in distribution-docs/javadoc directory.
-- grab all latest versions of all declared dependencies and put them in jars/ directory.
-- create both types of distribution packages (-dist and -dist-max) and place them in distribution-packages/ directory.
-
-== Shortcut for building
-If you wish to just build Tigase XMPP server to just a minimum standard just to make sure the server will compile, you may use the following command:
-[source,bash]
------
-mvn clean install
------
-
-This will:
-
-- Build Tigase XMPP tigase-server jar in tigase-server/jars.
-
-This will not incorporate dependencies or javadoc.
-
-== Documentation
-If you wish to build documentation as well as the distribution packages, you will need to add the following profile to your build commands:
-[source,bash]
------
-mvn -Pdoc clean install
------
-
--Pdoc may be used in conjunction with -Pdist command, but will also build documentation in the archive as well as distribution-docs/ in epub, html, html-chunk and PDF formats.
-
+* compile all documentation sources (including dependencies) and place them in `tigase-server-distribution/target/_docs` directory
+* download all dependencies in defined versions and put them in `tigase-server-distribution/target/dist/jars/` directory.
+* create both types of distribution packages (-dist and -dist-max) and place them in `tigase-server-distribution/target/_dist/` directory.
 
 == Running Server
 Afterwards you can run the server with the regular shell script from within `server` module:
