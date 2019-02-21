@@ -1211,7 +1211,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						reconnectionFailed(port_props);
 					}
 				} else {
-
+					serv.forceStop();
 					// Ignore
 				}
 

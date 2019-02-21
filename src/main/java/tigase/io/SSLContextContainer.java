@@ -234,7 +234,7 @@ public class SSLContextContainer
 
 			holder = find(sslContexts, alias);
 
-			if (!validateDomainCertificate(holder, hostname)) {
+			if (!validateDomainCertificate(holder, alias)) {
 				holder = null;
 			}
 
@@ -244,7 +244,7 @@ public class SSLContextContainer
 					return holder.sslContext;
 				}
 
-				if (!validateDomainCertificate(holder, hostname)) {
+				if (!validateDomainCertificate(holder, alias)) {
 					holder = createContextHolder(protocol, hostname, alias, clientMode, tms);
 				}
 
@@ -268,9 +268,9 @@ public class SSLContextContainer
 		return trustStore;
 	}
 
-	private void invalidateContextHolder(SSLHolder holder, String hostname) throws Exception {
-		sslContexts.remove(hostname);
-		createCertificate(hostname);
+	private void invalidateContextHolder(SSLHolder holder, String alias) throws Exception {
+		sslContexts.remove(alias);
+		createCertificate(alias);
 	}
 
 	/**
@@ -317,14 +317,14 @@ public class SSLContextContainer
 		eventBus.unregisterAll(this);
 	}
 
-	private boolean validateDomainCertificate(final SSLHolder holder, final String hostname) throws Exception {
+	private boolean validateDomainCertificate(final SSLHolder holder, final String alias) throws Exception {
 		// for self-signed certificates only
 		if (holder != null && holder.domainCertificate != null &&
 				holder.domainCertificate.getIssuerDN().equals(holder.domainCertificate.getSubjectDN())) {
 			try {
 				holder.domainCertificate.checkValidity();
 			} catch (CertificateException e) {
-				invalidateContextHolder(holder, hostname);
+				invalidateContextHolder(holder, alias);
 				return false;
 			}
 		}
