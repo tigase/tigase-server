@@ -1,16 +1,16 @@
 /**
  * Tigase XMPP Server - The instant messaging server
  * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
@@ -492,14 +492,19 @@ public class BruteForceLockerBean
 
 		@Override
 		public void fillFromString(String[] encoded) {
-			final int lenIps = Integer.parseInt(encoded[0]);
-			final int lenJids = Integer.parseInt(encoded[1]);
+			try {
+				final int lenIps = Integer.parseInt(encoded[0]);
+				final int lenJids = Integer.parseInt(encoded[1]);
 
-			ips.clear();
-			ips.putAll(read(encoded, 2, lenIps, key -> key));
+				ips.clear();
+				ips.putAll(read(encoded, 2, lenIps, key -> key));
 
-			jids.clear();
-			jids.putAll(read(encoded, 4 + lenIps, lenJids, BareJID::bareJIDInstanceNS));
+				jids.clear();
+				jids.putAll(read(encoded, 2 + lenIps * 2, lenJids, BareJID::bareJIDInstanceNS));
+
+			} catch (Exception e) {
+				throw new RuntimeException("Cannot decode parcel: " + Arrays.toString(encoded), e);
+			}
 		}
 
 		private <T> HashMap<T, Integer> read(final String[] src, final int offset, final int len,
