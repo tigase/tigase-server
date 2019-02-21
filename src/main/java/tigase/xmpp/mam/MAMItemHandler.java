@@ -22,11 +22,9 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Message;
 import tigase.server.Priority;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 import tigase.xmpp.mam.modules.QueryModule;
-
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 /**
  * Basic implementation of handler processing items found in repository and converting into forward messages for
@@ -38,12 +36,8 @@ import java.util.TimeZone;
 public class MAMItemHandler
 		implements MAMRepository.ItemHandler {
 
-	private static final SimpleDateFormat TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX");
-
-	static {
-		TIMESTAMP_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
-	}
-
+	private static final TimestampHelper TIMESTAMP_FORMATTER = new TimestampHelper();
+	
 	@Inject
 	private PacketWriter packetWriter;
 
@@ -59,10 +53,7 @@ public class MAMItemHandler
 		Element forwarded = new Element("forwarded", new String[]{"xmlns"}, new String[]{"urn:xmpp:forward:0"});
 		result.addChild(forwarded);
 
-		String timestampStr;
-		synchronized (TIMESTAMP_FORMATTER) {
-			timestampStr = TIMESTAMP_FORMATTER.format(item.getTimestamp());
-		}
+		String timestampStr = TIMESTAMP_FORMATTER.formatWithMs(item.getTimestamp());
 
 		Element delay = new Element("delay", new String[]{"xmlns", "stamp"},
 									new String[]{"urn:xmpp:delay", timestampStr});
