@@ -62,7 +62,7 @@ public class UpdatesChecker
 	public static final String PRODUCTS_REQUEST_KEY = "products";
 
 	private static final Logger log = Logger.getLogger(UpdatesChecker.class.getName());
-	private static final String VERSION_URL = "http://update.tigase.net/check/";
+	static final String VERSION_URL = "http://update.tigase.net/check/";
 
 	private final Version serverVersion;
 
@@ -92,6 +92,8 @@ public class UpdatesChecker
 		Objects.nonNull(currentVersion);
 		Objects.nonNull(url);
 
+		log.log(Level.FINEST, "Retrieving latest version information for localVersion: {0}, products: {1}",
+				new String[]{String.valueOf(currentVersion), String.valueOf(products)});
 		try {
 			final URL u = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) u.openConnection();

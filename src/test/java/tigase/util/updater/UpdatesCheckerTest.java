@@ -19,6 +19,7 @@ package tigase.util.updater;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import tigase.server.XMPPServer;
 import tigase.util.Version;
 
 import java.util.Arrays;
@@ -46,8 +47,9 @@ public class UpdatesCheckerTest {
 
 		String url = "http://atlantiscity.local:8080/rest/update/check/";
 
-		final Optional<Version> version = UpdatesChecker.retrieveCurrentVersionFromServer(Version.of("8.0.0"), products,
-																						  url, 10);
+		final Version localVersion = XMPPServer.getVersion();
+		final Optional<Version> version = UpdatesChecker.retrieveCurrentVersionFromServer(localVersion, products,
+																						  UpdatesChecker.VERSION_URL, 10);
 		System.out.println(version);
 
 	}
