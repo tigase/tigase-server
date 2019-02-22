@@ -35,6 +35,7 @@ import tigase.xml.XMLUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -59,6 +60,8 @@ public final class XMPPServer {
 	 * tigase.conf.Configurator.
 	 */
 	private static final String DEF_CONFIGURATOR = "tigase.conf.Configurator";
+	private final static String[] serverVersionCandidates = new String[]{"tigase.dist.XmppServerDist",
+																		 XMPPServer.class.getCanonicalName()};
 	private static Bootstrap bootstrap;
 	private static boolean inOSGi = false;
 	private static String serverName = "message-router";
@@ -103,12 +106,12 @@ public final class XMPPServer {
 	}
 
 	public static String getImplementationVersion() {
-		String version = ComponentInfo.getImplementationVersion(XMPPServer.class);
-		return (version.isEmpty() ? "0.0.0-0" : version);
+		Optional<Version> version = ComponentInfo.getImplementationVersion(serverVersionCandidates);
+		return (version.isPresent() ? version.get().toString() : "0.0.0-0");
 	}
 
 	public static Version getVersion() {
-		return Version.of(getImplementationVersion());
+		return ComponentInfo.getImplementationVersion(serverVersionCandidates).orElse(Version.ZERO);
 	}
 
 	/**
@@ -135,6 +138,7 @@ public final class XMPPServer {
 		System.out.println((new ComponentInfo(XMLUtils.class)).toString());
 		System.out.println((new ComponentInfo(ClassUtil.class)).toString());
 		System.out.println((new ComponentInfo(XMPPServer.class)).toString());
+		ComponentInfo.of("tigase.dist.XmppServerDist").ifPresent(System.out::println);
 		start(args);
 	}
 
@@ -189,7 +193,8 @@ public final class XMPPServer {
 				System.out.println("== " + sdf.format(new Date()) +
 										   " Server finished starting up and (if there wasn't any error) is ready to use\n");
 			}
-			EventBusFactory.getInstance().fire(new StartupFinishedEvent(DNSResolverFactory.getInstance().getDefaultHost()));
+			EventBusFactory.getInstance()
+					.fire(new StartupFinishedEvent(DNSResolverFactory.getInstance().getDefaultHost()));
 		} catch (ConfigReader.UnsupportedOperationException e) {
 			TigaseRuntime.getTigaseRuntime()
 					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",

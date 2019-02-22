@@ -18,9 +18,15 @@
 package tigase.server;
 
 import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.util.Version;
 import tigase.xml.Element;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Helper class for storing and handling additional informations about components
@@ -29,6 +35,7 @@ import java.util.HashMap;
  */
 public class ComponentInfo {
 
+	private static final Logger log = Logger.getLogger(ComponentInfo.class.getName());
 	private String cls;
 	private HashMap<String, Object> cmpData;
 	private String name = null;
@@ -72,6 +79,26 @@ public class ComponentInfo {
 		return title == null ? "" : title;
 	}
 
+	public static Optional<Version> getImplementationVersion(String... classes) {
+		return Arrays.stream(classes).map(clz -> {
+			try {
+				return Class.forName(clz);
+			} catch (Exception e) {
+				log.log(Level.INFO, "Problem obtaining version for class: " + clz);
+			}
+			return null;
+		}).filter(Objects::nonNull).map(clz -> {
+			Version version = null;
+			try {
+				version = Version.of(ComponentInfo.getImplementationVersion(clz));
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Problem obtaining current version information");
+				version = Version.ZERO;
+			}
+			return version;
+		}).max(Version.VERSION_COMPARATOR);
+	}
+
 	/**
 	 * Allows retrieving implementation version (obtained from jar package) for a given class
 	 *
@@ -96,6 +123,17 @@ public class ComponentInfo {
 		}
 
 		return (version == null) ? "" : version;
+	}
+
+	public static Optional<ComponentInfo> of(String className) {
+		ComponentInfo componentInfo = null;
+		try {
+			final Class<?> clazz = Class.forName(className);
+			componentInfo = new ComponentInfo(clazz);
+		} catch (Exception e) {
+			// if absent don't print anything
+		}
+		return Optional.ofNullable(componentInfo);
 	}
 
 	/**
