@@ -1,0 +1,99 @@
+[[features]]
+= XMPP Supported Extensions
+:author: Wojciech Kapcia
+:date: 2019-02-22
+
+Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Suites 2018]
+
+== Core Compliance Suite
+
+.Core Compliance Suite
+|===
+| Support | Specification | Name | Comment
+| ✓ | RFC6120 | Extensible Messaging and Presence Protocol (XMPP): Core |
+| ⍻ | RFC7622 | Extensible Messaging and Presence Protocol (XMPP): Address Format | We support previous version of the specification: RFC6122
+| ✓ | RFC 7590 | Use of Transport Layer Security (TLS) in the Extensible Messaging and Presence Protocol (XMPP) |
+| ✓ | XEP-0368 | SRV records for XMPP over TLS | Requires adding DNS entries pointing to port 5223
+| ✓ | XEP-0030 | Service Discovery |
+| ✓ | XEP-0115 | Entity Capabilities |
+| ✓ | XEP-0114 | Jabber Component Protocol |
+| ✓ | XEP-0163 | Personal Eventing Protocol |
+|===
+
+== Web Compliance Suite
+
+.Web Compliance Suite
+|===
+| Support | Specification | Name | Comment
+| ✓ | RFC7395 | An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket |
+| ✓ | XEP-0206 | XMPP Over BOSH |
+| ✓ | XEP-0124 | Bidirectional-streams Over Synchronous HTTP (BOSH) |
+|===
+
+== IM Compliance Suite
+
+.Web Compliance Suite
+|===
+| Support | Specification | Name | Comment
+| ✓ | RFC6120 | Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and Presence |
+| ✓ | XEP-0084 | User Avatar |
+| ✓ | XEP-0153 | vCard-Based Avatars |
+| ✓ | XEP-0054 | vcard-temp |
+| ✓ | XEP-0280 | Message Carbons |
+| ✓ | XEP-0191 | Blocking Command |
+| ✓ | XEP-0045 | Multi-User Chat |
+| ✓ | XEP-0249 | Direct MUC Invitations |
+| ✓ | XEP-0048 | Bookmarks |
+| ✓ | XEP-0223 | Persistent Storage of Private Data via PubSub |
+| ✓ | XEP-0049 | Private XML Storage |
+| ✓ | XEP-0198 | Stream Management | Both `Session Resumption` and `Stanza Acknowledgements`
+| ✓ | XEP-0313 | Message Archive Management |
+|===
+
+== Mobile Compliance Suite
+
+.Web Compliance Suite
+|===
+| Support | Specification | Name | Comment
+| ✓ | RFC7395 | An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket |
+| ✓ | XEP-0198 | Stream Management | Both `Session Resumption` and `Stanza Acknowledgements`
+| ✓ | XEP-0352 | Client State Indication |
+| ✓ | XEP-0357 | Push Notifications |
+|===
+
+== Non-Compliance Suite Extensions
+
+.Core Compliance Suite
+|===
+| Support | Specification | Name | Comment
+| ✓ | XEP-0004 | Data Forms |
+| ✓ | XEP-0012 | Last Activity |
+| ✓ | XEP-0013 | Flexible Offline Message Retrieval |
+| ✓ | XEP-0016 | Privacy Lists |
+| ✓ | XEP-0047 | In-Band Bytestreams |
+| ✓ | XEP-0050 | Ad-Hoc Commands |
+| ✓ | XEP-0059 | Result Set Management |
+| ✓ | XEP-0060 | Publish-Subscribe |
+| ✓ | XEP-0065 | SOCKS5 Bytestreams |
+| ✓ | XEP-0077 | In-Band Registration |
+| ✓ | XEP-0078 | Non-SASL Authentication |
+| ✓ | XEP-0079 | Advanced Message Processing |
+| ✓ | XEP-0092 | Software Version |
+| ✓ | XEP-0107 | User Mood | Server support via `Personal Eventing Protocol (XEP-0163)`
+| ✓ | XEP-0108 | User Activity | Server support via `Personal Eventing Protocol (XEP-0163)`
+| ✓ | XEP-0118 | User Tune | Server support via `Personal Eventing Protocol (XEP-0163)`
+| ✓ | XEP-0133 | Service Administration |
+| ✓ | XEP-0136 | Message Archiving |
+| ✓ | XEP-0142 | Workgroup Queues |
+| ✓ | XEP-0160 | Best Practices for Handling Offline Messages |
+| ✓ | XEP-0199 | XMPP Ping |
+| ✓ | XEP-0202 | Entity Time |
+| ✓ | XEP-0203 | Delayed Delivery |
+| ✓ | XEP-0215 | External Service Discovery |
+| ✓ | XEP-0220 | Server Dialback |
+| ✓ | XEP-0225 | Component Connections |
+| ✓ | XEP-0292 | vCard4 Over XMPP |
+| ✓ | XEP-0305 | XMPP Quickstart |
+| ✓ | XEP-0363 | HTTP File Upload |
+| ✓ | XEP-0387 | XMPP Compliance Suites 2018 |
+|===
