@@ -474,7 +474,7 @@ public class DBSchemaLoader
 			return Result.warning;
 		}
 
-		String dbUri = getDBUri(true, true);
+		String dbUri = getDBUri();
 		log.log(Level.INFO, "Adding XMPP Admin Account, URI: " + dbUri);
 
 		try {
@@ -510,7 +510,7 @@ public class DBSchemaLoader
 			return Result.error;
 		}
 
-		String db_conn = getDBUri(true, true);
+		String db_conn = getDBUri();
 		log.log(Level.INFO, "Setting version of the component: {0} to: {1} for connection: {2}",
 				new Object[]{component, version, db_conn});
 
@@ -635,7 +635,7 @@ public class DBSchemaLoader
 	                                   Version requiredVersion) {
 		Result result;
 		try {
-			String dbUri = getDBUri(true, true);
+			String dbUri = getDBUri();
 			log.log(Level.CONFIG, "Loading schema {0}, version: {1} into repo: {2}",
 			        new Object[]{schema.getId(), requiredVersion, dbUri});
 			DataRepository dataSource = new DataRepositoryImpl();
@@ -773,7 +773,7 @@ public class DBSchemaLoader
 			return Result.error;
 		}
 
-		String db_conn = getDBUri(true, true);
+		String db_conn = getDBUri();
 		log.log(Level.INFO, String.format("Loading schema from file(s): %1$s, URI: %2$s", fileName, db_conn));
 
 		return withStatement(db_conn, stmt -> {
@@ -971,7 +971,7 @@ public class DBSchemaLoader
 			return Result.error;
 		}
 
-		String db_conn = getDBUri(false, false);
+		String db_conn = getDBUri();
 		log.log(Level.INFO, "Executing Simple Query, URI: " + db_conn);
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
@@ -1211,6 +1211,7 @@ public class DBSchemaLoader
 				if (params.getServerTimezone() != null) {
 					db_uri += "&serverTimezone=" + params.getServerTimezone();
 				}
+				db_uri += "&allowPublicKeyRetrieval=true";
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown database type: " + database);

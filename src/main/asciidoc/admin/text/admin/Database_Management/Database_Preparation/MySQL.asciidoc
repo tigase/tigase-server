@@ -49,15 +49,6 @@ mysql> GRANT ALL ON tigasedb.* TO tigase_user
             IDENTIFIED BY 'tigase_passwd';
 -----
 
-For the Tigase server version 4.x additional permissions must be granted for the database user:
-
-[source,sql]
------
-mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user'@'localhost';
-mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user'@'%';
-mysql> GRANT SELECT, INSERT, UPDATE ON mysql.proc TO 'tigase_user';
------
-
 And now you can update user permission changes in the database:
 
 [source,sql]
@@ -65,6 +56,14 @@ And now you can update user permission changes in the database:
 mysql> FLUSH PRIVILEGES;
 -----
 
+[IMPORTANT]
+--
+It's essential to enable https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#sysvar_log_bin_trust_function_creators[log_bin_trust_function_creators] option in MySQL server, for example by running:
+[source,sql]
+----
+mysql> SET GLOBAL log_bin_trust_function_creators = 1;
+----
+--
 === Installing Schemas
 
 Starting with v8.0.0 the Schemas are no longer linked, and will need to manually be installed in the following order.

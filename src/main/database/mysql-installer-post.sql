@@ -16,8 +16,3 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
--- QUERY START: change procedure owners to mysql plain user (non-root)
-
-UPDATE mysql.proc p SET DEFINER = '${dbUser}@%' WHERE db = DATABASE();
-
--- QUERY END: change procedure owners to mysql plain user (non-root)

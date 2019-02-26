@@ -17,50 +17,34 @@
 --
 
 -- QUERY START: create database
-
-create database ${dbName};
-
+create database IF NOT EXISTS ${dbName};
 -- QUERY END: create database
 
 -- QUERY START: add user
-
-GRANT ALL ON ${dbName}.* TO ${dbUser}@'%' IDENTIFIED BY '${dbPass}';
-
+CREATE USER IF NOT EXISTS '${dbUser}'@'%' IDENTIFIED BY '${dbPass}';
 -- QUERY END: add user
 
 -- QUERY START: add user
-
-GRANT ALL ON ${dbName}.* TO ${dbUser}@'localhost' IDENTIFIED BY '${dbPass}';
-
+CREATE USER IF NOT EXISTS '${dbUser}'@'localhost' IDENTIFIED BY '${dbPass}';
 -- QUERY END: add user
 
 -- QUERY START: add user
-
-GRANT ALL ON ${dbName}.* TO ${dbUser} IDENTIFIED BY '${dbPass}';
-
+CREATE USER IF NOT EXISTS '${dbUser}' IDENTIFIED BY '${dbPass}';
 -- QUERY END: user
 
--- QUERY START: update user privileges
+-- QUERY START: add user
+GRANT ALL ON ${dbName}.* TO '${dbUser}'@'%';
+-- QUERY END: add user
 
-GRANT SELECT, INSERT, UPDATE ON mysql.proc TO ${dbUser}@'localhost';
+-- QUERY START: add user
+GRANT ALL ON ${dbName}.* TO '${dbUser}'@'localhost';
+-- QUERY END: add user
 
--- QUERY END: update user privileges
-
--- QUERY START: update user privileges
-
-GRANT SELECT, INSERT, UPDATE ON mysql.proc TO ${dbUser}@'%';
-
--- QUERY END: update user privileges
-
--- QUERY START: update user privileges
-
-GRANT SELECT, INSERT, UPDATE ON mysql.proc TO ${dbUser};
-
--- QUERY END: update user privileges
+-- QUERY START: add user
+GRANT ALL ON ${dbName}.* TO '${dbUser}';
+-- QUERY END: user
 
 -- QUERY START: flush privileges
-
 FLUSH PRIVILEGES;
-
 -- QUERY END: flush privileges
 
