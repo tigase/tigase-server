@@ -573,14 +573,17 @@ public class BruteForceLockerBean
 	public static class Value
 			implements TypesConverter.Parcelable {
 
-		private final String domain;
-		private final String ip;
-		private final BareJID jid;
 		private int badLoginCounter;
+		private String domain;
 		/** Invalidate this value at specific time */
 		private long invalidateAtTime;
+		private String ip;
+		private BareJID jid;
 
-		Value(String domain, String ip, BareJID jid) {
+		public Value() {
+		}
+
+		public Value(String domain, String ip, BareJID jid) {
 			this.domain = domain;
 			this.ip = ip;
 			this.jid = jid;

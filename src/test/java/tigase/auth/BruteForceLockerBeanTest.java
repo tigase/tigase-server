@@ -20,12 +20,41 @@ package tigase.auth;
 import org.junit.Assert;
 import org.junit.Test;
 import tigase.eventbus.impl.EventBusSerializer;
+import tigase.kernel.DefaultTypesConverter;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.HashMap;
 
 public class BruteForceLockerBeanTest {
+
+	@Test
+	public void testKeyValueSerialization() {
+		final BruteForceLockerBean.Key k1 = new BruteForceLockerBean.Key("1.2.3.4", "a@b.c", "c.d");
+		final BruteForceLockerBean.Value v1 = new BruteForceLockerBean.Value("c.d", "1.2.3.4",
+																			 BareJID.bareJIDInstanceNS("a@b.c"));
+		v1.setBadLoginCounter(412);
+		v1.setInvalidateAtTime(8352);
+
+		DefaultTypesConverter converter = new DefaultTypesConverter();
+
+		String k1s = converter.toString(k1);
+		String v1s = converter.toString(v1);
+
+		final BruteForceLockerBean.Key k2 = converter.convert(k1s, k1.getClass());
+		final BruteForceLockerBean.Value v2 = converter.convert(v1s, v1.getClass());
+
+		Assert.assertEquals("1.2.3.4", k2.getIp());
+		Assert.assertEquals("a@b.c", k2.getJid());
+		Assert.assertEquals(k1, k2);
+
+		Assert.assertEquals(412, v2.getBadLoginCounter());
+		Assert.assertEquals(v1.getBadLoginCounter(), v2.getBadLoginCounter());
+
+		Assert.assertEquals(8352, v2.getInvalidateAtTime());
+		Assert.assertEquals(v1.getInvalidateAtTime(), v2.getInvalidateAtTime());
+
+	}
 
 	@Test
 	public void testStatsSerializer() {
