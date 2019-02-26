@@ -1,0 +1,104 @@
+[[features]]
+= XMPP Supported Extensions
+:author: Wojciech Kapcia
+:date: 2019-02-22
+
+Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Suites 2018]
+
+== Core Compliance Suite
+
+.Core Compliance Suite
+[cols="^1,^2,5a,3a"]
+|===
+| Support | Specification | Name | Comment
+| ✓ | https://tools.ietf.org/html/rfc6120[RFC6120] | Extensible Messaging and Presence Protocol (XMPP): Core |
+| ⍻ | https://tools.ietf.org/html/rfc7622[RFC7622] | Extensible Messaging and Presence Protocol (XMPP): Address Format | We support previous version of the specification: RFC6122
+| ✓ | https://tools.ietf.org/html/rfc7590[RFC7590] | Use of Transport Layer Security (TLS) in the Extensible Messaging and Presence Protocol (XMPP) |
+| ✓ | https://xmpp.org/extensions/xep-0368.html[XEP-0368] | SRV records for XMPP over TLS | Requires adding DNS entries pointing to port 5223
+| ✓ | https://xmpp.org/extensions/xep-0030.html[XEP-0030] | Service Discovery |
+| ✓ | https://xmpp.org/extensions/xep-0115.html[XEP-0115] | Entity Capabilities |
+| ✓ | https://xmpp.org/extensions/xep-0114.html[XEP-0114] | Jabber Component Protocol |
+| ✓ | https://xmpp.org/extensions/xep-0163.html[XEP-0163] | Personal Eventing Protocol |
+|===
+
+== Web Compliance Suite
+
+.Web Compliance Suite
+[cols="^1,^2,5a,3a"]
+|===
+| Support | Specification | Name | Comment
+| ✓ | https://tools.ietf.org/html/rfc7395[RFC7395] | An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket |
+| ✓ | https://xmpp.org/extensions/xep-0206.html[XEP-0206] | XMPP Over BOSH |
+| ✓ | https://xmpp.org/extensions/xep-0124.html[XEP-0124] | Bidirectional-streams Over Synchronous HTTP (BOSH) |
+|===
+
+== IM Compliance Suite
+
+.Web Compliance Suite
+[cols="^1,^2,5a,3a"]
+|===
+| Support | Specification | Name | Comment
+| ✓ | https://tools.ietf.org/html/rfc6120[RFC6120] | Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and Presence |
+| ✓ | https://xmpp.org/extensions/xep-0084.html[XEP-0084] | User Avatar |
+| ✓ | https://xmpp.org/extensions/xep-0153.html[XEP-0153] | vCard-Based Avatars |
+| ✓ | https://xmpp.org/extensions/xep-0054.html[XEP-0054] | vcard-temp |
+| ✓ | https://xmpp.org/extensions/xep-0280.html[XEP-0280] | Message Carbons |
+| ✓ | https://xmpp.org/extensions/xep-0191.html[XEP-0191] | Blocking Command |
+| ✓ | https://xmpp.org/extensions/xep-0045.html[XEP-0045] | Multi-User Chat |
+| ✓ | https://xmpp.org/extensions/xep-0249.html[XEP-0249] | Direct MUC Invitations |
+| ✓ | https://xmpp.org/extensions/xep-0048.html[XEP-0048] | Bookmarks |
+| ✓ | https://xmpp.org/extensions/xep-0223.html[XEP-0223] | Persistent Storage of Private Data via PubSub |
+| ✓ | https://xmpp.org/extensions/xep-0049.html[XEP-0049] | Private XML Storage |
+| ✓ | https://xmpp.org/extensions/xep-0198.html[XEP-0198] | Stream Management | Both `Session Resumption` and `Stanza Acknowledgements`
+| ✓ | https://xmpp.org/extensions/xep-0313.html[XEP-0313] | Message Archive Management |
+|===
+
+== Mobile Compliance Suite
+
+.Web Compliance Suite
+[cols="^1,^2,5a,3a"]
+|===
+| Support | Specification | Name | Comment
+| ✓ | https://tools.ietf.org/html/rfc7395[RFC7395] | An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket |
+| ✓ | https://xmpp.org/extensions/xep-0198.html[XEP-0198] | Stream Management | Both `Session Resumption` and `Stanza Acknowledgements`
+| ✓ | https://xmpp.org/extensions/xep-0352.html[XEP-0352] | Client State Indication |
+| ✓ | https://xmpp.org/extensions/xep-0357.html[XEP-0357] | Push Notifications |
+|===
+
+== Non-Compliance Suite Extensions
+
+.Core Compliance Suite
+[cols="^1,^2,5a,3a"]
+|===
+| Support | Specification | Name | Comment
+| ✓ | https://xmpp.org/extensions/xep-0004.html[XEP-0004] | Data Forms |
+| ✓ | https://xmpp.org/extensions/xep-0012.html[XEP-0012] | Last Activity |
+| ✓ | https://xmpp.org/extensions/xep-0013.html[XEP-0013] | Flexible Offline Message Retrieval |
+| ✓ | https://xmpp.org/extensions/xep-0016.html[XEP-0016] | Privacy Lists |
+| ✓ | https://xmpp.org/extensions/xep-0047.html[XEP-0047] | In-Band Bytestreams |
+| ✓ | https://xmpp.org/extensions/xep-0050.html[XEP-0050] | Ad-Hoc Commands |
+| ✓ | https://xmpp.org/extensions/xep-0059.html[XEP-0059] | Result Set Management |
+| ✓ | https://xmpp.org/extensions/xep-0060.html[XEP-0060] | Publish-Subscribe |
+| ✓ | https://xmpp.org/extensions/xep-0065.html[XEP-0065] | SOCKS5 Bytestreams |
+| ✓ | https://xmpp.org/extensions/xep-0077.html[XEP-0077] | In-Band Registration |
+| ✓ | https://xmpp.org/extensions/xep-0078.html[XEP-0078] | Non-SASL Authentication |
+| ✓ | https://xmpp.org/extensions/xep-0079.html[XEP-0079] | Advanced Message Processing |
+| ✓ | https://xmpp.org/extensions/xep-0092.html[XEP-0092] | Software Version |
+| ✓ | https://xmpp.org/extensions/xep-0107.html[XEP-0107] | User Mood | Server support via `Personal Eventing Protocol (XEP-0163)`
+| ✓ | https://xmpp.org/extensions/xep-0108.html[XEP-0108] | User Activity | Server support via `Personal Eventing Protocol (XEP-0163)`
+| ✓ | https://xmpp.org/extensions/xep-0118.html[XEP-0118] | User Tune | Server support via `Personal Eventing Protocol (XEP-0163)`
+| ✓ | https://xmpp.org/extensions/xep-0133.html[XEP-0133] | Service Administration |
+| ✓ | https://xmpp.org/extensions/xep-0136.html[XEP-0136] | Message Archiving |
+| ✓ | https://xmpp.org/extensions/xep-0142.html[XEP-0142] | Workgroup Queues |
+| ✓ | https://xmpp.org/extensions/xep-0160.html[XEP-0160] | Best Practices for Handling Offline Messages |
+| ✓ | https://xmpp.org/extensions/xep-0199.html[XEP-0199] | XMPP Ping |
+| ✓ | https://xmpp.org/extensions/xep-0202.html[XEP-0202] | Entity Time |
+| ✓ | https://xmpp.org/extensions/xep-0203.html[XEP-0203] | Delayed Delivery |
+| ✓ | https://xmpp.org/extensions/xep-0215.html[XEP-0215] | External Service Discovery |
+| ✓ | https://xmpp.org/extensions/xep-0220.html[XEP-0220] | Server Dialback |
+| ✓ | https://xmpp.org/extensions/xep-0225.html[XEP-0225] | Component Connections |
+| ✓ | https://xmpp.org/extensions/xep-0292.html[XEP-0292] | vCard4 Over XMPP |
+| ✓ | https://xmpp.org/extensions/xep-0305.html[XEP-0305] | XMPP Quickstart |
+| ✓ | https://xmpp.org/extensions/xep-0363.html[XEP-0363] | HTTP File Upload |
+| ✓ | https://xmpp.org/extensions/xep-0387.html[XEP-0387] | XMPP Compliance Suites 2018 |
+|===
