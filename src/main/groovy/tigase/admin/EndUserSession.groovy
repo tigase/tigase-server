@@ -33,8 +33,10 @@ import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.StanzaType
 import tigase.xmpp.XMPPResourceConnection
 import tigase.xmpp.jid.JID
+import tigase.xml.Element
 
 def JIDS = "accountjids"
+def REASON = "reason";
 
 def p = (Packet) packet
 //def auth_repo =/**/ (AuthRepository)authRepository
@@ -51,6 +53,7 @@ boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf(notifyClust
 def user_sessions = (Map) userSessions;
 
 def userJids = Command.getFieldValues(packet, JIDS)
+def reason = Command.getFieldValue(packet, REASON)
 
 if (userJids == null) {
 	def result = p.commandResult(Command.DataType.form);
@@ -63,6 +66,7 @@ if (userJids == null) {
 						  "hidden")
 	Command.addFieldValue(result, JIDS, userJids ?: "", "jid-multi",
 						  "The Jabber ID(s) for which end session")
+	Command.addFieldValue(result, REASON, reason ?: "", "text-single", "Reason to display to the user");
 	if (clusterMode) {
 		Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
 	}
@@ -107,6 +111,15 @@ for (userJid in userJids) {
 							(userFullJID.getResource() == res.getResource())) {
 						def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
 																   StanzaType.set, res.nextStanzaId());
+						if (reason != null && !reason.isEmpty()) {
+							Element commandEl = commandClose.getElemChild("command", Command.XMLNS);
+							Element el = new Element("undefined-condition");
+							el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+							commandEl.addChild(el);
+							el = new Element("text", reason);
+							el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+							commandEl.addChild(el);
+						}
 						results.offer(commandClose);
 						msgs.add("Operation successful for user " + res.getjid());
 					}

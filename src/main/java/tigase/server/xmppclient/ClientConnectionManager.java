@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 
 /**
@@ -926,7 +927,7 @@ public class ClientConnectionManager
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, streamError);
 		}
-		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
+		return "<stream:error>" + err_el.stream().map(Element::toString).collect(Collectors.joining()) + "</stream:error>";
 	}
 
 	protected String[] prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {

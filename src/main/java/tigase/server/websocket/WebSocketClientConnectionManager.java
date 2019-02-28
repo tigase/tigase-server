@@ -31,6 +31,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Class implements basic support allowing clients to connect using WebSocket protocol
@@ -96,7 +97,8 @@ public class WebSocketClientConnectionManager
 			proc.streamError(serv, streamError);
 		}
 
-		return "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + err_el.get(0).toString() +
+		return "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + err_el.stream().map(Element::toString).collect(
+				Collectors.joining()) +
 				"</stream:error>";
 	}
 
