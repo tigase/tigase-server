@@ -48,6 +48,10 @@ public class TigaseSaslServerFactory
 				return new SaslSCRAMSha256(props, callbackHandler);
 			case SaslSCRAMSha256Plus.NAME:
 				return new SaslSCRAMSha256Plus(props, callbackHandler);
+			case SaslSCRAMSha512.NAME:
+				return new SaslSCRAMSha512(props, callbackHandler);
+			case SaslSCRAMSha512Plus.NAME:
+				return new SaslSCRAMSha512Plus(props, callbackHandler);
 			case SaslPLAIN.NAME:
 				return new SaslPLAIN(props, callbackHandler);
 			case SaslANONYMOUS.NAME:
@@ -64,7 +68,7 @@ public class TigaseSaslServerFactory
 		return new String[]{
 //				SaslSCRAMSha256Plus.NAME,
 //				SaslSCRAMPlus.NAME,
-SaslSCRAMSha256.NAME, SaslSCRAM.NAME, "PLAIN", "EXTERNAL", "ANONYMOUS",};
+SaslSCRAMSha512.NAME, SaslSCRAMSha256.NAME, SaslSCRAM.NAME, "PLAIN", "EXTERNAL", "ANONYMOUS",};
 	}
 
 }
