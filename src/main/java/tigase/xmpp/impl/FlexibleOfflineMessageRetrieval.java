@@ -72,7 +72,6 @@ public class FlexibleOfflineMessageRetrieval
 	private static final String form_type = "FORM_TYPE";
 	private static final String NUMBER_OF_ = "number_of_";
 	private final MsgRepository.OfflineMessagesProcessor offlineMessagesStamper = new MsgStamper();
-	private final OfflineMessages offlineProcessor = new OfflineMessages();
 	@Inject
 	private MsgRepositoryIfc msg_repo = null;
 

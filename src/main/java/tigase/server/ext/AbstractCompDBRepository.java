@@ -45,7 +45,7 @@ public class AbstractCompDBRepository
 
 	private static final Logger log = Logger.getLogger(AbstractCompDBRepository.class.getCanonicalName());
 
-	@Inject
+	@Inject(bean = "service")
 	private AbstractMessageReceiver component;
 
 	@ConfigField(desc = "ID of the external components group", alias = "external-components-group")
