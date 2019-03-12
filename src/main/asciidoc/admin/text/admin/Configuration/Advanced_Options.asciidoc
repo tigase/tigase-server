@@ -133,3 +133,15 @@ The following behavior is followed when they are both activated:
 - Upon sending a subscription request - Both contacts will each others' subscription and be added to each others' roster. Presence information will immediately be exchanged between both parties.
 - Upon sending presence with type either unsubscribe or unsubscribed follows the rules defined in RFC regarding processing of these stanzas (i.e. adjusting subscription type of user/contact), but without forwarding those stanzas to the receiving entity to avoid any notifications to the client. However, a roster push is generated to reflect changes to presence in user roster in a seamless manner.
 - Simply adding an item to the roster (i.e. with <iq/> stanza with correct semantics) will also cause an automatic subscription between the user and the contact in a matter explained above.
+
+=== Abuse Contacts
+Tigase has support for link:https://xmpp.org/extensions/xep-0128.html[XEP-0128: Service Discovery Extensions] for providing additional information to the server and component discovery information. One of the important usages for this feature is link:https://xmpp.org/extensions/xep-0157.html[XEP-0157: Contact Addresses for XMPP Services] which describes usage of this feature for providing contact information to server administrators or abuse response team.
+
+To set abuse contact details you should set `disco-extensions` in property in `etc/config.tdsl` file with subproperty `abuse-addresses` set to your abuse address URI (for email you need to prefix it with `mailto:` and for XMPP address you need to prefix it with `xmpp`):
+
+[source,dsl]
+-----
+'disco-extensions' = {
+    'abuse-addresses' = [ 'mailto:abuse@localhost', 'xmpp:abuse@localhost' ]
+}
+-----
