@@ -160,6 +160,10 @@ public class DiscoveryModule
 		for (String f : getAvailableFeatures()) {
 			resultQuery.addChild(new Element("feature", new String[]{"var"}, new String[]{f}));
 		}
+		Element form = component.getDiscoExtensionsForm();
+		if (form != null) {
+			resultQuery.addChild(form);
+		}
 		return resultIq;
 	}
 

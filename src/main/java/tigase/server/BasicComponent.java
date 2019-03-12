@@ -43,6 +43,7 @@ import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -116,6 +117,9 @@ public class BasicComponent
 	private List<ComponentStatisticsProvider> statisticsProviders;
 	@ConfigField(alias = "trusted", desc = "List of trusted JIDs")
 	private String[] trustedProp = null;
+
+	@ConfigField(desc = "Service Discovery Extensions", alias = "disco-extensions")
+	private Map<String,ArrayList<String>> discoExtensions = new HashMap<>();
 
 	public BasicComponent() {
 		DependencyChecker.checkDependencies(getClass());
@@ -552,9 +556,32 @@ public class BasicComponent
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
-			return serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
+			Element queryEl = serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
+			if (queryEl != null) {
+				Element form = getDiscoExtensionsForm();
+				if (form != null) {
+					queryEl.addChild(form);
+				}
+			}
+			return queryEl;
 		}
 
+		return null;
+	}
+
+	public Element getDiscoExtensionsForm() {
+		if (!discoExtensions.isEmpty()) {
+			Element form = DataForm.createDataForm(Command.DataType.result);
+			form.addChild(new Element("field", new String[]{"var", "type"}, new String[]{"FORM_TYPE", "hidden"})
+								  .withElement("value", null, "http://jabber.org/network/serverinfo"));
+
+			for(Map.Entry<String, ArrayList<String>> item : discoExtensions.entrySet()) {
+				Element child = new Element("field", new String[] {"var"}, new String[] {item.getKey()});
+				item.getValue().forEach(value -> child.withElement("value", null, XMLUtils.escape(value)));
+				form.addChild(child);
+			}
+			return form;
+		}
 		return null;
 	}
 
