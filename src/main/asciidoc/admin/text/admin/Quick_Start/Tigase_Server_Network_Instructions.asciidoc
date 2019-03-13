@@ -109,7 +109,7 @@ Once your server is setup, you may need to open at least two ports. By default X
 * `5222` (default XMPP socket port)
 * `5223` (legacy XMPP socket port)
 * `5269` (default s2s port, i.e.: federation support)
-* `5277` (component protocol port, e.g.: for external components)
+* `5277` (cluster connection)
 * `5280` (default BOSH port)
 * `5290` (default WebSocket port)
 * `8080` (HTTP API component port)
