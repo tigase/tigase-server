@@ -46,6 +46,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -202,6 +203,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@ConfigField(desc = "Action taken if XMPP limit is exceeded")
 	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
 	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
+
+	@ConfigField(desc = "Service connection timeout", alias = "service-connected-timeout")
+	protected int serviceConnectedTimeout = 60;
+
+	protected boolean enableServiceConnectedTimeout(IO service) {
+		return service != null && service.connectionType() == ConnectionType.accept;
+	}
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
@@ -409,6 +417,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		super.release();
 	}
 
+	protected void serviceConnected(IO service) {
+		ServiceConnectedTimer.cancel(service);
+	}
+
 	@TODO(note = "Do something if service with the same unique ID is already started, " +
 			"possibly kill the old one...")
 	public void serviceStarted(final IO service) {
@@ -439,6 +451,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		services.put(id, service);
 		++services_size;
 
+		if (enableServiceConnectedTimeout(service)) {
+			ServiceConnectedTimer startTimer = new ServiceConnectedTimer(service);
+			addTimerTask(startTimer, serviceConnectedTimeout, TimeUnit.SECONDS);
+		}
 		// }
 	}
 
@@ -452,6 +468,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		} catch (Exception e) {
 			log.log(Level.INFO, "Nothing serious to worry about but please notify the developer.", e);
 		}
+
+		ServiceConnectedTimer.cancel(service);
 
 		// synchronized(service) {
 		String id = getUniqueId(service);
@@ -1453,6 +1471,36 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					}
 				}
 			});
+		}
+	}
+
+	private static class ServiceConnectedTimer<IO extends XMPPIOService> extends TimerTask {
+
+		private final IO service;
+
+		private ServiceConnectedTimer(final IO service) {
+			this.service = service;
+			service.getSessionData().put("ServiceConnectedTimer", this);
+		}
+
+		@Override
+		public void run() {
+			service.forceStop();
+		}
+
+		@Override
+		public void cancel(boolean mayInterruptIfRunning) {
+			service.getSessionData().remove("ServiceConnectedTimer");
+			super.cancel(mayInterruptIfRunning);
+		}
+
+		public static void cancel(XMPPIOService service) {
+			ServiceConnectedTimer timer = (ServiceConnectedTimer) service.getSessionData().get("ServiceConnectedTimer");
+			if (timer != null) {
+				timer.cancel();
+			} else {
+				log.log(Level.FINEST, "Missing service connected timer task: {0}", service);
+			}
 		}
 	}
 }    // ConnectionManager

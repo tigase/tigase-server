@@ -66,7 +66,6 @@ import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
@@ -113,7 +112,6 @@ public class ClusterConnectionManager
 	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
 	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
 	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class.getName());
-	private static final String SERVICE_CONNECTED_TASK_FUTURE = "service-connected-task-future";
 
 	public static enum REPO_ITEM_UPDATE_TYPE {
 		ADDED,
@@ -176,6 +174,7 @@ public class ClusterConnectionManager
 
 	public ClusterConnectionManager() {
 		super();
+		serviceConnectedTimeout = 10;
 		elements_number_limit = ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL;
 		if (getDefHostName().toString().equalsIgnoreCase("localhost")) {
 			TigaseRuntime.getTigaseRuntime()
@@ -193,6 +192,11 @@ public class ClusterConnectionManager
 		watchdogPingType = WATCHDOG_PING_TYPE.XMPP;
 		watchdogDelay = 30 * SECOND;
 		watchdogTimeout = -1 * SECOND;
+	}
+
+	@Override
+	protected boolean enableServiceConnectedTimeout(XMPPIOService<Object> service) {
+		return true;
 	}
 
 	@Override
@@ -475,10 +479,6 @@ public class ClusterConnectionManager
 			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15 * SECOND);
 		}
 
-		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
-
-		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
-		addTimerTask(task, 10, TimeUnit.SECONDS);
 		super.serviceStarted(serv);
 		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
 				new Object[]{serv.getRemoteAddress(), serv.connectionType().toString(), serv.getUniqueId()});
@@ -745,6 +745,7 @@ public class ClusterConnectionManager
 		return initialClusterConnectedDone;
 	}
 
+	@Override
 	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 		String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
@@ -793,14 +794,8 @@ public class ClusterConnectionManager
 			log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
 		}
 
-		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData()
-				.get(SERVICE_CONNECTED_TASK_FUTURE);
 
-		if (task == null) {
-			log.log(Level.WARNING, "Missing service connected timer task: {0}", serv);
-		} else {
-			task.cancel();
-		}
+		super.serviceConnected(serv);
 	}
 
 	@Override
@@ -1088,24 +1083,7 @@ public class ClusterConnectionManager
 			}
 		}
 	}
-
-	private class ServiceConnectedTimerTask
-			extends TimerTask {
-
-		private XMPPIOService<Object> serv = null;
-
-		private ServiceConnectedTimerTask(XMPPIOService<Object> serv) {
-			this.serv = serv;
-		}
-
-		@Override
-		public void run() {
-			++servConnectedTimeouts;
-			log.log(Level.INFO, "ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
-			serv.forceStop();
-		}
-	}
-
+	
 	protected class Watchdog
 			extends ConnectionManager.Watchdog {
 

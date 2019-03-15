@@ -153,6 +153,8 @@ public class ComponentProtocol
 	public void authenticated(ComponentIOService serv) {
 		serv.setAuthenticated(true);
 
+		super.serviceConnected(serv);
+
 		String hostname = (String) serv.getSessionData().get(ComponentIOService.HOSTNAME_KEY);
 
 		bindHostname(hostname, serv);
@@ -211,6 +213,11 @@ public class ComponentProtocol
 		}
 		addComponentConnection(hostname, serv);
 		addComponentDomain(hostname);
+	}
+
+	@Override
+	protected boolean enableServiceConnectedTimeout(ComponentIOService service) {
+		return true;
 	}
 
 	@Override

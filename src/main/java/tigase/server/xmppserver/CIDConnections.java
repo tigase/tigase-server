@@ -119,6 +119,7 @@ public class CIDConnections {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
 		}
+		handler.serviceConnected(serv);
 		serv.addCID(cid);
 		if (serv.connectionType() == ConnectionType.connect) {
 

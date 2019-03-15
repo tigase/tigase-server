@@ -181,6 +181,11 @@ public class BoshConnectionManager
 	}
 
 	@Override
+	protected boolean enableServiceConnectedTimeout(XMPPIOService<Object> service) {
+		return false;
+	}
+
+	@Override
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet.toString());

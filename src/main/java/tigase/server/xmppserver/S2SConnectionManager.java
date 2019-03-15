@@ -417,6 +417,11 @@ public class S2SConnectionManager
 	}
 
 	@Override
+	public void serviceConnected(S2SIOService service) {
+		super.serviceConnected(service);
+	}
+
+	@Override
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
 		log.log(Level.FINEST, "s2s connection opened: {0}", serv);

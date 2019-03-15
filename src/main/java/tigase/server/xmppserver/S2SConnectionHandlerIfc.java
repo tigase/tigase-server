@@ -91,6 +91,8 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid, String key_sessionId,
 							 String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem);
 
+	void serviceConnected(IO service);
+
 	boolean writePacketToSocket(IO serv, Packet packet);
 
 	void writePacketsToSocket(IO serv, Queue<Packet> packets);

@@ -469,6 +469,8 @@ public class ClientConnectionManager
 			}
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
 
+			serviceConnected(serv);
+
 			sendTlsHandshakeCompletedToSessionManager(serv);
 			log.log(Level.FINER, "DONE 2");
 		} else {
@@ -638,6 +640,7 @@ public class ClientConnectionManager
 
 				if (jid != null) {
 					if (serv != null) {
+						super.serviceConnected(serv);
 						BareJID fromJID = null;
 
 						try {
