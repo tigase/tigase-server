@@ -27,12 +27,10 @@ import tigase.db.UserNotFoundException
 import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Iq
-import tigase.util.JIDUtils
 import tigase.vhosts.VHostManagerIfc
 import tigase.vhosts.filter.CustomDomainFilter
 import tigase.vhosts.filter.DomainFilterPolicy
 import tigase.xmpp.impl.DomainFilter
-import tigase.xmpp.jid.BareJID
 
 def vhost_man = (VHostManagerIfc) vhostMan
 
@@ -56,9 +54,9 @@ if (jid == null || domain == null || (domain == DomainFilterPolicy.LIST.name() &
 	return res
 }
 
-jid = JIDUtils.getNodeID(jid)
+bareJID = tigase.xmpp.jid.JID.jidInstanceNS(jid.toLowerCase()).getBareJID();
 
-bareJID = BareJID.bareJIDInstance(jid)
+jid = bareJID.toString();
 
 def repo = (UserRepository) userRepository
 
