@@ -368,6 +368,13 @@
                     <include>**/*.txt</include>
                 </includes>
             </resource>
+            <resource>
+                <targetPath>templates</targetPath>
+                <directory>src/main/resources/templates</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
         </resources>
 
     </build>

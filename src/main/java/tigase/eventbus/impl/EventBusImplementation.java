@@ -21,10 +21,7 @@ import tigase.eventbus.*;
 import tigase.xml.Element;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +39,16 @@ public class EventBusImplementation
 	private final Serializer serializer = new EventBusSerializer();
 	private boolean acceptOnlyRegisteredEvents = false;
 	private Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
+	private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+	public EventBusImplementation() {
+		this.scheduler.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				fire(new TickMinuteEvent(System.currentTimeMillis()));
+			}
+		}, 1, 1, TimeUnit.MINUTES);
+	}
 
 	public void addHandler(AbstractHandler listenerHandler) {
 		listeners.put(listenerHandler.getPackageName(), listenerHandler.getEventName(), listenerHandler);

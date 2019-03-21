@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Tigase Status Page</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+          integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <style type="text/css">
+        .infocards div.card > .card-body span.h2 {
+            font-size: 20px;
+            font-family: Nunito, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            color: #5a5c69;
+        }
+
+        .infocards div.card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid #edf2f9;
+            border-radius: .5rem;
+        }
+
+        .infocards .card-title {
+            color: #95aac9;
+            font-family: "Cerebri Sans", sans-serif;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+
+
+        }
+    </style>
+    <script>
+        var json = ${dataJson};
+
+    </script>
+</head>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+<body class="bg-light">
+<main role="main">
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <span class="navbar-brand mb-0 h1">Tigase Status</span>
+        <span id="report-creation-timstamp" class="navbar-text"></span>
+    </nav>
+    <div class="container mt-3 infocards">
+        <div class="row">
+
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col">
+                                <h6 class="card-title text-uppercase text-muted mb-2">
+                                    CPU usage
+                                </h6>
+                                <div class="row no-gutters align-items-center">
+                                    <span class="h2 mb-0"><span class="data-cpu-usage-proc"></span>%</span>
+                                    <div class="col">
+                                        <div class="progress mr-2 ml-2" style="height: 5px;">
+                                            <div id="data-cpu-usage-proc" class="progress-bar bg-info"
+                                                 role="progressbar"
+                                                 style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-auto ">
+                                <i class="fas fa-microchip fa-2x" style="color: #dddfeb;"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col">
+                                <h6 class="card-title text-uppercase text-muted mb-2">
+                                    HEAP usage
+                                </h6>
+                                <div class="row no-gutters align-items-center">
+                                    <span class="h2 mb-0"><span class="data-heap-usage-proc"></span>%</span>
+                                    <div class="col">
+                                        <div class="progress mr-2 ml-2" style="height: 5px;">
+                                            <div id="data-heap-usage-proc" class="progress-bar bg-info"
+                                                 role="progressbar"
+                                                 style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-auto ">
+                                <i class="fas fa-memory fa-2x" style="color: #dddfeb;"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="card-title text-uppercase text-muted mb-2">
+                                    Load average
+                                </h6>
+                                <span id="data-load-average" class="h2 mb-0">&nbsp;</span>
+                            </div>
+                            <div class="col-auto ">
+                                <i class="fas fa-tachometer-alt fa-2x" style="color: #dddfeb;"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container ">
+        <div class="card">
+            <div class="card-header">
+                Details
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th scope="row" style="width: 20%">Server version</th>
+                        <td class="version"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row" style="width: 20%">Uptime</th>
+                        <td class="data-uptime"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Load average</th>
+                        <td><span class="data-load-average"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">CPUs no</th>
+                        <td class="data-cpus-no"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Threads</th>
+                        <td class="data-threads-count"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">CPU usage</th>
+                        <td><span class="data-cpu-usage-proc"></span>%</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">HEAP usage</th>
+                        <td><span class="data-heap-usage-proc"></span>%</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">NONHEAP usage</th>
+                        <td><span class="data-nonheap-usage-proc"></span>%</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <table>
+
+        </table>
+
+    </div>
+</main>
+<script language="JavaScript">
+    for (key in json) {
+        if (key.endsWith("-proc")) {
+            \$('#' + key).css('width', json[key] + "%");
+            \$('.' + key).text(json[key]);
+        } else{
+            \$('#' + key).text(json[key]);
+            \$('.' + key).text(json[key]);
+        }
+    }
+</script>
+</body>
+</html>
