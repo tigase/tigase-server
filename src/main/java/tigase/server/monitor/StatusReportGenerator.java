@@ -109,7 +109,7 @@ public class StatusReportGenerator
 
 		append(sb, "data-cpu-usage-proc", runtime.getCPUUsage()).append(",");
 		append(sb, "data-heap-usage-proc", runtime.getHeapMemUsage()).append(",");
-		append(sb, "data-nonheap-usage-proc", runtime.getHeapMemUsage()).append(",");
+		append(sb, "data-nonheap-usage-proc", runtime.getNonHeapMemUsage()).append(",");
 
 		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		append(sb, "version", XMPPServer.getImplementationVersion()).append(",");
