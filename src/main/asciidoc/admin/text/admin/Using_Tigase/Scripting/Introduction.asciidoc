@@ -51,7 +51,7 @@ It uses a basic scripting API which is described line by line below:
 
 . It imports basic Tigase classes.
 . Sets a local variable `p` which points to a `packet` variable with data received from the client.
-. Creates a `res` variable which is response sent back to the client (administrator). The response to the client is of type `result. Other possible types will be introduced later.
+. Creates a `res` variable which is response sent back to the client (administrator). The response to the client is of type `result`. Other possible types will be introduced later.
 . We operate on ad-hoc commands here so the script uses Tigase utility class to set/retrieve command parameters. It sets the window title and a simple message displayed to the user (administrator).
 . The last line returns new packet as a script execution result.
 

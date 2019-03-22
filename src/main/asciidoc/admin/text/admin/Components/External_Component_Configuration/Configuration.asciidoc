@@ -30,7 +30,7 @@ image:images/admin/adminui_ext_add_item_form.png[]
 
 * _Domain name_ - external component domain name (`muc.devel.tigase.org`)
 * _Domain password_ - password for authentication of the external component connection (`muc-pass`)
-* _Connection type_ - `accept` to make component wait `for connection or `connect` force component to connect to the server (`connect`)
+* _Connection type_ - `accept` to make component wait for connection or `connect` force component to connect to the server (`connect`)
 * _Port number_ - port on which component should wait for connection or on which it try to connect (`5270`)
 * _Remote host_ - host to connect to (`devel.tigase.org`) _(may be left blank if component will only accept connections)_
 * _Protocol_ - id of protocol used for establishing connection

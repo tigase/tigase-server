@@ -76,7 +76,7 @@ You need to pass:
 
 * Domain name - external component domain name (`muc.devel.tigase.org`)
 * Domain password - password for authentication of the external component connection (`muc-pass`)
-* Connection type - `accept` to make component wait for connection or `connect` force component to connect to the server (`connect)
+* Connection type - `accept` to make component wait for connection or `connect` force component to connect to the server (`connect`)
 * Port number - port on which component should wait for connection or on which it try to connect (`5270`)
 * Remote host - host to connect to (`devel.tigase.org`)
 * Protocol - id of protocol used for establishing connection

@@ -124,7 +124,7 @@ You have to replace `hostname` with a domain name used for your XMPP installatio
 
 [source,dsl]
 -----
-'default-virtual-host' = 'jabber.your-great.net'`
+'default-virtual-host' = 'jabber.your-great.net'
 -----
 
 There are many other settings that can be configured xref:tigase41virtualHosts[visit this section for details].
@@ -134,7 +134,7 @@ At least one administrator is required, and once the database is setup will have
 
 [source,dsl]
 -----
-`admins = [ 'admin@jabber.your-great.net', 'user2jabber.your-great.net' ]`
+admins = [ 'admin@jabber.your-great.net', 'user2jabber.your-great.net' ]
 -----
 
 ==== Step 4: Set databases

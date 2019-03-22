@@ -57,7 +57,7 @@ If you wish to not use the `ClientStateIndication` processor, set the following 
 -----
 
 === A note about Mobile Plugins
-Previously, you could enable Mobile optimization logic using ``--sm-plugins=+Mobile_V1`.
+Previously, you could enable Mobile optimization logic using by enabling `Mobile_V1 (){}` bean to Session Manager: `sess-man () {}` bean.
 
 If you have used these in the past, it is recommended you change your system to use the CSI processor with the appropriate mobile processing logic.
 
