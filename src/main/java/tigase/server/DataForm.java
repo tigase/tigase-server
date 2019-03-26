@@ -414,7 +414,8 @@ public class DataForm {
 		}
 
 		private static Element createDataEl(Element parent) {
-			Element dataEl = new Element("x", "jabber:x:data");
+			Element dataEl = new Element("x");
+			dataEl.setXMLNS("jabber:x:data");
 			parent.addChild(dataEl);
 			return dataEl;
 		}
