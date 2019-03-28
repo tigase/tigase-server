@@ -52,7 +52,7 @@ import static tigase.xmpp.impl.Message.XMLNS;
 @Bean(name = ELEM_NAME, parent = SessionManager.class, active = false)
 public class Message
 		extends AnnotatedXMPPProcessor
-		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
+		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, MessageDeliveryProviderIfc {
 
 	protected static final String ELEM_NAME = tigase.server.Message.ELEM_NAME;
 	protected static final String XMLNS = "jabber:client";

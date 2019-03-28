@@ -34,6 +34,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +49,7 @@ import static tigase.server.amp.AmpFeatureIfc.*;
 @Bean(name = MessageAmp.ID, parent = SessionManager.class, active = true)
 public class MessageAmp
 		extends XMPPProcessor
-		implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, XMPPPreprocessorIfc, XMPPProcessorIfc, RegistrarBean {
+		implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, XMPPPreprocessorIfc, XMPPProcessorIfc, RegistrarBean, MessageDeliveryProviderIfc {
 
 	protected static final String ID = "amp";
 	private static final String AMP_JID_PROP_KEY = "amp-jid";
@@ -307,6 +308,16 @@ public class MessageAmp
 	@Override
 	public void unregister(Kernel kernel) {
 
+	}
+
+	@Override
+	public Set<JID> getJIDsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
+		return messageProcessor.getJIDsForMessageDelivery(session);
+	}
+
+	@Override
+	public boolean hasConnectionForMessageDelivery(XMPPResourceConnection session) {
+		return messageProcessor.hasConnectionForMessageDelivery(session);
 	}
 
 	private enum QuotaRule {
