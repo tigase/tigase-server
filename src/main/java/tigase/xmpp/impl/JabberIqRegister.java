@@ -495,7 +495,7 @@ public class JabberIqRegister
 		} else if (emailRequired) {
 			results.offer(packet.okResult(
 					"<instructions>" + "Choose a user name and password for use with this service." +
-							"Please provide also your e-mail address." + "</instructions>" + "<username/>" +
+							"Please also provide your e-mail address to which we will send confirmation link (MUST BE VALID!)" + "</instructions>" + "<username/>" +
 							"<password/>" + "<email/>", 1));
 		} else {
 			results.offer(packet.okResult(

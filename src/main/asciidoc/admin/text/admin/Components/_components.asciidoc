@@ -8,7 +8,7 @@ include::Monitoring/Setting_up.asciidoc[leveloffset=+3]
 
 include::Monitoring/Retrieving_statistics.asciidoc[leveloffset=+3]
 
-include::Monitoring/EventBus.asciidoc[leveloffset=+3]
+include::Monitoring/MonitorComponent.asciidoc[leveloffset=+3]
 
 include::Monitoring/Statistics_Logger_Config.asciidoc[leveloffset=+3]
 
