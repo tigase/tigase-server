@@ -17,10 +17,13 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.component.exceptions.RepositoryException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+import tigase.db.UserRepository;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
@@ -33,13 +36,18 @@ import tigase.xmpp.impl.annotation.DiscoFeatures;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
 import static tigase.xmpp.impl.VCardTemp.*;
 
 /**
@@ -55,7 +63,7 @@ import static tigase.xmpp.impl.VCardTemp.*;
 @DiscoFeatures({XMLNS})
 @Bean(name = VCardTemp.ID, parent = SessionManager.class, active = true)
 public class VCardTemp
-		extends VCardXMPPProcessorAbstract {
+		extends VCardXMPPProcessorAbstract implements PresenceState.ExtendedPresenceProcessorIfc {
 
 	public static final String VCARD_KEY = "vCard";
 	// VCARD element is added to support old vCard protocol where element
@@ -69,6 +77,9 @@ public class VCardTemp
 	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger(VCardTemp.class.getName());
+
+	@Inject
+	private UserRepository userRepository;
 
 	public void processFromUserOutPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
 										 NonAuthUserRepository repo, Queue<Packet> results,
@@ -225,6 +236,99 @@ public class VCardTemp
 		}
 	}
 
+	public void pepToVCardTemp_onPublication(BareJID userJid, XMPPResourceConnection session, String itemId, String mimeType, Supplier<JID> pubsubComponentJidSupplier, Consumer<Packet> writer) {
+		Element iqEl = new Element("iq", new String[]{"type", "id"}, new String[]{"get", "sm-query-vcard-pep-" + mimeType});
+		iqEl.withElement("pubsub", "http://jabber.org/protocol/pubsub", pubsubEl -> {
+			pubsubEl.withElement("items", itemsEl -> {
+				itemsEl.setAttribute("node", "urn:xmpp:avatar:data");
+				itemsEl.withElement("item", itemEl -> {
+					itemEl.setAttribute("id", itemId);
+				});
+			});
+		});
+
+		Iq iq = (Iq) Packet.packetInstance(iqEl, JID.jidInstanceNS(userJid), JID.jidInstanceNS(userJid));
+		iq.setPacketTo(pubsubComponentJidSupplier.get());
+
+		writer.accept(iq);
+	}
+
+	public void pepToVCardTemp_onDataRetrieved(Packet packet, XMPPResourceConnection session) {
+		Element itemEl = packet.getElement().findChild(new String[] { "iq", "pubsub", "items", "item" });
+		String mimeType = packet.getAttributeStaticStr("id").replace("sm-query-vcard-pep-", "");
+		if (itemEl != null && mimeType != null) {
+			String id = itemEl.getAttributeStaticStr("id");
+			Element data = itemEl.getChild("data", "urn:xmpp:avatar:data");
+			if (id != null && data != null) {
+				try {
+					Element vCard = this.parseXMLDataToElement(userRepository.getData(packet.getStanzaFrom().getBareJID(),
+																			 PUBLIC_DATA_NODE + "/vcard-temp",
+																			 VCardTemp.VCARD_KEY))
+							.orElseGet(() -> new Element("vCard", new String[]{"xmlns"}, new String[]{"vcard-temp"}));
+
+					Element photoEl = vCard.findChild(new String[]{"vCard", "PHOTO"});
+					if (photoEl != null) {
+						vCard.removeChild(photoEl);
+					}
+
+					if (data.getCData() != null) {
+						photoEl = new Element("PHOTO");
+						photoEl.withElement("TYPE", null, mimeType);
+						photoEl.withElement("BINVAL", null, data.getCData());
+						vCard.addChild(photoEl);
+					}
+					userRepository.setData(packet.getStanzaFrom().getBareJID(), ID, "pep-vcard-temp-conv-hash", id);
+					if (session != null) {
+						session.putCommonSessionData("pep-vcard-temp-conv-hash", id);
+					}
+					userRepository.setData(packet.getStanzaFrom().getBareJID(), PUBLIC_DATA_NODE + "/" + ID,
+										   VCardTemp.VCARD_KEY, vCard.toString());
+				} catch (RepositoryException ex) {
+					log.log(Level.FINEST, "failed to update VCardTemp avatar on PEP User Avatar change!");
+				}
+			}
+		}
+	}
+
+	@Override
+	public Element extend(Element presence, XMPPResourceConnection session, Queue<Packet> results) {
+		Element x = presence.getChild("x", "vcard-temp:x:update");
+		Element photoEl = x == null ? null : x.getChild("photo");
+		if (photoEl != null) {
+			return null;
+		}
+		String hash = (String) session.computeCommonSessionDataIfAbsent("pep-vcard-temp-conv-hash", (key) -> {
+			try {
+				return Optional.ofNullable(userRepository.getData(session.getBareJID(), ID, "pep-vcard-temp-conv-hash"))
+						.orElse("");
+			} catch (NotAuthorizedException ex) {
+				log.log(Level.FINEST, "failed to retrieve VCardTemp avatar hash - session not authorized yet!", ex);
+			} catch (RepositoryException ex) {
+				log.log(Level.FINEST, "failed to retrieve VCardTemp avatar hash!", ex);
+			}
+			return null;
+		});
+		if (hash.isEmpty()) {
+			return null;
+		}
+		if (x == null) {
+			x = new Element("x");
+			x.setXMLNS("vcard-temp:x:update");
+		} else if (photoEl != null) {
+			presence.removeChild(x);
+			x.removeChild(photoEl);
+		}
+		photoEl = new Element("photo", hash);
+		x.addChild(photoEl);
+		return x;
+	}
+
+	@Override
+	public Element extend(XMPPResourceConnection session, Queue<Packet> results) {
+		// this will never be called!
+		throw new UnsupportedOperationException("It should never be called!");
+	}
+
 	@Override
 	protected String getVCardXMLNS() {
 		return XMLNS;
@@ -262,6 +366,20 @@ public class VCardTemp
 
 		return result;
 	}
+
+	private Optional<Element> parseXMLDataToElement(String data) {
+		if (data == null) {
+			return Optional.empty();
+		}
+		DomBuilderHandler domHandler = new DomBuilderHandler();
+
+		parser.parse(domHandler, data.toCharArray(), 0, data.length());
+
+		Queue<Element> elems = domHandler.getParsedElements();
+
+		return Optional.ofNullable(elems.poll());
+	}
+
 }    // VCardTemp
 
 

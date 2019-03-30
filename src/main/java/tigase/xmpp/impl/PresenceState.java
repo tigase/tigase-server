@@ -499,7 +499,7 @@ public class PresenceState
 		Element presence = session.getPresence().clone();
 
 		for (ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors) {
-			Element extendContent = processor.extend(session, results);
+			Element extendContent = processor.extend(presence, session, results);
 			if (extendContent != null) {
 				// avoid duplicate
 				Element child = presence.getChild(extendContent.getName(), extendContent.getXMLNS());
@@ -806,8 +806,16 @@ public class PresenceState
 		// Is it a direct presence to some entity on the network?
 		if (packet.getStanzaTo() != null) {
 
+			Packet presence = packet.copyElementOnly();
+			Element presenceEl = presence.getElement();
+			for (ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors) {
+				Element extendContent = processor.extend(presenceEl, session, results);
+				if (extendContent != null) {
+					presenceEl.addChild(extendContent);
+				}
+			}
 			// Yes this is it, send direct presence
-			results.offer(packet.copyElementOnly());
+			results.offer(presence);
 
 			// If this is unavailable presence, remove jid from Set
 			// otherwise add it to the Set
@@ -829,7 +837,7 @@ public class PresenceState
 			final Element presenceEl = resultPacket.getElement();
 
 			for (ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors) {
-				Element extendContent = processor.extend(session, results);
+				Element extendContent = processor.extend(presenceEl, session, results);
 				if (extendContent != null) {
 					presenceEl.addChild(extendContent);
 				}
@@ -1011,6 +1019,10 @@ public class PresenceState
 	}
 
 	public interface ExtendedPresenceProcessorIfc {
+
+		default Element extend(Element presence, XMPPResourceConnection session, Queue<Packet> results) {
+			return extend(session, results);
+		}
 
 		Element extend(XMPPResourceConnection session, Queue<Packet> results);
 	}
