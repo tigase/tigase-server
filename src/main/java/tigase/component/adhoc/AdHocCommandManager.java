@@ -22,7 +22,7 @@ import tigase.component.exceptions.ComponentException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
-import tigase.util.cache.SimpleCache;
+import tigase.util.cache.SimpleCacheSynchronized;
 import tigase.xml.Element;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.jid.JID;
@@ -40,7 +40,7 @@ public class AdHocCommandManager {
 	private static final Logger log = Logger.getLogger(AdHocCommandManager.class.getCanonicalName());
 
 	private final Map<String, AdHocCommand> commands = new HashMap<String, AdHocCommand>();
-	private final SimpleCache<String, AdHocSession> sessions = new SimpleCache<String, AdHocSession>(100, 10 * 1000);
+	private final SimpleCacheSynchronized<String, AdHocSession> sessions = new SimpleCacheSynchronized<>(100, 10 * 1000);
 	@Inject(nullAllowed = true)
 	private AdHocCommand[] allCommands;
 

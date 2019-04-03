@@ -20,7 +20,6 @@ package tigase.db;
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class UserRepositoryPool
 
 	private static final Logger log = Logger.getLogger(UserRepositoryPool.class.getName());
 
-	private Map<String, Object> cache = null;
+	private IRepoCache<String, Object> cache = null;
 	private LinkedBlockingQueue<UserRepository> repoPool = new LinkedBlockingQueue<UserRepository>();
 
 	@Override
@@ -314,9 +313,9 @@ public class UserRepositoryPool
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		if (resource_uri.contains("cacheRepo=off")) {
 			log.fine("Disabling cache.");
-			cache = Collections.synchronizedMap(new RepoCache(0, -1000));
+			cache = new RepoNoCache();
 		} else {
-			cache = Collections.synchronizedMap(new RepoCache(10000, 60 * 1000));
+			cache = new RepoCache(10000, 60 * 1000);
 		}
 	}
 
@@ -464,11 +463,60 @@ public class UserRepositoryPool
 		return false;
 	}
 
-	private class RepoCache
-			extends SimpleCache<String, Object> {
+	public interface IRepoCache<K,V> {
 
-				public RepoCache(int maxsize, long cache_time) {
+		V get(Object key);
+
+		V put(K key, V value);
+
+		V remove(Object key);
+	}
+
+	private class RepoNoCache implements IRepoCache<String, Object> {
+
+		@Override
+		public Object get(Object key) {
+			return null;
+		}
+
+		@Override
+		public Object put(String key, Object value) {
+			return null;
+		}
+
+		@Override
+		public Object remove(Object key) {
+			return null;
+		}
+	}
+
+	private class RepoCache
+			extends SimpleCache<String, Object> implements IRepoCache<String, Object> {
+
+		public RepoCache(int maxsize, long cache_time) {
 			super(maxsize, cache_time);
+		}
+
+		@Override
+		public Object get(Object key) {
+			if (cache_off) {
+				return null;
+			}
+
+			synchronized (this) {
+				return super.get(key);
+			}
+		}
+
+		@Override
+		public Object put(String key, Object value) {
+			if (cache_off) {
+				return null;
+			}
+
+			synchronized (this) {
+				return super.put(key, value);
+			}
 		}
 
 		@Override
@@ -477,19 +525,21 @@ public class UserRepositoryPool
 				return null;
 			}
 
-			Object val = super.remove(key);
-			String strk = key.toString();
-			Iterator<String> ks = keySet().iterator();
+			synchronized (this) {
+				Object val = super.remove(key);
+				String strk = key.toString();
+				Iterator<String> ks = keySet().iterator();
 
-			while (ks.hasNext()) {
-				String k = ks.next().toString();
+				while (ks.hasNext()) {
+					String k = ks.next().toString();
 
-				if (k.startsWith(strk)) {
-					ks.remove();
-				}    // end of if (k.startsWith(strk))
-			}      // end of while (ks.hasNext())
+					if (k.startsWith(strk)) {
+						ks.remove();
+					}    // end of if (k.startsWith(strk))
+				}      // end of while (ks.hasNext())
 
-			return val;
+				return val;
+			}
 		}
 	}
 }
