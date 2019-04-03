@@ -28,14 +28,13 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 
 import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * Created: Jun 14, 2010 12:32:49 PM
@@ -46,6 +45,7 @@ import java.util.logging.Logger;
 public class CIDConnections {
 
 	private static final Logger log = Logger.getLogger(CIDConnections.class.getName());
+	private static final Random random = new Random();
 //	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
 //																									 true);
 
@@ -376,7 +376,21 @@ public class CIDConnections {
 					String serverName = handler.getServerNameForDomain(cid.getRemoteHost());
 
 					DNSEntry dns_entry = DNSResolverFactory.getInstance().getHostSRV_Entry(serverName);
-					S2SConnection s2s_conn = new S2SConnection(handler, dns_entry.getIp());
+
+					boolean hasIPv6 = Stream.concat(incoming.stream(), outgoing.stream())
+							.filter(conn -> conn.isConnected())
+							.filter(conn -> conn.getIPAddress().contains(":"))
+							.findFirst()
+							.isPresent();
+
+					String[] ips = dns_entry.getIps();
+					if (!hasIPv6) {
+						ips = Arrays.stream(ips).filter(ip -> !ip.contains(":")).toArray(String[]::new);
+					}
+
+					String ip = ips.length == 1 ? ips[0] : ips[random.nextInt(ips.length)];
+
+					S2SConnection s2s_conn = new S2SConnection(handler, ip);
 
 					s2s_conn.addControlPacket(verify_req);
 
@@ -388,7 +402,7 @@ public class CIDConnections {
 					// it looks like we are sending verify requests only on handshaking-only
 					// connection so there is only one domain for verification
 					port_props.put(S2SIOService.HANDSHAKING_DOMAIN_KEY, verify_req.getStanzaTo().toString());
-					initNewConnection(dns_entry.getIp(), dns_entry.getPort(), s2s_conn, port_props);
+					initNewConnection(ip, dns_entry.getPort(), s2s_conn, port_props);
 				} catch (UnknownHostException ex) {
 					log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost(), ex);
 				}
@@ -586,31 +600,33 @@ public class CIDConnections {
 
 			// Activate 'missing' connections
 			for (DNSEntry dNSEntry : dns_entries) {
-				int openForIP = getOpenForIP(dNSEntry.getIp());
+				for (String ip : dNSEntry.getIps()) {
+					int openForIP = getOpenForIP(ip);
 
-				for (int i = openForIP; i < max_out_conns_per_ip; i++) {
-					if (dNSEntry.getIp().equals("127.0.0.1")) {
+					for (int i = openForIP; i < max_out_conns_per_ip; i++) {
+						if (ip.equals("127.0.0.1")) {
 
-						// DNS misconfiguration for the remote server (icq.jabber.cz for
-						// example)
-						// Now we assume: UnknownHostException
-						if (log.isLoggable(Level.INFO)) {
-							log.log(Level.INFO, "DNS misconfiguration for domain: {0}, for: {1}",
-									new Object[]{cid.getRemoteHost(), cid});
+							// DNS misconfiguration for the remote server (icq.jabber.cz for
+							// example)
+							// Now we assume: UnknownHostException
+							if (log.isLoggable(Level.INFO)) {
+								log.log(Level.INFO, "DNS misconfiguration for domain: {0}, for: {1}",
+										new Object[]{cid.getRemoteHost(), cid});
+							}
+
+							throw new UnknownHostException("DNS misconfiguration for domain: " + cid.getRemoteHost());
 						}
 
-						throw new UnknownHostException("DNS misconfiguration for domain: " + cid.getRemoteHost());
-					}
+						// Create a new connection
+						S2SConnection s2s_conn = new S2SConnection(handler, dNSEntry.getIp());
+						Map<String, Object> port_props = new TreeMap<String, Object>();
+						port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
 
-					// Create a new connection
-					S2SConnection s2s_conn = new S2SConnection(handler, dNSEntry.getIp());
-					Map<String, Object> port_props = new TreeMap<String, Object>();
-					port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
-
-					initNewConnection(dNSEntry.getIp(), dNSEntry.getPort(), s2s_conn, port_props);
-					result = true;
-					if (++all_outgoing >= max_out_conns) {
-						return result;
+						initNewConnection(ip, dNSEntry.getPort(), s2s_conn, port_props);
+						result = true;
+						if (++all_outgoing >= max_out_conns) {
+							return result;
+						}
 					}
 				}
 			}

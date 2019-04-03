@@ -19,11 +19,10 @@ package tigase.net;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.nio.channels.*;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -239,7 +238,16 @@ public class ConnectionOpenThread
 			try {
 				addPort(al);
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Error: creating connection for: " + al, e);
+				if (((e instanceof SocketException && e.getMessage() != null &&
+						e.getMessage().contains("Network is unreachable")) &&
+						(e instanceof NoRouteToHostException && e.getMessage() != null &&
+								e.getMessage().equals("No route to host"))) &&
+						al.getConnectionType() == ConnectionType.connect && al.getIfcs() != null &&
+						Arrays.stream(al.getIfcs()).filter(ifc -> ifc.contains(":")).findFirst().isPresent()) {
+					log.log(Level.FINEST, "Error: creating IPv6 connection for: " + al, e);
+				} else {
+					log.log(Level.WARNING, "Error: creating connection for: " + al, e);
+				}
 				al.accept(null);
 			}    // end of try-catch
 		}      // end of for ()
