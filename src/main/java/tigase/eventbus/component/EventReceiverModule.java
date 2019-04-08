@@ -120,11 +120,20 @@ public class EventReceiverModule
 				eventPublisherModule.publishEvent(eventName.getPackage(), eventName.getName(), event, subscribers);
 			}
 		}
+	}
 
+	private Object deserialize(final Element event) {
+		// TODO: for now commented. This optimization will be enabled in the future,
+		//  when attribute 'serialized' will be set for sure on all nodes.
+//		final String serialized = event.getAttributeStaticStr("serialized");
+//		if (serialized == null || !serialized.equals("true")) {
+//			return null;
+//		}
+		return serializer.deserialize(event);
 	}
 
 	private void fireEventLocally(final EventName name, final Element event) {
-		Object obj = serializer.deserialize(event);
+		Object obj = deserialize(event);
 		if (obj == null) {
 			obj = event;
 		} else {
@@ -145,7 +154,6 @@ public class EventReceiverModule
 		}
 
 		localEventBus.fire(obj, this, true);
-
 	}
 
 }

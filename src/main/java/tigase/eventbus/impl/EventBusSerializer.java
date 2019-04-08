@@ -75,7 +75,9 @@ public class EventBusSerializer
 				}
 			}
 			return (T) result;
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (ClassNotFoundException e) {
+			return null;
+		} catch (InstantiationException | IllegalAccessException e) {
 			log.log(Level.WARNING, "Error while deserializing", e);
 			return null;
 		}

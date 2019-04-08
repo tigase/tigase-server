@@ -167,6 +167,7 @@ public class EventPublisherModule
 		}
 
 		Element eventElement = serializer.serialize(event);
+		eventElement.setAttribute("serialized", "true");
 
 		publishEvent(packageName, eventName, eventElement, subscribers);
 	}
