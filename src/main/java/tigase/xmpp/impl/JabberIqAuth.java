@@ -69,6 +69,8 @@ public class JabberIqAuth
 	@Inject
 	private BruteForceLockerBean bruteForceLocker;
 	@Inject
+	private boolean includeBruteForceLockerStatistics = false;
+	@Inject
 	private TigaseSaslProvider saslProvider;
 
 	@Override
@@ -79,7 +81,9 @@ public class JabberIqAuth
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		this.bruteForceLocker.getStatistics(getComponentInfo().getName(), list);
+		if (includeBruteForceLockerStatistics) {
+			this.bruteForceLocker.getStatistics(getComponentInfo().getName(), list);
+		}
 	}
 
 	@Override
