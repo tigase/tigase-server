@@ -23,6 +23,7 @@ import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -69,21 +70,11 @@ public class JabberIqAuth
 	@Inject
 	private BruteForceLockerBean bruteForceLocker;
 	@Inject
-	private boolean includeBruteForceLockerStatistics = false;
-	@Inject
 	private TigaseSaslProvider saslProvider;
 
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-		if (includeBruteForceLockerStatistics) {
-			this.bruteForceLocker.getStatistics(getComponentInfo().getName(), list);
-		}
 	}
 
 	@Override

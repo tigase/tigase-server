@@ -19,6 +19,18 @@ There is following lis of configuration parameters:
 | `brute-force-mode`                | `string`  | Working mode (see <<bruteForcePrevention_WorkingModes>>)
 |======================================
 
+=== Detailed statistics
+
+By default, in order not to pollute statistics, Brute-Force locker will only provide details about number of locker IPs and JIDs (and total number of locked attempts). In order to have detailed information about IPs and JIDs that has been locked in statistics you should use following configuration:
+
+```
+'sess-man' () {
+    'brute-force-locker' () {
+        detailedStatistics = false
+    }
+}
+```
+
 [[bruteForcePrevention_WorkingModes]]
 === Working modes
 

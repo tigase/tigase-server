@@ -30,7 +30,6 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
-import tigase.stats.StatisticsList;
 import tigase.util.Base64;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
@@ -272,12 +271,6 @@ public class SaslAuth
 				}
 			}
 		}
-	}
-
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-		this.bruteForceLocker.getStatistics(getComponentInfo().getName(), list);
 	}
 
 	@Override

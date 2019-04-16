@@ -25,6 +25,8 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.selector.ConfigType;
 import tigase.map.ClusterMapFactory;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.ComponentStatisticsProvider;
@@ -37,9 +39,11 @@ import tigase.xmpp.jid.JID;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static tigase.auth.BruteForceLockerBean.Mode.IpJid;
 import static tigase.auth.BruteForceLockerBean.Mode.valueOf;
@@ -57,6 +61,9 @@ public class BruteForceLockerBean
 	private static final String LOCK_PERIOD_TIME_KEY = "brute-force-period-time";
 	private static final String LOCK_MODE_KEY = "brute-force-mode";
 	private static final String MAP_TYPE = "brute-force-invalid-logins";
+
+	@ConfigField(desc = "Allows storing detailed, per IP/JID statistics of blocked attempts")
+	private boolean detailedStatistics = false;
 
 	public enum Mode {
 		Ip,
@@ -227,8 +234,11 @@ public class BruteForceLockerBean
 			otherSH.jids.forEach((jid, count) -> tmp.addJID(jid, count));
 		});
 
-		tmp.ips.forEach((ip, count) -> list.add(keyName, "From IP: " + ip, count, Level.INFO));
-		tmp.jids.forEach((jid, count) -> list.add(keyName, "For JID: " + jid, count, Level.INFO));
+		list.add(keyName, "Blocked IPs", tmp.ips.size(), Level.INFO);
+		list.add(keyName, "Blocked JIDs", tmp.jids.size(), Level.INFO);
+
+		list.add(keyName, "Total blocked IP attempts", tmp.ips.values().stream().mapToInt(Integer::intValue).sum(), Level.FINE);
+		list.add(keyName, "Total blocked JID attempts", tmp.jids.values().stream().mapToInt(Integer::intValue).sum(), Level.FINE);
 	}
 
 	@Override
@@ -533,8 +543,8 @@ public class BruteForceLockerBean
 				v = (v == null ? 0 : v) + value;
 				map.put(key, v);
 				return v;
-			}
 		}
+	}
 
 	}
 
