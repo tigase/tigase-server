@@ -548,7 +548,9 @@ public class BruteForceLockerBean
 				map.put(key, v);
 				return v;
 		}
-	}
+			//			return map.compute(key, (k, v ) -> (v == null) ? 0 : v + value);
+
+		}
 
 	}
 

@@ -43,7 +43,6 @@ import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
-import tigase.xml.XMLUtils;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -104,6 +103,8 @@ public class BasicComponent
 	private JID compId = null;
 	@ConfigField(desc = "Default hostname")
 	private BareJID defHostname = null;
+	@ConfigField(desc = "Service Discovery Extensions", alias = "disco-extensions")
+	private Map<String, ArrayList<String>> discoExtensions = new HashMap<>();
 	private boolean initializationCompleted = false;
 	@ConfigField(desc = "Component name")
 	private String name = null;
@@ -117,9 +118,6 @@ public class BasicComponent
 	private List<ComponentStatisticsProvider> statisticsProviders;
 	@ConfigField(alias = "trusted", desc = "List of trusted JIDs")
 	private String[] trustedProp = null;
-
-	@ConfigField(desc = "Service Discovery Extensions", alias = "disco-extensions")
-	private Map<String,ArrayList<String>> discoExtensions = new HashMap<>();
 
 	public BasicComponent() {
 		DependencyChecker.checkDependencies(getClass());
@@ -576,8 +574,8 @@ public class BasicComponent
 	public Element getDiscoExtensionsForm() {
 		if (!discoExtensions.isEmpty()) {
 			Element form = DataForm.createDataForm(Command.DataType.result);
-			DataForm.addHiddenField(form,"FORM_TYPE", "http://jabber.org/network/serverinfo");
-			for(Map.Entry<String, ArrayList<String>> item : discoExtensions.entrySet()) {
+			DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
+			for (Map.Entry<String, ArrayList<String>> item : discoExtensions.entrySet()) {
 				DataForm.addFieldMultiValue(form, item.getKey(), item.getValue());
 			}
 			return form;
@@ -694,7 +692,8 @@ public class BasicComponent
 			for (CommandIfc comm : scriptCommands.values()) {
 				if (!comm.isAdminOnly() || isAdminFrom) {
 					Element item = new Element("item", new String[]{"node", "name", "jid"},
-											   new String[]{comm.getCommandId(), comm.getDescription(), jid.toString()});
+											   new String[]{comm.getCommandId(), comm.getDescription(),
+															jid.toString()});
 					if (comm.getGroup() != null) {
 						item.setAttribute("group", comm.getGroup());
 					}
@@ -836,7 +835,8 @@ public class BasicComponent
 					// Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
 
-					Function<String,Boolean> isAllowedForDomain = (domain) -> canCallCommand(iqc.getStanzaFrom(), domain, strCommand);
+					Function<String, Boolean> isAllowedForDomain = (domain) -> canCallCommand(iqc.getStanzaFrom(),
+																							  domain, strCommand);
 					binds.put("isAllowedForDomain", isAllowedForDomain);
 
 					com.runCommand(iqc, binds, results);
@@ -876,6 +876,10 @@ public class BasicComponent
 		initializationCompleted();
 	}
 
+	public Optional<Element> getServiceEntityCaps(JID fromJid) {
+		return getServiceEntity().getCaps(isAdmin(fromJid) || nonAdminCommands);
+	}
+
 	protected ScriptEngineManager createScriptEngineManager() {
 		if (XMPPServer.isOSGi()) {
 			return new OSGiScriptEngineManager();
@@ -898,10 +902,6 @@ public class BasicComponent
 
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
-	}
-
-	public Optional<Element> getServiceEntityCaps(JID fromJid) {
-		return getServiceEntity().getCaps(isAdmin(fromJid) || nonAdminCommands);
 	}
 
 	protected boolean isNonAdminCommands() {

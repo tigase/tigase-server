@@ -837,27 +837,6 @@ public class SessionManager
 		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7).orElse(-1);
 	}
 
-	private void calculateActiveUsers() {
-		int count = 0;
-
-		for (BareJID bareJID : sessionsByNodeId.keySet()) {
-			if (!bareJID.toString().startsWith("sess-man")) {
-				XMPPSession session = sessionsByNodeId.get(bareJID);
-				// check if session is still there as it could be closed
-				// if sessionsByNodeId is big collection
-				if (session != null) {
-					for (XMPPResourceConnection xMPPResourceConnection : session.getActiveResources()) {
-						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < activeUserTimeframe) {
-							count++;
-						}
-					}
-				}
-			}
-		}
-
-		activeUserNumber = count;
-	}
-
 	@Override
 	public void handleDomainChange(final String domain, final XMPPResourceConnection conn) {
 		try {
@@ -1169,8 +1148,9 @@ public class SessionManager
 	}
 
 	protected boolean processCommand(Packet pc) {
-		if ((pc.getStanzaTo() == null) ||
-				!(getComponentId().equals(pc.getStanzaTo()) || (isLocalDomain(pc.getStanzaTo().getDomain()) && (pc.getStanzaTo().getLocalpart() == null || getName().equals(pc.getStanzaTo().getLocalpart()))))) {
+		if ((pc.getStanzaTo() == null) || !(getComponentId().equals(pc.getStanzaTo()) ||
+				(isLocalDomain(pc.getStanzaTo().getDomain()) && (pc.getStanzaTo().getLocalpart() == null ||
+						getName().equals(pc.getStanzaTo().getLocalpart()))))) {
 			return false;
 		}
 
@@ -1491,7 +1471,8 @@ public class SessionManager
 				//#2682: Commands addressed to domain should be processed by sess-man
 				if (iqc.isCommand() && isLocalDomain(iqc.getStanzaTo().getDomain())) {
 					try {
-						if (iqc.getStanzaFrom() == null && connection != null && connection.getConnectionId().equals(iqc.getPacketFrom())) {
+						if (iqc.getStanzaFrom() == null && connection != null &&
+								connection.getConnectionId().equals(iqc.getPacketFrom())) {
 							iqc.initVars(connection.getjid(), iqc.getStanzaTo());
 						}
 						if (iqc.getPermissions() == Permissions.NONE || iqc.getPermissions() == Permissions.REMOTE) {
@@ -1500,7 +1481,8 @@ public class SessionManager
 						if (connection != null && connection.isAuthorized()) {
 							ArrayDeque<Packet> results = new ArrayDeque<>();
 							for (XMPPPreprocessorIfc preproc : preProcessors.values()) {
-								if (preproc.preProcess(pc, connection, naUserRepository, results, plugin_config.get(preproc.id()))) {
+								if (preproc.preProcess(pc, connection, naUserRepository, results,
+													   plugin_config.get(preproc.id()))) {
 									addOutPackets(pc, connection, results);
 									if (log.isLoggable(Level.FINEST)) {
 										log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}",
@@ -1540,13 +1522,13 @@ public class SessionManager
 							}
 						}
 					} catch (ComponentException ex) {
-						 try {
-						 	addOutPacket(ex.makeElement(iqc, true));
-						 } catch (PacketErrorTypeException ex1) {
-						 	if (log.isLoggable(Level.FINEST)) {
-						 		log.log(Level.FINEST, "packet already of type = error, " + iqc);
+						try {
+							addOutPacket(ex.makeElement(iqc, true));
+						} catch (PacketErrorTypeException ex1) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "packet already of type = error, " + iqc);
 							}
-						 }
+						}
 					}
 					processing_result = true;
 				}
@@ -1654,7 +1636,7 @@ public class SessionManager
 							addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized", false));
 						}
 					} catch (PacketErrorTypeException e) {
-						log.log(Level.FINEST,"could not send not-authorized error, packet already of type error", e);
+						log.log(Level.FINEST, "could not send not-authorized error, packet already of type error", e);
 					}
 				}
 				processing_result = true;
@@ -1730,7 +1712,8 @@ public class SessionManager
 						try {
 							addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized", false));
 						} catch (PacketErrorTypeException ex) {
-							log.log(Level.FINEST, "could not send not-authorized error, packet already of type error", ex);
+							log.log(Level.FINEST, "could not send not-authorized error, packet already of type error",
+									ex);
 						}
 					}
 				} catch (PacketErrorTypeException e) {
@@ -2214,6 +2197,28 @@ public class SessionManager
 		return false;
 	}
 
+	private void calculateActiveUsers() {
+		int count = 0;
+
+		for (BareJID bareJID : sessionsByNodeId.keySet()) {
+			if (!bareJID.toString().startsWith("sess-man")) {
+				XMPPSession session = sessionsByNodeId.get(bareJID);
+				// check if session is still there as it could be closed
+				// if sessionsByNodeId is big collection
+				if (session != null) {
+					for (XMPPResourceConnection xMPPResourceConnection : session.getActiveResources()) {
+						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() <
+								activeUserTimeframe) {
+							count++;
+						}
+					}
+				}
+			}
+		}
+
+		activeUserNumber = count;
+	}
+
 	private long calcAverage(long[] timings) {
 		long res = 0;
 
@@ -2440,6 +2445,31 @@ public class SessionManager
 		}
 	}
 
+	@Bean(name = "writer", active = true)
+	public static class SMPacketWriter
+			implements PacketWriter {
+
+		@Inject(bean = "service", nullAllowed = false)
+		private SessionManager component;
+
+		@Override
+		public void write(Collection<Packet> packets) {
+			if (packets != null) {
+				packets.forEach(this::write);
+			}
+		}
+
+		@Override
+		public void write(Packet packet) {
+			component.addOutPacket(packet);
+		}
+
+		@Override
+		public void write(Packet packet, AsyncCallback callback) {
+			throw new UnsupportedOperationException("writing packets with AsyncCallback is not supported in SM!");
+		}
+	}
+
 	@Bean(name = sessionCloseProcId, parent = SessionManager.class, active = true)
 	public static class SessionCloseProc
 			extends XMPPProcessor
@@ -2646,9 +2676,9 @@ public class SessionManager
 	private class StaleConnectionCloser
 			extends TimerTask {
 
-			public static final int DEF_QUEUE_SIZE = 1000;
+		public static final int DEF_QUEUE_SIZE = 1000;
 
-			public static final long DEF_TIMEOUT = 30 * 1000;
+		public static final long DEF_TIMEOUT = 30 * 1000;
 
 		private int maxQueueSize;
 		private Set<JID> queueSet;
@@ -2779,30 +2809,6 @@ public class SessionManager
 
 				return !workingSet.isEmpty();
 			}
-		}
-	}
-
-	@Bean(name = "writer", active = true)
-	public static class SMPacketWriter implements PacketWriter {
-
-		@Inject(bean = "service", nullAllowed = false)
-		private SessionManager component;
-		
-		@Override
-		public void write(Collection<Packet> packets) {
-			if (packets != null) {
-				packets.forEach(this::write);
-			}
-		}
-
-		@Override
-		public void write(Packet packet) {
-			component.addOutPacket(packet);
-		}
-
-		@Override
-		public void write(Packet packet, AsyncCallback callback) {
-			throw new UnsupportedOperationException("writing packets with AsyncCallback is not supported in SM!");
 		}
 	}
 }

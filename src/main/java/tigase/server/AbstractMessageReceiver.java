@@ -154,17 +154,10 @@ public abstract class AbstractMessageReceiver
 	protected int maxOutQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	@ConfigField(desc = "Maximum size of internal queues", alias = "max-queue-size")
 	protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
-	// ~--- fields ---------------------------------------------------------------
-	// private static final TigaseTracer tracer =
-	// TigaseTracer.getTracer("abstract");
-	@ConfigField(desc = "Number of threads processing incoming packages", alias = "processing-in-threads")
-	private int processingInThreads = processingInThreads();
 	private int in_queues_size = processingInThreads();
 	private long last_hour_packets = 0;
 	private long last_minute_packets = 0;
 	private long last_second_packets = 0;
-	@ConfigField(desc = "Number of threads processing outgoing packages", alias = "processing-out-threads")
-	private int processingOutThreads = processingOutThreads();
 	private int out_queues_size = processingOutThreads();
 	private QueueListener out_thread = null;
 	@ConfigField(desc = "Packet delivery retry count", alias = PACKET_DELIVERY_RETRY_COUNT_PROP_KEY)
@@ -177,8 +170,14 @@ public abstract class AbstractMessageReceiver
 	private int pptIdx = 0;
 	@ConfigField(desc = "Priority queue class", alias = "priority-queue-implementation")
 	private Class<? extends PriorityQueueAbstract> priorityQueueClass = PriorityQueueRelaxed.class;
+	// ~--- fields ---------------------------------------------------------------
+	// private static final TigaseTracer tracer =
+	// TigaseTracer.getTracer("abstract");
+	@ConfigField(desc = "Number of threads processing incoming packages", alias = "processing-in-threads")
+	private int processingInThreads = processingInThreads();
+	@ConfigField(desc = "Number of threads processing outgoing packages", alias = "processing-out-threads")
+	private int processingOutThreads = processingOutThreads();
 	private ScheduledExecutorService receiverScheduler = null;
-	private Queue<Runnable> tasksAwaitingReceiver = new LinkedList<>();
 	private Timer receiverTasks = null;
 	@Inject(nullAllowed = true)
 	private Set<ScheduledTask> scheduledTasks;
@@ -194,6 +193,7 @@ public abstract class AbstractMessageReceiver
 	private long statReceivedPacketsOk = 0;
 	private long statSentPacketsEr = 0;
 	private long statSentPacketsOk = 0;
+	private Queue<Runnable> tasksAwaitingReceiver = new LinkedList<>();
 	private ArrayDeque<QueueListener> threadsQueueIn = null;
 	private ArrayDeque<QueueListener> threadsQueueOut = null;
 
@@ -413,16 +413,13 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Method queues and executes timer tasks using ScheduledExecutorService which allows using more than one thread for
 	 * executing tasks.
-	 *
-	 * @param task
-	 * @param delay
 	 */
 	public void addTimerTask(tigase.util.common.TimerTask task, long delay) {
 		if (task.isCancelled()) {
 			return;
 		}
 		if (receiverScheduler == null) {
-			tasksAwaitingReceiver.offer(() ->  this.addTimerTask(task, delay));
+			tasksAwaitingReceiver.offer(() -> this.addTimerTask(task, delay));
 			return;
 		}
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
@@ -435,7 +432,7 @@ public abstract class AbstractMessageReceiver
 			return;
 		}
 		if (receiverScheduler == null) {
-			tasksAwaitingReceiver.offer(() ->  this.addTimerTask(task, initialDelay, period));
+			tasksAwaitingReceiver.offer(() -> this.addTimerTask(task, initialDelay, period));
 			return;
 		}
 		ScheduledFuture<?> future = receiverScheduler.scheduleAtFixedRate(task, initialDelay, period,
@@ -467,7 +464,7 @@ public abstract class AbstractMessageReceiver
 			return;
 		}
 		if (receiverScheduler == null) {
-			tasksAwaitingReceiver.offer(() ->  this.addTimerTaskWithTimeout(task, delay, timeout));
+			tasksAwaitingReceiver.offer(() -> this.addTimerTaskWithTimeout(task, delay, timeout));
 			return;
 		}
 		receiverScheduler.schedule(new tigase.util.common.TimerTask() {
@@ -502,7 +499,7 @@ public abstract class AbstractMessageReceiver
 			return;
 		}
 		if (receiverScheduler == null) {
-			tasksAwaitingReceiver.offer(() ->  this.addTimerTaskWithTimeout(task, delay, period, timeout));
+			tasksAwaitingReceiver.offer(() -> this.addTimerTaskWithTimeout(task, delay, period, timeout));
 			return;
 		}
 		receiverScheduler.schedule(new tigase.util.common.TimerTask() {
@@ -872,7 +869,7 @@ public abstract class AbstractMessageReceiver
 		outgoing_filters.clear();
 		outgoing_filters.addAll(filters);
 	}
-	
+
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		super.beanConfigurationChanged(changedFields);
@@ -896,59 +893,6 @@ public abstract class AbstractMessageReceiver
 
 		if (recreate) {
 			recreateProcessingQueues(maxQueueSize);
-		}
-	}
-
-	private void recreateProcessingQueues(int maxQueueSize) {
-		// Processing threads number is split to incoming and outgoing queues...
-		// So real processing threads number of in_queues is processingThreads()/2
-		this.maxInQueueSize = (maxQueueSize / processingInThreads) * 2;
-		this.maxOutQueueSize = (maxQueueSize / processingOutThreads) * 2;
-		log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
-				new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
-		log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
-				new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
-
-		if (maxInQueueSize <= 15 || maxQueueSize <= 15) {
-			TigaseRuntime.getTigaseRuntime()
-					.shutdownTigase(new String[]{"You configured component of class " + getClass().getCanonicalName() +
-														 " with packet queues total size set to " + maxQueueSize,
-												 "Component uses " +
-														 Math.max(processingInThreads, processingOutThreads) +
-														 " queues which would give a limit of " +
-														 Math.min(maxInQueueSize, maxOutQueueSize) +
-														 " packets per queue.",
-												 "This value is too low for Tigase XMPP Server to run properly. Please adjust the configuration of the server.",
-												 "max-queue-size should be set to at least " +
-														 (Math.max(processingInThreads, processingOutThreads) / 2) *
-																 16});
-		}
-
-		if (in_queues.size() == 0) {
-			for (int i = 0; i < in_queues_size; i++) {
-				PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
-																							 maxInQueueSize,
-																							 priorityQueueClass);
-
-				in_queues.add(queue);
-			}
-		} else {
-			for (int i = 0; i < in_queues.size(); i++) {
-				in_queues.get(i).setMaxSize(maxInQueueSize);
-			}
-		}
-		if (out_queues.size() == 0) {
-			for (int i = 0; i < out_queues_size; i++) {
-				PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
-																							 maxOutQueueSize,
-																							 priorityQueueClass);
-
-				out_queues.add(queue);
-			}
-		} else {
-			for (int i = 0; i < out_queues.size(); i++) {
-				out_queues.get(i).setMaxSize(maxOutQueueSize);
-			}
 		}
 	}
 
@@ -1059,17 +1003,13 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Method queues and executes timer tasks using ScheduledExecutorService which allows using more than one thread for
 	 * executing tasks.
-	 *
-	 * @param task
-	 * @param delay
-	 * @param unit
 	 */
 	protected void addTimerTask(tigase.util.common.TimerTask task, long delay, TimeUnit unit) {
 		if (task.isCancelled()) {
 			return;
 		}
 		if (receiverScheduler == null) {
-			tasksAwaitingReceiver.offer(() ->  this.addTimerTask(task, delay, unit));
+			tasksAwaitingReceiver.offer(() -> this.addTimerTask(task, delay, unit));
 			return;
 		}
 		if (log.isLoggable(Level.FINEST)) {
@@ -1094,6 +1034,59 @@ public abstract class AbstractMessageReceiver
 
 	protected Integer getMaxQueueSize(int def) {
 		return def;
+	}
+
+	private void recreateProcessingQueues(int maxQueueSize) {
+		// Processing threads number is split to incoming and outgoing queues...
+		// So real processing threads number of in_queues is processingThreads()/2
+		this.maxInQueueSize = (maxQueueSize / processingInThreads) * 2;
+		this.maxOutQueueSize = (maxQueueSize / processingOutThreads) * 2;
+		log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
+				new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
+		log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}",
+				new Object[]{getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
+
+		if (maxInQueueSize <= 15 || maxQueueSize <= 15) {
+			TigaseRuntime.getTigaseRuntime()
+					.shutdownTigase(new String[]{"You configured component of class " + getClass().getCanonicalName() +
+														 " with packet queues total size set to " + maxQueueSize,
+												 "Component uses " +
+														 Math.max(processingInThreads, processingOutThreads) +
+														 " queues which would give a limit of " +
+														 Math.min(maxInQueueSize, maxOutQueueSize) +
+														 " packets per queue.",
+												 "This value is too low for Tigase XMPP Server to run properly. Please adjust the configuration of the server.",
+												 "max-queue-size should be set to at least " +
+														 (Math.max(processingInThreads, processingOutThreads) / 2) *
+																 16});
+		}
+
+		if (in_queues.size() == 0) {
+			for (int i = 0; i < in_queues_size; i++) {
+				PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
+																							 maxInQueueSize,
+																							 priorityQueueClass);
+
+				in_queues.add(queue);
+			}
+		} else {
+			for (int i = 0; i < in_queues.size(); i++) {
+				in_queues.get(i).setMaxSize(maxInQueueSize);
+			}
+		}
+		if (out_queues.size() == 0) {
+			for (int i = 0; i < out_queues_size; i++) {
+				PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
+																							 maxOutQueueSize,
+																							 priorityQueueClass);
+
+				out_queues.add(queue);
+			}
+		} else {
+			for (int i = 0; i < out_queues.size(); i++) {
+				out_queues.get(i).setMaxSize(maxOutQueueSize);
+			}
+		}
 	}
 
 	private Packet filterPacket(Packet packet, CopyOnWriteArrayList<PacketFilterIfc> filters) {
