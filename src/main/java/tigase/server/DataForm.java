@@ -21,10 +21,7 @@ import tigase.server.Command.DataType;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -36,9 +33,48 @@ public class DataForm {
 
 	public static final String FIELD_EL = "field";
 	public static final String VALUE_EL = "value";
+	public static final String FORM_TYPE = "FORM_TYPE";
 	protected static final String[] FIELD_VALUE_PATH = {FIELD_EL, VALUE_EL};
-
 	private static final Logger log = Logger.getLogger(DataForm.class.getName());
+
+	public enum FieldType {
+		Boolean,
+		Fixed,
+		Hidden,
+		JidMulti,
+		JidSingle,
+		ListMulti,
+		ListSingle,
+		TextMulti,
+		TextPrivate,
+		TextSingle;
+
+		public String value() {
+			switch (this) {
+				case Boolean:
+					return "boolean";
+				case Fixed:
+					return "fixed";
+				case Hidden:
+					return "hidden";
+				case JidMulti:
+					return "jid-multi";
+				case JidSingle:
+					return "jid-single";
+				case ListMulti:
+					return "list-multi";
+				case ListSingle:
+					return "list-single";
+				case TextMulti:
+					return "text-multi";
+				case TextPrivate:
+					return "text-private";
+				case TextSingle:
+					return "text-single";
+			}
+			return null;
+		}
+	}
 
 	/**
 	 * Data form-types as defined in the XEP-0050.
@@ -46,10 +82,6 @@ public class DataForm {
 
 	public static void addCheckBoxField(final Element el, String f_name, boolean f_value) {
 		DataForm.addFieldValue(el, f_name, Boolean.toString(f_value), "boolean");
-	}
-
-	public static Element createDataForm(DataType data_type) {
-		return new Element("x", new String[]{"xmlns", "type"}, new String[]{"jabber:x:data", data_type.name()});
 	}
 
 	public static Element addDataForm(Element el, DataType data_type) {
@@ -260,6 +292,10 @@ public class DataForm {
 		x.addChild(new Element("title", title));
 	}
 
+	public static Element createDataForm(DataType data_type) {
+		return new Element("x", new String[]{"xmlns", "type"}, new String[]{"jabber:x:data", data_type.name()});
+	}
+
 	public static String getFieldKeyStartingWith(final Element el, String f_name) {
 		Element x = el.getChild("x", "jabber:x:data");
 
@@ -333,6 +369,29 @@ public class DataForm {
 		return null;
 	}
 
+	public static Set<String> getFields(Element el) {
+		Element x = el.getChild("x", "jabber:x:data");
+
+		if (x != null) {
+			List<Element> children = x.getChildren();
+			Set<String> set = new HashSet<>();
+			for (Element child : children) {
+				String varName = child.getAttributeStaticStr("var");
+				if (varName != null) {
+					if (!varName.equals(FORM_TYPE)) {
+						set.add(varName);
+					}
+				}
+			}
+			return set;
+		}
+		return null;
+	}
+
+	public static String getFormType(Element form) {
+		return getFieldValue(form, FORM_TYPE);
+	}
+
 	public static boolean removeFieldValue(final Element el, final String f_name) {
 		Element x = el.getChild("x", "jabber:x:data");
 
@@ -354,6 +413,13 @@ public class DataForm {
 	public static class Builder {
 
 		private final Element x;
+
+		private static Element createDataEl(Element parent) {
+			Element dataEl = new Element("x");
+			dataEl.setXMLNS("jabber:x:data");
+			parent.addChild(dataEl);
+			return dataEl;
+		}
 
 		public Builder(Element parent, DataType type) {
 			x = Optional.ofNullable(parent.getChild("x", "jabber:x:data")).orElseGet(() -> createDataEl(parent));
@@ -412,81 +478,14 @@ public class DataForm {
 		public Element build() {
 			return x;
 		}
-
-		private static Element createDataEl(Element parent) {
-			Element dataEl = new Element("x");
-			dataEl.setXMLNS("jabber:x:data");
-			parent.addChild(dataEl);
-			return dataEl;
-		}
-	}
-
-	public static class Reported {
-
-		public static class Builder {
-
-			private final Element x;
-			private final Element reported;
-
-			public Builder(Element x) {
-				this.x = x;
-				this.reported = new Element("reported");
-			}
-
-			public Field.Builder addField(FieldType type, String var) {
-				return new Field.Builder(reported, type, var);
-			}
-
-			public Builder withFields(Consumer<Reported.Builder> consumer) {
-				consumer.accept(this);
-				return this;
-			}
-
-			public Element build() {
-				if (x != null) {
-					x.addChild(reported);
-				}
-				return reported;
-			}
-		}
-	}
-
-	public static class Item {
-
-		public static class Builder {
-
-			private final Element x;
-			private final Element item;
-
-			public Builder(Element x) {
-				this.x = x;
-				this.item = new Element("item");
-			}
-
-			public Field.Builder addField(String var) {
-				return new Field.Builder(item, null, var);
-			}
-
-			public Builder withFields(Consumer<Item.Builder> consumer) {
-				consumer.accept(this);
-				return this;
-			}
-
-			public Element build() {
-				if (x != null) {
-					x.addChild(item);
-				}
-				return item;
-			}
-		}
 	}
 
 	public static class Field {
 
 		public static class Builder {
 
-			private final Element parent;
 			private final Element el;
+			private final Element parent;
 			private final FieldType type;
 
 			public Builder(Element form, FieldType type, String var) {
@@ -498,7 +497,7 @@ public class DataForm {
 					this.el.setAttribute("type", type.value());
 				}
 			}
-			
+
 			public Builder setLabel(String label) {
 				if (label == null) {
 					el.removeAttribute("label");
@@ -545,13 +544,13 @@ public class DataForm {
 				el.addChild(option);
 				return this;
 			}
-			
+
 			public Builder setOptions(String[] values) {
 				return setOptions(values, null);
 			}
 
 			public Builder setOptions(String[] values, String[] labels) {
-				for (int i=0; i<values.length; i++) {
+				for (int i = 0; i < values.length; i++) {
 					addOption(values[i], labels == null ? null : labels[i]);
 				}
 				return this;
@@ -622,43 +621,64 @@ public class DataForm {
 		}
 
 	}
-	
-	public enum FieldType  {
-		Boolean,
-		Fixed,
-		Hidden,
-		JidMulti,
-		JidSingle,
-		ListMulti,
-		ListSingle,
-		TextMulti,
-		TextPrivate,
-		TextSingle;
 
-		public String value() {
-			switch (this) {
-				case Boolean:
-					return "boolean";
-				case Fixed:
-					return "fixed";
-				case Hidden:
-					return "hidden";
-				case JidMulti:
-					return "jid-multi";
-				case JidSingle:
-					return "jid-single";
-				case ListMulti:
-					return "list-multi";
-				case ListSingle:
-					return "list-single";
-				case TextMulti:
-					return "text-multi";
-				case TextPrivate:
-					return "text-private";
-				case TextSingle:
-					return "text-single";
+	public static class Item {
+
+		public static class Builder {
+
+			private final Element item;
+			private final Element x;
+
+			public Builder(Element x) {
+				this.x = x;
+				this.item = new Element("item");
 			}
-			return null;
+
+			public Field.Builder addField(String var) {
+				return new Field.Builder(item, null, var);
+			}
+
+			public Builder withFields(Consumer<Item.Builder> consumer) {
+				consumer.accept(this);
+				return this;
+			}
+
+			public Element build() {
+				if (x != null) {
+					x.addChild(item);
+				}
+				return item;
+			}
+		}
+	}
+
+	public static class Reported {
+
+		public static class Builder {
+
+			private final Element reported;
+			private final Element x;
+
+			public Builder(Element x) {
+				this.x = x;
+				this.reported = new Element("reported");
+			}
+
+			public Field.Builder addField(FieldType type, String var) {
+				return new Field.Builder(reported, type, var);
+			}
+
+			public Builder withFields(Consumer<Reported.Builder> consumer) {
+				consumer.accept(this);
+				return this;
+			}
+
+			public Element build() {
+				if (x != null) {
+					x.addChild(reported);
+				}
+				return reported;
+			}
 		}
 	}
 

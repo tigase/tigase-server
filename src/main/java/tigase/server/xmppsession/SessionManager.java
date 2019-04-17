@@ -111,12 +111,12 @@ public class SessionManager
 	protected ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId = new ConcurrentHashMap<BareJID, XMPPSession>(
 			100000);
 	private int activeUserNumber = 0;
+	@ConfigField(desc = "ActiveUsers timeframe", alias = SessionManagerConfig.ACTIVE_USER_TIMEFRAME_KEY)
+	private long activeUserTimeframe = 5 * 60 * 1000;
 	@Inject
 	private AdHocCommandModule adHocCommandModule;
 	@Inject
 	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins = new ConcurrentSkipListSet<XMPPImplIfc>();
-	@ConfigField(desc = "ActiveUsers timeframe", alias = SessionManagerConfig.ACTIVE_USER_TIMEFRAME_KEY)
-	private long activeUserTimeframe = 5 * 60 * 1000;
 	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
 	private long authTimeout = 120;
 	private long authTimeouts = 0;
@@ -166,6 +166,8 @@ public class SessionManager
 	private Map<String, long[]> postTimes = new ConcurrentSkipListMap<String, long[]>();
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String, XMPPPreprocessorIfc>(10);
 	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String, XMPPProcessorIfc>(32);
+	@Inject(nullAllowed = true)
+	private MessageRouter router;
 	@Inject
 	private SessionCloseProc sessionCloseProc = null;
 	@Inject
@@ -2272,6 +2274,10 @@ public class SessionManager
 				results.addAll(Arrays.asList(features));
 			}    // end of if (features != null)
 		}      // end of for ()
+
+		if (router != null && session != null && session.isAuthorized()) {
+			router.getServiceEntityCaps(session.getjid()).ifPresent(results::add);
+		}
 
 		return results;
 	}

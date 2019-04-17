@@ -18,10 +18,14 @@
 package tigase.disco;
 
 import tigase.xml.Element;
+import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.xmpp.impl.PresenceCapabilitiesManager.CAPS_NODE;
+import static tigase.xmpp.impl.PresenceCapabilitiesManager.generateVerificationString;
 
 /**
  * Describe class ServiceEntity here.
@@ -36,6 +40,7 @@ public class ServiceEntity {
 	private static Logger log = Logger.getLogger(ServiceEntity.class.getName());
 
 	private boolean adminOnly = false;
+	private Element extensions = null;
 	private Set<String> features = null;
 	private List<ServiceIdentity> identities = null;
 	private Set<ServiceEntity> items = null;
@@ -54,6 +59,14 @@ public class ServiceEntity {
 		this.node = node;
 		this.name = name;
 		this.adminOnly = adminOnly;
+	}
+
+	public Element getExtensions() {
+		return extensions.clone();
+	}
+
+	public void setExtensions(Element extensions) {
+		this.extensions = extensions;
 	}
 
 	public void addFeatures(String... features) {
@@ -172,6 +185,38 @@ public class ServiceEntity {
 	@Override
 	public String toString() {
 		return getDiscoItem(null, null).toString();
+	}
+
+	public Optional<Element> getCaps(boolean admin) {
+		if (adminOnly && !admin) {
+			return Optional.empty();
+		}
+		final String[] discoFeatures = getDiscoFeatures();
+		List<String> list = new ArrayList<>();
+		for (ServiceIdentity serviceIdentity : getDiscoIdentities()) {
+			String asCapsString = serviceIdentity.getAsCapsString();
+			list.add(asCapsString);
+		}
+		list.sort(null);
+		final String[] discoIdentities = list.toArray(new String[0]);
+
+		final String caps = generateVerificationString(discoIdentities, discoFeatures, extensions);
+
+		if (caps != null) {
+			final String capsNode = CAPS_NODE + "#" + caps;
+			PresenceCapabilitiesManager.setNodeFeatures(capsNode, getDiscoFeatures());
+			return Optional.of(PresenceCapabilitiesManager.getCapsElement(caps));
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public String[] getDiscoFeatures() {
+		return features == null ? new String[0] : features.toArray(new String[0]);
+	}
+
+	public List<ServiceIdentity> getDiscoIdentities() {
+		return identities == null ? Collections.emptyList() : Collections.unmodifiableList(identities);
 	}
 
 	public Element[] getDiscoFeatures(String node) {

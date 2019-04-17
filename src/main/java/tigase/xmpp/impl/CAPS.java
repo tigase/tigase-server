@@ -41,12 +41,14 @@ public class CAPS
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {
 
+	public static final String XMLNS = "http://jabber.org/protocol/caps";
 	private static final String[][] ELEMENTS = {{Presence.ELEM_NAME}, Iq.IQ_QUERY_PATH};
 	private static final String ID = "caps";
 	private static final Logger log = Logger.getLogger(CAPS.class.getCanonicalName());
 	private static final String XMLNS_DISCO = "http://jabber.org/protocol/disco#info";
 	private static final String[] XMLNSS = {"jabber:client", XMLNS_DISCO};
 	private static final RosterAbstract roster_impl = RosterFactory.getRosterImplementation(true);
+	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 
 	public static Set<JID> getJidsWithFeature(XMPPResourceConnection session, String feature) {
 		Set<JID> jids = new HashSet<JID>();
@@ -92,6 +94,11 @@ public class CAPS
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
+	}
+
+	@Override
+	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
+		return DISCO_FEATURES;
 	}
 
 	@Override

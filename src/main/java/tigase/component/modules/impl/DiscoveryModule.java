@@ -146,11 +146,11 @@ public class DiscoveryModule
 
 	protected void processDiscoInfo(Packet packet, JID jid, String node, JID senderJID)
 			throws ComponentException, RepositoryException {
-		Packet resultIq = prepareDiscoInfoReponse(packet, jid, node, senderJID);
+		Packet resultIq = prepareDiscoInfoResponse(packet, jid, node, senderJID);
 		write(resultIq);
 	}
 
-	protected Packet prepareDiscoInfoReponse(Packet packet, JID jid, String node, JID senderJID) {
+	protected Packet prepareDiscoInfoResponse(Packet packet, JID jid, String node, JID senderJID) {
 		Element resultQuery = new Element("query", new String[]{"xmlns"}, new String[]{DISCO_INFO_XMLNS});
 		Packet resultIq = packet.okResult(resultQuery, 0);
 

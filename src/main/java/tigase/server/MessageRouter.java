@@ -35,6 +35,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
@@ -51,6 +52,7 @@ import java.util.logging.Logger;
 
 import static tigase.server.MessageRouterConfig.DISCO_NAME_PROP_VAL;
 import static tigase.server.MessageRouterConfig.DISCO_SHOW_VERSION_PROP_VAL;
+import static tigase.xmpp.impl.PresenceCapabilitiesManager.CAPS_NODE;
 
 /**
  * Class MessageRouter
@@ -534,7 +536,7 @@ public class MessageRouter
 
 	@Override
 	public String getDiscoCategoryType() {
-		return "im";
+		return "router";
 	}
 
 	@Override
@@ -656,102 +658,130 @@ public class MessageRouter
 		String node = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
 		Element query = packet.getElement().getChild("query").clone();
 
+		if (node != null && PresenceCapabilitiesManager.getNodeFeatures(node) != null) {
+			node = null;
+		}
+
 		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
-			if (isLocalDomain(toJid.toString()) && (node == null)) {
-				try {
-					query = getDiscoInfo(node,
-										 (toJid.getLocalpart() == null) ? JID.jidInstance(getName(), toJid.toString(),
-																						  null) : toJid, fromJid);
-				} catch (TigaseStringprepException e) {
-					log.log(Level.WARNING, "processing by stringprep throw exception for = {0}@{1}",
-							new Object[]{getName(), toJid.toString()});
-				}
-				for (XMPPService comp : xmppServices.values()) {
-
-					// Buggy custom component may throw exceptions here (NPE most likely)
-					// which may cause service disco problems for well-behaving components
-					// too
-					// So this is kind of a protection
-					try {
-						List<Element> features = comp.getDiscoFeatures(fromJid);
-
-						if (features != null) {
-							query.addChildren(features);
-						}
-					} catch (Exception e) {
-						log.log(Level.WARNING,
-								"Component service disco problem: " + comp.getName() + ", during processing packet: " +
-										packet, e);
-					}
-				}
-			} else {
-				for (XMPPService comp : xmppServices.values()) {
-
-					// Buggy custom component may throw exceptions here (NPE most likely)
-					// which may cause service disco problems for well-behaving components
-					// too
-					// So this is kind of a protection
-					try {
-
-						// if (jid.startsWith(comp.getName() + ".")) {
-						Element resp = comp.getDiscoInfo(node, toJid, fromJid);
-
-						if (resp != null) {
-							query.addChildren(resp.getChildren());
-						}
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
-					}
-
-					// }
-				}
-			}
+			query.addChildren(getDiscoInfo(toJid, fromJid, node).getChildren());
 		}
 		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
-			boolean localDomain = isLocalDomain(toJid.toString());
+			query.addChildren(getDiscoItems(toJid, fromJid, node));
+		}
+		results.offer(packet.okResult(query, 0));
+	}
 
-			if (localDomain) {
-				for (XMPPService comp : xmppServices.values()) {
+	private List<Element> getDiscoItems(JID toJid, JID fromJid, String node) {
+		boolean localDomain = isLocalDomain(toJid.toString());
 
-					// Buggy custom component may throw exceptions here (NPE most likely)
-					// which may cause service disco problems for well-behaving components
-					// too
-					// So this is kind of a protection
-					try {
+		List<Element> items = new ArrayList<>();
 
-						// if (localDomain || (nick != null && comp.getName().equals(nick)))
-						// {
-						List<Element> items = comp.getDiscoItems(node, toJid, fromJid);
+		if (localDomain) {
+			for (XMPPService comp : xmppServices.values()) {
 
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
-									new Object[]{toJid, comp.getComponentId(),
-												 (items == null) ? null : items.toString()});
-						}
-						if ((items != null) && (items.size() > 0)) {
-							query.addChildren(items);
-						}
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
-					}
-				}    // end of for ()
-			} else {
-				ServerComponent comp = getLocalComponent(toJid);
+				// Buggy custom component may throw exceptions here (NPE most likely)
+				// which may cause service disco problems for well-behaving components
+				// too
+				// So this is kind of a protection
+				try {
 
-				if ((comp != null) && (comp instanceof XMPPService)) {
-					List<Element> items = ((XMPPService) comp).getDiscoItems(node, toJid, fromJid);
+					// if (localDomain || (nick != null && comp.getName().equals(nick)))
+					// {
+					final List<Element> discoItems = comp.getDiscoItems(node, toJid, fromJid);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "DiscoItems processed by: {0}, items: {1}",
-								new Object[]{comp.getComponentId(), (items == null) ? null : items.toString()});
+						log.log(Level.FINEST, "Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
+								new Object[]{toJid, comp.getComponentId(),
+											 (items == null) ? null : items.toString()});
 					}
-					if ((items != null) && (items.size() > 0)) {
-						query.addChildren(items);
+					if (discoItems != null && !discoItems.isEmpty()) {
+						items.addAll(discoItems);
 					}
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
+				}
+			}    // end of for ()
+		} else {
+			ServerComponent comp = getLocalComponent(toJid);
+
+			if ((comp != null) && (comp instanceof XMPPService)) {
+				items = ((XMPPService) comp).getDiscoItems(node, toJid, fromJid);
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "DiscoItems processed by: {0}, items: {1}",
+							new Object[]{comp.getComponentId(), (items == null) ? null : items.toString()});
 				}
 			}
 		}
-		results.offer(packet.okResult(query, 0));
+		return items;
+	}
+
+	@Override
+	public Optional<Element> getServiceEntityCaps(JID fromJid) {
+		if (fromJid != null) {
+			final Element discoInfo = getDiscoInfo(JID.jidInstanceNS(fromJid.getDomain()), fromJid, null);
+			final String caps = PresenceCapabilitiesManager.generateVerificationStringFromDiscoInfo(discoInfo);
+			final String capsNode = CAPS_NODE + "#" + caps;
+			String[] features = PresenceCapabilitiesManager.getFeaturesFromDiscoInfo(discoInfo);
+			PresenceCapabilitiesManager.setNodeFeatures(capsNode, features);
+
+			final Element capsElement = PresenceCapabilitiesManager.getCapsElement(caps);
+			return Optional.of(capsElement);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Element getDiscoInfo(JID toJid, JID fromJid, String node) {
+		Element discoInfoResult = new Element("query");
+		discoInfoResult.setXMLNS("http://jabber.org/protocol/disco#info");
+		if (isLocalDomain(toJid.toString()) && (node == null)) {
+			try {
+				final Element discoInfo = getDiscoInfo(node, (toJid.getLocalpart() == null)
+															 ? JID.jidInstance(getName(), toJid.toString(), null)
+															 : toJid, fromJid);
+				discoInfoResult.addChildren(discoInfo.getChildren());
+			} catch (TigaseStringprepException e) {
+				log.log(Level.WARNING, "processing by stringprep throw exception for = {0}@{1}",
+						new Object[]{getName(), toJid.toString()});
+			}
+			for (XMPPService comp : xmppServices.values()) {
+
+				// Buggy custom component may throw exceptions here (NPE most likely)
+				// which may cause service disco problems for well-behaving components
+				// too
+				// So this is kind of a protection
+				try {
+					List<Element> features = comp.getDiscoFeatures(fromJid);
+
+					if (features != null) {
+						discoInfoResult.addChildren(features);
+					}
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Component service disco problem: " + comp.getName() + "", e);
+				}
+			}
+		} else {
+			for (XMPPService comp : xmppServices.values()) {
+
+				// Buggy custom component may throw exceptions here (NPE most likely)
+				// which may cause service disco problems for well-behaving components
+				// too
+				// So this is kind of a protection
+				try {
+
+					// if (jid.startsWith(comp.getName() + ".")) {
+					Element resp = comp.getDiscoInfo(node, toJid, fromJid);
+
+					if (resp != null) {
+						discoInfoResult.addChildren(resp.getChildren());
+					}
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
+				}
+			}
+		}
+		return discoInfoResult;
 	}
 
 	private ServerComponent[] getComponentsForLocalDomain(String domain) {

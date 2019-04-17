@@ -191,7 +191,7 @@ public class BasicComponent
 	public boolean checkCommandAcl(JID jid, Set<CmdAcl> acl) {
 		return checkCommandAcl(jid, null, acl);
 	}
-	
+
 	/**
 	 * Check if entity with JID is allowed ot execute command with passed access control list.
 	 *
@@ -260,7 +260,7 @@ public class BasicComponent
 					}
 
 					break;
-					
+
 				case JID:
 				default:
 					if (cmdAcl.isJIDAllowed(jid.getBareJID())) {
@@ -471,6 +471,10 @@ public class BasicComponent
 		serviceEntity.addIdentities(
 				new ServiceIdentity(getDiscoCategory(), getDiscoCategoryType(), getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
+		final Element discoExtensionsForm = getDiscoExtensionsForm();
+		if (discoExtensionsForm != null) {
+			serviceEntity.setExtensions(discoExtensionsForm);
+		}
 	}
 
 	@Override
@@ -509,7 +513,7 @@ public class BasicComponent
 
 	/**
 	 * Method returns category of a component used for service discovery responses.
-	 * 
+	 *
 	 * @return category of a component
 	 */
 	public String getDiscoCategory() {
@@ -572,13 +576,9 @@ public class BasicComponent
 	public Element getDiscoExtensionsForm() {
 		if (!discoExtensions.isEmpty()) {
 			Element form = DataForm.createDataForm(Command.DataType.result);
-			form.addChild(new Element("field", new String[]{"var", "type"}, new String[]{"FORM_TYPE", "hidden"})
-								  .withElement("value", null, "http://jabber.org/network/serverinfo"));
-
+			DataForm.addHiddenField(form,"FORM_TYPE", "http://jabber.org/network/serverinfo");
 			for(Map.Entry<String, ArrayList<String>> item : discoExtensions.entrySet()) {
-				Element child = new Element("field", new String[] {"var"}, new String[] {item.getKey()});
-				item.getValue().forEach(value -> child.withElement("value", null, XMLUtils.escape(value)));
-				form.addChild(child);
+				DataForm.addFieldMultiValue(form, item.getKey(), item.getValue());
 			}
 			return form;
 		}
@@ -835,7 +835,7 @@ public class BasicComponent
 
 					// Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
-					
+
 					Function<String,Boolean> isAllowedForDomain = (domain) -> canCallCommand(iqc.getStanzaFrom(), domain, strCommand);
 					binds.put("isAllowedForDomain", isAllowedForDomain);
 
@@ -898,6 +898,10 @@ public class BasicComponent
 
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
+	}
+
+	public Optional<Element> getServiceEntityCaps(JID fromJid) {
+		return getServiceEntity().getCaps(isAdmin(fromJid) || nonAdminCommands);
 	}
 
 	protected boolean isNonAdminCommands() {

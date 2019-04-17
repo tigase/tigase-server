@@ -171,6 +171,7 @@ public final class XMPPServer {
 	}
 
 	public static void start(String[] args) {
+		final long start = System.currentTimeMillis();
 		Thread.setDefaultUncaughtExceptionHandler(new ThreadExceptionHandler());
 
 		if (!isOSGi()) {
@@ -190,8 +191,9 @@ public final class XMPPServer {
 			if (ServerBeanSelector.getConfigType(bootstrap.getKernel()) == ConfigTypeEnum.SetupMode) {
 				System.out.println("== " + sdf.format(new Date()) + " Please setup server at http://localhost:8080/\n");
 			} else {
-				System.out.println("== " + sdf.format(new Date()) +
-										   " Server finished starting up and (if there wasn't any error) is ready to use\n");
+				System.out.println("== " + sdf.format(new Date()) + " Server finished starting up in (" +
+										   (System.currentTimeMillis() - start) / 1000 +
+										   "s) and (if there wasn't any error) is ready to use\n");
 			}
 			EventBusFactory.getInstance()
 					.fire(new StartupFinishedEvent(DNSResolverFactory.getInstance().getDefaultHost()));

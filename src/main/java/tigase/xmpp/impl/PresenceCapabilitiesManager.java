@@ -17,12 +17,18 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.disco.ServiceIdentity;
+import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.util.Base64;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.jid.JID;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -30,6 +36,9 @@ import java.util.logging.Logger;
 
 public class PresenceCapabilitiesManager {
 
+	public static final String CAPS_NODE = "https://tigase.net/tigase-xmpp-server";
+	public final static String HASH_ALGORITHM = "SHA-1";
+	public final static String charsetName = "UTF-8";
 	// Map<capsNode,Set<feature>>
 	private static final Map<String, String[]> nodeFeatures = new ConcurrentHashMap<String, String[]>(250);
 	private static final ConcurrentMap<String, Set<String>> featureNodes = new ConcurrentHashMap<String, Set<String>>(
@@ -37,6 +46,80 @@ public class PresenceCapabilitiesManager {
 	private static final List<PresenceCapabilitiesListener> handlers = new CopyOnWriteArrayList<PresenceCapabilitiesListener>();
 	private static long idCounter = 0;
 	private static Logger log = Logger.getLogger(PresenceCapabilitiesManager.class.getName());
+
+	private static MessageDigest addValues(String[] features, MessageDigest md) throws UnsupportedEncodingException {
+		if (features != null) {
+			Arrays.sort(features);
+
+			for (String f : features) {
+				md.update(f.getBytes(charsetName));
+				md.update((byte) '<');
+			}
+		}
+		return md;
+	}
+
+	public static String generateVerificationString(String[] identities, String[] features) {
+		return generateVerificationString(identities, features, null);
+	}
+
+	public static String generateVerificationString(String[] identities, String[] features, Element extensions) {
+		try {
+			log.log(Level.FINEST, "Generating caps for identities: {0}, features: {1}, extensions: {2}",
+					new String[]{Arrays.toString(identities), Arrays.toString(features), String.valueOf(extensions)});
+			MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+
+			md = addValues(identities, md);
+			md = addValues(features, md);
+
+			if (extensions != null) {
+				final Set<String> fields = DataForm.getFields(extensions);
+				if (fields != null) {
+					md.update(DataForm.getFormType(extensions).getBytes(charsetName));
+					md.update((byte) '<');
+					SortedSet<String> vars = new TreeSet<>(fields);
+					for (String var : vars) {
+						md.update(var.getBytes(charsetName));
+						md.update((byte) '<');
+						final String[] values = DataForm.getFieldValues(extensions, var);
+						addValues(values, md);
+					}
+				}
+			}
+
+			byte[] digest = md.digest();
+			return Base64.encode(digest);
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			log.warning("Cannot calculate verification string.");
+		}
+		return null;
+	}
+
+	public static String generateVerificationStringFromDiscoInfo(Element discoInfo) {
+		String[] features = getFeaturesFromDiscoInfo(discoInfo);
+		String[] identities = ServiceIdentity.getServiceIdentitiesCapsFromDiscoInfo(discoInfo);
+		Element extension = discoInfo.getChild("x", "jabber:x:data");
+		return generateVerificationString(identities, features, extension);
+	}
+
+	public static Element getCapsElement(String caps) {
+		return new Element("c", new String[]{"xmlns", "hash", "node", "ver"},
+						   new String[]{CAPS.XMLNS, HASH_ALGORITHM, CAPS_NODE, caps});
+	}
+
+	public static String[] getFeaturesFromDiscoInfo(Element discoInfo) {
+		String[] features = null;
+		final List<Element> featureElements = discoInfo.findChildren(child -> child.getName().equals("feature"));
+		if (featureElements != null && !featureElements.isEmpty()) {
+			List<String> list = new ArrayList<>();
+			for (Element element : featureElements) {
+				String var = element.getAttributeStaticStr("var");
+				list.add(var);
+			}
+			features = list.toArray(new String[0]);
+		}
+		return features;
+	}
 
 	public static String[] getNodeFeatures(String capsNode) {
 		return nodeFeatures.get(capsNode);
