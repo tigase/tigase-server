@@ -341,8 +341,12 @@ public class BruteForceLockerBean
 	}
 
 	private void addToStatistic(Value v) {
-		this.statHolder.addIP(v.ip);
-		this.statHolder.addJID(v.jid);
+		if (v.ip != null) {
+			this.statHolder.addIP(v.ip);
+		}
+		if (v.jid != null) {
+			this.statHolder.addJID(v.jid);
+		}
 	}
 
 	private boolean isLoginAllowed(final XMPPResourceConnection session, final Key key, final Value value,
