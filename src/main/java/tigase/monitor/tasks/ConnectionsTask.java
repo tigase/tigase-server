@@ -127,6 +127,7 @@ public class ConnectionsTask
 
 	@Override
 	public void initialize() {
+		super.initialize();
 		eventBus.registerEvent(USERS_DISCONNECTEED_EVENT_NAME,
 							   "Fired when too many users disconnected in the same time", false);
 	}

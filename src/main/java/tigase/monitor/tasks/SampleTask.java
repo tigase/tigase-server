@@ -46,6 +46,7 @@ public class SampleTask
 
 	@Override
 	public void initialize() {
+		super.initialize();
 		eventBus.registerEvent("tigase.monitor.tasks.SampleTaskEnabled", "Sample task", false);
 	}
 

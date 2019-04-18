@@ -112,6 +112,7 @@ public class MemoryCheckerTask
 
 	@Override
 	public void initialize() {
+		super.initialize();
 		eventBus.registerEvent(HEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when HEAP memory is too low", false);
 		eventBus.registerEvent(NONHEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when NON-HEAP memory is too low", false);
 	}

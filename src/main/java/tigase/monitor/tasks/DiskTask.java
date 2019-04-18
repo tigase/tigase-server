@@ -71,6 +71,7 @@ public class DiskTask
 
 	@Override
 	public void initialize() {
+		super.initialize();
 		eventBus.registerEvent(DISK_USAGE_MONITOR_EVENT_NAME, "Fired if disk usage is too high", false);
 		findAllRoots();
 	}

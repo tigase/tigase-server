@@ -17,7 +17,6 @@
  */
 package tigase.monitor.tasks;
 
-import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 
 import javax.script.Bindings;
@@ -28,8 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ScriptTask
-		extends AbstractConfigurableTask
-		implements Initializable {
+		extends AbstractConfigurableTask {
 
 	private static final Logger log = Logger.getLogger(ScriptTask.class.getName());
 
@@ -63,10 +61,6 @@ public class ScriptTask
 
 	public String getScriptExtension() {
 		return scriptExtension;
-	}
-
-	@Override
-	public void initialize() {
 	}
 
 	public void setScript(String script, String scriptExtension) {

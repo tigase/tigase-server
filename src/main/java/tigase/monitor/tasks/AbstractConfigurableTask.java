@@ -19,18 +19,20 @@ package tigase.monitor.tasks;
 
 import tigase.form.Field;
 import tigase.form.Form;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.ConfigurableTask;
 import tigase.monitor.MonitorTask;
 
 public abstract class AbstractConfigurableTask
-		implements MonitorTask, ConfigurableTask, UnregisterAware {
+		implements MonitorTask, ConfigurableTask, UnregisterAware, Initializable {
 
 	private final static String ENABLED_VAR = "x-task#enabled";
 
 	@ConfigField(desc = "Enable task")
 	private boolean enabled = false;
+	private boolean initialized = false;
 
 	@Override
 	public void beforeUnregister() {
@@ -56,12 +58,25 @@ public abstract class AbstractConfigurableTask
 		if (enabled && !value) {
 			// turning off
 			this.enabled = value;
-			disable();
+			if (initialized) {
+				disable();
+			}
 		} else if (!enabled && value) {
 			// turning on
 			this.enabled = value;
+			if (initialized) {
+				enable();
+			}
+		}
+	}
+
+	@Override
+	public void initialize() {
+		this.initialized = true;
+		if (isEnabled()) {
 			enable();
 		}
+
 	}
 
 	@Override

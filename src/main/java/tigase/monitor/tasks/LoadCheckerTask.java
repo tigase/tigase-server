@@ -79,6 +79,7 @@ public class LoadCheckerTask
 
 	@Override
 	public void initialize() {
+		super.initialize();
 		eventBus.registerEvent(MONITOR_EVENT_NAME, "Fired when load is too high", false);
 	}
 
@@ -102,7 +103,7 @@ public class LoadCheckerTask
 			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
 			event.addChild(new Element("message",
 									   "Average Load is higher than " + averageLoadThreshold + " and it is equals " +
-											   Double.toString(curAverageLoad)));
+											   curAverageLoad));
 
 			if (!triggeredEvents.contains(event.getName())) {
 				eventBus.fire(event);

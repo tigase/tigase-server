@@ -94,6 +94,7 @@ public class LoggerTask
 
 	@Override
 	public void initialize() {
+		super.initialize();
 		eventBus.registerEvent(LOGGER_MONITOR_EVENT_NAME, "Fired when logger receives with specific level", false);
 	}
 

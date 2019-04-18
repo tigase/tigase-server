@@ -88,7 +88,7 @@ public class CpuTempTask
 	}
 
 	@Override
-	public void initialize() {
+	public void initialize() {super.initialize();
 		eventBus.registerEvent(CPU_TEMP_MONITOR_EVENT_NAME, "Fired when CPU temperature is too high", false);
 	}
 
