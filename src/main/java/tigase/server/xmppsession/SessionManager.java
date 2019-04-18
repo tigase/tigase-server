@@ -172,6 +172,8 @@ public class SessionManager
 	private SessionCloseProc sessionCloseProc = null;
 	@Inject
 	private SessionOpenProc sessionOpenProc = null;
+	@ConfigField(desc = "Include CAPS in stream features")
+	private boolean includeCapsInStream = true;
 	@ConfigField(desc = "Skip privacy check", alias = SessionManagerConfig.SKIP_PRIVACY_PROP_KEY)
 	private boolean skipPrivacy = false;
 	private SMResourceConnection smResourceConnection = null;
@@ -2280,7 +2282,7 @@ public class SessionManager
 			}    // end of if (features != null)
 		}      // end of for ()
 
-		if (router != null && session != null && session.isAuthorized()) {
+		if (includeCapsInStream && router != null && session != null && session.isAuthorized()) {
 			router.getServiceEntityCaps(session.getjid()).ifPresent(results::add);
 		}
 
