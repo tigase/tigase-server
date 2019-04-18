@@ -17,6 +17,7 @@
  */
 package tigase.component.modules.impl;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.AbstractModule;
@@ -148,6 +149,11 @@ public class DiscoveryModule
 			throws ComponentException, RepositoryException {
 		Packet resultIq = prepareDiscoInfoResponse(packet, jid, node, senderJID);
 		write(resultIq);
+	}
+
+	@TigaseDeprecated(removeIn = "9.0.0", since = "8.1.0", note = "Deprecating method with type-o")
+	protected Packet prepareDiscoInfoReponse(Packet packet, JID jid, String node, JID senderJID) {
+		return prepareDiscoInfoResponse(packet, jid, node, senderJID);
 	}
 
 	protected Packet prepareDiscoInfoResponse(Packet packet, JID jid, String node, JID senderJID) {
