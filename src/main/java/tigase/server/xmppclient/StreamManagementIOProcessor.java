@@ -25,6 +25,7 @@ import tigase.net.SocketThread;
 import tigase.server.*;
 import tigase.stats.StatisticsList;
 import tigase.util.common.TimerTask;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.StreamError;
@@ -153,7 +154,7 @@ public class StreamManagementIOProcessor
 						timeout = Math.min(max_resumption_timeout, Integer.parseInt(maxStr));
 					}
 					id = UUID.randomUUID().toString();
-					location = connectionManager.getDefHostName().toString();
+					location = DNSResolverFactory.getInstance().getSecondaryHost();
 					service.getSessionData().putIfAbsent(STREAM_ID_KEY, id);
 					service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, timeout);
 
