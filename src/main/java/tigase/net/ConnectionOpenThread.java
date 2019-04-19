@@ -239,7 +239,7 @@ public class ConnectionOpenThread
 				addPort(al);
 			} catch (Exception e) {
 				if (((e instanceof SocketException && e.getMessage() != null &&
-						e.getMessage().contains("Network is unreachable")) &&
+						e.getMessage().contains("Network is unreachable")) ||
 						(e instanceof NoRouteToHostException && e.getMessage() != null &&
 								e.getMessage().equals("No route to host"))) &&
 						al.getConnectionType() == ConnectionType.connect && al.getIfcs() != null &&
