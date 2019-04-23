@@ -669,7 +669,7 @@ public class JabberIqRegister
 		if (null != password) {
 			password = XMLUtils.unescape(password);
 		}
-		Map<String, String> reg_params = null;
+		Map<String, String> reg_params = Collections.emptyMap();
 
 		if ((email != null) && !email.trim().isEmpty()) {
 			reg_params = new LinkedHashMap<String, String>();
