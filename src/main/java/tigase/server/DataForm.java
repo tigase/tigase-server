@@ -93,11 +93,7 @@ public class DataForm {
 	}
 
 	public static void addField(final Element el, final String f_name, final String f_label, final String type) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new String[]{"var", "type", "label"},
 									new String[]{XMLUtils.escape(f_name), type, f_label});
@@ -111,7 +107,7 @@ public class DataForm {
 
 	public static void addFieldMultiValue(final Element el, final String f_name, final List<String> f_value,
 										  final String label) {
-		Element x = el.getChild("x", "jabber:x:data");
+		Element x = getXElement(el);
 
 		if (x == null) {
 			x = addDataForm(el, DataType.result);
@@ -136,11 +132,7 @@ public class DataForm {
 	}
 
 	public static void addFieldMultiValue(final Element el, final String f_name, final Throwable ex) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		List<String> f_value = null;
 
@@ -167,11 +159,7 @@ public class DataForm {
 	}
 
 	public static void addFieldValue(final Element el, final String f_name, final String f_value) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new Element[]{new Element(VALUE_EL, XMLUtils.escape(f_value))},
 									new String[]{"var"}, new String[]{XMLUtils.escape(f_name)});
@@ -181,16 +169,16 @@ public class DataForm {
 
 	public static void addFieldValue(final Element el, final String f_name, final String f_value, final String label,
 									 final String[] labels, final String[] options) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new Element[]{new Element(VALUE_EL, XMLUtils.escape(f_value))},
 									new String[]{"var", "type", "label"},
 									new String[]{XMLUtils.escape(f_name), "list-single", XMLUtils.escape(label)});
 
+		addOptions(labels, options, x, field);
+	}
+
+	private static void addOptions(String[] labels, String[] options, Element x, Element field) {
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option", new Element[]{new Element(VALUE_EL, XMLUtils.escape(options[i]))},
 									   new String[]{"label"}, new String[]{XMLUtils.escape(labels[i])}));
@@ -200,11 +188,7 @@ public class DataForm {
 
 	public static void addFieldValue(final Element el, final String f_name, final String[] f_values, final String label,
 									 final String[] labels, final String[] options) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new String[]{"var", "type", "label"},
 									new String[]{XMLUtils.escape(f_name), "list-multi", XMLUtils.escape(label)});
@@ -221,29 +205,33 @@ public class DataForm {
 
 	public static void addFieldValue(final Element el, final String f_name, final String f_value, final String label,
 									 final String[] labels, final String[] options, final String type) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new Element[]{new Element(VALUE_EL, XMLUtils.escape(f_value))},
 									new String[]{"var", "type", "label"},
 									new String[]{XMLUtils.escape(f_name), type, XMLUtils.escape(label)});
 
-		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option", new Element[]{new Element(VALUE_EL, XMLUtils.escape(options[i]))},
-									   new String[]{"label"}, new String[]{XMLUtils.escape(labels[i])}));
+		addOptions(labels, options, x, field);
+	}
+
+	private static Element getXElement(Element el) {
+		if (el != null) {
+			if ("x".equals(el.getName()) && "jabber:x:data".equals(el.getXMLNS())) {
+				return el;
+			} else {
+				Element x = el.getChild("x", "jabber:x:data");
+
+				if (x == null) {
+					x = addDataForm(el, DataType.submit);
+				}
+				return x;
+			}
 		}
-		x.addChild(field);
+		return null;
 	}
 
 	public static void addFieldValue(final Element el, final String f_name, final String f_value, final String type) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new Element[]{new Element(VALUE_EL, XMLUtils.escape(f_value))},
 									new String[]{"var", "type"}, new String[]{XMLUtils.escape(f_name), type});
@@ -253,11 +241,7 @@ public class DataForm {
 
 	public static void addFieldValue(final Element el, final String f_name, final String f_value, final String type,
 									 final String label) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 
 		Element field = new Element(FIELD_EL, new Element[]{new Element(VALUE_EL, XMLUtils.escape(f_value))},
 									new String[]{"var", "type", "label"},
@@ -271,11 +255,7 @@ public class DataForm {
 	}
 
 	public static void addInstructions(final Element el, final String instructions) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 		x.addChild(new Element("instructions", instructions));
 	}
 
@@ -284,11 +264,7 @@ public class DataForm {
 	}
 
 	public static void addTitle(final Element el, final String title) {
-		Element x = el.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(el, DataType.submit);
-		}
+		Element x = getXElement(el);
 		x.addChild(new Element("title", title));
 	}
 
@@ -297,7 +273,7 @@ public class DataForm {
 	}
 
 	public static String getFieldKeyStartingWith(final Element el, String f_name) {
-		Element x = el.getChild("x", "jabber:x:data");
+		Element x = getXElement(el);
 
 		if (x != null) {
 			List<Element> children = x.getChildren();
@@ -315,7 +291,7 @@ public class DataForm {
 	}
 
 	public static String getFieldValue(final Element el, String f_name) {
-		Element x = el.getChild("x", "jabber:x:data");
+		Element x = getXElement(el);
 
 		if (x != null) {
 			List<Element> children = x.getChildren();
@@ -337,7 +313,7 @@ public class DataForm {
 	}
 
 	public static String[] getFieldValues(final Element el, final String f_name) {
-		Element x = el.getChild("x", "jabber:x:data");
+		Element x = getXElement(el);
 
 		if (x != null) {
 			List<Element> children = x.getChildren();
@@ -370,7 +346,7 @@ public class DataForm {
 	}
 
 	public static Set<String> getFields(Element el) {
-		Element x = el.getChild("x", "jabber:x:data");
+		Element x = getXElement(el);
 
 		if (x != null) {
 			List<Element> children = x.getChildren();
@@ -393,7 +369,7 @@ public class DataForm {
 	}
 
 	public static boolean removeFieldValue(final Element el, final String f_name) {
-		Element x = el.getChild("x", "jabber:x:data");
+		Element x = getXElement(el);
 
 		if (x != null) {
 			List<Element> children = x.getChildren();

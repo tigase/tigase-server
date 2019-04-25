@@ -548,25 +548,7 @@ public enum Command {
 	public static String getFieldValue(Packet packet, String f_name) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
-		Element x = command.getChild("x", "jabber:x:data");
-
-		if (x != null) {
-			List<Element> children = x.getChildren();
-
-			if (children != null) {
-				for (Element child : children) {
-					if (child.getName().equals(FIELD_EL) && child.getAttributeStaticStr("var").equals(f_name)) {
-						String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
-
-						if (value != null) {
-							return XMLUtils.unescape(value);
-						}
-					}
-				}
-			}
-		}
-
-		return null;
+		return DataForm.getFieldValue(command, f_name);
 	}
 
 	public static String getFieldValue(final Packet packet, final String f_name, boolean debug) {
