@@ -288,13 +288,14 @@ public interface AuthRepository
 			if (entries.isEmpty()) {
 				return null;
 			}
-			RawEntry entry = entries.get(0);
-			try {
-				return decoder.decode(user, entry.getMechanism(), entry.getValue());
-			} catch (NoSuchAlgorithmException ex) {
-				log.log(Level.WARNING, "Could not decode credentials for " + entry.getMechanism(), ex);
-				return null;
+			for (RawEntry entry : entries) {
+				try {
+					return decoder.decode(user, entry.getMechanism(), entry.getValue());
+				} catch (NoSuchAlgorithmException ex) {
+					log.log(Level.FINEST, "Could not decode credentials for " + entry.getMechanism(), ex);
+				}
 			}
+			return null;
 		}
 
 		@Override
