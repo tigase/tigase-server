@@ -19,7 +19,6 @@ package tigase.monitor.tasks;
 
 import tigase.form.Field;
 import tigase.form.Form;
-import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
@@ -89,15 +88,7 @@ public abstract class AbstractConfigurableTimerTask
 
 		super.setNewConfiguration(form);
 	}
-
-	@Override
-	public void initialize() {
-		if (isEnabled()) {
-			timerTaskService.addTimerTask(worker, 1000l, period);
-		}
-
-	}
-
+	
 	@Override
 	protected void disable() {
 		super.disable();
