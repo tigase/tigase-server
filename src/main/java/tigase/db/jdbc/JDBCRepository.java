@@ -709,18 +709,19 @@ public class JDBCRepository
 	}
 
 	protected boolean isExceptionKeyViolation(SQLException ex) {
+		// sqlState may be NULL!!
 		String sqlState = ex.getSQLState();
 		boolean keyViolation = false;
 		switch (data_repo.getDatabaseType()) {
 
 			case derby:
-				keyViolation = (sqlState.equals("X0Y78"));
+				keyViolation = ("X0Y78".equals(sqlState));
 				break;
 			case postgresql:
-				keyViolation = (sqlState.equals("23505") || sqlState.equals("23000"));
+				keyViolation = ("23505".equals(sqlState) || "23000".equals(sqlState));
 				break;
 			default:
-				keyViolation = sqlState.equals("23000");
+				keyViolation = "23000".equals(sqlState);
 				break;
 		}
 		return keyViolation;
