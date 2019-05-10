@@ -40,15 +40,19 @@ import tigase.vhosts.VHostItem
 
 import java.security.cert.X509Certificate
 import java.util.function.Function
+import java.util.logging.Level
+import java.util.logging.Logger
 
 Kernel kernel = (Kernel) kernel;
 def repo = (ComponentRepository) comp_repo
 def p = (Packet) packet
 def admins = (Set) adminsSet
+def log = Logger.getLogger("tigase.admin");
 
 @CompileStatic
-Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Set admins, Function<String,Boolean> isAllowedForDomain) {
+Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, Iq packet, Set admins, Function<String,Boolean> isAllowedForDomain) {
 	def MARKER = "command-marker"
+
 
 	try {
 
@@ -146,9 +150,14 @@ Packet process(Kernel kernel, ComponentRepository<VHostItem> repo, Iq packet, Se
 		return result;
 	} catch (Exception ex) {
 		def result = packet.commandResult(Command.DataType.result);
-		Command.addTextField(result, "Error", ex.getMessage());
+		def errorMessage = ex.getMessage()
+		if (ex.getCause()!=null) {
+			errorMessage += "\n" + ex.getCause().getMessage();
+		}
+		Command.addTextField(result, "Error", errorMessage);
+		log.log(Level.FINE, "Error while processing request", ex)
 		return result;
 	}
 }
 
-return process(kernel, repo, p, admins, (Function<String,Boolean>) isAllowedForDomain);
+return process(kernel, log, repo, p, admins, (Function<String,Boolean>) isAllowedForDomain);
