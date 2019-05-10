@@ -46,27 +46,25 @@ public abstract class SSLContextContainerAbstract
 	/**
 	 * Generic method responsible for lookup of value in <code>Map</code> where passed key is domain name and in
 	 * <code>Map</code> wildcard name may be used as a key.
-	 *
-	 * @param data
-	 * @param key
-	 * @param <T>
-	 *
-	 * @return
 	 */
-	public static <T> T find(Map<String, T> data, String key) {
-		if (data.containsKey(key)) {
-			return data.get(key);
+	public static <T> T find(Map<String, T> lookupMap, String domain) {
+		if (lookupMap.containsKey(domain)) {
+			return lookupMap.get(domain);
+		}
+
+		if (lookupMap.containsKey("*." + domain)) {
+			return lookupMap.get("*." + domain);
 		}
 
 		// should be faster than code commented below
 		// in case when there is no value at all
-		int idx = key.indexOf(".");
+		int idx = domain.indexOf(".");
 		if (idx >= 0) {
-			String asteriskKey = "*" + key.substring(idx);
-			T value = data.get(asteriskKey);
-			if (value != null) {
-				data.put(key, value);
-				return value;
+			String wildcardDomain = "*" + domain.substring(idx);
+			T cert = lookupMap.get(wildcardDomain);
+			if (cert != null) {
+				lookupMap.put(domain, cert);
+				return cert;
 			}
 		}
 
@@ -82,22 +80,22 @@ public abstract class SSLContextContainerAbstract
 		this.certificateContainer.addCertificates(params);
 	}
 
+	@Override
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+		return getSSLContext(protocol, hostname, clientMode, null);
+	}
+
+	@Override
+	public KeyStore getTrustStore() {
+		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
+	}
+
 	protected KeyManager[] createCertificate(String alias) throws Exception {
 		return certificateContainer.createCertificate(alias);
 	}
 
 	/**
 	 * Common method used to create SSLContext instance based on provided parameters
-	 *
-	 * @param protocol
-	 * @param hostname
-	 * @param alias
-	 * @param clientMode
-	 * @param tms
-	 *
-	 * @return
-	 *
-	 * @throws Exception
 	 */
 	protected SSLHolder createContextHolder(String protocol, String hostname, String alias, boolean clientMode,
 											TrustManager[] tms) throws Exception {
@@ -119,8 +117,15 @@ public abstract class SSLContextContainerAbstract
 		X509Certificate crt = null;
 		if (kms.length > 0 && kms[0] instanceof X509KeyManager) {
 			X509KeyManager km = (X509KeyManager) kms[0];
-			X509Certificate[] zzz = km.getCertificateChain(hostname);
-			crt = zzz.length == 0 ? null : zzz[zzz.length - 1];
+			X509Certificate[] chain = km.getCertificateChain(alias);
+			if (chain == null) {
+				chain = km.getCertificateChain("*." + alias);
+			}
+			if (chain == null) {
+				chain = km.getCertificateChain(getParentWildcardDomain(alias));
+			}
+
+			crt = chain == null || chain.length == 0 ? null : chain[chain.length - 1];
 		}
 
 		sslContext = SSLContext.getInstance(protocol);
@@ -137,18 +142,12 @@ public abstract class SSLContextContainerAbstract
 		return certificateContainer.getKeyManagers(hostname);
 	}
 
-	@Override
-	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
-		return getSSLContext(protocol, hostname, clientMode, null);
-	}
-
 	protected TrustManager[] getTrustManagers() {
 		return certificateContainer.getTrustManagers();
 	}
 
-	@Override
-	public KeyStore getTrustStore() {
-		return (certificateContainer != null) ? certificateContainer.getTrustStore() : null;
+	private String getParentWildcardDomain(String hostname) {
+		return hostname.indexOf('.') > 0 ? "*" + hostname.substring(hostname.indexOf('.')) : hostname;
 	}
 
 	protected class SSLHolder {

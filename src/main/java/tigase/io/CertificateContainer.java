@@ -76,6 +76,8 @@ public class CertificateContainer
 	private KeyStore trustKeyStore = null;
 	@ConfigField(desc = "Location of trusted certificates", alias = TRUSTED_CERTS_DIR_KEY)
 	private String[] trustedCertsDir = {TRUSTED_CERTS_DIR_VAL};
+	@ConfigField(desc = "Whether generated certificate should be wildcard")
+	private boolean generateWildcardCertificate = true;
 
 	@Override
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
@@ -305,24 +307,52 @@ public class CertificateContainer
 
 	}
 
-	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
+	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
-		KeyStore keys = KeyStore.getInstance("JKS");
+		PrivateKey privateKey = entry.getPrivateKey();
+		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
 
-		keys.load(null, emptyPass);
-		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, CertificateUtil.sort(entry.getCertChain()));
-
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-
-		kmf.init(keys, emptyPass);
+		KeyManagerFactory kmf = getKeyManagerFactory(alias, privateKey, certChain);
 		kmfs.put(alias, kmf);
 		cens.put(alias, entry);
 
-		if (store) {
-			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(), entry);
+		Set<String> altDomains = new TreeSet<>();
+
+		Optional<Certificate> certificate = entry.getCertificate();
+		if (certificate.isPresent() && certificate.get() instanceof X509Certificate) {
+			X509Certificate certX509 = (X509Certificate) certificate.get();
+			String certCName = CertificateUtil.getCertCName(certX509);
+			if (certCName != null) {
+				altDomains.add(certCName);
+			}
+			List<String> certAltCName = CertificateUtil.getCertAltCName(certX509);
+			altDomains.addAll(certAltCName);
 		}
 
+		for (String domain : altDomains) {
+			kmf = getKeyManagerFactory(domain, privateKey, certChain);
+			kmfs.putIfAbsent(domain, kmf);
+			cens.putIfAbsent(domain, entry);
+		}
+
+		if (store) {
+			String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
+			CertificateUtil.storeCertificate(new File(certsDirs[0], filename + ".pem").toString(), entry);
+		}
+
+		return kmf;
+	}
+
+	private KeyManagerFactory getKeyManagerFactory(String domain, PrivateKey privateKey, Certificate[] certChain)
+			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
+				   UnrecoverableKeyException {
+		KeyStore keys = KeyStore.getInstance("JKS");
+		keys.load(null, emptyPass);
+		keys.setKeyEntry(domain, privateKey, emptyPass, certChain);
+
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+		kmf.init(keys, emptyPass);
 		return kmf;
 	}
 
@@ -365,6 +395,7 @@ public class CertificateContainer
 	private KeyManagerFactory createCertificateKmf(String alias)
 			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
 				   NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
+		alias = !alias.startsWith("*.") && generateWildcardCertificate ? "*." + alias : alias;
 		CertificateEntry entry = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
 																			 () -> CertificateUtil.createKeyPair(1024,
 																												 "secret"));
