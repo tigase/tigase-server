@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  *
  * @author andrzej
  */
-@Bean(name = StreamManagementIOProcessor.XMLNS, parent = ClientConnectionManager.class, active = false)
+@Bean(name = StreamManagementIOProcessor.XMLNS, parent = ClientConnectionManager.class, active = true)
 public class StreamManagementIOProcessor
 		implements XMPPIOProcessor {
 
