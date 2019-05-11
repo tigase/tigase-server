@@ -54,10 +54,10 @@ public abstract class AbstractSaslSCRAM
 	private static final Charset CHARSET = Charset.forName("UTF-8");
 	private final static Pattern CLIENT_FIRST_MESSAGE = Pattern.compile(
 			"^(?<gs2Header>(?:y|n|p=(?<cbName>[a-zA-z0-9.-]+))," +
-					"(?:a=(?<authzid>(?:[\\x21-\\x2B\\x2D-\\x7E]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)" +
-					"?n=(?<username>(?:[\\x21-\\x2B\\x2D-\\x7E]|=2C|=3D)+),r=(?<nonce>[\\x21-\\x2B\\x2D-\\x7E]+)(?:,.*)?)$");
+					"(?:a=(?<authzid>(?:[^,\\x00-\\x20\\x2C]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)" +
+					"?n=(?<username>(?:[^,\\x00-\\x20\\x2C]|=2C|=3D)+),r=(?<nonce>[^,\\x00-\\x20\\x2C]+)(?:,.*)?)$");
 	private final static Pattern CLIENT_LAST_MESSAGE = Pattern.compile("^(?<withoutProof>c=(?<cb>[a-zA-Z0-9/+=]+)," +
-																			   "(?:r=(?<nonce>[\\x21-\\x2B\\x2D-\\x7E]+))(?:,.*)?),p=(?<proof>[a-zA-Z0-9/+=]+)$");
+																			   "(?:r=(?<nonce>[^,\\x00-\\x20\\x2C]+))(?:,.*)?),p=(?<proof>[a-zA-Z0-9/+=]+)$");
 
 	public enum BindType {
 		/**
