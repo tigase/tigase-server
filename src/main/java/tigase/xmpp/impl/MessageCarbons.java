@@ -142,8 +142,9 @@ public class MessageCarbons
 				// send result of operation
 				results.offer(packet.okResult((Element) null, 0));
 			}
-		} else if (packet.getElemName() == Message.ELEM_NAME && packet.getType() == StanzaType.chat &&
-				packet.getStanzaTo() != null) {
+		} else if (packet.getElemName() == Message.ELEM_NAME
+//				&& packet.getType() == StanzaType.chat
+				&& packet.getStanzaTo() != null) {
 
 			// ignoring if message packet was resent from c2s for redelivery
 			if (C2SDeliveryErrorProcessor.isDeliveryError(packet)) {
@@ -161,7 +162,9 @@ public class MessageCarbons
 			//if (isErrorDeliveringForkedMessage(packet, session))
 			//	return;
 
-			if (packet.getType() == StanzaType.chat) {
+			// it is better to carbon copy all messages except from errors..
+			// this way all devices will be kept in sync
+			if (packet.getType() != StanzaType.error) {
 
 				// if this is error delivering forked message we should not fork it
 				// but we need to fork only messsages with type chat so no need to check it

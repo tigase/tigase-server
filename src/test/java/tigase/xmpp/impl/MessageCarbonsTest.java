@@ -135,6 +135,51 @@ public class MessageCarbonsTest
 
 	}
 
+	@Test
+	public void testResourceSelectionForMessageDeliveryForFullJid_NotChat() throws Exception {
+		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
+		JID res1 = JID.jidInstance(userJid, "res1");
+		JID res2 = JID.jidInstance(userJid, "res2");
+		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
+													 res1);
+		XMPPResourceConnection session2 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()),
+													 res2);
+
+		session2.putSessionData(MessageCarbons.XMLNS + "-enabled", true);
+		Map<JID, Boolean> enabled = new HashMap<>();
+		enabled.put(res2, true);
+		session2.putCommonSessionData(MessageCarbons.XMLNS + "-resources", enabled);
+		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
+
+		Element packetEl = new Element("message", new String[]{"from", "to"},
+									   new String[]{"remote-user@test.com/res1", res1.toString()});
+		Packet packet = Packet.packetInstance(packetEl);
+		Queue<Packet> results = new ArrayDeque<Packet>();
+		carbonsProcessor.process(packet, session1, null, results, null);
+		assertEquals("generated result even than no resource had nonnegative priority", 1, results.size());
+		assertEquals("packet sent to wrong jids", Arrays.asList(session2.getJID()), collectStanzaTo(results));
+
+		session1.setPresence(new Element("presence"));
+		results = new ArrayDeque<Packet>();
+		carbonsProcessor.process(packet, session1, null, results, null);
+		assertEquals("not generated result even than 1 resource had nonnegative priority", 1, results.size());
+		assertEquals("packet sent to wrong jids", Arrays.asList(session2.getJID()), collectStanzaTo(results));
+
+		session2.setPresence(new Element("presence"));
+		results = new ArrayDeque<Packet>();
+		carbonsProcessor.process(packet, session1, null, results, null);
+		assertEquals("not generated result even than 2 resource had nonnegative priority", 1, results.size());
+		assertEquals("packet sent to wrong jids", Arrays.asList(session2.getJID()), collectStanzaTo(results));
+
+		results = new ArrayDeque<Packet>();
+		Packet packet1 = packet.copyElementOnly();
+		packet1.getElement().addChild(new Element("no-copy", new String[]{"xmlns"}, new String[]{"urn:xmpp:hints"}));
+		carbonsProcessor.process(packet1, session1, null, results, null);
+		assertEquals("generated result even that no-copy was sent", 0, results.size());
+		assertEquals("packet sent to wrong jids", Collections.EMPTY_LIST, collectStanzaTo(results));
+
+	}
+
 	protected List<JID> collectStanzaTo(Queue<Packet> packets) {
 		List<JID> result = new ArrayList<JID>();
 		Packet p;
