@@ -48,6 +48,7 @@ public abstract class SSLContextContainerAbstract
 	 * <code>Map</code> wildcard name may be used as a key.
 	 */
 	public static <T> T find(Map<String, T> lookupMap, String domain) {
+		domain = domain != null ? domain.toLowerCase() : domain;
 		if (lookupMap.containsKey(domain)) {
 			return lookupMap.get(domain);
 		}
