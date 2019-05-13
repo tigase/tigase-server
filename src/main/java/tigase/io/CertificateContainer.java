@@ -111,13 +111,8 @@ public class CertificateContainer
 	}
 
 	public CertificateEntry getCertificateEntry(String hostname) {
-		String alias = hostname;
-		if (alias == null) {
-			alias = getDefCertAlias();
-		}
-
-		CertificateEntry c = SSLContextContainerAbstract.find(cens, alias);
-		return c;
+		String alias = hostname == null ? getDefCertAlias() : hostname.toLowerCase();
+		return SSLContextContainerAbstract.find(cens, alias);
 	}
 
 	@Override

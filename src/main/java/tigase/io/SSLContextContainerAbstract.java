@@ -101,6 +101,9 @@ public abstract class SSLContextContainerAbstract
 											TrustManager[] tms) throws Exception {
 		SSLContext sslContext = null;
 
+		hostname = hostname != null ? hostname.toLowerCase() : hostname;
+		alias = alias != null ? alias.toLowerCase() : alias;
+
 		KeyManager[] kms = getKeyManagers(hostname);
 		if (kms == null) {
 			// if there is no KeyManagerFactory for domain then we can create

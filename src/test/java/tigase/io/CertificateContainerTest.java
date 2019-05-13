@@ -52,6 +52,11 @@ public class CertificateContainerTest {
 	}
 
 	@Test
+	public void testUpperCaseDomain() throws Exception {
+		testDomain(domain.toUpperCase(), true);
+	}
+
+	@Test
 	public void testNonexistentDomain() throws Exception {
 		testDomain("xmpp.org", false);
 	}
