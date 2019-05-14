@@ -20,15 +20,12 @@ package tigase.osgi;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import tigase.server.XMPPServer;
 
-import javax.management.MBeanServer;
-import java.lang.management.ManagementFactory;
-import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@tigase.annotations.TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0", note = "Remove OSGi support which is disabled since 8.1.0")
+@Deprecated
 public class Activator
 		implements BundleActivator {
 
@@ -43,53 +40,28 @@ public class Activator
 	@Override
 	public void start(BundleContext bc) throws Exception {
 		try {
-			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-			bc.registerService(MBeanServer.class.getName(), mbs, null);
-
-			bundle = bc.getBundle();
-
-			if (!SLF4JBridgeHandler.isInstalled()) {
-				SLF4JBridgeHandler.install();
-			}
-
-			XMPPServer.setOSGi(true);
-
-//                        try {
-//                                Set<Class<XMPPImplIfc>> procs = ClassUtil.getClassesImplementing(XMPPImplIfc.class);
-//                                ArrayList<String> elems = new ArrayList<String>(32);
+			log.severe("Tigase XMPP Server does not support OSGi any more! Please consider the usage of Tigase XMPP Server in standalone mode with HTTP API for required integration. If you have additional questions or you would like support please contact us by sending an email to support@tigase.net.");
+			throw new RuntimeException("OSGi mode not supported!");
+//			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+//			bc.registerService(MBeanServer.class.getName(), mbs, null);
 //
-//                                for (Class<XMPPImplIfc> cproc : procs) {
-//                                        if (!Modifier.isPublic(cproc.getModifiers())) {
-//                                                continue;
-//                                        }
+//			bundle = bc.getBundle();
 //
-//                                        if (cproc != null) {
-//                                                ModulesManagerImpl.getInstance().registerPluginClass(cproc);
-//                                        }
-//                                }
-//                        }
-//                        catch (Exception e) {
-//                                log.log(Level.SEVERE, "Plugin loading excepton", e);
-//                        }
+//			if (!SLF4JBridgeHandler.isInstalled()) {
+//				SLF4JBridgeHandler.install();
+//			}
 //
-//						try {
-//								Set<Class<Repository>> repos = ClassUtil.getClassesImplementing(Repository.class);
-//								RepositoryFactory.initialize(repos);
-//                                Set<Class<?>> annotated = ClassUtil.getClassesAnnotated(bundle, Repository.Meta.class);
-//                                DataSourceHelper.initialize(annotated);
-//						} catch (Exception e) {
-//								log.log(Level.SEVERE, "Could not initialize properly ResourceFactory", e);
-//						}
-
-			// we need to export this before we start, so if start will fail due to missing
-			// dependencies we would be able to add them later and recorver from this
-			ModulesManagerImpl.getInstance().setActive(true);
-			bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
-
-			XMPPServer.start(new String[0]);
-
-			// if it is not too late
-			SLF4JBridgeHandler.install();
+//			XMPPServer.setOSGi(true);
+//
+//			// we need to export this before we start, so if start will fail due to missing
+//			// dependencies we would be able to add them later and recorver from this
+//			ModulesManagerImpl.getInstance().setActive(true);
+//			bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
+//
+//			XMPPServer.start(new String[0]);
+//
+//			// if it is not too late
+//			SLF4JBridgeHandler.install();
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Error starting bundle: ", ex);
 			throw ex;
@@ -98,12 +70,12 @@ public class Activator
 
 	@Override
 	public void stop(BundleContext bc) throws Exception {
-		try {
-			ModulesManagerImpl.getInstance().setActive(false);
-			XMPPServer.stop();
-		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Error stopping bundle: ", ex);
-			throw ex;
-		}
+//		try {
+//			ModulesManagerImpl.getInstance().setActive(false);
+//			XMPPServer.stop();
+//		} catch (Exception ex) {
+//			log.log(Level.SEVERE, "Error stopping bundle: ", ex);
+//			throw ex;
+//		}
 	}
 }
