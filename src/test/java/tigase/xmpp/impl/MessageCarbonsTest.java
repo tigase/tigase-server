@@ -156,6 +156,15 @@ public class MessageCarbonsTest
 		Packet packet = Packet.packetInstance(packetEl);
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		carbonsProcessor.process(packet, session1, null, results, null);
+		assertEquals("generated result even than no resource had nonnegative priority", 0, results.size());
+		assertEquals("packet sent to wrong jids", Collections.emptyList(), collectStanzaTo(results));
+
+		packetEl = new Element("message", new String[]{"from", "to"},
+							   new String[]{"remote-user@test.com/res1", res1.toString()});
+		packetEl.addChild(new Element("received", new String[] {"xmlns"}, new String[] {"urn:xmpp:receipts"}));
+		packet = Packet.packetInstance(packetEl);
+		results = new ArrayDeque<Packet>();
+		carbonsProcessor.process(packet, session1, null, results, null);
 		assertEquals("generated result even than no resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session2.getJID()), collectStanzaTo(results));
 

@@ -22,6 +22,7 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -73,6 +74,11 @@ public class MessageCarbons
 	private final EventBus eventBus = EventBusFactory.getInstance();
 	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
 
+	@ConfigField(desc = "Send carbons of messages of type normal with mathing paths", alias = "msg-carbons-paths")
+	private ElementMatcher[] msgCarbonPaths = {
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "received"}, "urn:xmpp:receipts", true)
+	};
+
 	/**
 	 * Returns true if session is enabled for receiving carbon copy messages
 	 *
@@ -89,7 +95,6 @@ public class MessageCarbons
 	 * Prepare packet which is carbon copy of message passed as argument
 	 *
 	 * @param packet
-	 * @param session
 	 * @param srcJid
 	 * @param jid
 	 * @param type
@@ -119,6 +124,25 @@ public class MessageCarbons
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	public String[] getMsgCarbonPaths() {
+		String[] result = new String[msgCarbonPaths.length];
+		for (int i = 0; i < msgCarbonPaths.length; i++) {
+			result[i] = msgCarbonPaths[i].toString();
+		}
+		return result;
+	}
+
+	public void setMsgCarbonPaths(String[] matcherStrs) {
+		List<ElementMatcher> matchers = new ArrayList<>();
+		for (String matcherStr : matcherStrs) {
+			ElementMatcher matcher = ElementMatcher.create(matcherStr);
+			if (matcher != null) {
+				matchers.add(matcher);
+			}
+		}
+		msgCarbonPaths = matchers.toArray(new ElementMatcher[0]);
 	}
 
 	@Override
@@ -164,7 +188,7 @@ public class MessageCarbons
 
 			// it is better to carbon copy all messages except from errors..
 			// this way all devices will be kept in sync
-			if (packet.getType() != StanzaType.error) {
+			if (shouldSendCarbons(packet, session)) {
 
 				// if this is error delivering forked message we should not fork it
 				// but we need to fork only messsages with type chat so no need to check it
@@ -363,6 +387,21 @@ public class MessageCarbons
 			resources.remove(packet.getStanzaFrom());
 		}
 
+	}
+
+	protected boolean shouldSendCarbons(Packet packet, XMPPResourceConnection session) {
+		if (packet.getType() == StanzaType.chat) {
+			return true;
+		}
+		
+		if (packet.getType() == null || packet.getType() == StanzaType.normal) {
+			for (ElementMatcher matcher : msgCarbonPaths) {
+				if (matcher.matches(packet)) {
+					return matcher.getValue();
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
