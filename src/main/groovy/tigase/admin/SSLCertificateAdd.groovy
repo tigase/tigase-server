@@ -37,6 +37,7 @@ import tigase.server.Command
 import tigase.server.Iq
 import tigase.server.Packet
 import tigase.vhosts.VHostItem
+import tigase.xmpp.jid.BareJID
 
 import java.security.cert.X509Certificate
 import java.util.function.Function
@@ -127,10 +128,7 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 				} else {
 					def certCName = CertificateUtil.getCertCName((X509Certificate) certEntry.getCertChain()[0])
 					def subjectAltName = CertificateUtil.getCertAltCName((X509Certificate) certEntry.getCertChain()[0])
-					if (certCName != itemKey && !subjectAltName.contains(itemKey) && !isServiceAdmin) {
-						Command.addTextField(result, "Error",
-											 "Neither certificate CName nor any of SubjectAlternativeNames match the domain name!")
-					} else {
+					if (hasPermissionToUpdate(item, isServiceAdmin, stanzaFromBare) && isCertificateValidForVhost(itemKey, certCName, subjectAltName)) {
 						def params = new HashMap()
 						params.put(SSLContextContainerIfc.PEM_CERTIFICATE_KEY, pemCert)
 						params.put(SSLContextContainerIfc.CERT_ALIAS_KEY, itemKey)
@@ -139,6 +137,9 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 						certContainer.addCertificates(params);
 						Command.addTextField(result, "Note",
 											 "SSL Certificate for domain: " + itemKey + " loaded successfully")
+					} else {
+						Command.addTextField(result, "Error",
+											 "Neither certificate CName nor any of SubjectAlternativeNames match the domain name!")
 					}
 				}
 			} else {
@@ -158,6 +159,16 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 		log.log(Level.FINE, "Error while processing request", ex)
 		return result;
 	}
+}
+
+private static boolean hasPermissionToUpdate(VHostItem item, boolean isServiceAdmin, BareJID userJid) {
+	isServiceAdmin || item.isOwner(userJid.toString()) || item.isAdmin(userJid.toString())
+}
+
+private static boolean isCertificateValidForVhost(String itemKey, String certCName, List<String> subjectAltName) {
+	def wildcardItemKey = "*." + itemKey
+	return certCName == itemKey || certCName == wildcardItemKey || subjectAltName.contains(itemKey) ||
+			subjectAltName.contains(wildcardItemKey)
 }
 
 return process(kernel, log, repo, p, admins, (Function<String,Boolean>) isAllowedForDomain);
