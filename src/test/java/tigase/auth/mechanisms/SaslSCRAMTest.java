@@ -144,6 +144,33 @@ public class SaslSCRAMTest
 	}
 
 	@Test
+	public void testServerFirstMessage_Unicode() {
+		final byte[] CFM = "n,,n=userıÖöŞş,r=fyko+d2lbbFgONRv9qkxdawL".getBytes();
+		final byte[] SFM = "r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096".getBytes();
+		final byte[] CSM = "c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=7sNePNxxiIaGAgsj/4cUierg50I=".getBytes();
+		final byte[] SSM = "v=e5vgklJnP74B890ahhtk9gjpZMI=".getBytes();
+
+		SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil", new TestCallbackHandler("userıÖöŞş@domain.com"));
+		try {
+			log.log(Level.FINE, ">> " + new String(CFM));
+			byte[] sfm = m.evaluateResponse(CFM);
+			log.log(Level.FINE, "<< " + new String(sfm));
+			Assert.assertArrayEquals(SFM, sfm);
+			log.log(Level.FINE, ">> " + new String(CSM));
+			byte[] ssm = m.evaluateResponse(CSM);
+			log.log(Level.FINE, "<< " + new String(ssm));
+			Assert.assertArrayEquals(SSM, ssm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+
+		assertTrue(m.isComplete());
+		assertEquals("userıÖöŞş@domain.com", m.getAuthorizationID());
+
+	}
+
+	@Test
 	public void testServerFirstMessageFail_1() {
 		try {
 			SaslSCRAM m = create("QSXCR+Q6sek8bf92", "3rfcNHYJY1ZVvWVs7j", "pencil");
@@ -199,7 +226,10 @@ public class SaslSCRAMTest
 	 * @return
 	 */
 	private SaslSCRAM create(String salt, String snonce, String password) {
-		TestCallbackHandler h = new TestCallbackHandler();
+		return create(salt, snonce, password, new TestCallbackHandler());
+	}
+	
+	private SaslSCRAM create(String salt, String snonce, String password, TestCallbackHandler h) {
 		h.setSalt(salt);
 		h.setPassword(password);
 		SaslSCRAM m = new SaslSCRAM(null, h, snonce) {
@@ -211,14 +241,20 @@ public class SaslSCRAMTest
 	static class TestCallbackHandler
 			implements CallbackHandler {
 
-		private String authorizedId = "user@domain.com";
+		private String authorizedId;
 		private byte[] bindingData;
 		private int iterations = 4096;
-		private String name = "user@domain.com";
+		private String name;
 		private String password;
 		private String salt;
 
 		public TestCallbackHandler() {
+			this("user@domain.com");
+		}
+
+		public TestCallbackHandler(String jid) {
+			authorizedId = jid;
+			name = jid;
 		}
 
 		public byte[] getBindingData() {
