@@ -128,7 +128,8 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 				} else {
 					def certCName = CertificateUtil.getCertCName((X509Certificate) certEntry.getCertChain()[0])
 					def subjectAltName = CertificateUtil.getCertAltCName((X509Certificate) certEntry.getCertChain()[0])
-					if (hasPermissionToUpdate(item, isServiceAdmin, stanzaFromBare) && isCertificateValidForVhost(itemKey, certCName, subjectAltName)) {
+					if (hasPermissionToUpdate(item, isServiceAdmin, stanzaFromBare, log) &&
+							isCertificateValidForVhost(itemKey, certCName, subjectAltName, log)) {
 						def params = new HashMap()
 						params.put(SSLContextContainerIfc.PEM_CERTIFICATE_KEY, pemCert)
 						params.put(SSLContextContainerIfc.CERT_ALIAS_KEY, itemKey)
@@ -161,14 +162,24 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 	}
 }
 
-private static boolean hasPermissionToUpdate(VHostItem item, boolean isServiceAdmin, BareJID userJid) {
+private static boolean hasPermissionToUpdate(VHostItem item, boolean isServiceAdmin, BareJID userJid, Logger log) {
+	if (log.isLoggable(Level.FINEST)) {
+		log.log(Level.FINEST, "hasPermissionToUpdate :: userJid: ${userJid}, isServiceAdmin: ${isServiceAdmin}, isOwner: ${item.isOwner(userJid.toString())}, isAdmin: ${item.isAdmin(userJid.toString())}")
+	}
 	isServiceAdmin || item.isOwner(userJid.toString()) || item.isAdmin(userJid.toString())
 }
 
-private static boolean isCertificateValidForVhost(String itemKey, String certCName, List<String> subjectAltName) {
+private static boolean isCertificateValidForVhost(String itemKey, String certCName, List<String> subjectAltName,
+												  Logger log) {
 	def wildcardItemKey = "*." + itemKey
-	return certCName == itemKey || certCName == wildcardItemKey || subjectAltName.contains(itemKey) ||
+	def result = certCName == itemKey || certCName == wildcardItemKey || subjectAltName.contains(itemKey) ||
 			subjectAltName.contains(wildcardItemKey)
+	if (log.isLoggable(Level.FINEST)) {
+		Logger.getLogger("tigase.admin").
+				log(Level.FINEST,
+					"isCertificateValidForVhost:: itemKey: ${itemKey}, wildcardItemKey: ${wildcardItemKey}, certCName: ${certCName}, subjectAltName: ${subjectAltName}, result: ${result}")
+	}
+	return result
 }
 
 return process(kernel, log, repo, p, admins, (Function<String,Boolean>) isAllowedForDomain);

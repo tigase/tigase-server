@@ -76,11 +76,11 @@ java -cp <path_to_tigase-server_installation>/jars/tigase-utils.jar tigase.cert.
 
 == Let's encrypt and DNS verification
 
-You can check if your DNS provider is listed by executing `$ certbot plugins`
+The only way to obtain wildcard (`*.domain.com`) certificate is via DNS verification. Certbot support a number of DNS operators - you can check if your DNS provider is listed by executing `$ certbot plugins`
 
 === AWS Route53
 
-If you want to use it with Amazon Cloud you should installplugin for AWS:
+If you want to use it with Amazon Cloud you should install plugin for AWS:
 ```
 pip install certbot-dns-route53
 ```
@@ -89,41 +89,66 @@ pip install certbot-dns-route53
     If you are using certbot under macOS and you installed it via brew then you should use:
     `$( brew --prefix certbot )/libexec/bin/pip install certbot-dns-route53`
 
-You should store your credentials in `~/.aws/credentials` (you may want to create dedicated policy for updating DNS as described in https://certbot-dns-route53.readthedocs.io/en/stable/[plugin's documentation]
+You should store your credentials in `~/.aws/credentials` (you may want to create dedicated policy for updating DNS as described in https://certbot-dns-route53.readthedocs.io/en/stable/[plugin's documentation]:
 
-== LE update hook and Tigase API
+[source,bash]
+----
+[default]
+aws_access_key_id = <key_id>
+aws_secret_access_key = <key>
+----
 
-For greater automation it's possible to automate updating certificate obtained with `certbot` in Tigase. You should use following deploy hook - either add it to `/etc/letsencrypt/renewal-hooks/deploy/` or use it directly in `certboot` commandline with `--deploy-hook` parameter.
+And afterward you should execute `certbot` with `--dns-route53` parameter
+
+== Certbot update hook and Tigase API
+
+For greater automation it's possible to automate updating certificate obtained with `certbot` in Tigase XMPP Server. You should use following deploy hook - either add it to `/etc/letsencrypt/renewal-hooks/deploy/` or use it directly in `certboot` commandline with `--deploy-hook` parameter (in the latter case, it will be added to particular domain configuration so it's not necessary to specify UPDATE_DOMAINS).
 
 NOTE: Please adjust account credentials used for deployment (`USER`, `PASS`, `DOMAIN`) as well as paths to Let's Encrypt certificates (_ISRG Root X1_ named `isrgrootx1.pem` and _Let’s Encrypt Authority X3_ named `letsencryptauthorityx3.pem`)
 
 [source,bash]
 ----
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 ## Configuration START
 
-USER=admin_username
-PASS=admin_password
-DOMAIN=my_domain.tld
-# HOST=${DOMAIN}
+USER="admin_username"
+PASS="admin_password"
+DOMAIN="my_domain.tld"
+HOST=${DOMAIN}
+#UPDATE_DOMAINS=(${DOMAIN})
 # PORT=":8080"
 # APIKEY="?api-key=mySecretKey"
-
-LE_CERTS_PATH="/Users/wojtek/dev/tigase/_clients/_Tigase+presentations/certificates/CAs/letsencrypt/"
+LE_CERTS_PATH="/path/to/letsencrypt/CA/certificates/"
 
 ## Configuration END
 
-for domain in $RENEWED_DOMAINS; do
-	CERT=`cat "$RENEWED_LINEAGE/cert.pem" "$RENEWED_LINEAGE/privkey.pem" ${LE_CERTS_PATH}/isrgrootx1.pem ${LE_CERTS_PATH}/letsencryptauthorityx3.pem`
+fail_count=0
 
+for domain in ${RENEWED_DOMAINS[@]}; do
 	if [[ $domain == "*."* ]]; then
 		CERT_DOMAIN=${domain#*\*.}
 	else
 		CERT_DOMAIN=${domain}
 	fi
+
+    if [[ ! -z "${UPDATE_DOMAINS}" ]] ; then
+        match=0
+        for dn in "${UPDATE_DOMAINS[@]}"; do
+            if [[ $dn = "$CERT_DOMAIN" ]]; then
+                match=1
+                break
+            fi
+        done
+        if [[ $match = 0 ]]; then
+            echo "Skipping updating ${domain} because it's not in the list of supported domains: ${UPDATE_DOMAINS[@]}"
+            continue
+        fi
+    fi
+
+    CERT=`cat "$RENEWED_LINEAGE/cert.pem" "$RENEWED_LINEAGE/privkey.pem" ${LE_CERTS_PATH}/isrgrootx1.pem ${LE_CERTS_PATH}/letsencryptauthorityx3.pem`
 
 	REQUEST="
 	<command>
@@ -148,8 +173,17 @@ for domain in $RENEWED_DOMAINS; do
 	  </fields>
 	</command>"
 
-	curl -L -H "Content-Type: text/xml" -X POST  http://${USER}%40${DOMAIN}:${PASS}@${HOST}${PORT}/rest/adhoc/vhost-man@${DOMAIN}${APIKEY} -d "${REQUEST}"
+	response=`curl -s -L -H "Content-Type: text/xml" -X POST  http://${USER}%40${DOMAIN}:${PASS}@${HOST}${PORT}/rest/adhoc/vhost-man@${DOMAIN}${APIKEY} -d "${REQUEST}"`
+
+    if [[ ! ${response} = *"loaded successfully"* ]] ; then
+        echo -e "Server returned error while updating   ${domain}   certificate:\n ${response}"
+        fail_count=$((${fail_count}+1))
+    else
+        echo "Correctly updated ${domain} certificate"
+    fi
 done
+
+exit ${fail_count}
 ----
 
 NOTE: If you are not using wildcard certificate when you have to provide certificate for main domain as well as certificates for subdomains that mach all components that you want to expose (muc, pubsub, push, etc…)

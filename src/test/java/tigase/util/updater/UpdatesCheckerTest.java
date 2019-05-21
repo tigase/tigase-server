@@ -45,11 +45,14 @@ public class UpdatesCheckerTest {
 		UpdatesChecker.ProductInfoIfc product2 = new TestProduct("iot-hub", "IoT hub", "7.7.7");
 		final List<UpdatesChecker.ProductInfoIfc> products = Arrays.asList(product, product2);
 
-		String url = "http://atlantiscity.local:8080/rest/update/check/";
+//		String url = "http://atlantiscity.local:8080/rest/update/check/";
+//		String url = "http://www.tigase.org/files/downloads/tigase-server/descript-redmine.ion";
+
+		String url = UpdatesChecker.VERSION_URL;
 
 		final Version localVersion = XMPPServer.getVersion();
 		final Optional<Version> version = UpdatesChecker.retrieveCurrentVersionFromServer(localVersion, products,
-																						  UpdatesChecker.VERSION_URL, 10);
+																						  url, 10);
 		System.out.println(version);
 
 	}
