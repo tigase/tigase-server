@@ -49,17 +49,10 @@ _xmpp-server._TCP.tigase.org 86400 IN SRV 0 5 5269 xmpp.tigase.org
 === Tigase and Vhosts
 If you are running multiple vhosts or subdomains that you wish to separate, you will need another record. In this case an A record will be all you need if you are using default ports. If you are using custom ports, you will need to have a new SRV record for each subdomain.
 
-== Hosting VIA Tigase.me
-If you don't want to do all the hosting yourself, you can still have an XMPP service running in your own domain. The only condition right now is that this must be a DNS registered domain and DNS must point to the following DNS address: `tigase.me`. Please note, do not confuse it with tigase.im domain name.
+== Hosting via Tigase.me
+If you don't want to do all the hosting yourself, you can still have an XMPP service running in your own domain. The only condition right now is proper DNS service record (SRV) configuration that point to the following DNS address: `tigase.me`.
 
-Although SRV records are required by the XMPP specifications we do not require SRV records either. If you want to register: *your-domain.tld* on our XMPP service make sure that either the command:
-[source,sh]
------
-$ host your-domain.tld
-your-domain.tld has address x.x.x.x
------
-
-This displays `x.x.x.x` IP address associated to your DNS domain or commands:
+We highly encourage using SRV records. If you want to register: *your-domain.tld* on our XMPP service make sure that it resolves correctly:
 
 [source,sh]
 -----
@@ -67,9 +60,9 @@ $ host -t SRV _xmpp-server._tcp.your-domain.tld
 _xmpp-server._tcp.your-domain.tld has SRV record 10 0 5269 tigase.me.
 $ host -t SRV _xmpp-client._tcp.your-domain.tld
 _xmpp-client._tcp.your-domain.tld has SRV record 10 0 5222 tigase.me.
+$ host -t SRV _xmpps-client._tcp.your-domain.tld
+_xmpp-client._tcp.your-domain.tld has SRV record 10 0 5222 tigase.me.
 -----
-
-This displays `tigase.me` DNS name. We *strongly* recommend not to use the IP address directly however, as if the service grows too much, it will be much easier for us to migrate and expand it using the DNS name rather then IP address.
 
 If you want to have MUC and PubSub available under your domain as subdomains, you have to setup DNS for your `muc.your-domain.tld` and `pubsub.your-domain.tld` domains too.
 
@@ -79,8 +72,6 @@ For MUC:
 -----
 $ host -t SRV _xmpp-server._tcp.muc.your-domain.tld
 _xmpp-server._tcp.muc.your-domain.tld has SRV record 10 0 5269 tigase.me.
-$ host -t SRV _xmpp-client._tcp.muc.your-domain.tld
-_xmpp-client._tcp.muc.your-domain.tld has SRV record 10 0 5222 tigase.me.
 -----
 
 For PubSub :
@@ -89,13 +80,16 @@ For PubSub :
 -----
 $ host -t SRV _xmpp-server._tcp.pubsub.your-domain.tld
 _xmpp-server._tcp.pubsub.your-domain.tld has SRV record 10 0 5269 tigase.me.
-$ host -t SRV _xmpp-client._tcp.pubsub.your-domain.tld
-_xmpp-client._tcp.pubsub.your-domain.tld has SRV record 10 0 5222 tigase.me.
 -----
 
 Now, how do you register your domain with our service?
 
 There are a few ways. We recommend checking with the xref:xref:addManageDomain[Add and Manage Domains] section of the documentation on setting that up. If you cannot or don't want to do it on your own, the way described in the guide please send us a message, either via XMPP to admin@tigase.im or the contact form requesting new domain. User registration is available via in-band registration protocol. You can also specify whether you want to allow anonymous authentication to be available for your domain and you can specify maximum number of users for your domain.
+
+=== Providing certificate
+
+It's also encouraged to provide dedicated SSL certificate - there are various ways to do it and they are described in <<InstallingSSLCertificate>>.
+You may want to take advantage of free Let's Encrypt certificates and automate whole upload and renewal process as described in <<LetsEncryptCertificate>>
 
 == Checking setup
 
