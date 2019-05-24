@@ -25,8 +25,11 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ClusterModeRequired;
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostManagerIfc;
+import tigase.server.Command;
+import tigase.server.DataForm;
+import tigase.server.Packet;
+import tigase.vhosts.*;
+import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -67,10 +70,6 @@ public class SeeOtherHost
 
 	@Override
 	public void initialize() {
-		List<VHostItem.DataType> types = new ArrayList<VHostItem.DataType>();
-		types.add(new VHostItem.DataType(REDIRECTION_ENABLED, "see-other-host redirection enabled", Boolean.class,
-										 Boolean.TRUE));
-		VHostItem.registerData(types);
 	}
 
 	public void setDefaultHost(List<BareJID> defaultHost) {
@@ -104,7 +103,11 @@ public class SeeOtherHost
 
 	@Override
 	public boolean isEnabled(VHostItem vHost, Phase ph) {
-		return (boolean) vHost.getData(REDIRECTION_ENABLED) && active.contains(ph);
+		SeeOtherHostVHostItemExtension extension = vHost.getExtension(SeeOtherHostVHostItemExtension.class);
+		if (extension == null) {
+			return active.contains(ph);
+		}
+		return extension.isEnabled() && active.contains(ph);
 	}
 
 	@Override
@@ -128,4 +131,68 @@ public class SeeOtherHost
 		}
 	}
 
+	@Bean(name = SeeOtherHostVHostItemExtension.ID, parent = VHostItemExtensionManager.class, active = true)
+	public static class SeeOtherHostVHostItemExtensionProvider implements VHostItemExtensionProvider<SeeOtherHostVHostItemExtension> {
+
+		@Override
+		public String getId() {
+			return SeeOtherHostVHostItemExtension.ID;
+		}
+
+		@Override
+		public Class<SeeOtherHostVHostItemExtension> getExtensionClazz() {
+			return SeeOtherHostVHostItemExtension.class;
+		}
+	}
+
+	public static class SeeOtherHostVHostItemExtension extends AbstractVHostItemExtension implements VHostItemExtensionBackwardCompatible {
+
+		public static final String ID = "see-other-host";
+
+		private boolean enabled = true;
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+		@Override
+		public void initFromElement(Element item) {
+			enabled = Boolean.parseBoolean(item.getAttributeStaticStr("enabled"));
+		}
+
+		@Override
+		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
+			enabled = Command.getCheckBoxFieldValue(packet, prefix + "-" + REDIRECTION_ENABLED);
+		}
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		@Override
+		public Element toElement() {
+			if (enabled) {
+				return null;
+			}
+
+			Element el = new Element(getId());
+			el.setAttribute("enabled", String.valueOf(enabled));
+			return el;
+		}
+
+		@Override
+		public void addCommandFields(String prefix, Packet packet) {
+			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
+			DataForm.addFieldValue(commandEl, prefix + "-" + REDIRECTION_ENABLED, String.valueOf(enabled), "boolean", "see-other-host redirection enabled");
+		}
+
+		@Override
+		public void initFromData(Map<String, Object> data) {
+			Boolean val = (Boolean) data.remove(REDIRECTION_ENABLED);
+			if (val != null) {
+				enabled = val;
+			}
+		}
+	}
 }

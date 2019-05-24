@@ -17,10 +17,10 @@
  */
 package tigase.vhosts;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.server.xmppclient.ClientTrustManagerFactory;
 import tigase.util.StringUtilities;
 import tigase.util.repository.DataTypes;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -31,9 +31,10 @@ import tigase.xmpp.jid.JID;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration settings. In most cases simple domain name
@@ -134,7 +135,8 @@ public class VHostItem
 	public static final String S2S_SECRET_LABEL = "S2S secret";
 	public static final String TLS_REQUIRED_ATT = "tls-required";
 	public static final String TLS_REQUIRED_LABEL = "TLS required";
-	public static final String TRUSTED_JIDS_ATT = "trusted-jids";
+	private static final String TRUSTED_JIDS_ATT = "trusted-jids";
+	public static final String TRUSTED_JIDS_LABEL = "Trusted JIDs";
 	/**
 	 * Element name to for the VHostItem XML storage.
 	 */
@@ -159,23 +161,16 @@ public class VHostItem
 	protected static final String[] VHOST_COMPONENTS_PATH = {VHOST_ELEM, COMPONENTS_ELEM};
 	protected static final Map<String, DataType> dataTypes = Collections.synchronizedMap(new LinkedHashMap<>());
 	private static final Logger log = Logger.getLogger(VHostItem.class.getName());
-
-	static {
-		List<DataType> types = new ArrayList<VHostItem.DataType>();
-		types.add(new DataType(ClientTrustManagerFactory.CA_CERT_PATH, "Client Certificate CA", String.class, null));
-		types.add(
-				new DataType(ClientTrustManagerFactory.CERT_REQUIRED_KEY, "Client Certificate Required", Boolean.class,
-							 Boolean.FALSE));
-		types.add(new DataType(TRUSTED_JIDS_ATT, "Trusted JIDs", String[].class, ConcurrentSkipListSet.class, null,
-							   null));
-		VHostItem.registerData(types);
-	}
-
+	
 	private boolean anonymousEnabled = VHOST_ANONYMOUS_ENABLED_PROP_DEF;
 	private int[] c2sPortsAllowed = null;
 
 	private String[] comps = null;
-	private Map<String, Object> data = new ConcurrentHashMap<String, Object>();
+	private Map<String, Element> unknownExtensions = new ConcurrentHashMap<>();
+	private Map<Class<? extends VHostItemExtension>, VHostItemExtension> extensions = new ConcurrentHashMap<>();
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
+	private Map<String, Object> oldData = new ConcurrentHashMap<String, Object>();
 	private VHostItemDefaults defaults;
 	private DomainFilterPolicy domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
 	private String[] domainFilterDomains = null;
@@ -188,9 +183,12 @@ public class VHostItem
 	private String s2sSecret = S2S_SECRET_PROP_DEF;
 	private String[] saslAllowedMechanisms = null;
 	private boolean tlsRequired = VHOST_TLS_REQUIRED_PROP_DEF;
+	private Set<String> trustedJids = null;
 	private VHostItem unmodifiableItem = null;
 	private JID vhost = null;
 
+	private VHostItemExtensionManager extensionManager;
+	
 	static DomainFilterPolicy getPolicyFromConfString(String configuration) {
 		String[] df = configuration.split("=");
 
@@ -218,6 +216,8 @@ public class VHostItem
 		return new String[0];
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
 	public static void registerData(List<DataType> types) {
 		for (DataType type : types) {
 			dataTypes.put(type.getKey(), type);
@@ -264,6 +264,10 @@ public class VHostItem
 		setVHost(vhost);
 	}
 
+	protected void setExtensionManager(VHostItemExtensionManager extensionManager) {
+		this.extensionManager = extensionManager;
+	}
+
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, HOSTNAME_LABEL, (vhost != null) ? vhost.getDomain() : "");
@@ -287,7 +291,17 @@ public class VHostItem
 		Command.addFieldValue(packet, SASL_MECHANISM_LABEL,
 							  saslAllowedMechanisms != null ? stringArrayToString(saslAllowedMechanisms, ",") : "");
 
+		Command.addFieldMultiValue(packet, TRUSTED_JIDS_LABEL,
+								   trustedJids != null ? new ArrayList<>(trustedJids) : Collections.EMPTY_LIST);
+
 		super.addCommandFields(packet);
+
+		extensionManager.addMissingExtensions(extensions.values()
+													  .stream()
+													  .map(v -> (VHostItemExtension) v)
+													  .collect(Collectors.toSet()))
+				.sorted(Comparator.comparing(VHostItemExtension::getId))
+				.forEach(ext -> ext.addCommandFields(ext.getId(), packet));
 
 		for (DataType type : dataTypes.values()) {
 			if (type.cls != Boolean.class) {
@@ -414,6 +428,16 @@ public class VHostItem
 			setSaslAllowedMechanisms(tmp.split(","));
 		}
 
+		String[] tmps = Command.getFieldValues(packet, TRUSTED_JIDS_LABEL);
+		if (tmps != null && tmps != null) {
+			trustedJids = Arrays.stream(tmps).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toSet());
+		}
+
+		extensionManager.newExtensionInstances().map(extension -> {
+			extension.initFromCommand(extension.getId(), packet);
+			return extension;
+		}).forEach(extension -> extensions.put((Class<VHostItemExtension>) extension.getClass(), extension));
+
 		for (DataType type : dataTypes.values()) {
 			String valueStr = Command.getFieldValue(packet, type.getName());
 			Character typeId = DataTypes.typesMap.get(type.cls.getName());
@@ -439,6 +463,8 @@ public class VHostItem
 		log.log(Level.FINE, "Initialized from command: {0}", this);
 
 	}
+
+	private static final Set<String> bannedExtensionIds = new HashSet<>(Arrays.asList(COMPONENTS_ELEM, OTHER_PARAMS_ELEM, TRUSTED_JIDS_ATT, "data"));
 
 	@Override
 	public void initFromElement(Element elem) {
@@ -497,6 +523,7 @@ public class VHostItem
 			setSaslAllowedMechanisms(tmp.split(";"));
 		}
 
+
 		Element data = elem.getChild("data");
 		if (data != null) {
 			List<Element> items = data.getChildren();
@@ -523,7 +550,41 @@ public class VHostItem
 				}
 			}
 		}
+
+		tmp = elem.getCDataStaticStr(new String[]{VHOST_ELEM, TRUSTED_JIDS_ATT});
+		if (tmp == null) {
+			tmp = (String) oldData.remove(TRUSTED_JIDS_ATT);
+		}
+		if (tmp != null) {
+			this.trustedJids = Collections.unmodifiableSet(
+					Arrays.stream(tmp.split(",")).map(String::trim).collect(Collectors.toSet()));
+		}
+
+		unknownExtensions.putAll(elem.getChildren()
+				.stream()
+				.filter(child -> !bannedExtensionIds.contains(child.getName()))
+				.collect(Collectors.toConcurrentMap(Element::getName, Function.identity())));
+		extensionManager.newExtensionInstances()
+				.map(this::initExtension)
+				.forEach(extension -> extensions.put((Class<VHostItemExtension>) extension.getClass(), extension));
+
 		log.log(Level.FINE, "Initialized from element: {0}", this);
+	}
+
+	protected VHostItemExtension initExtension(VHostItemExtension extension) {
+		Element extElem = unknownExtensions.remove(extension.getId());
+		if (extElem != null) {
+			try {
+				extension.initFromElement(extElem);
+			} catch (Throwable ex) {
+				throw new IllegalArgumentException(
+						"Could not initialize " + extension.getClass().getCanonicalName() + " with data " +
+								extElem);
+			}
+		} else if (extension instanceof VHostItemExtensionBackwardCompatible) {
+			((VHostItemExtensionBackwardCompatible) extension).initFromData(oldData);
+		}
+		return extension;
 	}
 
 	@Override
@@ -683,9 +744,26 @@ public class VHostItem
 			elem.addAttribute(C2S_PORTS_ALLOWED_ATT, c2sPortsAllowedStr);
 		}
 
-		if (!data.isEmpty()) {
+		if (trustedJids != null && !trustedJids.isEmpty()) {
+			elem.addChild(new Element(TRUSTED_JIDS_ATT,
+									  stringArrayToString(trustedJids.toArray(new String[trustedJids.size()]), ",")));
+		}
+
+		extensions.entrySet()
+				.stream()
+				.sorted(Comparator.comparing(e -> e.getKey().getSimpleName()))
+				.map(e -> e.getValue())
+				.map(VHostItemExtension::toElement)
+				.filter(Objects::nonNull)
+				.forEach(elem::addChild);
+
+		unknownExtensions.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).forEach((e) -> {
+			elem.addChild((Element) e.getValue());
+		});
+
+		if (!oldData.isEmpty()) {
 			Element data = new Element("data");
-			for (Map.Entry<String, Object> e : this.data.entrySet()) {
+			for (Map.Entry<String, Object> e : this.oldData.entrySet()) {
 				Element item = new Element(e.getKey());
 				item.addAttribute("type", String.valueOf(DataTypes.getTypeId(e.getValue())));
 				Object val = e.getValue();
@@ -759,9 +837,15 @@ public class VHostItem
 				s2sSecret + ", domainFilter: " + domainFilter + ", domainFilterDomains: " +
 				stringArrayToString(domainFilterDomains, ";") + ", c2sPortsAllowed: " +
 				intArrayToString(c2sPortsAllowed, ",") + ", saslAllowedMechanisms: " +
-				Arrays.toString(saslAllowedMechanisms);
+				Arrays.toString(saslAllowedMechanisms) + ", trustedJids: " + (trustedJids == null
+																			  ? "null"
+																			  : stringArrayToString(trustedJids.toArray(
+																					  new String[trustedJids.size()]),
+																									","));
 
-		for (Map.Entry<String, Object> e : data.entrySet()) {
+		str += extensions.values().stream().map(VHostItemExtension::toString).collect(Collectors.joining(", "));
+
+		for (Map.Entry<String, Object> e : oldData.entrySet()) {
 			Object val = e.getValue();
 			DataType type = dataTypes.get(e.getKey());
 			if (type != null && val instanceof Collection && type.getCollectionCls() != null) {
@@ -826,8 +910,10 @@ public class VHostItem
 	 *
 	 * @return
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
 	public <T> T getData(String key) {
-		T val = (T) data.get(key);
+		T val = (T) oldData.get(key);
 		if (val == null) {
 			DataType type = dataTypes.get(key);
 			if (type != null) {
@@ -872,6 +958,16 @@ public class VHostItem
 	@Override
 	public String getElemName() {
 		return VHOST_ELEM;
+	}
+
+	public <T extends VHostItemExtension> T getExtension(Class<T> clazz) {
+		return (T) extensions.computeIfAbsent(clazz, key -> {
+			VHostItemExtension ext = extensionManager.newExtensionInstanceForClass(key);
+			if (ext != null) {
+				this.initExtension(ext);
+			}
+			return ext;
+		});
 	}
 
 	@Override
@@ -955,13 +1051,9 @@ public class VHostItem
 	}
 
 	public Set<String> getTrustedJIDs() {
-		return getData(TRUSTED_JIDS_ATT);
+		return trustedJids;
 	}
-
-	public void setTrustedJIDs(JID[] trustedJids) {
-		setData(TRUSTED_JIDS_ATT, trustedJids);
-	}
-
+	
 	public VHostItem getUnmodifiableVHostItem() {
 		if (unmodifiableItem == null) {
 			unmodifiableItem = new UnmodifiableVHostItem();
@@ -1006,9 +1098,11 @@ public class VHostItem
 	 *
 	 * @return
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
 	public boolean isData(String key) {
-		if (data.containsKey(key)) {
-			return (Boolean) data.get(key);
+		if (oldData.containsKey(key)) {
+			return (Boolean) oldData.get(key);
 		} else {
 			DataType type = dataTypes.get(key);
 			Boolean defValue = (type == null) ? null : (Boolean) type.getDefValue();
@@ -1094,9 +1188,9 @@ public class VHostItem
 	 */
 	public void setData(String key, Object value) {
 		if (value == null) {
-			this.data.remove(key);
+			this.oldData.remove(key);
 		} else {
-			this.data.put(key, value);
+			this.oldData.put(key, value);
 		}
 	}
 
@@ -1107,7 +1201,7 @@ public class VHostItem
 		}
 
 		if (valueStr == null) {
-			this.data.remove(key);
+			this.oldData.remove(key);
 		} else {
 			char typeId = DataTypes.typesMap.get(type.cls.getName());
 			if (valueStr.contains(";")) {
@@ -1156,7 +1250,7 @@ public class VHostItem
 
 	protected void initializeFromDefaults(VHostItemDefaults vhostDefaults) {
 		if (vhostDefaults.getTrusted() != null) {
-			data.put(TRUSTED_JIDS_ATT, vhostDefaults.getTrusted());
+			oldData.put(TRUSTED_JIDS_ATT, vhostDefaults.getTrusted());
 		}
 		maxUsersNumber = vhostDefaults.getMaxUsersNumber();
 		messageForward = vhostDefaults.getMessageForward();
@@ -1401,6 +1495,11 @@ public class VHostItem
 		@Override
 		public void setDomainFilterDomains(String[] domainFilterDomains) {
 			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		@Override
+		public <T extends VHostItemExtension> T getExtension(Class<T> clazz) {
+			return VHostItem.this.getExtension(clazz);
 		}
 
 		@Override

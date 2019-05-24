@@ -73,6 +73,8 @@ public class VHostJDBCRepository
 	private String installationDnsAddress = null;
 
 	@Inject
+	private VHostItemExtensionManager extensionManager;
+	@Inject
 	private VHostItemDefaults vhostDefaults;
 
 	public VHostJDBCRepository() {
@@ -105,6 +107,7 @@ public class VHostJDBCRepository
 	@Override
 	public VHostItem getItemInstance() {
 		VHostItem item = VHostRepoDefaults.getItemInstance();
+		item.setExtensionManager(extensionManager);
 		item.initializeFromDefaults(vhostDefaults);
 		return item;
 	}
@@ -278,14 +281,12 @@ public class VHostJDBCRepository
 
 	public void setDefaultVHost(String vhost) {
 		this.defaultVHost = vhost;
-		if (vhostDefaults != null) {
-			reload();
-			VHostItem item = getItemInstance();
-			item.setKey(vhost);
-			if (!contains(vhost)) {
-				addItem(item);
-			}
-		}
+		reloadIfReady();
+	}
+
+	public void setExtensionManager(VHostItemExtensionManager extensionManager) {
+		this.extensionManager = extensionManager;
+		reloadIfReady();
 	}
 
 	@Override
@@ -305,6 +306,17 @@ public class VHostJDBCRepository
 			pendingItemsToSetOld = null;
 		}
 		setDefaultVHost(defaultVHost);
+	}
+
+	private void reloadIfReady() {
+		if (vhostDefaults != null && extensionManager != null) {
+			reload();
+			VHostItem item = getItemInstance();
+			item.setKey(defaultVHost);
+			if (!contains(defaultVHost)) {
+				addItem(item);
+			}
+		}
 	}
 }
 

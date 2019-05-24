@@ -27,10 +27,14 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.map.ClusterMapFactory;
+import tigase.server.Command;
+import tigase.server.DataForm;
+import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.ComponentStatisticsProvider;
 import tigase.stats.StatisticsList;
-import tigase.vhosts.VHostItem;
+import tigase.vhosts.*;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -43,7 +47,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.auth.BruteForceLockerBean.Mode.IpJid;
-import static tigase.auth.BruteForceLockerBean.Mode.valueOf;
 
 @Bean(name = "brute-force-locker", parent = SessionManager.class, active = true)
 public class BruteForceLockerBean
@@ -64,22 +67,7 @@ public class BruteForceLockerBean
 		IpJid,
 		Jid
 	}
-
-	static {
-		List<VHostItem.DataType> types = new ArrayList<>();
-		types.add(new VHostItem.DataType(LOCK_ENABLED_KEY, "Brute Force Prevention Enabled", Boolean.class,
-										 Boolean.TRUE));
-		types.add(new VHostItem.DataType(LOCK_AFTER_FAILS_KEY, "Number of allowed invalid login", Long.class, 3L));
-		types.add(
-				new VHostItem.DataType(LOCK_DISABLE_ACCOUNT_FAILS_KEY, "Disable account after failed login", Long.class,
-									   20L));
-		types.add(
-				new VHostItem.DataType(LOCK_PERIOD_TIME_KEY, "Failed login in period of time [sec]", Long.class, 60L));
-		types.add(new VHostItem.DataType(LOCK_TIME_KEY, "Lock time [sec]", Long.class, 60L));
-		types.add(new VHostItem.DataType(LOCK_MODE_KEY, "Brute Force Prevention Mode", Mode.class, IpJid));
-		VHostItem.registerData(types);
-	}
-
+	
 	private final Logger log = Logger.getLogger(this.getClass().getName());
 	private final Map<String, StatHolder> otherStatHolders = new ConcurrentHashMap<>();
 	private final StatHolder statHolder = new StatHolder();
@@ -139,13 +127,15 @@ public class BruteForceLockerBean
 
 		value.setBadLoginCounter(value.getBadLoginCounter() + 1);
 
-		final long lockAfterFails = session == null ? 3 : (long) session.getDomain().getData(LOCK_AFTER_FAILS_KEY);
+		BruteForceLockerVHostExtension extension = session != null ? session.getDomain().getExtension(BruteForceLockerVHostExtension.class) : null;
+
+		final long lockAfterFails = extension == null ? 3 : extension.getLockAccountAfterFailedAttempt();
 		if (value.getBadLoginCounter() <= lockAfterFails) {
 			final long periodTime =
-					(session == null ? 10 : (long) session.getDomain().getData(LOCK_PERIOD_TIME_KEY)) * 1000;
+					(extension == null ? 10 : extension.getPeriodTime()) * 1000;
 			value.setInvalidateAtTime(currentTime + periodTime);
 		} else {
-			final long lockTime = (session == null ? 10 : (long) session.getDomain().getData(LOCK_TIME_KEY)) * 1000;
+			final long lockTime = (extension == null ? 10 : extension.getLockTime()) * 1000;
 			value.setInvalidateAtTime(currentTime + lockTime);
 		}
 
@@ -173,8 +163,9 @@ public class BruteForceLockerBean
 			return false;
 		}
 
+		BruteForceLockerVHostExtension extension = session != null ? session.getDomain().getExtension(BruteForceLockerVHostExtension.class) : null;
 		final long disableAfterFails =
-				session == null ? 20 : (long) session.getDomain().getData(LOCK_DISABLE_ACCOUNT_FAILS_KEY);
+				extension == null ? 20 : extension.getDisableAccountAfterFailedAttempts();
 
 		if (disableAfterFails == 0) {
 			return false;
@@ -251,7 +242,8 @@ public class BruteForceLockerBean
 	}
 
 	public boolean isEnabled(XMPPResourceConnection session) {
-		return session == null || (boolean) session.getDomain().getData(LOCK_ENABLED_KEY);
+		BruteForceLockerVHostExtension extension = session != null ? session.getDomain().getExtension(BruteForceLockerVHostExtension.class) : null;
+		return extension == null || extension.isEnabled();
 	}
 
 	@HandleEvent(filter = HandleEvent.Type.remote)
@@ -320,7 +312,8 @@ public class BruteForceLockerBean
 	}
 
 	final Key createKey(XMPPResourceConnection session, String ip, BareJID jid) {
-		final Mode mode = session == null ? Mode.IpJid : valueOf(session.getDomain().getData(LOCK_MODE_KEY));
+		BruteForceLockerVHostExtension extension = session != null ? session.getDomain().getExtension(BruteForceLockerVHostExtension.class) : null;
+		final Mode mode = extension == null ? Mode.IpJid : extension.getMode();
 		return createKey(mode, session, ip, jid);
 	}
 
@@ -356,7 +349,8 @@ public class BruteForceLockerBean
 			}
 			return true;
 		} else {
-			long lockAfterFails = session == null ? 3 : (long) session.getDomain().getData(LOCK_AFTER_FAILS_KEY);
+			BruteForceLockerVHostExtension extension = session != null ? session.getDomain().getExtension(BruteForceLockerVHostExtension.class) : null;
+			long lockAfterFails = extension == null ? 3 : extension.getLockAccountAfterFailedAttempt();
 			boolean r = value.badLoginCounter <= lockAfterFails;
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Entry exist. lockAfterFails=" + lockAfterFails + ", value" + ".badLoginCounter=" +
@@ -653,4 +647,180 @@ public class BruteForceLockerBean
 
 	}
 
+	@Bean(name = BruteForceLockerVHostExtension.ID, parent = VHostItemExtensionManager.class, active = true)
+	public static class BruteForceLockerVHostExtensionProvider
+			implements VHostItemExtensionProvider<BruteForceLockerVHostExtension> {
+
+		@Override
+		public String getId() {
+			return BruteForceLockerVHostExtension.ID;
+		}
+
+		@Override
+		public Class<BruteForceLockerVHostExtension> getExtensionClazz() {
+			return BruteForceLockerVHostExtension.class;
+		}
+	}
+
+	public static class BruteForceLockerVHostExtension
+			extends AbstractVHostItemExtension
+			implements VHostItemExtensionBackwardCompatible {
+
+		public static final String ID = "brute-force-locker";
+		private static final long DEF_lockAccountAfterFailedAttempt = 3l;
+		private static final long DEF_disableAccountAfterFailedAttempts = 20l;
+		private static final long DEF_periodTime = 60l;
+		private static final long DEF_lockTime = 60l;
+		private static final Mode DEF_mode = IpJid;
+
+		private boolean enabled = true;
+		private long lockAccountAfterFailedAttempt = DEF_lockAccountAfterFailedAttempt;
+		private long disableAccountAfterFailedAttempts = DEF_disableAccountAfterFailedAttempts;
+		private long periodTime = DEF_periodTime;
+		private long lockTime = DEF_lockTime;
+		private Mode mode = DEF_mode;
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public long getLockAccountAfterFailedAttempt() {
+			return lockAccountAfterFailedAttempt;
+		}
+
+		public long getDisableAccountAfterFailedAttempts() {
+			return disableAccountAfterFailedAttempts;
+		}
+
+		public long getPeriodTime() {
+			return periodTime;
+		}
+
+		public long getLockTime() {
+			return lockTime;
+		}
+
+		public Mode getMode() {
+			return mode;
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+		@Override
+		public void initFromElement(Element item) {
+			enabled = !"false".equals(item.getAttributeStaticStr("enabled"));
+			String tmp = item.getAttributeStaticStr("lock-after-fails");
+			if (tmp != null) {
+				lockAccountAfterFailedAttempt = Long.parseLong(tmp);
+			}
+			tmp = item.getAttributeStaticStr("disable-after-fails");
+			if (tmp != null) {
+				disableAccountAfterFailedAttempts = Long.parseLong(tmp);
+			}
+			tmp = item.getAttributeStaticStr("period-time");
+			if (tmp != null) {
+				periodTime = Long.parseLong(tmp);
+			}
+			tmp = item.getAttributeStaticStr("lock-time");
+			if (tmp != null) {
+				lockTime = Long.parseLong(tmp);
+			}
+			tmp = item.getAttributeStaticStr("mode");
+			if (tmp != null) {
+				mode = Mode.valueOf(tmp);
+			}
+		}
+
+		@Override
+		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
+			enabled = Command.getCheckBoxFieldValue(packet, prefix + "-enabled");
+			lockAccountAfterFailedAttempt = Long.parseLong(Command.getFieldValue(packet, prefix + "-lock-after-fails"));
+			disableAccountAfterFailedAttempts = Long.parseLong(Command.getFieldValue(packet, prefix + "-disable-after-fails"));
+			periodTime = Long.parseLong(Command.getFieldValue(packet, prefix + "-period-time"));
+			lockTime = Long.parseLong(Command.getFieldValue(packet, prefix + "-lock-time"));
+			mode = Mode.valueOf(Command.getFieldValue(packet, prefix + "-mode"));
+		}
+
+		@Override
+		public Element toElement() {
+			if (enabled && lockAccountAfterFailedAttempt == DEF_lockAccountAfterFailedAttempt &&
+					disableAccountAfterFailedAttempts == DEF_disableAccountAfterFailedAttempts &&
+					periodTime == DEF_periodTime && lockTime == DEF_lockTime && mode == DEF_mode) {
+				return null;
+			}
+
+			Element el = new Element(ID);
+			if (!enabled) {
+				el.setAttribute("enabled", String.valueOf(enabled));
+			}
+			if (lockAccountAfterFailedAttempt != DEF_lockAccountAfterFailedAttempt) {
+				el.setAttribute("lock-after-fails", String.valueOf(lockAccountAfterFailedAttempt));
+			}
+			if (disableAccountAfterFailedAttempts != DEF_disableAccountAfterFailedAttempts) {
+				el.setAttribute("disable-after-fails", String.valueOf(disableAccountAfterFailedAttempts));
+			}
+			if (periodTime != DEF_periodTime) {
+				el.setAttribute("period-time", String.valueOf(periodTime));
+			}
+			if (lockTime != DEF_lockTime) {
+				el.setAttribute("lock-time", String.valueOf(lockTime));
+			}
+			if (mode != DEF_mode) {
+				el.setAttribute("mode", mode.name());
+			}
+			return el;
+		}
+		
+		@Override
+		public void addCommandFields(String prefix, Packet packet) {
+			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
+			DataForm.addFieldValue(commandEl, prefix + "-enabled", String.valueOf(enabled), "boolean",
+								   "Brute Force Prevention Enabled");
+			DataForm.addFieldValue(commandEl, prefix + "-lock-after-fails",
+								   String.valueOf(lockAccountAfterFailedAttempt), "text-single",
+								   "Number of allowed invalid login");
+
+			DataForm.addFieldValue(commandEl, prefix + "-disable-after-fails",
+								   String.valueOf(disableAccountAfterFailedAttempts), "text-single",
+								   "Disable account after failed login");
+			DataForm.addFieldValue(commandEl, prefix + "-period-time", String.valueOf(periodTime),
+								   "text-single", "Failed login in period of time [sec]");
+			DataForm.addFieldValue(commandEl, prefix + "-lock-time", String.valueOf(lockTime),
+								   "text-single", "Lock time [sec]");
+			DataForm.addFieldValue(commandEl, prefix + "-mode", mode.name(), "Brute Force Prevention Mode",
+								   new String[]{Mode.Ip.name(), Mode.Jid.name(), IpJid.name()},
+								   new String[]{Mode.Ip.name(), Mode.Jid.name(), IpJid.name()});
+		}
+
+		@Override
+		public void initFromData(Map<String, Object> data) {
+			Boolean enabled = (Boolean) data.remove(LOCK_ENABLED_KEY);
+			if (enabled != null) {
+				this.enabled = enabled;
+			}
+			Long tmp = (Long) data.remove(LOCK_AFTER_FAILS_KEY);
+			if (tmp != null) {
+				lockAccountAfterFailedAttempt = tmp;
+			}
+			tmp = (Long) data.remove(LOCK_DISABLE_ACCOUNT_FAILS_KEY);
+			if (tmp != null) {
+				disableAccountAfterFailedAttempts = tmp;
+			}
+			tmp = (Long) data.remove(LOCK_PERIOD_TIME_KEY);
+			if (tmp != null) {
+				periodTime = tmp;
+			}
+			tmp = (Long) data.remove(LOCK_TIME_KEY);
+			if (tmp != null) {
+				lockTime = tmp;
+			}
+			String mode = (String) data.remove(LOCK_MODE_KEY);
+			if (mode != null) {
+				this.mode = Mode.valueOf(mode);
+			}
+		}
+	}
 }

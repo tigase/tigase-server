@@ -21,7 +21,11 @@ import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.vhosts.VHostItem;
+import tigase.server.Command;
+import tigase.server.DataForm;
+import tigase.server.Packet;
+import tigase.vhosts.*;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
 import javax.net.ssl.TrustManager;
@@ -34,6 +38,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,7 +116,8 @@ public class ClientTrustManagerFactory {
 			}
 
 			result = defaultTrustManagers;
-			String path = vHost.getData(CA_CERT_PATH);
+			ClientTrustVHostItemExtension extension = vHost.getExtension(ClientTrustVHostItemExtension.class);
+			String path = extension != null ? extension.getCaCertPath() : null;
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("CA cert path=" + path + " for VHost " + vHost);
 			}
@@ -140,11 +147,11 @@ public class ClientTrustManagerFactory {
 	}
 
 	public boolean isTlsNeedClientAuthEnabled(final VHostItem vhost) {
-		Boolean result = vhost.getData(CERT_REQUIRED_KEY);
-		if (result == null) {
-			result = clientCertRequired;
+		ClientTrustVHostItemExtension extension = vhost.getExtension(ClientTrustVHostItemExtension.class);
+		if (extension == null || extension.isCertRequired() == null) {
+			return clientCertRequired;
 		}
-		return result;
+		return extension.isCertRequired();
 	}
 
 	public boolean isTlsWantClientAuthEnabled(final VHostItem vhost) {
@@ -189,6 +196,97 @@ public class ClientTrustManagerFactory {
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't create TrustManager with certificate from file.", e);
 			throw new RuntimeException(e);
+		}
+	}
+
+	@Bean(name = "client-trust-extension", parent = VHostItemExtensionManager.class, active = true)
+	public static class ClientTrustVHostItemExtensionProvider
+			implements VHostItemExtensionProvider<ClientTrustVHostItemExtension> {
+
+		@Override
+		public String getId() {
+			return ClientTrustVHostItemExtension.ID;
+		}
+
+		@Override
+		public Class<ClientTrustVHostItemExtension> getExtensionClazz() {
+			return ClientTrustVHostItemExtension.class;
+		}
+	}
+
+	public static class ClientTrustVHostItemExtension
+			extends AbstractVHostItemExtension
+			implements VHostItemExtensionBackwardCompatible {
+
+		protected static final String ID = "client-trust-extension";
+
+		public static final String CA_CERT_PATH = "ca-cert-path";
+		public static final String CERT_REQUIRED = "cert-required";
+
+		private String caCertPath;
+		private Boolean certRequired = null;
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+		public String getCaCertPath() {
+			return caCertPath;
+		}
+
+		public Boolean isCertRequired() {
+			return certRequired;
+		}
+
+		@Override
+		public void initFromElement(Element item) {
+			caCertPath = item.getAttributeStaticStr(CA_CERT_PATH);
+			certRequired = Optional.ofNullable(item.getAttributeStaticStr(CERT_REQUIRED))
+					.map(Boolean::parseBoolean)
+					.orElse(null);
+		}
+
+		@Override
+		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
+			caCertPath = Optional.ofNullable(Command.getFieldValue(packet, prefix + "-" + CA_CERT_PATH))
+					.filter(s -> !s.isEmpty())
+					.orElse(null);
+			certRequired = Optional.ofNullable(Command.getFieldValue(packet, prefix + "-" + CERT_REQUIRED))
+					.map(s -> s.isEmpty() ? null : s)
+					.map(Boolean::parseBoolean)
+					.orElse(null);
+		}
+
+		@Override
+		public Element toElement() {
+			if ((caCertPath != null && !caCertPath.isEmpty()) || certRequired != null) {
+				Element el = new Element(getId());
+				if (caCertPath != null) {
+					el.addAttribute(CA_CERT_PATH, caCertPath);
+				}
+				if (certRequired != null) {
+					el.addAttribute(CERT_REQUIRED, String.valueOf(certRequired));
+				}
+				return el;
+			} else {
+				return null;
+			}
+		}
+
+		@Override
+		public void addCommandFields(String prefix, Packet packet) {
+			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
+			DataForm.addFieldValue(commandEl, prefix + "-" + CA_CERT_PATH, caCertPath, "text-single",
+								   "Client Certificate CA");
+			addBooleanFieldWithDefaultToCommand(commandEl, prefix + "-" + CERT_REQUIRED, "Client Certificate Required",
+												certRequired);
+		}
+
+		@Override
+		public void initFromData(Map<String, Object> data) {
+			caCertPath = (String) data.remove(ClientTrustManagerFactory.CA_CERT_PATH);
+			certRequired = (Boolean) data.remove(ClientTrustManagerFactory.CERT_REQUIRED_KEY);
 		}
 	}
 

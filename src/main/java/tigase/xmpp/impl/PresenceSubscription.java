@@ -22,11 +22,11 @@ import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
 import tigase.server.xmppsession.SessionManager;
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostManagerIfc;
+import tigase.vhosts.*;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.Handle;
@@ -64,15 +64,7 @@ public class PresenceSubscription
 	 */
 	@ConfigField(desc = "Automatically authorize subscription requests", alias = AUTO_AUTHORIZE_PROP_KEY)
 	private static boolean autoAuthorize = false;
-
-	static {
-		List<VHostItem.DataType> types = new ArrayList<>();
-		types.add(new VHostItem.DataType(AUTO_AUTHORIZE_PROP_KEY, "Automatically authorize subscription requests",
-										 AUTO_AUTHORIZE_MODE.class, AUTO_AUTHORIZE_MODE.global));
-		VHostItem.registerData(types);
-
-	}
-
+	
 	@Inject(nullAllowed = true)
 	protected VHostManagerIfc vHostManager = null;
 
@@ -592,12 +584,13 @@ public class PresenceSubscription
 
 	private boolean isAutoAuthorizeEnabled(String domain) {
 
-		final Object data = vHostManager.getVHostItem(domain).getData(AUTO_AUTHORIZE_PROP_KEY);
-
-		AUTO_AUTHORIZE_MODE mode =
-				vHostManager != null && vHostManager.getVHostItem(domain).getData(AUTO_AUTHORIZE_PROP_KEY) != null
-				? AUTO_AUTHORIZE_MODE.valueOf(vHostManager.getVHostItem(domain).getData(AUTO_AUTHORIZE_PROP_KEY))
-				: AUTO_AUTHORIZE_MODE.global;
+		AUTO_AUTHORIZE_MODE mode = AUTO_AUTHORIZE_MODE.global;
+		if (vHostManager != null) {
+			PresenceSubscriptionVHostItemExtension extension = vHostManager.getVHostItem(domain).getExtension(PresenceSubscriptionVHostItemExtension.class);
+			if (extension != null) {
+				mode = extension.getAutoAuthorizeMode();
+			}
+		}
 
 		if (AUTO_AUTHORIZE_MODE.global.equals(mode)) {
 			return autoAuthorize;
@@ -627,4 +620,95 @@ public class PresenceSubscription
 		}
 	}
 
+	@Bean(name = PresenceSubscriptionVHostItemExtension.ID, parent = VHostItemExtensionManager.class, active = true)
+	public static class PresenceSubscriptionVHostItemExtensionProvider implements VHostItemExtensionProvider<PresenceSubscriptionVHostItemExtension> {
+
+		@Override
+		public String getId() {
+			return PresenceSubscriptionVHostItemExtension.ID;
+		}
+
+		@Override
+		public Class<PresenceSubscriptionVHostItemExtension> getExtensionClazz() {
+			return PresenceSubscriptionVHostItemExtension.class;
+		}
+	}
+
+	public static class PresenceSubscriptionVHostItemExtension extends AbstractVHostItemExtension implements VHostItemExtensionBackwardCompatible {
+
+		public static final String ID = "presence-subscription";
+
+		private AUTO_AUTHORIZE_MODE autoAuthorizeMode = AUTO_AUTHORIZE_MODE.global;
+
+		public AUTO_AUTHORIZE_MODE getAutoAuthorizeMode() {
+			return autoAuthorizeMode;
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+		@Override
+		public void initFromElement(Element item) {
+			String tmp = item.getAttributeStaticStr(AUTO_AUTHORIZE_PROP_KEY);
+			if (tmp != null) {
+				autoAuthorizeMode = AUTO_AUTHORIZE_MODE.valueOf(tmp);
+			} else {
+				autoAuthorizeMode = AUTO_AUTHORIZE_MODE.global;
+			}
+		}
+
+		@Override
+		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
+			String tmp = Command.getFieldValue(packet, prefix + "-" + AUTO_AUTHORIZE_PROP_KEY);
+			autoAuthorizeMode = AUTO_AUTHORIZE_MODE.global;
+			if (tmp != null) {
+				if (Boolean.parseBoolean(tmp)) {
+					autoAuthorizeMode = AUTO_AUTHORIZE_MODE.on;
+				} else {
+					autoAuthorizeMode = AUTO_AUTHORIZE_MODE.off;
+				}
+			}
+		}
+
+		@Override
+		public Element toElement() {
+			if (autoAuthorizeMode == AUTO_AUTHORIZE_MODE.global) {
+				return null;
+			}
+			
+			Element el = new Element(getId());
+			el.setAttribute(AUTO_AUTHORIZE_PROP_KEY, autoAuthorizeMode.name());
+			return el;
+		}
+
+		@Override
+		public void addCommandFields(String prefix, Packet packet) {
+			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
+			Boolean value = null;
+			switch (autoAuthorizeMode) {
+				case global:
+					break;
+				case off:
+					value = false;
+					break;
+				case on:
+					value = true;
+					break;
+			}
+			addBooleanFieldWithDefaultToCommand(commandEl, prefix + "-" + AUTO_AUTHORIZE_PROP_KEY,
+												"Automatically authorize subscription requests", value);
+		}
+
+		@Override
+		public void initFromData(Map<String, Object> data) {
+			String tmp = (String) data.remove(AUTO_AUTHORIZE_PROP_KEY);
+			if (tmp == null) {
+				autoAuthorizeMode = AUTO_AUTHORIZE_MODE.global;
+			} else {
+				autoAuthorizeMode = AUTO_AUTHORIZE_MODE.valueOf(tmp);
+			}
+		}
+	}
 }
