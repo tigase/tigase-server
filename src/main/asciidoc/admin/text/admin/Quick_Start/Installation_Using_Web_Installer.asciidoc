@@ -20,26 +20,25 @@ TIP: Do not run as root user!
 
 == Start the Server
 
+NOTE: Please make sure `JAVA_HOME` is set and points to your JVM installation
+
 [source,bash]
 -----
 scripts/tigase.sh start etc/tigase.conf
 -----
 
-== Verify Tigase is Running
+== Verify Tigase is ready to start installation
 
-You should see a list of listening ports.
+Tigase should start listening on port 8080 - you can check it using `lsof` command:
 
 [source,bash]
 -----
 $ lsof -i -P
 COMMAND   PID   USER   FD   TYPE   DEVICE SIZE/OFF NODE NAME
 java    18387 tigase  141u  IPv6 22185825      0t0  TCP *:8080 (LISTEN)
-java    18387 tigase  148u  IPv6 22185834      0t0  TCP *:5222 (LISTEN)
-java    18387 tigase  149u  IPv6 22185835      0t0  TCP *:5223 (LISTEN)
-java    18387 tigase  150u  IPv6 22185836      0t0  TCP *:5290 (LISTEN)
-java    18387 tigase  151u  IPv6 22185837      0t0  TCP *:5280 (LISTEN)
-java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
 -----
+
+You can also check console log under `logs/tigase-console.log`, which should point you directly to the installer.
 
 [[connecttoWebInstall]]
 == Connect to the Web Installer
@@ -124,6 +123,22 @@ where {OS} is your type of Linux, gentoo, debian, mandriva, or redhat
 To further fine tune the server you should edit `etc/tigase.conf`. Ensure `JAVA_HOME` path is correct, and increase memory if needed using `JAVA_OPTIONS` -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
 
 Everything should be running smooth at this point. Check the logfiles in `logs/` if you experience any problems.
+
+== Verify Tigase is Running
+
+You should see a list of listening ports.
+
+[source,bash]
+-----
+$ lsof -i -P
+COMMAND   PID   USER   FD   TYPE   DEVICE SIZE/OFF NODE NAME
+java    18387 tigase  141u  IPv6 22185825      0t0  TCP *:8080 (LISTEN)
+java    18387 tigase  148u  IPv6 22185834      0t0  TCP *:5222 (LISTEN)
+java    18387 tigase  149u  IPv6 22185835      0t0  TCP *:5223 (LISTEN)
+java    18387 tigase  150u  IPv6 22185836      0t0  TCP *:5290 (LISTEN)
+java    18387 tigase  151u  IPv6 22185837      0t0  TCP *:5280 (LISTEN)
+java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
+-----
 
 [[winWebInstall]]
 == Windows Instructions for using Web Installer
