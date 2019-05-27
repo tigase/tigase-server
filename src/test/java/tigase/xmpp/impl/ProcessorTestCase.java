@@ -43,6 +43,10 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 	private static final Logger log = TestLogger.getLogger(ProcessorTestCase.class);
 	private SessionManagerHandler loginHandler;
 
+	public SessionManagerHandler getSessionManagerHandler() {
+		return loginHandler;
+	}
+
 	@Before
 	public void setSessionManager() throws Exception {
 		loginHandler = new SessionManagerHandlerImpl();
