@@ -155,7 +155,7 @@ public class VHostItem
 	protected static final String VHOST_REGISTER_ENABLED_PROP_KEY = "vhost-register-enabled";
 	protected static final Boolean VHOST_REGISTER_ENABLED_PROP_DEF = Boolean.TRUE;
 	protected static final String VHOST_TLS_REQUIRED_PROP_KEY = "vhost-tls-required";
-	protected static final Boolean VHOST_TLS_REQUIRED_PROP_DEF = Boolean.FALSE;
+	protected static final Boolean VHOST_TLS_REQUIRED_PROP_DEF = Boolean.TRUE;
 	protected static final DomainFilterPolicy DOMAIN_FILTER_POLICY_PROP_DEF = DomainFilterPolicy.ALL;
 	protected static final String[] VHOST_OTHER_PARAMS_PATH = {VHOST_ELEM, OTHER_PARAMS_ELEM};
 	protected static final String[] VHOST_COMPONENTS_PATH = {VHOST_ELEM, COMPONENTS_ELEM};
