@@ -25,6 +25,7 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.eventbus.EventBusFactory;
+import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -39,9 +40,7 @@ import tigase.stats.StatisticsList;
 import tigase.util.common.DependencyChecker;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostListener;
-import tigase.vhosts.VHostManagerIfc;
+import tigase.vhosts.*;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
@@ -58,8 +57,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -409,7 +411,7 @@ public class BasicComponent
 	}
 
 	public void removeServiceDiscoveryItem(String jid, String node, String description) {
-		ServiceEntity item = new ServiceEntity(jid, node, description);
+		ServiceEntity item = new ServiceEntity(jid, node, description, null);
 
 		// item.addIdentities(new ServiceIdentity("component", identity_type,
 		// name));
@@ -449,7 +451,7 @@ public class BasicComponent
 				log.log(Level.FINEST, "Modifying service-discovery info: {0}", serviceEntity);
 			}
 		} else {
-			ServiceEntity item = new ServiceEntity(jid, node, description, admin);
+			ServiceEntity item = new ServiceEntity(jid, node, description, this::getDiscoExtensionsForm, admin);
 
 			if ((category != null) || (type != null)) {
 				item.addIdentities(new ServiceIdentity(category, type, description));
@@ -465,14 +467,14 @@ public class BasicComponent
 	}
 
 	public void updateServiceEntity() {
-		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
+		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), this::getDiscoExtensionsForm, true);
 		serviceEntity.addIdentities(
 				new ServiceIdentity(getDiscoCategory(), getDiscoCategoryType(), getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
-		final Element discoExtensionsForm = getDiscoExtensionsForm();
-		if (discoExtensionsForm != null) {
-			serviceEntity.setExtensions(discoExtensionsForm);
-		}
+//		final Element discoExtensionsForm = getDiscoExtensionsForm();
+//		if (discoExtensionsForm != null) {
+//			serviceEntity.setExtensions(discoExtensionsForm);
+//		}
 	}
 
 	@Override
@@ -560,7 +562,7 @@ public class BasicComponent
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
 			Element queryEl = serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
 			if (queryEl != null) {
-				Element form = getDiscoExtensionsForm();
+				Element form = getDiscoExtensionsForm(jid.getDomain());
 				if (form != null) {
 					queryEl.addChild(form);
 				}
@@ -571,16 +573,70 @@ public class BasicComponent
 		return null;
 	}
 
-	public Element getDiscoExtensionsForm() {
+	private static final List<String> DISCO_EXTENSION_ADDRESSES = Arrays.asList("abuse-addresses", "admin-addresses", "feedback-addresses", "sales-addresses", "security-addresses", "support-addresses");
+
+	public Element getDiscoExtensionsForm(String domain) {
+		VHostItem vHostItem = this.vHostManager.getVHostItem(domain);
+		ServerInfoVHostItemExtension extension = vHostItem.getExtension(ServerInfoVHostItemExtension.class);
+		Function<String, Supplier<List<String>>> addressesFromVHost = field -> {
+			if (extension == null) {
+				return Collections::emptyList;
+			}
+			switch (field) {
+				case "abuse-addresses":
+					return extension::getAbuseAddresses;
+				case "admin-addresses":
+					return extension::getAdminAddresses;
+				case "feedback-addresses":
+					return extension::getFeedbackAddresses;
+				case "sales-addresses":
+					return extension::getSalesAddresses;
+				case "security-addresses":
+					return extension::getSecurityAddresses;
+				case "support-addresses":
+					return extension::getSupportAddresses;
+				default:
+					return Collections::emptyList;
+			}
+		};
+
+		Element form = null;
+		for (String field: DISCO_EXTENSION_ADDRESSES) {
+			List<String> vhostAddresses = addressesFromVHost.apply(field).get();
+			List<String> globalAddresses = discoExtensions.get(field);
+
+			if (vhostAddresses.isEmpty() && (globalAddresses == null || globalAddresses.isEmpty())) {
+				continue;
+			}
+
+			List<String> addresses = globalAddresses == null
+									 ? vhostAddresses
+									 : Stream.concat(vhostAddresses.stream(), globalAddresses.stream())
+											 .collect(Collectors.toList());
+
+			if (form == null) {
+				form = DataForm.createDataForm(Command.DataType.result);
+				DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
+			}
+			DataForm.addFieldMultiValue(form, field, addresses);
+		}
+		
 		if (!discoExtensions.isEmpty()) {
-			Element form = DataForm.createDataForm(Command.DataType.result);
-			DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
+			if (form == null) {
+				form = DataForm.createDataForm(Command.DataType.result);
+				DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
+			}
+
 			for (Map.Entry<String, ArrayList<String>> item : discoExtensions.entrySet()) {
+				if (DISCO_EXTENSION_ADDRESSES.contains(item.getKey())) {
+					continue;
+				}
+				
 				DataForm.addFieldMultiValue(form, item.getKey(), item.getValue());
 			}
 			return form;
 		}
-		return null;
+		return form;
 	}
 
 	@Override
@@ -877,7 +933,7 @@ public class BasicComponent
 	}
 
 	public Optional<Element> getServiceEntityCaps(JID fromJid) {
-		return getServiceEntity().getCaps(isAdmin(fromJid) || nonAdminCommands);
+		return getServiceEntity().getCaps(isAdmin(fromJid) || nonAdminCommands, fromJid.getDomain());
 	}
 
 	protected ScriptEngineManager createScriptEngineManager() {
@@ -1102,6 +1158,124 @@ public class BasicComponent
 			}
 			return matched;
 		}
+	}
+
+	public static class ServerInfoVHostItemExtension
+			extends AbstractVHostItemExtension {
+
+		public static final String ID = "disco-server-info";
+
+		private List<String> abuseAddresses = Collections.EMPTY_LIST;
+		private List<String> adminAddresses = Collections.EMPTY_LIST;
+		private List<String> feedbackAddresses = Collections.EMPTY_LIST;
+		private List<String> salesAddresses = Collections.EMPTY_LIST;
+		private List<String> securityAddresses = Collections.EMPTY_LIST;
+		private List<String> supportAddresses = Collections.EMPTY_LIST;
+
+		public List<String> getAbuseAddresses() {
+			return abuseAddresses;
+		}
+
+		public List<String> getAdminAddresses() {
+			return adminAddresses;
+		}
+
+		public List<String> getFeedbackAddresses() {
+			return feedbackAddresses;
+		}
+
+		public List<String> getSalesAddresses() {
+			return salesAddresses;
+		}
+
+		public List<String> getSecurityAddresses() {
+			return securityAddresses;
+		}
+
+		public List<String> getSupportAddresses() {
+			return supportAddresses;
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+		@Override
+		public void initFromElement(Element item) {
+			abuseAddresses = childrenToList(item, "abuse");
+			adminAddresses = childrenToList(item, "admin");
+			feedbackAddresses = childrenToList(item, "feedback");
+			salesAddresses = childrenToList(item, "sales");
+			securityAddresses = childrenToList(item, "security");
+			supportAddresses = childrenToList(item, "support");
+		}
+
+		@Override
+		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
+			abuseAddresses = fromCommandField(packet, prefix + "-abuse");
+			adminAddresses = fromCommandField(packet, prefix + "-admin");
+			feedbackAddresses = fromCommandField(packet, prefix + "-feedback");
+			salesAddresses = fromCommandField(packet, prefix + "-sales");
+			securityAddresses = fromCommandField(packet, prefix + "-security");
+			supportAddresses = fromCommandField(packet, prefix + "-support");
+		}
+
+		@Override
+		public Element toElement() {
+			Element el = new Element(getId());
+			elementsFromList("abuse", abuseAddresses).forEach(el::addChild);
+			elementsFromList("admin", adminAddresses).forEach(el::addChild);
+			elementsFromList("feedback", feedbackAddresses).forEach(el::addChild);
+			elementsFromList("sales", salesAddresses).forEach(el::addChild);
+			elementsFromList("security", securityAddresses).forEach(el::addChild);
+			elementsFromList("support", supportAddresses).forEach(el::addChild);
+			return el.getChildren() != null ? el : null;
+		}
+
+		@Override
+		public void addCommandFields(String prefix, Packet packet) {
+			Element command = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
+			DataForm.addFieldMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-feedback", feedbackAddresses, "Feedback addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-sales", salesAddresses, "Sales addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-security", securityAddresses, "Security addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-support", supportAddresses, "Support addresses");
+		}
+
+		private static List<String> fromCommandField(Packet packet, String field) {
+			List<String> values = ((Stream<String>) Optional.ofNullable(Command.getFieldValues(packet, field))
+					.map(Arrays::asList)
+					.orElse(Collections.EMPTY_LIST)
+					.stream()).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+			return values.isEmpty() ? Collections.EMPTY_LIST : values;
+		}
+		
+		private static List<String> childrenToList(Element el, String name) {
+			return Optional.ofNullable(el.mapChildren(child -> child.getName() == name, Element::getCData))
+					.orElse(Collections.EMPTY_LIST);
+		}
+
+		private static Stream<Element> elementsFromList(String name, List<String> values) {
+			return values.stream().map(v -> new Element(name, v));
+		}
+
+		@Bean(name = ID, parent = VHostItemExtensionManager.class, active = true)
+		public static class ServerInfoVHostItemExtensionProvider
+				implements VHostItemExtensionProvider<ServerInfoVHostItemExtension> {
+
+			@Override
+			public String getId() {
+				return ID;
+			}
+
+			@Override
+			public Class<ServerInfoVHostItemExtension> getExtensionClazz() {
+				return ServerInfoVHostItemExtension.class;
+			}
+		}
+
 	}
 }
 
