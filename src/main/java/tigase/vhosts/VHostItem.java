@@ -560,10 +560,13 @@ public class VHostItem
 					Arrays.stream(tmp.split(",")).map(String::trim).collect(Collectors.toSet()));
 		}
 
-		unknownExtensions.putAll(elem.getChildren()
-				.stream()
-				.filter(child -> !bannedExtensionIds.contains(child.getName()))
-				.collect(Collectors.toConcurrentMap(Element::getName, Function.identity())));
+		List<Element> children = elem.getChildren();
+		if (children != null) {
+			unknownExtensions.putAll(children
+					.stream()
+					.filter(child -> !bannedExtensionIds.contains(child.getName()))
+					.collect(Collectors.toConcurrentMap(Element::getName, Function.identity())));
+		}
 		extensionManager.newExtensionInstances()
 				.map(this::initExtension)
 				.forEach(extension -> extensions.put((Class<VHostItemExtension>) extension.getClass(), extension));
@@ -682,10 +685,27 @@ public class VHostItem
 			}
 
 			String[] mu = tmp.split("=");
-			if (mu != null && mu.length == 2 && dataTypes.containsKey(mu[0])) {
-				parseDataValue(mu[0], mu[1]);
+			if (mu != null && mu.length == 2) {
+				if (dataTypes.containsKey(mu[0])) {
+					parseDataValue(mu[0], mu[1]);
+
+				} else if (mu[0].equals(TRUSTED_JIDS_ATT)) {
+					if (mu[1].contains(",")) {
+						trustedJids = Collections.unmodifiableSet(Arrays.stream(mu[1].split(",")).map(String::trim).collect(Collectors.toSet()));
+					} else {
+						trustedJids = Collections.unmodifiableSet(Arrays.stream(mu[1].split(";")).map(String::trim).collect(Collectors.toSet()));
+					}
+				}
 			}
 
+		}
+		if (trustedJids == null) {
+			trustedJids = Collections.EMPTY_SET;
+		}
+		if (extensionManager != null) {
+			extensionManager.newExtensionInstances()
+					.map(this::initExtension)
+					.forEach(extension -> extensions.put((Class<VHostItemExtension>) extension.getClass(), extension));
 		}
 		log.log(Level.FINE, "Initialized from property string: {0}", this);
 	}
@@ -1250,7 +1270,9 @@ public class VHostItem
 
 	protected void initializeFromDefaults(VHostItemDefaults vhostDefaults) {
 		if (vhostDefaults.getTrusted() != null) {
-			oldData.put(TRUSTED_JIDS_ATT, vhostDefaults.getTrusted());
+			trustedJids = vhostDefaults.getTrusted();
+		} else if (trustedJids == null) {
+			trustedJids = Collections.EMPTY_SET;
 		}
 		maxUsersNumber = vhostDefaults.getMaxUsersNumber();
 		messageForward = vhostDefaults.getMessageForward();

@@ -46,12 +46,13 @@ import java.util.regex.Pattern;
 public abstract class AbstractSaslSCRAM
 		extends AbstractSasl {
 
+	private static final Charset CHARSET = Charset.forName("UTF-8");
+
 	public static final String TLS_UNIQUE_ID_KEY = "TLS_UNIQUE_ID_KEY";
 	public static final String LOCAL_CERTIFICATE_KEY = "LOCAL_CERTIFICATE_KEY";
-	protected final static byte[] DEFAULT_CLIENT_KEY = "Client Key".getBytes();
-	protected final static byte[] DEFAULT_SERVER_KEY = "Server Key".getBytes();
+	protected final static byte[] DEFAULT_CLIENT_KEY = "Client Key".getBytes(CHARSET);
+	protected final static byte[] DEFAULT_SERVER_KEY = "Server Key".getBytes(CHARSET);
 	private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	private static final Charset CHARSET = Charset.forName("UTF-8");
 	private final static Pattern CLIENT_FIRST_MESSAGE = Pattern.compile(
 			"^(?<gs2Header>(?:y|n|p=(?<cbName>[a-zA-z0-9.-]+))," +
 					"(?:a=(?<authzid>(?:[^,\\x00-\\x20\\x2C]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)" +
@@ -163,7 +164,7 @@ public abstract class AbstractSaslSCRAM
 		try {
 			final ByteArrayOutputStream result = new ByteArrayOutputStream();
 
-			result.write(this.cfmGs2header.getBytes());
+			result.write(this.cfmGs2header.getBytes(CHARSET));
 
 			if (this.requestedBindType == BindType.tls_unique ||
 					this.requestedBindType == BindType.tls_server_end_point) {
@@ -290,7 +291,7 @@ public abstract class AbstractSaslSCRAM
 
 		this.sfmMessage = serverStringMessage.toString();
 		step = Step.clientFinalMessage;
-		return sfmMessage.getBytes();
+		return sfmMessage.getBytes(CHARSET);
 	}
 
 	protected byte[] processClientLastMessage(byte[] data)
@@ -321,7 +322,7 @@ public abstract class AbstractSaslSCRAM
 		}
 
 		final String authMessage = cfmBareMessage + "," + sfmMessage + "," + clmWithoutProof;
-		byte[] clientSignature = hmac(key(storedKey), authMessage.getBytes());
+		byte[] clientSignature = hmac(key(storedKey), authMessage.getBytes(CHARSET));
 		byte[] clientProof = xor(clientKey, clientSignature);
 
 		byte[] dcp = Base64.decode(clmProof);
@@ -341,13 +342,13 @@ public abstract class AbstractSaslSCRAM
 		}
 
 		byte[] serverKey = hmac(key(saltedPassword), serverKeyData);
-		byte[] serverSignature = hmac(key(serverKey), authMessage.getBytes());
+		byte[] serverSignature = hmac(key(serverKey), authMessage.getBytes(CHARSET));
 
 		final StringBuilder serverStringMessage = new StringBuilder();
 		serverStringMessage.append("v=").append(Base64.encode(serverSignature));
 		step = Step.finished;
 		complete = true;
-		return serverStringMessage.toString().getBytes();
+		return serverStringMessage.toString().getBytes(CHARSET);
 	}
 
 	private String randomString() {
