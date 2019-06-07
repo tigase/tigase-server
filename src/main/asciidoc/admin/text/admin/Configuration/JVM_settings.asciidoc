@@ -32,6 +32,29 @@ For the production environments we recommend a fixed size HEAP - both initial an
 
 For convenience it's possible to uncomment line with `PRODUCTION_HEAP_SETTINGS` and adjust parameters accordingly.
 
+=== Memory consideration - total usage
+
+The HEAP size is not the only thing that affects JVM memory usage. When trying to size accordingly for your usage and machine specification you have to consider other factors that count towards total: loaded classes, threads' stack, JIT code cache, garbage collector and others.
+In principle consider following equation:
+
+[source]
+----
+Maximum memory usage = [-Xmx] + [-XX:MaxMetaspaceSize] + number_of_threads * [-Xss] + [-XX:MaxDirectMemorySize]
+                       (heap)   (classes)                (threads' stack)             (direct memory)
+----
+
+NOTE: before Java8 memory dedicated to loaded classes was configured with `-XX:PermSize` and `-XX:MaxPermSize` instead of, respectively, `-XX:MetaspaceSize` and `-XX:MaxMetaspaceSize`
+
+In case of Tigase XMPP Server, apart from heap we limit remaining factors:
+
+* direct memory to *128* MB
+* loaded classes to *128* MB
+* single thread's stack size to *228* KB (number of threads depends on number of CPU cores and may vary from 500 to couple of thousands)
+
+In principle, in addition to HEAP's maximum size defined by `-Xmx` you should add roughly *512* MB
+
+If you are interested in detailed tracking of memory take a look at [Memory footprint of the JVM](https://spring.io/blog/2019/03/11/memory-footprint-of-the-jvm/), [Native Memory Tracking in JVM](https://www.baeldung.com/native-memory-tracking-in-jvm) or [Why does my Java process consume more memory than Xmx?](https://plumbr.io/blog/memory-leaks/why-does-my-java-process-consume-more-memory-than-xmx)
+
 == GC settings
 
 Let's start with stating that there is no "one to rule them all" - each deployment and use-case is different, however we will try to give a couple of pointers and recommendations proceed with short introduction to GC itself.
