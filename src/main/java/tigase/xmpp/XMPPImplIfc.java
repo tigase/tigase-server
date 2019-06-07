@@ -68,17 +68,7 @@ public interface XMPPImplIfc
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	/**
-	 * Number of threads per single packets queue. Not used anymore. At the moment only one thread is always used for
-	 * each queue. For a higher concurrency set more queues using {@link #concurrentQueuesNo() }.
-	 *
-	 * @return a value of <code>int</code>
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	int concurrentThreadsPerQueue();
-
-	/**
+/**
 	 * Method <code>id</code> returns a unique ID of the plugin. Each plugin has own, unique ID which is used in the
 	 * configuration file to determine whether it needs to be loaded or not. In most cases the ID can be equal to XMLNS
 	 * of the packages processed by the plugin.
@@ -123,19 +113,6 @@ public interface XMPPImplIfc
 	String[][] supElementNamePaths();
 
 	/**
-	 * Method <code>supElements</code> returns an array of element names for stanzas which can be processed by this
-	 * plugin. Each element name corresponds to XMLNS returned in array by <code>supNamespaces()</code> method. This
-	 * method has been deprecated in favor of <code>supElementNamePaths</code>.
-	 *
-	 * @return a <code>String[]</code> value
-	 *
-	 * @see #supElementNamePaths
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	String[] supElements();
-
-	/**
 	 * Method <code>supNamespaces</code> returns an array of name-spaces for stanzas which can be processed by this
 	 * plugin. Each namespace corresponds to element name returned in array by <code>supElemenets()</code> method.
 	 *
@@ -176,18 +153,5 @@ public interface XMPPImplIfc
 	 * @param list is a statistics collection to which plugins own metrics can be added.
 	 */
 	void getStatistics(StatisticsList list);
-
-	/**
-	 * Method <code>isSupporting</code> takes element name and name-space for this element and determines whether this
-	 * element can be processed by this plugin.
-	 *
-	 * @param elem a <code>String</code> value
-	 * @param ns a <code>String</code> value
-	 *
-	 * @return a <code>boolean</code> value
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	boolean isSupporting(String elem, String ns);
-}    // XMPPImplIfc
+}
 

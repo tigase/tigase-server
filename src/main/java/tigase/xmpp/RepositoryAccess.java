@@ -104,104 +104,6 @@ public abstract class RepositoryAccess {
 		addDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
 	}
 
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Authorization loginDigest(BareJID userId, String digest, String id, String alg)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Map<String, Object> props = new HashMap<>();
-		props.put(PROTOCOL_KEY, PROTOCOL_VAL_NONSASL);
-		props.put(USER_ID_KEY, userId);
-		props.put(DIGEST_KEY, digest);
-		props.put(DIGEST_ID_KEY, id);
-
-		return loginOther(props);
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Authorization loginOther(Map<String, Object> props)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		isLoginAllowed();
-		try {
-			String mech = (String) props.get(AuthRepository.MACHANISM_KEY);
-
-			if (domain.isAnonymousEnabled() && (mech != null) && mech.equals(ANONYMOUS_MECH)) {
-				is_anonymous = true;
-				props.put(AuthRepository.USER_ID_KEY,
-						  BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(), getDomain().getVhost().getDomain()));
-				authState = Authorization.AUTHORIZED;
-				login();
-			} else {
-				if (authRepo.otherAuth(props)) {
-					authState = Authorization.AUTHORIZED;
-					login();
-				}    // end of if (authRepo.loginPlain())auth.login();
-			}
-
-			return authState;
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "User not found: ", e);
-
-			throw new NotAuthorizedException("Authorization failed", e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-			// throw new NotAuthorizedException("Authorization failed", e);
-		}        // end of try-catch
-	}
-
-	/**
-	 * <code>authorize</code> method performs authorization with given password as plain text. If
-	 * <code>AUTHORIZED</code> has been returned it means authorization process is successful and session has been
-	 * activated, otherwise session hasn't been authorized and return code gives more detailed information of fail
-	 * reason. Please refer to <code>Authorization</code> documentation for more details.
-	 *
-	 * @param userId
-	 * @param password
-	 *
-	 * @return a <code>Authorization</code> value of result code.
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Authorization loginPlain(BareJID userId, String password)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Map<String, Object> props = new HashMap<>();
-		props.put(PROTOCOL_KEY, PROTOCOL_VAL_NONSASL);
-		props.put(USER_ID_KEY, userId);
-		props.put(PASSWORD_KEY, password);
-
-		return loginOther(props);
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Authorization loginToken(BareJID userId, String xmpp_sessionId, String token)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		isLoginAllowed();
-		try {
-			String db_token = repo.getData(userId, "tokens", xmpp_sessionId);
-
-			if (token.equals(db_token)) {
-				authState = Authorization.AUTHORIZED;
-				login();
-				repo.removeData(userId, "tokens", xmpp_sessionId);
-			}
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
-
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-		}    // end of try-catch
-
-		return authState;
-	}
-
 	public void logout() throws NotAuthorizedException {
 		authState = Authorization.NOT_AUTHORIZED;
 	}
@@ -227,20 +129,6 @@ public abstract class RepositoryAccess {
 			auth_mechs[auth_mechs.length - 1] = ANONYMOUS_MECH;
 			authProps.put(AuthRepository.RESULT_KEY, auth_mechs);
 		}
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Authorization register(String name_param, String pass_param, String email_param)
-			throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-		Map<String, String> reg_params = null;
-
-		if ((email_param != null) && !email_param.trim().isEmpty()) {
-			reg_params = new LinkedHashMap<String, String>();
-			reg_params.put("email", email_param);
-		}
-
-		return register(name_param, pass_param, reg_params);
 	}
 
 	public Authorization changeRegistration(final String name_param, final String pass_param,
@@ -316,63 +204,6 @@ public abstract class RepositoryAccess {
 
 	public void removePublicDataGroup(String subnode) throws NotAuthorizedException, TigaseDBException {
 		removeDataGroup(calcNode(PUBLIC_DATA_NODE, subnode));
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Authorization register(String name_param, String pass_param, Map<String, String> reg_params)
-			throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-
-		// Some clients send plain user name and others send
-		// jid as user name. Let's resolve this here.
-		String user_name = BareJID.parseJID(name_param)[0];
-
-		if ((user_name == null) || user_name.trim().isEmpty()) {
-			user_name = name_param;
-		}    // end of if (user_mame == null || user_name.equals(""))
-		if (isAuthorized()) {
-			return changeRegistration(user_name, pass_param, reg_params);
-		}
-
-		// new user registration, let's check limits...
-		if (!domain.isRegisterEnabled()) {
-			throw new NotAuthorizedException("Registration is now allowed for this domain");
-		}
-		if (domain.getMaxUsersNumber() > 0) {
-			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest(
-						"Current number of users for domain: " + domain.getVhost().getDomain() + " is: " + domainUsers);
-			}
-			if (domainUsers >= domain.getMaxUsersNumber()) {
-				throw new NotAuthorizedException("Maximum users number for the domain exceeded.");
-			}
-		}
-		if ((user_name == null) || user_name.equals("") || (pass_param == null) || pass_param.equals("")) {
-			return Authorization.NOT_ACCEPTABLE;
-		}
-		try {
-			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()), pass_param);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "User added: {0}, pass: {1}",
-						new Object[]{BareJID.toString(user_name, getDomain().getVhost().getDomain()), pass_param});
-			}
-			setRegistration(user_name, pass_param, reg_params);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}",
-						new Object[]{BareJID.toString(user_name, getDomain().getVhost().getDomain()), pass_param,
-									 reg_params});
-			}
-
-			return Authorization.AUTHORIZED;
-		} catch (UserExistsException e) {
-			return Authorization.CONFLICT;
-		} catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-
-			return Authorization.INTERNAL_SERVER_ERROR;
-		}    // end of try-catch
 	}
 
 	public String getAuthenticationToken(String xmpp_sessionId) throws NotAuthorizedException, TigaseDBException {

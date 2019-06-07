@@ -151,6 +151,7 @@ public class DiscoveryModule
 		write(resultIq);
 	}
 
+	@Deprecated
 	@TigaseDeprecated(removeIn = "9.0.0", since = "8.1.0", note = "Deprecating method with type-o")
 	protected Packet prepareDiscoInfoReponse(Packet packet, JID jid, String node, JID senderJID) {
 		return prepareDiscoInfoResponse(packet, jid, node, senderJID);

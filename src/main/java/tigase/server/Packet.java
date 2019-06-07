@@ -374,24 +374,6 @@ public class Packet {
 	 * @param key is an attribute key.
 	 *
 	 * @return an attribute value or NULL if there is no such attribute.
-	 *
-	 * @deprecated Consider using {@link #getAttributeStaticStr(java.lang.String) } instead.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getAttribute(String key) {
-		return elem.getAttribute(key);
-	}
-
-	/**
-	 * A convenience method for accessing stanza top element attributes. This call is equal to the call:
-	 * <pre>
-	 * packet.getElement().getAttribute(key);
-	 * </pre>
-	 *
-	 * @param key is an attribute key.
-	 *
-	 * @return an attribute value or NULL if there is no such attribute.
 	 */
 	public String getAttributeStaticStr(String key) {
 		return elem.getAttributeStaticStr(key);
@@ -414,49 +396,6 @@ public class Packet {
 	 */
 	public String getAttributeStaticStr(String[] path, String key) {
 		return elem.getAttributeStaticStr(path, key);
-	}
-
-	/**
-	 * A convenience method for accessing stanza top level or any of it's children attribute. This call is equal to the
-	 * call:
-	 * <pre>
-	 * packet.getElement().getAttribute(xmlPath, key);
-	 * </pre>
-	 * <strong>For performance reasons please consider using {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) } instead.</strong>
-	 *
-	 * @param path
-	 * @param key
-	 *
-	 * @return value of the requested attribute or NULL if the attribute is not set.
-	 *
-	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String[], java.lang.String)} instead, if possible, if
-	 * not, contact us so we preserve the API.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getAttribute(String[] path, String key) {
-		return elem.getAttribute(path, key);
-	}
-
-	/**
-	 * A convenience method for accessing stanza top level or any of it's children attribute. This call is equal to the
-	 * call:
-	 * <pre>
-	 * packet.getElement().getAttribute(xmlPath, key);
-	 * </pre>
-	 *
-	 * @param path is XML path for the stanza element or stanza child for which attribute is retrieved.
-	 * @param key is an attribute key.
-	 *
-	 * @return value of the requested attribute or NULL if the attribute is not set.
-	 *
-	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String[], java.lang.String)} instead, if possible, or
-	 * {@link #getAttribute(java.lang.String[], java.lang.String)}
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getAttribute(String path, String key) {
-		return elem.getAttribute(path, key);
 	}
 
 	/**
@@ -487,48 +426,6 @@ public class Packet {
 	 */
 	public String getElemCDataStaticStr(String[] xmlPath) {
 		return elem.getCDataStaticStr(xmlPath);
-	}
-
-	/**
-	 * Method returns character data from the enclosed stanza for a given stanza element or child pointed by the
-	 * <code>xmlPath</code> parameter. This call is equal to the call:
-	 * <pre>
-	 * packet.getElement().getCData(xmlPath);
-	 * </pre>
-	 * <strong>For performance reasons please consider using {@link #getElemCDataStaticStr(java.lang.String[])}
-	 * instead.</strong>
-	 *
-	 * @param xmlPath is an XML path to the stanza element for which CData is retrieved.
-	 *
-	 * @return CData for a given element or NULL if the element does not exist or there is no CData for the element.
-	 *
-	 * @deprecated use {@link #getElemCDataStaticStr(java.lang.String[]) } instead, if possible, if not, contact us so
-	 * we preserve the API.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getElemCData(String[] xmlPath) {
-		return elem.getCData(xmlPath);
-	}
-
-	/**
-	 * Method returns character data from the enclosed stanza for a given stanza element or child pointed by the
-	 * <code>xmlPath</code> parameter. This call is equal to the call:
-	 * <pre>
-	 * packet.getElement().getCData(xmlPath);
-	 * </pre>
-	 *
-	 * @param xmlPath is an XML path to the stanza element for which CData is retrieved.
-	 *
-	 * @return CData for a given element or NULL if the element does not exist or there is no CData for the element.
-	 *
-	 * @deprecated use {@link #getElemCDataStaticStr(java.lang.String[])} instead, if possible, or {@link
-	 * #getElemCData(java.lang.String[])}
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getElemCData(String xmlPath) {
-		return elem.getCData(xmlPath);
 	}
 
 	/**
@@ -564,65 +461,6 @@ public class Packet {
 	}
 
 	/**
-	 * Method returns a list of all XML children from the enclosed stanza for a given stanza element or child pointed by
-	 * the <code>xmlPath</code> parameter. This call is equal to the call:
-	 * <pre>
-	 * packet.getElement().getChildren(xmlPath);
-	 * </pre>
-	 * <strong>For performance reasons please consider using {@link #getElemChildrenStaticStr(java.lang.String[]) }
-	 * instead.</strong>
-	 *
-	 * @param xmlPath is an XML path to the stanza element for which children are retrieved.
-	 *
-	 * @return children list for a given element or NULL if the element does not exist or there is no children for the
-	 * element.
-	 *
-	 * @deprecated use {@link #getElemChildrenStaticStr(java.lang.String[])} instead, if possible, if not, contact us so
-	 * we preserve the API.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public List<Element> getElemChildren(String[] xmlPath) {
-		return elem.getChildren(xmlPath);
-	}
-
-	/**
-	 * Method returns a list of all XML children from the enclosed stanza for a given stanza element or child pointed by
-	 * the <code>xmlPath</code> parameter. This call is equal to the call:
-	 * <pre>
-	 * packet.getElement().getChildren(xmlPath);
-	 * </pre>
-	 *
-	 * @param xmlPath is an XML path to the stanza element for which children are retrieved.
-	 *
-	 * @return children list for a given element or NULL if the element does not exist or there is no children for the
-	 * element.
-	 *
-	 * @deprecated use {@link #getElemChildrenStaticStr(java.lang.String[]) } instead, if possible, or {@link
-	 * #getElemChildren(java.lang.String[]) }.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public List<Element> getElemChildren(String xmlPath) {
-		return elem.getChildren(xmlPath);
-	}
-
-	/**
-	 * Method returns a <code>String</code> representation of the stanza source address. Use of this method is not
-	 * recommended, the API is depreciated in favor of API operating on <code>JID</code> class.
-	 *
-	 * @return a <code>String</code> representation of the stanza source address or NULL if the source address has not
-	 * been set.
-	 *
-	 * @deprecated use getStanzaFrom() instead.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getElemFrom() {
-		return (stanzaFrom != null) ? stanzaFrom.toString() : null;
-	}
-
-	/**
 	 * Convenience method for retrieving the stanza top element name. This call is equal to the call:
 	 * <pre>
 	 * packet.getElement().getName();
@@ -632,21 +470,6 @@ public class Packet {
 	 */
 	public String getElemName() {
 		return elem.getName();
-	}
-
-	/**
-	 * Method returns a <code>String</code> representation of the stanza destination address. Use of this method is not
-	 * recommended, the API is depreciated in favor of API operating on <code>JID</code> class.
-	 *
-	 * @return a <code>String</code> representation of the stanza destination address or NULL if the destination address
-	 * has not been set..
-	 *
-	 * @deprecated use getStanzaTo() instead
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public String getElemTo() {
-		return (stanzaTo != null) ? stanzaTo.toString() : null;
 	}
 
 	/**
@@ -1018,50 +841,6 @@ public class Packet {
 	}
 
 	/**
-	 * The method checks whether the enclosed stanza contains an XML element and XML child element for a given element
-	 * path and xmlns. The <code>elementPath</code> is a String array with path elements. <strong>For performance
-	 * reasons please consider using {@link #isXMLNSStaticStr(java.lang.String[], java.lang.String)} instead.</strong>
-	 *
-	 * @param elementPath is a <code>String[]</code> value which represents XML element path to a desired child
-	 * element.
-	 * @param xmlns is a <code>String</code> value which represents XML XMLNS.
-	 *
-	 * @return a <code>true</code> is element given in parameters is found in the packet stanza, otherwise
-	 * <code>false</code>
-	 *
-	 * @deprecated use {@link #isXMLNSStaticStr(String[], String)} instead, if possible, if not contact us so we
-	 * preserve the API.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public boolean isXMLNS(String[] elementPath, String xmlns) {
-		String this_xmlns = elem.getXMLNS(elementPath);
-
-		return (this_xmlns == xmlns);
-	}
-
-	/**
-	 * Checks whether the XML stanza contains XML element with given XML path and element name and XMLNS. This is
-	 * inefficient method and highly recommended not to use. Please use the other methods which accept
-	 * <code>String[]</code> instead.
-	 *
-	 * @param elementPath is a string with XML path in form of: "/root/child1/child2"
-	 * @param xmlns is a valid XML namespace.
-	 *
-	 * @return a <code>true</code> is element given in parameters is found in the packet stanza, otherwise
-	 * <code>false</code>
-	 *
-	 * @deprecated use {@link #isXMLNSStaticStr(String[], String)} instead, if possible, or {@link #isXMLNS(String[], String)}
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public boolean isXMLNS(String elementPath, String xmlns) {
-		String this_xmlns = elem.getXMLNS(elementPath);
-
-		return (this_xmlns == xmlns);
-	}
-
-	/**
 	 * The method marks that the packet has NOT been processed by a packet processor with a given ID.
 	 *
 	 * @param id is a <code>String</code> instance of the packet processer identifier.
@@ -1195,34 +974,6 @@ public class Packet {
 	 */
 	public void processedBy(String id) {
 		processorsIds.add(id);
-	}
-
-	/**
-	 * The method left for compatibility with an old API reasons. Use <code>swapStanzaFromTo()</code> instead.
-	 *
-	 * @return a new packet instance with a copy of the stanza element with swapped source and destination addresses.
-	 *
-	 * @deprecated Use <code>swapStanzaFromTo()</code> instead.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Packet swapElemFromTo() {
-		return swapStanzaFromTo();
-	}
-
-	/**
-	 * The method left for compatibility with an old API reasons. Use <code>swapStanzaFromTo()</code> instead.
-	 *
-	 * @param type a new stanza type which has to be set to the generated stanza copy.
-	 *
-	 * @return a new packet instance with a copy of the stanza element with swapped source and destination addresses.
-	 *
-	 * @deprecated Use <code>swapStanzaFromTo()</code> instead.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public Packet swapElemFromTo(final StanzaType type) {
-		return swapStanzaFromTo(type);
 	}
 
 	/**

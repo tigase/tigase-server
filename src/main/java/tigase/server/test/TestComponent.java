@@ -21,7 +21,6 @@ import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.impl.DiscoveryModule;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
@@ -67,14 +66,14 @@ public class TestComponent
 
 	@Override
 	public int hashCodeForPacket(Packet packet) {
-		if (packet.getElemTo() != null) {
-			return packet.getElemTo().hashCode();
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
 		}
 		// This should not happen, every packet must have a destination
 		// address, but maybe our SPAM checker is used for checking
 		// strange kind of packets too....
-		if (packet.getElemFrom() != null) {
-			return packet.getElemFrom().hashCode();
+		if (packet.getStanzaFrom() != null) {
+			return packet.getStanzaFrom().hashCode();
 		}
 		// If this really happens on your system you should look carefully
 		// at packets arriving to your component and decide a better way

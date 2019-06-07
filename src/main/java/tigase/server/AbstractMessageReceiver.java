@@ -440,18 +440,7 @@ public abstract class AbstractMessageReceiver
 		task.setScheduledFuture(future);
 	}
 
-	/**
-	 * Method queues and executes all timer tasks on Timer SINGLE thread.
-	 *
-	 * @deprecated
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-	public void addTimerTask(TimerTask task, long delay) {
-		receiverTasks.schedule(task, delay);
-	}
-
-	/**
+/**
 	 * Method queues and executes timer tasks using ScheduledExecutorService which allows using more than one thread for
 	 * executing tasks. It allows to set a timeout to cancel long running tasks
 	 *
@@ -625,21 +614,6 @@ public abstract class AbstractMessageReceiver
 	public int processingOutThreads() {
 		return 1;
 	}
-
-	/**
-	 * There is now a separate setting for incoming packets and outgoing packets processing. Some components are
-	 * uni-directional, hence they don't even use any threads in one direction. This way you can save resources by
-	 * reducing unneeded threads. Use <code>processingOutThreads()</code> and <code>processingInThreads()</code>
-	 * instead.
-	 *
-	 * @return a value of <code>int</code>
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-	public int processingThreads() {
-		return 1;
-	}
-
 	/**
 	 * By default this method just copies the given packet between queue. This method operates on packets which have
 	 * been already processed somehow by the component so usually the default action is the best one, however some
@@ -1019,17 +993,6 @@ public abstract class AbstractMessageReceiver
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, unit);
 
 		task.setScheduledFuture(future);
-	}
-
-	/**
-	 * Method queues and executes all timer tasks on Timer SINGLE thread.
-	 *
-	 * @deprecated
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-	protected void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
-		receiverTasks.schedule(task, unit.toMillis(delay));
 	}
 
 	protected Integer getMaxQueueSize(int def) {

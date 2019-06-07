@@ -80,13 +80,6 @@ public abstract class XMPPProcessor
 			Set<StanzaType> types = supTypes();
 
 			result = checkPacket(packet, elemPaths, elemXMLNS, types);
-		} else {
-
-			// And this is the old API left for backward compatibility with plugins
-			// from earlier versions
-			if (walk(packet.getElement())) {
-				result = Authorization.AUTHORIZED;
-			}
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1})\n Request: " + "{2}, conn: {3}, authorization: {4}",
@@ -102,8 +95,7 @@ public abstract class XMPPProcessor
 	}
 
 	@Override
-	@Deprecated
-	public int concurrentThreadsPerQueue() {
+	public int concurrentQueuesNo() {
 		return 1;
 	}
 
@@ -119,12 +111,6 @@ public abstract class XMPPProcessor
 
 	@Override
 	public String[][] supElementNamePaths() {
-		return null;
-	}
-
-	@Override
-	@Deprecated
-	public String[] supElements() {
 		return null;
 	}
 
@@ -165,30 +151,6 @@ public abstract class XMPPProcessor
 	}
 
 	@Override
-	@Deprecated
-	public boolean isSupporting(final String element, final String ns) {
-		String[] impl_elements = supElements();
-		String[] impl_xmlns = supNamespaces();
-
-		if ((impl_elements != null) && (impl_xmlns != null)) {
-			for (int i = 0; (i < impl_elements.length) && (i < impl_xmlns.length); i++) {
-
-				// ******   WARNING!!!! WARNING!!!!    *****
-				// This is intentional reference comparison!
-				// This method is called very, very often and it is also very expensive
-				// therefore all XML element names and xmlns are created using
-				// String.intern()
-				if (((impl_elements[i] == element) || (impl_elements[i] == ALL_NAMES)) &&
-						((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL_NAMES))) {
-					return true;
-				}    // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
-			}      // end of for (int i = 0; i < ELEMENTS.length; i++)
-		}        // end of if (impl_elements != null && impl_xmlns != null)
-
-		return false;
-	}
-
-	@Override
 	public int getThreadsNo() {
 		return threadsNo;
 	}
@@ -217,26 +179,5 @@ public abstract class XMPPProcessor
 
 		return result;
 	}
-
-	private boolean walk(Element elem) {
-		boolean result;
-		String xmlns = elem.getXMLNS();
-
-		if (xmlns == null) {
-			xmlns = "jabber:client";
-		}
-		result = isSupporting(elem.getName(), xmlns);
-		if (!result) {
-			Collection<Element> children = elem.getChildren();
-
-			if (children != null) {
-				for (Element child : children) {
-					result = walk(child);
-				}    // end of for (Element child: children)
-			}      // end of if (children != null)
-		}
-
-		return result;
-	}
-}    // XMPPProcessor
+}
 

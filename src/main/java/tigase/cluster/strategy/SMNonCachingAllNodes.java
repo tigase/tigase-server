@@ -73,12 +73,6 @@ public abstract class SMNonCachingAllNodes
 		return null;
 	}
 
-	@Override
-	@Deprecated
-	public Object getInternalCacheData() {
-		return null;
-	}
-
 	public List<JID> getNodesForJid(JID jid) {
 		return getNodesConnected();
 	}

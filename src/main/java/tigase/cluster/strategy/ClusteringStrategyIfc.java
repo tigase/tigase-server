@@ -121,19 +121,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	/**
-	 * <strong>Note! This is not for a common use method.</strong> This is for debugging and diagnostic purposes only
-	 * and maybe removed or changed at any time in the future. It returns a content of an internal cache from the
-	 * strategy. Regardless of the cache data organization inside the strategy, it is returned here in a common format.
-	 * It may be a copy or a direct reference to internal data. Therefore this is unmodifiable instance of the cache.
-	 * Generating results of this structure may be a costly operation, therefore it must not be called frequently.
-	 *
-	 * @return an Object with content of an internal cache data.
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	Object getInternalCacheData();
-
-	/**
 	 * Add the strategy statistics to the List.
 	 */
 	void getStatistics(StatisticsList list);

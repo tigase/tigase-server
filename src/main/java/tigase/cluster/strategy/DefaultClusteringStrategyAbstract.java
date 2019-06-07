@@ -266,12 +266,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		return "basic strategy";
 	}
 
-	@Override
-	@Deprecated
-	public Object getInternalCacheData() {
-		return null;
-	}
-
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 
 		// If visited nodes is not null then we return null as this strategy never

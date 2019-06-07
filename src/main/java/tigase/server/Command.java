@@ -159,19 +159,7 @@ public enum Command {
 
 	public static final String COMMAND_EL = "command";
 
-	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-	public static final String FIELD_EL = DataForm.FIELD_EL;
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-	public static final String VALUE_EL = DataForm.VALUE_EL;
-
 	public static final String XMLNS = "http://jabber.org/protocol/commands";
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.1.0", removeIn = "8.1.0")
-	protected static final String[] FIELD_VALUE_PATH = DataForm.FIELD_VALUE_PATH;
 
 	private static final Logger log = Logger.getLogger("tigase.server.Command");
 
@@ -573,8 +561,8 @@ public enum Command {
 
 		for (Element child : children) {
 			log.info("Command form child: " + child.toString());
-			if (child.getName().equals(FIELD_EL) && child.getAttributeStaticStr("var").equals(f_name)) {
-				String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
+			if (child.getName().equals(DataForm.FIELD_EL) && child.getAttributeStaticStr("var").equals(f_name)) {
+				String value = child.getChildCDataStaticStr(DataForm.FIELD_VALUE_PATH);
 
 				log.info("Command found: field=" + f_name + ", value=" + value);
 				if (value != null) {
@@ -582,7 +570,7 @@ public enum Command {
 				}
 			} else {
 				log.info("Command not found: field=" + f_name + ", value=" +
-								 child.getChildCDataStaticStr(FIELD_VALUE_PATH));
+								 child.getChildCDataStaticStr(DataForm.FIELD_VALUE_PATH));
 			}
 		}
 
