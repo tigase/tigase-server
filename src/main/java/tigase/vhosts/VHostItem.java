@@ -976,6 +976,9 @@ public class VHostItem
 
 	public <T extends VHostItemExtension> T getExtension(Class<T> clazz) {
 		return (T) extensions.computeIfAbsent(clazz, key -> {
+			if (extensionManager == null) {
+				return null;
+			}
 			VHostItemExtension ext = extensionManager.newExtensionInstanceForClass(key);
 			if (ext != null) {
 				this.initExtension(ext);
