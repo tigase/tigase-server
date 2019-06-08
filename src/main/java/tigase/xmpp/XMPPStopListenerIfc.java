@@ -28,8 +28,7 @@ import java.util.Queue;
  * Created: Sat Oct 14 16:14:18 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface XMPPStopListenerIfc
 		extends XMPPImplIfc {
 

@@ -60,8 +60,7 @@ import static tigase.xmpp.impl.PresenceCapabilitiesManager.CAPS_NODE;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "message-router", parent = Kernel.class, active = true)
 public class MessageRouter
 		extends AbstractMessageReceiver

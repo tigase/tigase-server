@@ -36,8 +36,7 @@ import static tigase.server.ext.ComponentProtocolHandler.EXTCOMP_BIND_HOSTNAMES_
  * Created: Nov 2, 2009 2:37:18 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class BindProcessor
 		implements ExtProcessor {
 

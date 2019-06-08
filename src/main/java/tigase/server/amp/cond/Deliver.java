@@ -27,8 +27,7 @@ import java.util.logging.Logger;
  * Created: Apr 27, 2010 5:36:27 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class Deliver
 		implements ConditionIfc {
 

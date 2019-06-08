@@ -154,12 +154,8 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 
 	/**
 	 * Method returns class implementing repository which supports data source instance provided in parameter.
-	 *
-	 * @param dataSource
-	 *
 	 * @return repository class
 	 *
-	 * @throws DBInitException
 	 */
 	protected abstract Class<? extends T> findClassForDataSource(DataSource dataSource) throws DBInitException;
 
@@ -183,9 +179,6 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 
 	/**
 	 * Provides repository instance for passed domain name
-	 *
-	 * @param domain
-	 *
 	 * @return instance of repository
 	 */
 	protected T getRepository(String domain) {
@@ -215,8 +208,6 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 	 * Method called to initialized passed repository instance for passed domain. <br> Should be empty if no custom
 	 * initialization is required.
 	 *
-	 * @param domain
-	 * @param repo
 	 */
 	protected void initializeRepository(String domain, T repo) {
 
@@ -240,8 +231,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 	/**
 	 * MDRepositoryConfigBean is bean responsible for basic management and initialization of repository for domain.
 	 *
-	 * @param <A>
-	 */
+	 *	 */
 	public abstract static class MDRepositoryConfigBean<A extends DataSourceAware>
 			implements Initializable, UnregisterAware, ConfigurationChangedAware, RegistrarBean {
 
@@ -346,11 +336,6 @@ public abstract class MDRepositoryBean<T extends DataSourceAware>
 		/**
 		 * Method returns class for instance repository matching data source or returning class specified in
 		 * <code>cls</code> config field.
-		 *
-		 * @return
-		 *
-		 * @throws DBInitException
-		 * @throws ClassNotFoundException
 		 */
 		protected Class<?> getRepositoryClassName() throws DBInitException, ClassNotFoundException {
 			if (cls == null) {

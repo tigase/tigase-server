@@ -298,7 +298,6 @@ public class MobileV1
 	/**
 	 * Check if queuing is enabled
 	 *
-	 * @param session
 	 */
 	protected boolean isQueueEnabled(XMPPResourceConnection session) {
 		Boolean enabled = (Boolean) session.getSessionData(XMLNS);
@@ -309,7 +308,6 @@ public class MobileV1
 	/**
 	 * Check timeout for queue
 	 *
-	 * @param session
 	 */
 	protected boolean isTimedOut(XMPPResourceConnection session) {
 		Long lastAccessTime = (Long) session.getSessionData(LAST_TRANSFER_KEY);
@@ -327,7 +325,6 @@ public class MobileV1
 	/**
 	 * Update last send time
 	 *
-	 * @param session
 	 */
 	protected void updateLastAccessTime(XMPPResourceConnection session) {
 		session.putSessionData(LAST_TRANSFER_KEY, System.currentTimeMillis());
@@ -336,7 +333,6 @@ public class MobileV1
 	/**
 	 * Get timeout used for session queue
 	 *
-	 * @param session
 	 */
 	private long getTimeout(XMPPResourceConnection session) {
 		Long timeout = (Long) session.getSessionData(TIMEOUT_KEY);
@@ -351,8 +347,6 @@ public class MobileV1
 	/**
 	 * Set timeout for session queue
 	 *
-	 * @param session
-	 * @param timeout
 	 */
 	private void setTimeout(XMPPResourceConnection session, long timeout) {
 		if (timeout == 0) {

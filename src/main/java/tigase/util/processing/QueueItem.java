@@ -25,8 +25,7 @@ import tigase.xmpp.XMPPResourceConnection;
  * Created: Apr 21, 2009 9:05:23 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class QueueItem {
 
 	private XMPPResourceConnection conn;

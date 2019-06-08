@@ -43,8 +43,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  * Created: Sun Aug  6 22:27:13 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class TelnetServer
 		implements SampleSocketThread.SocketHandler {
 
@@ -201,10 +200,6 @@ public class TelnetServer
 
 	/**
 	 * Creates a new <code>TelnetServer</code> instance.
-	 *
-	 * @param port
-	 *
-	 * @throws IOException
 	 */
 	public TelnetServer(int port) throws IOException {
 		reader = new SampleSocketThread(this);

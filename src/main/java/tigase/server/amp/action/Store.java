@@ -42,8 +42,7 @@ import java.util.logging.Logger;
  * Created: May 1, 2010 11:32:59 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "store", parent = AmpComponent.class, active = true)
 public class Store
 		extends ActionAbstract

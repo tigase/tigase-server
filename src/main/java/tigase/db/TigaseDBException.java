@@ -25,8 +25,7 @@ import tigase.component.exceptions.RepositoryException;
  * Created: Thu Oct 26 12:15:36 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class TigaseDBException
 		extends RepositoryException {
 

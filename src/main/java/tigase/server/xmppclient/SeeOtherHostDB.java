@@ -97,7 +97,6 @@ public class SeeOtherHostDB
 	/**
 	 * Performs database check, creates missing schema if necessary
 	 *
-	 * @throws SQLException
 	 */
 	private void checkDB() throws SQLException {
 

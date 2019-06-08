@@ -224,7 +224,6 @@ public class SaslSCRAMTest
 	 * @param snonce server once
 	 * @param password user password (plaintext)
 	 *
-	 * @return
 	 */
 	private SaslSCRAM create(String salt, String snonce, String password) {
 		return create(salt, snonce, password, new TestCallbackHandler());

@@ -25,8 +25,7 @@ import java.util.Map;
  * Created: Fri Jan  6 14:54:21 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class MessageRouterConfig {
 
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";

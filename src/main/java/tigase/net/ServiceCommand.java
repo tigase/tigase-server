@@ -27,8 +27,7 @@ package tigase.net;
  * <p> Created: Sun Oct 17 22:32:22 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum ServiceCommand {
 
 	STOP,

@@ -28,8 +28,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * Created: Apr 27, 2010 5:36:03 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "notify", parent = AmpComponent.class, active = true)
 public class Notify
 		extends ActionAbstract {

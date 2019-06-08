@@ -24,8 +24,7 @@ import tigase.xml.Element;
  * Created: Apr 26, 2010 5:06:13 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ConditionIfc
 		extends AmpFeatureIfc {
 

@@ -29,8 +29,7 @@ import java.util.logging.Logger;
  * Created: Dec 9, 2010 2:01:12 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "startZlib", parent = S2SConnectionManager.class, active = true)
 public class StartZlib
 		extends S2SAbstractProcessor {

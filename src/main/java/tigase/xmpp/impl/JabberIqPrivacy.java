@@ -57,8 +57,7 @@ import static tigase.xmpp.impl.Privacy.*;
  * Created: Mon Oct  9 18:18:11 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = JabberIqPrivacy.ID, parent = SessionManager.class, active = true)
 public class JabberIqPrivacy
 		extends XMPPProcessor

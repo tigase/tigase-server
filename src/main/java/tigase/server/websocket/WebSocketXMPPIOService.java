@@ -36,7 +36,6 @@ import java.util.logging.Logger;
  * Class implements basic support for WebSocket protocol. It extends XMPPIOService so it can be used instead of
  * XMPPIOService in ClientConnectionManager to allow web clients to connect to it without using BOSH extension.
  *
- * @param <RefObject>
  */
 public class WebSocketXMPPIOService<RefObject>
 		extends XMPPIOService<RefObject> {
@@ -244,7 +243,6 @@ public class WebSocketXMPPIOService<RefObject>
 	/**
 	 * Custom implementation of writeData function which encodes data in WebSocket protocol frames
 	 *
-	 * @param data
 	 */
 	@Override
 	protected void writeData(final String data) {
@@ -354,8 +352,6 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Process data from internal temporary buffer used to decode HTTP request used by WebSocket protocol to switch
 	 * protocol to WebSocket protocol
 	 *
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
 	 */
 	private void processWebSocketHandshake(byte[] buf) throws NoSuchAlgorithmException, IOException {
 		HashMap<String, String> headers = new HashMap<String, String>();
@@ -409,7 +405,6 @@ public class WebSocketXMPPIOService<RefObject>
 	/**
 	 * Decode data encoded in WebSocket frames from buffer
 	 *
-	 * @param buf
 	 */
 	private ByteBuffer decodeFrame(ByteBuffer buf) {
 		return protocol.decodeFrame(this, buf);
@@ -417,10 +412,6 @@ public class WebSocketXMPPIOService<RefObject>
 
 	/**
 	 * Decode data from buffer to chars array
-	 *
-	 * @param tmpBuffer
-	 *
-	 * @throws MalformedInputException
 	 */
 	private char[] decode(ByteBuffer tmpBuffer) throws MalformedInputException {
 		if (tmpBuffer == null) {
@@ -469,10 +460,6 @@ public class WebSocketXMPPIOService<RefObject>
 
 	/**
 	 * Encode string into buffer
-	 *
-	 * @param data
-	 *
-	 * @throws CharacterCodingException
 	 */
 	private ByteBuffer encode(String data) throws CharacterCodingException {
 		ByteBuffer dataBuffer = null;

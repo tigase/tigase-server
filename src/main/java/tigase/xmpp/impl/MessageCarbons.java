@@ -81,10 +81,6 @@ public class MessageCarbons
 
 	/**
 	 * Returns true if session is enabled for receiving carbon copy messages
-	 *
-	 * @param session
-	 *
-	 * @throws NotAuthorizedException
 	 */
 	private static boolean isEnabled(XMPPResourceConnection session) throws NotAuthorizedException {
 		Boolean value = (Boolean) session.getSessionData(ENABLED_KEY);
@@ -93,13 +89,6 @@ public class MessageCarbons
 
 	/**
 	 * Prepare packet which is carbon copy of message passed as argument
-	 *
-	 * @param packet
-	 * @param srcJid
-	 * @param jid
-	 * @param type
-	 *
-	 * @throws NoConnectionIdException
 	 */
 	private static Packet prepareCarbonCopy(Packet packet, JID srcJid, JID jid,
 											String type) { //throws NoConnectionIdException {
@@ -321,7 +310,6 @@ public class MessageCarbons
 	 * Method responsible for handing <code>MessageCarbonsStateChangedEvent</code> and marking JIDs of user as
 	 * MessageCarbons enabled/disabled.
 	 *
-	 * @param event
 	 */
 	@HandleEvent
 	protected void stateChanged(MessageCarbonsStateChangedEvent event) {
@@ -340,10 +328,6 @@ public class MessageCarbons
 	/**
 	 * Method handles <code>UserPresenceChangedEvent</code> and synchronizes state of JIDs for MessageCarbons for
 	 * particular user.
-	 *
-	 * @param presenceEvent
-	 *
-	 * @throws NotAuthorizedException
 	 */
 	@HandleEvent
 	protected void presenceUpdate(UserPresenceChangedEvent presenceEvent) throws NotAuthorizedException {
@@ -406,11 +390,6 @@ public class MessageCarbons
 
 	/**
 	 * Add/Remove session JID to set of JIDs with enabled carbon copy protocol
-	 *
-	 * @param session
-	 * @param value
-	 *
-	 * @throws NotAuthorizedException
 	 */
 	private void setEnabled(XMPPResourceConnection session, boolean value) throws NotAuthorizedException {
 		session.putSessionData(ENABLED_KEY, value);
@@ -428,8 +407,6 @@ public class MessageCarbons
 	/**
 	 * Method returns true if
 	 *
-	 * @param packet
-	 * @param session
 	 */
 	private boolean isErrorDeliveringForkedMessage(Packet packet, XMPPResourceConnection session) {
 

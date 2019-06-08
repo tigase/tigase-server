@@ -27,8 +27,7 @@ import tigase.server.ServerComponent;
  * Created: Fri Nov 21 14:29:49 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface VHostListener
 		extends ServerComponent {
 

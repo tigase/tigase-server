@@ -449,28 +449,6 @@ public class RosterFlat
 				saveUserRoster(session);
 				// notify that roster element was changed!
 			}
-		} else {
-
-			// Try to load a roster from the 'old' style roster storage and
-			// convert it the the flat roster storage
-			Roster oldRoster = new Roster();
-			JID[] buddies = oldRoster.getBuddies(session);
-
-			if ((buddies != null) && (buddies.length > 0)) {
-				for (JID buddy : buddies) {
-					String name = oldRoster.getBuddyName(session, buddy);
-					SubscriptionType subscr = oldRoster.getBuddySubscription(session, buddy);
-					String[] groups = oldRoster.getBuddyGroups(session, buddy);
-					RosterElement relem = getRosterElementInstance(buddy, name, groups, session);
-
-					relem.setSubscription(subscr);
-					if (!addBuddy(relem, roster)) {
-						break;
-					}
-				}
-				saveUserRoster(session);
-				// notify that roster element was changed!
-			}
 		}
 
 		return roster;

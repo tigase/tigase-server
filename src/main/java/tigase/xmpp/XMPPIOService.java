@@ -45,8 +45,7 @@ import java.util.logging.Logger;
  * keeping more information about the connection.
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class XMPPIOService<RefObject>
 		extends IOService<RefObject> {
 
@@ -199,7 +198,6 @@ public class XMPPIOService<RefObject>
 	 * Returns queue with packets waiting to send. For use by ConnectionManager which may need to get undelivered
 	 * packets
 	 *
-	 * @return
 	 */
 	public Queue<Packet> getWaitingPackets() {
 		return waitingPackets;

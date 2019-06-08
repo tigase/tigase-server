@@ -35,12 +35,8 @@ import java.util.logging.Logger;
 
 /**
  * Created: Oct 3, 2009 3:55:27 PM
- *
- * @param <Item>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class UserRepoRepository<Item extends RepositoryItem>
 		extends ConfigRepository<Item> {
 

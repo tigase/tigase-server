@@ -26,8 +26,7 @@ import tigase.xmpp.jid.JID;
  * Created: Dec 31, 2009 8:38:38 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class Message
 		extends Packet {
 

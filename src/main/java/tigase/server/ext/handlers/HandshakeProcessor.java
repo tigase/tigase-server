@@ -37,8 +37,7 @@ import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
  * Created: Oct 21, 2009 1:58:56 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class HandshakeProcessor
 		implements ExtProcessor {
 

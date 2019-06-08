@@ -34,8 +34,7 @@ import java.util.logging.Logger;
  * Created: Sun Aug  6 22:34:40 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class SampleSocketThread
 		extends Thread {
 
@@ -49,10 +48,6 @@ public class SampleSocketThread
 
 	/**
 	 * Creates a new <code>SampleSocketThread</code> instance.
-	 *
-	 * @param handler
-	 *
-	 * @throws IOException
 	 */
 	public SampleSocketThread(SocketHandler handler) throws IOException {
 		this.handler = handler;

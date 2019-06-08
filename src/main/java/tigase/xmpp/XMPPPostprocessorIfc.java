@@ -29,8 +29,7 @@ import java.util.Queue;
  * Created: Sat Oct 14 17:41:09 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface XMPPPostprocessorIfc
 		extends XMPPImplIfc {
 

@@ -24,8 +24,7 @@ import tigase.conf.ConfiguratorAbstract;
  * Created: Dec 7, 2009 5:20:56 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface MessageRouterIfc
 		extends ServerComponent {
 

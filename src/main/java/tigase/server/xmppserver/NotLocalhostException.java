@@ -23,8 +23,7 @@ import tigase.xmpp.XMPPException;
  * Created: Sep 2, 2010 4:11:34 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class NotLocalhostException
 		extends XMPPException {
 

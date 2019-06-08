@@ -31,7 +31,7 @@ public class MD5UsernamePasswordCredentialsEntryTest {
 
 		MD5UsernamePasswordCredentialsEntry.Encoder encoder = new MD5UsernamePasswordCredentialsEntry.Encoder();
 		String encPassword = encoder.encode(user, testPassword);
-		System.out.println(encPassword);
+//		System.out.println(encPassword);
 
 		MD5UsernamePasswordCredentialsEntry.Decoder decoder = new MD5UsernamePasswordCredentialsEntry.Decoder();
 		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user,

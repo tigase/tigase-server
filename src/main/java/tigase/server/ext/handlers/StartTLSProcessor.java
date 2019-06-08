@@ -35,8 +35,7 @@ import java.util.logging.Logger;
  * Created: Oct 31, 2009 4:54:39 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class StartTLSProcessor
 		implements ExtProcessor {
 

@@ -23,8 +23,7 @@ package tigase.server;
  * Created: Tue Jan 23 22:52:45 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum Permissions {
 
 	NONE,

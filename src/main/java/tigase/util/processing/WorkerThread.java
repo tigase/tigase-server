@@ -25,8 +25,7 @@ import java.util.logging.Logger;
  * Created: Apr 21, 2009 9:02:57 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class WorkerThread
 		extends Thread {
 

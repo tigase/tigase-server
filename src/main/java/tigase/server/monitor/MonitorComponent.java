@@ -31,8 +31,7 @@ import java.util.logging.Logger;
  * Created: Jun 17, 2010 10:14:23 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- * @deprecated Use {@link  tigase.monitor.MonitorComponent} instead.
+* @deprecated Use {@link  tigase.monitor.MonitorComponent} instead.
  */
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")

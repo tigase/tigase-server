@@ -21,8 +21,7 @@ package tigase.server.ext;
  * Created: Sep 30, 2009 9:20:22 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ComponentConnection
 		implements Comparable<ComponentConnection> {
 

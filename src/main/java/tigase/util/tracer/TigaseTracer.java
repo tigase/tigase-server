@@ -33,8 +33,7 @@ import java.util.logging.Logger;
  * Created: Jun 30, 2009 5:18:10 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class TigaseTracer {
 
 	public static final String TRACER_IPS_PROP_KEY = "--tracer-ips";

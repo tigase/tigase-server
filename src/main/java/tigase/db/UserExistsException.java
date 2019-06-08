@@ -25,8 +25,7 @@ import tigase.xmpp.jid.BareJID;
  * user with particular ID. <p> Created: Wed Oct 27 14:17:44 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class UserExistsException
 		extends TigaseDBException {
 

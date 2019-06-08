@@ -39,8 +39,7 @@ import java.util.logging.Logger;
  * Created: Sun Feb 25 23:37:48 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = JabberIqIq.ID, parent = SessionManager.class, active = false)
 public class JabberIqIq
 		extends XMPPProcessor
@@ -63,7 +62,6 @@ public class JabberIqIq
 	 * IQ range table: Number Range   Descriptive Label 140+   genius 120-139  very superior 110-119  superior 90-109
 	 * normal 80-89  dull 70-79  borderline deficiency 50-69  moron 20-49  imbecile 0-19   idiot
 	 *
-	 * @param iq_level
 	 */
 	public static String calculateIQ(String iq_level) {
 		double value = 100;

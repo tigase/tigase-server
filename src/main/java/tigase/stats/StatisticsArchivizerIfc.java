@@ -21,8 +21,7 @@ package tigase.stats;
  * Created: Mar 25, 2010 5:10:28 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface StatisticsArchivizerIfc {
 
 	long getFrequency();

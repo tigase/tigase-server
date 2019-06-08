@@ -42,8 +42,7 @@ import java.util.logging.Logger;
  * Created: Sat Nov 11 22:22:04 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Meta(supportedUris = {"jdbc:[^:]+:.*"})
 public class DrupalWPAuth
 		implements AuthRepository, DataSourceAware<DataRepository> {

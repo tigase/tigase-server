@@ -26,8 +26,7 @@ import java.util.Set;
  * Created: Fri Feb 10 13:13:50 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum StanzaType {
 
 	error,

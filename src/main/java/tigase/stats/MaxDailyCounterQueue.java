@@ -26,8 +26,7 @@ import java.util.Optional;
  * A queue implementation which stores highest added value on a given day
  * and has limited size.
  *
- * @param <E>
- */
+ * */
 public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		extends ArrayDeque<E> {
 

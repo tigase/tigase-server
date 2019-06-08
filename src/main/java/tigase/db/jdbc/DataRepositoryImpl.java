@@ -39,8 +39,7 @@ import java.util.logging.Logger;
  * Created: Sep 3, 2010 5:55:41 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Repository.Meta(isDefault = true, supportedUris = {"jdbc:[^:]+:.*"})
 public class DataRepositoryImpl
 		implements DataRepository, StatisticsProviderIfc, RepositoryVersionAware {

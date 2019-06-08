@@ -365,7 +365,7 @@ public class ConfigHolderTest {
 		try {
 			StringWriter sw = new StringWriter();
 			new ConfigWriter().write(sw, result);
-			System.out.println("\n" + sw.toString());
+//			System.out.println("\n" + sw.toString());
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}

@@ -45,8 +45,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  * Created: Dec 7, 2009 4:15:31 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class ConfiguratorAbstract
 		extends AbstractComponentRegistrator<Configurable>
 		implements RepositoryChangeListenerIfc<ConfigItem>, StatisticsContainer {

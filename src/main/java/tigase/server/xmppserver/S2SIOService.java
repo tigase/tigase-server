@@ -28,8 +28,7 @@ import java.util.logging.Logger;
  * Created: Jun 14, 2010 12:30:53 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class S2SIOService
 		extends XMPPIOService<Object> {
 
@@ -52,7 +51,6 @@ public class S2SIOService
 	/**
 	 * Adds another connection id (CID) to the authenticated list for this connection
 	 *
-	 * @param cid
 	 */
 	public void addCID(CID cid) {
 		if (log.isLoggable(Level.FINEST)) {

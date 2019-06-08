@@ -36,8 +36,7 @@ import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
  * Created: Oct 31, 2009 11:06:57 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class SASLProcessor
 		implements ExtProcessor {
 

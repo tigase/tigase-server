@@ -36,14 +36,12 @@ public @interface ConfigAlias {
 	/**
 	 * Name of the field
 	 *
-	 * @return
 	 */
 	String field();
 
 	/**
 	 * Alias for the field
 	 *
-	 * @return
 	 */
 	String alias();
 

@@ -36,7 +36,6 @@ import java.util.Set;
 /**
  * Class is a base class for testing processors which require access to DataSource instances.
  * 
- * @param <DS>
  */
 public class AbstractProcessorWithDataSourceTestCase<DS extends DataSource> extends ProcessorTestCase {
 

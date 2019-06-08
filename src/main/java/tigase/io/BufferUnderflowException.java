@@ -25,8 +25,7 @@ import java.io.IOException;
  * Created: Sun Sep 24 22:32:37 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class BufferUnderflowException
 		extends IOException {
 

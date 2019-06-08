@@ -38,8 +38,7 @@ import static tigase.xmpp.impl.SessionBind.XMLNS;
  * Created: Mon Feb 20 22:43:59 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Id(XMLNS)
 @Handle(path = {Iq.ELEM_NAME, "session"}, xmlns = XMLNS)
 @StreamFeatures(@StreamFeature(elem = "session", xmlns = XMLNS, children = {"optional"}))

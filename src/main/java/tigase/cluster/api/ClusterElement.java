@@ -44,8 +44,7 @@ import java.util.logging.Logger;
  * Created: Fri May 2 09:40:40 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ClusterElement {
 
 	public static final String CLUSTER_CONTROL_EL_NAME = "control";
@@ -166,8 +165,6 @@ public class ClusterElement {
 
 	/**
 	 * Creates a new <code>ClusterElement</code> instance.
-	 *
-	 * @param elem
 	 */
 	public ClusterElement(Element elem) {
 		this.elem = elem;

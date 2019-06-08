@@ -34,8 +34,7 @@ import static tigase.xmpp.impl.PresenceCapabilitiesManager.generateVerificationS
  * Created: Sat Feb 10 13:11:34 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ServiceEntity {
 
 	private static Logger log = Logger.getLogger(ServiceEntity.class.getName());

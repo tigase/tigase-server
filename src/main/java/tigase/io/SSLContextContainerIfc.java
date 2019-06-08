@@ -34,8 +34,7 @@ import java.util.Map;
  * Created: Tue Nov 20 11:43:32 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface SSLContextContainerIfc
 		extends Lifecycle {
 
@@ -172,7 +171,6 @@ public interface SSLContextContainerIfc
 	 *
 	 * @param params a <code>Map</code> value with configuration parameters.
 	 *
-	 * @throws CertificateParsingException
 	 */
 	void addCertificates(Map<String, String> params) throws CertificateParsingException;
 

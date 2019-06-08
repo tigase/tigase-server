@@ -48,10 +48,6 @@ public class ReflectEventRoutingSelectorFactory {
 	/**
 	 * Method looks for methods of consumer class and returns list of <code>EventRoutingSelectors</code> created based
 	 * on methods annotated with <code>@RouteEvent</code>
-	 *
-	 * @param consumer
-	 *
-	 * @return
 	 */
 	public Collection<EventRoutingSelector> create(Object consumer) {
 		return collectAnnotatedMethods(consumer, RouteEvent.class, HANDLER);

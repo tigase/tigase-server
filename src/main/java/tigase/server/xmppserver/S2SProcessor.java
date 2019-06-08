@@ -28,15 +28,13 @@ import java.util.Queue;
  * Created: Dec 9, 2010 1:50:09 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface S2SProcessor
 		extends Comparable<S2SProcessor> {
 
 	/**
 	 * Returns order of processor which is used to set order in which processors will be processing packet
 	 *
-	 * @return
 	 */
 	int order();
 

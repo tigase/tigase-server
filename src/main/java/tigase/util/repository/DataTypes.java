@@ -30,8 +30,7 @@ import java.util.logging.Logger;
  * Created: May 28, 2009 7:39:07 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class DataTypes {
 
 	public static final Map<String, Character> typesMap = new LinkedHashMap<String, Character>();

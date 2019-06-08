@@ -30,8 +30,7 @@ import java.util.Queue;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ServerComponent {
 
 	/**
@@ -46,7 +45,6 @@ public interface ServerComponent {
 	 * packet and returns results instantly without waiting for any resources.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @param results
 	 */
 	void processPacket(Packet packet, Queue<Packet> results);
 
@@ -79,7 +77,7 @@ public interface ServerComponent {
 	/**
 	 * Method used to assign component name (localpart of the component)
 	 * 
-	 * @param name
+	 * @param name to be assigned
 	 */
 	void setName(String name);
 

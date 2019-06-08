@@ -28,8 +28,7 @@ import java.util.Queue;
  * Created: Jan 2, 2009 1:20:16 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface CommandIfc
 		extends StatisticHolder {
 

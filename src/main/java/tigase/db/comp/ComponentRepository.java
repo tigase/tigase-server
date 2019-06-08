@@ -37,8 +37,7 @@ import java.util.Map;
  * @param <Item> An element stored in the component repository.
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ComponentRepository<Item extends RepositoryItem>
 		extends Iterable<Item>, Repository {
 
@@ -60,8 +59,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * adds the item to memory cache and permanent storage.
 	 *
 	 * @param item a <code>Item</code> with all it's configuration parameters.
-	 *
-	 * @throws TigaseDBException
 	 */
 	void addItem(Item item) throws TigaseDBException;
 
@@ -76,8 +73,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 
 	/**
 	 * Returns a collection with all items stored in the repository.
-	 *
-	 * @throws TigaseDBException
 	 */
 	Collection<Item> allItems() throws TigaseDBException;
 
@@ -134,8 +129,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * list is modified externally by third-party system. When all modifications are done this method is called to
 	 * refresh the class cache. Whether the implementation load whole list or just last modifications is implementation
 	 * dependent.
-	 *
-	 * @throws TigaseDBException
 	 */
 	void reload() throws TigaseDBException;
 

@@ -37,8 +37,7 @@ import java.util.logging.Logger;
  * XEP-0199: XMPP Ping
  *
  * @author <a href="mailto:bmalkow@tigase.org">Bartosz Małkowski</a>
- * @version $Rev$
- */
+*/
 @Bean(name = UrnXmppPing.ID, parent = SessionManager.class, active = true)
 public class UrnXmppPing
 		extends XMPPProcessorAbstract {

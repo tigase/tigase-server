@@ -30,8 +30,7 @@ import java.util.logging.Logger;
  * Created: Dec 9, 2010 1:59:56 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "streamOpen", parent = S2SConnectionManager.class, active = true)
 public class StreamOpen
 		extends S2SAbstractProcessor {

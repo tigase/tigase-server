@@ -21,8 +21,7 @@ package tigase.server;
  * Created: Feb 13, 2009 9:44:53 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum Priority {
 
 	SYSTEM,

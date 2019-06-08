@@ -24,8 +24,7 @@ import java.util.logging.Logger;
  * Created: Dec 7, 2009 4:09:52 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class Configurator
 		extends ConfiguratorAbstract {
 

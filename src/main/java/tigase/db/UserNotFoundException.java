@@ -22,8 +22,7 @@ package tigase.db;
  * not exist in repository. <p> Created: Wed Oct 27 14:17:44 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class UserNotFoundException
 		extends TigaseDBException {
 

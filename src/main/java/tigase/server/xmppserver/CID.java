@@ -23,8 +23,7 @@ import java.util.logging.Logger;
  * Created: Jan 7, 2010 12:51:33 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class CID {
 
 	private static final Logger log = Logger.getLogger(CID.class.getName());

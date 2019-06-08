@@ -28,8 +28,7 @@ import java.util.List;
  * Created: Sat Feb 10 13:34:54 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ServiceIdentity {
 
 	private final String category;

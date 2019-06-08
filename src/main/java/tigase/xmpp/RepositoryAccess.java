@@ -39,8 +39,7 @@ import static tigase.db.NonAuthUserRepository.PUBLIC_DATA_NODE;
  * Created: Tue Oct 24 10:38:41 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class RepositoryAccess {
 
 	protected static final String NO_ACCESS_TO_REP_MSG = "Can not access user repository.";
@@ -168,7 +167,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
 	public void removeDataGroup(final String subnode) throws NotAuthorizedException, TigaseDBException {
@@ -254,7 +252,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
 	public String getData(String subnode, String key, String def) throws NotAuthorizedException, TigaseDBException {
@@ -289,7 +286,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
 	public String[] getDataGroups(String subnode) throws NotAuthorizedException, TigaseDBException {
@@ -325,7 +321,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
 	public String[] getDataKeys(final String subnode) throws NotAuthorizedException, TigaseDBException {
@@ -362,7 +357,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
 	public String[] getDataList(String subnode, String key) throws NotAuthorizedException, TigaseDBException {
@@ -468,7 +462,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #removeDataGroup(String)
 	 * @see UserRepository
 	 */
@@ -497,7 +490,6 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException is thrown when session has not been authorized yet and there is no access to
 	 * permanent storage.
-	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
 	public void setDataList(final String subnode, final String key, final String[] list)

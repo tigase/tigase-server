@@ -21,8 +21,7 @@ package tigase.server;
  * Created: Jun 8, 2009 1:53:38 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum QueueType {
 	IN_QUEUE,
 	OUT_QUEUE;

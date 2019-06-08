@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: Dec 10, 2009 2:02:41 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ConfigurationCache
 		implements ConfigRepositoryIfc {
 

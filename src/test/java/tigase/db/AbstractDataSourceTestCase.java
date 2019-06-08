@@ -34,7 +34,6 @@ import java.util.Set;
 /**
  * Abstract class providing support for classes requiring DataSource instances.
  * 
- * @param <DS>
  */
 public class AbstractDataSourceTestCase<DS extends DataSource> extends AbstractKernelTestCase {
 

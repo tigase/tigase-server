@@ -23,8 +23,7 @@ package tigase.stats;
  * Created: Wed Nov 23 21:20:20 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum StatisticType {
 
 	QUEUE_WAITING("Total waiting packets"),

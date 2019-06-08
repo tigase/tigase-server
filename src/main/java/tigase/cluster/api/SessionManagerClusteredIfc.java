@@ -55,8 +55,6 @@ public interface SessionManagerClusteredIfc
 	/**
 	 * Method to check if there is XMPPResourceConnection instance for connection JID.
 	 *
-	 * @param connJid
-	 *
 	 * @return true - if there is XMPPResourceConnection for connection JID
 	 */
 	boolean hasXMPPResourceConnectionForConnectionJid(JID connJid);

@@ -34,11 +34,8 @@ import java.util.Set;
 /**
  * Created: May 2, 2009 4:36:03 PM
  *
- * @param <E>
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+* @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+*/
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 		extends OnlineJidsReporter, StatisticHolder {
 

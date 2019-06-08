@@ -295,8 +295,6 @@ public class OfflineMessages
 	 * @return a {@link Queue} of {@link Packet} objects based on all stored payloads for the JID of the current
 	 * session.
 	 *
-	 * @throws UserNotFoundException
-	 * @throws NotAuthorizedException
 	 */
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn,
 													 tigase.db.OfflineMsgRepositoryIfc repo)
@@ -342,11 +340,9 @@ public class OfflineMessages
 	 *
 	 * @param pac a {@link Packet} object containing packet that should be verified and saved
 	 * @param repo a {@link MsgRepositoryIfc} repository handler responsible for storing messages
-	 * @param userRepo
 	 *
 	 * @return {@code true} if the packet was correctly saved to repository, {@code false} otherwise.
 	 *
-	 * @throws UserNotFoundException
 	 */
 	public Authorization savePacketForOffLineUser(Packet pac, tigase.db.OfflineMsgRepositoryIfc repo,
 												  NonAuthUserRepository userRepo) throws UserNotFoundException {

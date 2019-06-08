@@ -33,8 +33,7 @@ import java.util.logging.Logger;
  * Created: May 13, 2009 9:53:44 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class SMNonCachingAllNodes
 		implements ClusteringStrategyIfc<ConnectionRecord> {
 
@@ -183,8 +182,6 @@ public abstract class SMNonCachingAllNodes
 	}
 
 	/**
-	 * @param fromNode
-	 * @param visitedNodes
 	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;

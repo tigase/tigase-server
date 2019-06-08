@@ -43,8 +43,7 @@ import java.util.logging.Logger;
  * Created: Sat Jun 21 22:23:18 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "c2s", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 @ClusterModeRequired(active = true)

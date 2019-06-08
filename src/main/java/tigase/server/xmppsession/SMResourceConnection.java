@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: Feb 27, 2010 8:02:11 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class SMResourceConnection
 		extends XMPPResourceConnection {
 

@@ -27,8 +27,7 @@ import java.util.Queue;
  * Created: Oct 1, 2009 8:40:36 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ExtProcessor {
 
 	String getId();

@@ -47,8 +47,7 @@ import java.util.logging.Logger;
  * Created: Jun 14, 2010 11:59:38 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "s2s", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 public class S2SConnectionManager
@@ -637,7 +636,6 @@ public class S2SConnectionManager
 	/**
 	 * Method from ConnectionManager is overriden as it uses local value S2S_HT_TRAFFIC_THROTTLING_PROP_VAL
 	 *
-	 * @return
 	 */
 	@Override
 	protected String getDefTrafficThrottling() {

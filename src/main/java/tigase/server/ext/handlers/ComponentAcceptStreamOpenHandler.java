@@ -32,8 +32,7 @@ import static tigase.server.ext.ComponentProtocolHandler.REPO_ITEM_KEY;
  * Created: Oct 7, 2009 5:51:47 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ComponentAcceptStreamOpenHandler
 		implements StreamOpenHandler {
 

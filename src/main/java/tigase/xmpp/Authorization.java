@@ -32,8 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p> Created: Thu Oct 14 22:19:11 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum Authorization {
 	AUTHORIZED {
 		@Override

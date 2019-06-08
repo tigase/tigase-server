@@ -21,8 +21,7 @@ package tigase.server.amp;
  * Created: Apr 28, 2010 5:38:24 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface AmpFeatureIfc {
 
 	public static final String AMP_MSG_REPO_CLASS_PROP_KEY = "amp-repo-class";

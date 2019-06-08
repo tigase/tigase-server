@@ -28,8 +28,7 @@ import java.util.logging.Logger;
  * Created: Jun 26, 2010 9:40:04 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "s2sRandomSelector", parent = S2SConnectionManager.class, active = true)
 public class S2SRandomSelector
 		implements S2SConnectionSelector {

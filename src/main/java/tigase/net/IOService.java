@@ -61,8 +61,7 @@ import java.util.logging.Logger;
  * keeping more information about the connection.
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class IOService<RefObject>
 		implements Callable<IOService<?>>, TLSEventHandler, IOListener {
 
@@ -496,8 +495,6 @@ public abstract class IOService<RefObject>
 
 	/**
 	 * Method returns local port of opened socket
-	 *
-	 * @return
 	 */
 	public int getLocalPort() {
 		Socket sock = socketIO.getSocketChannel().socket();

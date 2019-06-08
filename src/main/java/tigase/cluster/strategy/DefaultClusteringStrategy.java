@@ -38,10 +38,7 @@ import java.util.logging.Logger;
 /**
  * Created: May 13, 2009 9:53:44 AM
  *
- * @param <E>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 @Bean(name = "strategy", parent = SessionManagerClustered.class, active = true)
 public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
@@ -230,9 +227,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * @param conn is user's XMPPResourceConnection for which Map structure is prepare.
 	 *
 	 * @return a Map structure with all user's connection essential data.
-	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
 	 */
 	protected Map<String, String> prepareConnectionParams(XMPPResourceConnection conn)
 			throws NotAuthorizedException, NoConnectionIdException {
@@ -254,11 +248,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method takes the data received from other cluster node and creates a ConnectionRecord with all essential
 	 * connection information. This might be used later to identify user's XMPPResourceConnection or use the clustering
 	 * strategy API.
-	 *
-	 * @param node
-	 * @param data
-	 *
-	 * @return
 	 */
 	protected ConnectionRecordIfc getConnectionRecord(JID node, Map<String, String> data) {
 		BareJID userId = BareJID.bareJIDInstanceNS(data.get(USER_ID));

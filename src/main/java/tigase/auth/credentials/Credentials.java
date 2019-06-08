@@ -109,14 +109,12 @@ public interface Credentials {
 		/**
 		 * Name of the mechanism for which it will work
 		 *
-		 * @return
 		 */
 		String getMechanism();
 
 		/**
 		 * Check if plaintext password will match stored credential
 		 *
-		 * @param plain
 		 */
 		boolean verifyPlainPassword(String plain);
 
@@ -130,23 +128,17 @@ public interface Credentials {
 		/**
 		 * Name of mechanism
 		 *
-		 * @return
 		 */
 		String getMechanism();
 
 		/**
 		 * Encoded value
 		 *
-		 * @return
 		 */
 		String getValue();
 
 		/**
 		 * Check if mechanism name matches
-		 *
-		 * @param mechanism
-		 *
-		 * @return
 		 */
 		default boolean isForMechanism(String mechanism) {
 			return mechanism.equals(getMechanism());

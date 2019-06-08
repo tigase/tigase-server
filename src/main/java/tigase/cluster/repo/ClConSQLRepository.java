@@ -250,7 +250,6 @@ public class ClConSQLRepository
 	/**
 	 * Performs database check, creates missing schema if necessary
 	 *
-	 * @throws SQLException
 	 */
 	private void checkDB(DataRepository data_repo) throws SQLException {
 		if (!data_repo.checkTable(TABLE_NAME)) {

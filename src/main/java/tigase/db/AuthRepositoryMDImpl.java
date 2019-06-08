@@ -33,8 +33,7 @@ import java.util.logging.Logger;
  * Implementation of multi domain pool for authentication repositories. Created: Mar 27, 2010 9:10:21 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class AuthRepositoryMDImpl
 		extends MDPoolBeanWithStatistics<AuthRepository, AuthRepositoryMDPoolBean.AuthRepositoryConfigBean>
 		implements AuthRepository {

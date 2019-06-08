@@ -32,8 +32,7 @@ import java.util.List;
  * Created: 22 Nov 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface VHostManagerIfc {
 
 	/**
@@ -49,9 +48,6 @@ public interface VHostManagerIfc {
 
 	/**
 	 * Method check if domains is locally hosted as a vhost or a component of a vhost.
-	 *
-	 * @param domain
-	 *
 	 * @return true - if domain is locally hosted as a vhost of a component of a vhost.
 	 */
 	boolean isLocalDomainOrComponent(String domain);
@@ -138,7 +134,6 @@ public interface VHostManagerIfc {
 
 	/**
 	 * Method returns a list of all hosted VHosts.
-	 * @return
 	 */
 	List<JID> getAllVHosts();
 }

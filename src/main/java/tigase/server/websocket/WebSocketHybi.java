@@ -284,8 +284,6 @@ public class WebSocketHybi
 	/**
 	 * Create WebSocket frame header with specific type and size
 	 *
-	 * @param type
-	 * @param size
 	 */
 	private ByteBuffer createFrameHeader(byte type, int size) {
 		ByteBuffer bbuf = ByteBuffer.allocate(12);

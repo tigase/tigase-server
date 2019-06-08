@@ -25,8 +25,7 @@ import tigase.xmpp.jid.BareJID;
  * Created: Sat Oct 14 20:42:30 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface NonAuthUserRepository {
 
 	public static final String PUBLIC_DATA_NODE = "public";
@@ -47,7 +46,6 @@ public interface NonAuthUserRepository {
 	 * @param value a <code>String</code> is an array of values to be assosiated with the specified key.
 	 *
 	 * @throws UserNotFoundException if user id hasn't been found in reository.
-	 * @throws DataOverwriteException
 	 */
 	void addOfflineData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, DataOverwriteException;

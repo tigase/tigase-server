@@ -26,8 +26,7 @@ import java.util.Queue;
  * Created: Jun 17, 2010 11:59:13 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface MonitorPluginIfc {
 
 	void check10Secs(Queue<Packet> results);

@@ -30,8 +30,7 @@ import java.util.logging.Logger;
  * Created: Nov 28, 2008 10:27:55 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class DynamicRosterTest
 		implements DynamicRosterIfc {
 

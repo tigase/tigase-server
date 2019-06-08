@@ -36,8 +36,7 @@ import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_VAL;
  * Created: Mon Jan 23 14:21:31 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class TLSUtil {
 
 	private static final Logger log = Logger.getLogger(TLSUtil.class.getName());
@@ -100,7 +99,6 @@ public abstract class TLSUtil {
 	 * Method returns singleton instance of class implementing CertificateContainterIfc responsible for caching SSL
 	 * certificates in memory.
 	 *
-	 * @return
 	 */
 	public static CertificateContainerIfc getCertificateContainer() {
 		return certificateContainer;
@@ -113,7 +111,6 @@ public abstract class TLSUtil {
 	 * This instance should be wrapped by new instance of SSLContextContainer if method getSSLContext will be used with
 	 * TrustManager array passed!
 	 *
-	 * @return
 	 */
 	public static SSLContextContainerIfc getRootSslContextContainer() {
 		return sslContextContainer;

@@ -58,8 +58,7 @@ import java.util.zip.Deflater;
  * Class ClientConnectionManager Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "c2s", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 @ClusterModeRequired(active = false)

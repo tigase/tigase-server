@@ -37,8 +37,7 @@ import java.util.logging.*;
  * Created: Feb 19, 2009 12:31:14 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class MonitorRuntime
 		extends TigaseRuntime {
 

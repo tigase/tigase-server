@@ -35,8 +35,7 @@ import java.util.logging.Logger;
  * <p> Created: Sat Nov 13 18:53:21 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ConfigXMLRepository
 		extends ConfigurationCache {
 

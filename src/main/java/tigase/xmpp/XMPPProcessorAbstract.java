@@ -37,8 +37,7 @@ import java.util.logging.Logger;
  * Created: Mar 1, 2010 10:21:29 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class XMPPProcessorAbstract
 		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc {

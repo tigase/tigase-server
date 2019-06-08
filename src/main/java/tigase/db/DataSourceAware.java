@@ -32,10 +32,6 @@ public interface DataSourceAware<T extends DataSource> {
 
 	/**
 	 * Method called to provide class with instance of a data source.
-	 *
-	 * @param dataSource
-	 *
-	 * @throws RepositoryException
 	 */
 	void setDataSource(T dataSource) throws RepositoryException;
 

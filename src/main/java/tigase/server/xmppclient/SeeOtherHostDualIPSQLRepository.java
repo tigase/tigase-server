@@ -96,7 +96,6 @@ public class SeeOtherHostDualIPSQLRepository
 	/**
 	 * Performs database check
 	 *
-	 * @throws SQLException
 	 */
 	private void checkDB() throws SQLException {
 		if (!data_repo.checkTable(CLUSTER_NODES_TABLE)) {

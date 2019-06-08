@@ -36,8 +36,7 @@ import static tigase.conf.Configurable.DEF_SM_NAME;
  * Created: Sat Feb 11 16:30:42 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class RoutingsContainer {
 
 	private static final Logger log = Logger.getLogger("tigase.util.RoutingsContainer");

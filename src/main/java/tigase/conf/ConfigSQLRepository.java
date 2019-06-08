@@ -36,8 +36,7 @@ import java.util.logging.Logger;
  * Created: Dec 15, 2009 10:44:00 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
 public class ConfigSQLRepository

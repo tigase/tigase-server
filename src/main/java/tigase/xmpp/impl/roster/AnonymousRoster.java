@@ -36,8 +36,7 @@ import java.util.Set;
  * Created: Tue Apr 22 21:41:46 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class AnonymousRoster
 		implements DynamicRosterIfc {
 

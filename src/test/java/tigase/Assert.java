@@ -39,8 +39,6 @@ public class Assert {
 	 * Warning: Actual element must have attributes and children which are part of expected element, however may contain
 	 * addition elements or attributes and assertion will not fail.
 	 *
-	 * @param expected
-	 * @param actual
 	 */
 	public static void assertElementEquals(Element expected, Element actual) {
 		assertElementEquals("", expected, actual);

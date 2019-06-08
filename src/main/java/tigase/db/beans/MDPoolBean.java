@@ -80,16 +80,11 @@ public abstract class MDPoolBean<S, T extends MDPoolConfigBean<S, T>>
 	/**
 	 * Method called to add repo instance for domain
 	 *
-	 * @param domain
-	 * @param repo
 	 */
 	protected abstract void addRepo(String domain, S repo);
 
 	/**
 	 * Method called to remove repo instance for domain
-	 *
-	 * @param domain
-	 *
 	 * @return removed instance of repo
 	 */
 	protected abstract S removeRepo(String domain);

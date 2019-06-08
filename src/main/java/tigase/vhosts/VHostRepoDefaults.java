@@ -27,8 +27,7 @@ import static tigase.conf.Configurable.HOSTNAMES_PROP_KEY;
  * Created: Oct 3, 2009 4:26:09 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class VHostRepoDefaults {
 
 	private static final BareJID vhost_user = BareJID.bareJIDInstanceNS("vhost-manager");

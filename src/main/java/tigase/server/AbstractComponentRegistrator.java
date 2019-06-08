@@ -36,11 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>
  * Created: Tue Nov 22 22:57:44 2005
  *
- * @param <E>
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+* @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+*/
 public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 		extends BasicComponent
 		implements ComponentRegistrator {

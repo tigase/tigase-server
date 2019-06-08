@@ -33,8 +33,7 @@ import java.util.stream.Collectors;
  * Created: Mar 27, 2010 6:43:02 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class UserRepositoryMDImpl
 		extends MDPoolBeanWithStatistics<UserRepository, UserRepositoryMDPoolBean.UserRepositoryConfigBean>
 		implements UserRepository {

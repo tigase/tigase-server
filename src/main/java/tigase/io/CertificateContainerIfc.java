@@ -46,7 +46,6 @@ public interface CertificateContainerIfc {
 	 *
 	 * @param params a <code>Map</code> value with configuration parameters.
 	 *
-	 * @throws CertificateParsingException
 	 */
 	void addCertificates(Map<String, String> params) throws CertificateParsingException;
 
@@ -57,14 +56,6 @@ public interface CertificateContainerIfc {
 	 *
 	 * @return an array of <code>KeyManager</code> containing generated certificate
 	 *
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateException
-	 * @throws SignatureException
-	 * @throws NoSuchProviderException
-	 * @throws InvalidKeyException
-	 * @throws IOException
-	 * @throws UnrecoverableKeyException
-	 * @throws KeyStoreException
 	 */
 	KeyManager[] createCertificate(String domain)
 			throws NoSuchAlgorithmException, CertificateException, SignatureException, NoSuchProviderException,
@@ -82,10 +73,6 @@ public interface CertificateContainerIfc {
 	/**
 	 * Method returns array of <code>KeyManager</code> with certificate for domain or <code>null</code> if there is no
 	 * certificate for domain
-	 *
-	 * @param domain
-	 *
-	 * @return
 	 */
 	KeyManager[] getKeyManagers(String domain);
 
@@ -96,7 +83,6 @@ public interface CertificateContainerIfc {
 	/**
 	 * Method used to pass parameters to initialize instance of class
 	 *
-	 * @param params
 	 */
 	void init(Map<String, Object> params);
 }

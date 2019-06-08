@@ -24,11 +24,8 @@ import java.io.IOException;
  * <br>
  * Created: Mon Jan 30 22:37:51 2006
  *
- * @param <IO>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface IOServiceListener<IO extends IOService<?>> {
 
 	void packetsReady(IO service) throws IOException;

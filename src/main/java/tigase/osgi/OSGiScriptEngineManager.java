@@ -99,7 +99,6 @@ public class OSGiScriptEngineManager
 	 * Follows the same behavior of @link javax.script.ScriptEngineManager#setBindings(Bindings) This means that the
 	 * same bindings are applied to all the underlying managers.
 	 *
-	 * @param bindings
 	 */
 	public void setBindings(Bindings bindings) {
 		this.bindings = bindings;
@@ -211,7 +210,6 @@ public class OSGiScriptEngineManager
 	 *
 	 * @return the names of the available ScriptEngineFactory classes
 	 *
-	 * @throws IOException
 	 */
 	private List<String> findFactoryCandidates(BundleContext context) throws IOException {
 		Bundle[] bundles = context.getBundles();

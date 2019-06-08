@@ -46,8 +46,7 @@ import java.util.stream.Stream;
  * Created: Wed Nov 23 07:04:18 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public final class XMPPServer {
 
 	@SuppressWarnings("PMD")

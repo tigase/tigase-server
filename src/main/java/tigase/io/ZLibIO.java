@@ -31,8 +31,7 @@ import java.util.logging.Logger;
  * Created: Jul 29, 2009 11:58:02 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ZLibIO
 		implements IOInterface {
 

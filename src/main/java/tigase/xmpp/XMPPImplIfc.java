@@ -34,8 +34,7 @@ import java.util.Set;
  * Created: Sat Oct 14 16:11:22 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface XMPPImplIfc
 		extends Comparable<XMPPImplIfc> {
 
@@ -84,7 +83,6 @@ public interface XMPPImplIfc
 	 *
 	 * @param settings is a Map with initial processor settings from the configuration file.
 	 *
-	 * @throws TigaseDBException
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")

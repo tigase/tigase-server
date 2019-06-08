@@ -22,10 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created: Feb 9, 2010 11:32:30 AM
  *
- * @param <E>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class NonpriorityQueue<E>
 		extends PriorityQueueAbstract<E> {

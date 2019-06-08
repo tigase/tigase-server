@@ -40,8 +40,7 @@ import java.util.stream.Stream;
  * Created: Jun 14, 2010 12:32:49 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class CIDConnections {
 
 	private static final Logger log = Logger.getLogger(CIDConnections.class.getName());

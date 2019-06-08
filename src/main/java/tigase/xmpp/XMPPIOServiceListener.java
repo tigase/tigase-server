@@ -27,9 +27,6 @@ import java.util.Map;
  * Describe interface XMPPIOServiceListener here.
  * <br>
  * Created: Wed Feb  8 10:19:41 2006
- *
- * @param <IO>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public interface XMPPIOServiceListener<IO extends XMPPIOService<?>>

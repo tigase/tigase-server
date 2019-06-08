@@ -38,8 +38,7 @@ import java.util.logging.Logger;
  * Created: Sun Nov  5 21:15:46 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface AuthRepository
 		extends Repository {
 

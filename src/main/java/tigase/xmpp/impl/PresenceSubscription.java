@@ -242,9 +242,6 @@ public class PresenceSubscription
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param pres_type specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processInSubscribe(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									  Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
@@ -303,9 +300,6 @@ public class PresenceSubscription
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param pres_type specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processInSubscribed(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									   Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
@@ -354,9 +348,6 @@ public class PresenceSubscription
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param pres_type specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 										Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
@@ -407,9 +398,6 @@ public class PresenceSubscription
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param pres_type specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processInUnsubscribed(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 										 Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
@@ -467,9 +455,6 @@ public class PresenceSubscription
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param pres_type specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processOutSubscribe(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									   Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
@@ -532,9 +517,6 @@ public class PresenceSubscription
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param pres_type specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processOutSubscribed(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 										Map<String, Object> settings, RosterAbstract.PresenceType pres_type)

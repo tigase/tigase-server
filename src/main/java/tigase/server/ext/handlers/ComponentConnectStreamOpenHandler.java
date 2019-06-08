@@ -27,8 +27,7 @@ import java.util.Map;
  * Created: Oct 7, 2009 5:50:34 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ComponentConnectStreamOpenHandler
 		implements StreamOpenHandler {
 

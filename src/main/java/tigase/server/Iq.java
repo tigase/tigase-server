@@ -29,8 +29,7 @@ import java.util.List;
  * Created: Dec 31, 2009 8:43:21 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class Iq
 		extends Packet {
 

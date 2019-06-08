@@ -76,7 +76,6 @@ public abstract class AbstractBeanConfigurator
 	 * @param kernel kernel instance to check
 	 * @param name name of the bean
 	 * @param clazz expected class of the bean
-	 * @return
 	 */
 	protected static boolean isBeanClassRegisteredInParentKernel(Kernel kernel, String name, Class<?> clazz) {
 		if (kernel == null) {
@@ -143,8 +142,6 @@ public abstract class AbstractBeanConfigurator
 	/**
 	 * Method registers beans which classes are annotated with <code>@Bean</code> and have <code>parent</code> set to
 	 * the class passed as parameter.
-	 * @param kernel
-	 * @param cls
 	 */
 	public static void registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
 		Set<Class<?>> classes = ClassUtilBean.getInstance().getAllClasses();
@@ -253,15 +250,11 @@ public abstract class AbstractBeanConfigurator
 
 	/**
 	 * Method returns current configuration map.
-	 * @return
 	 */
 	public abstract Map<String, Object> getProperties();
 
 	/**
 	 * Method configures passed bean with provided values.
-	 * @param beanConfig
-	 * @param bean
-	 * @param values
 	 */
 	public void configure(final BeanConfig beanConfig, final Object bean, final Map<String, Object> values) {
 		if (values == null) {
@@ -410,7 +403,6 @@ public abstract class AbstractBeanConfigurator
 
 	/**
 	 * Method returns default types converter used by bean configurator.
-	 * @return
 	 */
 	public TypesConverter getDefaultTypesConverter() {
 		return defaultTypesConverter;
@@ -566,7 +558,6 @@ public abstract class AbstractBeanConfigurator
 
 	/**
 	 * Method restors default configuration of a bean
-	 * @param beanName
 	 */
 	public void restoreDefaults(String beanName) {
 		BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(beanName);
@@ -603,8 +594,6 @@ public abstract class AbstractBeanConfigurator
 
 	/**
 	 * Method returns configuration of a bean.
-	 * @param beanConfig
-	 * @return
 	 */
 	protected abstract Map<String, Object> getConfiguration(BeanConfig beanConfig);
 
@@ -662,7 +651,6 @@ public abstract class AbstractBeanConfigurator
 	/**
 	 * Method returns map of bean definitions found in the configuration
 	 * @param values configuration map
-	 * @return
 	 */
 	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
 		return new HashMap<>();
@@ -671,8 +659,6 @@ public abstract class AbstractBeanConfigurator
 	/**
 	 * Method returns queue of kernel and bean names to find bean config (path to the bean config from root of
 	 * the config).
-	 * @param beanConfig
-	 * @return
 	 */
 	protected ArrayDeque<String> getBeanConfigPath(BeanConfig beanConfig) {
 		Kernel kernel = beanConfig.getKernel();

@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: Dec 10, 2010 3:32:11 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class S2SAbstractProcessor
 		extends S2SAbstract
 		implements S2SProcessor {

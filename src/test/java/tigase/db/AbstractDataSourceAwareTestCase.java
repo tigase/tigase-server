@@ -24,9 +24,7 @@ import tigase.component.exceptions.RepositoryException;
 /**
  * Abstract class for testing repositories implementing DataSourceAware interface.
  *
- * @param <DS>
- * @param <R>
- */
+ * */
 public abstract class AbstractDataSourceAwareTestCase<DS extends DataSource, R extends DataSourceAware> extends AbstractDataSourceTestCase<DS> {
 
 	protected R repo;

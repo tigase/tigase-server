@@ -216,25 +216,16 @@ public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
 	 *
 	 * @return class name
 	 *
-	 * @throws DBInitException
 	 */
 	protected abstract String getRepositoryPoolClassName() throws DBInitException;
 
 	/**
 	 * Method used to initialize provided instance
-	 *
-	 * @param repo
-	 *
-	 * @throws RepositoryException
 	 */
 	protected abstract void initRepository(A repo) throws RepositoryException;
 
 	/**
 	 * Get class name to initialize as repository
-	 *
-	 * @return
-	 *
-	 * @throws DBInitException
 	 */
 	protected String getRepositoryClassName() throws DBInitException {
 		if (cls != null) {

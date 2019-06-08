@@ -34,8 +34,7 @@ import java.util.logging.Logger;
  * Created: Jul 29, 2009 4:03:44 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = StartZLib.ID, parent = SessionManager.class, active = true)
 public class StartZLib
 		extends XMPPProcessor

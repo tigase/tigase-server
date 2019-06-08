@@ -26,8 +26,7 @@ import java.nio.channels.SocketChannel;
  * Created: Thu Jan 26 00:00:39 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ConnectionOpenListener {
 
 	/**

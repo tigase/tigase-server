@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: Sat Jan 13 16:58:41 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class SimpleForwarder
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {

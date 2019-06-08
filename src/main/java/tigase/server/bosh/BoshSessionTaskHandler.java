@@ -29,8 +29,7 @@ import tigase.xmpp.jid.JID;
  * Created: Sat Aug  4 10:39:21 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface BoshSessionTaskHandler {
 
 	JID getJidForBoshSession(BoshSession bs);

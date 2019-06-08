@@ -48,6 +48,7 @@ public class StatusReportGenerator
 	private EventBus eventBus;
 	@ConfigField(desc = "Status report generator enabled")
 	private boolean reportGeneratorEnabled = true;
+	Template template = null;
 
 	private static StringBuilder append(StringBuilder sb, String name, String value) {
 		sb.append("'").append(name).append("': ");
@@ -70,6 +71,12 @@ public class StatusReportGenerator
 	@Override
 	public void initialize() {
 		eventBus.registerAll(this);
+		final GStringTemplateEngine templateEngine = new GStringTemplateEngine();
+		try (InputStream in = StatusReportGenerator.class.getResourceAsStream("/templates/StatusReportTemplate.html")) {
+			template = templateEngine.createTemplate(new InputStreamReader(in));
+		} catch (Exception e) {
+			//pass
+		}
 		if (reportGeneratorEnabled) {
 			writeServerStatusFile();
 		}
@@ -119,16 +126,14 @@ public class StatusReportGenerator
 	}
 
 	private void processTemplate(final Writer writer) throws IOException, ClassNotFoundException {
-		final GStringTemplateEngine templateEngine = new GStringTemplateEngine();
-		try (InputStream in = StatusReportGenerator.class.getResourceAsStream("/templates/StatusReportTemplate.html")) {
-			final Template template = templateEngine.createTemplate(new InputStreamReader(in));
+//		final GStringTemplateEngine templateEngine = new GStringTemplateEngine();
+//		try (InputStream in = StatusReportGenerator.class.getResourceAsStream("/templates/StatusReportTemplate.html")) {
+//			final Template template = templateEngine.createTemplate(new InputStreamReader(in));
 			Map context = new HashMap();
 			context.put("dataJson", prepareJSON());
 
 			Writable result = template.make(context);
 			result.writeTo(writer);
-		}
-
+//		}
 	}
-
 }

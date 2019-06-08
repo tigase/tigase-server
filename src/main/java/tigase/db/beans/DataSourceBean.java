@@ -221,7 +221,6 @@ public class DataSourceBean
 		/**
 		 * Get name for which data source instance was changed
 		 *
-		 * @return
 		 */
 		public String getDomain() {
 			return domain;
@@ -230,7 +229,6 @@ public class DataSourceBean
 		/**
 		 * Get old instance of data source
 		 *
-		 * @return
 		 */
 		public DataSource getOldDataSource() {
 			return oldDataSource;
@@ -239,7 +237,6 @@ public class DataSourceBean
 		/**
 		 * Get new instance of data source
 		 *
-		 * @return
 		 */
 		public DataSource getNewDataSource() {
 			return newDataSource;
@@ -297,7 +294,6 @@ public class DataSourceBean
 		 *
 		 * @return name of a class
 		 *
-		 * @throws DBInitException
 		 */
 		@Override
 		protected String getRepositoryPoolClassName() throws DBInitException {
@@ -319,7 +315,6 @@ public class DataSourceBean
 		 *
 		 * @param repo instance of data source
 		 *
-		 * @throws RepositoryException
 		 */
 		@Override
 		protected void initRepository(DataSource repo) throws RepositoryException {

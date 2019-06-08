@@ -23,8 +23,7 @@ import java.io.Serializable;
  * Created: Feb 19, 2009 12:17:03 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class StartupFinishedEvent
 		implements Serializable {
 

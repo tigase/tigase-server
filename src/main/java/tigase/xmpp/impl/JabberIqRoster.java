@@ -47,8 +47,7 @@ import static tigase.xmpp.impl.PresenceSubscription.AUTO_AUTHORIZE_PROP_KEY;
  * Created: Tue Feb 21 17:42:53 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = JabberIqRoster.ID, parent = SessionManager.class, active = true)
 public class JabberIqRoster
 		extends XMPPProcessor
@@ -87,7 +86,6 @@ public class JabberIqRoster
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 *
-	 * @throws NotAuthorizedException
 	 */
 	protected static void dynamicGetRequest(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 											Map<String, Object> settings) throws NotAuthorizedException {
@@ -383,10 +381,6 @@ public class JabberIqRoster
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 * @throws TigaseDBException
 	 */
 	protected void processGetRequest(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									 Map<String, Object> settings)
@@ -480,9 +474,6 @@ public class JabberIqRoster
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws XMPPException
 	 */
 	protected void processSetRequest(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									 final Map<String, Object> settings)
@@ -649,10 +640,6 @@ public class JabberIqRoster
 	 * repository data.
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws RepositoryAccessException
-	 * @throws RosterRetrievingException
-	 * @throws TigaseDBException
 	 */
 	protected void updateHash(XMPPResourceConnection session, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException, RosterRetrievingException, RepositoryAccessException {
@@ -730,7 +717,6 @@ public class JabberIqRoster
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 *
-	 * @throws PacketErrorTypeException
 	 */
 	private void processRemoteRosterManagementRequest(Packet packet, XMPPResourceConnection session,
 													  Queue<Packet> results, final Map<String, Object> settings)

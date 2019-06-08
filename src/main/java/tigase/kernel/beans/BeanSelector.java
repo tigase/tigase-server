@@ -29,11 +29,6 @@ public interface BeanSelector {
 	/**
 	 * Method needs to return true if bean in which annotation class implementing this interface is specified and this
 	 * bean should be registered
-	 *
-	 * @param clazz
-	 * @param kernel
-	 *
-	 * @return
 	 */
 	boolean shouldRegister(Class clazz, Kernel kernel);
 

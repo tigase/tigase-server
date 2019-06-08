@@ -27,8 +27,7 @@ import java.util.Set;
  * Created: Dec 10, 2009 2:04:20 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ConfigRepositoryIfc
 		extends ComponentRepository<ConfigItem> {
 
@@ -46,7 +45,6 @@ public interface ConfigRepositoryIfc
 
 	/**
 	 * Get set of config items stored for component
-	 * @param compName
 	 * @return set of component items
 	 */
 	Set<ConfigItem> getItemsForComponent(String compName);

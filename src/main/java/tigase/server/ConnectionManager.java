@@ -56,12 +56,8 @@ import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
  * Describe class ConnectionManager here.
  * <br>
  * Created: Sun Jan 22 22:52:58 2006
- *
- * @param <IO>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		extends AbstractMessageReceiver
 		implements XMPPIOServiceListener<IO>, RegistrarBean {
@@ -373,9 +369,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 * Processes undelivered packets
 	 *
-	 * @param packet
 	 * @param stamp - timestamp when packet was received to be written to XMPPIOService
-	 * @param errorMessage
 	 */
 	public abstract boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage);
 

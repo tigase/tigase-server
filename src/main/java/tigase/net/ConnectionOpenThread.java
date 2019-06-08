@@ -34,8 +34,7 @@ import java.util.logging.Logger;
  * Created: Wed Jan 25 23:51:28 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ConnectionOpenThread
 		implements Runnable {
 

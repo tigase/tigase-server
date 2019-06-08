@@ -31,8 +31,7 @@ import java.util.logging.Logger;
  * Created: Oct 31, 2009 3:51:09 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class StreamFeaturesProcessor
 		implements ExtProcessor {
 

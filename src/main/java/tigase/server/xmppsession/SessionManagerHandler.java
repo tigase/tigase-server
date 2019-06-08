@@ -27,8 +27,7 @@ import tigase.xmpp.jid.JID;
  * Created: Sat Feb 18 13:27:58 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface SessionManagerHandler {
 
 	public static final String COMMIT_HANDLER_KEY = "LoginHandlerKey";

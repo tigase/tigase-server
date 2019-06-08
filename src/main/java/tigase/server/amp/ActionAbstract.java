@@ -42,8 +42,7 @@ import java.util.logging.Logger;
  * Created: May 1, 2010 7:44:17 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @ConfigAliases({@ConfigAlias(field = "security", alias = "amp-security-level")})
 public abstract class ActionAbstract
 		implements ActionIfc {

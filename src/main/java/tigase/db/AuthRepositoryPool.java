@@ -35,8 +35,7 @@ import java.util.logging.Logger;
  * Created: Mar 27, 2010 11:31:17 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class AuthRepositoryPool
 		implements AuthRepository, RepositoryPool<AuthRepository> {
 

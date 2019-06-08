@@ -34,8 +34,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @author <a href="mailto:piras@tiscali.com">Daniele</a>
- * @version $Rev$
- */
+*/
 @Repository.Meta(supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCRepository
@@ -532,7 +531,6 @@ public class JDBCRepository
 	 *
 	 * @param user_id a <code>String</code> value the user Jabber ID.
 	 *
-	 * @throws TigaseDBException
 	 * @throws UserNotFoundException if an error occurs
 	 */
 	@Override

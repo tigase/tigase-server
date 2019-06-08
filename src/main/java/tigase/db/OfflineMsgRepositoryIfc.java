@@ -58,7 +58,6 @@ public interface OfflineMsgRepositoryIfc
 	 *
 	 * @return a {@link Queue} of {@link Element} objects representing stored payloads for the given user's {@link JID}
 	 *
-	 * @throws UserNotFoundException
 	 */
 	Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException;
 
@@ -74,7 +73,6 @@ public interface OfflineMsgRepositoryIfc
 	 *
 	 * @return {@code true} if the packet was correctly saved to repository, {@code false} otherwise.
 	 *
-	 * @throws UserNotFoundException
 	 */
 	boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
 			throws UserNotFoundException;

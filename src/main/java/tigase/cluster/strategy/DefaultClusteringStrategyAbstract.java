@@ -45,10 +45,7 @@ import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 /**
  * Created: May 13, 2009 9:53:44 AM
  *
- * @param <E>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		implements ClusteringStrategyIfc<E> {
@@ -198,8 +195,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	 * attempt may fail if there is no more cluster nodes to send the packet or if the clustering strategy logic decided
 	 * that the packet does not have to be sent.
 	 *
-	 * @param fromNode
-	 * @param data
 	 * @param packet to be sent to a next cluster node
 	 * @param visitedNodes a list of nodes already visited by the packet.
 	 *

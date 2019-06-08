@@ -30,7 +30,6 @@ public class RepositoryAccessException
 	/**
 	 * Creates a new <code>PacketErrorTypeException</code> instance.
 	 *
-	 * @param message
 	 */
 	public RepositoryAccessException(String message) {
 		super(message);

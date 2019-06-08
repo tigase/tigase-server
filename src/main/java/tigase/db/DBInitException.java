@@ -23,8 +23,7 @@ package tigase.db;
  * Created: Thu Oct 26 12:18:05 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class DBInitException
 		extends TigaseDBException {
 

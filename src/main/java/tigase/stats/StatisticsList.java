@@ -28,8 +28,7 @@ import java.util.logging.Logger;
  * Created: Jul 10, 2009 3:23:23 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class StatisticsList
 		implements Iterable<StatRecord> {
 
@@ -106,7 +105,6 @@ public class StatisticsList
 	/**
 	 * Returns names of every component for which statistics are stored in <code>stats</code> variable
 	 *
-	 * @return
 	 */
 	public Set<String> getCompNames() {
 		return stats.keySet();

@@ -70,7 +70,6 @@ public class XMPPSession {
 	 *
 	 * @param conn {@link XMPPResourceConnection} that is being added.
 	 *
-	 * @throws TigaseStringprepException
 	 */
 	public void addResourceConnection(XMPPResourceConnection conn) throws TigaseStringprepException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -146,7 +145,6 @@ public class XMPPSession {
 	 * connections within given {@link XMPPSession} and detaches {@link XMPPSession} from the removed {@link
 	 * XMPPResourceConnection}
 	 *
-	 * @param conn
 	 */
 	public void removeResourceConnection(XMPPResourceConnection conn) {
 		if (activeResources.remove(conn)) {

@@ -21,8 +21,7 @@ package tigase.util.historyCache;
  * Created: Sep 8, 2009 7:32:09 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class FloatHistoryCache {
 
 	private float[] buffer = null;

@@ -27,8 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Generic utility class to allow storage of any value for particular JID (including resource).
  *
- * @param <T>
- *
+ * *
  * @author andrzej
  */
 public class JidResourceMap<T> {

@@ -27,8 +27,7 @@ import java.util.Map;
  * Created: Oct 2, 2009 5:18:44 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class UnknownXMLNSStreamOpenHandler
 		implements StreamOpenHandler {
 

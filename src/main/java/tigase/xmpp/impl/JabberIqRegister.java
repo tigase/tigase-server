@@ -50,8 +50,7 @@ import java.util.stream.Collectors;
  * Created: Thu Feb 16 13:14:06 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = JabberIqRegister.ID, parent = SessionManager.class, active = true)
 public class JabberIqRegister
 		extends XMPPProcessor

@@ -40,8 +40,7 @@ import java.util.logging.Logger;
  * Created: Feb 14, 2010 4:35:45 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = MessageAll.ID, parent = SessionManager.class, active = false)
 public class MessageAll
 		extends XMPPProcessor

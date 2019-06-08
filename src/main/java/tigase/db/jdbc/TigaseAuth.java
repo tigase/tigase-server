@@ -40,8 +40,7 @@ import static tigase.db.AuthRepository.Meta;
  * Created: Sat Nov 11 22:22:04 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Meta(supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 @Deprecated

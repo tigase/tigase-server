@@ -51,8 +51,7 @@ import java.util.logging.Logger;
  * Created: Fri Nov 21 14:28:20 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "vhost-man", parent = Kernel.class, active = true, exportable = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 public class VHostManager

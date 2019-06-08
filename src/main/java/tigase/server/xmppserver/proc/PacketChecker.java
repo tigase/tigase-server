@@ -40,8 +40,7 @@ import java.util.logging.Logger;
  * Created: Dec 10, 2010 5:53:57 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "packetChecker", parent = S2SConnectionManager.class, active = true)
 public class PacketChecker
 		extends S2SAbstractFilter {
@@ -129,9 +128,6 @@ public class PacketChecker
 	/**
 	 * Check if incoming packet is allowed on this connection
 	 *
-	 * @param p
-	 * @param serv
-	 * @param cid
 	 */
 	protected boolean isAllowed(Packet p, S2SIOService serv, CID cid) {
 		boolean allowed = serv.isAuthenticated(cid);

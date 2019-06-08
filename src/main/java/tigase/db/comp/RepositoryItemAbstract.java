@@ -33,8 +33,7 @@ import java.util.stream.Stream;
  * Created: Sep 23, 2010 6:53:14 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class RepositoryItemAbstract
 		implements RepositoryItem {
 

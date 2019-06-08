@@ -23,11 +23,8 @@ import java.util.logging.Logger;
 /**
  * Created: Feb 9, 2010 11:12:56 AM
  *
- * @param <E>
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+* @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+*/
 public class PriorityQueueRelaxed<E>
 		extends PriorityQueueAbstract<E> {
 

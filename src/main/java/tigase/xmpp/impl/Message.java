@@ -45,8 +45,7 @@ import static tigase.xmpp.impl.Message.XMLNS;
  * Created: Tue Feb 21 15:49:08 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Id(ELEM_NAME)
 @Handles({@Handle(path = {ELEM_NAME}, xmlns = XMLNS)})
 @Bean(name = ELEM_NAME, parent = SessionManager.class, active = false)

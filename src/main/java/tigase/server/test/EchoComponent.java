@@ -27,8 +27,7 @@ import java.util.logging.Logger;
  * Created: Sep 30, 2010 1:07:13 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class EchoComponent
 		extends AbstractMessageReceiver {
 

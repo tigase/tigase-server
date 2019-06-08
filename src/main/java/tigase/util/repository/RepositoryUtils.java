@@ -38,8 +38,7 @@ import java.util.List;
  * Created: Sat Oct 28 13:09:26 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class RepositoryUtils {
 
 	private static boolean add = false;

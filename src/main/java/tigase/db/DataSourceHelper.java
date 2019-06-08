@@ -101,13 +101,6 @@ public class DataSourceHelper {
 
 	/**
 	 * Method returns class which would be by default used as implementation of class
-	 *
-	 * @param cls
-	 * @param uri
-	 *
-	 * @return
-	 *
-	 * @throws tigase.db.DBInitException
 	 */
 	public static <T extends Class<?>> T getDefaultClass(T cls, String uri) throws DBInitException {
 		return getDefaultClass(cls, uri, null);

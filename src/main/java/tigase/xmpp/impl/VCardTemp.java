@@ -56,8 +56,7 @@ import static tigase.xmpp.impl.VCardTemp.*;
  * Created: Thu Oct 19 23:37:23 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Id(XMLNS)
 @Handles({@Handle(path = {Iq.ELEM_NAME, vCard}, xmlns = XMLNS), @Handle(path = {Iq.ELEM_NAME, VCARD}, xmlns = XMLNS)})
 @DiscoFeatures({XMLNS})

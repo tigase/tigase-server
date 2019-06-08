@@ -42,8 +42,7 @@ import java.util.logging.Logger;
  * Created: Dec 9, 2010 2:00:52 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "dialback", parent = S2SConnectionManager.class, active = true)
 public class Dialback
 		extends S2SAbstractProcessor {
@@ -215,8 +214,6 @@ public class Dialback
 	/**
 	 * Checks if result request for received domain was sent by service
 	 *
-	 * @param serv
-	 * @param domain
 	 */
 	@SuppressWarnings("unchecked")
 	protected boolean wasResultRequested(S2SIOService serv, String domain) {
@@ -227,10 +224,6 @@ public class Dialback
 
 	/**
 	 * Checks if verify request for received domain was sent by service
-	 *
-	 * @param serv
-	 * @param domain
-	 *
 	 * @see CIDConnections#sendHandshakingOnly
 	 */
 	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
@@ -396,8 +389,6 @@ public class Dialback
 	/**
 	 * Adds domain to list of domains requested for result by service
 	 *
-	 * @param serv
-	 * @param domain
 	 */
 	@SuppressWarnings("unchecked")
 	private void addToResultRequested(S2SIOService serv, String domain) {

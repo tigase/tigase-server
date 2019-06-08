@@ -46,8 +46,7 @@ import java.util.logging.Logger;
  * Created: Apr 26, 2010 3:22:06 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "amp", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})

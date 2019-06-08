@@ -41,8 +41,7 @@ import java.util.logging.Logger;
  * Created: Thu Feb 9 20:52:02 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum Command {
 
 	/**
@@ -635,11 +634,6 @@ public enum Command {
 	 *
 	 * WARNING: Returned packet will not have any XMLNS set!
 	 *
-	 * @param from
-	 * @param to
-	 * @param type
-	 * @param id
-	 * @return
 	 */
 	public Packet getPacket(JID from, JID to, final StanzaType type, final String id) {
 		Element elem = createIqCommand(from, to, type, id, this.toString(), null, null);
@@ -661,12 +655,6 @@ public enum Command {
 	 *
 	 * WARNING: Returned packet will not have any XMLNS set!
 	 * 
-	 * @param from
-	 * @param to
-	 * @param type
-	 * @param id
-	 * @param data_type
-	 * @return
 	 */
 	public Packet getPacket(JID from, JID to, StanzaType type, String id, DataType data_type) {
 		Element elem = createIqCommand(from, to, type, id, this.toString(), data_type, null);

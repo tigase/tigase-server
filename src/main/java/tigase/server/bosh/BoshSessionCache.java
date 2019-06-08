@@ -33,8 +33,7 @@ import java.util.logging.Logger;
  * Created: Mon Feb 25 23:54:57 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class BoshSessionCache {
 
 	public static final String DEF_ID = "";

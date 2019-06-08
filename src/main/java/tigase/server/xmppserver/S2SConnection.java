@@ -28,8 +28,7 @@ import java.util.logging.Logger;
  * Created: Jun 14, 2010 1:19:55 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class S2SConnection
 		implements Comparable<S2SConnection> {
 

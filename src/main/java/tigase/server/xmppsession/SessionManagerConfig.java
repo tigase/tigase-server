@@ -23,8 +23,7 @@ package tigase.server.xmppsession;
  * Created: Tue Oct 24 23:07:57 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class SessionManagerConfig {
 
 	public static final String defaultHandlerProcId = "default-handler";

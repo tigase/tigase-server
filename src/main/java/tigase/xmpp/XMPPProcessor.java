@@ -46,8 +46,7 @@ import java.util.logging.Logger;
  * <p> Created: Tue Oct  5 20:31:23 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class XMPPProcessor
 		implements XMPPImplIfc, XMPPProcessorConcurrencyAwareIfc {
 

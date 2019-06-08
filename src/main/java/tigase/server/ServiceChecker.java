@@ -23,12 +23,8 @@ import tigase.xmpp.XMPPIOService;
  * Describe interface ServiceChecker here.
  * <br>
  * Created: Sat Jun 21 22:45:52 2008
- *
- * @param <IO>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ServiceChecker<IO extends XMPPIOService<?>> {
 
 	void check(IO service);

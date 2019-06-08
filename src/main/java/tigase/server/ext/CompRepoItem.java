@@ -37,8 +37,7 @@ import java.util.stream.Collectors;
  * Created: Oct 3, 2009 4:39:51 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class CompRepoItem
 		extends RepositoryItemAbstract {
 

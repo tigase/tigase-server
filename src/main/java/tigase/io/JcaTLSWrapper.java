@@ -35,8 +35,7 @@ import java.util.logging.Logger;
  * Created: Sat Mar 5 09:13:29 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class JcaTLSWrapper
 		implements TLSWrapper {
 
@@ -59,12 +58,6 @@ public class JcaTLSWrapper
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
 	 *
-	 * @param sslc
-	 * @param eventHandler
-	 * @param hostname
-	 * @param port
-	 * @param clientMode
-	 * @param wantClientAuth
 	 */
 	public JcaTLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port,
 						 final boolean clientMode, final boolean wantClientAuth, final boolean needClientAuth) {

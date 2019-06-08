@@ -48,8 +48,7 @@ import java.util.logging.Logger;
  * Created: Thu Feb 16 17:46:16 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = JabberIqAuth.ID, parent = SessionManager.class, active = true)
 public class JabberIqAuth
 		extends AbstractAuthPreprocessor

@@ -23,8 +23,7 @@ package tigase.io;
  * Created: Sat Mar  5 09:28:45 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public enum TLSStatus {
 
 	NEED_WRITE,

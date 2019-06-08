@@ -21,8 +21,7 @@ package tigase.sys;
  * Created: Feb 19, 2009 12:19:57 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface MemoryChangeListener {
 
 }

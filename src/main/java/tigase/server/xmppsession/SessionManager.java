@@ -85,8 +85,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "sess-man", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
 @ClusterModeRequired(active = false)

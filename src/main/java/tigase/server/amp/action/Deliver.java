@@ -27,8 +27,7 @@ import tigase.xml.Element;
  * Created: May 1, 2010 11:28:40 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "deliver", parent = AmpComponent.class, active = true)
 public class Deliver
 		extends ActionAbstract {

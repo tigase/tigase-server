@@ -30,7 +30,6 @@ public interface RegistrarBeanWithDefaultBeanClass
 	 * This allows users to have more convenient configuration file without the need to specify class for each of
 	 * subbbeans if most of them will have the same class.
 	 *
-	 * @return
 	 */
 	Class<?> getDefaultBeanClass();
 

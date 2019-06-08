@@ -63,8 +63,7 @@ import java.util.Set;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class Packet {
 
 	public static final String CLIENT_XMLNS = "jabber:client";
@@ -114,7 +113,6 @@ public class Packet {
 	 *
 	 * @param el Element which should be converted
 	 *
-	 * @return
 	 */
 	public static String elemToString(Element el) {
 		String elemData = el.toString();
@@ -133,7 +131,6 @@ public class Packet {
 	 *
 	 * @param el Element which should be converted
 	 *
-	 * @return
 	 */
 	public static String elemToStringSecure(Element el) {
 		String elemData = el.toStringSecure();
@@ -386,8 +383,7 @@ public class Packet {
 	 * packet.getElement().getAttribute(xmlPath, key);
 	 * </pre>
 	 * <strong>Please note! This method can only be used with static strings or with strings processed through
-	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons. If you pass
-	 * dynamically built <code>String[]</code> to the method call, use {@link #getAttribute(java.lang.String[], java.lang.String) } instead.</strong>
+	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons.</strong>
 	 *
 	 * @param path is XML path for the stanza element or stanza child for which attribute is retrieved.
 	 * @param key is an attribute key.
@@ -416,9 +412,7 @@ public class Packet {
 	 * packet.getElement().getCData(xmlPath);
 	 * </pre>
 	 * <strong>Please note! This method can only be used with static strings or with strings processed through
-	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons. If you pass
-	 * dynamically built <code>String[]</code> to the method call, use {@link #getElemCData(java.lang.String[])}
-	 * instead.</strong>
+	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons.</strong>
 	 *
 	 * @param xmlPath is an XML path to the stanza element for which CData is retrieved.
 	 *
@@ -447,9 +441,7 @@ public class Packet {
 	 * packet.getElement().getChildrenStaticStr(xmlPath);
 	 * </pre>
 	 * <strong>Please note! This method can only be used with static strings or with strings processed through
-	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons. If you pass
-	 * dynamically built <code>String[]</code> to the method call, use {@link #getElemChildren(java.lang.String[]) }
-	 * instead.</strong>
+	 * <code>String.intern()</code> call. It uses "==" for string comparison for performance reasons.</strong>
 	 *
 	 * @param xmlPath is an XML path to the stanza element for which children are retrieved.
 	 *
@@ -824,8 +816,7 @@ public class Packet {
 	 * The method checks whether the enclosed stanza contains an XML element and XML child element for a given element
 	 * path and XMLNS. The <code>elementPath</code> is directory path like string. <strong>Please note! This method can
 	 * only be used with static strings or with strings processed through <code>String.intern()</code> call. It uses
-	 * "==" for string comparison for performance reasons. If you pass dynamically built <code>String[]</code> to the
-	 * method call, use {@link #isXMLNS(java.lang.String[], java.lang.String)} instead.</strong>
+	 * "==" for string comparison for performance reasons.</strong>
 	 *
 	 * @param elementPath is a <code>String[]</code> value which represents XML element path to a desired child
 	 * element.

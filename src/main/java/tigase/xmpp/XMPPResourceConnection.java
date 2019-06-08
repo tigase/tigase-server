@@ -19,7 +19,6 @@ package tigase.xmpp;
 
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.AuthRepository;
-import tigase.db.AuthorizationException;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.server.Packet;
@@ -46,8 +45,7 @@ import java.util.logging.Logger;
  * Created: Wed Feb 8 22:30:37 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class XMPPResourceConnection
 		extends RepositoryAccess {
 
@@ -153,11 +151,6 @@ public class XMPPResourceConnection
 	 * Method checks if in {@code parentSession} in session data there is value for passed {@code key} and returns it if
 	 * exists. If not then it uses passed {@code valueFactory} to generate value and sets it in {@code parentSession} in
 	 * session data under passed {@code key} and returns newly set value
-	 *
-	 * @param key
-	 * @param valueFactory
-	 *
-	 * @return
 	 */
 	public Object computeCommonSessionDataIfAbsent(String key, Function<String, Object> valueFactory) {
 		if (parentSession != null) {
@@ -170,11 +163,6 @@ public class XMPPResourceConnection
 	 * Method checks if in session data is value for passed {@code key} and returns it if exists. If not then it uses
 	 * passed {@code valueFactory} to generate value and sets it in session data under passed {@code key} and returns
 	 * newly set value
-	 *
-	 * @param key
-	 * @param valueFactory
-	 *
-	 * @return
 	 */
 	public Object computeSessionDataIfAbsent(String key, Function<String, Object> valueFactory) {
 		setLastAccessed(System.currentTimeMillis());
@@ -196,53 +184,6 @@ public class XMPPResourceConnection
 		++packets_counter;
 	}
 
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public final Authorization loginDigest(String user, String digest, String id, String alg)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException, TigaseStringprepException {
-		BareJID userId = BareJID.bareJIDInstance(user, getDomain().getVhost().getDomain());
-		Authorization result = super.loginDigest(userId, digest, id, alg);
-
-		if (result == Authorization.AUTHORIZED) {
-			loginHandler.handleLogin(userId, this);
-		}    // end of if (result == Authorization.AUTHORIZED)
-
-		return result;
-	}
-
-	@Override
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public final Authorization loginOther(Map<String, Object> props)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Authorization result = super.loginOther(props);
-
-		if (result == Authorization.AUTHORIZED) {
-			BareJID user = (BareJID) props.get(AuthRepository.USER_ID_KEY);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
-			}
-			loginHandler.handleLogin(user, this);
-		}    // end of if (result == Authorization.AUTHORIZED)
-
-		return result;
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public final Authorization loginPlain(String user, String password)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException, TigaseStringprepException {
-		BareJID userId = BareJID.bareJIDInstance(user, getDomain().getVhost().getDomain());
-		Authorization result = super.loginPlain(userId, password);
-
-		if (result == Authorization.AUTHORIZED) {
-			loginHandler.handleLogin(userId, this);
-		}    // end of if (result == Authorization.AUTHORIZED)
-
-		return result;
-	}
-
 	@Override
 	public final void logout() throws NotAuthorizedException {
 		loginHandler.handleLogout(getBareJID(), this);
@@ -257,8 +198,6 @@ public class XMPPResourceConnection
 	/**
 	 * Method sets passed value under passed key in common sessionData kept in parentSession
 	 *
-	 * @param key
-	 * @param value
 	 */
 	public void putCommonSessionData(String key, Object value) {
 		if (parentSession != null) {
@@ -269,10 +208,6 @@ public class XMPPResourceConnection
 	/**
 	 * Method sets passed value under passed {@code key} in common {@code sessionData} kept in {@code parentSession} but
 	 * only if there is no value for this {@code key} already
-	 *
-	 * @param key
-	 * @param value
-	 *
 	 * @return previous value
 	 */
 	public Object putCommonSessionDataIfAbsent(String key, Object value) {
@@ -303,10 +238,6 @@ public class XMPPResourceConnection
 	/**
 	 * Method sets passed value under passed {@code key} in {@code sessionData} but only if there is no value for this
 	 * {@code key} already
-	 *
-	 * @param key
-	 * @param value
-	 *
 	 * @return previous value
 	 */
 	public Object putSessionDataIfAbsent(String key, Object value) {
@@ -359,7 +290,6 @@ public class XMPPResourceConnection
 	 *
 	 * @return a value of {@code List<XMPPResourceConnection>}
 	 *
-	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
 		if (!isAuthorized()) {
@@ -404,7 +334,6 @@ public class XMPPResourceConnection
 	 *
 	 * @return the value of connectionId
 	 *
-	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId() throws NoConnectionIdException {
 		return getConnectionId(true);
@@ -475,7 +404,6 @@ public class XMPPResourceConnection
 	 *
 	 * @return a <code>String</code> value of calculated user full JID for this session including resource name.
 	 *
-	 * @throws NotAuthorizedException
 	 */
 	public final JID getJID() throws NotAuthorizedException {
 		if (!isAuthorized()) {
@@ -583,8 +511,6 @@ public class XMPPResourceConnection
 	 *
 	 * @param argResource Value to assign to this.resource
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseStringprepException
 	 */
 	public void setResource(final String argResource) throws NotAuthorizedException, TigaseStringprepException {
 		if (!isAuthorized()) {
@@ -641,23 +567,6 @@ public class XMPPResourceConnection
 
 	public JID getSMComponentId() {
 		return loginHandler.getComponentId();
-	}
-
-	/**
-	 * To get the user bare JID please use <code>getBareJID</code> method, to check the whether the user with given
-	 * BareJID is owner of the session please use method <code>isUserId(...)</code>. From now one the user session may
-	 * handle more than a single userId, hence getting just userId is not enough to check whether the user Id belongs to
-	 * the session.
-	 *
-	 * @return a value of <code>BareJID</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @deprecated
-	 */
-	@Deprecated
-	@TigaseDeprecated(since = "7.0.0", removeIn = "8.1.0")
-	public BareJID getUserId() throws NotAuthorizedException {
-		return this.getBareJID();
 	}
 
 	@Override

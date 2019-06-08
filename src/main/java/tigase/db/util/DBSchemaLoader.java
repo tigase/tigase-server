@@ -998,10 +998,6 @@ public class DBSchemaLoader
 	 * references/sources/import another schema file then it will also be read and parsed.
 	 *
 	 * @param resource name of the resource for which an {@link InputStream} should be created.
-	 *
-	 * @return
-	 *
-	 * @throws IOException
 	 */
 	private ArrayList<String> loadSQLQueries(String resource) throws IOException {
 		log.log(Level.FINER, "Loading queries, resource: {0}", new Object[]{resource});
@@ -1135,7 +1131,6 @@ public class DBSchemaLoader
 	 * @param useRootCredentials whether to put in the URI credentials of database administrator ({@code true}) or
 	 * regular user.
 	 *
-	 * @return
 	 */
 	private String getDBUri(boolean includeDbName, boolean useRootCredentials) {
 		String db_uri = "jdbc:";

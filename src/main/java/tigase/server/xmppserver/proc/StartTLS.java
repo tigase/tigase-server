@@ -34,8 +34,7 @@ import java.util.logging.Logger;
  * Created: Dec 9, 2010 2:01:01 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "startTLS", parent = S2SConnectionManager.class, active = true)
 public class StartTLS
 		extends S2SAbstractProcessor {

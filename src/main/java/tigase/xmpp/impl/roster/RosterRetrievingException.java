@@ -30,7 +30,6 @@ public class RosterRetrievingException
 	/**
 	 * Creates a new <code>PacketErrorTypeException</code> instance.
 	 *
-	 * @param message
 	 */
 	public RosterRetrievingException(String message) {
 		super(message);

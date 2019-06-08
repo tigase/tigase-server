@@ -53,8 +53,7 @@ import static tigase.server.bosh.Constants.*;
  * Created: Sat Jun 2 12:24:29 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "bosh", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 @ClusterModeRequired(active = false)

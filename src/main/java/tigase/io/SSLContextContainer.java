@@ -48,8 +48,7 @@ import java.util.logging.Logger;
  * Created: Oct 15, 2010 2:40:49 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true)
 public class SSLContextContainer
 		extends SSLContextContainerAbstract {
@@ -146,7 +145,6 @@ public class SSLContextContainer
 	 * Constructor used to create root SSLContextContainer instance which should cache only SSLContext instances where
 	 * array of TrustManagers is not set - common for all ConnectionManagers. This instance is kept by TLSUtil class.
 	 *
-	 * @param certContainer
 	 */
 	public SSLContextContainer(CertificateContainerIfc certContainer) {
 		this(certContainer, null);
@@ -156,8 +154,6 @@ public class SSLContextContainer
 	 * Constructor used to create instances for every ConnectionManager so that every connection manager can have
 	 * different TrustManagers and SSLContext instance will still be cached.
 	 *
-	 * @param certContainer
-	 * @param parent
 	 */
 	public SSLContextContainer(CertificateContainerIfc certContainer, SSLContextContainerIfc parent) {
 		super(certContainer);
@@ -277,7 +273,6 @@ public class SSLContextContainer
 	 * Method handles <code>CertificateChanged</code> event emitted by CertificateContainer and removes cached instance
 	 * of SSLContext for domain for which certificate has changed.
 	 *
-	 * @param event
 	 */
 	@HandleEvent
 	private void onCertificateChange(CertificateContainer.CertificateChanged event) {

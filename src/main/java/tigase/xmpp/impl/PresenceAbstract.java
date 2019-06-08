@@ -133,8 +133,6 @@ public abstract class PresenceAbstract
 	 * @return {code true} if the contact requires sending presence (e.g. is not online and options skipOffline or
 	 * skipOfflineSys are enabled)
 	 *
-	 * @throws TigaseDBException
-	 * @throws NotAuthorizedException
 	 */
 	protected static boolean requiresPresenceSending(RosterAbstract roster, JID buddy, XMPPResourceConnection session,
 													 boolean systemCheck)
@@ -443,7 +441,6 @@ public abstract class PresenceAbstract
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 *
 	 * @throws NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
 	 */
 	public void broadcastProbe(XMPPResourceConnection session, Queue<Packet> results, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {

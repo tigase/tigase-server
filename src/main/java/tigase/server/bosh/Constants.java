@@ -25,8 +25,7 @@ import java.util.logging.Level;
  * Created: Tue Jun  5 22:22:09 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class Constants {
 
 	public static final String BOSH_VERSION = "1.6";

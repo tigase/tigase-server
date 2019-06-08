@@ -362,7 +362,6 @@ public class Kernel {
 
 	/**
 	 * Register links for bean of the passed name.
-	 * @param beanName
 	 */
 	public void registerLinks(String beanName) {
 		Link l = this.registeredLinks.get(beanName);
@@ -473,7 +472,7 @@ public class Kernel {
 	}
 
 	/**
-	 * Registers bean as class in Kernel. Class must be annotated with {@link Bean} annotation. <p> For example: <p>
+	 * Registers bean as class in Kernel. Class must be annotated with {@link Bean} annotation. <p> For example: </p>
 	 * <pre>
 	 * {@code
 	 *
@@ -509,7 +508,7 @@ public class Kernel {
 
 	/**
 	 * Registers bean with given name. Class or instance of bean must be defined in returned {@link BeanConfigBuilder
-	 * config builder}. <p> For example: <p>
+	 * config builder}. <p> For example: </p>
 	 * <pre>
 	 * {@code
 	 *
@@ -553,10 +552,6 @@ public class Kernel {
 
 	/**
 	 * Calling this method instructs Kernel to end delaying dependency injection and inject all queued items.
-	 * @param queue
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws InvocationTargetException
 	 */
 	public void finishDependecyDelayedInjection(DelayedDependencyInjectionQueue queue)
 			throws IllegalAccessException, InstantiationException, InvocationTargetException {
@@ -643,7 +638,6 @@ public class Kernel {
 	/**
 	 * Force injection of nulls in all dependency injection fields of all beans if required bean for injections are not
 	 * available.
-	 * @param forceAllowNull
 	 */
 	public void setForceAllowNull(boolean forceAllowNull) {
 		this.forceAllowNull = forceAllowNull;
@@ -1187,10 +1181,6 @@ public class Kernel {
 	 * @return <code>true</code> if injection was successfull, <code>false</code> only in case of forcing null injection
 	 * on not-null dependency.
 	 *
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws InstantiationException
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private boolean inject(Object[] data, Dependency dependency, Object toBean, final boolean forceNullInjection)
@@ -1407,7 +1397,6 @@ public class Kernel {
 	/**
 	 * Unload given bean from all previously injected objects.
 	 *
-	 * @param beanConfig
 	 */
 	private void unloadInjectedBean(BeanConfig beanConfig)
 			throws IllegalAccessException, InstantiationException, InvocationTargetException {

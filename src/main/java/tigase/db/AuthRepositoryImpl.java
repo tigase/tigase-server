@@ -38,8 +38,7 @@ import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
  * Created: Sat Nov 11 21:46:50 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class AuthRepositoryImpl
 		implements AuthRepository {
 

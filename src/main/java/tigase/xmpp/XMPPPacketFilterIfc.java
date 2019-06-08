@@ -26,8 +26,7 @@ import java.util.Queue;
  * Created: Dec 30, 2008 12:53:16 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface XMPPPacketFilterIfc
 		extends XMPPImplIfc {
 

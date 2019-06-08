@@ -26,8 +26,7 @@ import java.util.Map;
  * Created: Jan 2, 2009 2:32:17 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class AbstractScriptCommand
 		extends StatisticHolderImpl
 		implements CommandIfc {

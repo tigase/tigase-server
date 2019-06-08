@@ -25,8 +25,7 @@ import java.util.Set;
  * Created: Jun 26, 2010 9:38:19 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface S2SConnectionSelector {
 
 	S2SConnection selectConnection(Packet packet, Set<S2SConnection> outgoing);

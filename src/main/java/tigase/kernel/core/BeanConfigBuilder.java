@@ -23,7 +23,7 @@ import tigase.kernel.beans.BeanFactory;
 import java.util.logging.Logger;
 
 /**
- * Builder to help register beans in Kernel. <p> Usage: <p>
+ * Builder to help register beans in Kernel. <p> Usage: </p>
  * <pre>
  * {@code
  *

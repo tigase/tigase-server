@@ -49,8 +49,7 @@ import java.util.logging.Logger;
  * Created: Mon Jun 9 20:03:28 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "cluster-contr", parent = Kernel.class, active = true, exportable = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})

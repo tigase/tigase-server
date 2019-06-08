@@ -32,8 +32,7 @@ import java.util.List;
  * <p> Created: Tue Oct 26 15:09:28 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface UserRepository
 		extends Repository {
 
@@ -235,7 +234,6 @@ public interface UserRepository
 	 *
 	 * @return returns a collection of all user IDs (Jabber IDs) stored in the user repository.
 	 *
-	 * @throws tigase.db.TigaseDBException
 	 */
 	List<BareJID> getUsers() throws TigaseDBException;
 
@@ -249,9 +247,6 @@ public interface UserRepository
 	/**
 	 * This method is only used by the server statistics component to report number of registered users for given
 	 * domain.
-	 *
-	 * @param domain
-	 *
 	 * @return a <code>long</code> number of registered users in the repository.
 	 */
 	long getUsersCount(String domain);

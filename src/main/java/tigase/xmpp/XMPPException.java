@@ -24,8 +24,7 @@ package tigase.xmpp;
  * <p> Created: Sat Oct 30 08:38:18 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class XMPPException
 		extends Exception {
 

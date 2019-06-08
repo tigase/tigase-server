@@ -27,22 +27,21 @@ import tigase.conf.ConfigurationException;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ComponentRegistrator
 		extends ServerComponent {
 
 	/**
-	 * @param component
+	 * @param component to be registered
 	 *
-	 * @return a <code>boolean</code> value indicating whehether component has been successfuly added or not.
+	 * @return a <code>boolean</code> value indicating whether component has been successfully added or not.
 	 */
 	boolean addComponent(ServerComponent component) throws ConfigurationException;
 
 	/**
-	 * @param component
+	 * @param component to be registered
 	 *
-	 * @return a <code>boolean</code> value indicating whehether component has been successfuly removed or not.
+	 * @return a <code>boolean</code> value indicating whether component has been successfully removed or not.
 	 */
 	boolean deleteComponent(ServerComponent component);
 

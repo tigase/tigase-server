@@ -44,8 +44,7 @@ import static tigase.io.SSLContextContainerIfc.JKS_KEYSTORE_PWD_KEY;
  * Created: Sun Aug  6 15:14:49 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class TelnetClient
 		implements SampleSocketThread.SocketHandler {
 
@@ -219,11 +218,6 @@ public class TelnetClient
 
 	/**
 	 * Creates a new <code>TelnetClient</code> instance.
-	 *
-	 * @param hostname
-	 * @param port
-	 *
-	 * @throws Exception
 	 */
 	public TelnetClient(String hostname, int port) throws Exception {
 		reader = new SampleSocketThread(this);

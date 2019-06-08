@@ -28,8 +28,7 @@ import java.util.logging.Logger;
  * Created: Sep 11, 2009 12:39:04 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class IPMonitor
 		extends Thread {
 

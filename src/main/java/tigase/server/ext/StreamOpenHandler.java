@@ -23,8 +23,7 @@ import java.util.Map;
  * Created: Oct 2, 2009 12:15:43 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface StreamOpenHandler {
 
 	public static final String XMLNS_KEY = "xmlns";

@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: Fri Feb 2 15:08:58 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class PacketDefaultHandler {
 
 	private static final Logger log = Logger.getLogger(PacketDefaultHandler.class.getName());
@@ -53,8 +52,6 @@ public class PacketDefaultHandler {
 	/**
 	 * Method checks if packet can be processed by this handler
 	 *
-	 * @param packet
-	 * @param session
 	 */
 	public boolean canHandle(Packet packet, XMPPResourceConnection session) {
 		if (session == null) {

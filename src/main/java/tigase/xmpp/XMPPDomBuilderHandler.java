@@ -36,12 +36,8 @@ import java.util.logging.Logger;
  * creating instances of required <code>ELement</code> extension.
  * <br>
  * <p> Created: Sat Oct  2 22:01:34 2004 </p>
- *
- * @param <RefObject>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class XMPPDomBuilderHandler<RefObject>
 		implements SimpleHandler {
 

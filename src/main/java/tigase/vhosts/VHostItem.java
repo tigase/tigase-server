@@ -70,8 +70,7 @@ import java.util.stream.Collectors;
  * Created: 22 Nov 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class VHostItem
 		extends RepositoryItemAbstract
 		implements Comparable<VHostItem> {
@@ -924,11 +923,6 @@ public class VHostItem
 
 	/**
 	 * Return value for key for this VHost
-	 *
-	 * @param <T>
-	 * @param key
-	 *
-	 * @return
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
@@ -1105,7 +1099,6 @@ public class VHostItem
 	 * This method allows to enable or disable anonymous logins for this domain. By default anonymous logins are
 	 * enabled.
 	 *
-	 * @param value
 	 */
 	public void setAnonymousEnabled(boolean value) {
 		this.anonymousEnabled = value;
@@ -1113,10 +1106,6 @@ public class VHostItem
 
 	/**
 	 * Get boolean value contained by this VHost for key
-	 *
-	 * @param key
-	 *
-	 * @return
 	 */
 	@Deprecated
 	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
@@ -1146,7 +1135,6 @@ public class VHostItem
 	 * This method allows to enable or disable local domain. If the domain is disabled packets sent for this domain are
 	 * not processed normally, instead the server returns an error to the sender. Domain is enabled by default.
 	 *
-	 * @param value
 	 */
 	public void setEnabled(boolean value) {
 		this.enabled = value;
@@ -1166,7 +1154,6 @@ public class VHostItem
 	 * This method allows to enable or disable user account registration for this domain. By default user account
 	 * registration is enabled.
 	 *
-	 * @param value
 	 */
 	public void setRegisterEnabled(boolean value) {
 		this.registerEnabled = value;
@@ -1203,8 +1190,6 @@ public class VHostItem
 	/**
 	 * Set value for specified key for this VHost
 	 *
-	 * @param key
-	 * @param value
 	 */
 	public void setData(String key, Object value) {
 		if (value == null) {

@@ -48,8 +48,7 @@ import static tigase.server.bosh.Constants.*;
  * Created: Tue Jun 5 18:07:23 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class BoshSession {
 
 	private static final String IQ_ELEMENT_NAME = "iq";

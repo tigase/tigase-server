@@ -120,16 +120,12 @@ public class ClassUtil {
 	/**
 	 * Scans file for classes annotated with annotation T
 	 *
-	 * @param <T>
-	 * @param <S>
-	 * @param loader class loader used to load classes
+	 *	 *	 * @param loader class loader used to load classes
 	 * @param f file to scan for classes
 	 * @param cls annotation class
 	 *
 	 * @return set of annotated classes
 	 *
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends Class, S extends Class> Set<S> getClassesAnnotated(ClassLoader loader, File f, T cls)
@@ -157,15 +153,11 @@ public class ClassUtil {
 	/**
 	 * Scans OSGI bundle for classes annotated with annotation T
 	 *
-	 * @param <T>
-	 * @param <S>
-	 * @param bundle bundle to scan for annotated classes
+	 *	 *	 * @param bundle bundle to scan for annotated classes
 	 * @param cls annotation class
 	 *
 	 * @return set of annotated classes
 	 *
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends Class, S extends Class> Set<S> getClassesAnnotated(Bundle bundle, T cls)
@@ -375,8 +367,6 @@ public class ClassUtil {
 	 *
 	 * @return returns set of implementations
 	 *
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends Class> Set<T> getClassesImplementing(Bundle bundle, T cls)

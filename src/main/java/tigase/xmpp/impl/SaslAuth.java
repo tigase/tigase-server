@@ -55,8 +55,7 @@ import java.util.logging.Logger;
  * Created: Mon Feb 20 16:28:13 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = SaslAuth.ID, parent = SessionManager.class, active = true)
 public class SaslAuth
 		extends AbstractAuthPreprocessor

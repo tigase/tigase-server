@@ -28,8 +28,7 @@ import java.util.List;
  * Created: Jun 14, 2010 12:05:41 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ComponentIOService
 		extends XMPPIOService<List<ComponentConnection>> {
 

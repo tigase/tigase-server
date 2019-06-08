@@ -36,7 +36,6 @@ public class XMPPProcessorException
 	}
 
 	/**
-	 * @param errorCondition
 	 * @param text human readable message will be send to client
 	 */
 	public XMPPProcessorException(Authorization errorCondition, String text) {
@@ -48,7 +47,6 @@ public class XMPPProcessorException
 	}
 
 	/**
-	 * @param errorCondition
 	 * @param message exception message for logging
 	 * @param text human readable message will be send to client
 	 */

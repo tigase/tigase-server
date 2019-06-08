@@ -62,8 +62,6 @@ public interface CommandListener
 	/**
 	 * Method returns priority of particular command which should be used to assign proper priority for processing of
 	 * this command
-	 *
-	 * @return
 	 */
 	Priority getPriority();
 

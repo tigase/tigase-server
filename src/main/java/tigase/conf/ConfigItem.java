@@ -29,8 +29,7 @@ import java.util.logging.Logger;
  * Created: Dec 10, 2009 2:40:26 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class ConfigItem
 		extends RepositoryItemAbstract {
 
@@ -251,7 +250,6 @@ public class ConfigItem
 	/**
 	 * Checks if the given component name is equal to this item compName.
 	 *
-	 * @param comp
 	 */
 	public boolean isComponent(String comp) {
 		if (compName != comp) {
@@ -264,7 +262,6 @@ public class ConfigItem
 	/**
 	 * Checks if the given key is equal to this item keyName.
 	 *
-	 * @param key
 	 */
 	public boolean isKey(String key) {
 		if (keyName != key) {
@@ -277,7 +274,6 @@ public class ConfigItem
 	/**
 	 * Checks if the given node is equal to this item nodeName
 	 *
-	 * @param node
 	 */
 	public boolean isNode(String node) {
 		if (nodeName != node) {

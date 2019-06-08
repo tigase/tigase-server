@@ -59,10 +59,9 @@ public class PresenceCapabilitiesManagerTest {
 		DataForm.addFieldMultiValue(form, "software", Arrays.asList("Psi"));
 		DataForm.addFieldMultiValue(form, "software_version", Arrays.asList("0.11"));
 
-		System.out.println(form.toStringPretty());
+//		System.out.println(form.toStringPretty());
 
 		final String s = PresenceCapabilitiesManager.generateVerificationString(identities, features, form);
-		System.out.println(s);
 		assertEquals("q07IKJEyjvHSyhy//CH0CxmKi8w=", s);
 
 	}

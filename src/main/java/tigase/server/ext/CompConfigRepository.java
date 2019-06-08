@@ -27,8 +27,7 @@ import java.util.Map;
  * Created: Oct 3, 2009 2:00:30 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Deprecated
 @TigaseDeprecated(since="8.0.0")
 public class CompConfigRepository

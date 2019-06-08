@@ -49,8 +49,7 @@ import java.util.logging.Logger;
  * Created: Sep 30, 2009 8:28:13 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "ext", parent = Kernel.class, active = false)
 public class ComponentProtocol
 		extends ConnectionManager<ComponentIOService>

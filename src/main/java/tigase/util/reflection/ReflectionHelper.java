@@ -93,11 +93,6 @@ public class ReflectionHelper {
 	 * This method collects every method of consumer class annotated with passed annotation and for each of them
 	 * executes implementation of Handler.
 	 *
-	 * @param <A>
-	 * @param <T>
-	 * @param consumer
-	 * @param annotationCls
-	 * @param handler
 	 */
 	public static <A extends Annotation, T> Collection<T> collectAnnotatedMethods(final Object consumer,
 																				  Class<A> annotationCls,

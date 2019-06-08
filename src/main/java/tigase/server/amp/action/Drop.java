@@ -27,8 +27,7 @@ import tigase.xml.Element;
  * Created: Apr 27, 2010 5:35:33 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "drop", parent = AmpComponent.class, active = true)
 public class Drop
 		extends ActionAbstract {

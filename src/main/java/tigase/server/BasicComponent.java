@@ -67,8 +67,7 @@ import java.util.stream.Stream;
  * Created: Oct 17, 2009 7:49:05 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class BasicComponent
 		implements Configurable,
 				   XMPPService,

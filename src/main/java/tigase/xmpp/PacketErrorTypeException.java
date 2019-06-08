@@ -23,8 +23,7 @@ package tigase.xmpp;
  * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class PacketErrorTypeException
 		extends XMPPException {
 
@@ -33,7 +32,6 @@ public class PacketErrorTypeException
 	/**
 	 * Creates a new <code>PacketErrorTypeException</code> instance.
 	 *
-	 * @param message
 	 */
 	public PacketErrorTypeException(String message) {
 		super(message);

@@ -42,8 +42,7 @@ import static tigase.db.RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY;
  * Created: Mar 25, 2010 8:55:11 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class CounterDataArchivizer
 		implements StatisticsArchivizerIfc, ConfigurationChangedAware, Initializable {
 

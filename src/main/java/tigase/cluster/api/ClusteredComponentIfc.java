@@ -25,8 +25,7 @@ import tigase.server.ServerComponent;
  * Created: Mon Jun  9 20:00:46 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ClusteredComponentIfc
 		extends ServerComponent {
 

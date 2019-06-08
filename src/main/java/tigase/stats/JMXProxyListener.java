@@ -21,8 +21,7 @@ package tigase.stats;
  * Created: Aug 24, 2009 1:02:08 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface JMXProxyListener {
 
 	void connected(String id, StatisticsProviderMBean bean);

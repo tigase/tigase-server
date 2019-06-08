@@ -25,8 +25,7 @@ import java.util.Queue;
  * Created: May 1, 2010 3:26:50 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ActionResultsHandlerIfc {
 
 	boolean addOutPacket(Packet packet);

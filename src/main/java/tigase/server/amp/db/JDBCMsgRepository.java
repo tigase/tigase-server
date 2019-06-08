@@ -39,8 +39,7 @@ import java.util.logging.Logger;
  * Created: May 3, 2010 5:28:02 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Repository.Meta(isDefault = true, supportedUris = {"jdbc:[^:]+:.*"})
 @Repository.SchemaId(id = Schema.SERVER_SCHEMA_ID, name = Schema.SERVER_SCHEMA_NAME)
 public class JDBCMsgRepository

@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: Jan 2, 2009 1:21:55 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class Script
 		extends AbstractScriptCommand {
 

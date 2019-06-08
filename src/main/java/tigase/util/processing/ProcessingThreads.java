@@ -28,11 +28,8 @@ import java.util.logging.Logger;
 /**
  * Created: Apr 21, 2009 8:50:50 PM
  *
- * @param <E>
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+* @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+*/
 public class ProcessingThreads<E extends WorkerThread> {
 
 	private static final Logger log = Logger.getLogger(ProcessingThreads.class.getName());

@@ -127,8 +127,6 @@ public class PresenceState
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 * @param pres an Object of type {@link Element} holding Presence stanza to be sent.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	@SuppressWarnings({"unchecked"})
 	protected static void broadcastDirectPresences(StanzaType t, XMPPResourceConnection session, Queue<Packet> results,
@@ -159,7 +157,6 @@ public class PresenceState
 	 * @param roster_util instance of class implementing {@link RosterAbstract}.
 	 *
 	 * @throws NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
 	 */
 	public static void broadcastOffline(XMPPResourceConnection session, Queue<Packet> results,
 										Map<String, Object> settings, RosterAbstract roster_util)
@@ -216,7 +213,6 @@ public class PresenceState
 	 * @param roster_util instance of class implementing {@link RosterAbstract}.
 	 *
 	 * @throws NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
 	 */
 	public static void sendPresenceBroadcast(StanzaType t, XMPPResourceConnection session,
 											 EnumSet<RosterAbstract.SubscriptionType> subscrs, Queue<Packet> results,
@@ -524,8 +520,6 @@ public class PresenceState
 	 * repository data.
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	public void resendPendingInRequests(XMPPResourceConnection session, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException {
@@ -556,9 +550,6 @@ public class PresenceState
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param presenceType specifies type of the presence
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processError(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 								Map<String, Object> settings, RosterAbstract.PresenceType presenceType)
@@ -592,9 +583,6 @@ public class PresenceState
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param presenceType specifies type of the presence.
 	 *
-	 * @throws NoConnectionIdException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processInInitial(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									Map<String, Object> settings, RosterAbstract.PresenceType presenceType)
@@ -684,9 +672,6 @@ public class PresenceState
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param presenceType specifies type of the presence.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws PacketErrorTypeException
-	 * @throws TigaseDBException
 	 */
 	protected void processInProbe(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 								  Map<String, Object> settings, RosterAbstract.PresenceType presenceType)
@@ -796,8 +781,6 @@ public class PresenceState
 	 * @param settings this map keeps plugin specific settings loaded from the Tigase server configuration.
 	 * @param type specifies type of the presence.
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void processOutInitial(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
 									 Map<String, Object> settings, RosterAbstract.PresenceType type)
@@ -911,8 +894,6 @@ public class PresenceState
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 * @param online set whether given contact is online or offline
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	protected void buddyOnline(XMPPResourceConnection session, JID buddy, Queue<Packet> results, boolean online)
 			throws NotAuthorizedException, TigaseDBException {
@@ -935,9 +916,6 @@ public class PresenceState
 	 * repository data.
 	 * @param results this a collection with packets which have been generated as input packet processing results.
 	 *
-	 * @throws TigaseDBException
-	 * @throws NotAuthorizedException
-	 * @throws NoConnectionIdException
 	 */
 	@SuppressWarnings("empty-statement")
 	protected void sendRosterOfflinePresence(XMPPResourceConnection session, Queue<Packet> results)

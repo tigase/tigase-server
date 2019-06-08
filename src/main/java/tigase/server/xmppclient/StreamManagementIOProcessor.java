@@ -104,7 +104,6 @@ public class StreamManagementIOProcessor
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
 	 *
-	 * @param service
 	 */
 	public static boolean isEnabled(XMPPIOService service) {
 		return service.getSessionData().containsKey(IN_COUNTER_KEY);
@@ -479,12 +478,6 @@ public class StreamManagementIOProcessor
 
 	/**
 	 * Method responsible for starting process of stream resumption
-	 *
-	 * @param service
-	 * @param id
-	 * @param h
-	 *
-	 * @throws IOException
 	 */
 	private void resumeStream(XMPPIOService service, String id, int h) throws IOException {
 		XMPPIOService oldService = services.get(id);
@@ -548,10 +541,6 @@ public class StreamManagementIOProcessor
 
 	/**
 	 * Verifies if connections are authenticate for same bare jid
-	 *
-	 * @param oldService
-	 * @param newService
-	 *
 	 * @return true - only when bare jids are the same
 	 */
 	private boolean isSameUser(XMPPIOService oldService, XMPPIOService newService) {
@@ -568,7 +557,6 @@ public class StreamManagementIOProcessor
 	/**
 	 * Method responsible for sending recipient-unavailable error for all not acked packets
 	 *
-	 * @param service
 	 */
 	private void sendErrorsForQueuedPackets(XMPPIOService service) {
 		service.clearWaitingPackets();
@@ -610,7 +598,6 @@ public class StreamManagementIOProcessor
 		/**
 		 * Sets value of a counter - use only for testing!
 		 *
-		 * @param value
 		 */
 		protected void setCounter(int value) {
 			this.counter = value;
@@ -631,7 +618,6 @@ public class StreamManagementIOProcessor
 		/**
 		 * Append packet to waiting for ack queue
 		 *
-		 * @param packet
 		 */
 		public void append(Packet packet) {
 			if (!packet.wasProcessedBy(XMLNS)) {
@@ -645,7 +631,6 @@ public class StreamManagementIOProcessor
 		/**
 		 * Confirm delivery of packets up to count passed as value
 		 *
-		 * @param value
 		 */
 		public void ack(int value) {
 			int count = get() - value;

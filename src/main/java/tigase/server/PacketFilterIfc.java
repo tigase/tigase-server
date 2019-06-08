@@ -27,8 +27,7 @@ import tigase.stats.StatisticsList;
  * Created: Jun 8, 2009 1:29:49 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface PacketFilterIfc {
 
 	/**

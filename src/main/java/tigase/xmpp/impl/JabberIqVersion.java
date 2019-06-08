@@ -40,8 +40,7 @@ import java.util.logging.Logger;
  * Created: Tue Mar 21 06:45:51 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = JabberIqVersion.ID, parent = SessionManager.class, active = true)
 public class JabberIqVersion
 		extends XMPPProcessorAbstract {

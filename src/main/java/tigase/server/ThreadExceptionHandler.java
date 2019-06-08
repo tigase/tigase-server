@@ -29,8 +29,7 @@ import java.util.logging.Logger;
  * <p> Created: Thu Sep 30 22:24:24 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 
 public class ThreadExceptionHandler
 		implements Thread.UncaughtExceptionHandler {

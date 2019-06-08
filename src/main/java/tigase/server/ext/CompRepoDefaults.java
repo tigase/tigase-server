@@ -23,8 +23,7 @@ import tigase.xmpp.jid.BareJID;
  * Created: Oct 24, 2009 3:57:36 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class CompRepoDefaults {
 
 	private static final BareJID comp_user = BareJID.bareJIDInstanceNS("ext-comp-manager");

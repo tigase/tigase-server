@@ -21,8 +21,7 @@ package tigase.server;
  * Created: Feb 16, 2009 1:44:46 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ReceiverTimeoutHandler {
 
 	void timeOutExpired(Packet data);

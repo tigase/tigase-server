@@ -33,8 +33,7 @@ import java.util.Optional;
  * Created: Sat Nov  3 16:17:03 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Repository.Meta(supportedUris = {"dummy"})
 public class DummyRepository
 		implements Repository, DataSource, UserRepository, AuthRepository {

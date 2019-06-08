@@ -37,8 +37,7 @@ import java.util.logging.Logger;
  * Created: Wed Feb 21 23:05:34 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = Jingle.ID, parent = SessionManager.class, active = false)
 public class Jingle
 		extends XMPPProcessor

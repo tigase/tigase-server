@@ -63,7 +63,6 @@ public interface EventBus {
 	 * Removes listener from Eventbus.
 	 *
 	 * @param listener listener to remove.
-	 * @param <T>
 	 */
 	<T> void removeListener(EventListener<T> listener);
 

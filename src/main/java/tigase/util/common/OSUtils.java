@@ -21,8 +21,7 @@ package tigase.util.common;
  * Created: Dec 11, 2008 10:26:00 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class OSUtils {
 
 	public enum OS {

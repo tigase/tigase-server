@@ -26,8 +26,7 @@ import java.util.List;
  * Created: Oct 7, 2009 5:54:56 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface ComponentProtocolHandler {
 
 	public static final String REPO_ITEM_KEY = "repo-item";

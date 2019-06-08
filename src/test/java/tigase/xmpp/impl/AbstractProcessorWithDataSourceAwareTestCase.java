@@ -28,9 +28,7 @@ import tigase.kernel.core.Kernel;
 /**
  * Class is a base class for testing processors which require instance of class implementing DataSourceAware interface.
  * 
- * @param <DS>
- * @param <R>
- */
+ * */
 public abstract class AbstractProcessorWithDataSourceAwareTestCase<DS extends DataSource, R extends DataSourceAware> extends AbstractProcessorWithDataSourceTestCase<DS> {
 
 	protected R repo;

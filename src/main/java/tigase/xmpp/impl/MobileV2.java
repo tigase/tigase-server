@@ -286,7 +286,6 @@ public class MobileV2
 	/**
 	 * Check if queuing is enabled
 	 *
-	 * @param session
 	 */
 	protected boolean isQueueEnabled(XMPPResourceConnection session) {
 		Boolean enabled = (Boolean) session.getSessionData(XMLNS);

@@ -38,8 +38,7 @@ import java.util.regex.Pattern;
  * Created: Tue Oct 24 22:13:52 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Deprecated
 @TigaseDeprecated(since = "8.0.0")
 public abstract class RepositoryFactory {
@@ -287,13 +286,6 @@ public abstract class RepositoryFactory {
 
 	/**
 	 * Method returns class which would be by default used as implementation of class
-	 *
-	 * @param cls
-	 * @param uri
-	 *
-	 * @return
-	 *
-	 * @throws tigase.db.DBInitException
 	 */
 	public static <T extends Class<? extends Repository>> T getRepoClass(T cls, String uri) throws DBInitException {
 		Set<T> classes = getRepoInternalClasses(cls);
@@ -380,10 +372,6 @@ public abstract class RepositoryFactory {
 	 *
 	 * @param cls - interface class needs to implement
 	 * @param uri - uri which needs to be supported by implementation
-	 *
-	 * @return
-	 *
-	 * @throws DBInitException
 	 */
 	public static String getRepoClassName(Class cls, String uri) throws DBInitException {
 		Class result = getRepoClass(cls, uri);

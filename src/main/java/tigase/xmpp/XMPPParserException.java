@@ -23,8 +23,7 @@ package tigase.xmpp;
  * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class XMPPParserException
 		extends RuntimeException {
 

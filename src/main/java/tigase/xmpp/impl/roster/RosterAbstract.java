@@ -763,10 +763,6 @@ public abstract class RosterAbstract {
 
 	/**
 	 * Check if data containing user roster for this session is loaded from database
-	 *
-	 * @param session
-	 *
-	 * @return
 	 */
 	public abstract boolean isRosterLoaded(XMPPResourceConnection session);
 

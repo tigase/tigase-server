@@ -478,8 +478,6 @@ public class DomainFilter
 	 *
 	 * @return relevant domain filtering policy
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	public DomainFilterPolicy getDomains(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
@@ -528,8 +526,6 @@ public class DomainFilter
 	 *
 	 * @return list of domains to be whitelisted/blacklisted
 	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
 	public String[] getDomainsList(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
 		VHostItem domain = session.getDomain();

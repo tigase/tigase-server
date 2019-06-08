@@ -30,12 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created: Dec 9, 2010 11:40:28 PM
- *
- * @param <IO>
- *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	/**

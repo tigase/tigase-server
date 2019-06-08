@@ -32,8 +32,7 @@ import java.util.logging.Logger;
  * Created: May 3, 2010 1:23:45 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 @Bean(name = "nonAuthUserRepository", parent = Kernel.class, active = true, exportable = true)
 public class NonAuthUserRepositoryImpl
 		implements NonAuthUserRepository {

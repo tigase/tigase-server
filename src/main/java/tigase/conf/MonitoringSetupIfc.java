@@ -21,8 +21,7 @@ package tigase.conf;
  * Created: Jan 10, 2009 8:43:04 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface MonitoringSetupIfc {
 
 	public enum MONITOR {

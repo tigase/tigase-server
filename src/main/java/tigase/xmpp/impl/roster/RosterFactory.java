@@ -30,8 +30,7 @@ import tigase.kernel.beans.config.ConfigField;
  * Created: Thu Sep 4 18:33:11 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public abstract class RosterFactory {
 
 	/** Key used to configure class name holding roster implementation */

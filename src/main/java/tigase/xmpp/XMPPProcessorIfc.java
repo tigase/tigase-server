@@ -29,8 +29,7 @@ import java.util.Queue;
  * Created: Wed Feb 8 13:47:56 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public interface XMPPProcessorIfc
 		extends XMPPImplIfc {
 
@@ -52,7 +51,6 @@ public interface XMPPProcessorIfc
 	 * cases it is unused, however if the plugin needs to access an external database that this is a way to pass
 	 * database connection string to the plugin.
 	 *
-	 * @throws XMPPException
 	 */
 	void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
 				 Map<String, Object> settings) throws XMPPException;

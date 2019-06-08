@@ -53,7 +53,7 @@ public class UpdatesCheckerTest {
 		final Version localVersion = XMPPServer.getVersion();
 		final Optional<Version> version = UpdatesChecker.retrieveCurrentVersionFromServer(localVersion, products,
 																						  url, 10);
-		System.out.println(version);
+//		System.out.println(version);
 
 	}
 

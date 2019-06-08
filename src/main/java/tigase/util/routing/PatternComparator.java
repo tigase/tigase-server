@@ -24,8 +24,7 @@ import java.util.regex.Pattern;
  * Created: Oct 22, 2009 6:08:50 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
- */
+*/
 public class PatternComparator
 		implements Comparator<Pattern> {
 
