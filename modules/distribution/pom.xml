@@ -355,7 +355,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-http-api</artifactId>
-			<version>1.2.2</version>
+			<version>1.2.3-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
