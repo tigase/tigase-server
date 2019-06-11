@@ -2,7 +2,7 @@
   <a href="https://tigase.net/">
     <img
       alt="Highly optimized, extremely modular and very flexible XMPP/Jabber server"
-      src="https://github.com/tigaseinc/devops-youtrack/blob/master/assets/tigase-logo.png"
+      src="https://github.com/tigaseinc/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true"
       width="300"
     />
   </a>
@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img alt="Tigase Tigase Logo" src="https://github.com/tigaseinc/devops-youtrack/blob/master/assets/tigase-logo.png" width="25"/>
+  <img alt="Tigase Tigase Logo" src="https://github.com/tigaseinc/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true" width="25"/>
   <img src="https://tc.tigase.net/app/rest/builds/buildType:(id:TigaseServer_Build)/statusIcon" width="100"/>
 </p>
 
@@ -89,7 +89,7 @@ to compile the project and run unit tests.
 
 # License
 
-<img alt="Tigase Tigase Logo" src="https://github.com/tigaseinc/devops-youtrack/blob/master/assets/tigase-logo.png" width="25"/> This is official <a href="https://tigase.net/">Tigase</a> Repository.
+<img alt="Tigase Tigase Logo" src="https://github.com/tigaseinc/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true" width="25"/> This is official <a href="https://tigase.net/">Tigase</a> Repository.
 Copyright (c) 2013-2019 Tigase, Inc.
 
 Licensed under AGPL License Version 3. Other licensing options available upon request.
