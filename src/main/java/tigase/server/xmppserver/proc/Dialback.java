@@ -234,6 +234,10 @@ public class Dialback
 
 	private void initDialback(S2SIOService serv, String remote_id) {
 		try {
+			if (remote_id == null) {
+				generateStreamError(false, "bad-request", serv);
+				return;
+			}
 			CID cid = (CID) serv.getSessionData().get("cid");
 
 			String secret = handler.getSecretForDomain(cid.getLocalHost());
