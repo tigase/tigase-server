@@ -17,7 +17,6 @@
  */
 package tigase.server.xmppserver;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -133,6 +132,9 @@ public class S2SConnectionManager
 
 	@Override
 	public boolean addOutPacket(Packet packet) {
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
 		return super.addOutPacket(packet);
 	}
 
