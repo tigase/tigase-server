@@ -179,11 +179,31 @@ begin
 
     alter table tig_cluster_nodes
         alter column last_update type timestamp with time zone;
-        
+
+    drop index if exists last_login;
+    drop index if exists last_logout;
+
     alter table tig_users
         alter column acc_create_time type timestamp with time zone,
         alter column last_login type timestamp with time zone,
 	    alter column last_logout type timestamp with time zone;
+end$$;
+-- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.last_login') is null then
+        create index last_login on tig_users (last_login);
+    end if;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.last_logout') is null then
+        create index last_logout on tig_users (last_logout);
+    end if;
 end$$;
 -- QUERY END:
 
