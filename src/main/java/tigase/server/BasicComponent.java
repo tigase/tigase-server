@@ -575,49 +575,51 @@ public class BasicComponent
 	private static final List<String> DISCO_EXTENSION_ADDRESSES = Arrays.asList("abuse-addresses", "admin-addresses", "feedback-addresses", "sales-addresses", "security-addresses", "support-addresses");
 
 	public Element getDiscoExtensionsForm(String domain) {
-		VHostItem vHostItem = this.vHostManager.getVHostItem(domain);
-		ServerInfoVHostItemExtension extension = vHostItem.getExtension(ServerInfoVHostItemExtension.class);
-		Function<String, Supplier<List<String>>> addressesFromVHost = field -> {
-			if (extension == null) {
-				return Collections::emptyList;
-			}
-			switch (field) {
-				case "abuse-addresses":
-					return extension::getAbuseAddresses;
-				case "admin-addresses":
-					return extension::getAdminAddresses;
-				case "feedback-addresses":
-					return extension::getFeedbackAddresses;
-				case "sales-addresses":
-					return extension::getSalesAddresses;
-				case "security-addresses":
-					return extension::getSecurityAddresses;
-				case "support-addresses":
-					return extension::getSupportAddresses;
-				default:
-					return Collections::emptyList;
-			}
-		};
-
+		VHostItem vHostItem = this.vHostManager.getVHostItemDomainOrComponent(domain);
 		Element form = null;
-		for (String field: DISCO_EXTENSION_ADDRESSES) {
-			List<String> vhostAddresses = addressesFromVHost.apply(field).get();
-			List<String> globalAddresses = discoExtensions.get(field);
 
-			if (vhostAddresses.isEmpty() && (globalAddresses == null || globalAddresses.isEmpty())) {
-				continue;
+		if (vHostItem != null) {
+			ServerInfoVHostItemExtension extension = vHostItem.getExtension(ServerInfoVHostItemExtension.class);
+			Function<String, Supplier<List<String>>> addressesFromVHost = field -> {
+				if (extension == null) {
+					return Collections::emptyList;
+				}
+				switch (field) {
+					case "abuse-addresses":
+						return extension::getAbuseAddresses;
+					case "admin-addresses":
+						return extension::getAdminAddresses;
+					case "feedback-addresses":
+						return extension::getFeedbackAddresses;
+					case "sales-addresses":
+						return extension::getSalesAddresses;
+					case "security-addresses":
+						return extension::getSecurityAddresses;
+					case "support-addresses":
+						return extension::getSupportAddresses;
+					default:
+						return Collections::emptyList;
+				}
+			};
+
+			for (String field : DISCO_EXTENSION_ADDRESSES) {
+				List<String> vhostAddresses = addressesFromVHost.apply(field).get();
+				List<String> globalAddresses = discoExtensions.get(field);
+
+				if (vhostAddresses.isEmpty() && (globalAddresses == null || globalAddresses.isEmpty())) {
+					continue;
+				}
+
+				List<String> addresses = globalAddresses == null
+										 ? vhostAddresses
+										 : Stream.concat(vhostAddresses.stream(), globalAddresses.stream()).collect(Collectors.toList());
+
+				if (form == null) {
+					form = DataForm.createDataForm(Command.DataType.result);
+					DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
+				}
+				DataForm.addFieldMultiValue(form, field, addresses);
 			}
-
-			List<String> addresses = globalAddresses == null
-									 ? vhostAddresses
-									 : Stream.concat(vhostAddresses.stream(), globalAddresses.stream())
-											 .collect(Collectors.toList());
-
-			if (form == null) {
-				form = DataForm.createDataForm(Command.DataType.result);
-				DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
-			}
-			DataForm.addFieldMultiValue(form, field, addresses);
 		}
 		
 		if (!discoExtensions.isEmpty()) {
