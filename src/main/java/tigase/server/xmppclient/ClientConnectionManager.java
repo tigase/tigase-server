@@ -929,7 +929,7 @@ public class ClientConnectionManager
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, streamError);
 		}
-		return "<stream:error>" + err_el.stream().map(Element::toString).collect(Collectors.joining()) + "</stream:error>";
+		return "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + err_el.stream().map(Element::toString).collect(Collectors.joining()) + "</stream:error>";
 	}
 
 	protected String[] prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {

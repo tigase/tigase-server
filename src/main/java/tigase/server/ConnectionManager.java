@@ -623,7 +623,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, streamError);
 		}
-		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
+		return "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + err_el.get(0).toString() + "</stream:error>";
 	}
 
 	@Override
