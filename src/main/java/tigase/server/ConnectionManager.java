@@ -594,6 +594,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				try {
 					ios.processWaitingPackets();
 					SocketThread.addSocketService(ios);
+				} catch (IOException e) {
+					// if there was IOException we need to forceStop this service!
+					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
+					try {
+						ios.forceStop();
+					} catch (Exception e1) {
+						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+					}    // end of try-catch
 				} catch (Exception e) {
 					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
 					try {
