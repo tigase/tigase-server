@@ -61,7 +61,7 @@ public class Dialback
 
 	// Ejabberd does not request dialback after TLS (at least some versions don't)
 	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd", alias = "ejabberd-bug-workaround")
-	private boolean ejabberd_bug_workaround_active = true;
+	private boolean ejabberd_bug_workaround_active = false;
 
 
 	public Dialback() {
