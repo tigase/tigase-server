@@ -38,6 +38,7 @@ import tigase.util.ui.console.Task;
 import tigase.util.workqueue.NonpriorityQueue;
 import tigase.util.workqueue.PriorityQueueAbstract;
 import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -206,7 +207,7 @@ public class ConfigHolder {
 				if (list == null || list.isEmpty()) {
 					return null;
 				}
-				VHostItem item = new VHostItem();
+				VHostItem item = new VHostItemImpl();
 				item.initFromPropertyString(list.get(0));
 				return item.getKey();
 			});

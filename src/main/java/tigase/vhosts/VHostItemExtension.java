@@ -20,7 +20,7 @@ package tigase.vhosts;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
-public interface VHostItemExtension {
+public interface VHostItemExtension<T extends VHostItemExtension<T>> {
 
 	String getId();
 
@@ -30,6 +30,7 @@ public interface VHostItemExtension {
 
 	Element toElement();
 
-	void addCommandFields(String prefix, Packet packet);
+	void addCommandFields(String prefix, Packet packet, boolean forDefault);
 
+	T mergeWithDefaults(T defaults);
 }

@@ -145,7 +145,7 @@ public class SeeOtherHost
 		}
 	}
 
-	public static class SeeOtherHostVHostItemExtension extends AbstractVHostItemExtension implements VHostItemExtensionBackwardCompatible {
+	public static class SeeOtherHostVHostItemExtension extends AbstractVHostItemExtension<SeeOtherHostVHostItemExtension> implements VHostItemExtensionBackwardCompatible<SeeOtherHostVHostItemExtension> {
 
 		public static final String ID = "see-other-host";
 
@@ -182,9 +182,19 @@ public class SeeOtherHost
 		}
 
 		@Override
-		public void addCommandFields(String prefix, Packet packet) {
+		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
 			DataForm.addFieldValue(commandEl, prefix + "-" + REDIRECTION_ENABLED, String.valueOf(enabled), "boolean", "see-other-host redirection enabled");
+		}
+
+		@Override
+		public SeeOtherHostVHostItemExtension mergeWithDefaults(SeeOtherHostVHostItemExtension defaults) {
+			if (isEnabled()) {
+				return this;
+			} else if (defaults.isEnabled()) {
+				return defaults;
+			}
+			return this;
 		}
 
 		@Override

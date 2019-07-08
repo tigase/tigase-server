@@ -20,7 +20,7 @@ package tigase.server.xmppsession;
 import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -41,7 +41,7 @@ public class SMResourceConnection
 		super(connectionId, rep, authRepo, loginHandler);
 
 		try {
-			setDomain(new VHostItem(loginHandler.getComponentId().getDomain()).getUnmodifiableVHostItem());
+			setDomain(new VHostItemImpl(loginHandler.getComponentId().getDomain()));
 		} catch (TigaseStringprepException ex) {
 			Logger.getLogger(SMResourceConnection.class.getName()).log(Level.SEVERE, null, ex);
 		}

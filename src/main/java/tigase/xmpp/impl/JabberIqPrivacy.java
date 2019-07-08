@@ -36,6 +36,7 @@ import tigase.util.cache.LRUConcurrentCache;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -769,8 +770,7 @@ public class JabberIqPrivacy
 			try {
 				XMPPResourceConnection session = new OfflineResourceConnection(offlineConnectionId, userRepository,
 																			   authRepository, this);
-				VHostItem vhost = new VHostItem();
-				vhost.setVHost(userJid.getDomain());
+				VHostItem vhost = new VHostItemImpl(userJid.getDomain());
 				session.setDomain(vhost);
 				session.authorizeJID(userJid, false);
 				XMPPSession parentSession = new XMPPSession(userJid.getLocalpart());

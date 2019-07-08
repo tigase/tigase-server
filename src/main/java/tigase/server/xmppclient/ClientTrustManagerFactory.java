@@ -215,8 +215,8 @@ public class ClientTrustManagerFactory {
 	}
 
 	public static class ClientTrustVHostItemExtension
-			extends AbstractVHostItemExtension
-			implements VHostItemExtensionBackwardCompatible {
+			extends AbstractVHostItemExtension<ClientTrustVHostItemExtension>
+			implements VHostItemExtensionBackwardCompatible<ClientTrustVHostItemExtension> {
 
 		protected static final String ID = "client-trust-extension";
 
@@ -275,12 +275,12 @@ public class ClientTrustManagerFactory {
 		}
 
 		@Override
-		public void addCommandFields(String prefix, Packet packet) {
+		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
 			DataForm.addFieldValue(commandEl, prefix + "-" + CA_CERT_PATH, caCertPath, "text-single",
 								   "Client Certificate CA");
 			addBooleanFieldWithDefaultToCommand(commandEl, prefix + "-" + CERT_REQUIRED, "Client Certificate Required",
-												certRequired);
+												certRequired, forDefault);
 		}
 
 		@Override
@@ -288,6 +288,12 @@ public class ClientTrustManagerFactory {
 			caCertPath = (String) data.remove(ClientTrustManagerFactory.CA_CERT_PATH);
 			certRequired = (Boolean) data.remove(ClientTrustManagerFactory.CERT_REQUIRED_KEY);
 		}
+
+		@Override
+		public ClientTrustVHostItemExtension mergeWithDefaults(ClientTrustVHostItemExtension defaults) {
+			return this;
+		}
+
 	}
 
 }

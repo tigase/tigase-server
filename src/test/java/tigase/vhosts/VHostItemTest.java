@@ -42,23 +42,23 @@ public class VHostItemTest
 	private final VHostItemExtensionManager vHostItemExtensionManager = new VHostItemExtensionManager();
 
 	public void testVHostItem() throws TigaseStringprepException {
-		assertEquals(new VHostItem("lowercase.com"), new VHostItem("lowercase.com"));
-		assertEquals(new VHostItem("CAPITAL.COM"), new VHostItem("capital.com"));
-		assertNotSame(new VHostItem("CAPITAL.COM"), new VHostItem("lowercase.com"));
+		assertEquals(new VHostItemImpl("lowercase.com"), new VHostItemImpl("lowercase.com"));
+		assertEquals(new VHostItemImpl("CAPITAL.COM"), new VHostItemImpl("capital.com"));
+		assertNotSame(new VHostItemImpl("CAPITAL.COM"), new VHostItemImpl("lowercase.com"));
 	}
 
 	public void testVHostDomainPolicy() throws TigaseStringprepException {
 
 		Element el;
-		VHostItem vHostItem;
+		VHostItemImpl vHostItem;
 
-		vHostItem = new VHostItem();
+		vHostItem = new VHostItemImpl();
 		vHostItem.setExtensionManager(vHostItemExtensionManager);
 		vHostItem.initFromPropertyString("domain1:domain-filter=LOCAL:max-users=1000");
 		assertEquals(DomainFilterPolicy.LOCAL, vHostItem.getDomainFilter());
 		assertTrue(vHostItem.getDomainFilterDomains() == null);
 
-		vHostItem = new VHostItem();
+		vHostItem = new VHostItemImpl();
 		vHostItem.setExtensionManager(vHostItemExtensionManager);
 		vHostItem.initFromPropertyString("domain1:domain-filter=LIST=domain1;domain2;domain3:max-users=1000");
 		assertEquals(DomainFilterPolicy.LIST, vHostItem.getDomainFilter());
@@ -66,7 +66,7 @@ public class VHostItemTest
 		assertTrue(Arrays.asList(vHostItem.getDomainFilterDomains()).contains("domain3"));
 		assertFalse(Arrays.asList(vHostItem.getDomainFilterDomains()).contains("domain5"));
 
-		vHostItem = new VHostItem();
+		vHostItem = new VHostItemImpl();
 		vHostItem.setExtensionManager(vHostItemExtensionManager);
 		el = new Element("vhost", new String[]{"hostname", "domain-filter", "domain-filter-domains"},
 						 new String[]{"domain3", "ALL", "domain1;domain2;domain3"});
@@ -77,7 +77,7 @@ public class VHostItemTest
 		assertTrue(vHostItem.getDomainFilterDomains() == null);
 		assertTrue(vHostItem.toPropertyString().contains("domain-filter=ALL"));
 
-		vHostItem = new VHostItem();
+		vHostItem = new VHostItemImpl();
 		vHostItem.setExtensionManager(vHostItemExtensionManager);
 		el = new Element("vhost", new String[]{"hostname", "domain-filter", "domain-filter-domains"},
 						 new String[]{"domain3", "BLACKLIST", "domain1;domain2;domain3"});
@@ -89,7 +89,7 @@ public class VHostItemTest
 		assertFalse(Arrays.asList(vHostItem.getDomainFilterDomains()).contains("domain5"));
 		assertTrue(vHostItem.toPropertyString().contains("domain-filter=BLACKLIST"));
 
-		vHostItem = new VHostItem();
+		vHostItem = new VHostItemImpl();
 		vHostItem.setExtensionManager(vHostItemExtensionManager);
 		el = new Element("vhost", new String[]{"hostname", "domain-filter", "domain-filter-domains"},
 						 new String[]{"domain3", "CUSTOM",
@@ -101,7 +101,7 @@ public class VHostItemTest
 						   .contains(
 								   "domain-filter=CUSTOM=4,deny,all;1,allow,self;3,allow,jid,pubsub@test.com;2,allow,jid,admin@test2.com"));
 
-		vHostItem = new VHostItem();
+		vHostItem = new VHostItemImpl();
 		vHostItem.setExtensionManager(vHostItemExtensionManager);
 		vHostItem.initFromPropertyString(
 				"domain1:domain-filter=CUSTOM=4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com");
@@ -118,10 +118,10 @@ public class VHostItemTest
 		JID jid = JID.jidInstanceNS("comp1@example.com");
 		JID notTrusted = JID.jidInstanceNS("not-trusted@example.com");
 
-		VHostItem item = new VHostItem();
+		VHostItemImpl item = new VHostItemImpl();
 		item.setExtensionManager(vHostItemExtensionManager);
 		item.toString();
-		Assert.assertNull(item.getTrustedJIDs());
+		Assert.assertTrue(item.getTrustedJIDs().isEmpty());
 		Assert.assertFalse(item.isTrustedJID(jid));
 
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com");
@@ -132,7 +132,7 @@ public class VHostItemTest
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 
-		item = new VHostItem();
+		item = new VHostItemImpl();
 		item.setExtensionManager(vHostItemExtensionManager);
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com,comp2@example.com");
 		Assert.assertArrayEquals(new String[]{jid.toString(), "comp2@example.com"},
@@ -141,7 +141,7 @@ public class VHostItemTest
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 
-		item = new VHostItem();
+		item = new VHostItemImpl();
 		item.setExtensionManager(vHostItemExtensionManager);
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com;comp2@example.com");
 		Assert.assertArrayEquals(new String[]{jid.toString(), "comp2@example.com"},
@@ -150,7 +150,7 @@ public class VHostItemTest
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 
-		item = new VHostItem();
+		item = new VHostItemImpl();
 		item.setExtensionManager(vHostItemExtensionManager);
 		item.toString();
 		item.initFromPropertyString("example.com:trusted-jids=example.com");
@@ -167,7 +167,7 @@ public class VHostItemTest
 		f.set(defaults, new ConcurrentSkipListSet<String>());
 		defaults.getTrusted().add("comp3@example.com");
 		defaults.getTrusted().add("comp4@example.com");
-		item = new VHostItem();
+		item = new VHostItemImpl();
 		item.setExtensionManager(vHostItemExtensionManager);
 		item.initializeFromDefaults(defaults);
 		item.toString();

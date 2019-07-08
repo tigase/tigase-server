@@ -57,6 +57,7 @@ import tigase.util.processing.QueueItem;
 import tigase.util.processing.WorkerThread;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
@@ -847,9 +848,9 @@ public class SessionManager
 					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}",
 							new Object[]{domain, getDefHostName()});
 				}
-				vHostItem = new VHostItem(getDefHostName().getDomain());
+				vHostItem = new VHostItemImpl(getDefHostName().getDomain());
 			}
-			conn.setDomain(vHostItem.getUnmodifiableVHostItem());
+			conn.setDomain(vHostItem);//.getUnmodifiableVHostItem());
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
 			// handleLogout(userId, conn);
@@ -1052,9 +1053,9 @@ public class SessionManager
 				log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}",
 						new Object[]{domain, getDefHostName()});
 			}
-			vitem = new VHostItem(getDefHostName().getDomain());
+			vitem = new VHostItemImpl(getDefHostName().getDomain());
 		}
-		connection.setDomain(vitem.getUnmodifiableVHostItem());
+		connection.setDomain(vitem);//.getUnmodifiableVHostItem());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Domain set for connectionId {0}", conn_id);
 		}

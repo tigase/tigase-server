@@ -31,10 +31,39 @@ Here is a complete list of all interfaces and classes with a brief description f
 [[vhostrepo]]
 . link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] - is an interface used to store and load virtual domains list from the database or any other storage media. There are 2 implementations for this interface: link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VhostConfigRepository.java[VHostConfigRepository] which loads vhosts information for the configuration file and provides read-only storage and - xref:vhostJDBC[VHostJDBCRepository] class which extends link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VhostConfigRepository.java[VHostConfigRepository] and allows for both - reading and saving virtual domains list. +VHostJDBCRepository+ is loaded as a default repository by Tigase server.
 [[vhostItem]]
-. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostItem.java[VHostItem] - is a class which allows for keeping all the virtual domain properties. Sometimes the domain name is not sufficient for data processing. The domain may be temporarily disabled, may have a limited number of users and so on. Instances of this class keep all the information about the domain which might be needed by the server components.
+. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostItem.java[VHostItem] - is an interface which allows for accessing all the virtual domain properties. Sometimes the domain name is not sufficient for data processing. The domain may be temporarily disabled, may have a limited number of users and so on. Instances of this class keep all the information about the domain which might be needed by the server components.
 [[vhostMgr]]
 . link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostManager.java[VHostManager] - the default implementation of the VHostManagerIfc interface. It provides components with the virtual hosts information and manages the virtual hosts list. Processes ad-hoc commands for reloading, updating and removing domains.
 [[vhostConfig]]
 . link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VhostConfigRepository.java[VHostConfirRepository] - a very basic implementation of the link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] for loading domains list from the configuration file.
 [[vhostJDCB]]
 . link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/vhosts/VHostJDBCRepository.java[VHostJDBCRepository] - the default implementation of the link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/vhosts/VHostRepository.java[VHostRepository] loaded by Tigase server. It allows to read and store virtual domains list in the database accessible through UserRepository.
+
+== Extending Virtual Domain settings
+
+In some cases it is desired to extend Virtual Domain to add some additional settings. Since version 8.1.0 it is possible with use of `VHostItemExtension` and VHostItemExtensionProvider`.
+
+To do so, you need to create a class implementing `VHostItemExtension`. This class will hold values of settings for each virtual host.
+It is required to make it serializable to `Element` and deserializable from `Element`. Moreover, it is required to make values of this class modifiable by ad-hoc commands.
+
+It is recommended to provide additional methods allowing you to access values of this class.
+
+Additionally, you need to implement `VHostItemExtensionProvider` interface as a +bean+ and return a class of your implementation of `VHostItemExtension`.
+
+.Example VHostItemExtensionProvider` implementation for `SeeOtherHostVHostItemExtension`.
+[source,java]
+-----
+@Bean(name = SeeOtherHostVHostItemExtension.ID, parent = VHostItemExtensionManager.class, active = true)
+public static class SeeOtherHostVHostItemExtensionProvider implements VHostItemExtensionProvider<SeeOtherHostVHostItemExtension> {
+
+	@Override
+	public String getId() {
+		return SeeOtherHostVHostItemExtension.ID;
+	}
+
+	@Override
+	public Class<SeeOtherHostVHostItemExtension> getExtensionClazz() {
+		return SeeOtherHostVHostItemExtension.class;
+	}
+}
+-----

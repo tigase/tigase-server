@@ -616,7 +616,7 @@ public class PresenceSubscription
 		}
 	}
 
-	public static class PresenceSubscriptionVHostItemExtension extends AbstractVHostItemExtension implements VHostItemExtensionBackwardCompatible {
+	public static class PresenceSubscriptionVHostItemExtension extends AbstractVHostItemExtension<PresenceSubscriptionVHostItemExtension> implements VHostItemExtensionBackwardCompatible<PresenceSubscriptionVHostItemExtension> {
 
 		public static final String ID = "presence-subscription";
 
@@ -666,7 +666,7 @@ public class PresenceSubscription
 		}
 
 		@Override
-		public void addCommandFields(String prefix, Packet packet) {
+		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
 			Boolean value = null;
 			switch (autoAuthorizeMode) {
@@ -680,7 +680,13 @@ public class PresenceSubscription
 					break;
 			}
 			addBooleanFieldWithDefaultToCommand(commandEl, prefix + "-" + AUTO_AUTHORIZE_PROP_KEY,
-												"Automatically authorize subscription requests", value);
+												"Automatically authorize subscription requests", value, forDefault);
+		}
+
+		@Override
+		public PresenceSubscriptionVHostItemExtension mergeWithDefaults(
+				PresenceSubscriptionVHostItemExtension defaults) {
+			return autoAuthorizeMode == AUTO_AUTHORIZE_MODE.global ? defaults : this;
 		}
 
 		@Override

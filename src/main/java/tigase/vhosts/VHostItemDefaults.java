@@ -19,13 +19,12 @@ package tigase.vhosts;
 
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.util.StringUtilities;
 import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xmpp.jid.JID;
 
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import static tigase.vhosts.VHostItem.*;
+import static tigase.vhosts.VHostItemImpl.*;
 
 /**
  * Created by andrzej on 01.07.2017.

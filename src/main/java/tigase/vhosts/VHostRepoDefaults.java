@@ -41,8 +41,8 @@ public abstract class VHostRepoDefaults {
 		return DNSResolverFactory.getInstance().getDefaultHosts();
 	}
 
-	public static VHostItem getItemInstance() {
-		return new VHostItem();
+	public static VHostItemImpl getItemInstance() {
+		return new VHostItemImpl();
 	}
 
 	public static String getItemsListPKey() {

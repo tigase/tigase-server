@@ -20,11 +20,16 @@ package tigase.vhosts;
 import tigase.server.DataForm;
 import tigase.xml.Element;
 
-public abstract class AbstractVHostItemExtension implements VHostItemExtension {
+public abstract class AbstractVHostItemExtension<T extends AbstractVHostItemExtension<T>> implements VHostItemExtension<T> {
 
-	protected void addBooleanFieldWithDefaultToCommand(Element commandEl, String var, String label, Boolean value) {
-		DataForm.addFieldValue(commandEl, var, value == null ? "" : value.toString(), label,
-							   new String[]{"Default", "Yes", "No"}, new String[]{"", "true", "false"});
+	protected void addBooleanFieldWithDefaultToCommand(Element commandEl, String var, String label, Boolean value, boolean forDefault) {
+		if (forDefault) {
+			DataForm.addFieldValue(commandEl, var, value == null ? "" : value.toString(), label,
+								   new String[]{"Yes", "No"}, new String[]{"true", "false"});
+		} else {
+			DataForm.addFieldValue(commandEl, var, value == null ? "" : value.toString(), label,
+								   new String[]{"Default", "Yes", "No"}, new String[]{"", "true", "false"});
+		}
 	}
 
 }

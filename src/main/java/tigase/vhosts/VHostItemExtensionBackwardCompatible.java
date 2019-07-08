@@ -23,7 +23,7 @@ import java.util.Map;
 
 @Deprecated
 @TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
-public interface VHostItemExtensionBackwardCompatible extends VHostItemExtension {
+public interface VHostItemExtensionBackwardCompatible<T extends VHostItemExtension<T>> extends VHostItemExtension<T> {
 
 	void initFromData(Map<String, Object> data);
 

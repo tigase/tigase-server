@@ -1162,7 +1162,7 @@ public class BasicComponent
 	}
 
 	public static class ServerInfoVHostItemExtension
-			extends AbstractVHostItemExtension {
+			extends AbstractVHostItemExtension<ServerInfoVHostItemExtension> {
 
 		public static final String ID = "disco-server-info";
 
@@ -1235,7 +1235,7 @@ public class BasicComponent
 		}
 
 		@Override
-		public void addCommandFields(String prefix, Packet packet) {
+		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element command = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
 			DataForm.addFieldMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
 			DataForm.addFieldMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
@@ -1243,6 +1243,11 @@ public class BasicComponent
 			DataForm.addFieldMultiValue(command, prefix + "-sales", salesAddresses, "Sales addresses");
 			DataForm.addFieldMultiValue(command, prefix + "-security", securityAddresses, "Security addresses");
 			DataForm.addFieldMultiValue(command, prefix + "-support", supportAddresses, "Support addresses");
+		}
+
+		@Override
+		public ServerInfoVHostItemExtension mergeWithDefaults(ServerInfoVHostItemExtension defaults) {
+			return this;
 		}
 
 		private static List<String> fromCommandField(Packet packet, String field) {

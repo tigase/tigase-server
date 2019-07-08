@@ -324,15 +324,15 @@ public class VHostManager
 		// loading all items
 		repo.reload();
 
-		List<VHostItem> items = new ArrayList<VHostItem>(repo.allItems());
-		for (VHostItem item : items) {
-			// if there is no S2S secret set for vhost, then we need to generate it
-			if (item.getS2sSecret() == null) {
-				String secret = generateSecret();
-				item.setS2sSecret(secret);
-				repo.addItem(item);
-			}
-		}
+//		List<VHostItem> items = new ArrayList<VHostItem>(repo.allItems());
+//		for (VHostItem item : items) {
+//			// if there is no S2S secret set for vhost, then we need to generate it
+//			if (item.getS2sSecret() == null) {
+//				String secret = generateSecret();
+//				item.setS2sSecret(secret);
+//				repo.addItem(item);
+//			}
+//		}
 	}
 
 	public String generateSecret() {

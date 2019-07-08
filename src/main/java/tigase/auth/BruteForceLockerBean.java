@@ -65,7 +65,25 @@ public class BruteForceLockerBean
 	public enum Mode {
 		Ip,
 		IpJid,
-		Jid
+		Jid;
+
+		public Mode merge(Mode mode) {
+			switch (this) {
+				case Ip:
+					if (mode == Ip) {
+						return Ip;
+					}
+					return IpJid;
+				case Jid:
+					if (mode == Jid) {
+						return Jid;
+					}
+					return IpJid;
+				case IpJid:
+					return IpJid;
+			}
+			return this;
+		}
 	}
 	
 	private final Logger log = Logger.getLogger(this.getClass().getName());
@@ -663,8 +681,8 @@ public class BruteForceLockerBean
 	}
 
 	public static class BruteForceLockerVHostExtension
-			extends AbstractVHostItemExtension
-			implements VHostItemExtensionBackwardCompatible {
+			extends AbstractVHostItemExtension<BruteForceLockerVHostExtension>
+			implements VHostItemExtensionBackwardCompatible<BruteForceLockerVHostExtension> {
 
 		public static final String ID = "brute-force-locker";
 		private static final long DEF_lockAccountAfterFailedAttempt = 3l;
@@ -775,7 +793,7 @@ public class BruteForceLockerBean
 		}
 		
 		@Override
-		public void addCommandFields(String prefix, Packet packet) {
+		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element commandEl = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
 			DataForm.addFieldValue(commandEl, prefix + "-enabled", String.valueOf(enabled), "boolean",
 								   "Brute Force Prevention Enabled");
@@ -794,6 +812,7 @@ public class BruteForceLockerBean
 								   new String[]{Mode.Ip.name(), Mode.Jid.name(), IpJid.name()},
 								   new String[]{Mode.Ip.name(), Mode.Jid.name(), IpJid.name()});
 		}
+
 
 		@Override
 		public void initFromData(Map<String, Object> data) {
@@ -822,5 +841,20 @@ public class BruteForceLockerBean
 				this.mode = Mode.valueOf(mode);
 			}
 		}
+
+		@Override
+		public BruteForceLockerVHostExtension mergeWithDefaults(BruteForceLockerVHostExtension defaults) {
+			BruteForceLockerVHostExtension merged = new BruteForceLockerVHostExtension();
+
+			merged.enabled = this.enabled || defaults.enabled;
+			merged.mode = this.mode.merge(defaults.mode);
+			merged.lockTime = Math.max(this.lockTime,  defaults.lockTime);
+			merged.periodTime = Math.max(this.periodTime, defaults.periodTime);
+			merged.disableAccountAfterFailedAttempts = Math.min(this.disableAccountAfterFailedAttempts, defaults.disableAccountAfterFailedAttempts);
+			merged.lockAccountAfterFailedAttempt = Math.min(this.lockAccountAfterFailedAttempt, defaults.lockAccountAfterFailedAttempt);
+
+			return merged;
+		}
+
 	}
 }

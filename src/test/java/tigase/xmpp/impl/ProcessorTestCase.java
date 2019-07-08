@@ -23,7 +23,7 @@ import tigase.TestLogger;
 import tigase.kernel.AbstractKernelWithUserRepositoryTestCase;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
@@ -71,7 +71,7 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 			throws NotAuthorizedException, TigaseStringprepException {
 		XMPPResourceConnection conn = new XMPPResourceConnection(connId, getUserRepository(),
 																 getAuthRepository(), loginHandler);
-		VHostItem vhost = new VHostItem();
+		VHostItemImpl vhost = new VHostItemImpl();
 		vhost.setVHost(userJid.getDomain());
 		conn.setDomain(vhost);
 		conn.authorizeJID(userJid.getBareJID(), false);

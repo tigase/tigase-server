@@ -25,7 +25,7 @@ import tigase.TestLogger;
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
 import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
@@ -380,7 +380,7 @@ public class DomainFilterTest
 	private XMPPResourceConnection getSession(JID connId, JID userJid, DomainFilterPolicy dfp, String[] domains)
 			throws NotAuthorizedException, TigaseStringprepException {
 		XMPPResourceConnection conn = super.getSession(connId, userJid);
-		VHostItem vhost = conn.getDomain();
+		VHostItemImpl vhost = (VHostItemImpl) conn.getDomain();
 		vhost.setDomainFilter(dfp);
 		vhost.setDomainFilterDomains(domains);
 

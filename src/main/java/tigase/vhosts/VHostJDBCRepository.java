@@ -30,6 +30,7 @@ import tigase.util.dns.DNSEntry;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.dns.DNSResolverIfc;
 import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -76,7 +77,8 @@ public class VHostJDBCRepository
 	private VHostItemExtensionManager extensionManager;
 	@Inject
 	private VHostItemDefaults vhostDefaults;
-
+	private VHostItem defaults = null;
+	
 	public VHostJDBCRepository() {
 		DNSResolverIfc resolver = DNSResolverFactory.getInstance();
 		def_srv_address = resolver.getDefaultHost();
@@ -106,9 +108,11 @@ public class VHostJDBCRepository
 
 	@Override
 	public VHostItem getItemInstance() {
-		VHostItem item = VHostRepoDefaults.getItemInstance();
+		VHostItemImpl item = VHostRepoDefaults.getItemInstance();
 		item.setExtensionManager(extensionManager);
-		item.initializeFromDefaults(vhostDefaults);
+		VHostItemImpl.VHostItemWrapper wrapper = new VHostItemImpl.VHostItemWrapper();
+		wrapper.setItem(item);
+		wrapper.setDefaults(defaults);
 		return item;
 	}
 
@@ -139,6 +143,27 @@ public class VHostJDBCRepository
 			return;
 		}
 		super.reload();
+
+		VHostItem defaults = getItem(VHostItem.DEF_VHOST_KEY);
+		if (defaults == null) {
+			addItem(this.defaults);
+		}
+	}
+
+	@Override
+	public void addItemNoStore(VHostItem item) {
+		if (item instanceof VHostItemImpl.VHostItemWrapper) {
+			((VHostItemImpl.VHostItemWrapper) item).readOnly();
+		}
+		super.addItemNoStore(item);
+		if (VHostItem.DEF_VHOST_KEY.equals(item.getKey())) {
+			this.defaults = defaults;
+			for (VHostItem it : allItems()) {
+				if (it instanceof VHostItemImpl.VHostItemWrapper && it != item) {
+					((VHostItemImpl.VHostItemWrapper) it).setDefaults(item);
+				}
+			}
+		}
 	}
 
 	public void setDef_srv_address(String address) {
@@ -310,6 +335,11 @@ public class VHostJDBCRepository
 
 	private void reloadIfReady() {
 		if (vhostDefaults != null && extensionManager != null) {
+			if (this.defaultVHost != null && defaults == null) {
+				defaults = new VHostItemImpl(JID.jidInstanceNS(VHostItem.DEF_VHOST_KEY));
+				((VHostItemImpl) defaults).initializeFromDefaults(vhostDefaults);
+			}
+
 			reload();
 			VHostItem item = getItemInstance();
 			item.setKey(defaultVHost);

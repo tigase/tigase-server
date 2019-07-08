@@ -29,7 +29,7 @@ public class VHostJDBCRepositoryTest
 
 	@Test
 	public void testDomainNameCases() throws TigaseStringprepException {
-		VHostItem vHostItem = new VHostItem(domain);
+		VHostItem vHostItem = new VHostItemImpl(domain);
 		vHostJDBCRepository.addItem(vHostItem);
 		assertEquals(vHostItem, vHostJDBCRepository.getItem(domain.toUpperCase()));
 	}
