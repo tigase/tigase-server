@@ -123,11 +123,11 @@ public class StanzaProcessor {
 	 */
 	public void sendException(final Packet packet, final ComponentException e) {
 		try {
-			final String t = packet.getElement().getAttributeStaticStr(Packet.TYPE_ATT);
+			final StanzaType t = packet.getType();
 
-			if ((t != null) && (t == "error")) {
+			if (t == StanzaType.error) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer(packet.getElemName() + " stanza already with type='error' ignored");
+					log.log(Level.FINER, packet.getElemName() + " stanza already with type='error' ignored", e);
 				}
 
 				return;
