@@ -116,9 +116,10 @@ From the Tigase base directory enter
 -----
 ./scripts/tigase.sh stop
 
-./scripts/{OS}/init.d/tigase start etc/tigase.conf
+./scripts/tigase.sh start etc/tigase.conf
 -----
-where {OS} is your type of Linux, gentoo, debian, mandriva, or redhat
+
+NOTE: In order to make Tigase XMPP Server start automatically during system startup you should setup startup scripts as described in <<tigaseScriptStart>>
 
 To further fine tune the server you should edit `etc/tigase.conf`. Ensure `JAVA_HOME` path is correct, and increase memory if needed using `JAVA_OPTIONS` -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
 
