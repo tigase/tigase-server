@@ -594,6 +594,44 @@ public class ConfigHolder {
 				.filter(Map::isEmpty)
 				.ifPresent(v -> props.remove("basic-conf"));
 
+		Optional.ofNullable(props.get("message-router")).filter(Map.class::isInstance).map(Map.class::cast).ifPresent(messageRouterCfg -> {
+			Optional.ofNullable(messageRouterCfg.get("components")).filter(Map.class::isInstance).map(Map.class::cast).ifPresent(componentsCfg -> {
+				Optional.ofNullable(componentsCfg.get("msg-receivers")).filter(Map.class::isInstance).map(Map.class::cast).ifPresent(msgReceiversCfg -> {
+					((Stream<Map.Entry<String, Object>>) msgReceiversCfg.entrySet().stream()).filter(e -> e.getKey().endsWith(".active")).forEach(e -> {
+						String compName = e.getKey().replace(".active", "" );
+						AbstractBeanConfigurator.BeanDefinition bean = (AbstractBeanConfigurator.BeanDefinition) props.compute(compName, (k, v) -> {
+							if (AbstractBeanConfigurator.BeanDefinition.class.isInstance(v)) {
+								return v;
+							} else if (Map.class.isInstance(v)) {
+								AbstractBeanConfigurator.BeanDefinition def = new AbstractBeanConfigurator.BeanDefinition();
+								def.setBeanName(k);
+								def.putAll((Map<String, Object>) v);
+								return def;
+							} else {
+								AbstractBeanConfigurator.BeanDefinition def = new AbstractBeanConfigurator.BeanDefinition();
+								def.setBeanName(k);
+								return def;
+							}
+						});
+						bean.setActive(Boolean.parseBoolean(String.valueOf(e.getValue())));
+					});
+					Set<String> toRemove = ((Stream<String>) messageRouterCfg.keySet().stream()).filter(e -> e.endsWith(".active")).collect(
+							Collectors.toSet());
+					toRemove.forEach(messageRouterCfg::remove);
+
+					if (messageRouterCfg.isEmpty()) {
+						componentsCfg.remove("msg-receivers");
+					}
+				});
+				if (componentsCfg.isEmpty()) {
+					messageRouterCfg.remove("components");
+				}
+			});
+			if (messageRouterCfg.isEmpty()) {
+				props.remove("message-router");
+			}
+		});
+		
 		String after = props.toString();
 		return !before.equals(after);
 	}
