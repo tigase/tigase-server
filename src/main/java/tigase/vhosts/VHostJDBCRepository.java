@@ -113,7 +113,7 @@ public class VHostJDBCRepository
 		VHostItemImpl.VHostItemWrapper wrapper = new VHostItemImpl.VHostItemWrapper();
 		wrapper.setItem(item);
 		wrapper.setDefaults(defaults);
-		return item;
+		return wrapper;
 	}
 
 	@Override
@@ -338,12 +338,16 @@ public class VHostJDBCRepository
 			if (this.defaultVHost != null && defaults == null) {
 				defaults = new VHostItemImpl(JID.jidInstanceNS(VHostItem.DEF_VHOST_KEY));
 				((VHostItemImpl) defaults).initializeFromDefaults(vhostDefaults);
+				((VHostItemImpl) defaults).setExtensionManager(extensionManager);
 			}
 
 			reload();
-			VHostItem item = getItemInstance();
-			item.setKey(defaultVHost);
 			if (!contains(defaultVHost)) {
+				VHostItem item = getItemInstance();
+				item.setKey(defaultVHost);
+				if (item instanceof VHostItemImpl.VHostItemWrapper) {
+					((VHostItemImpl.VHostItemWrapper) item).readOnly();
+				}
 				addItem(item);
 			}
 		}
