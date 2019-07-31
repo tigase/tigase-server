@@ -346,7 +346,7 @@ public class ConfigHolder {
 											  throttling);
 								break;
 							case 5277:
-								setter.accept("c2s/connections/" + port_no + "/new-connections-throttling", throttling);
+								setter.accept("cl-comp/connections/" + port_no + "/new-connections-throttling", throttling);
 								break;
 							case 5290:
 								setter.accept("ws2s/connections/" + port_no + "/new-connections-throttling",
