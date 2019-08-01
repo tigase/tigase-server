@@ -609,7 +609,13 @@ public class VHostItemImpl
 								extElem);
 			}
 		} else if (extension instanceof VHostItemExtensionBackwardCompatible) {
-			((VHostItemExtensionBackwardCompatible) extension).initFromData(oldData);
+			try {
+				((VHostItemExtensionBackwardCompatible) extension).initFromData(oldData);
+			} catch (Throwable ex) {
+				throw new IllegalArgumentException(
+						"Could not initialize " + extension.getClass().getCanonicalName() + " with oldData " +
+								oldData, ex);
+			}
 		}
 		return extension;
 	}

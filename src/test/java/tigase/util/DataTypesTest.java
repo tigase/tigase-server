@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Wojtek
@@ -56,4 +57,9 @@ public class DataTypesTest {
 		assertEquals(1, DataTypes.parseSizeInt("fail", 1));
 	}
 
+	@Test
+	public void testNull() {
+		final Object o = DataTypes.decodeValueType('S', "null");
+		assertNull(o);
+	}
 }

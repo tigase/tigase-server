@@ -72,6 +72,9 @@ public class DataTypes {
 
 	public static Object decodeValueType(char typeId, String value) throws IllegalArgumentException {
 		Object result = value.trim();
+		if ("null".equalsIgnoreCase(value.trim())) {
+			return null;
+		}
 
 		try {
 			switch (typeId) {
