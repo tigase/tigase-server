@@ -414,7 +414,6 @@ public class XMPPResourceConnection
 		if (updateLastAccessed) {
 			setLastAccessed(System.currentTimeMillis());
 		}
-		setLastAccessed(System.currentTimeMillis());
 		if (this.connectionId == null) {
 			throw new NoConnectionIdException(
 					"Connection ID not set for this session. " + "This is probably the SM session to handle traffic " +
