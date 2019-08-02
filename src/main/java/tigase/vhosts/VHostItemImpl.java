@@ -1742,6 +1742,11 @@ public class VHostItemImpl
 		protected void readOnly() {
 			editable = false;
 		}
+
+		@Override
+		public String toString() {
+			return item.toString();
+		}
 	}
 
 }
