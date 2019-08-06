@@ -144,8 +144,6 @@ public class XMPPDomBuilderHandler<RefObject>
 
 	@Override
 	public void error(String errorMessage) {
-		log.warning("XML content parse error.");
-
 		if (log.isLoggable(Level.FINE)) {
 			log.fine(errorMessage);
 		}
