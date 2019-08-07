@@ -87,7 +87,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
-@Bean(name = "sess-man", parent = Kernel.class, active = true)
+@Bean(name = "sess-man", parent = Kernel.class, active = true, exportable = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
 @ClusterModeRequired(active = false)
 public class SessionManager
@@ -790,7 +790,7 @@ public class SessionManager
 
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
-		kernel.registerBean("writer").asClass(SMPacketWriter.class).exec();
+		kernel.registerBean("writer").asClass(SMPacketWriter.class).exportable().exec();
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
 		kernel.registerBean("scriptCommandProcessor").asClass(ComponenScriptCommandProcessor.class).exec();
 		kernel.registerBean("adHocCommandModule").asClass(AdHocCommandModule.class).exec();

@@ -48,7 +48,7 @@ import static tigase.xmpp.impl.Message.XMLNS;
 */
 @Id(ELEM_NAME)
 @Handles({@Handle(path = {ELEM_NAME}, xmlns = XMLNS)})
-@Bean(name = ELEM_NAME, parent = SessionManager.class, active = false)
+@Bean(name = ELEM_NAME, parent = SessionManager.class, active = false, exportable = true)
 public class Message
 		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, MessageDeliveryProviderIfc {

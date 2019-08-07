@@ -45,7 +45,7 @@ import static tigase.server.amp.AmpFeatureIfc.*;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
-@Bean(name = MessageAmp.ID, parent = SessionManager.class, active = true)
+@Bean(name = MessageAmp.ID, parent = SessionManager.class, active = true, exportable = true)
 public class MessageAmp
 		extends XMPPProcessor
 		implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, XMPPPreprocessorIfc, XMPPProcessorIfc, RegistrarBean, MessageDeliveryProviderIfc {

@@ -15,7 +15,7 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.push;
 
 import tigase.server.Packet;
 import tigase.xml.Element;

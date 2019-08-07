@@ -438,8 +438,7 @@ public class ConfigHolder {
 			});
 		});
 
-		Map<String, Object> sessManCfg = (Map<String, Object>) props.get("sess-man");
-		if (sessManCfg != null) {
+		Optional.ofNullable(props.get("sess-man")).filter(Map.class::isInstance).map(Map.class::cast).ifPresent(sessManCfg -> {
 			Object saslMechanisms = (String) sessManCfg.remove("enabled-mechanisms");
 			if (saslMechanisms != null) {
 				if (saslMechanisms instanceof String) {
@@ -459,8 +458,7 @@ public class ConfigHolder {
 				sessManCfg.put("jabber:iq:last-marker", build);
 				putIfAbsent(props, "sess-man/jabber:iq:last-marker/jabber:iq:last", jabberIqLast);
 			}
-
-		}
+		});
 
 		props.remove("--api-keys");
 		
@@ -630,6 +628,22 @@ public class ConfigHolder {
 			if (messageRouterCfg.isEmpty()) {
 				props.remove("message-router");
 			}
+		});
+
+		Optional.ofNullable(props.get("sess-man")).filter(Map.class::isInstance).map(Map.class::cast).ifPresent(sessManCfg -> {
+			Optional.ofNullable(sessManCfg.remove("urn:xmpp:push:0:ext")).ifPresent(extCfg -> {
+				AbstractBeanConfigurator.BeanDefinition cfg = new AbstractBeanConfigurator.BeanDefinition();
+				cfg.setBeanName("urn:xmpp:push:0");
+				cfg.setActive(true);
+
+				cfg.compute("away", (k,v) -> {
+					AbstractBeanConfigurator.BeanDefinition c = new AbstractBeanConfigurator.BeanDefinition();
+					c.setBeanName("away");
+					c.setActive(true);
+					return c;
+				});
+				sessManCfg.put(cfg.getBeanName(), cfg);
+			});
 		});
 		
 		String after = props.toString();

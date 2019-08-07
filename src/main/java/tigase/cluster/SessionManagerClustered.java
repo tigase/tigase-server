@@ -61,7 +61,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Bean(name = "sess-man", parent = Kernel.class, active = true)
+@Bean(name = "sess-man", parent = Kernel.class, active = true, exportable = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode})
 @ClusterModeRequired(active = true)
 public class SessionManagerClustered

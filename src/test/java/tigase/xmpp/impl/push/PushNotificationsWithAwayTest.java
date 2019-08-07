@@ -15,7 +15,7 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.push;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +33,8 @@ import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.MessageAmp;
+import tigase.xmpp.impl.ProcessorTestCase;
 import tigase.xmpp.jid.JID;
 
 import java.util.*;
@@ -44,7 +46,7 @@ import static tigase.Assert.assertElementEquals;
 /**
  * Created by andrzej on 03.01.2017.
  */
-public class PushNotificationsTest
+public class PushNotificationsWithAwayTest
 		extends ProcessorTestCase {
 
 	private MsgRepository msgRepository;
@@ -62,6 +64,8 @@ public class PushNotificationsTest
 		registerLocalBeans(getKernel());
 		pushNotifications = getInstance(PushNotifications.class);
 		msgRepository = getInstance(MsgRepository.class);
+		Kernel subkernel = getInstance(PushNotifications.ID + "#KERNEL");
+		subkernel.setBeanActive("away", true);
 	}
 
 	@After
@@ -85,10 +89,10 @@ public class PushNotificationsTest
 
 	@Test
 	public void test_enable() throws Exception {
-		Element iqEl = new Element("iq", new Element[]{new Element("enable", new String[]{"xmlns", "jid", "node"},
+		Element iqEl = new Element("iq", new Element[]{new Element("enable", new String[]{"xmlns", "jid", "node", "away"},
 																   new String[]{"urn:xmpp:push:0",
 																				pushServiceJid.toString(),
-																				"push-node"})},
+																				"push-node", "true"})},
 								   new String[]{"type", "id"}, new String[]{"set", UUID.randomUUID().toString()});
 
 		XMPPResourceConnection session = getSession(
@@ -110,7 +114,7 @@ public class PushNotificationsTest
 		assertElementEquals(new Element("settings", new String[]{"jid", "node"},
 										new String[]{pushServiceJid.toString(), "push-node"}),
 							settings.get(pushServiceJid + "/push-node"));
-
+		
 		settings = pushNotifications.getPushServices(session);
 		assertNotNull(settings);
 		assertEquals(1, settings.size());
@@ -146,11 +150,10 @@ public class PushNotificationsTest
 		assertNull(getInstance(UserRepository.class).getData(recipientJid.getBareJID(), "urn:xmpp:push:0",
 															 pushServiceJid + "/push-node"));
 
-
 		Map<String, Element> settings = pushNotifications.getPushServices(recipientJid.getBareJID());
 		assertNotNull(settings);
 		assertEquals(0, settings.size());
-		
+
 		settings = pushNotifications.getPushServices(session);
 		assertNotNull(settings);
 		assertEquals(0, settings.size());
@@ -160,9 +163,9 @@ public class PushNotificationsTest
 	public void test_notificationGeneration() throws Exception {
 		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
 												  pushServiceJid + "/push-node",
-												  new Element("settings", new String[]{"jid", "node"},
+												  new Element("settings", new String[]{"jid", "node", "away"},
 															  new String[]{pushServiceJid.toString(),
-																		   "push-node"}).toString());
+																		   "push-node", "true"}).toString());
 
 		String msgBody = "Message body " + UUID.randomUUID().toString();
 		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
@@ -201,6 +204,59 @@ public class PushNotificationsTest
 																												  msgBody));
 
 		assertElementEquals(expNotification.getElement(), results.poll().getElement());
+	}
+
+	@Test
+	public void test_notificationGenerationAway() throws Exception {
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  new Element("settings", new String[]{"jid", "node", "away"},
+															  new String[]{pushServiceJid.toString(),
+																		   "push-node", "true"}).toString());
+
+		XMPPResourceConnection session = this.getSession(JID.jidInstanceNS(UUID.randomUUID().toString(), recipientJid.getDomain()), recipientJid);
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		Queue<Packet> results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element presence = new Element("presence");
+		presence.addChild(new Element("show", "xa"));
+		session.setPresence(presence);
+
+		msgBody = "Message body " + UUID.randomUUID().toString();
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+						  new String[]{"jabber:client"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		presence = new Element("presence");
+		session.setPresence(presence);
+
+		msgBody = "Message body " + UUID.randomUUID().toString();
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		results.forEach(p -> {
+			System.out.println(p.toString());
+		});
+		assertArrayEquals(new Element[0], results.stream().map(Packet::getElement).toArray(Element[]::new));
+		//assertEquals(0, results.size());
+
 	}
 
 	@Test
@@ -253,8 +309,9 @@ public class PushNotificationsTest
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean("sess-man").asInstance(this.getSessionManagerHandler()).setActive(true).exportable().exec();//.asClass(DummySessionManager.class).setActive(true).exportable().exec();
 		kernel.registerBean(MessageAmp.class).setActive(true).exportable().exec();
+		kernel.registerBean("writer").asClass(DummyPacketWriter.class).setActive(true).exportable().exec();
 		kernel.registerBean("msgRepository").asClass(MsgRepositoryIfcImpl.class).exportable().exec();
-		kernel.registerBean(PushNotifications.class).setActive(true).exec();
+		kernel.registerBean(PushNotifications.class).setActive(true).exportable().exec();
 	}
 
 	public static class MsgRepositoryIfcImpl
@@ -351,7 +408,7 @@ public class PushNotificationsTest
 		public Queue<Packet> getOutQueue() {
 			return outQueue;
 		}
-
+		
 		@Override
 		public void write(Collection<Packet> packets) {
 			outQueue.addAll(packets);
@@ -367,5 +424,5 @@ public class PushNotificationsTest
 			throw new UnsupportedOperationException("Method not implemented!");
 		}
 	}
-
+	
 }

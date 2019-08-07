@@ -15,7 +15,7 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.push;
 
 import tigase.db.*;
 import tigase.kernel.beans.Inject;
@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.xmpp.impl.PushNotifications.XMLNS;
+import static tigase.xmpp.impl.push.AbstractPushNotifications.XMLNS;
 
 @DiscoFeatures({PushNotifications.ID})
 @Handles({@Handle(path = {Iq.ELEM_NAME, "enable"}, xmlns = XMLNS),
@@ -53,8 +53,8 @@ public class AbstractPushNotifications
 		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc {
 
-		protected static final String XMLNS = "urn:xmpp:push:0";
-		protected static final String ID = XMLNS;
+		public static final String XMLNS = "urn:xmpp:push:0";
+		public static final String ID = XMLNS;
 		private static final Logger log = Logger.getLogger(AbstractPushNotifications.class.getCanonicalName());
 		private static final String JABBER_X_DATA_XMLNS = "jabber:x:data";
 		private static final String SUMMARY_XMLNS = XMLNS + ":summary";

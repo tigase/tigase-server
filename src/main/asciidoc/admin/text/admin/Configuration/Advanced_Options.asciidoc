@@ -145,3 +145,65 @@ To set abuse contact details you should set `disco-extensions` in property in `e
     'abuse-addresses' = [ 'mailto:abuse@localhost', 'xmpp:abuse@localhost' ]
 }
 -----
+
+=== Push Notifications
+Tigase XMPP Server comes with support for https://xmpp.org/extensions/xep-0357.html[XEP-0357: Push Notifications] allowing user to receive notifications for messages received while his XMPP client is not connected enabled by default.
+
+==== Disabling notifications
+You can disable this feature with following settings:
+[source,dsl]
+-----
+'sess-man' {
+    'urn:xmpp:push:0' (active: false) {}
+}
+-----
+
+==== Removing body and sender from notifications
+If you wish Tigase XMPP Server not to forward body of the message or sender details in the push notification you can disable that with following settings:
+[source,dsl]
+-----
+'sess-man' {
+    'urn:xmpp:push:0' () {
+        'with-body' = false
+        'with-sender' = false
+    }
+}
+-----
+
+==== Enabling push notifications for messages received when all resources are AWAY/XA/DND
+Push notifications may also be sent by Tigase XMPP Server when new message is received and all resources of recipient are in AWAY/XA/DND state.
+To enable this notifications you need to enable +urn:xmpp:push:0:ext+ processor instead of default Push processor.
+[source,dsl]
+----
+'sess-man' () {
+    'urn:xmpp:push:0' () {
+        'away' () {}
+    }
+}
+----
+
+As this behaviour may not be expected by users and users need a compatible XMPP client to properly handle this notifications (XMPP client needs to retrieve message history to get actual message), even with this processor enable XMPP clients need to enable push notifications and in +enable+ element need to have +away+ attribute with value of +true+ as in following example"
+
+.Enabling Push notifications for away/xa/dnd account
+[source,xml]
+----
+<iq type='set' id='x43'>
+  <enable xmlns='urn:xmpp:push:0' away='true' jid='push-5.client.example' node='yxs32uqsflafdk3iuqo'>
+    <x xmlns='jabber:x:data' type='submit'>
+        ....
+    </x>
+  </enable>
+</iq>
+----
+
+If later on, user decides to disable notification for account in away/xa/dnd state, it may disable push notifications or once again send stanza to enable push notification but without +away+ attribute being set:
+[source,xml]
+----
+<iq type='set' id='x43'>
+  <enable xmlns='urn:xmpp:push:0' away='true' jid='push-5.client.example' node='yxs32uqsflafdk3iuqo'>
+    <x xmlns='jabber:x:data' type='submit'>
+        ....
+    </x>
+  </enable>
+</iq>
+----
