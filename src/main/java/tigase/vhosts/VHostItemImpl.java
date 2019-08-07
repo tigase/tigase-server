@@ -1026,7 +1026,7 @@ public class VHostItemImpl
 
 	@Override
 	public String getKey() {
-		return this.vhost.getDomain();
+		return this.vhost == null ? null : this.vhost.getDomain();
 	}
 
 	/**
