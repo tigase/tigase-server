@@ -275,7 +275,7 @@ public class TLSIO
 		}
 
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.log(Level.WARNING,
+			log.log(Level.FINE,
 					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}, io: {1}",
 					new Object[]{tlsWrapper.getStatus(), toString()});
 
@@ -470,7 +470,7 @@ public class TLSIO
 			wr = io.write(tlsOutput);
 			result += wr;
 
-			if (log.isLoggable(Level.FINEST)) {
+			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
 						new Object[]{buff.remaining(), toString()});
 			}
@@ -478,7 +478,7 @@ public class TLSIO
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.warning("Infinite loop detected in writeBuff(buff) TLS code, " + "tlsWrapper.getStatus(): " +
+			log.log(Level.INFO, "Infinite loop detected in writeBuff(buff) TLS code, " + "tlsWrapper.getStatus(): " +
 								tlsWrapper.getStatus() + ", buff.remaining(): " + buff.remaining() + " io: " +
 								toString());
 
