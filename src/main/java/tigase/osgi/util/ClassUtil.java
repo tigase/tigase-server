@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -43,6 +44,8 @@ import java.util.logging.Logger;
  * @version $Rev: 609 $
  */
 public class ClassUtil {
+
+	private static final Logger log = Logger.getLogger(ClassUtil.class.getName());
 
 	private static final String[] SKIP_CONTAINS = {".ui.", ".swing", ".awt", ".sql.", ".xml.", ".terracotta."};
 	private static final String[] SKIP_STARTS = {"com.mysql", "tigase.pubsub.Utils", "org.apache.derby",
@@ -305,6 +308,8 @@ public class ClassUtil {
 					Class cls = loader.loadClass(name);
 					classes.add(cls);
 				}
+			} catch (UnsupportedClassVersionError e) {
+				log.log(Level.WARNING, "Class: " + name + " compiled using newer JDK version. Please upgrade your JDK!");
 			} catch (NoClassDefFoundError e) {
 				System.out.println("Class not found name: " + name);
 			} catch (UnsatisfiedLinkError e) {
