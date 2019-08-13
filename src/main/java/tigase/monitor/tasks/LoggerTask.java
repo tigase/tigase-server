@@ -26,8 +26,11 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.datetime.TimestampHelper;
+import tigase.util.dns.DNSResolverFactory;
+import tigase.util.dns.DNSResolverIfc;
 import tigase.util.log.LogFormatter;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -39,8 +42,9 @@ public class LoggerTask
 		implements Initializable {
 
 	public static final Logger log = Logger.getLogger(LoggerTask.class.getName());
-
 	protected final static TimestampHelper dtf = new TimestampHelper();
+	private static final String[] decoded = {"&", "<", ">"};
+	private static final String[] encoded = {"&amp;", "[", "]"};
 	private static final String LOGGER_MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoggerMonitorEvent";
 	@Inject
 	protected MonitorComponent component;
@@ -89,7 +93,7 @@ public class LoggerTask
 			registerHandler();
 		}
 
-		log.log(Level.FINEST, "HAAAAA " + this.levelTreshold);
+		log.log(Level.FINEST, "Set log level treshold to " + this.levelTreshold);
 	}
 
 	@Override
@@ -100,9 +104,10 @@ public class LoggerTask
 
 	public void sendWarningOut(String logBuff) {
 		Element event = new Element(LOGGER_MONITOR_EVENT_NAME);
-		event.addChild(new Element("hostname", component.getDefHostName().toString()));
+		final DNSResolverIfc dnsResolver = DNSResolverFactory.getInstance();
 		event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-		event.addChild(new Element("hostname", component.getDefHostName().toString()));
+		event.addChild(new Element("hostname", String.valueOf(dnsResolver.getDefaultHost())));
+		event.addChild(new Element("external_hostname", String.valueOf(dnsResolver.getSecondaryHost())));
 		event.addChild(new Element("log", logBuff));
 
 		eventBus.fire(event);
@@ -203,10 +208,8 @@ public class LoggerTask
 
 		@Override
 		public synchronized void publish(LogRecord record) {
-			String logEntry = formatter.format(record).replace('<', '[').replace('>', ']');
+			String logEntry = XMLUtils.translateAll(formatter.format(record), decoded, encoded);
 			logs.add(logEntry);
 		}
-
 	}
-
 }
