@@ -1114,7 +1114,7 @@ public class BasicComponent
 					}
 				}
 			} catch (IOException | ScriptException e) {
-				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
+				log.log(Level.WARNING, "Can''t load the admin script file: " + file, e);
 			}
 		}
 	}

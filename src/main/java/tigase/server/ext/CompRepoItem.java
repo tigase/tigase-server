@@ -449,7 +449,7 @@ public class CompRepoItem
 			result = Integer.parseInt(input);
 		} catch (Exception e) {
 			result = 5277;
-			log.warning("Incorrect port number, can't parse: " + input);
+			log.warning("Incorrect port number, can''t parse: " + input);
 		}
 
 		return result;

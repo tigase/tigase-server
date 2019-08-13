@@ -411,7 +411,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 			// Update all user's resources with the new presence
 			if (session != null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "User's {0} XMPPSession found: {1}",
+					log.log(Level.FINEST, "User''s {0} XMPPSession found: {1}",
 							new Object[]{rec.getUserJid().getBareJID(), session});
 				}
 				for (XMPPResourceConnection conn : session.getActiveResources()) {

@@ -137,7 +137,7 @@ public class CpuTempTask
 			}
 			buffr.close();
 		} catch (Exception ex) {
-			log.log(Level.WARNING, "Can't read file: " + FREQ_FILE, ex);
+			log.log(Level.WARNING, "Can''t read file: " + FREQ_FILE, ex);
 		}
 	}
 
@@ -155,7 +155,7 @@ public class CpuTempTask
 			log.log(Level.WARNING, "File contains temperature doesn't exists. Disabling task cpu-temp-task");
 			setEnabled(false);
 		} catch (Exception ex) {
-			log.log(Level.WARNING, "Can't read file: " + TEMP_FILE, ex);
+			log.log(Level.WARNING, "Can''t read file: " + TEMP_FILE, ex);
 		}
 	}
 
@@ -176,7 +176,7 @@ public class CpuTempTask
 				}
 				buffr.close();
 			} catch (Exception ex) {
-				log.log(Level.WARNING, "Can't read file: " + THROTT_DIR + i + THROTT_FILE, ex);
+				log.log(Level.WARNING, "Can''t read file: " + THROTT_DIR + i + THROTT_FILE, ex);
 			}
 		}
 	}

@@ -67,7 +67,7 @@ public class LdapAuthProvider
 				try {
 					return LdapAuthProvider.this.doBindAuthentication(user, plain);
 				} catch (Exception ex) {
-					log.log(Level.WARNING, "Can't authenticate user", ex);
+					log.log(Level.WARNING, "Can''t authenticate user", ex);
 				}
 				return false;
 			}
@@ -218,7 +218,7 @@ public class LdapAuthProvider
 			return false;
 		} catch (Exception e) {
 			if (log.isLoggable(Level.WARNING)) {
-				log.log(Level.WARNING, "Can't authenticate user", e);
+				log.log(Level.WARNING, "Can''t authenticate user", e);
 			}
 			return false;
 		}
@@ -304,7 +304,7 @@ public class LdapAuthProvider
 				userId = BareJID.bareJIDInstance(user_id, serverName);
 				authOk = doBindAuthentication(userId, passwd);
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Can't authenticate user", e);
+				log.log(Level.WARNING, "Can''t authenticate user", e);
 				authOk = false;
 			}
 

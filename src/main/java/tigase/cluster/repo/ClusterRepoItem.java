@@ -272,7 +272,7 @@ public class ClusterRepoItem
 			result = Integer.parseInt(input);
 		} catch (Exception e) {
 			result = 5277;
-			log.log(Level.WARNING, "Incorrect port number, can't parse: {0}", input);
+			log.log(Level.WARNING, "Incorrect port number, can''t parse: {0}", input);
 		}
 
 		return result;

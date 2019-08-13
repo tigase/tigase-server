@@ -690,7 +690,7 @@ public abstract class ConfiguratorAbstract
 				try {
 					addUserRepo(props, domain);
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
+					log.log(Level.SEVERE, "Can''t initialize user repository for domain: " + domain, e);
 				}
 			}
 		}
@@ -698,7 +698,7 @@ public abstract class ConfiguratorAbstract
 			try {
 				addUserRepo(props, null);
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can't initialize user default repository: ", e);
+				log.log(Level.SEVERE, "Can''t initialize user default repository: ", e);
 			}
 		}
 		if (auth_repo_domains != null) {
@@ -706,7 +706,7 @@ public abstract class ConfiguratorAbstract
 				try {
 					addAuthRepo(props, domain);
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
+					log.log(Level.SEVERE, "Can''t initialize user repository for domain: " + domain, e);
 				}
 			}
 		}
@@ -714,7 +714,7 @@ public abstract class ConfiguratorAbstract
 			try {
 				addAuthRepo(props, null);
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can't initialize auth default repository: ", e);
+				log.log(Level.SEVERE, "Can''t initialize auth default repository: ", e);
 			}
 		}
 	}

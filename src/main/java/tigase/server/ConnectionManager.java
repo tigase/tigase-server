@@ -572,7 +572,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			// }
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Can't find service for packets: [{0}] ", packets);
+				log.log(Level.FINE, "Can''t find service for packets: [{0}] ", packets);
 			}
 		}          // end of if (ios != null) else
 	}

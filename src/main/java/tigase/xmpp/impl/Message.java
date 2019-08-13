@@ -92,7 +92,7 @@ public class Message
 			// Checking if this is a packet TO the owner of the session
 			if (session.isUserId(id)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Message 'to' this user, packet: {0}, for session: {1}",
+					log.log(Level.FINEST, "Message ''to'' this user, packet: {0}, for session: {1}",
 							new Object[]{packet, session});
 				}
 

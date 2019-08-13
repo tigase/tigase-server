@@ -194,7 +194,7 @@ public class ClientTrustManagerFactory {
 			return tmf.getTrustManagers();
 			// this.saslExternalAvailable = true;
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Can't create TrustManager with certificate from file.", e);
+			log.log(Level.WARNING, "Can''t create TrustManager with certificate from file.", e);
 			throw new RuntimeException(e);
 		}
 	}

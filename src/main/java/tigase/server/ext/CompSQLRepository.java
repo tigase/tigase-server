@@ -96,7 +96,7 @@ public class CompSQLRepository
 			ds.checkSchemaVersion(this, true);
 			setDataSource((DataRepository) ds);
 		} else {
-			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
+			log.log(Level.WARNING, "Could not retrieve data source named ''{0}''", new Object[]{dataSourceName});
 		}
 	}
 
@@ -120,7 +120,7 @@ public class CompSQLRepository
 			ds.checkSchemaVersion(this, true);
 			setDataSource((DataRepository) ds);
 		} else {
-			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
+			log.log(Level.WARNING, "Could not retrieve data source named ''{0}''", new Object[]{dataSourceName});
 		}
 	}
 
@@ -328,7 +328,7 @@ public class CompSQLRepository
 				deleteItemSt.executeUpdate();
 			}
 		} catch (SQLException e) {
-			log.log(Level.WARNING, "Can't remove item: " + key, e);
+			log.log(Level.WARNING, "Can''t remove item: " + key, e);
 		}
 	}
 

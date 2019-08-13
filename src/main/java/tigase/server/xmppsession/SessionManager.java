@@ -845,7 +845,7 @@ public class SessionManager
 			VHostItem vHostItem = getVHostItem(domain);
 			if (vHostItem == null) {
 				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}",
+					log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
 							new Object[]{domain, getDefHostName()});
 				}
 				vHostItem = new VHostItemImpl(getDefHostName().getDomain());
@@ -1006,7 +1006,7 @@ public class SessionManager
 						}
 
 						if (sessionParent == null) {
-							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}", userJid);
+							log.log(Level.INFO, "UPS can''t remove, session not found in map: {0}", userJid);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
 								log.log(Level.FINER, "Number of user sessions: {0}", sessionsByNodeId.size());
@@ -1050,7 +1050,7 @@ public class SessionManager
 
 			// This shouldn't generally happen. Must mean misconfiguration.
 			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}",
+				log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
 						new Object[]{domain, getDefHostName()});
 			}
 			vitem = new VHostItemImpl(getDefHostName().getDomain());

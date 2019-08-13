@@ -305,7 +305,7 @@ public abstract class AbstractBeanConfigurator
 				ConfigField cf = field.getAnnotation(ConfigField.class);
 				if (!accessToAllFields && cf == null) {
 					log.fine("Field '" + property + "' of bean '" + beanConfig.getBeanName() +
-									 "' Can't be configured (missing @ConfigField). Ignoring!");
+									 "' Can''t be configured (missing @ConfigField). Ignoring!");
 					continue;
 				}
 
@@ -342,10 +342,10 @@ public abstract class AbstractBeanConfigurator
 
 			} catch (Exception e) {
 				log.log(Level.WARNING,
-						"Can't prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName() +
+						"Can''t prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName() +
 								"': '" + value + "'", e);
 				throw new RuntimeException(
-						"Can't prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName() +
+						"Can''t prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName() +
 								"': '" + value + "'");
 			}
 		}
@@ -376,10 +376,10 @@ public abstract class AbstractBeanConfigurator
 
 			} catch (Exception e) {
 				log.log(Level.WARNING,
-						"Can't set property '" + item.getKey().getName() + "' of bean '" + beanConfig.getBeanName() +
+						"Can''t set property '" + item.getKey().getName() + "' of bean '" + beanConfig.getBeanName() +
 								"' with value '" + item.getValue() + "'", e);
 				throw new RuntimeException(
-						"Can't set property '" + item.getKey().getName() + "' of bean '" + beanConfig.getBeanName() +
+						"Can''t set property '" + item.getKey().getName() + "' of bean '" + beanConfig.getBeanName() +
 								"' with value '" + item.getValue() + "'");
 			}
 		}

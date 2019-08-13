@@ -71,7 +71,7 @@ public class ExternalServiceDiscoveryModule
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
 		if (packet.getType() == StanzaType.error) {
-			log.log(Level.FINEST, "Received packet of type 'error', dropping packet = {0}", packet);
+			log.log(Level.FINEST, "Received packet of type ''error'', dropping packet = {0}", packet);
 			return;
 		}
 		if (packet.getType() != StanzaType.get) {

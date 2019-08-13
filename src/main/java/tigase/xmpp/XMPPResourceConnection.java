@@ -137,7 +137,7 @@ public class XMPPResourceConnection
 //			VHostItem vHostItem = sessMan.getVHostItem(this.userJid.getDomain());
 //			if (vHostItem == null) {
 //				if (log.isLoggable(Level.INFO)) {
-//					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}", new Object[] {
+//					log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}", new Object[] {
 //							domain, sessMan.getDefHostName() });
 //				}
 //				vHostItem = new VHostItem(sessMan.getDefHostName().getDomain());

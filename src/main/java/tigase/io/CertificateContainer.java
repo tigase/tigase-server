@@ -506,9 +506,9 @@ public class CertificateContainer
 			}
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Can't generate fake trusted CA certificate", e);
+				log.log(Level.FINEST, "Can''t generate fake trusted CA certificate", e);
 			}
-			log.log(Level.WARNING, "Can't generate fake trusted CA certificate");
+			log.log(Level.WARNING, "Can''t generate fake trusted CA certificate");
 		}
 
 		tms = new X509TrustManager[]{

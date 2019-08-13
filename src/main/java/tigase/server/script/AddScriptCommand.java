@@ -111,7 +111,7 @@ public class AddScriptCommand
 					saveCommandToDisk(commandId, description, originalGroup, sb, s.getFileExtension(), binds);
 				}
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Can't initialize script: ", e);
+				log.log(Level.WARNING, "Can''t initialize script: ", e);
 
 				Packet result = packet.commandResult(Command.DataType.result);
 
@@ -181,7 +181,7 @@ public class AddScriptCommand
 			try {
 				parentDirectory.mkdirs();
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Can't create scripts directory , read-only filesystem: " + parentDirectory, e);
+				log.log(Level.WARNING, "Can''t create scripts directory , read-only filesystem: " + parentDirectory, e);
 			}
 		}
 

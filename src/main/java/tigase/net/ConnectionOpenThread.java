@@ -90,7 +90,7 @@ public class ConnectionOpenThread
 		try {
 			selector = Selector.open();
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
+			log.log(Level.SEVERE, "Server I/O error, can''t continue my work.", e);
 			stopping = true;
 		}    // end of try-catch
 	}

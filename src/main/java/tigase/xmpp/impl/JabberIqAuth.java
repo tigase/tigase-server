@@ -287,7 +287,7 @@ public class JabberIqAuth
 
 			return Authorization.NOT_AUTHORIZED;
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Can't authenticate with given CallbackHandler", e);
+			log.log(Level.WARNING, "Can''t authenticate with given CallbackHandler", e);
 
 			return Authorization.INTERNAL_SERVER_ERROR;
 		}

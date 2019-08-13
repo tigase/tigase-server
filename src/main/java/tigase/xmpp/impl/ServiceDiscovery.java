@@ -80,7 +80,7 @@ public class ServiceDiscovery
 			JID from = packet.getStanzaFrom();
 			if (from == null) {
 				if (session == null || !session.isAuthorized()) {
-					log.log(Level.FINEST, "got <iq/> packet with no 'from' attribute = {0}", packet);
+					log.log(Level.FINEST, "got <iq/> packet with no ''from'' attribute = {0}", packet);
 					return;
 				}
 				from = session.getjid();
@@ -113,7 +113,7 @@ public class ServiceDiscovery
 								// if we do not have it, then we should drop this packet
 								if (log.isLoggable(Level.FINEST)) {
 									log.log(Level.FINEST,
-											"received <iq/> packet to forward to service provider component without 'from' attribute, dropping packet = {0}",
+											"received <iq/> packet to forward to service provider component without ''from'' attribute, dropping packet = {0}",
 											packet);
 								}
 								return;

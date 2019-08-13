@@ -1008,7 +1008,7 @@ public class DBSchemaLoader
 			Path srcPath = Paths.get("src/main/" + resource);
 			if (!Files.exists(srcPath)) {
 				if (params.isIgnoreMissingFiles()) {
-					log.log(Level.WARNING, "Provided path: {0} doesn't exist, skipping!", new Object[]{p.toString()});
+					log.log(Level.WARNING, "Provided path: {0} doesn''t exist, skipping!", new Object[]{p.toString()});
 					return results;
 				} else {
 					throw new IOException("Required file at " + p.toString() + " doesn't exist!");

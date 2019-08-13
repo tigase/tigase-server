@@ -403,7 +403,7 @@ public class S2SConnectionManager
 			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Can't find CID connections for cid: {0}, can't send verify response.", keyCid);
+				log.log(Level.FINE, "Can''t find CID connections for cid: {0}, can''t send verify response.", keyCid);
 			}
 		}
 

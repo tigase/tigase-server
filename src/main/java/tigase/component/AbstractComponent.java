@@ -151,7 +151,7 @@ public abstract class AbstractComponent
 		try {
 			initModules(props);
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Can't initialize modules!", e);
+			log.log(Level.WARNING, "Can''t initialize modules!", e);
 		}
 	}
 

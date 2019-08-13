@@ -247,7 +247,7 @@ public class DomainFilter
 			// Assuming this an initial, and authentication traffic, allowing for
 			// everything, which means, just ignore.
 		} catch (TigaseDBException ex) {
-			log.log(Level.WARNING, "Can't access user repository.", ex);
+			log.log(Level.WARNING, "Can''t access user repository.", ex);
 		}
 	}
 
@@ -450,7 +450,7 @@ public class DomainFilter
 			// Assuming this an initial, and authentication traffic, allowing for
 			// everything, which means, just ignore.
 		} catch (TigaseDBException ex) {
-			log.log(Level.WARNING, "Can't access user repository.", ex);
+			log.log(Level.WARNING, "Can''t access user repository.", ex);
 		}
 
 		return stop;

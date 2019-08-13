@@ -423,7 +423,7 @@ public class Kernel {
 				}
 			}
 		} catch (Exception e) {
-			throw new KernelException("Can't initialize all beans", e);
+			throw new KernelException("Can''t initialize all beans", e);
 		}
 	}
 
@@ -630,7 +630,7 @@ public class Kernel {
 				beanConfig.setState(State.inactive);
 				beanConfig.getKernel().unloadInjectedBean(beanConfig);
 			} catch (Exception e) {
-				throw new KernelException("Can't unload bean " + beanName + " from depenent beans", e);
+				throw new KernelException("Can''t unload bean " + beanName + " from depenent beans", e);
 			}
 		}
 	}
@@ -757,7 +757,7 @@ public class Kernel {
 		} catch (Exception e) {
 //			e.printStackTrace();
 			log.log(Level.SEVERE, "Exception during unregistering", e);
-			throw new KernelException("Can't unload bean " + beanName + " from depenent beans", e);
+			throw new KernelException("Can''t unload bean " + beanName + " from depenent beans", e);
 		} finally {
 			dependencyManager.unregister(beanName);
 		}
@@ -797,7 +797,7 @@ public class Kernel {
 //					e.printStackTrace();
 					log.log(Level.SEVERE, "Exception during un-registering", e);
 					throw new KernelException(
-							"Can't unload bean " + beanConfig.getBeanName() + " from depenent beans in kernel " +
+							"Can''t unload bean " + beanConfig.getBeanName() + " from depenent beans in kernel " +
 									kernel.getName(), e);
 				}
 			}
@@ -883,12 +883,12 @@ public class Kernel {
 				injectDependency(dep);
 			} catch (Exception e) {
 				log.log(Level.WARNING,
-						"Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() +
+						"Can''t inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() +
 								")" + " unloading bean " + depbc.getBeanName() +
 								ExceptionUtilities.getExceptionRootCause(e, true));
 
 				log.log(Level.CONFIG,
-						"Can't inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() +
+						"Can''t inject dependency to bean " + depbc.getBeanName() + " (class: " + depbc.getClazz() +
 								")" + " unloading bean " + depbc.getBeanName(), e);
 				try {
 					Object i = depbc.getKernel().beanInstances.remove(depbc);
@@ -899,7 +899,7 @@ public class Kernel {
 					}
 					unloadInjectedBean(depbc);
 				} catch (Exception ex) {
-					throw new KernelException("Can't unload bean " + depbc.getBeanName(), ex);
+					throw new KernelException("Can''t unload bean " + depbc.getBeanName(), ex);
 				} finally {
 					depbc.setState(State.registered);
 				}
@@ -911,7 +911,7 @@ public class Kernel {
 		final BeanConfig sbc = dependencyManager.getBeanConfig(exportingBeanName);
 		// Object bean = getInstance(sbc.getBeanName());
 		if (sbc == null) {
-			throw new KernelException("Can't export bean " + exportingBeanName + " as there is no such bean");
+			throw new KernelException("Can''t export bean " + exportingBeanName + " as there is no such bean");
 		}
 
 		BeanConfig dbc = new DelegatedBeanConfig(destinationName, sbc);
@@ -976,7 +976,7 @@ public class Kernel {
 		}
 
 		if (bcs.isEmpty()) {
-			throw new KernelException("Can't find bean implementing " + beanClass);
+			throw new KernelException("Can''t find bean implementing " + beanClass);
 		}
 
 		BeanConfig bc = bcs.get(0);
@@ -1051,7 +1051,7 @@ public class Kernel {
 		} catch (Exception e) {
 //			e.printStackTrace();
 			log.log(Level.SEVERE, "Exception", e);
-			throw new KernelException("Can't inject bean " + beanConfig + " to dependend beans.", e);
+			throw new KernelException("Can''t inject bean " + beanConfig + " to dependend beans.", e);
 		}
 	}
 
@@ -1131,10 +1131,10 @@ public class Kernel {
 									  "For more information please peruse ACS documentation.",};
 				TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
 			}
-			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "' (class: " +
+			throw new KernelException("Can''t create instance of bean '" + beanConfig.getBeanName() + "' (class: " +
 											  beanConfig.getClazz() + ")", e);
 		} catch (Exception e) {
-			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "' (class: " +
+			throw new KernelException("Can''t create instance of bean '" + beanConfig.getBeanName() + "' (class: " +
 											  beanConfig.getClazz() + ")", e);
 		}
 	}
@@ -1437,7 +1437,7 @@ public class Kernel {
 							}
 						}
 					} catch (KernelException ex) {
-						log.log(Level.FINEST, "Can't set null to " + d + " unloading bean " + d.getBeanName(), ex);
+						log.log(Level.FINEST, "Can''t set null to " + d + " unloading bean " + d.getBeanName(), ex);
 						beansToRemove.add(bc);
 					}
 				}

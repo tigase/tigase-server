@@ -712,7 +712,7 @@ public class ClientConnectionManager
 						log.log(Level.INFO, "Problem enabling zlib compression on the connection: ", ex);
 					}
 				} else {
-					log.log(Level.WARNING, "Can't find sevice for STARTZLIB command: {0}", iqc);
+					log.log(Level.WARNING, "Can''t find sevice for STARTZLIB command: {0}", iqc);
 				}
 
 				break;
@@ -765,7 +765,7 @@ public class ClientConnectionManager
 						serv.forceStop();
 					}    // end of try-catch
 				} else {
-					log.log(Level.WARNING, "Can't find sevice for STARTTLS command: {0}", iqc);
+					log.log(Level.WARNING, "Can''t find sevice for STARTTLS command: {0}", iqc);
 				}      // end of else
 
 				break;
@@ -991,7 +991,7 @@ public class ClientConnectionManager
 				Command.addFieldValue(command, "local-certificate", encodedLocalCertificate);
 				send = true;
 			} catch (CertificateEncodingException e) {
-				log.log(Level.WARNING, "Can't encode certificate", e);
+				log.log(Level.WARNING, "Can''t encode certificate", e);
 			}
 		}
 
@@ -1007,7 +1007,7 @@ public class ClientConnectionManager
 				Command.addFieldValue(command, "peer-certificate", encodedPeerCertificate);
 				send = true;
 			} catch (CertificateEncodingException e) {
-				log.log(Level.WARNING, "Can't encode certificate", e);
+				log.log(Level.WARNING, "Can''t encode certificate", e);
 			}
 		}
 		if (send) {

@@ -258,7 +258,7 @@ public class JabberIqRoster
 
 				// RFC says: ignore such request
 				log.log(Level.WARNING,
-						"Roster request ''from'' attribute doesn't match " + "session: {0}, request: {1}",
+						"Roster request ''from'' attribute doesn''t match " + "session: {0}, request: {1}",
 						new Object[]{session, packet});
 				return;
 			}    // end of if (packet.getElemFrom() != null
