@@ -281,13 +281,13 @@ public class KernelTest {
 			krnlChild1.getInstance(Bean1.class);
 			Assert.fail();
 		} catch (KernelException e) {
-			assertEquals("Can't find bean implementing class tigase.kernel.Bean1", e.getMessage());
+			assertEquals("Can''t find bean implementing class tigase.kernel.Bean1", e.getMessage());
 		}
 		try {
 			krnlChild1.getInstance(Bean3.class);
 			Assert.fail();
 		} catch (KernelException e) {
-			assertEquals("Can't find bean implementing class tigase.kernel.Bean3", e.getMessage());
+			assertEquals("Can''t find bean implementing class tigase.kernel.Bean3", e.getMessage());
 		}
 
 		try {
