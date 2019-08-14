@@ -652,7 +652,7 @@ public class S2SConnectionManager
 
 	@Override
 	protected long getMaxInactiveTime() {
-		return 15 * MINUTE;
+		return 120 * MINUTE;
 	}
 
 	@Override
