@@ -172,7 +172,7 @@ If you wish Tigase XMPP Server not to forward body of the message or sender deta
 
 ==== Enabling push notifications for messages received when all resources are AWAY/XA/DND
 Push notifications may also be sent by Tigase XMPP Server when new message is received and all resources of recipient are in AWAY/XA/DND state.
-To enable this notifications you need to enable +urn:xmpp:push:0:ext+ processor instead of default Push processor.
+To enable this type of notifications you need to enable additional push delivery extension named `away` in default push processor:
 [source,dsl]
 ----
 'sess-man' () {
@@ -182,7 +182,7 @@ To enable this notifications you need to enable +urn:xmpp:push:0:ext+ processor 
 }
 ----
 
-As this behaviour may not be expected by users and users need a compatible XMPP client to properly handle this notifications (XMPP client needs to retrieve message history to get actual message), even with this processor enable XMPP clients need to enable push notifications and in +enable+ element need to have +away+ attribute with value of +true+ as in following example"
+As this behaviour may not be expected by users and users need a compatible XMPP client to properly handle this notifications (XMPP client needs to retrieve message history from server to get actual message), in addition to enabling this plugin on the server, XMPP clients need to explicitly activate this feature. They can do that by including `away` attribute with value of `true` in push `enable` element send to the server, as in following example:
 
 .Enabling Push notifications for away/xa/dnd account
 [source,xml]
@@ -196,7 +196,7 @@ As this behaviour may not be expected by users and users need a compatible XMPP 
 </iq>
 ----
 
-If later on, user decides to disable notification for account in away/xa/dnd state, it may disable push notifications or once again send stanza to enable push notification but without +away+ attribute being set:
+If later on, user decides to disable notification for account in away/xa/dnd state, it may disable push notifications or once again send stanza to enable push notification but without `away` attribute being set:
 [source,xml]
 ----
 <iq type='set' id='x43'>
