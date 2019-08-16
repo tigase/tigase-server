@@ -25,4 +25,4 @@ Not necessarily, consult the Affero General Public License Agreement v3 to see i
 Yes!  Commercial licenses can be custom made for each client, and software written for your company may be made private or part of our open source distributions at your discretion.
 
 *Can I contribute code?* +
-Sure!  We accept code through GitHub pull-requests - submit them to one of our projects listed in our https://github.com/tigase/[[GitHub organisation]
+Sure!  We accept code through GitHub pull-requests - submit them to one of our projects listed in our https://github.com/tigase/[GitHub organisation]
