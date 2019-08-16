@@ -128,6 +128,6 @@ Shutting down Tigase: 6984
 
 This is it. The result we want in a simple and efficient way. We can repeat it as many times we want which is especially important in longer term trials. Every time we change the server code we can re-run tests to make sure we get correct responses from the server.
 
-You can have a look in the current build, with more complete test cases, file for link:https://projects.tigase.org/projects/tigase-testsuite/repository/revisions/master/entry/tests/data/JabberIqPrivate.cot[JabberIqPrivate].
+You can have a look in the current build, with more complete test cases, file for link:https://github.com/tigase/tigase-testsuite/tree/master/tests/data/JabberIqPrivate.cot[JabberIqPrivate].
 
 Now my server tests are no longer outdated. Of course not all cases are so simple. Some XEPs require calculations to be done before stanza is sent or to compare received results. A good example for this case is user authentication like SASL and even NON-SASL. But still, there are many cases which can be covered by simple tests: roster management, privacy lists management, vCard, private data storage and so on.

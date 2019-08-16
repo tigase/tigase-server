@@ -269,11 +269,6 @@ _Tigase Server Monitor Mailer Extension_ (TSMME) can send messages from the moni
 
 For v7.1.0 versions and later, TSMME is already included in your distribution package and no extra installation is needed.
 
-For versions older than 7.1.0 TSMME requires two files to operate:
-
-- A compiled build of tigase mailer from link:https://projects.tigase.org/projects/tigase-server-ext-mailer/repository[its repository]. Place the compiled `.jar` file into `jars/` directory.
-- `javax.mail.jar` file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the `jars/` directory.
-
 === Configuration
 
 Tigase Mailer Extension may be configured via the `config.tdsl` file in the following manner:

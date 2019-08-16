@@ -13,7 +13,7 @@ NOTE: Please note that these instructions are for *nix operating systems, and so
 
 == Get the Binary Package
 
-Have a look at our link:https://projects.tigase.org/projects/tigase-server/files[download area]. Always pick the latest version of the package available. For manual installation either `zip` or `tar.gz` file is available. Pick one of files with filename looking like: `tigase-server-<version>-b<build>-<type>.<archive>`, where `<version>` is in the form of `major.minor.bugfix`, `<type>` can be either `dist` (basic package) or `dist-max` (extended set of components) and archive type can be eitehr `tar.gz` or `zip`.
+Have a look at our link:https://tigase.net/downloads[download area]. Always pick the latest version of the package available. For manual installation either `zip` or `tar.gz` file is available. Pick one of files with filename looking like: `tigase-server-<version>-b<build>-<type>.<archive>`, where `<version>` is in the form of `major.minor.bugfix`, `<type>` can be either `dist` (basic package) or `dist-max` (extended set of components) and archive type can be eitehr `tar.gz` or `zip`.
 
 == Unpack the Package
 

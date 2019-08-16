@@ -7,7 +7,7 @@
 :numbered:
 :website: http://tigase.net/
 
-The schema basics, how it looks like and brief explanation to all rows can be found in the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/database/mysql-schema-4-schema.sql[schema creation script]. However, this is hardly enough to understand how it works and how all the data is accessed. There are only 3 basic tables which actually keep all the Tigase server users' data: *tig_users*, *tig_nodes* and *tig_pairs*. Therefore it is not clear at first how Tigase's data is organized.
+The schema basics, how it looks like and brief explanation to all rows can be found in the link:https://github.com/tigase/tigase-server/tree/master/src/main/database[list of schema files]. However, this is hardly enough to understand how it works and how all the data is accessed. There are only 3 basic tables which actually keep all the Tigase server users' data: *tig_users*, *tig_nodes* and *tig_pairs*. Therefore it is not clear at first how Tigase's data is organized.
 
 Before you can understand the Tigase XMPP Server database schema, how it works and how to use it, is it essential to know what were the goals of it's development and why it works that way. Let's start with the API as this gives you the best introduction.
 
@@ -26,7 +26,7 @@ And more a complex version:
 void setData(BareJID user, String subnode, String key, String value);
 String getData(BareJID user, String subnode, String key, String def);
 -----
-Even though the API contains more methods, the rest is more or less a variation of presented above. A complete API description for all access methods is available in JavaDoc documentation in the link:https://projects.tigase.org/projects/tigase-server/repository/entry/trunk/src/main/java/tigase/db/UserRepository.java[UserRepository] interface. So we are not going into too much detail here except for the main idea.
+Even though the API contains more methods, the rest is more or less a variation of presented above. A complete API description for all access methods is available in JavaDoc documentation in the link:https://github.com/tigase/tigase-server/tree/master/src/main/java/tigase/db/UserRepository.java[UserRepository] interface. So we are not going into too much detail here except for the main idea.
 
 Tigase operates on <*key*, *value*> pairs for the individual user data. The idea behind this was to make the API very simple and also at the same time very flexible, so adding a new plugin or component would not require a database schema change, adding new tables, or conversion of the DB schema to a new version.
 
