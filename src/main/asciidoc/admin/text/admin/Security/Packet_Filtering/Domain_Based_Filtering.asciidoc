@@ -40,7 +40,7 @@ There is no other configuration required for the plugin to work.
 
 Although controlling domain filtering rules is possible for each user separately, it is not practical for large installations. In most cases users are stored in the database and a third-party system keeps all the user information.
 
-To change the rule for a single user you can use loadable administration scripts feature and load link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/groovy/tigase/admin/UserDomainFilter.groovy[UserDomainFilter.groovy] script. It enables modifying rules for a given user JID.
+To change the rule for a single user you can use loadable administration scripts feature and load link:https://github.com/tigase/tigase-server/tree/master/src/main/groovy/tigase/admin/UserDomainFilter.groovy[UserDomainFilter.groovy] script. It enables modifying rules for a given user JID.
 
 == Implementation
 
@@ -86,4 +86,4 @@ For example:
 
 In case of `LIST` and `BLACKLIST` filtering options, it's essential to provide list of domains for the whitelisting/blacklisting. `DomainFilter.ALLOWED_DOMAINS_LIST_KEY` is a property key: "allowed-domains-list". The user repository MUST return semicolon separated list of domains: `domain1.com;domain2.com,domain3.org`
 
-The filtering is performed by the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/impl/DomainFilter.java[`tigase.xmpp.impl.DomainFilter`] plugin. Please refer to source code for more implementation details.
+The filtering is performed by the link:https://github.com/tigase/tigase-server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java[`tigase.xmpp.impl.DomainFilter`] plugin. Please refer to source code for more implementation details.

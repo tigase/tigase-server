@@ -8,7 +8,7 @@ If you are installing Tigase in a Windows environment, please see the xref:winWe
 
 == Download and Extract
 
-First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.tigase.org/nightlies/dists/[nightly builds]. Once you have the distribution binary extract it and navigate to the directory:
+First download Tigase XMPP Server and extract it. You can download the link:https://tigase.net/downloads[official binaries], or the latest and greatest link:https://build.tigase.net/nightlies/dists/[nightly builds]. Once you have the distribution binary extract it and navigate to the directory:
 
 [source,bash]
 -----

@@ -9,10 +9,10 @@
 
 Stanza processing takes place in 4 steps. A different kind of plugin is responsible for each step of processing:
 
-. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java[XMPPPreprocessorIfc] - is the interface for packets pre-processing plugins.
-. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPProcessor.java[XMPPProcessorIfc] - is the interface for packets processing plugins.
-. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java[XMPPPostprocessorIfc] - is the interface for packets post-processing plugins.
-. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java[XMPPPacketFilterIfc] - is the interface for processing results filtering.
+. link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java[XMPPPreprocessorIfc] - is the interface for packets pre-processing plugins.
+. link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/xmpp/XMPPProcessor.java[XMPPProcessorIfc] - is the interface for packets processing plugins.
+. link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java[XMPPPostprocessorIfc] - is the interface for packets post-processing plugins.
+. link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java[XMPPPacketFilterIfc] - is the interface for processing results filtering.
 
 If you look inside any of these interfaces you will only find a single method. This is where all the packet processing takes place. All of them take a similar set of parameters and below is a description for all of them:
 
@@ -22,9 +22,9 @@ If you look inside any of these interfaces you will only find a single method. T
 - *Queue<Packet> results* - this a collection with packets which have been generated as input packet processing results. Regardless a response to a user request is sent or the packet is forwarded to it's destination it is always required that a copy of the input packet is created and stored in the *results* queue.
 - *Map<String, Object> settings* - this map keeps plugin specific settings loaded from the Tigase server configuration. In most cases it is unused, however if the plugin needs to access an external database that this is a way to pass the database connection string to the plugin.
 
-After a closer look in some of the interfaces you can see that they extend another interface: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/xmpp/impl/package-summary.html[JavaDoc] documentation for all details.
+After a closer look in some of the interfaces you can see that they extend another interface: link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/xmpp/impl/package-summary.html[JavaDoc] documentation for all details.
 
-For purpose of this guide we are implementing a simple plugin for handling all *<message/>* packets that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our Git repository. The code has some comments inside already but this guide goes deeper into the implementation details.
+For purpose of this guide we are implementing a simple plugin for handling all *<message/>* packets that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our Git repository. The code has some comments inside already but this guide goes deeper into the implementation details.
 
 First of all you have to choose what kind of plugin you want to implement. If this is going to be a packet processor you have to implement the *XMPPProcessorIfc* interface, if this is going to be a pre-processor then you have to implement the *XMPPPreprocessorIfc* interface. Of course your implementation can implement more than one interface, even all of them. There are also two abstract helper classes, one of which you should use as a base for all you plugins *XMPPProcessor* or use *AnnotatedXMPPProcessor* for annotation support.
 

@@ -94,7 +94,7 @@ acl = {
 }
 -----
 
-You might also need Tigase MIB definition: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/resources/mib/JVM-MANAGEMENT-MIB.mib[TIGASE-MANAGEMENT-MIB.mib] for the server specific statistics. The MIB contains definition for all the server statistics exposed via SNMP.
+You might also need Tigase MIB definition: link:https://github.com/tigase/tigase-server/blob/master/src/main/resources/mib/JVM-MANAGEMENT-MIB.mib[TIGASE-MANAGEMENT-MIB.mib] for the server specific statistics. The MIB contains definition for all the server statistics exposed via SNMP.
 
 === HTTP
 Access the server at example.com:9080 and you will be presented with an Agent View.

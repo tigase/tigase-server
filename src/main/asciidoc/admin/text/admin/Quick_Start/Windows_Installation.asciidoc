@@ -10,7 +10,7 @@ Although you may wish to use command line, take note that commands entered in sh
 Make sure that you have Java JDK v8 installed on your system prior to installing Tigase. It will also help to fully setup whatever database software you will be using as well.
 
 == Step 1: Initial Setup
-Download the Tigase XMPP Server archive from link:https://projects.tigase.org/projects/tigase-server/files[our repository] and extract it to a directory of your choice.
+Download the Tigase XMPP Server archive from link:https://tigase.net/downloads[our repository] and extract it to a directory of your choice.
 
 Once that is completed, enter the directory `win-stuff` and run the setup.bat program. This program when run, will extract the necessary files to appropriate places on your computer. The bat file should look like the following:
 
