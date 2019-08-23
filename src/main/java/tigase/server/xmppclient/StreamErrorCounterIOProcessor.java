@@ -18,6 +18,8 @@
 package tigase.server.xmppclient;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
@@ -36,9 +38,15 @@ public class StreamErrorCounterIOProcessor
 		implements XMPPIOProcessor {
 
 	public static final String ID = "stream-error-counter";
-
 	private String compName;
+	@Inject
+	private ConnectionManager connectionManager;
 	private ErrorStatisticsHolder holder = new ErrorStatisticsHolder();
+
+	public void setConnectionManager(ConnectionManager connectionManager) {
+		this.connectionManager = connectionManager;
+		compName = connectionManager.getName();
+	}
 
 	@Override
 	public String getId() {
