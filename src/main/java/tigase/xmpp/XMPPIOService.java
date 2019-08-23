@@ -465,7 +465,7 @@ public class XMPPIOService<RefObject>
 
 				if (disconnect) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "{0}, checkData says disconnect: {1}",
+						log.log(Level.WARNING, "{0}, checkData says disconnect: {1}",
 								new Object[]{toString(), new String(data)});
 					} else {
 						log.log(Level.WARNING, "{0}, checkData says disconnect", toString());
@@ -485,8 +485,8 @@ public class XMPPIOService<RefObject>
 					parser.parse(domHandler, data, 0, data.length);
 					if (domHandler.parseError()) {
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "{0}, Data parsing error: {1}",
-									new Object[]{toString(), StringUtilities.convertNonPrintableCharactersToLiterals(new String(data))});
+							log.log(Level.WARNING, "{0}, Data parsing error: {1}",
+									new Object[]{toString(), new String(data)});
 						} else {
 							log.log(Level.WARNING, "{0}, data parsing error, stopping connection", toString());
 						}
