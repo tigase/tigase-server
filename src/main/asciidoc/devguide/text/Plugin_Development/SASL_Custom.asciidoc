@@ -16,18 +16,26 @@ SASL implementation in Tigase XMPP Server is compatible with Java API, the same 
 
 The SASL implementation consists of following parts:
 
-. mechanism
-. CallbackHandler
+. `mechanism-selector`
+. `callback-handler-factory`
 
-Properties list for SASL plugin _(urn:ietf:params:xml:ns:xmpp-sasl' ()_
+
+'sess-man' () {
+    'sasl-provider' () {
+        'mechanism-selector' (class: tigase.auth.CustomMechanismSelector) {}
+        'callback-handler-factory' (class: tigase.auth.impl.ThirdAuthCallbackHandlerFactory) {}
+        'customSaslServerFactory' (class: tigase.auth.mechanisms.CustomSaslServerFactory) {}
+        'tigaseSaslServerFactory' (active: false) {}
+    }
+}
+
+Properties list for SASL plugin `'sasl-provider' ()` bean on `'sess-man' () {}` bean.
 
 [width="90%"]
 |=====================================================================
 | *Property* | *Description*
-| factory | A factory class for SASL mechanisms. Detailed description at xref:mechconf[Mechanisms configuration]
-| callbackhandler |A default callback handler class. Detailed description at xref:cbconf[CallbackHandler configuration]
-| callbackhandler-${MECHANISM} | A callback handler class for a particular mechanism. Detailed description at xref:cbconf[CallbackHandler configuration]
-| mechanism-selector | A class for filtering SASL mechanisms available in a stream. Detailed description at xref:selmech[Selecting mechanisms]
+| `callback-handler-factory` | A factory class for SASL mechanisms. Detailed description at xref:mechconf[Mechanisms configuration]
+| `mechanism-selector` | A class for filtering SASL mechanisms available in a stream. Detailed description at xref:selmech[Selecting mechanisms]
 |=====================================================================
 
 [[mechconf]]
@@ -36,15 +44,24 @@ To add a new mechanism, a new factory for the mechanism has to be registered. It
 [source,dsl]
 -----
 'sess-man' () {
-    'urn:ietf:params:xml:ns:xmpp-sasl' () {
-        factory = 'com.example.OwnFactory'
+    'sasl-provider' () {
+        'customSaslServerFactory' (class: tigase.auth.mechanisms.CustomSaslServerFactory) {}
     }
 }
 -----
 
 The class must implement the `SaslServerFactory` interface. All mechanisms returned by `getMechanismNames()` method will be registered automatically.
 
-The default factory that is available and registered by default is `tigase.auth.TigaseSaslServerFactory` which provides `PLAIN` and `ANONYMOUS` mechanisms.
+The default factory that is available and registered by default is `tigase.auth.TigaseSaslServerFactory` which provides `PLAIN` and `ANONYMOUS` mechanisms. It can be disabled as follows:
+[source,dsl]
+-----
+'sess-man' () {
+    'sasl-provider' () {
+        'tigaseSaslServerFactory' (active: false) {}
+    }
+}
+-----
+
 
 [[cbconf]]
 === CallbackHandler Configuration
@@ -55,18 +72,7 @@ To register a new callback handler the `config.tdsl` file should include:
 -----
 'sess-man' () {
     'urn:ietf:params:xml:ns:xmpp-sasl' () {
-        callbackhandler = 'com.example.DefaultCallbackHandler'
-    }
-}
------
-
-It is also possible to register different callback handlers for different mechanisms:
-[source,dsl]
------
-'sess-man' () {
-    'urn:ietf:params:xml:ns:xmpp-sasl' () {
-      'callbackhandler-OAUTH' = 'com.example.OAuthCallbackHandler'
-      'callbackhandler-PLAIN' = 'com.example.PlainCallbackHandler'
+        'callback-handler-factory' (class: tigase.auth.impl.ThirdAuthCallbackHandlerFactory) {}
     }
 }
 -----
@@ -88,7 +94,7 @@ It is possible to use a custom selector by specifying it's class int the `config
 -----
 'sess-man' () {
     'urn:ietf:params:xml:ns:xmpp-sasl' () {
-        'mechanism-selector' = 'com.example.OwnSelector'
+        'mechanism-selector' (class: tigase.auth.CustomMechanismSelector) {}
     }
 }
 -----
