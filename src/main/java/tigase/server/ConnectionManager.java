@@ -1404,13 +1404,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				public void check(final XMPPIOService service) {
 					try {
 						if (null != service) {
+							long sinceLastTransfer = getDurationSinceLastTransfer(service);
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST,
 										"Testing service: {0}, sinceLastTransfer: {1}, maxInactivityTime: {2}, watchdogTimeout: {3}, watchdogDelay: {4}, watchdogPingType: {5} ",
-										new Object[]{service, getDurationSinceLastTransfer(service), maxInactivityTime,
+										new Object[]{service, sinceLastTransfer, maxInactivityTime,
 													 watchdogTimeout, watchdogDelay, watchdogPingType});
 							}
-							long sinceLastTransfer = getDurationSinceLastTransfer(service);
 							if (sinceLastTransfer >= maxInactivityTime) {
 
 								// Stop the service if max keep-alive time is exceeded
@@ -1418,7 +1418,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 								if (log.isLoggable(Level.INFO)) {
 									log.log(Level.INFO,
 											"{0}: Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} )",
-											new Object[]{getName(), service, getDurationSinceLastTransfer(service),
+											new Object[]{getName(), service, sinceLastTransfer,
 														 maxInactivityTime, watchdogTimeout, watchdogDelay,
 														 watchdogPingType});
 								}
