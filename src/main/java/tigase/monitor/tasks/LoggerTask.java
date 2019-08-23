@@ -25,6 +25,7 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
+import tigase.util.StringUtilities;
 import tigase.util.datetime.TimestampHelper;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.dns.DNSResolverIfc;
@@ -209,7 +210,8 @@ public class LoggerTask
 		@Override
 		public synchronized void publish(LogRecord record) {
 			String logEntry = XMLUtils.translateAll(formatter.format(record), decoded, encoded);
-			logs.add(logEntry);
+			String unicodeLiteral = StringUtilities.convertNonPrintableCharactersToLiterals(logEntry);
+			logs.add(unicodeLiteral);
 		}
 	}
 }
