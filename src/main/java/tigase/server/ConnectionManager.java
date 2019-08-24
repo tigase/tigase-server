@@ -1209,8 +1209,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					// Accept side for component service is not ready yet?
 					// Let's wait for a few secs and try again.
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Problem reconnecting the service: {0}, port_props: {1}, exception: {2}",
-								new Object[]{serv, port_props, e});
+						log.log(Level.FINEST, String.format("Problem reconnecting the service: %1$s, port_props: %2%s", serv, port_props), e);
 					}
 					updateConnectionDetails(port_props);
 
