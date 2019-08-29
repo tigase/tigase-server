@@ -17,6 +17,8 @@
  */
 package tigase.util.log;
 
+import tigase.util.ui.console.AnsiColor;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -35,27 +37,40 @@ public class LogFormatter
 		extends Formatter {
 
 	public static final Map<Integer, LogWithStackTraceEntry> errors = new ConcurrentSkipListMap<>();
-	final static DateFormat simple = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:SSS");
+	final static DateFormat simple = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	private static int DATE_TIME_LEN = 26;
 	private static int LEVEL_OFFSET = 7;
 	private static int METHOD_OFFSET = 37;
 	private static int THREAD_OFFSET = 25;
 	protected Date timestamp = new Date();
 
+	private boolean colorful = true;
+
 	public LogFormatter() {
+	}
+
+	public LogFormatter(boolean colorful) {
+		this.colorful = colorful;
 	}
 
 	@Override
 	public synchronized String format(LogRecord record) {
 		StringBuilder sb = new StringBuilder(200);
+		int colorOffset = 0;
 
 		timestamp.setTime(record.getMillis());
+		colorOffset += setColor(sb, AnsiColor.GREEN_BOLD_BRIGHT);
 		sb.append('[').append(simple.format(timestamp)).append(']');
-		padStringToColumn(sb, record.getLevel().toString(), LEFT, DATE_TIME_LEN + LEVEL_OFFSET, ' ', " [", "]");
-		padStringToColumn(sb, Thread.currentThread().getName(), RIGHT, DATE_TIME_LEN + LEVEL_OFFSET + THREAD_OFFSET,
-						  ' ', " [", " ]");
+		colorOffset += setColor(sb, AnsiColor.CYAN);
+		padStringToColumn(sb, record.getLevel().toString(), LEFT, DATE_TIME_LEN + LEVEL_OFFSET + colorOffset, ' ', " [",
+						  "]");
+		colorOffset += setColor(sb, AnsiColor.RESET);
+		padStringToColumn(sb, Thread.currentThread().getName(), RIGHT,
+						  DATE_TIME_LEN + LEVEL_OFFSET + THREAD_OFFSET + colorOffset, ' ', " [", " ]");
+		colorOffset += setColor(sb, AnsiColor.BLUE_BOLD);
 		padStringToColumn(sb, getClassMethodName(record), LEFT,
-						  DATE_TIME_LEN + LEVEL_OFFSET + THREAD_OFFSET + METHOD_OFFSET, ' ', " ", ": ");
+						  DATE_TIME_LEN + LEVEL_OFFSET + THREAD_OFFSET + METHOD_OFFSET + colorOffset, ' ', " ", ": ");
+		setColor(sb, AnsiColor.RESET);
 		sb.append(formatMessage(record));
 		if (record.getThrown() != null) {
 			final String stackTrace = fillThrowable(record);
@@ -74,6 +89,14 @@ public class LogFormatter
 			}
 			return new LogWithStackTraceEntry(msg, log_msg);
 		}).increment();
+	}
+
+	private int setColor(StringBuilder sb, AnsiColor color) {
+		if (colorful && AnsiColor.isCompatible()) {
+			sb.append(color);
+			return color.toString().length();
+		}
+		return 0;
 	}
 
 	private String fillThrowable(LogRecord record) {

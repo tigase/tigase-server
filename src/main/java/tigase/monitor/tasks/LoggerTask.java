@@ -177,7 +177,7 @@ public class LoggerTask
 	private class MonitorHandler
 			extends Handler {
 
-		private LogFormatter formatter = new LogFormatter();
+		private Formatter formatter = new LogFormatter(false);
 		private LinkedList<String> logs = new LinkedList<String>();
 
 		@Override
