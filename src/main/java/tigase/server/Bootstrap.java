@@ -41,6 +41,7 @@ import tigase.sys.ShutdownHook;
 import tigase.util.dns.DNSResolverDefault;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.dns.DNSResolverIfc;
+import tigase.util.log.LogFormatter;
 import tigase.util.reflection.ClassUtilBean;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.BareJID;
@@ -185,11 +186,11 @@ public class Bootstrap {
 		defaults.put(LOGGING_KEY + levelStr, "CONFIG");
 //		}
 		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", "tigase.util.log.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", LogFormatter.class.getName());
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", "tigase.util.log.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", LogFormatter.class.getName());
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");

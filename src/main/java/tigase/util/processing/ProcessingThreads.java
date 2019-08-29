@@ -67,7 +67,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 			t.setQueueMaxSize(maxQueueSize);
 			t.setDaemon(true);
-			t.setName(name + " Queue Worker " + j);
+			t.setName(name + "-proc-" + j);
 			t.start();
 			workerThreads.add((E) t);
 			log.log(Level.FINEST, "Created worker thread: {0}, queueSize: {1}",

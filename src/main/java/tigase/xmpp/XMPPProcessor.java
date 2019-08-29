@@ -81,7 +81,7 @@ public abstract class XMPPProcessor
 			result = checkPacket(packet, elemPaths, elemXMLNS, types);
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1})\n Request: " + "{2}, conn: {3}, authorization: {4}",
+			log.log(Level.FINEST, "{0} ({1}), authorization/canHandle: {4}, Request: " + "{2}, conn: {3}",
 					new Object[]{this.getClass().getSimpleName(), id(), packet, conn, result});
 		}
 

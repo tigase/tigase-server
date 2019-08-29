@@ -17,29 +17,30 @@
  */
 package tigase.util.log;
 
-import java.util.Calendar;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-/**
- * Describe class LogFormatter here.
- * <br>
- * Created: Thu Jan  5 22:58:02 2006
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+import static tigase.util.StringUtilities.JUSTIFY.LEFT;
+import static tigase.util.StringUtilities.JUSTIFY.RIGHT;
+import static tigase.util.StringUtilities.padStringToColumn;
+
 public class LogFormatter
 		extends Formatter {
 
-	public static final Map<Integer, LogWithStackTraceEntry> errors = new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
-	protected static int DATE_TIME_LEN = 24;
-	private static int LEVEL_OFFSET = 12;
-	private static int MED_LEN = 40;
-	private static int TH_NAME_LEN = 17;
-
-	protected Calendar cal = Calendar.getInstance();
+	public static final Map<Integer, LogWithStackTraceEntry> errors = new ConcurrentSkipListMap<>();
+	final static DateFormat simple = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss:SSS");
+	private static int DATE_TIME_LEN = 26;
+	private static int LEVEL_OFFSET = 7;
+	private static int METHOD_OFFSET = 37;
+	private static int THREAD_OFFSET = 25;
+	protected Date timestamp = new Date();
 
 	public LogFormatter() {
 	}
@@ -48,82 +49,61 @@ public class LogFormatter
 	public synchronized String format(LogRecord record) {
 		StringBuilder sb = new StringBuilder(200);
 
-		cal.setTimeInMillis(record.getMillis());
-		sb.append(String.format("%1$tF %1$tT.%1$tL", cal));
-
-		String th_name = Thread.currentThread().getName();
-
-		sb.append(" [").append(th_name).append("]");
-		while (sb.length() < DATE_TIME_LEN + TH_NAME_LEN) {
-			sb.append(' ');
-		}    // end of while (sb.length() < MEDIUM_LEN)
-		if (record.getSourceClassName() != null) {
-			String clsName = record.getSourceClassName();
-			int idx = clsName.lastIndexOf('.');
-
-			if (idx >= 0) {
-				clsName = clsName.substring(idx + 1);
-			}    // end of if (idx >= 0)
-			sb.append("  ").append(clsName);
-		}      // end of if (record.getSourceClassName() != null)
-		if (record.getSourceMethodName() != null) {
-			sb.append(".").append(record.getSourceMethodName()).append("()");
-		}    // end of if (record.getSourceMethodName() != null)
-		while (sb.length() < DATE_TIME_LEN + TH_NAME_LEN + MED_LEN) {
-			sb.append(' ');
-		}    // end of while (sb.length() < MEDIUM_LEN)
-		sb.append("  ").append(record.getLevel()).append(": ");
-		while (sb.length() < DATE_TIME_LEN + TH_NAME_LEN + MED_LEN + LEVEL_OFFSET) {
-			sb.append(' ');
-		}    // end of while (sb.length() < MEDIUM_LEN)
+		timestamp.setTime(record.getMillis());
+		sb.append('[').append(simple.format(timestamp)).append(']');
+		padStringToColumn(sb, record.getLevel().toString(), LEFT, DATE_TIME_LEN + LEVEL_OFFSET, ' ', " [", "]");
+		padStringToColumn(sb, Thread.currentThread().getName(), RIGHT, DATE_TIME_LEN + LEVEL_OFFSET + THREAD_OFFSET,
+						  ' ', " [", " ]");
+		padStringToColumn(sb, getClassMethodName(record), LEFT,
+						  DATE_TIME_LEN + LEVEL_OFFSET + THREAD_OFFSET + METHOD_OFFSET, ' ', " ", ": ");
 		sb.append(formatMessage(record));
 		if (record.getThrown() != null) {
-			sb.append('\n').append(record.getThrown().toString());
-
-			StringBuilder st_sb = new StringBuilder(1024);
-
-			getStackTrace(st_sb, record.getThrown());
-			sb.append(st_sb.toString());
-			addError(record.getThrown(), st_sb.toString(), sb.toString());
+			final String stackTrace = fillThrowable(record);
+			sb.append(stackTrace);
+			addError(record.getThrown(), stackTrace, sb.toString());
 		}
-
-		return sb.toString() + "\n";
+		return sb.append("\n").toString();
 	}
 
 	protected void addError(Throwable thrown, String stack, String log_msg) {
-		Integer code = stack.hashCode();
-		LogWithStackTraceEntry entry = errors.get(code);
-
-		if (entry == null) {
+		errors.computeIfAbsent(stack.hashCode(), integer -> {
 			String msg = thrown.getMessage();
 
 			if (msg == null) {
 				msg = thrown.toString();
 			}
-			entry = new LogWithStackTraceEntry(msg, log_msg);
-			errors.put(code, entry);
-		}
-		entry.increment();
+			return new LogWithStackTraceEntry(msg, log_msg);
+		}).increment();
 	}
 
-	protected void getStackTrace(StringBuilder sb, Throwable th) {
-		if (sb.length() > 0) {
-			sb.append("\nCaused by: ").append(th.toString());
+	private String fillThrowable(LogRecord record) {
+		if (record.getThrown() != null) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			pw.println();
+			record.getThrown().printStackTrace(pw);
+			pw.close();
+			return sw.toString();
+		} else {
+			return null;
 		}
+	}
 
-		StackTraceElement[] stackTrace = th.getStackTrace();
-
-		if ((stackTrace != null) && (stackTrace.length > 0)) {
-			for (int i = 0; i < stackTrace.length; i++) {
-				sb.append("\n\tat ").append(stackTrace[i].toString());
+	private String getClassMethodName(LogRecord record) {
+		StringBuilder sb = new StringBuilder();
+		if (record.getSourceClassName() != null) {
+			String className = "";
+			className = record.getSourceClassName();
+			int idx = className.lastIndexOf('.');
+			if (idx >= 0) {
+				className = className.substring(idx + 1);
 			}
+			sb.append(className);
 		}
-
-		Throwable cause = th.getCause();
-
-		if (cause != null) {
-			getStackTrace(sb, cause);
+		if (record.getSourceMethodName() != null) {
+			sb.append(".").append(record.getSourceMethodName()).append("()");
 		}
+		return sb.toString();
 	}
-}    // LogFormatter
+}
 
