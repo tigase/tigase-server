@@ -210,7 +210,7 @@ public class LoggerTask
 		@Override
 		public synchronized void publish(LogRecord record) {
 			String logEntry = XMLUtils.translateAll(formatter.format(record), decoded, encoded);
-			String unicodeLiteral = StringUtilities.convertNonPrintableCharactersToLiterals(logEntry);
+			String unicodeLiteral = StringUtilities.convertNonPrintableCharactersToLiterals(logEntry, true);
 			logs.add(unicodeLiteral);
 		}
 	}
