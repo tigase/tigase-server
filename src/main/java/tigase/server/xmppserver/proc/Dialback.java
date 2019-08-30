@@ -42,10 +42,12 @@ import java.util.logging.Logger;
  * Created: Dec 9, 2010 2:00:52 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 @Bean(name = "dialback", parent = S2SConnectionManager.class, active = true)
 public class Dialback
 		extends S2SAbstractProcessor {
+
+	private static final String METHOD_NAME = "DIALBACK";
 
 	private static final Logger log = Logger.getLogger(Dialback.class.getName());
 	private static final Element features_required = new Element("dialback", new Element[]{new Element("required")},
@@ -63,7 +65,6 @@ public class Dialback
 	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd", alias = "ejabberd-bug-workaround")
 	private boolean ejabberd_bug_workaround_active = true;
 
-
 	public Dialback() {
 		super();
 	}
@@ -76,7 +77,7 @@ public class Dialback
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		CID cid = (CID) serv.getSessionData().get("cid");
-		boolean skipTLS = (cid == null) ? false : skipTLSForHost(cid.getRemoteHost());
+		boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
 		// If this is a dialback packet, process it accordingly
 		if (p.getXMLNS() == XMLNS_DB_VAL) {
@@ -92,6 +93,14 @@ public class Dialback
 		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
+			}
+
+			String method = (String) serv.getSessionData().get(S2S_METHOD_USED);
+			if (method != null && method != METHOD_NAME) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Another method {1} is used. Skipping.", new Object[]{serv, method});
+				}
+				return true;
 			}
 
 			CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData()
@@ -181,13 +190,13 @@ public class Dialback
 
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
-		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
-
-		if (certCheckResult == CertCheckResult.trusted) {
-			results.add(features);
-		} else {
-			results.add(features_required);
-		}
+//		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
+//
+//		if (certCheckResult == CertCheckResult.trusted) {
+		results.add(features);
+//		} else {
+//			results.add(features_required);
+//		}
 	}
 
 	@Override
@@ -199,6 +208,10 @@ public class Dialback
 		}
 		switch (serv.connectionType()) {
 			case connect:
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Initializing dialback after stream opened: {1}",
+							new Object[]{serv, attribs.get("id")});
+				}
 				initDialback(serv, attribs.get("id"));
 
 				break;
@@ -213,7 +226,6 @@ public class Dialback
 
 	/**
 	 * Checks if result request for received domain was sent by service
-	 *
 	 */
 	@SuppressWarnings("unchecked")
 	protected boolean wasResultRequested(S2SIOService serv, String domain) {
@@ -224,6 +236,7 @@ public class Dialback
 
 	/**
 	 * Checks if verify request for received domain was sent by service
+	 *
 	 * @see CIDConnections#sendHandshakingOnly
 	 */
 	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
@@ -233,6 +246,7 @@ public class Dialback
 	}
 
 	private void initDialback(S2SIOService serv, String remote_id) {
+
 		try {
 			if (remote_id == null) {
 				generateStreamError(false, "bad-request", serv);
@@ -392,7 +406,6 @@ public class Dialback
 
 	/**
 	 * Adds domain to list of domains requested for result by service
-	 *
 	 */
 	@SuppressWarnings("unchecked")
 	private void addToResultRequested(S2SIOService serv, String domain) {

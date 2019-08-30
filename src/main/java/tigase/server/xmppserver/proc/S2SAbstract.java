@@ -19,6 +19,7 @@ package tigase.server.xmppserver.proc;
 
 import tigase.kernel.beans.Inject;
 import tigase.server.xmppserver.S2SConnectionHandlerIfc;
+import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
 
 import java.util.Map;
@@ -62,8 +63,6 @@ public class S2SAbstract {
 
 	protected static final String XMLNS_DB_VAL = "jabber:server:dialback";
 
-	protected static final String XMLNS_SERVER_VAL = "jabber:server";
-
 	protected static final String[] FEATURES_STARTTLS_PATH = {FEATURES_EL, START_TLS_EL};
 
 	protected static final String[] FEATURES_DIALBACK_PATH = {FEATURES_EL, DIALBACK_EL};
@@ -81,9 +80,10 @@ public class S2SAbstract {
 		String strError = "";
 
 		if (initStream) {
-			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-server-error'" + " from='" +
-					handler.getDefHostName() + "'" + " xml:lang='en'>";
+			strError +=
+					"<?xml version='1.0'?><stream:stream" + " xmlns='" + S2SConnectionManager.XMLNS_SERVER_VAL + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-server-error'" +
+							" from='" + handler.getDefHostName() + "'" + " xml:lang='en'>";
 		}
 		strError += "<stream:error>" + "<" + error_el + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 				"</stream:error>" + "</stream:stream>";

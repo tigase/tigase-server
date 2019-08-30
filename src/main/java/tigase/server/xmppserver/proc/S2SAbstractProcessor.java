@@ -32,10 +32,12 @@ import java.util.logging.Logger;
  * Created: Dec 10, 2010 3:32:11 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 public abstract class S2SAbstractProcessor
 		extends S2SAbstract
 		implements S2SProcessor {
+
+	public static final String S2S_METHOD_USED = "S2S_METHOD_USED";
 
 	private static final Logger log = Logger.getLogger(S2SAbstractProcessor.class.getName());
 	@ConfigField(desc = "Skip StartTLS for domains", alias = "skip-tls-hostnames")
@@ -92,17 +94,20 @@ public abstract class S2SAbstractProcessor
 
 	// Order of enum values is important as it is an order in which packet
 	// is processed by processors
-	protected static enum Order {
-		StreamOpen,
+	protected enum Order {
 		// 0
-		StreamError,
+		StreamOpen,
 		// 1
-		StreamFeatures,
+		StreamError,
 		// 2
-		StartTLS,
+		StreamFeatures,
 		// 3
-		StartZlib,
+		StartTLS,
 		// 4
-		Dialback                // 5
+		SaslExternal,
+		// 5
+		Dialback,
+		// 6
+		StartZlib,
 	}
 }

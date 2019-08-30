@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * Created: Jun 14, 2010 11:59:38 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 @Bean(name = "s2s", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.ConnectionManagersMode})
 public class S2SConnectionManager
@@ -86,13 +86,12 @@ public class S2SConnectionManager
 
 	// TODO: #1195 - estimate proper default value
 	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
+	public static final String XMLNS_SERVER_VAL = "jabber:server";
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
 	private static final Logger log = Logger.getLogger(S2SConnectionManager.class.getName());
 	private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
 	private static final String XMLNS_CLIENT_VAL = "jabber:client";
-	private static final String XMLNS_SERVER_VAL = "jabber:server";
-
 	/**
 	 * Outgoing and incoming connections for a given domains pair (localdomain, remotedomain)
 	 */
@@ -478,7 +477,7 @@ public class S2SConnectionManager
 			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[]{serv, sb});
 		}
 
-		return (sb.length() == 0) ? null : new String[] { sb.toString() };
+		return (sb.length() == 0) ? null : new String[]{sb.toString()};
 	}
 
 	@Override
@@ -637,7 +636,6 @@ public class S2SConnectionManager
 
 	/**
 	 * Method from ConnectionManager is overriden as it uses local value S2S_HT_TRAFFIC_THROTTLING_PROP_VAL
-	 *
 	 */
 	@Override
 	protected String getDefTrafficThrottling() {

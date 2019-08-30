@@ -36,11 +36,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.server.xmppserver.S2SConnectionManager.XMLNS_SERVER_VAL;
+
 /**
  * Created: Dec 10, 2010 5:53:57 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 @Bean(name = "packetChecker", parent = S2SConnectionManager.class, active = true)
 public class PacketChecker
 		extends S2SAbstractFilter {
@@ -127,7 +129,6 @@ public class PacketChecker
 
 	/**
 	 * Check if incoming packet is allowed on this connection
-	 *
 	 */
 	protected boolean isAllowed(Packet p, S2SIOService serv, CID cid) {
 		boolean allowed = serv.isAuthenticated(cid);

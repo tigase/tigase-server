@@ -61,7 +61,7 @@ import java.util.logging.Logger;
  * keeping more information about the connection.
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 public abstract class IOService<RefObject>
 		implements Callable<IOService<?>>, TLSEventHandler, IOListener {
 
@@ -87,8 +87,8 @@ public abstract class IOService<RefObject>
 	private final ReentrantLock readInProgress = new ReentrantLock();
 	private final ReentrantLock writeInProgress = new ReentrantLock();
 	protected CharBuffer cb = CharBuffer.allocate(2048);
-	protected CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-	protected CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+	protected CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+	protected CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
 	/**
 	 * The saved partial bytes for multi-byte UTF-8 characters between reads
 	 */
@@ -292,7 +292,7 @@ public abstract class IOService<RefObject>
 		if (!wrapper.isClientMode() && (wrapper.wantClientAuth() || wrapper.isNeedClientAuth())) {
 			try {
 				Certificate[] certs = wrapper.getPeerCertificates();
-				this.peerCertificate = certs[certs.length - 1];
+				this.peerCertificate = certs[0];
 
 			} catch (SSLPeerUnverifiedException e) {
 				this.peerCertificate = null;
@@ -1015,6 +1015,10 @@ public abstract class IOService<RefObject>
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
 	}
 
+	protected IOInterface getIO() {
+		return socketIO;
+	}
+
 	private void resizeInputBuffer() throws IOException {
 		int netSize = socketIO.getInputPacketSize();
 
@@ -1070,10 +1074,6 @@ public abstract class IOService<RefObject>
 			// log.finer("input.position()=" + socketInput.position());
 			// }
 		}
-	}
-
-	protected IOInterface getIO() {
-		return socketIO;
 	}
 
 	private void setLastTransferTime() {
