@@ -486,7 +486,7 @@ public class XMPPIOService<RefObject>
 					if (domHandler.parseError()) {
 						if (log.isLoggable(Level.FINE)) {
 							log.log(Level.WARNING, "{0}, Data parsing error: {1}",
-									new Object[]{toString(), new String(data)});
+									new Object[]{toString(), StringUtilities.convertNonPrintableCharactersToLiterals(new String(data))});
 						} else {
 							log.log(Level.WARNING, "{0}, data parsing error, stopping connection", toString());
 						}
