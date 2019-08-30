@@ -221,7 +221,7 @@ public class TLSIO
 		// return
 		// NEED_READ status all the time and the loop never ends.
 		int loop_cnt = 0;
-		int max_loop_runs = 100000;
+		int max_loop_runs = 5000;
 
 		boolean breakNow = true;
 
@@ -445,7 +445,7 @@ public class TLSIO
 		// It happens extremely rarely and is hard to diagnose. Let's leave it
 		// as it is now which just causes such connections to be closed.
 		int loop_cnt = 0;
-		int max_loop_runs = 100000;
+		int max_loop_runs = 5000;
 
 		do {
 			if (tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
