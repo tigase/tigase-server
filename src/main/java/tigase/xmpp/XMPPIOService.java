@@ -395,7 +395,7 @@ public class XMPPIOService<RefObject>
 	protected void addReceivedPacket(final Packet packet) {
 		if (firstPacket) {
 			if ("policy-file-request" == packet.getElemName()) {
-				log.fine("Got flash cross-domain request" + packet);
+				log.log(Level.FINER, "Got flash cross-domain request" + packet);
 				String cross_domain_policy = (this.serviceListener instanceof ConnectionManager)
 											 ? ((ConnectionManager) serviceListener).getFlashCrossDomainPolicy()
 											 : null;
@@ -465,10 +465,10 @@ public class XMPPIOService<RefObject>
 
 				if (disconnect) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.WARNING, "{0}, checkData says disconnect: {1}",
+						log.log(Level.FINE, "{0}, checkData says disconnect: {1}",
 								new Object[]{toString(), new String(data)});
 					} else {
-						log.log(Level.WARNING, "{0}, checkData says disconnect", toString());
+						log.log(Level.INFO, "{0}, checkData says disconnect", toString());
 					}
 					forceStop();
 
@@ -485,10 +485,10 @@ public class XMPPIOService<RefObject>
 					parser.parse(domHandler, data, 0, data.length);
 					if (domHandler.parseError()) {
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.WARNING, "{0}, Data parsing error: {1}",
+							log.log(Level.FINE, "{0}, Data parsing error: {1}",
 									new Object[]{toString(), StringUtilities.convertNonPrintableCharactersToLiterals(new String(data))});
 						} else {
-							log.log(Level.WARNING, "{0}, data parsing error, stopping connection", toString());
+							log.log(Level.INFO, "{0}, data parsing error, stopping connection", toString());
 						}
 						if (serviceListener != null) {
 							Element err = new Element("not-well-formed", new String[]{"xmlns"},
@@ -523,10 +523,6 @@ public class XMPPIOService<RefObject>
 			}
 			forceStop();
 		}
-
-		// } finally {
-		// readLock.unlock();
-		// }
 	}
 
 	@Override
@@ -567,12 +563,6 @@ public class XMPPIOService<RefObject>
 		if (serviceListener != null) {
 			serviceListener.xmppStreamClosed(this);
 		}
-
-		// try {
-		// stop();
-		// } catch (IOException e) {
-		// log.warning("Error stopping service: " + e);
-		// } // end of try-catch
 	}
 
 	@SuppressWarnings({"unchecked"})
@@ -616,8 +606,8 @@ public class XMPPIOService<RefObject>
 
 	private void sendAck(Packet packet) {
 
-		// If stanza receiving confirmation is configured, try to send confirmation
-		// back
+		// If stanza receiving confirmation is configured,
+		// try to send confirmation back
 		if (white_char_ack || xmpp_ack) {
 			String ack = null;
 
@@ -668,7 +658,6 @@ public class XMPPIOService<RefObject>
 		while ((elem = elems.poll()) != null) {
 			try {
 				// assert debug(elem.toString() + "\n");
-				// log.finer("Read element: " + elem.getName());
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[]{toString(), elem});
 				}
