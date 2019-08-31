@@ -171,8 +171,8 @@ public class TLSIO
 		} else {
 			if (tlsInput.capacity() > tlsWrapper.getAppBuffSize() && tlsInput.capacity() == tlsInput.remaining()) {
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}",
-							new Object[]{tlsWrapper.getAppBuffSize(), toString()});
+					log.log(Level.FINE, "Resizing tlsInput to {0} bytes, capacity: {1}, remaining: {2}; IO: {3}",
+							new Object[]{tlsWrapper.getAppBuffSize(), tlsInput.capacity(), tlsInput.remaining(), toString()});
 				}
 				ByteBuffer bb = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
 
@@ -297,8 +297,8 @@ public class TLSIO
 			result = io.write(null);
 		} else {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
-						new Object[]{buff.remaining(), toString()});
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, loop_cnt: {1}, TLSIO: {2}, tlsWrapper: {3}",
+						new Object[]{buff.remaining(), loop_cnt, toString(), tlsWrapper});
 			}
 
 			result = writeBuff(buff);
@@ -471,16 +471,16 @@ public class TLSIO
 			result += wr;
 
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
-						new Object[]{buff.remaining(), toString()});
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, run {1} of {2}, TLSIO: {3}, tlsWrapper: {4}",
+						new Object[]{buff.remaining(), loop_cnt, max_loop_runs, toString(), tlsWrapper});
 			}
 
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.log(Level.INFO, "Infinite loop detected in writeBuff(buff) TLS code, " + "tlsWrapper.getStatus(): " +
-								tlsWrapper.getStatus() + ", buff.remaining(): " + buff.remaining() + " io: " +
-								toString());
+			log.log(Level.INFO,
+					"Infinite loop detected in writeBuff(buff) TLS code, tlsWrapper.getStatus(): {0}, buff.remaining(): {1}, ran {2} times, io: {3}",
+					new Object[]{tlsWrapper.getStatus(), buff.remaining(), loop_cnt, toString()});
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");

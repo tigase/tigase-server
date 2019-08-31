@@ -26,6 +26,7 @@ import javax.net.ssl.SSLEngineResult.Status;
 import java.nio.ByteBuffer;
 import java.security.cert.Certificate;
 import java.util.Arrays;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,14 +94,18 @@ public class JcaTLSWrapper
 			tlsEngine.setNeedClientAuth(true);
 		}
 
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Created " + (clientMode ? "client" : "server") + " TLSWrapper. Protocols:" +
-							   (tlsEngine.getEnabledProtocols() == null
-								? " default"
-								: Arrays.toString(tlsEngine.getEnabledProtocols())) + "; Ciphers:" +
-							   (tlsEngine.getEnabledCipherSuites() == null
-								? " default"
-								: Arrays.toString(tlsEngine.getEnabledCipherSuites())));
+		if (log.isLoggable(Level.FINE)) {
+			final String mode = clientMode ? "client" : "server";
+			final String enabledCiphersDebug = tlsEngine.getEnabledCipherSuites() == null
+											   ? " default"
+											   : Arrays.toString(tlsEngine.getEnabledCipherSuites());
+			final String enabledProtocolsDebug = tlsEngine.getEnabledProtocols() == null
+												 ? " default"
+												 : Arrays.toString(tlsEngine.getEnabledProtocols());
+			final String sessionCipher =
+					tlsEngine.getSession() == null ? "n/a" : tlsEngine.getSession().getCipherSuite();
+			log.log(Level.FINE, "Created {0} TLSWrapper. Protocols: {1}; Ciphers: {2}; Session cipher: {3}",
+					new Object[]{mode, enabledProtocolsDebug, enabledCiphersDebug, sessionCipher});
 		}
 
 	}
@@ -315,8 +320,8 @@ public class JcaTLSWrapper
 		//
 		// ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
 		int newSize = app.capacity() * 2;
-		if (log.isLoggable(Level.FINE)) {
-			log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[]{newSize, debugId});
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "Resizing tlsInput to {0} bytes, {1}", new Object[]{newSize, debugId});
 		}
 
 		ByteBuffer bb = ByteBuffer.allocate(newSize);
@@ -334,4 +339,15 @@ public class JcaTLSWrapper
 		// } // end of else
 	}
 
+	@Override
+	public String toString() {
+		return new StringJoiner(", ", JcaTLSWrapper.class.getSimpleName() + "[", "]")
+//				.add("appBuffSize=" + appBuffSize)
+//				.add("netBuffSize=" + netBuffSize)
+				.add("WrapperStatus = " + getStatus())
+				.add("TLSEngineStatus = " + tlsEngineResult.getStatus())
+				.add("HandshakeStatus = " + tlsEngineResult.getHandshakeStatus())
+//				.add("CipherSuite = " + tlsEngine.getSession().getCipherSuite())
+				.toString();
+	}
 }
