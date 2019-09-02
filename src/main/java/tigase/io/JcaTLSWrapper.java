@@ -341,13 +341,16 @@ public class JcaTLSWrapper
 
 	@Override
 	public String toString() {
-		return new StringJoiner(", ", JcaTLSWrapper.class.getSimpleName() + "[", "]")
+		final StringJoiner joiner = new StringJoiner(", ", JcaTLSWrapper.class.getSimpleName() + "[", "]")
 //				.add("appBuffSize=" + appBuffSize)
 //				.add("netBuffSize=" + netBuffSize)
-				.add("WrapperStatus = " + getStatus())
-				.add("TLSEngineStatus = " + tlsEngineResult.getStatus())
-				.add("HandshakeStatus = " + tlsEngineResult.getHandshakeStatus())
+				.add("WrapperStatus = " + getStatus());
 //				.add("CipherSuite = " + tlsEngine.getSession().getCipherSuite())
-				.toString();
+		if (tlsEngineResult != null) {
+			joiner
+				.add("TLSEngineStatus = " + tlsEngineResult.getStatus())
+				.add("HandshakeStatus = " + tlsEngineResult.getHandshakeStatus());
+		}
+		return joiner.toString();
 	}
 }

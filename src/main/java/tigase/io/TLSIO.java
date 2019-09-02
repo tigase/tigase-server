@@ -298,7 +298,7 @@ public class TLSIO
 		} else {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, loop_cnt: {1}, TLSIO: {2}, tlsWrapper: {3}",
-						new Object[]{buff.remaining(), loop_cnt, toString(), tlsWrapper});
+						new Object[]{buff.remaining(), loop_cnt, toString(), String.valueOf(tlsWrapper)});
 			}
 
 			result = writeBuff(buff);
@@ -472,7 +472,7 @@ public class TLSIO
 
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, run {1} of {2}, TLSIO: {3}, tlsWrapper: {4}",
-						new Object[]{buff.remaining(), loop_cnt, max_loop_runs, toString(), tlsWrapper});
+						new Object[]{buff.remaining(), loop_cnt, max_loop_runs, toString(), String.valueOf(tlsWrapper)});
 			}
 
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
