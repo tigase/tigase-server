@@ -360,7 +360,7 @@ public class JabberIqPrivacy
 					list = Privacy.getDefaultList(session);
 				}
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Using privcy list: {0}", list);
+					log.log(Level.FINEST, "Using privacy list: {0}", list);
 				}
 				if (list != null) {
 					return allowed(packet, session.getConnectionId(), session.getBareJID(), list);

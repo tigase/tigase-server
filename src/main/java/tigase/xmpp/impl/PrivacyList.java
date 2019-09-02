@@ -107,12 +107,18 @@ public class PrivacyList {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("PrivacyList[" + name + ", [");
-		for (Item item : items) {
-			sb.append(item.toString()).append(",");
+		final StringJoiner joiner = new StringJoiner(", ", "PrivacyList[name=" + name + ", size: " + items.length +
+				", items: ", "]");
+
+		for (int i = 0; i < items.length; i++) {
+			Item item = items[i];
+			joiner.add(item.toString());
+			if (i + 1 >= 10) {
+				joiner.add("... " + (items.length - i - 1) + " more...");
+				break;
+			}
 		}
-		sb.append("]]");
-		return sb.toString();
+		return joiner.toString();
 	}
 
 	private PrivacyList getSingletonIfPossible() {
@@ -254,6 +260,11 @@ public class PrivacyList {
 		public boolean matches(JID jid, Type type) {
 			return true;
 		}
+
+		@Override
+		public String toString() {
+			return "All items: " + (allowed ? "allowed" : "blocked");
+		}
 	}
 
 	private class ItemGroup
@@ -282,6 +293,11 @@ public class PrivacyList {
 			}
 			return false;
 		}
+
+		@Override
+		public String toString() {
+			return "Group: " + group + ": " + (allowed ? "allowed" : "blocked");
+		}
 	}
 
 	private class ItemJid
@@ -297,6 +313,11 @@ public class PrivacyList {
 		@Override
 		public boolean matches(JID jid, Type type) {
 			return matches(jid) && types.contains(type);
+		}
+
+		@Override
+		public String toString() {
+			return "JID: " + jid + ": " + (allowed ? "allowed" : "blocked");
 		}
 
 		private boolean matches(JID jid) {
@@ -347,6 +368,11 @@ public class PrivacyList {
 							RosterAbstract.FROM_SUBSCRIBED.contains(subscription);
 			}
 			return false;
+		}
+
+		@Override
+		public String toString() {
+			return "Subscription: " + subscription + ": " + (allowed ? "allowed" : "blocked");
 		}
 	}
 }
