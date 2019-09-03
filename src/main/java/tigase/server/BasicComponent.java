@@ -1223,6 +1223,11 @@ public class BasicComponent
 		}
 
 		@Override
+		public String toDebugString() {
+			return "abuse: " + adminAddresses + ", admin: " + adminAddresses + ", feedback: " + feedbackAddresses + ", sales: " + salesAddresses + ", security: " + securityAddresses + ", support: " + supportAddresses;
+		}
+
+		@Override
 		public Element toElement() {
 			Element el = new Element(getId());
 			elementsFromList("abuse", abuseAddresses).forEach(el::addChild);

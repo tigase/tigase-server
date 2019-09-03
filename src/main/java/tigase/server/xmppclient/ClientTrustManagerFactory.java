@@ -259,6 +259,11 @@ public class ClientTrustManagerFactory {
 		}
 
 		@Override
+		public String toDebugString() {
+			return "caCertPath: " + caCertPath + ", certRequired: " + certRequired;
+		}
+
+		@Override
 		public Element toElement() {
 			if ((caCertPath != null && !caCertPath.isEmpty()) || certRequired != null) {
 				Element el = new Element(getId());

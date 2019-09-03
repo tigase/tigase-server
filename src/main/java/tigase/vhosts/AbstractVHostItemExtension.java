@@ -20,7 +20,7 @@ package tigase.vhosts;
 import tigase.server.DataForm;
 import tigase.xml.Element;
 
-public abstract class AbstractVHostItemExtension<T extends AbstractVHostItemExtension<T>> implements VHostItemExtension<T> {
+public abstract class AbstractVHostItemExtension<T extends AbstractVHostItemExtension<T>> extends VHostItemExtension<T> {
 
 	protected void addBooleanFieldWithDefaultToCommand(Element commandEl, String var, String label, Boolean value, boolean forDefault) {
 		if (forDefault) {

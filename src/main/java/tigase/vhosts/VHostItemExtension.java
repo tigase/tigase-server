@@ -17,20 +17,12 @@
  */
 package tigase.vhosts;
 
-import tigase.server.Packet;
-import tigase.xml.Element;
+public abstract class VHostItemExtension<T extends VHostItemExtension<T>> implements VHostItemExtensionIfc<T> {
 
-public interface VHostItemExtension<T extends VHostItemExtension<T>> {
+	public abstract T mergeWithDefaults(T defaults);
 
-	String getId();
-
-	void initFromElement(Element item);
-
-	void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException;
-
-	Element toElement();
-
-	void addCommandFields(String prefix, Packet packet, boolean forDefault);
-
-	T mergeWithDefaults(T defaults);
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "(" + toDebugString() + ")";
+	}
 }

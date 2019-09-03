@@ -655,6 +655,11 @@ public class PresenceSubscription
 		}
 
 		@Override
+		public String toDebugString() {
+			return "mode: " + autoAuthorizeMode;
+		}
+
+		@Override
 		public Element toElement() {
 			if (autoAuthorizeMode == AUTO_AUTHORIZE_MODE.global) {
 				return null;

@@ -17,14 +17,20 @@
  */
 package tigase.vhosts;
 
-import tigase.annotations.TigaseDeprecated;
+import tigase.server.Packet;
+import tigase.xml.Element;
 
-import java.util.Map;
+public interface VHostItemExtensionIfc<T extends VHostItemExtensionIfc<T>> {
 
-@Deprecated
-@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
-public interface VHostItemExtensionBackwardCompatible<T extends VHostItemExtension<T>> extends VHostItemExtensionIfc<T> {
+	String getId();
 
-	void initFromData(Map<String, Object> data);
+	void initFromElement(Element item);
 
+	void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException;
+
+	Element toElement();
+
+	void addCommandFields(String prefix, Packet packet, boolean forDefault);
+	
+	String toDebugString();
 }

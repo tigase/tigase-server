@@ -171,6 +171,11 @@ public class SeeOtherHost
 		}
 
 		@Override
+		public String toDebugString() {
+			return "enabled: " + enabled;
+		}
+
+		@Override
 		public Element toElement() {
 			if (enabled) {
 				return null;

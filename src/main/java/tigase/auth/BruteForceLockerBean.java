@@ -33,7 +33,10 @@ import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.ComponentStatisticsProvider;
 import tigase.stats.StatisticsList;
-import tigase.vhosts.*;
+import tigase.vhosts.AbstractVHostItemExtension;
+import tigase.vhosts.VHostItemExtensionBackwardCompatible;
+import tigase.vhosts.VHostItemExtensionManager;
+import tigase.vhosts.VHostItemExtensionProvider;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
@@ -760,6 +763,13 @@ public class BruteForceLockerBean
 			periodTime = Long.parseLong(Command.getFieldValue(packet, prefix + "-period-time"));
 			lockTime = Long.parseLong(Command.getFieldValue(packet, prefix + "-lock-time"));
 			mode = Mode.valueOf(Command.getFieldValue(packet, prefix + "-mode"));
+		}
+
+		@Override
+		public String toDebugString() {
+			return "enabled: " + enabled + ",mode: " + mode + ", lockAfter: " + lockAccountAfterFailedAttempt +
+					", disableAfter: " + disableAccountAfterFailedAttempts + ", period: " + periodTime +
+					", lockTime: " + lockTime;
 		}
 
 		@Override
