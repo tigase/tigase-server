@@ -18,9 +18,13 @@
 package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xmpp.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -39,6 +43,15 @@ public abstract class AbstractAuthPreprocessor
 	private static final Logger log = Logger.getLogger(AbstractAuthPreprocessor.class.getCanonicalName());
 
 	private static final String[] AUTH_ONLY_ELEMS = {"message", "presence"};
+
+	@ConfigField(desc = "Matchers selecting allowed packets for unauthorized session", alias = "allow-unauthorized")
+	private ElementMatcher[] allowMatchers = new ElementMatcher[]{
+			new ElementMatcher(new String[0], "urn:ietf:params:xml:ns:xmpp-tls", true),
+			new ElementMatcher(new String[0], "http://jabber.org/protocol/compress", true),
+			new ElementMatcher(new String[0], "urn:ietf:params:xml:ns:xmpp-sasl", true),
+			new ElementMatcher(Iq.IQ_QUERY_PATH, JabberIqRegister.ID, true),
+			new ElementMatcher(Iq.IQ_QUERY_PATH, JabberIqAuth.ID, true)
+	};
 
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
@@ -73,6 +86,20 @@ public abstract class AbstractAuthPreprocessor
 							return true;
 						}
 					}
+					if (!isPacketAllowed(packet)) {
+						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+																					  "You must authenticate session first, before you" +
+																							  " can send any message or presence packet.",
+																					  true));
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "Packet received before the session has been authenticated." +
+											"Session details: connectionId=" + "{0}, sessionId={1}, packet={2}",
+									new Object[]{session.getConnectionId(), session.getSessionId(),
+												 packet.toStringSecure()});
+						}
+
+						return true;
+					}
 					return false;
 				}
 
@@ -90,6 +117,34 @@ public abstract class AbstractAuthPreprocessor
 			return false;
 		}    // end of try-catch
 
+		return false;
+	}
+
+	public String[] getAllowMatchers() {
+		String[] result = new String[allowMatchers.length];
+		for (int i = 0; i < allowMatchers.length; i++) {
+			result[i] = allowMatchers[i].toString();
+		}
+		return result;
+	}
+
+	public void setAllowMatchers(String[] matcherStrs) {
+		List<ElementMatcher> matchers = new ArrayList<>();
+		for (String matcherStr : matcherStrs) {
+			ElementMatcher matcher = ElementMatcher.create(matcherStr);
+			if (matcher != null) {
+				matchers.add(matcher);
+			}
+		}
+		allowMatchers = matchers.toArray(new ElementMatcher[0]);
+	}
+
+	protected boolean isPacketAllowed(Packet packet) {
+		for (ElementMatcher matcher : allowMatchers) {
+			if (matcher.matches(packet)) {
+				return matcher.getValue();
+			}
+		}
 		return false;
 	}
 

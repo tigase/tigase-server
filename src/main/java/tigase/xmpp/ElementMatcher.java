@@ -86,6 +86,9 @@ public class ElementMatcher {
 	}
 
 	public boolean matches(Packet packet) {
+		if (path.length == 0) {
+			return xmlns == null || xmlns == packet.getElement().getXMLNS();
+		}
 		Element child = packet.getElement().findChildStaticStr(path);
 		return child != null && (xmlns == null || xmlns == child.getXMLNS());
 	}
