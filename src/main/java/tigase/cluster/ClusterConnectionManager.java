@@ -784,10 +784,12 @@ public class ClusterConnectionManager
 						new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
 			}
 
-			if (!initialClusterConnectedDone && (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
-				initialClusterConnectedDone = true;
+			synchronized (this) {
+				if (!initialClusterConnectedDone && (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
+					initialClusterConnectedDone = true;
 
-				eventBus.fire(new ClusterInitializedEvent());
+					eventBus.fire(new ClusterInitializedEvent());
+				}
 			}
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);

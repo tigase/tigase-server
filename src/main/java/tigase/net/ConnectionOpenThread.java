@@ -53,7 +53,8 @@ public class ConnectionOpenThread
 	private Selector selector = null;
 	private boolean stopping = false;
 	private Timer timer = null;
-	private ConcurrentLinkedQueue<ConnectionOpenListener> waiting = new ConcurrentLinkedQueue<ConnectionOpenListener>();
+	private ConcurrentLinkedQueue<ConnectionOpenListener> waiting = new ConcurrentLinkedQueue<>();
+	private ConcurrentLinkedQueue<ConnectionOpenListener> waitingForRemoval = new ConcurrentLinkedQueue<>();
 
 	public static ConnectionOpenThread getInstance() {
 
@@ -101,21 +102,9 @@ public class ConnectionOpenThread
 	}
 
 	public void removeConnectionOpenListener(ConnectionOpenListener al) {
-		for (SelectionKey key : selector.keys()) {
-			if (al == key.attachment()) {
-				try {
-					key.cancel();
-
-					SelectableChannel channel = key.channel();
-
-					channel.close();
-				} catch (Exception e) {
-					log.log(Level.WARNING, "Exception during removing connection listener.", e);
-				}
-
-				break;
-			}
-		}
+		waiting.remove(al);
+		waitingForRemoval.add(al);
+		selector.wakeup();
 	}
 
 	@Override
@@ -204,6 +193,7 @@ public class ConnectionOpenThread
 					}    // end of if (sc != null) else
 					++accept_counter;
 				}
+				removeAllWaiting();
 				addAllWaiting();
 			} catch (IOException e) {
 				log.log(Level.SEVERE, "Server I/O error.", e);
@@ -228,6 +218,27 @@ public class ConnectionOpenThread
 	public void stop() {
 		stopping = true;
 		selector.wakeup();
+	}
+
+	private void removeAllWaiting() throws IOException {
+		ConnectionOpenListener al = null;
+
+		while ((al = waitingForRemoval.poll()) != null) {
+			for (SelectionKey key : selector.keys()) {
+				if (al == key.attachment()) {
+					try {
+						key.cancel();
+
+						SelectableChannel channel = key.channel();
+						channel.close();
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Exception during removing connection listener.", e);
+					}
+
+					break;
+				}
+			}
+		}
 	}
 
 	private void addAllWaiting() throws IOException {

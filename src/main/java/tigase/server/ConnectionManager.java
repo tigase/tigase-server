@@ -1029,22 +1029,33 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				return;
 			}
 
-			if (connectionOpenListener != null) {
-				connectionManager.releaseListener(connectionOpenListener);
-			}
+			synchronized (this) {
+				if (connectionOpenListener != null) {
+					try {
+						connectionManager.releaseListener(connectionOpenListener);
+						connectionOpenListener = null;
+					} catch (Throwable ex) {
+						ex.printStackTrace();
+						throw ex;
+					}
+				}
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "connectionManager: {0}, changedFields: {1}, props: {2}",
-						new Object[]{connectionManager, changedFields, getProps()});
-			}
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "connectionManager: {0}, changedFields: {1}, props: {2}",
+							new Object[]{connectionManager, changedFields, getProps()});
+				}
 
-			connectionOpenListener = connectionManager.startService(getProps());
+				connectionOpenListener = connectionManager.startService(getProps());
+			}
 		}
 
 		@Override
 		public void beforeUnregister() {
-			if (connectionOpenListener != null) {
-				connectionManager.releaseListener(connectionOpenListener);
+			synchronized (this) {
+				if (connectionOpenListener != null) {
+					connectionManager.releaseListener(connectionOpenListener);
+					connectionOpenListener = null;
+				}
 			}
 		}
 
