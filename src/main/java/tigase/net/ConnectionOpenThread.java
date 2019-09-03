@@ -223,21 +223,32 @@ public class ConnectionOpenThread
 	private void removeAllWaiting() throws IOException {
 		ConnectionOpenListener al = null;
 
+		boolean removed = false;
 		while ((al = waitingForRemoval.poll()) != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "checking binding for port:" + al.getPort());
+			}
 			for (SelectionKey key : selector.keys()) {
+				
 				if (al == key.attachment()) {
 					try {
-						key.cancel();
-
 						SelectableChannel channel = key.channel();
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "removing binding for port:" + al.getPort());
+						}
 						channel.close();
+						key.cancel();
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Exception during removing connection listener.", e);
 					}
+					removed = true;
 
 					break;
 				}
 			}
+		}
+		if (removed) {
+			selector.selectNow();
 		}
 	}
 
@@ -257,6 +268,16 @@ public class ConnectionOpenThread
 					log.log(Level.FINEST, "Error: creating IPv6 connection for: " + al, e);
 				} else {
 					log.log(Level.WARNING, "Error: creating connection for: " + al, e);
+
+					// check for existing bindings
+					for (SelectionKey key : selector.keys()) {
+						ConnectionOpenListener al1 = (ConnectionOpenListener) key.attachment();
+						if (al != null) {
+							if (al.getPort() == al1.getPort()) {
+								log.log(Level.FINEST, "port " + al.getPort() + " still bound!!");
+							}
+						}
+					}
 				}
 				al.accept(null);
 			}    // end of try-catch
@@ -282,7 +303,7 @@ public class ConnectionOpenThread
 
 				ssc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
 				ssc.configureBlocking(false);
-				ssc.socket().bind(isa, (int) (port_throttling));
+				ssc.bind(isa, (int) (port_throttling));
 				ssc.register(selector, SelectionKey.OP_ACCEPT, al);
 
 				break;
