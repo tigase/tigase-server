@@ -30,7 +30,10 @@ Other projects related to the Tigase XMPP Server:
 * [PubSub Component](/tigase/tigase-pubsub) - Publish-Subscribe: [XEP-0060](https://xmpp.org/extensions/xep-0060.html) and Personal Eventing Protocol: [XEP-0163](https://xmpp.org/extensions/xep-0163.html)
 * [Socks5 Proxy Component](/tigase/tigase-socks5) - SOCKS5 Bytestreams: [XEP-0065](https://xmpp.org/extensions/xep-0065.html)
 * [STUN Component](/tigase/tigase-stun) - [STUN](https://en.wikipedia.org/wiki/STUN) Component for Tigase
-* [HTTP API Component](/tigase/tigase-http-api) - Component providing easy to use HTTP endpoints for server management and integration
+* [HTTP API Component](/tigase/tigase-http-api) - Component providing easy to use HTTP endpoints for server management and integration based on JDK built-in HTTP server.
+* [Jetty HTTP API Component](/tigase/tigase-http-api-jetty) - High performance and high load component providing easy to use HTTP endpoints for server management and integration based on [Jetty HTTP Server](https://www.eclipse.org/jetty/).
+* [MongoDB Connector](/tigase/tigase-mongodb) - Connector adding support for [MongoDB](https://www.mongodb.com) database to Tigase server.
+* [Message Archiving Component](/tigase/tigase-message-archiving) - Component providing Message Archiving [XEP-0136](https://xmpp.org/extensions/xep-0136.html) and Message Archive Management [XEP-0313](https://xmpp.org/extensions/xep-0313.html) support.
 
 # Features
 
