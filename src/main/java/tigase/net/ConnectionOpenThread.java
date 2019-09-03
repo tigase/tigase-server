@@ -53,8 +53,7 @@ public class ConnectionOpenThread
 	private Selector selector = null;
 	private boolean stopping = false;
 	private Timer timer = null;
-	private ConcurrentLinkedQueue<ConnectionOpenListener> waiting = new ConcurrentLinkedQueue<>();
-	private ConcurrentLinkedQueue<ConnectionOpenListener> waitingForRemoval = new ConcurrentLinkedQueue<>();
+	private ConcurrentLinkedQueue<Task> waiting = new ConcurrentLinkedQueue<>();
 
 	public static ConnectionOpenThread getInstance() {
 
@@ -97,13 +96,12 @@ public class ConnectionOpenThread
 	}
 
 	public void addConnectionOpenListener(ConnectionOpenListener al) {
-		waiting.offer(al);
+		waiting.offer(new Task(al, Task.Action.Add));
 		selector.wakeup();
 	}
 
 	public void removeConnectionOpenListener(ConnectionOpenListener al) {
-		waiting.remove(al);
-		waitingForRemoval.add(al);
+		waiting.offer(new Task(al, Task.Action.Remove));
 		selector.wakeup();
 	}
 
@@ -193,8 +191,7 @@ public class ConnectionOpenThread
 					}    // end of if (sc != null) else
 					++accept_counter;
 				}
-				removeAllWaiting();
-				addAllWaiting();
+				processWaiting();
 			} catch (IOException e) {
 				log.log(Level.SEVERE, "Server I/O error.", e);
 
@@ -220,70 +217,64 @@ public class ConnectionOpenThread
 		selector.wakeup();
 	}
 
-	private void removeAllWaiting() throws IOException {
-		ConnectionOpenListener al = null;
+	private void processWaiting() throws IOException {
+		Task task = null;
 
-		boolean removed = false;
-		while ((al = waitingForRemoval.poll()) != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "checking binding for port:" + al.getPort());
-			}
-			for (SelectionKey key : selector.keys()) {
-				
-				if (al == key.attachment()) {
+		while ((task = waiting.poll()) != null) {
+			ConnectionOpenListener al = task.openListener;
+
+			switch (task.action) {
+				case Add:
 					try {
-						SelectableChannel channel = key.channel();
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "removing binding for port:" + al.getPort());
-						}
-						channel.close();
-						key.cancel();
+						addPort(al);
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Exception during removing connection listener.", e);
-					}
-					removed = true;
+						if (((e instanceof SocketException && e.getMessage() != null &&
+								e.getMessage().contains("Network is unreachable")) ||
+								(e instanceof NoRouteToHostException && e.getMessage() != null &&
+										e.getMessage().equals("No route to host"))) &&
+								al.getConnectionType() == ConnectionType.connect && al.getIfcs() != null &&
+								Arrays.stream(al.getIfcs()).filter(ifc -> ifc.contains(":")).findFirst().isPresent()) {
+							log.log(Level.FINEST, "Error: creating IPv6 connection for: " + al, e);
+						} else {
+							log.log(Level.WARNING, "Error: creating connection for: " + al, e);
 
-					break;
-				}
-			}
-		}
-		if (removed) {
-			selector.selectNow();
-		}
-	}
-
-	private void addAllWaiting() throws IOException {
-		ConnectionOpenListener al = null;
-
-		while ((al = waiting.poll()) != null) {
-			try {
-				addPort(al);
-			} catch (Exception e) {
-				if (((e instanceof SocketException && e.getMessage() != null &&
-						e.getMessage().contains("Network is unreachable")) ||
-						(e instanceof NoRouteToHostException && e.getMessage() != null &&
-								e.getMessage().equals("No route to host"))) &&
-						al.getConnectionType() == ConnectionType.connect && al.getIfcs() != null &&
-						Arrays.stream(al.getIfcs()).filter(ifc -> ifc.contains(":")).findFirst().isPresent()) {
-					log.log(Level.FINEST, "Error: creating IPv6 connection for: " + al, e);
-				} else {
-					log.log(Level.WARNING, "Error: creating connection for: " + al, e);
-
-					// check for existing bindings
-					for (SelectionKey key : selector.keys()) {
-						ConnectionOpenListener al1 = (ConnectionOpenListener) key.attachment();
-						if (al != null) {
-							if (al.getPort() == al1.getPort()) {
-								log.log(Level.FINEST, "port " + al.getPort() + " still bound!!");
+							// check for existing bindings
+							for (SelectionKey key : selector.keys()) {
+								ConnectionOpenListener al1 = (ConnectionOpenListener) key.attachment();
+								if (al != null) {
+									if (al.getPort() == al1.getPort()) {
+										log.log(Level.FINEST, "port " + al.getPort() + " still bound!!");
+									}
+								}
 							}
 						}
-					}
-				}
-				al.accept(null);
-			}    // end of try-catch
-		}      // end of for ()
-	}
+						al.accept(null);
+					}    // end of try-catch
+					break;
+				case Remove:
+					for (SelectionKey key : selector.keys()) {
 
+						if (al == key.attachment()) {
+							try {
+								SelectableChannel channel = key.channel();
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST, "removing binding for port:" + al.getPort());
+								}
+								channel.close();
+								key.cancel();
+								selector.selectNow();
+							} catch (Exception e) {
+								log.log(Level.WARNING, "Exception during removing connection listener.", e);
+							}
+
+							break;
+						}
+					}
+					break;
+			}
+		}
+	}
+	
 	private void addISA(InetSocketAddress isa, ConnectionOpenListener al) throws IOException {
 		switch (al.getConnectionType()) {
 			case accept:
@@ -342,6 +333,22 @@ public class ConnectionOpenThread
 				addISA(new InetSocketAddress(ifc, al.getPort()), al);
 			}    // end of for ()
 		}      // end of if (ip == null || ip.equals("")) else
+	}
+
+	private static class Task {
+
+		private final ConnectionOpenListener openListener;
+		private final Action action;
+
+		private Task(ConnectionOpenListener openListener, Action action) {
+			this.action = action;
+			this.openListener = openListener;
+		}
+
+		private enum Action {
+			Add,
+			Remove
+		}
 	}
 
 	private class PortThrottlingData {
