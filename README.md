@@ -23,6 +23,15 @@ Tigase XMPP Server is highly optimized, extremely modular and very flexible XMPP
 
 This repository contains source code of the main part of the Tigase XMPP Server.
 
+*The project exists since 2004 and we have recently moved it over to GitHub.*
+
+Other projects related to the Tigase XMPP Server:
+* [MUC Component](/tigase/tigase-muc) - [XEP-0045](https://xmpp.org/extensions/xep-0045.html): Multi-User Chat
+* [PubSub Component](/tigase/tigase-pubsub) - [XEP-0060](https://xmpp.org/extensions/xep-0060.html): Publish-Subscribe and [XEP-0163](https://xmpp.org/extensions/xep-0163.html): Personal Eventing Protocol
+* [Socks5 Proxy Component](/tigase/tigase-socks5) - [XEP-0065](https://xmpp.org/extensions/xep-0065.html): SOCKS5 Bytestreams
+* [STUN Component](/tigase/tigase-stun) - [STUN](https://en.wikipedia.org/wiki/STUN) Component for Tigase
+* [HTTP API Component](/tigase/tigase-http-api) - Component providing easy to use HTTP endpoints for server management and integration
+
 # Features
 
 Tigase XMPP Server contains full support for [RFC 6120 - XMPP CORE](http://xmpp.org/rfcs/rfc6120.html), [RFC 6121 - XMPP IM](http://xmpp.org/rfcs/rfc6120.html) and [RFC 7395 - XMPP over WebSockets](https://tools.ietf.org/html/rfc7395) making it accessible using XMPP client connections:
