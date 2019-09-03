@@ -25,7 +25,9 @@ This repository contains source code of the main part of the Tigase XMPP Server.
 
 *The project exists since 2004 and we have recently moved it over to GitHub.*
 
-Other projects related to the Tigase XMPP Server:
+Other Tigase projects related to XMPP:
+
+Tigase XMPP Server addons:
 * [MUC Component](https://github.com/tigase/tigase-muc) - Multi-User Chat: [XEP-0045](https://xmpp.org/extensions/xep-0045.html)
 * [PubSub Component](https://github.com/tigase/tigase-pubsub) - Publish-Subscribe: [XEP-0060](https://xmpp.org/extensions/xep-0060.html) and Personal Eventing Protocol: [XEP-0163](https://xmpp.org/extensions/xep-0163.html)
 * [Socks5 Proxy Component](https://github.com/tigase/tigase-socks5) - SOCKS5 Bytestreams: [XEP-0065](https://xmpp.org/extensions/xep-0065.html)
@@ -34,6 +36,25 @@ Other projects related to the Tigase XMPP Server:
 * [Jetty HTTP API Component](https://github.com/tigase/tigase-http-api-jetty) - High performance and high load component providing easy to use HTTP endpoints for server management and integration based on [Jetty HTTP Server](https://www.eclipse.org/jetty/).
 * [MongoDB Connector](https://github.com/tigase/tigase-mongodb) - Connector adding support for [MongoDB](https://www.mongodb.com) database to Tigase server.
 * [Message Archiving Component](https://github.com/tigase/tigase-message-archiving) - Component providing Message Archiving [XEP-0136](https://xmpp.org/extensions/xep-0136.html) and Message Archive Management [XEP-0313](https://xmpp.org/extensions/xep-0313.html) support.
+
+Tools: 
+* [Database Migrator Tool](https://github.com/tigase/tigase-database-migrator) - Tools helping with migration from other XMPP servers to Tigase based system.
+* [TTS-NG Test Suite](https://github.com/tigase/tigase-tts-ng) - Test Suite to run automated tests for the Tigase XMPP Server
+* [Tigase Monitor Console](https://github.com/tigase/tigase-monitor) - Stand-alone application for the Tigase XMPP Server monitoring and management console.
+* [Atom DSL Syntax](https://github.com/tigase/tigase-dsl-syntax-highlighter-for-atom) - [Atom](https://atom.io/) DSL syntex highlighter for Tigase XMPP Server configuration files.
+* [IntelliJ IDEA DSL Syntax](https://github.com/tigase/tigase-dsl-syntax-highlighter-for-atom) - [IntelliJ IDEA IDE](https://www.jetbrains.com/idea/) DSL syntex highlighter for Tigase XMPP Server configuration files.
+
+Tigase XMPP Clients:
+* [StorkIM Client](https://github.com/tigase/stork) - Android XMPP Client
+* [SiskinIM Client](https://github.com/tigase/siskin-im) - iOS XMPP Client
+* [BeagleIM Client](https://github.com/tigase/beagle-im) - MacOS XMPP Client
+* [Swift Library](https://github.com/tigase/tigase-swift) - Tigase Swift XMPP Library
+* [Swift OMEMO Plugin](https://github.com/tigase/tigase-swift-omemo) - OMEMO support for Tigase Swift XMPP library
+
+Tigase based IoT:
+* [Tigase IoT Framework](https://github.com/tigase/tigase-iot-framework) - Easy to use IoT framework to communicate and control Iot devices over XMPP
+* [Tigase IoT Framework - Examples](https://github.com/tigase/tigase-iot-framework-examples) - Examples on how to extend the Tigase IoT Framework with support for different devices
+* [Tigase RPi Library](https://github.com/tigase/tigase-rpi) -  Java low-level library to control sensors and devices connected to RasperryPi.
 
 # Features
 
