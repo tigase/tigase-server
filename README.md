@@ -26,9 +26,9 @@ This repository contains source code of the main part of the Tigase XMPP Server.
 *The project exists since 2004 and we have recently moved it over to GitHub.*
 
 Other projects related to the Tigase XMPP Server:
-* [MUC Component](/tigase/tigase-muc) - [XEP-0045](https://xmpp.org/extensions/xep-0045.html): Multi-User Chat
-* [PubSub Component](/tigase/tigase-pubsub) - [XEP-0060](https://xmpp.org/extensions/xep-0060.html): Publish-Subscribe and [XEP-0163](https://xmpp.org/extensions/xep-0163.html): Personal Eventing Protocol
-* [Socks5 Proxy Component](/tigase/tigase-socks5) - [XEP-0065](https://xmpp.org/extensions/xep-0065.html): SOCKS5 Bytestreams
+* [MUC Component](/tigase/tigase-muc) - Multi-User Chat: [XEP-0045](https://xmpp.org/extensions/xep-0045.html)
+* [PubSub Component](/tigase/tigase-pubsub) - Publish-Subscribe: [XEP-0060](https://xmpp.org/extensions/xep-0060.html) and Personal Eventing Protocol: [XEP-0163](https://xmpp.org/extensions/xep-0163.html)
+* [Socks5 Proxy Component](/tigase/tigase-socks5) - SOCKS5 Bytestreams: [XEP-0065](https://xmpp.org/extensions/xep-0065.html)
 * [STUN Component](/tigase/tigase-stun) - [STUN](https://en.wikipedia.org/wiki/STUN) Component for Tigase
 * [HTTP API Component](/tigase/tigase-http-api) - Component providing easy to use HTTP endpoints for server management and integration
 
