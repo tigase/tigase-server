@@ -19,7 +19,7 @@ NOTE This works with the Tigase server from version *4.2.0* or build *1418*.
 
 == What You Need
 
-Statistics binaries are built-in `-dist-max` and no extra files are needed. If you have downloaded `-dist` file, you will need tigase-extras[https://tigase.tech/projects/tigase-extras/repository] built and included in the `jars/` directory.
+Statistics binaries are built-in `-dist-max` and no extra files are needed. If you have downloaded `-dist` file, you will need tigase-extras[https://github.com/tigase/tigase-extras] built and included in the `jars/` directory.
 
 
 [[monitoring_activation]]

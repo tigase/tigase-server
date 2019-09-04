@@ -3,7 +3,7 @@
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v3.0, October 2017: Reformatted for v8.0.0.
 
-Our preferred way to install the Tigase server is using xref:webinstall[Web installer] and configuration program which comes with one of the binary packages. Please pick up the latest version of the JAR file in our link:https://tigase.tech/projects/tigase-server/files[download section].
+Our preferred way to install the Tigase server is using xref:webinstall[Web installer] and configuration program which comes with one of the binary packages. Please pick up the latest version of the distribution archive in our link:https://tigase.net/downloads[download section].
 
 In many cases however it is not always possible to use the web installer. In many cases you have just an ssh access or even a direct access in console mode only. We are going to provide a text-only installer in one of the next releases but for the time being you can use our binary packages to install the server manually. Please continue reading to learn how to install and setup the server in a few easy steps...
 

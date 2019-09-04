@@ -15,6 +15,6 @@ If you want to run a service on a few cluster nodes (5 or even 10), then manuall
 
 To overcome this problem I started to work on a shell script which would run all the basic checks and report problems found. Ideally it should be also able to adjust some parameters for you.
 
-Inside the Tigase server link:https://tigase.tech/projects/tigase-server/repository/revisions/master/show/scripts[scripts/] repository find a script called `machine-check.sh`. It performs all the basic checks from the article and also tries to adjust them when necessary. Have a link:https://tigase.tech/projects/tigase-server/repository/revisions/master/show/scripts/machine-check.sh[look at the code] and run for yourself.
+Inside the Tigase server link:https://github.com/tigase/tigase-server/blob/master/scripts/[scripts/] repository find a script called `machine-check.sh`. It performs all the basic checks from the article and also tries to adjust them when necessary. Have a link:https://github.com/tigase/tigase-server/blob/master/scripts/machine-check.sh[look at the code] and run for yourself.
 
 Any comments or suggestions, as usual, are very much appreciated.
