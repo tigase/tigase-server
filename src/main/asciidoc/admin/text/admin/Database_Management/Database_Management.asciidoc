@@ -71,3 +71,5 @@ dataSource {
 -----
 
 WARNING: If `schema-management` is disabled, then it is administrator responsibility to maintain database schema and update it if needed (ie. if Tigase XMPP Server schema was changed).
+
+include::SchemaFilesMaintenance.asciidoc[leveloffset=+1]

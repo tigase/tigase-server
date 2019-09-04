@@ -52,7 +52,7 @@ This will
 
 === Server distribution packages
 
-Distribution building is handled by separate project (https://tigase.tech/projects/tigase-server-distribution/[Tigase Server Distribution])
+Distribution building is handled by separate project (https://github.com/tigase/tigase-server-distribution[Tigase Server Distribution])
 
 In order to build distribution packages
 * clone tigase-server-distribution repository:

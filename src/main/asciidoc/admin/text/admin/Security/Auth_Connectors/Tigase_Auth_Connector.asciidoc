@@ -8,7 +8,13 @@ WARNING: Tigase Auth connector is **DEPRECATED** as of version 8.0.0 and will be
 The Tigase Auth connector with shortcut name: *tigase-auth* is implemented in the class: link:https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/db/jdbc/TigaseAuth.java[tigase.db.jdbc.TigaseAuth]. It allows you to connect to any external database to perform user authentication.
 You can find more details how to setup a custom connector in the xref:customAuthConnector[Custom Authentication Connectors] guide.
 
-To make this connector working you have to prepare your database to offer set of stored procedures for Tigase server to perform all the authentication actions. The best description is the example schema with all the stored procedures defined - please refer to the Tigase https://tigase.tech/projects/tigase-server/repository/revisions/master/show/src/main/database[repository] for the schema definition files.
+To make this connector working you have to prepare your database to offer set of stored procedures for Tigase server to perform all the authentication actions. The best description is the example schema with all the stored procedures defined - please refer to the Tigase repositories for the schema definition files (each component has it's dedicated schema). For example:
+
+* https://github.com/tigase/tigase-server/tree/master/src/main/database[tigase-server]
+* https://github.com/tigase/tigase-pubsub/tree/master/src/main/database[tigase-pubsub]
+* https://github.com/tigase/tigase-muc/tree/master/src/main/database[tigase-muc]
+* https://github.com/tigase/tigase-message-archiving/tree/master/src/main/database[tigase-message-archiving]
+* https://github.com/tigase/tigase-socks5/tree/master/src/main/database[tigase-socks5]
 
 The absolute minimum of stored procedures you have to implement is:
 
