@@ -23,7 +23,7 @@ The best way to go is to use Jython implementation. It works very well within JV
 
 *Version 2.5.1* is a bit simpler to install. When you download and run the Jython installer, find `jython.jar` file in the directory where you installed Jython. Copy the file to the Tigase's *libs/* directory and all is ready to go. Please note, this is the same file as the one attached to this article for your convenience.
 
-*Version 2.2.1* needs a little bit more work. The first part is the same. It is not, however enough to copy the `jython.jar` file. One more file is necessary for the Jython to work with the Tigase server. You have to install JSR-223 engine separately which can be downloaded from the link:https://scripting.dev.java.net/[Java scripting project website]. The binary file has to be unpacked and `jython-engine.jar` file needs to be copied to the Tigase `libs/` directory.
+*Version 2.2.1* needs a little bit more work. The first part is the same. It is not, however enough to copy the `jython.jar` file. One more file is necessary for the Jython to work with the Tigase server. You have to install JSR-223 engine separately. The binary file has to be unpacked and `jython-engine.jar` file needs to be copied to the Tigase `libs/` directory.
 
 The best way to check if the Jython is installed correctly and support for Python is enabled, is by trying to submit a new script to the Tigase server. Browser the server service discovery, select "_Session manager_" component and run "_Execute command_" function. A new window should show with a list of all available ad-hoc commands. Select "_New command script_" item and click "_Execute_". Ad-hoc command dialog windows should show up. One of the field is "_Language_" with pull down list of available scripting languages. If "_python_" is on the list it means everything is ok and support for Python is enabled.
 
@@ -65,4 +65,4 @@ else:
 
 Except this minor difference, the rest part of scripting in Python for the Tigase administrator commands is the same as all other languages. As all languages can return execution results via these special variables, it could be argued there is no difference at all.
 
-link:http://docs.tigase.org/tigase-server/snapshot/Development_Guide/html_chunk/cil6.html[In another article], I am going to present the Tigase server API available for scripting framework. My main language is Groovy as it offers the best integration with JVM and Tigase API, however I will try to include Python example code as well.
+In article _"Component Implementation - Lesson 6 - Scripting Support"_ in Developer guide, I am going to present the Tigase server API available for scripting framework. My main language is Groovy as it offers the best integration with JVM and Tigase API, however I will try to include Python example code as well.

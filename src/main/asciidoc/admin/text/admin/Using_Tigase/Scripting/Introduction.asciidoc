@@ -7,9 +7,9 @@ This document is the first in a series describing scripting support in the Tigas
 
 Since Tigase version 4.3.1 the server supports scripting for administrator commands as well as standard commands.
 
-In theory many different languages can be used to write scripts and the only requirement is that support link:http://www.jcp.org/en/jsr/detail?id=223[JSR-223] for the language is installed. More details can be found on the link:https://scripting.dev.java.net/[Java scripting project site].
+In theory many different languages can be used to write scripts and the only requirement is that support link:http://www.jcp.org/en/jsr/detail?id=223[JSR-223] for the language is installed. More details can be found on the link:https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/prog_guide/api.html[Java scripting project site].
 
-In practice some languages are better supported than others, at the moment we recommend link:http://groovy.codehaus.org/[Groovy]. However the following languages are also confirmed to be working: link:http://www.scala-lang.org/[Scala], link:http://www.python.org/[Python] and link:http://www.ruby-lang.org/en/[Ruby]. The link:https://github.com/tigase/tigase-server/blob/master/src/main[tigase-server GitHub] contains a few examples for these languages.
+In practice some languages are better supported than others, at the moment we recommend link:http://groovy-lang.org/[Groovy]. However the following languages are also confirmed to be working: link:http://www.scala-lang.org/[Scala], link:http://www.python.org/[Python] and link:http://www.ruby-lang.org/[Ruby]. The link:https://github.com/tigase/tigase-server/blob/master/src/main[tigase-server GitHub] contains a few examples for these languages.
 
 NOTE: the default Tigase installation contains only libraries for Groovy. Adding support for a different language is as simple as copying a few JAR files to the Tigase `libs/` directory.
 
