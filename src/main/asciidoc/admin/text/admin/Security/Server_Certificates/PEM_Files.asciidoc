@@ -73,15 +73,10 @@ domain.com.crt
 
 [source,sh]
 -----
-cat yourdomain.com.crt yourdomain.com.key > yourdomain.com.pem
+cat yourdomain.com.cert.pem intermediate.cert.pem root.cert.pem > yourdomain.com.pem
 -----
 
-If the certificate is issued by third-party authority you will have to attach the certificate chain, that being certificate of the authority who has generated your certificate. You normally need to obtain certificates for your chain from the authority who has generated your certificate. For example, if you have a certificate from XMPP federation you need to download link:http://www.startssl.com/certs/ca.pem[StartCom root certificate] *and* link:http://www.startssl.com/certs/sub.class1.server.ca.pem[intermediate ICA certificate]. In such cases the pem file is created using following command:
-
-[source,sh]
------
-cat yourdomain.com.crt yourdomain.com.key sub.class1.xmpp.ca.crt ca.crt > yourdomain.com.pem
------
+If the certificate is issued by third-party authority you will have to attach the certificate chain, that being certificate of the authority who has generated your certificate. You normally need to obtain certificates for your chain from the authority who has generated your certificate.
 
 The result file should looks similar to:
 
