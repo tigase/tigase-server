@@ -761,7 +761,7 @@ public class ClientConnectionManager
 						serv.startTLS(false, wantClientAuth, needClientAuth);
 						SocketThread.addSocketService(serv);
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Error starting TLS: {0}", e);
+						log.log(Level.WARNING, "Error starting TLS: {0}", e.getMessage());
 						serv.forceStop();
 					}    // end of try-catch
 				} else {
