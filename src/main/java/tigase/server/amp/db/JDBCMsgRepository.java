@@ -408,7 +408,11 @@ public class JDBCMsgRepository
 		} catch (DataTruncation dte) {
 			log.log(Level.FINE, "Data truncated for message from {0} to {1}", new Object[]{from, to});
 		} catch (SQLException e) {
-			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
+			if (e.getErrorCode() == 1366 || e.getMessage() != null && e.getMessage().startsWith("Incorrect string value")) {
+				log.log(Level.WARNING, "Your MySQL configuration can't handle extended Unicode (for example emoji) correctly. Please refer to <Support for emoji and other icons> section of the server documentation");
+			} else {
+				log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
+			}
 		}
 		return result;
 	}

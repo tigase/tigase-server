@@ -319,9 +319,11 @@ Tigase Database Schema can support emojis and other icons, however by using UTF-
 [mysqld]
 character-set-server = utf8mb4
 collation-server = utf8mb4_bin
+character-set-client-handshake = FALSE
 -----
 
 Doing this, Tigase XMPP Server Database will still use `utf8` character set, with `utf8_general_ci` as collation, and only fields which require support for emojis will be converted to `utf8mb4`.
 
-NOTE: Database URI passed in Tigase XMPP Server config *MUST NOT* contain `&characterEncoding=UTF-8` as in other case it will override `utf8mb4` client charset with `utf8` charset!
-NOTE: Tigase XMPP Server databases should be created with `utf8_general_ci collation` as it will work properly and is fastest from `utf8` collations supported by MySQL
+NOTE: If for some reason, with above settings applied to your MySQL instance, you still receive `java.sql.SQLException: Incorrect string value: ` you should add to your database URI passed in Tigase XMPP Server following configuration `&useUnicode=true&characterEncoding=UTF-8`. If even this fails too, then you may try adding `&connectionCollation=utf8mb4_bin` as a last resort. This changes situation from previous versions that shipped older MySQL JDBC connector.
+
+NOTE: Tigase XMPP Server databases should be created with `utf8_general_ci` collation as it will work properly and is fastest from `utf8mb4_general_ci` collations supported by MySQL
