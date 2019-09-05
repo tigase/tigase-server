@@ -125,7 +125,7 @@ It's also possible to use:
 There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all XMPP servers, especially if it's one from a new provider. Here is an example list of providers:
 
 - LetsEncrypt - please see <<LetsEncryptCertificate>> for details
-- link:https://www.cacert.org/[CAcert] - free certificates with an excellent Web GUI for managing generated certificates and identities.
+- link:https://www.cacert.org/[CAcert] - free certificates with Web GUI. (WARNING: it's not widely accepted)
 - link:https://www.verisign.com/[Verisign] - very expensive certificates comparing to above provides but the provider is recognized by everybody. If you have a certificate from Verisign you can be sure it is identified as a valid certificate.
 - link:http://www.comodo.com/business-security/digital-certificates/ssl-certificates.php[Comodo Certificate Authority] offers different kind of commercial certificates
 
