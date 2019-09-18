@@ -32,6 +32,8 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.server.xmppserver.S2SConnectionManager.XMLNS_SERVER_VAL;
+
 @Bean(name = "sasl-external", parent = S2SConnectionManager.class, active = true)
 public class SaslExternal
 		extends S2SAbstractProcessor {
@@ -150,6 +152,14 @@ public class SaslExternal
 	private void processSuccess(Packet p, S2SIOService serv, Queue<Packet> results)
 			throws TigaseStringprepException, LocalhostException, NotLocalhostException {
 		final CID cid = (CID) serv.getSessionData().get("cid");
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, Sending new stream", new Object[]{serv});
+		}
+		String data =
+				"<stream:stream xmlns='" + XMLNS_SERVER_VAL + "' xmlns:stream='http://etherx.jabber.org/streams'" +
+						" from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + ">";
+		serv.xmppStreamOpen(data);
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
 		cid_conns.connectionAuthenticated(serv, cid);
