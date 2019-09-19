@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -113,6 +114,10 @@ public abstract class SSLContextContainerAbstract
 				sslContext = SSLContext.getInstance(protocol);
 				sslContext.init(null, tms, secureRandom);
 				return new SSLHolder(tms, sslContext, null);
+			}
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "Key manager for hostname: {0} doesn't exist, generating new one",
+						new String[]{hostname});
 			}
 
 			kms = createCertificate(alias);

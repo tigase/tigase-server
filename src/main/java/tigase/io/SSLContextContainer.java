@@ -319,6 +319,10 @@ public class SSLContextContainer
 			try {
 				holder.domainCertificate.checkValidity();
 			} catch (CertificateException e) {
+				if (log.isLoggable(Level.INFO)) {
+					log.log(Level.INFO, "Certificate for domain: {0} is not valid, exception: {1}, certificate: {2}",
+							new String[]{alias, String.valueOf(e), String.valueOf(holder.domainCertificate)});
+				}
 				invalidateContextHolder(holder, alias);
 				return false;
 			}
