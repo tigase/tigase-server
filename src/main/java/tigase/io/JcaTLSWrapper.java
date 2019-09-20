@@ -261,8 +261,8 @@ public class JcaTLSWrapper
 			doTasks();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "unwrap() doTasks(), handshake: {0}, {1}",
-						new Object[]{tlsEngine.getHandshakeStatus(), debugId});
+				log.log(Level.FINEST, "{0}, unwrap() doTasks(), handshake: {1}",
+						new Object[]{ debugId, tlsEngine.getHandshakeStatus()});
 			}
 		}
 
@@ -292,7 +292,7 @@ public class JcaTLSWrapper
 			doTasks();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "doTasks(): {0}, {1}", new Object[]{tlsEngine.getHandshakeStatus(), debugId});
+				log.log(Level.FINEST, "{0}, doTasks(): {1}", new Object[]{debugId, tlsEngine.getHandshakeStatus()});
 			}
 		}
 	}
@@ -321,7 +321,7 @@ public class JcaTLSWrapper
 		// ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
 		int newSize = app.capacity() * 2;
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Resizing tlsInput to {0} bytes, {1}", new Object[]{newSize, debugId});
+			log.log(Level.FINER, "{0}, Resizing tlsInput to {1} bytes", new Object[]{debugId, newSize});
 		}
 
 		ByteBuffer bb = ByteBuffer.allocate(newSize);

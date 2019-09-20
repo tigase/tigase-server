@@ -54,6 +54,8 @@ public class TLSIO
 	 */
 	private TLSWrapper tlsWrapper = null;
 
+	int max_loop_runs = 1000;
+
 	// /**
 	// * Creates a new <code>TLSIO</code> instance.
 	// *
@@ -221,14 +223,13 @@ public class TLSIO
 		// return
 		// NEED_READ status all the time and the loop never ends.
 		int loop_cnt = 0;
-		int max_loop_runs = 5000;
 
 		boolean breakNow = true;
 
 		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ)) && (++loop_cnt < max_loop_runs)) {
 			switch (stat) {
 				case NEED_WRITE:
-					writeBuff(ByteBuffer.allocate(0));
+					writeBuff(ByteBuffer.allocate(0), loop_cnt);
 
 					break;
 
@@ -301,7 +302,7 @@ public class TLSIO
 						new Object[]{buff.remaining(), loop_cnt, toString(), String.valueOf(tlsWrapper)});
 			}
 
-			result = writeBuff(buff);
+			result = writeBuff(buff, loop_cnt);
 		}
 
 		// if (isRemoteAddress("81.142.228.219")) {
@@ -362,7 +363,7 @@ public class TLSIO
 			// }// end of if (input.hasRemaining())
 			switch (tlsWrapper.getStatus()) {
 				case NEED_WRITE:
-					writeBuff(ByteBuffer.allocate(0));
+					writeBuff(ByteBuffer.allocate(0), 0);
 
 					break;
 
@@ -428,7 +429,7 @@ public class TLSIO
 		return tlsInput;
 	}
 
-	private int writeBuff(ByteBuffer buff) throws IOException {
+	private int writeBuff(ByteBuffer buff, int loop_cnt) throws IOException {
 		int result = 0;
 		int wr = 0;
 
@@ -444,9 +445,6 @@ public class TLSIO
 		// What to do with possible user data received in such a call?
 		// It happens extremely rarely and is hard to diagnose. Let's leave it
 		// as it is now which just causes such connections to be closed.
-		int loop_cnt = 0;
-		int max_loop_runs = 5000;
-
 		do {
 			if (tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
 
@@ -486,8 +484,13 @@ public class TLSIO
 			throw new EOFException("Socket has been closed due to TLS problems.");
 		}
 
-		if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
-			writeBuff(ByteBuffer.allocate(0));
+		if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE && (loop_cnt * 10) < max_loop_runs) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "TLS - Recursive: Writing data, remaining: {0}, buff capacity: {1}, run {2} of {3}, TLSIO: {4}, tlsWrapper: {5}",
+						new Object[]{buff.remaining(), buff.capacity(), loop_cnt, max_loop_runs, toString(), String.valueOf(tlsWrapper)});
+			}
+
+			writeBuff(ByteBuffer.allocate(0), ++loop_cnt);
 		} // end of if ()
 
 		return result;
