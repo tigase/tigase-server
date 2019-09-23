@@ -368,7 +368,7 @@ public class CertificateContainer
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Failed to update certificate for " + event.getAlias(), ex);
 			}
-			log.log(Level.WARNING, "Failed to update certificate for " + event.getAlias());
+			log.log(Level.WARNING, "Failed to update certificate for " + event.getAlias() + ", " + ex);
 		}
 	}
 
