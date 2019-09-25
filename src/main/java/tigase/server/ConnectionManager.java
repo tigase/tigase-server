@@ -1220,9 +1220,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					// Accept side for component service is not ready yet?
 					// Let's wait for a few secs and try again.
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST,
-								String.format("Problem reconnecting the service: %1$s, port_props: %2$s", serv,
-											  port_props), e);
+						if (sc != null || !(e instanceof Exception)) {
+							log.log(Level.FINEST,
+									String.format("Problem reconnecting the service: %1$s, port_props: %2$s", serv,
+												  port_props), e);
+						}
 					}
 					updateConnectionDetails(port_props);
 
@@ -1244,15 +1246,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					}
 				} else {
 					serv.forceStop();
-					// Ignore
 				}
-
-//      } catch (Exception e) {
-//        if (log.isLoggable(Level.FINEST)) {
-//          log.log(Level.FINEST, "Can not accept connection cid: " + cid, e);
-//        }
-//        log.log(Level.WARNING, "Can not accept connection.", e);
-//        serv.stop();
 			}          // end of try-catch
 		}
 

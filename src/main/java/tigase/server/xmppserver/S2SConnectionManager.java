@@ -247,11 +247,15 @@ public class S2SConnectionManager
 				cid_conns.sendPacket(server_packet);
 			} catch (NotLocalhostException e) {
 				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
-																			 "S2S - Incorrect source address - none of any local virtual hosts or components.",
+																			 "S2S - Incorrect source address (" +
+																					 from_hostname +
+																					 ") - none of any local virtual hosts or components.",
 																			 true));
 			} catch (LocalhostException e) {
 				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
-																			 "S2S - Incorrect destinationaddress - one of local virtual hosts or components.",
+																			 "S2S - Incorrect destination address " +
+																					 to_hostname +
+																					 " - one of local virtual hosts or components.",
 																			 true));
 			}
 		} catch (PacketErrorTypeException e) {

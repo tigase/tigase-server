@@ -234,7 +234,7 @@ public class ConnectionOpenThread
 										e.getMessage().equals("No route to host"))) &&
 								al.getConnectionType() == ConnectionType.connect && al.getIfcs() != null &&
 								Arrays.stream(al.getIfcs()).filter(ifc -> ifc.contains(":")).findFirst().isPresent()) {
-							log.log(Level.FINEST, "Error: creating IPv6 connection for: " + al, e);
+							log.log(Level.FINEST, "Error: creating IPv6 connection (" + e + ") for: " + al);
 						} else {
 							log.log(Level.WARNING, "Error: creating connection for: " + al, e);
 

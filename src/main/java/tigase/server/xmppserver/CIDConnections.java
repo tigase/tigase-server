@@ -536,8 +536,7 @@ public class CIDConnections {
 		port_props.put("port-no", port);
 		port_props.put("cid", cid);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "STARTING new connection: {0}", cid);
-			log.log(Level.FINEST, "{0} connection params: {1}", new Object[]{cid, port_props});
+			log.log(Level.FINEST, "STARTING new connection: {0}, params: {1}", new Object[]{cid, port_props});
 		}
 		handler.initNewConnection(port_props);
 	}
@@ -617,7 +616,7 @@ public class CIDConnections {
 						}
 
 						// Create a new connection
-						S2SConnection s2s_conn = new S2SConnection(handler, dNSEntry.getIp());
+						S2SConnection s2s_conn = new S2SConnection(handler, ip);
 						Map<String, Object> port_props = new TreeMap<String, Object>();
 						port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
 
