@@ -21,6 +21,7 @@ import tigase.component.PacketWriter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Message;
+import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
@@ -62,6 +63,7 @@ public class MAMItemHandler
 		forwarded.addChild(item.getMessage());
 
 		Message packet = new Message(m, query.getComponentJID(), query.getQuestionerJID());
+		packet.setXMLNS(Packet.CLIENT_XMLNS);
 		packet.setPriority(Priority.HIGH);
 
 		if (query.getRsm().getFirst() == null) {
