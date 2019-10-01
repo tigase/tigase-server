@@ -17,6 +17,7 @@
  */
 package tigase.io;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.Lifecycle;
 
 import javax.net.ssl.SSLContext;
@@ -218,8 +219,20 @@ public interface SSLContextContainerIfc
 	 */
 	KeyStore getTrustStore();
 
-	String[] getEnabledCiphers();
+	String[] getEnabledCiphers(String domain);
 
-	String[] getEnabledProtocols();
+	String[] getEnabledProtocols(String domain);
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0")
+	default String[] getEnabledCiphers() {
+		return getEnabledCiphers(null);
+	};
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0")
+	default String[] getEnabledProtocols() {
+		return getEnabledProtocols(null);
+	};
 }
 

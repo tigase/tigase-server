@@ -20,6 +20,7 @@ package tigase.conf;
 import tigase.cluster.ClusterConnectionManager;
 import tigase.db.RepositoryFactory;
 import tigase.io.CertificateContainer;
+import tigase.io.SSLContextContainer;
 import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.ConnectionManager;
@@ -292,6 +293,20 @@ public class ConfigHolder {
 		renameIfExists(props, "--tls-enabled-protocols", "tls-enabled-protocols", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--tls-enabled-ciphers", "tls-enabled-ciphers", ConfigHolder::convertToListOfStringsIfString);
 		renameIfExists(props, "--hardened-mode", "hardened-mode", Function.identity());
+		renameIfExists(props, "hardened-mode", "hardened-mode", val -> SSLContextContainer.HardenedModeVHostItemExtension.parseHardenedModeFromString(
+					String.valueOf(val)));
+
+		props.entrySet().stream()
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.filter(component -> component.containsKey("sslContextContainer") )
+				.map(component -> component.get("sslContextContainer") )
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.forEach(container -> {
+					renameIfExists(props, "hardened-mode", "hardened-mode", val -> SSLContextContainer.HardenedModeVHostItemExtension.parseHardenedModeFromString(
+							String.valueOf(val)));
+				});
 
 		boolean allowInvalidCerts = Boolean.parseBoolean((String) props.remove(ALLOW_INVALID_CERTS_KEY));
 		boolean allowSelfSignedCerts = Boolean.parseBoolean((String) props.remove(ALLOW_SELF_SIGNED_CERTS_KEY));

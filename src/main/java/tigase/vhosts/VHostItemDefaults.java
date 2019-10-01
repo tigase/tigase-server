@@ -17,6 +17,7 @@
  */
 package tigase.vhosts;
 
+import tigase.io.SSLContextContainer;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.vhosts.filter.DomainFilterPolicy;
@@ -24,6 +25,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import static tigase.io.SSLContextContainer.HardenedModeVHostItemExtension.parseHardenedModeFromString;
 import static tigase.vhosts.VHostItemImpl.*;
 
 /**
@@ -40,8 +42,9 @@ public class VHostItemDefaults {
 	private String[] domainFilterDomains = null;
 	@ConfigField(desc = "Domain filter policy", alias = DOMAIN_FILTER_POLICY_PROP_KEY)
 	private String domainFilterStr = null;
+	private SSLContextContainer.HARDENED_MODE hardenedMode = SSLContextContainer.HARDENED_MODE.secure;
 	@ConfigField(desc = "Hardened mode", alias = "hardened-mode")
-	private boolean hardenedMode = true;
+	private String hardenedModeStr = SSLContextContainer.HARDENED_MODE.secure.toString();
 	@ConfigField(desc = "Maximal number of users", alias = VHOST_MAX_USERS_PROP_KEY)
 	private long maxUsersNumber = VHOST_MAX_USERS_PROP_DEF;
 	@ConfigField(desc = "Message forward JID", alias = VHOST_MESSAGE_FORWARD_PROP_KEY)
@@ -91,10 +94,6 @@ public class VHostItemDefaults {
 
 	public boolean isCheckDns() {
 		return !disableDnsCheck;
-	}
-
-	public boolean isHardenedMode() {
-		return hardenedMode;
 	}
 
 	public boolean isRegisterEnabled() {

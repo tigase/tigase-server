@@ -242,7 +242,7 @@ public class JcaTLSWrapper
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
-					"{0}, unwrap() tlsEngineRsult.getStatus() = {1}, " + "tlsEngineRsult.getHandshakeStatus() = {2}",
+					"{0}, unwrap() tlsEngineResult.getStatus() = {1}, " + "tlsEngineResult.getHandshakeStatus() = {2}",
 					new Object[]{debugId, tlsEngineResult.getStatus(), tlsEngineResult.getHandshakeStatus()});
 		}
 

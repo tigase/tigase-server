@@ -28,7 +28,6 @@ It's possible to specify initial default configuration for all Virtual Host in T
 'vhost-man' () {
     'defaults' () {
         'domain-filter-policy' = null
-        'hardened-mode' = false
         's2s-secret' = null
         trusted = null
         'vhost-disable-dns-check' = false

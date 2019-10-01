@@ -24,6 +24,7 @@ import tigase.stats.StatisticsList;
 import tigase.util.IOListener;
 import tigase.xmpp.jid.JID;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
@@ -264,7 +265,7 @@ public abstract class IOService<RefObject>
 					Certificate peerCert = certs[0];
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
-								"{0}, TLS handshake veryfing if certificate from connection matches domain {1}",
+								"{0}, TLS handshake verifying if certificate from connection matches domain {1}",
 								new Object[]{this, reqCertDomain});
 					}
 					if (!CertificateUtil.verifyCertificateForDomain((X509Certificate) peerCert, reqCertDomain)) {
@@ -859,6 +860,11 @@ public abstract class IOService<RefObject>
 			// } catch (MalformedInputException ex) {
 			//// This happens after TLS initialization sometimes, maybe reset helps
 			// decoder.reset();
+		} catch (SSLHandshakeException e) {
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
+			}
+			forceStop();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
@@ -1024,6 +1030,10 @@ public abstract class IOService<RefObject>
 
 		// Resize buffer if needed.
 		// if (netSize > socketInput.remaining()) {
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "Socket: {0}, Resize? netSize: {1}, capacity: {2}, remaining: {3}.", new Object[]{socketIO, netSize, socketInput.capacity(), socketInput.remaining()});
+		}
+
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
 
 			// int newSize = netSize + socketInput.capacity();

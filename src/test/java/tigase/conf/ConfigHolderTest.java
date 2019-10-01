@@ -18,6 +18,7 @@
 package tigase.conf;
 
 import org.junit.Test;
+import tigase.io.SSLContextContainer;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.server.CmdAcl;
 import tigase.server.ext.AbstractCompDBRepository;
@@ -359,6 +360,35 @@ public class ConfigHolderTest {
 				"host3.example.net"));
 		assertEquals("/home/tigase/certs/hostx.pem", ((Map) ((Map) result.get("certificate-container")).get("custom-certificates")).get(
 				"*.hostx.example.net"));
+	}
+
+	@Test
+	public void testConversionOfHardenedMode() throws ConfigReader.ConfigException {
+		OldConfigHolder holder = new OldConfigHolder();
+		Map<String, Object> props = holder.loadFromPropertyStrings(
+				Arrays.asList("hardened-mode = true"));
+
+		holder.convertFromOldFormat();
+		Map<String,Object> result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		dumpConfig(result);
+
+		System.out.println(result);
+		assertEquals(SSLContextContainer.HARDENED_MODE.secure, result.get("hardened-mode"));
+
+		holder = new OldConfigHolder();
+		props = holder.loadFromPropertyStrings(
+				Arrays.asList("hardened-mode = false"));
+
+		holder.convertFromOldFormat();
+		result = ConfigWriter.buildTree(props);
+		ConfigHolder.upgradeDSL(result);
+
+		dumpConfig(result);
+
+		System.out.println(result);
+		assertEquals(SSLContextContainer.HARDENED_MODE.relaxed, result.get("hardened-mode"));
 	}
 
 	private static final void dumpConfig(Map result) {

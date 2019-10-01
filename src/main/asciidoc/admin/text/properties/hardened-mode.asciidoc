@@ -3,14 +3,17 @@
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2017: Reformatted for Kernel/DSL
 
-*Default value:* `false`
+*Default value:* `secure`
 
-*Example:* `'hardened-mode' = true`
+*Example:* `'hardened-mode' = secure`
 
-*Possible values:* `true|false`
+*Possible values:* `relaxed|secure|strict`
 
-*Description:* Enabling hardened mode affects handling of security aspects within Tigase. It turns off workarounds for SSL issues, turns off SSLv2 and forces enabling more secure ciphers suites. It also forces requirement of StartTLS.
+*Description:* Adjusting hardened mode affects handling of security aspects within Tigase. The higher the level the more strict are the rules:
+  * `relaxed` - uses default security capabilities from installed JVM;
+  * `secure` - disables old SSLv2 and SSLv3, disables weak cyphers;
+  * `strict` - in addition to `secure` level changes it also disables `TLSv1` and `TLSv1.1` as well as ciphers that don't support Forward secrecy.
 
-Enabling it requires link:http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html[UnlimitedJCEPolicyJDK] installed. We prefer to use OracleJDK as our tests revealed that using OpenJDK in hardened mode may cause issues with some clients on some platforms.
+On older JVM versions it required link:http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html[UnlimitedJCEPolicyJDK] installed. It's not required with OpenJDK8 and newer an OracleJVM 11 and newer.
 
 *Available since:* 5.2.0
