@@ -74,9 +74,9 @@ public class WebSocketHixie76Test
 
 		};
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("Sec-WebSocket-Key1", "1C2J899_05  6  !  M 9    ^4");
-		params.put("Sec-WebSocket-Key2", "23 2ff0M_E0#.454X23");
-		params.put("Sec-WebSocket-Protocol", "xmpp");
+		params.put("Sec-WebSocket-Key1".toUpperCase(), "1C2J899_05  6  !  M 9    ^4");
+		params.put("Sec-WebSocket-Key2".toUpperCase(), "23 2ff0M_E0#.454X23");
+		params.put("Sec-WebSocket-Protocol".toUpperCase(), "xmpp");
 		byte[] bytes = new byte[10];
 		bytes[0] = '\r';
 		bytes[1] = '\n';
@@ -101,8 +101,8 @@ public class WebSocketHixie76Test
 
 		};
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("Sec-WebSocket-Version", "13");
-		params.put("Sec-WebSocket-Protocol", "xmpp");
+		params.put("Sec-WebSocket-Version".toUpperCase(), "13");
+		params.put("Sec-WebSocket-Protocol".toUpperCase(), "xmpp");
 		byte[] bytes = new byte[10];
 		bytes[0] = '\r';
 		bytes[1] = '\n';

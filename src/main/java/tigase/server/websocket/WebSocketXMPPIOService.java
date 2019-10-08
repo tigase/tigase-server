@@ -307,7 +307,7 @@ public class WebSocketXMPPIOService<RefObject>
 			switch (buf[i]) {
 				case ':':
 					if (key == null) {
-						key = builder.toString().trim();
+						key = builder.toString().trim().toUpperCase();
 						builder = new StringBuilder(64);
 						skipWhitespace = true;
 					} else {
@@ -357,7 +357,7 @@ public class WebSocketXMPPIOService<RefObject>
 		HashMap<String, String> headers = new HashMap<String, String>();
 		int i = parseHttpHeaders(buf, headers);
 
-		String connectionHeader = headers.get(CONNECTION_KEY);
+		String connectionHeader = headers.get(CONNECTION_KEY.toUpperCase());
 		if (connectionHeader != null) {
 			String[] values = connectionHeader.split(",");
 			boolean contains = false;
@@ -375,8 +375,8 @@ public class WebSocketXMPPIOService<RefObject>
 				return;
 			}
 		}
-		if (!headers.containsKey(WebSocketProtocolIfc.WS_PROTOCOL_KEY) ||
-				!headers.get(WebSocketProtocolIfc.WS_PROTOCOL_KEY).contains("xmpp")) {
+		if (!headers.containsKey(WebSocketProtocolIfc.WS_PROTOCOL_KEY.toUpperCase()) ||
+				!headers.get(WebSocketProtocolIfc.WS_PROTOCOL_KEY.toUpperCase()).contains("xmpp")) {
 			writeRawData(BAD_REQUEST);
 
 			dumpHeaders(headers);

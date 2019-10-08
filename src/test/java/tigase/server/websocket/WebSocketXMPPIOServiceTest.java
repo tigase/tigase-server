@@ -39,7 +39,7 @@ public class WebSocketXMPPIOServiceTest
 		Map<String, String> parsedHeaders = new HashMap<>();
 		service.parseHttpHeaders(data, parsedHeaders);
 
-		assertMaps(headers, parsedHeaders);
+		assertMaps(prepareExpectedParsedHeaders(headers), parsedHeaders);
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class WebSocketXMPPIOServiceTest
 		Map<String, String> parsedHeaders = new HashMap<>();
 		service.parseHttpHeaders(data, parsedHeaders);
 
-		assertMaps(headers, parsedHeaders);
+		assertMaps(prepareExpectedParsedHeaders(headers), parsedHeaders);
 	}
 
 	@Override
@@ -97,5 +97,13 @@ public class WebSocketXMPPIOServiceTest
 		}
 		sb.append("\r\n");
 		return sb.toString().getBytes("UTF-8");
+	}
+
+	private Map<String, String> prepareExpectedParsedHeaders(Map<String, String> headers) {
+		Map<String, String> result = new HashMap<>();
+		for (Map.Entry<String,String> e : headers.entrySet()) {
+			result.put(e.getKey().toUpperCase(), e.getValue());
+		}
+		return result;
 	}
 }

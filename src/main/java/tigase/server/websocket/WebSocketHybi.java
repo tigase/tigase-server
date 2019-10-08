@@ -70,21 +70,21 @@ public class WebSocketHybi
 	@Override
 	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
 			throws NoSuchAlgorithmException, IOException {
-		if (!headers.containsKey(WS_VERSION_KEY)) {
+		if (!headers.containsKey(WS_VERSION_KEY.toUpperCase())) {
 			return false;
 		}
 
 		StringBuilder response = new StringBuilder(RESPONSE_HEADER.length() * 2);
 		response.append(RESPONSE_HEADER);
 
-		int version = Integer.parseInt(headers.get(WS_VERSION_KEY));
+		int version = Integer.parseInt(headers.get(WS_VERSION_KEY.toUpperCase()));
 		String key = headers.get(WS_KEY_KEY) + GUID;
 
 		MessageDigest md = MessageDigest.getInstance("SHA1");
 		byte[] resp = md.digest(key.getBytes());
 
 		response.append(WS_PROTOCOL_KEY).append(": ");
-		if (headers.get(WS_PROTOCOL_KEY).contains("xmpp-framing")) {
+		if (headers.get(WS_PROTOCOL_KEY.toUpperCase()).contains("xmpp-framing")) {
 			response.append("xmpp-framing");
 		} else {
 			response.append("xmpp");

@@ -64,13 +64,13 @@ public class WebSocketHixie76
 	@Override
 	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
 			throws NoSuchAlgorithmException, IOException {
-		if (headers.containsKey(WS_VERSION_KEY)) {
+		if (headers.containsKey(WS_VERSION_KEY.toUpperCase())) {
 			return false;
 		}
 
 		byte[] secBufArr = new byte[16];
-		Long secKey1 = decodeHyxie76SecKey(headers.get(WS_KEY1_KEY));
-		Long secKey2 = decodeHyxie76SecKey(headers.get(WS_KEY2_KEY));
+		Long secKey1 = decodeHyxie76SecKey(headers.get(WS_KEY1_KEY.toUpperCase()));
+		Long secKey2 = decodeHyxie76SecKey(headers.get(WS_KEY2_KEY.toUpperCase()));
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "WS-KEY1 = {0}", secKey1);
 			log.log(Level.FINEST, "WS-KEY2 = {0}", secKey2);
@@ -92,20 +92,20 @@ public class WebSocketHixie76
 
 		response.append("Content-Length: ").append(resp.length).append("\r\n");
 		response.append(WS_PROTOCOL_KEY).append(": ");
-		if (headers.get(WS_PROTOCOL_KEY).contains("xmpp-framing")) {
+		if (headers.get(WS_PROTOCOL_KEY.toUpperCase()).contains("xmpp-framing")) {
 			response.append("xmpp-framing");
 		} else {
 			response.append("xmpp");
 		}
 		response.append("\r\n");
-		if (headers.containsKey(ORIGIN_KEY)) {
-			response.append(WS_ORIGIN_KEY).append(": ").append(headers.get(ORIGIN_KEY)).append("\r\n");
+		if (headers.containsKey(ORIGIN_KEY.toUpperCase())) {
+			response.append(WS_ORIGIN_KEY).append(": ").append(headers.get(ORIGIN_KEY.toUpperCase())).append("\r\n");
 		}
 
 		boolean ssl = SocketType.ssl == ((SocketType) service.getSessionData().get("socket"));
 		int localPort = service.getLocalPort();
-		String location = (ssl ? "wss://" : "ws://") + headers.get(HOST_KEY) +
-				(((ssl && localPort == 443) || (!ssl && localPort == 80) || headers.get(HOST_KEY).contains(":"))
+		String location = (ssl ? "wss://" : "ws://") + headers.get(HOST_KEY.toUpperCase()) +
+				(((ssl && localPort == 443) || (!ssl && localPort == 80) || headers.get(HOST_KEY.toUpperCase()).contains(":"))
 				 ? ""
 				 : (":" + localPort)) + "/";
 		response.append(WS_LOCATION_KEY).append(": ").append(location).append("\r\n");
