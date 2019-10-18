@@ -217,13 +217,7 @@ public class VHostManager
 
 	@Override
 	public BareJID getDefVHostItem() {
-		Iterator<VHostItem> vhosts = repo.iterator();
-
-		if ((vhosts != null) && vhosts.hasNext()) {
-			return vhosts.next().getVhost().getBareJID();
-		}
-
-		return getDefHostName();
+		return repo.getItem(((VHostJDBCRepository)repo).getDefaultVHost()).getVhost().getBareJID();
 	}
 
 	@Override

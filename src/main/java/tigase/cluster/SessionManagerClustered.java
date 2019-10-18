@@ -49,6 +49,7 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -191,7 +192,7 @@ public class SessionManagerClustered
 		if (!getComponentId().equals(jid)) {
 			strategy.nodeConnected(jid);
 
-			sendAdminNotification(jid.getDomain(), STATUS.CONNECETED);
+			sendAdminNotification(jid.getDomain(), STATUS.CONNECTED);
 		}
 	}
 
@@ -206,7 +207,7 @@ public class SessionManagerClustered
 			// from the cluster node waiting....
 			// delTrusted(jid);
 
-			sendAdminNotification(jid.toString(), STATUS.DISCONNECTED);
+			sendAdminNotification(jid.getDomain(), STATUS.DISCONNECTED);
 		}
 	}
 
@@ -500,37 +501,25 @@ public class SessionManagerClustered
 	}
 
 	private void sendAdminNotification(String node, STATUS stat) {
-		String message = "Cluster ";
-		String subject = null;
+		String message = String.format("Cluster node %1$s %2$s: %3$s (%4$s)", String.valueOf(node), stat.message,
+									   String.valueOf(getDefHostName().getDomain()), LocalDateTime.now().toString());
 
-		if (node != null) {
-			message += "node " + node + " ";
-		}
-
-		switch (stat) {
-			case CONNECETED:
-				message += "connected to ";
-//				subject = "New cluster node connected";
-				break;
-			case DISCONNECTED:
-				message += "disconnected from ";
-//				subject = "Cluster node disconnected";
-				break;
-
-		}
-
-		message += getDefHostName() + " (" + new Date() + ")";
-
-		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.chat, message, subject,
+		final JID from = vHostManager != null ? JID.jidInstance(vHostManager.getDefVHostItem()) : this.my_address;
+		Packet p_msg = Message.getMessage(from, my_hostname, StanzaType.chat, message, null,
 										  "cluster_status_update", newPacketId(null));
-
 		sendToAdmins(p_msg);
 
 	}
 
 	private enum STATUS {
-		CONNECETED,
-		DISCONNECTED
+		CONNECTED("connected to"),
+		DISCONNECTED("disconnected from");
+
+		String message;
+
+		STATUS(String message) {
+			this.message = message;
+		}
 	}
 }
 
