@@ -20,7 +20,6 @@ package tigase.vhosts;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.Repository;
-import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.UserRepoRepository;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigAlias;
@@ -56,7 +55,7 @@ import java.util.stream.Collectors;
 @ConfigAliases({@ConfigAlias(field = "items", alias = "virtual-hosts")})
 public class VHostJDBCRepository
 		extends UserRepoRepository<VHostItem>
-		implements ComponentRepositoryDataSourceAware<VHostItem, DataSource> {
+		implements VHostComponentRepositoryDataSourceAware<DataSource> {
 
 	private static final Logger log = Logger.getLogger(VHostJDBCRepository.class.getName());
 
@@ -307,6 +306,11 @@ public class VHostJDBCRepository
 	public void setDefaultVHost(String vhost) {
 		this.defaultVHost = vhost;
 		reloadIfReady();
+	}
+
+	@Override
+	public VHostItem getDefaultVHostItem() {
+		return getItem(getDefaultVHost());
 	}
 
 	public void setExtensionManager(VHostItemExtensionManager extensionManager) {
