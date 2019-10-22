@@ -2149,13 +2149,15 @@ public class SessionManager
 			// sent back to the original sender. This original sender might be
 			// not local....
 			if ((p.getStanzaFrom() != null) && !isLocalDomain(p.getStanzaFrom().getDomain())) {
+				// needed to add following condition as we filtered out and dropped packets from S2S to users bare JID!!
+				if (p.getStanzaTo() == null || !isLocalDomain(p.getStanzaTo().getDomain(), false)) {
+					// ok just forward it there....
+					p.setPacketFrom(null);
+					p.setPacketTo(null);
+					fastAddOutPacket(p);
 
-				// ok just forward it there....
-				p.setPacketFrom(null);
-				p.setPacketTo(null);
-				fastAddOutPacket(p);
-
-				return true;
+					return true;
+				}
 			}
 
 			// this is special case in which we know and expect that there will be
