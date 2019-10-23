@@ -538,7 +538,7 @@ public abstract class IOService<RefObject>
 				sessionData.put(entry.getKey(), entry.getValue());
 			}
 		}
-		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
+		connectionType = ConnectionType.valueOf(String.valueOf(sessionData.get(PORT_TYPE_PROP_KEY)));
 	}
 
 	public int getSocketInputSize() {
