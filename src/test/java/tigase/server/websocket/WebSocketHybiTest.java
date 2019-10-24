@@ -20,12 +20,17 @@ package tigase.server.websocket;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.util.Base64;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author andrzej
@@ -98,6 +103,7 @@ public class WebSocketHybiTest
 	@Test
 	public void testHandshakeOK() throws NoSuchAlgorithmException, IOException {
 		final ByteBuffer tmp = ByteBuffer.allocate(2048);
+		final StringBuilder sb = new StringBuilder();
 		WebSocketXMPPIOService<Object> io = new WebSocketXMPPIOService<Object>(
 				new WebSocketProtocolIfc[]{new WebSocketHybi()}) {
 
@@ -111,6 +117,10 @@ public class WebSocketHybiTest
 				tmp.put(data);
 			}
 
+			protected void writeData(String data) {
+				sb.append(data);
+			}
+
 		};
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("Sec-WebSocket-Version".toUpperCase(), "13");
@@ -120,6 +130,24 @@ public class WebSocketHybiTest
 		bytes[0] = '\r';
 		bytes[1] = '\n';
 		Assert.assertTrue("Handshake failed", impl.handshake(io, params, bytes));
+		tmp.flip();
+		byte[] read = new byte[tmp.remaining()];
+		Arrays.stream(sb.toString().split("\n"))
+				.forEach(
+						System.out::println
+		);
+		Optional<String> secWebSocketAccept = Arrays.stream(sb.toString().split("\n"))
+				.map(line -> line.split(":"))
+				.filter(line -> "Sec-WebSocket-Accept".equalsIgnoreCase(line[0].trim()))
+				.map(line -> line[1])
+				.map(String::trim)
+				.findFirst();
+
+		String expSecWebSocketAccept = Base64.encode(MessageDigest.getInstance("SHA-1")
+															 .digest(("some random data as a key" +
+																	 "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes(
+																	 Charset.forName("UTF-8"))));
+		assertEquals(expSecWebSocketAccept, secWebSocketAccept.get());
 	}
 
 	@Test

@@ -87,7 +87,7 @@ public class WebSocketHybi
 		response.append(RESPONSE_HEADER);
 
 		int version = Integer.parseInt(headers.get(WS_VERSION_KEY.toUpperCase()));
-		String wsAccept = calculateWsAcceptKey(headers.get(WS_KEY_KEY));
+		String wsAccept = calculateWsAcceptKey(headers.get(WS_KEY_KEY.toUpperCase()));
 
 		response.append(WS_PROTOCOL_KEY).append(": ");
 		if (headers.get(WS_PROTOCOL_KEY.toUpperCase()).contains("xmpp-framing")) {
