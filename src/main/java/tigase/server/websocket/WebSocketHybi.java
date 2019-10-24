@@ -67,6 +67,15 @@ public class WebSocketHybi
 		return ID;
 	}
 
+	static String calculateWsAcceptKey(final String webSocketKey) throws NoSuchAlgorithmException {
+		final MessageDigest md = MessageDigest.getInstance("SHA1");
+		if (webSocketKey != null) {
+			md.update(webSocketKey.getBytes());
+		}
+		md.update(GUID.getBytes());
+		return Base64.encode(md.digest());
+	}
+
 	@Override
 	public boolean handshake(WebSocketXMPPIOService service, Map<String, String> headers, byte[] buf)
 			throws NoSuchAlgorithmException, IOException {
@@ -78,10 +87,7 @@ public class WebSocketHybi
 		response.append(RESPONSE_HEADER);
 
 		int version = Integer.parseInt(headers.get(WS_VERSION_KEY.toUpperCase()));
-		String key = headers.get(WS_KEY_KEY) + GUID;
-
-		MessageDigest md = MessageDigest.getInstance("SHA1");
-		byte[] resp = md.digest(key.getBytes());
+		String wsAccept = calculateWsAcceptKey(headers.get(WS_KEY_KEY));
 
 		response.append(WS_PROTOCOL_KEY).append(": ");
 		if (headers.get(WS_PROTOCOL_KEY.toUpperCase()).contains("xmpp-framing")) {
@@ -91,7 +97,7 @@ public class WebSocketHybi
 		}
 		response.append("\r\n");
 		response.append(WS_ACCEPT_KEY + ": ");
-		response.append(Base64.encode(resp));
+		response.append(wsAccept);
 		response.append("\r\n");
 		response.append("\r\n");
 		service.maskingKey = new byte[4];
@@ -296,7 +302,7 @@ public class WebSocketHybi
 			bbuf.putShort((short) size);
 		} else {
 			bbuf.put((byte) 0x7F);
-			bbuf.putLong((long) size);
+			bbuf.putLong(size);
 		}
 		bbuf.flip();
 
