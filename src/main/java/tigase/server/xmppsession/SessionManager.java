@@ -2158,6 +2158,11 @@ public class SessionManager
 
 					return true;
 				}
+
+				// maybe we should assume that if packetTo == null the it was routed correctly?
+				if (p.getPacketTo() == null) {
+					return false;
+				}
 			}
 
 			// this is special case in which we know and expect that there will be
