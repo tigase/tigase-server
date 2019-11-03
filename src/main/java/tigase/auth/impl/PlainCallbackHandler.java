@@ -126,7 +126,11 @@ public class PlainCallbackHandler
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		username = DEFAULT_USERNAME;//nc.getDefaultName();
 
-		setJid(BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain));
+		BareJID jid = BareJID.bareJIDInstanceNS(nc.getDefaultName());
+		if (jid.getLocalpart() == null || !domain.equalsIgnoreCase(jid.getDomain())) {
+			jid = BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain);
+		}
+		setJid(jid);
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "NameCallback: {0}", username);

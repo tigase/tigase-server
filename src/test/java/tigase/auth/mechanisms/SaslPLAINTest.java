@@ -23,6 +23,7 @@ import org.junit.Test;
 import tigase.auth.XmppSaslException;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.VerifyPasswordCallback;
+import tigase.xmpp.jid.BareJID;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -51,7 +52,11 @@ public class SaslPLAINTest
 			public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 				for (Callback callback : callbacks) {
 					if (callback instanceof NameCallback) {
-						username = ((NameCallback) callback).getDefaultName() + "@domain.com";
+						BareJID jid = BareJID.bareJIDInstanceNS(((NameCallback) callback).getDefaultName());
+						if (jid.getLocalpart() == null || !"domain.com".equalsIgnoreCase(jid.getDomain())) {
+							jid = BareJID.bareJIDInstanceNS(((NameCallback) callback).getDefaultName(), "domain.com");
+						}
+						username = jid.toString();
 						((NameCallback) callback).setName(username);
 					} else if (callback instanceof VerifyPasswordCallback) {
 						((VerifyPasswordCallback) callback).setVerified("juliet@domain.com:xsecret".equals(
@@ -243,6 +248,20 @@ public class SaslPLAINTest
 
 		try {
 			sasl.evaluateResponse("juliet@domain.com\0juliet\0xsecret".getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+
+		assertTrue(sasl.isComplete());
+		assertEquals("juliet@domain.com", sasl.getAuthorizationID());
+	}
+
+	@Test
+	public void testSuccessWithAuthzId3() {
+
+		try {
+			sasl.evaluateResponse("juliet@domain.com\0juliet@domain.com\0xsecret".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
