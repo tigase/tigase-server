@@ -26,7 +26,7 @@ import tigase.xmpp.jid.JID;
  */
 public class PushNotificationHelper {
 
-	public static Element createNotification(long messageCount, JID lastMessageSender, String lastMessageBody) {
+	public static Element createPlainNotification(long messageCount, JID lastMessageSender, String lastMessageBody) {
 		return new Element("notification",
 						   new Element[]{createNotificationForm(messageCount, lastMessageSender, lastMessageBody)},
 						   new String[]{"xmlns"}, new String[]{"urn:xmpp:push:0"});

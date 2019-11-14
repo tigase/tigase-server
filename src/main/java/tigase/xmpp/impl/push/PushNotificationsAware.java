@@ -17,19 +17,14 @@
  */
 package tigase.xmpp.impl.push;
 
-import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.jid.BareJID;
 
-public interface PushNotificationsExtension extends PushNotificationsAware {
-	
-	boolean shouldSendNotification(Packet packet, BareJID userJid, XMPPResourceConnection session)
-			throws XMPPException;
-	
-	default void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount, Element notification) {}
+public interface PushNotificationsAware {
 
-	default void setPushNotifications(PushNotifications pushNotifications) {}
+	default Element[] getDiscoFeatures() {
+		return new Element[0];
+	}
+	
+	default void processEnableElement(Element enableEl, Element settingsEl) { }
 	
 }

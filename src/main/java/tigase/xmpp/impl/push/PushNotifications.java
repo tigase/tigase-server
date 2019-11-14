@@ -24,10 +24,10 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.core.Kernel;
-import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.amp.db.MsgRepository;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -65,18 +65,34 @@ public class PushNotifications
 	private Element[] discoFeatures = new Element[0];
 
 	@Inject
+	private ArrayList<PushNotificationsAware> awares = new ArrayList<>();
+	@Inject
 	private ArrayList<PushNotificationsExtension> triggers = new ArrayList<>();
+	@Inject(nullAllowed = true)
+	private ArrayList<PushNotificationsFilter> filters = new ArrayList<>();
 
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
 		return discoFeatures;
 	}
 
+	public void setAwares(ArrayList<PushNotificationsAware> awares) {
+		this.awares = awares;
+	}
+
+	public void setFilter(ArrayList<PushNotificationsFilter> filters) {
+		this.filters = Optional.ofNullable(filters).orElseGet(ArrayList::new);
+		refreshDiscoFeatures();
+	}
+
 	public void setTriggers(ArrayList<PushNotificationsExtension> triggers) {
 		this.triggers = triggers;
-		this.discoFeatures = Stream.concat(Arrays.stream(super.supDiscoFeatures(null)), triggers.stream()
-				.map(PushNotificationsExtension::getDiscoFeatures)
-				.flatMap(Arrays::stream)).toArray(Element[]::new);
+		refreshDiscoFeatures();
+	}
+
+	protected void refreshDiscoFeatures() {
+		this.discoFeatures = Stream.concat(Arrays.stream(super.supDiscoFeatures(null)),
+										   awares.stream().map(PushNotificationsAware::getDiscoFeatures).flatMap(Arrays::stream)).toArray(Element[]::new);
 	}
 
 	@Override
@@ -87,7 +103,7 @@ public class PushNotifications
 				if (session == null || !session.isAuthorized() || !shouldSendNotification(packet, session.getBareJID(), session)) {
 					return;
 				}
-				sendPushNotification(packet, results);
+				sendPushNotification(session, packet, results);
 				return;
 			} else {
 				super.process(packet, session, nonAuthUserRepository, results, map);
@@ -111,7 +127,7 @@ public class PushNotifications
 		}
 
 		try {
-			sendPushNotification(packet, results);
+			sendPushNotification(session, packet, results);
 		} catch (UserNotFoundException ex) {
 			log.log(Level.FINEST, "Could not send push notification for message " + packet, ex);
 		} catch (TigaseDBException ex) {
@@ -154,7 +170,7 @@ public class PushNotifications
 	@Override
 	protected Element createSettingsElement(JID jid, String node, Element enableElem, Element optionsForm) {
 		Element settingsEl = super.createSettingsElement(jid, node, enableElem, optionsForm);
-		for (PushNotificationsExtension trigger : triggers) {
+		for (PushNotificationsAware trigger : awares) {
 			trigger.processEnableElement(enableElem, settingsEl);
 		}
 		return settingsEl;
@@ -162,15 +178,35 @@ public class PushNotifications
 
 	protected void notifyOfflineMessagesRetrieved(BareJID userJid, Collection<Element> pushServices,
 												  Consumer<Packet> results) {
-		Element notification = new Element("notification", new String[]{"xmlns"}, new String[]{XMLNS});
-
-		Element x = new Element("x", new String[]{"xmlns"}, new String[]{"jabber:x:data"});
-		notification.addChild(x);
-		DataForm.addFieldValue(notification, "message-count", String.valueOf(0l));
-
-		sendPushNotification(userJid, pushServices, notification, results);
+		Map<Enum, Long> map = new HashMap<>();
+		map.put(MsgRepository.MSG_TYPES.message, 0l);
+		sendPushNotification(userJid, pushServices, null, null, map, results);
 	}
 
+	@Override
+	protected Element prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount) {
+		Element notification = super.prepareNotificationPayload(pushServiceSettings, packet, msgCount);
+		for (PushNotificationsExtension trigger : triggers) {
+			trigger.prepareNotificationPayload(pushServiceSettings, packet, msgCount, notification);
+		}
+		return notification;
+	}
+
+	@Override
+	protected boolean isSendingNotificationAllowed(BareJID userJid, XMPPResourceConnection session, Element pushServiceSettings, Packet packet) {
+		if (!super.isSendingNotificationAllowed(userJid, session, pushServiceSettings, packet)) {
+			return false;
+		}
+
+		for (PushNotificationsFilter filter : filters) {
+			if (!filter.isSendingNotificationAllowed(userJid, session, pushServiceSettings, packet)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// move to filter
 	protected boolean shouldSendNotification(Packet packet, BareJID userJid, XMPPResourceConnection session) {
 		if (session == null && packet.getElemName() == Message.ELEM_NAME) {
 			return true;
@@ -189,5 +225,5 @@ public class PushNotifications
 
 		return false;
 	}
-	
+
 }

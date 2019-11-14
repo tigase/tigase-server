@@ -22,22 +22,37 @@ import org.junit.Before;
 import org.junit.Test;
 import tigase.component.PacketWriter;
 import tigase.component.responses.AsyncCallback;
-import tigase.db.DataSource;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
+import tigase.db.*;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
+import tigase.server.PolicyViolationException;
 import tigase.server.amp.db.MsgRepository;
+import tigase.util.Base64;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.MessageAmp;
 import tigase.xmpp.impl.ProcessorTestCase;
+import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.JID;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.lang.reflect.Field;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -64,6 +79,9 @@ public class PushNotificationsTest
 		registerLocalBeans(getKernel());
 		pushNotifications = getInstance(PushNotifications.class);
 		msgRepository = getInstance(MsgRepository.class);
+		Field f = RosterFactory.class.getDeclaredField("shared");
+		f.setAccessible(true);
+		f.set(null, RosterFactory.newRosterInstance(RosterFactory.ROSTER_IMPL_PROP_VAL));
 	}
 
 	@After
@@ -87,14 +105,23 @@ public class PushNotificationsTest
 
 	@Test
 	public void test_enable() throws Exception {
-		Element iqEl = new Element("iq", new Element[]{new Element("enable", new String[]{"xmlns", "jid", "node"},
-																   new String[]{"urn:xmpp:push:0",
-																				pushServiceJid.toString(),
-																				"push-node"})},
-								   new String[]{"type", "id"}, new String[]{"set", UUID.randomUUID().toString()});
-
 		XMPPResourceConnection session = getSession(
 				JID.jidInstanceNS("c2s@example.com/" + UUID.randomUUID().toString()), recipientJid);
+
+		enable(session,null);
+	}
+
+	protected void enable(XMPPResourceConnection session, Consumer<Element> consumer) throws Exception {
+		Element enableEl = new Element("enable", new String[]{"xmlns", "jid", "node"},
+									   new String[]{"urn:xmpp:push:0",
+													pushServiceJid.toString(),
+													"push-node"});
+		if (consumer != null) {
+			consumer.accept(enableEl);
+		}
+		Element iqEl = new Element("iq", new Element[]{ enableEl },
+								   new String[]{"type", "id"}, new String[]{"set", UUID.randomUUID().toString()});
+
 
 		Packet iq = Packet.packetInstance(iqEl);
 		iq.setPacketFrom(session.getConnectionId());
@@ -180,7 +207,7 @@ public class PushNotificationsTest
 
 		Packet expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid,
 																			   "push-node",
-																			   PushNotificationHelper.createNotification(
+																			   PushNotificationHelper.createPlainNotification(
 																					   1, senderJid, msgBody));
 
 		assertElementEquals(expNotification.getElement(), results.poll().getElement());
@@ -198,11 +225,55 @@ public class PushNotificationsTest
 		assertEquals(1, results.size());
 
 		expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid, "push-node",
-																		PushNotificationHelper.createNotification(2,
+																		PushNotificationHelper.createPlainNotification(2,
 																												  senderJid,
 																												  msgBody));
 
 		assertElementEquals(expNotification.getElement(), results.poll().getElement());
+	}
+
+	@Test
+	public void test_notificationGenerationForMUCwhenOnlineOLD() throws Exception {
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  new Element("settings", new String[]{"jid", "node"},
+															  new String[]{pushServiceJid.toString(),
+																		   "push-node"}).toString());
+
+		XMPPResourceConnection session = this.getSession(JID.jidInstanceNS(UUID.randomUUID().toString(), recipientJid.getDomain()), recipientJid);
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		Queue<Packet> results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(0, results.size());
+
+		Element presence = new Element("presence");
+		session.setPresence(presence);
+
+		msgBody = "Message body " + UUID.randomUUID().toString();
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+						  new String[]{"jabber:client"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(0, results.size());
+
+		msgBody = "Message body " + UUID.randomUUID().toString();
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns", "type"},
+						  new String[]{"jabber:client", "groupchat"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
 	}
 
 	@Test
@@ -248,6 +319,171 @@ public class PushNotificationsTest
 
 		assertEquals(1, results.size());
 
+		enable(session, enableEl -> {
+			enableEl.withElement("muc", "tigase:push:muc:0", mucEl -> {
+				mucEl.withElement("room", roomEl -> {
+					roomEl.setAttribute("jid", senderJid.getBareJID().toString());
+					roomEl.setAttribute("when", "always");
+				});
+			});
+		});
+
+		msgBody = "Message body " + UUID.randomUUID().toString() + " - my_nick";
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns", "type"},
+						  new String[]{"jabber:client", "groupchat"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		enable(session, enableEl -> {
+			enableEl.withElement("muc", "tigase:push:muc:0", mucEl -> {
+				mucEl.withElement("room", roomEl -> {
+					roomEl.setAttribute("jid", senderJid.getBareJID().toString());
+					roomEl.setAttribute("when", "mentioned");
+					roomEl.setAttribute("nick", "my_nick");
+				});
+			});
+		});
+
+		msgBody = "Message body " + UUID.randomUUID().toString() + " - my_nick";
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns", "type"},
+						  new String[]{"jabber:client", "groupchat"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		results = new ArrayDeque<>();
+		pushNotifications.process(packet, session, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
+	}
+
+	@Test
+	public void testMutingNotifications() throws TigaseDBException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.withElement("muted", "tigase:push:muted:0", mutedEl -> {
+			mutedEl.withElement("jid", null, senderJid.getBareJID().toString());
+		});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<Packet> results = new ArrayDeque<>();
+		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+
+		assertEquals(0, results.size());
+	}
+
+	@Test
+	public void testIgnoreUnknownNotifications()
+			throws TigaseDBException, NotAuthorizedException, TigaseStringprepException, PolicyViolationException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.addAttribute("ignore-from-unknown", "true");
+//		settings.withElement("ignore-unknown", "tigase:push:ignore-unknown:0", (String) null);
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<Packet> results = new ArrayDeque<>();
+		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+
+		assertEquals(0, results.size());
+
+		RosterAbstract roster = RosterFactory.getRosterImplementation(true);
+		XMPPResourceConnection session = getSession(JID.jidInstanceNS("test@test/1"), recipientJid);
+		roster.addBuddy(session, senderJid.copyWithoutResource(), "Sender 1", null, RosterAbstract.SubscriptionType.both, null);
+
+		session.logout();
+
+		msgBody = "Message body " + UUID.randomUUID().toString();
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		results = new ArrayDeque<>();
+		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
+	}
+
+	@Test
+	public void testEncryptedNotification() throws TigaseDBException, NoSuchPaddingException, NoSuchAlgorithmException,
+												   InvalidAlgorithmParameterException, InvalidKeyException,
+												   BadPaddingException, IllegalBlockSizeException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		SecureRandom random = new SecureRandom();
+		byte[] key = new byte[128/8];
+		random.nextBytes(key);
+		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
+			el.setCData(Base64.encode(key));
+			el.setAttribute("alg", "aes-gcm");
+		});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<Packet> results = new ArrayDeque<>();
+		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
+		byte[] enc = Base64.decode(encrypted.getCData());
+		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+		byte[] decoded = cipher.doFinal(enc);
+
+		assertTrue(new String(decoded).contains(msgBody));
+	}
+
+	@Test
+	public void testMessageRetrieved() throws TigaseDBException, NotAuthorizedException, TigaseStringprepException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.setAttribute("priority", "true");
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		Queue<Packet> results = new ArrayDeque<>();
+		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), results);
+
+		assertEquals(1, results.size());
+		System.out.println("results:" + results);
 	}
 
 	protected void registerLocalBeans(Kernel kernel) {

@@ -181,7 +181,7 @@ public class PushNotificationsWithAwayTest
 
 		Packet expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid,
 																			   "push-node",
-																			   PushNotificationHelper.createNotification(
+																			   PushNotificationHelper.createPlainNotification(
 																					   1, senderJid, msgBody));
 
 		assertElementEquals(expNotification.getElement(), results.poll().getElement());
@@ -199,7 +199,7 @@ public class PushNotificationsWithAwayTest
 		assertEquals(1, results.size());
 
 		expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid, "push-node",
-																		PushNotificationHelper.createNotification(2,
+																		PushNotificationHelper.createPlainNotification(2,
 																												  senderJid,
 																												  msgBody));
 
