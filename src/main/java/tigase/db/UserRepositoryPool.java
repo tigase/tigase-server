@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,6 +147,40 @@ public class UserRepositoryPool
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
+		return null;
+	}
+
+	@Override
+	public Map<String, String> getDataMap(BareJID user, String subnode)
+			throws TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getDataMap(user, subnode);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+		return null;
+	}
+
+	@Override
+	public <T> Map<String, T> getDataMap(BareJID user, String subnode, Function<String, T> converter)
+			throws TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getDataMap(user, subnode, converter);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
 		return null;
 	}
 

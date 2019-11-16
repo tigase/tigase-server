@@ -20,7 +20,11 @@ package tigase.db;
 import tigase.annotations.TigaseDeprecated;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * <code>UserRepository</code> interface defines all functionalities required to store user data. It contains adding,
@@ -122,6 +126,64 @@ public interface UserRepository
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	String getData(BareJID user, String key) throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getDataMap</code> method returns a values associated with each key for user repository in given subnode.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be stored. User ID consists of user name
+	 * and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 *
+	 * @return a <code>Map</code> with values
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	default Map<String, String> getDataMap(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException {
+		String[] keys = getKeys(user, subnode);
+		if (keys != null) {
+			Map<String, String> data = new HashMap<>();
+			for (String key : keys) {
+				data.put(key, getData(user, subnode, key));
+			}
+			return data;
+		}
+		return Collections.emptyMap();
+	}
+
+	/**
+	 * <code>getDataMap</code> method returns a values associated with each key for user repository in given subnode.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be stored. User ID consists of user name
+	 * and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is stored. Node path has the same form as
+	 * directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param converter a <code>Function</code> which takes value for a key and converts to expected value type
+	 *
+	 * @return a <code>Map</code> with values
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	default <T> Map<String, T> getDataMap(BareJID user, String subnode, Function<String,T> converter) throws UserNotFoundException, TigaseDBException {
+		String[] keys = getKeys(user, subnode);
+		if (keys != null) {
+			Map<String, T> data = new HashMap<>();
+			for (String key : keys) {
+				String value = getData(user, subnode, key);
+				if (value != null) {
+					data.put(key, converter.apply(value));
+				} else {
+					data.put(key, null);
+				}
+			}
+			return data;
+		}
+		return Collections.emptyMap();
+	}
 
 	/**
 	 * <code>getDataList</code> method returns array of values associated with given key or <code>null</code> if given

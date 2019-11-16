@@ -25,6 +25,7 @@ import tigase.xmpp.jid.BareJID;
 import java.io.StringReader;
 import java.sql.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,6 +85,8 @@ public class JDBCRepository
 			"insert into " + DEF_PAIRS_TBL + " (nid, uid, pkey, pval) " + " values (?, ?, ?, ?)";
 	private static final String DATA_FOR_NODE_QUERY =
 			"select pval from " + DEF_PAIRS_TBL + " where (nid = ?) AND (pkey = ?)";
+	private static final String KEYS_DATA_FOR_NODE_QUERY =
+			"select pkey, pval from " + DEF_PAIRS_TBL + " where (nid = ?)";
 
 	private static final String UPDATE_LAST_LOGIN_QUERY =
 			"update " + DEF_USERS_TBL + " set last_login=? where user_id=?";
@@ -174,6 +177,65 @@ public class JDBCRepository
 	@Override
 	public String getData(BareJID user_id, final String key) throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, null, key, null);
+	}
+
+	@Override
+	public Map<String, String> getDataMap(BareJID user_id, String subnode)
+			throws TigaseDBException {
+		try {
+			long nid = getNodeNID(null, user_id, subnode);
+			
+			if (nid > 0) {
+				ResultSet rs = null;
+
+				PreparedStatement data_for_node_st = data_repo.getPreparedStatement(user_id, KEYS_DATA_FOR_NODE_QUERY);
+
+				synchronized (data_for_node_st) {
+					try {
+						Map<String, String> results = new HashMap<>();
+
+						data_for_node_st.setLong(1, nid);
+						rs = data_for_node_st.executeQuery();
+						while (rs.next()) {
+							String key = rs.getString(1);
+							String value = rs.getString(2);
+							results.put(key, value);
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Found data: {0}, {1}", new String[] { key, value });
+							}
+						}
+
+						return results;
+					} finally {
+						data_repo.release(null, rs);
+					}
+				}
+			} else {
+				return Collections.emptyMap();
+			}    // end of if (nid > 0) else
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error getting data map for: " + user_id + "/" + subnode, e);
+		}
+	}
+
+	@Override
+	public <T> Map<String, T> getDataMap(BareJID user, String subnode, Function<String, T> converter)
+			throws TigaseDBException {
+		Map<String, String> data = getDataMap(user, subnode);
+		if (data.isEmpty()) {
+			return Collections.emptyMap();
+		} else {
+			Map<String, T> results = new HashMap<>();
+			for (Map.Entry<String, String> e : data.entrySet()) {
+				String value = e.getValue();
+				if (value != null) {
+					results.put(e.getKey(), converter.apply(value));
+				} else {
+					results.put(e.getKey(), null);
+				}
+			}
+			return results;
+		}
 	}
 
 	@Override
@@ -435,6 +497,7 @@ public class JDBCRepository
 			data_repo.initPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY, COUNT_USERS_FOR_DOMAIN_QUERY);
 			data_repo.initPreparedStatement(DATA_FOR_NODE_QUERY, DATA_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(KEYS_FOR_NODE_QUERY, KEYS_FOR_NODE_QUERY);
+			data_repo.initPreparedStatement(KEYS_DATA_FOR_NODE_QUERY, KEYS_DATA_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(NODES_FOR_NODE_QUERY, NODES_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(INSERT_KEY_VAL_QUERY, INSERT_KEY_VAL_QUERY);
 			data_repo.initPreparedStatement(REMOVE_KEY_DATA_QUERY, REMOVE_KEY_DATA_QUERY);

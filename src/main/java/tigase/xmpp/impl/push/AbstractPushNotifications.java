@@ -248,19 +248,7 @@ public class AbstractPushNotifications
 	}
 
 	protected Map<String, Element> getPushServices(BareJID userJid) throws TigaseDBException {
-		String[] keys = userRepository.getKeys(userJid, ID);
-		if (keys == null) {
-			return Collections.emptyMap();
-		}
-		Map<String, Element> map = new HashMap<>();
-		for (String key : keys) {
-			String val = userRepository.getData(userJid, ID, key);
-			if (val != null) {
-				Element valEl = parseElement(val);
-				map.put(key, valEl);
-			}
-		}
-		return map;
+		return userRepository.getDataMap(userJid, ID, this::parseElement);
 	}
 
 	protected void sendPushNotification(XMPPResourceConnection session, Packet packet, Queue<Packet> results)

@@ -25,6 +25,7 @@ import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -107,6 +108,36 @@ public abstract class UserRepositoryMDImpl
 
 		if (repo != null) {
 			return repo.getData(user, key);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+		}
+
+		return null;
+	}
+
+	@Override
+	public Map<String, String> getDataMap(BareJID user, String subnode)
+			throws TigaseDBException {
+		UserRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.getDataMap(user, subnode);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+		}
+
+		return null;
+	}
+
+	@Override
+	public <T> Map<String, T> getDataMap(BareJID user, String subnode, Function<String, T> converter)
+			throws TigaseDBException {
+		UserRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.getDataMap(user, subnode, converter);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
