@@ -28,6 +28,7 @@ import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
+import tigase.util.Algorithms;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -36,6 +37,7 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,8 +68,10 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	private JID ampJID = JID.jidInstanceNS("amp", DNSResolverFactory.getInstance().getDefaultHost());
 	private Set<CommandListener> commands = new CopyOnWriteArraySet<CommandListener>();
 	@ConfigField(desc="Forward error packets within cluster", alias = "error-forwarding")
-	private ErrorForwarding errorForwarding = ErrorForwarding.drop;
+	private ErrorForwarding errorForwarding = ErrorForwarding.forward;
+	private static EnumSet<StanzaType> ERROR_OR_RESULT = EnumSet.of(StanzaType.error, StanzaType.result);
 
+	private Map<String, JID> iqResourceToClusterNode = new ConcurrentHashMap<>();
 
 	public DefaultClusteringStrategyAbstract() {
 		super();
@@ -278,9 +282,12 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 //    jidLookup = packet.getStanzaFrom();
 //  }
 		if (isSuitableForForward(packet)) {
-
-			// nodes = metadata.getNodesForJid(jidLookup);
-			nodes = getNodesConnected();
+			if (isIqResponseToNode(packet)) {
+				nodes = getNodesForIqResponse(packet);
+			} else {
+				// nodes = metadata.getNodesForJid(jidLookup);
+				nodes = getNodesConnected();
+			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Selected nodes: {0}, for packet: {1}", new Object[]{nodes, packet});
 			}
@@ -291,6 +298,22 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		}
 
 		return nodes;
+	}
+
+	public boolean isIqResponseToNode(Packet packet) {
+		if (packet.getElemName() == Iq.ELEM_NAME && ERROR_OR_RESULT.contains(packet.getType())) {
+			JID to = packet.getStanzaTo();
+			return to != null && sm.isLocalDomain(to.getBareJID().toString(), false) && to.getResource() != null;
+		}
+		return false;
+	}
+
+	public List<JID> getNodesForIqResponse(Packet packet) {
+		JID clusterNode = iqResourceToClusterNode.get(packet.getStanzaTo().getResource());
+		if (clusterNode != null) {
+			return Collections.singletonList(clusterNode);
+		}
+		return null;
 	}
 
 	@Override
@@ -304,6 +327,18 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return false;
+	}
+
+	@Override
+	public void nodeConnected(JID node) {
+		String hash = Algorithms.sha256(node.getDomain());
+		iqResourceToClusterNode.put(hash, node);
+	}
+
+	@Override
+	public void nodeDisconnected(JID node) {
+		String hash = Algorithms.sha256(node.getDomain());
+		iqResourceToClusterNode.remove(hash, node);
 	}
 
 	@Override
@@ -381,6 +416,15 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 				sm.getComponentId().getBareJID().equals((packet.getStanzaTo().getBareJID()))) {
 			return false;
 		}
+
+//		if (sm.isLocalDomain(packet.getStanzaTo().getBareJID().toString(), false)) {
+//			if (packet.getElemName() == Iq.ELEM_NAME &&
+//					(packet.getType() == StanzaType.error || packet.getType() == StanzaType.result) &&
+//					packet.getStanzaTo().getResource() != null) {
+//				return true;
+//			}
+//			return false;
+//		}
 
 		// Also packets sent from the server to user are not being forwarded like
 		// service discovery perhaps?

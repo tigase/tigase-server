@@ -1121,7 +1121,7 @@ public class SessionManager
 
 		JID to = packet.getStanzaTo();
 
-		if ((to != null) && isLocalDomain(to.toString())) {
+		if ((to != null) && isLocalDomain(to.getBareJID().toString())) {
 			if (packet.getElemName() == "message") {
 
 				// Yes this packet is for admin....

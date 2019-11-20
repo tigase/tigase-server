@@ -19,7 +19,6 @@ package tigase.xmpp.impl.push;
 
 import tigase.cluster.strategy.ClusteringStrategyIfc;
 import tigase.cluster.strategy.ConnectionRecordIfc;
-import tigase.component.PacketWriter;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
@@ -64,8 +63,6 @@ public class AwayPushNotificationsExtension implements PushNotificationsExtensio
 	private EventBus eventBus;
 	@Inject
 	private SessionManagerHandler sessionManagerHandler;
-	@Inject
-	private PacketWriter packetWriter;
 	@Inject
 	private PushNotifications pushNotifications;
 
@@ -121,7 +118,7 @@ public class AwayPushNotificationsExtension implements PushNotificationsExtensio
 		}
 
 		try {
-			pushNotifications.notifyOfflineMessagesRetrieved(conn.getBareJID(), services, packetWriter::write);
+			pushNotifications.notifyOfflineMessagesRetrieved(conn.getBareJID(), services);
 		} catch (NotAuthorizedException ex) {
 			log.log(Level.FINEST, "Connection {0} not yet authorized, ignoring..", conn);
 		}

@@ -20,20 +20,18 @@ package tigase.xmpp.impl.push;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import tigase.component.PacketWriter;
-import tigase.component.responses.AsyncCallback;
 import tigase.db.*;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.core.Kernel;
+import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.PacketWriterWithTimeout;
 import tigase.server.PolicyViolationException;
 import tigase.server.amp.db.MsgRepository;
 import tigase.util.Base64;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.MessageAmp;
 import tigase.xmpp.impl.ProcessorTestCase;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -51,6 +49,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -97,8 +96,8 @@ public class PushNotificationsTest
 								  new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 	}
@@ -200,8 +199,8 @@ public class PushNotificationsTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 
@@ -210,7 +209,7 @@ public class PushNotificationsTest
 																			   PushNotificationHelper.createPlainNotification(
 																					   1, senderJid, msgBody));
 
-		assertElementEquals(expNotification.getElement(), results.poll().getElement());
+		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
 
 		msgBody = "Message body " + UUID.randomUUID().toString();
 		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
@@ -219,8 +218,8 @@ public class PushNotificationsTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 
@@ -229,7 +228,7 @@ public class PushNotificationsTest
 																												  senderJid,
 																												  msgBody));
 
-		assertElementEquals(expNotification.getElement(), results.poll().getElement());
+		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
 	}
 
 	@Test
@@ -247,8 +246,8 @@ public class PushNotificationsTest
 								  new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 
@@ -260,8 +259,8 @@ public class PushNotificationsTest
 						  new String[]{"jabber:client"});
 		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 
@@ -270,8 +269,8 @@ public class PushNotificationsTest
 						  new String[]{"jabber:client", "groupchat"});
 		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 	}
@@ -291,8 +290,8 @@ public class PushNotificationsTest
 								  new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 
@@ -304,8 +303,8 @@ public class PushNotificationsTest
 						  new String[]{"jabber:client"});
 		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 
@@ -314,8 +313,8 @@ public class PushNotificationsTest
 						  new String[]{"jabber:client", "groupchat"});
 		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 
@@ -333,8 +332,8 @@ public class PushNotificationsTest
 						  new String[]{"jabber:client", "groupchat"});
 		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 
@@ -353,8 +352,8 @@ public class PushNotificationsTest
 						  new String[]{"jabber:client", "groupchat"});
 		packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		results = new ArrayDeque<>();
-		pushNotifications.process(packet, session, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 	}
@@ -403,8 +402,8 @@ public class PushNotificationsTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 
@@ -421,8 +420,8 @@ public class PushNotificationsTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		results.clear();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 	}
@@ -452,12 +451,12 @@ public class PushNotificationsTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
 
-		Element notificationElem = results.remove().getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
 		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
 		byte[] enc = Base64.decode(encrypted.getCData());
 		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
@@ -479,15 +478,88 @@ public class PushNotificationsTest
 												  pushServiceJid + "/push-node",
 												  settings.toString());
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), results);
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), new ArrayDeque<>());
 
 		assertEquals(1, results.size());
 		System.out.println("results:" + results);
 	}
 
+	@Test
+	public void testPushError() throws TigaseDBException, XMPPException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+		Element settings1 = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node-1"});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node-1",
+												  settings1.toString());
+		
+		Queue<Packet> results = new ArrayDeque<>();
+		Packet message = Message.getMessage(senderJid, recipientJid, StanzaType.chat, "Message " +
+				UUID.randomUUID()
+						.toString(), null, null, UUID.randomUUID().toString());
+		pushNotifications.notifyNewOfflineMessage(message, null, results, new HashMap<>());
+
+		Queue<DummyPacketWriter.Item> items = getInstance(DummyPacketWriter.class).getOutQueue();
+
+		assertEquals(items.size(), 2);
+
+		DummyPacketWriter.Item item = null;
+		while ((item = items.poll()) != null) {
+			if ("push-node-1".equals(
+					item.packet.getAttributeStaticStr(new String[]{"iq", "pubsub", "publish"}, "node"))) {
+				item.handler.handle(Authorization.ITEM_NOT_FOUND.getResponseMessage(item.packet, null, false));
+			} else {
+				item.handler.handle(item.packet.okResult((String) null, 0));
+			}
+		}
+
+		Map<String, String> data = getInstance(UserRepository.class).getDataMap(recipientJid.getBareJID(), "urn:xmpp:push:0");
+		assertNotNull(data);
+		assertEquals(1, data.size());
+		assertNotNull(data.get(pushServiceJid.toString() + "/push-node"));
+	}
+
+	@Test
+	public void testPushDisableByComponent() throws TigaseDBException, NotAuthorizedException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+		Element settings1 = new Element("settings", new String[]{"jid", "node"},
+										new String[]{pushServiceJid.toString(),
+													 "push-node-1"});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node-1",
+												  settings1.toString());
+
+		Queue<Packet> results = new ArrayDeque<>();
+		Packet message = Packet.packetInstance(new Element("message").withElement("pubsub", "http://jabber.org/protocol/pubsub", pubsubEl -> {
+			pubsubEl.setAttribute("node", "push-node-1");
+			pubsubEl.withElement("affiliation", affEl -> {
+				affEl.setAttribute("jid", recipientJid.toString());
+				affEl.setAttribute("affiliation", "none");
+			});
+		}), pushServiceJid, recipientJid);
+		pushNotifications.processMessage(message, null, new ArrayDeque<>()::offer);
+		
+		Map<String, String> data = getInstance(UserRepository.class).getDataMap(recipientJid.getBareJID(), "urn:xmpp:push:0");
+		assertNotNull(data);
+		assertEquals(1, data.size());
+		assertNotNull(data.get(pushServiceJid.toString() + "/push-node"));
+	}
+
 	protected void registerLocalBeans(Kernel kernel) {
 		super.registerBeans(kernel);
+		kernel.registerBean("writerWithTimeout").asInstance(new DummyPacketWriter()).exportable().exec();
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean("sess-man").asInstance(this.getSessionManagerHandler()).setActive(true).exportable().exec();//.asClass(DummySessionManager.class).setActive(true).exportable().exec();
 		kernel.registerBean(MessageAmp.class).setActive(true).exportable().exec();
@@ -580,29 +652,31 @@ public class PushNotificationsTest
 		}
 	}
 
-	public static class DummyPacketWriter implements PacketWriter {
+	public static class DummyPacketWriter implements PacketWriterWithTimeout {
 
-		private Queue<Packet> outQueue = new ArrayDeque<>();
+		private Queue<Item> outQueue = new ArrayDeque<>();
 
 		public DummyPacketWriter() {}
 
-		public Queue<Packet> getOutQueue() {
+		public Queue<Item> getOutQueue() {
 			return outQueue;
 		}
-
+		
 		@Override
-		public void write(Collection<Packet> packets) {
-			outQueue.addAll(packets);
+		public boolean addOutPacketWithTimeout(Packet packet, Duration timeout, Handler handler) {
+			return outQueue.offer(new Item(packet, handler));
 		}
 
-		@Override
-		public void write(Packet packet) {
-			outQueue.offer(packet);
-		}
+		public class Item {
 
-		@Override
-		public void write(Packet packet, AsyncCallback callback) {
-			throw new UnsupportedOperationException("Method not implemented!");
+			public final Packet packet;
+			public final Handler handler;
+
+			Item(Packet packet, Handler handler) {
+				this.packet = packet;
+				this.handler = handler;
+			}
+			
 		}
 	}
 

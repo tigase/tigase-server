@@ -69,7 +69,7 @@ public class BoshConnectionManager
 	private static final Logger log = Logger.getLogger(BoshConnectionManager.class.getName());
 	private static final int DEF_PORT_NO = 5280;
 
-	private static Handler sidFilehandler;
+	private static java.util.logging.Handler sidFilehandler;
 	protected final Map<UUID, BoshSession> sessions = new ConcurrentSkipListMap<UUID, BoshSession>();
 	private int[] PORTS = {DEF_PORT_NO};
 	@ConfigField(desc = "Batch queue timeout", alias = BATCH_QUEUE_TIMEOUT_KEY)

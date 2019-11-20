@@ -21,10 +21,7 @@ import tigase.cluster.SessionManagerClustered;
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.kernel.beans.Bean;
-import tigase.server.Command;
-import tigase.server.Packet;
-import tigase.server.Presence;
-import tigase.server.Priority;
+import tigase.server.*;
 import tigase.server.xmppsession.UserConnectedEvent;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -73,15 +70,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		addCommandListener(new UserPresenceCommand(USER_PRESENCE_CMD));
 		addCommandListener(new UserConnectedCommand(USER_CONNECTED_CMD));
 	}
-
-	@Override
-	public void nodeConnected(JID node) {
-	}
-
-	@Override
-	public void nodeDisconnected(JID node) {
-	}
-
+	
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 		if (packet.getElemName() == Presence.ELEM_NAME) {
@@ -178,6 +167,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	@Override
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet) {
 		if (visitedNodes != null) {
+			if (isIqResponseToNode(packet)) {
+				return null;
+			}
 			List<JID> result = selectNodes(fromNode, visitedNodes);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -201,7 +193,12 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 			return result;
 		}
 		if (isSuitableForForward(packet)) {
-			List<JID> result = selectNodes(fromNode, visitedNodes);
+			List<JID> result = null;
+			if (isIqResponseToNode(packet)) {
+				result = getNodesForIqResponse(packet);
+			} else {
+				result = selectNodes(fromNode, visitedNodes);
+			}
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Visited nodes null, selecting new node: {0}, for packet: {1}",

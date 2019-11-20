@@ -20,10 +20,7 @@ package tigase.xmpp.impl.push;
 import tigase.db.*;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.server.DataForm;
-import tigase.server.Iq;
-import tigase.server.Message;
-import tigase.server.Packet;
+import tigase.server.*;
 import tigase.server.amp.db.MsgRepository;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
@@ -38,6 +35,7 @@ import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -48,7 +46,9 @@ import static tigase.xmpp.impl.push.AbstractPushNotifications.XMLNS;
 
 @DiscoFeatures({PushNotifications.ID})
 @Handles({@Handle(path = {Iq.ELEM_NAME, "enable"}, xmlns = XMLNS),
-		  @Handle(path = {Iq.ELEM_NAME, "disable"}, xmlns = XMLNS)})
+		  @Handle(path = {Iq.ELEM_NAME, "disable"}, xmlns = XMLNS),
+		  @Handle(path = {Message.ELEM_NAME, "pubsub"}, xmlns = "http://jabber.org/protocol/pubsub")
+})
 public class AbstractPushNotifications
 		extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc {
@@ -64,6 +64,8 @@ public class AbstractPushNotifications
 	protected boolean withBody = true;
 	@ConfigField(desc = "Send notifications with sender", alias = "with-sender")
 	protected boolean withSender = true;
+	@ConfigField(desc = "Max notification timeout", alias = "max-timeout")
+	protected Duration maxTimeout = Duration.ofMinutes(6);
 
 	@Inject
 	private MsgRepositoryIfc msgRepository;
@@ -71,10 +73,34 @@ public class AbstractPushNotifications
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private PacketWriterWithTimeout writer;
+	
+	protected boolean shouldDisablePush(Authorization error) {
+		if (error == null) {
+			return false;
+		}
+		switch (error) {
+			case REMOTE_SERVER_TIMEOUT:
+			case SERVICE_UNAVAILABLE:
+			case INTERNAL_SERVER_ERROR:
+			case BAD_REQUEST:
+				return false;
+			default:
+				// we need to handle possible error
+				return true;
+		}
+	}
+
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository nonAuthUserRepository,
 						Queue<Packet> results, Map<String, Object> map) throws XMPPException {
 		try {
+			if (packet.getElemName() == Message.ELEM_NAME) {
+				processMessage(packet, session, results::offer);
+				return;
+			}
+
 			if (session == null || !session.getConnectionId().equals(packet.getPacketFrom())) {
 				results.offer(Authorization.FORBIDDEN.getResponseMessage(packet, null, true));
 				return;
@@ -116,6 +142,26 @@ public class AbstractPushNotifications
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 																	   "Attribute 'jid' is not valid JID of Push Notifications service",
 																	   true));
+		}
+	}
+
+	protected void processMessage(Packet packet, XMPPResourceConnection session,
+								  Consumer<Packet> results) throws NotAuthorizedException, TigaseDBException {
+		Element pubsubEl = packet.getElemChild("pubsub", "http://jabber.org/protocol/pubsub");
+		if (pubsubEl != null) {
+			String node = pubsubEl.getAttributeStaticStr("node");
+			if (node != null) {
+				Element affiliationEl = pubsubEl.getChild("affiliation");
+				if (affiliationEl != null) {
+					String userJid = affiliationEl.getAttributeStaticStr("jid");
+					if ("none".equals(affiliationEl.getAttributeStaticStr("affiliation"))) {
+						if (userJid != null) {
+							userRepository.removeData(BareJID.bareJIDInstanceNS(userJid), ID,
+													  packet.getStanzaFrom().toString() + "/" + node);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -220,8 +266,7 @@ public class AbstractPushNotifications
 	}
 
 	protected void sendPushNotification(BareJID userJid, Collection<Element> pushServices,
-										XMPPResourceConnection session, Packet packet, Map<Enum, Long> notificationData,
-										Consumer<Packet> results) {
+										XMPPResourceConnection session, Packet packet, Map<Enum, Long> notificationData) {
 		pushServices.forEach(settings -> {
 			try {
 				if (packet != null && !isSendingNotificationAllowed(userJid, session, settings, packet)) {
@@ -239,7 +284,7 @@ public class AbstractPushNotifications
 							new Object[]{userJid, notification, pushService});
 				}
 
-				sendPushNotification(userJid, notification, pushService, pushNode, publishOptionsForm, results);
+				sendPushNotification(userJid, notification, pushService, pushNode, publishOptionsForm);
 			} catch (Exception ex) {
 				log.log(Level.FINE, "Could not publish notification for " + userJid + " to " +
 						settings.getAttributeStaticStr("jid") + " at " + settings.getAttributeStaticStr("node"));
@@ -251,7 +296,7 @@ public class AbstractPushNotifications
 		return userRepository.getDataMap(userJid, ID, this::parseElement);
 	}
 
-	protected void sendPushNotification(XMPPResourceConnection session, Packet packet, Queue<Packet> results)
+	protected void sendPushNotification(XMPPResourceConnection session, Packet packet)
 			throws TigaseDBException {
 		final BareJID userJid = packet.getStanzaTo().getBareJID();
 		Map<String, Element> pushServices = (session != null && session.isAuthorized())
@@ -267,7 +312,7 @@ public class AbstractPushNotifications
 
 		Map<Enum, Long> typesCount = msgRepository.getMessagesCount(packet.getStanzaTo());
 
-		sendPushNotification(userJid, pushServices.values(), session, packet, typesCount, results::offer);
+		sendPushNotification(userJid, pushServices.values(), session, packet, typesCount);
 	}
 
 	protected boolean isSendingNotificationAllowed(BareJID userJid, XMPPResourceConnection session,
@@ -276,10 +321,9 @@ public class AbstractPushNotifications
 	}
 
 	private void sendPushNotification(BareJID userJid, Element notification, JID pushService, String pushNode,
-									  Element publishOptionsForm, Consumer<Packet> results) {
+									  Element publishOptionsForm) {
 		Element iq = new Element("iq", new String[]{"xmlns", "type"},
 								 new String[]{Packet.CLIENT_XMLNS, StanzaType.set.name()});
-		iq.setAttribute("id", "" + System.nanoTime());
 
 		Element pubsub = new Element("pubsub", new String[]{"xmlns"},
 									 new String[]{"http://jabber.org/protocol/pubsub"});
@@ -297,7 +341,25 @@ public class AbstractPushNotifications
 			pubsub.addChild(publishOptions);
 		}
 
-		results.accept(new Iq(iq, JID.jidInstanceNS(userJid.getDomain()), pushService));
+		writer.addOutPacketWithTimeout(new Iq(iq, JID.jidInstanceNS(null, userJid.getDomain(), null), pushService),
+									   maxTimeout, result -> {
+					if (result == null) {
+						if (log.isLoggable(Level.FINER)) {
+							log.log(Level.FINER, "push notification delivery to " + pushService + " from " + userJid +
+									" timed out!");
+						}
+						return;
+					}
+					if (!shouldDisablePush(Authorization.getByCondition(result.getErrorCondition()))) {
+						return;
+					}
+					try {
+						userRepository.removeData(userJid, ID, pushService + "/" + pushNode);
+					} catch (TigaseDBException ex) {
+						log.log(Level.FINEST,
+								"could not disable push for " + userJid + " on " + pushService + "/" + pushNode, ex);
+					}
+				});
 	}
 
 	private Element parseElement(String data) {

@@ -17,7 +17,6 @@
  */
 package tigase.server;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.component.ScheduledTask;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -26,11 +25,14 @@ import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
+import tigase.util.Algorithms;
 import tigase.util.routing.PatternComparator;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.workqueue.PriorityQueueAbstract;
 import tigase.util.workqueue.PriorityQueueRelaxed;
+import tigase.xmpp.jid.JID;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -53,7 +55,7 @@ import java.util.regex.Pattern;
 */
 public abstract class AbstractMessageReceiver
 		extends BasicComponent
-		implements StatisticsContainer, MessageReceiver {
+		implements StatisticsContainer, MessageReceiver, PacketWriterWithTimeout {
 
 	/**
 	 * Configuration property key for setting incoming packets filters on the component level.
@@ -147,7 +149,7 @@ public abstract class AbstractMessageReceiver
 		}
 
 	};
-	private final ConcurrentHashMap<String, PacketReceiverTask> waitingTasks = new ConcurrentHashMap<String, PacketReceiverTask>(
+	private final ConcurrentHashMap<String, PacketReceiverTaskIfc> waitingTasks = new ConcurrentHashMap<>(
 			16, 0.75f, 4);
 	protected int maxInQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int maxOutQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
@@ -178,6 +180,7 @@ public abstract class AbstractMessageReceiver
 	private int processingOutThreads = processingOutThreads();
 	private ScheduledExecutorService receiverScheduler = null;
 	private Timer receiverTasks = null;
+	private String resourceForPacketWithTimeout = null;
 	@Inject(nullAllowed = true)
 	private Set<ScheduledTask> scheduledTasks;
 	@ConfigField(desc = "Number of threads for scheduler", alias = SCHEDULER_THREADS_PROP_KEY)
@@ -870,6 +873,16 @@ public abstract class AbstractMessageReceiver
 	}
 
 	@Override
+	public void setCompId(JID jid) {
+		super.setCompId(jid);
+		if (jid != null) {
+			resourceForPacketWithTimeout = Algorithms.sha256(jid.getDomain());
+		} else {
+			resourceForPacketWithTimeout = null;
+		}
+	}
+
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		in_queues_size = processingInThreads();
@@ -903,6 +916,11 @@ public abstract class AbstractMessageReceiver
 		return addOutPacket(packet);
 	}
 
+	public boolean addOutPacketWithTimeout(Packet packet, Duration timeout, PacketWriterWithTimeout.Handler handler) {
+		new SimplePacketReceiverTask(handler, timeout, packet);
+		return addOutPacket(packet);
+	}
+	
 	protected boolean addOutPacket(Packet packet) {
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
 
@@ -1165,8 +1183,65 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
+	private interface PacketReceiverTaskIfc {
+
+		void handleResponse(Packet response);
+
+		void handleTimeout();
+
+	}
+	
+	protected String getResourceForPacketWithTimeout() {
+		return resourceForPacketWithTimeout;
+	}
+
+	private class SimplePacketReceiverTask extends tigase.util.common.TimerTask implements PacketReceiverTaskIfc {
+
+		private final PacketWriterWithTimeout.Handler handler;
+		private final String id;
+
+		SimplePacketReceiverTask(PacketWriterWithTimeout.Handler handler, Duration timeout, Packet packet) {
+			this.handler = handler;
+
+			JID from = packet.getStanzaFrom();
+			if (from.getResource() == null && isLocalDomainOrComponent(from.toString())) {
+				from = from.copyWithResourceNS(getResourceForPacketWithTimeout());
+			}
+
+			if (packet.getStanzaId() != null) {
+				throw new IllegalArgumentException("Packet cannot have `id` set as it is required to be unique and will be set internally.");
+			}
+			packet.getElement().setAttribute("id", UUID.randomUUID().toString());
+
+			packet.initVars(from, packet.getStanzaTo());
+
+			// we need to generate id which will make this packet routable in the cluster!
+			this.id = packet.getStanzaFrom().toString() + packet.getStanzaId();
+
+			waitingTasks.put(id, this);
+
+			addTimerTask(this, timeout.getSeconds(), TimeUnit.SECONDS);
+		}
+
+		public void handleResponse(Packet response) {
+			cancel();
+			this.handler.handle(response);
+		}
+
+		public void handleTimeout() {
+			waitingTasks.remove(id);
+			this.handler.handle(null);
+		}
+
+		@Override
+		public void run() {
+			handleTimeout();
+		}
+		
+	}
+
 	private class PacketReceiverTask
-			extends tigase.util.common.TimerTask {
+			extends tigase.util.common.TimerTask implements PacketReceiverTaskIfc {
 
 		private ReceiverTimeoutHandler handler = null;
 		private String id = null;
@@ -1192,8 +1267,10 @@ public abstract class AbstractMessageReceiver
 							"Dropping command packet! Retry limit reached for packet with ID: {0}, retryCount: {1}, packet: {2}",
 							new Object[]{id, retryCount, this.packet});
 				}
-				PacketReceiverTask remove = waitingTasks.remove(id);
-				remove.cancel();
+				PacketReceiverTaskIfc remove = waitingTasks.remove(id);
+				if (remove instanceof tigase.util.common.TimerTask) {
+					((tigase.util.common.TimerTask) remove).cancel();
+				}
 				return;
 			}
 
@@ -1287,10 +1364,15 @@ public abstract class AbstractMessageReceiver
 
 							// tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 							// packet.getFrom(), getName(), type.name(), null, packet);
-							PacketReceiverTask task = null;
+							PacketReceiverTaskIfc task = null;
 
 							if (packet.getTo() != null) {
 								String id = packet.getTo().toString() + packet.getStanzaId();
+
+								task = waitingTasks.remove(id);
+							}
+							if (task == null && packet.getStanzaTo() != null) {
+								String id = packet.getStanzaTo().toString() + packet.getStanzaId();
 
 								task = waitingTasks.remove(id);
 							}

@@ -481,6 +481,10 @@ public class BasicComponent
 		return compId;
 	}
 
+	public void setCompId(JID jid) {
+		this.compId = jid;
+	}
+
 	@Override
 	public ComponentInfo getComponentInfo() {
 		if (cmpInfo == null) {
@@ -718,7 +722,7 @@ public class BasicComponent
 		this.name = name;
 
 		try {
-			compId = JID.jidInstance(name, defHostname.getDomain(), null);
+			setCompId(JID.jidInstance(name, defHostname.getDomain(), null));
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}

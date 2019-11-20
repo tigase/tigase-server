@@ -100,10 +100,7 @@ public class PushNotifications
 						Queue<Packet> results, Map<String, Object> map) throws XMPPException {
 		try {
 			if (packet.getElemName() == Message.ELEM_NAME) {
-				if (session == null || !session.isAuthorized() || !shouldSendNotification(packet, session.getBareJID(), session)) {
-					return;
-				}
-				sendPushNotification(session, packet, results);
+				processMessage(packet, session, results::offer);
 				return;
 			} else {
 				super.process(packet, session, nonAuthUserRepository, results, map);
@@ -113,6 +110,17 @@ public class PushNotifications
 		} catch (TigaseDBException ex) {
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, null, true));
 		}
+	}
+
+	@Override
+	protected void processMessage(Packet packet, XMPPResourceConnection session, Consumer<Packet> consumer)
+			throws NotAuthorizedException, TigaseDBException {
+		super.processMessage(packet, session, consumer);
+
+		if (session == null || !session.isAuthorized() || !shouldSendNotification(packet, session.getBareJID(), session)) {
+			return;
+		}
+		sendPushNotification(session, packet);
 	}
 
 	@Override
@@ -127,7 +135,7 @@ public class PushNotifications
 		}
 
 		try {
-			sendPushNotification(session, packet, results);
+			sendPushNotification(session, packet);
 		} catch (UserNotFoundException ex) {
 			log.log(Level.FINEST, "Could not send push notification for message " + packet, ex);
 		} catch (TigaseDBException ex) {
@@ -148,7 +156,7 @@ public class PushNotifications
 				return;
 			}
 
-			notifyOfflineMessagesRetrieved(userJid, pushServices.values(), results::offer);
+			notifyOfflineMessagesRetrieved(userJid, pushServices.values());
 		} catch (UserNotFoundException | NotAuthorizedException ex) {
 			log.log(Level.FINEST, "Could not send push notification about offline message retrieval by " + session, ex);
 		} catch (TigaseDBException ex) {
@@ -176,11 +184,10 @@ public class PushNotifications
 		return settingsEl;
 	}
 
-	protected void notifyOfflineMessagesRetrieved(BareJID userJid, Collection<Element> pushServices,
-												  Consumer<Packet> results) {
+	protected void notifyOfflineMessagesRetrieved(BareJID userJid, Collection<Element> pushServices) {
 		Map<Enum, Long> map = new HashMap<>();
 		map.put(MsgRepository.MSG_TYPES.message, 0l);
-		sendPushNotification(userJid, pushServices, null, null, map, results);
+		sendPushNotification(userJid, pushServices, null, null, map);
 	}
 
 	@Override
