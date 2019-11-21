@@ -77,7 +77,7 @@ public class BindResource
 	public void setResourcePrefix(String resourcePrefix) {
 		this.resourcePrefix = resourcePrefix;
 		this.resourceDefPrefix =
-				Math.abs(DNSResolverFactory.getInstance().getDefaultHost().hashCode()) + "-" + resourceDefPrefix;
+				Math.abs(DNSResolverFactory.getInstance().getDefaultHost().hashCode()) + "-" + (this.resourcePrefix != null ? this.resourcePrefix : resourceDefPrefix);
 	}
 
 	@Override
