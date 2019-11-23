@@ -88,7 +88,7 @@ public class PrivacyList {
 	}
 
 	public Stream<JID> getBlockedJids() {
-		return Arrays.stream(items).filter(x -> x instanceof ItemJid).map(x -> ((ItemJid) x).jid);
+		return Arrays.stream(items).filter(x -> x instanceof ItemJid).filter(x -> !x.isAllowed()).map(x -> ((ItemJid) x).jid);
 	}
 
 	public boolean isAllowed(JID jid, Item.Type type) {

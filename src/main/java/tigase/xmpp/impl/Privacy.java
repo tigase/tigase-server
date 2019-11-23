@@ -85,30 +85,31 @@ public class Privacy {
 		session.setData(lNode, PRIVACY_LIST, list.toString());
 	}
 
-	public static boolean block(XMPPResourceConnection session, String jid)
+	public static boolean block(XMPPResourceConnection session, List<String> jids)
 			throws NotAuthorizedException, TigaseDBException {
 		String name = getDefaultListName(session);
 		if (name == null) {
 			name = "default";
 		}
-		Element list = getList(session, name);
-		if (list != null) {
-			if (list.findChild(item -> jid.equals(item.getAttributeStaticStr(VALUE)) && isBlockItem(item)) != null) {
-				return false;
-			}
-		}
 		Element list_new = new Element(LIST, new String[]{NAME}, new String[]{name});
-		list_new.addChild(
-				new Element(ITEM, new String[]{TYPE, ACTION, VALUE, ORDER}, new String[]{"jid", "deny", jid, "0"}));
+		for (String jid : jids) {
+			list_new.addChild(new Element(ITEM, new String[]{TYPE, ACTION, VALUE},
+										  new String[]{"jid", "deny", jid}));
+		}
+
+		Element list = getList(session, name);
 		if (list != null) {
 			List<Element> items = list.getChildren();
 			if (items != null) {
-				Collections.sort(items, JabberIqPrivacy.compar);
-				for (int i = 0; i < items.size(); i++) {
-					items.get(i).setAttribute(ORDER, "" + (i + 1));
-				}
-				list_new.addChildren(items);
+				items.stream().filter(it -> !jids.contains(it.getAttributeStaticStr(VALUE))).sorted(JabberIqPrivacy.compar).forEach(it -> {
+					list_new.addChild(it);
+				});
 			}
+		}
+
+		int i=0;
+		for (Element item : list_new.getChildren()) {
+			item.setAttribute(ORDER, String.valueOf(++i));
 		}
 		updateList(session, name, list_new);
 		return true;
@@ -294,7 +295,7 @@ public class Privacy {
 		}
 	}
 
-	public static boolean unblock(XMPPResourceConnection session, String jid)
+	public static boolean unblock(XMPPResourceConnection session, List<String> jids)
 			throws NotAuthorizedException, TigaseDBException {
 		String name = getDefaultListName(session);
 		Element list = getList(session, name);
@@ -304,11 +305,11 @@ public class Privacy {
 
 		Element list_new = new Element(LIST, new String[]{NAME}, new String[]{name});
 		List<Element> items = list.findChildren(
-				item -> !jid.equals(item.getAttributeStaticStr(VALUE)) || !isBlockItem(item));
+				item -> !jids.contains(item.getAttributeStaticStr(VALUE)));
 		if (items != null) {
 			Collections.sort(items, JabberIqPrivacy.compar);
 			for (int i = 0; i < items.size(); i++) {
-				items.get(i).setAttribute(ORDER, "" + (i + 1));
+				items.get(i).setAttribute(ORDER, String.valueOf(i+1));
 			}
 			list_new.addChildren(items);
 		}

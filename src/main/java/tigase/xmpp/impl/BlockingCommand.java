@@ -32,12 +32,12 @@ import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.JID;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * XEP-0191: Blocking Command. Based on privacy lists.
@@ -144,8 +144,8 @@ public class BlockingCommand
 			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
 		List<JID> jids = collectJids(e);
 		if (jids != null && !jids.isEmpty()) {
+			Privacy.block(session, jids.stream().map(JID::toString).collect(Collectors.toList()));
 			for (JID jid : jids) {
-				Privacy.block(session, jid.toString());
 				sendBlockPresences(session, jid, results);
 			}
 			results.offer(packet.okResult((Element) null, 0));
@@ -161,19 +161,18 @@ public class BlockingCommand
 		if (jids == null || jids.isEmpty()) {
 			List<String> jidsStr = Privacy.getBlocked(session);
 			if (jidsStr != null) {
-				jids = new ArrayList<>(jidsStr.size());
-				for (String jidStr : jidsStr) {
-					jids.add(JID.jidInstanceNS(jidStr));
+				Privacy.unblock(session, jidsStr);
+				for (String jid : jidsStr) {
+					sendBlockPresences(session, JID.jidInstanceNS(jid), results);
 				}
 			}
-		}
-
-		if (jids != null) {
+		} else {
+			Privacy.unblock(session, jids.stream().map(JID::toString).collect(Collectors.toList()));
 			for (JID jid : jids) {
-				Privacy.unblock(session, jid.toString());
 				sendUnblockPresences(session, jid, results);
 			}
 		}
+
 		results.offer(packet.okResult((Element) null, 0));
 		sendPush(session.getParentSession(), packet, results);
 	}
