@@ -1,4 +1,4 @@
-[[features]]
+[[featuresXMPP]]
 = XMPP Supported Extensions
 :author: Wojciech Kapcia
 :date: 2019-02-22

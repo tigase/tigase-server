@@ -1,4 +1,4 @@
-[[features]]
+[[featuresTigase]]
 = Tigase Custom Extensions
 :author: Wojciech Kapcia
 :date: 2019-11-25
