@@ -2,7 +2,9 @@ Welcome to the Tigase Administration Guide.
 
 include::About_Tigase_Jabber_XMPP_Server.asciidoc[leveloffset=+1]
 
-include::Features.asciidoc[leveloffset=+2]
+include::FeaturesXMPP.asciidoc[leveloffset=+2]
+
+include::FeaturesTigase.asciidoc[leveloffset=+2]
 
 include::Licensing_and_Open_Source.asciidoc[leveloffset=+1]
 
