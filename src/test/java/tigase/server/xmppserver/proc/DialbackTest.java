@@ -34,6 +34,8 @@ import tigase.xmpp.StanzaType;
 import java.util.*;
 
 import static tigase.net.IOService.PORT_TYPE_PROP_KEY;
+import static tigase.server.xmppserver.proc.S2SAbstract.FEATURES_EL;
+import static tigase.server.xmppserver.proc.S2SAbstract.FEATURES_NS;
 
 /**
  * @author andrzej
@@ -86,6 +88,30 @@ public class DialbackTest
 		assertTrue(p.getType() == StanzaType.valid && remote1.equals(p.getStanzaTo().getDomain()));
 
 		serv.getCIDs().forEach((CID cid) -> assertEquals(remote1, cid.getRemoteHost()));
+	}
+
+	@Test
+	public void testEmptyFeatures() throws TigaseStringprepException {
+		Queue<Packet> results = new ArrayDeque<>();
+		handler.setResults(results);
+		dialback.init(handler, new HashMap());
+
+		String key = UUID.randomUUID().toString();
+
+		S2SIOService serv = new S2SIOService();
+		serv.setSessionId("sess-id-1");
+		Map<String, Object> props = new HashMap<>();
+		props.put(PORT_TYPE_PROP_KEY, "accept");
+		serv.setSessionData(props);
+
+		Packet p = null;
+
+		Element resultEl = new Element(FEATURES_EL);
+		resultEl.setXMLNS(FEATURES_NS);
+		p = Packet.packetInstance(resultEl);
+		final boolean processResult = dialback.process(p, serv, results);
+		assertFalse(processResult);
+		assertTrue(results.isEmpty());
 	}
 
 	@Test

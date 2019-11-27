@@ -90,7 +90,7 @@ public class Dialback
 		}
 
 		// If this is stream features, then it depends....
-		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
+		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
 			}
@@ -253,6 +253,10 @@ public class Dialback
 				return;
 			}
 			CID cid = (CID) serv.getSessionData().get("cid");
+			if (cid == null) {
+				// can't process such request
+				return;
+			}
 
 			String secret = handler.getSecretForDomain(cid.getLocalHost());
 			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), secret, remote_id);
@@ -268,7 +272,7 @@ public class Dialback
 			}
 			serv.getS2SConnection().sendAllControlPackets();
 		} catch (NotLocalhostException ex) {
-			generateStreamError(false, "host-unknown", serv);
+			generateStreamError(false, "host-unknown", serv, ex);
 		}
 	}
 
@@ -305,12 +309,12 @@ public class Dialback
 			cid_conns = handler.getCIDConnections(cid_main, true);
 		} catch (NotLocalhostException ex) {
 			log.log(Level.FINER, "{0} Incorrect local hostname: {1}", new Object[]{serv, p});
-			generateStreamError(false, "host-unknown", serv);
+			generateStreamError(false, "host-unknown", serv, ex);
 
 			return;
 		} catch (LocalhostException ex) {
 			log.log(Level.FINER, "{0} Incorrect remote hostname: {1}", new Object[]{serv, p});
-			generateStreamError(false, "invalid-from", serv);
+			generateStreamError(false, "invalid-from", serv, ex);
 
 			return;
 		}

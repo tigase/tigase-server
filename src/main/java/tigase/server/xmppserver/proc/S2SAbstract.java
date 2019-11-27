@@ -77,25 +77,24 @@ public class S2SAbstract {
 	}
 
 	public void generateStreamError(boolean initStream, String error_el, S2SIOService serv) {
-		String strError = "";
+		Throwable thr = new Throwable();
+		thr.fillInStackTrace();
+		generateStreamError(initStream,error_el,serv,thr);
+	}
+
+	public void generateStreamError(boolean initStream, String error_el, S2SIOService serv, Throwable throwable) {
+		final StringBuilder strError = new StringBuilder();
 
 		if (initStream) {
-			strError +=
-					"<?xml version='1.0'?><stream:stream" + " xmlns='" + S2SConnectionManager.XMLNS_SERVER_VAL + "'" +
+			strError.append("<?xml version='1.0'?><stream:stream" + " xmlns='" + S2SConnectionManager.XMLNS_SERVER_VAL + "'" +
 							" xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-server-error'" +
-							" from='" + handler.getDefHostName() + "'" + " xml:lang='en'>";
+							" from='" + handler.getDefHostName() + "'" + " xml:lang='en'>");
 		}
-		strError += "<stream:error>" + "<" + error_el + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-				"</stream:error>" + "</stream:stream>";
+		strError.append("<stream:error>" + "<" + error_el + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+				"</stream:error>" + "</stream:stream>");
 		try {
-			if (log.isLoggable(Level.FINEST)) {
-				Throwable thr = new Throwable();
-
-				thr.fillInStackTrace();
-				log.log(Level.FINEST, "Called from: ", thr);
-				log.log(Level.FINEST, "{0}, Sending stream error: {1}", new Object[]{serv, strError});
-			}
-			handler.writeRawData(serv, strError);
+			log.log(Level.FINEST, throwable, () -> String.format("%1$s, Sending stream error: %2$s", serv, strError.toString()));
+			handler.writeRawData(serv, strError.toString());
 			serv.stop();
 		} catch (Exception e) {
 			serv.forceStop();

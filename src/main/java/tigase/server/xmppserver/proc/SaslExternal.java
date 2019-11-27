@@ -72,7 +72,7 @@ public class SaslExternal
 			final CID cid = (CID) serv.getSessionData().get("cid");
 			final boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
-			if (p.isElement(FEATURES_EL, FEATURES_NS)) {
+			if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
 				}

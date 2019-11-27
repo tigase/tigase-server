@@ -48,7 +48,7 @@ public class StreamFeatures
 
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
-		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
+		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[]{serv, p});
 			}

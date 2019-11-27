@@ -89,13 +89,13 @@ public class StartTLS
 
 			return true;
 		}
-		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
+		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[]{serv, p});
 			}
 
 			CID cid = (CID) serv.getSessionData().get("cid");
-			boolean skipTLS = (cid == null) ? false : skipTLSForHost(cid.getRemoteHost());
+			boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
 			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && !skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {

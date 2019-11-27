@@ -216,9 +216,9 @@ public class StreamOpen
 					break;
 			} // end of switch (serv.connectionType())
 		} catch (NotLocalhostException ex) {
-			generateStreamError(false, "host-unknown", serv);
+			generateStreamError(false, "host-unknown", serv, ex);
 		} catch (LocalhostException ex) {
-			generateStreamError(false, "invalid-from", serv);
+			generateStreamError(false, "invalid-from", serv, ex);
 		}
 
 		return null;
