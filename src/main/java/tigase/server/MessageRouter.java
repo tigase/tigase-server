@@ -38,7 +38,10 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.xmpp.jid.JID;
 
+import javax.management.JMException;
+import javax.management.ObjectName;
 import javax.script.Bindings;
+import java.lang.management.BufferPoolMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
@@ -60,7 +63,7 @@ import static tigase.xmpp.impl.PresenceCapabilitiesManager.CAPS_NODE;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 @Bean(name = "message-router", parent = Kernel.class, active = true)
 public class MessageRouter
 		extends AbstractMessageReceiver
@@ -76,6 +79,7 @@ public class MessageRouter
 	private static final String JVM_STATS_GC_STATISTICS = "JVM/GC-statistics";
 	private static final String JVM_STATS_HEAP_TOTAL = "JVM/HEAP Total ";
 	private static final String JVM_STATS_HEAP_POOLS = "JVM/MemoryPools/HeapMemory/";
+	private static final String JVM_STATS_BUFFER_POOLS = "JVM/BufferPools/";
 
 	private Map<String, ServerComponent> components = new ConcurrentHashMap<>();
 	@Inject
@@ -99,6 +103,28 @@ public class MessageRouter
 	@Inject
 	private UpdatesChecker updates_checker = null;
 	private Map<String, XMPPService> xmppServices = new ConcurrentHashMap<>();
+
+	private static String execute(String command, String... args) throws JMException {
+		return (String) ManagementFactory.getPlatformMBeanServer()
+				.invoke(new ObjectName("com.sun.management:type=DiagnosticCommand"), command, new Object[]{args},
+						new String[]{"[Ljava.lang.String;"});
+	}
+
+	private static String getNativeMemoryTrackingSummary() {
+		String result;
+		try {
+			String summary = MessageRouter.execute("vmNativeMemory", "summary");
+			result = summary.replaceAll("\\n\\s", "")
+					.replaceAll("\\).*", ")")
+					.replaceAll("-\\s*", "")
+					.replaceAll("^\n", "")
+					.replaceAll("\\n", " / ");
+		} catch (Exception e) {
+			result = "NativeMemoryTracking summary not available";
+			log.log(Level.FINER, e, () -> "There was a problem obtaining NMT summary");
+		}
+		return result;
+	}
 
 	@Override
 	public void register(Kernel kernel) {
@@ -628,6 +654,17 @@ public class MessageRouter
 					 entry.getValue().getCollectionUsage().getMax() / factor, statLevel);
 
 		}
+		// per-buffer-pool metrics
+		for (BufferPoolMXBean bufferMXBean : ManagementFactory.getPlatformMXBeans(BufferPoolMXBean.class)) {
+			list.add(getName(), JVM_STATS_BUFFER_POOLS + bufferMXBean.getName() + "/Used [B]",
+					 bufferMXBean.getMemoryUsed(), statLevel);
+			list.add(getName(), JVM_STATS_BUFFER_POOLS + bufferMXBean.getName() + "/Capacity [B]",
+					 bufferMXBean.getTotalCapacity(), statLevel);
+			list.add(getName(), JVM_STATS_BUFFER_POOLS + bufferMXBean.getName() + "/Count", bufferMXBean.getCount(),
+					 statLevel);
+		}
+
+		list.add(getName(), "NativeMemoryTracking", getNativeMemoryTrackingSummary(), Level.FINER);
 	}
 
 	@Override
@@ -640,79 +677,6 @@ public class MessageRouter
 	@Override
 	public void beforeUnregister() {
 		stop();
-	}
-
-	@Override
-	protected Integer getMaxQueueSize(int def) {
-		return def * 10;
-	}
-
-	private void processDiscoQuery(final Packet packet, final Queue<Packet> results) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Processing disco query by: {0}", packet.toStringSecure());
-		}
-
-		JID toJid = packet.getStanzaTo();
-		JID fromJid = packet.getStanzaFrom();
-		String node = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
-		Element query = packet.getElement().getChild("query").clone();
-
-		if (node != null && PresenceCapabilitiesManager.getNodeFeatures(node) != null) {
-			node = null;
-		}
-
-		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
-			query.addChildren(getDiscoInfo(toJid, fromJid, node).getChildren());
-		}
-		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
-			query.addChildren(getDiscoItems(toJid, fromJid, node));
-		}
-		results.offer(packet.okResult(query, 0));
-	}
-
-	private List<Element> getDiscoItems(JID toJid, JID fromJid, String node) {
-		boolean localDomain = isLocalDomain(toJid.toString());
-
-		List<Element> items = new ArrayList<>();
-
-		if (localDomain) {
-			for (XMPPService comp : xmppServices.values()) {
-
-				// Buggy custom component may throw exceptions here (NPE most likely)
-				// which may cause service disco problems for well-behaving components
-				// too
-				// So this is kind of a protection
-				try {
-
-					// if (localDomain || (nick != null && comp.getName().equals(nick)))
-					// {
-					final List<Element> discoItems = comp.getDiscoItems(node, toJid, fromJid);
-
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
-								new Object[]{toJid, comp.getComponentId(),
-											 (items == null) ? null : items.toString()});
-					}
-					if (discoItems != null && !discoItems.isEmpty()) {
-						items.addAll(discoItems);
-					}
-				} catch (Exception e) {
-					log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
-				}
-			}    // end of for ()
-		} else {
-			ServerComponent comp = getLocalComponent(toJid);
-
-			if ((comp != null) && (comp instanceof XMPPService)) {
-				items = ((XMPPService) comp).getDiscoItems(node, toJid, fromJid);
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "DiscoItems processed by: {0}, items: {1}",
-							new Object[]{comp.getComponentId(), (items == null) ? null : items.toString()});
-				}
-			}
-		}
-		return items;
 	}
 
 	@Override
@@ -781,6 +745,78 @@ public class MessageRouter
 			}
 		}
 		return discoInfoResult;
+	}
+
+	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def * 10;
+	}
+
+	private void processDiscoQuery(final Packet packet, final Queue<Packet> results) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Processing disco query by: {0}", packet.toStringSecure());
+		}
+
+		JID toJid = packet.getStanzaTo();
+		JID fromJid = packet.getStanzaFrom();
+		String node = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
+		Element query = packet.getElement().getChild("query").clone();
+
+		if (node != null && PresenceCapabilitiesManager.getNodeFeatures(node) != null) {
+			node = null;
+		}
+
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
+			query.addChildren(getDiscoInfo(toJid, fromJid, node).getChildren());
+		}
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
+			query.addChildren(getDiscoItems(toJid, fromJid, node));
+		}
+		results.offer(packet.okResult(query, 0));
+	}
+
+	private List<Element> getDiscoItems(JID toJid, JID fromJid, String node) {
+		boolean localDomain = isLocalDomain(toJid.toString());
+
+		List<Element> items = new ArrayList<>();
+
+		if (localDomain) {
+			for (XMPPService comp : xmppServices.values()) {
+
+				// Buggy custom component may throw exceptions here (NPE most likely)
+				// which may cause service disco problems for well-behaving components
+				// too
+				// So this is kind of a protection
+				try {
+
+					// if (localDomain || (nick != null && comp.getName().equals(nick)))
+					// {
+					final List<Element> discoItems = comp.getDiscoItems(node, toJid, fromJid);
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
+								new Object[]{toJid, comp.getComponentId(), (items == null) ? null : items.toString()});
+					}
+					if (discoItems != null && !discoItems.isEmpty()) {
+						items.addAll(discoItems);
+					}
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Component service disco problem: " + comp.getName(), e);
+				}
+			}    // end of for ()
+		} else {
+			ServerComponent comp = getLocalComponent(toJid);
+
+			if ((comp != null) && (comp instanceof XMPPService)) {
+				items = ((XMPPService) comp).getDiscoItems(node, toJid, fromJid);
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "DiscoItems processed by: {0}, items: {1}",
+							new Object[]{comp.getComponentId(), (items == null) ? null : items.toString()});
+				}
+			}
+		}
+		return items;
 	}
 
 	private ServerComponent[] getComponentsForLocalDomain(String domain) {
