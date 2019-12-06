@@ -374,7 +374,7 @@ public class ConfigHolderTest {
 
 		dumpConfig(result);
 
-		System.out.println(result);
+//		System.out.println(result);
 		assertEquals(SSLContextContainer.HARDENED_MODE.secure, result.get("hardened-mode"));
 
 		holder = new OldConfigHolder();
@@ -387,7 +387,7 @@ public class ConfigHolderTest {
 
 		dumpConfig(result);
 
-		System.out.println(result);
+//		System.out.println(result);
 		assertEquals(SSLContextContainer.HARDENED_MODE.relaxed, result.get("hardened-mode"));
 	}
 

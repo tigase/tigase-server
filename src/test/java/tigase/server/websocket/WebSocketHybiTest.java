@@ -132,10 +132,7 @@ public class WebSocketHybiTest
 		Assert.assertTrue("Handshake failed", impl.handshake(io, params, bytes));
 		tmp.flip();
 		byte[] read = new byte[tmp.remaining()];
-		Arrays.stream(sb.toString().split("\n"))
-				.forEach(
-						System.out::println
-		);
+//		Arrays.stream(sb.toString().split("\n")).forEach(System.out::println);
 		Optional<String> secWebSocketAccept = Arrays.stream(sb.toString().split("\n"))
 				.map(line -> line.split(":"))
 				.filter(line -> "Sec-WebSocket-Accept".equalsIgnoreCase(line[0].trim()))

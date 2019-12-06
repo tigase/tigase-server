@@ -482,7 +482,7 @@ public class PushNotificationsTest
 		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), new ArrayDeque<>());
 
 		assertEquals(1, results.size());
-		System.out.println("results:" + results);
+//		System.out.println("results:" + results);
 	}
 
 	@Test

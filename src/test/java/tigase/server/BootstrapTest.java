@@ -117,7 +117,7 @@ public class BootstrapTest {
 			Set<CmdAcl> acl = val.get(cmdId);
 			assertTrue(acl.stream().filter(a -> a.equals(expectedAcl)).findAny().isPresent());
 			log.log(Level.FINE, "" + acl.getClass() + ", " + acl);
-			System.out.print("cmd " + cmdId + " = " + acl + ", expected = " + expectedAcl);
+//			System.out.print("cmd " + cmdId + " = " + acl + ", expected = " + expectedAcl);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

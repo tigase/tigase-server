@@ -253,9 +253,7 @@ public class PushNotificationsWithAwayTest
 		results.clear();
 		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
-		results.forEach(p -> {
-			System.out.println(p.toString());
-		});
+//		results.forEach(p -> System.out.println(p.toString()));
 		assertArrayEquals(new Element[0], results.stream().map(
 				DummyPacketWriter.Item::getPacket).map(Packet::getElement).toArray(Element[]::new));
 		//assertEquals(0, results.size());
