@@ -1,4 +1,4 @@
-/*
+/**
  * Tigase XMPP Server - The instant messaging server
  * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
@@ -15,7 +15,6 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-
 package tigase.sys;
 
 import javax.management.JMException;
