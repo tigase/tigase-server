@@ -28,6 +28,8 @@ import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
+import tigase.sys.NMTScope;
+import tigase.sys.NativeMemoryTracking;
 import tigase.sys.TigaseRuntime;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.updater.UpdatesChecker;
@@ -38,8 +40,6 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.xmpp.jid.JID;
 
-import javax.management.JMException;
-import javax.management.ObjectName;
 import javax.script.Bindings;
 import java.lang.management.BufferPoolMXBean;
 import java.lang.management.ManagementFactory;
@@ -104,27 +104,8 @@ public class MessageRouter
 	private UpdatesChecker updates_checker = null;
 	private Map<String, XMPPService> xmppServices = new ConcurrentHashMap<>();
 
-	private static String execute(String command, String... args) throws JMException {
-		return (String) ManagementFactory.getPlatformMBeanServer()
-				.invoke(new ObjectName("com.sun.management:type=DiagnosticCommand"), command, new Object[]{args},
-						new String[]{"[Ljava.lang.String;"});
-	}
-
-	private static String getNativeMemoryTrackingSummary() {
-		String result;
-		try {
-			String summary = MessageRouter.execute("vmNativeMemory", "summary");
-			result = summary.replaceAll("\\n\\s", "")
-					.replaceAll("\\).*", ")")
-					.replaceAll("-\\s*", "")
-					.replaceAll("^\n", "")
-					.replaceAll("\\n", " / ");
-		} catch (Exception e) {
-			result = "NativeMemoryTracking summary not available";
-			log.log(Level.FINER, e, () -> "There was a problem obtaining NMT summary");
-		}
-		return result;
-	}
+	@ConfigField(desc = "Enabled detailed memory usage statistics from NMT in metrics", alias = "detailed-memory-statistics")
+	private boolean detailedMemoryStatistics = false;
 
 	@Override
 	public void register(Kernel kernel) {
@@ -654,6 +635,7 @@ public class MessageRouter
 					 entry.getValue().getCollectionUsage().getMax() / factor, statLevel);
 
 		}
+
 		// per-buffer-pool metrics
 		for (BufferPoolMXBean bufferMXBean : ManagementFactory.getPlatformMXBeans(BufferPoolMXBean.class)) {
 			list.add(getName(), JVM_STATS_BUFFER_POOLS + bufferMXBean.getName() + "/Used [B]",
@@ -664,7 +646,27 @@ public class MessageRouter
 					 statLevel);
 		}
 
-		list.add(getName(), "NativeMemoryTracking", getNativeMemoryTrackingSummary(), Level.FINER);
+		if (detailedMemoryStatistics) {
+			// Native Memory Tracking statistics - require NMT to be enabled with -XX:NativeMemoryTracking=summary JVM option
+			// see `JVM_MEMORY` in etc/tigase.conf!
+			final Optional<NativeMemoryTracking> nativeMemoryTracking = TigaseRuntime.getNativeMemoryTracking();
+			nativeMemoryTracking.ifPresent(nmt -> {
+				list.add(getName(), "JVM/NativeMemoryTracking", nmt.toString(), Level.FINE);
+				final TreeSet<NMTScope> scopes = new TreeSet<>(Comparator.comparing(NMTScope::getCommitted).reversed());
+				scopes.addAll(nmt.getScopes().values());
+				for (NMTScope scope : scopes) {
+					final String keyPrefix = "JVM/NativeMemoryTracking/" + scope.getScopeType() + "/";
+					list.add(getName(), keyPrefix + "commited", scope.getCommitted(), Level.FINER);
+					list.add(getName(), keyPrefix + "reserved", scope.getReserved(), Level.FINER);
+					scope.getArena().ifPresent(val -> list.add(getName(), keyPrefix + "arena", val, Level.FINEST));
+					scope.getMalloc().ifPresent(val -> list.add(getName(), keyPrefix + "malloc", val, Level.FINEST));
+					scope.getMmapCommitted()
+							.ifPresent(val -> list.add(getName(), keyPrefix + "mmapCommitted", val, Level.FINEST));
+					scope.getMmapReserved()
+							.ifPresent(val -> list.add(getName(), keyPrefix + "mmapReserved", val, Level.FINEST));
+				}
+			});
+		}
 	}
 
 	@Override

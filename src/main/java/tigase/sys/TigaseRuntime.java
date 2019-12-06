@@ -23,10 +23,7 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.lang.management.*;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +45,10 @@ public abstract class TigaseRuntime {
 	private MemoryPoolMXBean oldMemPool = null;
 	private long prevCputime = 0;
 	private long prevUptime = 0;
+
+	public static Optional<NativeMemoryTracking> getNativeMemoryTracking() {
+		return NativeMemoryTracking.getNativeMemoryTracking();
+	}
 
 	public static TigaseRuntime getTigaseRuntime() {
 		return MonitorRuntime.getMonitorRuntime();
