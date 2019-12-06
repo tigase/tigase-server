@@ -1,4 +1,4 @@
-/**
+/*
  * Tigase XMPP Server - The instant messaging server
  * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
