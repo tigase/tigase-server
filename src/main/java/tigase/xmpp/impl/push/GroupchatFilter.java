@@ -33,7 +33,7 @@ import static tigase.xmpp.impl.push.GroupchatFilter.ID;
 public class GroupchatFilter
 		implements PushNotificationsFilter {
 
-	public static final String XMLNS = "tigase:push:muc:0";
+	public static final String XMLNS = "tigase:push:filter:groupchat:0";
 	public static final String ID = "groupchat-filter";
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[]{"var"}, new String[]{XMLNS}) };
 
@@ -44,7 +44,7 @@ public class GroupchatFilter
 
 	@Override
 	public void processEnableElement(Element enableEl, Element settingsEl) {
-		Element allowNotMentionedEl = enableEl.getChild("muc", XMLNS);
+		Element allowNotMentionedEl = enableEl.getChild("groupchat", XMLNS);
 		if (allowNotMentionedEl != null) {
 			settingsEl.addChild(allowNotMentionedEl);
 		}
@@ -57,7 +57,7 @@ public class GroupchatFilter
 			return true;
 		}
 
-		Element mucEl = pushServiceSettings.getChild("muc", XMLNS);
+		Element mucEl = pushServiceSettings.getChild("groupchat", XMLNS);
 		if (mucEl == null) {
 			return true;
 		}
@@ -77,12 +77,12 @@ public class GroupchatFilter
 				continue;
 			}
 
-			String when = room.getAttributeStaticStr("when");
-			if (when == null) {
+			String allow = room.getAttributeStaticStr("allow");
+			if (allow == null) {
 				return false;
 			}
 
-			switch (when) {
+			switch (allow) {
 				case "always":
 					return true;
 				case "mentioned":

@@ -49,9 +49,12 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 	private static final Logger log = Logger.getLogger(EncryptedPushNotificationExtension.class.getCanonicalName());
 
 	public static final String XMLNS = "tigase:push:encrypt:0";
+	private static final String AES128GCM_FEATURE = "tigase:push:encrypt:aes-128-gcm";
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
-	private static final Element[] DISCO_FEATURES = new Element[] { new Element("feature", new String[]{"var"}, new String[]{ XMLNS }) };
+	private static final Element[] DISCO_FEATURES = new Element[]{
+			new Element("feature", new String[]{"var"}, new String[]{XMLNS}),
+			new Element("feature", new String[]{"var"}, new String[]{AES128GCM_FEATURE})};
 
 	private final SecureRandom random = new SecureRandom();
 
@@ -94,7 +97,7 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 
 		int maxSize = (int) ((maxSizeBytes * 6) / 8);
 
-		if (!alg.equalsIgnoreCase("aes-gcm")) {
+		if (!alg.equalsIgnoreCase("aes-128-gcm")) {
 			return;
 		}
 
@@ -105,7 +108,7 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("unread", msgCount);
-		payload.put("sender", packet.getStanzaFrom());
+		payload.put("sender", packet.getStanzaFrom().getBareJID());
 
 		if (packet.getElemName() == Message.ELEM_NAME) {
 			if (packet.getType() == StanzaType.groupchat) {

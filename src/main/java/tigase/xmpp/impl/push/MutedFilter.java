@@ -30,7 +30,7 @@ import static tigase.xmpp.impl.push.MutedFilter.ID;
 @Bean(name = ID, parent = PushNotifications.class, active = true)
 public class MutedFilter implements PushNotificationsFilter {
 
-	public static final String XMLNS = "tigase:push:muted:0";
+	public static final String XMLNS = "tigase:push:filter:muted:0";
 	public static final String ID = "muted-filter";
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[]{"var"}, new String[]{XMLNS}) };
 
@@ -54,7 +54,9 @@ public class MutedFilter implements PushNotificationsFilter {
 		if (mutedEl == null) {
 			return true;
 		}
-		List<BareJID> list = mutedEl.mapChildren(child -> BareJID.bareJIDInstanceNS(child.getCData()));
+		List<BareJID> list = mutedEl.mapChildren(child -> child.getAttributeStaticStr("jid") != null,
+												 child -> BareJID.bareJIDInstanceNS(
+														 child.getAttributeStaticStr("jid")));
 		if (list == null) {
 			return true;
 		}

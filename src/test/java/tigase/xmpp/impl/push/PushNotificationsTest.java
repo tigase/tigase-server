@@ -319,10 +319,10 @@ public class PushNotificationsTest
 		assertEquals(1, results.size());
 
 		enable(session, enableEl -> {
-			enableEl.withElement("muc", "tigase:push:muc:0", mucEl -> {
+			enableEl.withElement("groupchat", "tigase:push:filter:groupchat:0", mucEl -> {
 				mucEl.withElement("room", roomEl -> {
 					roomEl.setAttribute("jid", senderJid.getBareJID().toString());
-					roomEl.setAttribute("when", "always");
+					roomEl.setAttribute("allow", "always");
 				});
 			});
 		});
@@ -338,10 +338,10 @@ public class PushNotificationsTest
 		assertEquals(1, results.size());
 
 		enable(session, enableEl -> {
-			enableEl.withElement("muc", "tigase:push:muc:0", mucEl -> {
+			enableEl.withElement("groupchat", "tigase:push:filter:groupchat:0", mucEl -> {
 				mucEl.withElement("room", roomEl -> {
 					roomEl.setAttribute("jid", senderJid.getBareJID().toString());
-					roomEl.setAttribute("when", "mentioned");
+					roomEl.setAttribute("allow", "mentioned");
 					roomEl.setAttribute("nick", "my_nick");
 				});
 			});
@@ -363,8 +363,10 @@ public class PushNotificationsTest
 		Element settings = new Element("settings", new String[]{"jid", "node"},
 									   new String[]{pushServiceJid.toString(),
 													"push-node"});
-		settings.withElement("muted", "tigase:push:muted:0", mutedEl -> {
-			mutedEl.withElement("jid", null, senderJid.getBareJID().toString());
+		settings.withElement("muted", "tigase:push:filter:muted:0", mutedEl -> {
+			mutedEl.withElement("item", itemEl -> {
+				itemEl.setAttribute("jid", senderJid.getBareJID().toString());
+			});
 		});
 		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
 												  pushServiceJid + "/push-node",
@@ -377,8 +379,8 @@ public class PushNotificationsTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		Queue<Packet> results = new ArrayDeque<>();
-		pushNotifications.notifyNewOfflineMessage(packet, null, results, new HashMap<>());
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
 	}
@@ -438,7 +440,7 @@ public class PushNotificationsTest
 		random.nextBytes(key);
 		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
 			el.setCData(Base64.encode(key));
-			el.setAttribute("alg", "aes-gcm");
+			el.setAttribute("alg", "aes-128-gcm");
 		});
 		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
 												  pushServiceJid + "/push-node",

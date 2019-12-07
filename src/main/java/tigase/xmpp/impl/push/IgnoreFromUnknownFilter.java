@@ -44,7 +44,7 @@ import static tigase.xmpp.impl.push.IgnoreFromUnknownFilter.ID;
 public class IgnoreFromUnknownFilter
 		implements PushNotificationsFilter {
 
-	public static final String XMLNS = "tigase:push:ignore-unknown:0";
+	public static final String XMLNS = "tigase:push:filter:ignore-unknown:0";
 	
 	private static final Logger log = Logger.getLogger(IgnoreFromUnknownFilter.class.getCanonicalName());
 
