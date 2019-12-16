@@ -84,7 +84,7 @@ _xmpp-server._tcp.pubsub.your-domain.tld has SRV record 10 0 5269 tigase.me.
 
 Now, how do you register your domain with our service?
 
-There are a few ways. We recommend checking with the xref:xref:addManageDomain[Add and Manage Domains] section of the documentation on setting that up. If you cannot or don't want to do it on your own, the way described in the guide please send us a message, either via XMPP to admin@tigase.im or the contact form requesting new domain. User registration is available via in-band registration protocol. You can also specify whether you want to allow anonymous authentication to be available for your domain and you can specify maximum number of users for your domain.
+There are a few ways. We recommend checking with the xref:addManageDomain[Add and Manage Domains] section of the documentation on setting that up. If you cannot or don't want to do it on your own, the way described in the guide please send us a message, either via XMPP to admin@tigase.im or the contact form requesting new domain. User registration is available via in-band registration protocol. You can also specify whether you want to allow anonymous authentication to be available for your domain and you can specify maximum number of users for your domain.
 
 === Providing certificate
 
