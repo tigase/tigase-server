@@ -453,23 +453,26 @@ public abstract class VCardXMPPProcessorAbstract
 						for (Element c1 : c.getChildren()) {
 							switch (c1.getName()) {
 								case "parameters":
-									for (Element c2 : c1.getChildren()) {
-										switch (c2.getName()) {
-											case "type":
-												list = c2.findChildren((Element c3) -> c3.getName() == "text");
-												if (list != null) {
-													for (Element c3 : list) {
-														r.addChild(new Element(c3.getCData().toUpperCase()));
+									List<Element> parametersChildren = c1.getChildren();
+									if (parametersChildren != null) {
+										for (Element c2 : c1.getChildren()) {
+											switch (c2.getName()) {
+												case "type":
+													list = c2.findChildren((Element c3) -> c3.getName() == "text");
+													if (list != null) {
+														for (Element c3 : list) {
+															r.addChild(new Element(c3.getCData().toUpperCase()));
+														}
 													}
-												}
-											case "pref":
-												text = c2.findChild((Element c3) -> c3.getName() == "integer");
-												if (text != null) {
-													r.addChild(new Element("PREF"));
-												}
-												break;
-											default:
-												break;
+												case "pref":
+													text = c2.findChild((Element c3) -> c3.getName() == "integer");
+													if (text != null) {
+														r.addChild(new Element("PREF"));
+													}
+													break;
+												default:
+													break;
+											}
 										}
 									}
 									break;
