@@ -36,6 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static tigase.server.ConnectionManager.*;
+
 /**
  * Created: Jun 14, 2010 12:32:49 PM
  *
@@ -523,17 +525,17 @@ public class CIDConnections {
 		return connectionSelector.selectConnection(packet, outgoing);
 	}
 
-	private void initNewConnection(String ip, int port, S2SConnection s2s_conn, Map<String, Object> port_props) {
+	void initNewConnection(String ip, int port, S2SConnection s2s_conn, Map<String, Object> port_props) {
 		outgoing_handshaking.add(s2s_conn);
 		port_props.put(S2SIOService.S2S_CONNECTION_KEY, s2s_conn);
 		port_props.put("remote-ip", ip);
 		port_props.put("local-hostname", cid.getLocalHost());
 		port_props.put("remote-hostname", cid.getRemoteHost());
-		port_props.put("ifc", new String[]{ip});
-		port_props.put("socket", SocketType.plain);
-		port_props.put("type", ConnectionType.connect);
+		port_props.put(PORT_IFC_PROP_KEY, new String[]{ip});
+		port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
+		port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
 		port_props.put("srv-type", "_xmpp-server._tcp");
-		port_props.put("port-no", port);
+		port_props.put(PORT_KEY, port);
 		port_props.put("cid", cid);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "STARTING new connection: {0}, params: {1}", new Object[]{cid, port_props});

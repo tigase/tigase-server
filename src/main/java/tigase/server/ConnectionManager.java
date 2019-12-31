@@ -81,37 +81,37 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Key name of the system property for configuration protection from system overload and DOS attack.
 	 */
 	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY = "elements-number-limit";
-	protected static final long LAST_MINUTE_BIN_LIMIT_PROP_VAL = 20000000L;
-	protected static final long LAST_MINUTE_PACKETS_LIMIT_PROP_VAL = 2500L;
-	protected static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
-	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
-	protected static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
-	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
-	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
-	protected static final int NET_BUFFER_LIMIT_HT_PROP_VAL = 20 * 1024 * 1024;
-	protected static final String NET_BUFFER_LIMIT_PROP_KEY = "net-buffer-limit";
-	protected static final int NET_BUFFER_LIMIT_ST_PROP_VAL = 2 * 1024 * 1024;
-	protected static final String PORT_CLASS_PROP_KEY = "class";
-	protected static final String PORT_IFC_PROP_KEY = "ifc";
-	protected static final String PORT_LISTENING_DELAY_KEY = "port-delay-listening";
-	protected static final boolean PORT_LISTENING_DELAY_DEF = false;
-	protected static final String PORT_KEY = "port-no";
-	protected static final String PORT_NEW_CONNECTIONS_THROTTLING_KEY = "new-connections-throttling";
-	protected static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
-	protected static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
-	protected static final String PORT_SOCKET_PROP_KEY = "socket";
-	protected static final String PORT_TYPE_PROP_KEY = "type";
-	protected static final String PROP_KEY = "connections/";
-	protected static final long TOTAL_BIN_LIMIT_PROP_VAL = 0L;
-	protected static final long TOTAL_PACKETS_LIMIT_PROP_VAL = 0L;
-	protected static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
-	protected static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
-	protected static final boolean XMPP_ACK_PROP_VAL = false;
-	protected static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
-	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
-	protected static final String WATCHDOG_DELAY = "watchdog_delay";
-	protected static final String WATCHDOG_TIMEOUT = "watchdog_timeout";
-	protected static final String WATCHDOG_PING_TYPE_KEY = "watchdog_ping_type";
+	public static final long LAST_MINUTE_BIN_LIMIT_PROP_VAL = 20000000L;
+	public static final long LAST_MINUTE_PACKETS_LIMIT_PROP_VAL = 2500L;
+	public static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
+	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
+	public static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
+	public static final String NET_BUFFER_PROP_KEY = "net-buffer";
+	public static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
+	public static final int NET_BUFFER_LIMIT_HT_PROP_VAL = 20 * 1024 * 1024;
+	public static final String NET_BUFFER_LIMIT_PROP_KEY = "net-buffer-limit";
+	public static final int NET_BUFFER_LIMIT_ST_PROP_VAL = 2 * 1024 * 1024;
+	public static final String PORT_CLASS_PROP_KEY = "class";
+	public static final String PORT_IFC_PROP_KEY = "ifc";
+	public static final String PORT_LISTENING_DELAY_KEY = "port-delay-listening";
+	public static final boolean PORT_LISTENING_DELAY_DEF = false;
+	public static final String PORT_KEY = "port-no";
+	public static final String PORT_NEW_CONNECTIONS_THROTTLING_KEY = "new-connections-throttling";
+	public static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
+	public static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
+	public static final String PORT_SOCKET_PROP_KEY = "socket";
+	public static final String PORT_TYPE_PROP_KEY = "type";
+	public static final String PROP_KEY = "connections/";
+	public static final long TOTAL_BIN_LIMIT_PROP_VAL = 0L;
+	public static final long TOTAL_PACKETS_LIMIT_PROP_VAL = 0L;
+	public static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
+	public static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
+	public static final boolean XMPP_ACK_PROP_VAL = false;
+	public static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
+	public static final String PORTS_PROP_KEY = PROP_KEY + "ports";
+	public static final String WATCHDOG_DELAY = "watchdog_delay";
+	public static final String WATCHDOG_TIMEOUT = "watchdog_timeout";
+	public static final String WATCHDOG_PING_TYPE_KEY = "watchdog_ping_type";
 
 	protected static final Element pingElement = new Element("iq", new Element[]{
 			new Element("ping", new String[]{"xmlns"}, new String[]{"urn:xmpp:ping"})}, new String[]{"type", "id"},
@@ -953,7 +953,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if (log.isLoggable(Level.FINER)) {
 			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
 
-			log.log(Level.FINER, "Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}, props: {3}",
+			log.log(Level.FINER, "Reconnecting service for: {0}, scheduling next try in {1} seconds, cid: {2}, props: {3}",
 					new Object[]{getName(), delay / 1000, cid, port_props});
 		}
 		addTimerTask(new TimerTask() {
