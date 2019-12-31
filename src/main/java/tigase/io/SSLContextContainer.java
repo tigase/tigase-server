@@ -91,10 +91,24 @@ public class SSLContextContainer
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
 
 	public enum HARDENED_MODE {
-		global,
-		relaxed,
-		secure,
-		strict;
+		global(null,null),
+		relaxed(HARDENED_RELAXED_CIPHERS,HARDENED_RELAXED_PROTOCOLS),
+		secure(HARDENED_SECURE_CIPHERS,HARDENED_SECURE_PROTOCOLS),
+		strict(HARDENED_STRICT_CIPHERS,HARDENED_STRICT_PROTOCOLS);
+
+		private String[] ciphers;
+		private String[] clientProtocols;
+		private String[] serverProtocols;
+
+		// "SSLv2Hello" should not be enabled, and for client it MUST be disabled as it can cause problems!
+		// https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4915862
+		// https://serverfault.com/questions/802992/how-to-test-for-sslv2hello-support-with-openssl-s-client
+		// https://security.stackexchange.com/questions/89930/is-it-safe-to-enable-sslv2-clienthello-support
+		HARDENED_MODE(String[] ciphers, String[] protocols) {
+			this.ciphers = ciphers;
+			this.serverProtocols = protocols;
+			this.clientProtocols = protocols != null? subtractItemsFromCollection(protocols, new String[]{"SSLv2Hello"}) : null;
+		}
 
 		public static HARDENED_MODE getDefault() {
 			return secure;
@@ -102,6 +116,13 @@ public class SSLContextContainer
 
 		static String[] stringValues() {
 			return EnumSet.allOf(HARDENED_MODE.class).stream().map(HARDENED_MODE::name).toArray(String[]::new);
+		}
+
+		public String[] getCiphers() {
+			return ciphers;
+		}
+		public String[] getProtocols(boolean client) {
+			return client ? clientProtocols : serverProtocols;
 		}
 	}
 
@@ -123,7 +144,14 @@ public class SSLContextContainer
 			log.config("Supported ciphers: " +
 							   markEnabled(tmpEngine.getEnabledCipherSuites(), tmpEngine.getSupportedCipherSuites()));
 
+			// TODO: we should temporarily disable TLS1.3 as an option?
+			final String enableTLS13 = System.getProperty("enableTLS13");
+			if (enableTLS13 != null && Boolean.parseBoolean(enableTLS13)) {
 			HARDENED_RELAXED_PROTOCOLS = tmpEngine.getEnabledProtocols();
+			} else {
+				HARDENED_RELAXED_PROTOCOLS = subtractItemsFromCollection(tmpEngine.getEnabledProtocols(), new String[]{"TLSv1.3"});
+			}
+
 			HARDENED_SECURE_PROTOCOLS = subtractItemsFromCollection(HARDENED_RELAXED_PROTOCOLS,
 																	HARDENED_SECURE_FORBIDDEN_PROTOCOLS);
 			HARDENED_STRICT_PROTOCOLS = subtractItemsFromCollection(HARDENED_SECURE_PROTOCOLS,
@@ -222,7 +250,7 @@ public class SSLContextContainer
 		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
 		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
 											   needClientAuth, getEnabledCiphers(tls_hostname),
-											   getEnabledProtocols(tls_hostname));
+											   getEnabledProtocols(tls_hostname, clientMode));
 		return new TLSIO(socketIO, wrapper, byteOrder);
 	}
 
@@ -234,16 +262,7 @@ public class SSLContextContainer
 			return TLS_WORKAROUND_CIPHERS;
 		} else {
 			HARDENED_MODE mode = getHardenedMode(domain);
-			switch (mode) {
-				case strict:
-					return HARDENED_STRICT_CIPHERS;
-				case secure:
-					return HARDENED_SECURE_CIPHERS;
-				case relaxed:
-					return HARDENED_RELAXED_CIPHERS;
-				default:
-					return null;
-			}
+			return mode.getCiphers();
 		}
 	}
 
@@ -255,21 +274,12 @@ public class SSLContextContainer
 	}
 
 	@Override
-	public String[] getEnabledProtocols(String domain) {
+	public String[] getEnabledProtocols(String domain, boolean client) {
 		if (enabledProtocols != null && enabledProtocols.length != 0) {
 			return enabledProtocols;
 		} else {
 			HARDENED_MODE mode = getHardenedMode(domain);
-			switch (mode) {
-				case strict:
-					return HARDENED_STRICT_PROTOCOLS;
-				case secure:
-					return HARDENED_SECURE_PROTOCOLS;
-				case relaxed:
-					return HARDENED_RELAXED_PROTOCOLS;
-				default:
-					return null;
-			}
+			return mode.getProtocols(client);
 		}
 	}
 
@@ -367,7 +377,7 @@ public class SSLContextContainer
 	}
 
 	private HARDENED_MODE getHardenedMode(String domain) {
-		HARDENED_MODE mode = HARDENED_MODE.secure;
+		HARDENED_MODE mode = hardenedMode;
 		if (domain != null && vHostManager != null) {
 			final VHostItem vHostItem = vHostManager.getVHostItem(domain);
 			if (vHostItem != null) {
@@ -377,8 +387,9 @@ public class SSLContextContainer
 				}
 			}
 		}
+		mode = HARDENED_MODE.global.equals(mode) ? hardenedMode : mode;
 		log.log(Level.INFO, "Using hardened-mode: {0} for domain: {1}", new String[]{String.valueOf(mode), domain});
-		return HARDENED_MODE.global.equals(mode) ? hardenedMode : mode;
+		return mode;
 	}
 
 	private void invalidateContextHolder(SSLHolder holder, String alias) throws Exception {

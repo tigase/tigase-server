@@ -1,0 +1,8 @@
+[[tls13compatibility]]
+= TLS 1.3 compatibility
+
+Due to compatibility issues TLS 1.3 is currently disabled by default. It can be enabled by setting Java system property `enable-tls13` to `true`:
+
+----
+-DenableTLS13=true
+----
