@@ -102,7 +102,7 @@ public class S2SConnectionManagerTest
 		getSslDebugString().ifPresent(debug -> System.setProperty("javax.net.debug", debug));
 
 		log = Logger.getLogger("tigase");
-		configureLogger(log, Level.INFO);
+		configureLogger(log, Level.CONFIG);
 
 		final DSLBeanConfiguratorWithBackwardCompatibility config = prepareKernel();
 
@@ -121,17 +121,17 @@ public class S2SConnectionManagerTest
 	}
 
 	private static void setupCID() {
-		final String localHostname = System.getProperty("test-local-hostname", "tigase.im");
-		final String remoteHostname = System.getProperty("test-remote-hostname", "wojtek-local.tigase.eu");
+		String localHostname = System.getProperty("test-local-hostname", "tigase.im");
+		String remoteHostname = System.getProperty("test-remote-hostname", "wojtek-local.tigase.eu");
+// //		 https://projects.tigase.net/issue/systems-54
+//			remoteHostname = "convorb.im";
+//			remoteHostname = "404.city";
+//			remoteHostname = "frsra.ml";
+//			remoteHostname = "jabber.ru";
+//			remoteHostname = "jabberix.com";
+//			remoteHostname = "jwchat.org";
+//			remoteHostname = "vrcshop.com";
 		cid = new CID(localHostname, remoteHostname);
-
-//			cid = new CID("tigase.im", "convorb.im");
-//			cid = new CID("tigase.im", "404.city");
-//			cid = new CID("tigase.im", "frsra.ml");
-//			cid = new CID("tigase.im", "jabber.ru");
-//			cid = new CID("tigase.im", "jabberix.com");
-//			cid = new CID("tigase.im", "jwchat.org");
-//			cid = new CID("tigase.im", "vrcshop.com");
 	}
 
 	private static void setupSslContextContainer(final SSLContextContainer context,
