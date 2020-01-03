@@ -17,6 +17,7 @@
  */
 package tigase.io;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
@@ -42,6 +43,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +57,7 @@ import java.util.regex.Pattern;
  */
 @Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true)
 public class SSLContextContainer
-		extends SSLContextContainerAbstract {
+		extends SSLContextContainerAbstract implements Initializable {
 
 	// Workaround for TLS/SSL bug in new JDK used with new version of
 	// nss library see also:
@@ -63,7 +65,7 @@ public class SSLContextContainer
 	// http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
 	/* @formatter:off */
 	private static final String EPHEMERAL_DH_KEYSIZE_KEY = "jdk.tls.ephemeralDHKeySize";
-	private static final String EPHEMERAL_DH_KEYSIZE_VALUE = "4096";
+	private static final int EPHEMERAL_DH_KEYSIZE_VALUE = 4096;
 	private static final String[] TLS_WORKAROUND_CIPHERS = new String[]{"SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
 																		"SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
 																		"SSL_DHE_DSS_WITH_DES_CBC_SHA",
@@ -91,24 +93,10 @@ public class SSLContextContainer
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
 
 	public enum HARDENED_MODE {
-		global(null,null),
-		relaxed(HARDENED_RELAXED_CIPHERS,HARDENED_RELAXED_PROTOCOLS),
-		secure(HARDENED_SECURE_CIPHERS,HARDENED_SECURE_PROTOCOLS),
-		strict(HARDENED_STRICT_CIPHERS,HARDENED_STRICT_PROTOCOLS);
-
-		private String[] ciphers;
-		private String[] clientProtocols;
-		private String[] serverProtocols;
-
-		// "SSLv2Hello" should not be enabled, and for client it MUST be disabled as it can cause problems!
-		// https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4915862
-		// https://serverfault.com/questions/802992/how-to-test-for-sslv2hello-support-with-openssl-s-client
-		// https://security.stackexchange.com/questions/89930/is-it-safe-to-enable-sslv2-clienthello-support
-		HARDENED_MODE(String[] ciphers, String[] protocols) {
-			this.ciphers = ciphers;
-			this.serverProtocols = protocols;
-			this.clientProtocols = protocols != null? subtractItemsFromCollection(protocols, new String[]{"SSLv2Hello"}) : null;
-		}
+		global(),
+		relaxed(),
+		secure(),
+		strict();
 
 		public static HARDENED_MODE getDefault() {
 			return secure;
@@ -117,60 +105,6 @@ public class SSLContextContainer
 		static String[] stringValues() {
 			return EnumSet.allOf(HARDENED_MODE.class).stream().map(HARDENED_MODE::name).toArray(String[]::new);
 		}
-
-		public String[] getCiphers() {
-			return ciphers;
-		}
-		public String[] getProtocols(boolean client) {
-			return client ? clientProtocols : serverProtocols;
-		}
-	}
-
-	private static String[] HARDENED_RELAXED_CIPHERS;
-	private static String[] HARDENED_RELAXED_PROTOCOLS;
-	private static String[] HARDENED_SECURE_CIPHERS;
-	private static String[] HARDENED_SECURE_PROTOCOLS;
-	private static String[] HARDENED_STRICT_CIPHERS;
-	private static String[] HARDENED_STRICT_PROTOCOLS;
-
-	static {
-		System.setProperty(EPHEMERAL_DH_KEYSIZE_KEY, EPHEMERAL_DH_KEYSIZE_VALUE);
-		try {
-			final SSLContext sslContext = SSLContext.getDefault();
-			SSLEngine tmpEngine = sslContext.createSSLEngine();
-			tmpEngine.setUseClientMode(false);
-			log.config("Supported protocols: " +
-							   markEnabled(tmpEngine.getEnabledProtocols(), tmpEngine.getSupportedProtocols()));
-			log.config("Supported ciphers: " +
-							   markEnabled(tmpEngine.getEnabledCipherSuites(), tmpEngine.getSupportedCipherSuites()));
-
-			// TODO: we should temporarily disable TLS1.3 as an option?
-			final String enableTLS13 = System.getProperty("enableTLS13");
-			if (enableTLS13 != null && Boolean.parseBoolean(enableTLS13)) {
-			HARDENED_RELAXED_PROTOCOLS = tmpEngine.getEnabledProtocols();
-			} else {
-				HARDENED_RELAXED_PROTOCOLS = subtractItemsFromCollection(tmpEngine.getEnabledProtocols(), new String[]{"TLSv1.3"});
-			}
-
-			HARDENED_SECURE_PROTOCOLS = subtractItemsFromCollection(HARDENED_RELAXED_PROTOCOLS,
-																	HARDENED_SECURE_FORBIDDEN_PROTOCOLS);
-			HARDENED_STRICT_PROTOCOLS = subtractItemsFromCollection(HARDENED_SECURE_PROTOCOLS,
-																	HARDENED_STRICT_FORBIDDEN_PROTOCOLS);
-			log.config("RELAXED protocols: " + Arrays.toString(HARDENED_RELAXED_PROTOCOLS));
-			log.config("SECURE protocols: " + Arrays.toString(HARDENED_SECURE_PROTOCOLS));
-			log.config("STRICT protocols: " + Arrays.toString(HARDENED_STRICT_PROTOCOLS));
-
-			HARDENED_RELAXED_CIPHERS = tmpEngine.getEnabledCipherSuites();
-			HARDENED_SECURE_CIPHERS = subtractItemsFromCollection(HARDENED_RELAXED_CIPHERS,
-																  HARDENED_SECURE_FORBIDDEN_CIPHERS);
-			HARDENED_STRICT_CIPHERS = subtractItemsFromCollection(HARDENED_SECURE_CIPHERS,
-																  HARDENED_STRICT_FORBIDDEN_CIPHERS);
-			log.config("RELAXED ciphers: " + Arrays.toString(HARDENED_RELAXED_CIPHERS));
-			log.config("SECURE ciphers: " + Arrays.toString(HARDENED_SECURE_CIPHERS));
-			log.config("STRICT ciphers: " + Arrays.toString(HARDENED_STRICT_CIPHERS));
-		} catch (NoSuchAlgorithmException e) {
-			log.log(Level.WARNING, "Can't determine supported protocols", e);
-		}
 	}
 
 	@Inject
@@ -178,8 +112,22 @@ public class SSLContextContainer
 	protected Map<String, SSLHolder> sslContexts = new ConcurrentSkipListMap<>();
 	@Inject(nullAllowed = true)
 	protected VHostManagerIfc vHostManager = null;
+	Map<String, String[]> enabledCiphersMap = new ConcurrentHashMap<>(3);
+	Map<String, String[]> enabledProtocolsMap = new ConcurrentHashMap<>(6);
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0", note = "(temporarily) disable TLS 1.3 due to compatibility issues")
+	@Deprecated
+	@ConfigField(desc = "Disable TLS 1.3", alias = "tls-disable-tls13")
+	private boolean disableTLS13 = true;
+	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "tls-disabled-ciphers")
+	private String[] disabledCiphers;
+	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "tls-disabled-protocols")
+	private String[] disabledProtocols;
 	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "tls-enabled-ciphers")
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0", note = "Control list of ciphers with `tls-disabled-ciphers`")
+	@Deprecated
 	private String[] enabledCiphers;
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0", note = "Control list of protocols with `tls-disabled-protocols`")
+	@Deprecated
 	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "tls-enabled-protocols")
 	private String[] enabledProtocols;
 	@ConfigField(desc = "TLS/SSL hardened mode", alias = "hardened-mode")
@@ -188,6 +136,12 @@ public class SSLContextContainer
 	private SSLContextContainerIfc parent;
 	@ConfigField(desc = "TLS/SSL", alias = "tls-jdk-nss-bug-workaround-active")
 	private boolean tlsJdkNssBugWorkaround = false;
+	@ConfigField(desc = "Sets ephemeral DH Key Size", alias = "ephemeral-key-size")
+	private int ephemeralDHKeySize = EPHEMERAL_DH_KEYSIZE_VALUE;
+
+	private static String getKey(SSLContextContainer.HARDENED_MODE mode, boolean client) {
+		return mode + (client ? "_client" : "");
+	}
 
 	private static String markEnabled(String[] enabled, String[] supported) {
 		final List<String> en = enabled == null ? new ArrayList<String>() : Arrays.asList(enabled);
@@ -262,7 +216,8 @@ public class SSLContextContainer
 			return TLS_WORKAROUND_CIPHERS;
 		} else {
 			HARDENED_MODE mode = getHardenedMode(domain);
-			return mode.getCiphers();
+			String key = getKey(mode, false);
+			return enabledCiphersMap.get(key);
 		}
 	}
 
@@ -279,7 +234,8 @@ public class SSLContextContainer
 			return enabledProtocols;
 		} else {
 			HARDENED_MODE mode = getHardenedMode(domain);
-			return mode.getProtocols(client);
+			String key = getKey(mode, client);
+			return enabledProtocolsMap.get(key);
 		}
 	}
 
@@ -289,6 +245,10 @@ public class SSLContextContainer
 					"Enabled protocols: " + (enabledProtocols == null ? "default" : Arrays.toString(enabledProtocols)));
 		}
 		this.enabledProtocols = enabledProtocols;
+	}
+
+	public void setEphemeralDHKeySize(int ephemeralDHKeySize) {
+		this.ephemeralDHKeySize = ephemeralDHKeySize;
 	}
 
 	@Override
@@ -364,6 +324,67 @@ public class SSLContextContainer
 			log.config("Workaround for TLS/SSL bug is " + (value ? "enabled" : "disabled"));
 		}
 		this.tlsJdkNssBugWorkaround = value;
+	}
+
+	@Override
+	public void initialize() {
+		System.setProperty(EPHEMERAL_DH_KEYSIZE_KEY, String.valueOf(ephemeralDHKeySize));
+		try {
+			final SSLContext sslContext = SSLContext.getDefault();
+			SSLEngine tmpEngine = sslContext.createSSLEngine();
+			tmpEngine.setUseClientMode(false);
+			log.config("Supported protocols: " +
+							   markEnabled(tmpEngine.getEnabledProtocols(), tmpEngine.getSupportedProtocols()));
+			log.config("Supported ciphers: " +
+							   markEnabled(tmpEngine.getEnabledCipherSuites(), tmpEngine.getSupportedCipherSuites()));
+
+			String[] TMP;
+			// TODO: we should temporarily disable TLS1.3 as an option?
+			if (disableTLS13) {
+				TMP = subtractItemsFromCollection(tmpEngine.getEnabledProtocols(), new String[]{"TLSv1.3"});
+			} else {
+				TMP = tmpEngine.getEnabledProtocols();
+			}
+
+			if (disabledProtocols != null && disabledProtocols.length > 0) {
+				TMP = subtractItemsFromCollection(TMP, disabledProtocols);
+			}
+
+			log.config("RELAXED protocols: " + Arrays.toString(TMP));
+			enabledProtocolsMap.put(getKey(HARDENED_MODE.relaxed, false), TMP);
+			enabledProtocolsMap.put(getKey(HARDENED_MODE.relaxed, true),
+									subtractItemsFromCollection(TMP, new String[]{"SSLv2Hello"}));
+
+			TMP = subtractItemsFromCollection(TMP, HARDENED_SECURE_FORBIDDEN_PROTOCOLS);
+			log.config("SECURE protocols: " + Arrays.toString(TMP));
+			enabledProtocolsMap.put(getKey(HARDENED_MODE.secure, false), TMP);
+			enabledProtocolsMap.put(getKey(HARDENED_MODE.secure, true),
+									subtractItemsFromCollection(TMP, new String[]{"SSLv2Hello"}));
+
+			TMP = subtractItemsFromCollection(TMP, HARDENED_STRICT_FORBIDDEN_PROTOCOLS);
+			log.config("STRICT protocols: " + Arrays.toString(TMP));
+			enabledProtocolsMap.put(getKey(HARDENED_MODE.strict, false), TMP);
+			enabledProtocolsMap.put(getKey(HARDENED_MODE.strict, true),
+									subtractItemsFromCollection(TMP, new String[]{"SSLv2Hello"}));
+
+			TMP = tmpEngine.getEnabledCipherSuites();
+			if (disabledProtocols != null && disabledProtocols.length > 0) {
+				TMP = subtractItemsFromCollection(TMP, disabledCiphers);
+			}
+
+			log.config("RELAXED ciphers: " + Arrays.toString(TMP));
+			enabledCiphersMap.put(getKey(HARDENED_MODE.relaxed, false), TMP);
+
+			TMP = subtractItemsFromCollection(TMP, HARDENED_SECURE_FORBIDDEN_CIPHERS);
+			log.config("SECURE ciphers: " + Arrays.toString(TMP));
+			enabledCiphersMap.put(getKey(HARDENED_MODE.secure, false), TMP);
+
+			TMP = subtractItemsFromCollection(TMP, HARDENED_STRICT_FORBIDDEN_CIPHERS);
+			log.config("STRICT ciphers: " + Arrays.toString(TMP));
+			enabledCiphersMap.put(getKey(HARDENED_MODE.strict, false), TMP);
+		} catch (NoSuchAlgorithmException e) {
+			log.log(Level.WARNING, "Can't determine supported protocols", e);
+		}
 	}
 
 	@Override
