@@ -32,8 +32,6 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.server.xmppserver.S2SConnectionManager.XMLNS_SERVER_VAL;
-
 @Bean(name = "sasl-external", parent = S2SConnectionManager.class, active = true)
 public class SaslExternal
 		extends S2SAbstractProcessor {
@@ -44,6 +42,12 @@ public class SaslExternal
 
 	private static final Logger log = Logger.getLogger(SaslExternal.class.getName());
 	private static Element successElement = new Element("success", new String[]{"xmlns"}, new String[]{XMLNS_SASL});
+
+	private static boolean isAnyMechanismsPresent(Packet p) {
+		final List<Element> childrenStaticStr = p.getElement().getChildrenStaticStr(FEATURES_SASL_PATH);
+		return p.isXMLNSStaticStr(FEATURES_SASL_PATH, XMLNS_SASL) && childrenStaticStr != null &&
+				!childrenStaticStr.isEmpty();
+	}
 
 	private static boolean isTlsEstablished(final CertCheckResult certCheckResult) {
 		return (certCheckResult == CertCheckResult.trusted || certCheckResult == CertCheckResult.untrusted ||
@@ -72,12 +76,14 @@ public class SaslExternal
 			final CID cid = (CID) serv.getSessionData().get("cid");
 			final boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
-			if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
+			if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
+					!p.getElement().getChildren().isEmpty()) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
 				}
 
-				if (!p.isXMLNSStaticStr(FEATURES_SASL_PATH, XMLNS_SASL)) {
+				// Some servers send empty SASL list!
+				if (!isAnyMechanismsPresent(p)) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "{0}, No SASL mechanisms found in features. Skipping SASL.",
 								new Object[]{serv, p});
@@ -156,9 +162,10 @@ public class SaslExternal
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Sending new stream", new Object[]{serv});
 		}
-		String data =
-				"<stream:stream xmlns='" + XMLNS_SERVER_VAL + "' xmlns:stream='http://etherx.jabber.org/streams'" +
-						" from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + ">";
+		// old ejabberd has problem if we first send `xmlns` and then `xmlns:stream` so we have to do it reversed...
+		String data = "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'" + " xmlns='jabber:server'" +
+				" from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + " version='1.0'>";
+
 		serv.xmppStreamOpen(data);
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
