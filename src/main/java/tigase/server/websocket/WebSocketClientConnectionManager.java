@@ -28,6 +28,7 @@ import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.xml.Element;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.impl.StartTLS;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
@@ -140,6 +141,12 @@ public class WebSocketClientConnectionManager
 	protected void preprocessStreamFeatures(XMPPIOService<Object> serv, Element elem_features) {
 		if (!isPreRFC(serv)) {
 			elem_features.setAttribute("xmlns:stream", "http://etherx.jabber.org/streams");
+		}
+		Element starttlsEl = elem_features.findChild(el -> {
+			return StartTLS.EL_NAME == el.getName() && "urn:ietf:params:xml:ns:xmpp-tls" == el.getXMLNS();
+		});
+		if (starttlsEl != null) {
+			elem_features.removeChild(starttlsEl);
 		}
 	}
 
