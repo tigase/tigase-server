@@ -23,3 +23,5 @@ Please note the `USER_ID` element, this is a special element of the configuratio
 . `%1$s` - use user name only for authentication (JabberID's localpart)
 . `%2$s` - use domain name only for authentication (JabberID's domain part)
 . `%3$s` - use the whole Jabber ID (JID) for authentication
+
+IMPORTANT: Please make sure that you included `autoCreateUser=true` in your main data source (UserRepository and *not* above AuthRepository) as outlined in <<autoCreateUser>> - otherwise you may run into problems with data access.

@@ -93,7 +93,9 @@ You can normally skip configuring connectors for the default Tigase database for
 
 One more important thing to know is that you will have to modify `authRepository` if you use a custom authentication connector. This is because if you retrieve user login data from the external database this external database is usually managed by an external system. User accounts are added without notifying Tigase server. Then, when the user logs in and tries to retrieve the user roster, the server can not find such a user in the roster database.
 
-To keep user accounts in sync between the authentication database and the main user database you have to add following option to the end of the database connection URL: `autoCreateUser=true`.
+[[autoCreateUser]]
+
+IMPORTANT: To keep user accounts in sync between the authentication database and the main user database you have to add following option to the end of the database connection URL: `autoCreateUser=true`.
 
 For example:
 
