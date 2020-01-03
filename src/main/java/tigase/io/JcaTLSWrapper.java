@@ -65,11 +65,11 @@ public class JcaTLSWrapper
 		this(sslc, eventHandler, hostname, port, clientMode, wantClientAuth, needClientAuth, null, null);
 	}
 
-	public JcaTLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port,
+	public JcaTLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String remote_hostname, int port,
 						 final boolean clientMode, final boolean wantClientAuth, final boolean needClientAuth,
 						 String[] enabledCiphers, String[] enabledProtocols) {
-		if (clientMode && hostname != null) {
-			tlsEngine = sslc.createSSLEngine(hostname, port);
+		if (clientMode && remote_hostname != null) {
+			tlsEngine = sslc.createSSLEngine(remote_hostname, port);
 		} else {
 			tlsEngine = sslc.createSSLEngine();
 		}

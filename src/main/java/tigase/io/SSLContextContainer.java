@@ -196,15 +196,15 @@ public class SSLContextContainer
 	}
 
 	@Override
-	public IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
+	public IOInterface createIoInterface(String protocol, String local_hostname, String remote_hostname, int port, boolean clientMode,
 										 boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
 										 TrustManager[] x509TrustManagers, TLSEventHandler eventHandler,
 										 IOInterface socketIO, CertificateContainerIfc certificateContainer)
 			throws IOException {
-		SSLContext sslContext = getSSLContext(protocol, tls_hostname, clientMode, x509TrustManagers);
-		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, tls_hostname, port, clientMode, wantClientAuth,
-											   needClientAuth, getEnabledCiphers(tls_hostname),
-											   getEnabledProtocols(tls_hostname, clientMode));
+		SSLContext sslContext = getSSLContext(protocol, local_hostname, clientMode, x509TrustManagers);
+		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, remote_hostname, port, clientMode, wantClientAuth,
+											   needClientAuth, getEnabledCiphers(local_hostname),
+											   getEnabledProtocols(local_hostname, clientMode));
 		return new TLSIO(socketIO, wrapper, byteOrder);
 	}
 

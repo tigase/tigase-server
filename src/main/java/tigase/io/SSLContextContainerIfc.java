@@ -175,10 +175,20 @@ public interface SSLContextContainerIfc
 	 */
 	void addCertificates(Map<String, String> params) throws CertificateParsingException;
 
-	IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
+	IOInterface createIoInterface(String protocol, String local_hostname, String remote_hostname, int port, boolean clientMode,
 								  boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
 								  TrustManager[] x509TrustManagers, TLSEventHandler eventHandler, IOInterface ioi,
 								  CertificateContainerIfc certificateContainer) throws IOException;
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0")
+	default IOInterface createIoInterface(String protocol, String tls_hostname, int port, boolean clientMode,
+								  boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
+								  TrustManager[] x509TrustManagers, TLSEventHandler eventHandler, IOInterface ioi,
+								  CertificateContainerIfc certificateContainer) throws IOException {
+		return this.createIoInterface(protocol, tls_hostname, tls_hostname, port, clientMode, wantClientAuth, needClientAuth,
+							   byteOrder, x509TrustManagers, eventHandler, ioi, certificateContainer);
+	};
 
 	// ~--- get methods
 	// ----------------------------------------------------------

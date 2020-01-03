@@ -130,6 +130,18 @@ public abstract class IOService<RefObject>
 
 	private TrustManager[] x509TrustManagers;
 
+	private static String getRemoteHostname(IOService ios) {
+		String tls_hostname = (String) ios.getSessionData().get(HOSTNAME_KEY);
+		String tls_remote_hostname = (String) ios.getSessionData().get("remote-host");
+		if (tls_remote_hostname == null) {
+			tls_remote_hostname = (String) ios.getSessionData().get("remote-hostname");
+			if (tls_remote_hostname == null) {
+				tls_remote_hostname = tls_hostname;
+			}
+		}
+		return tls_remote_hostname;
+	}
+
 	public void accept(final SocketChannel socketChannel) throws IOException {
 		try {
 			if (socketChannel.isConnectionPending()) {
@@ -318,17 +330,15 @@ public abstract class IOService<RefObject>
 
 		String tls_hostname = null;
 		int port = 0;
+		String tls_remote_hostname = null;
 		if (clientMode) {
-			tls_hostname = (String) this.getSessionData().get("remote-host");
-			if (tls_hostname == null) {
-				tls_hostname = (String) this.getSessionData().get("remote-hostname");
-			}
+			tls_remote_hostname = getRemoteHostname(this);
 			port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
 		}
 
-		socketIO = sslContextContainer.createIoInterface("SSL", tls_hostname, port, clientMode, wantClientAuth,
-														 needClientAuth, byteOrder(), x509TrustManagers, this, socketIO,
-														 certificateContainer);
+		socketIO = sslContextContainer.createIoInterface("SSL", tls_hostname, tls_remote_hostname, port, clientMode,
+														 wantClientAuth, needClientAuth, byteOrder(), x509TrustManagers,
+														 this, socketIO, certificateContainer);
 //		if (!clientMode && useBouncyCastle) {
 //			socketIO = new BcTLSIO(certificateContainer, this, socketIO, tls_hostname, byteOrder(), wantClientAuth,
 //								   needClientAuth, sslContextContainer.getEnabledCiphers(),
@@ -378,24 +388,20 @@ public abstract class IOService<RefObject>
 			stop();
 		} else {
 			String tls_hostname = (String) sessionData.get(HOSTNAME_KEY);
+			String tls_remote_hostname = null;
 			int port = 0;
 			if (clientMode) {
 				port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
-				if (tls_hostname == null) {
-					tls_hostname = (String) this.getSessionData().get("remote-host");
-					if (tls_hostname == null) {
-						tls_hostname = (String) this.getSessionData().get("remote-hostname");
-					}
-				}
+				tls_remote_hostname = getRemoteHostname(this);
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[]{this, tls_hostname});
 			}
 
-			socketIO = sslContextContainer.createIoInterface("TLS", tls_hostname, port, clientMode, wantClientAuth,
-															 needClientAuth, byteOrder(), x509TrustManagers, this,
-															 socketIO, certificateContainer);
+			socketIO = sslContextContainer.createIoInterface("TLS", tls_hostname, tls_remote_hostname, port, clientMode,
+															 wantClientAuth, needClientAuth, byteOrder(),
+															 x509TrustManagers, this, socketIO, certificateContainer);
 //			if (!clientMode && useBouncyCastle) {
 //				socketIO = new BcTLSIO(certificateContainer, this, socketIO, tls_hostname, byteOrder(), wantClientAuth,
 //									   needClientAuth, sslContextContainer.getEnabledCiphers(),
