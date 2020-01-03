@@ -680,6 +680,11 @@ public abstract class IOService<RefObject>
 			resizeInputBuffer();
 
 			return readBytes();
+		} catch (SSLHandshakeException e) {
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
+			}
+			forceStop();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
@@ -1001,6 +1006,11 @@ public abstract class IOService<RefObject>
 					empty_read_call_count = 0;
 				}
 			}
+		} catch (SSLHandshakeException e) {
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
+			}
+			forceStop();
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Data writing exception " + connectionId, e);

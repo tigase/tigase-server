@@ -231,7 +231,7 @@ public interface SSLContextContainerIfc
 
 	String[] getEnabledCiphers(String domain);
 
-	String[] getEnabledProtocols(String domain);
+	String[] getEnabledProtocols(String domain, boolean client);
 
 	@Deprecated
 	@TigaseDeprecated(since = "8.1.0")
@@ -242,7 +242,7 @@ public interface SSLContextContainerIfc
 	@Deprecated
 	@TigaseDeprecated(since = "8.1.0")
 	default String[] getEnabledProtocols() {
-		return getEnabledProtocols(null);
+		return getEnabledProtocols(null, true);
 	};
 }
 

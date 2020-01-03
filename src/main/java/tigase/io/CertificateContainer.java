@@ -267,6 +267,7 @@ public class CertificateContainer
 				certsDirs[++certsDirsIdx] = new File(pemDir);
 
 				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
+					log.log(Level.FINE, "Loading server certificate from PEM file: {0}", file);
 					try {
 						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
 						String alias = file.getName();
@@ -281,7 +282,7 @@ public class CertificateContainer
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
 						}
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file + ": " + ex.getLocalizedMessage());
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file + ": " + ex);
 					}
 				}
 			}

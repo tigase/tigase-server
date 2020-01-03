@@ -131,6 +131,7 @@ public class S2SConnectionManagerTest
 //			remoteHostname = "jabberix.com";
 //			remoteHostname = "jwchat.org";
 //			remoteHostname = "vrcshop.com";
+//			remoteHostname = "axeos.nl";
 		cid = new CID(localHostname, remoteHostname);
 	}
 

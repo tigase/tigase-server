@@ -134,7 +134,8 @@ public abstract class SSLContextContainerAbstract
 				chain = km.getCertificateChain(getParentWildcardDomain(alias));
 			}
 
-			crt = chain == null || chain.length == 0 ? null : chain[chain.length - 1];
+			// Certificates are sorted so first one contain our certificate!
+			crt = chain == null || chain.length == 0 ? null : chain[0];
 		}
 
 		sslContext = SSLContext.getInstance(protocol);
