@@ -109,7 +109,7 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | ✓ | https://xmpp.org/extensions/xep-0133.html[XEP-0133] | Service Administration |
 | ✓ | https://xmpp.org/extensions/xep-0136.html[XEP-0136] | Message Archiving |
 | ✓ | https://xmpp.org/extensions/xep-0141.html[XEP-0141] | Data Forms Layout |
-| ✓ | https://xmpp.org/extensions/xep-0142.html[XEP-0142] | Workgroup Queues |
+| ✓footnote:commercial[Requires commercial license] | https://xmpp.org/extensions/xep-0142.html[XEP-0142] | Workgroup Queues |
 | ✓ | https://xmpp.org/extensions/xep-0144.html[XEP-0144] | Roster Item Exchange |
 | ✓ | https://xmpp.org/extensions/xep-0145.html[XEP-0145] | Annotations |
 | ✓ | https://xmpp.org/extensions/xep-0146.html[XEP-0146] | Remote Controlling Clients |
@@ -288,7 +288,7 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | ✓ | https://xmpp.org/extensions/xep-0326.html[XEP-0326] | Internet of Things - Concentrators |
 | ✓ | https://xmpp.org/extensions/xep-0333.html[XEP-0333] | Chat Markers |
 | ✓ | https://xmpp.org/extensions/xep-0352.html[XEP-0352] | Client State Indication |
-| ✓ | https://xmpp.org/extensions/xep-0357.html[XEP-0357] | Push Notifications |
+| ✓footnote:commercial[] | https://xmpp.org/extensions/xep-0357.html[XEP-0357] | Push Notifications |
 | ✓ | https://xmpp.org/extensions/xep-0363.html[XEP-0363] | HTTP File Upload |
 | ✓ | https://xmpp.org/extensions/xep-0368.html[XEP-0368] | SRV records for XMPP over TLS | Requires adding DNS entries pointing to port 5223
 | ✓ | https://xmpp.org/extensions/xep-0387.html[XEP-0387] | XMPP Compliance Suites 2018 |

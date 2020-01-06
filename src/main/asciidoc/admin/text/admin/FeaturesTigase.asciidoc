@@ -9,6 +9,8 @@
 [cols="^1,2a,5a"]
 |===
 | Support | Name | Comment
+| ✓footnote:commercial[Requires commercial license] | AuditLog | Ability functionality to log important events in a system (loggins, message exchanges, calls)
+| ✓footnote:commercial[] | Anti Abuse | Fight stanza SPAM, DoS, brute-force attacks and other threats
 | ✓ | Virtual domains | Ability to create and manage multiple virtual domains from a single instance and restart-less management
 | ✓ | MUC subscribe for offline push | Option to register permanently to the room to receive push notifications about new messages.
 | ✓ | Scripting API | Supports the Java Scripting API JSR-223
@@ -18,10 +20,14 @@
 | ✓ | SNMP Monitoring | Advanced server monitoring via SNMP.
 | ✓ | Bosh Cache | Bosh Session Cache - a feature to quickly reload user data - roster, presences and messages history by the web client (for example after web page reload)
 | ✓ | Clustering | Full clustering support for HA and LB with pluggabble clustering strategies for perfect optimising the cluster to the client's system
+| ✓footnote:commercial[] | Advanced Clustering Strategy | Dedicated, specialised clustering strategy for best possible performance
+| ✓footnote:commercial[] | MUC Clustered | Support for clustering group chatrooms with various, pluggable strategies
+| ✓footnote:commercial[] | PubSub Clustered | Support for clustering PubSub component with various, pluggable strategies
 | ✓ | Mobile optimisations | Optimizations designed for Mobile Devices
 | ✓ | OSGi | Support for running in OSGi environment, i.e. as embedded XMPP server in advanced application server
 | ✓ | Dynamic rosters | Ability to create users' rosters entries on the fly based on data retrieved from any sources
 | ✓ | Command line admin tools | Commandline utility to manage server
+| ✓footnote:commercial[] | Unified Archive | An extension to XEP-0313 Message Archive Management, with greatly improved flexibility in terms of what can be archived.
 |===
 
 == Repositories/Databases
