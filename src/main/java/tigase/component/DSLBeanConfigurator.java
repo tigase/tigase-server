@@ -308,7 +308,7 @@ public class DSLBeanConfigurator
 			beanDef.remove("name");
 
 			if (RegistrarBean.class.isAssignableFrom(bean.getClass())) {
-				Kernel tmpKernel = new Kernel() {
+				Kernel tmpKernel = new Kernel("DLSConfiguratorTmpKernel") {
 //					@Override
 //					protected BeanConfig registerBean(BeanConfig beanConfig, BeanConfig factoryBeanConfig,
 //													  Object beanInstance) {

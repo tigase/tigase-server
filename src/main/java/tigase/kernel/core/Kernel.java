@@ -66,8 +66,8 @@ public class Kernel {
 									  : tmpBC;
 
 		if (log.isLoggable(Level.CONFIG)) {
-			log.log(Level.CONFIG, "[{0}] Initialising bean, bc={1}, createdBeansConfig={2}, deep={3}",
-					new Object[]{tmpBC.getBeanName(), tmpBC, createdBeansConfig, deep});
+			log.log(Level.CONFIG, "[{0}] Initialising bean, config: {1}, createdBeansConfigs={2}, deep={3}",
+					new Object[]{tmpBC.getBeanName(), tmpBC, createdBeansConfig.size(), deep});
 		}
 
 		if (beanConfig.getState() == State.initialized) {
@@ -285,8 +285,8 @@ public class Kernel {
 	public <T> T getInstance(String beanName) {
 		BeanConfig bc = dependencyManager.getBeanConfig(beanName);
 
-		if (log.isLoggable(Level.CONFIG)) {
-			log.log(Level.CONFIG, "[{0}] Creating instance of bean {1}: bc={2}, parent={3}, state={4}",
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "[{0}] Creating instance of bean ''{1}'': config={2}, parent={3}, state={4}",
 					new Object[]{getName(), beanName, bc, parent, (bc != null ? bc.getState() : "n/a")});
 		}
 
@@ -403,10 +403,7 @@ public class Kernel {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("Kernel{");
-		sb.append("dependencyManager=").append(dependencyManager);
-		sb.append(", currentlyUsedConfigBuilder=").append(currentlyUsedConfigBuilder);
-		sb.append(", forceAllowNull=").append(forceAllowNull);
-		sb.append(", name='").append(name).append('\'');
+		sb.append("name=").append(name);
 		sb.append(", parent=").append(parent);
 		sb.append('}');
 		return sb.toString();
@@ -854,8 +851,8 @@ public class Kernel {
 
 	void injectDependency(Dependency dep)
 			throws IllegalAccessException, InstantiationException, InvocationTargetException {
-		if (log.isLoggable(Level.CONFIG)) {
-			log.log(Level.CONFIG, "[{0}] Injecting dependency, dep: {1}", new Object[]{getName(), dep});
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "[{0}] Injecting dependency, dep: {1}", new Object[]{getName(), dep});
 		}
 
 		BeanConfig depbc = dep.getBeanConfig();
@@ -1189,7 +1186,7 @@ public class Kernel {
 		if (!forceNullInjection && !this.forceAllowNull && !dependency.isNullAllowed() &&
 				(data == null || data.length == 0)) {
 			throw new KernelException(
-					"Can't inject <null> to field " + dependency.getField().getDeclaringClass().getName() + "." +
+					"Can''t inject <null> to field " + dependency.getField().getDeclaringClass().getName() + "." +
 							dependency.getField().getName());
 		}
 
@@ -1217,7 +1214,7 @@ public class Kernel {
 			} else {
 				int l = Array.getLength(data);
 				if (l > 1) {
-					throw new KernelException("Can't put many objects to single field " + dependency.getField());
+					throw new KernelException("Can''t put many objects to single field " + dependency.getField());
 				}
 				if (l == 0) {
 					o = null;
@@ -1244,7 +1241,7 @@ public class Kernel {
 		if (log.isLoggable(Level.CONFIG)) {
 			log.log(Level.CONFIG,
 					"[{0}] Injecting dependencies, bean: {1}, dep: {2}, createdBeansConfig: {3}, deep: {4}",
-					new Object[]{getName(), bean, dep, createdBeansConfig, deep});
+					new Object[]{getName(), bean, dep, createdBeansConfig.size(), deep});
 		}
 
 		for (BeanConfig b : dependentBeansConfigs) {
@@ -1548,6 +1545,11 @@ public class Kernel {
 			}
 			return super.equals(obj);
 		}
+
+		@Override
+		public String toString() {
+			return "dependencies=" + dependencies;
+		}
 	}
 
 	/**
@@ -1578,7 +1580,7 @@ public class Kernel {
 		@Override
 		public String toString() {
 			final StringBuilder sb = new StringBuilder("DelayedDependencyInjectionQueue{");
-			sb.append("queue=").append(queue);
+			sb.append(queue.stream().flatMap(queue -> queue.dependencies.stream()).collect(Collectors.toList()));
 			sb.append('}');
 			return sb.toString();
 		}

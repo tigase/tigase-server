@@ -23,6 +23,10 @@ public class RegistrarKernel
 		extends Kernel
 		implements UnregisterAware {
 
+	public RegistrarKernel() {
+		super("RegistrarKernel");
+	}
+
 	@Override
 	public void beforeUnregister() {
 		for (BeanConfig bc : this.getDependencyManager().getBeanConfigs()) {

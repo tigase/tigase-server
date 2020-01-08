@@ -131,7 +131,7 @@ public class SetupHelper {
 	}
 
 	public static List<BeanDefinition> getAvailableBeans(Class processorClazz, Class componentClazz) {
-		Kernel kernel = new Kernel();
+		Kernel kernel = new Kernel("SetupHelper");
 		kernel.registerBean("beanSelector").asInstance(new ServerBeanSelector()).exportable().exec();
 		return AbstractBeanConfigurator.getBeanClassesFromAnnotations(kernel, componentClazz)
 				.entrySet()

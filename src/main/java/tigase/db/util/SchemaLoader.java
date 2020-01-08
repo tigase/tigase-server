@@ -294,7 +294,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	protected AuthRepository initializeAuthRepository(AuthRepository authRepository) {
 		if (authRepository instanceof AbstractAuthRepositoryWithCredentials) {
 			AbstractAuthRepositoryWithCredentials repo = (AbstractAuthRepositoryWithCredentials) authRepository;
-			Kernel kernel = new Kernel();
+			Kernel kernel = new Kernel("SchemaLoader");
 			kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
 			kernel.registerBean(DSLBeanConfigurator.class).exportable().exec();
 			kernel.getInstance(DSLBeanConfigurator.class).setProperties(new HashMap<>());

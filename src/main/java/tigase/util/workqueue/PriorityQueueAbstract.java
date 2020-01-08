@@ -55,7 +55,7 @@ public abstract class PriorityQueueAbstract<E> {
 			try {
 				result = (Class<? extends PriorityQueueAbstract>) Class.forName(queue_class);
 			} catch (Exception e) {
-				log.log(Level.FINEST, "Error crating priority queue", e);
+				log.log(Level.CONFIG, "Error crating priority queue", e);
 				TigaseRuntime.getTigaseRuntime()
 						.shutdownTigase(new String[]{
 								"Error: Could not instantiate or initialize priority queue of class: " + queue_class,
@@ -71,10 +71,10 @@ public abstract class PriorityQueueAbstract<E> {
 		try {
 			PriorityQueueAbstract<E> result = queueClass.newInstance();
 			result.init(maxPriority, maxSize);
-			log.log(Level.CONFIG, "Initialized queue implementation: " + result.getClass().getName());
+			log.log(Level.FINER, "Initialized queue implementation: " + result.getClass().getName());
 			return result;
 		} catch (Exception e) {
-			log.log(Level.FINEST, "Error crating priority queue", e);
+			log.log(Level.CONFIG, "Error crating priority queue", e);
 			TigaseRuntime.getTigaseRuntime()
 					.shutdownTigase(new String[]{
 							"Error: Could not instantiate or initialize priority queue of class: " + queueClass,

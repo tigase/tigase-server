@@ -70,7 +70,7 @@ public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public Collection<Item> allItems() throws TigaseDBException {
-		return getRepository().allItems();
+		return getRepository() != null ? getRepository().allItems() : Collections.emptySet();
 	}
 
 	@Override

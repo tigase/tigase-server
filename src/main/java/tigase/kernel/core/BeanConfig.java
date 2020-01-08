@@ -209,11 +209,15 @@ public class BeanConfig {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("BeanConfig{");
-		sb.append("beanName='").append(beanName).append('\'');
-		sb.append(", clazz=").append(clazz);
-		sb.append(", exportable=").append(exportable);
+		sb.append("beanName=").append(beanName);
+		sb.append(", class=").append(clazz.getName());
+		if (exportable) {
+			sb.append(", exportable=").append(exportable);
+		}
 		sb.append(", pinned=").append(pinned);
-		sb.append(", factory=").append(factory);
+		if (factory != null) {
+			sb.append(", factory=").append(factory);
+		}
 		sb.append(", kernel=").append(kernel.getName());
 		sb.append(", source=").append(source);
 		sb.append(", state=").append(state);

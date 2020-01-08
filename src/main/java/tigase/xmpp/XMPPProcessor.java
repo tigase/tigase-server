@@ -146,7 +146,7 @@ public abstract class XMPPProcessor
 
 	@Override
 	public String toString() {
-		return id() + getComponentInfo();
+		return String.valueOf(getComponentInfo());
 	}
 
 	@Override
