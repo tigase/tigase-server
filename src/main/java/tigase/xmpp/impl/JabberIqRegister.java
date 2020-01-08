@@ -24,8 +24,8 @@ import tigase.form.*;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
-import tigase.server.*;
 import tigase.server.Message;
+import tigase.server.*;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * Created: Thu Feb 16 13:14:06 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 @Bean(name = JabberIqRegister.ID, parent = SessionManager.class, active = true)
 public class JabberIqRegister
 		extends XMPPProcessor
@@ -492,10 +492,7 @@ public class JabberIqRegister
 		} else if (signedFormRequired) {
 			results.offer(packet.okResult(prepareSignedRegistrationForm(session), 0));
 		} else if (emailRequired) {
-			results.offer(packet.okResult(
-					"<instructions>" + "Choose a user name and password for use with this service." +
-							"Please also provide your e-mail address to which we will send confirmation link (MUST BE VALID!)" + "</instructions>" + "<username/>" +
-							"<password/>" + "<email/>", 1));
+			results.offer(packet.okResult(prepareEmailRegistrationForm(), 0));
 		} else {
 			results.offer(packet.okResult(
 					"<instructions>" + "Choose a user name and password for use with this service." +
@@ -726,8 +723,8 @@ public class JabberIqRegister
 			throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
 		query.addChild(new Element("instructions", "Use the enclosed form to register."));
-		Form form = new Form("form", "Contest Registration",
-							 "Please provide the following information to sign up for our special contests!");
+		Form form = new Form("form", "Account Registration",
+							 "Please provide the following information to sign up for an account!");
 		form.addField(Field.fieldHidden("FORM_TYPE", "jabber:iq:register"));
 
 		Field field = Field.fieldTextSingle("username", "", "Username");
@@ -753,8 +750,8 @@ public class JabberIqRegister
 	private Element prepareSignedRegistrationForm(final XMPPResourceConnection session) throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
 		query.addChild(new Element("instructions", "Use the enclosed form to register."));
-		Form form = new Form(SignatureCalculator.SUPPORTED_TYPE, "Contest Registration",
-							 "Please provide the following information to sign up for our special contests!");
+		Form form = new Form(SignatureCalculator.SUPPORTED_TYPE, "Account Registration",
+							 "Please provide the following information to sign up for an account!");
 
 		form.addField(Field.fieldTextSingle("username", "", "Username"));
 		form.addField(Field.fieldTextPrivate("password", "", "Password"));
@@ -764,6 +761,31 @@ public class JabberIqRegister
 		sc.setOauthToken(UUID.nameUUIDFromBytes((session.getConnectionId() + "|" + session.getSessionId()).getBytes())
 								 .toString());
 		sc.addEmptyFields(form);
+
+		query.addChild(form.getElement());
+		return query;
+	}
+
+	private Element prepareEmailRegistrationForm() throws NoConnectionIdException {
+
+		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
+		query.addChild(new Element("instructions",
+								   "Choose a user name and password for use with this service." + "\n\n" +
+										   "Please also provide your e-mail address (must be valid!) to which we will send confirmation link."));
+		Form form = new Form("form", "Account Registration",
+							 "Choose a user name and password for use with this service." + "\n\n" +
+									 "Please also provide your e-mail address (must be valid!) to which we will send confirmation link.");
+		form.addField(Field.fieldHidden("FORM_TYPE", "jabber:iq:register"));
+
+		Field field = Field.fieldTextSingle("username", "", "Username");
+		field.setRequired(true);
+		form.addField(field);
+		field = Field.fieldTextPrivate("password", "", "Password");
+		field.setRequired(true);
+		form.addField(field);
+		field = Field.fieldTextSingle("email", "", "Email (MUST BE VALID!)");
+		field.setRequired(true);
+		form.addField(field);
 
 		query.addChild(form.getElement());
 		return query;
