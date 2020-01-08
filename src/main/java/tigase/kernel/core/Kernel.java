@@ -1186,7 +1186,7 @@ public class Kernel {
 		if (!forceNullInjection && !this.forceAllowNull && !dependency.isNullAllowed() &&
 				(data == null || data.length == 0)) {
 			throw new KernelException(
-					"Can''t inject <null> to field " + dependency.getField().getDeclaringClass().getName() + "." +
+					"Can't inject <null> to field " + dependency.getField().getDeclaringClass().getName() + "." +
 							dependency.getField().getName());
 		}
 
