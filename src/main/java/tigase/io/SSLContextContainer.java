@@ -57,7 +57,8 @@ import java.util.regex.Pattern;
  */
 @Bean(name = "sslContextContainer", parent = ConnectionManager.class, active = true)
 public class SSLContextContainer
-		extends SSLContextContainerAbstract implements Initializable {
+		extends SSLContextContainerAbstract
+		implements Initializable {
 
 	// Workaround for TLS/SSL bug in new JDK used with new version of
 	// nss library see also:
@@ -130,14 +131,14 @@ public class SSLContextContainer
 	@Deprecated
 	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "tls-enabled-protocols")
 	private String[] enabledProtocols;
+	@ConfigField(desc = "Sets ephemeral DH Key Size", alias = "ephemeral-key-size")
+	private int ephemeralDHKeySize = EPHEMERAL_DH_KEYSIZE_VALUE;
 	@ConfigField(desc = "TLS/SSL hardened mode", alias = "hardened-mode")
 	private HARDENED_MODE hardenedMode = HARDENED_MODE.secure;
 	@Inject(bean = "rootSslContextContainer", type = Root.class, nullAllowed = true)
 	private SSLContextContainerIfc parent;
 	@ConfigField(desc = "TLS/SSL", alias = "tls-jdk-nss-bug-workaround-active")
 	private boolean tlsJdkNssBugWorkaround = false;
-	@ConfigField(desc = "Sets ephemeral DH Key Size", alias = "ephemeral-key-size")
-	private int ephemeralDHKeySize = EPHEMERAL_DH_KEYSIZE_VALUE;
 
 	private static String getKey(SSLContextContainer.HARDENED_MODE mode, boolean client) {
 		return mode + (client ? "_client" : "");
@@ -196,14 +197,14 @@ public class SSLContextContainer
 	}
 
 	@Override
-	public IOInterface createIoInterface(String protocol, String local_hostname, String remote_hostname, int port, boolean clientMode,
-										 boolean wantClientAuth, boolean needClientAuth, ByteOrder byteOrder,
-										 TrustManager[] x509TrustManagers, TLSEventHandler eventHandler,
-										 IOInterface socketIO, CertificateContainerIfc certificateContainer)
-			throws IOException {
+	public IOInterface createIoInterface(String protocol, String local_hostname, String remote_hostname, int port,
+										 boolean clientMode, boolean wantClientAuth, boolean needClientAuth,
+										 ByteOrder byteOrder, TrustManager[] x509TrustManagers,
+										 TLSEventHandler eventHandler, IOInterface socketIO,
+										 CertificateContainerIfc certificateContainer) throws IOException {
 		SSLContext sslContext = getSSLContext(protocol, local_hostname, clientMode, x509TrustManagers);
-		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, remote_hostname, port, clientMode, wantClientAuth,
-											   needClientAuth, getEnabledCiphers(local_hostname),
+		TLSWrapper wrapper = new JcaTLSWrapper(sslContext, eventHandler, remote_hostname, port, clientMode,
+											   wantClientAuth, needClientAuth, getEnabledCiphers(local_hostname),
 											   getEnabledProtocols(local_hostname, clientMode));
 		return new TLSIO(socketIO, wrapper, byteOrder);
 	}
@@ -424,8 +425,8 @@ public class SSLContextContainer
 	 */
 	@HandleEvent
 	private void onCertificateChange(CertificateContainer.CertificateChanged event) {
-		String alias = event.getAlias();
-		sslContexts.remove(alias);
+		sslContexts.remove(event.getAlias());
+		removeMatchedDomains(sslContexts, event.getDomains());
 	}
 
 	private boolean validateDomainCertificate(final SSLHolder holder, final String alias) throws Exception {

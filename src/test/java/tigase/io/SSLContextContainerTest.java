@@ -19,10 +19,12 @@ package tigase.io;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class SSLContextContainerTest {
 
@@ -41,6 +43,28 @@ public class SSLContextContainerTest {
 		assertEquals("*.two.com", SSLContextContainer.find(domains, "b.two.com"));
 		assertNull(SSLContextContainer.find(domains, "btwo.com"));
 		assertEquals("*.two.com", SSLContextContainer.find(domains, ".two.com"));
+	}
+
+	@Test
+	public void testRemoveMatched() {
+		final HashMap<String, String> contexts = new HashMap<String, String>();
+		contexts.put("one.com", "one.com");
+		contexts.put("push.one.com", "push.one.com");
+		contexts.put("sub.push.one.com", "sub.push.one.com");
+		contexts.put("*.one.com", "*.one.com");
+		contexts.put("a.two.com", "a.two.com");
+		contexts.put("*.two.com", "*.two.com");
+
+		final Set<String> domains = new HashSet<>(Arrays.asList("one.com", "*.one.com", "two.com"));
+
+		SSLContextContainer.removeMatchedDomains(contexts, domains);
+
+		assertFalse(contexts.containsKey("one.com"));
+		assertFalse(contexts.containsKey("push.one.com"));
+		assertTrue(contexts.containsKey("sub.push.one.com"));
+		assertFalse(contexts.containsKey("*.one.com"));
+		assertTrue(contexts.containsKey("a.two.com"));
+		assertTrue(contexts.containsKey("*.two.com"));
 	}
 
 }

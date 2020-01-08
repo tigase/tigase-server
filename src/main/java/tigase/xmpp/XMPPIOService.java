@@ -28,6 +28,7 @@ import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
@@ -572,7 +573,7 @@ public class XMPPIOService<RefObject>
 
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), responses});
+					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), String.join("", responses)});
 				}
 				if (responses == null) {
 					if (writeInProgress.tryLock()) {

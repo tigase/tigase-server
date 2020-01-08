@@ -31,6 +31,8 @@ import tigase.kernel.core.Kernel;
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -38,6 +40,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,8 +59,8 @@ public class CertificateContainer
 	public final static String SNI_DISABLE_KEY = "sni-disable";
 	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());
 	private static final EventBus eventBus = EventBusFactory.getInstance();
-	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<String, CertificateEntry>();
-	private File[] certsDirs = null;
+	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<>();
+	private File defaultCertDirectory = null;
 	@ConfigField(desc = "Custom certificates", alias = "custom-certificates")
 	private Map<String, String> customCerts = new HashMap<>();
 	@ConfigField(desc = "Alias for default certificate", alias = DEFAULT_DOMAIN_CERT_KEY)
@@ -163,54 +166,13 @@ public class CertificateContainer
 
 			String[] pemDirs = pemD.split(",");
 
-			certsDirs = new File[pemDirs.length];
+			defaultCertDirectory = getDefaultCertDirectory(pemDirs);
 
-			int certsDirsIdx = -1;
+			// we should first load available files and then override it with user configured mapping
+			loadCertificatesFromDirectories(pemDirs);
 
-			Map<String, File> predefined = findPredefinedCertificates(params);
-			log.log(Level.CONFIG, "Loading predefined server certificates");
-			for (final Map.Entry<String, File> entry : predefined.entrySet()) {
-				try {
-					CertificateEntry certEntry = CertificateUtil.loadCertificate(entry.getValue());
-					String alias = entry.getKey();
-					addCertificateEntry(certEntry, alias, false);
-					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
-							new Object[]{alias, entry.getValue()});
-				} catch (Exception ex) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Cannot load certficate from file: " + entry.getValue(), ex);
-					}
-					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue());
-				}
-			}
-
-			for (String pemDir : pemDirs) {
-				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
-				final File directory = new File(pemDir);
-				if (!directory.exists()) {
-					continue;
-				}
-				certsDirs[++certsDirsIdx] = directory;
-
-				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
-					try {
-						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-						String alias = file.getName();
-						if (alias.endsWith(".pem")) {
-							alias = alias.substring(0, alias.length() - 4);
-						}
-
-						addCertificateEntry(certEntry, alias, false);
-						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
-								new Object[]{alias, file});
-					} catch (Exception ex) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
-						}
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file);
-					}
-				}
-			}
+			Map<String, String> predefined = findPredefinedCertificates(params);
+			loadPredefinedCertificates(predefined);
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
@@ -235,57 +197,74 @@ public class CertificateContainer
 		}.start();
 	}
 
+	private void loadCertificatesFromDirectories(String[] pemDirs) {
+		for (String pemDir : pemDirs) {
+			log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
+			final File directory = new File(pemDir);
+			if (!directory.exists()) {
+				continue;
+			}
+
+			final File[] files = directory.listFiles(new PEMFileFilter());
+			// let's add certificates from most top-level to most nested domains (with the assumption that
+			// if there is a file for subdomain then there was an explicit effort to generat cert for that
+			// subdomain.
+			Arrays.sort(files, Comparator.comparingInt(fn -> fn.getName().split("\\.").length));
+			for (File file : files) {
+				loadCertificateFromFile(file);
+			}
+		}
+	}
+
+	private void loadCertificateFromFile(File file) {
+		try {
+			CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+			String alias = file.getName();
+			if (alias.endsWith(".pem")) {
+				alias = alias.substring(0, alias.length() - 4);
+			}
+
+			addCertificateEntry(certEntry, alias, false);
+			Set<String> domains = certEntry.getCertificate().map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
+			log.log(Level.CONFIG, "Loaded server certificate for domain: {0} (altCNames: {1}) from file: {2}",
+					new Object[]{alias, String.join(", ", domains), file});
+		} catch (Exception ex) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
+			}
+			log.log(Level.WARNING, "Cannot load certficate from file: " + file);
+		}
+	}
+
+	private void loadPredefinedCertificates(Map<String, String> predefined) {
+		log.log(Level.CONFIG, "Loading predefined server certificates");
+		for (final Map.Entry<String, String> entry : predefined.entrySet()) {
+			try {
+				File file = new File(entry.getValue());
+				CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+				String alias = entry.getKey();
+				addCertificateEntry(certEntry, alias, false);
+				Set<String> domains = certEntry.getCertificate().map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
+				log.log(Level.CONFIG, "Loaded predefined server certificate for domain: {0} (altCNames: {1}) from file: {2}",
+						new Object[]{alias, String.join(", ", domains), entry.getValue()});
+			} catch (Exception ex) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Cannot load certficate from file: " + entry.getValue(), ex);
+				}
+				log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue());
+			}
+		}
+	}
+
 	@Override
 	public void initialize() {
 		eventBus.registerAll(this);
 		try {
 			String[] pemDirs = sslCertsLocation;
-			certsDirs = new File[pemDirs.length];
-
-			int certsDirsIdx = -1;
-
-			Map<String, String> predefined = customCerts;
-			log.log(Level.CONFIG, "Loading predefined server certificates");
-			for (final Map.Entry<String, String> entry : predefined.entrySet()) {
-				try {
-					File file = new File(entry.getValue());
-					CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-					String alias = entry.getKey();
-					addCertificateEntry(certEntry, alias, false);
-					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
-							new Object[]{alias, entry.getValue()});
-				} catch (Exception ex) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "" + " from file: " + entry.getValue(), ex);
-					}
-					log.log(Level.WARNING, "" + " from file: " + entry.getValue());
-				}
-			}
-
-			for (String pemDir : pemDirs) {
-				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
-				certsDirs[++certsDirsIdx] = new File(pemDir);
-
-				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
-					log.log(Level.FINE, "Loading server certificate from PEM file: {0}", file);
-					try {
-						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-						String alias = file.getName();
-						if (alias.endsWith(".pem")) {
-							alias = alias.substring(0, alias.length() - 4);
-						}
-
-						addCertificateEntry(certEntry, alias, false);
-						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}",
-								new Object[]{alias, file});
-					} catch (Exception ex) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
-						}
-						log.log(Level.WARNING, "Cannot load certficate from file: " + file + ": " + ex);
-					}
-				}
-			}
+			defaultCertDirectory = getDefaultCertDirectory(pemDirs);
+			// we should first load available files and then override it with user configured mapping
+			loadCertificatesFromDirectories(pemDirs);
+			loadPredefinedCertificates(customCerts);
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
@@ -303,6 +282,17 @@ public class CertificateContainer
 
 	}
 
+	private File getDefaultCertDirectory(String[] pemDirs) {
+		final File file = Arrays.stream(pemDirs)
+				.map(Paths::get)
+				.map(Path::toFile)
+				.filter(File::exists)
+				.findFirst()
+				.orElse(Paths.get(pemDirs[0]).toFile());
+		log.log(Level.CONFIG, () -> "Setting default directory for storing certificates to: " + file.getAbsolutePath());
+		return file;
+	}
+
 	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
@@ -313,33 +303,26 @@ public class CertificateContainer
 		kmfs.put(alias, kmf);
 		cens.put(alias, entry);
 
-		Set<String> altDomains = new TreeSet<>();
 
 		Optional<Certificate> certificate = entry.getCertificate();
-		if (certificate.isPresent() && certificate.get() instanceof X509Certificate) {
-			X509Certificate certX509 = (X509Certificate) certificate.get();
-			String certCName = CertificateUtil.getCertCName(certX509);
-			if (certCName != null) {
-				altDomains.add(certCName);
+		if (certificate.isPresent()) {
+			Set<String> domains = getAllCNames(certificate.get());
+			SSLContextContainerAbstract.removeMatchedDomains(kmfs,domains);
+			SSLContextContainerAbstract.removeMatchedDomains(cens,domains);
+			for (String domain : domains) {
+				kmf = getKeyManagerFactory(domain, privateKey, certChain);
+				kmfs.put(domain, kmf);
+				cens.put(domain, entry);
 			}
-			List<String> certAltCName = CertificateUtil.getCertAltCName(certX509);
-			altDomains.addAll(certAltCName);
-		}
-
-		for (String domain : altDomains) {
-			kmf = getKeyManagerFactory(domain, privateKey, certChain);
-			kmfs.putIfAbsent(domain, kmf);
-			cens.putIfAbsent(domain, entry);
 		}
 
 		if (store) {
 			String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
-			CertificateUtil.storeCertificate(new File(certsDirs[0], filename + ".pem").toString(), entry);
+			CertificateUtil.storeCertificate(new File(defaultCertDirectory, filename + ".pem").toString(), entry);
 		}
 
 		return kmf;
 	}
-
 	private KeyManagerFactory getKeyManagerFactory(String domain, PrivateKey privateKey, Certificate[] certChain)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
@@ -381,8 +364,10 @@ public class CertificateContainer
 			if (notifyCluster) {
 				eventBus.fire(new CertificateChange(alias, pemCert, saveToDisk));
 			}
+			Optional<Certificate> certificate = entry.getCertificate();
+			Set<String> domains = certificate.map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
 
-			eventBus.fire(new CertificateChanged(alias));
+			eventBus.fire(new CertificateChanged(alias, domains));
 		} catch (Exception ex) {
 			throw new CertificateParsingException("Problem adding a new certificate.", ex);
 		}
@@ -398,20 +383,16 @@ public class CertificateContainer
 		return addCertificateEntry(entry, alias, true);
 	}
 
-	private Map<String, File> findPredefinedCertificates(Map<String, Object> params) {
-		final Map<String, File> result = new HashMap<String, File>();
+	private Map<String, String> findPredefinedCertificates(Map<String, Object> params) {
+		final Map<String, String> result = new HashMap<>();
 		if (params == null) {
 			return result;
 		}
 
-		Iterator<String> it = params.keySet().iterator();
-		while (it.hasNext()) {
-			String t = it.next();
+		for (String t : params.keySet()) {
 			if (t.startsWith(PER_DOMAIN_CERTIFICATE_KEY)) {
 				String domainName = t.substring(PER_DOMAIN_CERTIFICATE_KEY.length());
-				File f = new File(params.get(t).toString());
-
-				result.put(domainName, f);
+				result.put(domainName, params.get(t).toString());
 			}
 		}
 
@@ -520,25 +501,32 @@ public class CertificateContainer
 		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[]{counter, seconds});
 	}
 
+	private static Set<String> getAllCNames(Certificate certificate) {
+		Set<String> altDomains = new TreeSet<>();
+		if (certificate instanceof X509Certificate) {
+			X509Certificate certX509 = (X509Certificate) certificate;
+			String certCName = CertificateUtil.getCertCName(certX509);
+			if (certCName != null) {
+				altDomains.add(certCName);
+			}
+			List<String> certAltCName = CertificateUtil.getCertAltCName(certX509);
+			altDomains.addAll(certAltCName);
+		}
+		return altDomains;
+	}
+
 	private static class FakeTrustManager
 			implements X509TrustManager {
 
 		private X509Certificate[] issuers = null;
 
-		// ~--- constructors
-		// -------------------------------------------------------
-
-
 		FakeTrustManager() {
 			this(new X509Certificate[0]);
 		}
 
-
 		FakeTrustManager(X509Certificate[] ai) {
 			issuers = ai;
 		}
-
-		// Implementation of javax.net.ssl.X509TrustManager
 
 		@Override
 		public void checkClientTrusted(final X509Certificate[] x509CertificateArray, final String string)
@@ -593,17 +581,25 @@ public class CertificateContainer
 			return saveToDisk;
 		}
 	}
-	
+
 	public class CertificateChanged {
 
 		private String alias;
+		Set<String> domains = new ConcurrentSkipListSet<>();
 
-		public CertificateChanged(String alias) {
+		public CertificateChanged(String alias, Set<String> domains) {
 			this.alias = alias;
+			if (domains != null) {
+				this.domains.addAll(domains);
+			}
 		}
 
 		public String getAlias() {
 			return alias;
+		}
+
+		public Set<String> getDomains() {
+			return domains;
 		}
 	}
 

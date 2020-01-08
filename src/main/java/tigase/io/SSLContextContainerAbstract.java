@@ -28,8 +28,10 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by andrzej on 29.02.2016.
@@ -71,6 +73,18 @@ public abstract class SSLContextContainerAbstract
 		}
 
 		return null;
+	}
+
+	static void removeMatchedDomains(Map<String, ?> collection, Set<String> domains) {
+		collection.keySet().removeAll(domains);
+		final Set<String> wildcardDomainsWithoutAsterisk = domains.stream()
+				.filter(domain -> domain.startsWith("*."))
+				.map(domain -> domain.substring(2))
+				.collect(Collectors.toSet());
+		collection.keySet().removeIf(alias -> {
+			String parentDomain = alias.substring(alias.indexOf(".") + 1);
+			return wildcardDomainsWithoutAsterisk.contains(parentDomain);
+		});
 	}
 
 	public SSLContextContainerAbstract(CertificateContainerIfc certContainer) {
