@@ -136,7 +136,7 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 
 		try {
 			Key key = new SecretKeySpec(Base64.decode(keyStr), "AES");
-			byte[] iv = new byte[16];
+			byte[] iv = new byte[12];
 			random.nextBytes(iv);
 			GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, iv);
 
