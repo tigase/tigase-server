@@ -30,21 +30,30 @@ import tigase.io.SSLContextContainer;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
-import tigase.server.xmppserver.proc.Dialback;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
 import tigase.server.xmppserver.proc.StartTLS;
 import tigase.util.dns.DNSEntry;
 import tigase.util.dns.DNSResolverFactory;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItemImpl;
+import tigase.vhosts.VHostManagerIfc;
+import tigase.xml.Element;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static tigase.net.IOService.CERT_CHECK_RESULT;
 
@@ -90,8 +99,9 @@ public class S2SConnectionManagerTest
 		kernel.registerBean(S2SRandomSelector.class).exportable().exec();
 		kernel.registerBean(CertificateContainer.class).exportable().exec();
 		kernel.registerBean(StartTLS.class).exportable().exec();
-		kernel.registerBean(Dialback.class).exportable().setActive(false).exec();
+//		kernel.registerBean(Dialback.class).exportable().setActive(false).exec();
 //		kernel.registerBean(SaslExternal.class).setActive(false).exec();
+		kernel.registerBean("vHostManager").asClass(DummyVHostManager.class).exportable().setActive(true).exec();
 		kernel.registerBean(SSLContextContainer.class).exportable().setActive(true).exec();
 		kernel.registerBean("service").asClass(S2SConnectionHandlerImpl.class).setActive(true).exec();
 		return config;
@@ -132,7 +142,11 @@ public class S2SConnectionManagerTest
 //			remoteHostname = "jwchat.org";
 //			remoteHostname = "vrcshop.com";
 //			remoteHostname = "axeos.nl";
+//			remoteHostname = "jit.si";
+//			remoteHostname = "jabber.org";
 		cid = new CID(localHostname, remoteHostname);
+		final DummyVHostManager instance = (DummyVHostManager)kernel.getInstance(VHostManagerIfc.class);
+		instance.addVhost(localHostname);
 	}
 
 	private static void setupSslContextContainer(final SSLContextContainer context,
@@ -210,7 +224,25 @@ public class S2SConnectionManagerTest
 		log.log(Level.INFO, "handler.getService().getSessionData().get(CERT_CHECK_RESULT): " + trusted);
 		Assert.assertTrue(connected);
 		Assert.assertTrue(CertCheckResult.trusted.equals(trusted));
+
+		// it will fail when testing locally as it's not possible to perform dialback that way without mapping domain
+		// domain to local machine
 		Assert.assertTrue(authenticated);
+
+		try {
+			final Packet packet = Iq.packetInstance("iq", cid.getLocalHost(), cid.getRemoteHost(), StanzaType.get);
+			final Element iqElement = packet.getElement();
+			iqElement.setAttribute("id", UUID.randomUUID().toString());
+			final Element query = new Element("query");
+			query.setXMLNS("jabber:iq:version");
+			iqElement.addChild(query);
+
+			handler.addPacketNB(packet);
+		} catch (Exception e) {
+
+		}
+
+		TimeUnit.SECONDS.sleep(15);
 
 		handler.serviceStopped(s2SIOService);
 	}
@@ -298,6 +330,89 @@ public class S2SConnectionManagerTest
 			} catch (UnknownHostException ex) {
 				log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
 			}
+		}
+	}
+
+	/**
+	 * Dummy {@code VHostManagerIfc} implementation, mostly to avoid exceptions in Dialback processor
+	 */
+	public static class DummyVHostManager
+			implements VHostManagerIfc {
+
+		Map<String, VHostItem> items = new ConcurrentHashMap<>();
+
+		public DummyVHostManager() {
+		}
+
+		public void addVhost(String vhost) {
+
+			try {
+				VHostItem item = new VHostItemImpl(vhost);
+				items.put(vhost, item);
+			} catch (TigaseStringprepException e) {
+				log.log(Level.WARNING, "Adding VHost failed", e);
+			}
+		}
+
+		@Override
+		public boolean isLocalDomain(String domain) {
+			return false;
+		}
+
+		@Override
+		public boolean isLocalDomainOrComponent(String domain) {
+			return false;
+		}
+
+		@Override
+		public boolean isAnonymousEnabled(String domain) {
+			return false;
+		}
+
+		@Override
+		public ServerComponent[] getComponentsForLocalDomain(String domain) {
+			return new ServerComponent[0];
+		}
+
+		@Override
+		public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
+			return new ServerComponent[0];
+		}
+
+		@Override
+		public VHostItem getVHostItem(String domain) {
+			return items.get(domain);
+		}
+
+		@Override
+		public VHostItem getVHostItemDomainOrComponent(String domain) {
+			return items.get(domain);
+		}
+
+		@Override
+		public void addComponentDomain(String domain) {
+
+		}
+
+		@Override
+		public void removeComponentDomain(String domain) {
+
+		}
+
+		@Override
+		public BareJID getDefVHostItem() {
+			return items.values()
+					.stream()
+					.map(VHostItem::getVhost)
+					.map(JID::toString)
+					.map(BareJID::bareJIDInstanceNS)
+					.findFirst()
+					.orElse(BareJID.bareJIDInstanceNS("not@available"));
+		}
+
+		@Override
+		public List<JID> getAllVHosts() {
+			return items.values().stream().map(VHostItem::getVhost).collect(Collectors.toList());
 		}
 	}
 }

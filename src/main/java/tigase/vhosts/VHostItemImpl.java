@@ -237,6 +237,7 @@ public class VHostItemImpl
 	 * @param elem is an <code>Element</code> object with virtual domain settings.
 	 */
 	public VHostItemImpl(Element elem) {
+		this();
 		initFromElement(elem);
 	}
 
@@ -247,6 +248,7 @@ public class VHostItemImpl
 	 * @param vhost is a <code>String</code> value with a domain name.
 	 */
 	public VHostItemImpl(JID vhost) {
+		this();
 		setVHost(vhost);
 	}
 
@@ -259,6 +261,7 @@ public class VHostItemImpl
 	 * @throws TigaseStringprepException if the provided string causes stringprep processing errors.
 	 */
 	public VHostItemImpl(String vhost) throws TigaseStringprepException {
+		this();
 		setVHost(vhost);
 	}
 

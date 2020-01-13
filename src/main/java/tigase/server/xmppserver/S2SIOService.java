@@ -100,6 +100,6 @@ public class S2SIOService
 	public String toString() {
 		CID cid = (CID) getSessionData().get("cid");
 
-		return "CID: " + cid + ", " + super.toString();
+		return "CID: " + cid + ", " + super.toString() + ", authenticated: " + isAuthenticated();
 	}
 }

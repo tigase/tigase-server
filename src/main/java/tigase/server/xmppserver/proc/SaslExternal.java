@@ -61,7 +61,18 @@ public class SaslExternal
 
 		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
 
-		if (isTlsEstablished(certCheckResult)) {
+		final CID cid = (CID) serv.getSessionData().get("cid");
+
+		// "Server2 advertises SASL mechanisms. If the 'from' attribute of the stream header sent by Server1 can be
+		// matched against one of the identifiers provided in the certificate following the matching rules from
+		// RFC 6125, Server2 SHOULD advertise the SASL EXTERNAL mechanism. If no match is found, Server2 MAY either
+		// close Server1's TCP connection or continue with a Server Dialback (XEP-0220) [8] negotiation."
+		// If there was no `from` in the incomming stream then we should not advertise SASL-EXTERNAL and let
+		// other party possibly continue with Diallback
+		final boolean canAddSaslToFeatures =
+				isTlsEstablished(certCheckResult) && !serv.isAuthenticated() && cid != null;
+
+		if (canAddSaslToFeatures) {
 			results.add(mechanisms);
 		}
 	}
@@ -137,7 +148,7 @@ public class SaslExternal
 				return true;
 			}
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Error.", e);
+			log.log(Level.WARNING, e, () -> String.format("{0}, Error while processing packet: {1}", serv, p));
 			serv.forceStop();
 			return true;
 		}
@@ -177,13 +188,11 @@ public class SaslExternal
 
 	private void processAuth(Packet p, S2SIOService serv, Queue<Packet> results)
 			throws TigaseStringprepException, LocalhostException, NotLocalhostException {
-		final CID cid = (CID) serv.getSessionData().get("cid");
-
 		final X509Certificate peerCertificate = (X509Certificate) serv.getPeerCertificate();
 
 		if (peerCertificate == null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, No peer certificate!", new Object[]{serv});
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "{0}, No peer certificate!", new Object[]{serv});
 			}
 			results.add(Packet.packetInstance(failureElement("No peer certificate")));
 			serv.forceStop();
@@ -192,11 +201,29 @@ public class SaslExternal
 
 		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
 
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, Trust: {1} for peer certificate: {2}, AltNames: {3}",
+					new Object[]{serv, certCheckResult, peerCertificate.getSubjectDN(),
+								 CertificateUtil.getCertAltCName(peerCertificate)});
+		}
+
 		if (certCheckResult != CertCheckResult.trusted && certCheckResult != CertCheckResult.self_signed) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Certificate is not trusted", new Object[]{serv});
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "{0}, Certificate is not trusted", new Object[]{serv});
 			}
 			results.add(Packet.packetInstance(failureElement("Certificate is not trusted")));
+			serv.forceStop();
+			return;
+		}
+
+		final CID cid = (CID) serv.getSessionData().get("cid");
+		if (cid == null) {
+			// can't process such request
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "{0}, CID is unknown, can''t proceed",
+						new Object[]{serv});
+			}
+			results.add(Packet.packetInstance(failureElement("Unknown origin hostname (lack of `from` element)")));
 			serv.forceStop();
 			return;
 		}
@@ -209,8 +236,8 @@ public class SaslExternal
 		}
 
 		if (!nameValid) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Certificate name doesn't match to '{1}'",
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "{0}, Certificate name doesn't match to '{1}'",
 						new Object[]{serv, cid.getRemoteHost()});
 			}
 			results.add(Packet.packetInstance(failureElement("Certificate name doesn't match to domain name")));

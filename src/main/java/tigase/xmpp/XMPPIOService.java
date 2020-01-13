@@ -573,7 +573,7 @@ public class XMPPIOService<RefObject>
 
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), responses});
+					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), (responses != null ? String.join("", responses) : "null")});
 				}
 				if (responses == null) {
 					if (writeInProgress.tryLock()) {
