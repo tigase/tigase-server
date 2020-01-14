@@ -28,7 +28,6 @@ import tigase.xml.Element;
 
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -60,7 +59,7 @@ public class SaslExternal
 	}
 
 	private boolean isSkippedDomain(String domain ) {
-		if (domain != null) {
+		if (domain != null && skipForDomains != null && skipForDomains.length > 0) {
 			for (String skipForDomain : skipForDomains) {
 				if (domain.contains(skipForDomain)) {
 					return true;
@@ -85,8 +84,15 @@ public class SaslExternal
 		// close Server1's TCP connection or continue with a Server Dialback (XEP-0220) [8] negotiation."
 		// If there was no `from` in the incomming stream then we should not advertise SASL-EXTERNAL and let
 		// other party possibly continue with Diallback
+		final boolean skipDomain = isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost());
+		final boolean tlsEstablished = isTlsEstablished(certCheckResult);
 		final boolean canAddSaslToFeatures =
-				isTlsEstablished(certCheckResult) && !serv.isAuthenticated() && cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()));
+				tlsEstablished && !serv.isAuthenticated() && cid != null && !skipDomain;
+
+		if (!canAddSaslToFeatures & log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, Not adding SASL-EXTERNAL feature, isTlsEstablished: {1}, skipDomain: {2}",
+					new Object[]{serv, tlsEstablished, skipDomain});
+		}
 
 		if (canAddSaslToFeatures) {
 			results.add(mechanisms);

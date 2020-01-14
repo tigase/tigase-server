@@ -144,6 +144,7 @@ public class S2SConnectionManagerTest
 //			remoteHostname = "axeos.nl";
 //			remoteHostname = "jit.si";
 //			remoteHostname = "jabber.org";
+//			remoteHostname = "cluxia.eu";
 		cid = new CID(localHostname, remoteHostname);
 		final DummyVHostManager instance = (DummyVHostManager)kernel.getInstance(VHostManagerIfc.class);
 		instance.addVhost(localHostname);
