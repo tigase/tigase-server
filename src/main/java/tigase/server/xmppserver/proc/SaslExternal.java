@@ -20,6 +20,7 @@ package tigase.server.xmppserver.proc;
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -27,6 +28,7 @@ import tigase.xml.Element;
 
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -43,6 +45,9 @@ public class SaslExternal
 	private static final Logger log = Logger.getLogger(SaslExternal.class.getName());
 	private static Element successElement = new Element("success", new String[]{"xmlns"}, new String[]{XMLNS_SASL});
 
+	@ConfigField(desc = "Skip SASL-EXTERNAL for defined domains", alias = "skip-for-domains")
+	private String[] skipForDomains;
+
 	private static boolean isAnyMechanismsPresent(Packet p) {
 		final List<Element> childrenStaticStr = p.getElement().getChildrenStaticStr(FEATURES_SASL_PATH);
 		return p.isXMLNSStaticStr(FEATURES_SASL_PATH, XMLNS_SASL) && childrenStaticStr != null &&
@@ -52,6 +57,17 @@ public class SaslExternal
 	private static boolean isTlsEstablished(final CertCheckResult certCheckResult) {
 		return (certCheckResult == CertCheckResult.trusted || certCheckResult == CertCheckResult.untrusted ||
 				certCheckResult == CertCheckResult.self_signed);
+	}
+
+	private boolean isSkippedDomain(String domain ) {
+		if (domain != null) {
+			for (String skipForDomain : skipForDomains) {
+				if (domain.contains(skipForDomain)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -70,7 +86,7 @@ public class SaslExternal
 		// If there was no `from` in the incomming stream then we should not advertise SASL-EXTERNAL and let
 		// other party possibly continue with Diallback
 		final boolean canAddSaslToFeatures =
-				isTlsEstablished(certCheckResult) && !serv.isAuthenticated() && cid != null;
+				isTlsEstablished(certCheckResult) && !serv.isAuthenticated() && cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()));
 
 		if (canAddSaslToFeatures) {
 			results.add(mechanisms);
@@ -86,6 +102,13 @@ public class SaslExternal
 		try {
 			final CID cid = (CID) serv.getSessionData().get("cid");
 			final boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
+
+			if (cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()))) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Skipping SASL-EXTERNAL for domain: {1} because it was ignored", new Object[]{serv, cid});
+				}
+				return true;
+			}
 
 			if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
 					!p.getElement().getChildren().isEmpty()) {
