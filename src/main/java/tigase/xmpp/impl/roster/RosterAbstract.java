@@ -483,6 +483,10 @@ public abstract class RosterAbstract {
 	}
 
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
+								  SubscriptionType subscription, String mixParticipantId, String otherData)
+			throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
+
+	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
 								  SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
 
@@ -654,6 +658,13 @@ public abstract class RosterAbstract {
 			}    // end of for ()
 		}      // end of if-else
 
+		if (session.getSessionData("urn:xmpp:mix:roster:0") == Boolean.TRUE) {
+			String participantId = getMixParticipantId(session, buddy);
+			if (participantId != null) {
+				item.addChild(new Element("channel", new String[] { "xmlns", "participant-id" }, new String[] { "urn:xmpp:mix:roster:0", participantId }));
+			}
+		}
+
 		return item;
 	}
 
@@ -678,6 +689,9 @@ public abstract class RosterAbstract {
 		return result;
 	}
 
+	public abstract String getMixParticipantId(final XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException;
+	
 	public PresenceType getPresenceType(final XMPPResourceConnection session, final Packet packet)
 			throws NotAuthorizedException {
 		BareJID to = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;

@@ -396,7 +396,8 @@ public class JabberIqRoster
 		}
 
 		// Check roster version hash.
-		String incomingHash = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, RosterAbstract.VER_ATT);
+		Element queryEl = packet.getElement().getChildStaticStr(Iq.QUERY_NAME, RosterAbstract.XMLNS);
+		String incomingHash = queryEl.getAttributeStaticStr(RosterAbstract.VER_ATT);
 		String storedHash = "";
 
 		// If client provided hash and the server calculated hash are the same
@@ -414,6 +415,9 @@ public class JabberIqRoster
 				return;
 			}
 		}
+
+		boolean annotateMix = queryEl.getChildStaticStr("annotate", "urn:xmpp:mix:roster:0") != null;
+		session.putSessionData("urn:xmpp:mix:roster:0", annotateMix);
 
 		// Retrieve standard roster items.
 		List<Element> ritems = roster_util.getRosterItems(session);

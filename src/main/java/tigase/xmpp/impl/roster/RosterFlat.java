@@ -111,6 +111,12 @@ public class RosterFlat
 	@Override
 	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups, SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
+		this.addBuddy(session, buddy, name, groups, subscription, null, otherData);
+	}
+
+	@Override
+	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups, SubscriptionType subscription, String mixParticipantId, String otherData)
+			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
 		RosterElement relem = getRosterElement(session, buddy);
@@ -138,6 +144,7 @@ public class RosterFlat
 			if (subscription != null) {
 				relem.setSubscription(subscription);
 			}
+			relem.setMixParticipantId(mixParticipantId);
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
 				// notify that roster element was changed!
@@ -169,6 +176,7 @@ public class RosterFlat
 			relem.setGroups(groups);
 
 			// }
+			relem.setMixParticipantId(mixParticipantId);
 			relem.setPersistent(true);
 			if (subscription != null) {
 				relem.setSubscription(subscription);
@@ -284,6 +292,18 @@ public class RosterFlat
 		}
 
 		// return SubscriptionType.both;
+	}
+
+	@Override
+	public String getMixParticipantId(XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+
+		if (relem == null) {
+			return null;
+		} else {
+			return relem.getMixParticipantId();
+		}
 	}
 
 	public RosterElement getRosterElementInstance(JID buddy, String name, String[] groups,

@@ -53,11 +53,13 @@ public class RosterElement {
 	private static final String STRINGPREP_ATT = "preped";
 	private static final String SUBS_ATT = "subs";
 	private static final String WEIGHT_ATT = "weight";
+	private static final String MIX_PARTICIPANT_ID_ATT = "mix-id";
 
 	private double activity = INITIAL_ACTIVITY_VAL;
 	private String[] groups = null;
 	private JID jid = null;
 	private long lastSeen = INITIAL_LAST_SEEN_VAL;
+	private String mixParticipantId = null;
 	// private Element item = null;
 	// private boolean online = false;
 	private boolean modified = false;
@@ -86,6 +88,8 @@ public class RosterElement {
 			if ((grps != null) && !grps.trim().isEmpty()) {
 				setGroups(grps.split(","));
 			}
+
+			mixParticipantId = roster_el.getAttributeStaticStr(MIX_PARTICIPANT_ID_ATT);
 
 			String other_data = roster_el.getAttributeStaticStr(OTHER_ATT);
 
@@ -221,6 +225,14 @@ public class RosterElement {
 		otherData = other_data;
 	}
 
+	public String getMixParticipantId() {
+		return mixParticipantId;
+	}
+
+	public void setMixParticipantId(String value) {
+		this.mixParticipantId = value;
+	}
+
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME, new String[]{JID_ATT, SUBS_ATT, STRINGPREP_ATT},
 								   new String[]{jid.toString(), subscription.toString(), "" + stringpreped});
@@ -237,6 +249,9 @@ public class RosterElement {
 			}
 			grps = grps.substring(0, grps.length() - 1);
 			elem.setAttribute(GRP_ATT, grps);
+		}
+		if (mixParticipantId != null) {
+			elem.setAttribute(MIX_PARTICIPANT_ID_ATT, mixParticipantId);
 		}
 		if (otherData != null) {
 			elem.setAttribute(OTHER_ATT, otherData);
