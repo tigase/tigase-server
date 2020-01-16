@@ -123,6 +123,6 @@ to compile the project and run unit tests.
 # License
 
 <img alt="Tigase Tigase Logo" src="https://github.com/tigaseinc/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true" width="25"/> This is official <a href="https://tigase.net/">Tigase</a> Repository.
-Copyright (c) 2013-2019 Tigase, Inc.
+Copyright (c) 2004 Tigase, Inc.
 
 Licensed under AGPL License Version 3. Other licensing options available upon request.
