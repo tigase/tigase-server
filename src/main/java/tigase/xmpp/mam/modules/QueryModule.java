@@ -64,7 +64,7 @@ public class QueryModule
 
 	@Override
 	public boolean canHandle(Packet packet) {
-		return packet.getElement().getChildStaticStr("query", "urn:xmpp:mam:1") != null &&
+		return packet.getElement().findChild(child -> child.getName() == "query" && queryParser.getXMLNSs().contains(child.getXMLNS())) != null &&
 				packet.getType() == StanzaType.set;
 	}
 
@@ -79,7 +79,7 @@ public class QueryModule
 		}
 
 		Element fin = new Element("fin");
-		fin.setXMLNS("urn:xmpp:mam:1");
+		fin.setXMLNS(query.getXMLNS());
 		fin.addChild(query.getRsm().toElement());
 		if (query.getRsm().getIndex() + query.getRsm().getMax() >= query.getRsm().getCount()) {
 			fin.setAttribute("complete", "true");

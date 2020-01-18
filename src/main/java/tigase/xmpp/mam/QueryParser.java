@@ -21,6 +21,9 @@ import tigase.component.exceptions.ComponentException;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Interface of which class instance is used by QueryModule to process incoming stanzas into query.
  * <br>
@@ -28,7 +31,15 @@ import tigase.xml.Element;
  */
 public interface QueryParser<Q extends Query> {
 
+	default Set<String> getXMLNSs() {
+		return Collections.singleton(MAMQueryParser.MAM_XMLNS);
+	}
+
 	Q parseQuery(Q query, Packet packet) throws ComponentException;
+
+	default Element prepareForm(Element elem, String xmlns) {
+		return prepareForm(elem);
+	}
 
 	Element prepareForm(Element elem);
 }

@@ -57,16 +57,17 @@ public class GetFormModule
 
 	@Override
 	public boolean canHandle(Packet packet) {
-		return packet.getElement().getChildStaticStr("query", "urn:xmpp:mam:1") != null &&
+		return packet.getElement().findChild(child -> child.getName() == "query" && queryParser.getXMLNSs().contains(child.getXMLNS())) != null &&
 				packet.getType() == StanzaType.get;
 	}
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
+		Element reqQuery = packet.getElement().findChild(child -> child.getName() == "query" && queryParser.getXMLNSs().contains(child.getXMLNS()));
 		Element query = new Element("query");
-		query.setXMLNS("urn:xmpp:mam:1");
+		query.setXMLNS(reqQuery.getXMLNS());
 
-		queryParser.prepareForm(query);
+		queryParser.prepareForm(query, reqQuery.getXMLNS());
 
 		packetWriter.write(packet.okResult(query, 0));
 	}

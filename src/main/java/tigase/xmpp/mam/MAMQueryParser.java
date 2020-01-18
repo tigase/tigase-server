@@ -29,6 +29,8 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
 
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Implementation of parser for XEP-0313: Message Archive Management
@@ -43,9 +45,17 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 
 	private final TimestampHelper timestampHelper = new TimestampHelper();
 
+	private static final Set<String> XMLNNS = Collections.singleton(MAM_XMLNS);
+
+	@Override
+	public Set<String> getXMLNSs() {
+		return XMLNNS;
+	}
+
 	@Override
 	public Query parseQuery(Query query, Packet packet) throws ComponentException {
-		Element queryEl = packet.getElement().getChildStaticStr("query", MAM_XMLNS);
+		Element queryEl = packet.getElement().getChildStaticStr("query");
+		query.setXMLNS(queryEl.getXMLNS());
 
 		query.setQuestionerJID(packet.getStanzaFrom());
 		query.setComponentJID(packet.getStanzaTo());
@@ -56,7 +66,7 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 			return query;
 		}
 
-		if (!MAM_XMLNS.equals(DataForm.getFieldValue(queryEl, "FORM_TYPE"))) {
+		if (!getXMLNSs().contains(DataForm.getFieldValue(queryEl, "FORM_TYPE"))) {
 			throw new ComponentException(Authorization.BAD_REQUEST, "Invalid form type");
 		}
 
@@ -90,8 +100,13 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 
 	@Override
 	public Element prepareForm(Element elem) {
+		return prepareForm(elem, MAM_XMLNS);
+	}
+
+	@Override
+	public Element prepareForm(Element elem, String xmlns) {
 		Element x = DataForm.addDataForm(elem, Command.DataType.form);
-		DataForm.addHiddenField(elem, "FORM_TYPE", MAM_XMLNS);
+		DataForm.addHiddenField(elem, "FORM_TYPE", xmlns);
 
 		addField(x, "with", "jid-single", "With");
 		addField(x, "start", "jid-single", "Start");

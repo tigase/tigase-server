@@ -31,6 +31,7 @@ import java.util.Date;
 public class QueryImpl
 		implements Query {
 
+	private String xmlns = "urn:xmpp:mam:1";
 	private final RSM rsm = new RSM();
 	private JID componentJID;
 	private Date end;
@@ -41,6 +42,19 @@ public class QueryImpl
 
 	public QueryImpl() {
 
+	}
+
+	public String getXMLNS() {
+		return xmlns;
+	}
+
+	@Override
+	public void setXMLNS(String xmlns) {
+		this.xmlns = xmlns;
+	}
+
+	public void setXmlns(String xmlns) {
+		this.xmlns = xmlns;
 	}
 
 	public JID getQuestionerJID() {

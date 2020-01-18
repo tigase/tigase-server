@@ -46,7 +46,7 @@ public class MAMItemHandler
 	public void itemFound(Query query, MAMRepository.Item item) {
 		Element m = new Element("message");
 		Element result = new Element("result", new String[]{"xmlns", "id"},
-									 new String[]{"urn:xmpp:mam:1", item.getId()});
+									 new String[]{query.getXMLNS(), item.getId()});
 		if (query.getId() != null) {
 			result.setAttribute("queryid", query.getId());
 		}
@@ -60,7 +60,9 @@ public class MAMItemHandler
 									new String[]{"urn:xmpp:delay", timestampStr});
 		forwarded.addChild(delay);
 
-		forwarded.addChild(item.getMessage());
+		if (item.getMessage() != null) {
+			forwarded.addChild(item.getMessage());
+		}
 
 		Message packet = new Message(m, query.getComponentJID(), query.getQuestionerJID());
 		packet.setXMLNS(Packet.CLIENT_XMLNS);

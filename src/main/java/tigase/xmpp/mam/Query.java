@@ -30,6 +30,14 @@ import java.util.Date;
  */
 public interface Query {
 
+	default String getXMLNS() {
+		return MAMQueryParser.MAM_XMLNS;
+	}
+
+	default void setXMLNS(String xmlns) {
+		// nothing to do..
+	}
+
 	JID getQuestionerJID();
 
 	void setQuestionerJID(JID questionerJID);
