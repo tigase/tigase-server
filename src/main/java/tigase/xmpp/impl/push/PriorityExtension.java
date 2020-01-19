@@ -52,7 +52,7 @@ public class PriorityExtension implements PushNotificationsExtension {
 	@Override
 	public void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount,
 										   Element notification) {
-		if (packet != null && Boolean.parseBoolean(pushServiceSettings.getAttributeStaticStr("priority"))) {
+		if (packet != null && packet.getElemChild("body") != null && Boolean.parseBoolean(pushServiceSettings.getAttributeStaticStr("priority"))) {
 			Element element = new Element("priority", "high");
 			element.setXMLNS(XMLNS);
 			notification.addChild(element);

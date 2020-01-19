@@ -215,7 +215,7 @@ public class PushNotifications
 
 	// move to filter
 	protected boolean shouldSendNotification(Packet packet, BareJID userJid, XMPPResourceConnection session) {
-		if (session == null && packet.getElemName() == Message.ELEM_NAME) {
+		if (session == null && packet.getElemName() == Message.ELEM_NAME && packet.getElemChild("body") != null) {
 			return true;
 		}
 
