@@ -85,7 +85,9 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	public static List<TypeInfo> getAllSupportedTypes() {
-		return getAllSupportedTypesStream().collect(Collectors.toList());
+		final List<TypeInfo> supportedTypes = getAllSupportedTypesStream().collect(Collectors.toList());
+		log.log(Level.WARNING, "All supported types: " + supportedTypes);
+		return supportedTypes;
 	}
 
 	private static Stream<Class<?>> getSchemaLoaderClasses() {
@@ -385,22 +387,37 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		void setForceReloadSchema(boolean forceReloadSchema);
 	}
 
-	public static class TypeInfo {
+	public static class TypeInfo implements Comparable<TypeInfo> {
 
 		private final String name;
 		private final String label;
 		private final String driverClassName;
 		private final String warning;
+		private final int ordinal;
+		final Comparator<TypeInfo> typeInfoComparator = Comparator.comparing(TypeInfo::getOrdinal)
+				.thenComparing(TypeInfo::getName);
 
 		public TypeInfo(String name, String label, String driverClassName) {
 			this(name, label, driverClassName, null);
 		}
 
+		public TypeInfo(int ordinal, String name, String label, String driverClassName) {
+			this(ordinal, name, label, driverClassName, null);
+		}
+
 		public TypeInfo(String name, String label, String driverClassName, String warning) {
+			this(Integer.MAX_VALUE, name, label, driverClassName, warning);
+		}
+		public TypeInfo(int ordinal, String name, String label, String driverClassName, String warning) {
+			this.ordinal = ordinal;
 			this.name = name;
 			this.label = label;
 			this.driverClassName = driverClassName;
 			this.warning = warning;
+		}
+
+		public int getOrdinal() {
+			return ordinal;
 		}
 
 		public String getName() {
@@ -424,9 +441,18 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 			return true;
 		}
 
+		@Override
+		public int compareTo(TypeInfo o) {
+			return typeInfoComparator.compare(this, o);
+		}
+
 		protected String getDriverClassName() {
 			return driverClassName;
 		}
-		
+
+		@Override
+		public String toString() {
+			return name + " (" + ordinal + ")";
+		}
 	}
 }
