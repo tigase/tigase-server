@@ -84,7 +84,7 @@ public class ComponentInfo {
 			try {
 				return Class.forName(clz);
 			} catch (Exception e) {
-				log.log(Level.INFO, "Problem obtaining version for class: " + clz);
+				log.log(Level.INFO, "Problem obtaining version for class: " + clz + ", exception: " + e.getMessage());
 			}
 			return null;
 		}).filter(Objects::nonNull).map(clz -> {
