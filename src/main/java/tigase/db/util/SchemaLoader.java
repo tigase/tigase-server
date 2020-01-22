@@ -80,8 +80,11 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	}
 
 	public static Stream<TypeInfo> getAllSupportedTypesStream() {
-		return getSchemaLoaderInstances().map(SchemaLoader::getSupportedTypes)
-				.flatMap(List::stream);
+		return getSchemaLoaderInstances()
+				.map(SchemaLoader::getSupportedTypes)
+				.flatMap(List::stream)
+				.map(TypeInfo.class::cast)
+				.sorted();
 	}
 
 	public static List<TypeInfo> getAllSupportedTypes() {
