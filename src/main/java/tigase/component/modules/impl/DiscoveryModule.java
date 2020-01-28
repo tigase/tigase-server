@@ -28,12 +28,16 @@ import tigase.criteria.Or;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.BasicComponent;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
+import tigase.xmpp.rsm.RSM;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +75,10 @@ public class DiscoveryModule
 
 	public void setAdHocCommandModule(AdHocCommandModule adHocCommandModule) {
 		this.adHocCommandModule = adHocCommandModule;
+	}
+
+	public Set<String> getAvailableFeatures(BareJID serviceJID, String node, BareJID senderJID) {
+		return getAvailableFeatures();
 	}
 
 	public Set<String> getAvailableFeatures() {
@@ -164,7 +172,7 @@ public class DiscoveryModule
 		resultQuery.addChild(new Element("identity", new String[]{"category", "type", "name"},
 										 new String[]{component.getDiscoCategory(), component.getDiscoCategoryType(),
 													  component.getDiscoDescription()}));
-		for (String f : getAvailableFeatures()) {
+		for (String f : getAvailableFeatures(jid.getBareJID(), node, senderJID.getBareJID())) {
 			resultQuery.addChild(new Element("feature", new String[]{"var"}, new String[]{f}));
 		}
 		Element form = component.getDiscoExtensionsForm(jid.getDomain());
@@ -174,9 +182,32 @@ public class DiscoveryModule
 		return resultIq;
 	}
 
+	protected List<Element> prepareDiscoItems(JID jid, String node, JID senderJID, RSM rsm) throws ComponentException, RepositoryException {
+		return Collections.emptyList();
+	}
+
 	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID)
 			throws ComponentException, RepositoryException {
 		Element resultQuery = new Element("query", new String[]{Packet.XMLNS_ATT}, new String[]{DISCO_ITEMS_XMLNS});
+		
+		Element rsmEl = packet.getElement().getChildStaticStr(Iq.QUERY_NAME, "http://jabber.org/protocol/disco#items").getChildStaticStr("set", RSM.XMLNS);
+		RSM rsm = null;
+		if (rsmEl != null) {
+			rsm = RSM.parseRootElement(packet.getElement().getChild("query"));
+		}
+
+		List<Element> results = prepareDiscoItems(jid, node, senderJID, rsm);
+
+		if (node != null) {
+			resultQuery.setAttribute("node", node);
+		}
+
+		resultQuery.addChildren(results);
+
+		if (rsm != null && !results.isEmpty()) {
+			resultQuery.addChild(rsm.toElement());
+		}
+
 		write(packet.okResult(resultQuery, 0));
 	}
 
