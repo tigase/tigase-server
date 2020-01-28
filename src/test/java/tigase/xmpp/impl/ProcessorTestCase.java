@@ -21,6 +21,8 @@ import org.junit.After;
 import org.junit.Before;
 import tigase.TestLogger;
 import tigase.kernel.AbstractKernelWithUserRepositoryTestCase;
+import tigase.server.Packet;
+import tigase.server.PacketWriterWithTimeout;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItemImpl;
@@ -30,8 +32,11 @@ import tigase.xmpp.XMPPSession;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
+import java.time.Duration;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,8 +85,8 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 		return conn;
 	}
 
-	private class SessionManagerHandlerImpl
-			implements SessionManagerHandler {
+	public class SessionManagerHandlerImpl
+			implements SessionManagerHandler, PacketWriterWithTimeout {
 
 		Map<BareJID, XMPPSession> sessions = new HashMap<BareJID, XMPPSession>();
 
@@ -133,6 +138,32 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 
 		@Override
 		public void handleDomainChange(String domain, XMPPResourceConnection conn) {
+		}
+
+		private Queue<Item> outQueue = new ArrayDeque<>();
+
+		public Queue<Item> getOutQueue() {
+			return outQueue;
+		}
+
+		@Override
+		public boolean addOutPacketWithTimeout(Packet packet, Duration timeout, Handler handler) {
+			return outQueue.offer(new Item(packet, handler));
+		}
+
+		public class Item {
+
+			public final Packet packet;
+			public final Handler handler;
+
+			Item(Packet packet, Handler handler) {
+				this.packet = packet;
+				this.handler = handler;
+			}
+
+			public Packet getPacket() {
+				return packet;
+			}
 		}
 	}
 

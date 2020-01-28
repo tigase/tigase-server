@@ -73,7 +73,7 @@ public class AbstractPushNotifications
 	@Inject
 	private UserRepository userRepository;
 
-	@Inject
+	@Inject(bean = "sess-man")
 	private PacketWriterWithTimeout writer;
 	
 	protected boolean shouldDisablePush(Authorization error) {

@@ -27,7 +27,6 @@ import tigase.db.UserRepository;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
-import tigase.server.PacketWriterWithTimeout;
 import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -36,7 +35,6 @@ import tigase.xmpp.impl.MessageAmp;
 import tigase.xmpp.impl.ProcessorTestCase;
 import tigase.xmpp.jid.JID;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,7 +79,7 @@ public class PushNotificationsWithAwayTest
 								  new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
 
-		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
 		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
@@ -174,8 +172,8 @@ public class PushNotificationsWithAwayTest
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
 
-		Queue<DummyPacketWriter.Item> results = getInstance(
-				DummyPacketWriter.class).getOutQueue();
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(
+				SessionManagerHandlerImpl.class).getOutQueue();
 		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
@@ -222,8 +220,8 @@ public class PushNotificationsWithAwayTest
 								  new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		Queue<DummyPacketWriter.Item> results = getInstance(
-				DummyPacketWriter.class).getOutQueue();
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(
+				SessionManagerHandlerImpl.class).getOutQueue();
 		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(1, results.size());
@@ -255,7 +253,7 @@ public class PushNotificationsWithAwayTest
 
 //		results.forEach(p -> System.out.println(p.toString()));
 		assertArrayEquals(new Element[0], results.stream().map(
-				DummyPacketWriter.Item::getPacket).map(Packet::getElement).toArray(Element[]::new));
+				SessionManagerHandlerImpl.Item::getPacket).map(Packet::getElement).toArray(Element[]::new));
 		//assertEquals(0, results.size());
 
 	}
@@ -275,8 +273,8 @@ public class PushNotificationsWithAwayTest
 								  new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
 
-		Queue<DummyPacketWriter.Item> results = getInstance(
-				DummyPacketWriter.class).getOutQueue();
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(
+				SessionManagerHandlerImpl.class).getOutQueue();
 		pushNotifications.process(packet, session, null, new ArrayDeque<>(), new HashMap<>());
 
 		assertEquals(0, results.size());
@@ -308,7 +306,6 @@ public class PushNotificationsWithAwayTest
 
 	protected void registerLocalBeans(Kernel kernel) {
 		super.registerBeans(kernel);
-		kernel.registerBean("writerWithTimeout").asInstance(new DummyPacketWriter()).exportable().exec();
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean("sess-man").asInstance(this.getSessionManagerHandler()).setActive(true).exportable().exec();//.asClass(DummySessionManager.class).setActive(true).exportable().exec();
 		kernel.registerBean(MessageAmp.class).setActive(true).exportable().exec();
@@ -400,36 +397,5 @@ public class PushNotificationsWithAwayTest
 
 		}
 	}
-
-	public static class DummyPacketWriter implements PacketWriterWithTimeout {
-
-		private Queue<Item> outQueue = new ArrayDeque<>();
-
-		public DummyPacketWriter() {}
-
-		public Queue<Item> getOutQueue() {
-			return outQueue;
-		}
-
-		@Override
-		public boolean addOutPacketWithTimeout(Packet packet, Duration timeout, Handler handler) {
-			return outQueue.offer(new Item(packet, handler));
-		}
-
-		public class Item {
-
-			public final Packet packet;
-			public final Handler handler;
-
-			Item(Packet packet, Handler handler) {
-				this.packet = packet;
-				this.handler = handler;
-			}
-
-			public Packet getPacket() {
-				return packet;
-			}
-		}
-	}
-
+	
 }
