@@ -109,6 +109,14 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 		return true;
 	}
 
+	@Override
+	public boolean isMAMEnabled(BareJID serviceJid, String node) throws RepositoryException {
+		if (Mix.Nodes.MESSAGES.equals(node) || node == null) {
+			return true;
+		}
+		return super.isMAMEnabled(serviceJid, node);
+	}
+
 	//	@Override
 //	public void checkPermission(BareJID serviceJid, String nodeName, JID senderJid, Action action)
 //			throws PubSubException, RepositoryException {

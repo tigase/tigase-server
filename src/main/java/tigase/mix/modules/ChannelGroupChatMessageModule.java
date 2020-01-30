@@ -23,7 +23,8 @@ import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
-import tigase.mix.*;
+import tigase.mix.Mix;
+import tigase.mix.MixComponent;
 import tigase.mix.model.IMixRepository;
 import tigase.mix.model.IParticipant;
 import tigase.mix.model.MixAction;
@@ -98,6 +99,8 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 				mix.withElement("jid", null, participant.getRealJid().toString());
 			}
 			message.addChild(mix);
+			message.addChild((new Element("stanza-id", new String[]{"xmlns", "id", "by"},
+										  new String[]{"urn:xmpp:sid:0", uuid, channelJID.toString()})));
 
 			getRepository().addMAMItem(channelJID, Mix.Nodes.MESSAGES, uuid, message, null);
 

@@ -17,6 +17,7 @@
  */
 package tigase.mix.model;
 
+import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -29,6 +30,7 @@ import tigase.pubsub.NodeType;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.modules.PublishItemModule;
 import tigase.pubsub.modules.RetractItemModule;
+import tigase.pubsub.modules.mam.Query;
 import tigase.pubsub.repository.IItems;
 import tigase.pubsub.repository.cached.CachedPubSubRepository;
 import tigase.pubsub.repository.cached.IAffiliationsCached;
@@ -145,6 +147,11 @@ public class MixRepository extends CachedPubSubRepository implements IMixReposit
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void queryItems(Query query, ItemHandler itemHandler) throws RepositoryException, ComponentException {
+		super.queryItems(query, itemHandler);
 	}
 
 	@Override
