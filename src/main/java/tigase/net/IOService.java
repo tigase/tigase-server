@@ -402,20 +402,6 @@ public abstract class IOService<RefObject>
 			socketIO = sslContextContainer.createIoInterface("TLS", tls_hostname, tls_remote_hostname, port, clientMode,
 															 wantClientAuth, needClientAuth, byteOrder(),
 															 x509TrustManagers, this, socketIO, certificateContainer);
-//			if (!clientMode && useBouncyCastle) {
-//				socketIO = new BcTLSIO(certificateContainer, this, socketIO, tls_hostname, byteOrder(), wantClientAuth,
-//									   needClientAuth, sslContextContainer.getEnabledCiphers(),
-//									   sslContextContainer.getEnabledProtocols(), x509TrustManagers);
-//			} else {
-//				SSLContext sslContext = sslContextContainer.getSSLContext("TLS", tls_hostname, clientMode,
-//																		  x509TrustManagers);
-//				TLSWrapper wrapper = new JcaTLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth,
-//													   needClientAuth, sslContextContainer.getEnabledCiphers(),
-//													   sslContextContainer.getEnabledProtocols());
-//
-//				socketIO = new TLSIO(socketIO, wrapper, byteOrder());
-//			}
-
 			setLastTransferTime();
 			encoder.reset();
 			decoder.reset();

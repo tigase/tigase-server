@@ -269,7 +269,7 @@ public class SSLContextContainer
 
 			if (alias == null) {
 				alias = getDefCertAlias();
-			} // end of if (hostname == null)
+			}
 
 			holder = find(sslContexts, alias);
 

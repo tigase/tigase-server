@@ -82,6 +82,9 @@ public class CertificateContainer
 	@ConfigField(desc = "Whether generated certificate should be wildcard")
 	private boolean generateWildcardCertificate = true;
 
+	@ConfigField(desc = "Remove root CA (efectively self-signed) certificate from chain")
+	private boolean removeRootCACertificate = true;
+
 	@Override
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
 		String pemCert = params.get(PEM_CERTIFICATE_KEY);
@@ -298,6 +301,10 @@ public class CertificateContainer
 				   UnrecoverableKeyException {
 		PrivateKey privateKey = entry.getPrivateKey();
 		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
+
+		if (removeRootCACertificate) {
+			certChain = CertificateUtil.removeRootCACertificate(certChain);
+		}
 
 		KeyManagerFactory kmf = getKeyManagerFactory(alias, privateKey, certChain);
 		kmfs.put(alias, kmf);
