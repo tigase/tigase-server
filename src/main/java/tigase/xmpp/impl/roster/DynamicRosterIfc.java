@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl.roster;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -62,6 +63,8 @@ public interface DynamicRosterIfc {
 	 * @param props a {@code Map<String, Object> props} is a configuration parameters map in the form: key:value exactly
 	 * as they were specified in the configuration file.
 	 */
+	@Deprecated
+	@TigaseDeprecated(note = "No longer used, use Tigase Kernel and @ConfigField annotation", since = "8.1.0")
 	void init(Map<String, Object> props);
 
 	/**
@@ -72,6 +75,8 @@ public interface DynamicRosterIfc {
 	 *
 	 * @param par a <code>String</code> value of the configuration string.
 	 */
+	@Deprecated
+	@TigaseDeprecated(note = "No longer used, use Tigase Kernel and @ConfigField annotation", since = "8.1.0")
 	void init(String par);
 
 	/**

@@ -117,30 +117,15 @@ Client responds to the server:
 -----
 
 == Configuration
-DynamicRoster implementation class should be configured in the *config.tdsl* file. As it's an extension to the *PresenceState*, *PresenceSubscription* and *Roster* plugins classes should be configured either for each plugin:
-[source,dsl]
------
-'sess-man' () {
-    'jabber:iq:roster' () {
-        'dynamic-roster-classes' = 'class1.tigase.com,class2.tigase.com'
-    }
-    'presence-state' () {
-        'dynamic-roster-classes' = 'classList.rosterImplementation.tigase'
-    }
-    'presence-subscription' () {
-        'dynamic-roster-classes' = 'class2.custom.roster,another.class.dynamicRoster'
-    }
-}
------
-or globally:
+DynamicRoster implementation class should be configured in the *config.tdsl* file:
 
 [source,dsl]
 -----
 'sess-man' () {
     'dynamic-rosters' () {
-        class (class: custom.dynamicRoster.class) {}
+        class (class: package.custom.DynamicRosterImplementation) {}
     }
 }
 -----
 
-*<classes list>* is a comma separated list of classes.
+If you want to pass configuration to your implementation simply use `@ConfigField` annotation on your variable (see xref:cil2[Component implementation - Lesson 2 - Configuration] for more details).
