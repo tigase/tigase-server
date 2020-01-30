@@ -64,8 +64,12 @@ public class QueryModule
 
 	@Override
 	public boolean canHandle(Packet packet) {
-		return packet.getElement().findChild(child -> child.getName() == "query" && queryParser.getXMLNSs().contains(child.getXMLNS())) != null &&
+		return packet.getElement().findChild(child -> child.getName() == "query" && isXMLNSSupported(child.getXMLNS())) != null &&
 				packet.getType() == StanzaType.set;
+	}
+
+	protected boolean isXMLNSSupported(String xmlns) {
+		return queryParser.getXMLNSs().contains(xmlns);
 	}
 
 	@Override

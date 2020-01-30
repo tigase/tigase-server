@@ -50,6 +50,8 @@ public class DiscoveryModule
 
 	public final static String DISCO_ITEMS_XMLNS = "http://jabber.org/protocol/disco#items";
 
+	private static final String[] FEATURES = { DISCO_INFO_XMLNS, DISCO_ITEMS_XMLNS };
+
 	public final static String ID = "disco";
 
 	@Inject(nullAllowed = true)
@@ -96,7 +98,7 @@ public class DiscoveryModule
 
 	@Override
 	public String[] getFeatures() {
-		return null;
+		return FEATURES;
 	}
 
 	@Override
