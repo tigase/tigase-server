@@ -482,6 +482,26 @@ public class PushNotificationsTest
 		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), new ArrayDeque<>());
 
 		assertEquals(1, results.size());
+		assertEquals("low", results.poll().packet.getElemCDataStaticStr(
+				new String[]{"iq", "pubsub", "publish", "item", "notification", "priority"}));
+//		System.out.println("results:" + results);
+	}
+
+	@Test
+	public void testMessageRetrieved2() throws TigaseDBException, NotAuthorizedException, TigaseStringprepException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), new ArrayDeque<>());
+
+		assertEquals(1, results.size());
+		assertEquals(null, results.poll().packet.getElemCDataStaticStr(
+				new String[]{"iq", "pubsub", "publish", "item", "notification", "priority"}));
 //		System.out.println("results:" + results);
 	}
 
