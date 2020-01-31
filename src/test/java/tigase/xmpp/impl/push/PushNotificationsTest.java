@@ -496,7 +496,7 @@ public class PushNotificationsTest
 												  pushServiceJid + "/push-node",
 												  settings.toString());
 
-		Queue<DummyPacketWriter.Item> results = getInstance(DummyPacketWriter.class).getOutQueue();
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
 		pushNotifications.notifyOfflineMessagesRetrieved(getSession(recipientJid, recipientJid), new ArrayDeque<>());
 
 		assertEquals(1, results.size());
