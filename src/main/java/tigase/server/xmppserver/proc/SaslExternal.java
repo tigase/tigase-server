@@ -84,10 +84,10 @@ public class SaslExternal
 		// close Server1's TCP connection or continue with a Server Dialback (XEP-0220) [8] negotiation."
 		// If there was no `from` in the incomming stream then we should not advertise SASL-EXTERNAL and let
 		// other party possibly continue with Diallback
-		final boolean skipDomain = isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost());
+		final boolean skipDomain = cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()));
 		final boolean tlsEstablished = isTlsEstablished(certCheckResult);
 		final boolean canAddSaslToFeatures =
-				tlsEstablished && !serv.isAuthenticated() && cid != null && !skipDomain;
+				tlsEstablished && !serv.isAuthenticated() && !skipDomain;
 
 		if (!canAddSaslToFeatures & log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Not adding SASL-EXTERNAL feature, isTlsEstablished: {1}, skipDomain: {2}",
