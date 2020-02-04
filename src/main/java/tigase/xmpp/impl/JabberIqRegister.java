@@ -655,12 +655,20 @@ public class JabberIqRegister
 				throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Invalid form signature");
 			}
 		} else {
-			// No, so assuming this is registration of a new
-			// user or change registration details for existing
-			// user
-			user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
-			password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
-			email = request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
+			// No, so assuming this is registration of a new user
+			// or change registration details for existing user
+			Element queryEl = request.getChild("query", "jabber:iq:register");
+			Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
+			if (formEl != null) {
+				Form form = new Form(formEl);
+				user_name = form.getAsString("username");
+				password = form.getAsString("password");
+				email = form.getAsString("email");
+			} else {
+				user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
+				password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+				email = request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
+			}
 		}
 		if (null != password) {
 			password = XMLUtils.unescape(password);
