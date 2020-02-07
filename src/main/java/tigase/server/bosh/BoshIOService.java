@@ -131,7 +131,7 @@ public class BoshIOService
 		this.content_type = ct;
 	}
 
-	public StringBuilder prepareHeaders(String data) throws UnsupportedEncodingException {
+	public StringBuilder prepareHeaders(String data)  {
 		StringBuilder sb = new StringBuilder(200);
 
 		sb.append(HTTP_OK_RESPONSE);
@@ -151,22 +151,32 @@ public class BoshIOService
 		return sb;
 	}
 
-	private int getDataLength(String data, String content_type) {
+	protected int getDataLength(String data, String content_type) {
+		String charset = getCharset(content_type);
+		if (charset != null) {
+			try {
+				return data.getBytes(charset).length;
+			} catch (UnsupportedEncodingException e) {
+				log.fine("invalid charset:" + charset);
+			}
+		}
+
+		return data.getBytes().length;
+	}
+
+	protected String getCharset(String content_type) {
 		if (content_type != null) {
 			String[] props = content_type.split(";");
 			for (String prop : props) {
 				int i;
-				if (prop != null && (i = prop.indexOf('=')) != -1 && prop.length() > (i + 2)) {
-					String charset = prop.substring(i + 1);
-					try {
-						return data.getBytes(charset).length;
-					} catch (UnsupportedEncodingException e) {
-						log.warning("invalid charset:" + charset);
-					}
+				String trimmed = prop != null ? prop.trim() : null;
+				if (trimmed != null && (i = trimmed.indexOf('=')) != -1 &&
+						"charset".equalsIgnoreCase(trimmed.substring(0, i))) {
+					return trimmed.substring(i + 1);
 				}
 			}
 		}
-		return data.getBytes().length;
+		return null;
 	}
 
 	@Override
