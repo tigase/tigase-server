@@ -131,7 +131,7 @@ public class BoshIOService
 		this.content_type = ct;
 	}
 
-	public StringBuilder prepareHeaders(String data) throws UnsupportedEncodingException {
+	public StringBuilder prepareHeaders(String data)  {
 		StringBuilder sb = new StringBuilder(200);
 
 		sb.append(HTTP_OK_RESPONSE);
