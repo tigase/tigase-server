@@ -350,7 +350,7 @@ public class StatisticsProvider
 	}
 
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
-		log.log(Level.INFO, "Generating history for metrics: {0}", Arrays.toString(statsKeys));
+		log.log(Level.CONFIG, "Generating history for metrics: {0}", Arrays.toString(statsKeys));
 
 		Map<String, LinkedList<Object>> result = null;
 
@@ -368,7 +368,7 @@ public class StatisticsProvider
 				}
 			}
 		} else {
-			log.log(Level.INFO, "The server does not keep metrics history.");
+			log.log(Level.CONFIG, "The server does not keep metrics history.");
 		}
 
 		// log.log(Level.INFO, "History generated: {0}", result);

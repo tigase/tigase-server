@@ -178,14 +178,14 @@ public class ConnectionOpenThread
 							sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
 							al.accept(sc);
 						} catch (java.net.SocketException e) {
-							log.log(Level.INFO, "Socket closed instantly after it had been opened?", e);
+							log.log(Level.CONFIG, "Socket closed instantly after it had been opened?", e);
 
 							ConnectionOpenListener al = (ConnectionOpenListener) sk.attachment();
 
 							al.accept(sc);
 						}
 					} else {
-						log.log(Level.INFO,
+						log.log(Level.CONFIG,
 								"Can not obtain socket channel from selection key, throttling activated = {0}, for port: {1}",
 								new Object[]{throttled, port_no});
 					}    // end of if (sc != null) else

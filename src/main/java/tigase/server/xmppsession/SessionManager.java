@@ -264,7 +264,7 @@ public class SessionManager
 					new Object[]{proc.getClass().getSimpleName(), proc.id()});
 			loaded = true;
 			version = proc.getComponentInfo().getComponentVersion();
-			System.out.println("Loading plugin: " + proc.id() + "=" + threadsNo + ":" + queueSize + " ... " +
+			log.log(Level.INFO, "Loading plugin: " + proc.id() + "=" + threadsNo + ":" + queueSize + " ... " +
 									   (version.isEmpty() ? "" : "\t, version: " + version));
 		}
 
@@ -420,7 +420,7 @@ public class SessionManager
 							connToStop.logout();
 						} catch (NotAuthorizedException ex) {
 							// if it is not authorized, there is nothing we can do, but this should not happen
-							log.log(Level.INFO, "Exception during closing old connection, ignoring.", ex);
+							log.log(Level.CONFIG, "Exception during closing old connection, ignoring.", ex);
 						}
 						session.removeResourceConnection(connToStop);
 					});
@@ -881,15 +881,15 @@ public class SessionManager
 		try {
 			VHostItem vHostItem = getVHostItem(domain);
 			if (vHostItem == null) {
-				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
+				if (log.isLoggable(Level.CONFIG)) {
+					log.log(Level.CONFIG, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
 							new Object[]{domain, getDefHostName()});
 				}
 				vHostItem = new VHostItemImpl(getDefHostName().getDomain());
 			}
 			conn.setDomain(vHostItem);//.getUnmodifiableVHostItem());
 		} catch (TigaseStringprepException ex) {
-			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
+			log.log(Level.CONFIG, "Stringprep problem for resource connection: {0}", conn);
 			// handleLogout(userId, conn);
 		}
 	}
@@ -972,7 +972,7 @@ public class SessionManager
 			staleConnectionCloser.queueForClose(connectionId);
 
 			// code below is original loop for finding stale XMPPResourceConnections
-//    log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnection: {0}",
+//    log.log(Level.CONFIG, "Trying to find and remove stale XMPPResourceConnection: {0}",
 //        connectionId);
 //
 //    for (XMPPSession session : sessionsByNodeId.values()) {
@@ -1043,7 +1043,7 @@ public class SessionManager
 						}
 
 						if (sessionParent == null) {
-							log.log(Level.INFO, "UPS can''t remove, session not found in map: {0}", userJid);
+							log.log(Level.CONFIG, "UPS can''t remove, session not found in map: {0}", userJid);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
 								log.log(Level.FINER, "Number of user sessions: {0}", sessionsByNodeId.size());
@@ -1064,7 +1064,7 @@ public class SessionManager
 				}      // end of if (session.getActiveResourcesSize() == 0)
 			}
 		} catch (NotAuthorizedException e) {
-			log.log(Level.INFO, "Closed not authorized session: {0}", e);
+			log.log(Level.CONFIG, "Closed not authorized session: {0}", e);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Exception closing session... ", e);
 		}
@@ -1086,8 +1086,8 @@ public class SessionManager
 		if (vitem == null) {
 
 			// This shouldn't generally happen. Must mean misconfiguration.
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
+			if (log.isLoggable(Level.CONFIG)) {
+				log.log(Level.CONFIG, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
 						new Object[]{domain, getDefHostName()});
 			}
 			vitem = new VHostItemImpl(getDefHostName().getDomain());
@@ -1345,12 +1345,12 @@ public class SessionManager
 						XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
 
 						if (xs == null) {
-							log.log(Level.INFO, "Stream close for the user session which does not exist: {0}", iqc);
+							log.log(Level.CONFIG, "Stream close for the user session which does not exist: {0}", iqc);
 						} else {
 							XMPPResourceConnection xcr = xs.getResourceForConnectionId(iqc.getPacketFrom());
 
 							if (xcr == null) {
-								log.log(Level.INFO, "Stream close for the resource connection which does not exist",
+								log.log(Level.CONFIG, "Stream close for the resource connection which does not exist",
 										iqc);
 							} else {
 								xs.removeResourceConnection(xcr);
@@ -1481,7 +1481,7 @@ public class SessionManager
 								addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
 																							 "The user resource you want to remove does not exist.",
 																							 true));
-								log.info("Can not find resource connection for packet: " + iqc.toStringSecure());
+								log.log(Level.CONFIG, "Can not find resource connection for packet: " + iqc.toStringSecure());
 							}
 						}
 					} else {
@@ -1877,7 +1877,7 @@ public class SessionManager
 			} catch (NoConnectionIdException ex) {
 
 				// Ignore, this should not happen at this point, or even at all.
-				log.log(Level.INFO, "Impossible happened, please report to developer packet: {0}, connection: {1}.",
+				log.log(Level.CONFIG, "Impossible happened, please report to developer packet: {0}, connection: {1}.",
 						new Object[]{packet, conn});
 			}
 		}
@@ -2078,7 +2078,7 @@ public class SessionManager
 					}
 				}
 			} catch (TigaseStringprepException ex) {
-				log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
+				log.log(Level.CONFIG, "Stringprep problem for resource connection: {0}", conn);
 				handleLogout(userId, conn);
 			}
 		}
@@ -2173,7 +2173,7 @@ public class SessionManager
 
 			// Hm, not sure what should I do now....
 			// Maybe I should treat it as message to admin....
-			log.log(Level.INFO, "Message without TO attribute set, don''t know what to do wih this: {0}", p);
+			log.log(Level.CONFIG, "Message without TO attribute set, don''t know what to do wih this: {0}", p);
 		}    // end of else
 
 		return conn;
@@ -2655,10 +2655,10 @@ public class SessionManager
 			// we are stopping server so let's check if all session are closed
 			if (sessionsByNodeId.isEmpty() ||
 					(sessionsByNodeId.size() == 1 && sessionsByNodeId.get(getComponentId().getBareJID()) != null)) {
-				log.log(Level.INFO, "shutdown - stopping JVM");
+				log.log(Level.CONFIG, "shutdown - stopping JVM");
 				System.exit(0);
 			} else {
-				log.log(Level.INFO, "shutdown - still waiting for {0} to be closed", sessionsByNodeId.size());
+				log.log(Level.CONFIG, "shutdown - still waiting for {0} to be closed", sessionsByNodeId.size());
 				if (log.isLoggable(Level.FINEST)) {
 					StringBuilder sb = new StringBuilder();
 					for (XMPPSession session : sessionsByNodeId.values()) {
@@ -2689,10 +2689,10 @@ public class SessionManager
 				}
 				addOutPackets(item.getPacket(), item.getConn(), local_results);
 			} catch (InvalidPacketException e) {
-				log.log(Level.INFO, "Invalid packet! Error: {0}, packet: {1}",
+				log.log(Level.CONFIG, "Invalid packet! Error: {0}, packet: {1}",
 						new String[]{e.getLocalizedMessage(), item.getPacket().toStringSecure()});
 			} catch (NotAuthorizedException e) {
-				log.log(Level.INFO, "Session hasn't been authorised yet! Error: {0}, packet: {1}",
+				log.log(Level.CONFIG, "Session hasn't been authorised yet! Error: {0}, packet: {1}",
 						new String[]{e.getLocalizedMessage(), item.getPacket().toStringSecure()});
 				sendErrorBack(item.getPacket(), Authorization.NOT_AUTHORIZED, null);
 			} catch (XMPPProcessorException e) {
@@ -2786,7 +2786,7 @@ public class SessionManager
 			if (workingSet.isEmpty()) {
 				return;
 			}
-			log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnections");
+			log.log(Level.CONFIG, "Trying to find and remove stale XMPPResourceConnections");
 
 			LinkedList<XMPPResourceConnection> staleConnections = new LinkedList<XMPPResourceConnection>();
 

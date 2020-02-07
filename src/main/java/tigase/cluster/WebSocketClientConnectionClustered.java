@@ -116,7 +116,7 @@ public class WebSocketClientConnectionClustered
 		if (clusterEventHandler == null) {
 			clusterEventHandler = (ClusterConnectionManager.ClusterInitializedEvent event) -> {
 				WebSocketClientConnectionClustered.this.connectWaitingTasks();
-				log.log(Level.WARNING, "Starting listening on ports of component: {0}",
+				log.log(Level.INFO, "Starting listening on ports of component: {0}",
 						WebSocketClientConnectionClustered.this.getName());
 				eventBus.removeListener(clusterEventHandler);
 			};

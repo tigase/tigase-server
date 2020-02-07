@@ -150,11 +150,11 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 		if (repoChangeList != null) {
 			if (old == null) {
-				log.log(Level.INFO, "Calling itemAdded for: {0}", item);
+				log.log(Level.CONFIG, "Calling itemAdded for: {0}", item);
 				repoChangeList.itemAdded(item);
 			} else {
 				if (itemChanged(old, item)) {
-					log.log(Level.INFO, "Calling itemUpadted for: {0}", item);
+					log.log(Level.CONFIG, "Calling itemUpadted for: {0}", item);
 					repoChangeList.itemUpdated(item);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {

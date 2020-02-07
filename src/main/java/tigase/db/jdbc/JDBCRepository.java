@@ -509,7 +509,7 @@ public class JDBCRepository
 			auth = new AuthRepositoryImpl(this);
 
 			// initRepo();
-			log.log(Level.INFO, "Initialized database connection: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
+			log.log(Level.CONFIG, "Initialized database connection: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
 		} catch (SQLException ex) {
 			data_repo = null;
 			throw new DBInitException("Could not initialize repository", ex);
@@ -1092,7 +1092,7 @@ public class JDBCRepository
 			}    // end of if (isnext) else
 			if (nid <= 0) {
 				if (node_path == null) {
-					log.info("Missing root node, database upgrade or bug in the code? Adding missing " +
+					log.log(Level.CONFIG, "Missing root node, database upgrade or bug in the code? Adding missing " +
 									 "root node now.");
 
 					// OK

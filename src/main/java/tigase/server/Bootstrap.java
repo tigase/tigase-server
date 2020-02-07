@@ -187,7 +187,7 @@ public class Bootstrap {
 //		}
 		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", LogFormatter.class.getName());
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "INFO");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", LogFormatter.class.getName());
@@ -260,7 +260,7 @@ public class Bootstrap {
 		}
 		if ((Boolean) clusterMode) {
 			System.setProperty("tigase.cache", "false");
-			log.log(Level.WARNING, "Tigase cache turned off");
+			log.log(Level.INFO, "Tigase cache turned off");
 		}
 		config.getProperties().put("cluster-mode", clusterMode);
 
@@ -325,7 +325,7 @@ public class Bootstrap {
 			}
 		}
 		MessageRouter mr = kernel.getInstance("message-router");
-		log.info("Starting MessageRouter");
+		log.log(Level.INFO, "Starting MessageRouter");
 		mr.start();
 
 //		StringBuilder sb = new StringBuilder("\n======");

@@ -131,7 +131,7 @@ public abstract class XMPPProcessorAbstract
 						"Packet to a user session which is not yet authenticated: " + session + ", packet: " + packet);
 			}
 		} catch (PacketErrorTypeException ex) {
-			log.info("Attempt to send an error response to the error packet: " + packet + ", session: " + session +
+			log.log(Level.CONFIG, "Attempt to send an error response to the error packet: " + packet + ", session: " + session +
 							 ", plugin: " + id());
 		}
 	}
@@ -198,7 +198,7 @@ public abstract class XMPPProcessorAbstract
 				processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
 			}
 		} catch (NotAuthorizedException ex) {
-			log.info("Session not yet authorized to send ping requests: " + session + ", packet: " + packet);
+			log.log(Level.CONFIG, "Session not yet authorized to send ping requests: " + session + ", packet: " + packet);
 		}
 	}
 

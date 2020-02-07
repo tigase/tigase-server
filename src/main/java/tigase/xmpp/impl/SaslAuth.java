@@ -322,7 +322,7 @@ public class SaslAuth
 		try {
 			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
 			if (status == AuthRepository.AccountStatus.active) {
-				log.info("Disabling user " + userJID);
+				log.log(Level.CONFIG, "Disabling user " + userJID);
 				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
 			}
 		} catch (TigaseDBException e) {

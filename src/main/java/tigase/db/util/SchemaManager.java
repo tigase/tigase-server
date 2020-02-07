@@ -285,9 +285,9 @@ public class SchemaManager {
 		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
 
 		Map<String, DataSourceInfo> result = getDataSources(config);
-		log.info("found " + result.size() + " data sources to destroy...");
+		log.log(Level.INFO, "found " + result.size() + " data sources to destroy...");
 		Map<DataSourceInfo, List<SchemaManager.ResultEntry>> results = destroySchemas(result.values());
-		log.info("data sources  destruction finished!");
+		log.log(Level.INFO, "data sources  destruction finished!");
 		List<String> output = prepareOutput("Data source destruction finished", results, conversionMessages);
 
 		final int exitCode = isErrorPresent(results) ? 1 : 0;
@@ -641,9 +641,9 @@ public class SchemaManager {
 
 		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
 
-		log.info("beginning loading schema files...");
+		log.log(Level.INFO, "beginning loading schema files...");
 		Map<SchemaManager.DataSourceInfo, List<SchemaManager.ResultEntry>> results = loadSchemas();
-		log.info("schema loading finished!");
+		log.log(Level.INFO, "schema loading finished!");
 		return results;
 	}
 

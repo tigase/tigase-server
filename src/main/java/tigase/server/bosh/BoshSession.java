@@ -175,7 +175,7 @@ public class BoshSession {
 			if (filterInPacket(packet)) {
 				if (!waiting_packets.offer(packet.getElement())) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.INFO, "waiting_packets queue exceeded, dropping packet: " + packet.toString());
+						log.log(Level.FINEST, "waiting_packets queue exceeded, dropping packet: " + packet.toString());
 					}
 				}
 			} else {
@@ -235,7 +235,7 @@ public class BoshSession {
 					long rid = Long.parseLong(packet.getAttributeStaticStr(RID_ATTR));
 
 					if (isDuplicateRid(rid, children)) {
-						log.info("Discovered duplicate client connection, trying to close the " + "old one with RID: " +
+						log.log(Level.CONFIG, "Discovered duplicate client connection, trying to close the " + "old one with RID: " +
 										 rid);
 
 						Element body = getBodyElem();
@@ -338,7 +338,7 @@ public class BoshSession {
 					handler.addOutStreamClosed(command, this, true);
 				}
 			} else {
-				log.info("Duplicated packet: " + packet.toString());
+				log.log(Level.CONFIG, "Duplicated packet: " + packet.toString());
 			}
 		} else {
 			log.warning("[" + connections.size() + "] Unexpected packet from the network: " + packet.toString());
@@ -356,7 +356,7 @@ public class BoshSession {
 
 				if (!waiting_packets.offer(error.getElement())) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.INFO, "waiting_packets queue exceeded, dropping packet: " + error.toString());
+						log.log(Level.FINEST, "waiting_packets queue exceeded, dropping packet: " + error.toString());
 					}
 				}
 
@@ -378,7 +378,7 @@ public class BoshSession {
 
 				// out_results.offer(command);
 			} catch (PacketErrorTypeException e) {
-				log.info("Error type and incorrect from bosh client? Ignoring...");
+				log.log(Level.CONFIG, "Error type and incorrect from bosh client? Ignoring...");
 			}
 		}
 
@@ -481,7 +481,7 @@ public class BoshSession {
 				} catch (TigaseStringprepException ex) {
 					log.warning("Packet addressing problem, stringprep processing failed, dropping: " + packet);
 //				} catch (PacketErrorTypeException e) {
-//					log.info("Packet processing exception: " + e);
+//					log.log(Level.CONFIG, ("Packet processing exception: " + e);
 				}
 			}
 
@@ -808,7 +808,7 @@ public class BoshSession {
 				elem.addAttribute("packet-counter", "" + (++packet_counter));
 				if (!waiting_packets.offer(elem)) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.INFO, "waiting_packets queue exceeded, dropping packet: " + elem.toString());
+						log.log(Level.FINEST, "waiting_packets queue exceeded, dropping packet: " + elem.toString());
 					}
 				}
 

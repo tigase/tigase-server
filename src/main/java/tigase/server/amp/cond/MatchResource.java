@@ -22,6 +22,7 @@ import tigase.server.amp.ConditionIfc;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -74,10 +75,10 @@ public class MatchResource
 						break;
 				}
 			} catch (Exception e) {
-				log.info("Incorrect " + name + " condition value for rule: " + rule);
+				log.log(Level.CONFIG, "Incorrect " + name + " condition value for rule: " + rule);
 			}
 		} else {
-			log.info("No value set for rule: " + rule);
+			log.log(Level.CONFIG, "No value set for rule: " + rule);
 		}
 
 		return result;

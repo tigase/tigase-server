@@ -106,7 +106,7 @@ public class BindResource
 
 								// User provided resource is invalid, generating different
 								// server one
-								log.log(Level.INFO, "Incrrect resource provided by the user: {0}, generating a " +
+								log.log(Level.CONFIG, "Incrrect resource provided by the user: {0}, generating a " +
 										"different one by the server.", resource);
 								resource = resourceDefPrefix + (++resGenerator);
 								session.setResource(resource);

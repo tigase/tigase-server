@@ -260,7 +260,7 @@ public class ClConSQLRepository
 	 */
 	private void checkDB(DataRepository data_repo) throws SQLException {
 		if (!data_repo.checkTable(TABLE_NAME)) {
-			log.info("DB for external component is not OK, stopping server...");
+			log.log(Level.INFO, "DB for external component is not OK, stopping server...");
 
 			TigaseRuntime.getTigaseRuntime()
 					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",

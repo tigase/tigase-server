@@ -265,7 +265,7 @@ public class ClusterConnectionManager
 
 	@Override
 	public void itemAdded(ClusterRepoItem repoItem) {
-		log.log(Level.INFO, "Loaded repoItem: {0}", repoItem.toString());
+		log.log(Level.CONFIG, "Loaded repoItem: {0}", repoItem.toString());
 
 		String host = repoItem.getHostname();
 
@@ -489,7 +489,7 @@ public class ClusterConnectionManager
 		log.log(Level.INFO, "Cluster connection opened: {0}, type: {1}, id={2}",
 				new Object[]{serv.getRemoteAddress(), serv.connectionType().toString(), serv.getUniqueId()});
 		if (compress_stream) {
-			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());
+			log.log(Level.CONFIG, "Starting stream compression for: {0}", serv.getUniqueId());
 			serv.startZLib(Deflater.BEST_COMPRESSION);
 		}
 		switch (serv.connectionType()) {
@@ -507,7 +507,7 @@ public class ClusterConnectionManager
 						" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName() + "'" +
 						" to='" + remote_host + "'" + ">";
 
-				log.log(Level.INFO, "cid: {0}, sending: {1}",
+				log.log(Level.CONFIG, "cid: {0}, sending: {1}",
 						new Object[]{(String) serv.getSessionData().get("cid"), data});
 				serv.xmppStreamOpen(data);
 
@@ -618,7 +618,7 @@ public class ClusterConnectionManager
 
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
-		log.info("Stream closed.");
+		log.log(Level.CONFIG, "Stream closed.");
 	}
 
 	@Override

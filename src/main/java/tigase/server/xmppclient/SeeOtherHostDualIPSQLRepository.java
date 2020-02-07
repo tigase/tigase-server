@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -89,7 +90,7 @@ public class SeeOtherHostDualIPSQLRepository
 				data_repo.release(null, rs);
 			}
 		}
-		log.info("Loaded " + result.size() + " redirect definitions from database.");
+		log.log(Level.CONFIG, "Loaded " + result.size() + " redirect definitions from database.");
 		return result;
 	}
 

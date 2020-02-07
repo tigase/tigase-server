@@ -367,7 +367,7 @@ public class PresenceState
 								processOutInitial(pres, session, results, settings,
 												  RosterAbstract.PresenceType.out_initial);
 							} catch (NotAuthorizedException e) {
-								log.log(Level.INFO,
+								log.log(Level.CONFIG,
 										"Can not access user Roster, user session is not authorized yet: {0}", packet);
 								log.log(Level.FINEST, "presence problem...", e);
 							} catch (TigaseDBException e) {
@@ -390,7 +390,7 @@ public class PresenceState
 				RosterAbstract.PresenceType pres_type = roster_util.getPresenceType(session, packet);
 
 				if (pres_type == null) {
-					log.log(Level.INFO, "Invalid presence found: {0}", packet);
+					log.log(Level.CONFIG, "Invalid presence found: {0}", packet);
 
 					return;
 				}    // end of if (type == null)
@@ -435,7 +435,7 @@ public class PresenceState
 						break;
 				}    // end of switch (type)
 			} catch (NotAuthorizedException e) {
-				log.log(Level.INFO, "Can not access user Roster, user session is not authorized yet: {0}", packet);
+				log.log(Level.CONFIG, "Can not access user Roster, user session is not authorized yet: {0}", packet);
 				log.log(Level.FINEST, "presence problem...", e);
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Error accessing database for presence data: {0}", e);
@@ -836,7 +836,7 @@ public class PresenceState
 						try {
 							sendRosterOfflinePresence(session, results);
 						} catch (NotAuthorizedException | TigaseDBException | NoConnectionIdException ex) {
-							log.log(Level.INFO, "Experimental code throws exception: ", ex);
+							log.log(Level.CONFIG, "Experimental code throws exception: ", ex);
 						}
 
 						// Send presence probes to 'to' or 'both' contacts

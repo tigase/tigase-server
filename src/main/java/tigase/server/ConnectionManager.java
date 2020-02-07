@@ -472,7 +472,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		try {
 			ioStatsGetter.check(service);
 		} catch (Exception e) {
-			log.log(Level.INFO, "Nothing serious to worry about but please notify the developer.", e);
+			log.log(Level.CONFIG, "Nothing serious to worry about but please notify the developer.", e);
 		}
 
 		ServiceConnectedTimer.cancel(service);
@@ -525,7 +525,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if (!delayPortListening) {
 			connectWaitingTasks();
 		} else {
-			log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
+			log.log(Level.INFO, "Delaying opening ports of component: {0}", getName());
 		}
 
 		setupWatchdogThread();
@@ -1456,8 +1456,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 								// Stop the service if max keep-alive time is exceeded
 								// for non-active connections.
-								if (log.isLoggable(Level.INFO)) {
-									log.log(Level.INFO,
+								if (log.isLoggable(Level.CONFIG)) {
+									log.log(Level.CONFIG,
 											"Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} ) [{0}]",
 											new Object[]{getName(), service, sinceLastTransfer,
 														 maxInactivityTime, watchdogTimeout, watchdogDelay,
@@ -1512,7 +1512,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						// Close the service
 						try {
 							if (service != null) {
-								log.info(getName() + ": Found dead connection, stopping: " + service);
+								log.log(Level.CONFIG, getName() + ": Found dead connection, stopping: " + service);
 								++watchdogStopped;
 								service.forceStop();
 							}

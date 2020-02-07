@@ -244,7 +244,7 @@ public class ConfigSQLRepository
 					st = data_repo.createStatement(null);
 					st.executeUpdate(CREATE_TABLE_QUERY);
 				} else {
-					log.info("DB for server configuration OK.");
+					log.log(Level.CONFIG, "DB for server configuration OK.");
 				}
 			} finally {
 				data_repo.release(st, rs);

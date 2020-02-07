@@ -484,7 +484,7 @@ public class TLSIO
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.log(Level.INFO,
+			log.log(Level.CONFIG,
 					"Infinite loop detected in writeBuff(buff) TLS code, tlsWrapper.getStatus(): {0}, buff.remaining(): {1}, ran {2} times, io: {3}",
 					new Object[]{tlsWrapper.getStatus(), buff.remaining(), loop_cnt, toString()});
 

@@ -68,9 +68,9 @@ public class AuthRepositoryImpl
 	@Override
 	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		repo.addUser(user);
-		log.info("Repo user added: " + user);
+		log.log(Level.FINE, "Repo user added: " + user);
 		updateCredential(user, DEFAULT_CREDENTIAL_ID, password);
-		log.info("Password updated: " + user + ":" + password);
+		log.log(Level.FINE, "Password updated: " + user + ":" + password);
 	}
 
 	@Override

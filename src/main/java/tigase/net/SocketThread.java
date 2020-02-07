@@ -77,7 +77,7 @@ public class SocketThread
 				thrd.start();
 			}
 
-			log.log(Level.WARNING, "{0} socketReadThreads started.", socketReadThread.length);
+			log.log(Level.INFO, "{0} socketReadThreads started.", socketReadThread.length);
 
 			for (int i = 0; i < socketWriteThread.length; i++) {
 				socketWriteThread[i] = new SocketThread("socketWriteThread-" + i);
@@ -89,7 +89,7 @@ public class SocketThread
 				thrd.start();
 			}
 
-			log.log(Level.WARNING, "{0} socketWriteThreads started.", socketWriteThread.length);
+			log.log(Level.INFO, "{0} socketWriteThreads started.", socketWriteThread.length);
 		}    // end of if (acceptThread == null)
 	}
 
@@ -421,7 +421,7 @@ public class SocketThread
 				sk.cancel();
 
 				try {
-					log.log(Level.INFO, "Forcing stopping the service: {0}", serv.getIO());
+					log.log(Level.CONFIG, "Forcing stopping the service: {0}", serv.getIO());
 					serv.forceStop();
 				} catch (Exception e) {
 				}

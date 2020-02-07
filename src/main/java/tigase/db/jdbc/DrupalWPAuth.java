@@ -127,9 +127,9 @@ public class DrupalWPAuth
 				status_val = WP_OK_STATUS_VAL;
 				status_fld = WP_STATUS_FLD;
 				pass_fld = WP_PASS_FLD;
-				log.log(Level.INFO, "Initializing Wordpress repository: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
+				log.log(Level.CONFIG, "Initializing Wordpress repository: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
 			} else {
-				log.log(Level.INFO, "Initializing Drupal repository: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
+				log.log(Level.CONFIG, "Initializing Drupal repository: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
 			}
 
 			String query = "select " + pass_fld + " from " + users_tbl + " where " + name_fld + " = ?";

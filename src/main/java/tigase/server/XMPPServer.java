@@ -17,7 +17,10 @@
  */
 package tigase.server;
 
+import tigase.component.DSLBeanConfigurator;
+import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigReader;
+import tigase.conf.ConfigWriter;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.events.StartupFinishedEvent;
@@ -33,9 +36,12 @@ import tigase.util.dns.DNSResolverFactory;
 import tigase.util.log.LogFormatter;
 import tigase.xml.XMLUtils;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -196,9 +202,10 @@ public final class XMPPServer {
 			bootstrap.start();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 			if (ServerBeanSelector.getConfigType(bootstrap.getKernel()) == ConfigTypeEnum.SetupMode) {
-				System.out.println("== " + sdf.format(new Date()) + " Please setup server at http://localhost:8080/\n");
+				logTdslConfigWithSetupCredentials();
+				log.log(Level.INFO, "Please setup server at http://localhost:8080/\n");
 			} else {
-				System.out.println("== " + sdf.format(new Date()) + " Server finished starting up in (" +
+				log.log(Level.INFO, "Server finished starting up in (" +
 										   (System.currentTimeMillis() - start) / 1000 +
 										   "s) and (if there wasn't any error) is ready to use\n");
 			}
@@ -221,6 +228,20 @@ public final class XMPPServer {
 					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
 												 "Problem initializing the server: " + cause,
 												 "Please fix the problem and start the server again."});
+		}
+	}
+
+	private static void logTdslConfigWithSetupCredentials() {
+		DSLBeanConfigurator configurator = bootstrap.getInstance(DSLBeanConfigurator.class);
+		final ConfigHolder configHolder = configurator.getConfigHolder();
+		if (configHolder != null) {
+			final Map<String, Object> properties = configHolder.getProperties();
+			try (Writer w = new StringWriter()) {
+				new ConfigWriter().resolveVariables().write(w, properties);
+				log.log(Level.INFO, "Setup configuration:\n" + w.toString());
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Problem showing configuration");
+			}
 		}
 	}
 

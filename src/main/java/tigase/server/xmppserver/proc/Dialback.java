@@ -187,12 +187,12 @@ public class Dialback
 					} catch (NotLocalhostException ex) {
 
 						// Should not happen....
-						log.log(Level.INFO, "Incorrect local hostname, packet: {1} [{0}]", new Object[]{serv, p});
+						log.log(Level.CONFIG, "Incorrect local hostname, packet: {1} [{0}]", new Object[]{serv, p});
 						authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 					} catch (LocalhostException ex) {
 
 						// Should not happen....
-						log.log(Level.INFO, "Incorrect remote hostname name, packet: {1} [{0}]", new Object[]{serv, p});
+						log.log(Level.CONFIG, "Incorrect remote hostname name, packet: {1} [{0}]", new Object[]{serv, p});
 						authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 					}
 

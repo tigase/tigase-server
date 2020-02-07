@@ -563,7 +563,7 @@ public class ComponentConnectionManager
 
 						updateServiceDiscovery(addr, "XEP-0114 connected");
 					} else {
-						log.info("Handshaking passwords don't match, disconnecting...");
+						log.log(Level.CONFIG, "Handshaking passwords don't match, disconnecting...");
 						serv.stop();
 					}
 				} catch (Exception e) {
@@ -582,7 +582,7 @@ public class ComponentConnectionManager
 
 	private void updateRoutings(String[] routings, boolean add) {
 		if (add) {
-			log.info("Adding routings: " + Arrays.toString(routings));
+			log.log(Level.CONFIG, "Adding routings: " + Arrays.toString(routings));
 
 			for (String route : routings) {
 				try {
@@ -592,7 +592,7 @@ public class ComponentConnectionManager
 				}
 			}
 		} else {
-			log.info("Removing routings: " + Arrays.toString(routings));
+			log.log(Level.CONFIG, "Removing routings: " + Arrays.toString(routings));
 
 			for (String route : routings) {
 				try {

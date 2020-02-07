@@ -144,9 +144,9 @@ public class DataRepositoryImpl
 		boolean result = false;
 
 		try {
-			log.log(Level.INFO, "Checking if table {0} exists in DB {1}.", new Object[]{tableName, table_schema});
+			log.log(Level.CONFIG, "Checking if table {0} exists in DB {1}.", new Object[]{tableName, table_schema});
 			if (!checkTable(tableName)) {
-				log.log(Level.INFO, "Table {0} not found in database, creating: {1}",
+				log.log(Level.CONFIG, "Table {0} not found in database, creating: {1}",
 						new Object[]{tableName, createTableQuery});
 				st = createStatement(null);
 				if (!db_conn.contains("derby")) {
@@ -164,7 +164,7 @@ public class DataRepositoryImpl
 				}
 				result = true;
 			} else {
-				log.log(Level.INFO, "OK table {0} found in database.", tableName);
+				log.log(Level.CONFIG, "OK table {0} found in database.", tableName);
 			}
 		} finally {
 			release(st, rs);
@@ -302,7 +302,7 @@ public class DataRepositoryImpl
 					table_schema = slashes[slashes.length - 1].split("\\?")[0];
 					break;
 			}
-			log.log(Level.INFO, "Table schema found: {0}, database type: {1}, database driver: {2}",
+			log.log(Level.CONFIG, "Table schema found: {0}, database type: {1}, database driver: {2}",
 					new Object[]{table_schema, database.toString(), driverClass});
 		}
 		try {
@@ -318,7 +318,7 @@ public class DataRepositoryImpl
 			throw new DBInitException("Database initialization failed", ex);
 		}
 
-		log.log(Level.INFO, "Initialized database connection: {0}", JDBCPasswordObfuscator.obfuscatePassword(resource_uri));
+		log.log(Level.CONFIG, "Initialized database connection: {0}", JDBCPasswordObfuscator.obfuscatePassword(resource_uri));
 	}
 
 	public static dbTypes parseDatabaseType(String resource_uri) {
@@ -517,7 +517,7 @@ public class DataRepositoryImpl
 		try {
 			if (conn != null) {
 				reconnectionCounter.inc();
-				log.log(Level.INFO, "Reconnecting connection: {0}", reconnectionCounter);
+				log.log(Level.CONFIG, "Reconnecting connection: {0}", reconnectionCounter);
 			}
 			synchronized (db_statements) {
 				db_statements.clear();
@@ -535,7 +535,7 @@ public class DataRepositoryImpl
 
 			if (failure) {
 				reconnectionFailedCounter.inc();
-				log.log(Level.INFO, "Reconnecting connection failed: {0}", reconnectionFailedCounter);
+				log.log(Level.CONFIG, "Reconnecting connection failed: {0}", reconnectionFailedCounter);
 			}
 			// release(stmt, rs);
 			// stmt = null;

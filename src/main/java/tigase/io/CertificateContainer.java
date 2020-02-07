@@ -106,7 +106,7 @@ public class CertificateContainer
 
 	public void setRepository(CertificateRepository repository) {
 		if (repository != null) {
-			log.log(Level.WARNING,
+			log.log(Level.INFO,
 					"CertificateRepository configured! No certificate will be loaded from the local filesystem!");
 		}
 		this.repository = repository;
@@ -449,7 +449,7 @@ public class CertificateContainer
 					Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
 					log.log(Level.CONFIG, "Made backup of file: {0} to: {1}", new Object[]{file, target});
 				} catch (Exception e) {
-					log.log(Level.INFO, "Making file from: {0} to: {1} failed!", new Object[]{file, target, e});
+					log.log(Level.INFO, "Making certificate backup file from: {0} to: {1} failed!", new Object[]{file, target, e});
 				}
 			}
 		} catch (Exception ex) {
@@ -524,7 +524,7 @@ public class CertificateContainer
 			Set<String> domains = certificate.map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
 
 			eventBus.fire(new CertificateChanged(alias, domains));
-			log.log(Level.INFO,
+			log.log(Level.CONFIG,
 					"Certificate with alias: {0} for domains: {1} added. Saving to disk: {2}, notify cluster: {3}",
 					new Object[]{alias, domains, saveToDisk, notifyCluster});
 		} catch (Exception ex) {

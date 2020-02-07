@@ -932,7 +932,7 @@ public class BasicComponent
 		reloadScripts();
 		cmpInfo = new ComponentInfo(getName(), this.getClass());
 
-		System.out.println("Loading component: " + cmpInfo);
+		log.log(Level.INFO, "Loading component: " + cmpInfo);
 
 		initializationCompleted();
 	}

@@ -78,7 +78,7 @@ public class DSLBeanConfigurator
 	}
 
 	public void dumpConfiguration(File f) throws IOException {
-		log.log(Level.WARNING, "Dumping full server configuration to: {0}", f);
+		log.log(Level.INFO, "Dumping full server configuration to: {0}", f);
 		Map<String, Object> dump = new LinkedHashMap<>(props);
 		dumpConfiguration(dump, kernel);
 

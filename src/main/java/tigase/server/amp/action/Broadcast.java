@@ -146,7 +146,7 @@ public class Broadcast
 							}
 						}
 					} catch (ParseException ex) {
-						log.info("Incorrect " + NAME + " condition value for rule: " + rule);
+						log.log(Level.CONFIG, "Incorrect " + NAME + " condition value for rule: " + rule);
 					}
 					return true;
 				}

@@ -135,7 +135,7 @@ public abstract class AuthRepositoryMDImpl
 
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
-		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: " + params);
+		log.log(Level.CONFIG, "Multi-domain repository pool initialized: " + resource_uri + ", params: " + params);
 	}
 
 	@Override

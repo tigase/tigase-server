@@ -213,7 +213,7 @@ public class SessionManagerClustered
 				}
 			} catch (NotAuthorizedException ex) {
 				// if connection is not authorized, we can skip it
-				log.log(Level.INFO, "Exception during closing old connection, ignoring.", ex);
+				log.log(Level.CONFIG, "Exception during closing old connection, ignoring.", ex);
 			}
 		}
 	}

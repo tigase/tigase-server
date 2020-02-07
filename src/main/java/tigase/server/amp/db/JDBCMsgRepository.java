@@ -109,7 +109,7 @@ public class JDBCMsgRepository
 		}
 
 		initialized = true;
-		log.log(Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str);
+		log.log(Level.CONFIG, "Initializing dbAccess for db connection url: {0}", conn_str);
 
 		super.initRepository(conn_str, map);
 
@@ -571,7 +571,7 @@ public class JDBCMsgRepository
 		Element msg = elems.poll();
 
 		if (msg == null) {
-			log.log(Level.INFO, "Something wrong, loaded offline message from DB but parsed no " + "XML elements: {0}",
+			log.log(Level.CONFIG, "Something wrong, loaded offline message from DB but parsed no " + "XML elements: {0}",
 					msg_str);
 			return null;
 		} else {

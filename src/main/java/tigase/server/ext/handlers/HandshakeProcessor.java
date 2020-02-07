@@ -101,7 +101,7 @@ public class HandshakeProcessor
 
 							results.offer(resp);
 						} else {
-							log.info("Handshaking passwords don't match, disconnecting...");
+							log.log(Level.CONFIG, "Handshaking passwords don't match, disconnecting...");
 							serv.stop();
 						}
 					} catch (Exception e) {

@@ -425,7 +425,7 @@ public class XMPPIOService<RefObject>
 					try {
 						writeRawData(cross_domain_policy);
 					} catch (Exception ex) {
-						log.log(Level.INFO, "Can't send cross-domain policy: ", ex);
+						log.log(Level.CONFIG, "Can't send cross-domain policy: ", ex);
 					}
 					log.log(Level.FINER, "Cross-domain policy sent: {1}", cross_domain_policy);
 				} else {
@@ -497,7 +497,7 @@ public class XMPPIOService<RefObject>
 						log.log(Level.FINE, "checkData says disconnect: {1} [{0}]",
 								new Object[]{toString(), new String(data)});
 					} else {
-						log.log(Level.INFO, "checkData says disconnect [{0}]", toString());
+						log.log(Level.CONFIG, "checkData says disconnect [{0}]", toString());
 					}
 					forceStop();
 
@@ -517,7 +517,7 @@ public class XMPPIOService<RefObject>
 							log.log(Level.FINE, "Data parsing error: {1} [{0}]",
 									new Object[]{toString(), StringUtilities.convertNonPrintableCharactersToLiterals(new String(data))});
 						} else {
-							log.log(Level.INFO, "Data parsing error, stopping connection [{0}]", toString());
+							log.log(Level.CONFIG, "Data parsing error, stopping connection [{0}]", toString());
 						}
 						if (serviceListener != null) {
 							Element err = new Element("not-well-formed", new String[]{"xmlns"},
@@ -535,7 +535,7 @@ public class XMPPIOService<RefObject>
 
 					moveParsedPacketsToReceived(true);
 				} catch (Exception ex) {
-					log.log(Level.INFO,
+					log.log(Level.CONFIG,
 							"Incorrect XML data: " + new String(data) + ", stopping connection " + " [" + toString() +
 									"] exception: ", ex);
 					forceStop();
@@ -585,7 +585,7 @@ public class XMPPIOService<RefObject>
 				}
 			}
 		} catch (IOException e) {
-			log.log(Level.INFO, "Error sending stream closed data: {1} [{0}]", new Object[]{toString(), e});
+			log.log(Level.CONFIG, "Error sending stream closed data: {1} [{0}]", new Object[]{toString(), e});
 		}
 
 		// streamClosed = true;
@@ -699,7 +699,7 @@ public class XMPPIOService<RefObject>
 					sendAck(pack);
 				}
 			} catch (TigaseStringprepException ex) {
-				log.log(Level.INFO, "Incorrect to/from JID format for stanza: " + elem.toString() + " [" + toString() + "]", ex);
+				log.log(Level.CONFIG, "Incorrect to/from JID format for stanza: " + elem.toString() + " [" + toString() + "]", ex);
 			}
 		}    // end of while ((elem = elems.poll()) != null)
 	}

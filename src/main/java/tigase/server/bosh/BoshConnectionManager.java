@@ -619,7 +619,7 @@ public class BoshConnectionManager
 
 				return old_receiver;
 			} else {
-				log.info("Incorrect session ID, ignoring data redirect for: " + newAddress);
+				log.log(Level.CONFIG, "Incorrect session ID, ignoring data redirect for: " + newAddress);
 			}
 		}
 
@@ -741,7 +741,7 @@ public class BoshConnectionManager
 					} catch (PacketErrorTypeException e) {
 
 						// Hm, error already, ignoring...
-						log.log(Level.INFO, "Error packet is not really expected here: {0}", packet);
+						log.log(Level.CONFIG, "Error packet is not really expected here: {0}", packet);
 					}
 				}
 
@@ -768,7 +768,7 @@ public class BoshConnectionManager
 
 			return true;
 		} else {
-			log.info("Session does not exist for packet: " + packet.toString());
+			log.log(Level.CONFIG, "Session does not exist for packet: " + packet.toString());
 
 			return false;
 		}
@@ -898,7 +898,7 @@ public class BoshConnectionManager
 				}
 				sessions.remove(session.getSid());
 			} else {
-				log.info("Session does not exist for packet: " + packet.toString());
+				log.log(Level.CONFIG, "Session does not exist for packet: " + packet.toString());
 			}
 		}
 	}

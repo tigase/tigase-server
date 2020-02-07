@@ -89,7 +89,7 @@ public class NonAuthUserRepositoryImpl
 		} catch (UserNotFoundException e) {
 
 			// This is quite normal for anonymous users.
-			log.log(Level.INFO, "User not found in repository: {0}", user);
+			log.log(Level.CONFIG, "User not found in repository: {0}", user);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem accessing repository data.", e);
 		}    // end of try-catch

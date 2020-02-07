@@ -236,7 +236,7 @@ public class MessageAmp
 							}
 						}    // end of if (packets != null)
 					} catch (UserNotFoundException e) {
-						log.info("Something wrong, DB problem, cannot load offline messages. " + e);
+						log.log(Level.CONFIG, "Something wrong, DB problem, cannot load offline messages. " + e);
 					}      // end of try-catch
 
 					// notify AMP component that user is online now

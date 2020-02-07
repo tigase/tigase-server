@@ -142,7 +142,7 @@ public class CIDConnections {
 		S2SConnection s2s_conn = serv.getS2SConnection();
 
 		if (s2s_conn == null) {
-			log.log(Level.INFO, "s2s_conn not set for serv: {0}", serv);
+			log.log(Level.CONFIG, "s2s_conn not set for serv: {0}", serv);
 
 			return;
 		}
@@ -307,7 +307,7 @@ public class CIDConnections {
 		S2SConnection s2s_conn = (S2SConnection) port_props.get(S2SIOService.S2S_CONNECTION_KEY);
 
 		if (s2s_conn == null) {
-			log.log(Level.INFO, "s2s_conn not set for serv: {0}", port_props);
+			log.log(Level.CONFIG, "s2s_conn not set for serv: {0}", port_props);
 
 			return;
 		}
@@ -336,7 +336,7 @@ public class CIDConnections {
 				default:
 			}
 		} else {
-			log.log(Level.INFO, "ConnectionType not set for serv: {0}", port_props);
+			log.log(Level.CONFIG, "ConnectionType not set for serv: {0}", port_props);
 		}
 	}
 
@@ -400,7 +400,7 @@ public class CIDConnections {
 					port_props.put(S2SIOService.HANDSHAKING_DOMAIN_KEY, verify_req.getStanzaTo().toString());
 					initNewConnection(ip, dns_entry.getPort(), s2s_conn, port_props);
 				} catch (UnknownHostException ex) {
-					log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost(), ex);
+					log.log(Level.CONFIG, "Remote host not found: " + cid.getRemoteHost(), ex);
 				}
 			}
 		}, 0, TimeUnit.MILLISECONDS);
@@ -624,8 +624,8 @@ public class CIDConnections {
 							// DNS misconfiguration for the remote server (icq.jabber.cz for
 							// example)
 							// Now we assume: UnknownHostException
-							if (log.isLoggable(Level.INFO)) {
-								log.log(Level.INFO, "DNS misconfiguration for domain: {0}, for: {1}",
+							if (log.isLoggable(Level.CONFIG)) {
+								log.log(Level.CONFIG, "DNS misconfiguration for domain: {0}, for: {1}",
 										new Object[]{cid.getRemoteHost(), cid});
 							}
 
@@ -646,7 +646,7 @@ public class CIDConnections {
 				}
 			}
 		} catch (UnknownHostException ex) {
-			log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
+			log.log(Level.CONFIG, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
 			sendPacketsBack();
 		}
 

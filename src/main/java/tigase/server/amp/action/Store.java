@@ -96,7 +96,7 @@ public class Store
 						}
 					}
 				} catch (Exception e) {
-					log.log(Level.INFO, "Incorrect expire-at value: " + rule.getAttributeStaticStr("value"), e);
+					log.log(Level.CONFIG, "Incorrect expire-at value: " + rule.getAttributeStaticStr("value"), e);
 					expired = null;
 				}
 			}
@@ -115,7 +115,7 @@ public class Store
 				}
 				repo.storeMessage(packet.getStanzaFrom(), packet.getStanzaTo(), expired, elem, nonAuthUserRepo);
 			} catch (UserNotFoundException ex) {
-				log.info("User not found for offline message: " + packet);
+				log.log(Level.CONFIG, "User not found for offline message: " + packet);
 			}
 		}
 
@@ -144,11 +144,11 @@ public class Store
 								try {
 									resultsHandler.addOutPacket(Packet.packetInstance(elem));
 								} catch (TigaseStringprepException ex) {
-									log.info("Stringprep error for offline message loaded from DB: " + elem);
+									log.log(Level.CONFIG, "Stringprep error for offline message loaded from DB: " + elem);
 								}
 							}
 							if (Thread.interrupted()) {
-								log.info("stopping expired-processor");
+								log.log(Level.INFO, "stopping expired-processor");
 								expiredProcessor = null;
 								return;
 							}

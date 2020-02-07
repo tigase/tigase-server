@@ -497,7 +497,7 @@ public class ConfiguratorOld
 		Iq iqc = (Iq) packet;
 
 		if ((iqc.getType() != null) && (iqc.getType() == StanzaType.error)) {
-			log.info("Ignoring error packet: " + iqc.toString());
+			log.log(Level.CONFIG, "Ignoring error packet: " + iqc.toString());
 
 			return;
 		}
@@ -954,7 +954,7 @@ public class ConfiguratorOld
 						val = "";
 					}
 					val = XMLUtils.unescape(val);
-					log.info("New component value: " + entry.getKey() + "=" + val);
+					log.log(Level.CONFIG, "New component value: " + entry.getKey() + "=" + val);
 					setValue(entry.getKey(), val, false, false, new_params);
 				}    // end of for (Map.Entry entry: prop.entrySet())
 				if (admin) {
@@ -969,7 +969,7 @@ public class ConfiguratorOld
 							key = entry.getKey().substring(key_idx + 1);
 							subnode = entry.getKey().substring(0, key_idx);
 						}
-						log.info("Saving property to repository: " + "root=" + new_comp_name + ", subnode=" + subnode +
+						log.log(Level.CONFIG, "Saving property to repository: " + "root=" + new_comp_name + ", subnode=" + subnode +
 										 ", key=" + key + ", value=" + entry.getValue());
 						repository.set(new_comp_name, subnode, key, entry.getValue());
 					}    // end of for (Map.Entry entry: prop.entrySet())

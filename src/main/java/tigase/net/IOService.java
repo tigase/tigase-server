@@ -307,8 +307,8 @@ public abstract class IOService<RefObject>
 				}
 			} catch (Exception e) {
 				certCheckResult = CertCheckResult.invalid;
-				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO,
+				if (log.isLoggable(Level.CONFIG)) {
+					log.log(Level.CONFIG,
 							"Certificate validation failed, CertCheckResult: " + certCheckResult + ") [" + this + "]", e);
 				}
 			}
@@ -692,8 +692,8 @@ public abstract class IOService<RefObject>
 
 			return readBytes();
 		} catch (SSLHandshakeException e) {
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Exception starting connection [" + socketIO + "]: " + e);
+			if (log.isLoggable(Level.CONFIG)) {
+				log.log(Level.CONFIG, "Exception starting connection [" + socketIO + "]: " + e);
 			}
 			forceStop();
 		} catch (Exception eof) {
@@ -882,8 +882,8 @@ public abstract class IOService<RefObject>
 			//// This happens after TLS initialization sometimes, maybe reset helps
 			// decoder.reset();
 		} catch (SSLProtocolException | SSLHandshakeException e) {
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Exception starting connection ["  + socketIO + "] " + e);
+			if (log.isLoggable(Level.CONFIG)) {
+				log.log(Level.CONFIG, "Exception starting connection ["  + socketIO + "] " + e);
 			}
 			forceStop();
 		} catch (Exception eof) {
@@ -1007,8 +1007,8 @@ public abstract class IOService<RefObject>
 				}
 			}
 		} catch (SSLHandshakeException e) {
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO,  "Exception starting connection [" + socketIO + "]" + e);
+			if (log.isLoggable(Level.CONFIG)) {
+				log.log(Level.CONFIG,  "Exception starting connection [" + socketIO + "]" + e);
 			}
 			forceStop();
 		} catch (Exception e) {

@@ -715,10 +715,10 @@ public class ClientConnectionManager
 						// serv.call();
 						SocketThread.addSocketService(serv);
 					} catch (IOException ex) {
-						log.log(Level.INFO, "Problem enabling zlib compression on the connection: ", ex);
+						log.log(Level.CONFIG, "Problem enabling zlib compression on the connection: ", ex);
 					}
 				} else {
-					log.log(Level.INFO, "Can not find service for STARTZLIB command: {0}", iqc);
+					log.log(Level.CONFIG, "Can not find service for STARTZLIB command: {0}", iqc);
 				}
 
 				break;
@@ -772,7 +772,7 @@ public class ClientConnectionManager
 						serv.forceStop();
 					}    // end of try-catch
 				} else {
-					log.log(Level.INFO, "Can not find service for STARTTLS command: {0}", iqc);
+					log.log(Level.CONFIG, "Can not find service for STARTTLS command: {0}", iqc);
 				}      // end of else
 
 				break;
@@ -863,7 +863,7 @@ public class ClientConnectionManager
 					} catch (PacketErrorTypeException e) {
 
 						// Hm, error already, ignoring...
-						log.log(Level.INFO, "Error packet is not really expected here: {0}", iqc.toStringSecure());
+						log.log(Level.CONFIG, "Error packet is not really expected here: {0}", iqc.toStringSecure());
 					}
 				}
 
@@ -1114,7 +1114,7 @@ public class ClientConnectionManager
 			// If we still haven't received confirmation from the SM then
 			// the packet either has been lost or the server is overloaded
 			// In either case we disconnect the connection.
-			log.log(Level.INFO, "No response within time limit received for a packet: {0}", packet.toStringSecure());
+			log.log(Level.CONFIG, "No response within time limit received for a packet: {0}", packet.toStringSecure());
 
 			XMPPIOService<Object> serv = getXMPPIOService(packet.getFrom().toString());
 
@@ -1144,7 +1144,7 @@ public class ClientConnectionManager
 
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
-			log.log(Level.INFO, "No response within time limit received for a packet: {0}; RETRYING",
+			log.log(Level.CONFIG, "No response within time limit received for a packet: {0}; RETRYING",
 					packet.toStringSecure());
 			addOutPacketWithTimeout(packet, stoppedHandler, 60L, TimeUnit.SECONDS);
 		}

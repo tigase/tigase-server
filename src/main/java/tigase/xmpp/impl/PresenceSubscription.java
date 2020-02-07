@@ -104,7 +104,7 @@ public class PresenceSubscription
 				RosterAbstract.PresenceType pres_type = roster_util.getPresenceType(session, packet);
 
 				if (pres_type == null) {
-					log.log(Level.INFO, "Invalid presence found: {0}", packet);
+					log.log(Level.CONFIG, "Invalid presence found: {0}", packet);
 
 					return;
 				}    // end of if (type == null)
@@ -217,7 +217,7 @@ public class PresenceSubscription
 						break;
 				}    // end of switch (type)
 			} catch (NotAuthorizedException e) {
-				log.log(Level.INFO, "Can not access user Roster, user session is not authorized yet: {0}", packet);
+				log.log(Level.CONFIG, "Can not access user Roster, user session is not authorized yet: {0}", packet);
 				log.log(Level.FINEST, "presence problem...", e);
 			} catch (PolicyViolationException e) {
 				log.log(Level.FINE, "Violation of roster items number policy: {0}", packet);

@@ -148,7 +148,7 @@ public class LoggingBean
 			if (props == null) {
 				props = new HashMap<>();
 			}
-			props.putIfAbsent("level", Level.WARNING);
+			props.putIfAbsent("level", Level.INFO);
 			props.putIfAbsent("formatter", LogFormatter.class.getCanonicalName());
 			return props;
 		});

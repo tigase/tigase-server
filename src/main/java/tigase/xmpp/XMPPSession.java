@@ -107,7 +107,7 @@ public class XMPPSession {
 						old_res.putSessionData(XMPPResourceConnection.ERROR_KEY, "conflict");
 						old_res.logout();
 					} catch (NotAuthorizedException e) {
-						log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
+						log.log(Level.CONFIG, "Exception during closing old connection, ignoring.", e);
 					}
 					removeResourceConnection(old_res);
 				}

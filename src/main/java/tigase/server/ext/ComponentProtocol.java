@@ -697,10 +697,10 @@ public class ComponentProtocol
 						if (serv.isConnected()) {
 							result = serv;
 						} else {
-							log.info("Service is not connected for connection for hostname: " + hostname);
+							log.log(Level.CONFIG, "Service is not connected for connection for hostname: " + hostname);
 						}
 					} else {
-						log.info("Service is null for connection for hostname: " + hostname);
+						log.log(Level.CONFIG, "Service is null for connection for hostname: " + hostname);
 					}
 					if (result != null) {
 						break;
@@ -708,7 +708,7 @@ public class ComponentProtocol
 				}
 			}
 		} else {
-			log.info("No ext connection for hostname: " + hostname);
+			log.log(Level.CONFIG, "No ext connection for hostname: " + hostname);
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Selected connection: " + result);

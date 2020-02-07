@@ -277,7 +277,7 @@ public class Privacy {
 			if (list != null) {
 				session.putSessionData(ACTIVE, list);
 			} else {
-				log.log(Level.INFO, "Setting active list to null, do something better than that, perhaps notify user.");
+				log.log(Level.CONFIG, "Setting active list to null, do something better than that, perhaps notify user.");
 			}
 		}
 	}

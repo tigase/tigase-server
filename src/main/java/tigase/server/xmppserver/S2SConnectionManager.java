@@ -288,7 +288,7 @@ public class S2SConnectionManager
 						}
 					}
 				} catch (Exception e) {
-					log.log(Level.INFO, "Unexpected exception for packet: " + p, e);
+					log.log(Level.CONFIG, "Unexpected exception for packet: " + p, e);
 				}
 			}
 		}    // end of while ()
@@ -403,7 +403,7 @@ public class S2SConnectionManager
 		} else {
 			serv.setConnectionId(JID.jidInstanceNS(null, serv.getUniqueId(), UUID.randomUUID().toString()));
 		}
-		log.log(Level.INFO, "s2s connection opened: {0}", serv);
+		log.log(Level.CONFIG, "s2s connection opened: {0}", serv);
 		for (S2SProcessor proc : processors) {
 			proc.serviceStarted(serv);
 		}
@@ -419,8 +419,8 @@ public class S2SConnectionManager
 			}
 		}
 
-		if (log.isLoggable(Level.INFO)) {
-			log.log(Level.INFO, "[[{0}]] S2S Connection stopped: {1}", new Object[]{getName(), serv});
+		if (log.isLoggable(Level.CONFIG)) {
+			log.log(Level.CONFIG, "[[{0}]] S2S Connection stopped: {1}", new Object[]{getName(), serv});
 		}
 
 		return result;

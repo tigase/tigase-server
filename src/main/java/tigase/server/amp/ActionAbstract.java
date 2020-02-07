@@ -156,7 +156,7 @@ public abstract class ActionAbstract
 				}
 			}
 		} catch (Exception ex) {
-			log.log(Level.INFO, "Problem retrieving user roster: " + user, ex);
+			log.log(Level.CONFIG, "Problem retrieving user roster: " + user, ex);
 		}
 
 		return false;

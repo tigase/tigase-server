@@ -31,6 +31,7 @@ import tigase.xmpp.jid.BareJID;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -139,7 +140,7 @@ public class JabberIqIq
 			return;
 		}      // end of if (session == null)
 		if (session == null) {
-			log.info("Session null, dropping packet: " + packet.toString());
+			log.log(Level.CONFIG, "Session null, dropping packet: " + packet.toString());
 
 			return;
 		}    // end of if (session == null)

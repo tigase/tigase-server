@@ -28,6 +28,7 @@ import tigase.xmpp.StanzaType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.server.ext.ComponentProtocolHandler.EXTCOMP_BIND_HOSTNAMES_PROP_KEY;
@@ -99,7 +100,7 @@ public class BindProcessor
 				if (!host.isEmpty()) {
 					Packet bind_p = Packet.packetInstance(newBindElement(host, handler), null, null);
 
-					log.info("Generating hostname bind packet: " + bind_p.toString());
+					log.log(Level.CONFIG, "Generating hostname bind packet: " + bind_p.toString());
 					results.offer(bind_p);
 				} else {
 					log.warning("Empty hostname set for bind...");

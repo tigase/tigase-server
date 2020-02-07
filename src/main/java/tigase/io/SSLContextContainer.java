@@ -423,7 +423,7 @@ public class SSLContextContainer
 			}
 		}
 		mode = HARDENED_MODE.global.equals(mode) ? hardenedMode : mode;
-		log.log(Level.INFO, "Using hardened-mode: {0} for domain: {1}", new String[]{String.valueOf(mode), domain});
+		log.log(Level.CONFIG, "Using hardened-mode: {0} for domain: {1}", new String[]{String.valueOf(mode), domain});
 		return mode;
 	}
 

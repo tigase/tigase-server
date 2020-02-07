@@ -214,7 +214,7 @@ public class OfflineMessages
 							}
 						}    // end of if (packets != null)
 					} catch (UserNotFoundException e) {
-						log.info("Something wrong, DB problem, cannot load offline messages. " + e);
+						log.log(Level.CONFIG, "Something wrong, DB problem, cannot load offline messages. " + e);
 					}      // end of try-catch
 				}
 				break;
@@ -782,7 +782,7 @@ public class OfflineMessages
 					return domHandler.getParsedElements();
 				}    // end of while (elem = elems.poll() != null)
 			} catch (NotAuthorizedException ex) {
-				log.info("User not authrized to retrieve offline messages, " +
+				log.log(Level.CONFIG, "User not authrized to retrieve offline messages, " +
 								 "this happens quite often on some installations where there" +
 								 " are a very short living client connections. They can " + "disconnect at any time. " +
 								 ex);

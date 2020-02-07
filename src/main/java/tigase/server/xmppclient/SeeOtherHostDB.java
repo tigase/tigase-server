@@ -234,7 +234,7 @@ public class SeeOtherHostDB
 				}
 			}
 
-			log.info("Loaded " + redirectsMap.size() + " redirect definitions from database.");
+			log.log(Level.CONFIG, "Loaded " + redirectsMap.size() + " redirect definitions from database.");
 		}
 	}
 

@@ -185,7 +185,7 @@ public class AddScriptCommand
 			}
 		}
 
-		log.log(Level.INFO, "Saving command: {0} to disk file: {1}", new Object[]{commandId, fileName.toString()});
+		log.log(Level.CONFIG, "Saving command: {0} to disk file: {1}", new Object[]{commandId, fileName.toString()});
 
 		FileWriter fw = new FileWriter(fileName, false);
 		String comment = lineCommentStart.get(fileExtension);

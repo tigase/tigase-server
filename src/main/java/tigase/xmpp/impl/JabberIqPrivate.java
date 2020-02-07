@@ -67,7 +67,7 @@ public class JabberIqPrivate
 
 		// Don't do anything if session is null
 		if (session == null) {
-			log.info("Session null, dropping packet: " + packet.toString());
+			log.log(Level.CONFIG, "Session null, dropping packet: " + packet.toString());
 
 			return;
 		}    // end of if (session == null)

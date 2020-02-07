@@ -667,7 +667,7 @@ public abstract class AbstractMessageReceiver
 	@Override
 	public void start() {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.INFO, "{0}: starting queue management threads ...", getName());
+			log.log(Level.FINER, "{0}: starting queue management threads ...", getName());
 		}
 		startThreads();
 
@@ -680,7 +680,7 @@ public abstract class AbstractMessageReceiver
 
 	public void stop() {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.INFO, "{0}: stopping queue management threads ...", getName());
+			log.log(Level.FINER, "{0}: stopping queue management threads ...", getName());
 		}
 		stopThreads();
 	}
@@ -1352,7 +1352,7 @@ public abstract class AbstractMessageReceiver
 					++packetCounter;
 
 					// if (log.isLoggable(Level.INFO)) {
-					// log.info("[" + getName() + "] packet from " + type + " queue: " +
+					// log.log(Level.INFO, ("[" + getName() + "] packet from " + type + " queue: " +
 					// packet);
 					// }
 					switch (type) {

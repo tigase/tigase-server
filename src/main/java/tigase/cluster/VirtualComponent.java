@@ -182,7 +182,7 @@ public class VirtualComponent
 			packet.setPacketTo(redirectTo);
 			results.add(packet);
 		} else {
-			log.log(Level.INFO, "No redirectTo address, dropping packet: {0}", packet);
+			log.log(Level.CONFIG, "No redirectTo address, dropping packet: {0}", packet);
 		}
 	}
 

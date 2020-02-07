@@ -68,7 +68,7 @@ public class StartTLS
 				serv.getSessionData().put("TLS", "TLS");
 				serv.startTLS(false, handler.isTlsWantClientAuthEnabled(), handler.isTlsNeedClientAuthEnabled());
 			} catch (IOException ex) {
-				log.log(Level.INFO, "Problem with TLS initialization.", ex);
+				log.log(Level.CONFIG, "Problem with TLS initialization.", ex);
 			}
 
 			return true;
@@ -84,7 +84,7 @@ public class StartTLS
 				serv.getSessionData().put("TLS", "TLS");
 				serv.startTLS(true, handler.isTlsWantClientAuthEnabled(), handler.isTlsNeedClientAuthEnabled());
 			} catch (IOException ex) {
-				log.log(Level.INFO, "Problem with TLS initialization.", ex);
+				log.log(Level.CONFIG, "Problem with TLS initialization.", ex);
 			}
 
 			return true;

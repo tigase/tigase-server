@@ -375,12 +375,12 @@ public abstract class ConfiguratorAbstract
 
 		// Ignored, removing configuration settings does not make sense, for now...
 		// right now, just print a log message
-		log.log(Level.INFO, "Removing configuration item not supported yet: {0}", item);
+		log.log(Level.CONFIG, "Removing configuration item not supported yet: {0}", item);
 	}
 
 	@Override
 	public void itemUpdated(ConfigItem item) {
-		log.log(Level.INFO, "Updating configuration item: {0}", item);
+		log.log(Level.CONFIG, "Updating configuration item: {0}", item);
 
 		Configurable component = getComponent(item.getCompName());
 
@@ -474,7 +474,7 @@ public abstract class ConfiguratorAbstract
 		}
 		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter", LogFormatter.class.getName());
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "INFO");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter", LogFormatter.class.getName());
@@ -647,13 +647,13 @@ public abstract class ConfiguratorAbstract
 
 			return;
 		} else {
-			log.log(Level.INFO, "Propeties size is {0}, and here are all propeties: {1}",
+			log.log(Level.CONFIG, "Properties size is {0}, and here are all propeties: {1}",
 					new Object[]{props.size(), props});
 		}
 		setupLogManager(props);
 		super.setProperties(props);
 		if (props.size() == 1) {
-			log.log(Level.INFO, "Propeties size is {0}, and here are all propeties: {1}",
+			log.log(Level.CONFIG, "Propeties size is {0}, and here are all propeties: {1}",
 					new Object[]{props.size(), props});
 
 			return;
@@ -736,7 +736,7 @@ public abstract class ConfiguratorAbstract
 		} else {
 			auth_repo_impl.addRepo(domain, repo);
 		}
-		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository pool, url: {3}",
+		log.log(Level.CONFIG, "[{0}] Initialized {1} as user auth repository pool, url: {3}",
 				new Object[]{((domain != null) ? domain : "DEFAULT"), cls_name, conn_url});
 	}
 
@@ -757,7 +757,7 @@ public abstract class ConfiguratorAbstract
 		} else {
 			user_repo_impl.addRepo(domain, repo);
 		}
-		log.log(Level.INFO, "[{0}] Initialized {1} as user repository pool, url: {2}",
+		log.log(Level.CONFIG, "[{0}] Initialized {1} as user repository pool, url: {2}",
 				new Object[]{((domain != null) ? domain : "DEFAULT"), cls_name, conn_url});
 	}
 
@@ -790,7 +790,7 @@ public abstract class ConfiguratorAbstract
 		String options = key.substring(br_open + 1, br_close);
 		String[] domains = options.split(",");
 
-		log.log(Level.INFO, "Found DB domain: {0}", Arrays.toString(domains));
+		log.log(Level.CONFIG, "Found DB domain: {0}", Arrays.toString(domains));
 
 		String get_user_db = RepositoryFactory.GEN_AUTH_DB + "[" + options + "]";
 
@@ -825,7 +825,7 @@ public abstract class ConfiguratorAbstract
 		String options = key.substring(br_open + 1, br_close);
 		String[] domains = options.split(",");
 
-		log.log(Level.INFO, "Found DB domain: {0}", Arrays.toString(domains));
+		log.log(Level.CONFIG, "Found DB domain: {0}", Arrays.toString(domains));
 
 		String get_user_db = RepositoryFactory.GEN_USER_DB + "[" + options + "]";
 

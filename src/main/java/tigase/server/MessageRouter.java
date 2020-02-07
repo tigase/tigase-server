@@ -170,7 +170,7 @@ public class MessageRouter
 	}
 
 	public void addComponent(ServerComponent component) throws ConfigurationException {
-		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
+		log.log(Level.CONFIG, "Adding component: ", component.getClass().getSimpleName());
 		components.put(component.getName(), component);
 		components_byId.put(component.getComponentId(), component);
 		if (component instanceof XMPPService) {
@@ -188,7 +188,7 @@ public class MessageRouter
 	}
 
 	public void addRegistrator(ComponentRegistrator registr) throws ConfigurationException {
-		log.log(Level.INFO, "Adding registrator: {0}", registr.getClass().getSimpleName());
+		log.log(Level.CONFIG, "Adding registrator: {0}", registr.getClass().getSimpleName());
 		registrators.put(registr.getName(), registr);
 		addComponent(registr);
 		for (ServerComponent comp : components.values()) {
@@ -201,7 +201,7 @@ public class MessageRouter
 	}
 
 	public void addRouter(MessageReceiver receiver) throws ConfigurationException {
-		log.info("Adding receiver: " + receiver.getClass().getSimpleName());
+		log.log(Level.CONFIG, "Adding receiver: " + receiver.getClass().getSimpleName());
 		addComponent(receiver);
 		receivers.put(receiver.getName(), receiver);
 	}
@@ -293,7 +293,7 @@ public class MessageRouter
 		// SessionManager
 		// TODO: Replace the hack with a proper solution
 		// if (packet.getTo() == NULL_ROUTING) {
-		// log.info("NULL routing, it is normal if server doesn't know how to"
+		// log.log(Level.INFO, ("NULL routing, it is normal if server doesn't know how to"
 		// + " process packet: " + packet.toStringSecure());
 		//
 		// try {
@@ -521,7 +521,7 @@ public class MessageRouter
 	}
 
 	public void removeRegistrator(ComponentRegistrator registr) {
-		log.log(Level.INFO, "Removing registrator: {0}", registr.getClass().getSimpleName());
+		log.log(Level.CONFIG, "Removing registrator: {0}", registr.getClass().getSimpleName());
 		registrators.remove(registr.getName(), registr);
 		removeComponent(registr);
 		for (ServerComponent comp : components.values()) {
@@ -534,7 +534,7 @@ public class MessageRouter
 	}
 
 	public void removeRouter(MessageReceiver receiver) {
-		log.info("Removing receiver: " + receiver.getClass().getSimpleName());
+		log.log(Level.CONFIG, "Removing receiver: " + receiver.getClass().getSimpleName());
 		receivers.remove(receiver.getName());
 		removeComponent(receiver);
 	}

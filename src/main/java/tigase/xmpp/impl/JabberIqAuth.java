@@ -214,7 +214,7 @@ public class JabberIqAuth
 																  session.nextStanzaId()));
 						}    // end of else
 					} catch (Exception e) {
-						log.info("Authentication failed: " + user_name);
+						log.log(Level.CONFIG, "Authentication failed: " + user_name);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Authorization exception: ", e);
 						}

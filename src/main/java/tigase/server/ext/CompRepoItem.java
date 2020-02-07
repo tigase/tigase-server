@@ -403,7 +403,7 @@ public class CompRepoItem
 //  if (!class_name.endsWith(".class")) {
 //    class_name = class_name + ".class";
 //  }
-		log.log(Level.INFO, "Activating load-balancer for domain: {0}, class: {1}", new Object[]{domain, class_name});
+		log.log(Level.CONFIG, "Activating load-balancer for domain: {0}, class: {1}", new Object[]{domain, class_name});
 
 		LoadBalancerIfc result = null;
 
@@ -411,7 +411,7 @@ public class CompRepoItem
 			result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
 		} catch (Exception ex1) {
 			class_name = "tigase.server.ext.lb." + class_name;
-			log.log(Level.INFO, "Cannot active load balancer for class: {0}, trying: {1}",
+			log.log(Level.CONFIG, "Cannot active load balancer for class: {0}, trying: {1}",
 					new Object[]{cls_name, class_name});
 			try {
 				result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
@@ -422,7 +422,7 @@ public class CompRepoItem
 				result = DEF_LB_CLASS;
 			}
 		}
-		log.log(Level.INFO, "Activated load-balancer for domain: {0}, class: {1}",
+		log.log(Level.CONFIG, "Activated load-balancer for domain: {0}, class: {1}",
 				new Object[]{domain, result.getClass().getName()});
 
 		return result;

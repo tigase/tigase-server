@@ -69,7 +69,7 @@ public class SchemaVersionCheckerLogger {
 			sb.append("\n\tPlease upgrade the installation by running:");
 			sb.append("\n\t\t$ ./scripts/tigase.sh upgrade-schema etc/tigase.conf").append("\n");
 			sb.append("\n\t(this warning is printed each time SNAPSHOT version is started, you can ignore this");
-			sb.append("message if you've just run above command)").append("\n");
+			sb.append("\n\tmessage if you've just run above command)").append("\n");
 
 			log.log(Level.WARNING, sb.toString());
 		}

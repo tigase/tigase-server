@@ -25,6 +25,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -541,34 +542,34 @@ public enum Command {
 	public static String getFieldValue(final Packet packet, final String f_name, boolean debug) {
 		Element iq = packet.getElement();
 
-		log.info("Command iq: " + iq.toString());
+		log.log(Level.FINEST, "Command iq: " + iq.toString());
 
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
 
-		log.info("Command command: " + command.toString());
+		log.log(Level.FINEST, "Command command: " + command.toString());
 
 		Element x = command.getChild("x", "jabber:x:data");
 
 		if (x == null) {
-			log.info("Command x: NULL");
+			log.log(Level.FINEST, "Command x: NULL");
 
 			return null;
 		}
-		log.info("Command x: " + x.toString());
+		log.log(Level.FINEST, "Command x: " + x.toString());
 
 		List<Element> children = x.getChildren();
 
 		for (Element child : children) {
-			log.info("Command form child: " + child.toString());
+			log.log(Level.FINEST, "Command form child: " + child.toString());
 			if (child.getName().equals(DataForm.FIELD_EL) && child.getAttributeStaticStr("var").equals(f_name)) {
 				String value = child.getChildCDataStaticStr(DataForm.FIELD_VALUE_PATH);
 
-				log.info("Command found: field=" + f_name + ", value=" + value);
+				log.log(Level.FINEST, "Command found: field=" + f_name + ", value=" + value);
 				if (value != null) {
 					return XMLUtils.unescape(value);
 				}
 			} else {
-				log.info("Command not found: field=" + f_name + ", value=" +
+				log.log(Level.FINEST, "Command not found: field=" + f_name + ", value=" +
 								 child.getChildCDataStaticStr(DataForm.FIELD_VALUE_PATH));
 			}
 		}
