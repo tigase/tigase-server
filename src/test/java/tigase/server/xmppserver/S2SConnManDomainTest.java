@@ -109,6 +109,18 @@ public class S2SConnManDomainTest
 	}
 
 	@Test
+	public void testS2S_pouet_ovh() {
+		setupCID("tigase.im", "pouet.ovh");
+		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
+	public void testS2S_upload_pouet_ovh() {
+		setupCID("tigase.im", "upload.pouet.ovh");
+		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
 	public void testS2S_rsocks_net() {
 		// can't connect from 404.im, certificate not trusted ; jabster.pl: ejabberd 18.12.1
 		setupCID("tigase.im", "rsocks.net");
@@ -154,6 +166,24 @@ public class S2SConnManDomainTest
 	public void testS2S_xmpp_uwpx_org() {
 		// can't connect from 404.im, certificate not trusted ; jabster.pl: ejabberd, 19.09.1
 		setupCID("tigase.im", "xmpp.uwpx.org");
+		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
+	public void testS2S_messaging_one() {
+		setupCID("tigase.im", "messaging.one");
+		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
+	public void testS2S_conference_process_one_net() {
+		setupCID("tigase.im", "conference.process-one.net");
+		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
+	public void testS2S_shreddox_eu() {
+		setupCID("tigase.im", "shreddox.eu");
 		testS2STigaseConnectionManager(null);
 	}
 
