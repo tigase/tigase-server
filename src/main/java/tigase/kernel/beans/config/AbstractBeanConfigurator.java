@@ -173,6 +173,7 @@ public abstract class AbstractBeanConfigurator
 		List<Class<?>> toRegister = new ArrayList<>();
 		Class<?> req = requiredClass;
 		do {
+			Optional<List<Class<?>>> interfaces = Optional.ofNullable(req.getInterfaces()).map(Arrays::asList);
 			Iterator<Map.Entry<Class<?>, Bean>> it = matching.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<Class<?>, Bean> e = it.next();
@@ -181,6 +182,20 @@ public abstract class AbstractBeanConfigurator
 					toRegister.add(0, e.getKey());
 					it.remove();
 					continue;
+				}
+				if (interfaces.isPresent()) {
+					boolean found = false;
+					for(Class<?> reqIfc : interfaces.get()) {
+						if (reqIfc.isAssignableFrom(expParent)) {
+							toRegister.add(0, e.getKey());
+							it.remove();
+							found = true;
+							break;
+						}
+					}
+					if (found) {
+						continue;
+					}
 				}
 				Class[] exParents = e.getValue().parents();
 				for (Class exp : exParents) {

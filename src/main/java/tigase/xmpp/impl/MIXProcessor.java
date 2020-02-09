@@ -27,13 +27,9 @@ import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
-import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
-import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
-import tigase.xmpp.impl.annotation.DiscoFeatures;
-import tigase.xmpp.impl.annotation.Handle;
-import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.BareJID;
@@ -50,6 +46,7 @@ import java.util.function.Consumer;
 
 import static tigase.xmpp.impl.MIXProcessor.ID;
 
+@Id(ID)
 @Bean(name = ID, parent = SessionManager.class, active = false)
 @Handles({
 		@Handle(path = {Iq.ELEM_NAME, "client-join"}, xmlns = "urn:xmpp:mix:pam:2"),
@@ -90,7 +87,7 @@ public class MIXProcessor
 			if (XMPPProcessorAbstract.isFromUserSession(packet, session)) {
 				// processing packet coming fom the user..
 				Element actionEl = packet.getElement().findChild(el -> el.getXMLNS() == ID);
-				if (actionEl != null || !EnumSet.of(StanzaType.set).contains(packet.getType())) {
+				if (actionEl == null || !EnumSet.of(StanzaType.set).contains(packet.getType())) {
 					// TODO: Add a way to forward iq's sent from the client directly to MIX component (leave/join)
 					// FIXED: we do not need that as leave/join are no longer processed here
 					throw new XMPPProcessorException(Authorization.BAD_REQUEST);
@@ -127,7 +124,7 @@ public class MIXProcessor
 						EnumSet.of(StanzaType.result, StanzaType.error).contains(packet.getType())) {
 					BareJID userJID = packet.getStanzaTo().getBareJID();
 					String requestId = generateId(channel, packet.getStanzaId());
-					String resource = userRepository.getData(userJID, ID, channel.toString(), null);
+					String resource = userRepository.getData(userJID, ID, requestId, null);
 					if (resource == null) {
 						// this is error or result, so lets just ignore that as most likely it was already handled...
 						return;
@@ -157,11 +154,17 @@ public class MIXProcessor
 									rosterUtil.updateBuddyChange(session, results, it);
 									break;
 							}
-							try {
-								sendToUser(userJID, resource, packet.getType(), packet.getStanzaId(), actionEl, results::offer);
-							} catch (TigaseStringprepException ex) {
-								throw new XMPPProcessorException(Authorization.JID_MALFORMED);
-							}
+							Optional.ofNullable(session.getParentSession())
+									.map(parent -> parent.getResourceForResource(resource))
+									.map(conn -> {
+										try {
+											return conn.getConnectionId();
+										} catch (NoConnectionIdException ex) {
+											return null;
+										}
+									})
+									.ifPresent(connJID -> sendToUser(userJID, resource, connJID, packet.getType(),
+																	 packet.getStanzaId(), actionEl, results::offer));
 						} else {
 							results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true));
 						}
@@ -188,8 +191,7 @@ public class MIXProcessor
 		writer.accept(Packet.packetInstance(iqEl, JID.jidInstance(userJID), JID.jidInstance(channel)));
 	}
 
-	protected void sendToUser(BareJID userJID, String resource, StanzaType stanzaType, String id, Element actionEl, Consumer<Packet> writer)
-			throws TigaseStringprepException {
+	protected void sendToUser(BareJID userJID, String resource, JID connectionJID, StanzaType stanzaType, String id, Element actionEl, Consumer<Packet> writer) {
 		Element iqEl = new Element("iq");
 		iqEl.setXMLNS(Iq.CLIENT_XMLNS);
 		iqEl.setAttribute("id", id);
@@ -216,7 +218,9 @@ public class MIXProcessor
 			}
 		}
 
-		writer.accept(Packet.packetInstance(iqEl, JID.jidInstance(userJID), JID.jidInstance(userJID, resource)));
+		Packet response = Packet.packetInstance(iqEl, JID.jidInstance(userJID), JID.jidInstanceNS(userJID, resource));
+		response.setPacketTo(connectionJID);
+		writer.accept(response);
 	}
 
 	protected String generateId(BareJID channel, String packetID) throws XMPPProcessorException {
