@@ -16,12 +16,10 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select now(), ' - Setting schema version to 5.1';
-
 -- QUERY START:
-select TigPutDBProperty('schema-version', '5.1');
+call TigPutDBProperty('schema-version', '8.1.0');
 -- QUERY END:
 
 -- QUERY START:
-select TigSetComponentVersion('server', '5.1');
+call TigSetComponentVersion('server', '8.1.0');
 -- QUERY END:

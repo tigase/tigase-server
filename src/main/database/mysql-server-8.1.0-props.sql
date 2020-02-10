@@ -16,14 +16,12 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
---  To load schema to PostgreSQL database execute following commands:
---
---  createuser tigase
---  createdb -U tigase tigase
---  psql -q -U tigase -d tigase -f postgresql-schema.sql
+select NOW(), ' - Setting schema version to 8.1.0';
 
--- LOAD FILE: database/sqlserver-server-7.0.0-schema.sql
+-- QUERY START:
+call TigPutDBProperty('schema-version', '8.1.0');
+-- QUERY END:
 
--- LOAD FILE: database/sqlserver-server-7.0.0-sp.sql
-
--- LOAD FILE: database/sqlserver-server-7.0.0-props.sql
+-- QUERY START:
+call TigSetComponentVersion('server', '8.1.0');
+-- QUERY END:

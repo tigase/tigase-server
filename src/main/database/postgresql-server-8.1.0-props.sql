@@ -16,15 +16,12 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-7.0.0-schema.sql;
+select now(), ' - Setting schema version to 8.1.0';
 
-source database/mysql-server-7.0.0-sp.sql;
+-- QUERY START:
+select TigPutDBProperty('schema-version', '8.1.0');
+-- QUERY END:
 
-source database/mysql-server-7.0.0-props.sql;
-
--- LOAD FILE: database/mysql-server-7.0.0-schema.sql
-
--- LOAD FILE: database/mysql-server-7.0.0-sp.sql
-
--- LOAD FILE: database/mysql-server-7.0.0-props.sql
-
+-- QUERY START:
+select TigSetComponentVersion('server', '8.1.0');
+-- QUERY END:

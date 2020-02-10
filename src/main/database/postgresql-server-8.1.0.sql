@@ -16,4 +16,6 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
---
+\i database/postgresql-server-8.1.0-props.sql
+
+-- LOAD FILE: database/postgresql-server-8.1.0-props.sql

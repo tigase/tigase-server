@@ -16,12 +16,19 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select NOW(), ' - Setting schema version to 5.1';
+-- QUERY START:
+SET QUOTED_IDENTIFIER ON
+-- QUERY END:
+GO
+
+select GETDATE(), ' - Setting schema version to 8.1.0';
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '5.1');
+exec dbo.TigPutDBProperty 'schema-version', '8.1.0';
 -- QUERY END:
+GO
 
 -- QUERY START:
-call TigSetComponentVersion('server', '5.1');
+exec TigSetComponentVersion 'server', '8.1.0';
 -- QUERY END:
+GO

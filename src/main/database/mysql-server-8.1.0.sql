@@ -16,4 +16,8 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
+source database/mysql-server-8.1.0-props.sql;
+
+-- LOAD FILE: database/mysql-server-8.1.0-props.sql;
+
 --
