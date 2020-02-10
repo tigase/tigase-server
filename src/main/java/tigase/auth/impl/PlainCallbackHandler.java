@@ -53,7 +53,7 @@ public class PlainCallbackHandler
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 	protected AuthRepository repo;
 	private XMPPResourceConnection session;
-	private boolean accountDisabled = false;
+	private boolean loggingInForbidden = false;
 	private String username;
 
 	@Override
@@ -88,7 +88,7 @@ public class PlainCallbackHandler
 			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
 		}
 
-		if (accountDisabled) {
+		if (loggingInForbidden) {
 			authCallback.setAuthorized(false);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "User {0} is disabled", jid);
@@ -158,7 +158,7 @@ public class PlainCallbackHandler
 				entry = credentials.getFirst();
 			}
 
-			accountDisabled = credentials.isAccountDisabled();
+			loggingInForbidden = !credentials.canLogin();
 
 			pc.setVerified(entry != null && entry.verifyPlainPassword(password));
 		} catch (Exception e) {

@@ -29,6 +29,11 @@ public interface Credentials {
 	String DEFAULT_USERNAME = "default";
 
 	/**
+	 * Checks if account can perform logging-in
+	 */
+	boolean canLogin();
+
+	/**
 	 * Returns bare jid of an account
 	 *
 	 * @return bare jid of an account

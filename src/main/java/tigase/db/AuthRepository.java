@@ -126,6 +126,10 @@ public interface AuthRepository
 			}
 		}
 
+		public boolean isInactive() {
+			return value <= 0;
+		}
+
 		private final int value;
 
 		public static AccountStatus byValue(int value) {
@@ -190,7 +194,7 @@ public interface AuthRepository
 	}
 
 	@Deprecated
-	@TigaseDeprecated(since = "8.0.0")
+	@TigaseDeprecated(since = "8.0.0", note = "Use getAccountStatus()")
 	default boolean isUserDisabled(BareJID user) throws TigaseDBException {
 		AccountStatus s = getAccountStatus(user);
 		return s == AccountStatus.disabled;
@@ -283,6 +287,11 @@ public interface AuthRepository
 		}
 
 		@Override
+		public boolean canLogin() {
+			return !(isAccountDisabled() || accountStatus.isInactive());
+		}
+
+		@Override
 		public Credentials.Entry getFirst() {
 			if (entries.isEmpty()) {
 				return null;
@@ -352,6 +361,11 @@ public interface AuthRepository
 		@Override
 		public Entry getFirst() {
 			return entry;
+		}
+
+		@Override
+		public boolean canLogin() {
+			return !(isAccountDisabled() || accountStatus.isInactive());
 		}
 
 		@Override

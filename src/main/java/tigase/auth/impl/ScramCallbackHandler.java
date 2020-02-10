@@ -53,7 +53,7 @@ public class ScramCallbackHandler
 		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware, MechanismNameAware {
 
 	private static final Logger log = Logger.getLogger(ScramCallbackHandler.class.getCanonicalName());
-	private boolean accountDisabled = false;
+	private boolean loggingInForbidden = false;
 	private ScramCredentialsEntry credentialsEntry;
 	private boolean credentialsFetched;
 	private String domain;
@@ -104,7 +104,7 @@ public class ScramCallbackHandler
 		}
 
 		fetchCredentials();
-		if (accountDisabled) {
+		if (loggingInForbidden) {
 			authCallback.setAuthorized(false);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "User {0} is disabled", jid);
@@ -245,7 +245,7 @@ public class ScramCallbackHandler
 			Credentials credentials = repo.getCredentials(jid, username);
 
 			if (credentials == null) {
-				accountDisabled = true;
+				loggingInForbidden = true;
 			} else {
 				String mech = mechanismName.endsWith("-PLUS") ? mechanismName.substring(0, mechanismName.length() -
 						"-PLUS".length()) : mechanismName;
@@ -261,7 +261,7 @@ public class ScramCallbackHandler
 																 (PlainCredentialsEntry) entry);
 				}
 
-				accountDisabled = credentials.isAccountDisabled();
+				loggingInForbidden = !credentials.canLogin();
 			}
 		} catch (Exception ex) {
 			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with username " + username, ex);
