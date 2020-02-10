@@ -17,30 +17,11 @@
  */
 package tigase.mix;
 
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.selector.ClusterModeRequired;
-import tigase.kernel.beans.selector.ConfigType;
-import tigase.kernel.beans.selector.ConfigTypeEnum;
-import tigase.kernel.core.Kernel;
-import tigase.pubsub.PubSubComponent;
+import tigase.xmpp.jid.JID;
 
-@Bean(name = "mix", parent = Kernel.class, active = true)
-@ConfigType(ConfigTypeEnum.DefaultMode)
-@ClusterModeRequired(active = false)
-public class MixComponent extends PubSubComponent implements IMixComponent {
-	
-	@Override
-	public String getDiscoCategory() {
-		return "conference";
-	}
+public interface IMixComponent {
 
-	@Override
-	public String getDiscoCategoryType() {
-		return "mix";
-	}
+	JID getComponentId();
 
-	@Override
-	public String getDiscoDescription() {
-		return "Mediated Information eXchange";
-	}
+	String getName();
 }

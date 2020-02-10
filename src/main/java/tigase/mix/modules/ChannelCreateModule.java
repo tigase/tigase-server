@@ -23,8 +23,8 @@ import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
-import tigase.mix.MixComponent;
 import tigase.mix.model.ChannelConfiguration;
 import tigase.mix.model.MixAction;
 import tigase.mix.model.MixLogic;
@@ -45,7 +45,7 @@ import java.util.UUID;
 
 import static tigase.pubsub.AbstractNodeConfig.PUBSUB;
 
-@Bean(name="channelCreateModule", parent = MixComponent.class, active = true)
+@Bean(name="channelCreateModule", parent = IMixComponent.class, active = true)
 public class ChannelCreateModule extends AbstractPubSubModule {
 
 	private static final Criteria CRIT_CREATE = ElementCriteria.nameType("iq", "set")

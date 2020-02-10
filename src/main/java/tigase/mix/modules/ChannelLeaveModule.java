@@ -23,9 +23,9 @@ import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
-import tigase.mix.model.IMixRepository;
+import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
-import tigase.mix.MixComponent;
+import tigase.mix.model.IMixRepository;
 import tigase.mix.model.MixLogic;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.Subscription;
@@ -40,7 +40,7 @@ import tigase.xmpp.jid.BareJID;
 
 import java.util.Map;
 
-@Bean(name="channelLeaveModule", parent = MixComponent.class, active = true)
+@Bean(name="channelLeaveModule", parent = IMixComponent.class, active = true)
 public class ChannelLeaveModule extends AbstractPubSubModule {
 
 	private static final Criteria CRIT_LEAVE = ElementCriteria.nameType("iq", "set")

@@ -17,23 +17,22 @@
  */
 package tigase.mix.model;
 
-import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.Affiliations;
 import tigase.mix.Mix;
 import tigase.mix.MixComponent;
-import tigase.pubsub.AbstractNodeConfig;
 import tigase.pubsub.CollectionItemsOrdering;
-import tigase.pubsub.NodeType;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.modules.PublishItemModule;
 import tigase.pubsub.modules.RetractItemModule;
-import tigase.pubsub.modules.mam.Query;
 import tigase.pubsub.repository.IItems;
+import tigase.pubsub.repository.IPubSubRepository;
+import tigase.pubsub.repository.ISubscriptions;
 import tigase.pubsub.repository.cached.CachedPubSubRepository;
 import tigase.pubsub.repository.cached.IAffiliationsCached;
+import tigase.pubsub.repository.stateless.UsersAffiliation;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -43,12 +42,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Bean(name = "repository", parent = MixComponent.class, active = true)
-public class MixRepository extends CachedPubSubRepository implements IMixRepository {
+@Bean(name = "mixRepository", parent = MixComponent.class, active = true)
+public class MixRepository<T> implements IMixRepository, IPubSubRepository.IListener, CachedPubSubRepository.NodeAffiliationProvider<T> {
 
 	private static final Logger log = Logger.getLogger(MixRepository.class.getCanonicalName());
 
-	@Inject
+	@Inject (nullAllowed = true)
 	private MixLogic mixLogic;
 
 	@Inject(nullAllowed = true)
@@ -57,30 +56,15 @@ public class MixRepository extends CachedPubSubRepository implements IMixReposit
 	@Inject
 	private RetractItemModule retractItemModule;
 
+	@Inject
+	private IPubSubRepository pubSubRepository;
+
 	private Map<BareJID, ChannelConfiguration> channelConfigs = Collections.synchronizedMap(
 			new tigase.util.cache.SizedCache<BareJID, ChannelConfiguration>(1000));
 
 	@Override
-	protected boolean isServiceAutoCreated() {
-		return false;
-	}
-
-	@Override
-	public void createNode(BareJID serviceJid, String nodeName, BareJID ownerJid, AbstractNodeConfig nodeConfig,
-						   NodeType nodeType, String collection) throws RepositoryException, PubSubException {
-		mixLogic.checkNodeConfig(nodeConfig);
-		super.createNode(serviceJid, nodeName, ownerJid, nodeConfig, nodeType, collection);
-	}
-	
-	@Override
-	public void update(BareJID serviceJid, String nodeName, AbstractNodeConfig nodeConfig) throws RepositoryException, PubSubException {
-		mixLogic.checkNodeConfig(nodeConfig);
-		super.update(serviceJid, nodeName, nodeConfig);
-	}
-
-	@Override
 	public IParticipant getParticipant(BareJID channelJID, BareJID participantRealJID) throws RepositoryException {
-		IItems items = getNodeItems(channelJID, Mix.Nodes.PARTICIPANTS);
+		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.PARTICIPANTS);
 		if (items == null) {
 			return null;
 		}
@@ -129,9 +113,9 @@ public class MixRepository extends CachedPubSubRepository implements IMixReposit
 		}
 		return configuration;
 	}
-
+	
 	protected ChannelConfiguration loadChannelConfiguration(BareJID channelJID) throws RepositoryException {
-		IItems items = getNodeItems(channelJID, Mix.Nodes.CONFIG);
+		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.CONFIG);
 		if (items != null) {
 			String[] ids = items.getItemsIds(CollectionItemsOrdering.byUpdateDate);
 			if (ids != null && ids.length > 0) {
@@ -150,33 +134,25 @@ public class MixRepository extends CachedPubSubRepository implements IMixReposit
 	}
 
 	@Override
-	public void queryItems(Query query, ItemHandler itemHandler) throws RepositoryException, ComponentException {
-		super.queryItems(query, itemHandler);
+	public ISubscriptions getNodeSubscriptions(BareJID serviceJid, String nodeName) throws RepositoryException {
+		return pubSubRepository.getNodeSubscriptions(serviceJid, nodeName);
 	}
 
 	@Override
-	protected void userRemoved(BareJID userJid) {
-		super.userRemoved(userJid);
+	public void serviceRemoved(BareJID userJid) {
 		channelConfigs.remove(userJid);
 	}
 
 	@Override
 	public void itemDeleted(BareJID serviceJID, String node, String id) {
-		super.itemDeleted(serviceJID, node, id);
 	}
 
 	@Override
 	public void itemWritten(BareJID serviceJID, String node, String id, String publisher, Element item, String uuid) {
 		if (Mix.Nodes.CONFIG.equals(node)) {
 			// node config has changed, we need to update it
-			try {
-				ChannelConfiguration configuration = new ChannelConfiguration(item);
-				channelConfigs.put(serviceJID, configuration);
-			} catch (PubSubException ex) {
-				log.log(Level.WARNING, "Could not parse new configuration of channel " + serviceJID, ex);
-			}
+			updateChannelConfiguration(serviceJID, item);
 		}
-		super.itemWritten(serviceJID, node, id, publisher, item, uuid);
 	}
 
 	@Override
@@ -190,13 +166,22 @@ public class MixRepository extends CachedPubSubRepository implements IMixReposit
 	}
 
 	@Override
-	protected IAffiliationsCached newNodeAffiliations(BareJID serviceJid, String nodeName, Object nodeId,
-													  RepositorySupplier affiliationSupplier)
+	public IAffiliationsCached newNodeAffiliations(BareJID serviceJid, String nodeName, T nodeId,
+												   IPubSubRepository.RepositorySupplier<Map<BareJID, UsersAffiliation>> affiliationSupplier)
 			throws RepositoryException {
 		if (Mix.Nodes.ALL_NODES.contains(nodeName)) {
 			return new Affiliations(serviceJid, nodeName, this);
 		} else {
-			return super.newNodeAffiliations(serviceJid, nodeName, nodeId, affiliationSupplier);
+			return null;
+		}
+	}
+
+	protected void updateChannelConfiguration(BareJID serviceJID, Element item) {
+		try {
+			ChannelConfiguration configuration = new ChannelConfiguration(item);
+			channelConfigs.put(serviceJID, configuration);
+		} catch (PubSubException ex) {
+			log.log(Level.WARNING, "Could not parse new configuration of channel " + serviceJID, ex);
 		}
 	}
 }

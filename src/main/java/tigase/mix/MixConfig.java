@@ -17,15 +17,15 @@
  */
 package tigase.mix;
 
-import tigase.pubsub.IPubSubConfig;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.pubsub.IPubSubConfig;
 import tigase.pubsub.PubSubConfig;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
-@Bean(name = "config", parent = MixComponent.class, active = true)
+@Bean(name = "config", parent = IMixComponent.class, active = true)
 public class MixConfig implements IPubSubConfig {
 
 	@ConfigField(desc = "Max Cache size", alias = PubSubConfig.MAX_CACHE_SIZE)
@@ -34,9 +34,9 @@ public class MixConfig implements IPubSubConfig {
 	private BareJID serviceBareJID;
 
 	@Inject(bean = "service")
-	private MixComponent component;
+	private IMixComponent component;
 
-	public void setComponent(MixComponent component) {
+	public void setComponent(IMixComponent component) {
 		this.component = component;
 		serviceBareJID = BareJID.bareJIDInstanceNS(component.getName(), "mix");
 	}

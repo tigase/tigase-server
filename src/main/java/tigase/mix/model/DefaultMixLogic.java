@@ -20,8 +20,8 @@ package tigase.mix.model;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
-import tigase.mix.MixComponent;
 import tigase.pubsub.*;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.utils.DefaultPubSubLogic;
@@ -34,7 +34,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
-@Bean(name = "logic", parent = MixComponent.class, active = true)
+@Bean(name = "logic", parent = IMixComponent.class, active = true)
 public class DefaultMixLogic extends DefaultPubSubLogic
 		implements MixLogic {
 
@@ -42,6 +42,11 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 
 	@Inject
 	private IMixRepository mixRepository;
+
+	@Override
+	public boolean isServiceAutoCreated() {
+		return true;
+	}
 
 	public String generateParticipantId(BareJID channelJID, BareJID participantRealJID) throws RepositoryException {
 		try {
@@ -80,6 +85,7 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 				throw new PubSubException(Authorization.NOT_ALLOWED, "Only publishers can post to MIX nodes!");
 			}
 		}
+		super.checkNodeConfig(nodeConfig);
 	}
 
 	@Override

@@ -21,10 +21,11 @@ import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
+import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
-import tigase.mix.MixComponent;
 import tigase.mix.model.IMixRepository;
 import tigase.mix.model.IParticipant;
 import tigase.mix.model.MixAction;
@@ -41,7 +42,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.UUID;
 
-@Bean(name="channelGroupChatMessageModule", parent = MixComponent.class, active = true)
+@Bean(name="channelGroupChatMessageModule", parent = IMixComponent.class, active = true)
 public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 
 	private static final Criteria CRIT_LEAVE = ElementCriteria.nameType("message", "groupchat");
@@ -56,6 +57,9 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 
 	@Inject
 	private PublishItemModule publishItemModule;
+
+	@Inject
+	private EventBus eventBus;
 
 	@Override
 	public String[] getFeatures() {
@@ -104,6 +108,7 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 
 			getRepository().addMAMItem(channelJID, Mix.Nodes.MESSAGES, uuid, message, null);
 
+			eventBus.fire(new PublishItemModule.BroadcastNotificationEvent(channelJID, Mix.Nodes.MESSAGES, message));
 			publishItemModule.broadcastNotification(channelJID, Mix.Nodes.MESSAGES, message);
 		} catch (RepositoryException ex) {
 			throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);

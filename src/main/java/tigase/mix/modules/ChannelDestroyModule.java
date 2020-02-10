@@ -23,9 +23,9 @@ import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
 import tigase.mix.model.MixAction;
-import tigase.mix.MixComponent;
 import tigase.mix.model.MixLogic;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.exceptions.PubSubException;
@@ -36,7 +36,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 
-@Bean(name="channelDestroyModule", parent = MixComponent.class, active = true)
+@Bean(name="channelDestroyModule", parent = IMixComponent.class, active = true)
 public class ChannelDestroyModule extends AbstractPubSubModule {
 
 	private static final Criteria CRIT_DESTROY = ElementCriteria.nameType("iq", "set")

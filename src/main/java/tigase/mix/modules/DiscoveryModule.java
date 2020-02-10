@@ -21,7 +21,7 @@ import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
-import tigase.mix.MixComponent;
+import tigase.mix.IMixComponent;
 import tigase.mix.model.MixLogic;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Bean(name = tigase.pubsub.modules.DiscoveryModule.ID, parent = MixComponent.class, active = true)
+@Bean(name = tigase.pubsub.modules.DiscoveryModule.ID, parent = IMixComponent.class, active = true)
 public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 
 	private static final Set<String> FEATURES = Set.of("urn:xmpp:mix:core:1", "urn:xmpp:mix:core:1#searchable", DISCO_ITEMS_XMLNS, DISCO_INFO_XMLNS);

@@ -18,7 +18,6 @@
 package tigase.mix.model;
 
 import tigase.component.exceptions.RepositoryException;
-import tigase.pubsub.AbstractNodeConfig;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.utils.PubSubLogic;
 import tigase.xmpp.jid.BareJID;
@@ -29,8 +28,6 @@ public interface MixLogic extends PubSubLogic {
 
 	void checkPermission(BareJID channel, BareJID senderJid, MixAction action)
 			throws PubSubException, RepositoryException;
-
-	void checkNodeConfig(AbstractNodeConfig nodeConfig) throws PubSubException;
 
 	boolean isChannelCreationAllowed(BareJID channelJID, BareJID senderJID);
 }

@@ -43,7 +43,7 @@ import tigase.xmpp.jid.BareJID;
 import java.util.Iterator;
 import java.util.List;
 
-@Bean(name="channelJoinModule", parent = MixComponent.class, active = true)
+@Bean(name="channelJoinModule", parent = IMixComponent.class, active = true)
 public class ChannelJoinModule extends AbstractPubSubModule {
 
 	private static final Criteria CRIT_JOIN = ElementCriteria.nameType("iq", "set")
