@@ -18,6 +18,7 @@
 package tigase.kernel.beans.config;
 
 import tigase.conf.AbstractConfigBuilder;
+import tigase.db.util.SchemaManager;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.TypesConverter;
@@ -170,7 +171,9 @@ public abstract class AbstractBeanConfigurator
 			}
 		}
 
-		List<Class<?>> toRegister = new ArrayList<>();
+		Map<String, SchemaManager.Pair<Class<?>,Class>> map = new HashMap<>();
+
+		//List<Class<?>> toRegister = new ArrayList<>();
 		Class<?> req = requiredClass;
 		do {
 			Optional<List<Class<?>>> interfaces = Optional.ofNullable(req.getInterfaces()).map(Arrays::asList);
@@ -179,15 +182,23 @@ public abstract class AbstractBeanConfigurator
 				Map.Entry<Class<?>, Bean> e = it.next();
 				Class expParent = e.getValue().parent();
 				if (expParent.equals(req)) {
-					toRegister.add(0, e.getKey());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("comparing exp parent " + expParent.getCanonicalName() + " with " + req.getCanonicalName() + " for " + e.getKey().getCanonicalName());
+					}
+					putInMap(map, e.getValue().name(), e.getKey(), req);
+					//toRegister.add(0, e.getKey());
 					it.remove();
 					continue;
 				}
 				if (interfaces.isPresent()) {
 					boolean found = false;
 					for(Class<?> reqIfc : interfaces.get()) {
-						if (reqIfc.isAssignableFrom(expParent)) {
-							toRegister.add(0, e.getKey());
+						if (reqIfc.equals(expParent)) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("comparing required interface " + reqIfc.getCanonicalName() + " with exp parent" + expParent.getCanonicalName() + " for " + e.getKey().getCanonicalName());
+							}
+							putInMap(map, e.getValue().name(), e.getKey(), req);
+//							toRegister.add(0, e.getKey());
 							it.remove();
 							found = true;
 							break;
@@ -200,14 +211,42 @@ public abstract class AbstractBeanConfigurator
 				Class[] exParents = e.getValue().parents();
 				for (Class exp : exParents) {
 					if (exp.equals(req)) {
-						toRegister.add(0, e.getKey());
+						putInMap(map, e.getValue().name(), e.getKey(), req);
+//						toRegister.add(0, e.getKey());
 						it.remove();
 						break;
 					}
 				}
 			}
 		} while ((req = req.getSuperclass()) != null && !req.equals(Object.class) && !matching.isEmpty());
+
+		List<Class<?>> toRegister = map.values().stream().map(SchemaManager.Pair::getKey).collect(Collectors.toList());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(
+					"for class " + requiredClass.getCanonicalName() + " we need to register: " + toRegister);
+		}
 		return toRegister;
+	}
+
+	private static void putInMap(Map<String, SchemaManager.Pair<Class<?>,Class>> map, String key, Class<?> value, Class parent) {
+		SchemaManager.Pair<Class<?>, Class> oldValue = map.get(key);
+		if (oldValue == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("setting class " + value.getCanonicalName() + " for " + key + " for parent " + parent.getCanonicalName());
+			}
+			map.put(key, new SchemaManager.Pair<>(value, parent));
+		} else {
+			// if newly found bean is for subclass of previous bean, then replace it..
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("checking class " + value.getCanonicalName() + " for " + key + " for parent " + parent.getCanonicalName());
+			}
+			if (oldValue.getValue().isAssignableFrom(parent)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("replacing with class " + value.getCanonicalName() + " for " + key + " for parent " + parent.getCanonicalName());
+				}
+				map.put(key, new SchemaManager.Pair<>(value, parent));
+			}
+		}
 	}
 
 	protected static Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass,
