@@ -473,7 +473,6 @@ public class JDBCRepository
 
 		String connection_str = data_repo.getResourceUri();
 		try {
-			checkDBSchema();
 			if (connection_str.contains("autoCreateUser=true")) {
 				autoCreateUser = true;
 			}    // end of if (db_conn.contains())
@@ -1004,49 +1003,6 @@ public class JDBCRepository
 
 			return subquery;
 		}      // end of else
-	}
-
-	// Implementation of tigase.db.UserRepository
-	private void checkDBSchema() throws SQLException {
-		String schema_version = "1.0";
-		String query = null;
-
-		switch (data_repo.getDatabaseType()) {
-			case derby:
-				query = DERBY_GETSCHEMAVER_QUERY;
-				break;
-			case jtds:
-			case sqlserver:
-				query = SQLSERVER_GETSCHEMAVER_QUERY;
-				break;
-			default:
-				query = JDBC_GETSCHEMAVER_QUERY;
-				break;
-		}
-		Statement stmt = data_repo.createStatement(null);
-		ResultSet rs = stmt.executeQuery(query);
-
-		try {
-			if (rs.next()) {
-				schema_version = rs.getString(1);
-				if (false == CURRENT_DB_SCHEMA_VER.equals(schema_version)) {
-					System.err.println("\n\nPlease upgrade database schema now.");
-					System.err.println(
-							"Current scheme version is: " + schema_version + ", expected: " + CURRENT_DB_SCHEMA_VER);
-					System.err.println("Check the schema upgrade guide at the address:");
-					System.err.println(SCHEMA_UPGRADE_LINK);
-					System.err.println("----");
-					System.err.println("If you have upgraded your schema and you are still");
-					System.err.println("experiencing this problem please contact support at");
-					System.err.println("e-mail address: support@tigase.org");
-
-					// e.printStackTrace();
-					System.exit(100);
-				}
-			}
-		} finally {
-			data_repo.release(stmt, rs);
-		}    // end of try-catch
 	}
 
 	private long createNodePath(DataRepository repo, BareJID user_id, String node_path)

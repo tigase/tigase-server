@@ -29,7 +29,7 @@ CREATE TABLE [dbo].[tig_users](
 
 	-- Jabber User ID
 	[user_id] [nvarchar](2049) NOT NULL,
-	
+
 	-- UserID SHA1 hash to prevent duplicate user_ids
 	[sha1_user_id] [varbinary](32) NOT NULL,
 	-- User password encrypted or not
@@ -50,8 +50,8 @@ CREATE TABLE [dbo].[tig_users](
 	-- User status, whether the account is active or disabled
 	-- >0 - account active, 0 - account disabled
 	[account_status] [int] default 1,
-	-- helper column for indexing due to limitation of SQL server 
-	user_id_fragment AS LEFT (user_id, 256), 
+	-- helper column for indexing due to limitation of SQL server
+	user_id_fragment AS LEFT (user_id, 256),
 
 	CONSTRAINT [PK_tig_users] PRIMARY KEY CLUSTERED ( [uid] ASC ) ON [PRIMARY],
 	CONSTRAINT [IX_tig_users_sha1_user_id] UNIQUE NONCLUSTERED ( [sha1_user_id] ASC ) ON [PRIMARY]
@@ -147,7 +147,8 @@ CREATE TABLE [dbo].[tig_pairs](
 	[nid] [bigint] NULL,
 	[uid] [bigint] NOT NULL,
 	[pkey] [nvarchar](255) NOT NULL,
-	[pval] [ntext] NULL
+	[pval] [ntext] NULL,
+    CONSTRAINT [PK_tig_pairs] PRIMARY KEY CLUSTERED ( [pid] ASC ) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 -- QUERY END:
 GO
@@ -193,16 +194,3 @@ GO
 ALTER TABLE [dbo].[tig_pairs] CHECK CONSTRAINT [FK_tig_pairs_tig_users]
 -- QUERY END:
 GO
-
--- QUERY START:
-if object_id('dbo.FK_tig_pairs_tig_users') is null
-ALTER TABLE [dbo].[tig_pairs] WITH CHECK ADD CONSTRAINT [PK_tig_pairs] PRIMARY KEY CLUSTERED ( [pid] ASC ) ON [PRIMARY]
--- QUERY END:
-GO
-
--- QUERY START:
-ALTER TABLE [dbo].[tig_pairs] CHECK CONSTRAINT [PK_tig_pairs]
--- QUERY END:
-GO
-
-
