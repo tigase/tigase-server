@@ -74,13 +74,20 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 
 	protected XMPPResourceConnection getSession(JID connId, JID userJid)
 			throws NotAuthorizedException, TigaseStringprepException {
+		return getSession(connId, userJid, true);
+	}
+
+	protected XMPPResourceConnection getSession(JID connId, JID userJid, boolean authorised)
+			throws NotAuthorizedException, TigaseStringprepException {
 		XMPPResourceConnection conn = new XMPPResourceConnection(connId, getUserRepository(),
 																 getAuthRepository(), loginHandler);
 		VHostItemImpl vhost = new VHostItemImpl();
 		vhost.setVHost(userJid.getDomain());
 		conn.setDomain(vhost);
-		conn.authorizeJID(userJid.getBareJID(), false);
-		conn.setResource(userJid.getResource());
+		if (authorised) {
+			conn.authorizeJID(userJid.getBareJID(), false);
+			conn.setResource(userJid.getResource());
+		}
 
 		return conn;
 	}

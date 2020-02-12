@@ -384,22 +384,24 @@ public class XMLRepository
 
 	@Override
 	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		return false;
+		final String disabled = getData(user, "disabled");
+		return disabled != null && Boolean.parseBoolean(disabled);
 	}
 
 	@Override
 	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Feature not supported");
+		setData(user, "disabled", value.toString());
 	}
 
 	@Override
 	public void setAccountStatus(BareJID user, AccountStatus status) throws TigaseDBException {
-		throw new TigaseDBException("Feature not supported");
+		setData(user, "accountStatus", status.toString());
 	}
 
 	@Override
 	public AccountStatus getAccountStatus(BareJID user) throws TigaseDBException {
-		return AccountStatus.active;
+		final String accountStatus = getData(user, "accountStatus");
+		return accountStatus != null ? AccountStatus.valueOf(accountStatus) : AccountStatus.active;
 	}
 
 	@Override

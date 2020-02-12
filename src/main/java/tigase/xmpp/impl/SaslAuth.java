@@ -63,7 +63,7 @@ public class SaslAuth
 
 	public static final String ID = "urn:ietf:params:xml:ns:xmpp-sasl";
 	private static final String _XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
-	private final static String ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";
+	protected final static String ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{_XMLNS})};
 	private static final String[][] ELEMENTS = {{"auth"}, {"response"}, {"challenge"}, {"failure"}, {"success"},
 												{"abort"}};
