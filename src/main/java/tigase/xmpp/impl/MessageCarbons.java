@@ -22,6 +22,7 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Message;
@@ -38,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * MessageCarbons class implements XEP-0280 Message Carbons protocol extension.
@@ -72,7 +74,8 @@ public class MessageCarbons
 	};
 
 	private final EventBus eventBus = EventBusFactory.getInstance();
-	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
+	@Inject
+	private MessageDeliveryLogic messageProcessor;
 
 	@ConfigField(desc = "Send carbons of messages of type normal with mathing paths", alias = "msg-carbons-paths")
 	private ElementMatcher[] msgCarbonPaths = {
@@ -86,6 +89,9 @@ public class MessageCarbons
 		Boolean value = (Boolean) session.getSessionData(ENABLED_KEY);
 		return (value != null && value);
 	}
+
+	@Inject(nullAllowed = true)
+	private SessionManager.MessageArchive messageArchive;
 
 	/**
 	 * Prepare packet which is carbon copy of message passed as argument
@@ -205,54 +211,55 @@ public class MessageCarbons
 				String type = session.isUserId(packet.getStanzaTo().getBareJID()) ? "received" : "sent";
 				JID srcJid = JID.jidInstance(session.getBareJID());
 				// collections of jid to which message will be delivered by default so we need to skip them
-				Set<JID> skipForkingTo = null;
-
-				if (session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null) {
-					// message is cloned to all resources by Message.java, it violates RFC6121
-					// while it should be copied only to resources with non negative priority!!
-					// until it is not solved there is no need to fork messages
-
-					// as we started to respect connection priority we need to implement proper
-					// forking of messages sent to bare jid
-					// we need to fork this message
-					skipForkingTo = messageProcessor.getJIDsForMessageDelivery(session);
-
-					// we should skip forking to JID with enabled message carbons if jid is not from local node
-					for (JID jid : resources.keySet()) {
-						if (session.getParentSession().getResourceForJID(jid) == null) {
-							skipForkingTo.add(jid);
-						}
-					}
-				} else {
-					skipForkingTo = Collections.singleton(session.getJID());
-				}
-
+				Set<JID> skipForkingTo = prepareSkipForkingToList(packet, session,resources);
+				
 				if (log.isLoggable(Level.FINER)) {
 					log.log(Level.FINER,
 							"Sending message carbon copy, packet: {0}, resources {1}, skipForkingTo: {2}, session: {3}",
 							new Object[]{packet, resources, skipForkingTo, session});
 				}
 
-				for (Map.Entry<JID, Boolean> entry : resources.entrySet()) {
+				List<JID> copyTo = resources.entrySet()
+						.stream()
+						.filter(Map.Entry::getValue)
+						.map(Map.Entry::getKey)
+						.filter(jid -> !skipForkingTo.contains(jid))
+						.collect(Collectors.toList());
 
-					if (!entry.getValue()) {
-						continue;
+				if (!copyTo.isEmpty()) {
+					if (messageArchive != null) {
+						messageArchive.addStableId(packet, session);
 					}
-
-					JID jid = entry.getKey();
-
-					// do not send carbon copy to session to which it is addressed
-					// or from which it is sent or to which it will be delivered due
-					// to default routing
-					if (skipForkingTo.contains(entry.getKey())) {
-						continue;
+					for (JID jid : copyTo) {
+						Packet msgClone = prepareCarbonCopy(packet, srcJid, jid, type);
+						results.offer(msgClone);
 					}
-
-					// prepare carbon copy of message
-					Packet msgClone = prepareCarbonCopy(packet, srcJid, jid, type);
-					results.offer(msgClone);
 				}
 			}
+		}
+	}
+
+	protected Set<JID> prepareSkipForkingToList(Packet packet, XMPPResourceConnection session, Map<JID, Boolean> resources)
+			throws NotAuthorizedException {
+		if (session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null) {
+			// message is cloned to all resources by Message.java, it violates RFC6121
+			// while it should be copied only to resources with non negative priority!!
+			// until it is not solved there is no need to fork messages
+
+			// as we started to respect connection priority we need to implement proper
+			// forking of messages sent to bare jid
+			// we need to fork this message
+			Set<JID> skipForkingTo = messageProcessor.getJIDsForMessageDelivery(session);
+
+			// we should skip forking to JID with enabled message carbons if jid is not from local node
+			for (JID jid : resources.keySet()) {
+				if (session.getParentSession().getResourceForJID(jid) == null) {
+					skipForkingTo.add(jid);
+				}
+			}
+			return skipForkingTo;
+		} else {
+			return Collections.singleton(session.getJID());
 		}
 	}
 

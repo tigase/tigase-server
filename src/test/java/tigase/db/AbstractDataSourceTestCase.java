@@ -85,7 +85,7 @@ public class AbstractDataSourceTestCase<DS extends DataSource> extends AbstractK
 		loader.validateDBExists();
 		Assert.assertNotEquals(SchemaLoader.Result.error, loader.loadCommonSchema());
 		Optional<SchemaManager.SchemaInfo> schemaInfo = SchemaManager.getDefaultSchemaFor(uri, schemaId, components);
-		Assert.assertEquals(SchemaLoader.Result.ok, loader.loadSchema(schemaInfo.get(), schemaVersion));
+		Assert.assertNotEquals(SchemaLoader.Result.error, loader.loadSchema(schemaInfo.get(), schemaVersion));
 		loader.postInstallation();
 		loader.shutdown();
 	}

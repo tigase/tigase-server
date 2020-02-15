@@ -40,6 +40,7 @@ public class Deliver
 		if (packet.getAttributeStaticStr(FROM_CONN_ID) == null) {
 			result.setPacketFrom(packet.getPacketTo());
 		}
+		result.setStableId(packet.getStableId());
 		removeTigasePayload(result);
 		resultsHandler.addOutPacket(result);
 		return true;

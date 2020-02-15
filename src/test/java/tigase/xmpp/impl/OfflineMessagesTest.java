@@ -254,7 +254,7 @@ public class OfflineMessagesTest
 	@Override
 	protected void registerBeans(Kernel kernel) {
 		super.registerBeans(kernel);
-		kernel.registerBean(tigase.xmpp.impl.Message.class).setActive(true).exec();
+		kernel.registerBean(tigase.xmpp.impl.MessageDeliveryLogic.class).setActive(true).exec();
 		kernel.registerBean(OfflineMessagesTestImpl.class).setActive(true).exec();
 	}
 

@@ -181,6 +181,9 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 				if (packet.getPacketFrom() != null) {
 					data.put(PacketForwardCmd.PACKET_FROM_KEY, packet.getPacketFrom().toString());
 				}
+				if (packet.getStanzaId() != null) {
+					data.put(PacketForwardCmd.STABLE_ID_KEY, packet.getStableId());
+				}
 			}
 			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), sm.getComponentId(), null,
 								toNodes.toArray(new JID[toNodes.size()]));

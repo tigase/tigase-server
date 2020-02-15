@@ -17,9 +17,9 @@
  */
 package tigase.xmpp.impl;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
@@ -46,18 +46,19 @@ public class C2SDeliveryErrorProcessorTest
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 
-	private Message messageProcessor = new Message();
+	private MessageDeliveryLogic messageDeliveryLogic;
 
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+		messageDeliveryLogic = getInstance(MessageDeliveryLogic.class);
 	}
 
-	@After
 	@Override
-	public void tearDown() throws Exception {
-		super.tearDown();
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean(MessageDeliveryLogic.class).exec();
 	}
 
 	@Test
@@ -96,12 +97,12 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl = new Element("iq", new String[]{"id", "from", "to"},
 							   new String[]{UUID.randomUUID().toString(), from.toString(), to.toString()});
 		packet = Packet.packetInstance(packetEl);
-		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, null, null, null, null, messageProcessor));
+		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, null, null, null, null, messageDeliveryLogic));
 
 		packetEl = new Element("message", new String[]{"id", "from", "to"},
 							   new String[]{UUID.randomUUID().toString(), from.toString(), to.toString()});
 		packet = Packet.packetInstance(packetEl);
-		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, null, null, null, null, messageProcessor));
+		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, null, null, null, null, messageDeliveryLogic));
 
 		// packet is still not supported as session is null
 		packetEl = new Element("message", new String[]{"id", "from", "to"},
@@ -109,7 +110,7 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl.addChild(
 				new Element("delivery-error", new String[]{"xmlns"}, new String[]{"http://tigase.org/delivery-error"}));
 		packet = Packet.packetInstance(packetEl);
-		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, null, null, null, null, messageProcessor));
+		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, null, null, null, null, messageDeliveryLogic));
 	}
 
 	@Test
@@ -136,7 +137,7 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl.addChild(
 				new Element("delivery-error", new String[]{"xmlns"}, new String[]{"http://tigase.org/delivery-error"}));
 		packet = Packet.packetInstance(packetEl);
-		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, null, null, messageProcessor));
+		assertFalse(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, null, null, messageDeliveryLogic));
 
 		sessionToRes1.setPriority(10);
 		sessionToRes1.setPresence(new Element("presence"));
@@ -146,7 +147,7 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl.addChild(
 				new Element("delivery-error", new String[]{"xmlns"}, new String[]{"http://tigase.org/delivery-error"}));
 		packet = Packet.packetInstance(packetEl);
-		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, null, null, messageProcessor));
+		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, null, null, messageDeliveryLogic));
 
 		packetEl = new Element("message", new String[]{"id", "from", "to"},
 							   new String[]{UUID.randomUUID().toString(), from.toString(), to.toString()});
@@ -154,7 +155,7 @@ public class C2SDeliveryErrorProcessorTest
 				new Element("delivery-error", new String[]{"xmlns"}, new String[]{"http://tigase.org/delivery-error"}));
 		packetEl.addChild(new Element("delay", new String[]{"xmlns"}, new String[]{"urn:xmpp:delay"}));
 		packet = Packet.packetInstance(packetEl);
-		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, null, null, messageProcessor));
+		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, null, null, messageDeliveryLogic));
 
 		Queue<Packet> results = new ArrayDeque();
 		results.clear();
@@ -164,7 +165,7 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl.addChild(new Element("delivery-error", new String[]{"xmlns", "stamp"},
 									  new String[]{"http://tigase.org/delivery-error", stampBefore}));
 		packet = Packet.packetInstance(packetEl);
-		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, results, null, messageProcessor));
+		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, results, null, messageDeliveryLogic));
 		assertEquals(1, results.size());
 		Packet result = results.poll();
 		assertEquals(sessionToRes1.getConnectionId(), result.getPacketTo());
@@ -177,7 +178,7 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl.addChild(new Element("delivery-error", new String[]{"xmlns", "stamp"},
 									  new String[]{"http://tigase.org/delivery-error", stampBefore}));
 		packet = Packet.packetInstance(packetEl);
-		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, results, null, messageProcessor));
+		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, results, null, messageDeliveryLogic));
 		assertEquals(1, results.size());
 		result = results.peek();
 		assertEquals(sessionToRes1.getConnectionId(), result.getPacketTo());
@@ -192,7 +193,7 @@ public class C2SDeliveryErrorProcessorTest
 		packetEl.addChild(new Element("delivery-error", new String[]{"xmlns", "stamp"},
 									  new String[]{"http://tigase.org/delivery-error", stampAfter}));
 		packet = Packet.packetInstance(packetEl);
-		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, results, null, messageProcessor));
+		assertTrue(C2SDeliveryErrorProcessor.preProcess(packet, sessionToRes1, null, results, null, messageDeliveryLogic));
 		assertEquals(0, results.size());
 	}
 

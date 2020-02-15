@@ -135,7 +135,7 @@ public class MessageAmpTest
 		// testing silently ignoring error responses
 		results.clear();
 
-		Message messageProcessor = ((Kernel) this.getInstance("amp#KERNEL")).getInstance(Message.class);
+		MessageDeliveryLogic messageProcessor = ((Kernel) this.getInstance("amp#KERNEL")).getInstance(MessageDeliveryLogic.class);
 		Field f = messageProcessor.getClass().getDeclaredField("silentlyIgnoreError");
 		f.setAccessible(true);
 		f.set(messageProcessor, true);
@@ -187,6 +187,7 @@ public class MessageAmpTest
 	protected void registerBeans(Kernel kernel) {
 		kernel.setForceAllowNull(true);
 		super.registerBeans(kernel);
+		kernel.registerBean(MessageDeliveryLogic.class).exec();
 		MsgRepositoryIfc msgRepo = new MsgRepository.MsgRepositoryMDBean();
 		kernel.registerBean("msgRepository").asInstance(msgRepo).exportable().exec();
 		kernel.registerBean(MessageAmp.class).exec();

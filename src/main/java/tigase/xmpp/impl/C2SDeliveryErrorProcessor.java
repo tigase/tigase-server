@@ -106,6 +106,15 @@ public class C2SDeliveryErrorProcessor {
 		if (stamp != null) {
 			error.setAttribute("stamp", String.valueOf(stamp));
 		}
+		if (packet.getStanzaFrom() != null) {
+			String by = packet.getStanzaTo().getBareJID().toString();
+			Element stanzaIdEl = packet.getElement()
+					.findChild(el -> el.getName() == "stanza-id" && el.getXMLNS() == "urn:xmpp:sid:0" &&
+							by.equals(el.getAttributeStaticStr("by")));
+			if (stanzaIdEl != null) {
+				result.getElement().removeChild(stanzaIdEl);
+			}
+		}
 		result.getElement().addChild(error);
 		return result;
 	}
@@ -115,7 +124,7 @@ public class C2SDeliveryErrorProcessor {
 	 * other connection is available
 	 */
 	public static boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-									 Queue<Packet> results, Map<String, Object> settings, Message messageProcessor) {
+									 Queue<Packet> results, Map<String, Object> settings, MessageDeliveryLogic messageProcessor) {
 		if (packet.getElemName() != tigase.server.Message.ELEM_NAME) {
 			return false;
 		}

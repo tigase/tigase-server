@@ -297,6 +297,7 @@ public abstract class XMPPProcessorAbstract
 
 					result.setPacketTo(con.getConnectionId());
 					result.setPacketFrom(packet.getTo());
+					result.setStableId(packet.getStableId());
 					results.offer(result);
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Delivering packet: {0}, to session: {1}", new Object[]{packet, con});

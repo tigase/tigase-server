@@ -34,7 +34,6 @@ import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +47,7 @@ import static tigase.server.amp.AmpFeatureIfc.*;
 @Bean(name = MessageAmp.ID, parent = SessionManager.class, active = true, exportable = true)
 public class MessageAmp
 		extends XMPPProcessor
-		implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, XMPPPreprocessorIfc, XMPPProcessorIfc, RegistrarBean, MessageDeliveryProviderIfc {
+		implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, XMPPPreprocessorIfc, XMPPProcessorIfc, RegistrarBean {
 
 	protected static final String ID = "amp";
 	private static final String AMP_JID_PROP_KEY = "amp-jid";
@@ -68,8 +67,8 @@ public class MessageAmp
 
 	@ConfigField(desc = "AMP component JID", alias = AMP_JID_PROP_KEY)
 	private JID ampJID = JID.jidInstanceNS("amp@" + defHost);
-	@Inject(nullAllowed = true)
-	private Message messageProcessor;
+	@Inject
+	private MessageDeliveryLogic messageProcessor;
 	@Inject
 	private MsgRepositoryIfc msg_repo = null;
 	@Inject(nullAllowed = true)
@@ -178,6 +177,7 @@ public class MessageAmp
 				if (session == null) {
 					Packet result = packet.copyElementOnly();
 					result.setPacketTo(ampJID);
+					result.setStableId(packet.getStableId());
 					results.offer(result);
 					result.getElement().addAttribute(OFFLINE, "1");
 					packet.processedBy(ID);
@@ -187,6 +187,7 @@ public class MessageAmp
 				if (session.isUserId(packet.getStanzaTo().getBareJID()) && session.getjid() != null &&
 						session.getjid().equals(packet.getStanzaTo())) {
 					Packet result = packet.copyElementOnly();
+					result.setStableId(packet.getStableId());
 					result.setPacketTo(ampJID);
 					if (packet.getStanzaTo().getResource() != null) {
 						result.getElement().addAttribute(TO_RES, session.getResource());
@@ -255,7 +256,7 @@ public class MessageAmp
 						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null) ||
 						(packet.getPacketFrom() != null &&
 								ampJID.getLocalpart().equals(packet.getPacketFrom().getLocalpart()))) {
-					messageProcessor.process(packet, session, repo, results, settings);
+					messageProcessor.handleDelivery(packet, session, repo, results, settings);
 				} else {
 					// when packet from user with AMP is sent we need to forward it to AMP
 					// for processing but we need to do this here and not in preProcess method
@@ -304,7 +305,6 @@ public class MessageAmp
 
 	@Override
 	public void register(Kernel kernel) {
-		kernel.registerBean(Message.class).setActive(true).exec();
 		kernel.registerBean(OfflineMessages.class).setActive(true).exec();
 	}
 
@@ -312,17 +312,7 @@ public class MessageAmp
 	public void unregister(Kernel kernel) {
 
 	}
-
-	@Override
-	public Set<JID> getJIDsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
-		return messageProcessor.getJIDsForMessageDelivery(session);
-	}
-
-	@Override
-	public boolean hasConnectionForMessageDelivery(XMPPResourceConnection session) {
-		return messageProcessor.hasConnectionForMessageDelivery(session);
-	}
-
+	
 	private enum QuotaRule {
 		error,
 		drop;

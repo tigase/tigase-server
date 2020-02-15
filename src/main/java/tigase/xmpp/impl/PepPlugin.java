@@ -181,13 +181,16 @@ public class PepPlugin
 				// Yes this is message to 'this' client
 				Packet result = packet.copyElementOnly();
 
+				result.setStableId(packet.getStableId());
 				result.setPacketTo(session.getConnectionId());
 				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
 
 				// This is message to some other client
-				results.offer(packet.copyElementOnly());
+				Packet result = packet.copyElementOnly();
+				result.setStableId(packet.getStableId());
+				results.offer(result);
 			}    // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);

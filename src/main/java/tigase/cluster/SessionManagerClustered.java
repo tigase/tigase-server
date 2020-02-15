@@ -241,6 +241,10 @@ public class SessionManagerClustered
 			packet.processedBy("SessionManager");
 
 		} else {
+			if (messageArchive != null) {
+				messageArchive.generateStableId(packet);
+			}
+
 			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
 			if (log.isLoggable(Level.FINEST)) {

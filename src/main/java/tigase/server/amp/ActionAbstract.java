@@ -107,6 +107,7 @@ public abstract class ActionAbstract
 
 			// Packet result = Packet.packetInstance(packet.getElement(), new_from, old_from);
 			result = packet.copyElementOnly();
+			result.setStableId(packet.getStableId());
 			result.initVars(new_from, old_from);
 
 			Element amp = result.getElement().getChild("amp", AMP_XMLNS);

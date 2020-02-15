@@ -31,7 +31,7 @@ import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.MessageAmp;
+import tigase.xmpp.impl.MessageDeliveryLogic;
 import tigase.xmpp.impl.ProcessorTestCase;
 import tigase.xmpp.jid.JID;
 
@@ -308,7 +308,7 @@ public class PushNotificationsWithAwayTest
 		super.registerBeans(kernel);
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean("sess-man").asInstance(this.getSessionManagerHandler()).setActive(true).exportable().exec();//.asClass(DummySessionManager.class).setActive(true).exportable().exec();
-		kernel.registerBean(MessageAmp.class).setActive(true).exportable().exec();
+		kernel.registerBean(MessageDeliveryLogic.class).setActive(true).exportable().exec();
 		kernel.registerBean("msgRepository").asClass(MsgRepositoryIfcImpl.class).exportable().exec();
 		kernel.registerBean(PushNotifications.class).setActive(true).exportable().exec();
 	}

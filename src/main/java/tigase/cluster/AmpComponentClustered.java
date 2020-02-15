@@ -66,7 +66,9 @@ public class AmpComponentClustered
 			if (packet.getElemName() == Message.ELEM_NAME &&
 					packet.getElement().getChild("broadcast", "http://tigase.org/protocol/broadcast") != null &&
 					packet.getAttributeStaticStr(FROM_CONN_ID) == null) {
-				forwardPacket(packet.copyElementOnly());
+				Packet forward = packet.copyElementOnly();
+				forward.setStableId(packet.getStableId());
+				forwardPacket(forward);
 			}
 		}
 		super.processPacket(packet); //To change body of generated methods, choose Tools | Templates.

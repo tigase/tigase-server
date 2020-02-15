@@ -48,6 +48,7 @@ public class PacketForwardCmd
 		extends CommandListenerAbstract {
 
 	public static final String PACKET_FROM_KEY = "packet-from";
+	public static final String STABLE_ID_KEY = "stable-id";
 	private static final Logger log = Logger.getLogger(PacketForwardCmd.class.getName());
 
 	private DefaultClusteringStrategyAbstract strategy;
@@ -72,6 +73,10 @@ public class PacketForwardCmd
 					String packetFromStr = data.get(PACKET_FROM_KEY);
 					if (packetFromStr != null) {
 						el_packet.setPacketFrom(JID.jidInstanceNS(packetFromStr));
+					}
+					String stableId = data.get(STABLE_ID_KEY);
+					if (stableId != null) {
+						el_packet.setStableId(stableId);
 					}
 					XMPPResourceConnection conn = sm.getXMPPResourceConnection(el_packet);
 					Map<String, String> locdata = null;

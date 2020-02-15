@@ -17,7 +17,6 @@
  */
 package tigase.server;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -107,6 +106,7 @@ public class Packet {
 	private String stanzaId = null;
 	private JID stanzaTo = null;
 	private StanzaType type;
+	private String stableId = null;
 
 	/**
 	 * Method trims {@link Element} stanza to 1024 characters and returns String representation of the element
@@ -615,6 +615,14 @@ public class Packet {
 	 */
 	public JID getStanzaFrom() {
 		return stanzaFrom;
+	}
+
+	public String getStableId() {
+		return stableId;
+	}
+
+	public void setStableId(String stableId) {
+		this.stableId = stableId;
 	}
 
 	/**

@@ -17,9 +17,9 @@
  */
 package tigase.xmpp.impl;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
@@ -38,21 +38,20 @@ public class MessageCarbonsTest
 
 	private MessageCarbons carbonsProcessor;
 
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean(MessageDeliveryLogic.class).exec();
+		kernel.registerBean(MessageCarbons.class).setActive(true).exec();
+	}
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		carbonsProcessor = new MessageCarbons();
-		carbonsProcessor.init(new HashMap<String, Object>());
 		super.setUp();
+		carbonsProcessor = getInstance(MessageCarbons.class);
 	}
-
-	@After
-	@Override
-	public void tearDown() throws Exception {
-		carbonsProcessor = null;
-		super.tearDown();
-	}
-
+	
 	@Test
 	public void testResourceSelectionForMessageDeliveryForBareJid() throws Exception {
 		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");

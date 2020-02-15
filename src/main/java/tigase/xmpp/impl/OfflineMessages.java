@@ -115,7 +115,7 @@ public class OfflineMessages
 	 */
 	private final SimpleDateFormat formatter;
 	@Inject
-	private Message message;
+	private MessageDeliveryLogic message;
 	@ConfigField(desc = "Offline message implementation repository class", alias = MSG_REPO_CLASS_KEY)
 	private String msgRepoCls = null;
 	@Inject(nullAllowed = true)

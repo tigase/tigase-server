@@ -17,9 +17,9 @@
  */
 package tigase.xmpp.impl;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -38,20 +38,22 @@ import static org.junit.Assert.*;
 public class MessageTest
 		extends ProcessorTestCase {
 
+	private MessageDeliveryLogic messageDeliveryLogic;
 	private Message messageProcessor;
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean(MessageDeliveryLogic.class).exec();
+		kernel.registerBean(Message.class).setActive(true).exec();
+	}
 
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		messageProcessor = new Message();
 		super.setUp();
-	}
-
-	@After
-	@Override
-	public void tearDown() throws Exception {
-		messageProcessor = null;
-		super.tearDown();
+		messageProcessor = getInstance(Message.class);
+		messageDeliveryLogic = getInstance(MessageDeliveryLogic.class);
 	}
 
 	@Test
@@ -70,9 +72,9 @@ public class MessageTest
 
 		// testing silently ignoring error responses
 		results.clear();
-		Field f = messageProcessor.getClass().getDeclaredField("silentlyIgnoreError");
+		Field f = messageDeliveryLogic.getClass().getDeclaredField("silentlyIgnoreError");
 		f.setAccessible(true);
-		f.set(messageProcessor, true);
+		f.set(messageDeliveryLogic, true);
 
 		messageProcessor.process(packet, null, null, results, null);
 		assertTrue("result was generated", results.isEmpty());
@@ -87,24 +89,24 @@ public class MessageTest
 		XMPPResourceConnection session2 = getSession(res2, res2);
 
 		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
-		assertEquals(Collections.emptyList(), messageProcessor.getConnectionsForMessageDelivery(session1));
+		assertEquals(Collections.emptyList(), messageDeliveryLogic.getConnectionsForMessageDelivery(session1));
 
 		assertFalse("found XMPPResourceConnection for delivery of message",
-					messageProcessor.hasConnectionForMessageDelivery(session1));
+					messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 		session1.setPriority(1);
 		assertTrue("found XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 
 		session1.setPresence(new Element("presence"));
 		assertTrue("could not find XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 
-		assertEquals(Arrays.asList(session1), messageProcessor.getConnectionsForMessageDelivery(session2));
+		assertEquals(Arrays.asList(session1), messageDeliveryLogic.getConnectionsForMessageDelivery(session2));
 
 		session2.setPresence(new Element("presence"));
 		assertTrue("could not find XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
-		assertEquals(Arrays.asList(session1, session2), messageProcessor.getConnectionsForMessageDelivery(session2));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
+		assertEquals(Arrays.asList(session1, session2), messageDeliveryLogic.getConnectionsForMessageDelivery(session2));
 	}
 
 	@Test
@@ -118,7 +120,7 @@ public class MessageTest
 													 res2);
 
 		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
-		assertEquals(Collections.emptyList(), messageProcessor.getConnectionsForMessageDelivery(session1));
+		assertEquals(Collections.emptyList(), messageDeliveryLogic.getConnectionsForMessageDelivery(session1));
 
 		Element packetEl = new Element("message", new String[]{"type", "from", "to"},
 									   new String[]{"chat", "remote-user@test.com/res1", userJid.toString()});
@@ -134,7 +136,7 @@ public class MessageTest
 
 		session1.setPresence(new Element("presence"));
 		assertTrue("could not find XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session2, null, results, null);
 		assertEquals("not generated result even than 1 resource had nonnegative priority", 1, results.size());
@@ -142,7 +144,7 @@ public class MessageTest
 
 		session2.setPresence(new Element("presence"));
 		assertTrue("could not find XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session1, null, results, null);
 		assertEquals("not generated result even than 2 resource had nonnegative priority", 2, results.size());
@@ -161,7 +163,7 @@ public class MessageTest
 													 res2);
 
 		assertEquals(Arrays.asList(session1, session2), session1.getActiveSessions());
-		assertEquals(Collections.emptyList(), messageProcessor.getConnectionsForMessageDelivery(session1));
+		assertEquals(Collections.emptyList(), messageDeliveryLogic.getConnectionsForMessageDelivery(session1));
 
 		Element packetEl = new Element("message", new String[]{"type", "from", "to"},
 									   new String[]{"chat", "remote-user@test.com/res1", res1.toString()});
@@ -179,7 +181,7 @@ public class MessageTest
 
 		session1.setPresence(new Element("presence"));
 		assertTrue("could not find XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session2, null, results, null);
 		assertEquals("not generated result even than 1 resource had nonnegative priority", 1, results.size());
@@ -187,7 +189,7 @@ public class MessageTest
 
 		session2.setPresence(new Element("presence"));
 		assertTrue("could not find XMPPResourceConnection for delivery of message",
-				   messageProcessor.hasConnectionForMessageDelivery(session1));
+				   messageDeliveryLogic.hasConnectionForMessageDelivery(session1));
 		results = new ArrayDeque<Packet>();
 		messageProcessor.process(packet, session1, null, results, null);
 		assertEquals("not generated result even than 2 resource had nonnegative priority", 1, results.size());
