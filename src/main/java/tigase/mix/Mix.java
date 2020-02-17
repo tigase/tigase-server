@@ -28,6 +28,8 @@ public class Mix {
 	public static final String ADMIN0_XMLNS = "urn:xmpp:mix:admin:0";
 
 	public static class Nodes {
+		public static final String ALLOWED = "urn:xmpp:mix:nodes:allowed";
+		public static final String BANNED = "urn:xmpp:mix:nodes:banned";
 		public static final String CONFIG = "urn:xmpp:mix:nodes:config";
 		public static final String PARTICIPANTS = "urn:xmpp:mix:nodes:participants";
 		public static final String INFO = "urn:xmpp:mix:nodes:info";

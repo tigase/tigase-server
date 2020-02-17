@@ -37,10 +37,10 @@ import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Bean(name = "mixRepository", parent = MixComponent.class, active = true)
 public class MixRepository<T> implements IMixRepository, IPubSubRepository.IListener, CachedPubSubRepository.NodeAffiliationProvider<T> {
@@ -61,6 +61,28 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 
 	private Map<BareJID, ChannelConfiguration> channelConfigs = Collections.synchronizedMap(
 			new tigase.util.cache.SizedCache<BareJID, ChannelConfiguration>(1000));
+
+	@Override
+	public Optional<List<BareJID>> getAllowed(BareJID channelJID) throws RepositoryException {
+		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.ALLOWED);
+		if (items == null) {
+			return Optional.empty();
+		}
+
+		return Optional.ofNullable(items.getItemsIds(CollectionItemsOrdering.byUpdateDate))
+				.map(strings -> Arrays.stream(strings).map(BareJID::bareJIDInstanceNS).collect(Collectors.toList()));
+	}
+
+	@Override
+	public Optional<List<BareJID>> getBanned(BareJID channelJID) throws RepositoryException {
+		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.BANNED);
+		if (items == null) {
+			return Optional.empty();
+		}
+
+		return Optional.ofNullable(items.getItemsIds(CollectionItemsOrdering.byUpdateDate))
+				.map(strings -> Arrays.stream(strings).map(BareJID::bareJIDInstanceNS).collect(Collectors.toList()));
+	}
 
 	@Override
 	public IParticipant getParticipant(BareJID channelJID, BareJID participantRealJID) throws RepositoryException {

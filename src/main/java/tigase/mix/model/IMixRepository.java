@@ -22,6 +22,9 @@ import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.repository.ISubscriptions;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface IMixRepository {
 
 	IParticipant getParticipant(BareJID channelJID, BareJID participantJID) throws RepositoryException;
@@ -31,6 +34,8 @@ public interface IMixRepository {
 	IParticipant updateParticipant(BareJID channelJID, BareJID participantJID, String nick) throws RepositoryException,
 																								   PubSubException;
 
+	Optional<List<BareJID>> getAllowed(BareJID channelJID) throws RepositoryException;
+	Optional<List<BareJID>> getBanned(BareJID channelJID) throws RepositoryException;
 
 	ChannelConfiguration getChannelConfiguration(BareJID channelJID) throws RepositoryException;
 

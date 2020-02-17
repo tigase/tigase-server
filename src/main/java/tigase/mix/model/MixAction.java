@@ -19,5 +19,6 @@ package tigase.mix.model;
 
 public enum  MixAction {
 	manage,
-	publish
+	publish,
+	join
 }

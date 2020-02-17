@@ -24,10 +24,7 @@ import tigase.criteria.ElementCriteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.*;
-import tigase.mix.model.ChannelConfiguration;
-import tigase.mix.model.IMixRepository;
-import tigase.mix.model.IParticipant;
-import tigase.mix.model.MixLogic;
+import tigase.mix.model.*;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.Subscription;
 import tigase.pubsub.exceptions.PubSubException;
@@ -79,6 +76,8 @@ public class ChannelJoinModule extends AbstractPubSubModule {
 			if (config == null) {
 				throw new PubSubException(Authorization.ITEM_NOT_FOUND);
 			}
+
+			mixLogic.checkPermission(channelJID, senderJID, MixAction.join);
 
 			String nick = joinEl.getCData(new String[]{"join", "nick"});
 			if (config.isNickMandator() && (nick == null || nick.trim().isEmpty())) {

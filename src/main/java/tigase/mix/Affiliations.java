@@ -19,6 +19,7 @@ package tigase.mix;
 
 import tigase.component.exceptions.RepositoryException;
 import tigase.mix.model.ChannelConfiguration;
+import tigase.mix.model.ChannelNodePermission;
 import tigase.mix.model.IMixRepository;
 import tigase.pubsub.Affiliation;
 import tigase.pubsub.Subscription;
@@ -114,14 +115,18 @@ public class Affiliations implements IAffiliationsCached {
 					if (channelConfiguration.isOwner(jid)) {
 						return new UsersAffiliation(jid, Affiliation.owner);
 					}
-					if (channelConfiguration.isAdministrator(jid)) {
+					ChannelNodePermission updatePermission = channelConfiguration.getInformationNodeUpdateRights();
+					if (channelConfiguration.isAdministrator(jid) && updatePermission == ChannelNodePermission.admins) {
 						return new UsersAffiliation(jid, Affiliation.publisher);
 					}
 					switch (channelConfiguration.getInformationNodeSubscription()) {
 						case allowed:
 						case participants:
 							// TODO: add support when we add support for ALLOWED node!!!
-							return new UsersAffiliation(jid, isParticipant(jid) ? Affiliation.member : Affiliation.none);
+							return new UsersAffiliation(jid, isParticipant(jid) ? (
+									updatePermission == ChannelNodePermission.participants
+									? Affiliation.publisher
+									: Affiliation.member) : Affiliation.none);
 						case anyone:
 							return new UsersAffiliation(jid, Affiliation.member);
 						default:
@@ -130,6 +135,7 @@ public class Affiliations implements IAffiliationsCached {
 				case Mix.Nodes.MESSAGES:
 					switch (channelConfiguration.getMessagesNodeSubscription()) {
 						case allowed:
+							return new UsersAffiliation(jid, isParticipant(jid) ? Affiliation.member : Affiliation.none);
 						case participants:
 							// TODO: add support when we add support for ALLOWED node!!!
 							return new UsersAffiliation(jid, isParticipant(jid) ? Affiliation.member : Affiliation.none);
@@ -152,6 +158,13 @@ public class Affiliations implements IAffiliationsCached {
 						case nobody:
 							// TODO: add support when we add support for ALLOWED node!!!
 							return new UsersAffiliation(jid, Affiliation.none);
+					}
+				case Mix.Nodes.ALLOWED:
+				case Mix.Nodes.BANNED:
+					if (channelConfiguration.isOwner(jid)) {
+						return new UsersAffiliation(jid, Affiliation.owner);
+					} else {
+						return new UsersAffiliation(jid, channelConfiguration.isAdministrator(jid) ? Affiliation.publisher : Affiliation.none);
 					}
 				default:
 					return new UsersAffiliation(jid, Affiliation.none);

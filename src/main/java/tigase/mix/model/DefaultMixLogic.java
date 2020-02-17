@@ -32,6 +32,8 @@ import tigase.xmpp.jid.BareJID;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Bean(name = "logic", parent = IMixComponent.class, active = true)
@@ -105,6 +107,26 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 			case publish:
 				if (mixRepository.getParticipant(channel, senderJid) == null) {
 					throw new PubSubException(Authorization.NOT_ALLOWED);
+				}
+				break;
+			case join:
+				Optional<List<BareJID>> allowed = mixRepository.getAllowed(channel);
+				if (allowed.isPresent()) {
+					if (!allowed.get().contains(senderJid)) {
+						if (!allowed.get().contains(BareJID.bareJIDInstanceNS(senderJid.getDomain()))) {
+							throw new PubSubException(Authorization.NOT_ALLOWED);
+						}
+					}
+				}
+
+				Optional<List<BareJID>> banned = mixRepository.getBanned(channel);
+				if (banned.isPresent()) {
+					if (banned.get().contains(senderJid)) {
+						throw new PubSubException(Authorization.NOT_ALLOWED);
+					}
+					if (banned.get().contains(BareJID.bareJIDInstanceNS(senderJid.getDomain()))) {
+						throw new PubSubException(Authorization.NOT_ALLOWED);
+					}
 				}
 				break;
 		}
