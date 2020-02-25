@@ -15,6 +15,8 @@
 <p align="center">
   <img alt="Tigase Tigase Logo" src="https://github.com/tigase/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true" width="25"/>
   <img src="https://tc.tigase.net/app/rest/builds/buildType:(id:TigaseServer_Build)/statusIcon" width="100"/>
+  <a href='https://compliance.conversations.im/server/tigase.im'><img src='https://compliance.conversations.im/badge/tigase.im'></a> 
+  <a href='https://xmpp.net/result.php?domain=tigase.im&amp;type=client'><img src='https://xmpp.net/badge.php?domain=tigase.im' alt='xmpp.net score' /></a>
 </p>
 
 # What it is
