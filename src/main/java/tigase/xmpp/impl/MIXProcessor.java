@@ -163,8 +163,12 @@ public class MIXProcessor
 											return null;
 										}
 									})
-									.ifPresent(connJID -> sendToUser(userJID, resource, connJID, packet.getType(),
-																	 packet.getStanzaId(), actionEl, results::offer));
+									.ifPresent(connJID -> {
+										Element actionElCopy = actionEl.clone();
+										actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" + channel.toString());
+										sendToUser(userJID, resource, connJID, packet.getType(),
+												   packet.getStanzaId(), actionElCopy, results::offer);
+									});
 						} else {
 							results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true));
 						}

@@ -116,6 +116,8 @@ public class OfflineMessages
 	private final SimpleDateFormat formatter;
 	@Inject
 	private MessageDeliveryLogic message;
+	@Inject(nullAllowed = true)
+	private SessionManager.MessageArchive messageArchive;
 	@ConfigField(desc = "Offline message implementation repository class", alias = MSG_REPO_CLASS_KEY)
 	private String msgRepoCls = null;
 	@Inject(nullAllowed = true)
@@ -365,12 +367,17 @@ public class OfflineMessages
 				stamp = formatter.format(new Date());
 			}
 
+			if (messageArchive != null) {
+				messageArchive.addStableId(pac, null);
+			}
+
 			String from = pac.getStanzaTo().getDomain();
 			Element x = new Element("delay", "Offline Storage - " + defHost, new String[]{"from", "stamp", "xmlns"},
 									new String[]{from, stamp, "urn:xmpp:delay"});
 
 			elem.addChild(x);
 			pac.processedBy(ID);
+
 
 			if (repo.storeMessage(pac.getStanzaFrom(), pac.getStanzaTo(), null, elem, userRepo)) {
 				return Authorization.AUTHORIZED;

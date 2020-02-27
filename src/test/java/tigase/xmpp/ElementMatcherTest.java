@@ -40,4 +40,46 @@ public class ElementMatcherTest {
 		assertTrue(matcher.matches(packet));
 	}
 
+	@Test
+	public void testXMLNSAndType() throws TigaseStringprepException {
+		String matcherStr = "[urn:ietf:params:xml:ns:xmpp-sasl,type=headline]";
+		ElementMatcher matcher = ElementMatcher.create(matcherStr);
+		assertNotNull(matcher);
+
+		assertEquals(matcherStr, matcher.toString());
+
+		Packet packet = Packet.packetInstance(new Element("message", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-sasl" }));
+		assertFalse(matcher.matches(packet));
+		packet = Packet.packetInstance(new Element("message", new String[] { "xmlns", "type" }, new String[] { "urn:ietf:params:xml:ns:xmpp-sasl", "headline" }));
+		assertTrue(matcher.matches(packet));
+	}
+
+	@Test
+	public void testAttr() throws TigaseStringprepException {
+		String matcherStr = "/message/dummy[type=headline]";
+		ElementMatcher matcher = ElementMatcher.create(matcherStr);
+		assertNotNull(matcher);
+
+		assertEquals(matcherStr, matcher.toString());
+
+		Packet packet = Packet.packetInstance(new Element("message", new Element[] { new Element("dummy", new String[]{"type"}, new String[] {"fail"})}, new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-sasl" }));
+		assertFalse(matcher.matches(packet));
+		packet = Packet.packetInstance(new Element("message", new Element[] { new Element("dummy", new String[]{"type"}, new String[] {"headline"})}, new String[] { "xmlns", "type" }, new String[] { "urn:ietf:params:xml:ns:xmpp-sasl", "headline" }));
+		assertTrue(matcher.matches(packet));
+	}
+
+
+	@Test
+	public void testAllWithXMLNS() throws TigaseStringprepException {
+		String matcherStr = "/message/*[http://jabber.org/protocol/chatstates]";
+		ElementMatcher matcher = ElementMatcher.create(matcherStr);
+		assertNotNull(matcher);
+
+		assertEquals(matcherStr, matcher.toString());
+
+		Packet packet = Packet.packetInstance(new Element("message", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-sasl" }));
+		assertFalse(matcher.matches(packet));
+		packet = Packet.packetInstance(new Element("message", new Element[] { new Element("active", new String[]{"xmlns"}, new String[] {"http://jabber.org/protocol/chatstates"})}, new String[] { "xmlns", "type" }, new String[] { "urn:ietf:params:xml:ns:xmpp-sasl", "headline" }));
+		assertTrue(matcher.matches(packet));
+	}
 }

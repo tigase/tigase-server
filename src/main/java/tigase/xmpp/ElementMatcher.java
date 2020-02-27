@@ -31,10 +31,14 @@ public class ElementMatcher {
 	private final String[] path;
 	private final boolean value;
 	private final String xmlns;
+	private final String[][] attributes;
+	private final boolean checkChildren;
 
 	public static ElementMatcher create(String str) {
 		List<String> path = new ArrayList<String>();
 		String xmlns = null;
+		List<String[]> attributes = new ArrayList<>();
+		boolean checkChildren = false;
 		int offset = 0;
 		boolean value = !str.startsWith("-");
 		if (str.charAt(0) == '-' || str.charAt(0) == '+') {
@@ -56,7 +60,16 @@ public class ElementMatcher {
 			} else {
 				int eIdx = str.indexOf(']', sIdx);
 				elemName = str.substring(offset, sIdx);
-				xmlns = str.substring(sIdx + 1, eIdx);
+				String content = str.substring(sIdx + 1, eIdx);
+				String[] parts = content.split(",");
+				for (String part : parts) {
+					int equalIdx = part.indexOf('=');
+					if (equalIdx > 0) {
+						attributes.add(new String[]{part.substring(0, equalIdx).intern(), part.substring(equalIdx + 1)});
+					} else {
+						xmlns = part;
+					}
+				}
 				slashIdx = str.indexOf('/', eIdx);
 				if (slashIdx < 0) {
 					slashIdx = str.length();
@@ -64,7 +77,11 @@ public class ElementMatcher {
 			}
 
 			if (elemName != null && !elemName.isEmpty()) {
-				path.add(elemName.intern());
+				if ("*".equals(elemName)) {
+					checkChildren = true;
+				} else {
+					path.add(elemName.intern());
+				}
 			}
 
 			if (slashIdx == str.length()) {
@@ -76,21 +93,57 @@ public class ElementMatcher {
 			xmlns = xmlns.intern();
 		}
 
-		return new ElementMatcher(path.toArray(new String[0]), xmlns, value);
+		return new ElementMatcher(path.toArray(new String[0]), checkChildren, xmlns, attributes.isEmpty() ? null : attributes.stream().toArray(String[][]::new), value);
 	}
 
 	public ElementMatcher(String[] path, String xmlns, boolean value) {
+		this(path, false, xmlns, null, value);
+	}
+
+	public ElementMatcher(String[] path, boolean checkChildren, String xmlns, String[][] attributes, boolean value) {
 		this.path = path;
 		this.xmlns = xmlns;
+		this.attributes = attributes;
 		this.value = value;
+		this.checkChildren = checkChildren;
 	}
 
 	public boolean matches(Packet packet) {
-		if (path.length == 0) {
-			return xmlns == null || xmlns == packet.getElement().getXMLNS();
+		Element child = path.length == 0 ? packet.getElement() : packet.getElement().findChildStaticStr(path);
+		if (checkChildren) {
+			if (child == null) {
+				return false;
+			}
+			List<Element> children = child.getChildren();
+			if (children == null) {
+				return false;
+			}
+			for (Element el : children) {
+				if (matches(el)) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			return matches(child);
 		}
-		Element child = packet.getElement().findChildStaticStr(path);
-		return child != null && (xmlns == null || xmlns == child.getXMLNS());
+	}
+
+	protected boolean matches(Element child) {
+		if (child == null) {
+			return false;
+		}
+		if (xmlns != null && xmlns != child.getXMLNS()) {
+			return false;
+		}
+		if (attributes != null) {
+			for (String[] pair : attributes) {
+				if (!pair[1].equals(child.getAttributeStaticStr(pair[0]))) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public boolean getValue() {
@@ -106,9 +159,27 @@ public class ElementMatcher {
 			sb.append('/');
 			sb.append(p);
 		}
-		if (xmlns != null) {
+
+		if (checkChildren) {
+			sb.append("/*");
+		}
+
+		if (xmlns != null || attributes != null) {
 			sb.append("[");
-			sb.append(xmlns);
+			if (xmlns != null) {
+				sb.append(xmlns);
+			}
+			if (attributes != null && attributes.length > 0) {
+				boolean first = xmlns == null;
+				for (String[] pair : attributes) {
+					if (!first) {
+						sb.append(",");
+					} else {
+						first = false;
+					}
+					sb.append(pair[0]).append("=").append(pair[1]);
+				}
+			}
 			sb.append("]");
 		}
 		return sb.toString();

@@ -94,7 +94,7 @@ public abstract class AbstractBeanConfigurator
 
 		Bean annotation = clazz.getAnnotation(Bean.class);
 		for (Class<?> ifc : clazz.getInterfaces()) {
-			if (ifc.isAssignableFrom(bc.getClazz()) && !ifc.equals(RegistrarBean.class)) {
+			if (ifc.isAssignableFrom(bc.getClazz()) && !ifc.equals(RegistrarBean.class) && !ifc.equals(Initializable.class) && !ifc.equals(UnregisterAware.class)) {
 				Bean existingBeanAnnotation = bc.getClazz().getAnnotation(Bean.class);
 				if (existingBeanAnnotation == null ||
 						annotation.parent().isAssignableFrom(existingBeanAnnotation.parent())) {
