@@ -26,12 +26,14 @@ import tigase.pubsub.*;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.utils.DefaultPubSubLogic;
 import tigase.util.Algorithms;
+import tigase.util.datetime.TimestampHelper;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +43,8 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 		implements MixLogic {
 
 	private static final Set<String> MIX_NODES = Mix.Nodes.ALL_NODES;
+
+	private static final tigase.util.datetime.TimestampHelper timestampHelper = new TimestampHelper();
 
 	@Inject
 	private IMixRepository mixRepository;
@@ -143,6 +147,15 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 			return true;
 		}
 		return super.isMAMEnabled(serviceJid, node);
+	}
+
+	@Override
+	public String validateItemId(BareJID toJid, String node, String id) {
+		if (Mix.Nodes.INFO.equals(node) || Mix.Nodes.CONFIG.equals(node)) {
+			return timestampHelper.format(new Date());
+		} else {
+			return super.validateItemId(toJid, node, id);
+		}
 	}
 
 	//	@Override

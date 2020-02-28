@@ -31,12 +31,15 @@ import tigase.mix.model.MixLogic;
 import tigase.pubsub.*;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.repository.IItems;
+import tigase.server.Command;
+import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.datetime.TimestampHelper;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.Collections;
@@ -103,6 +106,7 @@ public class ChannelCreateModule extends AbstractPubSubModule {
 			config.setValue(PUBSUB + "access_model", AccessModel.whitelist.name());
 			config.setValue(PUBSUB + "publish_model",PublisherModel.publishers.name());
 			config.setValue(PUBSUB + "send_last_published_item", SendLastPublishedItem.never.name());
+			config.setValue(PUBSUB + "notification_type", StanzaType.normal.name());
 			getRepository().createNode(channelJID, Mix.Nodes.PARTICIPANTS, owner,
 									   config, NodeType.leaf, null);
 			getRepository().addToRootCollection(channelJID, Mix.Nodes.PARTICIPANTS);
@@ -113,6 +117,7 @@ public class ChannelCreateModule extends AbstractPubSubModule {
 			config.setValue(PUBSUB + "access_model", AccessModel.whitelist.name());
 			config.setValue(PUBSUB + "publish_model",PublisherModel.publishers.name());
 			config.setValue(PUBSUB + "send_last_published_item", SendLastPublishedItem.never.name());
+			config.setValue(PUBSUB + "notification_type", StanzaType.normal.name());
 			getRepository().createNode(channelJID, Mix.Nodes.MESSAGES, owner,
 									   config, NodeType.leaf, null);
 			getRepository().addToRootCollection(channelJID, Mix.Nodes.MESSAGES);
@@ -122,6 +127,7 @@ public class ChannelCreateModule extends AbstractPubSubModule {
 			config.setValue(PUBSUB + "access_model", AccessModel.whitelist.name());
 			config.setValue(PUBSUB + "publish_model",PublisherModel.publishers.name());
 			config.setValue(PUBSUB + "send_last_published_item", SendLastPublishedItem.never.name());
+			config.setValue(PUBSUB + "notification_type", StanzaType.normal.name());
 			getRepository().createNode(channelJID, Mix.Nodes.INFO, owner,
 									   config, NodeType.leaf, null);
 			getRepository().addToRootCollection(channelJID, Mix.Nodes.INFO);
@@ -130,6 +136,16 @@ public class ChannelCreateModule extends AbstractPubSubModule {
 			IItems nodeItems = getRepository().getNodeItems(channelJID, Mix.Nodes.CONFIG);
 			String configItemId = timestampHelper.format(new Date());
 			nodeItems.writeItem(configItemId, owner.toString(), channelConfig.toElement(configItemId), null);
+
+			Element item = new Element("item", new String[] {"id"}, new String[] {configItemId });
+			new DataForm.Builder(item, Command.DataType.result).withFields(builder -> {
+				builder.addField(DataForm.FieldType.Hidden, "FORM_TYPE").setValue(Mix.CORE1_XMLNS).build();
+				builder.addField(DataForm.FieldType.TextSingle, "Name").setLabel("Channel Name").setValue("").build();
+				builder.addField(DataForm.FieldType.TextSingle, "Description").setLabel("Channel Description").setValue("").build();
+				builder.addField(DataForm.FieldType.JidMulti, "Contact").setLabel("Channel Administrative Contact").build();
+			}).build();
+			nodeItems = getRepository().getNodeItems(channelJID, Mix.Nodes.INFO);
+			nodeItems.writeItem(configItemId, owner.toString(), item, null);
 
 			Packet response = packet.okResult(new Element("create", new String[] {"xmlns", "channel"}, new String[] {Mix.CORE1_XMLNS, channel}), 0);
 			response.getElemChild("create", Mix.CORE1_XMLNS).setAttribute("channel", channel);

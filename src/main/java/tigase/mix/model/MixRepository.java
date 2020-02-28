@@ -185,6 +185,10 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 			ChannelConfiguration config = new ChannelConfiguration(item);
 			ChannelConfiguration.updateLastChangeMadeBy(item, JID.jidInstanceNS(publisher));
 		}
+		if (Mix.Nodes.INFO.equals(node)) {
+			// we need to handle this properly..
+
+		}
 	}
 
 	@Override
