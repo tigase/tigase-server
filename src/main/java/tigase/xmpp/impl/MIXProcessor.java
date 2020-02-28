@@ -167,11 +167,27 @@ public class MIXProcessor
 										Element actionElCopy = actionEl.clone();
 										actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" + channel.toString());
 										sendToUser(userJID, resource, connJID, packet.getType(),
-												   packet.getStanzaId(), actionElCopy, results::offer);
+												   packet.getStanzaId(), actionElCopy, null, results::offer);
 									});
 						} else {
 							results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true));
 						}
+					} else if(packet.getType() == StanzaType.error) {
+						Optional.ofNullable(session.getParentSession())
+								.map(parent -> parent.getResourceForResource(resource))
+								.map(conn -> {
+									try {
+										return conn.getConnectionId();
+									} catch (NoConnectionIdException ex) {
+										return null;
+									}
+								})
+								.ifPresent(connJID -> {
+									Element actionElCopy = actionEl.clone();
+									actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" + channel.toString());
+									sendToUser(userJID, resource, connJID, packet.getType(),
+											   packet.getStanzaId(), actionElCopy, packet.getElement().findChild(el -> el.getName() == "error"), results::offer);
+								});
 					}
 				} else {
 					throw new XMPPProcessorException(Authorization.BAD_REQUEST);
@@ -195,7 +211,7 @@ public class MIXProcessor
 		writer.accept(Packet.packetInstance(iqEl, JID.jidInstance(userJID), JID.jidInstance(channel)));
 	}
 
-	protected void sendToUser(BareJID userJID, String resource, JID connectionJID, StanzaType stanzaType, String id, Element actionEl, Consumer<Packet> writer) {
+	protected void sendToUser(BareJID userJID, String resource, JID connectionJID, StanzaType stanzaType, String id, Element actionEl, Element errorEl, Consumer<Packet> writer) {
 		Element iqEl = new Element("iq");
 		iqEl.setXMLNS(Iq.CLIENT_XMLNS);
 		iqEl.setAttribute("id", id);
@@ -220,6 +236,9 @@ public class MIXProcessor
 				wrapEl.addChild(actionEl);
 				iqEl.addChild(wrapEl);
 			}
+		}
+		if (errorEl != null) {
+			iqEl.addChild(errorEl);
 		}
 
 		Packet response = Packet.packetInstance(iqEl, JID.jidInstance(userJID), JID.jidInstanceNS(userJID, resource));
