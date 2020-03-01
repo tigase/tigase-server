@@ -17,16 +17,19 @@
  */
 package tigase.mix.model;
 
+import tigase.component.PacketWriter;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.Affiliations;
 import tigase.mix.Mix;
 import tigase.mix.MixComponent;
+import tigase.pubsub.Affiliation;
 import tigase.pubsub.CollectionItemsOrdering;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.modules.PublishItemModule;
 import tigase.pubsub.modules.RetractItemModule;
+import tigase.pubsub.repository.IAffiliations;
 import tigase.pubsub.repository.IItems;
 import tigase.pubsub.repository.IPubSubRepository;
 import tigase.pubsub.repository.ISubscriptions;
@@ -58,6 +61,9 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 
 	@Inject
 	private IPubSubRepository pubSubRepository;
+
+	@Inject
+	private PacketWriter packetWriter;
 
 	private Map<BareJID, ChannelConfiguration> channelConfigs = Collections.synchronizedMap(
 			new tigase.util.cache.SizedCache<BareJID, ChannelConfiguration>(1000));
@@ -173,7 +179,24 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 	public void itemWritten(BareJID serviceJID, String node, String id, String publisher, Element item, String uuid) {
 		if (Mix.Nodes.CONFIG.equals(node)) {
 			// node config has changed, we need to update it
+			ChannelConfiguration oldConfig = null;
+			ChannelConfiguration newConfig = null;
+
+			try {
+				oldConfig = getChannelConfiguration(serviceJID);
+			} catch (RepositoryException ex) {
+				// if exception happended just ignore it..
+			}
 			updateChannelConfiguration(serviceJID, item);
+
+			try {
+				newConfig = getChannelConfiguration(serviceJID);
+				if (newConfig != null && oldConfig != null) {
+					mixLogic.generateAffiliationChangesNotifications(serviceJID, oldConfig, newConfig, packetWriter::write);
+				}
+			} catch (RepositoryException ex) {
+				// if exception happended just ignore it..
+			}
 		}
 	}
 
@@ -189,6 +212,24 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 			// we need to handle this properly..
 
 		}
+	}
+
+	@Override
+	public Map<String, UsersAffiliation> getUserAffiliations(BareJID serviceJid, BareJID jid) throws RepositoryException {
+		Map<String, UsersAffiliation> userAffiliations = new HashMap<>();
+		String[] nodes = pubSubRepository.getRootCollection(serviceJid);
+		if (nodes != null) {
+			for (String node : nodes) {
+				IAffiliations affiliations = pubSubRepository.getNodeAffiliations(serviceJid, node);
+				if (affiliations != null) {
+					UsersAffiliation affiliation = affiliations.getSubscriberAffiliation(jid);
+					if (affiliation.getAffiliation() != Affiliation.none) {
+						userAffiliations.put(node, affiliation);
+					}
+				}
+			}
+		}
+		return userAffiliations;
 	}
 
 	@Override

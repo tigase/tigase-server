@@ -35,6 +35,9 @@ public class Mix {
 		public static final String INFO = "urn:xmpp:mix:nodes:info";
 		public static final String MESSAGES = "urn:xmpp:mix:nodes:messages";
 
+		public static final String AVATAR_METADATA = "urn:xmpp:avatar:metadata";
+		public static final String AVATAR_DATA = "urn:xmpp:avatar:data";
+
 		public static final Set<String> ALL_NODES = Collections.unmodifiableSet(
 				Stream.of(Mix.Nodes.CONFIG, Mix.Nodes.INFO, Mix.Nodes.MESSAGES, Mix.Nodes.PARTICIPANTS).collect(
 						Collectors.toSet()));

@@ -20,9 +20,16 @@ package tigase.mix.model;
 import tigase.component.exceptions.RepositoryException;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.utils.PubSubLogic;
+import tigase.server.Packet;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.function.Consumer;
+
 public interface MixLogic extends PubSubLogic {
+
+	void generateAffiliationChangesNotifications(BareJID channelJid,
+														ChannelConfiguration oldConfig,
+														ChannelConfiguration newConfig, Consumer<Packet> packetConsumer);
 
 	String generateParticipantId(BareJID channelJID, BareJID participantRealJID) throws RepositoryException;
 

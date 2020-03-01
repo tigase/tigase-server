@@ -114,6 +114,10 @@ public class ChannelConfiguration {
 		return administrators.contains(jid);
 	}
 
+	public Set<BareJID> getAdministrators() {
+		return administrators;
+	}
+
 	public void setAdministrators(Set<BareJID> administrators) {
 		if (administrators == null || administrators.isEmpty()) {
 			this.administrators = Collections.emptySet();
@@ -148,6 +152,10 @@ public class ChannelConfiguration {
 
 	public ChannelNodePermission getInformationNodeUpdateRights() {
 		return informationNodeUpdateRights;
+	}
+
+	public ChannelNodePermission getAvatarNodesUpdateRights() {
+		return avatarNodesUpdateRights;
 	}
 
 	public Element toElement(String id) {

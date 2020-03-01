@@ -24,23 +24,33 @@ import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
 import tigase.pubsub.*;
 import tigase.pubsub.exceptions.PubSubException;
+import tigase.pubsub.modules.ManageAffiliationsModule;
+import tigase.pubsub.repository.IAffiliations;
+import tigase.pubsub.repository.ISubscriptions;
+import tigase.pubsub.repository.stateless.UsersAffiliation;
+import tigase.pubsub.repository.stateless.UsersSubscription;
 import tigase.pubsub.utils.DefaultPubSubLogic;
+import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.datetime.TimestampHelper;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Bean(name = "logic", parent = IMixComponent.class, active = true)
 public class DefaultMixLogic extends DefaultPubSubLogic
 		implements MixLogic {
+
+	private static final Logger log = Logger.getLogger(DefaultMixLogic.class.getCanonicalName());
 
 	private static final Set<String> MIX_NODES = Mix.Nodes.ALL_NODES;
 
@@ -158,6 +168,137 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 		}
 	}
 
+	@Override
+	public void generateAffiliationChangesNotifications(BareJID channelJid,
+														ChannelConfiguration oldConfig,
+														ChannelConfiguration newConfig, Consumer<Packet> packetConsumer) {
+		Set<BareJID> changed = new HashSet<>();
+		xor(oldConfig.getOwners(), newConfig.getOwners(), changed::add);
+		xor(oldConfig.getAdministrators(), newConfig.getAdministrators(), changed::add);
+		if (!changed.isEmpty()) {
+			try {
+				String[] childNodes = getRepository().getRootCollection(channelJid);
+				if (childNodes != null) {
+					for (String node : childNodes) {
+						generateAffiliationNotifications(channelJid, node, changed, packetConsumer);
+					}
+				}
+			} catch (RepositoryException ex) {
+				log.log(Level.FINEST, "Could not list nodes for channel " + channelJid, ex);
+			}
+		}
+		generateAffiliationChangesNotificationsForNodeUpdateRights(channelJid, newConfig, oldConfig.getInformationNodeUpdateRights(),
+																	 newConfig.getInformationNodeUpdateRights(),
+																	 Mix.Nodes.INFO, packetConsumer);
+		generateAffiliationChangesNotificationsForNodeUpdateRights(channelJid, newConfig, oldConfig.getAvatarNodesUpdateRights(),
+																   newConfig.getAvatarNodesUpdateRights(),
+																   Mix.Nodes.AVATAR_METADATA, packetConsumer);
+		generateAffiliationChangesNotificationsForNodeUpdateRights(channelJid, newConfig, oldConfig.getAvatarNodesUpdateRights(),
+																   newConfig.getAvatarNodesUpdateRights(),
+																   Mix.Nodes.AVATAR_DATA, packetConsumer);
+	}
+
+	protected void generateAffiliationChangesNotificationsForNodeUpdateRights(BareJID channelJID, ChannelConfiguration configuration, ChannelNodePermission oldPermission, ChannelNodePermission newPermission, String node, Consumer<Packet> packetConsumer) {
+		try {
+			switch (oldPermission) {
+				case owners:
+					switch (newPermission) {
+						case owners:
+							break;
+						case admins:
+							generateAffiliationNotifications(channelJID, node, configuration.getAdministrators(),
+															 packetConsumer);
+							break;
+						case participants:
+							generateAffiliationNotifications(channelJID, node,
+															 mixRepository.getNodeSubscriptions(channelJID, node)
+																	 .getSubscriptions()
+																	 .map(UsersSubscription::getJid)
+																	 .filter(jid -> !configuration.isOwner(jid))
+																	 .collect(Collectors.toSet()), packetConsumer);
+							break;
+						default:
+							break;
+					}
+				case admins:
+					switch (newPermission) {
+						case owners:
+							generateAffiliationNotifications(channelJID, node, configuration.getAdministrators(),
+															 packetConsumer);
+							break;
+						case admins:
+							break;
+						case participants:
+							generateAffiliationNotifications(channelJID, node,
+															 mixRepository.getNodeSubscriptions(channelJID, node)
+																	 .getSubscriptions()
+																	 .map(UsersSubscription::getJid)
+																	 .filter(jid -> !configuration.isAdministrator(jid))
+																	 .filter(jid -> !configuration.isOwner(jid))
+																	 .collect(Collectors.toSet()), packetConsumer);
+							break;
+						default:
+							break;
+					}
+				case participants:
+					switch (newPermission) {
+						case owners:
+							generateAffiliationNotifications(channelJID, node,
+															 mixRepository.getNodeSubscriptions(channelJID, node)
+																	 .getSubscriptions()
+																	 .map(UsersSubscription::getJid)
+																	 .filter(jid -> !configuration.isOwner(jid))
+																	 .collect(Collectors.toSet()), packetConsumer);
+						case admins:
+							generateAffiliationNotifications(channelJID, node,
+															 mixRepository.getNodeSubscriptions(channelJID, node)
+																	 .getSubscriptions()
+																	 .map(UsersSubscription::getJid)
+																	 .filter(jid -> !configuration.isAdministrator(jid))
+																	 .filter(jid -> !configuration.isOwner(jid))
+																	 .collect(Collectors.toSet()), packetConsumer);
+							break;
+						case participants:
+							break;
+					}
+				default:
+					break;
+			}
+		} catch (RepositoryException ex) {
+			log.log(Level.FINEST, "Could not load subscriptions for channel " + channelJID + " and node " + node, ex);
+		}
+	}
+
+	protected void generateAffiliationNotifications(BareJID channelJID, String node, Set<BareJID> changed, Consumer<Packet> packetConsumer) {
+		try {
+			JID channel = JID.jidInstance(channelJID);
+			IAffiliations affiliations = getRepository().getNodeAffiliations(channelJID, node);
+			ISubscriptions subscriptions = getRepository().getNodeSubscriptions(channelJID, node);
+			if (affiliations != null && subscriptions != null) {
+				for (BareJID jid : changed) {
+					if (subscriptions.getSubscription(jid) != Subscription.subscribed) {
+						continue;
+					}
+
+					UsersAffiliation affiliation = affiliations.getSubscriberAffiliation(jid);
+					Packet notification = ManageAffiliationsModule.createAffiliationNotification(channel,
+																								 JID.jidInstance(jid),
+																								 node,
+																								 affiliation.getAffiliation());
+					if (notification != null) {
+						packetConsumer.accept(notification);
+					}
+				}
+			}
+		} catch (RepositoryException ex) {
+			log.log(Level.FINEST, "Could not load affiliations for channel " + channelJID + " and node " + node, ex);
+		}
+	}
+
+	private static <T> void xor(Collection<T> oldCollection, Collection<T> newCollection, Consumer<T> consumer) {
+		oldCollection.stream().filter(it -> !newCollection.contains(it)).forEach(consumer);
+		newCollection.stream().filter(it -> !oldCollection.contains(it)).forEach(consumer);
+	}
 	//	@Override
 //	public void checkPermission(BareJID serviceJid, String nodeName, JID senderJid, Action action)
 //			throws PubSubException, RepositoryException {
