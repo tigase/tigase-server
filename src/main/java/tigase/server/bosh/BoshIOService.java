@@ -29,6 +29,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.util.StringUtilities.checkIfArrayContainsString;
+
 /**
  * Describe class BoshIOService here.
  * <br>
@@ -47,6 +49,9 @@ public class BoshIOService
 	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
 	private static final String SERVER = "Server: Tigase Bosh/" + tigase.server.XMPPServer.getImplementationVersion();
 	private static final char[] HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER = "GET /clientaccesspolicy.xml".toCharArray();
+	private static final char[] HTTP_CLIENT_ROOT_REQUEST_HEADER = "GET /".toCharArray();
+	private static final char[] HTTP_CLIENT_GET_REQUEST_HEADER = "GET".toCharArray();
+	private static final char[] HTTP_CLIENT_OPTIONS_REQUEST_HEADER = "OPTIONS".toCharArray();
 
 	private final ConfigProvider configProvider;
 	private String content_type = "text/xml; charset=utf-8";
@@ -173,41 +178,33 @@ public class BoshIOService
 		// we need to check this every time as Webkit based browser are reusing
 		// existing connections and repeat this CORS request every 10 minutes
 		//if (firstPassCORS && 
-		if ((data != null) && (data.length > 7)) {
-			if ((data[0] == 'O') && (data[1] == 'P') && (data[2] == 'T') && (data[3] == 'I') && (data[4] == 'O') &&
-					(data[5] == 'N') && (data[6] == 'S')) {
+		final boolean isOptionsRequst = checkIfArrayContainsString(data, HTTP_CLIENT_OPTIONS_REQUEST_HEADER);
+		if (isOptionsRequst) {
+			// responding with headers - needed for Chrome browser
+			this.writeRawData(prepareHeaders(null).toString());
 
-				// responding with headers - needed for Chrome browser
-				this.writeRawData(prepareHeaders(null).toString());
-
-				// connection needs to be closed as in other case data headers are not sent to browser
-				// until connection is closed and for OPTIONS request we are not sending any data
-				//firstPassCORS = false;
-
-				return false;
-			}
+			// connection needs to be closed as in other case data headers are not sent to browser
+			// until connection is closed and for OPTIONS request we are not sending any data
 			//firstPassCORS = false;
-		}
-		if (firstPassClientAccessPolicy && (data != null) &&
-				(data.length >= HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
-			if ((data[0] == 'G') && (data[1] == 'E') && (data[2] == 'T')) {
-				boolean ok = true;
-				int i = 3;
 
-				while (ok && (i < HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
-					ok &= (data[i] == HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER[i]);
-					i++;
-				}
-				if (ok) {
+			return false;
+		}
+		final boolean isGetRequest = checkIfArrayContainsString(data, HTTP_CLIENT_GET_REQUEST_HEADER);
+		if (firstPassClientAccessPolicy && isGetRequest) {
+			final boolean isClientAccessPolicyRequest = checkIfArrayContainsString(data,
+																				   HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER);
+			final boolean isClientRootRequest = checkIfArrayContainsString(data, HTTP_CLIENT_ROOT_REQUEST_HEADER);
+			if (isClientAccessPolicyRequest || isClientRootRequest) {
+				if (isClientAccessPolicyRequest) {
 					String client_access_policy = configProvider.getClientAccessPolicy();
 					this.writeRawData(prepareHeaders(client_access_policy).toString() + client_access_policy);
-
-					// connection needs to be closed as in other case data headers are not sent to browser
-					// until connection is closed
-					firstPassClientAccessPolicy = false;
-
-					return true;
+				} else if (isClientRootRequest) {
+					this.writeRawData(prepareHeaders(null).toString());
 				}
+				// connection needs to be closed as in other case data headers are not sent to browser
+				// until connection is closed
+				firstPassClientAccessPolicy = false;
+				return true;
 			}
 			firstPassClientAccessPolicy = false;
 		}

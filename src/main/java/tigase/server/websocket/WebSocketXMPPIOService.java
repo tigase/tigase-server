@@ -370,6 +370,7 @@ public class WebSocketXMPPIOService<RefObject>
 			if (!contains) {
 				writeRawData(BAD_REQUEST);
 
+				log.log(Level.FINEST, "WS, Connection: Upgrade not found, closing connection: {0}", this);
 				dumpHeaders(headers);
 				forceStop();
 				return;
@@ -379,6 +380,7 @@ public class WebSocketXMPPIOService<RefObject>
 				!headers.get(WebSocketProtocolIfc.WS_PROTOCOL_KEY.toUpperCase()).contains("xmpp")) {
 			writeRawData(BAD_REQUEST);
 
+			log.log(Level.FINEST, WebSocketProtocolIfc.WS_PROTOCOL_KEY + " not found, closing connection: {0}", this);
 			dumpHeaders(headers);
 			forceStop();
 			return;
