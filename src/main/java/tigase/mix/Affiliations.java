@@ -132,6 +132,19 @@ public class Affiliations implements IAffiliationsCached {
 						default:
 							return new UsersAffiliation(jid, Affiliation.none);
 					}
+				case Mix.Nodes.AVATAR_DATA:
+				case Mix.Nodes.AVATAR_METADATA:
+					if (channelConfiguration.isOwner(jid)) {
+						return new UsersAffiliation(jid, Affiliation.owner);
+					}
+					ChannelNodePermission avatarUpdatePermission = channelConfiguration.getAvatarNodesUpdateRights();
+					if (channelConfiguration.isAdministrator(jid) && avatarUpdatePermission == ChannelNodePermission.admins) {
+						return new UsersAffiliation(jid, Affiliation.publisher);
+					}
+					return new UsersAffiliation(jid, isParticipant(jid) ? (
+							avatarUpdatePermission == ChannelNodePermission.participants
+							? Affiliation.publisher
+							: Affiliation.member) : Affiliation.none);
 				case Mix.Nodes.MESSAGES:
 					switch (channelConfiguration.getMessagesNodeSubscription()) {
 						case allowed:

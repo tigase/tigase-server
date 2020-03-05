@@ -39,7 +39,7 @@ public class Mix {
 		public static final String AVATAR_DATA = "urn:xmpp:avatar:data";
 
 		public static final Set<String> ALL_NODES = Collections.unmodifiableSet(
-				Stream.of(Mix.Nodes.CONFIG, Mix.Nodes.INFO, Mix.Nodes.MESSAGES, Mix.Nodes.PARTICIPANTS).collect(
+				Stream.of(Mix.Nodes.CONFIG, Mix.Nodes.INFO, Mix.Nodes.MESSAGES, Mix.Nodes.PARTICIPANTS, ALLOWED, BANNED, AVATAR_DATA, AVATAR_METADATA).collect(
 						Collectors.toSet()));
 	}
 

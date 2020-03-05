@@ -310,7 +310,7 @@ public class ChannelConfiguration {
 		if (privateMessages) {
 			throw new PubSubException(Authorization.NOT_ACCEPTABLE, "Private messages are not supported!");
 		}
-		if (Arrays.stream(nodesPresent).anyMatch(node -> (!"participants".equals(node)) && (!"information".equals(node)))) {
+		if (Arrays.stream(nodesPresent).anyMatch(node -> "presence".equals(node) || "jidmap-visible".equals(node))) {
 			throw new PubSubException(Authorization.NOT_ACCEPTABLE, "Only participants and information nodes are supported!");
 		}
 		if (openPresence) {
