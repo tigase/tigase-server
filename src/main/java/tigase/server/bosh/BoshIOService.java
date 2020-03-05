@@ -199,7 +199,8 @@ public class BoshIOService
 					String client_access_policy = configProvider.getClientAccessPolicy();
 					this.writeRawData(prepareHeaders(client_access_policy).toString() + client_access_policy);
 				} else if (isClientRootRequest) {
-					this.writeRawData(prepareHeaders(null).toString());
+					String notice = "This is BOSH (XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH)) endpoint, if you want to use it use POST method as defined in it's specification: https://xmpp.org/extensions/xep-0124.html";
+					this.writeRawData(prepareHeaders(notice).toString() + notice);
 				}
 				// connection needs to be closed as in other case data headers are not sent to browser
 				// until connection is closed
