@@ -92,12 +92,16 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 
 	@Override
 	public IParticipant getParticipant(BareJID channelJID, BareJID participantRealJID) throws RepositoryException {
+		String participantId = mixLogic.generateParticipantId(channelJID, participantRealJID);
+		return getParticipant(channelJID, participantId);
+	}
+
+	@Override
+	public IParticipant getParticipant(BareJID channelJID, String participantId) throws RepositoryException {
 		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.PARTICIPANTS);
 		if (items == null) {
 			return null;
 		}
-
-		String participantId = mixLogic.generateParticipantId(channelJID, participantRealJID);
 		IItems.IItem item = items.getItem(participantId);
 		if (item == null) {
 			return null;

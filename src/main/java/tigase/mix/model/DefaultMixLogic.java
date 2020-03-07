@@ -143,6 +143,17 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 					}
 				}
 				break;
+			case relay:
+				ChannelConfiguration configuration1 = mixRepository.getChannelConfiguration(channel);
+				if (configuration1 != null) {
+					if (!configuration1.arePrivateMessagesAllowed()) {
+						throw new PubSubException(Authorization.NOT_ALLOWED);
+					}
+					if (mixRepository.getParticipant(channel, senderJid) == null) {
+						throw new PubSubException(Authorization.NOT_ALLOWED);
+					}
+				}
+				break;
 		}
 	}
 

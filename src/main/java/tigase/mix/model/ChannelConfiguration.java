@@ -75,7 +75,7 @@ public class ChannelConfiguration {
 	private ChannelNodePermission administratorMessageRetractionRights = ChannelNodePermission.nobody;
 	private boolean participantAdditionByInvitation = false;
 	// should be true
-	private boolean privateMessages = false;
+	private boolean privateMessages = true;
 	private boolean mandatoryNicks = true;
 
 	public ChannelConfiguration() {
@@ -255,6 +255,10 @@ public class ChannelConfiguration {
 		return mandatoryNicks;
 	}
 
+	public boolean arePrivateMessagesAllowed() {
+		return privateMessages;
+	}
+
 	protected void applyFrom(Element item) throws PubSubException {
 		Element form = item.getChild("x", "jabber:x:data");
 		if (form == null || !Mix.ADMIN0_XMLNS.equals(DataForm.getFieldValue(form, "FORM_TYPE"))) {
@@ -307,9 +311,6 @@ public class ChannelConfiguration {
 		privateMessages = getBoolFromField(form,"Private Messages");
 		mandatoryNicks = getBoolFromField(form,"Mandatory Nicks");
 
-		if (privateMessages) {
-			throw new PubSubException(Authorization.NOT_ACCEPTABLE, "Private messages are not supported!");
-		}
 		if (Arrays.stream(nodesPresent).anyMatch(node -> "presence".equals(node) || "jidmap-visible".equals(node))) {
 			throw new PubSubException(Authorization.NOT_ACCEPTABLE, "Only participants and information nodes are supported!");
 		}

@@ -28,6 +28,7 @@ import java.util.Optional;
 public interface IMixRepository {
 
 	IParticipant getParticipant(BareJID channelJID, BareJID participantJID) throws RepositoryException;
+	IParticipant getParticipant(BareJID channelJID, String participantId) throws RepositoryException;
 
 	void removeParticiapnt(BareJID channelJID, BareJID participantJID) throws RepositoryException;
 

@@ -15,11 +15,25 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.mix.model;
+package tigase.mix.modules;
 
-public enum  MixAction {
-	manage,
-	publish,
-	join,
-	relay
+import tigase.kernel.beans.Bean;
+import tigase.mix.IMixComponent;
+import tigase.server.Packet;
+import tigase.xmpp.jid.JID;
+
+import java.util.function.Predicate;
+
+@Bean(name = "pubsubModulePredicate", parent = IMixComponent.class, active = true)
+public class PubSubModulePredicate implements Predicate<Packet> {
+
+	@Override
+	public boolean test(Packet packet) {
+		JID jid = packet.getStanzaTo();
+		if (jid == null || jid.getLocalpart() == null) {
+			return true;
+		}
+		return !jid.getLocalpart().contains("#");
+
+	}
 }
