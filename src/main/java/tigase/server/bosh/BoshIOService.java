@@ -25,6 +25,7 @@ import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -135,13 +136,13 @@ public class BoshIOService
 		this.content_type = ct;
 	}
 
-	public StringBuilder prepareHeaders(String data) {
+	public StringBuilder prepareHeaders(String data)  {
 		StringBuilder sb = new StringBuilder(200);
 
 		sb.append(HTTP_OK_RESPONSE);
 		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
 		if (data != null) {
-			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
+			sb.append(CONTENT_TYPE_LENGTH).append(getDataLength(data, content_type)).append(EOL);
 		} else {
 			sb.append(CONTENT_TYPE_LENGTH).append("0").append(EOL);
 		}
@@ -153,6 +154,34 @@ public class BoshIOService
 		sb.append(EOL);
 
 		return sb;
+	}
+
+	protected int getDataLength(String data, String content_type) {
+		String charset = getCharset(content_type);
+		if (charset != null) {
+			try {
+				return data.getBytes(charset).length;
+			} catch (UnsupportedEncodingException e) {
+				log.fine("invalid charset:" + charset);
+			}
+		}
+
+		return data.getBytes().length;
+	}
+
+	protected String getCharset(String content_type) {
+		if (content_type != null) {
+			String[] props = content_type.split(";");
+			for (String prop : props) {
+				int i;
+				String trimmed = prop != null ? prop.trim() : null;
+				if (trimmed != null && (i = trimmed.indexOf('=')) != -1 &&
+						"charset".equalsIgnoreCase(trimmed.substring(0, i))) {
+					return trimmed.substring(i + 1);
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
