@@ -25,6 +25,7 @@ import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
+import tigase.db.UserNotFoundException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
@@ -160,9 +161,11 @@ public class PlainCallbackHandler
 
 			loggingInForbidden = !credentials.canLogin();
 
-			pc.setVerified(entry != null && entry.verifyPlainPassword(password));
-		} catch (Exception e) {
+			// AHRlc3QAdGVzdA==
+			pc.setVerified(!loggingInForbidden && entry != null && entry.verifyPlainPassword(password));
+		} catch (UserNotFoundException e) {
 			pc.setVerified(false);
+		} catch (Exception e) {
 			throw new IOException("Password verification problem.", e);
 		}
 	}

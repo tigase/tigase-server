@@ -116,7 +116,9 @@ public interface AuthRepository
 		pending(-2),
 		system(-1),
 		vip(2),
-		paid(3);
+		paid(3),
+		undefined_active(Integer.MAX_VALUE),
+		undefined_inactive(Integer.MIN_VALUE);
 
 		private static final HashMap<Integer, AccountStatus> statuses = new HashMap<>();
 
@@ -133,7 +135,12 @@ public interface AuthRepository
 		private final int value;
 
 		public static AccountStatus byValue(int value) {
-			return statuses.get(value);
+			AccountStatus accountStatus = statuses.get(value);
+			if (accountStatus == null) {
+				Logger.getLogger(AuthRepository.class.getName()).log(Level.WARNING, "Undefined AccountStatus for value: " + value);
+				accountStatus = value <= 0 ? AccountStatus.undefined_inactive : AccountStatus.undefined_active;
+			}
+			return accountStatus;
 		}
 
 		AccountStatus(int value) {

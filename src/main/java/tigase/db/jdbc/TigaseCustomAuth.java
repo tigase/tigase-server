@@ -407,6 +407,9 @@ public class TigaseCustomAuth
 					data_repo.release(null, rs);
 				}
 			}
+			if (accountStatus == null && entries.isEmpty()) {
+				throw new UserNotFoundException("No credentials found for the user");
+			}
 			return new DefaultCredentials(user, accountStatus, entries, getCredentialsDecoder());
 		} catch (SQLException e) {
 			throw new TigaseDBException(
