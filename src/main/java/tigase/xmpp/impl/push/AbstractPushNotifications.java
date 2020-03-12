@@ -256,10 +256,24 @@ public class AbstractPushNotifications
 									   packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH));
 			}
 			if (withSender && packet.getElemName() == Message.ELEM_NAME && packet.getType() == StanzaType.groupchat) {
-				Element groupchat = new Element("groupchat");
-				groupchat.setXMLNS("http://tigase.org/protocol/muc#offline");
-				groupchat.addChild(new Element("nickname", packet.getStanzaFrom().getResource()));
-				notification.addChild(groupchat);
+				Element mix = packet.getElement().getChild("mix", "urn:xmpp:mix:core:1");
+				if (mix != null) {
+					Element nickEl = mix.getChild("nick");
+					if (nickEl != null) {
+						String nick = nickEl.getCData();
+						if (nick != null) {
+							Element groupchat = new Element("groupchat");
+							groupchat.setXMLNS("http://tigase.org/protocol/muc#offline");
+							groupchat.addChild(new Element("nickname", nick));
+							notification.addChild(groupchat);
+						}
+					}
+				} else {
+					Element groupchat = new Element("groupchat");
+					groupchat.setXMLNS("http://tigase.org/protocol/muc#offline");
+					groupchat.addChild(new Element("nickname", packet.getStanzaFrom().getResource()));
+					notification.addChild(groupchat);
+				}
 			}
 		}
 		return notification;

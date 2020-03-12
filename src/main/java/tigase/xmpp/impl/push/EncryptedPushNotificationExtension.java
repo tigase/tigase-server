@@ -113,9 +113,20 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		if (packet.getElemName() == Message.ELEM_NAME) {
 			if (packet.getType() == StanzaType.groupchat) {
 				payload.put("type", "groupchat");
-				String nickname = packet.getStanzaFrom().getResource();
-				if (nickname != null) {
-					payload.put("nickname", nickname);
+				Element mix = packet.getElement().getChild("mix", "urn:xmpp:mix:core:1");
+				if (mix != null) {
+					Element nickEl = mix.getChild("nick");
+					if (nickEl != null) {
+						String nickname = nickEl.getCData();
+						if (nickname != null) {
+							payload.put("nickname", nickname);
+						}
+					}
+				} else {
+					String nickname = packet.getStanzaFrom().getResource();
+					if (nickname != null) {
+						payload.put("nickname", nickname);
+					}
 				}
 			} else {
 				payload.put("type", "chat");
