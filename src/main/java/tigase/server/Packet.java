@@ -1197,7 +1197,7 @@ public class Packet {
 	 */
 	private String calcToString(String elemData) {
 		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS=" + elem.getXMLNS() +
-				", PRIORITY=" + priority + ", PERMISSION=" + permissions + ", TYPE=" + type;
+				", PRIORITY=" + priority + ", PERMISSION=" + permissions + ", TYPE=" + type + ", STABLE_ID=" + stableId;
 	}
 
 	private void setElem(Element elem) {
