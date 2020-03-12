@@ -158,6 +158,19 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 	}
 
 	@Override
+	public void checkPermission(BareJID serviceJid, String nodeName, JID senderJid, Action action)
+			throws PubSubException, RepositoryException {
+		if (action == Action.manageNode && (nodeName == null || nodeName.isEmpty())) {
+			ChannelConfiguration configuration = mixRepository.getChannelConfiguration(serviceJid);
+			if (configuration == null) {
+				throw new PubSubException(Authorization.ITEM_NOT_FOUND );
+			}
+			this.checkPermission(serviceJid, serviceJid, MixAction.manage);
+		}
+		super.checkPermission(serviceJid, nodeName, senderJid, action);
+	}
+
+	@Override
 	public boolean isChannelCreationAllowed(BareJID channelJID, BareJID senderJID) {
 		return true;
 	}
