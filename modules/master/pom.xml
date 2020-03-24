@@ -16,8 +16,6 @@
         <sign-skip-server>true</sign-skip-server>
 		<verbose-log>false</verbose-log>
 		<tsa-uri />
-
-		<scm_repo_base>https://git.tigase.tech</scm_repo_base>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -57,10 +55,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:${scm_repo_base}/tigase-server.git</connection>
-		<developerConnection>scm:git:${scm_repo_base}/tigase-server.git</developerConnection>
-		<url>https://tigase.tech/projects/tigase-server/repository</url>
-		<tag>tigase-server-7.1.5</tag>
+		<connection>scm:git:https://github.com/tigase/tigase-server.git</connection>
+		<developerConnection>scm:git:https://github.com/tigase/tigase-server.git</developerConnection>
+		<url>https://github.com/tigase/tigase-server/</url>
   </scm>
 
 	<organization>
