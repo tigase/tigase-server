@@ -249,8 +249,19 @@ public class RosterFlat
 		}
 	}
 
-	public Element getBuddyItem(RosterElement relem) {
+	private Element getBuddyItem(RosterElement relem) {
 		return relem.getRosterItem();
+	}
+
+	private Element getBuddyItem(final XMPPResourceConnection session, RosterElement relem) {
+		Element item = getBuddyItem(relem);
+		if (Boolean.TRUE.equals(session.getSessionData("urn:xmpp:mix:roster:0"))) {
+			String participantId = relem.getMixParticipantId();
+			if (participantId != null) {
+				item.addChild(new Element("channel", new String[] { "xmlns", "participant-id" }, new String[] { "urn:xmpp:mix:roster:0", participantId }));
+			}
+		}
+		return item;
 	}
 
 	@Override
@@ -261,7 +272,7 @@ public class RosterFlat
 		if (relem == null) {
 			return null;
 		} else {
-			return getBuddyItem(relem);
+			return getBuddyItem(session, relem);
 		}
 	}
 
@@ -322,7 +333,7 @@ public class RosterFlat
 			// Skip temporary roster elements added only for online presence tracking
 			// from dynamic roster
 			if (relem.isPersistent() && !SubscriptionType.none_pending_in.equals(relem.getSubscription())) {
-				items.add(getBuddyItem(relem));
+				items.add(getBuddyItem(session, relem));
 			}
 		}
 
@@ -585,11 +596,13 @@ public class RosterFlat
 		if (element == null) {
 			element = new RosterElement(event.getJid(), event.getName(), event.getGroups());
 			element.setSubscription(event.getSubscription());
+			element.setMixParticipantId(event.getMixParticipantId());
 			addBuddy(element, getUserRoster(session));
 		} else {
 			element.setName(event.getName());
 			element.setGroups(event.getGroups());
 			element.setSubscription(event.getSubscription());
+			element.setMixParticipantId(event.getMixParticipantId());
 		}
 
 		super.updateRosterItem(session, event);

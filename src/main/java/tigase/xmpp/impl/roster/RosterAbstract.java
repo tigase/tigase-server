@@ -658,7 +658,7 @@ public abstract class RosterAbstract {
 			}    // end of for ()
 		}      // end of if-else
 
-		if (session.getSessionData("urn:xmpp:mix:roster:0") == Boolean.TRUE) {
+		if (Boolean.TRUE.equals(session.getSessionData("urn:xmpp:mix:roster:0"))) {
 			String participantId = getMixParticipantId(session, buddy);
 			if (participantId != null) {
 				item.addChild(new Element("channel", new String[] { "xmlns", "participant-id" }, new String[] { "urn:xmpp:mix:roster:0", participantId }));
@@ -960,6 +960,7 @@ public abstract class RosterAbstract {
 		private JID jid;
 		private String name;
 		private SubscriptionType subscription;
+		private String mixParticipantId;
 
 		public RosterModifiedEvent() {
 		}
@@ -970,6 +971,7 @@ public abstract class RosterAbstract {
 			this.name = rosterElement.getName();
 			this.subscription = rosterElement.getSubscription();
 			this.groups = rosterElement.getGroups();
+			this.mixParticipantId = rosterElement.getMixParticipantId();
 		}
 
 		public RosterModifiedEvent(JID sender, JID userJid, XMPPSession session, JID jid,
@@ -997,5 +999,8 @@ public abstract class RosterAbstract {
 			return groups;
 		}
 
+		public String getMixParticipantId() {
+			return mixParticipantId;
+		}
 	}
 }
