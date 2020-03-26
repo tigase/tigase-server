@@ -124,6 +124,12 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 				}
 				break;
 			case join:
+				ChannelConfiguration configuration2 = mixRepository.getChannelConfiguration(channel);
+				if (configuration2 != null) {
+					if (configuration2.isOwner(senderJid)) {
+						return;
+					}
+				}
 				Optional<List<BareJID>> allowed = mixRepository.getAllowed(channel);
 				if (allowed.isPresent()) {
 					if (!allowed.get().contains(senderJid)) {
@@ -165,7 +171,7 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 			if (configuration == null) {
 				throw new PubSubException(Authorization.ITEM_NOT_FOUND );
 			}
-			this.checkPermission(serviceJid, serviceJid, MixAction.manage);
+			this.checkPermission(serviceJid, senderJid.getBareJID(), MixAction.manage);
 		}
 		super.checkPermission(serviceJid, nodeName, senderJid, action);
 	}
