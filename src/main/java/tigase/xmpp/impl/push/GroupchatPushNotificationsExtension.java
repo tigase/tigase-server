@@ -47,6 +47,8 @@ public class GroupchatPushNotificationsExtension implements PushNotificationsExt
 			return false;
 		}
 
-		return session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null;
+		return session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null &&
+				packet.getElement().findChild(el -> el.getName() == "mix" && el.getXMLNS() == "urn:xmpp:mix:core:1") ==
+						null;
 	}
 }
