@@ -389,14 +389,18 @@ public class JabberIqRoster
 		// Retrieve all Dynamic roster elements from the roster repository
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
 
+		Element queryEl = packet.getElement().getChildStaticStr(Iq.QUERY_NAME, RosterAbstract.XMLNS);
+		boolean annotateMix = queryEl.getChildStaticStr("annotate", "urn:xmpp:mix:roster:0") != null;
+		session.putSessionData("urn:xmpp:mix:roster:0", annotateMix);
+
 		// If the dynamic roster exists, we have to always recalculate hash, as the
 		// part of the roster could have changed outside of the Tigase server.
-		if ((its != null) && (its.size() > 0)) {
-			updateHash(session, settings);
+		// the same goes for annotate mix
+		if (annotateMix || ((its != null) && (its.size() > 0))) {
+			roster_util.updateRosterHash(session);
 		}
 
 		// Check roster version hash.
-		Element queryEl = packet.getElement().getChildStaticStr(Iq.QUERY_NAME, RosterAbstract.XMLNS);
 		String incomingHash = queryEl.getAttributeStaticStr(RosterAbstract.VER_ATT);
 		String storedHash = "";
 
@@ -406,7 +410,7 @@ public class JabberIqRoster
 		if (incomingHash != null) {
 			storedHash = roster_util.getBuddiesHash(session);
 			if ((storedHash == null) || storedHash.isEmpty()) {
-				updateHash(session, settings);
+				roster_util.updateRosterHash(session);
 				storedHash = roster_util.getBuddiesHash(session);
 			}
 			if (incomingHash.equals(storedHash)) {
@@ -415,10 +419,7 @@ public class JabberIqRoster
 				return;
 			}
 		}
-
-		boolean annotateMix = queryEl.getChildStaticStr("annotate", "urn:xmpp:mix:roster:0") != null;
-		session.putSessionData("urn:xmpp:mix:roster:0", annotateMix);
-
+		
 		// Retrieve standard roster items.
 		List<Element> ritems = roster_util.getRosterItems(session);
 
@@ -647,58 +648,7 @@ public class JabberIqRoster
 	 */
 	protected void updateHash(XMPPResourceConnection session, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException, RosterRetrievingException, RepositoryAccessException {
-
-		// Retrieve standard roster items.
-		List<Element> ritems = roster_util.getRosterItems(session);
-
-		// Recalculate the roster hash again with dynamic roster content
-		StringBuilder roster_str = new StringBuilder(5000);
-
-		// Retrieve all Dynamic roster elements from the roster repository
-		List<Element> its = DynamicRoster.getRosterItems(session, settings);
-
-		// There is always a chance that the same elements exist in a dynamic roster
-		// and the standard user roster. Moreover, the items in the standard roster
-		// may have a different presence subscription set.
-		// Here we make sure they are both in sync, that is for each entry which
-		// exists in both rosters we enforce 'both' subscription type for element in
-		// standard roster and remove it from the dynamic roster list.
-		if ((its != null) && (its.size() > 0)) {
-			for (Iterator<Element> it = its.iterator(); it.hasNext(); ) {
-				Element element = it.next();
-
-				try {
-					JID jid = JID.jidInstance(element.getAttributeStaticStr("jid"));
-
-					if (roster_util.containsBuddy(session, jid)) {
-						roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
-
-						String[] itemGroups = getItemGroups(element);
-
-						if (itemGroups != null) {
-							roster_util.addBuddyGroup(session, jid, itemGroups);
-						}
-						it.remove();
-					}
-				} catch (TigaseStringprepException ex) {
-					log.log(Level.INFO, "JID from dynamic roster is incorrect, stringprep failed for: {0}",
-							element.getAttributeStaticStr("jid"));
-					it.remove();
-				}
-			}
-
-			// This may seem to be redundant as this call has already been made
-			// but the roster could have been changed during above dynamic roster
-			// merge
-			ritems = roster_util.getRosterItems(session);
-			for (Element ritem : its) {
-				roster_str.append(ritem.toString());
-			}
-		}
-		for (Element ritem : ritems) {
-			roster_str.append(ritem.toString());
-		}
-		roster_util.updateRosterHash(roster_str.toString(), session);
+		roster_util.updateRosterHash(session);
 	}
 
 	/**

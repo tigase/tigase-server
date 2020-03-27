@@ -472,8 +472,6 @@ public class RosterFlat
 			log.log(Level.FINEST, "Loaded user {1} roster: {0}", new Object[]{roster_str, session.getjid()});
 		}
 		if ((roster_str != null) && !roster_str.isEmpty()) {
-			updateRosterHash(roster_str, session);
-
 			boolean modified = parseRoster(roster_str, roster, session);
 
 			if (modified) {
@@ -554,6 +552,9 @@ public class RosterFlat
 			roster = (Map<BareJID, RosterElement>) session.getCommonSessionData(ROSTER);
 			if (roster == null) {
 				roster = loadUserRoster(session);
+			}
+			if (getBuddiesHash(session) == null) {
+				updateRosterHash(session);
 			}
 		}
 

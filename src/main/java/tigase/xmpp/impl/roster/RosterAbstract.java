@@ -584,7 +584,7 @@ public abstract class RosterAbstract {
 		} catch (Exception e) {
 			roster_hash = null;
 		}
-		session.putCommonSessionData(ROSTERHASH, roster_hash);
+		session.putSessionData(ROSTERHASH, roster_hash);
 	}
 
 	public abstract JID[] getBuddies(final XMPPResourceConnection session)
@@ -614,14 +614,9 @@ public abstract class RosterAbstract {
 	}
 
 	public String getBuddiesHash(final XMPPResourceConnection session) {
-		String hash = (String) session.getCommonSessionData(ROSTERHASH);
+		String hash = (String) session.getSessionData(ROSTERHASH);
 
 		return ((hash != null) ? hash : "");
-	}
-
-	public String getBuddiesHash(final XMPPSession session) {
-		String hash = (String) session.getCommonSessionData(ROSTERHASH);
-		return hash != null ? hash : "";
 	}
 
 	public abstract String[] getBuddyGroups(final XMPPResourceConnection session, JID buddy)
@@ -886,13 +881,33 @@ public abstract class RosterAbstract {
 
 	protected void updateRosterItem(XMPPResourceConnection conn, RosterModifiedEvent event)
 			throws NotAuthorizedException, TigaseDBException {
-		List<Element> items = getRosterItems(conn);
-		if (items != null) {
-			StringBuilder sb = new StringBuilder(4096);
-			for (Element item : items) {
-				item.toString(sb);
+		updateRosterHash(conn);
+	}
+
+	public void updateRosterHash(XMPPResourceConnection conn) throws NotAuthorizedException, TigaseDBException {
+		for (XMPPResourceConnection session : conn.getActiveSessions()) {
+			updateRosterHashForConnection(session);
+		}
+	}
+
+	protected void updateRosterHashForConnection(XMPPResourceConnection conn) throws NotAuthorizedException, TigaseDBException {
+		try {
+			List<Element> items = getRosterItems(conn);
+			if (items != null) {
+				StringBuilder sb = new StringBuilder(4096);
+				for (Element item : items) {
+					item.toString(sb);
+				}
+				List<Element> its = DynamicRoster.getRosterItems(conn, Collections.emptyMap());
+				if (its != null && !its.isEmpty()) {
+					for (Element item : its) {
+						item.toString(sb);
+					}
+				}
+				updateRosterHash(sb.toString(), conn);
 			}
-			updateRosterHash(sb.toString(), conn);
+		} catch (RosterRetrievingException|RepositoryAccessException ex) {
+			throw new TigaseDBException("Could not load dynamic roster", ex);
 		}
 	}
 
@@ -925,6 +940,13 @@ public abstract class RosterAbstract {
 
 	private void broadcastRosterChange(XMPPSession session, Element item, Consumer<Packet> consumer)
 			throws NotAuthorizedException, NoConnectionIdException {
+		for (XMPPResourceConnection conn : session.getActiveResources()) {
+			broadcastRosterChange(conn, item, consumer);
+		}
+	}
+
+	private void broadcastRosterChange(XMPPResourceConnection conn, Element item, Consumer<Packet> consumer)
+			throws NotAuthorizedException, NoConnectionIdException {
 		Element update = new Element("iq");
 
 		update.setXMLNS(CLIENT_XMLNS);
@@ -933,24 +955,20 @@ public abstract class RosterAbstract {
 		Element query = new Element("query");
 
 		query.setXMLNS(ROSTER_XMLNS);
-		query.addAttribute(VER_ATT, getBuddiesHash(session));
+		query.addAttribute(VER_ATT, getBuddiesHash(conn));
 		query.addChild(item);
 		update.addChild(query);
 
-		for (XMPPResourceConnection conn : session.getActiveResources()) {
+		update.setAttribute("to", conn.getBareJID().toString());
+		update.setAttribute("id", "rst" + conn.nextStanzaId());
 
-			Element conn_update = update.clone();
+		Packet pack_update = Packet.packetInstance(update, null, conn.getJID());
 
-			conn_update.setAttribute("to", conn.getBareJID().toString());
-			conn_update.setAttribute("id", "rst" + conn.nextStanzaId());
+		pack_update.setPacketTo(conn.getConnectionId());
 
-			Packet pack_update = Packet.packetInstance(conn_update, null, conn.getJID());
-
-			pack_update.setPacketTo(conn.getConnectionId());
-
-			// pack_update.setPacketFrom(session.getJID());
-			consumer.accept(pack_update);
-		}    // end of for (XMPPResourceConnection conn: sessions)
+		// pack_update.setPacketFrom(session.getJID());
+		consumer.accept(pack_update);
+		// end of for (XMPPResourceConnection conn: sessions)
 	}
 
 	public static class RosterModifiedEvent
