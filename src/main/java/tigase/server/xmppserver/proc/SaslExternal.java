@@ -142,6 +142,11 @@ public class SaslExternal
 					return true;
 				}
 
+				// it is reasonable to skip SASL EXTERNAL for handshaking only connections
+				if (certCheckResult == CertCheckResult.invalid && serv.isHandshakingOnly()) {
+					return true;
+				}
+
 				String method = (String) serv.getSessionData().get(S2S_METHOD_USED);
 				if (method != null && method != METHOD_NAME) {
 					if (log.isLoggable(Level.FINEST)) {
