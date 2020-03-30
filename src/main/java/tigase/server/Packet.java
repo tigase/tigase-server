@@ -623,6 +623,8 @@ public class Packet {
 
 	public void setStableId(String stableId) {
 		this.stableId = stableId;
+		packetToString = null;
+		packetToStringSecure = null;
 	}
 
 	/**

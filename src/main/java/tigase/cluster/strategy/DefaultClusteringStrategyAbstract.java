@@ -173,7 +173,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 			Map<String, String> data = null;
 
-			if (conn != null || packet.getPacketFrom() != null) {
+			if (conn != null || packet.getPacketFrom() != null || packet.getStableId() != null) {
 				data = new LinkedHashMap<String, String>();
 				if (conn != null) {
 					data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
