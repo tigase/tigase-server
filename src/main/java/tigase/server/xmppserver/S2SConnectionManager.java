@@ -259,7 +259,7 @@ public class S2SConnectionManager
 																			 true));
 			}
 		} catch (PacketErrorTypeException e) {
-			log.log(Level.WARNING, "Packet processing exception: {0}", e);
+			log.log(Level.WARNING, "Packet processing exception", e);
 		}
 	}
 
