@@ -129,7 +129,7 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 						result.setPacketFrom(packet.getTo());
 
 						if (messageArchive != null) {
-							messageArchive.addStableId(packet, session);
+							messageArchive.addStableId(result, session);
 						}
 
 						// Don't forget to add the packet to the results queue or it
