@@ -30,6 +30,7 @@ import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.impl.MessageCarbons;
 import tigase.xmpp.jid.JID;
 
 import java.io.IOException;
@@ -677,19 +678,32 @@ public class StreamManagementIOProcessor
 			}
 
 			public Packet getPacketWithStamp() {
-				if (packet.getElemName() != Iq.ELEM_NAME && !packet.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
+				Packet result = packet.copyElementOnly();
+				if (result.getElemName() != Iq.ELEM_NAME && !result.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
 					String stamp = null;
 					synchronized (formatter) {
 						stamp = formatter.format(this.stamp);
 					}
-					String from = packet.getStanzaTo() != null
-								  ? packet.getStanzaTo().getDomain()
-								  : packet.getPacketTo().getDomain();
+					String from = result.getStanzaTo() != null
+								  ? result.getStanzaTo().getDomain()
+								  : result.getPacketTo().getDomain();
+
 					Element x = new Element("delay", new String[]{"from", "stamp", "xmlns"},
 											new String[]{from, stamp, "urn:xmpp:delay"});
-					packet.getElement().addChild(x);
+					Element carbon = result.getElement().findChild(e -> e.getXMLNS() == MessageCarbons.XMLNS);
+					if (carbon == null) {
+						result.getElement().addChild(x);
+					} else {
+						Element forwarded = carbon.getChild("forwarded", "urn:xmpp:forward:0");
+						if (forwarded != null) {
+							Element message = forwarded.getChild("message");
+							if (message != null) {
+								message.addChild(x);
+							}
+						}
+					}
 				}
-				return packet;
+				return result;
 			}
 		}
 	}

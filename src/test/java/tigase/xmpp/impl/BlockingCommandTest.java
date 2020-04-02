@@ -230,7 +230,7 @@ public class BlockingCommandTest
 	@Override
 	protected void registerBeans(Kernel kernel) {
 		super.registerBeans(kernel);
-		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exec();
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 		kernel.registerBean(RosterFactory.Bean.class).setActive(true).exec();
 		kernel.registerBean(JabberIqPrivacy.class).setActive(true).exec();
 		kernel.registerBean(BlockingCommand.class).setActive(true).exec();

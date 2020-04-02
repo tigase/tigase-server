@@ -227,11 +227,13 @@ public class MessageCarbons
 						.collect(Collectors.toList());
 
 				if (!copyTo.isEmpty()) {
+					Packet clone = packet.copyElementOnly();
+					clone.setStableId(packet.getStableId());
 					if (messageArchive != null) {
-						messageArchive.addStableId(packet, session);
+						messageArchive.addStableId(clone, session);
 					}
 					for (JID jid : copyTo) {
-						Packet msgClone = prepareCarbonCopy(packet, srcJid, jid, type);
+						Packet msgClone = prepareCarbonCopy(clone, srcJid, jid, type);
 						results.offer(msgClone);
 					}
 				}

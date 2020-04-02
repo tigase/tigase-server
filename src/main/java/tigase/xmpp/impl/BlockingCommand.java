@@ -19,7 +19,9 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
@@ -70,6 +72,9 @@ public class BlockingCommand
 	private static final String _JID = "jid";
 
 	private final RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
+
+	@Inject
+	private EventBus eventBus;
 
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
@@ -140,11 +145,23 @@ public class BlockingCommand
 		}
 	}
 
+	private void notifyPrivacyListChanged(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
+		String name = Privacy.getDefaultListName(session);
+		if (name == null) {
+			name = "default";
+		}
+		eventBus.fire(
+				new JabberIqPrivacy.PrivacyListUpdatedEvent(session.getJID(), session.getJID().copyWithoutResource(),
+															session.getParentSession(), name));
+	}
+
 	private void processSetBlock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
 		List<JID> jids = collectJids(e);
 		if (jids != null && !jids.isEmpty()) {
 			Privacy.block(session, jids.stream().map(JID::toString).collect(Collectors.toList()));
+			notifyPrivacyListChanged(session);
 			for (JID jid : jids) {
 				sendBlockPresences(session, jid, results);
 			}
@@ -162,6 +179,7 @@ public class BlockingCommand
 			List<String> jidsStr = Privacy.getBlocked(session);
 			if (jidsStr != null) {
 				Privacy.unblock(session, jidsStr);
+				notifyPrivacyListChanged(session);
 				for (String jid : jidsStr) {
 					sendBlockPresences(session, JID.jidInstanceNS(jid), results);
 				}

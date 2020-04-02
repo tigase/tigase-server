@@ -32,6 +32,7 @@ import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.server.xmppsession.UserConnectedEvent;
+import tigase.server.xmppsession.UserSessionEvent;
 import tigase.util.cache.LRUConcurrentCache;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -62,7 +63,7 @@ import static tigase.xmpp.impl.Privacy.*;
 @Bean(name = JabberIqPrivacy.ID, parent = SessionManager.class, active = true)
 public class JabberIqPrivacy
 		extends XMPPProcessor
-		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, RegistrarBean {
+		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc, RegistrarBean, Initializable, UnregisterAware {
 
 	protected static final String ACTIVE_EL_NAME = "active";
 	protected static final Element BLOCKED_ELEM = new Element("blocked", new String[]{"xmlns"},
@@ -307,6 +308,46 @@ public class JabberIqPrivacy
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
+	}
+
+	@Inject
+	private EventBus eventBus;
+
+	@Override
+	public void initialize() {
+		eventBus.registerAll(this);
+	}
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	@HandleEvent
+	public void privacyListUpdated(PrivacyListUpdatedEvent event) {
+		String name = event.getPrivacyListName();
+		boolean first = true;
+		for (XMPPResourceConnection session : event.getSession().getActiveResources()) {
+			try {
+				if (event.getSender().equals(session.getJID())) {
+					continue;
+				}
+				PrivacyList activeList = getActiveList(session);
+				if (activeList != null  && event.getPrivacyListName().equals(activeList.getName())) {
+					setActiveList(session, activeList.getName());
+				}
+				if (first) {
+					if (name.equals(Privacy.getDefaultListName(session))) {
+						Element defaultListEl = getDefaultListElement(session);
+						Privacy.setDefaultList(session, defaultListEl);
+					}
+					first = false;
+				}
+			} catch (NotAuthorizedException|TigaseDBException ex) {
+				// just ignore this, as privacy list was not loaded anyway or there is a database access issue and we
+				// cannot do anything about that
+			}
+		}
 	}
 
 	protected boolean allowed(Packet packet, JID connId, BareJID userJid, PrivacyList privacyList) {
@@ -581,6 +622,9 @@ public class JabberIqPrivacy
 						if (name.equals(Privacy.getDefaultListName(session))) {
 							Privacy.setDefaultList(session, child);
 						}
+						eventBus.fire(
+								new PrivacyListUpdatedEvent(session.getJID(), session.getJID().copyWithoutResource(),
+															session.getParentSession(), name));
 						results.offer(packet.okResult((String) null, 0));
 					} else {
 						results.offer(error.getResponseMessage(packet, null, true));
@@ -644,6 +688,28 @@ public class JabberIqPrivacy
 		group,
 		subscription,
 		all
+	}
+
+	public static class PrivacyListUpdatedEvent extends UserSessionEvent {
+
+		private String privacyListName;
+
+		public PrivacyListUpdatedEvent() {
+			super();
+		}
+
+		public PrivacyListUpdatedEvent(JID sender, JID userJid, XMPPSession session, String privacyListName) {
+			super(sender, userJid, session);
+			this.privacyListName = privacyListName;
+		}
+
+		public String getPrivacyListName() {
+			return privacyListName;
+		}
+
+		public void setPrivacyListName(String privacyListName) {
+			this.privacyListName = privacyListName;
+		}
 	}
 
 	public static class OfflineResourceConnection

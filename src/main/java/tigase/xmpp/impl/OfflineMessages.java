@@ -346,47 +346,47 @@ public class OfflineMessages
 	 * @return {@code true} if the packet was correctly saved to repository, {@code false} otherwise.
 	 *
 	 */
-	public Authorization savePacketForOffLineUser(Packet pac, tigase.db.OfflineMsgRepositoryIfc repo,
+	public Authorization savePacketForOffLineUser(Packet packet, tigase.db.OfflineMsgRepositoryIfc repo,
 												  NonAuthUserRepository userRepo) throws UserNotFoundException {
-		StanzaType type = pac.getType();
+		StanzaType type = packet.getType();
 
 		// save only:
 		// message stanza with either {@code <body>} or {@code <event>} child element and only of type normal, chat
 		// presence stanza of type subscribe, subscribed, unsubscribe and unsubscribed
-		if (isAllowedForOfflineStorage(pac)) {
+		if (isAllowedForOfflineStorage(packet)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Storing packet for offline user: {0}", pac);
+				log.log(Level.FINEST, "Storing packet for offline user: {0}", packet);
 			}
 
-			Element elem = pac.getElement().clone();
+			Packet pac = packet.copyElementOnly();
+			if (messageArchive != null) {
+				messageArchive.addStableId(pac, null);
+			}
 
-			C2SDeliveryErrorProcessor.filterErrorElement(elem);
+			C2SDeliveryErrorProcessor.filterErrorElement(pac.getElement());
 
 			String stamp = null;
 			synchronized (formatter) {
 				stamp = formatter.format(new Date());
 			}
 
-			if (messageArchive != null) {
-				messageArchive.addStableId(pac, null);
-			}
 
 			String from = pac.getStanzaTo().getDomain();
 			Element x = new Element("delay", "Offline Storage - " + defHost, new String[]{"from", "stamp", "xmlns"},
 									new String[]{from, stamp, "urn:xmpp:delay"});
 
-			elem.addChild(x);
+			pac.getElement().addChild(x);
 			pac.processedBy(ID);
 
 
-			if (repo.storeMessage(pac.getStanzaFrom(), pac.getStanzaTo(), null, elem, userRepo)) {
+			if (repo.storeMessage(pac.getStanzaFrom(), pac.getStanzaTo(), null, pac.getElement(), userRepo)) {
 				return Authorization.AUTHORIZED;
 			} else {
 				return Authorization.SERVICE_UNAVAILABLE;
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Packet for offline user not suitable for storing: {0}", pac);
+				log.log(Level.FINEST, "Packet for offline user not suitable for storing: {0}", packet);
 			}
 		}
 

@@ -117,9 +117,6 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 				// to resources with non negative priority!!
 
 				if (conns.size() > 0) {
-					if (messageArchive != null) {
-						messageArchive.addStableId(packet, session);
-					}
 					for (XMPPResourceConnection con : conns) {
 						Packet result = packet.copyElementOnly();
 
@@ -130,6 +127,10 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 						// In most cases this might be skept, however if there is a
 						// problem during packet delivery an error might be sent back
 						result.setPacketFrom(packet.getTo());
+
+						if (messageArchive != null) {
+							messageArchive.addStableId(packet, session);
+						}
 
 						// Don't forget to add the packet to the results queue or it
 						// will be lost.
