@@ -36,6 +36,8 @@ import tigase.pubsub.repository.ISubscriptions;
 import tigase.pubsub.repository.cached.CachedPubSubRepository;
 import tigase.pubsub.repository.cached.IAffiliationsCached;
 import tigase.pubsub.repository.stateless.UsersAffiliation;
+import tigase.pubsub.utils.Cache;
+import tigase.pubsub.utils.LRUCacheWithFuture;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -64,9 +66,9 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 
 	@Inject
 	private PacketWriter packetWriter;
-
-	private Map<BareJID, ChannelConfiguration> channelConfigs = Collections.synchronizedMap(
-			new tigase.util.cache.SizedCache<BareJID, ChannelConfiguration>(1000));
+	
+	private final Cache<BareJID, ChannelConfiguration> channelConfigs = new LRUCacheWithFuture<>(1000);
+	private final Cache<ParticipantKey, Participant> participants = new LRUCacheWithFuture<>(4000);
 
 	@Override
 	public Optional<List<BareJID>> getAllowed(BareJID channelJID) throws RepositoryException {
@@ -98,15 +100,29 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 
 	@Override
 	public IParticipant getParticipant(BareJID channelJID, String participantId) throws RepositoryException {
-		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.PARTICIPANTS);
-		if (items == null) {
-			return null;
+		return getParticipant(new ParticipantKey(channelJID, participantId));
+	}
+
+	protected IParticipant getParticipant(ParticipantKey key) throws RepositoryException {
+		try {
+			return participants.computeIfAbsent(key, () -> {
+				try {
+					IItems items = pubSubRepository.getNodeItems(key.channelJID, Mix.Nodes.PARTICIPANTS);
+					if (items == null) {
+						return null;
+					}
+					IItems.IItem item = items.getItem(key.participantId);
+					if (item == null) {
+						return null;
+					}
+					return new Participant(key.participantId, item.getItem().getChild("participant", Mix.CORE1_XMLNS));
+				} catch (RepositoryException ex) {
+					throw new Cache.CacheException(ex);
+				}
+			});
+		} catch (Cache.CacheException ex) {
+			throw new RepositoryException(ex.getMessage(), ex);
 		}
-		IItems.IItem item = items.getItem(participantId);
-		if (item == null) {
-			return null;
-		}
-		return new Participant(participantId, item.getItem().getChild("participant", Mix.CORE1_XMLNS));
 	}
 
 	@Override
@@ -114,12 +130,13 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 		String id = mixLogic.generateParticipantId(channelJID, participantJID);
 		retractItemModule.retractItems(channelJID, "urn:xmpp:mix:nodes:participants",
 									   Collections.singletonList(id));
+		participants.remove(new ParticipantKey(channelJID, id));
 	}
 
 	@Override
 	public IParticipant updateParticipant(BareJID channelJID, BareJID participantJID, String nick)
 			throws RepositoryException, PubSubException {
-		IParticipant participant = new Participant(mixLogic.generateParticipantId(channelJID, participantJID), participantJID,
+		Participant participant = new Participant(mixLogic.generateParticipantId(channelJID, participantJID), participantJID,
 												   nick);
 		Element itemEl = new Element("item");
 		itemEl.setAttribute("id", participant.getParticipantId());
@@ -128,22 +145,25 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 		publishItemModule.publishItems(channelJID, Mix.Nodes.PARTICIPANTS, JID.jidInstance(participantJID),
 									   Collections.singletonList(itemEl), null);
 
+		participants.put(new ParticipantKey(channelJID, participant.getParticipantId()), participant);
+
 		return participant;
 	}
 
 	@Override
 	public ChannelConfiguration getChannelConfiguration(BareJID channelJID) throws RepositoryException {
-		ChannelConfiguration configuration = channelConfigs.get(channelJID);
-		if (configuration == null) {
-			configuration = loadChannelConfiguration(channelJID);
-			if (configuration != null) {
-				ChannelConfiguration existing = channelConfigs.putIfAbsent(channelJID, configuration);
-				if (existing != null) {
-					configuration = existing;
+		try {
+			ChannelConfiguration configuration = channelConfigs.computeIfAbsent(channelJID, () -> {
+				try {
+					return loadChannelConfiguration(channelJID);
+				} catch (RepositoryException ex) {
+					throw new Cache.CacheException(ex);
 				}
-			}
+			});
+			return configuration;
+		} catch (Cache.CacheException ex) {
+			throw new RepositoryException(ex.getMessage(), ex);
 		}
-		return configuration;
 	}
 	
 	protected ChannelConfiguration loadChannelConfiguration(BareJID channelJID) throws RepositoryException {
@@ -247,12 +267,41 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 		}
 	}
 
+	protected void invalidateChannelParticipant(BareJID channelJID, BareJID participantId) throws RepositoryException {
+		participants.remove(new ParticipantKey(channelJID, mixLogic.generateParticipantId(channelJID, participantId)));
+	}
+
 	protected void updateChannelConfiguration(BareJID serviceJID, Element item) {
 		try {
 			ChannelConfiguration configuration = new ChannelConfiguration(item);
 			channelConfigs.put(serviceJID, configuration);
 		} catch (PubSubException ex) {
 			log.log(Level.WARNING, "Could not parse new configuration of channel " + serviceJID, ex);
+		}
+	}
+
+	protected static class ParticipantKey {
+
+		private final BareJID channelJID;
+		private final String participantId;
+
+		public ParticipantKey(BareJID channelJID, String participantId) {
+			this.channelJID = channelJID;
+			this.participantId = participantId;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof ParticipantKey)) {
+				return false;
+			}
+			ParticipantKey that = (ParticipantKey) o;
+			return channelJID.equals(that.channelJID) && participantId.equals(that.participantId);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(channelJID, participantId);
 		}
 	}
 }
