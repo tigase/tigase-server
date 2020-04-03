@@ -108,7 +108,7 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 
 			getRepository().addMAMItem(channelJID, Mix.Nodes.MESSAGES, uuid, message, null);
 
-			eventBus.fire(new PublishItemModule.BroadcastNotificationEvent(channelJID, Mix.Nodes.MESSAGES, message));
+			eventBus.fire(new PublishItemModule.BroadcastNotificationEvent(config.getComponentName(), channelJID, Mix.Nodes.MESSAGES, message));
 			publishItemModule.broadcastNotification(channelJID, Mix.Nodes.MESSAGES, message);
 		} catch (RepositoryException ex) {
 			throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);

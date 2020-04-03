@@ -47,6 +47,11 @@ public class MixConfig implements IPubSubConfig {
 	}
 
 	@Override
+	public String getComponentName() {
+		return component.getName();
+	}
+
+	@Override
 	public JID getComponentJID() {
 		return component.getComponentId();
 	}
