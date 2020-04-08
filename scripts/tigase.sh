@@ -214,7 +214,7 @@ case "${1}" in
     ;;
 
   upgrade-schema|install-schema|destroy-schema)
-    TMP="${@:3}"
+    TMP="${@:2}"
     sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager ${1} ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
