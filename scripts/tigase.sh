@@ -45,12 +45,6 @@ fi
 
 [[ -f "${TIGASE_PARAMS}" ]] && . ${TIGASE_PARAMS}
 
-if [ -z "${JAVA_HOME}" ] ; then
-  echo "JAVA_HOME is not set."
-  echo "Please set it to correct value before starting the sever."
-  exit 1
-fi
-
 if [ -z "${TIGASE_HOME}" ] ; then
   if [ ${0:0:1} = '/' ] ; then
     TIGASE_HOME=${0}
@@ -110,13 +104,23 @@ fi
 [[ -z "${TIGASE_RUN}" ]] && \
   TIGASE_RUN="tigase.server.XMPPServer ${TIGASE_OPTIONS}"
 
-[[ -z "${JAVA}" ]] && JAVA="${JAVA_HOME}/bin/java"
+JAVA=$(command -v java)
+
+if [ -n "${JAVA_HOME}" ] ; then
+  if [ -n "$(command -v ${JAVA_HOME}/bin/java)" ] ; then
+    JAVA="$(command -v ${JAVA_HOME}/bin/java)"
+  fi
+fi
+
+if [ -z "${JAVA}" ] ; then
+  echo "Java is not installed or not configured properly"
+  echo "Please make sure that 'java' can be executed or set JAVA_HOME to correct value before starting the sever."
+  exit 1
+fi
 
 [[ -z "${CLASSPATH}" ]] || CLASSPATH="${CLASSPATH}:"
 
-CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
-
-CLASSPATH="`ls -d ${TIGASE_HOME}/${LIB_DIR}/*.jar 2>/dev/null | grep -v wrapper | tr '\n' :`${CLASSPATH}"
+CLASSPATH="${TIGASE_HOME}/${LIB_DIR}/*:${CLASSPATH}"
 
 LOGBACK="-Dlogback.configurationFile=$TIGASE_HOME/etc/logback.xml"
 
@@ -228,8 +232,9 @@ case "${1}" in
     echo "TIGASE_RUN      =  $TIGASE_RUN"
     echo "TIGASE_PID      =  $TIGASE_PID"
     echo "TIGASE_OPTIONS  =  $TIGASE_OPTIONS"
-    echo "JAVA_OPTIONS    =  $JAVA_OPTIONS"
+    echo "JAVA_HOME       =  $JAVA_HOME"
     echo "JAVA            =  $JAVA"
+    echo "JAVA_OPTIONS    =  $JAVA_OPTIONS"
     echo "JAVA_CMD        =  $JAVA_CMD"
     echo "CLASSPATH       =  $CLASSPATH"
     echo "TIGASE_CMD      =  $TIGASE_CMD"
