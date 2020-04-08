@@ -137,7 +137,7 @@ public interface AuthRepository
 		public static AccountStatus byValue(int value) {
 			AccountStatus accountStatus = statuses.get(value);
 			if (accountStatus == null) {
-				Logger.getLogger(AuthRepository.class.getName()).log(Level.WARNING, "Undefined AccountStatus for value: " + value);
+				Logger.getLogger(AuthRepository.class.getName()).log(Level.INFO, "Undefined AccountStatus for value: " + value);
 				accountStatus = value <= 0 ? AccountStatus.undefined_inactive : AccountStatus.undefined_active;
 			}
 			return accountStatus;
