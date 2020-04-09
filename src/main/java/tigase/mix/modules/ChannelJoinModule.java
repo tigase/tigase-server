@@ -60,6 +60,9 @@ public class ChannelJoinModule extends AbstractPubSubModule {
 		return CRIT_JOIN;
 	}
 
+	@Inject(nullAllowed = true)
+	private RoomPresenceModule roomPresenceModule;
+
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
 		try {
@@ -117,6 +120,10 @@ public class ChannelJoinModule extends AbstractPubSubModule {
 			}
 
 			packetWriter.write(packet.okResult(responseContent, 0));
+
+			if (roomPresenceModule != null) {
+				roomPresenceModule.participantJoined(channelJID, null, nick);
+			}
 		} catch (RepositoryException ex) {
 			throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
 		}

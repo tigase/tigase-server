@@ -38,6 +38,7 @@ import tigase.pubsub.repository.cached.IAffiliationsCached;
 import tigase.pubsub.repository.stateless.UsersAffiliation;
 import tigase.pubsub.utils.Cache;
 import tigase.pubsub.utils.LRUCacheWithFuture;
+import tigase.server.DataForm;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -148,6 +149,44 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 		participants.put(new ParticipantKey(channelJID, participant.getParticipantId()), participant);
 
 		return participant;
+	}
+
+	@Override
+	public IParticipant updateTempParticipant(BareJID channelJID, JID participantJID, String nick)
+			throws RepositoryException, PubSubException {
+		Participant participant = new Participant(mixLogic.generateTempParticipantId(channelJID, participantJID), participantJID.getBareJID(),
+												  nick);
+		Element itemEl = new Element("item");
+		itemEl.setAttribute("id", participant.getParticipantId());
+		Element participantEl = participant.toElement();
+		participantEl.addChild(new Element("resource", participantJID.getResource()).withAttribute("xmlns", "tigase:mix:muc:0"));
+		itemEl.addChild(participantEl);
+
+		publishItemModule.publishItems(channelJID, Mix.Nodes.PARTICIPANTS, participantJID,
+									   Collections.singletonList(itemEl), null);
+
+		participants.put(new ParticipantKey(channelJID, participant.getParticipantId()), participant);
+
+		return participant;
+	}
+
+	@Override
+	public void removeTempParticipant(BareJID channelJID, JID participantJID) throws RepositoryException {
+		String id = mixLogic.generateTempParticipantId(channelJID, participantJID);
+		retractItemModule.retractItems(channelJID, "urn:xmpp:mix:nodes:participants",
+									   Collections.singletonList(id));
+		participants.remove(new ParticipantKey(channelJID, id));
+	}
+
+	public String getChannelName(BareJID channelJID) throws RepositoryException {
+		IItems items = pubSubRepository.getNodeItems(channelJID, Mix.Nodes.INFO);
+		if (items != null) {
+			IItems.IItem item = items.getLastItem(CollectionItemsOrdering.byUpdateDate);
+			if (item != null) {
+				return DataForm.getFieldValue(item.getItem(), "Name");
+			}
+		}
+		return null;
 	}
 
 	@Override

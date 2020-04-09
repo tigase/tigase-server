@@ -26,10 +26,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
-import tigase.mix.model.IMixRepository;
-import tigase.mix.model.IParticipant;
-import tigase.mix.model.MixAction;
-import tigase.mix.model.MixLogic;
+import tigase.mix.model.*;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.modules.PublishItemModule;
@@ -58,8 +55,14 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 	@Inject
 	private PublishItemModule publishItemModule;
 
+	@Inject(nullAllowed = true)
+	private RoomPresenceRepository roomPresenceRepository;
+
 	@Inject
 	private EventBus eventBus;
+
+	@Inject(nullAllowed = true)
+	private RoomPresenceModule roomPresenceModule;
 
 	@Override
 	public String[] getFeatures() {
@@ -81,9 +84,16 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 		BareJID senderJID = packet.getStanzaFrom().getBareJID();
 
 		try {
-			mixLogic.checkPermission(channelJID, senderJID, MixAction.publish);
+			IParticipant participant;
+			if (roomPresenceRepository != null && roomPresenceRepository.isParticipant(channelJID, packet.getStanzaFrom())) {
+				// we know that someone joined using MUC, and we already checked that..
+				participant = mixRepository.getParticipant(channelJID, mixLogic.generateTempParticipantId(channelJID,
+																										  packet.getStanzaFrom()));
+			} else {
+				mixLogic.checkPermission(channelJID, senderJID, MixAction.publish);
+				participant = mixRepository.getParticipant(channelJID, senderJID);
+			}
 
-			IParticipant participant = mixRepository.getParticipant(channelJID, senderJID);
 			if (participant == null) {
 				throw new PubSubException(Authorization.FORBIDDEN);
 			}
@@ -110,6 +120,9 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 
 			eventBus.fire(new PublishItemModule.BroadcastNotificationEvent(config.getComponentName(), channelJID, Mix.Nodes.MESSAGES, message));
 			publishItemModule.broadcastNotification(channelJID, Mix.Nodes.MESSAGES, message);
+			if (roomPresenceModule != null) {
+				roomPresenceModule.broadcastMessage(channelJID, participant.getNick(), message.clone());
+			}
 		} catch (RepositoryException ex) {
 			throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
 		}

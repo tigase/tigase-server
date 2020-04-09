@@ -22,6 +22,7 @@ import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.utils.PubSubLogic;
 import tigase.server.Packet;
 import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.function.Consumer;
 
@@ -32,6 +33,8 @@ public interface MixLogic extends PubSubLogic {
 														ChannelConfiguration newConfig, Consumer<Packet> packetConsumer);
 
 	String generateParticipantId(BareJID channelJID, BareJID participantRealJID) throws RepositoryException;
+
+	String generateTempParticipantId(BareJID channelJID, JID participantRealJID) throws RepositoryException;
 
 	void checkPermission(BareJID channel, BareJID senderJid, MixAction action)
 			throws PubSubException, RepositoryException;

@@ -22,7 +22,10 @@ import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.IMixComponent;
+import tigase.mix.model.IMixRepository;
 import tigase.mix.model.MixLogic;
+import tigase.pubsub.repository.IPubSubRepository;
+import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -30,7 +33,9 @@ import tigase.xmpp.rsm.RSM;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Bean(name = tigase.pubsub.modules.DiscoveryModule.ID, parent = IMixComponent.class, active = true)
@@ -42,12 +47,57 @@ public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 	@Inject
 	private MixLogic mixLogic;
 
+	@Inject
+	private IMixRepository mixRepository;
+
+	@Inject
+	private IPubSubRepository pubSubRepository;
+
+	@Inject(nullAllowed = true)
+	private RoomPresenceModule roomPresenceModule;
+
 	@Override
 	public Set<String> getAvailableFeatures(BareJID serviceJID, String node, BareJID senderJID) {
 		if (serviceJID.getLocalpart() == null) {
 			return mixLogic.isChannelCreationAllowed(serviceJID, senderJID) ? FEATURES_WITH_CREATE : FEATURES;
 		} else {
 			return super.getAvailableFeatures(serviceJID, node, senderJID);
+		}
+	}
+
+	@Override
+	protected Packet prepareDiscoInfoResponse(Packet packet, JID jid, String node, JID senderJID) {
+		if (node == null && jid.getLocalpart() != null) {
+			Element resultQuery = new Element("query", new String[]{"xmlns"},
+											  new String[]{"http://jabber.org/protocol/disco#info"});
+
+			Packet resultIq = packet.okResult(resultQuery, 0);
+			Element mixIdentity = new Element("identity", new String[]{"category", "type"},
+										   new String[]{"conference", "mix"});
+			Optional<Element> mucIdentity = Optional.ofNullable(roomPresenceModule).map(x -> new Element("identity", new String[]{"category", "type"},
+													   new String[]{"conference", "text"}));
+			try {
+				Optional.ofNullable(mixRepository.getChannelName(jid.getBareJID())).filter(s -> !s.isEmpty()).ifPresent(name -> {
+					mixIdentity.setAttribute("name", name);
+					mucIdentity.ifPresent(identity -> identity.setAttribute("name", name));
+				});
+			} catch (RepositoryException ex) {
+				log.log(Level.FINEST, "Could not retrieve info for channel " + jid.toString(), ex);
+			}
+			resultQuery.addChild(mixIdentity);
+			mucIdentity.ifPresent(resultQuery::addChild);
+
+			for (String f : getAvailableFeatures(jid.getBareJID(), node, senderJID.getBareJID())) {
+				resultQuery.addChild(new Element("feature", new String[]{"var"}, new String[]{f}));
+			}
+			Element form = component.getDiscoExtensionsForm(jid.getDomain());
+			if (form != null) {
+				resultQuery.addChild(form);
+			}
+
+			return resultIq;
+		} else {
+			return super.prepareDiscoInfoResponse(packet, jid, node, senderJID);
 		}
 	}
 
@@ -101,7 +151,17 @@ public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 			}
 
 			return channels.stream()
-					.map(channelJID -> new Element("item", new String[]{"jid"}, new String[]{channelJID.toString()}))
+					.map(channelJID -> {
+						Element el = new Element("item", new String[]{"jid"}, new String[]{channelJID.toString()});
+						try {
+							Optional.ofNullable(mixRepository.getChannelName(channelJID))
+									.filter(s -> !s.isEmpty())
+									.ifPresent(name -> el.setAttribute("name", name));
+						} catch (RepositoryException ex) {
+							log.log(Level.FINEST, "could not retrieve channel " + channelJID.toString() + " name", ex);
+						}
+						return el;
+					})
 					.collect(Collectors.toList());
 		} else {
 			return super.prepareDiscoItems(serviceJID, nodeName, senderJID, rsm);

@@ -59,6 +59,9 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 	@Inject
 	private IMixRepository mixRepository;
 
+	@Inject(nullAllowed = true)
+	private RoomPresenceRepository roomPresenceRepository;
+
 	@Override
 	public boolean isServiceAutoCreated() {
 		return true;
@@ -75,7 +78,20 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 			return null;
 		}
 	}
-	
+
+	@Override
+	public String generateTempParticipantId(BareJID channelJID, JID participantRealJID) throws RepositoryException {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA1");
+			md.update(channelJID.getDomain().getBytes(StandardCharsets.UTF_8));
+			md.update(participantRealJID.toString().getBytes(StandardCharsets.UTF_8));
+			md.update(channelJID.getLocalpart().getBytes(StandardCharsets.UTF_8));
+			return "temp-" + Algorithms.bytesToHex(md.digest());
+		} catch (NoSuchAlgorithmException e) {
+			return null;
+		}
+	}
+
 	@Override
 	public void checkNodeConfig(AbstractNodeConfig nodeConfig) throws PubSubException {
 		if (nodeConfig.getNodeAccessModel() != AccessModel.whitelist) {
@@ -172,6 +188,11 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 				throw new PubSubException(Authorization.ITEM_NOT_FOUND );
 			}
 			this.checkPermission(serviceJid, senderJid.getBareJID(), MixAction.manage);
+		}
+		if (action == Action.retrieveItems && Mix.Nodes.MESSAGES.equals(nodeName) && roomPresenceRepository != null) {
+			if (roomPresenceRepository.isRoomParticipant(serviceJid, senderJid)) {
+				return;
+			}
 		}
 		super.checkPermission(serviceJid, nodeName, senderJid, action);
 	}

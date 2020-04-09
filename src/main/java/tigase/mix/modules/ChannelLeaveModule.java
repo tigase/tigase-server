@@ -26,6 +26,7 @@ import tigase.kernel.beans.Inject;
 import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
 import tigase.mix.model.IMixRepository;
+import tigase.mix.model.IParticipant;
 import tigase.mix.model.MixLogic;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.Subscription;
@@ -52,6 +53,9 @@ public class ChannelLeaveModule extends AbstractPubSubModule {
 	@Inject
 	private IMixRepository mixRepository;
 
+	@Inject(nullAllowed = true)
+	private RoomPresenceModule roomPresenceModule;
+
 	@Override
 	public Criteria getModuleCriteria() {
 		return CRIT_LEAVE;
@@ -75,9 +79,14 @@ public class ChannelLeaveModule extends AbstractPubSubModule {
 				getRepository().update(channelJID, node, subscriptions);
 			}
 
+			IParticipant participant = (roomPresenceModule != null) ? mixRepository.getParticipant(channelJID, senderJID) : null;
 			mixRepository.removeParticiapnt(channelJID, senderJID);
 
 			packetWriter.write(packet.okResult((Element) null, 1));
+
+			if (roomPresenceModule != null && participant != null) {
+				roomPresenceModule.participantLeft(channelJID, null, participant.getNick());
+			}
 		} catch (RepositoryException ex) {
 			throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
 		}

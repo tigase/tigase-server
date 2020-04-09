@@ -21,11 +21,14 @@ import tigase.component.exceptions.RepositoryException;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.repository.ISubscriptions;
 import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface IMixRepository {
+
+	String getChannelName(BareJID channelJID) throws RepositoryException;
 
 	IParticipant getParticipant(BareJID channelJID, BareJID participantJID) throws RepositoryException;
 	IParticipant getParticipant(BareJID channelJID, String participantId) throws RepositoryException;
@@ -34,6 +37,10 @@ public interface IMixRepository {
 
 	IParticipant updateParticipant(BareJID channelJID, BareJID participantJID, String nick) throws RepositoryException,
 																								   PubSubException;
+
+	IParticipant updateTempParticipant(BareJID channelJID, JID participantJID, String nick) throws RepositoryException, PubSubException;
+
+	void removeTempParticipant(BareJID channelJID, JID participantJID) throws RepositoryException;
 
 	Optional<List<BareJID>> getAllowed(BareJID channelJID) throws RepositoryException;
 	Optional<List<BareJID>> getBanned(BareJID channelJID) throws RepositoryException;
