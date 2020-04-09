@@ -58,7 +58,7 @@ public class DiscoveryModule
 	private AdHocCommandModule adHocCommandModule;
 
 	@Inject(bean = "service")
-	private BasicComponent component;
+	protected BasicComponent component;
 
 	private Criteria criteria;
 
