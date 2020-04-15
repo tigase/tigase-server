@@ -215,8 +215,7 @@ public class DBSchemaLoader
 			return pathStream.map(Path::getFileName)
 					.map(filename -> new AbstractMap.SimpleImmutableEntry<>(
 							getVersionFromSchemaFilename(filename, databaseType, schemaId), filename))
-					.sorted(Comparator.comparing(SimpleImmutableEntry::getKey, Version.VERSION_COMPARATOR))
-					.collect(Collectors.toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
+					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> null, TreeMap::new));
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Error while getting schema file list: {0}", e.getMessage());
 		}
@@ -668,15 +667,13 @@ public class DBSchemaLoader
 			schemaFileNames = getSchemaFileNamesInRange(schemaFileNames, currentVersion, requiredVersion);
 		}
 
-		Collection<Path> schemaFiles = schemaFileNames.values();
-
-		if (schemaFiles.isEmpty()) {
+		if (schemaFileNames.isEmpty()) {
 			log.log(Level.FINEST, "Empty schema list");
 			result = Result.skipped;
 		} else {
-			log.log(Level.INFO, "Schema files to load: {0}", new Object[]{schemaFiles});
-			final Set<Result> collect = schemaFiles.stream()
-					.map(file -> loadSchemaFile(file.toString()))
+			log.log(Level.INFO, "Schema files to load: {0}", new Object[]{schemaFileNames});
+			final Set<Result> collect = schemaFileNames.entrySet().stream()
+					.map(file -> loadSchemaFile(file.getValue().toString()))
 					.collect(Collectors.toSet());
 
 			result = parseResultsSet(collect);
