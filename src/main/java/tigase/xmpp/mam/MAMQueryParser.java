@@ -27,10 +27,12 @@ import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.JID;
+import tigase.xmpp.rsm.RSM;
 
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of parser for XEP-0313: Message Archive Management
@@ -95,6 +97,8 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 
 		query.getRsm().fromElement(queryEl);
 
+		validateRsm(query.getRsm());
+
 		return query;
 	}
 
@@ -121,5 +125,21 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 			field.setAttribute("label", label);
 		}
 		x.addChild(field);
+	}
+
+	protected void validateRsm(RSM rsm) throws ComponentException {
+		assertIsUUID(rsm.getAfter());
+		assertIsUUID(rsm.getBefore());
+	}
+
+	protected void assertIsUUID(String uuid) throws ComponentException {
+		if (uuid == null) {
+			return;
+		}
+		try {
+			UUID.fromString(uuid);
+		} catch (IllegalArgumentException ex) {
+			throw new ComponentException(Authorization.NOT_ACCEPTABLE, "Invalid item id: " + uuid, ex);
+		}
 	}
 }
