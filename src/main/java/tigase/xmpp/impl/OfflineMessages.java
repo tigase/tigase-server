@@ -359,6 +359,7 @@ public class OfflineMessages
 			}
 
 			Packet pac = packet.copyElementOnly();
+			pac.setStableId(packet.getStableId());
 			if (messageArchive != null) {
 				messageArchive.addStableId(pac, null);
 			}
