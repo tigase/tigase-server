@@ -115,6 +115,7 @@ c2s {
 This setting will set the maximum time allowed for stream resumption to 900 seconds. This can be handy if you expect a number of mobile phones to connect to your server and want to avoid duplicate messages being sent back and forth.
 
 [[autoSub]]
+=== Automatic subscription approval
 You may setup a server to automatically approve presence subscriptions or roster authorizations for all users. Say you were hosting bots and wanted to automate the process. This can be done with the following settings:
 [source,dsl]
 -----
