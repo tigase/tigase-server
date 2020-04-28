@@ -98,15 +98,13 @@ Following features are supported by Tigase XMPP Server:
 When looking for support, please first search for answers to your question in the available online channels:
 
 * Our online documentation: [Tigase Docs](https://docs.tigase.net)
-* Our online forums: [Tigase Forums](https://help.tigase.net/portal/community)
-* Our online Knowledge Base [Tigase KB](https://help.tigase.net/portal/kb)
+* Existing issues in relevant project, for Tigase Server it's: [Tigase XMPP Server GitHub issues](https://github.com/tigase/tigase-server/issues)
 
-If you didn't find an answer in the resources above, feel free to submit your question to either our 
-[community portal](https://help.tigase.net/portal/community) or open a [support ticket](https://help.tigase.net/portal/newticket).
+If you didn't find an answer in the resources above, feel free to submit your question as [new issue on GitHub](https://github.com/tigase/tigase-server/issues/new/choose) or, if you have valid support subscription, open [new support ticket](https://tigase.net/technical-support).
 
 # Downloads
 
-You can download distribution version of the Tigase XMPP Server directly from [here](https://github.com/tigaseinc/tigase-server/releases).
+You can download distribution version of the Tigase XMPP Server directly from [here](https://github.com/tigase/tigase-server/releases).
 
 If you wish to downloand SNAPSHOT build of the development version of Tigase XMPP Server you can grab it from [here](https://build.tigase.net/nightlies/dists/latest/tigase-server-dist-max.zip).
 
