@@ -119,16 +119,19 @@ This setting will set the maximum time allowed for stream resumption to 900 seco
 You may setup a server to automatically approve presence subscriptions or roster authorizations for all users. Say you were hosting bots and wanted to automate the process. This can be done with the following settings:
 [source,dsl]
 -----
-'sess-man' {
+'sess-man' () {
     'jabber:iq:roster' {
         'auto-authorize' = 'true'
     }
-    presence {
+    'presence-subscription' () {
         'auto-authorize' = 'true'
     }
 }
 -----
 Both of these settings are false by default, and you may use them together or separately.
+
+NOTE: `presence-subscription` is current default plugin. If you are using old `presence` then you should configure the option with correct plugin name.
+
 The following behavior is followed when they are both activated:
 
 - Upon sending a subscription request - Both contacts will each others' subscription and be added to each others' roster. Presence information will immediately be exchanged between both parties.
