@@ -110,6 +110,7 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		payload.put("unread", msgCount);
 		payload.put("sender", packet.getStanzaFrom().getBareJID());
 
+		Element actionEl = packet.getElement().findChild(el -> el.getXMLNS() == "urn:xmpp:jingle-message:0");
 		if (packet.getElemName() == Message.ELEM_NAME) {
 			if (packet.getType() == StanzaType.groupchat) {
 				payload.put("type", "groupchat");
@@ -128,6 +129,13 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 						payload.put("nickname", nickname);
 					}
 				}
+			} else if (actionEl != null) {
+				payload.put("type", "call");
+				payload.put("sender", packet.getStanzaFrom());
+				payload.put("sid", actionEl.getAttributeStaticStr("id"));
+				payload.put("media", actionEl.mapChildren(
+						el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
+						el -> el.getAttributeStaticStr("media")));
 			} else {
 				payload.put("type", "chat");
 			}
@@ -157,6 +165,9 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 			byte[] data = cipher.doFinal(content.getBytes(UTF8));
 
 			Element encryped = new Element("encrypted", Base64.encode(data));
+			if (actionEl != null) {
+				encryped.setAttribute("type", "voip");
+			}
 			encryped.addAttribute("iv", Base64.encode(iv));
 			encryped.setXMLNS(XMLNS);
 			notification.addChild(encryped);

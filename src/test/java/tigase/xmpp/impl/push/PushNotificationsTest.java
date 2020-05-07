@@ -469,6 +469,94 @@ public class PushNotificationsTest
 	}
 
 	@Test
+	public void testEncryptedJingleNotification() throws TigaseDBException, NoSuchPaddingException, NoSuchAlgorithmException,
+												   InvalidAlgorithmParameterException, InvalidKeyException,
+												   BadPaddingException, IllegalBlockSizeException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.addChild(new Element("jingle", new String[] {"xmlns", "id"}, new String[] {"tigase:push:jingle:0", "test-1"}));
+		SecureRandom random = new SecureRandom();
+		byte[] key = new byte[128/8];
+		random.nextBytes(key);
+		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
+			el.setCData(Base64.encode(key));
+			el.setAttribute("alg", "aes-128-gcm");
+		});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		Element msg = new Element("message", new Element[]{new Element("propose", new String[] {"xmlns", "id"}, new String[] {"urn:xmpp:jingle-message:0", "test-1"})}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
+		assertEquals("voip", encrypted.getAttributeStaticStr("type"));
+		byte[] enc = Base64.decode(encrypted.getCData());
+		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+		byte[] decoded = cipher.doFinal(enc);
+
+		assertTrue(new String(decoded).contains("test-1"));
+	}
+
+	@Test
+	public void testEncryptedJingleNotification_reject()
+			throws TigaseDBException, NoSuchPaddingException, NoSuchAlgorithmException,
+				   InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException,
+				   IllegalBlockSizeException, NotAuthorizedException, TigaseStringprepException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.addChild(new Element("jingle", new String[] {"xmlns", "id"}, new String[] {"tigase:push:jingle:0", "test-1"}));
+		SecureRandom random = new SecureRandom();
+		byte[] key = new byte[128/8];
+		random.nextBytes(key);
+		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
+			el.setCData(Base64.encode(key));
+			el.setAttribute("alg", "aes-128-gcm");
+		});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		Element msg = new Element("message", new Element[]{new Element("reject", new String[] {"xmlns", "id"}, new String[] {"urn:xmpp:jingle-message:0", "test-1"})}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, recipientJid, senderJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		XMPPResourceConnection session = getSession(JID.jidInstanceNS("test-1", "example.com", "test-1"), recipientJid);
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, session, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
+		assertEquals("voip", encrypted.getAttributeStaticStr("type"));
+		byte[] enc = Base64.decode(encrypted.getCData());
+		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+		byte[] decoded = cipher.doFinal(enc);
+
+		assertTrue(new String(decoded).contains("test-1"));
+	}
+	
+	@Test
 	public void testMessageRetrieved() throws TigaseDBException, NotAuthorizedException, TigaseStringprepException {
 		Element settings = new Element("settings", new String[]{"jid", "node"},
 									   new String[]{pushServiceJid.toString(),
