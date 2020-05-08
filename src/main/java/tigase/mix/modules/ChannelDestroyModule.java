@@ -27,14 +27,18 @@ import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
 import tigase.mix.model.MixAction;
 import tigase.mix.model.MixLogic;
+import tigase.pubsub.AbstractNodeConfig;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.exceptions.PubSubException;
+import tigase.pubsub.modules.PublishItemModule;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
+
+import java.util.Collections;
 
 @Bean(name="channelDestroyModule", parent = IMixComponent.class, active = true)
 public class ChannelDestroyModule extends AbstractPubSubModule {
@@ -45,6 +49,8 @@ public class ChannelDestroyModule extends AbstractPubSubModule {
 
 	@Inject
 	private MixLogic mixLogic;
+	@Inject
+	private PublishItemModule publishModule;
 
 	@Override
 	public Criteria getModuleCriteria() {
@@ -68,19 +74,17 @@ public class ChannelDestroyModule extends AbstractPubSubModule {
 			mixLogic.checkPermission(channelJID, packet.getStanzaFrom().getBareJID(), MixAction.manage);
 
 //			// do we really need that? removing service should be enough...
-//			String[] nodes = getRepository().getRootCollection(channelJID);
-//			if (nodes != null) {
-//				for (String node : nodes) {
-//					if (node.equals(Mix.Nodes.CONFIG)) {
-//						continue;
-//					}
-//					getRepository().deleteNode(channelJID, node);
-//					getRepository().removeFromRootCollection(channelJID, node);
-//					// how to remove service JID?
-//				}
-//				getRepository().deleteNode(channelJID, Mix.Nodes.CONFIG);
-//				getRepository().removeFromRootCollection(channelJID, Mix.Nodes.CONFIG);
-//			}
+			String[] nodes = getRepository().getRootCollection(channelJID);
+			if (nodes != null) {
+				for (String node : nodes) {
+					AbstractNodeConfig config = getRepository().getNodeConfig(channelJID, node);
+					if (config != null) {
+						Element del = new Element("delete", new String[]{"node"}, new String[]{node});
+						this.publishModule.generateNotifications(packet.getStanzaTo().getBareJID(), node, Collections
+								.singletonList(del), null, false);
+					}
+				}
+			}
 			getRepository().deleteService(channelJID);
 
 			packetWriter.write(packet.okResult((Element) null,  0));
