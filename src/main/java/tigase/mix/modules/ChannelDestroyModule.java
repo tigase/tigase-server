@@ -38,8 +38,6 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 
-import java.util.Collections;
-
 @Bean(name="channelDestroyModule", parent = IMixComponent.class, active = true)
 public class ChannelDestroyModule extends AbstractPubSubModule {
 
@@ -80,8 +78,7 @@ public class ChannelDestroyModule extends AbstractPubSubModule {
 					AbstractNodeConfig config = getRepository().getNodeConfig(channelJID, node);
 					if (config != null) {
 						Element del = new Element("delete", new String[]{"node"}, new String[]{node});
-						this.publishModule.generateNotifications(packet.getStanzaTo().getBareJID(), node, Collections
-								.singletonList(del), null, false);
+						this.publishModule.generateNodeNotifications(channelJID, node, del, null, false);
 					}
 				}
 			}
