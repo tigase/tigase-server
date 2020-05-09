@@ -20,12 +20,14 @@ package tigase.vhosts;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
+import tigase.server.DataForm;
 import tigase.server.Packet;
 import tigase.util.StringUtilities;
 import tigase.util.repository.DataTypes;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Array;
@@ -383,7 +385,11 @@ public class VHostItemImpl
 		enabled = Command.getCheckBoxFieldValue(packet, ENABLED_LABEL);
 		anonymousEnabled = Command.getCheckBoxFieldValue(packet, ANONYMOUS_ENABLED_LABEL);
 		registerEnabled = Command.getCheckBoxFieldValue(packet, REGISTER_ENABLED_LABEL);
-		tlsRequired = Command.getCheckBoxFieldValue(packet, TLS_REQUIRED_LABEL);
+		if (DataForm.getFields(packet.getElement().getChild(Command.COMMAND_EL, Command.XMLNS)) != null) {
+			tlsRequired = Command.getCheckBoxFieldValue(packet, TLS_REQUIRED_LABEL);
+		} else {
+			tlsRequired = true;
+		}
 		tmp = Command.getFieldValue(packet, S2S_SECRET_LABEL);
 		if ((tmp != null) && !tmp.trim().isEmpty()) {
 			s2sSecret = tmp;
@@ -1511,6 +1517,7 @@ public class VHostItemImpl
 		private Map<Class<? extends VHostItemExtension>, VHostItemExtension> extensions = new ConcurrentHashMap<>();
 
 		private boolean editable = true;
+		private VHostItemDefaults vhostDefaults;
 
 		public VHostItemWrapper() {
 		}
@@ -1523,6 +1530,10 @@ public class VHostItemImpl
 		public void setDefaults(VHostItem defaults) {
 			this.defaults = defaults;
 			refresh();
+		}
+
+		public void setVHostDefaults(VHostItemDefaults vHostDefaults) {
+			this.vhostDefaults = vHostDefaults;
 		}
 
 		public void refresh() {
@@ -1665,6 +1676,30 @@ public class VHostItemImpl
 		@Override
 		public void addCommandFields(Packet packet) {
 			item.addCommandFields(packet);
+			if (vhostDefaults.isTlsRequired()) {
+				Element commandEl = packet.getElement().getChild(Command.COMMAND_EL, Command.XMLNS);
+				if (commandEl != null) {
+					Element x = commandEl.getChild("x", "jabber:x:data");
+					if (x != null) {
+						List<Element> fields = x.getChildren();
+						if (fields != null) {
+							for (int i = 0; i < fields.size(); i++) {
+								Element field = fields.get(i);
+								x.removeChild(field);
+								if (TLS_REQUIRED_LABEL.equals(field.getAttributeStaticStr("var"))) {
+									field = new Element("field", new String[]{"var", "type"},
+														new String[]{"TLS", "fixed"});
+									field.addChild(new Element("value", XMLUtils.escape(
+											"This installation forces VHost to require TLS. If you need to use unencrypted connections set 'vhost-tls-required' property to 'false' in the installation configuration file")));
+									x.addChild(field);
+								} else {
+									x.addChild(field);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		@Override

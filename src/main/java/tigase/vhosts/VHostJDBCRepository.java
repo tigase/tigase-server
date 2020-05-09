@@ -112,6 +112,7 @@ public class VHostJDBCRepository
 		VHostItemImpl.VHostItemWrapper wrapper = new VHostItemImpl.VHostItemWrapper();
 		wrapper.setItem(item);
 		wrapper.setDefaults(defaults);
+		wrapper.setVHostDefaults(this.vhostDefaults);
 		return wrapper;
 	}
 
@@ -192,6 +193,10 @@ public class VHostJDBCRepository
 
 		if (item.getS2sSecret() == null) {
 			return "S2S Secret is required";
+		}
+
+		if (vhostDefaults.isTlsRequired() && !item.isTlsRequired()) {
+			return "This installation forces VHost to require TLS. If you need to use unencrypted connections set 'vhost-tls-required' property to 'false' in the installation configuration file.";
 		}
 
 		if (!vhostDefaults.isCheckDns()) {
