@@ -32,6 +32,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,41 +61,12 @@ public class SaslExternal
 				certCheckResult == CertCheckResult.self_signed);
 	}
 
-	private boolean isSkippedDomain(String domain ) {
-		if (domain != null && skipForDomains != null && skipForDomains.length > 0) {
-			for (String skipForDomain : skipForDomains) {
-				if (domain.contains(skipForDomain)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		Element mechanisms = new Element("mechanisms", new Element[]{new Element("mechanism", "EXTERNAL")},
 										 new String[]{"xmlns"}, new String[]{XMLNS_SASL});
 
-		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
-
-		final CID cid = (CID) serv.getSessionData().get("cid");
-
-		// "Server2 advertises SASL mechanisms. If the 'from' attribute of the stream header sent by Server1 can be
-		// matched against one of the identifiers provided in the certificate following the matching rules from
-		// RFC 6125, Server2 SHOULD advertise the SASL EXTERNAL mechanism. If no match is found, Server2 MAY either
-		// close Server1's TCP connection or continue with a Server Dialback (XEP-0220) [8] negotiation."
-		// If there was no `from` in the incomming stream then we should not advertise SASL-EXTERNAL and let
-		// other party possibly continue with Diallback
-		final boolean skipDomain = cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()));
-		final boolean tlsEstablished = isTlsEstablished(certCheckResult);
-		final boolean canAddSaslToFeatures =
-				tlsEstablished && !serv.isAuthenticated() && !skipDomain;
-
-		if (!canAddSaslToFeatures & log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Not adding SASL-EXTERNAL feature, isTlsEstablished: {1}, skipDomain: {2}",
-					new Object[]{serv, tlsEstablished, skipDomain});
-		}
+		final boolean canAddSaslToFeatures = canAddSaslToFeatures(serv);
 
 		if (canAddSaslToFeatures) {
 			results.add(mechanisms);
@@ -113,7 +85,8 @@ public class SaslExternal
 
 			if (cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()))) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Skipping SASL-EXTERNAL for domain: {1} because it was ignored", new Object[]{serv, cid});
+					log.log(Level.FINEST, "{0}, Skipping SASL-EXTERNAL for domain: {1} because it was ignored",
+							new Object[]{serv, cid});
 				}
 				return true;
 			}
@@ -192,6 +165,49 @@ public class SaslExternal
 		return false;
 	}
 
+	private boolean isSkippedDomain(String domain) {
+		if (domain != null && skipForDomains != null && skipForDomains.length > 0) {
+			for (String skipForDomain : skipForDomains) {
+				if (domain.contains(skipForDomain)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * "Server2 advertises SASL mechanisms. If the 'from' attribute of the stream header sent by Server1 can be
+	 * matched against one of the identifiers provided in the certificate following the matching rules from
+	 * RFC 6125, Server2 SHOULD advertise the SASL EXTERNAL mechanism. If no match is found, Server2 MAY either
+	 * close Server1's TCP connection or continue with a Server Dialback (XEP-0220) [8] negotiation."
+	 * If there was no `from` in the incomming stream then we should not advertise SASL-EXTERNAL and let
+	 * other party possibly continue with Diallback
+	 *
+	 * @param serv for which to determine if SASL-EXTERNAL can be added to features
+	 *
+	 * @return {@code true} if TLS is established, local certificate is valid and domains have not been excluded
+	 */
+	private boolean canAddSaslToFeatures(S2SIOService serv) {
+		final ConcurrentMap<String, Object> sessionData = serv.getSessionData();
+		CID cid = (CID) sessionData.get("cid");
+		boolean skipDomain =
+				cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()));
+		CertCheckResult certCheckResult = (CertCheckResult) sessionData.get(S2SIOService.CERT_CHECK_RESULT);
+		boolean tlsEstablished = isTlsEstablished(certCheckResult);
+		CertCheckResult localCertCheckResult = (CertCheckResult) sessionData.get(S2SIOService.LOCAL_CERT_CHECK_RESULT);
+		boolean localCertTrusted = localCertCheckResult == CertCheckResult.trusted;
+		boolean canAddSaslToFeatures = tlsEstablished && localCertTrusted && !serv.isAuthenticated() && !skipDomain;
+
+		if (!canAddSaslToFeatures && log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST,
+					"{0}, Not adding SASL-EXTERNAL feature, tlsEstablished: {1} (result: {2}), skipDomain: {3}, localCertTrusted: {4} (result: {5})",
+					new Object[]{serv, tlsEstablished, certCheckResult, skipDomain, localCertTrusted,
+								 localCertCheckResult});
+		}
+		return canAddSaslToFeatures;
+	}
+
 	private void sendAuthRequest(Packet p, S2SIOService serv, Queue<Packet> results) throws TigaseStringprepException {
 		String cdata = "=";
 		CID cid = (CID) serv.getSessionData().get("cid");
@@ -261,8 +277,7 @@ public class SaslExternal
 		if (cid == null) {
 			// can't process such request
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, CID is unknown, can''t proceed",
-						new Object[]{serv});
+				log.log(Level.FINE, "{0}, CID is unknown, can''t proceed", new Object[]{serv});
 			}
 			results.add(Packet.packetInstance(failureElement("Unknown origin hostname (lack of `from` element)")));
 			serv.forceStop();

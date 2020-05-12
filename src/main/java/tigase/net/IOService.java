@@ -35,6 +35,7 @@ import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.*;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Map;
@@ -44,6 +45,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.cert.CertificateUtil.validateCertificate;
 
 /**
  * <code>IOService</code> offers thread safe <code>call()</code> method execution, however you must be prepared that
@@ -67,6 +70,8 @@ public abstract class IOService<RefObject>
 		implements Callable<IOService<?>>, TLSEventHandler, IOListener {
 
 	public static final String CERT_CHECK_RESULT = "cert-check-result";
+
+	public static final String LOCAL_CERT_CHECK_RESULT = "local-cert-check-result";
 
 	public static final String CERT_REQUIRED_DOMAIN = "cert-required-domain";
 
@@ -297,6 +302,11 @@ public abstract class IOService<RefObject>
 			try {
 				Certificate[] certs = wrapper.getLocalCertificates();
 				this.localCertificate = certs == null || certs.length == 0 ? null : certs[0];
+				if (certs != null) {
+					KeyStore trustStore = sslContextContainer.getTrustStore();
+					CertCheckResult checkResult = validateCertificate(certs, trustStore, false);
+					sessionData.put(LOCAL_CERT_CHECK_RESULT, checkResult);
+				}
 			} catch (Exception e) {
 				this.localCertificate = null;
 				log.log(Level.WARNING, "Cannot get local certificate", e);

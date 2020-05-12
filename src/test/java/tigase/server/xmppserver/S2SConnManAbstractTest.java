@@ -50,6 +50,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -144,16 +145,23 @@ class S2SConnManAbstractTest
 	}
 
 	protected void testS2STigaseConnectionManager(String[] protocols) {
+		testS2STigaseConnectionManager(protocols,
+									   certCheckResult -> Assert.assertEquals(CertCheckResult.trusted, certCheckResult),
+									   Assert::assertTrue);
+	}
+
+	protected void testS2STigaseConnectionManager(String[] protocols, Consumer<CertCheckResult> certificateCheckResult, Consumer<Boolean> authenticatedConsumer) {
 		try {
 			final SSLContextContainer context = kernel.getInstance(SSLContextContainer.class);
 			setupSslContextContainer(context, SSLContextContainer.HARDENED_MODE.secure, protocols, null);
-			testConnectionForCID(cid);
+			testConnectionForCID(cid, certificateCheckResult, authenticatedConsumer);
 		} catch (Exception e) {
+			log.log(Level.FINE, "Error running test", e);
 			Assert.fail("exception: " + e);
 		}
 	}
 
-	private void testConnectionForCID(CID cid) throws NotLocalhostException, LocalhostException, InterruptedException {
+	private void testConnectionForCID(CID cid, Consumer<CertCheckResult> certificateCheckResult, Consumer<Boolean> authenticatedConsumer) throws NotLocalhostException, LocalhostException, InterruptedException {
 		final fastCIDConnections connections = handler.createNewCIDConnections(cid);
 		connections.openConnections();
 
@@ -176,11 +184,11 @@ class S2SConnManAbstractTest
 		log.log(Level.INFO, cid + ": isAuthenticated(): " + authenticated);
 		log.log(Level.INFO, cid + ": getSessionData().get(CERT_CHECK_RESULT): " + trusted);
 		Assert.assertTrue(connected);
-		Assert.assertTrue(CertCheckResult.trusted.equals(trusted));
+		certificateCheckResult.accept(trusted);
 
 		// it will fail when testing locally as it's not possible to perform dialback that way without mapping domain
 		// domain to local machine
-		Assert.assertTrue(authenticated);
+		authenticatedConsumer.accept(authenticated);
 
 		try {
 			final Packet packet = Iq.packetInstance("iq", cid.getLocalHost(), cid.getRemoteHost(), StanzaType.get);
@@ -373,7 +381,8 @@ class S2SConnManAbstractTest
 					initNewConnection(ip, dns_entry.getPort(), s2s_conn, port_props);
 				}
 			} catch (UnknownHostException ex) {
-				log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
+				log.log(Level.FINE, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
+				Assert.fail("Remote host not found: " + cid.getRemoteHost() + ", for: " + cid);
 			}
 		}
 	}
