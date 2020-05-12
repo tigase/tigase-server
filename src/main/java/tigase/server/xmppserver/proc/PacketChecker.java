@@ -115,6 +115,10 @@ public class PacketChecker
 				return true;
 			}
 		} else {
+			// if there is a stream features and we are authenticated we should ignore it..
+			if (p.getElemName() == "features" && p.getXMLNS() == "http://etherx.jabber.org/streams" && p.getElement().getChildren() == null && serv.isAuthenticated()) {
+				return true;
+			}
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "{0}, Invalid namespace for packet: {1}", new Object[]{serv, p});
 			}

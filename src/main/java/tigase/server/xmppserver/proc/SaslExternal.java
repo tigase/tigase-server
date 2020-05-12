@@ -23,9 +23,11 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
+import tigase.util.Base64;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -191,7 +193,12 @@ public class SaslExternal
 	}
 
 	private void sendAuthRequest(Packet p, S2SIOService serv, Queue<Packet> results) throws TigaseStringprepException {
-		Element auth = new Element("auth", "=", new String[]{"xmlns", "mechanism"},
+		String cdata = "=";
+		CID cid = (CID) serv.getSessionData().get("cid");
+		if (cid != null) {
+			cdata = Base64.encode(cid.getLocalHost().getBytes(StandardCharsets.UTF_8));
+		}
+		Element auth = new Element("auth", cdata, new String[]{"xmlns", "mechanism"},
 								   new String[]{XMLNS_SASL, "EXTERNAL"});
 		results.add(Packet.packetInstance(auth));
 		serv.getSessionData().put(S2S_METHOD_USED, METHOD_NAME);
