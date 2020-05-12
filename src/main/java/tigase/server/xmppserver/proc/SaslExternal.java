@@ -49,6 +49,8 @@ public class SaslExternal
 
 	@ConfigField(desc = "Skip SASL-EXTERNAL for defined domains", alias = "skip-for-domains")
 	private String[] skipForDomains;
+	@ConfigField(desc = "Enable compatibility with legacy servers", alias = "legacy-compat")
+	private boolean legacyCompat = true;
 
 	private static boolean isAnyMechanismsPresent(Packet p) {
 		final List<Element> childrenStaticStr = p.getElement().getChildrenStaticStr(FEATURES_SASL_PATH);
@@ -211,7 +213,7 @@ public class SaslExternal
 	private void sendAuthRequest(Packet p, S2SIOService serv, Queue<Packet> results) throws TigaseStringprepException {
 		String cdata = "=";
 		CID cid = (CID) serv.getSessionData().get("cid");
-		if (cid != null) {
+		if (cid != null && legacyCompat) {
 			cdata = Base64.encode(cid.getLocalHost().getBytes(StandardCharsets.UTF_8));
 		}
 		Element auth = new Element("auth", cdata, new String[]{"xmlns", "mechanism"},
