@@ -276,7 +276,7 @@ public class MessageAmp
 				break;
 			case "iq":
 				if (packet.getElemChild("fin") != null) {
-					messageProcessor.process(packet, session, repo, results, settings);
+					messageProcessor.handleDelivery(packet, session, repo, results, settings);
 				} else {
 					if (offlineProcessor != null) {
 						offlineProcessor.processIq(packet, session, repo, results);

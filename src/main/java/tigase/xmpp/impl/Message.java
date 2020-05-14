@@ -19,14 +19,9 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
-<<<<<<< HEAD
-import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
-=======
 import tigase.kernel.beans.Inject;
->>>>>>> Modifications allowing to add support for MAM:2 (stable stanza-id) in Message Archiving #messagearchiving-47
 import tigase.server.Packet;
-import tigase.server.xmppsession.PacketDefaultHandler;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;

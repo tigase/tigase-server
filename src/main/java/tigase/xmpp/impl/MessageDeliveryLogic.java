@@ -21,7 +21,9 @@ import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.xmppsession.PacketDefaultHandler;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -50,6 +52,8 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 	@Inject(nullAllowed = true)
 	private SessionManager.MessageArchive messageArchive;
 
+	private PacketDefaultHandler packetDefaultHandler = new PacketDefaultHandler();
+
 	public void handleDelivery(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 
@@ -57,6 +61,11 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 		// before calling logging method.
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}, for session: {1}", new Object[]{packet, session});
+		}
+
+		if (packet.getElemName() == Iq.ELEM_NAME) {
+			packetDefaultHandler.process(packet, session, repo, results);
+			return;
 		}
 
 		// You may want to skip processing completely if the user is offline.
