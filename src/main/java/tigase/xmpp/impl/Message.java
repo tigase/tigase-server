@@ -20,7 +20,9 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.xmppsession.PacketDefaultHandler;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -47,7 +49,8 @@ import static tigase.xmpp.impl.Message.XMLNS;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
 @Id(ELEM_NAME)
-@Handles({@Handle(path = {ELEM_NAME}, xmlns = XMLNS)})
+@Handles({@Handle(path = {ELEM_NAME}, xmlns = XMLNS), @Handle(path = {Iq.ELEM_NAME, "fin"}, xmlns = "urn:xmpp:mam:2"),
+		  @Handle(path = {Iq.ELEM_NAME, "fin"}, xmlns = "urn:xmpp:mam:1")})
 @Bean(name = ELEM_NAME, parent = SessionManager.class, active = false, exportable = true)
 public class Message
 		extends AnnotatedXMPPProcessor
@@ -63,6 +66,9 @@ public class Message
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
 	@ConfigField(desc = "Silently ignore errors", alias = SILENTLY_IGNORE_ERROR_KEY)
 	private boolean silentlyIgnoreError = false;
+
+	private PacketDefaultHandler packetDefaultHandler = new PacketDefaultHandler();
+
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 					   Queue<Packet> results) {
@@ -77,6 +83,11 @@ public class Message
 		// before calling logging method.
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}, for session: {1}", new Object[]{packet, session});
+		}
+
+		if (packet.getElemName() == Iq.ELEM_NAME) {
+			packetDefaultHandler.process(packet, session, repo, results);
+			return;
 		}
 
 		// You may want to skip processing completely if the user is offline.

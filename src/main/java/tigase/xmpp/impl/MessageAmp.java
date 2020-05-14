@@ -53,10 +53,10 @@ public class MessageAmp
 	protected static final String ID = "amp";
 	private static final String AMP_JID_PROP_KEY = "amp-jid";
 	private static final String STATUS_ATTRIBUTE_NAME = "status";
-	private static final String[][] ELEMENTS = {{"message"}, {"presence"}, {"iq", "msgoffline"}};
+	private static final String[][] ELEMENTS = {{"message"}, {"presence"}, {"iq", "msgoffline"}, {"iq", "fin"}, {"iq", "fin"}};
 	private static final Logger log = Logger.getLogger(MessageAmp.class.getName());
 	private static final String XMLNS = "http://jabber.org/protocol/amp";
-	private static final String[] XMLNSS = {"jabber:client", "jabber:client", "msgoffline"};
+	private static final String[] XMLNSS = {"jabber:client", "jabber:client", "msgoffline", "urn:xmpp:mam:2", "urn:xmpp:mam:1"};
 	private static final Element[] DISCO_FEATURES_WITH_OFFLINE = {
 			new Element("feature", new String[]{"var"}, new String[]{XMLNS}),
 			new Element("feature", new String[]{"var"}, new String[]{"msgoffline"})};
@@ -274,10 +274,14 @@ public class MessageAmp
 				}
 				break;
 			case "iq":
-				if (offlineProcessor != null) {
-					offlineProcessor.processIq(packet, session, repo, results);
+				if (packet.getElemChild("fin") != null) {
+					messageProcessor.process(packet, session, repo, results, settings);
 				} else {
-					results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, ID, true));
+					if (offlineProcessor != null) {
+						offlineProcessor.processIq(packet, session, repo, results);
+					} else {
+						results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, ID, true));
+					}
 				}
 				break;
 		}
