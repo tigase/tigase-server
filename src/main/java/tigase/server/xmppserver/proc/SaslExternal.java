@@ -239,7 +239,7 @@ public class SaslExternal
 		serv.xmppStreamOpen(data);
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
-		cid_conns.connectionAuthenticated(serv, cid);
+		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, handler);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Making connection authenticated. cid={1} ", new Object[]{serv, cid});
 		}
@@ -304,7 +304,7 @@ public class SaslExternal
 		}
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
-		cid_conns.connectionAuthenticated(serv, cid);
+		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, handler);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Making connection authenticated. cid={1} ", new Object[]{serv, cid});
 		}

@@ -122,6 +122,9 @@ public class S2SConnectionManager
 	 * timeout in server configuration.
 	 */
 	private long maxPacketWaitingTime = MAX_PACKET_WAITING_TIME_PROP_VAL;
+
+	@ConfigField(desc = "Whether s2s connection is required to be authenticated both ways before allowing transmission", alias = "one-way-authentication")
+	private boolean oneWayAuthentication = false;
 	/**
 	 * List of processors which should handle all traffic incoming from the network. In most cases if not all, these
 	 * processors handle just protocol traffic, all the rest traffic should be passed on to MR.
@@ -676,7 +679,7 @@ public class S2SConnectionManager
 		}
 
 		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector, maxINConnections, maxOUTTotalConnections,
-													  maxOUTPerIPConnections, maxPacketWaitingTime);
+													  maxOUTPerIPConnections, maxPacketWaitingTime, oneWayAuthentication);
 
 		cidConnections.put(cid, cid_conns);
 

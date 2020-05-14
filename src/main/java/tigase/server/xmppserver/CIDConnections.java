@@ -64,6 +64,7 @@ public class CIDConnections {
 	private int max_out_conns = 4;
 	private int max_out_conns_per_ip = 2;
 	private long max_waiting_time = 15 * 60 * 1000;
+	private boolean oneWayAuthentication;
 	private Set<S2SConnection> outgoing = new ConcurrentSkipListSet<S2SConnection>();
 	private AtomicBoolean outgoingOpenInProgress = new AtomicBoolean(false);
 	private Set<S2SConnection> outgoing_handshaking = new ConcurrentSkipListSet<S2SConnection>();
@@ -73,6 +74,10 @@ public class CIDConnections {
 
 	public CIDConnections(CID cid, S2SConnectionHandlerIfc<S2SIOService> handler, S2SConnectionSelector selector,
 						  int maxInConns, int maxOutConns, int maxOutConnsPerIP, long max_waiting_time) {
+		this(cid,handler,selector,maxInConns,maxOutConns,maxOutConnsPerIP,max_waiting_time, false);
+	}
+	public CIDConnections(CID cid, S2SConnectionHandlerIfc<S2SIOService> handler, S2SConnectionSelector selector,
+						  int maxInConns, int maxOutConns, int maxOutConnsPerIP, long max_waiting_time, boolean oneWayAuthentication) {
 		this.cid = cid;
 		this.handler = handler;
 		this.connectionsOpenerService = handler.getConnectionOpenerService();
@@ -81,6 +86,7 @@ public class CIDConnections {
 		this.max_out_conns = maxOutConns;
 		this.max_out_conns_per_ip = maxOutConnsPerIP;
 		this.max_waiting_time = max_waiting_time;
+		this.oneWayAuthentication = oneWayAuthentication;
 	}
 
 	public void resetOutgoingInProgress() {
@@ -117,12 +123,21 @@ public class CIDConnections {
 	}
 
 	public void connectionAuthenticated(S2SIOService serv, CID cid) {
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
+		final boolean isOutgoing = serv.connectionType() == ConnectionType.connect;
+		S2SIOService.DIRECTION direction;
+		if (oneWayAuthentication) {
+			direction = isOutgoing ? S2SIOService.DIRECTION.OUT : S2SIOService.DIRECTION.IN;
+		} else {
+			direction = S2SIOService.DIRECTION.BOTH;
 		}
-		handler.serviceConnected(serv);
-		serv.addCID(cid);
-		if (serv.connectionType() == ConnectionType.connect) {
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "{0}, connection is authenticated. Direction: {1}", new Object[]{serv, direction});
+		}
+		serv.addCID(cid, direction);
+		if (serv.isAuthenticated()) {
+			handler.serviceConnected(serv);
+		}
+		if (isOutgoing) {
 
 			// Release the 'lock'
 			outgoingOpenInProgress.set(false);

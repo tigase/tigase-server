@@ -19,6 +19,7 @@ package tigase.server.xmppserver;
 
 import tigase.xmpp.XMPPIOService;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
@@ -41,27 +42,55 @@ public class S2SIOService
 	 * This structure keeps a set of all CIDs reusing this connection. If the connection goes down all CIDs must be
 	 * notified.
 	 */
-	private Set<CID> authenticatedCIDs = new CopyOnWriteArraySet<CID>();
+	private Set<CID> authenticatedCIDsOUT = new CopyOnWriteArraySet<CID>();
+	private Set<CID> authenticatedCIDsIN = new CopyOnWriteArraySet<CID>();
 	private CIDConnections cid_conns = null;
 	private String dbKey = null;
 	private S2SConnection s2s_conn = null;
 
 	private String session_id = null;
 
+	enum DIRECTION {
+		IN,
+		OUT,
+		BOTH,
+		ANY
+	}
+
 	/**
 	 * Adds another connection id (CID) to the authenticated list for this connection
 	 *
 	 */
 	public void addCID(CID cid) {
+		addCID(cid, DIRECTION.BOTH);
+	}
+
+	public void addCID(CID cid, DIRECTION direction) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Adding CID to authenticated: {1}", new Object[]{this, cid});
 		}
 
-		authenticatedCIDs.add(cid);
+		switch (direction) {
+			case IN:
+				authenticatedCIDsIN.add(cid);
+				break;
+			case OUT:
+				authenticatedCIDsOUT.add(cid);
+				break;
+			case BOTH:
+			case ANY:
+			default:
+				authenticatedCIDsIN.add(cid);
+				authenticatedCIDsOUT.add(cid);
+				break;
+		}
 	}
 
 	public Set<CID> getCIDs() {
-		return authenticatedCIDs;
+		final CopyOnWriteArraySet<CID> cids = new CopyOnWriteArraySet<>();
+		cids.addAll(authenticatedCIDsIN);
+		cids.retainAll(authenticatedCIDsOUT);
+		return cids;
 	}
 
 	public S2SConnection getS2SConnection() {
@@ -81,11 +110,11 @@ public class S2SIOService
 	}
 
 	public boolean isAuthenticated(CID cid) {
-		return authenticatedCIDs.contains(cid);
+		return authenticatedCIDsOUT.contains(cid) && authenticatedCIDsIN.contains(cid);
 	}
 
 	public boolean isAuthenticated() {
-		return authenticatedCIDs.size() > 0;
+		return authenticatedCIDsOUT.size() > 0 && authenticatedCIDsIN.size() > 0;
 	}
 
 	public boolean isHandshakingOnly() {
