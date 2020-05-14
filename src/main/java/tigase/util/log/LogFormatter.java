@@ -44,7 +44,7 @@ public class LogFormatter
 	private static int THREAD_OFFSET = 25;
 	protected Date timestamp = new Date();
 
-	private boolean colorful = true;
+	private boolean colorful = !Boolean.getBoolean("disable_logger_color");
 
 	public LogFormatter() {
 	}
@@ -100,16 +100,14 @@ public class LogFormatter
 	}
 
 	private String fillThrowable(LogRecord record) {
+		StringWriter sw = new StringWriter();
 		if (record.getThrown() != null) {
-			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			pw.println();
 			record.getThrown().printStackTrace(pw);
 			pw.close();
-			return sw.toString();
-		} else {
-			return null;
 		}
+		return sw.toString();
 	}
 
 	private String getClassMethodName(LogRecord record) {

@@ -52,3 +52,12 @@ You only need to specify the settings you wish to customize, otherwise they will
 . `ConsoleHandler` - Determines the formatting for Tigase output to console.
 .. `level` - specifies the level of logs to be written, default is WARNING.
 .. `formatter` - specifies the package to format logging output. Default is tigase.util.LogFormatter.
+
+== Disabling colored output
+
+If for some reason you don't want colored output in the logs you can disable it by setting `disable_logger_color` to `true`. For convenience, you can uncomment in `etc/tigase.conf` following line:
+
+[source,bash]
+----
+#DISABLE_LOGGER_COLOR=" -Ddisable_logger_color=true "
+----
