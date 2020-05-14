@@ -287,10 +287,18 @@ public abstract class IOService<RefObject>
 					}
 					if (!CertificateUtil.verifyCertificateForDomain((X509Certificate) peerCert, reqCertDomain)) {
 						certCheckResult = CertCheckResult.invalid;
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "{0}, TLS handshake: certificate doesn't match domain)",
+									new Object[]{this});
+						}
 					}
 				}
 			} catch (Exception e) {
 				certCheckResult = CertCheckResult.invalid;
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING,
+							this + ", Certificate validation failed, CertCheckResult: " + certCheckResult + ")", e);
+				}
 			}
 		}
 		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
