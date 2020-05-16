@@ -32,8 +32,10 @@ import tigase.xmpp.jid.JID;
 import java.sql.*;
 import java.util.Date;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 /**
  * Created: May 3, 2010 5:28:02 PM
@@ -305,13 +307,28 @@ public class JDBCMsgRepository
 		return loadMessagesToJID(session, delete, null);
 	}
 
+	private final ReentrantReadWriteLock locks[] = IntStream.range(0, 128)
+			.mapToObj(i -> new ReentrantReadWriteLock())
+			.toArray(ReentrantReadWriteLock[]::new);
+
+	private ReentrantReadWriteLock getLock(BareJID jid) {
+		if (jid == null) {
+			return locks[0];
+		}
+		return locks[Math.abs(jid.hashCode() % locks.length)];
+	}
+
 	public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete,
 											OfflineMessagesProcessor proc) throws UserNotFoundException {
 		Queue<Element> result = null;
 		BareJID to = null;
 
+		ReentrantReadWriteLock.WriteLock lock = null;
 		try {
+			log.log(Level.WARNING, "for " + session.getBareJID() + " loading messages");
 			to = session.getBareJID();
+			lock = getLock(to).writeLock();
+			lock.lock();
 
 			ResultSet rs = null;
 			PreparedStatement select_to_jid_st = data_repo.getPreparedStatement(to, MSGS_GET_MESSAGES);
@@ -322,6 +339,9 @@ public class JDBCMsgRepository
 					rs = select_to_jid_st.executeQuery();
 
 					result = parseLoadedMessages(proc, rs);
+					for (Element el : result) {
+						log.log(Level.WARNING, "for " + session.getBareJID() + " loaded message:" + el.toString());
+					}
 				} finally {
 					data_repo.release(null, rs);
 				}
@@ -331,6 +351,7 @@ public class JDBCMsgRepository
 				rs = null;
 				try {
 					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement(to, MSGS_DELETE_MESSAGES);
+					log.log(Level.WARNING, "for " + session.getBareJID() + " deleting offline messages");
 
 					synchronized (delete_to_jid_st) {
 						delete_to_jid_st.setString(1, to.toString());
@@ -344,6 +365,10 @@ public class JDBCMsgRepository
 			log.log(Level.WARNING, "Problem getting offline messages for user: " + to, e);
 		} catch (NotAuthorizedException ex) {
 			log.log(Level.WARNING, "Session not authorized yet!", ex);
+		} finally {
+			if (lock != null) {
+				lock.unlock();
+			}
 		}
 
 		return result;
@@ -359,7 +384,10 @@ public class JDBCMsgRepository
 
 		boolean result = false;
 
+		ReentrantReadWriteLock.ReadLock lock = getLock(to == null ? null : to.getBareJID()).readLock();
+		lock.lock();
 		try {
+			log.log(Level.WARNING, "for " + to.getBareJID() + " storing message:" + msg.toString());
 			long msgs_store_limit = getMsgsStoreLimit(to.getBareJID(), userRepo);
 
 			PreparedStatement insert_msg_st = data_repo.getPreparedStatement(to.getBareJID(), MSGS_ADD_MESSAGE);
@@ -413,6 +441,8 @@ public class JDBCMsgRepository
 			} else {
 				log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 			}
+		} finally {
+			lock.unlock();
 		}
 		return result;
 	}
