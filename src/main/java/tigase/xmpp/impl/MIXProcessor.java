@@ -165,7 +165,11 @@ public class MIXProcessor
 									})
 									.ifPresent(connJID -> {
 										Element actionElCopy = actionEl.clone();
-										actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" + channel.toString());
+										String id = actionEl.getAttributeStaticStr("id");
+										if (id != null) {
+											actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" +
+													channel.toString());
+										}
 										sendToUser(userJID, resource, connJID, packet.getType(),
 												   packet.getStanzaId(), actionElCopy, null, results::offer);
 									});
