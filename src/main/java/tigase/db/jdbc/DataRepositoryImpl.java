@@ -87,23 +87,23 @@ public class DataRepositoryImpl
 
 	@Override
 	public Optional<Version> getSchemaVersion(String component) {
+		ResultSet rs = null;
+		String dbVersionStr = null;
 		try {
 			PreparedStatement ps = getPreparedStatement(null, JDBC_SCHEMA_VERSION_QUERY);
-			ps.setString(1, component);
-			final ResultSet rs = ps.executeQuery();
-			String dbVersionStr = null;
-			if (rs.next()) {
-				dbVersionStr = rs.getString(1);
-			}
-			if (dbVersionStr != null) {
-				return Optional.of(Version.of(dbVersionStr));
-			} else {
-				return Optional.empty();
+			synchronized (ps) {
+				ps.setString(1, component);
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					dbVersionStr = rs.getString(1);
+				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.FINE, "Error getting schema version from the DB", e);
-			return Optional.empty();
+		} finally {
+			release(null, rs);
 		}
+		return dbVersionStr != null ? Optional.of(Version.of(dbVersionStr)) : Optional.empty();
 	}
 
 	@Override

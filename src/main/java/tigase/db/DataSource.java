@@ -20,10 +20,14 @@ package tigase.db;
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.db.util.SchemaVersionCheckerLogger;
+import tigase.kernel.core.Kernel;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Version;
+import tigase.util.log.LogFormatter;
 
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +65,10 @@ public interface DataSource
 	default public boolean checkSchemaVersion(DataSourceAware<? extends DataSource> datasource, boolean shutdownServer) {
 		boolean result = false;
 
+		if (datasource == null) {
+			//most likely shutdown, no need to check schema now
+			return true;
+		}
 		final Class<? extends DataSourceAware> datasourceClass = datasource.getClass();
 		if (datasourceClass.isAnnotationPresent(SchemaId.class)
 				&& RepositoryVersionAware.class.isAssignableFrom(datasourceClass)) {

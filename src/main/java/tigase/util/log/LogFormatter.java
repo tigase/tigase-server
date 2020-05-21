@@ -99,12 +99,16 @@ public class LogFormatter
 		return 0;
 	}
 
-	private String fillThrowable(LogRecord record) {
+	private static String fillThrowable(LogRecord record) {
+		return fillThrowable(record.getThrown());
+	}
+
+	public static String fillThrowable(Throwable throwable) {
 		StringWriter sw = new StringWriter();
-		if (record.getThrown() != null) {
+		if (throwable != null) {
 			PrintWriter pw = new PrintWriter(sw);
 			pw.println();
-			record.getThrown().printStackTrace(pw);
+			throwable.printStackTrace(pw);
 			pw.close();
 		}
 		return sw.toString();
