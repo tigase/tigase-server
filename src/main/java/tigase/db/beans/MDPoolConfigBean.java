@@ -21,6 +21,7 @@ import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.RepositoryPool;
+import tigase.db.util.DBInitForkJoinPoolCache;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
@@ -156,7 +157,8 @@ public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
 
 		if (!toInitialize.isEmpty()) {
 			Queue<ForkJoinTask<A>> tasks = new ArrayDeque<>();
-			final ForkJoinPool pool = new ForkJoinPool(Math.min(toInitialize.size(), 128));
+			final ForkJoinPool pool = DBInitForkJoinPoolCache
+			.shared.pool(repository == null ? "dbinit" : "dbinit-" + repository.hashCode(), Math.min(toInitialize.size(), 128));//new ForkJoinPool(Math.min(toInitialize.size(), 128));
 			for (A repo : toInitialize) {
 				tasks.offer(pool.submit(() -> {
 					try {
@@ -188,7 +190,7 @@ public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
 					((RepositoryPool<A>) repository).addRepo(repo);
 				}
 			}
-			pool.shutdown();
+			//pool.shutdown();
 		}
 
 		this.instances = instances;

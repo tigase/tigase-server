@@ -17,7 +17,9 @@
  */
 package tigase.db.jdbc;
 
-import tigase.db.*;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.Repository;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.stats.CounterValue;
