@@ -139,8 +139,8 @@ public class ConnectionOpenThread
 							++port_throttling.lastSecondConnections;
 							if (port_throttling.lastSecondConnections > port_throttling.throttling) {
 								if (log.isLoggable(Level.INFO)) {
-									log.log(Level.INFO, "New connections throttling level {0} exceeded, closing: {0}",
-											new Object[]{port_throttling.lastSecondConnections, sc});
+									log.log(Level.INFO, "New connections throttling level {0} exceeded limit of {1}, closing: {2}",
+											new Object[]{port_throttling.lastSecondConnections, port_throttling.throttling, sc});
 								}
 								sc.close();
 								sc = null;
