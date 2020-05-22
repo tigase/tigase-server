@@ -375,8 +375,11 @@ public class CertificateContainer
 			Set<String> domains = certificate.map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
 
 			eventBus.fire(new CertificateChanged(alias, domains));
+			log.log(Level.INFO,
+					"Certificate with alias: {0} for domains: {1} added. Saving to disk: {2}, notify cluster: {3}",
+					new Object[]{alias, domains, saveToDisk, notifyCluster});
 		} catch (Exception ex) {
-			throw new CertificateParsingException("Problem adding a new certificate.", ex);
+			throw new CertificateParsingException("Problem adding a new certificate (" + ex.getMessage() + ")", ex);
 		}
 	}
 
