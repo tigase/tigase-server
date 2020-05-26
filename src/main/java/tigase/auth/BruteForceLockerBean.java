@@ -116,9 +116,12 @@ public class BruteForceLockerBean
 	}
 
 	public void addInvalidLogin(XMPPResourceConnection session, String ip, BareJID jid, final long currentTime) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Adding new entry, JID: {0}, ip: {1}, time: {2}", new Object[]{jid, ip, currentTime});
+		}
 		if (ip == null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("IP is null. Skip adding entry.");
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "IP is null. Skip adding entry.");
 			}
 			return;
 		}
@@ -134,14 +137,14 @@ public class BruteForceLockerBean
 			value = new Value(session != null ? session.getDomain().getVhost().toString() : null, ip, jid);
 			value.setBadLoginCounter(0);
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Entry didn't exists. Create new one.");
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER,"Entry didn't exists. Create new one.");
 			}
 		}
 
 		if (value.getInvalidateAtTime() < currentTime) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Entry exists and is old, reset counter.");
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER,"Entry exists and is old, reset counter.");
 			}
 			value.setBadLoginCounter(0);
 		}
@@ -318,7 +321,6 @@ public class BruteForceLockerBean
 
 	@Override
 	public void everyMinute() {
-//		String clusterNode = DNSResolverFactory.getInstance().getDefaultHost();
 		String clusterNode = sessionManager.getComponentId().getDomain();
 		eventBus.fire(new StatisticsEmitEvent(clusterNode, this.statHolder));
 	}

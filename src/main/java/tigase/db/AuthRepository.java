@@ -342,6 +342,15 @@ public interface AuthRepository
 			}
 
 		}
+
+		@Override
+		public String toString() {
+			final StringBuffer sb = new StringBuffer("DefaultCredentials");
+			sb.append(", user=").append(user);
+			sb.append(", accountStatus=").append(accountStatus);
+			sb.append(", entries=").append(entries.size());
+			return sb.toString();
+		}
 	}
 
 	class SingleCredential
@@ -383,6 +392,14 @@ public interface AuthRepository
 		@Override
 		public boolean isAccountDisabled() {
 			return accountStatus == AccountStatus.disabled;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuffer sb = new StringBuffer("SingleCredential");
+			sb.append(", user=").append(user);
+			sb.append(", accountStatus=").append(accountStatus);
+			return sb.toString();
 		}
 	}
 

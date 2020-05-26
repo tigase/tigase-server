@@ -273,6 +273,10 @@ public class TigaseCustomAuth
 
 	@Override
 	public void addUser(BareJID user, final String password) throws TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Adding account: {0}", new Object[]{user});
+		}
+
 		if (adduser_query == null) {
 			return;
 		}
@@ -350,7 +354,11 @@ public class TigaseCustomAuth
 
 					if (rs.next()) {
 						int v = rs.getInt(1);
-						return AccountStatus.byValue(v);
+						final AccountStatus accountStatus = AccountStatus.byValue(v);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Got account: {0} status: {1}", new Object[]{user, accountStatus});
+						}
+						return accountStatus;
 					} else {
 						throw new UserNotFoundException("User does not exist: " + user);
 					}
@@ -358,6 +366,7 @@ public class TigaseCustomAuth
 					data_repo.release(null, rs);
 				}
 			}
+
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem with retrieving account status.", e);
 		}
@@ -400,6 +409,8 @@ public class TigaseCustomAuth
 						String value = rs.getString(2);
 						accountStatus = AccountStatus.byValue(rs.getInt(3));
 
+						// TODO: if we were to add status of particular credentials we would
+						// have include it here; currently we only use global status from tig_users;
 						entries.add(new DefaultCredentials.RawEntry(mechanism, value));
 					}
 
@@ -408,7 +419,11 @@ public class TigaseCustomAuth
 				}
 			}
 			if (accountStatus == null && entries.isEmpty()) {
-				throw new UserNotFoundException("No credentials found for the user");
+				throw new UserNotFoundException(
+						"No credentials found for the user: " + user + " (username: " + username + ")");
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Got account: {0} credentials: {1}", new Object[]{user, accountStatus});
 			}
 			return new DefaultCredentials(user, accountStatus, entries, getCredentialsDecoder());
 		} catch (SQLException e) {
@@ -467,6 +482,10 @@ public class TigaseCustomAuth
 					data_repo.release(null, rs);
 				}
 			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Account: {0} has usernames: {1}", new Object[]{user, result});
+			}
+
 			return result;
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem with retrieving usernames for account " + user, e);
@@ -834,6 +853,9 @@ public class TigaseCustomAuth
 
 	@Override
 	public void setAccountStatus(BareJID user, AccountStatus value) throws TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Setting account: {0} status to: {1}", new Object[]{user, value});
+		}
 		try {
 			PreparedStatement changeState = data_repo.getPreparedStatement(user, updateaccountstatus_query);
 			synchronized (changeState) {
@@ -913,6 +935,10 @@ public class TigaseCustomAuth
 			throws TigaseDBException {
 		List<String[]> entries = getCredentialsEncoder().encodeForAllMechanisms(user, password);
 		try {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Updating credentials for user: {0}, username: {1}",
+						new Object[]{user, username});
+			}
 			removeCredential(user, username);
 
 			PreparedStatement updateCredential_stmt = data_repo.getPreparedStatement(user,

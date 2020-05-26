@@ -161,9 +161,14 @@ public class PlainCallbackHandler
 
 			loggingInForbidden = !credentials.canLogin();
 
-			// AHRlc3QAdGVzdA==
-			pc.setVerified(!loggingInForbidden && entry != null && entry.verifyPlainPassword(password));
+			final boolean verified = !loggingInForbidden && entry != null && entry.verifyPlainPassword(password);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Verification result: {0}, loggingInForbidden: {1}, entry: {2}, credentials: {3}",
+						new Object[]{verified, loggingInForbidden, entry, credentials});
+			}
+			pc.setVerified(verified);
 		} catch (UserNotFoundException e) {
+			log.log(Level.FINE, "User not found: " + e);
 			pc.setVerified(false);
 		} catch (Exception e) {
 			throw new IOException("Password verification problem.", e);
