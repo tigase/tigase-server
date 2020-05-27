@@ -1537,7 +1537,7 @@ public class VHostItemImpl
 		}
 
 		public void refresh() {
-			if (defaults == null || item == null || !defaults.getExtensionClasses().containsAll(item.getExtensionClasses())) {
+			if (defaults == null || item == null) {
 				return;
 			}
 			
@@ -1563,9 +1563,7 @@ public class VHostItemImpl
 
 			extensions.clear();
 			for (Class<? extends VHostItemExtension> extClass : item.getExtensionClasses()) {
-				final VHostItemExtension defaultsExtension = defaults.getExtension(extClass);
-				final VHostItemExtension itemExtension = item.getExtension(extClass);
-				extensions.put(extClass, itemExtension.mergeWithDefaults(defaultsExtension));
+				extensions.put(extClass, item.getExtension(extClass).mergeWithDefaults(defaults.getExtension(extClass)));
 			}
 		}
 
