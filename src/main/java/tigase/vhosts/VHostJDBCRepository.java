@@ -67,16 +67,16 @@ public class VHostJDBCRepository
 	private int max_domains_per_user = 25;
 	private Map<String, Map<String, Object>> pendingItemsToSet = null;
 	private String[] pendingItemsToSetOld = null;
-	@ConfigField(desc = "Default VHost name", alias = "default-virtual-host")
-	private String defaultVHost;
+	@ConfigField(desc = "Main VHost name", alias = "default-virtual-host")
+	private String mainVHostName;
 	@ConfigField(desc = "DNS address under which whole installation is accessible (ie. name pointing to all cluster nodes or to the load balancer)", alias = "installation-dns-address")
 	private String installationDnsAddress = null;
 
 	@Inject
 	private VHostItemExtensionManager extensionManager;
 	@Inject
-	private VHostItemDefaults vhostDefaults;
-	private VHostItem defaults = null;
+	private VHostItemDefaults vhostDefaultValues;
+	private VHostItem defaultVHost = null;
 	
 	public VHostJDBCRepository() {
 		DNSResolverIfc resolver = DNSResolverFactory.getInstance();
@@ -110,9 +110,9 @@ public class VHostJDBCRepository
 		VHostItemImpl item = VHostRepoDefaults.getItemInstance();
 		item.setExtensionManager(extensionManager);
 		VHostItemImpl.VHostItemWrapper wrapper = new VHostItemImpl.VHostItemWrapper();
-		wrapper.setItem(item);
-		wrapper.setDefaults(defaults);
-		wrapper.setVHostDefaults(this.vhostDefaults);
+		wrapper.setItem(item, false);
+//		wrapper.setDefaultVHost(defaultVHost, false);  // we shouldn't set default in bare-boned instance
+		wrapper.setVHostDefaults(this.vhostDefaultValues);
 		return wrapper;
 	}
 
@@ -139,14 +139,16 @@ public class VHostJDBCRepository
 
 	@Override
 	public void reload() {
-		if (vhostDefaults == null) {
+		if (vhostDefaultValues == null) {
 			return;
 		}
 		super.reload();
 
-		VHostItem defaults = getItem(VHostItem.DEF_VHOST_KEY);
-		if (defaults == null) {
-			addItem(this.defaults);
+		VHostItem defaultVHost = getItem(VHostItem.DEF_VHOST_KEY);
+		if (defaultVHost == null) {
+			addItem(this.defaultVHost);
+		} else {
+			this.defaultVHost = defaultVHost;
 		}
 	}
 
@@ -157,10 +159,9 @@ public class VHostJDBCRepository
 		}
 		super.addItemNoStore(item);
 		if (VHostItem.DEF_VHOST_KEY.equals(item.getKey())) {
-			this.defaults = defaults;
 			for (VHostItem it : allItems()) {
 				if (it instanceof VHostItemImpl.VHostItemWrapper && it != item) {
-					((VHostItemImpl.VHostItemWrapper) it).setDefaults(item);
+					((VHostItemImpl.VHostItemWrapper) it).setDefaultVHost(item, true);
 				}
 			}
 		}
@@ -195,11 +196,11 @@ public class VHostJDBCRepository
 			return "S2S Secret is required";
 		}
 
-		if (vhostDefaults.isTlsRequired() && !item.isTlsRequired()) {
+		if (vhostDefaultValues.isTlsRequired() && !item.isTlsRequired()) {
 			return "This installation forces VHost to require TLS. If you need to use unencrypted connections set 'vhost-tls-required' property to 'false' in the installation configuration file.";
 		}
 
-		if (!vhostDefaults.isCheckDns()) {
+		if (!vhostDefaultValues.isCheckDns()) {
 			return null;
 		}
 
@@ -304,18 +305,18 @@ public class VHostJDBCRepository
 		// this is needed as it is required by interface
 	}
 
-	public String getDefaultVHost() {
-		return defaultVHost;
+	public String getMainVHostName() {
+		return mainVHostName;
 	}
 
-	public void setDefaultVHost(String vhost) {
-		this.defaultVHost = vhost;
+	public void setMainVHostName(String vhost) {
+		this.mainVHostName = vhost;
 		reloadIfReady();
 	}
 
 	@Override
 	public VHostItem getDefaultVHostItem() {
-		return getItem(getDefaultVHost());
+		return getItem(getMainVHostName());
 	}
 
 	public void setExtensionManager(VHostItemExtensionManager extensionManager) {
@@ -325,7 +326,7 @@ public class VHostJDBCRepository
 
 	@Override
 	public void setItemsOld(String[] items_arr) {
-		if (vhostDefaults == null) {
+		if (vhostDefaultValues == null) {
 			this.pendingItemsToSetOld = items_arr;
 		} else {
 			super.setItemsOld(items_arr);
@@ -333,27 +334,27 @@ public class VHostJDBCRepository
 		}
 	}
 
-	public void setVhostDefaults(VHostItemDefaults vhostDefaults) {
-		this.vhostDefaults = vhostDefaults;
+	public void setVhostDefaultValues(VHostItemDefaults vhostDefaultValues) {
+		this.vhostDefaultValues = vhostDefaultValues;
 		if (pendingItemsToSetOld != null) {
 			setItemsOld(pendingItemsToSetOld);
 			pendingItemsToSetOld = null;
 		}
-		setDefaultVHost(defaultVHost);
+		setMainVHostName(mainVHostName);
 	}
 
 	private void reloadIfReady() {
-		if (vhostDefaults != null && extensionManager != null) {
-			if (this.defaultVHost != null && defaults == null) {
-				defaults = new VHostItemImpl(JID.jidInstanceNS(VHostItem.DEF_VHOST_KEY));
-				((VHostItemImpl) defaults).initializeFromDefaults(vhostDefaults);
-				((VHostItemImpl) defaults).setExtensionManager(extensionManager);
+		if (vhostDefaultValues != null && extensionManager != null) {
+			if (this.mainVHostName != null && defaultVHost == null) {
+				defaultVHost = new VHostItemImpl(JID.jidInstanceNS(VHostItem.DEF_VHOST_KEY));
+				((VHostItemImpl) defaultVHost).initializeFromDefaults(vhostDefaultValues);
+				((VHostItemImpl) defaultVHost).setExtensionManager(extensionManager);
 			}
 
 			reload();
-			if (!contains(defaultVHost)) {
+			if (!contains(mainVHostName)) {
 				VHostItem item = getItemInstance();
-				item.setKey(defaultVHost);
+				item.setKey(mainVHostName);
 				if (item instanceof VHostItemImpl.VHostItemWrapper) {
 					((VHostItemImpl.VHostItemWrapper) item).readOnly();
 				}

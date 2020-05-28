@@ -608,7 +608,8 @@ public class VHostItemImpl
 	}
 
 	protected VHostItemExtension initExtension(VHostItemExtension extension) {
-		Element extElem = unknownExtensions.remove(extension.getId());
+		final String id = extension.getId();
+		Element extElem = unknownExtensions.remove(id);
 		if (extElem != null) {
 			try {
 				extension.initFromElement(extElem);
@@ -1496,8 +1497,9 @@ public class VHostItemImpl
 
 	protected static class VHostItemWrapper implements VHostItem {
 
+		private VHostItem defaultVHost;
 		private VHostItem item;
-		private VHostItem defaults;
+		private VHostItemDefaults vhostDefaults;
 
 		private boolean anonymousEnabled = false;
 		private int[] c2sPortsAllowed = null;
@@ -1517,53 +1519,67 @@ public class VHostItemImpl
 		private Map<Class<? extends VHostItemExtension>, VHostItemExtension> extensions = new ConcurrentHashMap<>();
 
 		private boolean editable = true;
-		private VHostItemDefaults vhostDefaults;
 
 		public VHostItemWrapper() {
 		}
 
-		public void setItem(VHostItem item) {
-			this.item = item;
-			refresh();
+		public void setItem(VHostItem item, boolean refresh) {
+			this.item = unwrap(item);
+			if (refresh) {
+				refresh();
+			}
 		}
 
-		public void setDefaults(VHostItem defaults) {
-			this.defaults = defaults;
-			refresh();
+		public void setDefaultVHost(VHostItem item, boolean refresh) {
+			this.defaultVHost = unwrap(item);
+			if (refresh) {
+				refresh();
+			}
 		}
 
 		public void setVHostDefaults(VHostItemDefaults vHostDefaults) {
 			this.vhostDefaults = vHostDefaults;
 		}
 
+		private static VHostItem unwrap(VHostItem item) {
+			return (item instanceof VHostItemWrapper) ? ((VHostItemWrapper)item).item : item;
+		}
+
 		public void refresh() {
-			if (defaults == null || item == null) {
+			if (defaultVHost == null || item == null) {
 				return;
 			}
-			
-			comps = Stream.concat(Arrays.stream(item.getComps()), Arrays.stream(defaults.getComps())).toArray(String[]::new);
-			c2sPortsAllowed = Optional.ofNullable(item.getC2SPortsAllowed()).orElseGet(defaults::getC2SPortsAllowed);
-			domainFilter = Optional.ofNullable(item.getDomainFilter()).orElseGet(defaults::getDomainFilter);
+
+			if (item.getKey() != null && item.getKey().equals(VHostItem.DEF_VHOST_KEY)) {
+				item = defaultVHost;
+				return;
+			}
+
+			comps = Stream.concat(Arrays.stream(item.getComps()), Arrays.stream(defaultVHost.getComps())).toArray(String[]::new);
+			c2sPortsAllowed = Optional.ofNullable(item.getC2SPortsAllowed()).orElseGet(defaultVHost::getC2SPortsAllowed);
+			domainFilter = Optional.ofNullable(item.getDomainFilter()).orElseGet(defaultVHost::getDomainFilter);
 			if (domainFilter.isDomainListRequired()) {
-				domainFilterDomains = Optional.ofNullable(item.getDomainFilterDomains()).orElseGet(defaults::getDomainFilterDomains);
+				domainFilterDomains = Optional.ofNullable(item.getDomainFilterDomains()).orElseGet(defaultVHost::getDomainFilterDomains);
 			} else {
 				domainFilterDomains = null;
 			}
-			maxUsersNumber = Optional.ofNullable(Optional.ofNullable(item.getMaxUsersNumber()).orElseGet(defaults::getMaxUsersNumber)).orElse(VHOST_MAX_USERS_PROP_DEF);
-			messageForward = Optional.ofNullable(item.getMessageForward()).orElseGet(defaults::getMessageForward);
-			otherDomainParams = Optional.ofNullable(item.getOtherDomainParams()).orElseGet(defaults::getOtherDomainParams);
-			presenceForward = Optional.ofNullable(item.getPresenceForward()).orElseGet(defaults::getPresenceForward);
-			registerEnabled = defaults.isRegisterEnabled() && item.isRegisterEnabled();
+			maxUsersNumber = Optional.ofNullable(Optional.ofNullable(item.getMaxUsersNumber()).orElseGet(defaultVHost::getMaxUsersNumber)).orElse(VHOST_MAX_USERS_PROP_DEF);
+			messageForward = Optional.ofNullable(item.getMessageForward()).orElseGet(defaultVHost::getMessageForward);
+			otherDomainParams = Optional.ofNullable(item.getOtherDomainParams()).orElseGet(defaultVHost::getOtherDomainParams);
+			presenceForward = Optional.ofNullable(item.getPresenceForward()).orElseGet(defaultVHost::getPresenceForward);
+			registerEnabled = defaultVHost.isRegisterEnabled() && item.isRegisterEnabled();
 			s2sSecret = item.getS2sSecret();
-			trustedJids = Collections.unmodifiableSet(Stream.concat(item.getTrustedJIDs().stream(), defaults.getTrustedJIDs().stream()).collect(
+			trustedJids = Collections.unmodifiableSet(Stream.concat(item.getTrustedJIDs().stream(), defaultVHost.getTrustedJIDs().stream()).collect(
 					Collectors.toSet()));
-			saslAllowedMechanisms = Optional.ofNullable(item.getSaslAllowedMechanisms()).orElseGet(defaults::getSaslAllowedMechanisms);
-			tlsRequired = defaults.isTlsRequired() || item.isTlsRequired();
-			anonymousEnabled = defaults.isAnonymousEnabled() && item.isAnonymousEnabled();
+			saslAllowedMechanisms = Optional.ofNullable(item.getSaslAllowedMechanisms()).orElseGet(defaultVHost::getSaslAllowedMechanisms);
+			tlsRequired = defaultVHost.isTlsRequired() || item.isTlsRequired();
+			anonymousEnabled = defaultVHost.isAnonymousEnabled() && item.isAnonymousEnabled();
 
 			extensions.clear();
 			for (Class<? extends VHostItemExtension> extClass : item.getExtensionClasses()) {
-				extensions.put(extClass, item.getExtension(extClass).mergeWithDefaults(defaults.getExtension(extClass)));
+				final VHostItemExtension defaultsExtension = defaultVHost.getExtension(extClass);
+				final VHostItemExtension itemExtension = item.getExtension(extClass);
+				extensions.put(extClass, itemExtension.mergeWithDefaults(defaultsExtension));
 			}
 		}
 
@@ -1597,7 +1613,7 @@ public class VHostItemImpl
 			return (T) extensions.computeIfAbsent(clazz, cls -> {
 				T ext = (T) item.getExtension(cls);
 				if (ext != null) {
-					ext.mergeWithDefaults(defaults.getExtension(cls));
+					ext.mergeWithDefaults(defaultVHost.getExtension(cls));
 				}
 				return ext;
 			});
