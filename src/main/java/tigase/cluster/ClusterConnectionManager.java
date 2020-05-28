@@ -529,24 +529,26 @@ public class ClusterConnectionManager
 				connectionsPool.put(addr, conns);
 			}
 
-			int size = conns.size();
+			synchronized (conns) {
+				int size = conns.size();
 
-			conns.removeConn(service);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / type={5}",
-						new Object[]{result, size, connectionsPool, service, conns, service.connectionType()});
-			}
-
-			if (size != 0 && conns.size() == 0) {
-				if (routings != null) {
-					updateRoutings(routings, false);
+				conns.removeConn(service);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / connsSize: {5}, / type={6}",
+							new Object[]{result, size, connectionsPool, service, conns, conns.size(), service.connectionType()});
 				}
 
-				// removeRouting(serv.getRemoteHost());
-				log.log(Level.INFO, "Disonnected from: {0}", addr);
-				updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
-				clusterController.nodeDisconnected(addr);
+				if (size != 0 && conns.size() == 0) {
+					if (routings != null) {
+						updateRoutings(routings, false);
+					}
+
+					// removeRouting(serv.getRemoteHost());
+					log.log(Level.INFO, "Disconnected from: {0}", addr);
+					updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
+					clusterController.nodeDisconnected(addr);
+				}
 			}
 
 			ConnectionType type = service.connectionType();
@@ -756,22 +758,24 @@ public class ClusterConnectionManager
 			connectionsPool.put(addr, conns);
 		}
 
-		int size = conns.size();
+		synchronized (conns) {
+			int size = conns.size();
 
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "New service connected: size = {0} / connectionsPool={1} / serv={2} / conns={3}",
-					new Object[]{size, connectionsPool, serv, conns});
-		}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "New service connected: size = {0} / connectionsPool={1} / serv={2} / conns={3}, connsSize={4}",
+						new Object[]{size, connectionsPool, serv, conns, conns.size()});
+			}
 
-		// setting userJid to hostname of remote cluster node
-		serv.setUserJid((String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY));
+			// setting userJid to hostname of remote cluster node
+			serv.setUserJid((String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY));
 
-		conns.addConn(serv);
-		if (size == 0 && conns.size() > 0) {
-			updateRoutings(routings, true);
-			log.log(Level.INFO, "Connected to: {0}", addr);
-			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
-			clusterController.nodeConnected(addr);
+			conns.addConn(serv);
+			if (size == 0 && conns.size() > 0) {
+				updateRoutings(routings, true);
+				log.log(Level.INFO, "Connected to: {0}", addr);
+				updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
+				clusterController.nodeConnected(addr);
+			}
 		}
 
 		try {

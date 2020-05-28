@@ -34,12 +34,12 @@ public class ClusterConnection {
 		this.addr = addr;
 	}
 
-	public void addConn(XMPPIOService<Object> conn) {
-		conns.add(conn);
+	public boolean addConn(XMPPIOService<Object> conn) {
+		return conns.add(conn);
 	}
 
-	public void removeConn(XMPPIOService<Object> conn) {
-		conns.remove(conn);
+	public boolean removeConn(XMPPIOService<Object> conn) {
+		return conns.remove(conn);
 	}
 
 	public int size() {
