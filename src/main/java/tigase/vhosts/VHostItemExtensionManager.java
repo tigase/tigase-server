@@ -43,19 +43,6 @@ public class VHostItemExtensionManager {
 		Arrays.stream(this.providers).forEach(provider -> providersByClass.put(provider.getExtensionClazz(), provider));
 	}
 	
-//	public <T extends VHostItemExtension> Optional<T> getExtensionFor(Element item) {
-//		return ((Optional<T>) Arrays.stream(providers).filter(provider -> provider.getId().equals(item.getName())).findFirst().map(this::newExtensionInstance)).map(extension -> {
-//			try {
-//				extension.initFromElement(item);
-//				return extension;
-//			} catch (Throwable ex) {
-//				log.log(Level.WARNING, "Could not initialize extension " + extension.getClass() + " with data " + item.toString(), ex);
-//				return null;
-//			}
-//		});
-//	}
-
-
 	public <T extends VHostItemExtension> T newExtensionInstanceForClass(Class<T> extensionClass) {
 		return Optional.ofNullable((VHostItemExtensionProvider<T>) providersByClass.get(extensionClass))
 				.map(this::newExtensionInstance)
