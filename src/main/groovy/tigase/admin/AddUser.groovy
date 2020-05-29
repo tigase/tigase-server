@@ -36,6 +36,11 @@ import tigase.server.Packet
 import tigase.vhosts.VHostManagerIfc
 import tigase.xmpp.jid.BareJID
 
+import java.util.logging.Level
+import java.util.logging.Logger
+
+def log = Logger.getLogger("tigase.admin");
+
 def JID = "accountjid"
 def PASSWORD = "password"
 def PASSWORD_VERIFY = "password-verify"
@@ -53,6 +58,11 @@ def userJid = Command.getFieldValue(packet, JID)
 def userPass = Command.getFieldValue(packet, PASSWORD)
 def userPassVer = Command.getFieldValue(packet, PASSWORD_VERIFY)
 def userEmail = Command.getFieldValue(packet, EMAIL)
+
+
+if (log.isLoggable(Level.FINEST)) {
+	log.log(Level.FINEST, "Executing command add-user: ${userJid}. Request: ${p}, command: ${this}")
+}
 
 if (userJid == null || userPass == null || userPassVer == null || userEmail == null) {
 	def result = p.commandResult(Command.DataType.form);
@@ -81,14 +91,17 @@ try {
 		auth_repo.addUser(bareJID, userPass)
 		user_repo.setData(bareJID, "email", userEmail);
 		Command.addTextField(result, "Note", "Operation successful");
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "User ${userJid} added correctly. Request packet: ${p}, command: ${this}")
+		}
 	} else {
 		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");
 	}
 } catch (UserExistsException ex) {
-	ex.printStackTrace();
+	log.log(Level.WARNING, "Error while adding user ${userJid}: User already exists, can't be added. Request packet: ${p}, command: ${this}", ex)
 	Command.addTextField(result, "Note", "User already exists, can't be added.");
 } catch (TigaseDBException ex) {
-	ex.printStackTrace();
+	log.log(Level.WARNING, "Error while adding user ${userJid}: Problem accessing database, user not added. Request packet: ${p}, command: ${this}", ex)
 	Command.addTextField(result, "Note", "Problem accessing database, user not added.");
 }
 
