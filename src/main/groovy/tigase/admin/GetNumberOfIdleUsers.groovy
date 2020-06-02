@@ -72,7 +72,7 @@ if (domainJid == null) {
 }
 def result = p.commandResult(Command.DataType.result)
 try {
-	bareJID = BareJID.bareJIDInstance(domainJid)
+	def bareJID = BareJID.bareJIDInstance(domainJid)
 	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		def users_list = [ ];
 		users_sessions.entrySet().each {

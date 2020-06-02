@@ -71,7 +71,7 @@ if (userJid == null || userPass == null /*|| userPassVer == null*/) {
 
 def result = p.commandResult(Command.DataType.result)
 try {
-	bareJID = BareJID.bareJIDInstance(userJid)
+	def bareJID = BareJID.bareJIDInstance(userJid)
 	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		if (user_repo.userExists(bareJID)) {
 			auth_repo.updatePassword(bareJID, userPass)

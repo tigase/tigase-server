@@ -86,7 +86,7 @@ if (userJid == null || userPass == null || userPassVer == null || userEmail == n
 
 def result = p.commandResult(Command.DataType.result)
 try {
-	bareJID = BareJID.bareJIDInstance(userJid)
+	def bareJID = BareJID.bareJIDInstance(userJid)
 	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		auth_repo.addUser(bareJID, userPass)
 		user_repo.setData(bareJID, "email", userEmail);

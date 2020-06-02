@@ -84,7 +84,7 @@ def result = p.commandResult(Command.DataType.result)
 try {
 	def maxItems = maxItemsStr ? (maxItemsStr == "None" ? null : Integer.parseInt(maxItemsStr)) : 25;
 
-	bareJID = BareJID.bareJIDInstance(domainJid)
+	def bareJID = BareJID.bareJIDInstance(domainJid)
 	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		def users_list = [ ];
 		def domain_user_repo = (user_repo instanceof tigase.db.UserRepositoryMDImpl) ? user_repo.getRepo(

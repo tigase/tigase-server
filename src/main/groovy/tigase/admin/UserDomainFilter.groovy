@@ -54,7 +54,7 @@ if (jid == null || domain == null || (domain == DomainFilterPolicy.LIST.name() &
 	return res
 }
 
-bareJID = tigase.xmpp.jid.JID.jidInstanceNS(jid.toLowerCase()).getBareJID();
+def bareJID = tigase.xmpp.jid.JID.jidInstanceNS(jid.toLowerCase()).getBareJID();
 
 jid = bareJID.toString();
 

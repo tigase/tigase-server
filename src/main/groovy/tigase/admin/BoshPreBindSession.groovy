@@ -65,7 +65,7 @@ try {
 		return res
 	}
 
-	bareJID = BareJID.bareJIDInstance(userJid)
+	def bareJID = BareJID.bareJIDInstance(userJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 
 	def result = (Iq) p.commandResult(Command.DataType.result)

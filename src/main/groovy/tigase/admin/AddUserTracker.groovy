@@ -88,7 +88,7 @@ if (hand != null) {
 def result = p.commandResult(Command.DataType.result)
 
 def users_sessions = (Map) userSessions
-bareJID = BareJID.bareJIDInstance(userJid)
+def bareJID = BareJID.bareJIDInstance(userJid)
 
 XMPPSession session = users_sessions.get(bareJID)
 

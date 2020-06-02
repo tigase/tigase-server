@@ -79,7 +79,7 @@ if (domainJid == null || maxItemsStr == null) {
 def result = p.commandResult(Command.DataType.result)
 try {
 	def maxItems = maxItemsStr ? (maxItemsStr == "None" ? null : Integer.parseInt(maxItemsStr)) : 25;
-	bareJID = BareJID.bareJIDInstance(domainJid)
+	def bareJID = BareJID.bareJIDInstance(domainJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isAllowedForDomain.apply(bareJID.getDomain())) {
 		def users_list = [ ];
