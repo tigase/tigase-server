@@ -88,9 +88,10 @@ public class Script
 		if (this.ext == null && scriptEngine != null) {
 			this.ext = scriptEngine.getFactory().getExtensions().get(0);
 		}
+		String THREADING = scriptEngine != null ? String.valueOf(scriptEngine.getFactory().getParameter("THREADING")) : null;
 
-		log.log(Level.FINE, "Initialized script command, id: {0}, lang: {1}, ext: {2}",
-				new Object[]{id, this.language, this.ext});
+		log.log(Level.FINE, "Initialized script command, id: {0}, lang: {1}, ext: {2}, threading: {3}",
+				new Object[]{id, this.language, this.ext, THREADING});
 
 	}
 
@@ -110,7 +111,7 @@ public class Script
 			Object res = "";
 
 			binds.put("result", res);
-			context = scriptEngine.getContext();
+			context = new SimpleScriptContext(); //scriptEngine.getContext(); returns global context!
 			context.setBindings(binds, ScriptContext.ENGINE_SCOPE);
 			writer = new StringWriter();
 			context.setErrorWriter(writer);
@@ -164,6 +165,7 @@ public class Script
 			long end = System.currentTimeMillis();
 			statisticExecutedIn(end - start);
 		} catch (Exception e) {
+			log.log(Level.SEVERE, "Script execution error: " + e, e);
 			Packet result = packet.commandResult(Command.DataType.result);
 
 			Command.addTextField(result, "Note", "Script execution error.");
@@ -193,6 +195,24 @@ public class Script
 			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 			results.offer(result);
 		}
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("Script{");
+		sb.append("'")
+				.append(getGroup())
+				.append(':')
+				.append(getCommandId())
+				.append(':')
+				.append(language)
+				.append(':')
+				.append(getDescription())
+				.append('\'');
+		sb.append(", adminOnly=").append(isAdminOnly());
+		sb.append(", stats='").append(getName()).append(':').append(getValue());
+		sb.append('}');
+		return sb.toString();
 	}
 }
 

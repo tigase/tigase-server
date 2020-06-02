@@ -110,7 +110,7 @@ public class BasicComponent
 	@ConfigField(desc = "Component name")
 	private String name = null;
 	private boolean nonAdminCommands = false;
-	private ScriptEngineManager scriptEngineManager = null;
+	protected ScriptEngineManager scriptEngineManager = null;
 	@ConfigField(desc = "Base directory for scripts", alias = SCRIPTS_DIR_PROP_KEY)
 	private String scriptsBaseDir = SCRIPTS_DIR_PROP_DEF;
 	private String scriptsCompDir = null;
@@ -625,7 +625,7 @@ public class BasicComponent
 				DataForm.addFieldMultiValue(form, field, addresses);
 			}
 		}
-		
+
 		if (!discoExtensions.isEmpty()) {
 			if (form == null) {
 				form = DataForm.createDataForm(Command.DataType.result);
@@ -636,7 +636,7 @@ public class BasicComponent
 				if (DISCO_EXTENSION_ADDRESSES.contains(item.getKey())) {
 					continue;
 				}
-				
+
 				DataForm.addFieldMultiValue(form, item.getKey(), item.getValue());
 			}
 			return form;
@@ -1266,7 +1266,7 @@ public class BasicComponent
 					.stream()).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
 			return values.isEmpty() ? Collections.EMPTY_LIST : values;
 		}
-		
+
 		private static List<String> childrenToList(Element el, String name) {
 			return Optional.ofNullable(el.mapChildren(child -> child.getName() == name, Element::getCData))
 					.orElse(Collections.EMPTY_LIST);
