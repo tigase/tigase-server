@@ -12,7 +12,7 @@ Config file for startup script simply sets number of environment variables with 
 - `TIGASE_CONSOLE_LOG` - file to which all console messages will be redirected if server is run in background. By default it will be: `TIGASE_HOME/logs/tigase-console.log`. *_If this file/directory is not writable by Tigase process all console messages will be redirected to /dev/null_*
 - `TIGASE_PID` location of the file with server PID number. By default it will be `TIGASE_HOME/logs/tigase.pid`.
 - `JAVA_OPTIONS` - options for JVM like size of RAM allocated for the JVM, properties and so on.
-- `TIGASE_OPTIONS` - additional options for Tigase server program. You can tweak initial parameters for your environment here.
+- `TIGASE_OPTIONS` - (optional) additional options for Tigase server program. You can tweak initial parameters for your environment here. If you want to specify custom location of your configuration file you should use `--config-file <path/to/config.tdsl>` configuration
 
 Sample file to run *Tigase* with *PostgreSQL* database may look like:
 
@@ -23,7 +23,7 @@ DRV="-Djdbc.drivers=org.postgresql.Driver"
 JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
 CLASSPATH=""
 TIGASE_CONFIG="tigase-pgsql.xml"
-TIGASE_OPTIONS=" --property-file etc/config.tdsl "
+TIGASE_OPTIONS=" "
 -----
 
 Please note encoding settings. JVM by default uses encoding set in operating system environment. XMPP protocol, however uses `UTF-8` for all data processing. So the ENC settings enforces `UTF-8` encoding for all operations.
