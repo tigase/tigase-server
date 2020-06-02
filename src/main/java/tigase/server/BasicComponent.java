@@ -107,7 +107,7 @@ public class BasicComponent
 	@ConfigField(desc = "Component name")
 	private String name = null;
 	private boolean nonAdminCommands = false;
-	private ScriptEngineManager scriptEngineManager = null;
+	protected ScriptEngineManager scriptEngineManager = null;
 	@ConfigField(desc = "Base directory for scripts", alias = SCRIPTS_DIR_PROP_KEY)
 	private String scriptsBaseDir = SCRIPTS_DIR_PROP_DEF;
 	private String scriptsCompDir = null;
@@ -187,7 +187,7 @@ public class BasicComponent
 	public boolean checkCommandAcl(JID jid, Set<CmdAcl> acl) {
 		return checkCommandAcl(jid, null, acl);
 	}
-	
+
 	/**
 	 * Check if entity with JID is allowed ot execute command with passed access control list.
 	 *
@@ -256,7 +256,7 @@ public class BasicComponent
 					}
 
 					break;
-					
+
 				case JID:
 				default:
 					if (cmdAcl.isJIDAllowed(jid.getBareJID())) {
@@ -505,7 +505,7 @@ public class BasicComponent
 
 	/**
 	 * Method returns category of a component used for service discovery responses.
-	 * 
+	 *
 	 * @return category of a component
 	 */
 	public String getDiscoCategory() {
@@ -808,7 +808,7 @@ public class BasicComponent
 
 					// Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
-					
+
 					Function<String,Boolean> isAllowedForDomain = (domain) -> canCallCommand(iqc.getStanzaFrom(), domain, strCommand);
 					binds.put("isAllowedForDomain", isAllowedForDomain);
 
