@@ -1523,18 +1523,13 @@ public class VHostItemImpl
 		public VHostItemWrapper() {
 		}
 
-		public void setItem(VHostItem item, boolean refresh) {
-			this.item = unwrap(item);
-			if (refresh) {
-				refresh();
-			}
+		public void setItem(VHostItem item) {
+			this.item = item;
 		}
 
-		public void setDefaultVHost(VHostItem item, boolean refresh) {
+		public void setDefaultVHost(VHostItem item) {
 			this.defaultVHost = unwrap(item);
-			if (refresh) {
-				refresh();
-			}
+			refresh();
 		}
 
 		public void setVHostDefaults(VHostItemDefaults vHostDefaults) {
