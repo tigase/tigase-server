@@ -760,11 +760,26 @@ public class BruteForceLockerBean
 		@Override
 		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
 			enabled = Command.getCheckBoxFieldValue(packet, prefix + "-enabled");
-			lockAccountAfterFailedAttempt = Long.parseLong(Command.getFieldValue(packet, prefix + "-lock-after-fails"));
-			disableAccountAfterFailedAttempts = Long.parseLong(Command.getFieldValue(packet, prefix + "-disable-after-fails"));
-			periodTime = Long.parseLong(Command.getFieldValue(packet, prefix + "-period-time"));
-			lockTime = Long.parseLong(Command.getFieldValue(packet, prefix + "-lock-time"));
-			mode = Mode.valueOf(Command.getFieldValue(packet, prefix + "-mode"));
+			String value = Command.getFieldValue(packet, prefix + "-lock-after-fails");
+			if (value != null) {
+				lockAccountAfterFailedAttempt = Long.parseLong(value);
+			}
+			value = Command.getFieldValue(packet, prefix + "-disable-after-fails");
+			if (value != null) {
+				disableAccountAfterFailedAttempts = Long.parseLong(value);
+			}
+			value = Command.getFieldValue(packet, prefix + "-period-time");
+			if (value != null) {
+				periodTime = Long.parseLong(value);
+			}
+			value = Command.getFieldValue(packet, prefix + "-lock-time");
+			if (value != null) {
+				lockTime = Long.parseLong(value);
+			}
+			value = Command.getFieldValue(packet, prefix + "-mode");
+			if (value != null) {
+				mode = Mode.valueOf(value);
+			}
 		}
 
 		@Override

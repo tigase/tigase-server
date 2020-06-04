@@ -20,10 +20,12 @@ package tigase.server.script;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.util.log.LogFormatter;
 
 import javax.script.*;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -170,29 +172,12 @@ public class Script
 
 			Command.addTextField(result, "Note", "Script execution error.");
 
-			StackTraceElement[] ste = e.getStackTrace();
-			String[] error = new String[ste.length + 2 + ((writer != null) ? writer.toString().split("\n").length : 0)];
-
-			error[0] = e.getMessage();
-			error[1] = e.toString();
-
-			for (int i = 0; i < ste.length; i++) {
-				error[i + 2] = ste[i].toString();
-			}
-
-			if (writer != null) {
-				String[] errorMsgs = writer.toString().split("\n");
-
-				for (int i = 0; i < errorMsgs.length; i++) {
-					error[i + 2 + ste.length] = errorMsgs[i];
-				}
-			}
-
 			if (e.getMessage() != null) {
 				Command.addTextField(result, "Error message", e.getMessage());
 			}
 
-			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
+			final String stackTrace = LogFormatter.fillThrowable(e);
+			Command.addFieldMultiValue(result, "Debug info", Collections.singletonList(stackTrace));
 			results.offer(result);
 		}
 	}

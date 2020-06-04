@@ -467,6 +467,8 @@ public class SSLContextContainer
 				} else if ("false".equals(legacyOption)) {
 					m = HARDENED_MODE.relaxed;
 				}
+			} catch (Exception e) {
+				m = HARDENED_MODE.global;
 			}
 			return m;
 		}
@@ -483,7 +485,8 @@ public class SSLContextContainer
 
 		@Override
 		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
-			mode = parseHardenedModeFromString(Command.getFieldValue(packet, prefix));
+			final String fieldValue = Command.getFieldValue(packet, prefix);
+			mode = fieldValue != null ? parseHardenedModeFromString(fieldValue) : HARDENED_MODE.global;
 		}
 
 		public HARDENED_MODE getMode() {
