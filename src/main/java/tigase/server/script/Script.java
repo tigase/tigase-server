@@ -167,7 +167,7 @@ public class Script
 			long end = System.currentTimeMillis();
 			statisticExecutedIn(end - start);
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Script execution error: " + e, e);
+			log.log(Level.WARNING, "Script execution error: " + e, e);
 			Packet result = packet.commandResult(Command.DataType.result);
 
 			Command.addTextField(result, "Note", "Script execution error.");
