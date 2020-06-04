@@ -277,6 +277,11 @@ public class VHostItemImpl
 
 	@Override
 	public void addCommandFields(Packet packet) {
+		if (!isDefault()) {
+			Command.addInstructions(packet, "❗NOTE: Options without value set will use configuration defined in 'DEFAULT' VHost❗");
+		} else {
+			Command.addInstructions(packet, "❗This VHost is intended to configure certain default values for all VHosts in the system and it's not actual, available domain to which you can connect❗");
+		}
 		Command.addFieldValue(packet, HOSTNAME_LABEL, (vhost != null) ? vhost.getDomain() : "");
 		if (!isDefault()) {
 			Command.addCheckBoxField(packet, ENABLED_LABEL, enabled);
