@@ -325,7 +325,6 @@ public class JDBCMsgRepository
 
 		ReentrantReadWriteLock.WriteLock lock = null;
 		try {
-			log.log(Level.WARNING, "for " + session.getBareJID() + " loading messages");
 			to = session.getBareJID();
 			lock = getLock(to).writeLock();
 			lock.lock();
@@ -339,9 +338,6 @@ public class JDBCMsgRepository
 					rs = select_to_jid_st.executeQuery();
 
 					result = parseLoadedMessages(proc, rs);
-					for (Element el : result) {
-						log.log(Level.WARNING, "for " + session.getBareJID() + " loaded message:" + el.toString());
-					}
 				} finally {
 					data_repo.release(null, rs);
 				}
@@ -351,7 +347,6 @@ public class JDBCMsgRepository
 				rs = null;
 				try {
 					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement(to, MSGS_DELETE_MESSAGES);
-					log.log(Level.WARNING, "for " + session.getBareJID() + " deleting offline messages");
 
 					synchronized (delete_to_jid_st) {
 						delete_to_jid_st.setString(1, to.toString());
@@ -387,7 +382,6 @@ public class JDBCMsgRepository
 		ReentrantReadWriteLock.ReadLock lock = getLock(to == null ? null : to.getBareJID()).readLock();
 		lock.lock();
 		try {
-			log.log(Level.WARNING, "for " + to.getBareJID() + " storing message:" + msg.toString());
 			long msgs_store_limit = getMsgsStoreLimit(to.getBareJID(), userRepo);
 
 			PreparedStatement insert_msg_st = data_repo.getPreparedStatement(to.getBareJID(), MSGS_ADD_MESSAGE);
