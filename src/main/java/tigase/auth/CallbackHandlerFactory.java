@@ -20,10 +20,7 @@ package tigase.auth;
 import tigase.auth.callbacks.CallbackHandlerFactoryIfc;
 import tigase.auth.impl.PlainCallbackHandler;
 import tigase.auth.impl.ScramCallbackHandler;
-import tigase.auth.mechanisms.SaslSCRAM;
-import tigase.auth.mechanisms.SaslSCRAMPlus;
-import tigase.auth.mechanisms.SaslSCRAMSha256;
-import tigase.auth.mechanisms.SaslSCRAMSha256Plus;
+import tigase.auth.mechanisms.*;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.xmpp.XMPPResourceConnection;
@@ -94,6 +91,8 @@ public class CallbackHandlerFactory
 				case SaslSCRAMPlus.NAME:
 				case SaslSCRAMSha256.NAME:
 				case SaslSCRAMSha256Plus.NAME:
+				case SaslSCRAMSha512.NAME:
+				case SaslSCRAMSha512Plus.NAME:
 					return ScramCallbackHandler.class.getName();
 				default:
 					return null;
