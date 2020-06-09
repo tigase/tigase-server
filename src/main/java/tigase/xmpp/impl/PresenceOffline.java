@@ -415,6 +415,8 @@ public class PresenceOffline
 	public class StartStopEvent
 			implements Serializable {
 
+		public StartStopEvent() {}
+
 		private String action;
 		private BareJID[] jids;
 
