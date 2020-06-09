@@ -20,6 +20,7 @@ package tigase.server.xmppserver;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import tigase.TestLogger;
 import tigase.cert.CertCheckResult;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.conf.LoggingBean;
@@ -107,7 +108,7 @@ class S2SConnManAbstractTest
 		getSslDebugString().ifPresent(debug -> System.setProperty("javax.net.debug", debug));
 
 		log = Logger.getLogger("tigase");
-		configureLogger(log, Level.CONFIG);
+		TestLogger.configureLogger(log, Level.CONFIG);
 
 		final DSLBeanConfiguratorWithBackwardCompatibility config = prepareKernel();
 
@@ -122,7 +123,7 @@ class S2SConnManAbstractTest
 			log.log(Level.WARNING, ex, () -> "There was an error setting up test");
 		}
 
-		configureLogger(log, Level.ALL);
+		TestLogger.configureLogger(log, Level.ALL);
 	}
 
 	protected static void setupCID(String localHostname, String remoteHostname) {

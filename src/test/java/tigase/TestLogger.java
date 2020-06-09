@@ -17,9 +17,30 @@
  */
 package tigase;
 
+import tigase.util.log.LogFormatter;
+
+import java.util.Arrays;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TestLogger {
+
+	public static void configureLogger(Logger log, Level level) {
+		log.setUseParentHandlers(false);
+		log.setLevel(level);
+		final Handler[] handlers = log.getHandlers();
+		if (Arrays.stream(handlers).noneMatch(ConsoleHandler.class::isInstance)) {
+			ConsoleHandler ch = new ConsoleHandler();
+			ch.setLevel(level);
+			ch.setFormatter(new LogFormatter());
+			log.addHandler(ch);
+		}
+		for (Handler logHandler : handlers) {
+			logHandler.setLevel(level);
+		}
+	}
 
 	public static Logger getLogger(Class clazz) {
 		return Logger.getLogger("test." + clazz.getName());

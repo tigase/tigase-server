@@ -18,11 +18,15 @@
 
 package tigase.server.xmppserver;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import tigase.TestLogger;
+import tigase.cert.CertCheckResult;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Ignore
 public class S2SConnManDomainTest
@@ -32,7 +36,9 @@ public class S2SConnManDomainTest
 	public static void setup() {
 		System.setProperty("test-ssl-debug", "false");
 		S2SConnManAbstractTest.setup();
-		configureLogger(log, Level.INFO);
+		TestLogger.configureLogger(log, Level.INFO);
+		log = Logger.getLogger("tigase.server.xmppserver");
+		TestLogger.configureLogger(log, Level.FINEST);
 	}
 
 
@@ -91,6 +97,7 @@ public class S2SConnManDomainTest
 	}
 
 	@Test
+	@Ignore
 	public void testS2S_jit_si() {
 		setupCID("tigase.im", "jit.si");
 		testS2STigaseConnectionManager(null);
@@ -185,6 +192,20 @@ public class S2SConnManDomainTest
 	public void testS2S_shreddox_eu() {
 		setupCID("tigase.im", "shreddox.eu");
 		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
+	public void testS2S_xabber_org() {
+		setupCID("tigase.im", "xabber.org");
+		testS2STigaseConnectionManager(null);
+	}
+
+	@Test
+	@Ignore
+	public void testS2S_expired_badxmpp_eu() {
+		setupCID("tigase.im", "expired.badxmpp.eu");
+		testS2STigaseConnectionManager(null, certCheckResult -> Assert.assertEquals(CertCheckResult.expired, certCheckResult),
+									   Assert::assertFalse);
 	}
 
 }

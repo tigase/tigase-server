@@ -31,21 +31,6 @@ abstract class SSLTestAbstract {
 
 	static Logger log;
 
-	static void configureLogger(Logger log, Level level) {
-		log.setUseParentHandlers(false);
-		log.setLevel(level);
-		final Handler[] handlers = log.getHandlers();
-		if (Arrays.stream(handlers).noneMatch(ConsoleHandler.class::isInstance)) {
-			ConsoleHandler ch = new ConsoleHandler();
-			ch.setLevel(level);
-			ch.setFormatter(new LogFormatter());
-			log.addHandler(ch);
-		}
-		for (Handler logHandler : handlers) {
-			logHandler.setLevel(level);
-		}
-	}
-
 	static Optional<String> getSslDebugString() {
 		// https://docs.oracle.com/en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide.html#GUID-31B7E142-B874-46E9-8DD0-4E18EC0EB2CF
 

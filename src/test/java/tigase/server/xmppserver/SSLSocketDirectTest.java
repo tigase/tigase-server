@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import tigase.TestLogger;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -63,7 +64,7 @@ public class SSLSocketDirectTest
 		getSslDebugString().ifPresent(debug -> System.setProperty("javax.net.debug", debug));
 
 		log = Logger.getLogger("tigase");
-		configureLogger(log, Level.INFO);
+		TestLogger.configureLogger(log, Level.INFO);
 
 		hostname = System.getProperty("test-hostname");
 		final String portProperty = System.getProperty("test-port");
