@@ -146,6 +146,9 @@ public class VHostJDBCRepository
 
 		VHostItem defaultVHost = getItem(VHostItem.DEF_VHOST_KEY);
 		if (defaultVHost == null) {
+			this.defaultVHost = new VHostItemImpl(JID.jidInstanceNS(VHostItem.DEF_VHOST_KEY));
+			((VHostItemImpl) this.defaultVHost).initializeFromDefaults(vhostDefaultValues);
+			((VHostItemImpl) this.defaultVHost).setExtensionManager(extensionManager);
 			addItem(this.defaultVHost);
 		} else {
 			this.defaultVHost = defaultVHost;
@@ -156,6 +159,9 @@ public class VHostJDBCRepository
 	public void addItemNoStore(VHostItem item) {
 		if (item instanceof VHostItemImpl.VHostItemWrapper) {
 			((VHostItemImpl.VHostItemWrapper) item).readOnly();
+			if (defaultVHost != null) {
+				((VHostItemImpl.VHostItemWrapper) item).setDefaultVHost(defaultVHost);
+			}
 		}
 		super.addItemNoStore(item);
 		if (VHostItem.DEF_VHOST_KEY.equals(item.getKey())) {
@@ -347,12 +353,6 @@ public class VHostJDBCRepository
 	private void reloadIfReady() {
 		//called from setters for below members -- to force reload only after everything is initialised
 		if (vhostDefaultValues != null && extensionManager != null) {
-			if (this.mainVHostName != null && defaultVHost == null) {
-				defaultVHost = new VHostItemImpl(JID.jidInstanceNS(VHostItem.DEF_VHOST_KEY));
-				((VHostItemImpl) defaultVHost).initializeFromDefaults(vhostDefaultValues);
-				((VHostItemImpl) defaultVHost).setExtensionManager(extensionManager);
-			}
-
 			reload();
 			if (!contains(mainVHostName)) {
 				VHostItem item = getItemInstance();
