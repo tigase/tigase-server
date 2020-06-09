@@ -192,19 +192,19 @@ class S2SConnManAbstractTest
 		authenticatedConsumer.accept(authenticated);
 
 		try {
-			final Packet packet = Iq.packetInstance("iq", cid.getLocalHost(), cid.getRemoteHost(), StanzaType.get);
+			final Packet packet = Iq.packetInstance("iq_version_query_test"+UUID.randomUUID(), cid.getLocalHost(), cid.getRemoteHost(), StanzaType.get);
 			final Element iqElement = packet.getElement();
 			iqElement.setAttribute("id", UUID.randomUUID().toString());
 			final Element query = new Element("query");
 			query.setXMLNS("jabber:iq:version");
 			iqElement.addChild(query);
 
-			handler.addPacketNB(packet);
+			handler.addPacket(packet);
 		} catch (Exception e) {
 
 		}
 
-//		TimeUnit.SECONDS.sleep(15);
+		TimeUnit.SECONDS.sleep(1);
 
 		handler.serviceStopped(s2SIOService);
 	}
@@ -359,6 +359,11 @@ class S2SConnManAbstractTest
 		public fastCIDConnections(CID cid, S2SConnectionHandlerIfc<S2SIOService> handler) {
 			super(cid, handler, new S2SRandomSelector(), 1, 1, 1, 0);
 			this.cid = cid;
+		}
+
+		@Override
+		public void connectionAuthenticated(S2SIOService serv, CID cid) {
+			super.connectionAuthenticated(serv, cid);
 		}
 
 		public S2SIOService getS2SIOService() {

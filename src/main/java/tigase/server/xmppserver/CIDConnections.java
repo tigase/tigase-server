@@ -150,14 +150,6 @@ public class CIDConnections {
 		}
 	}
 
-	public void connectionAuthenticated(String sessionId, CID cid) {
-		S2SConnection s2s_conn = getS2SConnectionForSessionId(sessionId);
-
-		if (s2s_conn != null) {
-			connectionAuthenticated(s2s_conn.getS2SIOService(), cid);
-		}
-	}
-
 	public void connectionStopped(S2SIOService serv) {
 		S2SConnection s2s_conn = serv.getS2SConnection();
 
@@ -428,7 +420,7 @@ public class CIDConnections {
 
 	public void sendPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Sending packets.");
+			log.log(Level.FINEST, "Sending packet: " + packet);
 		}
 		if (packet != null) {
 			if ((firstWaitingTime == 0) || waitingPackets.isEmpty()) {

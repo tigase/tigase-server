@@ -30,6 +30,7 @@ import tigase.xml.Element;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentMap;
@@ -38,10 +39,16 @@ import java.util.logging.Logger;
 
 @Bean(name = "sasl-external", parent = S2SConnectionManager.class, active = true)
 public class SaslExternal
-		extends S2SAbstractProcessor {
+		extends AuthenticationProcessor {
 
 	protected static final String[] FEATURES_SASL_PATH = {FEATURES_EL, "mechanisms"};
 	private static final String METHOD_NAME = "SASL-EXTERNAL";
+
+	@Override
+	public String getMethodName() {
+		return METHOD_NAME;
+	}
+
 	private final static String XMLNS_SASL = "urn:ietf:params:xml:ns:xmpp-sasl";
 
 	private static final Logger log = Logger.getLogger(SaslExternal.class.getName());
@@ -51,6 +58,12 @@ public class SaslExternal
 	private String[] skipForDomains;
 	@ConfigField(desc = "Enable compatibility with legacy servers", alias = "legacy-compat")
 	private boolean legacyCompat = true;
+
+	public void setSkipForDomains(String[] skipForDomains) {
+		this.skipForDomains = skipForDomains != null
+							  ? Arrays.stream(skipForDomains).map(String::toLowerCase).toArray(String[]::new)
+							  : null;
+	}
 
 	private static boolean isAnyMechanismsPresent(Packet p) {
 		final List<Element> childrenStaticStr = p.getElement().getChildrenStaticStr(FEATURES_SASL_PATH);
@@ -72,6 +85,7 @@ public class SaslExternal
 
 		if (canAddSaslToFeatures) {
 			results.add(mechanisms);
+			authenticatorSelectorManager.getAuthenticationProcessors(serv).add(this);
 		}
 	}
 
@@ -80,63 +94,75 @@ public class SaslExternal
 	}
 
 	@Override
-	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
+	public void restartAuth(Packet packet, S2SIOService serv, Queue<Packet> results) {
 		try {
-			final CID cid = (CID) serv.getSessionData().get("cid");
-			final boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
+			sendAuthRequest(serv, results);
+		} catch (Exception e) {
+			log.log(Level.WARNING, e, () -> String.format("%s, Error while restarting authentication", serv));
+			results.add(failurePacket(null));
+			authenticatorSelectorManager.authenticationFailed(packet, serv, this, results);
+		}
+	}
 
-			if (cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()))) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Skipping SASL-EXTERNAL for domain: {1} because it was ignored",
-							new Object[]{serv, cid});
-				}
-				return true;
+	@Override
+	public boolean canHandle(Packet p, S2SIOService serv, Queue<Packet> results) {
+		final CID cid = (CID) serv.getSessionData().get("cid");
+		final boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
+
+		if (cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()))) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, Skipping SASL-EXTERNAL for domain: {1} because it was ignored",
+						new Object[]{serv, cid});
+			}
+			return false;
+		}
+
+		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
+				!p.getElement().getChildren().isEmpty()) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
 			}
 
-			if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
-					!p.getElement().getChildren().isEmpty()) {
+			// Some servers send empty SASL list!
+			if (!isAnyMechanismsPresent(p)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
+					log.log(Level.FINEST, "{0}, No SASL mechanisms found in features. Skipping SASL.",
+							new Object[]{serv, p});
+				}
+				return false;
+			}
+
+			CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData()
+					.get(S2SIOService.CERT_CHECK_RESULT);
+
+			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && (certCheckResult == null) && !skipTLS) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}", new Object[]{serv, p});
 				}
 
-				// Some servers send empty SASL list!
-				if (!isAnyMechanismsPresent(p)) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, No SASL mechanisms found in features. Skipping SASL.",
-								new Object[]{serv, p});
-					}
-					return true;
+				return false;
+			}
+
+			// it is reasonable to skip SASL EXTERNAL for handshaking only connections
+			if (certCheckResult == CertCheckResult.invalid || serv.isHandshakingOnly()) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Connection is handshaking only: {1}, certCheckResult: {2}, packet: {3}", new Object[]{serv, serv.isHandshakingOnly(), certCheckResult, p});
 				}
+				return false;
+			}
 
-				CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData()
-						.get(S2SIOService.CERT_CHECK_RESULT);
+			return true;
 
-				if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && (certCheckResult == null) && !skipTLS) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}", new Object[]{serv, p});
-					}
+		}
+		return false;
+	}
 
-					return true;
-				}
-
-				// it is reasonable to skip SASL EXTERNAL for handshaking only connections
-				if (certCheckResult == CertCheckResult.invalid && serv.isHandshakingOnly()) {
-					return true;
-				}
-
-				String method = (String) serv.getSessionData().get(S2S_METHOD_USED);
-				if (method != null && method != METHOD_NAME) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, Another method {1} is used. Skipping.", new Object[]{serv, method});
-					}
-					return true;
-				}
-
-				if (!serv.isAuthenticated() && serv.getSessionData().get(S2S_METHOD_USED) == null) {
-					sendAuthRequest(p, serv, results);
-					return true;
-				}
-
+	@Override
+	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
+		try {
+			if (authenticatorSelectorManager.isAllowed(p, serv, this, results )) {
+				sendAuthRequest(serv, results);
+				return true;
 			} else if (p.isElement("auth", XMLNS_SASL)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Received auth request: {1}", new Object[]{serv, p});
@@ -154,13 +180,14 @@ public class SaslExternal
 					log.log(Level.FINEST, "{0}, Received failure response: {1}", new Object[]{serv, p});
 				}
 
-				serv.forceStop();
+				authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 
 				return true;
 			}
 		} catch (Exception e) {
-			log.log(Level.WARNING, e, () -> String.format("{0}, Error while processing packet: {1}", serv, p));
-			serv.forceStop();
+			log.log(Level.WARNING, e, () -> String.format("%s, Error while processing packet: %s", serv, p));
+			results.add(failurePacket(null));
+			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 			return true;
 		}
 
@@ -168,14 +195,7 @@ public class SaslExternal
 	}
 
 	private boolean isSkippedDomain(String domain) {
-		if (domain != null && skipForDomains != null && skipForDomains.length > 0) {
-			for (String skipForDomain : skipForDomains) {
-				if (domain.contains(skipForDomain)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return domain != null && skipForDomains != null && Arrays.binarySearch(skipForDomains, domain.toLowerCase()) >= 0;
 	}
 
 	/**
@@ -199,7 +219,7 @@ public class SaslExternal
 		boolean tlsEstablished = isTlsEstablished(certCheckResult);
 		CertCheckResult localCertCheckResult = (CertCheckResult) sessionData.get(S2SIOService.LOCAL_CERT_CHECK_RESULT);
 		boolean localCertTrusted = localCertCheckResult == CertCheckResult.trusted;
-		boolean canAddSaslToFeatures = tlsEstablished && localCertTrusted && !serv.isAuthenticated() && !skipDomain;
+		boolean canAddSaslToFeatures = tlsEstablished && localCertTrusted && !serv.isAuthenticated() && !serv.isHandshakingOnly() && !skipDomain;
 
 		if (!canAddSaslToFeatures && log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
@@ -210,7 +230,7 @@ public class SaslExternal
 		return canAddSaslToFeatures;
 	}
 
-	private void sendAuthRequest(Packet p, S2SIOService serv, Queue<Packet> results) throws TigaseStringprepException {
+	private void sendAuthRequest(S2SIOService serv, Queue<Packet> results) throws TigaseStringprepException {
 		String cdata = "=";
 		CID cid = (CID) serv.getSessionData().get("cid");
 		if (cid != null && legacyCompat) {
@@ -219,7 +239,6 @@ public class SaslExternal
 		Element auth = new Element("auth", cdata, new String[]{"xmlns", "mechanism"},
 								   new String[]{XMLNS_SASL, "EXTERNAL"});
 		results.add(Packet.packetInstance(auth));
-		serv.getSessionData().put(S2S_METHOD_USED, METHOD_NAME);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Starting SASL EXTERNAL: {1}", new Object[]{serv, auth});
 		}
@@ -239,10 +258,10 @@ public class SaslExternal
 		serv.xmppStreamOpen(data);
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
-		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, handler);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Making connection authenticated. cid={1} ", new Object[]{serv, cid});
 		}
+		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, cid);
 	}
 
 	private void processAuth(Packet p, S2SIOService serv, Queue<Packet> results)
@@ -253,8 +272,8 @@ public class SaslExternal
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "{0}, No peer certificate!", new Object[]{serv});
 			}
-			results.add(Packet.packetInstance(failureElement("No peer certificate")));
-			serv.forceStop();
+			results.add(failurePacket("No peer certificate"));
+			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 			return;
 		}
 
@@ -270,8 +289,8 @@ public class SaslExternal
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "{0}, Certificate is not trusted", new Object[]{serv});
 			}
-			results.add(Packet.packetInstance(failureElement("Certificate is not trusted")));
-			serv.forceStop();
+			results.add(failurePacket("Certificate is not trusted"));
+			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 			return;
 		}
 
@@ -281,8 +300,8 @@ public class SaslExternal
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "{0}, CID is unknown, can''t proceed", new Object[]{serv});
 			}
-			results.add(Packet.packetInstance(failureElement("Unknown origin hostname (lack of `from` element)")));
-			serv.forceStop();
+			results.add(failurePacket("Unknown origin hostname (lack of `from` element)"));
+			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 			return;
 		}
 
@@ -298,21 +317,21 @@ public class SaslExternal
 				log.log(Level.FINE, "{0}, Certificate name doesn't match to '{1}'",
 						new Object[]{serv, cid.getRemoteHost()});
 			}
-			results.add(Packet.packetInstance(failureElement("Certificate name doesn't match to domain name")));
-			serv.forceStop();
+			results.add(failurePacket("Certificate name doesn't match to domain name"));
+			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 			return;
 		}
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
-		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, handler);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Making connection authenticated. cid={1} ", new Object[]{serv, cid});
 		}
+		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, cid);
 
 		results.add(Packet.packetInstance(successElement));
 	}
 
-	private Element failureElement(String description) {
+	private Packet failurePacket(String description) {
 		Element result = new Element("failure", new Element[]{new Element("invalid-authzid")}, new String[]{"xmlns"},
 									 new String[]{XMLNS_SASL});
 
@@ -320,7 +339,7 @@ public class SaslExternal
 			result.addChild(new Element("text", description));
 		}
 
-		return result;
+		return Packet.packetInstance(result, null, null);
 	}
 
 }

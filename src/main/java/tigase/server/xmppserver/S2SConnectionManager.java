@@ -382,6 +382,10 @@ public class S2SConnectionManager
 									String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem) {
 		CIDConnections cid_conns = getCIDConnections(connCid);
 
+		log.log(Level.FINEST,
+				"{0}, Sending verification result: {1}, session: {2}, handshaking: {3}, cdata: {4}, error: {5}",
+				new Object[]{cid_conns, valid, serv_sessionId, handshakingOnly, cdata, errorElem});
+
 		if (cid_conns != null) {
 			StanzaType type = null;
 			if (valid != null) {

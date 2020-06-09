@@ -23,10 +23,7 @@ import tigase.server.xmppserver.S2SIOService;
 import tigase.server.xmppserver.S2SProcessor;
 import tigase.xml.Element;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -38,7 +35,7 @@ public abstract class S2SAbstractProcessor
 		extends S2SAbstract
 		implements S2SProcessor {
 
-	public static final String S2S_METHOD_USED = "S2S_METHOD_USED";
+	protected static final Comparator<S2SProcessor> processorsComparator = Comparator.comparingInt(S2SProcessor::order);
 
 	private static final Logger log = Logger.getLogger(S2SAbstractProcessor.class.getName());
 	@ConfigField(desc = "Skip StartTLS for domains", alias = "skip-tls-hostnames")
@@ -85,7 +82,7 @@ public abstract class S2SAbstractProcessor
 
 	@Override
 	public int compareTo(S2SProcessor proc) {
-		return (-1) * (proc.order() - order());
+		return processorsComparator.compare(this, proc);
 	}
 
 	// Order of enum values is important as it is an order in which packet

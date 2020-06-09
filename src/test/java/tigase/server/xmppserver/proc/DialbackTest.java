@@ -19,6 +19,7 @@ package tigase.server.xmppserver.proc;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import tigase.TestLogger;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.eventbus.EventBusFactory;
 import tigase.io.CertificateContainer;
@@ -32,6 +33,8 @@ import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.net.IOService.PORT_TYPE_PROP_KEY;
 import static tigase.server.xmppserver.proc.S2SAbstract.FEATURES_EL;
@@ -214,8 +217,9 @@ public class DialbackTest
 
 		p = results.poll();
 		assertTrue(p.getType() == StanzaType.valid && remote2.equals(p.getStanzaTo().getDomain()));
-		assertTrue(serv.getCIDs().stream().anyMatch((CID cid) -> remote1.equals(cid.getRemoteHost())));
-		assertTrue(serv.getCIDs().stream().anyMatch((CID cid) -> remote2.equals(cid.getRemoteHost())));
+		final Set<CID> CIDs = serv.getCIDs();
+		assertTrue(CIDs.stream().anyMatch((CID cid) -> remote1.equals(cid.getRemoteHost())));
+		assertTrue(CIDs.stream().anyMatch((CID cid) -> remote2.equals(cid.getRemoteHost())));
 	}
 
 	@Test
@@ -298,6 +302,7 @@ public class DialbackTest
 		kernel.registerBean(ConnectionManager.PortsConfigBean.class).exec();
 		kernel.registerBean(CIDConnections.CIDConnectionsOpenerService.class).exportable().exec();
 		kernel.registerBean(S2SRandomSelector.class).exportable().exec();
+		kernel.registerBean(AuthenticatorSelectorManager.class).exportable().exec();
 		kernel.registerBean(DialbackImpl.class).exportable().exec();
 		kernel.registerBean(CertificateContainer.class).exportable().exec();
 		kernel.registerBean("service").asClass(S2SConnectionHandlerImpl.class).setActive(true).exec();
@@ -308,6 +313,8 @@ public class DialbackTest
 			ex.printStackTrace();
 			throw ex;
 		}
+//		final Logger log = Logger.getLogger("tigase");
+//		TestLogger.configureLogger(log, Level.FINEST);
 		dialback = kernel.getInstance(Dialback.class);
 	}
 
