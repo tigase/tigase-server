@@ -63,6 +63,24 @@ public class MAMItemHandler
 		if (item.getMessage() != null) {
 			forwarded.addChild(item.getMessage());
 		}
+		
+		for (MAMRepository.Item fastening : item.getFastenings()) {
+			Element fm = fastening.getMessage();
+			if (fm != null) {
+				Element messageDeliveryReceiptEl = fm.findChild(el -> el.getName() == "received" && el.getXMLNS() == "urn:xmpp:receipts");
+				if (messageDeliveryReceiptEl != null) {
+					Element applied = new Element("applied", new String[] {"xmlns", "from"}, new String[] {"tigase:mamfc:0", fm.getAttributeStaticStr("from")});
+					applied.addChild(messageDeliveryReceiptEl);
+					result.addChild(applied);
+				}
+				Element chatMarkerEl = fm.findChild(el -> el.getName() == "urn:xmpp:chat-markers:0");
+				if (chatMarkerEl != null) {
+					Element applied = new Element("applied", new String[] {"xmlns", "from"}, new String[] {"tigase:mamfc:0", fm.getAttributeStaticStr("from")});
+					applied.addChild(chatMarkerEl);
+					result.addChild(applied);
+				} 
+			}
+		}
 
 		Message packet = new Message(m, query.getComponentJID(), query.getQuestionerJID());
 		packet.setXMLNS(Packet.CLIENT_XMLNS);

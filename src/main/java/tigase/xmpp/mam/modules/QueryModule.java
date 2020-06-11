@@ -77,7 +77,7 @@ public class QueryModule
 		Query query = mamRepository.newQuery();
 		query = queryParser.parseQuery(query, packet);
 		try {
-			mamRepository.queryItems(query, itemHandler);
+			queryItems(query, itemHandler);
 		} catch (RepositoryException ex) {
 			throw new RuntimeException("Error retrieving messages from database", ex);
 		}
@@ -94,5 +94,9 @@ public class QueryModule
 		result.setPriority(Priority.LOW);
 
 		packetWriter.write(result);
+	}
+
+	protected void queryItems(Query query, MAMRepository.ItemHandler itemHandler) throws RepositoryException, ComponentException {
+		mamRepository.queryItems(query, itemHandler);
 	}
 }

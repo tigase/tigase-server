@@ -21,7 +21,9 @@ import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.xml.Element;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Base interface which is required to be implemented by class which should be used as repository implementation for
@@ -44,6 +46,10 @@ public interface MAMRepository<Q extends Query, I extends MAMRepository.Item> {
 		Element getMessage();
 
 		Date getTimestamp();
+
+		default List<Item> getFastenings() {
+			return Collections.emptyList();
+		}
 	}
 
 	interface ItemHandler<Q extends Query, I extends Item> {
