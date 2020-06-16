@@ -23,6 +23,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.net.ConnectionType;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
+import tigase.stats.StatisticsList;
 import tigase.util.Algorithms;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -46,12 +47,6 @@ public class Dialback
 		extends AuthenticationProcessor {
 
 	private static final String METHOD_NAME = "DIALBACK";
-
-	@Override
-	public String getMethodName() {
-		return METHOD_NAME;
-	}
-
 	private static final Logger log = Logger.getLogger(Dialback.class.getName());
 	private static final Element features_required = new Element("dialback", new Element[]{new Element("required")},
 																 new String[]{"xmlns"},
@@ -59,13 +54,17 @@ public class Dialback
 	private static final Element features = new Element("dialback", new String[]{"xmlns"},
 														new String[]{"urn:xmpp:features:dialback"});
 	private static final String REQUESTED_RESULT_DOMAINS_KEY = "requested-result-domains-key";
-
 	// Ejabberd does not request dialback after TLS (at least some versions don't)
 	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd", alias = "ejabberd-bug-workaround")
 	private boolean ejabberd_bug_workaround_active = true;
 
 	public Dialback() {
 		super();
+	}
+
+	@Override
+	public String getMethodName() {
+		return METHOD_NAME;
 	}
 
 	@Override
@@ -85,7 +84,7 @@ public class Dialback
 			return true;
 		}
 
-		if (authenticatorSelectorManager.isAllowed(p, serv, this, results )) {
+		if (authenticatorSelectorManager.isAllowed(p, serv, this, results)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Initializing dialback, packet: {1}", new Object[]{serv, p});
 			}
@@ -126,27 +125,6 @@ public class Dialback
 		return null;
 	}
 
-	/**
-	 * Checks if result request for received domain was sent by service
-	 */
-	@SuppressWarnings("unchecked")
-	protected boolean wasResultRequested(S2SIOService serv, String domain) {
-		Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
-
-		return (requested != null) && requested.contains(domain);
-	}
-
-	/**
-	 * Checks if verify request for received domain was sent by service
-	 *
-	 * @see CIDConnections#sendHandshakingOnly
-	 */
-	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
-		String requested = (String) serv.getSessionData().get(S2SIOService.HANDSHAKING_DOMAIN_KEY);
-
-		return (requested != null) && requested.contains(domain);
-	}
-
 	@Override
 	public void restartAuth(Packet packet, S2SIOService serv, Queue<Packet> results) {
 		initDialback(serv, serv.getSessionId());
@@ -157,7 +135,8 @@ public class Dialback
 		CID cid = (CID) serv.getSessionData().get("cid");
 		boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
-		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
+		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
+				!p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
 			}
@@ -207,12 +186,12 @@ public class Dialback
 
 						// Should not happen....
 						log.log(Level.INFO, "{0}, Incorrect local hostname, packet: {1}", new Object[]{serv, p});
-						authenticatorSelectorManager.authenticationFailed(p, serv, this,results );
+						authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 					} catch (LocalhostException ex) {
 
 						// Should not happen....
 						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}", new Object[]{serv, p});
-						authenticatorSelectorManager.authenticationFailed(p, serv, this,results );
+						authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 					}
 
 					return false;
@@ -235,7 +214,34 @@ public class Dialback
 		return false;
 	}
 
-	private void initDialback(S2SIOService serv, String remote_id) {
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		super.getStatistics(compName, list);
+		authenticatorSelectorManager.getStatistics(compName, list);
+	}
+
+	/**
+	 * Checks if result request for received domain was sent by service
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean wasResultRequested(S2SIOService serv, String domain) {
+		Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
+
+		return (requested != null) && requested.contains(domain);
+	}
+
+	/**
+	 * Checks if verify request for received domain was sent by service
+	 *
+	 * @see CIDConnections#sendHandshakingOnly
+	 */
+	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
+		String requested = (String) serv.getSessionData().get(S2SIOService.HANDSHAKING_DOMAIN_KEY);
+
+		return (requested != null) && requested.contains(domain);
+	}
+
+	protected void initDialback(S2SIOService serv, String remote_id) {
 
 		try {
 			if (remote_id == null) {
@@ -347,6 +353,7 @@ public class Dialback
 						log.log(Level.FINE, "Invalid result for DB authentication: {0}, stopping connection: {1}",
 								new Object[]{cid_packet, serv});
 					}
+					authenticatorSelectorManager.markConnectionAsFailed(getMethodName(), serv);
 					serv.stop();
 				}
 			}

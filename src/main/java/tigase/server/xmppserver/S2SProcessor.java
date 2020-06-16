@@ -18,6 +18,7 @@
 package tigase.server.xmppserver;
 
 import tigase.server.Packet;
+import tigase.stats.StatisticsProviderIfc;
 import tigase.xml.Element;
 
 import java.util.List;
@@ -28,13 +29,12 @@ import java.util.Queue;
  * Created: Dec 9, 2010 1:50:09 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 public interface S2SProcessor
-		extends Comparable<S2SProcessor> {
+		extends Comparable<S2SProcessor>, StatisticsProviderIfc {
 
 	/**
 	 * Returns order of processor which is used to set order in which processors will be processing packet
-	 *
 	 */
 	int order();
 

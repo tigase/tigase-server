@@ -23,6 +23,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
+import tigase.stats.StatisticsList;
 import tigase.util.Base64;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
@@ -43,27 +44,13 @@ public class SaslExternal
 
 	protected static final String[] FEATURES_SASL_PATH = {FEATURES_EL, "mechanisms"};
 	private static final String METHOD_NAME = "SASL-EXTERNAL";
-
-	@Override
-	public String getMethodName() {
-		return METHOD_NAME;
-	}
-
 	private final static String XMLNS_SASL = "urn:ietf:params:xml:ns:xmpp-sasl";
-
 	private static final Logger log = Logger.getLogger(SaslExternal.class.getName());
 	private static Element successElement = new Element("success", new String[]{"xmlns"}, new String[]{XMLNS_SASL});
-
-	@ConfigField(desc = "Skip SASL-EXTERNAL for defined domains", alias = "skip-for-domains")
-	private String[] skipForDomains;
 	@ConfigField(desc = "Enable compatibility with legacy servers", alias = "legacy-compat")
 	private boolean legacyCompat = true;
-
-	public void setSkipForDomains(String[] skipForDomains) {
-		this.skipForDomains = skipForDomains != null
-							  ? Arrays.stream(skipForDomains).map(String::toLowerCase).toArray(String[]::new)
-							  : null;
-	}
+	@ConfigField(desc = "Skip SASL-EXTERNAL for defined domains", alias = "skip-for-domains")
+	private String[] skipForDomains;
 
 	private static boolean isAnyMechanismsPresent(Packet p) {
 		final List<Element> childrenStaticStr = p.getElement().getChildrenStaticStr(FEATURES_SASL_PATH);
@@ -74,6 +61,17 @@ public class SaslExternal
 	private static boolean isTlsEstablished(final CertCheckResult certCheckResult) {
 		return (certCheckResult == CertCheckResult.trusted || certCheckResult == CertCheckResult.untrusted ||
 				certCheckResult == CertCheckResult.self_signed);
+	}
+
+	@Override
+	public String getMethodName() {
+		return METHOD_NAME;
+	}
+
+	public void setSkipForDomains(String[] skipForDomains) {
+		this.skipForDomains = skipForDomains != null
+							  ? Arrays.stream(skipForDomains).map(String::toLowerCase).toArray(String[]::new)
+							  : null;
 	}
 
 	@Override
@@ -94,13 +92,13 @@ public class SaslExternal
 	}
 
 	@Override
-	public void restartAuth(Packet packet, S2SIOService serv, Queue<Packet> results) {
+	public void restartAuth(Packet p, S2SIOService serv, Queue<Packet> results) {
 		try {
 			sendAuthRequest(serv, results);
 		} catch (Exception e) {
 			log.log(Level.WARNING, e, () -> String.format("%s, Error while restarting authentication", serv));
 			results.add(failurePacket(null));
-			authenticatorSelectorManager.authenticationFailed(packet, serv, this, results);
+			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 		}
 	}
 
@@ -146,7 +144,8 @@ public class SaslExternal
 			// it is reasonable to skip SASL EXTERNAL for handshaking only connections
 			if (certCheckResult == CertCheckResult.invalid || serv.isHandshakingOnly()) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Connection is handshaking only: {1}, certCheckResult: {2}, packet: {3}", new Object[]{serv, serv.isHandshakingOnly(), certCheckResult, p});
+					log.log(Level.FINEST, "{0}, Connection is handshaking only: {1}, certCheckResult: {2}, packet: {3}",
+							new Object[]{serv, serv.isHandshakingOnly(), certCheckResult, p});
 				}
 				return false;
 			}
@@ -158,9 +157,15 @@ public class SaslExternal
 	}
 
 	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		super.getStatistics(compName, list);
+		authenticatorSelectorManager.getStatistics(compName, list);
+	}
+
+	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		try {
-			if (authenticatorSelectorManager.isAllowed(p, serv, this, results )) {
+			if (authenticatorSelectorManager.isAllowed(p, serv, this, results)) {
 				sendAuthRequest(serv, results);
 				return true;
 			} else if (p.isElement("auth", XMLNS_SASL)) {
@@ -195,7 +200,8 @@ public class SaslExternal
 	}
 
 	private boolean isSkippedDomain(String domain) {
-		return domain != null && skipForDomains != null && Arrays.binarySearch(skipForDomains, domain.toLowerCase()) >= 0;
+		return domain != null && skipForDomains != null &&
+				Arrays.binarySearch(skipForDomains, domain.toLowerCase()) >= 0;
 	}
 
 	/**
@@ -219,7 +225,9 @@ public class SaslExternal
 		boolean tlsEstablished = isTlsEstablished(certCheckResult);
 		CertCheckResult localCertCheckResult = (CertCheckResult) sessionData.get(S2SIOService.LOCAL_CERT_CHECK_RESULT);
 		boolean localCertTrusted = localCertCheckResult == CertCheckResult.trusted;
-		boolean canAddSaslToFeatures = tlsEstablished && localCertTrusted && !serv.isAuthenticated() && !serv.isHandshakingOnly() && !skipDomain;
+		boolean canAddSaslToFeatures =
+				tlsEstablished && localCertTrusted && !serv.isAuthenticated() && !serv.isHandshakingOnly() &&
+						!skipDomain;
 
 		if (!canAddSaslToFeatures && log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,

@@ -21,6 +21,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.S2SIOService;
 import tigase.server.xmppserver.S2SProcessor;
+import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 
 import java.util.*;
@@ -83,6 +84,11 @@ public abstract class S2SAbstractProcessor
 	@Override
 	public int compareTo(S2SProcessor proc) {
 		return processorsComparator.compare(this, proc);
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+
 	}
 
 	// Order of enum values is important as it is an order in which packet

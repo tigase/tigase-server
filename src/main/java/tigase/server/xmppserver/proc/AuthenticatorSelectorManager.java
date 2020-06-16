@@ -23,19 +23,21 @@ import tigase.kernel.beans.Inject;
 import tigase.net.ConnectionType;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
+import tigase.stats.StatisticsList;
+import tigase.stats.StatisticsProviderIfc;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.SortedSet;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Bean(name = "authenticator-selector-manager", parent = S2SConnectionManager.class, active = true)
-public class AuthenticatorSelectorManager {
+public class AuthenticatorSelectorManager
+		implements StatisticsProviderIfc {
 
 	public static final String S2S_METHOD_USED = "S2S_METHOD_USED";
 	public static final String S2S_METHODS_ADVERTISED = "S2S_METHODS_ADVERTISED";
@@ -44,9 +46,9 @@ public class AuthenticatorSelectorManager {
 	@Inject
 	public List<AuthenticationProcessor> authenticationProcessors;
 
-	public AuthenticatorSelectorManager() {
-		System.out.println();
-	}
+	private Map<String, AtomicInteger> failedAuthenticationDomains = new ConcurrentHashMap<>();
+
+	public AuthenticatorSelectorManager() {}
 
 	/**
 	 * Method determines if given authenticator is allowed to proceed: takes into consideration authenticators
@@ -100,9 +102,18 @@ public class AuthenticatorSelectorManager {
 		cid_conns.connectionAuthenticated(serv, cidPacket);
 	}
 
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		final String keyName = compName + "/AuthenticationFailures";
+		for (Map.Entry<String, AtomicInteger> entry : failedAuthenticationDomains.entrySet()) {
+			list.add(keyName, entry.getKey(), entry.getValue().intValue(), Level.FINER);
+		}
+	}
+
 	public void authenticationFailed(Packet packet, S2SIOService serv, AuthenticationProcessor processor,
 									 Queue<Packet> results) {
 
+		markConnectionAsFailed(processor.getMethodName(), serv);
 		serv.getSessionData().remove(S2S_METHOD_USED);
 		final SortedSet<AuthenticationProcessor> methodsAvailable = getAuthenticationProcessors(serv);
 		methodsAvailable.remove(processor);
@@ -122,8 +133,19 @@ public class AuthenticatorSelectorManager {
 						new Object[]{serv, nextAuthenticationProcessor.get().getMethodName()});
 				methodsAvailable.remove(nextAuthenticationProcessor.get());
 				nextAuthenticationProcessor.get().restartAuth(packet, serv, results);
+			} else {
+				log.log(Level.WARNING, "{0}, No more authenticators for outgoing connections, stopping",
+						new Object[]{serv});
+				flushRemainingPackets(serv, results);
+				serv.forceStop();
 			}
 		}
+	}
+
+	public void markConnectionAsFailed(String prefix, S2SIOService serv) {
+		CID cid = (CID) serv.getSessionData().get("cid");
+		log.log(Level.FINEST, () -> "Adding entry to stats, prefix: " + prefix + ", cid: " + cid);
+		failedAuthenticationDomains.computeIfAbsent(prefix + "/" + cid, s -> new AtomicInteger()).incrementAndGet();
 	}
 
 	SortedSet<AuthenticationProcessor> getAuthenticationProcessors(S2SIOService serv) {

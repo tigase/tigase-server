@@ -33,6 +33,8 @@ import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
+import tigase.server.xmppserver.proc.AuthenticatorSelectorManager;
+import tigase.server.xmppserver.proc.Dialback;
 import tigase.server.xmppserver.proc.StartTLS;
 import tigase.util.dns.DNSEntry;
 import tigase.util.dns.DNSResolverFactory;
@@ -61,9 +63,9 @@ import static tigase.net.IOService.CERT_CHECK_RESULT;
 class S2SConnManAbstractTest
 		extends SSLTestAbstract {
 
+	protected static Kernel kernel;
 	private static CID cid;
 	private static S2SConnManTest.S2SConnectionHandlerImpl handler = null;
-	private static Kernel kernel;
 
 	private static void dumpConfiguration(DSLBeanConfiguratorWithBackwardCompatibility config) throws IOException {
 		final StringWriter stringWriter = new StringWriter();
@@ -90,8 +92,8 @@ class S2SConnManAbstractTest
 		kernel.registerBean(S2SRandomSelector.class).exportable().exec();
 		kernel.registerBean(CertificateContainer.class).exportable().exec();
 		kernel.registerBean(StartTLS.class).exportable().exec();
-//		kernel.registerBean(Dialback.class).exportable().setActive(false).exec();
-//		kernel.registerBean(SaslExternal.class).setActive(false).exec();
+		kernel.registerBean(DummyDialbackImpl.class).exportable().setActive(true).exec();
+		kernel.registerBean(AuthenticatorSelectorManager.class).exportable().setActive(true).exec();
 		kernel.registerBean("vHostManager")
 				.asClass(S2SConnManTest.DummyVHostManager.class)
 				.exportable()
@@ -116,6 +118,8 @@ class S2SConnManAbstractTest
 			final SSLContextContainer context = kernel.getInstance(SSLContextContainer.class);
 			final LoggingBean loggingBean = kernel.getInstance(LoggingBean.class);
 			loggingBean.setPacketFullDebug(true);
+			final AuthenticatorSelectorManager instance = kernel.getInstance(AuthenticatorSelectorManager.class);
+			System.out.println(instance);
 			handler = kernel.getInstance(S2SConnManTest.S2SConnectionHandlerImpl.class);
 			handler.start();
 			dumpConfiguration(config);
@@ -151,7 +155,8 @@ class S2SConnManAbstractTest
 									   Assert::assertTrue);
 	}
 
-	protected void testS2STigaseConnectionManager(String[] protocols, Consumer<CertCheckResult> certificateCheckResult, Consumer<Boolean> authenticatedConsumer) {
+	protected void testS2STigaseConnectionManager(String[] protocols, Consumer<CertCheckResult> certificateCheckResult,
+												  Consumer<Boolean> authenticatedConsumer) {
 		try {
 			final SSLContextContainer context = kernel.getInstance(SSLContextContainer.class);
 			setupSslContextContainer(context, SSLContextContainer.HARDENED_MODE.secure, protocols, null);
@@ -162,7 +167,9 @@ class S2SConnManAbstractTest
 		}
 	}
 
-	private void testConnectionForCID(CID cid, Consumer<CertCheckResult> certificateCheckResult, Consumer<Boolean> authenticatedConsumer) throws NotLocalhostException, LocalhostException, InterruptedException {
+	private void testConnectionForCID(CID cid, Consumer<CertCheckResult> certificateCheckResult,
+									  Consumer<Boolean> authenticatedConsumer)
+			throws NotLocalhostException, LocalhostException, InterruptedException {
 		final fastCIDConnections connections = handler.createNewCIDConnections(cid);
 		connections.openConnections();
 
@@ -185,14 +192,17 @@ class S2SConnManAbstractTest
 		log.log(Level.INFO, cid + ": isAuthenticated(): " + authenticated);
 		log.log(Level.INFO, cid + ": getSessionData().get(CERT_CHECK_RESULT): " + trusted);
 		Assert.assertTrue(connected);
-		certificateCheckResult.accept(trusted);
+
+		// Should we test if the certificate is trusted if we fallback to diallback?
+//		certificateCheckResult.accept(trusted);
 
 		// it will fail when testing locally as it's not possible to perform dialback that way without mapping domain
 		// domain to local machine
 		authenticatedConsumer.accept(authenticated);
 
 		try {
-			final Packet packet = Iq.packetInstance("iq_version_query_test"+UUID.randomUUID(), cid.getLocalHost(), cid.getRemoteHost(), StanzaType.get);
+			final Packet packet = Iq.packetInstance("iq_version_query_test" + UUID.randomUUID(), cid.getLocalHost(),
+													cid.getRemoteHost(), StanzaType.get);
 			final Element iqElement = packet.getElement();
 			iqElement.setAttribute("id", UUID.randomUUID().toString());
 			final Element query = new Element("query");
@@ -207,6 +217,22 @@ class S2SConnManAbstractTest
 		TimeUnit.SECONDS.sleep(1);
 
 		handler.serviceStopped(s2SIOService);
+	}
+
+	public static class DummyDialbackImpl
+			extends Dialback {
+
+		@Override
+		protected void initDialback(S2SIOService serv, String remote_id) {
+			super.initDialback(serv, remote_id);
+			try {
+				CID cid_main = (CID) serv.getSessionData().get("cid");
+				CIDConnections cid_conns = handler.getCIDConnections(cid_main, true);
+				authenticatorSelectorManager.authenticateConnection(serv, cid_conns, cid_main);
+			} catch (NotLocalhostException | LocalhostException e) {
+				log.log(Level.WARNING, "Failure", e);
+			}
+		}
 	}
 
 	/**

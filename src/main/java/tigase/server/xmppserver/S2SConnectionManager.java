@@ -27,7 +27,9 @@ import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
+import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
+import tigase.stats.StatisticsProviderIfc;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -604,6 +606,9 @@ public class S2SConnectionManager
 			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
 			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
 			list.add(getName(), "Total control waiting", total_waiting_control, Level.FINEST);
+		}
+		for (S2SProcessor processor : processors) {
+			((StatisticsProviderIfc)processor).getStatistics(getName(), list);
 		}
 	}
 

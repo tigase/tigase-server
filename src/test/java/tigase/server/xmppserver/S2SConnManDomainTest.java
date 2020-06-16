@@ -18,12 +18,12 @@
 
 package tigase.server.xmppserver;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import tigase.TestLogger;
 import tigase.cert.CertCheckResult;
+import tigase.server.xmppserver.proc.AuthenticatorSelectorManager;
+import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +31,16 @@ import java.util.logging.Logger;
 @Ignore
 public class S2SConnManDomainTest
 		extends S2SConnManAbstractTest {
+
+	@AfterClass
+	public static void postStats() {
+		final AuthenticatorSelectorManager selector = kernel.getInstance(AuthenticatorSelectorManager.class);
+		final StatisticsList list = new StatisticsList(Level.FINEST);
+		selector.getStatistics("test", list);
+		for (StatRecord statRecord : list) {
+			log.log(Level.ALL, statRecord.toString());
+		}
+	}
 
 	@BeforeClass
 	public static void setup() {
@@ -40,7 +50,6 @@ public class S2SConnManDomainTest
 		log = Logger.getLogger("tigase.server.xmppserver");
 		TestLogger.configureLogger(log, Level.FINEST);
 	}
-
 
 	@Test
 	public void testS2S_convorb_im() {
@@ -97,7 +106,6 @@ public class S2SConnManDomainTest
 	}
 
 	@Test
-	@Ignore
 	public void testS2S_jit_si() {
 		setupCID("tigase.im", "jit.si");
 		testS2STigaseConnectionManager(null);
@@ -204,8 +212,8 @@ public class S2SConnManDomainTest
 	@Ignore
 	public void testS2S_expired_badxmpp_eu() {
 		setupCID("tigase.im", "expired.badxmpp.eu");
-		testS2STigaseConnectionManager(null, certCheckResult -> Assert.assertEquals(CertCheckResult.expired, certCheckResult),
+		testS2STigaseConnectionManager(null,
+									   certCheckResult -> Assert.assertEquals(CertCheckResult.expired, certCheckResult),
 									   Assert::assertFalse);
 	}
-
 }

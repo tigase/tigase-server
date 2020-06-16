@@ -29,17 +29,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class
-AuthenticationProcessor
+public abstract class AuthenticationProcessor
 		extends S2SAbstractProcessor {
 
 	private final static Logger log = Logger.getLogger(AuthenticationProcessor.class.getName());
+	private final static String AUTHENTICATION_TIMER_KEY = "AUTHENTICATION_TIMER_KEY";
 	@Inject
-	AuthenticatorSelectorManager authenticatorSelectorManager;
+	protected static AuthenticatorSelectorManager authenticatorSelectorManager;
 	@ConfigField(desc = "Authentication timeout for S2S connections")
 	private long authenticationTimeOut = 30;
-
-	private final static String AUTHENTICATION_TIMER_KEY = "AUTHENTICATION_TIMER_KEY";
 
 	@Override
 	public void serviceStarted(S2SIOService serv) {
@@ -77,6 +75,7 @@ AuthenticationProcessor
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE, "Connection not authenticated within timeout, stopping: {0}", serv);
 				}
+				authenticatorSelectorManager.markConnectionAsFailed("timeout", serv);
 				serv.stop();
 			}
 		}
