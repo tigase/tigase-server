@@ -298,7 +298,7 @@ Note that the processor arrray will only have as many threads as the component h
 |`{compname}/processors/stream-error-counter`
 
 |Socket overflow
-|The number of times that this component has experienced socket overflow and had to drop packets. This does not include the number of dropped packets. |FINEST |Integer |
+|The number of times that this component has experienced socket queue overflow and had to drop packets. The XMPP server queues packets which are being sent over connection if receiver is not able to read them fast enough or if the network connection too slow to the amount of data which needs to be sent. If the queue will over flow that will be counted. This does not include the number of dropped packets.|FINEST |Integer |
 |`{compname}/Socket overflow`
 
 |Total {in/out} queues wait
