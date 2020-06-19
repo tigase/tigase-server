@@ -45,6 +45,8 @@ public class SocketIO
 
 	// ~--- fields ---------------------------------------------------------------
 	private static final String MAX_USER_IO_QUEUE_SIZE_PROP_KEY = "max-user-io-queue-size";
+	private static final boolean DEBUG_SOCKET_OVERFLOW = Boolean.getBoolean("socket-overflow-debug");
+	private static final Level LOG_SOCKET_OVERFLOW_LEVEL = DEBUG_SOCKET_OVERFLOW ? Level.INFO : Level.FINEST;
 
 	private long buffOverflow = 0;
 	private int bytesRead = 0;
@@ -72,6 +74,10 @@ public class SocketIO
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
 			int queue_size = Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY, MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
+			if (log.isLoggable(LOG_SOCKET_OVERFLOW_LEVEL)) {
+				log.log(LOG_SOCKET_OVERFLOW_LEVEL, "SOCKET - Buffer to send limit: {0}, {1}",
+						new Object[]{queue_size, toString()});
+			}
 
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(queue_size);
 		}
@@ -249,6 +255,10 @@ public class SocketIO
 			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
 				++totalBuffOverflow;
+				if (log.isLoggable(LOG_SOCKET_OVERFLOW_LEVEL)) {
+					log.log(LOG_SOCKET_OVERFLOW_LEVEL, "SOCKET - Buffer overflow: {0}, {1}, {2}",
+							new Object[]{totalBuffOverflow, dataToSend.size(), toString()});
+				}
 			}
 		}
 
