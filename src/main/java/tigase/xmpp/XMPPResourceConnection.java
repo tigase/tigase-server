@@ -61,6 +61,8 @@ public class XMPPResourceConnection
 
 	public static final String ERROR_KEY = "error-key";
 
+	public static final String CONNECTION_CHECK_TIMESTAMP_KEY = "connection-check-timestamp";
+
 	/**
 	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data where the last presence sent by the user to
 	 * server is stored, either initial presence or off-line presence before disconnecting.
