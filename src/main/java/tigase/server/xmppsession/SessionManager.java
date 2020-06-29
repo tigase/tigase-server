@@ -124,6 +124,8 @@ public class SessionManager
 	private AuthRepository auth_repository = null;
 	private long closedConnections = 0;
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler = new ConnectionCheckCommandHandler();
+	@ConfigField(desc = "Period after which connection may be checked on authentication of a new session")
+	private long connectionCheckPeriod = 30 * 1000;
 	@Inject
 	private DefaultHandlerProc defHandlerProc = null;
 	private PacketDefaultHandler defPacketHandler = new PacketDefaultHandler();
@@ -1272,6 +1274,7 @@ public class SessionManager
 				} else {
 					TimerTask task = new SessionCloseTimer(iqc.getFrom(), connection.getSessionId());
 					addTimerTask(task, 10, TimeUnit.SECONDS);
+					connection.putSessionData(XMPPResourceConnection.CLOSING_KEY, XMPPResourceConnection.CLOSING_KEY);
 					connection.putSessionData(SESSION_CLOSE_TIMER_KEY, task);
 				}
 				processing_result = true;
@@ -1987,7 +1990,12 @@ public class SessionManager
 
 				if (connections != null) {
 					for (XMPPResourceConnection connection : connections) {
-						if (connection != conn) {
+						if (connection != conn && connection.getSessionData(XMPPResourceConnection.CLOSING_KEY) == null) {
+							Long lastCheck = (Long) connection.getSessionData(XMPPResourceConnection.CONNECTION_CHECK_TIMESTAMP_KEY);
+							if (lastCheck != null && (System.currentTimeMillis() - lastCheck) < this.connectionCheckPeriod) {
+								continue;
+							}
+							connection.putSessionData(XMPPResourceConnection.CONNECTION_CHECK_TIMESTAMP_KEY, System.currentTimeMillis());
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST, "Checking connection: {0}", connection);
 							}
