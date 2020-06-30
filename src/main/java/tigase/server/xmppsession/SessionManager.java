@@ -124,7 +124,7 @@ public class SessionManager
 	private AuthRepository auth_repository = null;
 	private long closedConnections = 0;
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler = new ConnectionCheckCommandHandler();
-	@ConfigField(desc = "Period after which connection may be checked on authentication of a new session")
+	@ConfigField(desc = "Period after which connection may be checked when authenticating a new session")
 	private long connectionCheckPeriod = 30 * 1000;
 	@Inject
 	private DefaultHandlerProc defHandlerProc = null;
