@@ -32,6 +32,7 @@ import tigase.util.workqueue.PriorityQueueAbstract;
 import tigase.util.workqueue.PriorityQueueRelaxed;
 import tigase.xmpp.jid.JID;
 
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
@@ -199,6 +200,8 @@ public abstract class AbstractMessageReceiver
 	private ArrayDeque<QueueListener> threadsQueueIn = null;
 	private ArrayDeque<QueueListener> threadsQueueOut = null;
 
+	private static final DecimalFormat df = new DecimalFormat("#0.00");
+
 	/**
 	 * Helper method used in statistics to find uneven distribution of packet processing across processing threads
 	 *
@@ -233,11 +236,12 @@ public abstract class AbstractMessageReceiver
 		List<String> outliers = new ArrayList<>();
 		for (QueueListener queueListener : array) {
 			if (Math.abs(queueListener.packetCounter - mean) > (2 * deviation)) {
-				outliers.add(queueListener.getName() + ":" + queueListener.packetCounter);
+				outliers.add(queueListener.getName() + ":" + queueListener.packetCounter + ":x" +
+									 df.format(queueListener.packetCounter / mean));
 			}
 		}
 
-		return "mean: " + mean + ", deviation: " + deviation +
+		return "mean: " + df.format(mean) + ", deviation: " + df.format(deviation) +
 				(!outliers.isEmpty() ? ", outliers: " + outliers.toString() : "");
 	}
 
