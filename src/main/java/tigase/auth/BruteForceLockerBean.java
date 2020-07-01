@@ -759,7 +759,8 @@ public class BruteForceLockerBean
 
 		@Override
 		public void initFromCommand(String prefix, Packet packet) throws IllegalArgumentException {
-			enabled = Command.getCheckBoxFieldValue(packet, prefix + "-enabled");
+			Optional.ofNullable(Command.getFieldValue(packet, prefix + "-enabled"))
+					.ifPresent(s -> enabled = Boolean.parseBoolean(s));
 			String value = Command.getFieldValue(packet, prefix + "-lock-after-fails");
 			if (value != null) {
 				lockAccountAfterFailedAttempt = Long.parseLong(value);

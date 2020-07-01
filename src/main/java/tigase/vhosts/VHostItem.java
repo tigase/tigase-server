@@ -46,6 +46,9 @@ public interface VHostItem
 	String[] getDomainFilterDomains();
 
 	<T extends VHostItemExtension> T getExtension(Class<T> clazz);
+
+	<T extends VHostItemExtension> Set<T> getExtensions();
+
 	Set<Class<? extends VHostItemExtension>> getExtensionClasses();
 
 	Long getMaxUsersNumber();

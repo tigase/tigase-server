@@ -111,7 +111,7 @@ public class VHostJDBCRepository
 		item.setExtensionManager(extensionManager);
 		VHostItemImpl.VHostItemWrapper wrapper = new VHostItemImpl.VHostItemWrapper();
 		wrapper.setItem(item);
-//		wrapper.setDefaultVHost(defaultVHost);  // we shouldn't set default in bare-boned instance
+		wrapper.setDefaultVHost(defaultVHost);
 		wrapper.setVHostDefaults(this.vhostDefaultValues);
 		return wrapper;
 	}
