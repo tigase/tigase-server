@@ -289,6 +289,8 @@ public class DialbackTest
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		final Logger log = Logger.getLogger("tigase");
+		TestLogger.configureLogger(log, Level.OFF);
 		Map<String, Object> props = new HashMap<>();
 		props.put("name", "s2s");
 
@@ -314,7 +316,7 @@ public class DialbackTest
 			throw ex;
 		}
 //		final Logger log = Logger.getLogger("tigase");
-//		TestLogger.configureLogger(log, Level.FINEST);
+//		TestLogger.configureLogger(log, Level.OFF);
 		dialback = kernel.getInstance(Dialback.class);
 	}
 

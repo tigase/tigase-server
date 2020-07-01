@@ -104,7 +104,6 @@ public class VHostJDBCRepositoryTest {
 			repository.initRepository("memory://", new ConcurrentHashMap<>());
 			vHostJDBCRepository = kernel.getInstance(TestVHostJDBCRepository.class);
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			log.log(Level.WARNING, ex, () -> "There was an error setting up test");
 		}
 
@@ -143,9 +142,7 @@ public class VHostJDBCRepositoryTest {
 
 		final VHostItem domainItemInstance = vHostJDBCRepository.getItemInstance();
 		domainItemInstance.initFromCommand(packet);
-
 		final String validateItem = vHostJDBCRepository.validateItem(domainItemInstance);
-		System.out.println(validateItem);
 		assertNull(validateItem);
 	}
 
