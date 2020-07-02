@@ -20,12 +20,14 @@ package tigase.auth.impl;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
 import tigase.auth.SessionAware;
+import tigase.auth.XmppSaslException;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
 import tigase.db.UserNotFoundException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
@@ -53,8 +55,8 @@ public class PlainCallbackHandler
 	protected BareJID jid = null;
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 	protected AuthRepository repo;
-	private XMPPResourceConnection session;
 	private boolean loggingInForbidden = false;
+	private XMPPResourceConnection session;
 	private String username;
 
 	@Override
@@ -175,14 +177,15 @@ public class PlainCallbackHandler
 		}
 	}
 
-	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
+	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) throws XmppSaslException {
 		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
 				!callback.getAuthzId().equals(jid.toString())) {
 			try {
 				username = jid.getLocalpart();
 				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
+			} catch (TigaseStringprepException ex) {
+				log.warning("Malformed AuthorizationId: " + ex.getMessage());
+				throw new XmppSaslException(XmppSaslException.SaslError.invalid_authzid);
 			}
 		} else {
 			username = DEFAULT_USERNAME;
