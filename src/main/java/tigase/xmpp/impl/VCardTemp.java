@@ -26,6 +26,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -248,6 +249,8 @@ public class VCardTemp
 
 		Iq iq = (Iq) Packet.packetInstance(iqEl, JID.jidInstanceNS(userJid), JID.jidInstanceNS(userJid));
 		iq.setPacketTo(pubsubComponentJidSupplier.get());
+		// lower priority to make sure that publication will take place before we would query for an item
+		iq.setPriority(Priority.LOW);
 
 		writer.accept(iq);
 	}
