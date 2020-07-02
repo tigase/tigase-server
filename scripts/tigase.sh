@@ -104,6 +104,12 @@ fi
 [[ -z "${TIGASE_RUN}" ]] && \
   TIGASE_RUN="tigase.server.XMPPServer ${TIGASE_OPTIONS}"
 
+[[ -z "${SCHEMA_MANAGER}" ]] && \
+  SCHEMA_MANAGER="tigase.db.util.SchemaManager"
+
+[[ -z "${CONFIG_HOLDER}" ]] && \
+  CONFIG_HOLDER="tigase.conf.ConfigHolder"
+
 JAVA=$(command -v java)
 
 if [ -n "${JAVA_HOME}" ] ; then
@@ -215,12 +221,12 @@ case "${1}" in
 
   upgrade-schema|install-schema|destroy-schema)
     TMP="${@:2}"
-    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} tigase.db.util.SchemaManager ${1} ${TIGASE_OPTIONS} ${TMP}"
+    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} ${SCHEMA_MANAGER} ${1} ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
   upgrade-config)
     TMP="${@:3}"
-    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} tigase.conf.ConfigHolder ${1} ${TIGASE_OPTIONS} ${TMP}"
+    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} ${CONFIG_HOLDER} ${1} ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
   check|status)
