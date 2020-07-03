@@ -21,6 +21,7 @@ import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.mix.IMixComponent;
 import tigase.mix.model.IMixRepository;
 import tigase.mix.model.MixLogic;
@@ -43,6 +44,9 @@ public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 
 	private static final Set<String> FEATURES = Set.of("urn:xmpp:mix:core:1", "urn:xmpp:mix:core:1#searchable", DISCO_ITEMS_XMLNS, DISCO_INFO_XMLNS);
 	private static final Set<String> FEATURES_WITH_CREATE = Set.of("urn:xmpp:mix:core:1", "urn:xmpp:mix:core:1#searchable", "urn:xmpp:mix:core:1#create-channel", DISCO_ITEMS_XMLNS, DISCO_INFO_XMLNS);
+
+	@ConfigField(desc = "Allow disco#items for nodes without node attribute set")
+	private boolean allowDiscoitems = false;
 
 	@Inject
 	private MixLogic mixLogic;
@@ -164,7 +168,20 @@ public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 					})
 					.collect(Collectors.toList());
 		} else {
-			return super.prepareDiscoItems(serviceJID, nodeName, senderJID, rsm);
+			if (nodeName == null) {
+				// we need to handle that somehow...
+				if (!allowDiscoitems) {
+					return Collections.emptyList();
+				} else {
+					return super.prepareDiscoItems(senderJID, null, senderJID, rsm);
+				}
+			} else if ("mix".equals(nodeName)) {
+			    // for node "mix" we present "root" nodes
+				return super.prepareDiscoItems(senderJID, null, senderJID, rsm);
+			} else {
+				// in any other case just use default
+				return super.prepareDiscoItems(serviceJID, nodeName, senderJID, rsm);
+			}
 		}
 	}
 
