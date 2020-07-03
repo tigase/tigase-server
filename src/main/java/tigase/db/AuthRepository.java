@@ -113,6 +113,7 @@ public interface AuthRepository
 	enum AccountStatus {
 		active(1),
 		disabled(0),
+		banned(-5),
 		pending(-2),
 		system(-1),
 		vip(2),
