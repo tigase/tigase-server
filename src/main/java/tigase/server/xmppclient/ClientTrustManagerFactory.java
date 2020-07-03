@@ -57,14 +57,14 @@ public class ClientTrustManagerFactory {
 
 	private final ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>();
 
-	private final TrustManager[] emptyTrustManager;
+	protected final TrustManager[] emptyTrustManager;
 	private final KeyStore keystore;
 	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<>();
 	@ConfigField(desc = "CA for client certificate", alias = "clientCertCA")
 	private String clientCertCA;
 	@ConfigField(desc = "Is client certificate required")
 	private boolean clientCertRequired = false;
-	private TrustManager[] defaultTrustManagers;
+	protected TrustManager[] defaultTrustManagers;
 	private TrustManagerFactory tmf;
 
 	public ClientTrustManagerFactory() {
