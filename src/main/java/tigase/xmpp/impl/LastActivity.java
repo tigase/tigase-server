@@ -57,7 +57,8 @@ import static tigase.xmpp.impl.LastActivityAbstract.XMLNS;
 @Handles(@Handle(path = {Iq.ELEM_NAME, Iq.QUERY_NAME}, xmlns = XMLNS))
 @Bean(name = LastActivity.ID, parent = LastActivityMarker.class, active = false)
 public class LastActivity
-		extends XMPPProcessorAbstract {
+		extends XMPPProcessorAbstract
+		implements LastActivityRetriever {
 
 	protected final static String ID = XMLNS;
 	private static final Logger log = Logger.getLogger(LastActivity.class.getName());
