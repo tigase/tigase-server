@@ -34,7 +34,7 @@ The simplest way to add register a new factory is to annotate its class with `@B
 public class OwnFactory implements SaslServerFactory {}
 ----
 
-It can also be done with a new lines in the `config.tdsl` file like in the example below:
+It can also be done by specifying the class directly for bean `customSaslFactory` in the `config.tdsl` file like in the example below:
 
 .Example of the registration of a SASL mechanism factory with TDSL setting id of the factory to `customSaslFactory`
 [source,dsl]
