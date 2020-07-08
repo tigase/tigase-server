@@ -31,6 +31,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,9 +61,12 @@ public class CertBasedCallbackHandler
 					}
 
 					Certificate cert = (Certificate) session.getSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY);
-					final String[] authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert)
-							.toArray(new String[]{});
+					final List<String> authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert);
 
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, Found authJIDs: {1} in certificate: {1}",
+								new Object[]{session, authJIDs, CertificateUtil.getCertCName(((X509Certificate) cert))});
+					}
 					for (String string : authJIDs) {
 						if (defaultAuthzid != null) {
 							if (string.equals(defaultAuthzid.toString())) {

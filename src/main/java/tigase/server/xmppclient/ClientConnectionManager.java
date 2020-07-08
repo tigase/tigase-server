@@ -743,17 +743,18 @@ public class ClientConnectionManager
 						String hostname = (String) serv.getSessionData().get(IOService.HOSTNAME_KEY);
 						VHostItem vhost = getVHostItem(hostname);
 
-						TrustManager[] x = clientTrustManagerFactory.getManager(vhost);
+						TrustManager[] trustManagers = clientTrustManagerFactory.getManager(vhost);
 						boolean wantClientAuth = clientTrustManagerFactory.isTlsWantClientAuthEnabled(vhost);
 						boolean needClientAuth = clientTrustManagerFactory.isTlsNeedClientAuthEnabled(vhost);
 
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
-									"TLS: wantClientAuth=" + wantClientAuth + "; needClientAuth=" + needClientAuth +
-											" for connection {0}", serv);
+									"TLS: wantClientAuth={0}, needClientAuth={1}, trustManagers={2}; for connection {3}",
+									new Object[]{wantClientAuth, needClientAuth,
+												 (trustManagers != null ? Arrays.asList(trustManagers) : null), serv});
 						}
 
-						serv.setX509TrustManagers(x);
+						serv.setX509TrustManagers(trustManagers);
 
 						serv.addPacketToSend(p_proceed);
 						serv.processWaitingPackets();
@@ -761,7 +762,7 @@ public class ClientConnectionManager
 						serv.startTLS(false, wantClientAuth, needClientAuth);
 						SocketThread.addSocketService(serv);
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Error starting TLS: {0}", e.getMessage());
+						log.log(Level.WARNING, "Error starting TLS: " + e.getMessage(), e);
 						serv.forceStop();
 					}    // end of try-catch
 				} else {

@@ -280,7 +280,10 @@ public class SSLContextContainer
 			if (holder == null || !holder.isValid(tms)) {
 				holder = createContextHolder(protocol, hostname, alias, clientMode, tms);
 				if (clientMode) {
-					return holder.sslContext;
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Using SSLHolder: " + holder);
+					}
+					return holder.getSSLContext();
 				}
 
 				if (!validateDomainCertificate(holder, alias)) {
@@ -295,6 +298,9 @@ public class SSLContextContainer
 			holder = null;
 		}
 
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Using SSLHolder: " + holder);
+		}
 		return holder != null ? holder.getSSLContext() : null;
 	}
 

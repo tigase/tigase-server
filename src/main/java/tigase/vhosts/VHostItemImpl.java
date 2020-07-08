@@ -419,7 +419,11 @@ public class VHostItemImpl
 
 		tmp = Command.getFieldValue(packet, SASL_MECHANISM_LABEL);
 		if ((tmp != null) && !tmp.trim().isEmpty()) {
-			setSaslAllowedMechanisms(tmp.split(","));
+			final String[] split = tmp.split(",");
+			for (String mechanism : split) {
+				mechanism.trim();
+			}
+			setSaslAllowedMechanisms(split);
 		}
 
 		String[] tmps = Command.getFieldValues(packet, TRUSTED_JIDS_LABEL);

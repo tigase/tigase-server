@@ -17,6 +17,7 @@
  */
 package tigase.io;
 
+import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Inject;
 
 import javax.net.ssl.KeyManager;
@@ -27,6 +28,7 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -127,7 +129,12 @@ public abstract class SSLContextContainerAbstract
 			if (clientMode) {
 				sslContext = SSLContext.getInstance(protocol);
 				sslContext.init(null, tms, secureRandom);
-				return new SSLHolder(tms, sslContext, null);
+				final SSLHolder sslHolder = new SSLHolder(tms, sslContext, null);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Created new SSLHolder: {0} for domain: {1} (with alias: {2})",
+							new String[]{String.valueOf(sslHolder), hostname, alias, String.valueOf(clientMode)});
+				}
+				return sslHolder;
 			}
 			if (log.isLoggable(Level.INFO)) {
 				log.log(Level.INFO, "Key manager for hostname: {0} doesn't exist, generating new one",
@@ -155,7 +162,12 @@ public abstract class SSLContextContainerAbstract
 		sslContext = SSLContext.getInstance(protocol);
 		sslContext.init(kms, tms, secureRandom);
 
-		return new SSLHolder(tms, sslContext, crt);
+		final SSLHolder sslHolder = new SSLHolder(tms, sslContext, crt);
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Created new SSLHolder: {0} for domain: {1} (with alias: {2})",
+					new String[]{String.valueOf(sslHolder), hostname, alias, String.valueOf(clientMode)});
+		}
+		return sslHolder;
 	}
 
 	protected String getDefCertAlias() {
@@ -192,6 +204,18 @@ public abstract class SSLContextContainerAbstract
 
 		public boolean isValid(TrustManager[] tms) {
 			return tms == this.tms;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuffer sb = new StringBuffer("SSLHolder{");
+			sb.append("domainCertificate=subject: ").append(CertificateUtil.getCertCName(domainCertificate))
+					.append(", altNames: ").append(CertificateUtil.getCertAltCName(domainCertificate))
+					.append(", issuer: ").append(domainCertificate.getIssuerDN());
+			sb.append(", sslContext=").append(sslContext);
+			sb.append(", tms=").append(tms == null ? "null" : Arrays.asList(tms).toString());
+			sb.append('}');
+			return sb.toString();
 		}
 	}
 

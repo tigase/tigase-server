@@ -32,11 +32,15 @@ import javax.security.sasl.SaslServerFactory;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 @Bean(name = "mechanism-selector", parent = TigaseSaslProvider.class, active = true)
 public class DefaultMechanismSelector
 		implements MechanismSelector {
+
+	private static Logger log = Logger.getLogger(DefaultMechanismSelector.class.getName());
 
 	@ConfigField(desc = "List of allowed SASL mechanisms", alias = "allowed-mechanisms")
 	private HashSet<String> allowedMechanisms = new HashSet<String>();
@@ -116,6 +120,10 @@ public class DefaultMechanismSelector
 		}
 
 		final List<String> authJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) cert);
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, Found authJIDs: {1} in certificate: {1}",
+					new Object[]{session, String.valueOf(authJIDs), CertificateUtil.getCertCName(((X509Certificate) cert))});
+		}
 		return authJIDs != null && !authJIDs.isEmpty();
 	}
 }
