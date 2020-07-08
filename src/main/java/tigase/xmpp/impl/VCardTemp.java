@@ -310,7 +310,7 @@ public class VCardTemp
 			}
 			return null;
 		});
-		if (hash.isEmpty()) {
+		if (hash == null || hash.isEmpty()) {
 			return null;
 		}
 		if (x == null) {
