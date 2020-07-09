@@ -37,7 +37,7 @@ public interface CallbackHandlerFactoryIfc {
 	default CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
 						   Map<String, Object> settings)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		return this.create(mechanismName, session, repo, null);
+		return this.create(mechanismName, session, repo);
 	}
 
 }
