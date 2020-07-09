@@ -2,11 +2,11 @@
 Tigase Team <team@tigase.com>
 v{revnumber}, {localdate}
 :toc:
-:toclevels: 2
+:toclevels: 3
 :numbered:
 :website: http://tigase.net
 
-include::text/Tigase_v8.0.0.asciidoc[leveloffset=+1]
+include::text/Tigase_Release_Notes.asciidoc[leveloffset=+1]
 
 include::text/user/_user.asciidoc[leveloffset=+1]
 

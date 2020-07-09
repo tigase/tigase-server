@@ -1,11 +1,10 @@
 [[tigase800]]
 = Tigase XMPP Server 8.0.0 announcement
 :author: Daniel Wisnewski
-:date: 2015-25-08 22:09
+:date: 2015-25-08
+:toclevels: 0
 
-Tigase XMPP Server {project-version} Change notes and announcement
-
-:toc:
+Tigase XMPP Server 8.0.0 Change notes and announcement
 
 == Major Changes
 
@@ -130,7 +129,7 @@ Memory Buffer for TLS no longer remains at highest buffer size needed for the se
 
 === XEP-305 Quickstart now supported
 
-It's now possible to establish connection faster due to implementation of https://xmpp.org/extensions/xep-0305.html[XEP-0305: XMPP Quickstart] (https://tigase.tech/issues/1936[#1936]). Feature is only available for `c2s` Connection Manager (i.e. connections on port 5222) and needs to be enabled in `config.tdsl`
+It's now possible to establish connection faster due to implementation of https://xmpp.org/extensions/xep-0305.html[XEP-0305: XMPP Quickstart] (https://projects.tigase.net/issues?q=Redmine%20ID:%201936[#1936]). Feature is only available for `c2s` Connection Manager (i.e. connections on port 5222) and needs to be enabled in `config.tdsl`
 
 [source,dsl]
 -----
@@ -199,211 +198,211 @@ This will do the following:
 
 === Protection against brute-force attacks
 
-Version 8.0.0 improves security by preventing brute-force attacks. Feature needs to be explicitly enabled and configured (on per VHost basis). Detailed configuration is described in <<bruteForcePrevention>> (https://tigase.tech/issues/8160[#8160])
+Version 8.0.0 improves security by preventing brute-force attacks. Feature needs to be explicitly enabled and configured (on per VHost basis). Detailed configuration is described in <<bruteForcePrevention>> (https://projects.tigase.net/issues?q=Redmine%20ID:%208160[#8160])
 
 == New Minor Features & Behavior Changes
-- https://tigase.tech/issues/611[#611] Support for Message of the Day is now enabled in Tigase XMPP Server and can be administered using link:http://xmpp.org/extensions/xep-0133.html#set-motd[XEP-0133 Service Administration].
-- https://tigase.tech/issues/1569[#1569] Re-implemented XEP-0133 Service Administration Scripts `4.3 Disable User` and `4.4 Re-enable User`.
-- https://tigase.tech/issues/1449[#1449] Monitoring modules now works in OSGi mode.
-- https://tigase.tech/issues/1706[#1706] `auto-authorize` of presence subscriptions can now be set for individual vhosts.
-- https://tigase.tech/issues/1968[#1968] Added a Proxy Wrapper to handle reconnections to database connection pool to help prevent deadlocking threads.
-- https://tigase.tech/issues/3511[#3511] Mechanism responsible for closing XMPP in SessionManager has been changed to process all packets from TCP connection before closing connection.
-- https://tigase.tech/issues/3802[#3802] Implementation and API of LocalEventBus and ClusteredEventBus has been unified and is now available as EventBus.
-- https://tigase.tech/issues/3918[#3918] Session Establishment Advertisement is now optional, bringing session establishment in line with link:https://tools.ietf.org/html/rfc6121[RFC 6121].
-- https://tigase.tech/issues/4111[#4111] Changed input buffer sizing to use a ratio of 2 to 1 based on input capacity. No longer using a constant value.
-- https://tigase.tech/issues/4212[#4212] Database schema files have been flattened and made for better organization.
-- https://tigase.tech/issues/4501[#4501] `CounterDataFileLogger` now has an upper limit and will be default be shrunk to 75% if available disk space is 5% or less than 100MB.
-- https://tigase.tech/issues/4654[#4654] PubSub component has been updated and new schema uses UTF-8 encoding when hashing database lookup.
-- https://tigase.tech/issues/4776[#4776] Tigase `DbSchemaLoader` now prompts for password if one is missing from command line.
-- https://tigase.tech/issues/4788[#4788] Push component added to dist-max archive.
-- https://tigase.tech/issues/4814[#4814] SASL-SCRAM will now be automatically disabled if auth database uses encoded passwords.
-- https://tigase.tech/issues/4844[#4844] External components can now have SSL socket connections assigned to them.
-- https://tigase.tech/issues/4859[#4859] Tigase `DbSchemaLoader` now can support using SSL when connecting to databases.
-- https://tigase.tech/issues/4874[#4874] Tigase Test Suite has been updated to correspond to all changes for v8.0.0.
-- https://tigase.tech/issues/4877[#4877] In-memory repository implemented for *testing ONLY*.
-- https://tigase.tech/issues/4880[#4880] Tigase config-type settings have been reduced and changed. See xref:configType[this section] for more details.
-- https://tigase.tech/issues/4908[#4908] Limited Ad-hoc execution to admin only within monitor component.
-- https://tigase.tech/issues/5005[#5005] Detailed logging configuration is now available in DSL format. See xref:[customLogging] for more details.
-- https://tigase.tech/issues/5069[#5069] Packet processed statistics now separates results based on XML Namespaces.
-- https://tigase.tech/issues/5079[#5079] Tigase `DbSchemaLoader` can now process multiple .sql files in one command by using a comma separated list when calling.
-- https://tigase.tech/issues/5086[#5086] Tigase server monitor is loaded after delay to prevent NPE during startup.
-- https://tigase.tech/issues/5149[#5149] `StanzaReceiver` and `StanzaSender` Components have been deprecated and are no longer part of Tigase XMPP Server. Related SQL tables `xmpp_stanza` and `short_news` have also been removed from schemas.
-- https://tigase.tech/issues/5150[#5150] All TigaseDB tables now use the `tig_` prefix.
-- https://tigase.tech/issues/5214[#5214] Check has been added if recipient exists before storing offline messages for local jid.
-- https://tigase.tech/issues/5293[#5293] `DbSchemaLoader` now will fail execution instead of skipping when encountering missing files.
-- https://tigase.tech/issues/5379[#5379] Server ready detection has been improved in testrunner.sh.
-- https://tigase.tech/issues/5397[#5397] Webhelp Documentation will no longer be built.
-- https://tigase.tech/issues/5422[#5422] Errors with Beans will now result in compact and more readable StackTrace print in console log.
-- https://tigase.tech/issues/5423[#5423] System configuration will now be printed to log file as `ConfigHolder.loadConfiguration` output.
-- https://tigase.tech/issues/5425[#5425] `GetAnyFile` and `GetConfigFile` scripts moved to message-router instead of basic-conf.
-- https://tigase.tech/issues/5429[#5429] Adjusted settings for Dynamic Rostering now can use separate beans for multiple implementations.
-- https://tigase.tech/issues/5430[#5430] `BindResource` is now set to FINER log level to reduce console output verbosity.
-- https://tigase.tech/issues/5475[#5475] Setting default environment variables is now possible in `config.tdsl` file using `env('env-1', 'def-value')` lines. Details available xref:dslEnv[in DSL Configuration] section.
-- https://tigase.tech/issues/5496[#5496] `Destroy Schema` task now added to schema manager.
-- https://tigase.tech/issues/5583[#5583] Error messages now properly sent when offline message storage is full.
-- https://tigase.tech/issues/5674[#5674] All components now use UTC timestamp when interacting with databases.
-- https://tigase.tech/issues/5800[#5800] Better annotation of deprecated code, cleanup and removal code previously marked as deprecated.
-- https://tigase.tech/issues/5964[#5964] Server version is now added to JMX statistics.
-- https://tigase.tech/issues/5982[#5982] Remote JVM debugging configuration added to tigase.conf file, commented by default.
-- https://tigase.tech/issues/6038[#6038] Data Source pool connections are now initialized concurrently instead of one at a time, dropping initializing time.
-- https://tigase.tech/issues/6103[#6103] `RosterElement`no longer keeps `XMPPResourceConnection` instance as it is cached elsewhere. Removal results in net improvement in memory footprint.
-- https://tigase.tech/issues/6133[#6133] Tigase now checks components against server version to ensure compatibility.
-- https://tigase.tech/issues/6163[#6163] Groovy plugin updated to v2.4.12.
-- https://tigase.tech/issues/6206[#6206] Separated TigaseXMLTools and TigaseUtil packages for better compatibility with JDK v9.
-- https://tigase.tech/issues/6216[#6216] MongoDB Driver now updated to v3.5.0.
-- https://tigase.tech/issues/6560[#6560] tigase anti-spam component now included in tigase dist-max archive.
-- https://tigase.tech/issues/6821[#6821] Improved error reporting when errors from `ConfigReader`.
-- https://tigase.tech/issues/6842[#6842] `DefaultTypesConverter` no longer requires case sensitive enums.
-- https://tigase.tech/issues/7082[#7082] `ClassUtilBean` now handles packet filtering for packets part of Tigase Server but not containing beans, other improvements to mDNS.
-- https://tigase.tech/issues/7433[#7433] `SeeOtherHost` no longer uses `PropertiesBeanConfigurator` to parse configuration.
-- https://tigase.tech/issues/7446[#7446] User credentials can now be managed with Ad-hoc commands.
-- https://tigase.tech/issues/7743[#7743] Improved error message when repository is not found.
-- https://tigase.tech/issues/7773[#7773] Ad-hoc commands can now by executed asynchronously.
-- https://tigase.tech/issues/2341[#2341] allow specifying SubscriptionType when adding buddy to avoid calling separately .setBuddySubscription() thus eliminating saving roster twice to database if not needed
+- https://projects.tigase.net/issues?q=Redmine%20ID:%20611[#611] Support for Message of the Day is now enabled in Tigase XMPP Server and can be administered using link:http://xmpp.org/extensions/xep-0133.html#set-motd[XEP-0133 Service Administration].
+- https://projects.tigase.net/issues?q=Redmine%20ID:%201569[#1569] Re-implemented XEP-0133 Service Administration Scripts `4.3 Disable User` and `4.4 Re-enable User`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%201449[#1449] Monitoring modules now works in OSGi mode.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%201706[#1706] `auto-authorize` of presence subscriptions can now be set for individual vhosts.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%201968[#1968] Added a Proxy Wrapper to handle reconnections to database connection pool to help prevent deadlocking threads.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203511[#3511] Mechanism responsible for closing XMPP in SessionManager has been changed to process all packets from TCP connection before closing connection.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203802[#3802] Implementation and API of LocalEventBus and ClusteredEventBus has been unified and is now available as EventBus.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203918[#3918] Session Establishment Advertisement is now optional, bringing session establishment in line with link:https://tools.ietf.org/html/rfc6121[RFC 6121].
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204111[#4111] Changed input buffer sizing to use a ratio of 2 to 1 based on input capacity. No longer using a constant value.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204212[#4212] Database schema files have been flattened and made for better organization.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204501[#4501] `CounterDataFileLogger` now has an upper limit and will be default be shrunk to 75% if available disk space is 5% or less than 100MB.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204654[#4654] PubSub component has been updated and new schema uses UTF-8 encoding when hashing database lookup.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204776[#4776] Tigase `DbSchemaLoader` now prompts for password if one is missing from command line.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204788[#4788] Push component added to dist-max archive.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204814[#4814] SASL-SCRAM will now be automatically disabled if auth database uses encoded passwords.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204844[#4844] External components can now have SSL socket connections assigned to them.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204859[#4859] Tigase `DbSchemaLoader` now can support using SSL when connecting to databases.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204874[#4874] Tigase Test Suite has been updated to correspond to all changes for v8.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204877[#4877] In-memory repository implemented for *testing ONLY*.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204880[#4880] Tigase config-type settings have been reduced and changed. See xref:configType[this section] for more details.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204908[#4908] Limited Ad-hoc execution to admin only within monitor component.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205005[#5005] Detailed logging configuration is now available in DSL format. See xref:[customLogging] for more details.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205069[#5069] Packet processed statistics now separates results based on XML Namespaces.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205079[#5079] Tigase `DbSchemaLoader` can now process multiple .sql files in one command by using a comma separated list when calling.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205086[#5086] Tigase server monitor is loaded after delay to prevent NPE during startup.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205149[#5149] `StanzaReceiver` and `StanzaSender` Components have been deprecated and are no longer part of Tigase XMPP Server. Related SQL tables `xmpp_stanza` and `short_news` have also been removed from schemas.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205150[#5150] All TigaseDB tables now use the `tig_` prefix.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205214[#5214] Check has been added if recipient exists before storing offline messages for local jid.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205293[#5293] `DbSchemaLoader` now will fail execution instead of skipping when encountering missing files.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205379[#5379] Server ready detection has been improved in testrunner.sh.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205397[#5397] Webhelp Documentation will no longer be built.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205422[#5422] Errors with Beans will now result in compact and more readable StackTrace print in console log.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205423[#5423] System configuration will now be printed to log file as `ConfigHolder.loadConfiguration` output.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205425[#5425] `GetAnyFile` and `GetConfigFile` scripts moved to message-router instead of basic-conf.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205429[#5429] Adjusted settings for Dynamic Rostering now can use separate beans for multiple implementations.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205430[#5430] `BindResource` is now set to FINER log level to reduce console output verbosity.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205475[#5475] Setting default environment variables is now possible in `config.tdsl` file using `env('env-1', 'def-value')` lines. Details available xref:dslEnv[in DSL Configuration] section.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205496[#5496] `Destroy Schema` task now added to schema manager.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205583[#5583] Error messages now properly sent when offline message storage is full.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205674[#5674] All components now use UTC timestamp when interacting with databases.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205800[#5800] Better annotation of deprecated code, cleanup and removal code previously marked as deprecated.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205964[#5964] Server version is now added to JMX statistics.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205982[#5982] Remote JVM debugging configuration added to tigase.conf file, commented by default.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206038[#6038] Data Source pool connections are now initialized concurrently instead of one at a time, dropping initializing time.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206103[#6103] `RosterElement`no longer keeps `XMPPResourceConnection` instance as it is cached elsewhere. Removal results in net improvement in memory footprint.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206133[#6133] Tigase now checks components against server version to ensure compatibility.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206163[#6163] Groovy plugin updated to v2.4.12.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206206[#6206] Separated TigaseXMLTools and TigaseUtil packages for better compatibility with JDK v9.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206216[#6216] MongoDB Driver now updated to v3.5.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206560[#6560] tigase anti-spam component now included in tigase dist-max archive.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206821[#6821] Improved error reporting when errors from `ConfigReader`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206842[#6842] `DefaultTypesConverter` no longer requires case sensitive enums.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207082[#7082] `ClassUtilBean` now handles packet filtering for packets part of Tigase Server but not containing beans, other improvements to mDNS.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207433[#7433] `SeeOtherHost` no longer uses `PropertiesBeanConfigurator` to parse configuration.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207446[#7446] User credentials can now be managed with Ad-hoc commands.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207743[#7743] Improved error message when repository is not found.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207773[#7773] Ad-hoc commands can now by executed asynchronously.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%202341[#2341] allow specifying SubscriptionType when adding buddy to avoid calling separately .setBuddySubscription() thus eliminating saving roster twice to database if not needed
 
 == Fixes
-- https://tigase.tech/issues/2750[#2750] Multiple artifact and depreciated file cleanup. Massive code cleanup and javadoc cleaning.
-- https://tigase.tech/issues/3582[#3582] Schema files streamlined, and no longer embedded in code.
-- https://tigase.tech/issues/3611[#3611] Fixed TheadExceptionHandler caused by ACS unable to read PubSub schema changes.
-- https://tigase.tech/issues/3686[#3686] Issues with processing XHTML-IM have been fixed, and now render correctly messages with multiple CData items.
-- https://tigase.tech/issues/3689[#3689] Packets returned from CM no longer bear the original senders' jid.
-- https://tigase.tech/issues/3803[#3803] New call `RouteEvent` has been added to check to list and check events and determine which should be forwarded to other nodes.
-- https://tigase.tech/issues/3822[#3822] Error is now thrown if listener is registered for an event that is not found in EventBus.
-- https://tigase.tech/issues/3910[#3910] Fixed NPE in SessionManager when session is closed during execution of everyMinute method.
-- https://tigase.tech/issues/3911[#3911] Fixed issue of dropping connections during thread load distribution.
-- https://tigase.tech/issues/4185[#4185] Fixed an error where messages would be duplicated on stream resumption due to a counter being reset upon reconnection.
-- https://tigase.tech/issues/4447[#4447] Fixed condition where expired messages in offline store would cause locks.
-- https://tigase.tech/issues/4547[#4547] config.dump file now is fully compatible with init.tdsl file and DSL file formatting.
-- https://tigase.tech/issues/4672[#4672] Fixed `UnsupportedOperationException` occurring during configuration of `WebSocketConnectionClustered`.
-- https://tigase.tech/issues/4776[#4776] `DBSchemaLoader` now asks for user credentials if parameter is missing. Exceptions are no longer thrown if file specified is not found.
-- https://tigase.tech/issues/4885[#4885] `client-port-delay-listening` no longer causes exception when called.
-- https://tigase.tech/issues/4973[#4973] Changed Message History query to now include a limit when selecting items, preventing an SQLTimeoutException.
-- https://tigase.tech/issues/5005[#5005] Fixed an issue where disabling components would result in server shutdown.
-- https://tigase.tech/issues/5042[#5042] Fixed issue when implementing custom SASL providers, mechanisms and callback handler factories.
-- https://tigase.tech/issues/5066[#5066] Fixed issue initializing databases using MongoDB.
-- https://tigase.tech/issues/5076[#5076] last_login and last_logout values are now properly updated while using SASL SCRAM authentication.
-- https://tigase.tech/issues/5084[#5084] SCRAM now checks to see if account is disabled before retrieving password.
-- https://tigase.tech/issues/5085[#5085] Fixed `too many beans implemented` error in Monitor Component.
-- https://tigase.tech/issues/5088[#5088] Removed unnecessary SASL request processing after session is closed.
-- https://tigase.tech/issues/5118[#5118] Fixed NPE during query of privacy lists then `type` is missing.
-- https://tigase.tech/issues/5303[#5303] Fixed beans not being overridden by configuration if they were registered in `RegistrarBean` or `AbstractKernelBasedComponent`.
-- https://tigase.tech/issues/5311[#5311] Offline messages are no longer dumped from MongoDB when restarting server.
-- https://tigase.tech/issues/5394[#5394] Loading main Derby schema no longer throws exceptions.
-- https://tigase.tech/issues/5428[#5428] Fixed parsing of v-host per domain limit property.
-- https://tigase.tech/issues/5450[#5450] Server no longer automatically shuts down when default or other db can not be found or accessed.
-- https://tigase.tech/issues/5458[#5458] Fixed potential timeout arising from `XMPPIOService::xmppStreamOpened()` method.
-- https://tigase.tech/issues/5480[#5480] Fixed issue in Derby DB where obtaining offline messages results in SQLException.
-- https://tigase.tech/issues/5525[#5525] Fixed S2S `invalid-namespace` error being returned during connection establishment.
-- https://tigase.tech/issues/5587[#5587] Fixed unclosed `ResultSet` when storing a message to AMP-offline database in Derby causing deadlock.
-- https://tigase.tech/issues/5645[#5645] Added fix for possible NPE when failing to retrieve beans.
-- https://tigase.tech/issues/5670[#5670] config-dump now prints configuration for inactive components and beans to log.
-- https://tigase.tech/issues/5692[#5692] Messages sent with negative priority were being occasionally dropped and not processed to `OfflineMessageHandler`.
-- https://tigase.tech/issues/5727[#5727] Fixed potential issue with MySQL procedures not being killed properly.
-- https://tigase.tech/issues/5750[#5750] Statistics now filter out zero-value results unless FINEST level is requested.
-- https://tigase.tech/issues/5831[#5831] Fixed occurrence of `OutOfMemory` error.
-- https://tigase.tech/issues/5864[#5864] Fixed NPE when executing BOSH pre-bind script.
-- https://tigase.tech/issues/5867[#5867] Fixed NPE occurring during configuration dump.
-- https://tigase.tech/issues/6000[#6000] Fixed a few issues with dynamic rosters properly handling presence subscription requests.
-- https://tigase.tech/issues/6006[#6006] Improved configuration file and DB Schema handling.
-- https://tigase.tech/issues/6041[#6041] Fixed potential issue where vhosts DB could be overwritten by vhosts configuration in `init.config`.
-- https://tigase.tech/issues/6078[#6078] Fixed `ClusterConnectionManager` to use custom_elements_limit instead of a fixed value.
-- https://tigase.tech/issues/6080[#6080] Fixed Packet Filtering to not filter cluster node information requests.
-- https://tigase.tech/issues/6083[#6083] Fixed clustered mode shutting down server when certain components are disabled.
-- https://tigase.tech/issues/6135[#6135] Tigase now properly enabled selective TLS if not enabled globally.
-- https://tigase.tech/issues/6140[#6140] Fixed issue while sending server welcome message.
-- https://tigase.tech/issues/6141[#6141] Fixed NPE at startup.
-- https://tigase.tech/issues/6234[#6234] Fixed an error where an error message would repeat unnecessarily.
-- https://tigase.tech/issues/6284[#6284] Ad-hoc commands now refresh SSL Certificate, and restart is no longer required.
-- https://tigase.tech/issues/6293[#6293] Server no longer sends no response upon setting empty photo in vCard.
-- https://tigase.tech/issues/6263[#6263] Fixed missing namespaces in responses from adhoc commands.
-- https://tigase.tech/issues/6400[#6400] Added a proper error when max-queue-size is too small and server cannot start.
-- https://tigase.tech/issues/6408[#6408] Fixed an issue where single WebSocket frames contained multiple XML stanzas instead of one per frame.
-- https://tigase.tech/issues/6411[#6411] Main kernel is now called to smooth shutdown. Further, timeout periods are opened up for large instances.
-- https://tigase.tech/issues/6574[#6574] SSL certificate upload handling is now fixed within cluster mode.
-- https://tigase.tech/issues/6598[#6598] Fixed EventBus Registration connection issues between cluster nodes.
-- https://tigase.tech/issues/6658[#6658] Cluster connections no longer potentially keep open connection after cluster is no longer connected or available.
-- https://tigase.tech/issues/6749[#6749] Fixed schema parsing for DerbyDB.
-- https://tigase.tech/issues/6776[#6776] Fixed failing Websocket connections if header contains more than one value.
-- https://tigase.tech/issues/6875[#6875] Fixed an issue where C2S connections could be accepted before SessionManager was initialized.
-- https://tigase.tech/issues/7037[#7037] Fixed error while parsing negative values from `config.tdsl` file.
-- https://tigase.tech/issues/7055[#7055] Improvements to metaspace use and other memory use tweaks.
-- https://tigase.tech/issues/7304[#7304] Virtual host logs now properly follow log size limits.
-- https://tigase.tech/issues/7431[#7431] AdHoc requests between the same user with different resources are no longer dropped with `NoConnectionIdExecption`error.
-- https://tigase.tech/issues/7434[#7434] Adjusted `SeeOtherHotDualIP` to use new table name in cluster nodes database.
-- https://tigase.tech/issues/7491[#7491] Stacktraces from `CertificateContainer` are no longer printed to tigase-console.log, but will be printed to tigase.log.
-- https://tigase.tech/issues/7687[#7687] Fixed an error where connections failed after authentication timeout were marked as active after cleanup.
-- https://tigase.tech/issues/7747[#7747] Fixed `ClusterRepoItemEvent` serialization issues causing unsupported conversion error in cluster mode.
-- https://tigase.tech/issues/7495[#7495] fix issue with not all logs being obfuscated, added testcase, documentation
-- https://tigase.tech/issues/8305[#8305] fix issue with SeeOtherHostDualIP when using MongoDB
+- https://projects.tigase.net/issues?q=Redmine%20ID:%202750[#2750] Multiple artifact and depreciated file cleanup. Massive code cleanup and javadoc cleaning.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203582[#3582] Schema files streamlined, and no longer embedded in code.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203611[#3611] Fixed TheadExceptionHandler caused by ACS unable to read PubSub schema changes.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203686[#3686] Issues with processing XHTML-IM have been fixed, and now render correctly messages with multiple CData items.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203689[#3689] Packets returned from CM no longer bear the original senders' jid.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203803[#3803] New call `RouteEvent` has been added to check to list and check events and determine which should be forwarded to other nodes.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203822[#3822] Error is now thrown if listener is registered for an event that is not found in EventBus.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203910[#3910] Fixed NPE in SessionManager when session is closed during execution of everyMinute method.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%203911[#3911] Fixed issue of dropping connections during thread load distribution.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204185[#4185] Fixed an error where messages would be duplicated on stream resumption due to a counter being reset upon reconnection.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204447[#4447] Fixed condition where expired messages in offline store would cause locks.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204547[#4547] config.dump file now is fully compatible with init.tdsl file and DSL file formatting.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204672[#4672] Fixed `UnsupportedOperationException` occurring during configuration of `WebSocketConnectionClustered`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204776[#4776] `DBSchemaLoader` now asks for user credentials if parameter is missing. Exceptions are no longer thrown if file specified is not found.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204885[#4885] `client-port-delay-listening` no longer causes exception when called.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204973[#4973] Changed Message History query to now include a limit when selecting items, preventing an SQLTimeoutException.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205005[#5005] Fixed an issue where disabling components would result in server shutdown.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205042[#5042] Fixed issue when implementing custom SASL providers, mechanisms and callback handler factories.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205066[#5066] Fixed issue initializing databases using MongoDB.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205076[#5076] last_login and last_logout values are now properly updated while using SASL SCRAM authentication.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205084[#5084] SCRAM now checks to see if account is disabled before retrieving password.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205085[#5085] Fixed `too many beans implemented` error in Monitor Component.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205088[#5088] Removed unnecessary SASL request processing after session is closed.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205118[#5118] Fixed NPE during query of privacy lists then `type` is missing.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205303[#5303] Fixed beans not being overridden by configuration if they were registered in `RegistrarBean` or `AbstractKernelBasedComponent`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205311[#5311] Offline messages are no longer dumped from MongoDB when restarting server.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205394[#5394] Loading main Derby schema no longer throws exceptions.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205428[#5428] Fixed parsing of v-host per domain limit property.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205450[#5450] Server no longer automatically shuts down when default or other db can not be found or accessed.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205458[#5458] Fixed potential timeout arising from `XMPPIOService::xmppStreamOpened()` method.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205480[#5480] Fixed issue in Derby DB where obtaining offline messages results in SQLException.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205525[#5525] Fixed S2S `invalid-namespace` error being returned during connection establishment.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205587[#5587] Fixed unclosed `ResultSet` when storing a message to AMP-offline database in Derby causing deadlock.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205645[#5645] Added fix for possible NPE when failing to retrieve beans.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205670[#5670] config-dump now prints configuration for inactive components and beans to log.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205692[#5692] Messages sent with negative priority were being occasionally dropped and not processed to `OfflineMessageHandler`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205727[#5727] Fixed potential issue with MySQL procedures not being killed properly.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205750[#5750] Statistics now filter out zero-value results unless FINEST level is requested.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205831[#5831] Fixed occurrence of `OutOfMemory` error.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205864[#5864] Fixed NPE when executing BOSH pre-bind script.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205867[#5867] Fixed NPE occurring during configuration dump.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206000[#6000] Fixed a few issues with dynamic rosters properly handling presence subscription requests.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206006[#6006] Improved configuration file and DB Schema handling.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206041[#6041] Fixed potential issue where vhosts DB could be overwritten by vhosts configuration in `init.config`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206078[#6078] Fixed `ClusterConnectionManager` to use custom_elements_limit instead of a fixed value.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206080[#6080] Fixed Packet Filtering to not filter cluster node information requests.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206083[#6083] Fixed clustered mode shutting down server when certain components are disabled.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206135[#6135] Tigase now properly enabled selective TLS if not enabled globally.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206140[#6140] Fixed issue while sending server welcome message.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206141[#6141] Fixed NPE at startup.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206234[#6234] Fixed an error where an error message would repeat unnecessarily.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206284[#6284] Ad-hoc commands now refresh SSL Certificate, and restart is no longer required.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206293[#6293] Server no longer sends no response upon setting empty photo in vCard.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206263[#6263] Fixed missing namespaces in responses from adhoc commands.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206400[#6400] Added a proper error when max-queue-size is too small and server cannot start.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206408[#6408] Fixed an issue where single WebSocket frames contained multiple XML stanzas instead of one per frame.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206411[#6411] Main kernel is now called to smooth shutdown. Further, timeout periods are opened up for large instances.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206574[#6574] SSL certificate upload handling is now fixed within cluster mode.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206598[#6598] Fixed EventBus Registration connection issues between cluster nodes.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206658[#6658] Cluster connections no longer potentially keep open connection after cluster is no longer connected or available.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206749[#6749] Fixed schema parsing for DerbyDB.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206776[#6776] Fixed failing Websocket connections if header contains more than one value.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206875[#6875] Fixed an issue where C2S connections could be accepted before SessionManager was initialized.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207037[#7037] Fixed error while parsing negative values from `config.tdsl` file.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207055[#7055] Improvements to metaspace use and other memory use tweaks.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207304[#7304] Virtual host logs now properly follow log size limits.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207431[#7431] AdHoc requests between the same user with different resources are no longer dropped with `NoConnectionIdExecption`error.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207434[#7434] Adjusted `SeeOtherHotDualIP` to use new table name in cluster nodes database.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207491[#7491] Stacktraces from `CertificateContainer` are no longer printed to tigase-console.log, but will be printed to tigase.log.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207687[#7687] Fixed an error where connections failed after authentication timeout were marked as active after cleanup.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207747[#7747] Fixed `ClusterRepoItemEvent` serialization issues causing unsupported conversion error in cluster mode.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207495[#7495] fix issue with not all logs being obfuscated, added testcase, documentation
+- https://projects.tigase.net/issues?q=Redmine%20ID:%208305[#8305] fix issue with SeeOtherHostDualIP when using MongoDB
 
 == Component Changes
 
 === AMP
-- https://tigase.tech/issues/7301[#7301] Tigase AMP component now uses multiple processing threads.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207301[#7301] Tigase AMP component now uses multiple processing threads.
 
 === PubSub
-- https://tigase.tech/issues/5033[#5033] PubSub now compatible with using emojis in pubsub items.
-- https://tigase.tech/issues/5693[#5693] Fixed parsing configuration of SessionManager processors.
-- https://tigase.tech/issues/5766[#5766] PubSub now writes to all databases with UTC timestamp.
-- https://tigase.tech/issues/5953[#5953] Fixed presences not being removed from `presenceByService` collection if client disconnects without `<unavailable/>` presence being sent.
-- https://tigase.tech/issues/6176[#6176] version changed to PubSub v4.0.0.
-- https://tigase.tech/issues/7707[#7707] Fixed potential NPE in PubSub.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205033[#5033] PubSub now compatible with using emojis in pubsub items.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205693[#5693] Fixed parsing configuration of SessionManager processors.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205766[#5766] PubSub now writes to all databases with UTC timestamp.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205953[#5953] Fixed presences not being removed from `presenceByService` collection if client disconnects without `<unavailable/>` presence being sent.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206176[#6176] version changed to PubSub v4.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207707[#7707] Fixed potential NPE in PubSub.
 
 === http-api
-- https://tigase.tech/issues/4873[#4873] Support added to display timestamp fields as data, time, and timezone fields.
-- https://tigase.tech/issues/4876[#4876] Implemented using XML repository for new setups, and updated default config to use this.
-- https://tigase.tech/issues/4888[#4888] `http-api` now is enabled by default.
-- https://tigase.tech/issues/5209[#5209] Updated visual styling of pages hosted by component.
-- https://tigase.tech/issues/5290[#5290] Fixed invalid property name.
-- https://tigase.tech/issues/5316[#5316] Account Registration now can now require and send confirmation E-mails.
-- https://tigase.tech/issues/5415[#5415] Web Setup now checks configuration for message archive conflicts.
-- https://tigase.tech/issues/5460[#5460] MongoDB now supported through web-setup.
-- https://tigase.tech/issues/5717[#5717] Fixed default values of check-boxes in admin UI not being shown.
-- https://tigase.tech/issues/5950[#5950] Supported added for link:https://xmpp.org/extensions/xep-0363.html[XEP-0363: HTTP File Upload].
-- https://tigase.tech/issues/6159[#6159] Fixed NPE thrown if scripts directory is not present.
-- https://tigase.tech/issues/6176[#6176] version changed to tigase-http-api v2.0.0.
-- https://tigase.tech/issues/6212[#6212] Added mechanism for password changing through HTTP API.
-- https://tigase.tech/issues/7307[#7307] Fixed scripts returning 404 while handling rest/user/ requests even though user exists.
-- https://tigase.tech/issues/7178[#7178] Ad-hoc commands are now categorized in groups for better organization.
-- https://tigase.tech/issues/7568[#7568] Added timeout reading for HTTP request headers, added configurable `accept-timeout`.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204873[#4873] Support added to display timestamp fields as data, time, and timezone fields.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204876[#4876] Implemented using XML repository for new setups, and updated default config to use this.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204888[#4888] `http-api` now is enabled by default.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205209[#5209] Updated visual styling of pages hosted by component.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205290[#5290] Fixed invalid property name.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205316[#5316] Account Registration now can now require and send confirmation E-mails.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205415[#5415] Web Setup now checks configuration for message archive conflicts.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205460[#5460] MongoDB now supported through web-setup.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205717[#5717] Fixed default values of check-boxes in admin UI not being shown.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205950[#5950] Supported added for link:https://xmpp.org/extensions/xep-0363.html[XEP-0363: HTTP File Upload].
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206159[#6159] Fixed NPE thrown if scripts directory is not present.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206176[#6176] version changed to tigase-http-api v2.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206212[#6212] Added mechanism for password changing through HTTP API.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207307[#7307] Fixed scripts returning 404 while handling rest/user/ requests even though user exists.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207178[#7178] Ad-hoc commands are now categorized in groups for better organization.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207568[#7568] Added timeout reading for HTTP request headers, added configurable `accept-timeout`.
 
 === message-archive
-- https://tigase.tech/issues/4867[#4867] fixed issue when changing MA jid.
-- https://tigase.tech/issues/4888[#4888] `message-archive` is enabled by default.
-- https://tigase.tech/issues/5033[#5033] Update message archive to be compatible with emojis.
-- https://tigase.tech/issues/5391[#5391] Added missing query statement block starts and ends to be compatible with SQL Server.
-- https://tigase.tech/issues/5604[#5604] Modified access to static fields and functions.
-- https://tigase.tech/issues/5681[#5681] Fixed duplication of groupchat messages with different ids by modifying hash algorithm.
-- https://tigase.tech/issues/6176[#6176] version changed to message-archive v2.0.0.
-- https://tigase.tech/issues/7615[#7615] `feature-not-implemented` response no longer occurs when removing stored messages.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204867[#4867] fixed issue when changing MA jid.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204888[#4888] `message-archive` is enabled by default.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205033[#5033] Update message archive to be compatible with emojis.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205391[#5391] Added missing query statement block starts and ends to be compatible with SQL Server.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205604[#5604] Modified access to static fields and functions.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205681[#5681] Fixed duplication of groupchat messages with different ids by modifying hash algorithm.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206176[#6176] version changed to message-archive v2.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207615[#7615] `feature-not-implemented` response no longer occurs when removing stored messages.
 
 === MUC
-- https://tigase.tech/issues/4888[#4888] `muc` now is enabled by default.
-- https://tigase.tech/issues/5033[#5033] MUC component is now compatible with emojis.
-- https://tigase.tech/issues/5066[#5066] Fixed issues working with MongoDB repository.
-- https://tigase.tech/issues/5085[#5085] Removed invalid annotation parameter values.
-- https://tigase.tech/issues/5559[#5559] Fixed NPE while changing default room configuration.
-- https://tigase.tech/issues/5666[#5666] User may add more than one `<item/>` elements to query when querying room members.
-- https://tigase.tech/issues/5715[#5715] Welcome messages may now be disabled globally, or in individual room configurations.
-- https://tigase.tech/issues/5736[#5736] Rooms with no subject now return empty `<subject/>` element, as per link:https://xmpp.org/extensions/xep-0045.html#enter-subject[XEP-0048 7.2.16].
-- https://tigase.tech/issues/5813[#5813] Fixed NPE during room creation.
-- https://tigase.tech/issues/6176[#6176] version changed to tigase-muc v3.0.0.
-- https://tigase.tech/issues/6395[#6395] Fixed `tigase.db.UserNotFoundException` during retrieval of MUC user.
-- https://tigase.tech/issues/6734[#6734] Introduced `muc#roomconfig_maxresources` to allow configuration of max number of resources for a single occupant.
-- https://tigase.tech/issues/7443[#7443] Disabled XEP-0091 by default, added history attribute validation.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%204888[#4888] `muc` now is enabled by default.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205033[#5033] MUC component is now compatible with emojis.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205066[#5066] Fixed issues working with MongoDB repository.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205085[#5085] Removed invalid annotation parameter values.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205559[#5559] Fixed NPE while changing default room configuration.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205666[#5666] User may add more than one `<item/>` elements to query when querying room members.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205715[#5715] Welcome messages may now be disabled globally, or in individual room configurations.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205736[#5736] Rooms with no subject now return empty `<subject/>` element, as per link:https://xmpp.org/extensions/xep-0045.html#enter-subject[XEP-0048 7.2.16].
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205813[#5813] Fixed NPE during room creation.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206176[#6176] version changed to tigase-muc v3.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206395[#6395] Fixed `tigase.db.UserNotFoundException` during retrieval of MUC user.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206734[#6734] Introduced `muc#roomconfig_maxresources` to allow configuration of max number of resources for a single occupant.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%207443[#7443] Disabled XEP-0091 by default, added history attribute validation.
 
 === socks5 Proxy
-- https://tigase.tech/issues/2750[#2750] Cleanup of code and removal of empty javadocs.
-- https://tigase.tech/issues/5867[#5867] Fixed NPE during configuration dump when component is disabled.
-- https://tigase.tech/issues/6176[#6176] version changed to tigase-socks5 v2.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%202750[#2750] Cleanup of code and removal of empty javadocs.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205867[#5867] Fixed NPE during configuration dump when component is disabled.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206176[#6176] version changed to tigase-socks5 v2.0.0.
 
 === stats
-- https://tigase.tech/issues/5206[#5206] Fixed exception causing duplicate error entry.
-- https://tigase.tech/issues/5728[#5728] Fixed `MySQLIntegrityConstraintViolationException` in upload handler.
-- https://tigase.tech/issues/6161[#6161] Removed usage of classes from javax.xml.ws package for JDKv9 compatibility.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205206[#5206] Fixed exception causing duplicate error entry.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%205728[#5728] Fixed `MySQLIntegrityConstraintViolationException` in upload handler.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206161[#6161] Removed usage of classes from javax.xml.ws package for JDKv9 compatibility.
 
 === STUN Server
-- https://tigase.tech/issues/6176[#6176] version changed to tigase-stun v2.0.0.
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206176[#6176] version changed to tigase-stun v2.0.0.
 
 === WebSocket
-- https://tigase.tech/issues/6481[#6481] Websocket component has been improved to be more compliant with link:https://tools.ietf.org/html/rfc6455[rfc6455]
+- https://projects.tigase.net/issues?q=Redmine%20ID:%206481[#6481] Websocket component has been improved to be more compliant with link:https://tools.ietf.org/html/rfc6455[rfc6455]
