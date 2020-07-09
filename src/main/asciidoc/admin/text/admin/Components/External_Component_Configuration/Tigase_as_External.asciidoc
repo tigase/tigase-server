@@ -48,7 +48,7 @@ Knowing that we can now create simple configuration file for Tigase XMPP Server:
 admins = [ 'admin@devel.tigase.org' ]
 'config-type' = 'component'
 debug = [ 'server' ]
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 dataSource {
     default () {
         uri = 'master_server_default_database_url'
@@ -95,7 +95,7 @@ The most straightforward way is just to add another component to the server runn
 admins = [ 'admin@devel.tigase.org' ]
 'config-type' = 'component'
 debug = [ 'server' ]
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 dataSource {
     default () {
         uri = 'jdbc:derby:/tigasedb'
@@ -128,7 +128,7 @@ admins = [ 'admin@devel.tigase.org' ]
 'bind-ext-hostnames' = [ 'pubsub.devel.tigase.org' ]
 'config-type' = 'component'
 debug = [ 'server' ]
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 dataSource {
     default () {
         uri = 'jdbc:derby:/tigasedb'
@@ -171,7 +171,7 @@ This generates a configuration for Tigase with only one component loaded by defa
 admins = [ 'admin@devel.tigase.org' ]
 'config-type' = 'component'
 debug = [ 'server' ]
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 dataSource {
     default () {
         uri = 'jdbc:derby:/tigasedb'
@@ -209,7 +209,7 @@ Then we can use following configuration on the server running in the `component`
 admins = [ 'admin@devel.tigase.org' ]
 'config-type' = 'component'
 debug = [ 'server' ]
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 dataSource {
     default () {
         uri = 'jdbc:derby:/tigasedb'
@@ -249,7 +249,7 @@ admins = [ 'admin@devel.tigase.org' ]
 'bind-ext-hostnames' = [ 'pubsub.devel.tigase.org' ]
 'config-type' = 'component'
 debug = [ 'server' ]
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 dataSource {
     default () {
         uri = 'jdbc:derby:/tigasedb'

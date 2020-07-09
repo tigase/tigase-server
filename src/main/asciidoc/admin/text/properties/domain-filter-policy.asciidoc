@@ -18,12 +18,7 @@
 . `LIST` property allows to set a list of domains (users' JIDs) with which users on the domain can communicate (i.e. _whitelist_).
 . `BLACKLIST` - user can communicate with everybody (like `ALL`), except contacts on listed domains.
 
-This is a global property which is overridden by settings for particular vhosts.
-
-[source,dsl]
------
-'virtual-hosts' = [ 'domain2:domain-filter-policy=OWN' ]
------
+This is a global property which is overridden by settings for particular VHosts (see <<addManageDomain>>).
 
 A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the init.property file for which there is no individual settings specified. It allows default value for all of servers, instead of having to provide individual configuration for each vhost.
 

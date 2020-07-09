@@ -83,7 +83,7 @@ The following should be configured:
 === Mandriva
 
 Mandriva has a single init.d file, however it should be configured:
-[source,java]
+[source,bash]
 -----
 …
 export JAVA_HOME=/usr/java/jdk1.8.0
@@ -105,7 +105,7 @@ The following should be configured:
 === Redhat
 
 Similar to Mandriva, you will need to configure the init.d file:
-[source,java]
+[source,bash]
 -----
 …
 JAVA_HOME=/usr/lib/jvm/java/
@@ -141,12 +141,12 @@ TIGASE_CONSOLE_LOG=
 - `TIGASE_CONSOLE_LOG` - Location of Tigase Server console log file if you wish to use a custom directory. Default will be located in /logs directory, failing that /dev/null.
 
 After you've copied the script, in order to install sysinit script you have to add it to the configuration:
-[source,java]
+[source,bash]
 -----
 /sbin/chkconfig --add tigase
 -----
 Service can be enabled or disabled service with:
-[source,java]
+[source,bash]
 -----
 /sbin/chkconfig tigase <on|off|reset>
 -----

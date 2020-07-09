@@ -90,11 +90,11 @@ But how we can send packet from a module? *AbstractModule* contains method *void
 Before we go any further with the implementation let's configure the component in Tigase server so it is loaded next time the server starts.
 Assuming our *init.tdsl* file looks like this one:
 
-[source,java]
+[source]
 -----
 'config-type' = 'default'
 'debug' = ['server']
-'virtual-hosts' = [ 'devel.tigase.org' ]
+'default-virtual-host' = [ 'devel.tigase.org' ]
 admins = [ 'admin@devel.tigase.org' ]
 dataSource {
   default () {

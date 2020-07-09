@@ -244,7 +244,7 @@ INFO: schema upgrade finished!
 
   'config-type' = 'default'
   debug = [ 'server' ]
-  'virtual-hosts' = [ 'ubuntu' ]
+  'default-virtual-host' = [ 'ubuntu' ]
   dataSource () {
       default () {
           uri = 'jdbc:derby:tigasedbx;create=true'

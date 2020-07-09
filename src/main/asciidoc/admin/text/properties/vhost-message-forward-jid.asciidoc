@@ -15,11 +15,6 @@ The null value is used as a default when no configuration is set. This setting i
 
 It is also applied as a default value for all new vhosts added at run-time.
 
-This is a global property which is overridden by settings for particular vhost.
-
-[source,dsl]
------
-'virtual-hosts' = [ 'domain3:vhost-message-forward-jid = archive@domain.com' ]
------
+This is a global property which is overridden by settings for particular VHost (see <<addManageDomain>>).
 
 *Available since:* 8.0.0

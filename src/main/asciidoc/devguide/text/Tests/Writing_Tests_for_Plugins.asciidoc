@@ -39,7 +39,7 @@ Let's take link:http://www.xmpp.org/extensions/xep-0049.html[XEP-0049] Private X
 
 This is enough for the first simple test. I have to create text file `JabberIqPrivate.test` looking like this:
 
-[source,java]
+[source]
 -----
 send: {
 

@@ -17,11 +17,6 @@ The `false` value is used as a default when no configuration is set. This settin
 
 It is also applied as a default value for all new vhosts added at run-time.
 
-This may be used on a per-vhost basis
-
-[source,dsl]
------
-'virtual-hosts' = [ 'domain3:vhost-tls-required = true' ]
------
+This may be used on a per-VHost (see <<addManageDomain>>).
 
 *Available since:* 8.0.0

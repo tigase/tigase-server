@@ -44,7 +44,7 @@ Please refer to the Tigase scripting documentation for all the details how to ad
 
 The script to pull a list of current bad words can be as simple as the following Groovy code:
 
-[source,java]
+[source,groovy]
 -----
 def badw = (java.util.Set)badWords
 def result = ""
@@ -58,7 +58,7 @@ Load the script on to the server and execute it. You should receive a new window
 
 Below is another simple script which allows updating (adding/removing) bad words from the list.
 
-[source,java]
+[source,groovy]
 -----
 import tigase.server.Command
 import tigase.server.Packet

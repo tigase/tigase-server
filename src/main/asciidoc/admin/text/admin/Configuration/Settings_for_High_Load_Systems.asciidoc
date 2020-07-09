@@ -23,7 +23,7 @@ fs.file-max = 358920
 
 If you plan to run high load service with large number of server connections, then this parameter should be at least as twice big as the number of network connections you expect to support. You can change this setting by executing the command:
 
-[source,java]
+[source]
 -----
 # sysctl -w fs.file-max=360000
 fs.file-max = 360000

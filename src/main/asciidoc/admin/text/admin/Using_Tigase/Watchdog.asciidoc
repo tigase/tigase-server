@@ -54,7 +54,7 @@ For example, lets draw this out and get a visual representation
 
 // from https://tigase.tech/issues/3581#note-25
 
-[source,java]
+[source]
 -----
 -----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-- // <1>
      |     |     |     |     |     |     |     |     |     |     |

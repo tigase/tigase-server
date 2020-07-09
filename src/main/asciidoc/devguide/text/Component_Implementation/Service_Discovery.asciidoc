@@ -44,9 +44,7 @@ In our simple spam filtering component let's show how many messages have been ch
 
 [source,java]
 -----
-updateServiceDiscoveryItem(getName(), null,
-  getDiscoDescription() + ": [" +
-  (++messagesCounter) + "]", true);
+updateServiceDiscoveryItem(getName(), null, getDiscoDescription() + ": [" + (++messagesCounter) + "]", true);
 -----
 
 _A small performance note, in some cases calling `updateServiceDiscoveryItem(...)` might be an expensive operation so probably a better idea would be to call the method not every time we receive a message but maybe every 100 times or so._
