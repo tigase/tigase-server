@@ -26,7 +26,6 @@ import tigase.kernel.beans.Bean;
 import tigase.xmpp.XMPPResourceConnection;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.util.Map;
 
 /**
  * Factory of {@linkplain CallbackHandler CallbackHandlers}.
@@ -40,10 +39,9 @@ public class CallbackHandlerFactory
 	private static final String CALLBACK_HANDLER_KEY = "callbackhandler";
 
 	@Override
-	public CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
-								  Map<String, Object> settings)
+	public CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		String handlerClassName = getHandlerClassname(mechanismName, session, repo, settings);
+		String handlerClassName = getHandlerClassname(mechanismName, session, repo);
 		if (handlerClassName == null) {
 			handlerClassName = PlainCallbackHandler.class.getName();
 		}
@@ -68,10 +66,6 @@ public class CallbackHandlerFactory
 			((AuthRepositoryAware) handler).setAuthRepository(session.getAuthRepository());
 		}
 
-		if (handler instanceof PluginSettingsAware) {
-			((PluginSettingsAware) handler).setPluginSettings(settings);
-		}
-
 		if (handler instanceof MechanismNameAware) {
 			((MechanismNameAware) handler).setMechanismName(mechanismName);
 		}
@@ -79,25 +73,18 @@ public class CallbackHandlerFactory
 		return handler;
 	}
 
-	private String getHandlerClassname(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
-									   Map<String, Object> settings) {
-		if (settings != null && settings.containsKey(CALLBACK_HANDLER_KEY + "-" + mechanismName)) {
-			return (String) settings.get(CALLBACK_HANDLER_KEY + "-" + mechanismName);
-		} else if (settings != null && settings.containsKey(CALLBACK_HANDLER_KEY)) {
-			return (String) settings.get(CALLBACK_HANDLER_KEY);
-		} else {
-			switch (mechanismName) {
-				case SaslSCRAM.NAME:
-				case SaslSCRAMPlus.NAME:
-				case SaslSCRAMSha256.NAME:
-				case SaslSCRAMSha256Plus.NAME:
-				case SaslSCRAMSha512.NAME:
-				case SaslSCRAMSha512Plus.NAME:
-					return ScramCallbackHandler.class.getName();
-				default:
-					return null;
-			}
+	protected String getHandlerClassname(String mechanismName, XMPPResourceConnection session,
+										 NonAuthUserRepository repo) {
+		switch (mechanismName) {
+			case SaslSCRAM.NAME:
+			case SaslSCRAMPlus.NAME:
+			case SaslSCRAMSha256.NAME:
+			case SaslSCRAMSha256Plus.NAME:
+			case SaslSCRAMSha512.NAME:
+			case SaslSCRAMSha512Plus.NAME:
+				return ScramCallbackHandler.class.getName();
+			default:
+				return null;
 		}
 	}
-
 }

@@ -17,6 +17,7 @@
  */
 package tigase.auth.callbacks;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.NonAuthUserRepository;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -28,8 +29,15 @@ import java.util.Map;
  */
 public interface CallbackHandlerFactoryIfc {
 
-	CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
-						   Map<String, Object> settings)
+	CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException;
+
+	@Deprecated
+	@TigaseDeprecated(note = "Settings are not use anymore", since = "8.1.0")
+	default CallbackHandler create(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
+						   Map<String, Object> settings)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		return this.create(mechanismName, session, repo, null);
+	}
 
 }
