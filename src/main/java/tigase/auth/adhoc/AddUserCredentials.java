@@ -55,20 +55,20 @@ public class AddUserCredentials
 
 		checkIfCanModifyJID(request, jid);
 
-		String username = form.getAsString(FIELD_USERNAME);
+		String credentialId = form.getAsString(FIELD_CREDENTIAL_ID);
 		String password = form.getAsString(FIELD_PASSWORD);
 
-		if (username == null || username.trim().isEmpty()) {
-			username = Credentials.DEFAULT_USERNAME;
+		if (credentialId == null || credentialId.trim().isEmpty()) {
+			credentialId = Credentials.DEFAULT_CREDENTIAL_ID;
 		}
 
-		if (password == null || username.isEmpty()) {
+		if (password == null || credentialId.isEmpty()) {
 			throw new AdHocCommandException(Authorization.BAD_REQUEST, "Passwor cannot be null");
 		}
 
 		Form resp = new Form("result", null, null);
 
-		authRepository.updateCredential(jid, username.trim(), password);
+		authRepository.updateCredential(jid, credentialId.trim(), password);
 
 		resp.addField(Field.fieldFixed("OK"));
 
@@ -81,7 +81,7 @@ public class AddUserCredentials
 		Form form = new Form("form", getName(), null);
 
 		form.addField(Field.fieldJidSingle(FIELD_JID, null, "The Jabber ID for the account"));
-		form.addField(Field.fieldJidSingle(FIELD_USERNAME, null, "Username"));
+		form.addField(Field.fieldJidSingle(FIELD_CREDENTIAL_ID, null, "Credential ID"));
 		form.addField(Field.fieldJidSingle(FIELD_PASSWORD, null, "Password"));
 
 		response.startSession();

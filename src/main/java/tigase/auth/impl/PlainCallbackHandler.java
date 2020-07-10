@@ -42,7 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.auth.CallbackHandlerFactory.AUTH_JID;
-import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
+import static tigase.auth.credentials.Credentials.DEFAULT_CREDENTIAL_ID;
 
 /**
  * Implementation of CallbackHandler for authentication with SASL PLAIN or using plaintext password.
@@ -57,7 +57,7 @@ public class PlainCallbackHandler
 	protected AuthRepository repo;
 	private boolean loggingInForbidden = false;
 	private XMPPResourceConnection session;
-	private String username;
+	private String credentialId;
 
 	@Override
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -127,7 +127,7 @@ public class PlainCallbackHandler
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
-		username = DEFAULT_USERNAME;//nc.getDefaultName();
+		credentialId = DEFAULT_CREDENTIAL_ID;
 
 		BareJID jid = BareJID.bareJIDInstanceNS(nc.getDefaultName());
 		if (jid.getLocalpart() == null || !domain.equalsIgnoreCase(jid.getDomain())) {
@@ -136,7 +136,7 @@ public class PlainCallbackHandler
 		setJid(jid);
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "NameCallback: {0}", username);
+			log.log(Level.FINEST, "NameCallback: {0}", credentialId);
 		}
 	}
 
@@ -154,7 +154,7 @@ public class PlainCallbackHandler
 	protected void handleVerifyPasswordCallback(VerifyPasswordCallback pc) throws IOException {
 		final String password = pc.getPassword();
 		try {
-			Credentials credentials = repo.getCredentials(jid, username);
+			Credentials credentials = repo.getCredentials(jid, credentialId);
 
 			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");
 			if (entry == null) {
@@ -181,14 +181,14 @@ public class PlainCallbackHandler
 		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
 				!callback.getAuthzId().equals(jid.toString())) {
 			try {
-				username = jid.getLocalpart();
+				credentialId = jid.getLocalpart();
 				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
 			} catch (TigaseStringprepException ex) {
 				log.warning("Malformed AuthorizationId: " + ex.getMessage());
 				throw new XmppSaslException(XmppSaslException.SaslError.invalid_authzid);
 			}
 		} else {
-			username = DEFAULT_USERNAME;
+			credentialId = DEFAULT_CREDENTIAL_ID;
 			callback.setAuthzId(jid.toString());
 		}
 	}

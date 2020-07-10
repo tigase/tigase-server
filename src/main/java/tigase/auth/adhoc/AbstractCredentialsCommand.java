@@ -17,6 +17,7 @@
  */
 package tigase.auth.adhoc;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
@@ -39,7 +40,10 @@ public abstract class AbstractCredentialsCommand
 		implements AdHocCommand {
 
 	protected static final String FIELD_JID = "jid";
-	protected static final String FIELD_USERNAME = "username";
+	protected static final String FIELD_CREDENTIAL_ID = "credentialId";
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", note = "Using CredentialID instead of username for clarity")
+	protected static final String FIELD_USERNAME = FIELD_CREDENTIAL_ID;
 	protected static final String FIELD_PASSWORD = "password";
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	@Inject

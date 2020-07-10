@@ -37,7 +37,7 @@ public class StoredProcedures {
 
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
-	private static final String DEFAULT_USERNAME_SHA1 = sha1(Credentials.DEFAULT_USERNAME);
+	private static final String DEFAULT_USERNAME_SHA1 = sha1(Credentials.DEFAULT_CREDENTIAL_ID);
 
 	private static final String GET_VERSION = "select version from tig_schema_versions where (component = ?)";
 
@@ -726,7 +726,7 @@ public class StoredProcedures {
 	public static void tigUpdatePasswordPlainPw(String userId, String userPw) throws SQLException {
 		String passwordEncoding = Optional.ofNullable(tigGetDBProperty("password-encoding")).orElse("PLAIN");
 		String encodedPassword = encodePassword(passwordEncoding, userId, userPw);
-		tigUserCredentialUpdate(userId, Credentials.DEFAULT_USERNAME, passwordEncoding, encodedPassword);
+		tigUserCredentialUpdate(userId, Credentials.DEFAULT_CREDENTIAL_ID, passwordEncoding, encodedPassword);
 	}
 
 	public static void tigUpdatePasswordPlainPwRev(String userPw, String userId) throws SQLException {
@@ -835,7 +835,7 @@ public class StoredProcedures {
 			String encodedPassword = encodePassword(passwordEncoding, userId, userPw);
 			PreparedStatement ps = conn.prepareStatement(
 					"select u.user_id from tig_users u inner join tig_user_credentials c on c.uid = u.uid where (u.account_status > 0) AND ( lower(u.user_id) = ?) " +
-							" AND c.username = '" + Credentials.DEFAULT_USERNAME +
+							" AND c.username = '" + Credentials.DEFAULT_CREDENTIAL_ID +
 							"' AND c.mechanism = ? AND c.value = ?");
 
 			ps.setString(1, userId.toLowerCase());

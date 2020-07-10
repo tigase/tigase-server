@@ -538,7 +538,7 @@ public abstract class RepositoryAccess {
 			throws TigaseDBException, TigaseStringprepException {
 		try {
 			authRepo.updateCredential(BareJID.bareJIDInstance(name_param, getDomain().getVhost().getDomain()),
-									  Credentials.DEFAULT_USERNAME, pass_param);
+									  Credentials.DEFAULT_CREDENTIAL_ID, pass_param);
 			if (registr_params != null) {
 				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
 					repo.setData(BareJID.bareJIDInstance(name_param, getDomain().getVhost().getDomain()),

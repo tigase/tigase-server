@@ -54,15 +54,15 @@ public class DeleteUserCredentials
 
 		checkIfCanModifyJID(request, jid);
 
-		String username = form.getAsString(FIELD_USERNAME);
+		String credentialId = form.getAsString(FIELD_CREDENTIAL_ID);
 
-		if (username == null || username.trim().isEmpty()) {
-			username = Credentials.DEFAULT_USERNAME;
+		if (credentialId == null || credentialId.trim().isEmpty()) {
+			credentialId = Credentials.DEFAULT_CREDENTIAL_ID;
 		}
 
 		Form resp = new Form("result", null, null);
 
-		authRepository.removeCredential(jid, username.trim());
+		authRepository.removeCredential(jid, credentialId.trim());
 
 		resp.addField(Field.fieldFixed("OK"));
 
@@ -75,7 +75,7 @@ public class DeleteUserCredentials
 		Form form = new Form("form", getName(), null);
 
 		form.addField(Field.fieldJidSingle(FIELD_JID, null, "The Jabber ID for the account"));
-		form.addField(Field.fieldJidSingle(FIELD_USERNAME, null, "Username"));
+		form.addField(Field.fieldJidSingle(FIELD_CREDENTIAL_ID, null, "Credential ID"));
 
 		response.startSession();
 		response.getElements().add(form.getElement());

@@ -44,7 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.auth.CallbackHandlerFactory.AUTH_JID;
-import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
+import static tigase.auth.credentials.Credentials.DEFAULT_CREDENTIAL_ID;
 
 /**
  * Implementation of CallbackHandler to support authentication using SASL SCRAM-* authentication mechanism.
@@ -61,7 +61,7 @@ public class ScramCallbackHandler
 	private String mechanismName;
 	private AuthRepository repo;
 	private XMPPResourceConnection session;
-	private String username = null;
+	private String credentialId = null;
 
 	public ScramCallbackHandler() {
 	}
@@ -144,7 +144,7 @@ public class ScramCallbackHandler
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
-		username = DEFAULT_USERNAME;//nc.getDefaultName();
+		credentialId = DEFAULT_CREDENTIAL_ID;
 		BareJID jid = BareJID.bareJIDInstanceNS(nc.getDefaultName());
 		if (jid.getLocalpart() == null || !domain.equalsIgnoreCase(jid.getDomain())) {
 			jid = BareJID.bareJIDInstanceNS(nc.getDefaultName(), domain);
@@ -152,7 +152,7 @@ public class ScramCallbackHandler
 		setJid(jid);
 		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "NameCallback: {0}", username);
+			log.log(Level.FINEST, "NameCallback: {0}", credentialId);
 		}
 	}
 
@@ -196,13 +196,13 @@ public class ScramCallbackHandler
 		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
 				!callback.getAuthzId().equals(jid.toString())) {
 			try {
-				username = jid.getLocalpart();
+				credentialId = jid.getLocalpart();
 				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
 		} else {
-			username = DEFAULT_USERNAME;
+			credentialId = DEFAULT_CREDENTIAL_ID;
 			callback.setAuthzId(jid.toString());
 		}
 	}
@@ -242,7 +242,7 @@ public class ScramCallbackHandler
 		}
 
 		try {
-			Credentials credentials = repo.getCredentials(jid, username);
+			Credentials credentials = repo.getCredentials(jid, credentialId);
 
 			if (credentials == null) {
 				loggingInForbidden = true;
@@ -264,7 +264,7 @@ public class ScramCallbackHandler
 				loggingInForbidden = !credentials.canLogin();
 			}
 		} catch (Exception ex) {
-			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with username " + username, ex);
+			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with credentialId " + credentialId, ex);
 		}
 		credentialsFetched = true;
 	}
