@@ -282,10 +282,13 @@ public abstract class XMPPProcessorAbstract
 			if ((resource == null) && (packet.getElemName() == Message.ELEM_NAME)) {
 				conns.addAll(session.getActiveSessions());
 			} else {
-				XMPPResourceConnection con = session.getParentSession().getResourceForResource(resource);
+				XMPPSession parentSession = session.getParentSession();
+				if (parentSession != null) {
+					XMPPResourceConnection con = parentSession.getResourceForResource(resource);
 
-				if (con != null) {
-					conns.add(con);
+					if (con != null) {
+						conns.add(con);
+					}
 				}
 			}
 			if (conns.size() > 0) {
