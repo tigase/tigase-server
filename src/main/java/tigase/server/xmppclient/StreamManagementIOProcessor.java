@@ -240,7 +240,12 @@ public class StreamManagementIOProcessor
 		}
 
 		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
-		outQueue.append(packet);
+		if (outQueue == null) {
+			OutQueue.Entry e = new OutQueue.Entry(packet);
+			connectionManager.processUndeliveredPacket(e.getPacketWithStamp(), e.stamp, null);
+		} else {
+			outQueue.append(packet);
+		}
 
 		return service.getSessionData().containsKey(RESUMPTION_TASK_KEY);
 	}
@@ -662,7 +667,7 @@ public class StreamManagementIOProcessor
 			return queue;
 		}
 
-		public class Entry {
+		public static class Entry {
 
 			private final Packet packet;
 			private final long stamp = System.currentTimeMillis();
