@@ -60,10 +60,10 @@ public class ShowUserCredentials
 		MultiItemForm resp = new MultiItemForm();
 		resp.setType("form");
 
-		Collection<String> usernames = authRepository.getUsernames(jid);
-		for (String username : usernames) {
+		Collection<String> credentialIds = authRepository.getCredentialIds(jid);
+		for (String credentialId : credentialIds) {
 			Fields ff = new Fields();
-			ff.addField(Field.fieldTextSingle("username", username, "Username"));
+			ff.addField(Field.fieldTextSingle("credentialId", credentialId, "Credential ID"));
 			resp.addItem(ff);
 		}
 

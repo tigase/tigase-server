@@ -55,7 +55,7 @@ public class LdapAuthProvider
 	}
 
 	@Override
-	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+	public Credentials getCredentials(BareJID user, String credentialId) throws TigaseDBException {
 		Credentials.Entry entry = new Credentials.Entry() {
 			@Override
 			public String getMechanism() {

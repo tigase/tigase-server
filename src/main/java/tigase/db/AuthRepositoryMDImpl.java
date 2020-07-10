@@ -72,11 +72,11 @@ public abstract class AuthRepositoryMDImpl
 	}
 
 	@Override
-	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+	public Credentials getCredentials(BareJID user, String credentialId) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
-			return repo.getCredentials(user, username);
+			return repo.getCredentials(user, credentialId);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
@@ -103,11 +103,11 @@ public abstract class AuthRepositoryMDImpl
 	}
 
 	@Override
-	public Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+	public Collection<String> getCredentialIds(BareJID user) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
-			return repo.getUsernames(user);
+			return repo.getCredentialIds(user);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
@@ -215,11 +215,11 @@ public abstract class AuthRepositoryMDImpl
 	}
 
 	@Override
-	public void removeCredential(BareJID user, String username) throws TigaseDBException {
+	public void removeCredential(BareJID user, String credentialId) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
-			repo.removeCredential(user, username);
+			repo.removeCredential(user, credentialId);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
@@ -265,11 +265,11 @@ public abstract class AuthRepositoryMDImpl
 	}
 
 	@Override
-	public void updateCredential(BareJID user, String username, String password) throws TigaseDBException {
+	public void updateCredential(BareJID user, String credentialId, String password) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
-			repo.updateCredential(user, username, password);
+			repo.updateCredential(user, credentialId, password);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");

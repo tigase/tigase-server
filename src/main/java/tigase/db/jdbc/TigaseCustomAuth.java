@@ -238,22 +238,22 @@ public class TigaseCustomAuth
 	@ConfigField(desc = "Removes a user from the database", alias = DEF_DELUSER_KEY)
 	private String deluser_query = DEF_DELUSER_QUERY;
 	// credentials queries
-	@ConfigField(desc = "Select list of credentials for account and username", alias = "get-account-credentials-query")
+	@ConfigField(desc = "Select list of credentials for account and credential-id", alias = "get-account-credentials-query")
 	private String getaccountcredentials_query = "{ call TigUserCredentials_Get(?,?) }";
-	@ConfigField(desc = "Select list of usernames for account", alias = "get-account-usernames-query")
-	private String getaccountusernames_query = "{ call TigUserUsernames_Get(?) }";
+	@ConfigField(desc = "Select list of credential IDs for account", alias = "get-account-credentialids-query")
+	private String getaccountcredentialids_query = "{ call TigUserUsernames_Get(?) }";
 	@ConfigField(desc = "Database initialization query which is run after the server is started", alias = DEF_INITDB_KEY)
 	private String initdb_query = null;
 	@ConfigField(desc = "Lists disabled accounts", alias = DEF_LISTDISABLEDACCOUNTS_KEY)
 	private String listdisabledaccounts_query = DEF_LISTDISABLEDACCOUNTS_QUERY;
 	@ConfigField(desc = "Comma separated list of NON-SASL authentication mechanisms", alias = DEF_NONSASL_MECHS_KEY)
 	private String[] nonsasl_mechs = DEF_NONSASL_MECHS.split(",");
-	@ConfigField(desc = "Remove credential for account and username", alias = "remove-account-credential-query")
+	@ConfigField(desc = "Remove credential for account and credential ID", alias = "remove-account-credential-query")
 	private String removeaccountcredential_query = "{ call TigUserCredential_Remove(?,?) }";
 	// private String userlogout_query = DEF_USERLOGOUT_QUERY;
 	@ConfigField(desc = "Comma separated list of SASL authentication mechanisms", alias = DEF_SASL_MECHS_KEY)
 	private String[] sasl_mechs = DEF_SASL_MECHS.split(",");
-	@ConfigField(desc = "Update credential for account and username", alias = "update-account-credential-query")
+	@ConfigField(desc = "Update credential for account and credential ID", alias = "update-account-credential-query")
 	private String updateaccountcredential_query = "{ call TigUserCredential_Update(?,?,?,?) }";
 	@ConfigField(desc = "Updates (changes) account status", alias = DEF_UPDATEACCOUNTSTATUS_KEY)
 	private String updateaccountstatus_query = DEF_UPDATEACCOUNTSTATUS_QUERY;
@@ -300,7 +300,7 @@ public class TigaseCustomAuth
 				}
 			}
 
-			updateCredential(user, Credentials.DEFAULT_USERNAME, password);
+			updateCredential(user, Credentials.DEFAULT_CREDENTIAL_ID, password);
 		} catch (SQLIntegrityConstraintViolationException e) {
 			throw new UserExistsException("Error while adding user to repository, user possibly exists: " + user, e);
 		} catch (SQLException e) {
@@ -373,7 +373,7 @@ public class TigaseCustomAuth
 	}
 
 	@Override
-	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+	public Credentials getCredentials(BareJID user, String credentialId) throws TigaseDBException {
 		if (userlogin_active) {
 			return new SingleCredential(user, getAccountStatus(user), new Credentials.Entry() {
 				@Override
@@ -401,7 +401,7 @@ public class TigaseCustomAuth
 				ResultSet rs = null;
 				try {
 					get_credentials.setString(1, user.toString());
-					get_credentials.setString(2, username);
+					get_credentials.setString(2, credentialId);
 					rs = get_credentials.executeQuery();
 
 					while (rs.next()) {
@@ -420,7 +420,7 @@ public class TigaseCustomAuth
 			}
 			if (accountStatus == null && entries.isEmpty()) {
 				throw new UserNotFoundException(
-						"No credentials found for the user: " + user + " (username: " + username + ")");
+						"No credentials found for the user: " + user + " (credential ID: " + credentialId + ")");
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Got account: {0} credentials: {1}", new Object[]{user, accountStatus});
@@ -428,7 +428,7 @@ public class TigaseCustomAuth
 			return new DefaultCredentials(user, accountStatus, entries, getCredentialsDecoder());
 		} catch (SQLException e) {
 			throw new TigaseDBException(
-					"Problem with retrieving credentials for account " + user + " and username " + username, e);
+					"Problem with retrieving credentials for account " + user + " and credential ID " + credentialId, e);
 		}
 	}
 
@@ -463,19 +463,19 @@ public class TigaseCustomAuth
 	}
 
 	@Override
-	public Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+	public Collection<String> getCredentialIds(BareJID user) throws TigaseDBException {
 		try {
-			PreparedStatement usernamesStatement = data_repo.getPreparedStatement(user, getaccountusernames_query);
+			PreparedStatement credentialIdsStatement = data_repo.getPreparedStatement(user, getaccountcredentialids_query);
 			List<String> result = new ArrayList<>();
-			synchronized (usernamesStatement) {
+			synchronized (credentialIdsStatement) {
 				ResultSet rs = null;
 				try {
-					usernamesStatement.setString(1, user.toString());
-					rs = usernamesStatement.executeQuery();
+					credentialIdsStatement.setString(1, user.toString());
+					rs = credentialIdsStatement.executeQuery();
 
 					while (rs.next()) {
-						String username = rs.getString(1);
-						result.add(username);
+						String credentialId = rs.getString(1);
+						result.add(credentialId);
 					}
 
 				} finally {
@@ -483,12 +483,12 @@ public class TigaseCustomAuth
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Account: {0} has usernames: {1}", new Object[]{user, result});
+				log.log(Level.FINEST, "Account: {0} has credentialId: {1}", new Object[]{user, result});
 			}
 
 			return result;
 		} catch (SQLException e) {
-			throw new TigaseDBException("Problem with retrieving usernames for account " + user, e);
+			throw new TigaseDBException("Problem with retrieving credential IDs for account " + user, e);
 		}
 	}
 
@@ -741,13 +741,13 @@ public class TigaseCustomAuth
 	}
 
 	@Override
-	public void removeCredential(BareJID user, String username) throws TigaseDBException {
+	public void removeCredential(BareJID user, String credentialId) throws TigaseDBException {
 		try {
 			PreparedStatement removeCredential_stmt = data_repo.getPreparedStatement(user,
 																					 removeaccountcredential_query);
 			synchronized (removeCredential_stmt) {
 				removeCredential_stmt.setString(1, user.toString());
-				removeCredential_stmt.setString(2, username);
+				removeCredential_stmt.setString(2, credentialId);
 				removeCredential_stmt.execute();
 			}
 		} catch (SQLException e) {
@@ -909,8 +909,8 @@ public class TigaseCustomAuth
 			if (getaccountcredentials_query != null) {
 				data_repo.initPreparedStatement(getaccountcredentials_query, getaccountcredentials_query);
 			}
-			if (getaccountusernames_query != null) {
-				data_repo.initPreparedStatement(getaccountusernames_query, getaccountusernames_query);
+			if (getaccountcredentialids_query != null) {
+				data_repo.initPreparedStatement(getaccountcredentialids_query, getaccountcredentialids_query);
 			}
 			if (removeaccountcredential_query != null) {
 				data_repo.initPreparedStatement(removeaccountcredential_query, removeaccountcredential_query);
@@ -931,22 +931,22 @@ public class TigaseCustomAuth
 	}
 
 	@Override
-	public void updateCredential(BareJID user, String username, String password)
+	public void updateCredential(BareJID user, String credentialId, String password)
 			throws TigaseDBException {
 		List<String[]> entries = getCredentialsEncoder().encodeForAllMechanisms(user, password);
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Updating credentials for user: {0}, username: {1}",
-						new Object[]{user, username});
+				log.log(Level.FINEST, "Updating credentials for user: {0}, credentialId: {1}",
+						new Object[]{user, credentialId});
 			}
-			removeCredential(user, username);
+			removeCredential(user, credentialId);
 
 			PreparedStatement updateCredential_stmt = data_repo.getPreparedStatement(user,
 																					 updateaccountcredential_query);
 			synchronized (updateCredential_stmt) {
 				for (String[] entry : entries) {
 					updateCredential_stmt.setString(1, user.toString());
-					updateCredential_stmt.setString(2, username);
+					updateCredential_stmt.setString(2, credentialId);
 					updateCredential_stmt.setString(3, entry[0]);
 					updateCredential_stmt.setString(4, entry[1]);
 

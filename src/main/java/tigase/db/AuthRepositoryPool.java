@@ -79,12 +79,12 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+	public Credentials getCredentials(BareJID user, String credentialId) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
-				return repo.getCredentials(user, username);
+				return repo.getCredentials(user, credentialId);
 			} finally {
 				addRepo(repo);
 			}
@@ -128,12 +128,12 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+	public Collection<String> getCredentialIds(BareJID user) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
-				return repo.getUsernames(user);
+				return repo.getCredentialIds(user);
 			} finally {
 				addRepo(repo);
 			}
@@ -278,12 +278,12 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public void removeCredential(BareJID user, String username) throws TigaseDBException {
+	public void removeCredential(BareJID user, String credentialId) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
-				repo.removeCredential(user, username);
+				repo.removeCredential(user, credentialId);
 			} finally {
 				addRepo(repo);
 			}
@@ -348,12 +348,12 @@ public class AuthRepositoryPool
 	}
 
 	@Override
-	public void updateCredential(BareJID user, String username, String password) throws TigaseDBException {
+	public void updateCredential(BareJID user, String credentialId, String password) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
-				repo.updateCredential(user, username, password);
+				repo.updateCredential(user, credentialId, password);
 			} finally {
 				addRepo(repo);
 			}

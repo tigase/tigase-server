@@ -30,7 +30,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.auth.credentials.Credentials.DEFAULT_USERNAME;
+import static tigase.auth.credentials.Credentials.DEFAULT_CREDENTIAL_ID;
 
 /**
  * Describe class AuthRepositoryImpl here.
@@ -68,7 +68,7 @@ public class AuthRepositoryImpl
 	public void addUser(BareJID user, final String password) throws UserExistsException, TigaseDBException {
 		repo.addUser(user);
 		log.info("Repo user added: " + user);
-		updateCredential(user, DEFAULT_USERNAME, password);
+		updateCredential(user, DEFAULT_CREDENTIAL_ID, password);
 		log.info("Password updated: " + user + ":" + password);
 	}
 

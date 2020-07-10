@@ -108,8 +108,6 @@ public interface AuthRepository
 	 */
 	String USER_ID_KEY = "user-id";
 
-	String USERNAME_KEY = "username";
-
 	enum AccountStatus {
 		active(1),
 		disabled(0),
@@ -157,7 +155,7 @@ public interface AuthRepository
 
 	AccountStatus getAccountStatus(BareJID user) throws TigaseDBException;
 
-	default Credentials getCredentials(BareJID user, String username) throws TigaseDBException {
+	default Credentials getCredentials(BareJID user, String credentialId) throws TigaseDBException {
 		String password = getPassword(user);
 		if (password != null) {
 			return new SingleCredential(user, getAccountStatus(user), new PlainCredentialsEntry(password));
@@ -176,8 +174,14 @@ public interface AuthRepository
 	 */
 	String getResourceUri();
 
-	default Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+	default Collection<String> getCredentialIds(BareJID user) throws TigaseDBException {
 		return Collections.emptyList();
+	}
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", note = "Adjusting naming, 'name' was renamed to correct 'credentialId'")
+	default Collection<String> getUsernames(BareJID user) throws TigaseDBException {
+		return getCredentialIds(user);
 	}
 
 	/**
@@ -233,7 +237,7 @@ public interface AuthRepository
 	@TigaseDeprecated(since = "8.0.0")
 	void queryAuth(Map<String, Object> authProps);
 
-	default void removeCredential(BareJID user, String username) throws TigaseDBException {
+	default void removeCredential(BareJID user, String credentialId) throws TigaseDBException {
 
 	}
 
@@ -254,7 +258,7 @@ public interface AuthRepository
 		}
 	}
 
-	default void updateCredential(BareJID user, String username, String password)
+	default void updateCredential(BareJID user, String credentialId, String password)
 			throws TigaseDBException {
 		updatePassword(user, password);
 	}

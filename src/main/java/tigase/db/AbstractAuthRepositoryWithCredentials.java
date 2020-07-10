@@ -36,7 +36,7 @@ public abstract class AbstractAuthRepositoryWithCredentials
 
 	@Override
 	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
-		Credentials credentials = getCredentials(user, Credentials.DEFAULT_USERNAME);
+		Credentials credentials = getCredentials(user, Credentials.DEFAULT_CREDENTIAL_ID);
 		if (credentials != null) {
 			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");
 			if (entry != null && entry instanceof PlainCredentialsEntry) {

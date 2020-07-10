@@ -17,16 +17,21 @@
  */
 package tigase.auth.credentials;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xmpp.jid.BareJID;
 
 /**
  * Interface implemented by classes handling user login credentials. In implementations of this interface multiple
- * credentials for single account may be stored but for single username, ie. different credentials for different
+ * credentials for single account may be stored but for single credentialId, ie. different credentials for different
  * authentication mechanisms.
  */
 public interface Credentials {
 
-	String DEFAULT_USERNAME = "default";
+	String DEFAULT_CREDENTIAL_ID = "default";
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.1.0", note = "Username changed to CredentialId")
+	String DEFAULT_USERNAME = DEFAULT_CREDENTIAL_ID;
 
 	/**
 	 * Checks if account can perform logging-in
