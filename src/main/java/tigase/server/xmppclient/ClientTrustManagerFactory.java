@@ -110,29 +110,30 @@ public class ClientTrustManagerFactory {
 	public TrustManager[] getManager(final VHostItem vHost) {
 		TrustManager[] result = trustManagers.get(vHost);
 
+		final String vhostKey = vHost != null ? vHost.getKey() : "null";
 		if (result == null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Creating new TrustManager for VHost " + vHost.getKey());
+				log.finest("Creating new TrustManager for VHost " + vhostKey);
 			}
 
 			result = defaultTrustManagers;
 			ClientTrustVHostItemExtension extension = vHost.getExtension(ClientTrustVHostItemExtension.class);
 			String path = extension != null ? extension.getCaCertPath() : null;
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("CA cert path=" + path + " for VHost " + vHost.getKey());
+				log.finest("CA cert path=" + path + " for VHost " + vhostKey);
 			}
 			if (path != null) {
 				TrustManager[] tmp = loadTrustedCert(path);
 				if (tmp != null) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Using custom TrustManager for VHost " + vHost.getKey());
+						log.finest("Using custom TrustManager for VHost " + vhostKey);
 					}
 					result = tmp;
 					trustManagers.put(vHost, result);
 				}
 			}
 		} else if (log.isLoggable(Level.FINEST)) {
-			log.finest("Found TrustManager for VHost " + vHost.getKey());
+			log.finest("Found TrustManager for VHost " + vhostKey);
 		}
 
 		return result;

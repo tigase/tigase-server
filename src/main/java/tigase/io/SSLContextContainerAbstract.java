@@ -209,9 +209,14 @@ public abstract class SSLContextContainerAbstract
 		@Override
 		public String toString() {
 			final StringBuffer sb = new StringBuffer("SSLHolder{");
-			sb.append("domainCertificate=subject: ").append(CertificateUtil.getCertCName(domainCertificate))
-					.append(", altNames: ").append(CertificateUtil.getCertAltCName(domainCertificate))
-					.append(", issuer: ").append(domainCertificate.getIssuerDN());
+			if (domainCertificate != null) {
+				sb.append("domainCertificate=subject: ")
+						.append(CertificateUtil.getCertCName(domainCertificate))
+						.append(", altNames: ")
+						.append(CertificateUtil.getCertAltCName(domainCertificate))
+						.append(", issuer: ")
+						.append(domainCertificate.getIssuerDN());
+			}
 			sb.append(", sslContext=").append(sslContext);
 			sb.append(", tms=").append(tms == null ? "null" : Arrays.asList(tms).toString());
 			sb.append('}');

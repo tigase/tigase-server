@@ -751,7 +751,7 @@ public class ClientConnectionManager
 							log.log(Level.FINEST,
 									"TLS: wantClientAuth={0}, needClientAuth={1}, trustManagers={2}; for connection {3}",
 									new Object[]{wantClientAuth, needClientAuth,
-												 (trustManagers != null ? Arrays.asList(trustManagers) : null), serv});
+												 (trustManagers != null ? Arrays.asList(trustManagers) : "null"), serv});
 						}
 
 						serv.setX509TrustManagers(trustManagers);
