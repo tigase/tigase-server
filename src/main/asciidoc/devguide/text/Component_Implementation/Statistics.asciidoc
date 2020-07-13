@@ -82,8 +82,8 @@ public class TestComponent extends AbstractKernelBasedComponent {
     // This should not happen, every packet must have a destination
     // address, but maybe our SPAM checker is used for checking
     // strange kind of packets too....
-    if (packet.getElemFrom() != null) {
-      return packet.getElemFrom().hashCode();
+    if (packet.getStanzaFrom() != null) {
+      return packet.getStanzaFrom().hashCode();
     }
     // If this really happens on your system you should look carefully
     // at packets arriving to your component and decide a better way

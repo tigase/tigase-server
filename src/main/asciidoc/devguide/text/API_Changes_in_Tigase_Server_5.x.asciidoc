@@ -33,8 +33,8 @@ Whereas following methods are still available but have been deprecated:
 
 [source,java]
 -----
-String getElemFrom();
-String getElemTo();
+String getStanzaFrom();
+String getStanzaTo();
 -----
 
 Please refer to the JavaDoc documentation for the link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/server/Packet.html[`Packet`] class and methods to learn all the details of these methods and difference between them.

@@ -170,7 +170,7 @@ public void process(Packet packet, XMPPResourceConnection session,
 		// who is owner of the session:
 		JID jid = packet.getFrom();
 
-		// This test is in most cases equal to checking getElemFrom()
+		// This test is in most cases equal to checking getStanzaFrom()
 		if (session.getConnectionId().equals(jid)) {
 
 			// Do some packet specific processing here, but we are dealing
