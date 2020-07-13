@@ -173,11 +173,11 @@ public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 				if (!allowDiscoitems) {
 					return Collections.emptyList();
 				} else {
-					return super.prepareDiscoItems(senderJID, null, senderJID, rsm);
+					return super.prepareDiscoItems(serviceJID, null, senderJID, rsm);
 				}
 			} else if ("mix".equals(nodeName)) {
 			    // for node "mix" we present "root" nodes
-				return super.prepareDiscoItems(senderJID, null, senderJID, rsm);
+				return super.prepareDiscoItems(serviceJID, null, senderJID, rsm);
 			} else {
 				// in any other case just use default
 				return super.prepareDiscoItems(serviceJID, nodeName, senderJID, rsm);
