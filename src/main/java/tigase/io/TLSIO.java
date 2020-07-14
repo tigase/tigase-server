@@ -40,6 +40,10 @@ public class TLSIO
 
 	public static final String TLS_CAPS = "tls-caps";
 
+	private static final String TLS_WAIT_FOR_HANDSHAKE_NOT_READY_KEY = "tls-wait-for-handshake";
+	
+	private static final boolean TLS_WAIT_FOR_HANDSHAKE_NOT_READY = Boolean.getBoolean(TLS_WAIT_FOR_HANDSHAKE_NOT_READY_KEY);
+
 	private static final Logger log = Logger.getLogger(TLSIO.class.getName());
 
 	private IOInterface io = null;
@@ -452,6 +456,10 @@ public class TLSIO
 				// would
 				// loose the data) or this is just TLS stuff here.....
 				ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
+				if ((!TLS_WAIT_FOR_HANDSHAKE_NOT_READY) && loop_cnt > 2 && tlsWrapper.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP &&
+						tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
+					throw new IOException("TLS handshake not established!");
+				}
 			}
 
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
