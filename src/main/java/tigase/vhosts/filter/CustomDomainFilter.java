@@ -106,17 +106,17 @@ public final class CustomDomainFilter {
 					}
 
 					if (type == RuleType.jid && jid == null) {
-						throw new ParseException("Error while pasing rule (no value for JID provided): " + rule, 0);
+						throw new ParseException("Error while parsing rule (no value for JID provided): " + rule, 0);
 					}
 
 					rulesSet.add(new Rule(id, allow, type, jid));
 				} catch (Exception ex) {
-					log.log(Level.FINEST, "Error while pasing rule: " + rule, ex);
-					throw new ParseException("Error while pasing rule: " + rule, 0);
+					log.log(Level.FINEST, "Error while parsing rule: " + rule, ex);
+					throw new ParseException("Error while parsing rule: " + rule, 0);
 				}
 			} else {
-				log.log(Level.FINEST, "Error while pasing rule (wrong number of parameters): " + rule);
-				throw new ParseException("Error while pasing rule: " + rule, 0);
+				log.log(Level.FINEST, "Error while parsing rule (wrong number of parameters): " + rule);
+				throw new ParseException("Error while parsing rule: " + rule, 0);
 			}
 		}
 

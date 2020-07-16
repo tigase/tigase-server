@@ -350,6 +350,7 @@ public class DomainFilter
 							(packet.getStanzaFrom() == null && packet.getStanzaTo() != null &&
 									session.isUserId(packet.getStanzaTo().getBareJID()))) {
 						// don't filter system packets, breaks things
+						log.log(Level.FINEST, "Skipping filtering system packet: {0}, outDomain: {1}, local_hostname: {2}", new Object[]{packet, outDomain, local_hostname});
 						break;
 					}
 
@@ -486,14 +487,14 @@ public class DomainFilter
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Domains read from user session: {0} for VHost: {1}",
-					new Object[]{domainFilterPolicy, domain});
+					new Object[]{domainFilterPolicy, domain.getKey()});
 		}
 		if (domainFilterPolicy == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Domains read from database: {0} for VHost: {1}",
-						new Object[]{dbDomains, domain});
+						new Object[]{dbDomains, domain.getKey()});
 			}
 			domainFilterPolicy = DomainFilterPolicy.valueof(dbDomains);
 			if (domainFilterPolicy == null) {
@@ -506,7 +507,7 @@ public class DomainFilter
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Domains read from VHost item: {0} for VHost: {1}",
-						new Object[]{domainFilterPolicy, domain});
+						new Object[]{domainFilterPolicy, domain.getKey()});
 			}
 			session.putCommonSessionData(ALLOWED_DOMAINS_KEY, domainFilterPolicy);
 		}
@@ -534,7 +535,7 @@ public class DomainFilter
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Getting list of domains from user session: {0} for VHost: {1}",
-					new Object[]{domainsList != null ? Arrays.asList(domainsList) : "", domain});
+					new Object[]{domainsList != null ? Arrays.asList(domainsList) : "", domain.getKey()});
 		}
 
 		if (domainsList == null) {
@@ -542,7 +543,7 @@ public class DomainFilter
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Domains list read from database: {0} for VHost: {1}",
-						new Object[]{dbDomains, domain});
+						new Object[]{dbDomains, domain.getKey()});
 			}
 
 			if (dbDomains != null) {
@@ -551,7 +552,7 @@ public class DomainFilter
 				domainsList = domain.getDomainFilterDomains();
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Domains list read from VHost: {0} for VHost: {1}",
-							new Object[]{domainsList != null ? Arrays.asList(domainsList) : "", domain});
+							new Object[]{domainsList != null ? Arrays.asList(domainsList) : "", domain.getKey()});
 				}
 			}
 			if (domainsList == null) {
