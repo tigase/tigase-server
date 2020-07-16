@@ -19,8 +19,10 @@ package tigase.stats;
 
 import java.time.LocalDate;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * A queue implementation which stores highest added value on a given day
@@ -28,7 +30,7 @@ import java.util.Optional;
  *
  * */
 public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
-		extends ArrayDeque<E> {
+		extends ConcurrentLinkedDeque<E> {
 
 	private final int maxQueueLength;
 	private LocalDate lastDailyStatsReset = LocalDate.now();
@@ -159,21 +161,4 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		return toString;
 	}
 
-//	private String toStringReversed() {
-//		Iterator<E> it = descendingIterator();
-//		if (!it.hasNext()) {
-//			return "[]";
-//		}
-//
-//		StringBuilder sb = new StringBuilder();
-//		sb.append('[');
-//		for (; ; ) {
-//			E e = it.next();
-//			sb.append(e == this ? "(this Collection)" : e);
-//			if (!it.hasNext()) {
-//				return sb.append(']').toString();
-//			}
-//			sb.append(',').append(' ');
-//		}
-//	}
 }

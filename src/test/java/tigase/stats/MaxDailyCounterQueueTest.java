@@ -20,7 +20,10 @@ package tigase.stats;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Stream;
 
 public class MaxDailyCounterQueueTest {
 
@@ -123,6 +126,19 @@ public class MaxDailyCounterQueueTest {
 
 		lq.add(1);
 		Assert.assertFalse(lq.isLimitSurpassedAllItems(3, limit));
+
+	}
+	@Test
+	public void concurrentAddition() {
+		final int collectionSize = 500;
+		final int limit = 5;
+		MaxDailyCounterQueue<Integer> lq = new MaxDailyCounterQueueEveryXItems<>(collectionSize, 1);
+
+		final Random random = new Random();
+		Stream.generate(random::nextInt).parallel().limit(collectionSize)
+				.forEach(lq::add);
+
+		Assert.assertEquals(collectionSize, lq.size());
 
 	}
 
