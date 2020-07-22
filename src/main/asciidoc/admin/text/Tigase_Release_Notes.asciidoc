@@ -5,7 +5,8 @@
 
 Welcome to Tigase XMPP Server {project-version}! This is a feature release for Tigase XMPP Server v8 with a number of fixes and updates.
 
-include::Tigase_v8.1.0.asciidoc[leveloffset=+1]
+include::Tigase_v8.2.0.asciidoc[leveloffset=+1]
 
 == Previous Releases
-include::Tigase_v8.0.0.asciidoc[leveloffset=+1]
+include::Tigase_v8.1.0.asciidoc[leveloffset=+2]
+include::Tigase_v8.0.0.asciidoc[leveloffset=+2]

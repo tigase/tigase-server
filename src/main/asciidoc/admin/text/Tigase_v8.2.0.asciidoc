@@ -1,0 +1,16 @@
+[[tigase810]]
+= Tigase XMPP Server 8.2.0 announcement
+:author: Wojciech Kapcia
+:date: 2020-10-01
+
+Tigase XMPP Server {project-version} Change notes and announcement
+
+== Major Changes
+
+=== MIX support
+
+Version 8.2.0 brings in MIX support
+
+== New Minor Features & Behavior Changes
+
+
