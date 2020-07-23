@@ -1,4 +1,4 @@
-[[tigase810]]
+[[tigase820]]
 = Tigase XMPP Server 8.2.0 announcement
 :author: Wojciech Kapcia
 :date: 2020-10-01
