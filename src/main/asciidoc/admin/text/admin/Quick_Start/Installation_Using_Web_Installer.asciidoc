@@ -150,4 +150,4 @@ First step is to extract the distribution archive in it's entirety to the intend
 
 From here, you have a few options how to run Tigase; `run.bat` will operate Tigase using a java command, or `tigase.bat` which will start Tigase using the wrapper. You may also install Tigase and run it as a service.
 
-One this setup is finished, web installer will continue the same from xref:connecttoWebInstall[here].
+Once this setup is finished, web installer will continue the same from xref:connecttoWebInstall[here].
