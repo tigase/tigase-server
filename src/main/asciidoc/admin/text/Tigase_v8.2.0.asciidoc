@@ -11,6 +11,8 @@ Tigase XMPP Server {project-version} Change notes and announcement
 
 Version 8.2.0 brings in MIX support
 
+MIX Works in cluster (with ACS-MIX component, requires licence) and with all database, including MongoDB https://projects.tigase.net/issue/mongodb-32[Add support for storing MIX data in MongoDB]
+
 == New Minor Features & Behavior Changes
 
 
