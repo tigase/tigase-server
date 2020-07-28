@@ -33,6 +33,7 @@
         <tests.logger_properties />
 
         <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
+        <source_generation.main.phase>package</source_generation.main.phase>
     </properties>
 
     <artifactId>tigase-server</artifactId>
