@@ -34,6 +34,8 @@
 
         <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
         <source_generation.main.phase>package</source_generation.main.phase>
+
+        <documentation_phases.all_converters>generate-resources</documentation_phases.all_converters>
     </properties>
 
     <artifactId>tigase-server</artifactId>
