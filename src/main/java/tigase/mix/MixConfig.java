@@ -92,6 +92,11 @@ public class MixConfig implements IPubSubConfig {
 	}
 
 	@Override
+	public boolean isMAMEnabledForGenericService() {
+		return false;
+	}
+
+	@Override
 	public boolean isPepPeristent() {
 		return false;
 	}
