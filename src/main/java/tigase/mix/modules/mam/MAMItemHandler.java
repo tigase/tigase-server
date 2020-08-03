@@ -21,7 +21,6 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.Mix;
 import tigase.mix.model.RoomPresenceRepository;
-import tigase.pubsub.modules.mam.MAMQueryModule;
 import tigase.xml.Element;
 import tigase.xmpp.mam.MAMRepository;
 import tigase.xmpp.mam.Query;
