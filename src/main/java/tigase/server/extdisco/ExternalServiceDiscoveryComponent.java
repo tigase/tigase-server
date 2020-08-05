@@ -30,7 +30,7 @@ import javax.script.Bindings;
 /**
  * Created by andrzej on 06.09.2016.
  */
-@Bean(name = "ext-disco", parent = Kernel.class, active = false)
+@Bean(name = "ext-disco", parent = Kernel.class, active = true)
 public class ExternalServiceDiscoveryComponent
 		extends AbstractKernelBasedComponent {
 

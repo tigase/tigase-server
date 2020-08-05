@@ -28,6 +28,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -87,6 +88,10 @@ public class ExternalServiceDiscoveryModule
 
 		services.forEach(service -> {
 			Element item = service.toElement();
+			String host = item.getAttributeStaticStr("host");
+			if (host != null && host.contains("{clusterNode}")) {
+				item.setAttribute("host", host.replace("{clusterNode}", DNSResolverFactory.getInstance().getSecondaryHost()));
+			}
 			item.removeAttribute("key");
 			servicesEl.addChild(item);
 		});

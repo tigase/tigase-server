@@ -39,7 +39,7 @@ import static tigase.server.extdisco.ExternalServiceDiscoveryProcessor.XMLNS;
 /**
  * Created by andrzej on 06.09.2016.
  */
-@Bean(name = ID, parent = SessionManager.class, active = false)
+@Bean(name = ID, parent = SessionManager.class, active = true)
 @Id(ID)
 @DiscoFeatures({XMLNS})
 @Handles({@Handle(path = {Iq.ELEM_NAME, "services"}, xmlns = XMLNS)})
