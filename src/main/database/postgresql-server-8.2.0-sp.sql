@@ -16,8 +16,13 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select now(), ' - Setting schema version to 8.1.0';
+-- database properties are deprecated and are being removed
 
 -- QUERY START:
-select TigSetComponentVersion('server', '8.1.0');
+do $$
+begin
+    if exists( select 1 from pg_proc where proname = lower('TigGetDBProperty')) then
+        drop function TigPutDBProperty(varchar(255), text);
+end if;
+end$$;
 -- QUERY END:

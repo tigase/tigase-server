@@ -16,7 +16,258 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
--- Database stored procedures and functions for Tigase schema version 5.1
+-- QUERY START:
+drop procedure if exists TigInitdb;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigAddUser;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigGetUserDBUid;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUpdatePassword;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUpdatePasswordPlainPwRev;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserLogin;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserLogout;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigOnlineUsers;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigOfflineUsers;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigAllUsers;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigAllUsersCount;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigDisableAccount;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigEnableAccount;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigActiveAccounts;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigDisabledAccounts;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigAddNode;
+-- QUERY END:
+-- QUERY START:
+drop function if exists TigGetDBProperty;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+-- DEPRECATED | Database properties get - function
+create function TigGetDBProperty(_tkey varchar(255) CHARSET utf8) returns mediumtext CHARSET utf8
+READS SQL DATA
+begin
+	declare _result mediumtext CHARSET utf8;
+
+	select pval into _result from tig_pairs, tig_users
+		where (pkey = _tkey) AND (sha1_user_id = sha1(lower('db-properties')))
+					AND (tig_pairs.uid = tig_users.uid);
+
+	return (_result);
+end //
+-- QUERY END:
+
+
+-- QUERY START:
+-- DEPRECATED | The initialization of the database.
+-- The procedure should be called manually somehow before starting the
+-- server. In theory the server could call the procedure automatically
+-- at the startup time but I don't know yet how to solve the problem
+-- with multiple cluster nodes starting at later time when the server
+-- is already running.
+create procedure TigInitdb()
+begin
+  update tig_users set online_status = 0;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Add a new user to the database assuming the user password is already
+-- encoded properly according to the database settings.
+-- If password is not encoded TigAddUserPlainPw should be used instead.
+create procedure TigAddUser(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
+begin
+	declare res_uid bigint unsigned;
+
+	insert into tig_users (user_id, sha1_user_id, user_pw)
+		values (_user_id, sha1(lower(_user_id)), _user_pw);
+
+	select LAST_INSERT_ID() into res_uid;
+
+	insert into tig_nodes (parent_nid, uid, node)
+		values (NULL, res_uid, 'root');
+
+	if _user_pw is NULL then
+		update tig_users set account_status = -1 where uid = res_uid;
+	end if;
+
+	select res_uid as uid;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Low level database user id as big number. Used only for performance reasons
+-- and save database space. Besides JID is too large to server as UID
+create procedure TigGetUserDBUid(_user_id varchar(2049) CHARSET utf8)
+begin
+	select uid from tig_users where sha1_user_id = sha1(lower(_user_id));
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Variant of TigUpdatePasswordPlainPw SP with parameters in reverse order.
+-- Some implementations require the parameters to be in the same order as
+-- the update query.
+create procedure TigUpdatePasswordPlainPwRev(_user_pw varchar(255) CHARSET utf8, _user_id varchar(2049) CHARSET utf8)
+begin
+	call TigUpdatePasswordPlainPw(_user_id, _user_pw);
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Update user password
+create procedure TigUpdatePassword(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
+begin
+	update tig_users set user_pw = _user_pw where sha1_user_id = sha1(lower(_user_id));
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- DEPRECATED | List all online users
+create procedure TigOnlineUsers()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where online_status > 0;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- DEPRECATED | List all offline users
+create procedure TigOfflineUsers()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where online_status = 0;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- List of all users in database
+create procedure TigAllUsers()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- All users count
+create procedure TigAllUsersCount()
+begin
+	select count(*) from tig_users;
+end //
+-- QUERY END:
+
+
+-- QUERY START:
+-- DEPRECATED | Perforrm user login. It returns user_id uppon success and NULL
+-- on failure.
+-- If the login is successful it also increases online_status and sets
+-- last_login time to the current timestamp
+create procedure TigUserLogin(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
+begin
+	if exists(select 1 from tig_users
+		where (account_status > 0) AND (sha1_user_id = sha1(lower(_user_id))) AND (user_pw = _user_pw) AND (user_id = _user_id))
+	then
+		update tig_users
+			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
+			where sha1_user_id = sha1(lower(_user_id));
+		select _user_id as user_id;
+	else
+		update tig_users set failed_logins = failed_logins + 1 where sha1_user_id = sha1(lower(_user_id));
+		select NULL as user_id;
+	end if;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- It decreases online_status and sets last_logout time to the current timestamp
+create procedure TigUserLogout(_user_id varchar(2049) CHARSET utf8)
+begin
+	update tig_users
+		set online_status = greatest(online_status - 1, 0),
+			last_logout = CURRENT_TIMESTAMP
+		where sha1_user_id = sha1(lower(_user_id));
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Disable user account
+create procedure TigDisableAccount(_user_id varchar(2049) CHARSET utf8)
+begin
+	update tig_users set account_status = 0 where sha1_user_id = sha1(lower(_user_id));
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Enable user account
+create procedure TigEnableAccount(_user_id varchar(2049) CHARSET utf8)
+begin
+	update tig_users set account_status = 1 where sha1_user_id = sha1(lower(_user_id));
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Get list of all active user accounts
+create procedure TigActiveAccounts()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status > 0;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Get list of all disabled user accounts
+create procedure TigDisabledAccounts()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status = 0;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Helper procedure for adding a new node
+create procedure TigAddNode(_parent_nid bigint, _uid bigint, _node varchar(255) CHARSET utf8)
+begin
+  if exists(SELECT 1 FROM tig_nodes WHERE parent_nid = _parent_nid AND uid = _uid AND node = _node)  then
+    SELECT nid FROM tig_nodes WHERE parent_nid = _parent_nid AND uid = _uid AND node = _node;
+  ELSEIF exists(SELECT 1 FROM tig_nodes WHERE _parent_nid is null AND uid = _uid AND 'root' = _node)  then
+    SELECT nid FROM tig_nodes WHERE uid = _uid AND node = _node;
+  ELSE
+	insert into tig_nodes (parent_nid, uid, node) values (_parent_nid, _uid, _node);
+	select LAST_INSERT_ID() as nid;
+  END IF;
+end //
+-- QUERY END:
+
+delimiter ;
 
 -- QUERY START:
 drop procedure if exists TigUpdateLoginTime;
@@ -519,33 +770,6 @@ begin
 	delete from tig_pairs where uid = res_uid;
 	delete from tig_nodes where uid = res_uid;
 	delete from tig_users where uid = res_uid;
-end //
--- QUERY END:
-
-delimiter ;
-
--- QUERY START:
-drop procedure if exists TigPutDBProperty;
--- QUERY END:
-
-delimiter //
-
--- QUERY START:
--- Database properties set - procedure
-create procedure TigPutDBProperty(_tkey varchar(255) CHARSET utf8, _tval mediumtext CHARSET utf8)
-begin
-  if exists( select 1 from tig_pairs, tig_users where
-    (sha1_user_id = sha1(lower('db-properties'))) AND (tig_users.uid = tig_pairs.uid)
-    AND (pkey = _tkey))
-  then
-    update tig_pairs tp, tig_users tu, tig_nodes tn set pval = _tval
-    where (tu.sha1_user_id = sha1(lower('db-properties'))) AND (tu.uid = tp.uid)
-      AND (tp.pkey = _tkey) AND (tn.node = 'root');
-  else
-    insert into tig_pairs (pkey, pval, uid, nid)
-          select _tkey, _tval, tu.uid, tn.nid from tig_users tu left join tig_nodes tn on tn.uid=tu.uid
-        where (tu.sha1_user_id = sha1(lower('db-properties')) and tn.node='root');
-  end if;
 end //
 -- QUERY END:
 

@@ -17,127 +17,207 @@
 --
 
 -- QUERY START:
+create table if not exists tig_users (
+	uid bigserial,
+
+	-- Jabber User ID
+	user_id varchar(2049) NOT NULL,
+	-- User password encrypted or not
+	user_pw varchar(255) default NULL,
+	-- Time the account has been created
+	acc_create_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+	-- Time of the last user login
+	last_login timestamp with time zone,
+	-- Time of the last user logout
+	last_logout timestamp with time zone,
+	-- User online status, if > 0 then user is online, the value
+	-- indicates the number of user connections.
+	-- It is incremented on each user login and decremented on each
+	-- user logout.
+	online_status int default 0,
+	-- Number of failed login attempts
+	failed_logins int default 0,
+	-- User status, whether the account is active or disabled
+	-- >0 - account active, 0 - account disabled
+	account_status int default 1,
+
+	primary key (uid)
+);
+-- QUERY END:
+-- QUERY START:
 do $$
 begin
-    if to_regclass('public.msg_history') is not null then
-        if to_regclass('public.tig_offline_messages') is null then
-            alter table msg_history rename to tig_offline_messages;
-        end if;
-    else
-        create table if not exists tig_offline_messages (
-            msg_id bigserial,
-            ts timestamp with time zone default now(),
-            expired timestamp with time zone,
-            sender varchar(2049),
-            receiver varchar(2049) not null,
-            msg_type int not null default 0,
-            message text not null,
-
-            primary key(msg_id)
-        );
+    if to_regclass('public.user_id') is null then
+        create unique index user_id on tig_users ( lower(user_id) );
     end if;
-
-    if not exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'msg_type') then
-        alter table tig_offline_messages
-            add msg_type int not null default 0;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.user_pw') is null then
+        create index user_pw on tig_users (user_pw);
     end if;
-
-    if exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'message' and udt_name = 'varchar') then
-        alter table tig_offline_messages alter message type text;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.last_login') is null then
+        create index last_login on tig_users (last_login);
     end if;
-
-    if not exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'receiver') then
-        alter table tig_offline_messages
-            add receiver varchar(2049),
-            add sender varchar(2049),
-            alter msg_id type bigint;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.last_logout') is null then
+        create index last_logout on tig_users (last_logout);
     end if;
-
-    if to_regclass('public.index_expired') is not null then
-        drop index index_expired;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.account_status') is null then
+        create index account_status on tig_users (account_status);
     end if;
-    if to_regclass('public.index_receiver_uid_sender_uid') is not null then
-        drop index index_receiver_uid_sender_uid;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.online_status') is null then
+        create index online_status on tig_users (online_status);
     end if;
-    if to_regclass('public.index_sender_uid_receiver_uid') is not null then
-        drop index index_sender_uid_receiver_uid;
+end$$;
+-- QUERY END:
+
+-- QUERY START:
+create table if not exists tig_nodes (
+       nid bigserial,
+       parent_nid bigint,
+       uid bigint NOT NULL references tig_users(uid),
+
+       node varchar(255) NOT NULL,
+
+       primary key (nid)
+);
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.tnode') is null then
+        create unique index tnode on tig_nodes ( parent_nid, uid, node );
     end if;
-
-    if to_regclass('public.user_jid') is not null and exists (select 1 from information_schema.columns where table_catalog = current_database() and table_schema = 'public' and table_name = 'tig_offline_messages' and column_name = 'receiver_uid') then
-    	update tig_offline_messages
-    	set receiver = (select jid from user_jid where jid_id = receiver_uid),
-        	sender = (select jid from user_jid where jid_id = sender_uid)
-    	where receiver is null;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.node') is null then
+        create index node on tig_nodes ( node );
     end if;
-
-    alter table tig_offline_messages
-        drop if exists receiver_uid,
-        drop if exists sender_uid;
-
-    alter table tig_offline_messages
-        alter receiver set not null;
-
-    if to_regclass('public.tig_offline_messages_pkey') is null then
-        alter table tig_offline_messages add primary key (msg_id);
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.nuid') is null then
+        create index nuid on tig_nodes (uid);
     end if;
-
-    if to_regclass('public.broadcast_msgs') is not null then
-        if to_regclass('tig_broadcast_messages') is null then
-            alter table broadcast_msgs rename to tig_broadcast_messages;
-            alter table tig_broadcast_messages alter msg type text;
-        end if;
-    else
-        create table if not exists tig_broadcast_messages (
-            id varchar(128) not null,
-            expired timestamp with time zone not null,
-			msg text not null,
-			primary key (id)
-			);
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.parent_nid') is null then
+        create index parent_nid on tig_nodes (parent_nid);
     end if;
+end$$;
+-- QUERY END:
 
-    create table if not exists tig_broadcast_jids (
-        jid_id bigserial,
-        jid varchar(2049) not null,
+-- QUERY START:
+create table if not exists tig_pairs (
+       pid BIGSERIAL PRIMARY KEY,
+       nid bigint references tig_nodes(nid),
+       uid bigint NOT NULL references tig_users(uid),
 
-        primary key (jid_id)
-    );
+       pkey varchar(255) NOT NULL,
+       pval text
+);
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.pkey') is null then
+        create index pkey on tig_pairs ( pkey );
+    end if;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.puid') is null then
+        create index puid on tig_pairs (uid);
+    end if;
+end$$;
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
+    if to_regclass('public.pnid') is null then
+        create index pnid on tig_pairs (nid);
+    end if;
+end$$;
+-- QUERY END:
+
+-- QUERY START:
+create table if not exists tig_offline_messages (
+    msg_id bigint,
+    ts timestamp with time zone default now(),
+    expired timestamp with time zone,
+    sender varchar(2049),
+    receiver varchar(2049) not null,
+    msg_type int not null default 0,
+    message text not null,
+
+    primary key(msg_id)
+);
+-- QUERY END:
+
+-- QUERY START:
+create table if not exists tig_broadcast_messages (
+    id varchar(128) not null,
+    expired timestamp with time zone not null,
+    msg text not null,
+    primary key (id)
+);
+-- QUERY END:
+
+-- QUERY START:
+create table if not exists tig_broadcast_jids (
+    jid_id bigserial,
+    jid varchar(2049) not null,
+
+    primary key (jid_id)
+);
+-- QUERY END:
+-- QUERY START:
+do $$
+begin
     if to_regclass('public.tig_broadcast_jids_jid') is null then
         create index tig_broadcast_jids_jid on tig_broadcast_jids (lower(jid));
     end if;
-
-    if to_regclass('public.user_jid') is not null and to_regclass('public.broadcast_msgs_recipients') is not null then
-        insert into tig_broadcast_jids (jid)
-            select u.jid
-            from user_jid u
-            inner join broadcast_msgs_recipients b on u.jid_id = b.jid_id
-            where not exists (select 1 from tig_broadcast_jids bj where bj.jid = u.jid);
-    end if;
-
-    create table if not exists tig_broadcast_recipients (
-        msg_id varchar(128) not null references tig_broadcast_messages(id),
-        jid_id bigint not null references tig_broadcast_jids(jid_id),
-        primary key (msg_id, jid_id)
-    );
-
-    if to_regclass('public.user_jid') is not null and to_regclass('public.broadcast_msgs_recipients') is not null then
-        insert into tig_broadcast_recipients (msg_id, jid_id)
-            select x.msg_id, x.jid_id
-            from (select bmr.msg_id, bj.jid_id
-                from broadcast_msgs_recipients bmr
-                inner join user_jid uj on uj.jid_id = bmr.jid_id
-                inner join tig_broadcast_jids bj on lower(bj.jid) = lower(uj.jid)
-            ) x
-            where not exists (select 1 from tig_broadcast_recipients br where br.msg_id = x.msg_id and br.jid_id = x.jid_id);
-    end if;
-
-    if to_regclass('public.broadcast_msgs_recipients') is not null then
-        drop table broadcast_msgs_recipients;
-    end if;
-
-    if to_regclass('public.user_jid') is not null then
-        drop table user_jid;
-    end if;
 end$$;
+-- QUERY END:
+
+-- QUERY START:
+create table if not exists tig_broadcast_recipients (
+    msg_id varchar(128) not null references tig_broadcast_messages(id),
+    jid_id bigint not null references tig_broadcast_jids(jid_id),
+    primary key (msg_id, jid_id)
+);
 -- QUERY END:
 
 -- QUERY START:
@@ -168,45 +248,6 @@ create table if not exists tig_cluster_nodes (
 );
 -- QUERY END:
 
--- QUERY START:
-do $$
-begin
-    alter table tig_offline_messages
-        alter column ts type timestamp with time zone,
-        alter column expired type timestamp with time zone;
-    alter table tig_broadcast_messages
-        alter column expired type timestamp with time zone;
-
-    alter table tig_cluster_nodes
-        alter column last_update type timestamp with time zone;
-
-    drop index if exists last_login;
-    drop index if exists last_logout;
-
-    alter table tig_users
-        alter column acc_create_time type timestamp with time zone,
-        alter column last_login type timestamp with time zone,
-	    alter column last_logout type timestamp with time zone;
-end$$;
--- QUERY END:
-
--- QUERY START:
-do $$
-begin
-    if to_regclass('public.last_login') is null then
-        create index last_login on tig_users (last_login);
-    end if;
-end$$;
--- QUERY END:
--- QUERY START:
-do $$
-begin
-    if to_regclass('public.last_logout') is null then
-        create index last_logout on tig_users (last_logout);
-    end if;
-end$$;
--- QUERY END:
-
 -- ------------- Credentials support
 -- QUERY START:
 create table if not exists tig_user_credentials (
@@ -217,17 +258,4 @@ create table if not exists tig_user_credentials (
 
     primary key (uid, username, mechanism)
 );
--- QUERY END:
-
--- QUERY START:
-do $$
-begin
-    if not exists (select 1 from tig_user_credentials) and exists( select 1 from pg_proc where proname = lower('TigGetDBProperty')) then
-        insert into tig_user_credentials (uid, username, mechanism, value)
-            select uid, 'default', COALESCE(TigGetDBProperty('password-encoding'), 'PLAIN'), user_pw
-            from tig_users where user_pw is not null;
-            
-        update tig_users set user_pw = null where user_pw is not null;
-    end if;
-end$$;
 -- QUERY END:

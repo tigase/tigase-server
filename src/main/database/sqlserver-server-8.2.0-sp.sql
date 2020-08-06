@@ -16,8 +16,15 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select now(), ' - Setting schema version to 8.1.0';
+-- database properties are deprecated and are being removed
 
 -- QUERY START:
-select TigSetComponentVersion('server', '8.1.0');
+SET QUOTED_IDENTIFIER ON
 -- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigPutDBProperty')
+    DROP PROCEDURE TigPutDBProperty
+-- QUERY END:
+GO

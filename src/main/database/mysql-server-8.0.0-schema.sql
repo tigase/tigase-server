@@ -16,169 +16,125 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
--- Database stored procedures and functions for Tigase schema version 5.1
-
 -- QUERY START:
-alter table tig_pairs modify `pval` mediumtext character set utf8mb4 collate utf8mb4_unicode_ci;
+create table if not exists tig_users (
+	uid bigint unsigned NOT NULL auto_increment,
+
+	-- Jabber User ID
+	user_id varchar(2049) NOT NULL,
+	-- UserID SHA1 hash to prevent duplicate user_ids
+	sha1_user_id char(128) NOT NULL,
+	-- User password encrypted or not
+	user_pw varchar(255) default NULL,
+	-- Time the account has been created
+	acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
+	-- Time of the last user login
+	last_login timestamp NULL DEFAULT NULL,
+	-- Time of the last user logout
+	last_logout timestamp NULL DEFAULT NULL,
+	-- User online status, if > 0 then user is online, the value
+	-- indicates the number of user connections.
+	-- It is incremented on each user login and decremented on each
+	-- user logout.
+	online_status int default 0,
+	-- Number of failed login attempts
+	failed_logins int default 0,
+	-- User status, whether the account is active or disabled
+	-- >0 - account active, 0 - account disabled
+	account_status int default 1,
+
+	primary key (uid),
+	unique key sha1_user_id (sha1_user_id),
+	key user_pw (user_pw),
+    key part_of_user_id (user_id(255)),
+	key last_login (last_login),
+	key last_logout (last_logout),
+	key account_status (account_status),
+	key online_status (online_status)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 -- QUERY END:
 
 -- QUERY START:
-drop procedure if exists TigUpgradeMsgHistory;
+create table if not exists tig_nodes (
+       nid bigint unsigned NOT NULL auto_increment,
+       parent_nid bigint unsigned,
+       uid bigint unsigned NOT NULL,
+
+       node varchar(255) NOT NULL,
+
+       primary key (nid),
+       unique key tnode (parent_nid, uid, node),
+       key node (node),
+			 key uid (uid),
+			 key parent_nid (parent_nid),
+			 constraint tig_nodes_constr foreign key (uid) references tig_users (uid)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 -- QUERY END:
 
-delimiter //
+-- QUERY START:
+create table if not exists tig_pairs (
+       pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+       nid bigint unsigned,
+       uid bigint unsigned NOT NULL,
+
+       pkey varchar(255) NOT NULL,
+       pval mediumtext character set utf8mb4 collate utf8mb4_unicode_ci,
+
+       key pkey (pkey),
+			 key uid (uid),
+			 key nid (nid),
+			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid),
+			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+-- QUERY END:
 
 -- QUERY START:
-create procedure TigUpgradeMsgHistory()
-begin
-    if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'msg_history') then
-        alter table msg_history rename tig_offline_messages;
-    else
-        create table if not exists tig_offline_messages (
-            msg_id bigint unsigned not null auto_increment,
-            ts timestamp(6) default current_timestamp(6),
-            expired timestamp null default null,
-            sender varchar(2049),
-            sender_sha1 char(128),
-            receiver varchar(2049) not null,
-            receiver_sha1 char(128),
-            msg_type int not null default 0,
-            message mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null,
-            primary key (msg_id),
-            key tig_offline_messages_expired_index (expired),
-            key tig_offline_messages_receiver_sha1_index (receiver_sha1),
-            key tig_offline_messages_receiver_sha1_sender_sha1_index (receiver_sha1, sender_sha1)
-        ) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;        
-    end if;
+create table if not exists tig_offline_messages (
+    msg_id bigint unsigned not null auto_increment,
+    ts timestamp(6) default current_timestamp(6),
+    expired timestamp null default null,
+    sender varchar(2049),
+    sender_sha1 char(128),
+    receiver varchar(2049) not null,
+    receiver_sha1 char(128) not null,
+    msg_type int not null default 0,
+    message mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null,
+    primary key (msg_id),
+    key tig_offline_messages_expired_index (expired),
+    key tig_offline_messages_receiver_sha1_index (receiver_sha1),
+    key tig_offline_messages_receiver_sha1_sender_sha1_index (receiver_sha1, sender_sha1)
+) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+-- QUERY END:
 
-    if not exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'msg_type') then
-        alter table tig_offline_messages add msg_type int not null default 0;
-    end if;
-
-    if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'expired') then
-        alter table tig_offline_messages modify expired timestamp(6) null default null;
-    end if;
-
-    if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'ts') then
-        alter table tig_offline_messages modify ts timestamp(6) default current_timestamp(6);
-    end if;
-
-    if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'message') then
-        alter table tig_offline_messages modify message mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null;
-    end if;
-
-    if not exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'receiver') then
-        alter table tig_offline_messages
-            add receiver varchar(2049) character set utf8,
-            add receiver_sha1 char(128),
-            add sender varchar(2049) character set utf8,
-            add sender_sha1 char(128),
-            add key tig_offline_messages_expired_index (expired),
-            add key tig_offline_messages_receiver_sha1_index (receiver_sha1),
-            add key tig_offline_messages_receiver_sha1_sender_sha1_index (receiver_sha1, sender_sha1),
-            drop index expired,
-            drop index sender_uid,
-            drop index receiver_uid;
-    end if;
-
-	if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'user_jid')
-	        and exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'receiver_uid') then
-    	update tig_offline_messages
-    	set receiver = (select jid from user_jid where jid_id = receiver_uid),
-        	sender = (select jid from user_jid where jid_id = sender_uid)
-    	where receiver is null;
-    end if;
-
-    update tig_offline_messages
-    set receiver_sha1 = sha1(lower(receiver)),
-        sender_sha1 = sha1(lower(sender))
-    where receiver_sha1 is null;
-
-    alter table tig_offline_messages
-        modify receiver varchar(2049) character set utf8 not null,
-        modify receiver_sha1 char(128) not null;
-
-    if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_offline_messages' and column_name = 'receiver_uid') then
-        alter table tig_offline_messages
-            drop column sender_uid,
-            drop column receiver_uid;
-    end if;
-
-    if not exists (select 1 from information_schema.statistics where table_schema = database() and table_name = 'tig_offline_messages' and index_name = 'PRIMARY') then
-        alter table tig_offline_messages add primary key (msg_id);
-    end if;
-
-    if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'broadcast_msgs') then
-        alter table broadcast_msgs rename tig_broadcast_messages;
-        alter table tig_broadcast_messages
-            modify expired timestamp(6) not null,
-            modify msg mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null;
-    else
-        create table if not exists tig_broadcast_messages (
-            id varchar(128) not null,
-            expired timestamp(6) not null,
-			msg mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null,
-			primary key (id)
-			);
-    end if;
-
-    create table if not exists tig_broadcast_jids (
-        jid_id bigint unsigned not null auto_increment,
-        jid varchar(2049) not null,
-        jid_sha1 char(128) not null,
-
-        primary key (jid_id)
+-- QUERY START:
+create table if not exists tig_broadcast_messages (
+    id varchar(128) not null,
+    expired timestamp(6) not null,
+    msg mediumtext character set utf8mb4 collate utf8mb4_unicode_ci not null,
+    primary key (id)
     );
-    if not exists (select 1 from information_schema.statistics where table_schema = database() and table_name = 'tig_broadcast_jids' and index_name = 'tig_broadcast_jids_jid_sha1') then
-        create index tig_broadcast_jids_jid_sha1 on tig_broadcast_jids (jid_sha1);
-    end if;
-
-    if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'user_jid')
-            and exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'public.broadcast_msgs_recipients') then
-        insert into tig_broadcast_jids (jid, jid_sha1)
-            select u.jid, sha1(lower(u.jid))
-            from user_jid u
-            inner join broadcast_msgs_recipients b on u.jid_id = b.jid_id
-            where not exists (select 1 from tig_broadcast_jids bj where bj.jid = u.jid);
-    end if;
-
-    create table if not exists tig_broadcast_recipients (
-        msg_id varchar(128) not null references tig_broadcast_messages(id),
-        jid_id bigint not null references tig_broadcast_jids(jid_id),
-        primary key (msg_id, jid_id)
-    );
-
-    if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'user_jid')
-            and exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'public.broadcast_msgs_recipients') then
-        insert into tig_broadcast_recipients (msg_id, jid_id)
-            select x.msg_id, x.jid_id
-            from (select bmr.msg_id, bj.jid_id
-                from broadcast_msgs_recipients bmr
-                inner join user_jid uj on uj.jid_id = bmr.jid_id
-                inner join tig_broadcast_jids bj on bj.jid_sha1 = sha1(lower(uj.jid))
-            ) x
-            where not exists (select 1 from tig_broadcast_recipients br where br.msg_id = x.msg_id and br.jid_id = x.jid_id);
-    end if;
-
-    if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'public.broadcast_msgs_recipients') then
-        drop table broadcast_msgs_recipients;
-    end if;
-
-    if exists (select 1 from information_schema.tables where table_schema = database() and table_name = 'user_jid') then
-        drop table user_jid;
-    end if;
-
-end //
--- QUERY END:
-
-delimiter ;
-
--- QUERY START:
-call TigUpgradeMsgHistory();
 -- QUERY END:
 
 -- QUERY START:
-drop procedure if exists TigUpgradeMsgHistory;
+create table if not exists tig_broadcast_jids (
+    jid_id bigint unsigned not null auto_increment,
+    jid varchar(2049) not null,
+    jid_sha1 char(128) not null,
+
+    primary key (jid_id),
+    key tig_broadcast_jids_jid_sha1 (jid_sha1)
+);
+-- QUERY END:
+
+-- QUERY START:
+create table if not exists tig_broadcast_recipients (
+    msg_id varchar(128) not null references tig_broadcast_messages(id),
+    jid_id bigint not null references tig_broadcast_jids(jid_id),
+    primary key (msg_id, jid_id)
+);
 -- QUERY END:
 
 -- ------------ Clustering support
@@ -209,37 +165,4 @@ create table if not exists tig_user_credentials (
     primary key (uid, username_sha1, mechanism),
     constraint tig_credentials_uid foreign key (uid) references tig_users (uid)
 ) ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
--- QUERY END:
-
--- QUERY START:
-drop procedure if exists TigUpgradeCredentials;
--- QUERY END:
-
-delimiter //
-
--- QUERY START:
-create procedure TigUpgradeCredentials()
-begin
-    if not exists (select 1 from tig_user_credentials)
-        and exists (select 1 from information_schema.ROUTINES where routine_type = 'FUNCTION' and routine_schema = lower(database()) and routine_name = 'TigGetDBProperty') then
-        insert into tig_user_credentials (uid, username, username_sha1, mechanism, value)
-            select uid, 'default', sha1('default'), IFNULL(TigGetDBProperty('password-encoding'), 'PLAIN'), user_pw
-            from tig_users
-            where
-                user_pw is not null;
-        update tig_users set user_pw = null where user_pw is not null;
-    end if;
-end //
--- QUERY END:
-
--- QUERY END:
-
-delimiter ;
-
--- QUERY START:
-call TigUpgradeCredentials();
--- QUERY END:
-
--- QUERY START:
-drop procedure if exists TigUpgradeCredentials;
 -- QUERY END:

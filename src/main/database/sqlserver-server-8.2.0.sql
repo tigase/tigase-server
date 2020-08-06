@@ -16,8 +16,6 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select now(), ' - Setting schema version to 8.1.0';
+-- LOAD FILE: database/sqlserver-server-8.2.0-sp.sql
 
--- QUERY START:
-select TigSetComponentVersion('server', '8.1.0');
--- QUERY END:
+-- LOAD FILE: database/sqlserver-server-8.2.0-props.sql

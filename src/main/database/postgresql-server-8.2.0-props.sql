@@ -16,12 +16,8 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select now(), ' - Setting schema version to 7.1';
+select now(), ' - Setting schema version to 8.2.0';
 
 -- QUERY START:
-select TigPutDBProperty('schema-version', '7.1');
--- QUERY END:
-
--- QUERY START:
-select TigSetComponentVersion('server', '7.1');
+select TigSetComponentVersion('server', '8.2.0');
 -- QUERY END:

@@ -16,12 +16,7 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select NOW(), ' - Setting schema version to 7.1';
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '7.1');
--- QUERY END:
-
--- QUERY START:
-call TigSetComponentVersion('server', '7.1');
+DROP procedure TigPutDBProperty(tkey varchar(255), tval varchar(32672));
 -- QUERY END:

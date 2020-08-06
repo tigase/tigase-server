@@ -17,9 +17,5 @@
 --
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '8.0.0');
--- QUERY END:
-
--- QUERY START:
 call TigSetComponentVersion('server', '8.0.0');
 -- QUERY END:

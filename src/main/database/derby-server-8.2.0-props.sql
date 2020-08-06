@@ -16,15 +16,6 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-7.1.0-schema.sql;
-
-source database/mysql-server-7.1.0-sp.sql;
-
-source database/mysql-server-7.1.0-props.sql;
-
--- LOAD FILE: database/mysql-server-7.1.0-schema.sql;
-
--- LOAD FILE: database/mysql-server-7.1.0-sp.sql;
-
--- LOAD FILE: database/mysql-server-7.1.0-props.sql;
- 
+-- QUERY START:
+call TigSetComponentVersion('server', '8.2.0');
+-- QUERY END:

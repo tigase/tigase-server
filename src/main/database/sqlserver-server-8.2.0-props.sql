@@ -16,14 +16,14 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-run 'database/derby-server-7.1.0-schema.sql';
+-- QUERY START:
+SET QUOTED_IDENTIFIER ON
+-- QUERY END:
+GO
 
-run 'database/derby-server-7.1.0-sp.sql';
+select GETDATE(), ' - Setting schema version to 8.2.0';
 
-run 'database/derby-server-7.1.0-props.sql';
-
--- LOAD FILE: database/derby-server-7.1.0-schema.sql
-
--- LOAD FILE: database/derby-server-7.1.0-sp.sql
-
--- LOAD FILE: database/derby-server-7.1.0-props.sql
+-- QUERY START:
+exec TigSetComponentVersion 'server', '8.2.0';
+-- QUERY END:
+GO

@@ -22,19 +22,180 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- QUERY START:
-if exists (select 1 from sysobjects where name = 'msg_history' and xtype = 'U')
-    exec sp_rename 'dbo.msg_history', 'tig_offline_messages';
+IF object_id('dbo.tig_users') IS NULL
+CREATE TABLE [dbo].[tig_users](
+	[uid] [bigint] IDENTITY(1,1) NOT NULL,
+
+	-- Jabber User ID
+	[user_id] [nvarchar](2049) NOT NULL,
+
+	-- UserID SHA1 hash to prevent duplicate user_ids
+	[sha1_user_id] [varbinary](32) NOT NULL,
+	-- User password encrypted or not
+	[user_pw] [nvarchar](255) NULL,
+	-- Time the account has been created
+	[acc_create_time] [datetime] DEFAULT getdate(),
+	-- Time of the last user login
+	[last_login] [datetime] default 0,
+	-- Time of the last user logout
+	[last_logout] [datetime] default 0,
+	-- User online status, if > 0 then user is online, the value
+	-- indicates the number of user connections.
+	-- It is incremented on each user login and decremented on each
+	-- user logout.
+	[online_status] [int] default 0,
+	-- Number of failed login attempts
+	[failed_logins] [int] default 0,
+	-- User status, whether the account is active or disabled
+	-- >0 - account active, 0 - account disabled
+	[account_status] [int] default 1,
+	-- helper column for indexing due to limitation of SQL server
+	user_id_fragment AS LEFT (user_id, 256),
+
+	CONSTRAINT [PK_tig_users] PRIMARY KEY CLUSTERED ( [uid] ASC ) ON [PRIMARY],
+	CONSTRAINT [IX_tig_users_sha1_user_id] UNIQUE NONCLUSTERED ( [sha1_user_id] ASC ) ON [PRIMARY]
+) ON [PRIMARY]
+-- QUERY END:
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_account_status' )
+CREATE NONCLUSTERED INDEX [IX_tig_users_account_status] ON [dbo].[tig_users] ([account_status] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
-if exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'message' and user_type_id = (select user_type_id from  sys.types where name = 'nvarchar') and max_length = 8000)
-    alter table tig_offline_messages alter column message nvarchar(max) not null;
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_last_login' )
+CREATE NONCLUSTERED INDEX [IX_tig_users_last_login] ON [dbo].[tig_users] ([last_login] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
 -- QUERY START:
-if object_id('dbo.tig_offline_messages') is null
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_last_logout' )
+CREATE NONCLUSTERED INDEX [IX_tig_users_last_logout] ON [dbo].[tig_users] ( [last_logout] ASC)  ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_online_status' )
+CREATE NONCLUSTERED INDEX [IX_tig_users_online_status] ON [dbo].[tig_users] ([online_status] ASC) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_user_id_fragment' )
+CREATE NONCLUSTERED INDEX [IX_tig_users_user_id_fragment] ON [dbo].[tig_users] ( [user_id_fragment] ASC) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_users') and name = 'IX_tig_users_user_pw' )
+CREATE NONCLUSTERED INDEX [IX_tig_users_user_pw] ON [dbo].[tig_users] ([user_pw] ASC) ON [PRIMARY]
+-- QUERY END:
+GO
+
+
+
+-- QUERY START:
+IF object_id('dbo.tig_nodes') IS NULL
+CREATE TABLE [dbo].[tig_nodes](
+	[nid] [bigint] IDENTITY(1,1) NOT NULL,
+	[parent_nid] [bigint] NULL,
+	[uid] [bigint] NOT NULL,
+	[node] [nvarchar](255) NOT NULL,
+ CONSTRAINT [PK_tig_nodes_nid] PRIMARY KEY CLUSTERED ( [nid] ASC ) ON [PRIMARY],
+ CONSTRAINT [IX_tnode] UNIQUE NONCLUSTERED ( [parent_nid] ASC, [uid] ASC, [node] ASC ) ON [PRIMARY]
+) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_nodes') and name = 'IX_tig_nodes_node' )
+CREATE NONCLUSTERED INDEX [IX_tig_nodes_node] ON [dbo].[tig_nodes] ( [node] ASC) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_nodes') and name = 'IX_tig_nodes_parent_nid' )
+CREATE NONCLUSTERED INDEX [IX_tig_nodes_parent_nid] ON [dbo].[tig_nodes] ( [parent_nid] ASC ) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_nodes') and name = 'IX_tig_nodes_uid' )
+CREATE NONCLUSTERED INDEX [IX_tig_nodes_uid] ON [dbo].[tig_nodes] ( [uid] ASC ) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if object_id('dbo.FK_tig_nodes_tig_users') is null
+ALTER TABLE [dbo].[tig_nodes]  WITH CHECK ADD  CONSTRAINT [FK_tig_nodes_tig_users] FOREIGN KEY([uid])
+REFERENCES [dbo].[tig_users] ([uid])
+-- QUERY END:
+GO
+
+-- QUERY START:
+ALTER TABLE [dbo].[tig_nodes] CHECK CONSTRAINT [FK_tig_nodes_tig_users]
+-- QUERY END:
+GO
+
+
+-- QUERY START:
+IF object_id('dbo.tig_pairs') IS NULL
+CREATE TABLE [dbo].[tig_pairs](
+	[pid] [bigint] IDENTITY(1,1) NOT NULL,
+	[nid] [bigint] NULL,
+	[uid] [bigint] NOT NULL,
+	[pkey] [nvarchar](255) NOT NULL,
+	[pval] [ntext] NULL,
+    CONSTRAINT [PK_tig_pairs] PRIMARY KEY CLUSTERED ( [pid] ASC ) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_pairs') and name = 'IX_tig_pairs_nid' )
+CREATE NONCLUSTERED INDEX [IX_tig_pairs_nid] ON [dbo].[tig_pairs] ( [nid] ASC ) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_pairs') and name = 'IX_tig_pairs_pkey' )
+CREATE NONCLUSTERED INDEX [IX_tig_pairs_pkey] ON [dbo].[tig_pairs] ( [pkey] ASC ) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_pairs') and name = 'IX_tig_pairs_uid' )
+CREATE NONCLUSTERED INDEX [IX_tig_pairs_uid] ON [dbo].[tig_pairs] ( [uid] ASC ) ON [PRIMARY]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if object_id('dbo.FK_tig_pairs_tig_nodes') is null
+ALTER TABLE [dbo].[tig_pairs]  WITH CHECK ADD  CONSTRAINT [FK_tig_pairs_tig_nodes] FOREIGN KEY([nid])
+REFERENCES [dbo].[tig_nodes] ([nid])
+-- QUERY END:
+GO
+
+-- QUERY START:
+ALTER TABLE [dbo].[tig_pairs] CHECK CONSTRAINT [FK_tig_pairs_tig_nodes]
+-- QUERY END:
+GO
+
+-- QUERY START:
+if object_id('dbo.FK_tig_pairs_tig_users') is null
+ALTER TABLE [dbo].[tig_pairs]  WITH CHECK ADD  CONSTRAINT [FK_tig_pairs_tig_users] FOREIGN KEY([uid])
+REFERENCES [dbo].[tig_users] ([uid])
+-- QUERY END:
+GO
+
+-- QUERY START:
+ALTER TABLE [dbo].[tig_pairs] CHECK CONSTRAINT [FK_tig_pairs_tig_users]
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF object_id('dbo.tig_offline_messages') IS NULL
     create table tig_offline_messages (
         msg_id [bigint] IDENTITY(1,1),
         ts [datetime] DEFAULT GETUTCDATE(),
@@ -43,97 +204,11 @@ if object_id('dbo.tig_offline_messages') is null
         sender_sha1 varbinary(20),
         receiver nvarchar(2049) not null,
         receiver_sha1 varbinary(20) not null,
-	    msg_type int not null default 0,
-	    message nvarchar(max),
+        msg_type int not null default 0,
+        message nvarchar(max) not null,
 
-	    primary key (msg_id)
+        primary key (msg_id)
     );
--- QUERY END:
-GO
-
--- QUERY START:
-if not exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'msg_type')
-begin
-    alter table tig_offline_messages add msg_type int not null default 0;
-end
--- QUERY END:
-GO
-
--- QUERY START:
-if not exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'receiver')
-begin
-    alter table tig_offline_messages add receiver nvarchar(2049);
-    alter table tig_offline_messages add receiver_sha1 varbinary(20);
-    alter table tig_offline_messages add sender nvarchar(2049);
-    alter table tig_offline_messages add sender_sha1 varbinary(20);
-end
--- QUERY END:
-GO
-
--- QUERY START:
-if exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_offline_messages') and name = 'index_expired' )
-    drop index index_expired on [dbo].[tig_offline_messages];
--- QUERY END:
-GO
-
--- QUERY START:
-if exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_offline_messages') and name = 'index_receiver_uid_sender_uid' )
-    drop index index_receiver_uid_sender_uid on [dbo].[tig_offline_messages];
--- QUERY END:
-GO
--- QUERY START:
-if exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_offline_messages') and name = 'index_sender_uid_receiver_uid' )
-    drop index index_sender_uid_receiver_uid on [dbo].[tig_offline_messages];
--- QUERY END:
-GO
-
--- QUERY START:
-if object_id('dbo.user_jid') is not null
-    update tig_offline_messages
-    set receiver = (select jid from user_jid where jid_id = receiver_uid),
-        sender = (select jid from user_jid where jid_id = sender_uid)
-    where receiver is null;
--- QUERY END:
-GO
-
--- QUERY START:
-update tig_offline_messages
-set receiver_sha1 = HASHBYTES('SHA1', lower(receiver)),
-    sender_sha1 = HASHBYTES('SHA1', lower(sender))
-where receiver_sha1 is null;
--- QUERY END:
-GO
-
--- QUERY START:
-if exists (select 1 from sys.columns where object_id = object_id('dbo.tig_offline_messages') and name = 'receiver_uid')
-begin
-    alter table tig_offline_messages drop column receiver_uid;
-    alter table tig_offline_messages drop column sender_uid;
-end
--- QUERY END:
-GO
-
--- QUERY START:
-alter table tig_offline_messages alter column receiver nvarchar(max) not null;
--- QUERY END:
-GO
--- QUERY START:
-alter table tig_offline_messages alter column receiver_sha1 varbinary(20) not null;
--- QUERY END:
-GO
-
--- QUERY START:
-if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_offline_messages') and name like 'PK_%' )
-    alter table tig_offline_messages add primary key (msg_id);
--- QUERY END:
-GO
-
--- QUERY START:
-if object_id('dbo.broadcast_msgs') is not null
-begin
-    exec sp_rename 'dbo.broadcast_msgs', 'tig_broadcast_messages';
-    alter table tig_broadcast_messages alter column msg nvarchar(max) not null;
-end
 -- QUERY END:
 GO
 -- QUERY START:
@@ -166,47 +241,12 @@ if exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_offlin
 GO
 
 -- QUERY START:
-if object_id('dbo.user_jid') is not null and object_id('dbo.broadcast_msgs_recipients') is not null
-    insert into tig_broadcast_jids (jid, jid_sha1)
-        select u.jid, HASHBYTES('SHA1', lower(u.jid))
-        from user_jid u
-        inner join broadcast_msgs_recipients b on u.jid_id = b.jid_id
-        where not exists (select 1 from tig_broadcast_jids bj where bj.jid = u.jid);
--- QUERY END:
-GO
-
--- QUERY START:
 if object_id('dbo.tig_broadcast_recipients') is null
     create table tig_broadcast_recipients (
         msg_id [varchar](128) not null references tig_broadcast_messages(id),
         jid_id [bigint] not null references tig_broadcast_jids(jid_id),
         primary key (msg_id, jid_id)
     );
--- QUERY END:
-GO
-
--- QUERY START:
-if object_id('dbo.user_jid') is not null and object_id('dbo.broadcast_msgs_recipients') is not null
-    insert into tig_broadcast_recipients (msg_id, jid_id)
-        select x.msg_id, x.jid_id
-        from (select bmr.msg_id, bj.jid_id
-            from broadcast_msgs_recipients bmr
-            inner join user_jid uj on uj.jid_id = bmr.jid_id
-            inner join tig_broadcast_jids bj on bj.jid_sha1 = HASHBYTES('SHA1', lower(uj.jid))
-        ) x
-        where not exists (select 1 from tig_broadcast_recipients br where br.msg_id = x.msg_id and br.jid_id = x.jid_id);
--- QUERY END:
-GO
-
--- QUERY START:
-if object_id('dbo.broadcast_msgs_recipients') is not null
-    drop table broadcast_msgs_recipients;
--- QUERY END:
-GO
-
--- QUERY START:
-if object_id('dbo.user_jid') is not null
-    drop table user_jid;
 -- QUERY END:
 GO
 

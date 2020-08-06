@@ -16,19 +16,8 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
--- QUERY START:
-SET QUOTED_IDENTIFIER ON
--- QUERY END:
-GO
-
-select GETDATE(), ' - Setting schema version to 7.1';
+-- database properties are deprecated and are being removed
 
 -- QUERY START:
-exec dbo.TigPutDBProperty 'schema-version', '7.1';
+drop procedure if exists TigPutDBProperty;
 -- QUERY END:
-GO
-
--- QUERY START:
-exec TigSetComponentVersion 'server', '7.1';
--- QUERY END:
-GO

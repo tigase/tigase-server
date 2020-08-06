@@ -15,15 +15,11 @@
 -- along with this program. Look for COPYING file in the top folder.
 -- If not, see http://www.gnu.org/licenses/.
 --
+\i database/postgresql-server-8.2.0-sp.sql
 
---  To load schema to PostgreSQL database execute following commands:
---
---  createuser tigase
---  createdb -U tigase tigase
---  psql -q -U tigase -d tigase -f postgresql-schema.sql
+\i database/postgresql-server-8.2.0-props.sql
 
--- LOAD FILE: database/sqlserver-server-7.1.0-schema.sql
+-- LOAD FILE: database/postgresql-server-8.2.0-sp.sql
 
--- LOAD FILE: database/sqlserver-server-7.1.0-sp.sql
+-- LOAD FILE: database/postgresql-server-8.2.0-props.sql
 
--- LOAD FILE: database/sqlserver-server-7.1.0-props.sql

@@ -16,8 +16,8 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-select now(), ' - Setting schema version to 8.1.0';
+select NOW(), ' - Setting schema version to 8.2.0';
 
 -- QUERY START:
-select TigSetComponentVersion('server', '8.1.0');
+call TigSetComponentVersion('server', '8.2.0');
 -- QUERY END:

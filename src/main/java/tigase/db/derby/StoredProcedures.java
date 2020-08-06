@@ -17,6 +17,7 @@
  */
 package tigase.db.derby;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.auth.credentials.Credentials;
 import tigase.util.Algorithms;
 
@@ -67,46 +68,6 @@ public class StoredProcedures {
 			return Algorithms.bytesToHex(digest);
 		} catch (Exception e) {
 			throw new RuntimeException("Error on encoding password", e);
-		}
-	}
-
-	public static void migrateCredentials() throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");
-
-		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("select 1 from tig_user_credentials");
-			boolean migrated = rs.next();
-			rs.close();
-
-			if (migrated) {
-				return;
-			}
-
-			rs = stmt.executeQuery("select uid, user_pw from tig_users where user_pw is not null");
-
-			String encoding = Optional.ofNullable(tigGetDBProperty("password-encoding")).orElse("PLAIN");
-
-			PreparedStatement ps = conn.prepareStatement(
-					"insert into tig_user_credentials (uid, username, mechanism, value) values (?, ?, ?, ?)");
-			while (rs.next()) {
-				ps.setLong(1, rs.getLong(1));
-				ps.setString(2, "default");
-				ps.setString(3, encoding);
-				ps.setString(4, rs.getString(2));
-				ps.execute();
-			}
-
-			stmt.execute("update tig_users set user_pw = null where user_pw is not null");
-		} catch (SQLException e) {
-			log.log(Level.WARNING, "Migration of data failed", e);
-			// e.printStackTrace();
-			// log.log(Level.SEVERE, "SP error", e);
-			//throw e;
-		} finally {
-			conn.close();
 		}
 	}
 
@@ -490,60 +451,6 @@ public class StoredProcedures {
 					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status > 0");
 
 			data[0] = ps.executeQuery();
-		} catch (SQLException e) {
-
-			// e.printStackTrace();
-			// log.log(Level.SEVERE, "SP error", e);
-			throw e;
-		} finally {
-			conn.close();
-		}
-	}
-
-	public static void tigPutDBProperty(final String key, final String value) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");
-
-		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-		try {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("procedure tigPutDBProperty('" + key + "', '" + value + "') called");
-			}
-
-			int result;
-
-			if (tigGetDBProperty(key) != null) {
-				PreparedStatement ps = conn.prepareStatement(
-						"update tig_pairs set tig_pairs.pval = ? where (pkey = ?) and uid = (select uid from tig_users where tig_users.user_id = 'db-properties')");
-
-				ps.setString(1, value);
-				ps.setString(2, key);
-				result = ps.executeUpdate();
-			} else {
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(
-						"select uid from tig_users where lower(user_id) = lower('db-properties')");
-				if (!rs.next()) {
-					rs.close();
-					tigAddUser("db-properties", null, new ResultSet[1]);
-				} else {
-					rs.close();
-				}
-
-				PreparedStatement ps = conn.prepareStatement(
-						"insert into tig_pairs (pkey, pval, uid, nid) select ?, ?, tu.uid, tn.nid from tig_users tu left join tig_nodes tn on tn.uid=tu.uid where (user_id = 'db-properties' and tn.node='root' ) ");
-
-				ps.setString(1, key);
-				Clob c = conn.createClob();
-				c.setString(1, value);
-				ps.setClob(2, c);
-//				ps.setString(2, value);
-				result = ps.executeUpdate();
-			}
-
-			if (result != 1) {
-				log.severe("Error on put properties");
-			}
 		} catch (SQLException e) {
 
 			// e.printStackTrace();

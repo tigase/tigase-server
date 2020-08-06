@@ -285,37 +285,4 @@ public class MsgRepositoryStoredProcedures {
 		}
 	}
 
-	public static void migrateFromOldSchema() throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");
-
-		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("select 1 from SYS.SYSTABLES where tablename = UPPER('msg_history')");
-			boolean hasTable = rs.next();
-			rs.close();
-
-			if (!hasTable) {
-				return;
-			}
-
-			stmt.execute(
-					"insert into tig_offline_messages (receiver, receiver_sha1, sender, sender_sha1, msg_type, ts, message, expired ) " +
-							"select r.jid, r.jid_sha, s.jid, s.jid_sha, m.msg_type, m.ts, m.message, m.expired " +
-							"from msg_history m " + "inner join user_jid r on r.jid_id = m.receiver_uid " +
-							"left join user_jid s on s.jid_id = m.sender_uio");
-
-			stmt.execute("drop table user_jid");
-			stmt.execute("drop table msg_history");
-		} catch (SQLException e) {
-			log.log(Level.WARNING, "Migration of data failed", e);
-			// e.printStackTrace();
-			// log.log(Level.SEVERE, "SP error", e);
-			//throw e;
-		} finally {
-			conn.close();
-		}
-	}
-
 }

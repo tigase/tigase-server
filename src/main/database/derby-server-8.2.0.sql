@@ -16,10 +16,10 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
--- QUERY START:
-call TigPutDBProperty('schema-version', '7.1');
--- QUERY END:
+run 'database/derby-server-8.2.0-sp.sql';
 
--- QUERY START:
-call TigSetComponentVersion('server', '7.1');
--- QUERY END:
+run 'database/derby-server-8.2.0-props.sql';
+
+-- LOAD FILE: database/derby-server-8.2.0-sp.sql
+
+-- LOAD FILE: database/derby-server-8.2.0-props.sql
