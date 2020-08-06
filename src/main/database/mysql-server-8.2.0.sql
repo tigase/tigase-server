@@ -15,6 +15,7 @@
 -- along with this program. Look for COPYING file in the top folder.
 -- If not, see http://www.gnu.org/licenses/.
 --
+
 source database/mysql-server-8.2.0-sp.sql;
 
 source database/mysql-server-8.2.0-props.sql;
