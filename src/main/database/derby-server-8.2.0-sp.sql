@@ -18,5 +18,5 @@
 
 
 -- QUERY START:
-DROP procedure TigPutDBProperty(tkey varchar(255), tval varchar(32672));
+DROP procedure TigPutDBProperty;
 -- QUERY END:
