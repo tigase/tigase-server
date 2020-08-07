@@ -275,7 +275,8 @@ public class MessageAmp
 				}
 				break;
 			case "iq":
-				if (packet.getElemChild("fin") != null) {
+				// if there is no session do not try to deliver this stanza, instead use offline processor
+				if (session != null && packet.getElemChild("fin") != null) {
 					messageProcessor.handleDelivery(packet, session, repo, results, settings);
 				} else {
 					if (offlineProcessor != null) {
