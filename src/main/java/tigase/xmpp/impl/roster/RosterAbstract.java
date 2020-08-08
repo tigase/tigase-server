@@ -522,9 +522,9 @@ public abstract class RosterAbstract {
 	public void updateBuddyChange(final XMPPResourceConnection session, final Queue<Packet> results, final Element item)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 
-		broadcastRosterChange(session.getParentSession(), item, results::offer);
+		JID jid = JID.jidInstanceNS(item.getAttributeStaticStr("jid"));
+		broadcastRosterChange(session.getParentSession(), jid, results::offer);
 		if (eventBus != null) {
-			JID jid = JID.jidInstanceNS(item.getAttributeStaticStr("jid"));
 			RosterElement rosterElement = getRosterElement(session, jid);
 			if (rosterElement != null) {
 				eventBus.fire(new RosterModifiedEvent(session.getJID().copyWithoutResource(),
@@ -852,22 +852,8 @@ public abstract class RosterAbstract {
 								updateRosterItem(conn, event);
 							}
 
-							// prepare broadcast notification
-							Element item = new Element("item");
-							item.setAttributes(event.getSubscription().getSubscriptionAttr());
-							item.setAttribute("jid", event.getJid().toString());
-							if (event.getName() != null) {
-								item.setAttribute("name", XMLUtils.escape(event.getName()));
-							}
-							if (event.getGroups() != null) {
-								Arrays.stream(event.getGroups())
-										.map(XMLUtils::escape)
-										.map(group -> new Element("group", group))
-										.forEach(item::addChild);
-							}
-
 							Queue<Packet> results = new ArrayDeque<>();
-							broadcastRosterChange(event.getSession(), item, results::offer);
+							broadcastRosterChange(event.getSession(), event.getJid(), results::offer);
 							preparePresencePackets(event.getSession(), event.getJid(), event.getSubscription(),
 												   results::offer);
 
@@ -938,10 +924,20 @@ public abstract class RosterAbstract {
 		}
 	}
 
-	private void broadcastRosterChange(XMPPSession session, Element item, Consumer<Packet> consumer)
+	private void broadcastRosterChange(XMPPSession session, JID jid, Consumer<Packet> consumer)
 			throws NotAuthorizedException, NoConnectionIdException {
 		for (XMPPResourceConnection conn : session.getActiveResources()) {
-			broadcastRosterChange(conn, item, consumer);
+			try {
+				Element item = getBuddyItem(conn, jid);
+				if (item == null) {
+					item = new Element("item");
+					item.setAttribute("jid", jid.toString());
+					item.setAttribute("subscription", "remove");
+				}
+				broadcastRosterChange(conn, item, consumer);
+			} catch (TigaseDBException ex) {
+				log.log(Level.FINE, "could not load roster for " + session.getUserName(), ex);
+			}
 		}
 	}
 
