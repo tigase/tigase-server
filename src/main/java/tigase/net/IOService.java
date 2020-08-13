@@ -295,8 +295,8 @@ public abstract class IOService<RefObject>
 				}
 			} catch (Exception e) {
 				certCheckResult = CertCheckResult.invalid;
-				if (log.isLoggable(Level.WARNING)) {
-					log.log(Level.WARNING,
+				if (log.isLoggable(Level.INFO)) {
+					log.log(Level.INFO,
 							this + ", Certificate validation failed, CertCheckResult: " + certCheckResult + ")", e);
 				}
 			}
