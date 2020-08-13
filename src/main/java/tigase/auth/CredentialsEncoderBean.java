@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Bean(name = "credentialsEncoders", parent = AuthRepositoryMDPoolBean.AuthRepositoryConfigBean.class, active = true)
+@Bean(name = "credentialEncoders", parent = AuthRepositoryMDPoolBean.AuthRepositoryConfigBean.class, active = true)
 public class CredentialsEncoderBean
 		implements RegistrarBean {
 
