@@ -684,9 +684,20 @@ public class StreamManagementIOProcessor
 					synchronized (formatter) {
 						stamp = formatter.format(this.stamp);
 					}
-					String from = result.getStanzaTo() != null
-								  ? result.getStanzaTo().getDomain()
-								  : result.getPacketTo().getDomain();
+					String from = null;
+					if (result.getStanzaTo() != null) {
+						from = result.getStanzaTo().getDomain();
+					} else if (result.getPacketTo() != null) {
+						from = result.getPacketTo().getDomain();
+					} else {
+						// if we still do not have anything just set from to the cluster node name
+						// (same as result.getPacket().getDomain())
+						from = DNSResolverFactory.getInstance().getDefaultHost();
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "unacked packet without 'stanzaTo' and 'packetTo' "
+									+ packet.toString());
+						}
+					}
 
 					Element x = new Element("delay", new String[]{"from", "stamp", "xmlns"},
 											new String[]{from, stamp, "urn:xmpp:delay"});
