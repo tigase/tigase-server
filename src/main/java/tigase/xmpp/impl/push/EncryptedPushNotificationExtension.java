@@ -86,9 +86,10 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 			return;
 		}
 		String alg = encryptEl.getAttributeStaticStr("alg");
+		// default limit should be 4000 bytes as 4096 bytes is current limit for APNs and FCM
 		long maxSizeBytes = Optional.ofNullable(encryptEl.getAttributeStaticStr("max-size"))
 				.map(Integer::parseInt)
-				.orElse(Integer.MAX_VALUE);
+				.orElse(4000);
 		String keyStr = encryptEl.getCData();
 
 		if (alg == null || keyStr == null) {
