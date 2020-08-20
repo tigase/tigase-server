@@ -692,20 +692,24 @@ public class SchemaManager {
 	}
 
 	private static Map<String, DataSourceInfo> getDataSources(Map<String, Object> config) {
-		boolean automaticSchemaManagement = Optional.ofNullable(config.get("dataSource"))
-				.map(Map.class::cast)
+		final Optional<Map<String,Object>> dataSources = Optional.ofNullable(config.get("dataSource")).map(obj -> (Map<String,Object>)obj);
+		boolean automaticSchemaManagement = dataSources
 				.map(map -> map.getOrDefault("automaticSchemaManagement", map.get("schema-management")))
 				.map(Boolean.class::cast)
 				.orElseGet(() -> (Boolean) config.getOrDefault("automaticSchemaManagement",
 														 config.getOrDefault("schema-management", true)));
-		Map<String, DataSourceInfo> dataSources = ((Map<String, Object>) config.get("dataSource")).values()
-				.stream()
-				.filter(v -> v instanceof AbstractBeanConfigurator.BeanDefinition)
-				.map(v -> (AbstractBeanConfigurator.BeanDefinition) v)
-				.filter(AbstractBeanConfigurator.BeanDefinition::isActive)
-				.map(v -> SchemaManager.createDataSourceInfo(v, automaticSchemaManagement))
-				.collect(Collectors.toMap(DataSourceInfo::getName, Function.identity()));
-		return dataSources;
+//		return dataSources.stream()
+//				.map(Map::values)
+		return dataSources.isEmpty()
+			   ? Collections.emptyMap()
+			   : dataSources.get()
+					   .values()
+					   .stream()
+					   .filter(v -> v instanceof AbstractBeanConfigurator.BeanDefinition)
+					   .map(v -> (AbstractBeanConfigurator.BeanDefinition) v)
+					   .filter(AbstractBeanConfigurator.BeanDefinition::isActive)
+					   .map(v -> SchemaManager.createDataSourceInfo(v, automaticSchemaManagement))
+					   .collect(Collectors.toMap(DataSourceInfo::getName, Function.identity()));
 	}
 
 	private static DataSourceInfo createDataSourceInfo(AbstractBeanConfigurator.BeanDefinition def, boolean automaticSchemaManagement) {
@@ -721,8 +725,10 @@ public class SchemaManager {
 	private static List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans, Map<String, Object> config) {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
 		Map<String, DataSourceInfo> dataSources = getDataSources(config);
-		return repoBeans.stream().flatMap(bc -> {
-			try {
+		return dataSources.isEmpty()
+			   ? Collections.emptyList()
+			   : repoBeans.stream().filter(Objects::nonNull).flatMap(bc -> {
+				   try {
 				if (SDRepositoryBean.class.isAssignableFrom(bc.getClazz())) {
 					String dataSourceName = getDataSourceNameOr(configurator, bc, "default");
 					DataSourceInfo dataSource = dataSources.get(dataSourceName);
@@ -862,6 +868,9 @@ public class SchemaManager {
 												 BeanConfig beanConfig, BeanConfig mdRepoBeanConfig)
 			throws ClassNotFoundException, DBInitException, IllegalAccessException, InstantiationException,
 				   NoSuchMethodException, InvocationTargetException {
+		if (dataSource == null) {
+			throw new RuntimeException("No dataSource configured!");
+		}
 		Map<String, Object> cfg = configurator.getConfiguration(beanConfig);
 		String cls = (String) cfg.getOrDefault("cls", cfg.get("repo-cls"));
 		if (cls != null) {
