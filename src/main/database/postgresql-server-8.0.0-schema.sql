@@ -174,7 +174,7 @@ end$$;
 
 -- QUERY START:
 create table if not exists tig_offline_messages (
-    msg_id bigint,
+    msg_id bigserial,
     ts timestamp with time zone default now(),
     expired timestamp with time zone,
     sender varchar(2049),
