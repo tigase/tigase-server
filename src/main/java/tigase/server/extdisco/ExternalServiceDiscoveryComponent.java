@@ -23,6 +23,8 @@ import tigase.component.modules.impl.DiscoveryModule;
 import tigase.db.comp.ComponentRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.selector.ConfigType;
+import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 
 import javax.script.Bindings;
@@ -31,6 +33,7 @@ import javax.script.Bindings;
  * Created by andrzej on 06.09.2016.
  */
 @Bean(name = "ext-disco", parent = Kernel.class, active = true)
+@ConfigType({ConfigTypeEnum.DefaultMode})
 public class ExternalServiceDiscoveryComponent
 		extends AbstractKernelBasedComponent {
 
