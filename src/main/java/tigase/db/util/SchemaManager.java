@@ -698,8 +698,6 @@ public class SchemaManager {
 				.map(Boolean.class::cast)
 				.orElseGet(() -> (Boolean) config.getOrDefault("automaticSchemaManagement",
 														 config.getOrDefault("schema-management", true)));
-//		return dataSources.stream()
-//				.map(Map::values)
 		return dataSources.isEmpty()
 			   ? Collections.emptyMap()
 			   : dataSources.get()
