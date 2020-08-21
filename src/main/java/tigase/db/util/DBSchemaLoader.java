@@ -47,7 +47,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.AbstractMap.SimpleImmutableEntry;
 import static tigase.db.DataRepository.dbTypes;
 import static tigase.db.jdbc.DataRepositoryImpl.JDBC_SCHEMA_VERSION_QUERY;
 
@@ -287,7 +286,7 @@ public class DBSchemaLoader
 	public Result validateDBConnection() {
 		connection_ok = false;
 		String db_conn = getDBUri(false, true);
-		log.log(Level.INFO, "Validating DBConnection, URI: " + db_conn);
+		log.log(Level.INFO, "Validating DBConnection, URI: " + getDBUri(false, true, true));
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.ok;
@@ -313,7 +312,7 @@ public class DBSchemaLoader
 	public Result shutdownDerby() {
 		String db_conn = getDBUri(false, true);
 		if ("derby".equals(params.getDbType())) {
-			log.log(Level.INFO, "Validating DBConnection, URI: " + db_conn);
+			log.log(Level.INFO, "Validating DBConnection, URI: " + getDBUri(false, true, true));
 			if (db_conn == null) {
 				log.log(Level.WARNING, "Missing DB connection URL");
 			} else {
@@ -337,7 +336,7 @@ public class DBSchemaLoader
 
 		db_ok = false;
 		String db_conn1 = getDBUri(true, false);
-		log.log(Level.INFO, "Validating whether DB Exists, URI: " + db_conn1);
+		log.log(Level.INFO, "Validating whether DB Exists, URI: " + getDBUri(true, false, true));
 		if (db_conn1 == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.error;
@@ -417,7 +416,7 @@ public class DBSchemaLoader
 
 		// part 2, acquire reqired fields and validate them
 		String db_conn = getDBUri(true, true);
-		log.log(Level.INFO, "Post Installation, URI: " + db_conn);
+		log.log(Level.INFO, "Post Installation, URI: " + getDBUri(true, true,true));
 		return withStatement(db_conn, stmt -> {
 			log.log(Level.INFO, "Finalizing...");
 			ArrayList<String> queries = loadSQLQueries("database/" + params.getDbType() + "-installer-post.sql");
@@ -492,7 +491,7 @@ public class DBSchemaLoader
 		}
 
 		String dbUri = getDBUri();
-		log.log(Level.INFO, "Adding XMPP Admin Account, URI: " + dbUri);
+		log.log(Level.INFO, "Adding XMPP Admin Account, URI: " + getDBUri(true));
 
 		try {
 			DataRepository dataSource = new DataRepositoryImpl();
@@ -529,7 +528,7 @@ public class DBSchemaLoader
 
 		String db_conn = getDBUri();
 		log.log(Level.INFO, "Setting version of the component: {0} to: {1} for connection: {2}",
-				new Object[]{component, version, db_conn});
+				new Object[]{component, version, getDBUri(true)});
 
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
@@ -654,7 +653,7 @@ public class DBSchemaLoader
 		try {
 			String dbUri = getDBUri();
 			log.log(Level.CONFIG, "Loading schema {0}, version: {1} into repo: {2}",
-			        new Object[]{schema.getId(), requiredVersion, dbUri});
+			        new Object[]{schema.getId(), requiredVersion, getDBUri(true)});
 			DataRepository dataSource = new DataRepositoryImpl();
 			dataSource.initialize(dbUri);
 
@@ -789,7 +788,7 @@ public class DBSchemaLoader
 		}
 
 		String db_conn = getDBUri();
-		log.log(Level.INFO, String.format("Loading schema from file(s): %1$s, URI: %2$s", fileName, db_conn));
+		log.log(Level.INFO, String.format("Loading schema from file(s): %1$s, URI: %2$s", fileName, getDBUri(true)));
 
 		return withStatement(db_conn, stmt -> {
 			ArrayList<String> queries = new ArrayList<>(loadSQLQueries("database/" + fileName));
@@ -854,7 +853,7 @@ public class DBSchemaLoader
 			}
 		} else {
 			String db_conn = getDBUri(false, true);
-			log.log(Level.INFO, "Dropping database, URI: " + db_conn);
+			log.log(Level.INFO, "Dropping database, URI: " + getDBUri(false, true, true));
 			return withStatement(db_conn, stmt -> {
 				String query = "drop database " + params.getDbName();
 				log.log(Level.FINEST, "Executing query: " + query);
@@ -871,7 +870,11 @@ public class DBSchemaLoader
 	}
 
 	public String getDBUri() {
-		return getDBUri(true, false);
+		return getDBUri(false);
+	}
+
+	public String getDBUri(boolean debug) {
+		return getDBUri(true, false, debug);
 	}
 
 	public List<CommandlineParameter> getCommandlineParameters() {
@@ -987,7 +990,7 @@ public class DBSchemaLoader
 		}
 
 		String db_conn = getDBUri();
-		log.log(Level.INFO, "Executing Simple Query, URI: " + db_conn);
+		log.log(Level.INFO, "Executing Simple Query, URI: " + getDBUri(true));
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.error;
@@ -1148,6 +1151,10 @@ public class DBSchemaLoader
 	 *
 	 */
 	private String getDBUri(boolean includeDbName, boolean useRootCredentials) {
+		return getDBUri(includeDbName, useRootCredentials, false);
+	}
+
+	private String getDBUri(boolean includeDbName, boolean useRootCredentials, boolean debug) {
 		String db_uri = "jdbc:";
 		String database = params.getDbType();
 		String USERNAME = useRootCredentials ? params.getDbRootUser() : params.getDbUser();
@@ -1172,7 +1179,7 @@ public class DBSchemaLoader
 				}
 				db_uri += ";user=" + USERNAME;
 				if (PASSWORD != null && !PASSWORD.isEmpty()) {
-					db_uri += ";password=" + PASSWORD;
+					db_uri += ";password=" + (maskString(PASSWORD, debug));
 				}
 				db_uri += ";schema=dbo";
 				db_uri += ";lastUpdateCount=false";
@@ -1190,7 +1197,7 @@ public class DBSchemaLoader
 				}
 				db_uri += "?user=" + USERNAME;
 				if (PASSWORD != null && !PASSWORD.isEmpty()) {
-					db_uri += "&password=" + PASSWORD;
+					db_uri += "&password=" + (maskString(PASSWORD, debug));
 				}
 				if (Boolean.TRUE.equals(params.isUseSSL())) {
 					db_uri += "&useSSL=true";
@@ -1207,7 +1214,7 @@ public class DBSchemaLoader
 				}
 				db_uri += "?user=" + USERNAME;
 				if (PASSWORD != null && !PASSWORD.isEmpty()) {
-					db_uri += "&password=" + PASSWORD;
+					db_uri += "&password=" + maskString(PASSWORD, debug);
 				}
 				if (Boolean.TRUE.equals(params.isUseSSL())) {
 					db_uri += "&useSSL=true";
@@ -1227,6 +1234,10 @@ public class DBSchemaLoader
 				throw new IllegalArgumentException("Unknown database type: " + database);
 		}
 		return db_uri;
+	}
+
+	private String maskString(String PASSWORD, boolean debug) {
+		return debug ? PASSWORD.replaceAll(".", "*") : PASSWORD;
 	}
 
 	enum SQL_LOAD_STATE {
@@ -1606,6 +1617,9 @@ public class DBSchemaLoader
 				try {
 					field.setAccessible(true);
 					value = field.get(this);
+					if (field.getName().toLowerCase().contains("pass")) {
+						value = String.valueOf(value).replaceAll(".", "*");
+					}
 				} catch (Exception ex) {
 					value = "Error!";
 				}
