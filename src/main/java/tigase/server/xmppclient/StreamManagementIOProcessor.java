@@ -693,8 +693,8 @@ public class StreamManagementIOProcessor
 						// if we still do not have anything just set from to the cluster node name
 						// (same as result.getPacket().getDomain())
 						from = DNSResolverFactory.getInstance().getDefaultHost();
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "unacked packet without 'stanzaTo' and 'packetTo' "
+						if (log.isLoggable(Level.WARNING)) {
+							log.log(Level.WARNING, "unacked packet without 'stanzaTo' and 'packetTo' "
 									+ packet.toString());
 						}
 					}
