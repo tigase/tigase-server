@@ -783,8 +783,9 @@ public class SchemaManager {
 									.filter(bc1 -> !Kernel.class.isAssignableFrom(bc1.getClazz()))
 									.filter(bc1 -> !Kernel.DelegatedBeanConfig.class.isAssignableFrom(bc1.getClass()))
 									.map(bc1 -> {
+										String dataSourceName = null;
 										try {
-											String dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
+											dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
 											DataSourceInfo dataSource = dataSources.get(dataSourceName);
 
 											mdRepositoryBean.registerIfNotExists(bc1.getBeanName());
@@ -793,7 +794,10 @@ public class SchemaManager {
 																								  bc);
 											return new RepoInfo(bc2, dataSource, implementation);
 										} catch (Exception ex) {
-											log.log(Level.WARNING, "Error getting repository implementation", ex);
+											log.log(Level.WARNING, "Error getting repository implementation for: " +
+													bc.getKernel().getParent().getName() +
+													" bean and named repository: " + dataSourceName +
+													", available data sources:\n" + dataSources.values(), ex);
 											return null;
 										}
 									});
@@ -805,14 +809,18 @@ public class SchemaManager {
 									.filter(bc1 -> !Kernel.class.isAssignableFrom(bc1.getClazz()))
 									.filter(bc1 -> !Kernel.DelegatedBeanConfig.class.isAssignableFrom(bc1.getClass()))
 									.map(bc1 -> {
+										String dataSourceName = null;
 										try {
-											String dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
+											dataSourceName = getDataSourceNameOr(configurator, bc1, bc1.getBeanName());
 											DataSourceInfo dataSource = dataSources.get(dataSourceName);
 											Class<?> implementation = getRepositoryImplementation(configurator, dataSource, bc1,
 																								  bc);
 											return new RepoInfo(bc1, dataSource, implementation);
 										} catch (Exception ex) {
-											log.log(Level.WARNING, "Error getting repository implementation", ex);
+											log.log(Level.WARNING, "Error getting repository implementation for: " +
+													bc.getKernel().getParent().getName() +
+													" bean and named repository: " + dataSourceName +
+													", available data sources:\n" + dataSources.values(), ex);
 											return null;
 										}
 									});

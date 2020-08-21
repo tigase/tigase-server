@@ -54,3 +54,5 @@ etc/acs.licence
 etc/config-dump.properties
 etc/installation-id
 database
+tigasedb
+derby.log
