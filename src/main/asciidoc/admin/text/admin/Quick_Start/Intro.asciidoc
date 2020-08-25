@@ -10,7 +10,7 @@ Before you begin installing Tigase server onto your system, please make sure the
 - *Java Development Kit (JDK) 11 (LTS)* - We recommend OpenJDK
 - *Administrator access* - We recommend that you install Tigase Server from a user login with administrator access.
 
-NOTE: It may be possible to run Tigase XMPP Server with JDK v8 but it is not recommended as not all features will be available and you may encounter startup issues.
+IMPORTANT: You should always run the latest point/bugfix release of the recommended JDK.
 
 NOTE: While it should be possible to use newer versions of the JDK, we don't guarantee it and we recommend using the one mentioned above.
 
