@@ -98,16 +98,17 @@ If you have a cell phone on a separate network with an XMPP client, you can now 
 == Ports description
 Once your server is setup, you may need to open at least two ports. By default XMPP communication happens on ports 5222/5269, to which point SRV records. Other ports used by the server are:
 
-* `3478` (TURN or STUN, plain socket, TCP and UDP)
-* `5349` (TURN or STUN, over TLS, TCP and UDP)
-* `5222` (default XMPP socket port)
-* `5223` (legacy XMPP socket port)
-* `5269` (default s2s port, i.e.: federation support)
-* `5277` (cluster connection)
-* `5280` (default BOSH port)
-* `5290` (default WebSocket port)
-* `8080` (HTTP API component port)
-* `9050` (JMX Monitoring)
+* `3478` - TURN or STUN, plain socket, TCP and UDP
+* `5349` - TURN or STUN, over TLS, TCP and UDP
+* `5222` - incoming client to server XMPP connections
+* `5223` - incoming client to server XMPP connections over TLS/SSL, including DirectTLS
+* `5269` - default s2s port, i.e.: federation support
+* `5277` - inter-cluster communication
+* `5280` - default BOSH connections
+* `5290` - default WebSocket connections
+* `5291` - default WebSocket connections over TLS/SSL
+* `8080` - for HTTP server (web-based setup, REST API, file upload extension, etc.)
+* `9050` - JMX Monitoring
 
 If for any reason you can't use default ports and have to change them it's possible to point SRV records those ports. Please keep in mind, that you have to open those ports for incoming connections in your firewall. In case you are using `iptables` you can use following command to include those ports in your rules:
 [source,bash]
