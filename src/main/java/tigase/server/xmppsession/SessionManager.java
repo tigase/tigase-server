@@ -2649,8 +2649,9 @@ public class SessionManager
 					setPermissions(item.getConn(), local_results);
 				}
 				addOutPackets(item.getPacket(), item.getConn(), local_results);
-			} catch (PacketErrorTypeException e) {
-				log.log(Level.INFO, "Already error packet, ignoring: {0}", item.getPacket().toStringSecure());
+			} catch (InvalidPacketException e) {
+				log.log(Level.INFO, "Invalid packet! Error: {0}, packet: {1}",
+						new String[]{e.getLocalizedMessage(), item.getPacket().toStringSecure()});
 			} catch (XMPPException e) {
 				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket().toStringSecure(), e);
 			}

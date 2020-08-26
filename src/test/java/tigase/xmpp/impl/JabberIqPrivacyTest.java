@@ -395,6 +395,7 @@ public class JabberIqPrivacyTest
 		if (type != null) {
 			iq.setAttribute("type", type);
 		}
+		iq.setAttribute("from", "someuser@domain.com");
 		Element query = new Element("query", new String[]{"xmlns"}, new String[]{JabberIqPrivacy.XMLNS});
 		if (null != additionalChild) {
 			query.addChild(additionalChild);

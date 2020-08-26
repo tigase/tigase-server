@@ -25,6 +25,8 @@ import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.PacketInvalidAddressException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
@@ -142,7 +144,19 @@ public class MessageAmpTest
 
 		messageAmp.process(packet, null, null, results, null);
 		assertTrue("result was generated", results.isEmpty());
+	}
 
+	@Test(expected = PacketInvalidAddressException.class)
+	public void testMessageToOfflineUserWithoutFrom() throws Exception {
+		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
+		JID res1 = JID.jidInstance(userJid, "res1");
+
+		Element packetEl = new Element("message", new String[]{"to"}, new String[]{res1.toString()});
+		Packet packet = Packet.packetInstance(packetEl);
+		Queue<Packet> results = new ArrayDeque<>();
+		messageAmp.process(packet, null, null, results, null);
+		System.out.println(results);
+		assertTrue("Results were generated for incorrectly addressed stanza", results.isEmpty());
 	}
 
 	@Test

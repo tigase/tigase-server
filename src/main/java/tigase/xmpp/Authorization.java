@@ -471,10 +471,13 @@ public enum Authorization {
 	 */
 	public Packet getResponseMessage(Packet packet, String text, boolean includeOriginalXML)
 			throws PacketErrorTypeException {
+		if (packet.getFrom() == null) {
+			throw new PacketInvalidAddressException("The packet does not have 'from' address, can't generate error response: " + packet.toString());
+		}
 		if ((packet.getType() == null) || (packet.getType() != StanzaType.error)) {
 			return packet.errorResult(getErrorType(), getErrorCode(), getCondition(), text, includeOriginalXML);
 		} else {
-			throw new PacketErrorTypeException("The packet has already 'error' type: " + packet.toString());
+			throw new PacketInvalidTypeException("The packet has already 'error' type: " + packet.toString());
 		}
 	}
 }

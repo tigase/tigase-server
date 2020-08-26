@@ -269,7 +269,7 @@ public class ClientConnectionManager
 
 			processOutPacket(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet, errorMessage, true));
 		} catch (PacketErrorTypeException ex) {
-			log.log(Level.FINER, "exception prepareing request for returning error, data = {0}", packet);
+			log.log(Level.FINER, "exception preparing request for returning error, data = {0}", packet);
 		}
 		return true;
 	}
