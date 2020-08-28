@@ -340,7 +340,7 @@ public class OfflineMessages
 	 * of type normal, chat.</li> <li> presence stanza of type subscribe, subscribed, unsubscribe and unsubscribed.</li>
 	 * </ul> <br> Processed messages are stamped with the {@code delay} element and appropriate timestamp. <br>
 	 *
-	 * @param pac a {@link Packet} object containing packet that should be verified and saved
+	 * @param packet a {@link Packet} object containing packet that should be verified and saved
 	 * @param repo a {@link MsgRepositoryIfc} repository handler responsible for storing messages
 	 *
 	 * @return {@code true} if the packet was correctly saved to repository, {@code false} otherwise.
