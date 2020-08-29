@@ -27,7 +27,6 @@ import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.vhosts.VHostItem;
@@ -430,6 +429,8 @@ public class S2SConnectionManager
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
+		
+		serv.setConnectionId(JID.jidInstanceNS(null, serv.getUniqueId(), UUID.randomUUID().toString()));
 		log.log(Level.FINEST, "s2s connection opened: {0}", serv);
 		for (S2SProcessor proc : processors) {
 			proc.serviceStarted(serv);
