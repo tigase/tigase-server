@@ -685,10 +685,10 @@ public class StreamManagementIOProcessor
 						stamp = formatter.format(this.stamp);
 					}
 					String from = null;
-					if (result.getStanzaTo() != null) {
-						from = result.getStanzaTo().getDomain();
-					} else if (result.getPacketTo() != null) {
-						from = result.getPacketTo().getDomain();
+					if (packet.getStanzaTo() != null) {
+						from = packet.getStanzaTo().getDomain();
+					} else if (packet.getPacketTo() != null) {
+						from = packet.getPacketTo().getDomain();
 					} else {
 						// if we still do not have anything just set from to the cluster node name
 						// (same as result.getPacket().getDomain())
