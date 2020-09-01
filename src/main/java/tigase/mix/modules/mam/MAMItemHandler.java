@@ -33,7 +33,7 @@ public class MAMItemHandler extends tigase.pubsub.modules.mam.MAMItemHandler {
 
 	@Override
 	public void itemFound(Query query, MAMRepository.Item item) {
-		if (roomPresenceRepository.isParticipant(query.getComponentJID().getBareJID(), query.getQuestionerJID())) {
+		if (roomPresenceRepository != null && roomPresenceRepository.isParticipant(query.getComponentJID().getBareJID(), query.getQuestionerJID())) {
 			Element mixEl = item.getMessage().getChild("mix", Mix.CORE1_XMLNS);
 			if (mixEl != null) {
 				item.getMessage().removeChild(mixEl);
