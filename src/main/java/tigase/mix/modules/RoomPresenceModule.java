@@ -50,7 +50,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
-@Bean(name = "roomPresenceModule", parent = IMixComponent.class, active = false)
+@Bean(name = "roomPresenceModule", parent = IMixComponent.class, active = true)
 public class RoomPresenceModule
 		extends AbstractPubSubModule implements Initializable, UnregisterAware {
 
