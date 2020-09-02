@@ -1017,7 +1017,7 @@ public abstract class IOService<RefObject>
 			forceStop();
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Data writing exception " + connectionId, e);
+				log.log(Level.FINER, "Data [" + data + "] writing exception, connection " + connectionId + ", socket: " + socketIO, e);
 			}
 			forceStop();
 		} finally {

@@ -482,6 +482,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				--services_size;
 
 				Queue<Packet> undeliveredPackets = service.getWaitingPackets();
+				log.log(Level.FINEST, "[[{0}]] processing undelivered packets: {1}",
+						new Object[]{getName(), undeliveredPackets.size()});
+
 				Packet p = null;
 				while ((p = undeliveredPackets.poll()) != null) {
 					processUndeliveredPacket(p, null, null);

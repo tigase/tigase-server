@@ -51,7 +51,7 @@ public class S2SAbstract {
 
 	protected static final String START_TLS_NS = "urn:ietf:params:xml:ns:xmpp-tls";
 
-	protected static final String STREAM_FEATURES_EL = "stream:features";
+	public static final String STREAM_FEATURES_EL = "stream:features";
 
 	protected static final String VERIFY_EL_NAME = "verify";
 

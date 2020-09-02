@@ -24,9 +24,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-import tigase.server.Permissions;
+import tigase.server.*;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.vhosts.VHostItem;
@@ -34,6 +32,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
@@ -42,6 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.server.xmppserver.proc.S2SAbstract.STREAM_FEATURES_EL;
 
 /**
  * Created: Jun 14, 2010 11:59:38 AM
@@ -337,8 +338,14 @@ public class S2SConnectionManager
 
 	@Override
 	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
-		// readd packet - this may be good as we would retry to send packet 
+		// re-add packet - this may be good as we would retry to send packet
 		// which delivery failed due to IO error
+
+		if (packet.getElemName() == STREAM_FEATURES_EL) {
+			// we should not re-add stream features as those related to particular connection
+			// and if it got broken then there's no point in trying to re-deliver it
+			return false;
+		}
 		addPacket(packet);
 		return true;
 	}
