@@ -89,15 +89,13 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		// default limit should be 4000 bytes as 4096 bytes is current limit for APNs and FCM
 		long maxSizeBytes = Optional.ofNullable(encryptEl.getAttributeStaticStr("max-size"))
 				.map(Integer::parseInt)
-				.orElse(4000);
+				.orElse(3000);
 		String keyStr = encryptEl.getCData();
 
 		if (alg == null || keyStr == null) {
 			return;
 		}
-
-		int maxSize = (int) ((maxSizeBytes * 6) / 8);
-
+		
 		if (!alg.equalsIgnoreCase("aes-128-gcm")) {
 			return;
 		}
@@ -146,10 +144,7 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 
 		String body = packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH);
 		if (body != null) {
-			int currentContentLength = content.getBytes(UTF8).length + 64;
-			while (maxSize < (currentContentLength + body.getBytes(UTF8).length)) {
-				body = body.substring(0, maxSize - currentContentLength);
-			}
+			body = trimBodyToSize(maxSizeBytes, body);
 			payload.put("message", body);
 			content = valueToString(payload);
 		}
@@ -177,6 +172,66 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		}
 	}
 
+	// for testing message truncation
+//	public static void main(String[] args) {
+//		int maxSize = 3000;
+//
+//		StringBuilder sb = new StringBuilder();
+//		for (int i=0; i<1000; i++) {
+//			sb.append("\uD83D\uDE21");
+//		}
+//		for (int i=0; i<(8000-64); i++) {
+//			if (i % 10 ==0) {
+//				sb.append("\uD83D\uDE21");
+//			} else {
+//				sb.append(String.valueOf(i % 10));
+//			}
+//		}
+//		String body = sb.toString();
+//		System.out.println("" + body);
+//		body = trimBodyToSize(maxSize, body);
+//		System.out.println("" + body);
+//		System.out.println("body length: " + body.getBytes(UTF8).length);
+//	}
+
+	public static String trimBodyToSize(long limit, String body) {
+		int maxSize = ((int) limit * 6) / 8;
+
+		int currentContentLength = 64;
+		if (maxSize < (currentContentLength + body.getBytes(UTF8).length)) {
+			body = body.substring(0, truncateAtChar(maxSize, body));
+		}
+		
+		return body;
+	}
+
+	public static int truncateAtChar(int maxBytes, String body) {
+		int bytes = 0;
+		char[] chars = body.toCharArray();
+		for (int i = 0; i < body.length(); ) {
+			int c = Character.codePointAt(chars, i);
+			
+			int charBytes = 1;
+			if (c <= 0x007F) {
+				charBytes = 1;
+			} else if (c <= 0x07FF) {
+				charBytes = 2;
+			} else if (c <= 0xDFFF) {
+				charBytes = 3;
+			} else {
+				charBytes = 4;
+			}
+
+			if (bytes + charBytes > maxBytes) {
+				return i;
+			}
+
+			bytes += charBytes;
+			i += Character.charCount(c);
+		}
+		return body.length();
+	}
+	
 	private static String valueToString(Object value) {
 		if (value instanceof Number) {
 			return value.toString();
