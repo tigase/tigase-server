@@ -86,10 +86,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
 	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 	public static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
-	public static final String NET_BUFFER_PROP_KEY = "net-buffer";
 	public static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
 	public static final int NET_BUFFER_LIMIT_HT_PROP_VAL = 20 * 1024 * 1024;
-	public static final String NET_BUFFER_LIMIT_PROP_KEY = "net-buffer-limit";
 	public static final int NET_BUFFER_LIMIT_ST_PROP_VAL = 2 * 1024 * 1024;
 	public static final String PORT_CLASS_PROP_KEY = "class";
 	public static final String PORT_IFC_PROP_KEY = "ifc";
@@ -148,7 +146,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected int elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
 	protected Kernel kernel;
 	@ConfigField(desc = "Default size of a network buffer", alias = "net-buffer")
-	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
+	protected int net_buffer = isHighThroughput() ? NET_BUFFER_HT_PROP_VAL : NET_BUFFER_ST_PROP_VAL;
 	@Inject(nullAllowed = true)
 	protected XMPPIOProcessor[] processors = new XMPPIOProcessor[0];
 	@ConfigField(desc = "Traffic throttling")
