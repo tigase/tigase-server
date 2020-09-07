@@ -148,6 +148,16 @@ public class MessageCarbons
 			return;
 		}
 
+		if (!session.isAuthorized()) {
+			try {
+				results.offer(
+						session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.FINEST, "ignoring packet from not authorized session");
+			}
+			return;
+		}
+
 		if (packet.getElemName() == Iq.ELEM_NAME) {
 
 			boolean enable = packet.getElement().getChild(ENABLE_ELEM_NAME, XMLNS) != null;
