@@ -26,6 +26,7 @@ import tigase.server.*;
 import tigase.stats.StatisticsList;
 import tigase.util.common.TimerTask;
 import tigase.util.dns.DNSResolverFactory;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.StreamError;
@@ -668,6 +669,13 @@ public class StreamManagementIOProcessor
 			return queue;
 		}
 
+		public static void main(String[] args) throws TigaseStringprepException {
+			final Logger log = Logger.getGlobal();
+			final Packet packet = new Iq(new Element("iq"), JID.jidInstance("from@bla"), JID.jidInstance("to@bla"));
+			log.log(Level.WARNING, "unacked packet without stanzaTo: {0}, and packetTo: {1}; setting from to: {2}; packet: {3} ",
+					new Object[]{packet.getStanzaTo(), packet.getPacketTo(), "from", packet.toString()});
+		}
+
 		public static class Entry {
 
 			private final Packet packet;
@@ -694,8 +702,8 @@ public class StreamManagementIOProcessor
 						// (same as result.getPacket().getDomain())
 						from = DNSResolverFactory.getInstance().getDefaultHost();
 						if (log.isLoggable(Level.WARNING)) {
-							log.log(Level.WARNING, "unacked packet without 'stanzaTo' and 'packetTo' "
-									+ packet.toString());
+							log.log(Level.WARNING, "unacked packet without stanzaTo: {0}, and packetTo: {1}; setting from to: {2}; packet: {3} ",
+									new Object[]{packet.getStanzaTo(), packet.getPacketTo(), from, packet.toString()});
 						}
 					}
 
