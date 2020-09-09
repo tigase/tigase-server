@@ -420,8 +420,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		// synchronized(services) {
 		String id = getUniqueId(service);
 
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[]{getName(), service});
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "[[{0}]] Connection started: {1}", new Object[]{getName(), service});
 		}
 
 		IO serv = services.get(id);
@@ -466,8 +466,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		// synchronized(service) {
 		String id = getUniqueId(service);
 
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[]{getName(), service});
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "[[{0}]] Connection stopped: {1}", new Object[]{getName(), service});
 		}
 
 		// id might be null if service is stopped in accept method due to

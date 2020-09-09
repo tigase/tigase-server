@@ -61,3 +61,43 @@ If for some reason you don't want colored output in the logs you can disable it 
 ----
 #DISABLE_LOGGER_COLOR=" -Ddisable_logger_color=true "
 ----
+
+== Alternate loggers in Tigase - Logback
+
+It's possible to use Logback for logging purposes, which offers certain interesting features (async logging, better control over log rotation, on the fly changing logging configuration)
+
+Requirements:
+* slf4j-api.jar (provided in `-dist-max` package)
+* jul-to-slf4j.jar (provided in `-dist-max` package)
+* desired logger libraries (for logback it's `logback-classic.jar` and `logback-core.jar` (provided in -dist-max).
+
+Configuration boils down to adding slf4j bridge handler to the list of build-in Java Logger handlers configuration, which in Tigase translates to adding following line to `etc/config.tdsl`:
+
+[source,bash]
+----
+logging () {
+    rootHandlers = [ 'java.util.logging.ConsoleHandler', 'java.util.logging.FileHandler', 'org.slf4j.bridge.SLF4JBridgeHandler' ]
+}
+----
+
+After that `etc/logback.xml` configuration file will be used.
+
+As stated in [jul-to-slf4j bridge documentation](http://www.slf4j.org/legacy.html#jul-to-slf4j) it's essential to include `LevelChangePropagator` to eliminate translation overhead for disabled log statements:
+
+[source,xml]
+----
+<configuration debug="true">
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+  ...
+</configuration>
+----
+
+NOTE, that it may be prudent to remove configuration of all old JUL logger by appending following to `etc/logback.xml` configuration:
+
+[source,xml]
+----
+<configuration debug="true">
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+    <resetJUL>true</resetJUL>
+</configuration>
+----
