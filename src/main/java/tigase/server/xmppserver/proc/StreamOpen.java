@@ -20,6 +20,7 @@ package tigase.server.xmppserver.proc;
 import tigase.kernel.beans.Bean;
 import tigase.net.ConnectionType;
 import tigase.server.xmppserver.*;
+import tigase.xmpp.jid.JID;
 
 import java.util.Map;
 import java.util.UUID;
@@ -57,7 +58,7 @@ public class StreamOpen
 						cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + " version='1.0'>";
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, sending: {1}", new Object[]{serv, data});
+					log.log(Level.FINEST, "Sending: {1} [{0}]", new Object[]{serv, data});
 				}
 
 				S2SConnection s2s_conn = (S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
@@ -137,7 +138,7 @@ public class StreamOpen
 					String remote_id = attribs.get("id");
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, Connect Stream opened for: {1}, session id{2}",
+						log.log(Level.FINEST, "Connect Stream opened for: {1}, session id: {2} [{0}]",
 								new Object[]{serv, cid, remote_id});
 					}
 
@@ -146,15 +147,15 @@ public class StreamOpen
 						// This should actually not happen. Let's be clear here about
 						// handling unexpected
 						// cases.
-						log.log(Level.WARNING, "{0} This might be a bug in s2s code, should not happen." +
-								" Missing CIDConnections for stream open to ''connect'' service type.", serv);
+						log.log(Level.WARNING, "This might be a bug in s2s code, should not happen." +
+								" Missing CIDConnections for stream open to ''connect'' service type. [{0}]", serv);
 						generateStreamError(false, "internal-server-error", serv);
 
 						return null;
 					}
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, stream open for cid: {1}, outgoint: {2}, incoming: {3}",
+						log.log(Level.FINEST, "Stream open for cid: {1}, outgoint: {2}, incoming: {3} [{0}]",
 								new Object[]{serv, cid, cid_conns.getOutgoingCount(), cid_conns.getIncomingCount()});
 					}
 
@@ -168,7 +169,7 @@ public class StreamOpen
 						serv.getSessionData().put(S2SIOService.HOSTNAME_KEY, local_hostname);
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Unknown local hostname.", serv);
+							log.log(Level.FINEST, "Unknown local hostname. [{0}]", serv);
 						}
 					}
 
@@ -187,15 +188,16 @@ public class StreamOpen
 						}
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Accept Stream opened for: {1}, session id: {2}",
+							log.log(Level.FINEST, "Accept Stream opened for: {1}, session id: {2} [{0}]",
 									new Object[]{serv, cid, id});
 						}
 
 						serv.getSessionData().put("cid", cid);
+						serv.setConnectionId(JID.jidInstanceNS(cid.getLocalHost(), cid.getRemoteHost(), serv.getConnectionId().getResource()));
 						cid_conns.addIncoming(serv);
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Accept Stream opened for unknown CID, session id: {1}",
+							log.log(Level.FINEST, "Accept Stream opened for unknown CID, session id: {1} [{0}]",
 									new Object[]{serv, id});
 						}
 					}
@@ -211,7 +213,7 @@ public class StreamOpen
 				}
 
 				default:
-					log.log(Level.SEVERE, "{0}, Warning, program shouldn't reach that point.", serv);
+					log.log(Level.SEVERE, "Warning, program shouldn't reach that point. [{0}]", serv);
 
 					break;
 			} // end of switch (serv.connectionType())

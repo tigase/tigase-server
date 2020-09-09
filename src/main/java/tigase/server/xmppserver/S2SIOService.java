@@ -19,7 +19,6 @@ package tigase.server.xmppserver;
 
 import tigase.xmpp.XMPPIOService;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
@@ -67,7 +66,7 @@ public class S2SIOService
 
 	public void addCID(CID cid, DIRECTION direction) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Adding CID to authenticated: {1}", new Object[]{this, cid});
+			log.log(Level.FINEST, "Adding CID to authenticated: {1} [{0}]", new Object[]{this, cid});
 		}
 
 		switch (direction) {
@@ -129,6 +128,8 @@ public class S2SIOService
 	public String toString() {
 		CID cid = (CID) getSessionData().get("cid");
 
-		return "CID: " + cid + ", " + super.toString() + ", authenticated: " + isAuthenticated();
+		return "CID: " + cid + ", IN: " + authenticatedCIDsIN.size() + ", OUT: " + authenticatedCIDsOUT.size() +
+				", authenticated: " + isAuthenticated() + ", remote-session-id: " + getSessionId() + ", " +
+				super.toString();
 	}
 }

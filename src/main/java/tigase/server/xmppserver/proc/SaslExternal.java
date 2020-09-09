@@ -109,7 +109,7 @@ public class SaslExternal
 
 		if (cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()))) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Skipping SASL-EXTERNAL for domain: {1} because it was ignored",
+				log.log(Level.FINEST, "Skipping SASL-EXTERNAL for domain: {1} because it was ignored [{0}]",
 						new Object[]{serv, cid});
 			}
 			return false;
@@ -118,13 +118,13 @@ public class SaslExternal
 		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
 				!p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
+				log.log(Level.FINEST, "Stream features received packet: {1} [{0}]", new Object[]{serv, p});
 			}
 
 			// Some servers send empty SASL list!
 			if (!isAnyMechanismsPresent(p)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, No SASL mechanisms found in features. Skipping SASL.",
+					log.log(Level.FINEST, "No SASL mechanisms found in features. Skipping SASL. [{0}]",
 							new Object[]{serv, p});
 				}
 				return false;
@@ -135,7 +135,7 @@ public class SaslExternal
 
 			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && (certCheckResult == null) && !skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}", new Object[]{serv, p});
+					log.log(Level.FINEST, "Waiting for starttls, packet: {1} [{0}]", new Object[]{serv, p});
 				}
 
 				return false;
@@ -144,7 +144,7 @@ public class SaslExternal
 			// it is reasonable to skip SASL EXTERNAL for handshaking only connections
 			if (certCheckResult == CertCheckResult.invalid || serv.isHandshakingOnly()) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Connection is handshaking only: {1}, certCheckResult: {2}, packet: {3}",
+					log.log(Level.FINEST, "Connection is handshaking only: {1}, certCheckResult: {2}, packet: {3} [{0}]",
 							new Object[]{serv, serv.isHandshakingOnly(), certCheckResult, p});
 				}
 				return false;
@@ -170,19 +170,19 @@ public class SaslExternal
 				return true;
 			} else if (p.isElement("auth", XMLNS_SASL)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Received auth request: {1}", new Object[]{serv, p});
+					log.log(Level.FINEST, "Received auth request: {1} [{0}]", new Object[]{serv, p});
 				}
 				processAuth(p, serv, results);
 				return true;
 			} else if (p.isElement("success", XMLNS_SASL)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Received success response: {1}", new Object[]{serv, p});
+					log.log(Level.FINEST, "Received success response: {1} [{0}]", new Object[]{serv, p});
 				}
 				processSuccess(p, serv, results);
 				return true;
 			} else if (p.isElement("failure", XMLNS_SASL)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Received failure response: {1}", new Object[]{serv, p});
+					log.log(Level.FINEST, "Received failure response: {1} [{0}]", new Object[]{serv, p});
 				}
 
 				authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
@@ -231,7 +231,7 @@ public class SaslExternal
 
 		if (!canAddSaslToFeatures && log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
-					"{0}, Not adding SASL-EXTERNAL feature, tlsEstablished: {1} (result: {2}), skipDomain: {3}, localCertTrusted: {4} (result: {5})",
+					"Not adding SASL-EXTERNAL feature, tlsEstablished: {1} (result: {2}), skipDomain: {3}, localCertTrusted: {4} (result: {5}) [{0}]",
 					new Object[]{serv, tlsEstablished, certCheckResult, skipDomain, localCertTrusted,
 								 localCertCheckResult});
 		}
@@ -248,7 +248,7 @@ public class SaslExternal
 								   new String[]{XMLNS_SASL, "EXTERNAL"});
 		results.add(Packet.packetInstance(auth));
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Starting SASL EXTERNAL: {1}", new Object[]{serv, auth});
+			log.log(Level.FINEST, "Starting SASL EXTERNAL: {1} [{0}]", new Object[]{serv, auth});
 		}
 	}
 
@@ -257,7 +257,7 @@ public class SaslExternal
 		final CID cid = (CID) serv.getSessionData().get("cid");
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Sending new stream", new Object[]{serv});
+			log.log(Level.FINEST, "Sending new stream [{0}]", new Object[]{serv});
 		}
 		// old ejabberd has problem if we first send `xmlns` and then `xmlns:stream` so we have to do it reversed...
 		String data = "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'" + " xmlns='jabber:server'" +
@@ -267,7 +267,7 @@ public class SaslExternal
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Making connection authenticated. cid={1} ", new Object[]{serv, cid});
+			log.log(Level.FINEST, "Making connection authenticated. cid={1}  [{0}]", new Object[]{serv, cid});
 		}
 		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, cid);
 	}
@@ -278,7 +278,7 @@ public class SaslExternal
 
 		if (peerCertificate == null) {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, No peer certificate!", new Object[]{serv});
+				log.log(Level.FINE, "No peer certificate! [{0}]", new Object[]{serv});
 			}
 			results.add(failurePacket("No peer certificate"));
 			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
@@ -288,14 +288,14 @@ public class SaslExternal
 		CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Trust: {1} for peer certificate: {2}, AltNames: {3}",
+			log.log(Level.FINEST, "Trust: {1} for peer certificate: {2}, AltNames: {3} [{0}]",
 					new Object[]{serv, certCheckResult, peerCertificate.getSubjectDN(),
 								 CertificateUtil.getCertAltCName(peerCertificate)});
 		}
 
 		if (certCheckResult != CertCheckResult.trusted && certCheckResult != CertCheckResult.self_signed) {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, Certificate is not trusted", new Object[]{serv});
+				log.log(Level.FINE, "Certificate is not trusted [{0}]", new Object[]{serv});
 			}
 			results.add(failurePacket("Certificate is not trusted"));
 			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
@@ -306,7 +306,7 @@ public class SaslExternal
 		if (cid == null) {
 			// can't process such request
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, CID is unknown, can''t proceed", new Object[]{serv});
+				log.log(Level.FINE, "CID is unknown, can''t proceed [{0}]", new Object[]{serv});
 			}
 			results.add(failurePacket("Unknown origin hostname (lack of `from` element)"));
 			authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
@@ -322,7 +322,7 @@ public class SaslExternal
 
 		if (!nameValid) {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, Certificate name doesn't match to '{1}'",
+				log.log(Level.FINE, "Certificate name doesn't match to '{1}' [{0}]",
 						new Object[]{serv, cid.getRemoteHost()});
 			}
 			results.add(failurePacket("Certificate name doesn't match to domain name"));
@@ -332,7 +332,7 @@ public class SaslExternal
 
 		CIDConnections cid_conns = handler.getCIDConnections(cid, true);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Making connection authenticated. cid={1} ", new Object[]{serv, cid});
+			log.log(Level.FINEST, "Making connection authenticated. cid={1} [{0}]", new Object[]{serv, cid});
 		}
 		authenticatorSelectorManager.authenticateConnection(serv, cid_conns, cid);
 

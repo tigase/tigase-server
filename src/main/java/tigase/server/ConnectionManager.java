@@ -428,13 +428,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		if (serv != null) {
 			if (serv == service) {
-				log.log(Level.WARNING, "{0}: That would explain a lot, adding the same service twice, ID: {1}",
+				log.log(Level.WARNING, "That would explain a lot, adding the same service twice, ID: {1} [{0}]",
 						new Object[]{getName(), serv});
 			} else {
 
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.log(Level.FINE, "{0}: Attempt to add different service with the same ID: {1}; old: {2} (stopped)",
+				log.log(Level.FINE, "Attempt to add different service with the same ID: {1}; old: {2} (stopped)  [{0}]",
 						new Object[]{getName(), service, serv});
 				// And stop the old service....
 				serv.stop();
@@ -549,11 +549,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				while ((p = packets.poll()) != null) {
 					if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}",
+						log.log(Level.FINER, "Processing packet: {1}, type: {2} [{0}]",
 								new Object[]{serv, p.getElemName(), p.getType()});
 					}
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[]{serv, p});
+						log.log(Level.FINEST, "Writing packet: {1} [{0}]", new Object[]{serv, p});
 					}
 					serv.addPacketToSend(p);
 				}      // end of for ()
@@ -561,11 +561,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					serv.processWaitingPackets();
 					SocketThread.addSocketService(serv);
 				} catch (Exception e) {
-					log.log(Level.WARNING, serv + "Exception during writing packets: ", e);
+					log.log(Level.WARNING, "Exception during writing packets [" + serv + "]: ", e);
 					try {
 						serv.stop();
 					} catch (Exception e1) {
-						log.log(Level.WARNING, serv + "Exception stopping XMPPIOService: ", e1);
+						log.log(Level.WARNING, "Exception stopping XMPPIOService [" + serv + "[: ", e1);
 					}    // end of try-catch
 				}      // end of try-catch
 			}
@@ -581,11 +581,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
 			if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}",
+				log.log(Level.FINER, "Processing packet: {1}, type: {2} [{0}]",
 						new Object[]{ios, p.getElemName(), p.getType()});
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[]{ios, p});
+				log.log(Level.FINEST, "Writing packet: {1} [{0}]", new Object[]{ios, p});
 			}
 
 			// if packet is added to waiting packets queue then we can assume it is sent
@@ -597,18 +597,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					SocketThread.addSocketService(ios);
 				} catch (IOException e) {
 					// if there was IOException we need to forceStop this service!
-					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
+					log.log(Level.WARNING, "Exception during writing packets [" + ios + "[: ", e);
 					try {
 						ios.forceStop();
 					} catch (Exception e1) {
-						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+						log.log(Level.WARNING, "Exception stopping XMPPIOService [" + ios + "]: ", e1);
 					}    // end of try-catch
 				} catch (Exception e) {
-					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
+					log.log(Level.WARNING, "Exception during writing packets [" + ios + "]: ", e);
 					try {
 						ios.stop();
 					} catch (Exception e1) {
-						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+						log.log(Level.WARNING, "Exception stopping XMPPIOService [" + ios + "]: ", e1);
 					}    // end of try-catch
 				} finally {
 					ios.writeInProgress.unlock();
@@ -880,11 +880,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			ios.writeRawData(data);
 			SocketThread.addSocketService(ios);
 		} catch (Exception e) {
-			log.log(Level.WARNING, ios + "Exception during writing data: " + data, e);
+			log.log(Level.WARNING, "Exception during writing data: " + data + " [" + ios + "]", e);
 			try {
 				ios.stop();
 			} catch (Exception e1) {
-				log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+				log.log(Level.WARNING, "Exception stopping XMPPIOService [" + ios + "]", e1);
 			}    // end of try-catch
 		}
 	}
@@ -1424,7 +1424,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 								// for non-active connections.
 								if (log.isLoggable(Level.INFO)) {
 									log.log(Level.INFO,
-											"{0}: Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} )",
+											"Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} ) [{0}]",
 											new Object[]{getName(), service, sinceLastTransfer,
 														 maxInactivityTime, watchdogTimeout, watchdogDelay,
 														 watchdogPingType});
@@ -1443,7 +1443,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 													(String) service.getSessionData().get(XMPPIOService.HOSTNAME_KEY)),
 																		   JID.jidInstanceNS(service.getUserJid()));
 											if (log.isLoggable(Level.FINEST)) {
-												log.log(Level.FINEST, "{0}, sending XMPP ping {1}",
+												log.log(Level.FINEST, "Sending XMPP ping {1} [{0}]",
 														new Object[]{service, pingPacket});
 											}
 											if (!writePacketToSocket((IO) service, pingPacket)) {
@@ -1470,7 +1470,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						// Close the service
 						try {
 							if (service != null) {
-								log.info(getName() + "Found dead connection, stopping: " + service);
+								log.info(getName() + ": Found dead connection, stopping: " + service);
 								++watchdogStopped;
 								service.forceStop();
 							}

@@ -168,7 +168,7 @@ public class StreamManagementIOProcessor
 												 (location != null ? " " + LOCATION_ATTR + "='" + location + "'" : "") +
 												 " />");
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "{0}, started StreamManagement with resumption timeout set to = {1}",
+						log.log(Level.FINE, "Started StreamManagement with resumption timeout set to = {1} [{0}]",
 								new Object[]{service.toString(), (id != null ? resumption_timeout : null)});
 					}
 				} catch (IOException ex) {
@@ -208,7 +208,7 @@ public class StreamManagementIOProcessor
 					outQueue.ack(val);
 				} else {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "{0}, outQueue already null while processing: {1}",
+						log.log(Level.FINE, "outQueue already null while processing: {1} [{0}]",
 								new Object[]{service, packet});
 					}
 				}
@@ -299,7 +299,7 @@ public class StreamManagementIOProcessor
 					for (OutQueue.Entry entry : packetsToResend) {
 						Packet packetToResend = entry.getPacketWithStamp();
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "{0}, resuming stream with id = {1} resending unacked packet = {2}",
+							log.log(Level.FINE, "resuming stream with id = {1} resending unacked packet = {2} [{0}]",
 									new Object[]{service, id, packetToResend});
 						}
 						newService.addPacketToSend(packetToResend);
@@ -356,7 +356,7 @@ public class StreamManagementIOProcessor
 	public boolean serviceStopped(XMPPIOService service, boolean streamClosed) {
 		if (!isEnabled(service)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, service stopped - StreamManagement disabled", new Object[]{service});
+				log.log(Level.FINEST, "Service stopped - StreamManagement disabled [{0}]", new Object[]{service});
 			}
 			return false;
 		}
@@ -376,7 +376,7 @@ public class StreamManagementIOProcessor
 		Long resumptionTimeoutStart = (Long) service.getSessionData().get(RESUMPTION_TIMEOUT_START_KEY);
 		if (resumptionTimeoutStart != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, service stopped - checking resumption timeout", new Object[]{service});
+				log.log(Level.FINEST, "Service stopped - checking resumption timeout [{0}]", new Object[]{service});
 			}
 			// if resumptionTimeoutStart is set let's check if resumption was
 			// not started for longer time than twice value of resumption_timeout
@@ -411,7 +411,7 @@ public class StreamManagementIOProcessor
 
 			if (!services.containsKey(id)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, service stopped - resumption enabled but service not available",
+					log.log(Level.FINEST, "Service stopped - resumption enabled but service not available [{0}]",
 							new Object[]{service});
 				}
 				return false;
@@ -436,7 +436,7 @@ public class StreamManagementIOProcessor
 					service.getSessionData().put(RESUMPTION_TIMEOUT_START_KEY, System.currentTimeMillis());
 					service.clearWaitingPackets();
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, service stopped - resumption enabled and timeout started",
+						log.log(Level.FINEST, "Service stopped - resumption enabled and timeout started [{0}]",
 								new Object[]{service});
 					}
 				}
@@ -448,7 +448,7 @@ public class StreamManagementIOProcessor
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, service stopped - resumption disabled, sending unacked packets",
+			log.log(Level.FINEST, "Service stopped - resumption disabled, sending unacked packets [{0}]",
 					new Object[]{service});
 		}
 
@@ -518,7 +518,7 @@ public class StreamManagementIOProcessor
 			OutQueue outQueue = (OutQueue) oldService.getSessionData().get(OUT_COUNTER_KEY);
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE,
-						"{0}, resuming stream with id = {1} with {2} packets waiting for ack, local h = {3} and remote h = {4}",
+						"Resuming stream with id = {1} with {2} packets waiting for ack, local h = {3} and remote h = {4} [{0}]",
 						new Object[]{service, id, outQueue.waitingForAck(), outQueue.get(), h});
 			}
 			outQueue.ack(h);

@@ -101,6 +101,10 @@ public abstract class IOService<RefObject>
 	protected byte[] partialCharacterBytes = null;
 	private int bufferLimit = 0;
 	private CertificateContainerIfc certificateContainer;
+
+	/**
+	 * Intended for low-level logging to contain user connection ID to easier track particular user connection and troubleshoot issues.
+	 */
 	private JID connectionId = null;
 	private ConnectionType connectionType = null;
 	private JID dataReceiver = null;
@@ -207,7 +211,7 @@ public abstract class IOService<RefObject>
 						// added to sooner detect disconnection of peer - ie. client
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
-									"{0}, stopping connection due to the fact that it was disconnected, forceStop()",
+									"Stopping connection due to the fact that it was disconnected, forceStop() [{0}]",
 									toString());
 						}
 						forceStop();
@@ -230,7 +234,7 @@ public abstract class IOService<RefObject>
 
 	public void forceStop() {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Socket: {0}, Force stop called...", socketIO);
+			log.log(Level.FINER, "Force stop called... Socket: {0}, ", socketIO);
 		}
 		try {
 			if ((socketIO != null) && socketIO.isConnected()) {
@@ -282,13 +286,13 @@ public abstract class IOService<RefObject>
 					Certificate peerCert = certs[0];
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
-								"{0}, TLS handshake verifying if certificate from connection matches domain {1}",
+								"TLS handshake verifying if certificate from connection matches domain {1} [{0}]",
 								new Object[]{this, reqCertDomain});
 					}
 					if (!CertificateUtil.verifyCertificateForDomain((X509Certificate) peerCert, reqCertDomain)) {
 						certCheckResult = CertCheckResult.invalid;
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, TLS handshake: certificate doesn't match domain)",
+							log.log(Level.FINEST, "TLS handshake: certificate doesn't match domain) [{0}]",
 									new Object[]{this});
 						}
 					}
@@ -297,13 +301,13 @@ public abstract class IOService<RefObject>
 				certCheckResult = CertCheckResult.invalid;
 				if (log.isLoggable(Level.INFO)) {
 					log.log(Level.INFO,
-							this + ", Certificate validation failed, CertCheckResult: " + certCheckResult + ")", e);
+							"Certificate validation failed, CertCheckResult: " + certCheckResult + ") [" + this + "]", e);
 				}
 			}
 		}
 		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[]{this, certCheckResult});
+			log.log(Level.FINEST, "TLS handshake completed: {1} [{0}]", new Object[]{this, certCheckResult});
 		}
 		if (!wrapper.isClientMode()) {
 			this.tlsUniqueId = wrapper.getTlsUniqueBindingData();
@@ -414,7 +418,7 @@ public abstract class IOService<RefObject>
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[]{this, tls_hostname});
+				log.log(Level.FINEST, "Starting TLS for domain: {1} [{0}]", new Object[]{this, tls_hostname});
 			}
 
 			socketIO = sslContextContainer.createIoInterface("TLS", tls_hostname, tls_remote_hostname, port, clientMode,
@@ -444,7 +448,9 @@ public abstract class IOService<RefObject>
 
 	@Override
 	public String toString() {
-		return getConnectionId() + ", type: " + connectionType + ", Socket: " + socketIO;
+		// there is no need to include connectionId here as it's passed to socket in
+		// tigase.net.IOService.setConnectionId and included from there
+		return getClass().getSimpleName() + ", UniqueId: " + getUniqueId() + ", type: " + connectionType.toStringPretty() + ", " + socketIO;
 	}
 
 	public boolean waitingToRead() {
@@ -589,15 +595,7 @@ public abstract class IOService<RefObject>
 		boolean result = (socketIO != null) && socketIO.isConnected();
 
 		if (log.isLoggable(Level.FINEST)) {
-
-			// if (socketIO.getSocketChannel().socket().getLocalPort() == 5269) {
-			// Throwable thr = new Throwable();
-			//
-			// thr.fillInStackTrace();
-			// log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result,
-			// thr);
-			// }
-			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[]{socketIO, result, connectionId});
+			log.log(Level.FINEST, "Connected: {1} [{0}]", new Object[]{socketIO, result});
 		}
 
 		return result;
@@ -634,9 +632,7 @@ public abstract class IOService<RefObject>
 	protected boolean debug(final char[] msg) {
 		if (msg != null) {
 			System.out.print(new String(msg));
-
-			// log.finest("\n" + new String(msg) + "\n");
-		}    // end of if (msg != null)
+		}
 
 		return true;
 	}
@@ -675,7 +671,7 @@ public abstract class IOService<RefObject>
 				return tmpBuffer;
 			} else {
 				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress.isLocked())) {
-					log.log(Level.WARNING, "Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+					log.log(Level.WARNING, "Max allowed empty calls exceeded, closing connection. [{0}]",
 							socketIO);
 					forceStop();
 				}
@@ -686,15 +682,13 @@ public abstract class IOService<RefObject>
 			return readBytes();
 		} catch (SSLHandshakeException e) {
 			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
+				log.log(Level.INFO, "Exception starting connection [" + socketIO + "]: " + e);
 			}
 			forceStop();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
+				log.log(Level.FINEST, "Exception reading data [" + socketIO + "]: " + eof);
 			}
-
-			// eof.printStackTrace();
 			forceStop();
 		}
 
@@ -725,7 +719,7 @@ public abstract class IOService<RefObject>
 
 				// Yes, looks like we can
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Socket: {0}, Resizing socketInput down to {1} bytes.",
+					log.log(Level.FINE, "Resizing socketInput down to {1} bytes. [{0}]",
 							new Object[]{socketIO, socketInputSize});
 				}
 				socketInput = ByteBuffer.allocate(socketInputSize);
@@ -752,14 +746,15 @@ public abstract class IOService<RefObject>
 				// be not enough data to decode TLS or compressed buffer.
 				if (tmpBuffer != null) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Socket: {0}, Reading network binary data: {1}",
+						log.log(Level.FINEST, "Reading network binary data: {1} [{0}]",
 								new Object[]{socketIO, socketIO.bytesRead()});
 					}
 
 					// Restore the partial bytes for multibyte UTF8 characters
 					if (partialCharacterBytes != null) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Reloading partial bytes " + partialCharacterBytes.length);
+							log.log(Level.FINEST, "Reloading partial bytes: {1} [{0}]",
+									new Object[]{socketIO, partialCharacterBytes.length});
 						}
 
 						ByteBuffer oldTmpBuffer = tmpBuffer;
@@ -791,7 +786,7 @@ public abstract class IOService<RefObject>
 					// tmpBuffer.flip();
 					if (cb.capacity() < tmpBuffer.remaining() * 4) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Socket: {0}, resizing character buffer to: {1}",
+							log.log(Level.FINEST, "Resizing character buffer to: {1} [{0}]",
 									new Object[]{socketIO, tmpBuffer.remaining()});
 						}
 						cb = CharBuffer.allocate(tmpBuffer.remaining() * 4);
@@ -809,7 +804,7 @@ public abstract class IOService<RefObject>
 						result = new char[cb.remaining()];
 						cb.get(result);
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Socket: {0}, Decoded character data: {1}",
+							log.log(Level.FINEST, "Decoded character data: {1} [{0}]",
 									new Object[]{socketIO, new String(result)});
 						}
 
@@ -827,7 +822,7 @@ public abstract class IOService<RefObject>
 					}
 					if (cr.isUnderflow() && (tmpBuffer.remaining() > 0)) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Socket: {0}, UTF-8 decoder data underflow: {1}",
+							log.log(Level.FINEST, "UTF-8 decoder data underflow: {1} [{0}]",
 									new Object[]{socketIO, tmpBuffer.remaining()});
 						}
 
@@ -859,7 +854,7 @@ public abstract class IOService<RefObject>
 				// and the select thinks there are some bytes waiting for reading
 				// and 0 bytes are read
 				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress.isLocked())) {
-					log.log(Level.WARNING, "Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+					log.log(Level.WARNING, "Max allowed empty calls exceeded, closing connection. [{0}]",
 							socketIO);
 					forceStop();
 				}
@@ -877,19 +872,15 @@ public abstract class IOService<RefObject>
 			// decoder.reset();
 		} catch (SSLHandshakeException e) {
 			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
+				log.log(Level.INFO, "Exception starting connection ["  + socketIO + "] " + e);
 			}
 			forceStop();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
+				log.log(Level.FINEST, "Exception reading data ["  + socketIO + "] " + eof);
 			}
-
-			// eof.printStackTrace();
 			forceStop();
 		}    // end of try-catch
-
-		// }
 		return null;
 	}
 
@@ -918,15 +909,9 @@ public abstract class IOService<RefObject>
 
 				socketIO.write(data);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[]{socketIO, length});
+					log.log(Level.FINEST, "Wrote: {1} [{0}]", new Object[]{socketIO, length});
 				}
-
-				// idx_start = idx_offset;
-				// idx_offset = Math.min(idx_start + out_buff_size, data.length());
-				// }
 				setLastTransferTime();
-
-				// addWritten(data.length());
 				empty_read_call_count = 0;
 			} else {
 				if (socketIO.waitingToSend()) {
@@ -937,7 +922,7 @@ public abstract class IOService<RefObject>
 			}
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Data writing exception " + connectionId, e);
+				log.log(Level.FINER, "Data writing exception ["  + socketIO + "] " + e);
 			}
 			forceStop();
 		} finally {
@@ -966,10 +951,10 @@ public abstract class IOService<RefObject>
 			if ((data != null) && (data.length() > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
 					if (data.length() < 256) {
-						log.log(Level.FINEST, "Socket: {0}, Writing data ({1}): {2}",
+						log.log(Level.FINEST, "Writing data ({1}): {2} [{0}]",
 								new Object[]{socketIO, data.length(), data});
 					} else {
-						log.log(Level.FINEST, "Socket: {0}, Writing data: {1}", new Object[]{socketIO, data.length()});
+						log.log(Level.FINEST, "Writing data: {1} [{0}]", new Object[]{socketIO, data.length()});
 					}
 				}
 
@@ -993,7 +978,7 @@ public abstract class IOService<RefObject>
 				encoder.flush(dataBuffer);
 				socketIO.write(dataBuffer);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[]{socketIO, data.length()});
+					log.log(Level.FINEST, "Wrote: {1} [{0}]", new Object[]{socketIO, data.length()});
 				}
 
 				// idx_start = idx_offset;
@@ -1012,12 +997,12 @@ public abstract class IOService<RefObject>
 			}
 		} catch (SSLHandshakeException e) {
 			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
+				log.log(Level.INFO,  "Exception starting connection [" + socketIO + "]" + e);
 			}
 			forceStop();
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Data [" + data + "] writing exception, connection " + connectionId + ", socket: " + socketIO, e);
+				log.log(Level.FINER,  "Data [" + data + "] writing exception [" + socketIO + "]" + e);
 			}
 			forceStop();
 		} finally {
@@ -1051,7 +1036,8 @@ public abstract class IOService<RefObject>
 		// Resize buffer if needed.
 		// if (netSize > socketInput.remaining()) {
 		if (log.isLoggable(Level.FINE)) {
-			log.log(Level.FINE, "Socket: {0}, Resize? netSize: {1}, capacity: {2}, remaining: {3}.", new Object[]{socketIO, netSize, socketInput.capacity(), socketInput.remaining()});
+			log.log(Level.FINE, "Resize? netSize: {1}, capacity: {2}, remaining: {3}. [{0}]",
+					new Object[]{socketIO, netSize, socketInput.capacity(), socketInput.remaining()});
 		}
 
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
@@ -1066,7 +1052,7 @@ public abstract class IOService<RefObject>
 			}
 
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.", new Object[]{socketIO, newSize});
+				log.log(Level.FINE, "Resizing socketInput to {1} bytes. [{0}]", new Object[]{socketIO, newSize});
 			}
 
 			ByteBuffer b = ByteBuffer.allocate(newSize);
@@ -1092,7 +1078,7 @@ public abstract class IOService<RefObject>
 			// log.finer("input.position()=" + socketInput.position());
 			// }
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Socket: {0}, Compacting socketInput.", socketIO);
+				log.log(Level.FINE, "Compacting socketInput. [{0}]", socketIO);
 			}
 			socketInput.compact();
 

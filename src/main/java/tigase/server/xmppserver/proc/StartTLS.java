@@ -58,12 +58,12 @@ public class StartTLS
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.isElement(START_TLS_EL, START_TLS_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[]{serv, proceed_el});
+				log.log(Level.FINEST, "Sending packet: {1} [{0}]", new Object[]{serv, proceed_el});
 			}
 			handler.writeRawData(serv, proceed_el.toString());
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Starting TLS handshaking server side.", serv);
+					log.log(Level.FINEST, "Starting TLS handshaking server side. [{0}]", serv);
 				}
 				serv.getSessionData().put("TLS", "TLS");
 				serv.startTLS(false, handler.isTlsWantClientAuthEnabled(), handler.isTlsNeedClientAuthEnabled());
@@ -75,11 +75,11 @@ public class StartTLS
 		}
 		if (p.isElement(PROCEED_TLS_EL, START_TLS_NS)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Received TLS proceed.", serv);
+				log.log(Level.FINEST, "Received TLS proceed. [{0}]", serv);
 			}
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Starting TLS handshaking client side.", serv);
+					log.log(Level.FINEST, "Starting TLS handshaking client side. [{0}]", serv);
 				}
 				serv.getSessionData().put("TLS", "TLS");
 				serv.startTLS(true, handler.isTlsWantClientAuthEnabled(), handler.isTlsNeedClientAuthEnabled());
@@ -91,7 +91,7 @@ public class StartTLS
 		}
 		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[]{serv, p});
+				log.log(Level.FINEST, "Stream features received: {1} [{0}]", new Object[]{serv, p});
 			}
 
 			CID cid = (CID) serv.getSessionData().get("cid");
@@ -99,7 +99,7 @@ public class StartTLS
 
 			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && !skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[]{serv, starttls_el});
+					log.log(Level.FINEST, "Sending packet: {1} [{0}]", new Object[]{serv, starttls_el});
 				}
 				handler.writeRawData(serv, starttls_el.toString());
 

@@ -211,7 +211,7 @@ public class SocketThread
 
 							try {
 								if (log.isLoggable(Level.FINEST)) {
-									StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
+									StringBuilder sb = new StringBuilder("AWAKEN: " + s.getIO());
 
 									if (sk.isWritable()) {
 										sb.append(", ready for WRITING");
@@ -244,7 +244,7 @@ public class SocketThread
 							} catch (CancelledKeyException e) {
 								if (log.isLoggable(Level.FINEST)) {
 									log.log(Level.FINEST, "CancelledKeyException, stopping the connection: {0}",
-											s.getUniqueId());
+											s.getIO());
 								}
 
 								try {
@@ -341,7 +341,7 @@ public class SocketThread
 						sc.register(clientsSel, SelectionKey.OP_READ, s);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "ADDED OP_READ: {0}", s.getUniqueId());
+							log.log(Level.FINEST, "ADDED OP_READ: {0}", s.getIO());
 						}
 					}
 
@@ -349,38 +349,38 @@ public class SocketThread
 						sc.register(clientsSel, SelectionKey.OP_WRITE, s);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "ADDED OP_WRITE: {0}", s.getUniqueId());
+							log.log(Level.FINEST, "ADDED OP_WRITE: {0}", s.getIO());
 						}
 					}
 
 					// added = true;
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Socket not connected: {0}", s.getUniqueId());
+						log.log(Level.FINEST, "Socket not connected: {0}", s.getIO());
 					}
 
 					try {
 						if (log.isLoggable(Level.FINER)) {
-							log.log(Level.FINER, "Forcing stopping the service: {0}", s.getUniqueId());
+							log.log(Level.FINER, "Forcing stopping the service: {0}", s.getIO());
 						}
 
 						s.forceStop();
 					} catch (Exception e) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Exception while stopping service: " + s.getUniqueId(), e);
+							log.log(Level.FINEST, "Exception while stopping service: " + s.getIO(), e);
 						}
 					}
 				}
 			} catch (Exception e) {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Forcing stopping the service: " + s.getUniqueId(), e);
+					log.log(Level.FINER, "Forcing stopping the service: " + s.getIO(), e);
 				}
 
 				try {
 					s.forceStop();
 				} catch (Exception ez) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Exception while stopping service: " + s.getUniqueId(), ez);
+						log.log(Level.FINEST, "Exception while stopping service: " + s.getIO(), ez);
 					}
 				}
 			}    // end of try-catch
@@ -421,7 +421,7 @@ public class SocketThread
 				sk.cancel();
 
 				try {
-					log.log(Level.INFO, "Forcing stopping the service: {0}", serv.getUniqueId());
+					log.log(Level.INFO, "Forcing stopping the service: {0}", serv.getIO());
 					serv.forceStop();
 				} catch (Exception e) {
 				}
@@ -478,13 +478,13 @@ public class SocketThread
 					if (service != null) {
 						if (service.isConnected()) {
 							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "COMPLETED: {0}", service.getUniqueId());
+								log.log(Level.FINEST, "COMPLETED: {0}", service.getIO());
 							}
 
 							addSocketService(service);
 						} else {
 							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "REMOVED: {0}", service.getUniqueId());
+								log.log(Level.FINEST, "REMOVED: {0}", service.getIO());
 							}
 						}    // end of else
 					}

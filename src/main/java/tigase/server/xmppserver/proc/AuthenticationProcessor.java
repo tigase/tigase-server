@@ -41,7 +41,7 @@ public abstract class AuthenticationProcessor
 
 	@Override
 	public void serviceStarted(S2SIOService serv) {
-		log.log(Level.FINEST, "{0}, s2s connection opened, isHandshaking: {1}",
+		log.log(Level.FINEST, "s2s connection opened, isHandshaking: {1} [{0}]",
 				new Object[]{serv, serv.isHandshakingOnly()});
 
 		if (serv.getSessionData().get(AUTHENTICATION_TIMER_KEY) == null) {

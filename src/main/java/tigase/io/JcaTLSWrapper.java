@@ -242,7 +242,7 @@ public class JcaTLSWrapper
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
-					"{0}, unwrap() tlsEngineResult.getStatus() = {1}, " + "tlsEngineResult.getHandshakeStatus() = {2}",
+					"unwrap() tlsEngineResult.getStatus() = {1}, tlsEngineResult.getHandshakeStatus() = {2} [{0}]",
 					new Object[]{debugId, tlsEngineResult.getStatus(), tlsEngineResult.getHandshakeStatus()});
 		}
 
@@ -261,7 +261,7 @@ public class JcaTLSWrapper
 			doTasks();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, unwrap() doTasks(), handshake: {1}",
+				log.log(Level.FINEST, "unwrap() doTasks(), handshake: {1} [{0}]",
 						new Object[]{ debugId, tlsEngine.getHandshakeStatus()});
 			}
 		}
@@ -278,7 +278,7 @@ public class JcaTLSWrapper
 	public void wrap(ByteBuffer app, ByteBuffer net) throws SSLException {
 		tlsEngineResult = tlsEngine.wrap(app, net);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, tlsEngineRsult.getStatus() = {1}, tlsEngineRsult.getHandshakeStatus() = {2}",
+			log.log(Level.FINEST, "tlsEngineRsult.getStatus() = {1}, tlsEngineRsult.getHandshakeStatus() = {2} [{0}]",
 					new Object[]{debugId, tlsEngineResult.getStatus(), tlsEngineResult.getHandshakeStatus()});
 		}
 
@@ -292,7 +292,7 @@ public class JcaTLSWrapper
 			doTasks();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, doTasks(): {1}", new Object[]{debugId, tlsEngine.getHandshakeStatus()});
+				log.log(Level.FINEST, "doTasks(): {1} [{0}]", new Object[]{debugId, tlsEngine.getHandshakeStatus()});
 			}
 		}
 	}
@@ -321,7 +321,7 @@ public class JcaTLSWrapper
 		// ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
 		int newSize = app.capacity() * 2;
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Resizing tlsInput to {1} bytes", new Object[]{debugId, newSize});
+			log.log(Level.FINER, "Resizing tlsInput to {1} bytes [{0}]", new Object[]{debugId, newSize});
 		}
 
 		ByteBuffer bb = ByteBuffer.allocate(newSize);

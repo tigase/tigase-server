@@ -37,4 +37,15 @@ public enum ConnectionType {
 		Arrays.setAll(names, i -> values[i].toString());
 		return names;
 	}
-} // ConnectionType
+
+	public String toStringPretty() {
+		switch (this) {
+			case accept:
+				return "<- incoming (" + name() + ")";
+			case connect:
+				return "-> outgoing (" + name() + ")";
+			default:
+				return name();
+		}
+	}
+}

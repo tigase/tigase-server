@@ -428,7 +428,7 @@ public class ClusterConnectionManager
 						p.getStanzaFrom().getDomain().equals(serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY))) {
 					// received PING between cluster nodes to confirm connectivity
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, received XMPP ping", serv);
+						log.log(Level.FINEST, "Received XMPP ping [{0}]", serv);
 					}
 					serv.getSessionData().put("lastConnectivityCheck", System.currentTimeMillis());
 					continue;
@@ -479,7 +479,7 @@ public class ClusterConnectionManager
 		}
 
 		super.serviceStarted(serv);
-		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
+		log.log(Level.INFO, "Cluster connection opened: {0}, type: {1}, id={2}",
 				new Object[]{serv.getRemoteAddress(), serv.connectionType().toString(), serv.getUniqueId()});
 		if (compress_stream) {
 			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());

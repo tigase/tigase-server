@@ -105,6 +105,16 @@ public class S2SConnManDomainTest
 		testS2STigaseConnectionManager(null);
 	}
 
+	/**
+	 * local tests
+	 */
+	@Test
+	@Ignore
+	public void testS2S_puddlejumper_atlantiscity() {
+		setupCID("puddlejumper", "atlantiscity");
+		testS2STigaseConnectionManager(null);
+	}
+
 	@Test
 	public void testS2S_jit_si() {
 		setupCID("tigase.im", "jit.si");

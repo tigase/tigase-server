@@ -93,7 +93,7 @@ public class S2SAbstract {
 		strError.append("<stream:error>" + "<" + error_el + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 				"</stream:error>" + "</stream:stream>");
 		try {
-			log.log(Level.FINEST, throwable, () -> String.format("%1$s, Sending stream error: %2$s", serv, strError.toString()));
+			log.log(Level.FINEST, throwable, () -> String.format("Sending stream error: %1$s: %2$s [%3$s]", error_el, strError.toString(), serv));
 			handler.writeRawData(serv, strError.toString());
 			serv.stop();
 		} catch (Exception e) {

@@ -47,8 +47,6 @@ public class CIDConnections {
 
 	private static final Logger log = Logger.getLogger(CIDConnections.class.getName());
 	private static final Random random = new Random();
-//	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
-//																									 true);
 
 	private CID cid = null;
 	private S2SConnectionSelector connectionSelector = null;
@@ -131,7 +129,7 @@ public class CIDConnections {
 			direction = S2SIOService.DIRECTION.BOTH;
 		}
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, connection is authenticated. Direction: {1}", new Object[]{serv, direction});
+			log.log(Level.FINER, "Connection is authenticated. Direction: {1} [{0}]", new Object[]{serv, direction});
 		}
 		serv.addCID(cid, direction);
 		if (serv.isAuthenticated()) {
@@ -680,6 +678,16 @@ public class CIDConnections {
 		public void schedule(Runnable r, long delay, TimeUnit unit) {
 			outgoingOpenTasks.schedule(r, delay, unit);
 		}
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("CIDConnections{");
+		sb.append(cid);
+		sb.append(", incoming=").append(getIncomingCount());
+		sb.append(", outgoing=").append(getOutgoingCount());
+		sb.append('}');
+		return sb.toString();
 	}
 }
 

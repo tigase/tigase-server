@@ -28,7 +28,6 @@ import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
@@ -133,7 +132,7 @@ public class XMPPIOService<RefObject>
 			packet.getElement().addChild(new Element(REQ_NAME, new String[]{ID_ATT}, new String[]{req}));
 			waitingForAck.put(req, packet);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Added req {1} for packet: {2}", new Object[]{toString(), req, packet});
+				log.log(Level.FINEST, "Added req {1} for packet: {2} [{0}]", new Object[]{toString(), req, packet});
 			}
 		}
 		++packetsSent;
@@ -174,7 +173,7 @@ public class XMPPIOService<RefObject>
 					}
 				}
 			} catch (IOException ex) {
-				log.log(Level.FINEST, "{0}, Exception sending policy-violation stream error", new Object[]{toString()});
+				log.log(Level.FINEST, "Exception sending policy-violation stream error [{0}]", new Object[]{toString()});
 			}
 			this.forceStop();
 			return false;
@@ -231,7 +230,7 @@ public class XMPPIOService<RefObject>
 
 			// ++cnt;
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[]{toString(), packet});
+				log.log(Level.FINEST, "Sending packet: {1} [{0}]", new Object[]{toString(), packet});
 			}
 			writeRawData(packet.getElement().toString());
 
@@ -239,7 +238,7 @@ public class XMPPIOService<RefObject>
 			waitingPackets.poll();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, SENT: {1}", new Object[]{toString(), packet.getElement().toString()});
+				log.log(Level.FINEST, "SENT: {1} [{0}]", new Object[]{toString(), packet.getElement().toString()});
 			}
 		}    // end of while (packet = waitingPackets.poll() != null)
 
@@ -263,7 +262,7 @@ public class XMPPIOService<RefObject>
 
 	@Override
 	public String toString() {
-		return super.toString() + ", jid: " + jid;
+		return "jid: " + jid + ", " + super.toString();
 	}
 
 	public void writeRawData(String data) throws IOException {
@@ -283,12 +282,12 @@ public class XMPPIOService<RefObject>
 	public void xmppStreamOpen(final String data) {
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), data});
+				log.log(Level.FINEST, "Sending data: {1} [{0}]", new Object[]{toString(), data});
 			}
 			writeRawData(data);
 			assert debug(data, "--SENT:");
 		} catch (IOException e) {
-			log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[]{toString(), e});
+			log.log(Level.WARNING, "Error sending stream open data: {1} [{0}]", new Object[]{toString(), e});
 			forceStop();
 		}
 	}
@@ -339,7 +338,7 @@ public class XMPPIOService<RefObject>
 
 			if (req == null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Missing req element in waiting for ACK packet: {1}",
+					log.log(Level.FINEST, "Missing req element in waiting for ACK packet: {1} [{0}]",
 							new Object[]{toString(), p});
 				}
 			} else {
@@ -459,17 +458,17 @@ public class XMPPIOService<RefObject>
 
 			while (isConnected() && (data != null) && (data.length > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, READ:{1}", new Object[]{toString(), new String(data)});
+					log.log(Level.FINEST, "READ:{1} [{0}]", new Object[]{toString(), new String(data)});
 				}
 
 				boolean disconnect = checkData(data);
 
 				if (disconnect) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "{0}, checkData says disconnect: {1}",
+						log.log(Level.FINE, "checkData says disconnect: {1} [{0}]",
 								new Object[]{toString(), new String(data)});
 					} else {
-						log.log(Level.INFO, "{0}, checkData says disconnect", toString());
+						log.log(Level.INFO, "checkData says disconnect [{0}]", toString());
 					}
 					forceStop();
 
@@ -486,10 +485,10 @@ public class XMPPIOService<RefObject>
 					parser.parse(domHandler, data, 0, data.length);
 					if (domHandler.parseError()) {
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "{0}, Data parsing error: {1}",
+							log.log(Level.FINE, "Data parsing error: {1} [{0}]",
 									new Object[]{toString(), StringUtilities.convertNonPrintableCharactersToLiterals(new String(data))});
 						} else {
-							log.log(Level.INFO, "{0}, data parsing error, stopping connection", toString());
+							log.log(Level.INFO, "Data parsing error, stopping connection [{0}]", toString());
 						}
 						if (serviceListener != null) {
 							Element err = new Element("not-well-formed", new String[]{"xmlns"},
@@ -508,8 +507,8 @@ public class XMPPIOService<RefObject>
 					moveParsedPacketsToReceived(true);
 				} catch (Exception ex) {
 					log.log(Level.INFO,
-							toString() + ", Incorrect XML data: " + new String(data) + ", stopping connection: " +
-									getConnectionId() + ", exception: ", ex);
+							"Incorrect XML data: " + new String(data) + ", stopping connection " + " [" + toString() +
+									"] exception: ", ex);
 					forceStop();
 				} finally {
 					if (domHandler.isStreamClosed()) {
@@ -520,7 +519,7 @@ public class XMPPIOService<RefObject>
 			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, function called when the service is not connected! forceStop()", toString());
+				log.log(Level.FINE, "Function called when the service is not connected! forceStop() [{0}]", toString());
 			}
 			forceStop();
 		}
@@ -534,7 +533,7 @@ public class XMPPIOService<RefObject>
 	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamClosed() {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Received STREAM-CLOSE from the client", toString());
+			log.log(Level.FINEST, "Received STREAM-CLOSE from the client [{0}]", toString());
 		}
 
 		if (processors != null) {
@@ -546,18 +545,18 @@ public class XMPPIOService<RefObject>
 		try {
 			if (isConnected()) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: </stream:stream>, as socket is still connected",
+					log.log(Level.FINEST, "Sending data: </stream:stream>, as socket is still connected [{0}]",
 							toString());
 				}
 				writeRawData(prepareStreamClose());
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Not sending data: </stream:stream>, as socket is alreadt closed",
+					log.log(Level.FINEST, "Not sending data: </stream:stream>, as socket is already closed [{0}]",
 							toString());
 				}
 			}
 		} catch (IOException e) {
-			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[]{toString(), e});
+			log.log(Level.INFO, "Error sending stream closed data: {1} [{0}]", new Object[]{toString(), e});
 		}
 
 		// streamClosed = true;
@@ -573,7 +572,7 @@ public class XMPPIOService<RefObject>
 
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[]{toString(), (responses != null ? String.join("", responses) : "null")});
+					log.log(Level.FINEST, "Sending data: {1} [{0}]", new Object[]{toString(), (responses != null ? String.join("", responses) : "null")});
 				}
 				if (responses == null) {
 					if (writeInProgress.tryLock()) {
@@ -599,7 +598,7 @@ public class XMPPIOService<RefObject>
 					stop();
 				}    // end of if (response.endsWith())
 			} catch (IOException e) {
-				log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[]{toString(), e});
+				log.log(Level.WARNING, "Error sending stream open data: {1} [{0}]", new Object[]{toString(), e});
 				forceStop();
 			}
 		}
@@ -660,7 +659,7 @@ public class XMPPIOService<RefObject>
 			try {
 				// assert debug(elem.toString() + "\n");
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[]{toString(), elem});
+					log.log(Level.FINEST, "Read packet: {1} [{0}]", new Object[]{toString(), elem});
 				}
 
 				// System.out.print(elem.toString());
@@ -671,7 +670,7 @@ public class XMPPIOService<RefObject>
 					sendAck(pack);
 				}
 			} catch (TigaseStringprepException ex) {
-				log.log(Level.INFO, toString() + ", Incorrect to/from JID format for stanza: " + elem.toString(), ex);
+				log.log(Level.INFO, "Incorrect to/from JID format for stanza: " + elem.toString() + " [" + toString() + "]", ex);
 			}
 		}    // end of while ((elem = elems.poll()) != null)
 	}

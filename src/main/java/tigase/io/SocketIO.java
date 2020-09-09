@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * Created: Sat May 14 07:18:30 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
+ */
 public class SocketIO
 		implements IOInterface {
 
@@ -53,6 +53,7 @@ public class SocketIO
 	private long bytesReceived = 0;
 	private long bytesSent = 0;
 	private SocketChannel channel = null;
+	private String channelToString = null;
 	private Queue<ByteBuffer> dataToSend = null;
 	private String logId = null;
 	private String remoteAddress = null;
@@ -60,11 +61,11 @@ public class SocketIO
 	private long totalBytesReceived = 0;
 	private long totalBytesSent = 0;
 
-	/**
-	 * Creates a new <code>SocketIO</code> instance.
-	 */
 	public SocketIO(final SocketChannel sock) throws IOException {
 		channel = sock;
+		if (channel != null && channel.socket() != null) {
+			channelToString = channel.socket().toString();
+		}
 		channel.configureBlocking(false);
 		channel.socket().setSoLinger(false, 0);
 		channel.socket().setReuseAddress(true);
@@ -75,7 +76,7 @@ public class SocketIO
 		} else {
 			int queue_size = Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY, MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
 			if (log.isLoggable(LOG_SOCKET_OVERFLOW_LEVEL)) {
-				log.log(LOG_SOCKET_OVERFLOW_LEVEL, "SOCKET - Buffer to send limit: {0}, {1}",
+				log.log(LOG_SOCKET_OVERFLOW_LEVEL, "SOCKET - Buffer to send limit: {0} [{1}]",
 						new Object[]{queue_size, toString()});
 			}
 
@@ -190,7 +191,7 @@ public class SocketIO
 		}
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[]{bytesRead, toString()});
+			log.log(Level.FINER, "Read from channel {0} bytes [{1}]", new Object[]{bytesRead, toString()});
 		}
 		if (bytesRead == -1) {
 			// we need to close channel but we should not throw exception as
@@ -213,15 +214,17 @@ public class SocketIO
 			log.finest("Stop called " + toString());
 		}
 
-		// if (isRemoteAddress("81.142.228.219")) {
-		// log.warning("Stop called.");
-		// }
 		channel.close();
 	}
 
 	@Override
 	public String toString() {
-		return logId + ((channel == null) ? null : channel.socket());
+		return getClass().getSimpleName() + ", ID: " + logId + ((channel == null)
+																? null
+																: ", " +
+																		(channel.socket().isConnected()
+																		 ? "connected " + channel.socket()
+																		 : "disconnected " + channelToString));
 	}
 
 	@Override
@@ -249,14 +252,14 @@ public class SocketIO
 		// return result;
 		if ((buff != null) && buff.hasRemaining()) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}",
+				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0} [{1}]",
 						new Object[]{buff.remaining(), toString()});
 			}
 			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
 				++totalBuffOverflow;
 				if (log.isLoggable(LOG_SOCKET_OVERFLOW_LEVEL)) {
-					log.log(LOG_SOCKET_OVERFLOW_LEVEL, "SOCKET - Buffer overflow: {0}, {1}, {2}",
+					log.log(LOG_SOCKET_OVERFLOW_LEVEL, "SOCKET - Buffer overflow: {0}, {1} [{2}]",
 							new Object[]{totalBuffOverflow, dataToSend.size(), toString()});
 				}
 			}
@@ -301,12 +304,9 @@ public class SocketIO
 		}
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[]{result, toString()});
+			log.log(Level.FINER, "Wrote to channel {0} bytes [{1}]", new Object[]{result, toString()});
 		}
 
-		// if (isRemoteAddress("81.142.228.219")) {
-		// log.warning("Wrote to channel " + result + " bytes.");
-		// }
 		bytesSent += result;
 		totalBytesSent += result;
 
@@ -315,6 +315,6 @@ public class SocketIO
 
 	@Override
 	public void setLogId(String logId) {
-		this.logId = logId + " ";
+		this.logId = logId;
 	}
-}    // SocketIO
+}

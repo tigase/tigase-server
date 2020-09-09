@@ -62,11 +62,11 @@ public class AuthenticatorSelectorManager
 				serv);
 		if (authenticated) {
 			log.log(Level.FINE,
-					"{0}, Connection already authenticated, skipping processor: {1}, methodsAvailable: {2}, checking packet: {3}",
+					"Connection already authenticated, skipping processor: {1}, methodsAvailable: {2}, checking packet: {3} [{0}]",
 					new Object[]{serv, processor, methodsAvailable, p});
 			return false;
 		}
-		log.log(Level.FINE, "{0}, Processor {1}, methodsAvailable: {2}, checking packet: {3}",
+		log.log(Level.FINE, "Processor {1}, methodsAvailable: {2}, checking packet: {3} [{0}]",
 				new Object[]{serv, processor.getMethodName(), methodsAvailable, p});
 
 		boolean canHandle = processor.canHandle(p, serv, results);
@@ -76,13 +76,13 @@ public class AuthenticatorSelectorManager
 
 		final boolean result = !currentAuthenticationProcessor.isPresent() && canHandle;
 		log.log(Level.FINEST,
-				"{0}, Processor {1} canHandle: {2}, currentAuthenticationProcessor: {3}, result: {4}, methodsAvailable: {5}, packet: {6}",
+				"Processor {1}, canHandle: {2}, currentAuthenticationProcessor: {3}, result: {4}, methodsAvailable: {5}, packet: {6} [{0}]",
 				new Object[]{serv, processor.getMethodName(), canHandle, currentAuthenticationProcessor, result,
 							 methodsAvailable, p});
 		if (result) {
 			methodsAvailable.remove(processor);
 			serv.getSessionData().put(S2S_METHOD_USED, processor);
-			log.log(Level.FINE, "{0}, Allowing auth for: {1}, remaining: {2}",
+			log.log(Level.FINE, "Allowing auth for: {1}, remaining: {2} [{0}]",
 					new Object[]{serv, processor.getMethodName(), methodsAvailable});
 		}
 		return result;
@@ -97,7 +97,7 @@ public class AuthenticatorSelectorManager
 	}
 
 	public void authenticateConnection(S2SIOService serv, CIDConnections cid_conns, CID cidPacket) {
-		log.log(Level.FINE, "{0}, Authenticating connection", new Object[]{serv});
+		log.log(Level.FINE, "Authenticating connection [{0}]", new Object[]{serv});
 		serv.getSessionData().remove(S2S_METHOD_USED);
 		cid_conns.connectionAuthenticated(serv, cidPacket);
 	}
@@ -117,11 +117,11 @@ public class AuthenticatorSelectorManager
 		serv.getSessionData().remove(S2S_METHOD_USED);
 		final SortedSet<AuthenticationProcessor> methodsAvailable = getAuthenticationProcessors(serv);
 		methodsAvailable.remove(processor);
-		log.log(Level.FINE, "{0}, Authentication failed for: {1}, remaining methodsAvailable: {2}",
+		log.log(Level.FINE, "Authentication failed for: {1}, remaining methodsAvailable: {2} [{0}]",
 				new Object[]{serv, processor.getMethodName(), methodsAvailable});
 
 		if (methodsAvailable.isEmpty()) {
-			log.log(Level.WARNING, "{0}, All authentication methods failed, stopping connection", new Object[]{serv});
+			log.log(Level.WARNING, "All authentication methods failed, stopping connection [{0}]", new Object[]{serv});
 			flushRemainingPackets(serv, results);
 			serv.forceStop();
 		}
@@ -129,12 +129,12 @@ public class AuthenticatorSelectorManager
 		if (serv.connectionType() == ConnectionType.connect) {
 			Optional<AuthenticationProcessor> nextAuthenticationProcessor = methodsAvailable.stream().findFirst();
 			if (nextAuthenticationProcessor.isPresent()) {
-				log.log(Level.FINE, "{0}, Restarting authentication with: {1}",
+				log.log(Level.FINE, "Restarting authentication with: {1} [{0}]",
 						new Object[]{serv, nextAuthenticationProcessor.get().getMethodName()});
 				methodsAvailable.remove(nextAuthenticationProcessor.get());
 				nextAuthenticationProcessor.get().restartAuth(packet, serv, results);
 			} else {
-				log.log(Level.WARNING, "{0}, No more authenticators for outgoing connections, stopping",
+				log.log(Level.WARNING, "No more authenticators for outgoing connections, stopping [{0}]",
 						new Object[]{serv});
 				flushRemainingPackets(serv, results);
 				serv.forceStop();
@@ -165,7 +165,7 @@ public class AuthenticatorSelectorManager
 		try {
 			serv.processWaitingPackets();
 		} catch (IOException e) {
-			log.log(Level.WARNING, "Error while writing packets before closing the stream", e);
+			log.log(Level.WARNING, "Error while writing packets before closing the stream [" + serv + "]", e);
 		}
 	}
 

@@ -50,7 +50,7 @@ public class StreamFeatures
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received: {1}", new Object[]{serv, p});
+				log.log(Level.FINEST, "Stream features received: {1} [{0}]", new Object[]{serv, p});
 			}
 
 			return true;
@@ -81,7 +81,7 @@ public class StreamFeatures
 				}
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Sending stream features: {1}", new Object[]{serv, featuresElement});
+					log.log(Level.FINEST, "Sending stream features: {1} [{0}]", new Object[]{serv, featuresElement});
 				}
 
 				serv.addPacketToSend(Packet.packetInstance(featuresElement, null, null));

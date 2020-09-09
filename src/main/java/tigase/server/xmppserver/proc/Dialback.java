@@ -77,7 +77,7 @@ public class Dialback
 		// If this is a dialback packet, process it accordingly
 		if (p.getXMLNS() == XMLNS_DB_VAL) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Processing dialback packet: {1}", new Object[]{serv, p});
+				log.log(Level.FINEST, "Processing dialback packet: {1} [{0}]", new Object[]{serv, p});
 			}
 			processDialback(p, serv);
 
@@ -86,7 +86,7 @@ public class Dialback
 
 		if (authenticatorSelectorManager.isAllowed(p, serv, this, results)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Initializing dialback, packet: {1}", new Object[]{serv, p});
+				log.log(Level.FINEST, "Initializing dialback, packet: {1} [{0}]", new Object[]{serv, p});
 			}
 			initDialback(serv, serv.getSessionId());
 			return true;
@@ -111,7 +111,7 @@ public class Dialback
 		switch (serv.connectionType()) {
 			case connect:
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Initializing dialback after stream opened: {1}",
+					log.log(Level.FINEST, "Initializing dialback after stream opened: {1} [{0}]",
 							new Object[]{serv, attribs.get("id")});
 				}
 				initDialback(serv, attribs.get("id"));
@@ -138,14 +138,14 @@ public class Dialback
 		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
 				!p.getElement().getChildren().isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Stream features received packet: {1}", new Object[]{serv, p});
+				log.log(Level.FINEST, "Stream features received packet: {1} [{0}]", new Object[]{serv, p});
 			}
 
 			CertCheckResult certCheckResult = (CertCheckResult) serv.getSessionData()
 					.get(S2SIOService.CERT_CHECK_RESULT);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, TLS Certificate check: {1}, packet: {2}",
+				log.log(Level.FINEST, "TLS Certificate check: {1}, packet: {2} [{0}]",
 						new Object[]{serv, certCheckResult, p});
 			}
 
@@ -155,7 +155,7 @@ public class Dialback
 			// initialized....
 			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && (certCheckResult == null) && !skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}", new Object[]{serv, p});
+					log.log(Level.FINEST, "Waiting for starttls, packet: {1} [{0}]", new Object[]{serv, p});
 				}
 
 				return false;
@@ -169,13 +169,13 @@ public class Dialback
 				if (ejabberd_bug_workaround_active) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
-								"{0}, Ejabberd bug workaround active, proceeding to dialback anyway, packet: {1}",
+								"Ejabberd bug workaround active, proceeding to dialback anyway, packet: {1} [{0}]",
 								new Object[]{serv, p});
 						return true;
 					}
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, TLS trusted peer, no dialback needed or requested, packet: {1}",
+						log.log(Level.FINEST, "TLS trusted peer, no dialback needed or requested, packet: {1} [{0}]",
 								new Object[]{serv, p});
 					}
 
@@ -185,12 +185,12 @@ public class Dialback
 					} catch (NotLocalhostException ex) {
 
 						// Should not happen....
-						log.log(Level.INFO, "{0}, Incorrect local hostname, packet: {1}", new Object[]{serv, p});
+						log.log(Level.INFO, "Incorrect local hostname, packet: {1} [{0}]", new Object[]{serv, p});
 						authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 					} catch (LocalhostException ex) {
 
 						// Should not happen....
-						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}", new Object[]{serv, p});
+						log.log(Level.INFO, "Incorrect remote hostname name, packet: {1} [{0}]", new Object[]{serv, p});
 						authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 					}
 
@@ -201,8 +201,7 @@ public class Dialback
 			// we need to check if TLS is required
 			if (!skipTLS && cid != null && !serv.getSessionData().containsKey("TLS") &&
 					handler.isTlsRequired(cid.getLocalHost())) {
-				log.log(Level.FINER, "{0}, TLS is required for domain {1} but STARTTLS was not " +
-								"offered by {2} - policy-violation",
+				log.log(Level.FINER, "TLS is required for domain {1} but STARTTLS was not offered by {2} - policy-violation [{0}]",
 						new Object[]{serv, cid.getLocalHost(), cid.getRemoteHost()});
 //				authenticatorSelectorManager.authenticationFailed(p, serv, this, results);
 				return false;
@@ -281,7 +280,7 @@ public class Dialback
 		CID cid_packet = new CID(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID_packet: {2}", new Object[]{serv, p, cid_packet});
+			log.log(Level.FINEST, "DIALBACK packet: {1}, CID_packet: {2} [{0}]", new Object[]{serv, p, cid_packet});
 		}
 
 		CIDConnections cid_conns = null;
@@ -304,12 +303,12 @@ public class Dialback
 		try {
 			cid_conns = handler.getCIDConnections(cid_main, true);
 		} catch (NotLocalhostException ex) {
-			log.log(Level.FINER, "{0} Incorrect local hostname: {1}", new Object[]{serv, p});
+			log.log(Level.FINER, "Incorrect local hostname: {1} [{0}]", new Object[]{serv, p});
 			generateStreamError(false, "host-unknown", serv, ex);
 
 			return;
 		} catch (LocalhostException ex) {
-			log.log(Level.FINER, "{0} Incorrect remote hostname: {1}", new Object[]{serv, p});
+			log.log(Level.FINER, "Incorrect remote hostname: {1} [{0}]", new Object[]{serv, p});
 			generateStreamError(false, "invalid-from", serv, ex);
 
 			return;
@@ -328,7 +327,7 @@ public class Dialback
 				if (!skipTls && !serv.getSessionData().containsKey("TLS") &&
 						handler.isTlsRequired(cid.getLocalHost())) {
 					log.log(Level.FINER,
-							"{0}, rejecting S2S connection from {1} to {2} due to policy violation - STARTTLS is required",
+							"Rejecting S2S connection from {1} to {2} due to policy violation - STARTTLS is required [{0}]",
 							new Object[]{serv, cid.getRemoteHost(), cid.getLocalHost()});
 					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet, false, null, serv.getSessionId(),
 											 null, false, new Element("error", new Element[]{
@@ -392,7 +391,7 @@ public class Dialback
 					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "received verify for {0} but it was not requested!", p.getStanzaFrom());
+						log.log(Level.FINE, "Received verify for {0} but it was not requested!", p.getStanzaFrom());
 					}
 				}
 				if (serv.isHandshakingOnly()) {

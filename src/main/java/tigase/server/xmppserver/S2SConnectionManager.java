@@ -199,46 +199,7 @@ public class S2SConnectionManager
 		String to_hostname = packet.getStanzaTo().getDomain();
 
 		try {
-
-			// Code commented out below is not needed anymore
-			// following call below takes care of hostnames checking:
-			// getCIDConnections(cid, true);
-			//// Check whether addressing is correct:
-			//
-			//// We don't send packets to local domains trough s2s, there
-			//// must be something wrong with configuration
-			// if (isLocalDomainOrComponent(to_hostname)) {
-			//
-			//// Ups, remote hostname is the same as one of local hostname??
-			//// Internal loop possible, we don't want that....
-			//// Let's send the packet back....
-			// if (log.isLoggable(Level.INFO)) {
-			// log.log(Level.INFO, "Packet addresses to localhost,"
-			// + " I am not processing it: {0}", packet);
-			// }
-			//
-			// addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-			// "S2S - not delivered. Server missconfiguration.", true));
-			//
-			// return;
-			// }
-			//
 			String from_hostname = packet.getStanzaFrom().getDomain();
-
-			// Code commented out below is not needed anymore
-			// following call below takes care of hostnames checking:
-			// getCIDConnections(cid, true);
-			//// I think from_hostname needs to be different from to_hostname at
-			//// this point... or s2s doesn't make sense
-			//
-			//// All hostnames go through String.intern()
-			// if (to_hostname == from_hostname) {
-			// log.log(Level.WARNING,
-			// "Dropping incorrect packet - from_hostname == to_hostname: {0}",
-			// packet);
-			//
-			// return;
-			// }
 			CID cid = new CID(from_hostname, to_hostname);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -276,7 +237,7 @@ public class S2SConnectionManager
 
 		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Processing socket data: {0}", p);
+				log.log(Level.FINEST, "Processing socket data: {0} [{1}]", new Object[]{p, serv});
 			}
 			if (p.getXMLNS() == null) {
 				p.setXMLNS(XMLNS_SERVER_VAL);
@@ -312,7 +273,7 @@ public class S2SConnectionManager
 				try {
 					if (isLocalDomainOrComponent(p.getStanzaTo().getDomain())) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Adding packet out: {1}", new Object[]{serv, p});
+							log.log(Level.FINEST, "Adding packet out: {0} [{1}]", new Object[]{p, serv});
 						}
 
 						// TODO: not entirely sure if this is a good idea....
@@ -389,9 +350,8 @@ public class S2SConnectionManager
 	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid, String key_sessionId,
 									String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem) {
 		CIDConnections cid_conns = getCIDConnections(connCid);
-
 		log.log(Level.FINEST,
-				"{0}, Sending verification result: {1}, session: {2}, handshaking: {3}, cdata: {4}, error: {5}",
+				"Sending verification result: {1}, session: {2}, handshaking: {3}, cdata: {4}, error: {5} [{0}]",
 				new Object[]{cid_conns, valid, serv_sessionId, handshakingOnly, cdata, errorElem});
 
 		if (cid_conns != null) {
@@ -436,9 +396,14 @@ public class S2SConnectionManager
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
-		
-		serv.setConnectionId(JID.jidInstanceNS(null, serv.getUniqueId(), UUID.randomUUID().toString()));
-		log.log(Level.FINEST, "s2s connection opened: {0}", serv);
+		final CID cid = (CID)serv.getSessionData().get("cid");
+		if (cid != null) {
+			serv.setUserJid(cid.toString());
+			serv.setConnectionId(JID.jidInstanceNS(cid.getLocalHost(), cid.getRemoteHost(), UUID.randomUUID().toString()));
+		} else {
+			serv.setConnectionId(JID.jidInstanceNS(null, serv.getUniqueId(), UUID.randomUUID().toString()));
+		}
+		log.log(Level.INFO, "s2s connection opened: {0}", serv);
 		for (S2SProcessor proc : processors) {
 			proc.serviceStarted(serv);
 		}
@@ -452,6 +417,10 @@ public class S2SConnectionManager
 			for (S2SProcessor proc : processors) {
 				proc.serviceStopped(serv);
 			}
+		}
+
+		if (log.isLoggable(Level.INFO)) {
+			log.log(Level.INFO, "[[{0}]] S2S Connection stopped: {1}", new Object[]{getName(), serv});
 		}
 
 		return result;
@@ -472,7 +441,7 @@ public class S2SConnectionManager
 	@Override
 	public void xmppStreamClosed(S2SIOService serv) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Stream closed.", new Object[]{serv});
+			log.log(Level.FINER, "Stream closed. {0}", new Object[]{serv});
 		}
 		for (S2SProcessor proc : processors) {
 			proc.streamClosed(serv);
@@ -482,7 +451,7 @@ public class S2SConnectionManager
 	@Override
 	public String[] xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Stream opened: {1}", new Object[]{serv, attribs});
+			log.log(Level.FINER, "Stream opened: {1} [{0}]", new Object[]{serv, attribs});
 		}
 
 		StringBuilder sb = new StringBuilder(256);
@@ -495,7 +464,7 @@ public class S2SConnectionManager
 			}
 		}
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[]{serv, sb});
+			log.log(Level.FINER, "Sending stream open: {1} [{0}]", new Object[]{serv, sb});
 		}
 
 		return (sb.length() == 0) ? null : new String[]{sb.toString()};
