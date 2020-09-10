@@ -129,20 +129,20 @@ public class PacketTest {
 		Command.addFieldValue(result, "password", "mySuperSecretPassword", "text-private",
 							  "The password for this account");
 
-		Assert.assertTrue("Output secured in default Element.toString()",
+		Assert.assertTrue("Output secured in default Element.toString(): " + iqEl.toString(),
 						  iqEl.toString().contains("mySuperSecretPassword"));
-		Assert.assertFalse("Plain output in Element.toStringSecure()",
+		Assert.assertFalse("Plain output in Element.toStringSecure(): " + iqEl.toStringSecure(),
 						   iqEl.toStringSecure().contains("mySuperSecretPassword"));
 
-		Assert.assertFalse("Plain output in Packet.toString()", result.toString().contains("mySuperSecretPassword"));
+		Assert.assertFalse("Plain output in Packet.toString(): " + result.toString(), result.toString().contains("mySuperSecretPassword"));
 		Assert.assertFalse("Plain output in Packet.toString(true)",
 						   result.toString(true).contains("mySuperSecretPassword"));
-		Assert.assertFalse("Plain output in Packet.toStringSecure(true)",
+		Assert.assertFalse("Plain output in Packet.toStringSecure(true): " + result.toStringSecure(),
 						   result.toStringSecure().contains("mySuperSecretPassword"));
 
-		Assert.assertTrue("Output secured in default Packet.toStringFull()",
+		Assert.assertTrue("Output secured in default Packet.toStringFull(): " + result.toStringFull(),
 						  result.toStringFull().contains("mySuperSecretPassword"));
-		Assert.assertTrue("Output secured in default Packet.toString(false)",
+		Assert.assertTrue("Output secured in default Packet.toString(false): " + result.toString(false),
 						  result.toString(false).contains("mySuperSecretPassword"));
 	}
 }
