@@ -135,7 +135,7 @@ public class PacketTest {
 						   iqEl.toStringSecure().contains("mySuperSecretPassword"));
 
 		Assert.assertFalse("Plain output in Packet.toString(): " + result.toString(), result.toString().contains("mySuperSecretPassword"));
-		Assert.assertFalse("Plain output in Packet.toString(true)",
+		Assert.assertFalse("Plain output in Packet.toString(true): " + result.toString(true),
 						   result.toString(true).contains("mySuperSecretPassword"));
 		Assert.assertFalse("Plain output in Packet.toStringSecure(true): " + result.toStringSecure(),
 						   result.toStringSecure().contains("mySuperSecretPassword"));
