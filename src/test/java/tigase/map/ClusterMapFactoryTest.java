@@ -20,7 +20,6 @@ package tigase.map;
 import org.junit.Assert;
 import org.junit.Test;
 import tigase.eventbus.EventBus;
-import tigase.eventbus.EventListener;
 import tigase.eventbus.impl.EventBusImplementation;
 
 import java.util.Map;
@@ -29,23 +28,26 @@ public class ClusterMapFactoryTest {
 
 	@Test
 	public void testCreateMap() throws Exception {
+		final Object mutex = new Object();
+
 		final ClusterMapFactory factory = new ClusterMapFactory();
 		factory.setEventBus(new EventBusImplementation());
 		final EventBus eventBus = factory.getEventBus();
 
 		final Object[] createdEvent = new Object[]{null};
-		eventBus.addListener(ClusterMapFactory.NewMapCreatedEvent.class,
-							 new EventListener<ClusterMapFactory.NewMapCreatedEvent>() {
-								 @Override
-								 public void onEvent(ClusterMapFactory.NewMapCreatedEvent event) {
-									 Assert.assertNull(createdEvent[0]);
-									 createdEvent[0] = event;
-								 }
-							 });
+		eventBus.addListener(ClusterMapFactory.NewMapCreatedEvent.class, event -> {
+			Assert.assertNull(createdEvent[0]);
+			createdEvent[0] = event;
+			synchronized (mutex) {
+				mutex.notifyAll();
+			}
+		});
 
 		Map<String, String> map = factory.createMap("test", String.class, String.class, "1", "2", "3");
 
-		Thread.sleep(100);
+		synchronized (mutex) {
+			mutex.wait(10_000);
+		}
 
 		Assert.assertNotNull(createdEvent[0]);
 
@@ -53,31 +55,36 @@ public class ClusterMapFactoryTest {
 
 	@Test
 	public void testDestroyMap() throws Exception {
+		final Object mutex = new Object();
 		final ClusterMapFactory factory = new ClusterMapFactory();
 		factory.setEventBus(new EventBusImplementation());
 		final EventBus eventBus = factory.getEventBus();
 
 		final Object[] destroyedEvent = new Object[]{null};
-		eventBus.addListener(ClusterMapFactory.MapDestroyEvent.class,
-							 new EventListener<ClusterMapFactory.MapDestroyEvent>() {
-								 @Override
-								 public void onEvent(ClusterMapFactory.MapDestroyEvent event) {
-									 Assert.assertNull(destroyedEvent[0]);
-									 destroyedEvent[0] = event;
-								 }
-							 });
+		eventBus.addListener(ClusterMapFactory.MapDestroyEvent.class, event -> {
+			Assert.assertNull(destroyedEvent[0]);
+			destroyedEvent[0] = event;
+			synchronized (mutex) {
+				mutex.notifyAll();
+			}
+
+		});
 
 		final Map<String, String> map = factory.createMap("test2", String.class, String.class, "1", "2", "3");
 
 		factory.destroyMap(map);
 
-		Thread.sleep(100);
+		synchronized (mutex) {
+			mutex.wait(10_000);
+		}
 
-		Assert.assertNotNull(destroyedEvent[0]);
+		Assert.assertNotNull("MapDestroyEvent not received", destroyedEvent[0]);
 	}
 
 	@Test
 	public void testPutToMap() throws Exception {
+		final Object mutex = new Object();
+
 		final ClusterMapFactory factory = new ClusterMapFactory();
 		factory.setEventBus(new EventBusImplementation());
 		final EventBus eventBus = factory.getEventBus();
@@ -86,26 +93,29 @@ public class ClusterMapFactoryTest {
 
 		final Map<String, String> map = factory.createMap("test", String.class, String.class);
 
-		eventBus.addListener(ClusterMapFactory.ElementAddEvent.class,
-							 new EventListener<ClusterMapFactory.ElementAddEvent>() {
-								 @Override
-								 public void onEvent(ClusterMapFactory.ElementAddEvent event) {
-									 received[0] = true;
-									 Assert.assertEquals("kluczyk", event.getKey());
-									 Assert.assertEquals("wartosc", event.getValue());
-									 Assert.assertEquals(((DMap) map).getUid(), event.getUid());
-								 }
-							 });
+		eventBus.addListener(ClusterMapFactory.ElementAddEvent.class, event -> {
+			received[0] = true;
+			Assert.assertEquals("kluczyk", event.getKey());
+			Assert.assertEquals("wartosc", event.getValue());
+			Assert.assertEquals(((DMap) map).getUid(), event.getUid());
+
+			synchronized (mutex) {
+				mutex.notifyAll();
+			}
+		});
 
 		map.put("kluczyk", "wartosc");
 
-		Thread.sleep(100);
-
+		synchronized (mutex) {
+			mutex.wait(10_000);
+		}
 		Assert.assertTrue(received[0]);
 	}
 
 	@Test
 	public void testRemoteCreatedMap() throws Exception {
+		final Object mutex = new Object();
+
 		ClusterMapFactory.NewMapCreatedEvent eventCreate = new ClusterMapFactory.NewMapCreatedEvent();
 		eventCreate.setUid("test");
 		eventCreate.setKeyClass(java.lang.String.class);
@@ -116,19 +126,21 @@ public class ClusterMapFactoryTest {
 		factory.setEventBus(new EventBusImplementation());
 		final EventBus eventBus = factory.getEventBus();
 
-		final Map[] maps = new Map[]{null};
-		eventBus.addListener(MapCreatedEvent.class, new EventListener<MapCreatedEvent>() {
-			@Override
-			public void onEvent(MapCreatedEvent e) {
-				maps[0] = e.getMap();
-				Assert.assertEquals("test", e.getUid());
-				Assert.assertArrayEquals(new String[]{"1", "2"}, e.getParameters());
+		final var maps = new Map[]{null};
+		eventBus.addListener(MapCreatedEvent.class, e -> {
+			maps[0] = e.getMap();
+			Assert.assertEquals("test", e.getUid());
+			Assert.assertArrayEquals(new String[]{"1", "2"}, e.getParameters());
+			synchronized (mutex) {
+				mutex.notifyAll();
 			}
 		});
 
 		factory.onNewMapCreated(eventCreate);
 
-		Thread.sleep(100);
+		synchronized (mutex) {
+			mutex.wait(10_000);
+		}
 
 		Assert.assertNotNull("It seems map was not created", maps[0]);
 		Assert.assertEquals("test", ((DMap) maps[0]).uid);
@@ -165,11 +177,11 @@ public class ClusterMapFactoryTest {
 		Assert.assertEquals(0, maps[0].size());
 
 		final boolean[] received = new boolean[]{false};
-		eventBus.addListener(MapDestroyedEvent.class, new EventListener<MapDestroyedEvent>() {
-			@Override
-			public void onEvent(MapDestroyedEvent event) {
-				Assert.assertEquals(maps[0], event.getMap());
-				received[0] = true;
+		eventBus.addListener(MapDestroyedEvent.class, event -> {
+			Assert.assertEquals(maps[0], event.getMap());
+			received[0] = true;
+			synchronized (mutex) {
+				mutex.notifyAll();
 			}
 		});
 
@@ -180,7 +192,9 @@ public class ClusterMapFactoryTest {
 		factory.onMapDestroyed(eventDestroy);
 
 		Assert.assertNull(factory.getMap("test"));
-		Thread.sleep(100);
+		synchronized (mutex) {
+			mutex.wait(10_000);
+		}
 		Assert.assertTrue(received[0]);
 	}
 }
