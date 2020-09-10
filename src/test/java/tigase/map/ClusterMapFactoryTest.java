@@ -50,7 +50,7 @@ public class ClusterMapFactoryTest {
 		}
 
 		Assert.assertNotNull(createdEvent[0]);
-
+		Assert.assertNotNull(map);
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class ClusterMapFactoryTest {
 			received[0] = true;
 			Assert.assertEquals("kluczyk", event.getKey());
 			Assert.assertEquals("wartosc", event.getValue());
-			Assert.assertEquals(((DMap) map).getUid(), event.getUid());
+			Assert.assertEquals(((DMap<?,?>) map).getUid(), event.getUid());
 
 			synchronized (mutex) {
 				mutex.notifyAll();
@@ -143,7 +143,7 @@ public class ClusterMapFactoryTest {
 		}
 
 		Assert.assertNotNull("It seems map was not created", maps[0]);
-		Assert.assertEquals("test", ((DMap) maps[0]).uid);
+		Assert.assertEquals("test", ((DMap<?,?>) maps[0]).uid);
 
 		ClusterMapFactory.ElementAddEvent eventAdd = new ClusterMapFactory.ElementAddEvent();
 		eventAdd.setUid("test");
