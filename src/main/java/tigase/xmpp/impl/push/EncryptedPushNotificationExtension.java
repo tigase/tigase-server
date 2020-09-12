@@ -172,28 +172,6 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		}
 	}
 
-	// for testing message truncation
-//	public static void main(String[] args) {
-//		int maxSize = 3000;
-//
-//		StringBuilder sb = new StringBuilder();
-//		for (int i=0; i<1000; i++) {
-//			sb.append("\uD83D\uDE21");
-//		}
-//		for (int i=0; i<(8000-64); i++) {
-//			if (i % 10 ==0) {
-//				sb.append("\uD83D\uDE21");
-//			} else {
-//				sb.append(String.valueOf(i % 10));
-//			}
-//		}
-//		String body = sb.toString();
-//		System.out.println("" + body);
-//		body = trimBodyToSize(maxSize, body);
-//		System.out.println("" + body);
-//		System.out.println("body length: " + body.getBytes(UTF8).length);
-//	}
-
 	public static String trimBodyToSize(long limit, String body) {
 		int maxSize = ((int) limit * 6) / 8;
 
