@@ -712,7 +712,7 @@ public class ClientConnectionManager
 						log.log(Level.INFO, "Problem enabling zlib compression on the connection: ", ex);
 					}
 				} else {
-					log.log(Level.WARNING, "Can''t find sevice for STARTZLIB command: {0}", iqc);
+					log.log(Level.INFO, "Can not find service for STARTZLIB command: {0}", iqc);
 				}
 
 				break;
@@ -766,7 +766,7 @@ public class ClientConnectionManager
 						serv.forceStop();
 					}    // end of try-catch
 				} else {
-					log.log(Level.WARNING, "Can''t find sevice for STARTTLS command: {0}", iqc);
+					log.log(Level.INFO, "Can not find service for STARTTLS command: {0}", iqc);
 				}      // end of else
 
 				break;
