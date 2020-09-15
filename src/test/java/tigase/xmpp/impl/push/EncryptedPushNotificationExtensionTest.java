@@ -45,4 +45,43 @@ public class EncryptedPushNotificationExtensionTest {
 		assertTrue(body.getBytes(StandardCharsets.UTF_8).length <= 3000);
 		assertTrue(origBody.contains(body));
 	}
+
+	@Test
+	public void testMessageBodyTruncation1() {
+		runCharTest(1, "\u0800", 2999);
+	}
+
+	@Test
+	public void testMessageBodyTruncation2() {
+		runCharTest(2, "\uD83D\uDC75\uD83C\uDFFB", 2999);
+	}
+
+	@Test
+	public void testMessageBodyTruncation3() {
+		runCharTest(3, "\uD83D\uDE21", 2999);
+	}
+
+	@Test
+	public void testMessageBodyTruncation4() {
+		runCharTest(4, "\u07DF", 2999);
+	}
+
+	@Test
+	public void testMessageBodyTruncation5() {
+		runCharTest(5, "\uFFFD", 2999);
+	}
+	
+	private void runCharTest(int tryNo, String ch, int maxSize) {
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<5000; i++) {
+			sb.append(ch);
+		}
+		String origBody = sb.toString();
+		String body = EncryptedPushNotificationExtension.trimBodyToSize(maxSize, origBody);
+		// DO NOT REMOVE: left intentionally for better analysis of the issue with a code when needed
+		//System.out.println("" + tryNo + ": maxSize: " + maxSize + ", size: " + body.getBytes(StandardCharsets.UTF_8).length + ", char size:" + ch.toCharArray().length + ":" + ch.getBytes(StandardCharsets.UTF_8).length);
+		assertTrue(body.getBytes(StandardCharsets.UTF_8).length <= 3000);
+		assertTrue(origBody.contains(body));
+	}
+
 }

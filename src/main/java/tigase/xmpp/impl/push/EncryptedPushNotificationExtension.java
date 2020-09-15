@@ -31,7 +31,12 @@ import tigase.xmpp.jid.JID;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -144,7 +149,9 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 
 		String body = packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH);
 		if (body != null) {
-			body = trimBodyToSize(maxSizeBytes, body);
+			// body is encrypted and base64 encoded so we need to adjust the size and reduce it by 64 (header size)
+			int maxSize = (int) (((maxSizeBytes - 64) * 6) / 8);
+			body = trimBodyToSize(maxSize, body);
 			payload.put("message", body);
 			content = valueToString(payload);
 		}
@@ -172,42 +179,12 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		}
 	}
 
-	public static String trimBodyToSize(long limit, String body) {
-		int maxSize = ((int) limit * 6) / 8;
-
-		int currentContentLength = 64;
-		if (maxSize < (currentContentLength + body.getBytes(UTF8).length)) {
-			body = body.substring(0, truncateAtChar(maxSize, body));
-		}
-		
-		return body;
-	}
-
-	public static int truncateAtChar(int maxBytes, String body) {
-		int bytes = 0;
-		char[] chars = body.toCharArray();
-		for (int i = 0; i < body.length(); ) {
-			int c = Character.codePointAt(chars, i);
-			
-			int charBytes = 1;
-			if (c <= 0x007F) {
-				charBytes = 1;
-			} else if (c <= 0x07FF) {
-				charBytes = 2;
-			} else if (c <= 0xDFFF) {
-				charBytes = 3;
-			} else {
-				charBytes = 4;
-			}
-
-			if (bytes + charBytes > maxBytes) {
-				return i;
-			}
-
-			bytes += charBytes;
-			i += Character.charCount(c);
-		}
-		return body.length();
+	public static String trimBodyToSize(int limit, String body) {
+		CharsetEncoder enc = StandardCharsets.UTF_8.newEncoder();
+		ByteBuffer bb = ByteBuffer.allocate((int) limit);
+		CharBuffer cb = CharBuffer.wrap(body);
+		CoderResult r = enc.encode(cb, bb, true);
+		return r.isOverflow() ? cb.flip().toString() : body;
 	}
 	
 	private static String valueToString(Object value) {
