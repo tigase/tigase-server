@@ -134,15 +134,17 @@ public class PacketTest {
 		Assert.assertFalse("Plain output in Element.toStringSecure(): " + iqEl.toStringSecure(),
 						   iqEl.toStringSecure().contains("mySuperSecretPassword"));
 
-		Assert.assertFalse("Plain output in Packet.toString(): " + result.toString(), result.toString().contains("mySuperSecretPassword"));
+//		Default `result.toString()` relies on `tigase.server.Packet.FULL_DEBUG` which may be changed by other tests
+//		hence testing it could yield unsteady results. Commenting this out
+//		Assert.assertFalse("Plain output in Packet.toString(): " + result.toString(), result.toString().contains("mySuperSecretPassword"));
 		Assert.assertFalse("Plain output in Packet.toString(true): " + result.toString(true),
 						   result.toString(true).contains("mySuperSecretPassword"));
+		Assert.assertTrue("Output secured in default Packet.toString(false): " + result.toString(false),
+						  result.toString(false).contains("mySuperSecretPassword"));
 		Assert.assertFalse("Plain output in Packet.toStringSecure(true): " + result.toStringSecure(),
 						   result.toStringSecure().contains("mySuperSecretPassword"));
 
 		Assert.assertTrue("Output secured in default Packet.toStringFull(): " + result.toStringFull(),
 						  result.toStringFull().contains("mySuperSecretPassword"));
-		Assert.assertTrue("Output secured in default Packet.toString(false): " + result.toString(false),
-						  result.toString(false).contains("mySuperSecretPassword"));
 	}
 }

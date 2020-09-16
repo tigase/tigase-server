@@ -96,8 +96,6 @@ public class VHostJDBCRepositoryTest {
 		kernel.registerBean("logging").asClass(LoggingBean.class).setActive(true).setPinned(true).exec();
 
 		try {
-			final LoggingBean loggingBean = kernel.getInstance(LoggingBean.class);
-			loggingBean.setPacketFullDebug(true);
 			final VHostItemExtensionManager extensionManager = kernel.getInstance(VHostItemExtensionManager.class);
 			extensionManager.setProviders(new VHostItemExtensionProvider[]{new TestVHostExtensionProvider()});
 			repository = kernel.getInstance(XMLRepository.class);
