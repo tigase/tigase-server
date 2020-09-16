@@ -418,7 +418,10 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 						try {
 
 							// Send user's presence from remote connection to local connection
-							Packet presence = Packet.packetInstance(elem);
+							Element clone = elem.clone();
+							// Set proper to attribute
+							clone.setAttribute("to", conn.getJID().toString());
+							Packet presence = Packet.packetInstance(clone);
 
 							presence.setPacketTo(conn.getConnectionId());
 							sm.fastAddOutPacket(presence);
