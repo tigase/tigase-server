@@ -311,6 +311,19 @@ public class ChannelConfiguration {
 		privateMessages = getBoolFromField(form,"Private Messages");
 		mandatoryNicks = getBoolFromField(form,"Mandatory Nicks");
 
+		validate();
+	}
+
+	public boolean isValid() {
+		try {
+			validate();
+			return true;
+		} catch (PubSubException ex) {
+			return false;
+		}
+	}
+
+	private void validate() throws PubSubException {
 		if (Arrays.stream(nodesPresent).anyMatch(node -> "presence".equals(node) || "jidmap-visible".equals(node))) {
 			throw new PubSubException(Authorization.NOT_ACCEPTABLE, "Only participants and information nodes are supported!");
 		}

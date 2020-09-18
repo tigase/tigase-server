@@ -264,17 +264,22 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 	}
 
 	@Override
-	public void validateItem(BareJID serviceJID, String node, String id, String publisher, Element item)
+	public boolean validateItem(BareJID serviceJID, String node, String id, String publisher, Element item)
 			throws PubSubException {
 		if (Mix.Nodes.CONFIG.equals(node)) {
 			// this line is required as it validates it configuration is correct!
 			ChannelConfiguration config = new ChannelConfiguration(item);
 			ChannelConfiguration.updateLastChangeMadeBy(item, JID.jidInstanceNS(publisher));
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "validated channel " + serviceJID + " configuration as valid: " + config.toElement("UNSET"));
+			}
+			return config != null && config.isValid();
 		}
 		if (Mix.Nodes.INFO.equals(node)) {
 			// we need to handle this properly..
 
 		}
+		return true;
 	}
 
 	@Override
