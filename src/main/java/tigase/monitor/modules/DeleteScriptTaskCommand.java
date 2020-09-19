@@ -44,7 +44,7 @@ public class DeleteScriptTaskCommand
 	private final static Logger log = Logger.getLogger(DeleteScriptTaskCommand.class.getName());
 	@Inject
 	private MonitorComponent component;
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 
 	public DeleteScriptTaskCommand() {

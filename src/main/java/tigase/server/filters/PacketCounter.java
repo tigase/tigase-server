@@ -17,6 +17,7 @@
  */
 package tigase.server.filters;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
@@ -28,6 +29,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
+@Bean(name = "packetCounter", parents = {PacketFiltersBean.IncomingPacketFiltersBean.class,
+										 PacketFiltersBean.OutgoingPacketFiltersBean.class}, active = true)
 public class PacketCounter
 		implements PacketFilterIfc {
 

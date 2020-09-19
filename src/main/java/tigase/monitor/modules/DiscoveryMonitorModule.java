@@ -38,7 +38,7 @@ import java.util.List;
 public class DiscoveryMonitorModule
 		extends DiscoveryModule {
 
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 
 	@Inject(nullAllowed = true)

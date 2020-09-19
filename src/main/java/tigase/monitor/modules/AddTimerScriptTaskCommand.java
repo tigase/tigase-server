@@ -46,7 +46,7 @@ public class AddTimerScriptTaskCommand
 	private final static Logger log = Logger.getLogger(AddTimerScriptTaskCommand.class.getName());
 	@Inject
 	private MonitorComponent component;
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 
 	public AddTimerScriptTaskCommand() {

@@ -47,7 +47,7 @@ public class ConfigureTaskCommand
 
 	@Inject
 	private MonitorComponent component;
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 	@Inject
 	private TasksScriptRegistrar registrar;

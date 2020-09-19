@@ -37,7 +37,7 @@ public class TasksScriptRegistrar {
 
 	public static final String ID = "TasksScriptRegistrar";
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 	@Inject(nullAllowed = false)
 	private ComponentRepository<TaskConfigItem> repo;

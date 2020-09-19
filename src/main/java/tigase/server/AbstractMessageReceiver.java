@@ -20,7 +20,7 @@ package tigase.server;
 import tigase.component.ScheduledTask;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.server.filters.PacketCounter;
+import tigase.server.filters.PacketFiltersBean;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
@@ -127,10 +127,10 @@ public abstract class AbstractMessageReceiver
 	private static final Logger log = Logger.getLogger("tigase.debug.AbstractMessageReceiver");
 
 	// PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
-	@ConfigField(desc = "Incoming filters", alias = INCOMING_FILTERS_PROP_KEY)
-	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters = new CopyOnWriteArrayList<>();
-	@ConfigField(desc = "Outgoing filters", alias = OUTGOING_FILTERS_PROP_KEY)
-	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters = new CopyOnWriteArrayList<PacketFilterIfc>();
+	@Inject
+	private PacketFiltersBean.IncomingPacketFiltersBean incoming_filters;
+	@Inject
+	private PacketFiltersBean.OutgoingPacketFiltersBean outgoing_filters;
 	// Array cache to speed processing up....
 	private final Priority[] pr_cache = Priority.values();
 	private final List<PriorityQueueAbstract<Packet>> out_queues = new ArrayList<PriorityQueueAbstract<Packet>>(
@@ -246,12 +246,6 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public AbstractMessageReceiver() {
-		// initializing default value for incoming filters
-		PacketFilterIfc filter = new PacketCounter();
-		setIncomingFilters(Arrays.asList(filter));
-		// initializing default value for outgoing filters
-		filter = new PacketCounter();
-		setOutogingFilters(Arrays.asList(filter));
 	}
 
 	/**
@@ -797,10 +791,10 @@ public abstract class AbstractMessageReceiver
 
 		list.add(getName(), "Average processing time on last " + processPacketTimings.length + " runs [ms]",
 				 prcessingTime, Level.FINE);
-		for (PacketFilterIfc packetFilter : incoming_filters) {
+		for (PacketFilterIfc packetFilter : incoming_filters.getFilters()) {
 			packetFilter.getStatistics(list);
 		}
-		for (PacketFilterIfc packetFilter : outgoing_filters) {
+		for (PacketFilterIfc packetFilter : outgoing_filters.getFilters()) {
 			packetFilter.getStatistics(list);
 		}
 		if (list.checkLevel(Level.FINEST)) {
@@ -834,20 +828,19 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
-	public void setIncomingFilters(List<PacketFilterIfc> filters) {
-		for (PacketFilterIfc filter : filters) {
-			filter.init(getName(), QueueType.IN_QUEUE);
-		}
-		incoming_filters.clear();
-		incoming_filters.addAll(filters);
+	public void setIncoming_filters(PacketFiltersBean.IncomingPacketFiltersBean incoming_filters) {
+		this.incoming_filters = incoming_filters;
+		updateFiltersName();
 	}
 
-	public void setOutogingFilters(List<PacketFilterIfc> filters) {
-		for (PacketFilterIfc filter : filters) {
-			filter.init(getName(), QueueType.OUT_QUEUE);
-		}
-		outgoing_filters.clear();
-		outgoing_filters.addAll(filters);
+	public void setOutgoing_filters(PacketFiltersBean.OutgoingPacketFiltersBean outgoing_filters) {
+		this.outgoing_filters = outgoing_filters;
+		updateFiltersName();
+	}
+
+	protected void updateFiltersName() {
+		Optional.ofNullable(incoming_filters).ifPresent(filters -> filters.setName(getName()));
+		Optional.ofNullable(outgoing_filters).ifPresent(filters -> filters.setName(getName()));
 	}
 
 	@Override
@@ -892,8 +885,7 @@ public abstract class AbstractMessageReceiver
 		in_queues_size = processingInThreads();
 		out_queues_size = processingOutThreads();
 		schedulerThreads_size = schedulerThreads();
-		setIncomingFilters(new ArrayList<>(incoming_filters));
-		setOutogingFilters(new ArrayList<>(outgoing_filters));
+		updateFiltersName();
 	}
 
 	@Override
@@ -1073,7 +1065,7 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
-	private Packet filterPacket(Packet packet, CopyOnWriteArrayList<PacketFilterIfc> filters) {
+	private Packet filterPacket(Packet packet, List<PacketFilterIfc> filters) {
 		Packet result = packet;
 
 		for (PacketFilterIfc packetFilterIfc : filters) {
@@ -1401,7 +1393,7 @@ public abstract class AbstractMessageReceiver
 										}
 									}
 								}
-								if (!processed && ((packet = filterPacket(packet, incoming_filters)) != null)) {
+								if (!processed && ((packet = filterPacket(packet, incoming_filters.getFilters())) != null)) {
 									processPacket(packet);
 								}
 
@@ -1421,7 +1413,7 @@ public abstract class AbstractMessageReceiver
 
 							// tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 							// packet.getTo(), getName(), type.name(), null, packet);
-							if ((packet = filterPacket(packet, outgoing_filters)) != null) {
+							if ((packet = filterPacket(packet, outgoing_filters.getFilters())) != null) {
 								processOutPacket(packet);
 							}
 

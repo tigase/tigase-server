@@ -44,7 +44,7 @@ public class InfoTaskCommand
 
 	@Inject
 	private MonitorComponent component;
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 
 	public InfoTaskCommand() {

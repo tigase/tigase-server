@@ -44,7 +44,7 @@ public class AdHocCommandMonitorModule
 	@Inject
 	private InfoTaskCommand infoCommand;
 
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 
 	public AdHocCommandMonitorModule() {
