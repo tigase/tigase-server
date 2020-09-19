@@ -24,12 +24,11 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.io.File;
-import java.util.EnumSet;
-import java.util.HashMap;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
 import java.util.logging.Level;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TypesConverterTest {
 
@@ -40,6 +39,10 @@ public class TypesConverterTest {
 	}
 
 	private HashMap<String, EnumSet<XT>> mapEnumSetField;
+	private Collection<Integer> collectionIntField;
+	private List<Integer> listIntField;
+	private ArrayList<Integer> arrayListIntField;
+	private Set<Integer> setIntField;
 
 	@Test
 	public void testConvert() throws Exception {
@@ -154,6 +157,98 @@ public class TypesConverterTest {
 		compositeVariable.add('*', 60.0);
 		compositeVariable.add('*', 1000);
 		assertEquals(new Double(300000.0), converter.convert(compositeVariable, Double.class));
+	}
+
+	@Test
+	public void testCollections() throws NoSuchFieldException {
+		TypesConverter converter = new DefaultTypesConverter();
+
+		// -----
+
+		ParameterizedType pt = (ParameterizedType) this.getClass().getDeclaredField("collectionIntField").getGenericType();
+		collectionIntField = converter.convert("1,2,3", (Class<Collection>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, collectionIntField.toArray(Integer[]::new));
+
+		collectionIntField = converter.convert(new int[]{1, 2, 3}, (Class<Collection>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, collectionIntField.toArray(Integer[]::new));
+
+		collectionIntField = converter.convert(new String[]{"1", "2", "3"}, (Class<Collection>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, collectionIntField.toArray(Integer[]::new));
+
+		collectionIntField = converter.convert(Arrays.asList(1,2,3), (Class<Collection>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, collectionIntField.toArray(Integer[]::new));
+
+		try {
+			collectionIntField.add(4);
+			assertFalse(true);
+		} catch (UnsupportedOperationException ex) {
+			// ok
+		}
+
+		// -----
+
+		pt = (ParameterizedType) this.getClass().getDeclaredField("listIntField").getGenericType();
+		listIntField = converter.convert("1,2,3" , (Class<List>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, listIntField.toArray(Integer[]::new));
+
+		listIntField = converter.convert(new int[]{1, 2, 3}, (Class<List>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, listIntField.toArray(Integer[]::new));
+
+		listIntField = converter.convert(new String[]{"1", "2", "3"}, (Class<List>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, listIntField.toArray(Integer[]::new));
+
+		listIntField = converter.convert(Arrays.asList(1,2,3) , (Class<List>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, listIntField.toArray(Integer[]::new));
+
+		try {
+			listIntField.add(4);
+			assertFalse(true);
+		} catch (UnsupportedOperationException ex) {
+			// ok
+		}
+
+		// -----
+
+		pt = (ParameterizedType) this.getClass().getDeclaredField("setIntField").getGenericType();
+		setIntField = converter.convert("1,2,3", (Class<Set>) pt.getRawType(), pt);
+		assertEquals(listIntField.size(), setIntField.stream().filter(i -> listIntField.contains(i)).count());
+
+		setIntField = converter.convert(new int[]{1, 2, 3}, (Class<Set>) pt.getRawType(), pt);
+		assertEquals(listIntField.size(), setIntField.stream().filter(i -> listIntField.contains(i)).count());
+
+		setIntField = converter.convert(new String[]{"1", "2", "3"}, (Class<Set>) pt.getRawType(), pt);
+		assertEquals(listIntField.size(), setIntField.stream().filter(i -> listIntField.contains(i)).count());
+
+		setIntField = converter.convert(Arrays.asList(1,2,3), (Class<Set>) pt.getRawType(), pt);
+		assertEquals(listIntField.size(), setIntField.stream().filter(i -> listIntField.contains(i)).count());
+
+		try {
+			setIntField.add(4);
+			assertFalse(true);
+		} catch (UnsupportedOperationException ex) {
+			// ok
+		}
+		// -----
+
+		pt = (ParameterizedType) this.getClass().getDeclaredField("arrayListIntField").getGenericType();
+		arrayListIntField = converter.convert("1,2,3" , (Class<ArrayList>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, arrayListIntField.toArray(Integer[]::new));
+
+		arrayListIntField = converter.convert(new int[]{1, 2, 3}, (Class<ArrayList>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, arrayListIntField.toArray(Integer[]::new));
+
+		arrayListIntField = converter.convert(new String[]{"1", "2", "3"}, (Class<ArrayList>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, arrayListIntField.toArray(Integer[]::new));
+
+		arrayListIntField = converter.convert(Arrays.asList(1,2,3), (Class<ArrayList>) pt.getRawType(), pt);
+		assertArrayEquals(new Integer[]{1, 2, 3}, arrayListIntField.toArray(Integer[]::new));
+
+		try {
+			arrayListIntField.add(4);
+		} catch (UnsupportedOperationException ex) {
+			assertFalse(true);
+		}
+
 	}
 
 	@Test

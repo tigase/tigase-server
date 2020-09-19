@@ -28,14 +28,13 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.io.File;
-import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Bean(name = "defaultTypesConverter", active = true)
 public class DefaultTypesConverter
@@ -246,42 +245,31 @@ public class DefaultTypesConverter
 				return (T) Pattern.compile(value.toString());
 			} else if (Collection.class.isAssignableFrom(expectedType) && genericType != null) {
 				int mod = expectedType.getModifiers();
-				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod) &&
+				if ((Modifier.isInterface(mod) || !Modifier.isAbstract(mod)) &&
 						genericType instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) genericType;
 					Type[] actualTypes = pt.getActualTypeArguments();
 					if (actualTypes[0] instanceof Class) {
-						if (value != null && value.getClass().isArray()) {
-							try {
-								Collection result = (Collection) expectedType.newInstance();
-								for (int i = 0; i < Array.getLength(value); i++) {
-									result.add(convert(Array.get(value, i), (Class<?>) actualTypes[0]));
-								}
-								return (T) result;
-							} catch (InstantiationException | IllegalAccessException ex) {
-								throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
-							}
-						}
-						if (value instanceof Collection) {
-							try {
-								Collection result = (Collection) expectedType.newInstance();
-								for (Object c : ((Collection) value)) {
-									result.add(convert(c, (Class<?>) actualTypes[0]));
-								}
-								return (T) result;
-							} catch (InstantiationException | IllegalAccessException ex) {
-								throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
-							}
+						Stream<?> stream = valueToStream(value, (Class<?>) actualTypes[0]);
+						if (stream == null) {
+							return null;
 						} else {
-							String[] a_str = value.toString().split(regex);
-							try {
-								Collection result = (Collection) expectedType.newInstance();
-								for (int i = 0; i < a_str.length; i++) {
-									result.add(convert(unescape(a_str[i]), (Class<?>) actualTypes[0]));
+							if (Modifier.isInterface(mod)) {
+								if (expectedType.isAssignableFrom(List.class)) {
+									return (T) stream.collect(Collectors.toUnmodifiableList());
+								} else if (expectedType.isAssignableFrom(Set.class)) {
+									return (T) stream.collect(Collectors.toUnmodifiableSet());
+								} else {
+									throw new RuntimeException("Unsupported conversion to " + expectedType);
 								}
-								return (T) result;
-							} catch (InstantiationException | IllegalAccessException ex) {
-								throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
+							} else {
+								try {
+									Collection result = (Collection) expectedType.getDeclaredConstructor().newInstance();
+									stream.forEach(result::add);
+									return (T) result;
+								} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
+									throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
+								}
 							}
 						}
 					}
@@ -332,6 +320,21 @@ public class DefaultTypesConverter
 			}
 		} catch (TigaseStringprepException e) {
 			throw new IllegalArgumentException(e);
+		}
+	}
+
+	private <T> Stream<T> valueToStream(Object value, Class<T> actualType) {
+		if (value == null) {
+			return null;
+		}
+		if (value.getClass().isArray()) {
+			int size = Array.getLength(value);
+			return Stream.iterate(0, i -> i + 1).limit(size).map(i -> Array.get(value, i)).map(v -> convert(v, actualType));
+		}
+		if (value instanceof Collection) {
+			return ((Collection) value).stream().map(v -> convert(v, actualType));
+		} else {
+			return valueToStream(value.toString().split(regex), actualType);
 		}
 	}
 
