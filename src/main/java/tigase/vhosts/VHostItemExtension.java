@@ -17,10 +17,27 @@
  */
 package tigase.vhosts;
 
+/**
+ * Abstract class required to be a superclass for all classes implementing <code>VHostItemExtensionIfc</code>.
+ * @param <T>
+ */
 public abstract class VHostItemExtension<T extends VHostItemExtension<T>> implements VHostItemExtensionIfc<T> {
 
+	/**
+	 * Abstract method required to be implemented for merging values stored in this instance with default settings
+	 * stored in the default virtual host item (global or default settings of the installation).
+	 * 
+	 * @param defaults - instance of the extension with default values
+	 * @return instance of the extension containing merged values
+	 */
 	public abstract T mergeWithDefaults(T defaults);
 
+	/**
+	 * Generic implementation of a method which combines data returned by <code>toDebugString()</code> with
+	 * class name for easier debugging.
+	 * 
+	 * @return
+	 */
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + "(" + toDebugString() + ")";

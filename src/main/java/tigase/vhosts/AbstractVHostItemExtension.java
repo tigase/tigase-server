@@ -20,8 +20,22 @@ package tigase.vhosts;
 import tigase.server.DataForm;
 import tigase.xml.Element;
 
+/**
+ * Abstract class and subclass of <code>VHostItemExtension</code> providing a helper method to add a boolean fields
+ * to ad-hoc forms for manipulation of vhost extension.
+ * @param <T>
+ */
 public abstract class AbstractVHostItemExtension<T extends AbstractVHostItemExtension<T>> extends VHostItemExtension<T> {
 
+	/**
+	 * Method adds a boolean field to the form
+	 * @param commandEl
+	 * @param var
+	 * @param label
+	 * @param value
+	 * @param forDefault - if true then we are setting values for default instance and we can choose only YES or NO.
+	 * In other case we can also select DEFAULT to enforce usage of the default value for this vhost item extension.s
+	 */
 	protected void addBooleanFieldWithDefaultToCommand(Element commandEl, String var, String label, Boolean value, boolean forDefault) {
 		if (forDefault) {
 			DataForm.addFieldValue(commandEl, var, value == null ? "" : value.toString(), label,
