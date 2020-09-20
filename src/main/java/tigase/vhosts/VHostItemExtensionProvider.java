@@ -17,10 +17,27 @@
  */
 package tigase.vhosts;
 
+/**
+ * Interface required to be implemented by factories which are adding extensions to vhost items.
+ * @param <T> - class of the extension which will be provided by this factory
+ *
+ * Class to work should be annotated with <code>@Bean</code> annotation and annotation <code>name</code> parameter
+ * should be equal to the extension unique id. Moreover, <code>parent</code> parameter should be set to
+ * <code>VHostItemExtensionManager.class</code> and <code>active</code> parameter should be set to <code>true</code>.
+ *
+ */
 public interface VHostItemExtensionProvider<T extends VHostItemExtension> {
 
+	/**
+	 * Returns unique id of the extension
+	 * @return
+	 */
 	String getId();
 
+	/**
+	 * Returns class of the extension
+	 * @return
+	 */
 	Class<T> getExtensionClazz();
 
 }
