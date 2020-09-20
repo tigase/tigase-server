@@ -30,6 +30,7 @@ import tigase.mix.model.*;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.modules.PublishItemModule;
+import tigase.pubsub.utils.executors.Executor;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
@@ -119,7 +120,7 @@ public class ChannelGroupChatMessageModule extends AbstractPubSubModule {
 			getRepository().addMAMItem(channelJID, Mix.Nodes.MESSAGES, uuid, message, null);
 
 			eventBus.fire(new PublishItemModule.BroadcastNotificationEvent(config.getComponentName(), channelJID, Mix.Nodes.MESSAGES, message));
-			publishItemModule.broadcastNotification(channelJID, Mix.Nodes.MESSAGES, message);
+			publishItemModule.broadcastNotification(Executor.Priority.normal, channelJID, Mix.Nodes.MESSAGES, message);
 			if (roomPresenceModule != null) {
 				roomPresenceModule.broadcastMessage(channelJID, participant.getNick(), message.clone());
 			}
