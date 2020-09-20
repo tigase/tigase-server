@@ -33,7 +33,6 @@ public interface VHostItemExtensionIfc<T extends VHostItemExtensionIfc<T>> {
 
 	/**
 	 * Unique identifier of the extension. It has to be a valid XML element name!
-	 * @return
 	 */
 	String getId();
 
@@ -41,9 +40,9 @@ public interface VHostItemExtensionIfc<T extends VHostItemExtensionIfc<T>> {
 	 * Method initializes instances of a class with values from the element which contains configuration
 	 * loaded from the database.
 	 *
-	 * @see VHostItemExtensionIfc::toElement()
+	 * see VHostItemExtensionIfc::toElement()
 	 *
-	 * @param item
+	 * @param item - provided element with data
 	 */
 	void initFromElement(Element item);
 
@@ -60,8 +59,6 @@ public interface VHostItemExtensionIfc<T extends VHostItemExtensionIfc<T>> {
 	 * Method serializes data stored by this instance to element which will be then stored in the database.
 	 *
 	 * Element name should be equal to the extension id.
-	 *
-	 * @return
 	 */
 	Element toElement();
 
@@ -78,7 +75,6 @@ public interface VHostItemExtensionIfc<T extends VHostItemExtensionIfc<T>> {
 
 	/**
 	 * Returns a string containing all information about the instance of the extension useful for debugging.
-	 * @return
 	 */
 	String toDebugString();
 }

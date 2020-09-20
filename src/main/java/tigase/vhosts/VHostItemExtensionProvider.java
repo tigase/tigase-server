@@ -30,13 +30,11 @@ public interface VHostItemExtensionProvider<T extends VHostItemExtension> {
 
 	/**
 	 * Returns unique id of the extension
-	 * @return
 	 */
 	String getId();
 
 	/**
 	 * Returns class of the extension
-	 * @return
 	 */
 	Class<T> getExtensionClazz();
 

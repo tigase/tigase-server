@@ -19,7 +19,6 @@ package tigase.vhosts;
 
 /**
  * Abstract class required to be a superclass for all classes implementing <code>VHostItemExtensionIfc</code>.
- * @param <T>
  */
 public abstract class VHostItemExtension<T extends VHostItemExtension<T>> implements VHostItemExtensionIfc<T> {
 
@@ -36,7 +35,7 @@ public abstract class VHostItemExtension<T extends VHostItemExtension<T>> implem
 	 * Generic implementation of a method which combines data returned by <code>toDebugString()</code> with
 	 * class name for easier debugging.
 	 * 
-	 * @return
+	 * @return - class
 	 */
 	@Override
 	public String toString() {
