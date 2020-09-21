@@ -43,6 +43,7 @@ public class PacketFiltersBean implements RegistrarBean {
 	}
 	
 	public void setName(String name) {
+		this.name = name;
 		initializeFilters();
 	}
 

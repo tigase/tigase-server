@@ -27,6 +27,7 @@ import tigase.stats.StatisticsList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 
 @Bean(name = "packetCounter", parents = {PacketFiltersBean.IncomingPacketFiltersBean.class,
@@ -43,7 +44,7 @@ public class PacketCounter
 	private String name = null;
 	private long otherCounter = 0;
 	private long presCounter = 0;
-	private QueueType qType = null;
+	private QueueType queueType = null;
 	private long total = 0;
 
 	public PacketCounter() {
@@ -75,14 +76,7 @@ public class PacketCounter
 
 			if (detailedOtherStat) {
 				String xmlns = packet.getXMLNS() != null ? packet.getXMLNS() : "no XMLNS";
-				String element = elemName;
-
-				TypeCounter counter = otherCounters.get(xmlns);
-				if (counter == null) {
-					counter = new TypeCounter("other " + xmlns);
-					otherCounters.put(xmlns, counter);
-				}
-				counter.incrementCounter(element);
+				otherCounters.computeIfAbsent(xmlns, s -> new TypeCounter("other " + xmlns)).incrementCounter(elemName);
 			}
 		}
 		return packet;
@@ -90,11 +84,11 @@ public class PacketCounter
 
 	@Override
 	public void getStatistics(StatisticsList list) {
-		list.add(name, qType.name() + " processed", total, Level.FINER);
-		list.add(name, qType.name() + " processed messages", msgCounter, Level.FINER);
-		list.add(name, qType.name() + " processed presences", presCounter, Level.FINER);
-		list.add(name, qType.name() + " processed cluster", clusterCounter, Level.FINER);
-		list.add(name, qType.name() + " processed other", otherCounter, Level.FINER);
+		list.add(name, queueType.name() + " processed", total, Level.FINER);
+		list.add(name, queueType.name() + " processed messages", msgCounter, Level.FINER);
+		list.add(name, queueType.name() + " processed presences", presCounter, Level.FINER);
+		list.add(name, queueType.name() + " processed cluster", clusterCounter, Level.FINER);
+		list.add(name, queueType.name() + " processed other", otherCounter, Level.FINER);
 
 		iqCounter.getStatistics(list, Level.FINER);
 
@@ -105,42 +99,22 @@ public class PacketCounter
 	}
 
 	@Override
-	public void init(String name, QueueType qType) {
+	public void init(String name, QueueType queueType) {
 		this.name = name;
-		this.qType = qType;
-	}
-
-	private class MutableLong {
-
-		long value = 0;
-
-		@Override
-		public String toString() {
-			return String.valueOf(value);
-		}
-
-		private long get() {
-			return value;
-		}
-
-		private void increment() {
-			++value;
-		}
-
+		this.queueType = queueType;
 	}
 
 	private class TypeCounter {
 
-		private final Map<String, MutableLong> counter = new ConcurrentHashMap<>();
+		private final Map<String, AtomicLong> counter = new ConcurrentHashMap<>();
 		private final String counterName;
-		private final MutableLong total = new MutableLong();
-		private final MutableLong withoutValue = new MutableLong();
+		private final AtomicLong total = new AtomicLong();
 
 		public TypeCounter(String name) {
 			this.counterName = name;
 		}
 
-		public Map<String, MutableLong> getCounter() {
+		public Map<String, AtomicLong> getCounter() {
 			return counter;
 		}
 
@@ -149,15 +123,10 @@ public class PacketCounter
 		}
 
 		public void getStatistics(StatisticsList list, Level level) {
-			list.add(name, qType.name() + " processed " + counterName, total.get(), level);
-			if (this.withoutValue.get() > 0) {
-				list.add(name, qType.name() + " processed " + counterName + " no XMLNS", this.withoutValue.get(),
-						 level);
-			}
-			for (Entry<String, MutableLong> xmlnsValues : counter.entrySet()) {
-				list.add(name, qType.name() + " processed " + counterName + " " + xmlnsValues.getKey(),
+			list.add(name, queueType.name() + " processed " + counterName, total.get(), level);
+			for (Entry<String, AtomicLong> xmlnsValues : counter.entrySet()) {
+				list.add(name, queueType.name() + " processed " + counterName + " " + xmlnsValues.getKey(),
 						 xmlnsValues.getValue().get(), level);
-
 			}
 		}
 
@@ -166,17 +135,9 @@ public class PacketCounter
 		}
 
 		synchronized public void incrementCounter(String param) {
-			total.increment();
-			if (param == null) {
-				withoutValue.increment();
-			} else {
-				MutableLong count = counter.get(param);
-				if (count == null) {
-					count = new MutableLong();
-					counter.put(param, count);
-				}
-				count.increment();
-			}
+			total.incrementAndGet();
+			param = param == null ? "[no XMLNS/child]" : param;
+			counter.computeIfAbsent(param, s -> new AtomicLong()).getAndIncrement();
 		}
 	}
 }
