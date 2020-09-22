@@ -54,7 +54,7 @@ public class QueryModule
 
 	@Override
 	public String[] getFeatures() {
-		return FEATURES;
+		return (String[]) queryParser.getXMLNSs().toArray(String[]::new);
 	}
 
 	@Override
