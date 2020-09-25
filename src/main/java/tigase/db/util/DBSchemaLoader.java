@@ -663,6 +663,13 @@ public class DBSchemaLoader
 
 		Map<Version, Path> schemaFileNames = getSchemaFileNames(schema.getId());
 
+		if (!schemaFileNames.containsKey(requiredVersion.getBaseVersion())) {
+			log.log(Level.WARNING,
+					"Schema file for required version: {0} is missing in the list of available schema files: {1}",
+					new Object[]{requiredVersion.getBaseVersion(), schemaFileNames.keySet()});
+			return Result.error;
+		}
+
 		if (!params.isForceReloadSchema()) {
 			schemaFileNames = getSchemaFileNamesInRange(schemaFileNames, currentVersion, requiredVersion);
 		}
